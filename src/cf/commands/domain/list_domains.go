@@ -25,16 +25,16 @@ func NewListDomains(ui terminal.UI, config configuration.Reader, domainRepo api.
 	return
 }
 
-func (cmd *ListDomains) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *ListDomains) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) > 0 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "domains")
 		return
 	}
 
-	cmd.orgReq = reqFactory.NewTargetedOrgRequirement()
+	cmd.orgReq = requirementsFactory.NewTargetedOrgRequirement()
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.orgReq,
 	}
 	return

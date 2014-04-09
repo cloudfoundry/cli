@@ -47,18 +47,18 @@ var _ = Describe("set-env command", func() {
 		appRepo := &testapi.FakeApplicationRepository{}
 		args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-		callSetEnv(args, reqFactory, appRepo)
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		callSetEnv(args, requirementsFactory, appRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
-		callSetEnv(args, reqFactory, appRepo)
+		requirementsFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
+		callSetEnv(args, requirementsFactory, appRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		testcmd.CommandDidPassRequirements = true
 
-		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
-		callSetEnv(args, reqFactory, appRepo)
+		requirementsFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
+		callSetEnv(args, requirementsFactory, appRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
@@ -68,11 +68,11 @@ var _ = Describe("set-env command", func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		app.EnvironmentVars = map[string]string{"foo": "bar"}
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{}
 
 		args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
-		ui := callSetEnv(args, reqFactory, appRepo)
+		ui := callSetEnv(args, requirementsFactory, appRepo)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -89,7 +89,7 @@ var _ = Describe("set-env command", func() {
 			{"TIP"},
 		})
 
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
 		Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
 			"DATABASE_URL": "mysql://example.com/my-db",
@@ -103,11 +103,11 @@ var _ = Describe("set-env command", func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{}
 
 		args := []string{"my-app", "DATABASE_URL", "mysql://example2.com/my-db"}
-		ui := callSetEnv(args, reqFactory, appRepo)
+		ui := callSetEnv(args, requirementsFactory, appRepo)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -124,7 +124,7 @@ var _ = Describe("set-env command", func() {
 			{"TIP"},
 		})
 
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
 		Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
 			"DATABASE_URL": "mysql://example2.com/my-db",
@@ -135,12 +135,12 @@ var _ = Describe("set-env command", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{UpdateErr: true}
 		appRepo.ReadReturns.App = app
 
 		args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
-		ui := callSetEnv(args, reqFactory, appRepo)
+		ui := callSetEnv(args, requirementsFactory, appRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Setting env variable"},
@@ -153,33 +153,33 @@ var _ = Describe("set-env command", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{}
 		appRepo.ReadReturns.App = app
 
 		args := []string{"my-app", "DATABASE_URL", "..."}
-		ui := callSetEnv(args, reqFactory, appRepo)
+		ui := callSetEnv(args, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 
 		args = []string{"my-app", "DATABASE_URL"}
-		ui = callSetEnv(args, reqFactory, appRepo)
+		ui = callSetEnv(args, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		args = []string{"my-app"}
-		ui = callSetEnv(args, reqFactory, appRepo)
+		ui = callSetEnv(args, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		args = []string{}
-		ui = callSetEnv(args, reqFactory, appRepo)
+		ui = callSetEnv(args, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 })
 
-func callSetEnv(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+func callSetEnv(args []string, requirementsFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-env", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewSetEnv(ui, configRepo, appRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

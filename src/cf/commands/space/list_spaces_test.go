@@ -40,12 +40,12 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callSpaces(args []string, reqFactory *testreq.FakeReqFactory, config configuration.Reader, spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {
+func callSpaces(args []string, requirementsFactory *testreq.FakeReqFactory, config configuration.Reader, spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("spaces", args)
 
 	cmd := NewListSpaces(ui, config, spaceRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
@@ -55,16 +55,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		spaceRepo := &testapi.FakeSpaceRepository{}
 		config := testconfig.NewRepository()
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-		callSpaces([]string{}, reqFactory, config, spaceRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		callSpaces([]string{}, requirementsFactory, config, spaceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-		callSpaces([]string{}, reqFactory, config, spaceRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callSpaces([]string{}, requirementsFactory, config, spaceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-		callSpaces([]string{}, reqFactory, config, spaceRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callSpaces([]string{}, requirementsFactory, config, spaceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
@@ -80,9 +80,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 
 		config := testconfig.NewRepositoryWithDefaults()
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-		ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
+		ui := callSpaces([]string{}, requirementsFactory, config, spaceRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting spaces in org", "my-org", "my-user"},
@@ -98,9 +98,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 
 		configRepo := testconfig.NewRepositoryWithDefaults()
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-		ui := callSpaces([]string{}, reqFactory, configRepo, spaceRepo)
+		ui := callSpaces([]string{}, requirementsFactory, configRepo, spaceRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting spaces in org", "my-org", "my-user"},

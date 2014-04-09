@@ -16,27 +16,27 @@ import (
 
 var _ = Describe("rename-space command", func() {
 	var (
-		ui         *testterm.FakeUI
-		configRepo configuration.ReadWriter
-		reqFactory *testreq.FakeReqFactory
-		spaceRepo  *testapi.FakeSpaceRepository
+		ui                  *testterm.FakeUI
+		configRepo          configuration.ReadWriter
+		requirementsFactory *testreq.FakeReqFactory
+		spaceRepo           *testapi.FakeSpaceRepository
 	)
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		spaceRepo = &testapi.FakeSpaceRepository{}
 	})
 
 	var callRenameSpace = func(args []string) {
 		cmd := NewRenameSpace(ui, configRepo, spaceRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("create-space", args), reqFactory)
+		testcmd.RunCommand(cmd, testcmd.NewContext("create-space", args), requirementsFactory)
 	}
 
 	Describe("when the user is not logged in", func() {
 		It("does not pass requirements", func() {
-			reqFactory.LoginSuccess = false
+			requirementsFactory.LoginSuccess = false
 			callRenameSpace([]string{"my-space", "my-new-space"})
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
@@ -44,7 +44,7 @@ var _ = Describe("rename-space command", func() {
 
 	Describe("when the user has not targeted an org", func() {
 		It("does not pass requirements", func() {
-			reqFactory.TargetedOrgSuccess = false
+			requirementsFactory.TargetedOrgSuccess = false
 			callRenameSpace([]string{"my-space", "my-new-space"})
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
@@ -62,7 +62,7 @@ var _ = Describe("rename-space command", func() {
 			space := models.Space{}
 			space.Name = "the-old-space-name"
 			space.Guid = "the-old-space-guid"
-			reqFactory.Space = space
+			requirementsFactory.Space = space
 		})
 
 		It("renames a space", func() {
@@ -81,7 +81,7 @@ var _ = Describe("rename-space command", func() {
 
 		Describe("renaming the space the user has targeted", func() {
 			BeforeEach(func() {
-				configRepo.SetSpaceFields(reqFactory.Space.SpaceFields)
+				configRepo.SetSpaceFields(requirementsFactory.Space.SpaceFields)
 			})
 
 			It("renames the targeted space", func() {

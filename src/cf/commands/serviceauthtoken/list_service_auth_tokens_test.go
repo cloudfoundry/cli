@@ -38,14 +38,14 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListServiceAuthTokens(reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+func callListServiceAuthTokens(requirementsFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
 	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewListServiceAuthTokens(ui, config, authTokenRepo)
 	ctxt := testcmd.NewContext("service-auth-tokens", []string{})
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
 	return
 }
@@ -53,19 +53,19 @@ func callListServiceAuthTokens(reqFactory *testreq.FakeReqFactory, authTokenRepo
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestListServiceAuthTokensRequirements", func() {
 		authTokenRepo := &testapi.FakeAuthTokenRepo{}
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 
-		reqFactory.LoginSuccess = false
-		callListServiceAuthTokens(reqFactory, authTokenRepo)
+		requirementsFactory.LoginSuccess = false
+		callListServiceAuthTokens(requirementsFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory.LoginSuccess = true
-		callListServiceAuthTokens(reqFactory, authTokenRepo)
+		requirementsFactory.LoginSuccess = true
+		callListServiceAuthTokens(requirementsFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestListServiceAuthTokens", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		authTokenRepo := &testapi.FakeAuthTokenRepo{}
 		authToken := models.ServiceAuthTokenFields{}
 		authToken.Label = "a label"
@@ -75,7 +75,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken2.Provider = "a second provider"
 		authTokenRepo.FindAllAuthTokens = []models.ServiceAuthTokenFields{authToken, authToken2}
 
-		ui := callListServiceAuthTokens(reqFactory, authTokenRepo)
+		ui := callListServiceAuthTokens(requirementsFactory, authTokenRepo)
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting service auth tokens as", "my-user"},
 			{"OK"},

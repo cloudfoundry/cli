@@ -24,15 +24,15 @@ func NewDeleteSharedDomain(ui terminal.UI, config configuration.Reader, repo api
 	return
 }
 
-func (cmd *DeleteSharedDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteSharedDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete-shared-domain")
 		return
 	}
 
-	loginReq := reqFactory.NewLoginRequirement()
-	cmd.orgReq = reqFactory.NewTargetedOrgRequirement()
+	loginReq := requirementsFactory.NewLoginRequirement()
+	cmd.orgReq = requirementsFactory.NewTargetedOrgRequirement()
 
 	reqs = []requirements.Requirement{
 		loginReq,

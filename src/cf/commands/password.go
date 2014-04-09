@@ -22,8 +22,8 @@ func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, config configur
 	return
 }
 
-func (cmd Password) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
+func (cmd Password) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return
 }
 

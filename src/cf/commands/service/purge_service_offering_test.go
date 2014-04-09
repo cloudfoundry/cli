@@ -20,13 +20,13 @@ var _ = Describe("purge-service command", func() {
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			deps := setupDependencies()
-			deps.reqFactory.LoginSuccess = false
+			deps.requirementsFactory.LoginSuccess = false
 
 			cmd := NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo)
 			testcmd.RunCommand(
 				cmd,
 				testcmd.NewContext("purge-service-offering", []string{"-f", "whatever"}),
-				deps.reqFactory,
+				deps.requirementsFactory,
 			)
 
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
@@ -34,12 +34,12 @@ var _ = Describe("purge-service command", func() {
 
 		It("fails when called without exactly one arg", func() {
 			deps := setupDependencies()
-			deps.reqFactory.LoginSuccess = true
+			deps.requirementsFactory.LoginSuccess = true
 
 			testcmd.RunCommand(
 				NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 				testcmd.NewContext("purge-service-offering", []string{}),
-				deps.reqFactory,
+				deps.requirementsFactory,
 			)
 
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
@@ -59,7 +59,7 @@ var _ = Describe("purge-service command", func() {
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 			testcmd.NewContext("purge-service-offering", []string{"-p", "the-provider", "the-service-name"}),
-			deps.reqFactory,
+			deps.requirementsFactory,
 		)
 
 		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderName).To(Equal("the-service-name"))
@@ -78,7 +78,7 @@ var _ = Describe("purge-service command", func() {
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 			testcmd.NewContext("purge-service-offering", []string{"the-service-name"}),
-			deps.reqFactory,
+			deps.requirementsFactory,
 		)
 
 		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
@@ -108,7 +108,7 @@ var _ = Describe("purge-service command", func() {
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 			testcmd.NewContext("purge-service-offering", []string{"the-service-name"}),
-			deps.reqFactory,
+			deps.requirementsFactory,
 		)
 
 		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderCalled).To(Equal(true))
@@ -124,7 +124,7 @@ var _ = Describe("purge-service command", func() {
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 			testcmd.NewContext("purge-service-offering", []string{"-f", "the-service-name"}),
-			deps.reqFactory,
+			deps.requirementsFactory,
 		)
 
 		Expect(len(deps.ui.Prompts)).To(Equal(0))
@@ -139,7 +139,7 @@ var _ = Describe("purge-service command", func() {
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 			testcmd.NewContext("purge-service-offering", []string{"-f", "-p", "the-provider", "the-service-name"}),
-			deps.reqFactory,
+			deps.requirementsFactory,
 		)
 
 		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
@@ -160,7 +160,7 @@ var _ = Describe("purge-service command", func() {
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 			testcmd.NewContext("purge-service-offering", []string{"-p", "the-provider", "the-service-name"}),
-			deps.reqFactory,
+			deps.requirementsFactory,
 		)
 
 		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{{"Service offering", "does not exist"}})
@@ -172,17 +172,17 @@ var _ = Describe("purge-service command", func() {
 })
 
 type commandDependencies struct {
-	ui          *testterm.FakeUI
-	config      configuration.ReadWriter
-	serviceRepo *testapi.FakeServiceRepo
-	reqFactory  *testreq.FakeReqFactory
+	ui                  *testterm.FakeUI
+	config              configuration.ReadWriter
+	serviceRepo         *testapi.FakeServiceRepo
+	requirementsFactory *testreq.FakeReqFactory
 }
 
 func setupDependencies() (obj commandDependencies) {
 	obj.ui = &testterm.FakeUI{}
 
 	obj.config = testconfig.NewRepository()
-	obj.reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	obj.requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	obj.serviceRepo = new(testapi.FakeServiceRepo)
 	return
 }

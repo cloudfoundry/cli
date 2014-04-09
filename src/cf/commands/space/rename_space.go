@@ -24,16 +24,16 @@ func NewRenameSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo a
 	return
 }
 
-func (cmd *RenameSpace) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *RenameSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "rename-space")
 		return
 	}
-	cmd.spaceReq = reqFactory.NewSpaceRequirement(c.Args()[0])
+	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedOrgRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 	}
 	return

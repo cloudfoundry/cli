@@ -36,39 +36,39 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callShowService(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callShowService(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("service", args)
 	cmd := NewShowService(ui)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestShowServiceRequirements", func() {
 		args := []string{"service1"}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-		callShowService(args, reqFactory)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		callShowService(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-		callShowService(args, reqFactory)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+		callShowService(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-		callShowService(args, reqFactory)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+		callShowService(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		Expect(reqFactory.ServiceInstanceName).To(Equal("service1"))
+		Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 	})
 	It("TestShowServiceFailsWithUsage", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-		ui := callShowService([]string{}, reqFactory)
+		ui := callShowService([]string{}, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callShowService([]string{"my-service"}, reqFactory)
+		ui = callShowService([]string{"my-service"}, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestShowServiceOutput", func() {
@@ -87,12 +87,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Guid = "service1-guid"
 		serviceInstance.ServicePlan = plan
 		serviceInstance.ServiceOffering = offering
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 			ServiceInstance:      serviceInstance,
 		}
-		ui := callShowService([]string{"service1"}, reqFactory)
+		ui := callShowService([]string{"service1"}, requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Service instance:", "service1"},
@@ -107,12 +107,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance2 := models.ServiceInstance{}
 		serviceInstance2.Name = "service1"
 		serviceInstance2.Guid = "service1-guid"
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 			ServiceInstance:      serviceInstance2,
 		}
-		ui := callShowService([]string{"service1"}, reqFactory)
+		ui := callShowService([]string{"service1"}, requirementsFactory)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{

@@ -26,21 +26,21 @@ import (
 
 var _ = Describe("Push Command", func() {
 	var (
-		cmd           *Push
-		ui            *testterm.FakeUI
-		configRepo    configuration.ReadWriter
-		manifestRepo  *testmanifest.FakeManifestRepository
-		starter       *testcmd.FakeAppStarter
-		stopper       *testcmd.FakeAppStopper
-		serviceBinder *testcmd.FakeAppBinder
-		appRepo       *testapi.FakeApplicationRepository
-		domainRepo    *testapi.FakeDomainRepository
-		routeRepo     *testapi.FakeRouteRepository
-		stackRepo     *testapi.FakeStackRepository
-		appBitsRepo   *testapi.FakeApplicationBitsRepository
-		serviceRepo   *testapi.FakeServiceRepo
-		wordGenerator words.WordGenerator
-		reqFactory    *testreq.FakeReqFactory
+		cmd                 *Push
+		ui                  *testterm.FakeUI
+		configRepo          configuration.ReadWriter
+		manifestRepo        *testmanifest.FakeManifestRepository
+		starter             *testcmd.FakeAppStarter
+		stopper             *testcmd.FakeAppStopper
+		serviceBinder       *testcmd.FakeAppBinder
+		appRepo             *testapi.FakeApplicationRepository
+		domainRepo          *testapi.FakeDomainRepository
+		routeRepo           *testapi.FakeRouteRepository
+		stackRepo           *testapi.FakeStackRepository
+		appBitsRepo         *testapi.FakeApplicationBitsRepository
+		serviceRepo         *testapi.FakeServiceRepo
+		wordGenerator       words.WordGenerator
+		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
@@ -63,13 +63,13 @@ var _ = Describe("Push Command", func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 		cmd = NewPush(ui, configRepo, manifestRepo, starter, stopper, serviceBinder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo, wordGenerator)
 	})
 
 	callPush := func(args ...string) {
-		testcmd.RunCommand(cmd, testcmd.NewContext("push", args), reqFactory)
+		testcmd.RunCommand(cmd, testcmd.NewContext("push", args), requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -79,13 +79,13 @@ var _ = Describe("Push Command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			reqFactory.LoginSuccess = false
+			requirementsFactory.LoginSuccess = false
 			callPush()
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
-			reqFactory.TargetedSpaceSuccess = false
+			requirementsFactory.TargetedSpaceSuccess = false
 			callPush()
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})

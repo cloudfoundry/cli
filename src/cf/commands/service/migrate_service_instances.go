@@ -25,7 +25,7 @@ func NewMigrateServiceInstances(ui terminal.UI, configRepo configuration.Reader,
 	return
 }
 
-func (cmd *MigrateServiceInstances) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *MigrateServiceInstances) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 5 {
 		err = errors.New("incorrect usage")
 		cmd.ui.FailWithUsage(c, "migrate-service-instances")
@@ -33,7 +33,7 @@ func (cmd *MigrateServiceInstances) GetRequirements(reqFactory requirements.Fact
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

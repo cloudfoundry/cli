@@ -48,25 +48,25 @@ var _ = Describe("Show App Command", func() {
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
-		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
+		callApp(args, requirementsFactory, appSummaryRepo, appInstancesRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
-		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
+		callApp(args, requirementsFactory, appSummaryRepo, appInstancesRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
+		callApp(args, requirementsFactory, appSummaryRepo, appInstancesRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 	})
 
 	It("requires an app name", func() {
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-		ui := callApp([]string{}, reqFactory, appSummaryRepo, appInstancesRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
+		ui := callApp([]string{}, requirementsFactory, appSummaryRepo, appInstancesRepo)
 
 		Expect(ui.FailedWithUsage).To(BeTrue())
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
@@ -120,8 +120,8 @@ var _ = Describe("Show App Command", func() {
 
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: application}
 		appInstancesRepo := &testapi.FakeAppInstancesRepo{GetInstancesResponses: [][]models.AppInstanceFields{instances}}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-		ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
+		ui := callApp([]string{"my-app"}, requirementsFactory, appSummaryRepo, appInstancesRepo)
 
 		Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
 
@@ -180,8 +180,8 @@ func testDisplayingAppSummaryWithErrorCode(errorCode string) {
 
 	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: application, GetSummaryErrorCode: errorCode}
 	appInstancesRepo := &testapi.FakeAppInstancesRepo{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-	ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
+	requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
+	ui := callApp([]string{"my-app"}, requirementsFactory, appSummaryRepo, appInstancesRepo)
 
 	Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
 	Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
@@ -196,13 +196,13 @@ func testDisplayingAppSummaryWithErrorCode(errorCode string) {
 	})
 }
 
-func callApp(args []string, reqFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo, appInstancesRepo *testapi.FakeAppInstancesRepo) (ui *testterm.FakeUI) {
+func callApp(args []string, requirementsFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo, appInstancesRepo *testapi.FakeAppInstancesRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("app", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewShowApp(ui, configRepo, appSummaryRepo, appInstancesRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
 	return
 }

@@ -22,8 +22,8 @@ func callApi(args []string, config configuration.ReadWriter, endpointRepo *testa
 
 	cmd := NewApi(ui, config, endpointRepo)
 	ctxt := testcmd.NewContext("api", args)
-	reqFactory := &testreq.FakeReqFactory{}
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	requirementsFactory := &testreq.FakeReqFactory{}
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
@@ -54,10 +54,10 @@ var _ = Describe("api command", func() {
 	Context("when the user does not provide an endpoint", func() {
 		Context("when the endpoint is set in the config", func() {
 			var (
-				ui         *testterm.FakeUI
-				cmd        Command
-				ctx        *cli.Context
-				reqFactory *testreq.FakeReqFactory
+				ui                  *testterm.FakeUI
+				cmd                 Command
+				ctx                 *cli.Context
+				requirementsFactory *testreq.FakeReqFactory
 			)
 
 			BeforeEach(func() {
@@ -68,11 +68,11 @@ var _ = Describe("api command", func() {
 				ui = new(testterm.FakeUI)
 				cmd = NewApi(ui, config, endpointRepo)
 				ctx = testcmd.NewContext("api", []string{})
-				reqFactory = &testreq.FakeReqFactory{}
+				requirementsFactory = &testreq.FakeReqFactory{}
 			})
 
 			JustBeforeEach(func() {
-				testcmd.RunCommand(cmd, ctx, reqFactory)
+				testcmd.RunCommand(cmd, ctx, requirementsFactory)
 			})
 
 			It("prints out the api endpoint", func() {

@@ -99,13 +99,13 @@ var _ = Describe("unbind-service command", func() {
 	})
 })
 
-func callUnbindService(args []string, reqFactory *testreq.FakeReqFactory, serviceBindingRepo api.ServiceBindingRepository) (fakeUI *testterm.FakeUI) {
+func callUnbindService(args []string, requirementsFactory *testreq.FakeReqFactory, serviceBindingRepo api.ServiceBindingRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("unbind-service", args)
 
 	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewUnbindService(fakeUI, config, serviceBindingRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

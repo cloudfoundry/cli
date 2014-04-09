@@ -30,7 +30,7 @@ func NewTarget(ui terminal.UI,
 	return
 }
 
-func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Target) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 0 {
 		err = errors.New("incorrect usage")
 		cmd.ui.FailWithUsage(c, "target")
@@ -38,7 +38,7 @@ func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 	}
 
 	if c.String("o") != "" || c.String("s") != "" {
-		reqs = append(reqs, reqFactory.NewLoginRequirement())
+		reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	}
 
 	return

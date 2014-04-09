@@ -22,7 +22,7 @@ func NewUpdateServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	return
 }
 
-func (cmd UpdateServiceAuthTokenFields) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd UpdateServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c, "update-service-auth-token")
@@ -30,7 +30,7 @@ func (cmd UpdateServiceAuthTokenFields) GetRequirements(reqFactory requirements.
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

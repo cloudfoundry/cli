@@ -17,21 +17,21 @@ import (
 
 var _ = Describe("events command", func() {
 	var (
-		reqFactory *testreq.FakeReqFactory
-		eventsRepo *testapi.FakeAppEventsRepo
-		ui         *testterm.FakeUI
+		requirementsFactory *testreq.FakeReqFactory
+		eventsRepo          *testapi.FakeAppEventsRepo
+		ui                  *testterm.FakeUI
 	)
 
 	BeforeEach(func() {
 		eventsRepo = &testapi.FakeAppEventsRepo{}
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		ui = new(testterm.FakeUI)
 	})
 
 	runCommand := func(args ...string) {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		cmd := NewEvents(ui, configRepo, eventsRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("events", args), reqFactory)
+		testcmd.RunCommand(cmd, testcmd.NewContext("events", args), requirementsFactory)
 	}
 
 	It("fails with usage when called without an app name", func() {
@@ -50,7 +50,7 @@ var _ = Describe("events command", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
-		reqFactory.Application = app
+		requirementsFactory.Application = app
 
 		eventsRepo.RecentEventsReturns.Events = []models.EventFields{
 			{
@@ -84,7 +84,7 @@ var _ = Describe("events command", func() {
 
 		app := models.Application{}
 		app.Name = "my-app"
-		reqFactory.Application = app
+		requirementsFactory.Application = app
 
 		runCommand("my-app")
 
@@ -98,7 +98,7 @@ var _ = Describe("events command", func() {
 	It("tells the user when no events exist for that app", func() {
 		app := models.Application{}
 		app.Name = "my-app"
-		reqFactory.Application = app
+		requirementsFactory.Application = app
 
 		runCommand("my-app")
 

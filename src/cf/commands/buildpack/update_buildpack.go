@@ -23,15 +23,15 @@ func NewUpdateBuildpack(ui terminal.UI, repo api.BuildpackRepository, bitsRepo a
 	return
 }
 
-func (cmd *UpdateBuildpack) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *UpdateBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "update-buildpack")
 		return
 	}
 
-	loginReq := reqFactory.NewLoginRequirement()
-	cmd.buildpackReq = reqFactory.NewBuildpackRequirement(c.Args()[0])
+	loginReq := requirementsFactory.NewLoginRequirement()
+	cmd.buildpackReq = requirementsFactory.NewBuildpackRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
 		loginReq,

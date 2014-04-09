@@ -31,16 +31,16 @@ func NewCreateSpace(ui terminal.UI, config configuration.Reader, spaceRoleSetter
 	return
 }
 
-func (cmd CreateSpace) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd CreateSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-space")
 		return
 	}
 
-	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	if c.String("o") == "" {
-		reqs = append(reqs, reqFactory.NewTargetedOrgRequirement())
+		reqs = append(reqs, requirementsFactory.NewTargetedOrgRequirement())
 	}
 
 	return

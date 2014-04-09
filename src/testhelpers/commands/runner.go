@@ -9,7 +9,7 @@ import (
 
 var CommandDidPassRequirements bool
 
-func RunCommand(cmd commands.Command, ctxt *cli.Context, reqFactory *testreq.FakeReqFactory) {
+func RunCommand(cmd commands.Command, ctxt *cli.Context, requirementsFactory *testreq.FakeReqFactory) {
 	defer func() {
 		errMsg := recover()
 
@@ -20,7 +20,7 @@ func RunCommand(cmd commands.Command, ctxt *cli.Context, reqFactory *testreq.Fak
 
 	CommandDidPassRequirements = false
 
-	requirements, err := cmd.GetRequirements(reqFactory, ctxt)
+	requirements, err := cmd.GetRequirements(requirementsFactory, ctxt)
 	if err != nil {
 		return
 	}

@@ -27,18 +27,18 @@ func NewUnsetOrgRole(ui terminal.UI, config configuration.Reader, userRepo api.U
 	return
 }
 
-func (cmd *UnsetOrgRole) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *UnsetOrgRole) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "unset-org-role")
 		return
 	}
 
-	cmd.userReq = reqFactory.NewUserRequirement(c.Args()[0])
-	cmd.orgReq = reqFactory.NewOrganizationRequirement(c.Args()[1])
+	cmd.userReq = requirementsFactory.NewUserRequirement(c.Args()[0])
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[1])
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.userReq,
 		cmd.orgReq,
 	}

@@ -25,7 +25,7 @@ func NewCurl(ui terminal.UI, config configuration.Reader, curlRepo api.CurlRepos
 	return
 }
 
-func (cmd *Curl) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Curl) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect number of arguments")
 		cmd.ui.FailWithUsage(c, "curl")
@@ -33,7 +33,7 @@ func (cmd *Curl) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

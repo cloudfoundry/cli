@@ -24,7 +24,7 @@ func NewCreateSharedDomain(ui terminal.UI, config configuration.Reader, domainRe
 	return
 }
 
-func (cmd *CreateSharedDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateSharedDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-shared-domain")
@@ -32,7 +32,7 @@ func (cmd *CreateSharedDomain) GetRequirements(reqFactory requirements.Factory, 
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

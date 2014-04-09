@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("Marketplace Services", func() {
 	var ui *testterm.FakeUI
-	var reqFactory *testreq.FakeReqFactory
+	var requirementsFactory *testreq.FakeReqFactory
 	var config configuration.ReadWriter
 	var serviceRepo *testapi.FakeServiceRepo
 	var fakeServiceOfferings []models.ServiceOffering
@@ -24,7 +24,7 @@ var _ = Describe("Marketplace Services", func() {
 	BeforeEach(func() {
 		serviceRepo = &testapi.FakeServiceRepo{}
 		ui = &testterm.FakeUI{}
-		reqFactory = &testreq.FakeReqFactory{ApiEndpointSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{ApiEndpointSuccess: true}
 
 		fakeServiceOfferings = []models.ServiceOffering{
 			models.ServiceOffering{
@@ -51,9 +51,9 @@ var _ = Describe("Marketplace Services", func() {
 		It("does not meet its requirements", func() {
 			config := testconfig.NewRepository()
 			cmd := NewMarketplaceServices(ui, config, serviceRepo)
-			reqFactory.ApiEndpointSuccess = false
+			requirementsFactory.ApiEndpointSuccess = false
 
-			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
+			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
@@ -75,7 +75,7 @@ var _ = Describe("Marketplace Services", func() {
 				serviceRepo := &testapi.FakeServiceRepo{}
 				serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = fakeServiceOfferings
 				cmd := NewMarketplaceServices(ui, config, serviceRepo)
-				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
+				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
 
 				Expect(serviceRepo.GetServiceOfferingsForSpaceArgs.SpaceGuid).To(Equal("the-space-guid"))
 
@@ -96,7 +96,7 @@ var _ = Describe("Marketplace Services", func() {
 
 			It("tells the user to target a space", func() {
 				cmd := NewMarketplaceServices(ui, config, serviceRepo)
-				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
+				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"without", "space"},
 				})
@@ -114,7 +114,7 @@ var _ = Describe("Marketplace Services", func() {
 			serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = fakeServiceOfferings
 
 			cmd := NewMarketplaceServices(ui, config, serviceRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
+			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Getting all services from marketplace"},
@@ -130,7 +130,7 @@ var _ = Describe("Marketplace Services", func() {
 			serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = []models.ServiceOffering{}
 
 			cmd := NewMarketplaceServices(ui, config, serviceRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
+			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"No service offerings found"},

@@ -53,8 +53,8 @@ func main() {
 	defer deps.configRepo.Close()
 
 	cmdFactory := commands.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator)
-	reqFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
-	cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
+	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
+	cmdRunner := commands.NewRunner(cmdFactory, requirementsFactory)
 
 	app, err := app.NewApp(cmdRunner)
 	if err != nil {

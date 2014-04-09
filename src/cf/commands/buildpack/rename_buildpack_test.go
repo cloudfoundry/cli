@@ -15,14 +15,14 @@ import (
 
 var _ = Describe("rename-buildpack command", func() {
 	var (
-		cmd        *RenameBuildpack
-		fakeRepo   *testapi.FakeBuildpackRepository
-		ui         *testterm.FakeUI
-		reqFactory *testreq.FakeReqFactory
+		cmd                 *RenameBuildpack
+		fakeRepo            *testapi.FakeBuildpackRepository
+		ui                  *testterm.FakeUI
+		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		ui = new(testterm.FakeUI)
 		fakeRepo = &testapi.FakeBuildpackRepository{}
 		cmd = NewRenameBuildpack(ui, fakeRepo)
@@ -30,7 +30,7 @@ var _ = Describe("rename-buildpack command", func() {
 
 	runCommand := func(args ...string) {
 		ctxt := testcmd.NewContext("rename-buildpack", args)
-		testcmd.RunCommand(cmd, ctxt, reqFactory)
+		testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	}
 
 	It("fails requirements when called without the current name and the new name to use", func() {
@@ -41,7 +41,7 @@ var _ = Describe("rename-buildpack command", func() {
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			reqFactory.LoginSuccess = true
+			requirementsFactory.LoginSuccess = true
 		})
 
 		It("renames a buildpack", func() {

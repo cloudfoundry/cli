@@ -39,7 +39,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListQuotas(reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (fakeUI *testterm.FakeUI) {
+func callListQuotas(requirementsFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("quotas", []string{})
 
@@ -55,7 +55,7 @@ func callListQuotas(reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQ
 	config.SetOrganizationFields(orgFields)
 
 	cmd := organization.NewListQuotas(fakeUI, config, quotaRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
@@ -63,12 +63,12 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestListQuotasRequirements", func() {
 		quotaRepo := &testapi.FakeQuotaRepository{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callListQuotas(reqFactory, quotaRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callListQuotas(requirementsFactory, quotaRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callListQuotas(reqFactory, quotaRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callListQuotas(requirementsFactory, quotaRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestListQuotas", func() {
@@ -78,8 +78,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		quota.MemoryLimit = 1024
 
 		quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: []models.QuotaFields{quota}}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		ui := callListQuotas(reqFactory, quotaRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		ui := callListQuotas(requirementsFactory, quotaRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting quotas as", "my-user"},

@@ -57,7 +57,7 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 	}
 }
 
-func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Push) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) > 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "push")
@@ -65,8 +65,8 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedSpaceRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 	return
 }

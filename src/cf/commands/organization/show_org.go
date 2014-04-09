@@ -23,16 +23,16 @@ func NewShowOrg(ui terminal.UI, config configuration.Reader) (cmd *ShowOrg) {
 	return
 }
 
-func (cmd *ShowOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *ShowOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "org")
 		return
 	}
 
-	cmd.orgReq = reqFactory.NewOrganizationRequirement(c.Args()[0])
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.orgReq,
 	}
 

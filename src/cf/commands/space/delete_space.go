@@ -26,17 +26,17 @@ func NewDeleteSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo a
 	return
 }
 
-func (cmd *DeleteSpace) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete-space")
 		return
 	}
 
-	cmd.spaceReq = reqFactory.NewSpaceRequirement(c.Args()[0])
+	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedOrgRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 	}
 	return

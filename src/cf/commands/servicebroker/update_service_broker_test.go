@@ -38,55 +38,55 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callUpdateServiceBroker(args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+func callUpdateServiceBroker(args []string, requirementsFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
 	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewUpdateServiceBroker(ui, config, repo)
 	ctxt := testcmd.NewContext("update-service-broker", args)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestUpdateServiceBrokerFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		repo := &testapi.FakeServiceBrokerRepo{}
 
-		ui := callUpdateServiceBroker([]string{}, reqFactory, repo)
+		ui := callUpdateServiceBroker([]string{}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateServiceBroker([]string{"arg1"}, reqFactory, repo)
+		ui = callUpdateServiceBroker([]string{"arg1"}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateServiceBroker([]string{"arg1", "arg2"}, reqFactory, repo)
+		ui = callUpdateServiceBroker([]string{"arg1", "arg2"}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3"}, reqFactory, repo)
+		ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3"}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3", "arg4"}, reqFactory, repo)
+		ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3", "arg4"}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestUpdateServiceBrokerRequirements", func() {
 
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		repo := &testapi.FakeServiceBrokerRepo{}
 		args := []string{"arg1", "arg2", "arg3", "arg4"}
 
-		reqFactory.LoginSuccess = false
-		callUpdateServiceBroker(args, reqFactory, repo)
+		requirementsFactory.LoginSuccess = false
+		callUpdateServiceBroker(args, requirementsFactory, repo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory.LoginSuccess = true
-		callUpdateServiceBroker(args, reqFactory, repo)
+		requirementsFactory.LoginSuccess = true
+		callUpdateServiceBroker(args, requirementsFactory, repo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestUpdateServiceBroker", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		broker := models.ServiceBroker{}
 		broker.Name = "my-found-broker"
 		broker.Guid = "my-found-broker-guid"
@@ -95,7 +95,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		args := []string{"my-broker", "new-username", "new-password", "new-url"}
 
-		ui := callUpdateServiceBroker(args, reqFactory, repo)
+		ui := callUpdateServiceBroker(args, requirementsFactory, repo)
 
 		Expect(repo.FindByNameName).To(Equal("my-broker"))
 

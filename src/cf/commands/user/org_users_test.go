@@ -38,7 +38,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callOrgUsers(args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callOrgUsers(args []string, requirementsFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
 	config := testconfig.NewRepositoryWithDefaults()
@@ -46,35 +46,35 @@ func callOrgUsers(args []string, reqFactory *testreq.FakeReqFactory, userRepo *t
 	cmd := NewOrgUsers(ui, config, userRepo)
 	ctxt := testcmd.NewContext("org-users", args)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
 var _ = Describe("Listing users in an org", func() {
 	It("TestOrgUsersFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		userRepo := &testapi.FakeUserRepository{}
-		ui := callOrgUsers([]string{}, reqFactory, userRepo)
+		ui := callOrgUsers([]string{}, requirementsFactory, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callOrgUsers([]string{"Org1"}, reqFactory, userRepo)
+		ui = callOrgUsers([]string{"Org1"}, requirementsFactory, userRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 
 	It("TestOrgUsersRequirements", func() {
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		userRepo := &testapi.FakeUserRepository{}
 		args := []string{"Org1"}
 
-		reqFactory.LoginSuccess = false
-		callOrgUsers(args, reqFactory, userRepo)
+		requirementsFactory.LoginSuccess = false
+		callOrgUsers(args, requirementsFactory, userRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory.LoginSuccess = true
-		callOrgUsers(args, reqFactory, userRepo)
+		requirementsFactory.LoginSuccess = true
+		callOrgUsers(args, requirementsFactory, userRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		Expect("Org1").To(Equal(reqFactory.OrganizationName))
+		Expect("Org1").To(Equal(requirementsFactory.OrganizationName))
 	})
 
 	It("TestOrgUsers", func() {
@@ -97,12 +97,12 @@ var _ = Describe("Listing users in an org", func() {
 			models.ORG_AUDITOR:     []models.UserFields{user3},
 		}
 
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess: true,
 			Organization: org,
 		}
 
-		ui := callOrgUsers([]string{"Org1"}, reqFactory, userRepo)
+		ui := callOrgUsers([]string{"Org1"}, requirementsFactory, userRepo)
 
 		Expect(userRepo.ListUsersOrganizationGuid).To(Equal("found-org-guid"))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -131,12 +131,12 @@ var _ = Describe("Listing users in an org", func() {
 			models.ORG_USER: []models.UserFields{user, user2},
 		}
 
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess: true,
 			Organization: org,
 		}
 
-		ui := callOrgUsers([]string{"-a", "Org1"}, reqFactory, userRepo)
+		ui := callOrgUsers([]string{"-a", "Org1"}, requirementsFactory, userRepo)
 
 		Expect(userRepo.ListUsersOrganizationGuid).To(Equal("found-org-guid"))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{

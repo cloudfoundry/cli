@@ -21,8 +21,8 @@ func NewListStacks(ui terminal.UI, config configuration.Reader, stacksRepo api.S
 	return
 }
 
-func (cmd ListStacks) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
+func (cmd ListStacks) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	return
 }
 

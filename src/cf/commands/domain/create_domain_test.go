@@ -42,28 +42,28 @@ import (
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestCreateDomainRequirements", func() {
 		domainRepo := &testapi.FakeDomainRepository{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-		callCreateDomain([]string{"my-org", "example.com"}, reqFactory, domainRepo)
+		callCreateDomain([]string{"my-org", "example.com"}, requirementsFactory, domainRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		Expect(reqFactory.OrganizationName).To(Equal("my-org"))
+		Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 
-		callCreateDomain([]string{"my-org", "example.com"}, reqFactory, domainRepo)
+		callCreateDomain([]string{"my-org", "example.com"}, requirementsFactory, domainRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestCreateDomainFailsWithUsage", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		domainRepo := &testapi.FakeDomainRepository{}
-		ui := callCreateDomain([]string{""}, reqFactory, domainRepo)
+		ui := callCreateDomain([]string{""}, requirementsFactory, domainRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callCreateDomain([]string{"org1"}, reqFactory, domainRepo)
+		ui = callCreateDomain([]string{"org1"}, requirementsFactory, domainRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callCreateDomain([]string{"org1", "example.com"}, reqFactory, domainRepo)
+		ui = callCreateDomain([]string{"org1", "example.com"}, requirementsFactory, domainRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestCreateDomain", func() {
@@ -71,9 +71,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		org := models.Organization{}
 		org.Name = "myOrg"
 		org.Guid = "myOrg-guid"
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 		domainRepo := &testapi.FakeDomainRepository{}
-		ui := callCreateDomain([]string{"myOrg", "example.com"}, reqFactory, domainRepo)
+		ui := callCreateDomain([]string{"myOrg", "example.com"}, requirementsFactory, domainRepo)
 
 		Expect(domainRepo.CreateDomainName).To(Equal("example.com"))
 		Expect(domainRepo.CreateDomainOwningOrgGuid).To(Equal("myOrg-guid"))
@@ -84,7 +84,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func callCreateDomain(args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
+func callCreateDomain(args []string, requirementsFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-domain", args)
 
@@ -93,6 +93,6 @@ func callCreateDomain(args []string, reqFactory *testreq.FakeReqFactory, domainR
 
 	cmd := domain.NewCreateDomain(fakeUI, configRepo, domainRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

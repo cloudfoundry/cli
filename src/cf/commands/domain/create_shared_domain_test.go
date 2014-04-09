@@ -42,29 +42,29 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestShareDomainRequirements", func() {
 		domainRepo := &testapi.FakeDomainRepository{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callShareDomain([]string{"example.com"}, requirementsFactory, domainRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callShareDomain([]string{"example.com"}, requirementsFactory, domainRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestShareDomainFailsWithUsage", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		domainRepo := &testapi.FakeDomainRepository{}
-		ui := callShareDomain([]string{}, reqFactory, domainRepo)
+		ui := callShareDomain([]string{}, requirementsFactory, domainRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
+		ui = callShareDomain([]string{"example.com"}, requirementsFactory, domainRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestShareDomain", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		domainRepo := &testapi.FakeDomainRepository{}
-		ui := callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
+		ui := callShareDomain([]string{"example.com"}, requirementsFactory, domainRepo)
 
 		Expect(domainRepo.CreateSharedDomainName).To(Equal("example.com"))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -74,11 +74,11 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func callShareDomain(args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
+func callShareDomain(args []string, requirementsFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-shared-domain", args)
 	configRepo := testconfig.NewRepositoryWithAccessToken(configuration.TokenInfo{Username: "my-user"})
 	cmd := NewCreateSharedDomain(fakeUI, configRepo, domainRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

@@ -22,8 +22,8 @@ func NewListServiceBrokers(ui terminal.UI, config configuration.Reader, repo api
 	return
 }
 
-func (cmd ListServiceBrokers) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
+func (cmd ListServiceBrokers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	return
 }
 

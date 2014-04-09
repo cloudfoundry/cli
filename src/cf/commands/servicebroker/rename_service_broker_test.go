@@ -38,47 +38,47 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callRenameServiceBroker(args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+func callRenameServiceBroker(args []string, requirementsFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	config := testconfig.NewRepositoryWithDefaults()
 	cmd := NewRenameServiceBroker(ui, config, repo)
 	ctxt := testcmd.NewContext("rename-service-broker", args)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestRenameServiceBrokerFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		repo := &testapi.FakeServiceBrokerRepo{}
 
-		ui := callRenameServiceBroker([]string{}, reqFactory, repo)
+		ui := callRenameServiceBroker([]string{}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callRenameServiceBroker([]string{"arg1"}, reqFactory, repo)
+		ui = callRenameServiceBroker([]string{"arg1"}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callRenameServiceBroker([]string{"arg1", "arg2"}, reqFactory, repo)
+		ui = callRenameServiceBroker([]string{"arg1", "arg2"}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestRenameServiceBrokerRequirements", func() {
 
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		repo := &testapi.FakeServiceBrokerRepo{}
 		args := []string{"arg1", "arg2"}
 
-		reqFactory.LoginSuccess = false
-		callRenameServiceBroker(args, reqFactory, repo)
+		requirementsFactory.LoginSuccess = false
+		callRenameServiceBroker(args, requirementsFactory, repo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory.LoginSuccess = true
-		callRenameServiceBroker(args, reqFactory, repo)
+		requirementsFactory.LoginSuccess = true
+		callRenameServiceBroker(args, requirementsFactory, repo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestRenameServiceBroker", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		broker := models.ServiceBroker{}
 		broker.Name = "my-found-broker"
 		broker.Guid = "my-found-broker-guid"
@@ -87,7 +87,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		args := []string{"my-broker", "my-new-broker"}
 
-		ui := callRenameServiceBroker(args, reqFactory, repo)
+		ui := callRenameServiceBroker(args, requirementsFactory, repo)
 
 		Expect(repo.FindByNameName).To(Equal("my-broker"))
 

@@ -25,18 +25,18 @@ func NewRenameService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	return
 }
 
-func (cmd *RenameService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *RenameService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("incorrect usage")
 		cmd.ui.FailWithUsage(c, "rename-service")
 		return
 	}
 
-	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.Args()[0])
+	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedSpaceRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.serviceInstanceReq,
 	}
 

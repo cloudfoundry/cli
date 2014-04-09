@@ -24,16 +24,16 @@ func NewCreateDomain(ui terminal.UI, config configuration.Reader, domainRepo api
 	return
 }
 
-func (cmd *CreateDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-domain")
 		return
 	}
 
-	cmd.orgReq = reqFactory.NewOrganizationRequirement(c.Args()[0])
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.orgReq,
 	}
 	return

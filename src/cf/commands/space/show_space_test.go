@@ -37,14 +37,14 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callShowSpace(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callShowSpace(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("space", args)
 
 	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewShowSpace(ui, config)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
@@ -52,16 +52,16 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestShowSpaceRequirements", func() {
 		args := []string{"my-space"}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-		callShowSpace(args, reqFactory)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callShowSpace(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-		callShowSpace(args, reqFactory)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callShowSpace(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-		callShowSpace(args, reqFactory)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		callShowSpace(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestShowSpaceInfoSuccess", func() {
@@ -91,8 +91,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		space.Domains = domains
 		space.ServiceInstances = services
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
-		ui := callShowSpace([]string{"space1"}, reqFactory)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
+		ui := callShowSpace([]string{"space1"}, requirementsFactory)
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting info for space", "space1", "my-org", "my-user"},
 			{"OK"},

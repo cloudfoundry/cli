@@ -20,14 +20,14 @@ func NewDeleteBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *Dele
 	return
 }
 
-func (cmd *DeleteBuildpack) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete-buildpack")
 		return
 	}
 
-	loginReq := reqFactory.NewLoginRequirement()
+	loginReq := requirementsFactory.NewLoginRequirement()
 
 	reqs = []requirements.Requirement{
 		loginReq,

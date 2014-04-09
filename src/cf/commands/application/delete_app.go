@@ -26,14 +26,14 @@ func NewDeleteApp(ui terminal.UI, config configuration.Reader, appRepo api.Appli
 	return
 }
 
-func (cmd *DeleteApp) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteApp) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete")
 		return
 	}
 
-	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return
 }
 

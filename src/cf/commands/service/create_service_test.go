@@ -17,11 +17,11 @@ import (
 
 var _ = Describe("create-service command", func() {
 	var (
-		ui          *testterm.FakeUI
-		config      configuration.Repository
-		reqFactory  *testreq.FakeReqFactory
-		cmd         CreateService
-		serviceRepo *testapi.FakeServiceRepo
+		ui                  *testterm.FakeUI
+		config              configuration.Repository
+		requirementsFactory *testreq.FakeReqFactory
+		cmd                 CreateService
+		serviceRepo         *testapi.FakeServiceRepo
 
 		offering1 models.ServiceOffering
 		offering2 models.ServiceOffering
@@ -30,7 +30,7 @@ var _ = Describe("create-service command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		serviceRepo = &testapi.FakeServiceRepo{}
 		cmd = NewCreateService(ui, config, serviceRepo)
 
@@ -49,7 +49,7 @@ var _ = Describe("create-service command", func() {
 
 	var callCreateService = func(args []string) {
 		ctxt := testcmd.NewContext("create-service", args)
-		testcmd.RunCommand(cmd, ctxt, reqFactory)
+		testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -59,13 +59,13 @@ var _ = Describe("create-service command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			reqFactory.LoginSuccess = false
+			requirementsFactory.LoginSuccess = false
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
-			reqFactory.TargetedSpaceSuccess = false
+			requirementsFactory.TargetedSpaceSuccess = false
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})

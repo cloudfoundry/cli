@@ -26,7 +26,7 @@ var _ = Describe("routes command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess: true,
+			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 		}
 		routeRepo = &testapi.FakeRouteRepository{}

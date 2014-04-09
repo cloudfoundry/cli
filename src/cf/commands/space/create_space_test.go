@@ -73,45 +73,45 @@ func resetSpaceDefaults() {
 	defaultOrgRepo = &testapi.FakeOrgRepository{}
 }
 
-func callCreateSpace(args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, orgRepo *testapi.FakeOrgRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callCreateSpace(args []string, requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, orgRepo *testapi.FakeOrgRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-space", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	spaceRoleSetter := user.NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
 	cmd := NewCreateSpace(ui, configRepo, spaceRoleSetter, spaceRepo, orgRepo, userRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestCreateSpaceFailsWithUsage", func() {
 		resetSpaceDefaults()
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 
-		ui := callCreateSpace([]string{}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+		ui := callCreateSpace([]string{}, requirementsFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callCreateSpace([]string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+		ui = callCreateSpace([]string{"my-space"}, requirementsFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestCreateSpaceRequirements", func() {
 
 		resetSpaceDefaults()
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-		callCreateSpace([]string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		callCreateSpace([]string{"my-space"}, requirementsFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-		callCreateSpace([]string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callCreateSpace([]string{"my-space"}, requirementsFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-		callCreateSpace([]string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callCreateSpace([]string{"my-space"}, requirementsFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-		callCreateSpace([]string{"-o", "some-org", "my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callCreateSpace([]string{"-o", "some-org", "my-space"}, requirementsFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestCreateSpace", func() {

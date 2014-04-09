@@ -43,41 +43,41 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestCreateRouteRequirements", func() {
 		routeRepo := &testapi.FakeRouteRepository{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-		callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, requirementsFactory, routeRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-		callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, requirementsFactory, routeRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-		callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, requirementsFactory, routeRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 
 	It("TestCreateRouteFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		routeRepo := &testapi.FakeRouteRepository{}
 
-		ui := callCreateRoute([]string{""}, reqFactory, routeRepo)
+		ui := callCreateRoute([]string{""}, requirementsFactory, routeRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callCreateRoute([]string{"my-space"}, reqFactory, routeRepo)
+		ui = callCreateRoute([]string{"my-space"}, requirementsFactory, routeRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callCreateRoute([]string{"my-space", "example.com", "host"}, reqFactory, routeRepo)
+		ui = callCreateRoute([]string{"my-space", "example.com", "host"}, requirementsFactory, routeRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callCreateRoute([]string{"my-space", "example.com", "-n", "host"}, reqFactory, routeRepo)
+		ui = callCreateRoute([]string{"my-space", "example.com", "-n", "host"}, requirementsFactory, routeRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 
-		ui = callCreateRoute([]string{"my-space", "example.com"}, reqFactory, routeRepo)
+		ui = callCreateRoute([]string{"my-space", "example.com"}, requirementsFactory, routeRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 
 	It("creates routes", func() {
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:       true,
 			TargetedOrgSuccess: true,
 			Domain: models.DomainFields{
@@ -92,7 +92,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		routeRepo := &testapi.FakeRouteRepository{}
 
-		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
+		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, requirementsFactory, routeRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
@@ -115,7 +115,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Name: "my-space",
 		}}
 
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:       true,
 			TargetedOrgSuccess: true,
 			Domain:             domain,
@@ -136,7 +136,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		}
 
-		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
+		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, requirementsFactory, routeRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route"},
@@ -188,7 +188,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func callCreateRoute(args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (fakeUI *testterm.FakeUI) {
+func callCreateRoute(args []string, requirementsFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-route", args)
 
@@ -204,6 +204,6 @@ func callCreateRoute(args []string, reqFactory *testreq.FakeReqFactory, routeRep
 
 	cmd := NewCreateRoute(fakeUI, configRepo, routeRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

@@ -30,7 +30,7 @@ var _ = Describe("curl command", func() {
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			deps.reqFactory.LoginSuccess = true
+			deps.requirementsFactory.LoginSuccess = true
 		})
 
 		It("fails with usage when not given enough input", func() {
@@ -134,16 +134,16 @@ var _ = Describe("curl command", func() {
 })
 
 type curlDependencies struct {
-	ui         *testterm.FakeUI
-	config     configuration.Reader
-	reqFactory *testreq.FakeReqFactory
-	curlRepo   *testapi.FakeCurlRepository
+	ui                  *testterm.FakeUI
+	config              configuration.Reader
+	requirementsFactory *testreq.FakeReqFactory
+	curlRepo            *testapi.FakeCurlRepository
 }
 
 func newCurlDependencies() (deps curlDependencies) {
 	deps.ui = &testterm.FakeUI{}
 	deps.config = testconfig.NewRepository()
-	deps.reqFactory = &testreq.FakeReqFactory{}
+	deps.requirementsFactory = &testreq.FakeReqFactory{}
 	deps.curlRepo = &testapi.FakeCurlRepository{}
 	return
 }
@@ -151,5 +151,5 @@ func newCurlDependencies() (deps curlDependencies) {
 func runCurlWithInputs(deps curlDependencies, inputs []string) {
 	ctxt := testcmd.NewContext("curl", inputs)
 	cmd := NewCurl(deps.ui, deps.config, deps.curlRepo)
-	testcmd.RunCommand(cmd, ctxt, deps.reqFactory)
+	testcmd.RunCommand(cmd, ctxt, deps.requirementsFactory)
 }

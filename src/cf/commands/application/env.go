@@ -21,17 +21,17 @@ func NewEnv(ui terminal.UI, config configuration.Reader) (cmd *Env) {
 	return
 }
 
-func (cmd *Env) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Env) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) < 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "env")
 		return
 	}
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.appReq,
 	}
 	return
