@@ -617,6 +617,16 @@ var _ = Describe("Push Command", func() {
 			appRepo.UpdateAppResult = existingApp
 		})
 
+		It("resets the app's buildpack when the -b flag is provided as 'default'", func() {
+			callPush("-b", "default", "existing-app")
+			Expect(*appRepo.UpdateParams.BuildpackUrl).To(Equal(""))
+		})
+
+		It("resets the app's command when the -c flag is provided as 'default'", func() {
+			callPush("-c", "default", "existing-app")
+			Expect(*appRepo.UpdateParams.Command).To(Equal(""))
+		})
+
 		It("resets the app's buildpack when the -b flag is provided as 'null'", func() {
 			callPush("-b", "null", "existing-app")
 			Expect(*appRepo.UpdateParams.BuildpackUrl).To(Equal(""))
@@ -711,7 +721,7 @@ var _ = Describe("Push Command", func() {
 				existingRoute.Host = "existing-app"
 				existingRoute.Domain = domain
 
-				routeRepo.FindByHostAndDomainRoute = models.Route{ RouteSummary: existingRoute }
+				routeRepo.FindByHostAndDomainRoute = models.Route{RouteSummary: existingRoute}
 
 				existingApp.Routes = []models.RouteSummary{existingRoute}
 
