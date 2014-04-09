@@ -30,9 +30,9 @@ func (cmd DeleteServiceBroker) GetRequirements(reqFactory requirements.Factory, 
 	}
 
 	reqs = append(reqs, reqFactory.NewLoginRequirement())
-
 	return
 }
+
 func (cmd DeleteServiceBroker) Run(c *cli.Context) {
 	brokerName := c.Args()[0]
 	if !c.Bool("f") && !cmd.ui.ConfirmDelete("service-broker", brokerName) {
