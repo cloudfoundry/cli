@@ -39,7 +39,7 @@ func SliceDoesNotContain(actual Line, expected Lines, msgAndArgs ...interface{})
 				allStringsFound = allStringsFound && strings.Contains(strings.ToLower(actualValue), strings.ToLower(expectedValue))
 			}
 			if allStringsFound {
-				return Fail(fmt.Sprintf("\"%s\" found on line %d", expectedLine, i), msgAndArgs...)
+				return Fail(fmt.Sprintf("\"%s\" found on line %d of output...\n%s\n", expectedLine, i, actual), msgAndArgs...)
 			}
 		}
 	}

@@ -115,12 +115,15 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 		)
 		err = cmd.serviceBinder.BindApplication(app, serviceInstance)
 
-		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.APP_ALREADY_BOUND {
-			err = nil
+		switch httpErr := err.(type) {
+		case errors.HttpError:
+			if httpErr.ErrorCode() == errors.APP_ALREADY_BOUND {
+				err = nil
+			}
 		}
 
 		if err != nil {
-			cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, err)
+			cmd.ui.Failed("Could not bind to service %s\nError: %s", serviceName, err)
 		}
 
 		cmd.ui.Ok()

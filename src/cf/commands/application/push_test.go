@@ -32,7 +32,7 @@ var _ = Describe("Push Command", func() {
 		manifestRepo  *testmanifest.FakeManifestRepository
 		starter       *testcmd.FakeAppStarter
 		stopper       *testcmd.FakeAppStopper
-		binder        *testcmd.FakeAppBinder
+		serviceBinder *testcmd.FakeAppBinder
 		appRepo       *testapi.FakeApplicationRepository
 		domainRepo    *testapi.FakeDomainRepository
 		routeRepo     *testapi.FakeRouteRepository
@@ -47,7 +47,7 @@ var _ = Describe("Push Command", func() {
 		manifestRepo = &testmanifest.FakeManifestRepository{}
 		starter = &testcmd.FakeAppStarter{}
 		stopper = &testcmd.FakeAppStopper{}
-		binder = &testcmd.FakeAppBinder{}
+		serviceBinder = &testcmd.FakeAppBinder{}
 		appRepo = &testapi.FakeApplicationRepository{}
 
 		domainRepo = &testapi.FakeDomainRepository{}
@@ -65,7 +65,7 @@ var _ = Describe("Push Command", func() {
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-		cmd = NewPush(ui, configRepo, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo, wordGenerator)
+		cmd = NewPush(ui, configRepo, manifestRepo, starter, stopper, serviceBinder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo, wordGenerator)
 	})
 
 	callPush := func(args ...string) {
@@ -544,59 +544,6 @@ var _ = Describe("Push Command", func() {
 				Expect(len(appRepo.CreateAppParams)).To(Equal(0))
 			})
 		})
-
-		Context("when the manifest has services to bind", func() {
-			BeforeEach(func() {
-				manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
-			})
-
-			It("binds service instances to the app", func() {
-				serviceRepo.FindInstanceByNameMap = generic.NewMap(map[interface{}]interface{}{
-					"global-service": maker.NewServiceInstance("global-service"),
-					"app1-service":   maker.NewServiceInstance("app1-service"),
-					"app2-service":   maker.NewServiceInstance("app2-service"),
-				})
-
-				callPush()
-
-				Expect(len(binder.AppsToBind)).To(Equal(4))
-				Expect(binder.AppsToBind[0].Name).To(Equal("app1"))
-				Expect(binder.AppsToBind[1].Name).To(Equal("app1"))
-				Expect(binder.InstancesToBindTo[0].Name).To(Equal("app1-service"))
-				Expect(binder.InstancesToBindTo[1].Name).To(Equal("global-service"))
-
-				Expect(binder.AppsToBind[2].Name).To(Equal("app2"))
-				Expect(binder.AppsToBind[3].Name).To(Equal("app2"))
-				Expect(binder.InstancesToBindTo[2].Name).To(Equal("app2-service"))
-				Expect(binder.InstancesToBindTo[3].Name).To(Equal("global-service"))
-
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating", "app1"},
-					{"OK"},
-					{"Binding service", "app1-service", "app1", "my-org", "my-space", "my-user"},
-					{"OK"},
-					{"Binding service", "global-service", "app1", "my-org", "my-space", "my-user"},
-					{"OK"},
-					{"Creating", "app2"},
-					{"OK"},
-					{"Binding service", "app2-service", "app2", "my-org", "my-space", "my-user"},
-					{"OK"},
-					{"Binding service", "global-service", "app2", "my-org", "my-space", "my-user"},
-					{"OK"},
-				})
-			})
-
-			It("fails when the service instances can't be found", func() {
-				serviceRepo.FindInstanceByNameErr = true
-
-				callPush()
-
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"Could not find service", "app1-service", "app1"},
-				})
-			})
-		})
 	})
 
 	Describe("re-pushing an existing app", func() {
@@ -817,6 +764,83 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreatedDomainGuid).To(Equal("domain-guid"))
 			})
 		})
+	})
+
+	Describe("service instances", func() {
+		BeforeEach(func() {
+			serviceRepo.FindInstanceByNameMap = generic.NewMap(map[interface{}]interface{}{
+				"global-service": maker.NewServiceInstance("global-service"),
+				"app1-service":   maker.NewServiceInstance("app1-service"),
+				"app2-service":   maker.NewServiceInstance("app2-service"),
+			})
+
+			manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
+		})
+
+		Context("when the service is not bound", func() {
+			BeforeEach(func() {
+				appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
+			})
+
+			It("binds service instances to the app", func() {
+				callPush()
+				Expect(len(serviceBinder.AppsToBind)).To(Equal(4))
+				Expect(serviceBinder.AppsToBind[0].Name).To(Equal("app1"))
+				Expect(serviceBinder.AppsToBind[1].Name).To(Equal("app1"))
+				Expect(serviceBinder.InstancesToBindTo[0].Name).To(Equal("app1-service"))
+				Expect(serviceBinder.InstancesToBindTo[1].Name).To(Equal("global-service"))
+
+				Expect(serviceBinder.AppsToBind[2].Name).To(Equal("app2"))
+				Expect(serviceBinder.AppsToBind[3].Name).To(Equal("app2"))
+				Expect(serviceBinder.InstancesToBindTo[2].Name).To(Equal("app2-service"))
+				Expect(serviceBinder.InstancesToBindTo[3].Name).To(Equal("global-service"))
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Creating", "app1"},
+					{"OK"},
+					{"Binding service", "app1-service", "app1", "my-org", "my-space", "my-user"},
+					{"OK"},
+					{"Binding service", "global-service", "app1", "my-org", "my-space", "my-user"},
+					{"OK"},
+					{"Creating", "app2"},
+					{"OK"},
+					{"Binding service", "app2-service", "app2", "my-org", "my-space", "my-user"},
+					{"OK"},
+					{"Binding service", "global-service", "app2", "my-org", "my-space", "my-user"},
+					{"OK"},
+				})
+			})
+		})
+
+		Context("when the app is already bound to the service", func() {
+			BeforeEach(func() {
+				appRepo.ReadReturns.App = maker.NewApp(maker.Overrides{})
+				serviceBinder.BindApplicationReturns.Error = errors.NewHttpError(500, "90003", "it don't work")
+			})
+
+			It("gracefully continues", func() {
+				callPush()
+				Expect(len(serviceBinder.AppsToBind)).To(Equal(4))
+				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{{"FAILED"}})
+			})
+		})
+
+		Context("when the service instance can't be found", func() {
+			BeforeEach(func() {
+				routeRepo.FindByHostAndDomainErr = true
+				serviceRepo.FindInstanceByNameErr = true
+				manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
+			})
+
+			It("fails with an error", func() {
+				callPush()
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"FAILED"},
+					{"Could not find service", "app1-service", "app1"},
+				})
+			})
+		})
+
 	})
 
 	Describe("checking for bad flags", func() {
