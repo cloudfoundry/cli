@@ -58,14 +58,14 @@ func (t *PrintableTable) printHeader() {
 
 func (t *PrintableTable) printRow(row []string) {
 	output := ""
-	for col, value := range row {
-		if col == 0 {
+	for columnIndex, value := range row {
+		if columnIndex == 0 {
 			value = TableContentHeaderColor(value)
 		}
 
-		output = output + t.cellValue(col, value)
+		output = output + t.cellValue(columnIndex, value)
 	}
-	t.ui.Say(output)
+	t.ui.Say("%s", output)
 }
 
 func (t *PrintableTable) cellValue(col int, value string) string {
