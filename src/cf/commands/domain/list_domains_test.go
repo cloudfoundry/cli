@@ -42,26 +42,26 @@ import (
 
 var _ = Describe("domains command", func() {
 	It("TestListDomainsRequirements", func() {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		domainRepo := &testapi.FakeDomainRepository{}
 
-		callListDomains([]string{}, reqFactory, domainRepo)
+		callListDomains([]string{}, requirementsFactory, domainRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-		callListDomains([]string{}, reqFactory, domainRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callListDomains([]string{}, requirementsFactory, domainRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-		callListDomains([]string{}, reqFactory, domainRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callListDomains([]string{}, requirementsFactory, domainRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
 	It("TestListDomainsFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		domainRepo := &testapi.FakeDomainRepository{}
 
-		ui := callListDomains([]string{"foo"}, reqFactory, domainRepo)
+		ui := callListDomains([]string{"foo"}, requirementsFactory, domainRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
@@ -70,7 +70,7 @@ var _ = Describe("domains command", func() {
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
 			ListDomainsForOrgDomains: []models.DomainFields{
@@ -88,7 +88,7 @@ var _ = Describe("domains command", func() {
 				}},
 		}
 
-		ui := callListDomains([]string{}, reqFactory, domainRepo)
+		ui := callListDomains([]string{}, requirementsFactory, domainRepo)
 
 		Expect(domainRepo.ListDomainsForOrgGuid).To(Equal("my-org-guid"))
 
@@ -106,10 +106,10 @@ var _ = Describe("domains command", func() {
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 		domainRepo := &testapi.FakeDomainRepository{}
 
-		ui := callListDomains([]string{}, reqFactory, domainRepo)
+		ui := callListDomains([]string{}, requirementsFactory, domainRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
@@ -122,12 +122,12 @@ var _ = Describe("domains command", func() {
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
 			ListDomainsForOrgApiResponse: errors.New("borked!"),
 		}
-		ui := callListDomains([]string{}, reqFactory, domainRepo)
+		ui := callListDomains([]string{}, requirementsFactory, domainRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
@@ -138,7 +138,7 @@ var _ = Describe("domains command", func() {
 	})
 })
 
-func callListDomains(args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
+func callListDomains(args []string, requirementsFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("domains", args)
 
@@ -154,6 +154,6 @@ func callListDomains(args []string, reqFactory *testreq.FakeReqFactory, domainRe
 	configRepo.SetOrganizationFields(orgFields)
 
 	cmd := domain.NewListDomains(fakeUI, configRepo, domainRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

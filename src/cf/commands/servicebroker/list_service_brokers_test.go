@@ -26,11 +26,11 @@ func callListServiceBrokers(args []string, serviceBrokerRepo *testapi.FakeServic
 
 var _ = Describe("service-brokers command", func() {
 	var (
-		ui         *testterm.FakeUI
-		config     configuration.Repository
-		cmd        ListServiceBrokers
-		repo       *testapi.FakeServiceBrokerRepo
-		reqFactory *testreq.FakeReqFactory
+		ui                  *testterm.FakeUI
+		config              configuration.Repository
+		cmd                 ListServiceBrokers
+		repo                *testapi.FakeServiceBrokerRepo
+		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
@@ -38,14 +38,14 @@ var _ = Describe("service-brokers command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		repo = &testapi.FakeServiceBrokerRepo{}
 		cmd = NewListServiceBrokers(ui, config, repo)
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
-			reqFactory.LoginSuccess = false
+			requirementsFactory.LoginSuccess = false
 			ctxt := testcmd.NewContext("service-brokers", []string{})
-			testcmd.RunCommand(cmd, ctxt, reqFactory)
+			testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
@@ -66,7 +66,7 @@ var _ = Describe("service-brokers command", func() {
 		}}
 
 		context := testcmd.NewContext("service-brokers", []string{})
-		testcmd.RunCommand(cmd, context, reqFactory)
+		testcmd.RunCommand(cmd, context, requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting service brokers as", "my-user"},
@@ -79,7 +79,7 @@ var _ = Describe("service-brokers command", func() {
 
 	It("says when no service brokers were found", func() {
 		context := testcmd.NewContext("service-brokers", []string{})
-		testcmd.RunCommand(cmd, context, reqFactory)
+		testcmd.RunCommand(cmd, context, requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting service brokers as", "my-user"},
@@ -90,7 +90,7 @@ var _ = Describe("service-brokers command", func() {
 	It("reports errors when listing service brokers", func() {
 		repo.ListErr = true
 		context := testcmd.NewContext("service-brokers", []string{})
-		testcmd.RunCommand(cmd, context, reqFactory)
+		testcmd.RunCommand(cmd, context, requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting service brokers as ", "my-user"},

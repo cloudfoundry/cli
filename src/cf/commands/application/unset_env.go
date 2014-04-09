@@ -26,17 +26,17 @@ func NewUnsetEnv(ui terminal.UI, config configuration.Reader, appRepo api.Applic
 	return
 }
 
-func (cmd *UnsetEnv) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *UnsetEnv) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) < 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "unset-env")
 		return
 	}
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedSpaceRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 	return

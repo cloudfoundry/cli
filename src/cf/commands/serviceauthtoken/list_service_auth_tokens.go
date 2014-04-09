@@ -21,9 +21,9 @@ func NewListServiceAuthTokens(ui terminal.UI, config configuration.Reader, authT
 	return
 }
 
-func (cmd ListServiceAuthTokens) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListServiceAuthTokens) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

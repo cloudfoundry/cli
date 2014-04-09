@@ -16,17 +16,17 @@ import (
 
 var _ = Describe("auth command", func() {
 	var (
-		ui         *testterm.FakeUI
-		cmd        Authenticate
-		config     configuration.ReadWriter
-		repo       *testapi.FakeAuthenticationRepository
-		reqFactory *testreq.FakeReqFactory
+		ui                  *testterm.FakeUI
+		cmd                 Authenticate
+		config              configuration.ReadWriter
+		repo                *testapi.FakeAuthenticationRepository
+		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		reqFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = &testreq.FakeReqFactory{}
 		repo = &testapi.FakeAuthenticationRepository{
 			Config:       config,
 			AccessToken:  "my-access-token",
@@ -38,14 +38,14 @@ var _ = Describe("auth command", func() {
 	Describe("requirements", func() {
 		It("fails with usage when given too few arguments", func() {
 			context := testcmd.NewContext("auth", []string{})
-			testcmd.RunCommand(cmd, context, reqFactory)
+			testcmd.RunCommand(cmd, context, requirementsFactory)
 
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
 		It("fails if the user has not set an api endpoint", func() {
 			context := testcmd.NewContext("auth", []string{"username", "password"})
-			testcmd.RunCommand(cmd, context, reqFactory)
+			testcmd.RunCommand(cmd, context, requirementsFactory)
 
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
@@ -53,14 +53,14 @@ var _ = Describe("auth command", func() {
 
 	Context("when an api endpoint is targeted", func() {
 		BeforeEach(func() {
-			reqFactory.ApiEndpointSuccess = true
+			requirementsFactory.ApiEndpointSuccess = true
 			config.SetApiEndpoint("foo.example.org/authenticate")
 		})
 
 		It("authenticates successfully", func() {
-			reqFactory.ApiEndpointSuccess = true
+			requirementsFactory.ApiEndpointSuccess = true
 			context := testcmd.NewContext("auth", []string{"foo@example.com", "password"})
-			testcmd.RunCommand(cmd, context, reqFactory)
+			testcmd.RunCommand(cmd, context, requirementsFactory)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -77,15 +77,15 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("gets the UAA endpoint and saves it to the config file", func() {
-			reqFactory.ApiEndpointSuccess = true
-			testcmd.RunCommand(cmd, testcmd.NewContext("auth", []string{"foo@example.com", "password"}), reqFactory)
+			requirementsFactory.ApiEndpointSuccess = true
+			testcmd.RunCommand(cmd, testcmd.NewContext("auth", []string{"foo@example.com", "password"}), requirementsFactory)
 			Expect(repo.GetLoginPromptsWasCalled).To(BeTrue())
 		})
 
 		Describe("when authentication fails", func() {
 			BeforeEach(func() {
 				repo.AuthError = true
-				testcmd.RunCommand(cmd, testcmd.NewContext("auth", []string{"username", "password"}), reqFactory)
+				testcmd.RunCommand(cmd, testcmd.NewContext("auth", []string{"username", "password"}), requirementsFactory)
 			})
 
 			It("does not prompt the user when provided username and password", func() {

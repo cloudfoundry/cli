@@ -88,9 +88,9 @@ var _ = Describe("list-apps command", func() {
 			GetSummariesInCurrentSpaceApps: apps,
 		}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-		ui := callApps(appSummaryRepo, reqFactory)
+		ui := callApps(appSummaryRepo, requirementsFactory)
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
@@ -107,9 +107,9 @@ var _ = Describe("list-apps command", func() {
 			GetSummariesInCurrentSpaceApps: []models.Application{},
 		}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-		ui := callApps(appSummaryRepo, reqFactory)
+		ui := callApps(appSummaryRepo, requirementsFactory)
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -121,29 +121,29 @@ var _ = Describe("list-apps command", func() {
 	It("TestAppsRequiresLogin", func() {
 
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 
-		callApps(appSummaryRepo, reqFactory)
+		callApps(appSummaryRepo, requirementsFactory)
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestAppsRequiresASelectedSpaceAndOrg", func() {
 
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 
-		callApps(appSummaryRepo, reqFactory)
+		callApps(appSummaryRepo, requirementsFactory)
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 })
 
-func callApps(appSummaryRepo *testapi.FakeAppSummaryRepo, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callApps(appSummaryRepo *testapi.FakeAppSummaryRepo, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	ctxt := testcmd.NewContext("apps", []string{})
 	cmd := NewListApps(ui, configRepo, appSummaryRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
 	return
 }

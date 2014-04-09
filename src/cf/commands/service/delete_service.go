@@ -24,7 +24,7 @@ func NewDeleteService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	return
 }
 
-func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	var serviceName string
 
 	if len(c.Args()) == 1 {
@@ -37,7 +37,7 @@ func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cl
 		return
 	}
 
-	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return
 }
 

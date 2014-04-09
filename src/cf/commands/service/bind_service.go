@@ -31,7 +31,7 @@ func NewBindService(ui terminal.UI, config configuration.Reader, serviceBindingR
 	return
 }
 
-func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *BindService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
@@ -41,10 +41,10 @@ func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.
 	appName := c.Args()[0]
 	serviceName := c.Args()[1]
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
-	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
+	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
-	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement(), cmd.appReq, cmd.serviceInstanceReq}
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(), cmd.appReq, cmd.serviceInstanceReq}
 	return
 }
 

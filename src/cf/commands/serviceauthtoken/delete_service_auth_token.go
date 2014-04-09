@@ -23,14 +23,14 @@ func NewDeleteServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	return
 }
 
-func (cmd DeleteServiceAuthTokenFields) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd DeleteServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c, "delete-service-auth-token")
 		return
 	}
 
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	return
 }
 

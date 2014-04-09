@@ -38,7 +38,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callUpdateServiceAuthToken(args []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+func callUpdateServiceAuthToken(args []string, requirementsFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
 	config := testconfig.NewRepositoryWithDefaults()
@@ -46,39 +46,39 @@ func callUpdateServiceAuthToken(args []string, reqFactory *testreq.FakeReqFactor
 	cmd := NewUpdateServiceAuthToken(ui, config, authTokenRepo)
 	ctxt := testcmd.NewContext("update-service-auth-token", args)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestUpdateServiceAuthTokenFailsWithUsage", func() {
 		authTokenRepo := &testapi.FakeAuthTokenRepo{}
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 
-		ui := callUpdateServiceAuthToken([]string{}, reqFactory, authTokenRepo)
+		ui := callUpdateServiceAuthToken([]string{}, requirementsFactory, authTokenRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateServiceAuthToken([]string{"MY-TOKEN-LABEL"}, reqFactory, authTokenRepo)
+		ui = callUpdateServiceAuthToken([]string{"MY-TOKEN-LABEL"}, requirementsFactory, authTokenRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateServiceAuthToken([]string{"MY-TOKEN-LABEL", "my-token-abc123"}, reqFactory, authTokenRepo)
+		ui = callUpdateServiceAuthToken([]string{"MY-TOKEN-LABEL", "my-token-abc123"}, requirementsFactory, authTokenRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateServiceAuthToken([]string{"MY-TOKEN-LABEL", "my-provider", "my-token-abc123"}, reqFactory, authTokenRepo)
+		ui = callUpdateServiceAuthToken([]string{"MY-TOKEN-LABEL", "my-provider", "my-token-abc123"}, requirementsFactory, authTokenRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestUpdateServiceAuthTokenRequirements", func() {
 
 		authTokenRepo := &testapi.FakeAuthTokenRepo{}
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		args := []string{"MY-TOKEN-LABLE", "my-provider", "my-token-abc123"}
 
-		reqFactory.LoginSuccess = true
-		callUpdateServiceAuthToken(args, reqFactory, authTokenRepo)
+		requirementsFactory.LoginSuccess = true
+		callUpdateServiceAuthToken(args, requirementsFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory.LoginSuccess = false
-		callUpdateServiceAuthToken(args, reqFactory, authTokenRepo)
+		requirementsFactory.LoginSuccess = false
+		callUpdateServiceAuthToken(args, requirementsFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestUpdateServiceAuthToken", func() {
@@ -89,10 +89,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		foundAuthToken.Provider = "found provider"
 
 		authTokenRepo := &testapi.FakeAuthTokenRepo{FindByLabelAndProviderServiceAuthTokenFields: foundAuthToken}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider", "a value"}
 
-		ui := callUpdateServiceAuthToken(args, reqFactory, authTokenRepo)
+		ui := callUpdateServiceAuthToken(args, requirementsFactory, authTokenRepo)
 		expectedAuthToken := models.ServiceAuthTokenFields{}
 		expectedAuthToken.Guid = "found-auth-token-guid"
 		expectedAuthToken.Label = "found label"

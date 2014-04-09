@@ -39,11 +39,11 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListOrgs(config configuration.Reader, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
+func callListOrgs(config configuration.Reader, requirementsFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("orgs", []string{})
 	cmd := organization.NewListOrgs(fakeUI, config, orgRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
@@ -53,12 +53,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		orgRepo := &testapi.FakeOrgRepository{}
 		config := testconfig.NewRepository()
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callListOrgs(config, reqFactory, orgRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callListOrgs(config, requirementsFactory, orgRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callListOrgs(config, reqFactory, orgRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callListOrgs(config, requirementsFactory, orgRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
@@ -76,11 +76,11 @@ var _ = Describe("Testing with ginkgo", func() {
 			Organizations: []models.Organization{org1, org2, org3},
 		}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		tokenInfo := configuration.TokenInfo{Username: "my-user"}
 		config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
 
-		ui := callListOrgs(config, reqFactory, orgRepo)
+		ui := callListOrgs(config, requirementsFactory, orgRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting orgs as my-user"},
@@ -96,11 +96,11 @@ var _ = Describe("Testing with ginkgo", func() {
 			Organizations: orgs,
 		}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		tokenInfo := configuration.TokenInfo{Username: "my-user"}
 		config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
 
-		ui := callListOrgs(config, reqFactory, orgRepo)
+		ui := callListOrgs(config, requirementsFactory, orgRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting orgs as my-user"},

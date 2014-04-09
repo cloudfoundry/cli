@@ -18,7 +18,7 @@ func NewLogout(ui terminal.UI, config configuration.ReadWriter) (cmd Logout) {
 	return
 }
 
-func (cmd Logout) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Logout) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

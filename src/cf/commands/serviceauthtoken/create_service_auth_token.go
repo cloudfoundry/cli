@@ -23,7 +23,7 @@ func NewCreateServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	return
 }
 
-func (cmd CreateServiceAuthTokenFields) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd CreateServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c, "create-service-auth-token")
@@ -31,7 +31,7 @@ func (cmd CreateServiceAuthTokenFields) GetRequirements(reqFactory requirements.
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

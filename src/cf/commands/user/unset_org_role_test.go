@@ -41,36 +41,36 @@ import (
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestUnsetOrgRoleFailsWithUsage", func() {
 		userRepo := &testapi.FakeUserRepository{}
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 
-		ui := callUnsetOrgRole([]string{}, userRepo, reqFactory)
+		ui := callUnsetOrgRole([]string{}, userRepo, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUnsetOrgRole([]string{"username"}, userRepo, reqFactory)
+		ui = callUnsetOrgRole([]string{"username"}, userRepo, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUnsetOrgRole([]string{"username", "org"}, userRepo, reqFactory)
+		ui = callUnsetOrgRole([]string{"username", "org"}, userRepo, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUnsetOrgRole([]string{"username", "org", "role"}, userRepo, reqFactory)
+		ui = callUnsetOrgRole([]string{"username", "org", "role"}, userRepo, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestUnsetOrgRoleRequirements", func() {
 
 		userRepo := &testapi.FakeUserRepository{}
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		args := []string{"username", "org", "role"}
 
-		reqFactory.LoginSuccess = false
-		callUnsetOrgRole(args, userRepo, reqFactory)
+		requirementsFactory.LoginSuccess = false
+		callUnsetOrgRole(args, userRepo, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory.LoginSuccess = true
-		callUnsetOrgRole(args, userRepo, reqFactory)
+		requirementsFactory.LoginSuccess = true
+		callUnsetOrgRole(args, userRepo, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		Expect(reqFactory.UserUsername).To(Equal("username"))
-		Expect(reqFactory.OrganizationName).To(Equal("org"))
+		Expect(requirementsFactory.UserUsername).To(Equal("username"))
+		Expect(requirementsFactory.OrganizationName).To(Equal("org"))
 	})
 	It("TestUnsetOrgRole", func() {
 
@@ -81,14 +81,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		org := models.Organization{}
 		org.Name = "some-org"
 		org.Guid = "some-org-guid"
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess: true,
 			UserFields:   user,
 			Organization: org,
 		}
 		args := []string{"my-username", "my-org", "OrgManager"}
 
-		ui := callUnsetOrgRole(args, userRepo, reqFactory)
+		ui := callUnsetOrgRole(args, userRepo, requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing role", "OrgManager", "my-username", "my-org", "my-user"},
@@ -101,13 +101,13 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func callUnsetOrgRole(args []string, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callUnsetOrgRole(args []string, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("unset-org-role", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewUnsetOrgRole(ui, configRepo, userRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

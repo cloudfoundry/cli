@@ -40,23 +40,23 @@ import (
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestRenameAppFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		appRepo := &testapi.FakeApplicationRepository{}
 
-		ui := callRename([]string{}, reqFactory, appRepo)
+		ui := callRename([]string{}, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callRename([]string{"foo"}, reqFactory, appRepo)
+		ui = callRename([]string{"foo"}, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 	It("TestRenameRequirements", func() {
 
 		appRepo := &testapi.FakeApplicationRepository{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callRename([]string{"my-app", "my-new-app"}, reqFactory, appRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callRename([]string{"my-app", "my-new-app"}, requirementsFactory, appRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 	})
 	It("TestRenameRun", func() {
 
@@ -64,8 +64,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
-		ui := callRename([]string{"my-app", "my-new-app"}, reqFactory, appRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
+		ui := callRename([]string{"my-app", "my-new-app"}, requirementsFactory, appRepo)
 
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
 		Expect(*appRepo.UpdateParams.Name).To(Equal("my-new-app"))
@@ -76,12 +76,12 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func callRename(args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
+func callRename(args []string, requirementsFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("rename", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewRenameApp(ui, configRepo, appRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

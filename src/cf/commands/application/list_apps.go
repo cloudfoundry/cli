@@ -23,10 +23,10 @@ func NewListApps(ui terminal.UI, config configuration.Reader, appSummaryRepo api
 	return
 }
 
-func (cmd ListApps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListApps) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedSpaceRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 	return
 }

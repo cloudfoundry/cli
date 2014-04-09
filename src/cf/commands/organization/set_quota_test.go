@@ -40,39 +40,39 @@ import (
 )
 
 var _ = Describe("set-quota command", func() {
-	var reqFactory *testreq.FakeReqFactory
+	var requirementsFactory *testreq.FakeReqFactory
 	var quotaRepo *testapi.FakeQuotaRepository
 
 	BeforeEach(func() {
-		reqFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = &testreq.FakeReqFactory{}
 		quotaRepo = &testapi.FakeQuotaRepository{}
 	})
 
 	It("fails with usage when provided too many or two few args", func() {
-		ui := callSetQuota([]string{}, reqFactory, quotaRepo)
+		ui := callSetQuota([]string{}, requirementsFactory, quotaRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSetQuota([]string{"org"}, reqFactory, quotaRepo)
+		ui = callSetQuota([]string{"org"}, requirementsFactory, quotaRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSetQuota([]string{"org", "quota", "extra-stuff"}, reqFactory, quotaRepo)
+		ui = callSetQuota([]string{"org", "quota", "extra-stuff"}, requirementsFactory, quotaRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
 	It("fails requirements when not logged in", func() {
-		callSetQuota([]string{"my-org", "my-quota"}, reqFactory, quotaRepo)
+		callSetQuota([]string{"my-org", "my-quota"}, requirementsFactory, quotaRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			reqFactory.LoginSuccess = true
+			requirementsFactory.LoginSuccess = true
 		})
 
 		It("passes requirements when provided two args", func() {
-			callSetQuota([]string{"my-org", "my-quota"}, reqFactory, quotaRepo)
+			callSetQuota([]string{"my-org", "my-quota"}, requirementsFactory, quotaRepo)
 			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-			Expect(reqFactory.OrganizationName).To(Equal("my-org"))
+			Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
 		})
 
 		It("TestSetQuota", func() {
@@ -85,9 +85,9 @@ var _ = Describe("set-quota command", func() {
 			quota.Guid = "my-quota-guid"
 
 			quotaRepo.FindByNameQuota = quota
-			reqFactory.Organization = org
+			requirementsFactory.Organization = org
 
-			ui := callSetQuota([]string{"my-org", "my-quota"}, reqFactory, quotaRepo)
+			ui := callSetQuota([]string{"my-org", "my-quota"}, requirementsFactory, quotaRepo)
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Setting quota", "my-found-quota", "my-org", "my-user"},
@@ -101,7 +101,7 @@ var _ = Describe("set-quota command", func() {
 	})
 })
 
-func callSetQuota(args []string, reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (ui *testterm.FakeUI) {
+func callSetQuota(args []string, requirementsFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-quota", args)
 
@@ -120,6 +120,6 @@ func callSetQuota(args []string, reqFactory *testreq.FakeReqFactory, quotaRepo *
 	configRepo.SetOrganizationFields(orgFields)
 
 	cmd := organization.NewSetQuota(ui, configRepo, quotaRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

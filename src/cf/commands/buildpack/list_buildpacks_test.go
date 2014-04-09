@@ -37,11 +37,11 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListBuildpacks(reqFactory *testreq.FakeReqFactory, buildpackRepo *testapi.FakeBuildpackRepository) (ui *testterm.FakeUI) {
+func callListBuildpacks(requirementsFactory *testreq.FakeReqFactory, buildpackRepo *testapi.FakeBuildpackRepository) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("buildpacks", []string{})
 	cmd := buildpack.NewListBuildpacks(ui, buildpackRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
@@ -49,12 +49,12 @@ var _ = Describe("ListBuildpacks", func() {
 	It("has the right requirements", func() {
 		buildpackRepo := &testapi.FakeBuildpackRepository{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callListBuildpacks(reqFactory, buildpackRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callListBuildpacks(requirementsFactory, buildpackRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callListBuildpacks(reqFactory, buildpackRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callListBuildpacks(requirementsFactory, buildpackRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
@@ -73,9 +73,9 @@ var _ = Describe("ListBuildpacks", func() {
 			},
 		}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-		ui := callListBuildpacks(reqFactory, buildpackRepo)
+		ui := callListBuildpacks(requirementsFactory, buildpackRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting buildpacks"},
@@ -91,9 +91,9 @@ var _ = Describe("ListBuildpacks", func() {
 			Buildpacks: []models.Buildpack{},
 		}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-		ui := callListBuildpacks(reqFactory, buildpackRepo)
+		ui := callListBuildpacks(requirementsFactory, buildpackRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting buildpacks"},

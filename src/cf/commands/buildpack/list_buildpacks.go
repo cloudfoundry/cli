@@ -20,9 +20,9 @@ func NewListBuildpacks(ui terminal.UI, buildpackRepo api.BuildpackRepository) (c
 	return
 }
 
-func (cmd ListBuildpacks) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListBuildpacks) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

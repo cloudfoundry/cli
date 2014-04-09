@@ -16,15 +16,15 @@ import (
 
 var _ = Describe("services", func() {
 	var (
-		ui         *testterm.FakeUI
-		configRepo configuration.Repository
-		reqFactory *testreq.FakeReqFactory
+		ui                  *testterm.FakeUI
+		configRepo          configuration.Repository
+		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		reqFactory = &testreq.FakeReqFactory{
+		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 			TargetedOrgSuccess:   true,
@@ -40,22 +40,22 @@ var _ = Describe("services", func() {
 
 		Context("when not logged in", func() {
 			BeforeEach(func() {
-				reqFactory.LoginSuccess = false
+				requirementsFactory.LoginSuccess = false
 			})
 
 			It("fails requirements", func() {
-				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
+				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
 				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 			})
 		})
 
 		Context("when no space is targeted", func() {
 			BeforeEach(func() {
-				reqFactory.TargetedSpaceSuccess = false
+				requirementsFactory.TargetedSpaceSuccess = false
 			})
 
 			It("fails requirements", func() {
-				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
+				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
 				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 			})
 		})
@@ -95,7 +95,7 @@ var _ = Describe("services", func() {
 		}
 
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
+		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting services in org", "my-org", "my-space", "my-user"},
@@ -113,7 +113,7 @@ var _ = Describe("services", func() {
 		}
 
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
+		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting services in org", "my-org", "my-space", "my-user"},

@@ -39,14 +39,14 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func getSetSpaceRoleDeps() (reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) {
-	reqFactory = &testreq.FakeReqFactory{}
+func getSetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) {
+	requirementsFactory = &testreq.FakeReqFactory{}
 	spaceRepo = &testapi.FakeSpaceRepository{}
 	userRepo = &testapi.FakeUserRepository{}
 	return
 }
 
-func callSetSpaceRole(args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callSetSpaceRole(args []string, requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-space-role", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()
@@ -57,44 +57,44 @@ func callSetSpaceRole(args []string, reqFactory *testreq.FakeReqFactory, spaceRe
 	configRepo.SetAccessToken(accessToken)
 
 	cmd := NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestSetSpaceRoleFailsWithUsage", func() {
-		reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
+		requirementsFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 
-		ui := callSetSpaceRole([]string{}, reqFactory, spaceRepo, userRepo)
+		ui := callSetSpaceRole([]string{}, requirementsFactory, spaceRepo, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSetSpaceRole([]string{"my-user"}, reqFactory, spaceRepo, userRepo)
+		ui = callSetSpaceRole([]string{"my-user"}, requirementsFactory, spaceRepo, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSetSpaceRole([]string{"my-user", "my-org"}, reqFactory, spaceRepo, userRepo)
+		ui = callSetSpaceRole([]string{"my-user", "my-org"}, requirementsFactory, spaceRepo, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSetSpaceRole([]string{"my-user", "my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
+		ui = callSetSpaceRole([]string{"my-user", "my-org", "my-space"}, requirementsFactory, spaceRepo, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSetSpaceRole([]string{"my-user", "my-org", "my-space", "my-role"}, reqFactory, spaceRepo, userRepo)
+		ui = callSetSpaceRole([]string{"my-user", "my-org", "my-space", "my-role"}, requirementsFactory, spaceRepo, userRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestSetSpaceRoleRequirements", func() {
 
 		args := []string{"username", "org", "space", "role"}
-		reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
+		requirementsFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 
-		reqFactory.LoginSuccess = false
-		callSetSpaceRole(args, reqFactory, spaceRepo, userRepo)
+		requirementsFactory.LoginSuccess = false
+		callSetSpaceRole(args, requirementsFactory, spaceRepo, userRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory.LoginSuccess = true
-		callSetSpaceRole(args, reqFactory, spaceRepo, userRepo)
+		requirementsFactory.LoginSuccess = true
+		callSetSpaceRole(args, requirementsFactory, spaceRepo, userRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		Expect(reqFactory.UserUsername).To(Equal("username"))
-		Expect(reqFactory.OrganizationName).To(Equal("org"))
+		Expect(requirementsFactory.UserUsername).To(Equal("username"))
+		Expect(requirementsFactory.OrganizationName).To(Equal("org"))
 	})
 	It("TestSetSpaceRole", func() {
 
@@ -104,19 +104,19 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		args := []string{"some-user", "some-org", "some-space", "SpaceManager"}
 
-		reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
-		reqFactory.LoginSuccess = true
-		reqFactory.UserFields = models.UserFields{}
-		reqFactory.UserFields.Guid = "my-user-guid"
-		reqFactory.UserFields.Username = "my-user"
-		reqFactory.Organization = org
+		requirementsFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
+		requirementsFactory.LoginSuccess = true
+		requirementsFactory.UserFields = models.UserFields{}
+		requirementsFactory.UserFields.Guid = "my-user-guid"
+		requirementsFactory.UserFields.Username = "my-user"
+		requirementsFactory.Organization = org
 
 		spaceRepo.FindByNameInOrgSpace = models.Space{}
 		spaceRepo.FindByNameInOrgSpace.Guid = "my-space-guid"
 		spaceRepo.FindByNameInOrgSpace.Name = "my-space"
 		spaceRepo.FindByNameInOrgSpace.Organization = org.OrganizationFields
 
-		ui := callSetSpaceRole(args, reqFactory, spaceRepo, userRepo)
+		ui := callSetSpaceRole(args, requirementsFactory, spaceRepo, userRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Assigning role ", "SpaceManager", "my-user", "my-org", "my-space", "current-user"},

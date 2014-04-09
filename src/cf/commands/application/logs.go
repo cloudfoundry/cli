@@ -27,17 +27,17 @@ func NewLogs(ui terminal.UI, config configuration.Reader, logsRepo api.LogsRepos
 	return
 }
 
-func (cmd *Logs) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Logs) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		cmd.ui.FailWithUsage(c, "logs")
 		err = errors.New("Incorrect Usage")
 		return
 	}
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.appReq,
 	}
 

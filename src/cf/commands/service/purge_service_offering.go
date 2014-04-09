@@ -14,13 +14,13 @@ type PurgeServiceOffering struct {
 	serviceRepo api.ServiceRepository
 }
 
-func (cmd PurgeServiceOffering) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd PurgeServiceOffering) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("incorrect usage")
 		cmd.ui.FailWithUsage(c, "purge-service-offering")
 	}
 
-	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return
 }
 

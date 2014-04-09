@@ -22,10 +22,10 @@ func NewListSpaces(ui terminal.UI, config configuration.Reader, spaceRepo api.Sp
 	return
 }
 
-func (cmd ListSpaces) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListSpaces) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedOrgRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedOrgRequirement(),
 	}
 	return
 }

@@ -35,7 +35,7 @@ func NewSpaceUsers(ui terminal.UI, config configuration.Reader, spaceRepo api.Sp
 	return
 }
 
-func (cmd *SpaceUsers) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *SpaceUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "space-users")
@@ -43,8 +43,8 @@ func (cmd *SpaceUsers) GetRequirements(reqFactory requirements.Factory, c *cli.C
 	}
 
 	orgName := c.Args()[0]
-	cmd.orgReq = reqFactory.NewOrganizationRequirement(orgName)
-	reqs = append(reqs, reqFactory.NewLoginRequirement(), cmd.orgReq)
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(orgName)
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement(), cmd.orgReq)
 
 	return
 }

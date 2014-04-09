@@ -43,24 +43,24 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-app", "/foo"}
 		appFilesRepo := &testapi.FakeAppFilesRepo{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
-		callFiles(args, reqFactory, appFilesRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
+		callFiles(args, requirementsFactory, appFilesRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
-		callFiles(args, reqFactory, appFilesRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
+		callFiles(args, requirementsFactory, appFilesRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-		callFiles(args, reqFactory, appFilesRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
+		callFiles(args, requirementsFactory, appFilesRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 	})
 	It("TestFilesFailsWithUsage", func() {
 
 		appFilesRepo := &testapi.FakeAppFilesRepo{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-		ui := callFiles([]string{}, reqFactory, appFilesRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
+		ui := callFiles([]string{}, requirementsFactory, appFilesRepo)
 
 		Expect(ui.FailedWithUsage).To(BeTrue())
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
@@ -71,10 +71,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		app.Name = "my-found-app"
 		app.Guid = "my-app-guid"
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
 		appFilesRepo := &testapi.FakeAppFilesRepo{FileList: "file 1\nfile 2"}
 
-		ui := callFiles([]string{"my-app", "/foo"}, reqFactory, appFilesRepo)
+		ui := callFiles([]string{"my-app", "/foo"}, requirementsFactory, appFilesRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
@@ -92,10 +92,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		app.Name = "my-found-app"
 		app.Guid = "my-app-guid"
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
 		appFilesRepo := &testapi.FakeAppFilesRepo{FileList: "%s %d %i"}
 
-		ui := callFiles([]string{"my-app", "/foo"}, reqFactory, appFilesRepo)
+		ui := callFiles([]string{"my-app", "/foo"}, requirementsFactory, appFilesRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"%s %d %i"},
@@ -103,13 +103,13 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func callFiles(args []string, reqFactory *testreq.FakeReqFactory, appFilesRepo *testapi.FakeAppFilesRepo) (ui *testterm.FakeUI) {
+func callFiles(args []string, requirementsFactory *testreq.FakeReqFactory, appFilesRepo *testapi.FakeAppFilesRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("files", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewFiles(ui, configRepo, appFilesRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
 	return
 }

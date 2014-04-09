@@ -47,16 +47,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		appRepo := &testapi.FakeApplicationRepository{}
 		args := []string{"my-app", "DATABASE_URL"}
 
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-		callUnsetEnv(args, reqFactory, appRepo)
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		callUnsetEnv(args, requirementsFactory, appRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
-		callUnsetEnv(args, reqFactory, appRepo)
+		requirementsFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
+		callUnsetEnv(args, requirementsFactory, appRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
-		callUnsetEnv(args, reqFactory, appRepo)
+		requirementsFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
+		callUnsetEnv(args, requirementsFactory, appRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestUnsetEnvWhenApplicationExists", func() {
@@ -65,18 +65,18 @@ var _ = Describe("Testing with ginkgo", func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		app.EnvironmentVars = map[string]string{"foo": "bar", "DATABASE_URL": "mysql://example.com/my-db"}
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{}
 
 		args := []string{"my-app", "DATABASE_URL"}
-		ui := callUnsetEnv(args, reqFactory, appRepo)
+		ui := callUnsetEnv(args, requirementsFactory, appRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing env variable", "DATABASE_URL", "my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
 
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 		Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
 			"foo": "bar",
@@ -88,14 +88,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{
 			UpdateErr: true,
 		}
 		appRepo.ReadReturns.App = app
 
 		args := []string{"does-not-exist", "DATABASE_URL"}
-		ui := callUnsetEnv(args, reqFactory, appRepo)
+		ui := callUnsetEnv(args, requirementsFactory, appRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing env variable"},
@@ -108,11 +108,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{}
 
 		args := []string{"my-app", "DATABASE_URL"}
-		ui := callUnsetEnv(args, reqFactory, appRepo)
+		ui := callUnsetEnv(args, requirementsFactory, appRepo)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -126,29 +126,29 @@ var _ = Describe("Testing with ginkgo", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
-		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{}
 		appRepo.ReadReturns.App = app
 
 		args := []string{"my-app", "DATABASE_URL"}
-		ui := callUnsetEnv(args, reqFactory, appRepo)
+		ui := callUnsetEnv(args, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 
 		args = []string{"my-app"}
-		ui = callUnsetEnv(args, reqFactory, appRepo)
+		ui = callUnsetEnv(args, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		args = []string{}
-		ui = callUnsetEnv(args, reqFactory, appRepo)
+		ui = callUnsetEnv(args, requirementsFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 })
 
-func callUnsetEnv(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+func callUnsetEnv(args []string, requirementsFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("unset-env", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewUnsetEnv(ui, configRepo, appRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

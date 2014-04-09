@@ -22,9 +22,9 @@ func NewListOrgs(ui terminal.UI, config configuration.Reader, orgRepo api.Organi
 	return
 }
 
-func (cmd ListOrgs) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListOrgs) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

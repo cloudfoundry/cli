@@ -27,18 +27,18 @@ func NewRestart(ui terminal.UI, starter ApplicationStarter, stopper ApplicationS
 	return
 }
 
-func (cmd *Restart) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Restart) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "restart")
 		return
 	}
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedSpaceRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 	return

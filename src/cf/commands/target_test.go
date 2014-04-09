@@ -16,24 +16,24 @@ import (
 
 var _ = Describe("target command", func() {
 	var (
-		orgRepo    *testapi.FakeOrgRepository
-		spaceRepo  *testapi.FakeSpaceRepository
-		reqFactory *testreq.FakeReqFactory
-		config     configuration.ReadWriter
-		ui         *testterm.FakeUI
+		orgRepo             *testapi.FakeOrgRepository
+		spaceRepo           *testapi.FakeSpaceRepository
+		requirementsFactory *testreq.FakeReqFactory
+		config              configuration.ReadWriter
+		ui                  *testterm.FakeUI
 	)
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
 		orgRepo = new(testapi.FakeOrgRepository)
 		spaceRepo = new(testapi.FakeSpaceRepository)
-		reqFactory = new(testreq.FakeReqFactory)
+		requirementsFactory = new(testreq.FakeReqFactory)
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 
 	var callTarget = func(args []string) {
 		cmd := NewTarget(ui, config, orgRepo, spaceRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("target", args), reqFactory)
+		testcmd.RunCommand(cmd, testcmd.NewContext("target", args), requirementsFactory)
 	}
 
 	It("fails with usage when called with an argument but no flags", func() {
@@ -59,7 +59,7 @@ var _ = Describe("target command", func() {
 
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
-			reqFactory.LoginSuccess = true
+			requirementsFactory.LoginSuccess = true
 		})
 
 		var expectOrgToBeCleared = func() {

@@ -15,14 +15,14 @@ import (
 
 var _ = Describe("Create user command", func() {
 	var (
-		reqFactory *testreq.FakeReqFactory
-		ui         *testterm.FakeUI
-		userRepo   *testapi.FakeUserRepository
-		configRepo configuration.ReadWriter
+		requirementsFactory *testreq.FakeReqFactory
+		ui                  *testterm.FakeUI
+		userRepo            *testapi.FakeUserRepository
+		configRepo          configuration.ReadWriter
 	)
 
 	BeforeEach(func() {
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		ui = new(testterm.FakeUI)
 		userRepo = &testapi.FakeUserRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -35,7 +35,7 @@ var _ = Describe("Create user command", func() {
 	runCommand := func(args ...string) {
 		ctxt := testcmd.NewContext("create-user", args)
 		cmd := NewCreateUser(ui, configRepo, userRepo)
-		testcmd.RunCommand(cmd, ctxt, reqFactory)
+		testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 		return
 	}
 
@@ -71,7 +71,7 @@ var _ = Describe("Create user command", func() {
 	})
 
 	It("fails when the user is not logged in", func() {
-		reqFactory.LoginSuccess = false
+		requirementsFactory.LoginSuccess = false
 
 		runCommand("my-user", "my-password")
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())

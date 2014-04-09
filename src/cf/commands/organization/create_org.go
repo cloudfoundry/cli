@@ -23,7 +23,7 @@ func NewCreateOrg(ui terminal.UI, config configuration.Reader, orgRepo api.Organ
 	return
 }
 
-func (cmd CreateOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd CreateOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-org")
@@ -31,7 +31,7 @@ func (cmd CreateOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

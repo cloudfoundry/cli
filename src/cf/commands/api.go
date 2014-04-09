@@ -25,7 +25,7 @@ func NewApi(ui terminal.UI, config configuration.ReadWriter, endpointRepo api.En
 	return
 }
 
-func (cmd Api) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Api) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

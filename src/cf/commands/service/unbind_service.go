@@ -25,7 +25,7 @@ func NewUnbindService(ui terminal.UI, config configuration.Reader, serviceBindin
 	return
 }
 
-func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *UnbindService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "unbind-service")
@@ -35,11 +35,11 @@ func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cl
 	appName := c.Args()[0]
 	serviceName := c.Args()[1]
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
-	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
+	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.appReq,
 		cmd.serviceInstanceReq,
 	}

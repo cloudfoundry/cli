@@ -39,55 +39,55 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callUpdateUserProvidedService(args []string, reqFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
+func callUpdateUserProvidedService(args []string, requirementsFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("update-user-provided-service", args)
 
 	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewUpdateUserProvidedService(fakeUI, config, userProvidedServiceInstanceRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestUpdateUserProvidedServiceFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-		ui := callUpdateUserProvidedService([]string{}, reqFactory, userProvidedServiceInstanceRepo)
+		ui := callUpdateUserProvidedService([]string{}, requirementsFactory, userProvidedServiceInstanceRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateUserProvidedService([]string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
+		ui = callUpdateUserProvidedService([]string{"foo"}, requirementsFactory, userProvidedServiceInstanceRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 
 	It("TestUpdateUserProvidedServiceRequirements", func() {
 		args := []string{"service-name"}
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-		reqFactory.LoginSuccess = false
-		callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+		requirementsFactory.LoginSuccess = false
+		callUpdateUserProvidedService(args, requirementsFactory, userProvidedServiceInstanceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory.LoginSuccess = true
-		callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+		requirementsFactory.LoginSuccess = true
+		callUpdateUserProvidedService(args, requirementsFactory, userProvidedServiceInstanceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		Expect(reqFactory.ServiceInstanceName).To(Equal("service-name"))
+		Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
 	})
 	It("TestUpdateUserProvidedServiceWhenNoFlagsArePresent", func() {
 
 		args := []string{"service-name"}
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "found-service-name"
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:    true,
 			ServiceInstance: serviceInstance,
 		}
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(args, reqFactory, repo)
+		ui := callUpdateUserProvidedService(args, requirementsFactory, repo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
@@ -100,12 +100,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name"}
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "found-service-name"
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:    true,
 			ServiceInstance: serviceInstance,
 		}
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(args, reqFactory, repo)
+		ui := callUpdateUserProvidedService(args, requirementsFactory, repo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
@@ -121,12 +121,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"-l", "syslog://example.com", "service-name"}
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "found-service-name"
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:    true,
 			ServiceInstance: serviceInstance,
 		}
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(args, reqFactory, repo)
+		ui := callUpdateUserProvidedService(args, requirementsFactory, repo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating user provided service"},
@@ -138,13 +138,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"-p", `{"foo":"ba`, "service-name"}
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "found-service-name"
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:    true,
 			ServiceInstance: serviceInstance,
 		}
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-		ui := callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+		ui := callUpdateUserProvidedService(args, requirementsFactory, userProvidedServiceInstanceRepo)
 
 		Expect(userProvidedServiceInstanceRepo.UpdateServiceInstance).NotTo(Equal(serviceInstance))
 
@@ -162,13 +162,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Name = "found-service-name"
 		serviceInstance.ServicePlan = plan
 
-		reqFactory := &testreq.FakeReqFactory{
+		requirementsFactory := &testreq.FakeReqFactory{
 			LoginSuccess:    true,
 			ServiceInstance: serviceInstance,
 		}
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-		ui := callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+		ui := callUpdateUserProvidedService(args, requirementsFactory, userProvidedServiceInstanceRepo)
 
 		Expect(userProvidedServiceInstanceRepo.UpdateServiceInstance).NotTo(Equal(serviceInstance))
 

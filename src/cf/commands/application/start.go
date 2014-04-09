@@ -78,16 +78,16 @@ func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer Applicat
 	return
 }
 
-func (cmd *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Start) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "start")
 		return
 	}
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement(), cmd.appReq}
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(), cmd.appReq}
 	return
 }
 

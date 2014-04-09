@@ -24,15 +24,15 @@ func NewDeleteDomain(ui terminal.UI, config configuration.Reader, repo api.Domai
 	return
 }
 
-func (cmd *DeleteDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete-domain")
 		return
 	}
 
-	loginReq := reqFactory.NewLoginRequirement()
-	cmd.orgReq = reqFactory.NewTargetedOrgRequirement()
+	loginReq := requirementsFactory.NewLoginRequirement()
+	cmd.orgReq = requirementsFactory.NewTargetedOrgRequirement()
 
 	reqs = []requirements.Requirement{
 		loginReq,

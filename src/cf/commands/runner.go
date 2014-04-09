@@ -9,7 +9,7 @@ import (
 )
 
 type Command interface {
-	GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error)
+	GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error)
 	Run(c *cli.Context)
 }
 
@@ -18,13 +18,13 @@ type Runner interface {
 }
 
 type ConcreteRunner struct {
-	cmdFactory Factory
-	reqFactory requirements.Factory
+	cmdFactory          Factory
+	requirementsFactory requirements.Factory
 }
 
-func NewRunner(cmdFactory Factory, reqFactory requirements.Factory) (runner ConcreteRunner) {
+func NewRunner(cmdFactory Factory, requirementsFactory requirements.Factory) (runner ConcreteRunner) {
 	runner.cmdFactory = cmdFactory
-	runner.reqFactory = reqFactory
+	runner.requirementsFactory = requirementsFactory
 	return
 }
 
@@ -36,7 +36,7 @@ func (runner ConcreteRunner) RunCmdByName(cmdName string, c *cli.Context) (err e
 		return
 	}
 
-	requirements, err := cmd.GetRequirements(runner.reqFactory, c)
+	requirements, err := cmd.GetRequirements(runner.requirementsFactory, c)
 	if err != nil {
 		return
 	}

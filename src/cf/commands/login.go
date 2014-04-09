@@ -38,7 +38,7 @@ func NewLogin(ui terminal.UI,
 	}
 }
 
-func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Login) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

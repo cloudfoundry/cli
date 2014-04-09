@@ -38,7 +38,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callRenameService(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, serviceRepo *testapi.FakeServiceRepo) {
+func callRenameService(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, serviceRepo *testapi.FakeServiceRepo) {
 	ui = &testterm.FakeUI{}
 	serviceRepo = &testapi.FakeServiceRepo{}
 
@@ -47,43 +47,43 @@ func callRenameService(args []string, reqFactory *testreq.FakeReqFactory) (ui *t
 	cmd := NewRenameService(ui, config, serviceRepo)
 	ctxt := testcmd.NewContext("rename-service", args)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestRenameServiceFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 
-		fakeUI, _ := callRenameService([]string{}, reqFactory)
+		fakeUI, _ := callRenameService([]string{}, requirementsFactory)
 		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 
-		fakeUI, _ = callRenameService([]string{"my-service"}, reqFactory)
+		fakeUI, _ = callRenameService([]string{"my-service"}, requirementsFactory)
 		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 
-		fakeUI, _ = callRenameService([]string{"my-service", "new-name", "extra"}, reqFactory)
+		fakeUI, _ = callRenameService([]string{"my-service", "new-name", "extra"}, requirementsFactory)
 		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 	})
 	It("TestRenameServiceRequirements", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-		callRenameService([]string{"my-service", "new-name"}, reqFactory)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+		callRenameService([]string{"my-service", "new-name"}, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-		callRenameService([]string{"my-service", "new-name"}, reqFactory)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+		callRenameService([]string{"my-service", "new-name"}, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		Expect(reqFactory.ServiceInstanceName).To(Equal("my-service"))
+		Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 	})
 	It("TestRenameService", func() {
 
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "different-name"
 		serviceInstance.Guid = "different-name-guid"
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
-		ui, fakeServiceRepo := callRenameService([]string{"my-service", "new-name"}, reqFactory)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
+		ui, fakeServiceRepo := callRenameService([]string{"my-service", "new-name"}, requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Renaming service", "different-name", "new-name", "my-org", "my-space", "my-user"},

@@ -42,12 +42,12 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestShowOrgRequirements", func() {
 		args := []string{"my-org"}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callShowOrg(args, reqFactory)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callShowOrg(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callShowOrg(args, reqFactory)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callShowOrg(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestShowOrgFailsWithUsage", func() {
@@ -55,14 +55,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		org := models.Organization{}
 		org.Name = "my-org"
 		org.Guid = "my-org-guid"
-		reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 		args := []string{"my-org"}
-		ui := callShowOrg(args, reqFactory)
+		ui := callShowOrg(args, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 
 		args = []string{}
-		ui = callShowOrg(args, reqFactory)
+		ui = callShowOrg(args, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 	It("TestRunWhenOrganizationExists", func() {
@@ -82,12 +82,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 		org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
 
-		reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 		args := []string{"my-org"}
-		ui := callShowOrg(args, reqFactory)
+		ui := callShowOrg(args, requirementsFactory)
 
-		Expect(reqFactory.OrganizationName).To(Equal("my-org"))
+		Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting info for org", "my-org", "my-user"},
@@ -100,7 +100,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func callShowOrg(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callShowOrg(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("org", args)
 
@@ -117,6 +117,6 @@ func callShowOrg(args []string, reqFactory *testreq.FakeReqFactory) (ui *testter
 	configRepo.SetOrganizationFields(orgFields)
 
 	cmd := NewShowOrg(ui, configRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }

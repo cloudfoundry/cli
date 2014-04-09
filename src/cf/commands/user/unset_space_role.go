@@ -28,18 +28,18 @@ func NewUnsetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo ap
 	return
 }
 
-func (cmd *UnsetSpaceRole) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *UnsetSpaceRole) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 4 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "unset-space-role")
 		return
 	}
 
-	cmd.userReq = reqFactory.NewUserRequirement(c.Args()[0])
-	cmd.orgReq = reqFactory.NewOrganizationRequirement(c.Args()[1])
+	cmd.userReq = requirementsFactory.NewUserRequirement(c.Args()[0])
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[1])
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.userReq,
 		cmd.orgReq,
 	}

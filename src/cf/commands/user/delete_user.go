@@ -22,14 +22,14 @@ func NewDeleteUser(ui terminal.UI, config configuration.Reader, userRepo api.Use
 	return
 }
 
-func (cmd DeleteUser) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd DeleteUser) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Invalid usage")
 		cmd.ui.FailWithUsage(c, "delete-user")
 		return
 	}
 
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 
 	return
 }

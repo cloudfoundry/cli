@@ -25,7 +25,7 @@ func NewUnmapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.Ro
 	return
 }
 
-func (cmd *UnmapRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *UnmapRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "unmap-route")
@@ -35,11 +35,11 @@ func (cmd *UnmapRoute) GetRequirements(reqFactory requirements.Factory, c *cli.C
 	appName := c.Args()[0]
 	domainName := c.Args()[1]
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
-	cmd.domainReq = reqFactory.NewDomainRequirement(domainName)
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
+	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 		cmd.appReq,
 		cmd.domainReq,
 	}

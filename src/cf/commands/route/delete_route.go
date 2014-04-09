@@ -23,7 +23,7 @@ func NewDeleteRoute(ui terminal.UI, config configuration.Reader, routeRepo api.R
 	return
 }
 
-func (cmd *DeleteRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
@@ -32,7 +32,7 @@ func (cmd *DeleteRoute) GetRequirements(reqFactory requirements.Factory, c *cli.
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

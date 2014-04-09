@@ -15,25 +15,25 @@ import (
 
 var _ = Describe("stacks command", func() {
 	var (
-		ui         *testterm.FakeUI
-		cmd        ListStacks
-		repo       *testapi.FakeStackRepository
-		reqFactory *testreq.FakeReqFactory
+		ui                  *testterm.FakeUI
+		cmd                 ListStacks
+		repo                *testapi.FakeStackRepository
+		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config := testconfig.NewRepositoryWithDefaults()
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		repo = &testapi.FakeStackRepository{}
 		cmd = NewListStacks(ui, config, repo)
 	})
 
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
-			reqFactory.LoginSuccess = false
+			requirementsFactory.LoginSuccess = false
 			context := testcmd.NewContext("stacks", []string{})
-			testcmd.RunCommand(cmd, context, reqFactory)
+			testcmd.RunCommand(cmd, context, requirementsFactory)
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
@@ -50,7 +50,7 @@ var _ = Describe("stacks command", func() {
 
 		repo.FindAllStacks = []models.Stack{stack1, stack2}
 		context := testcmd.NewContext("stacks", []string{})
-		testcmd.RunCommand(cmd, context, reqFactory)
+		testcmd.RunCommand(cmd, context, requirementsFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting stacks in org", "my-org", "my-space", "my-user"},

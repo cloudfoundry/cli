@@ -22,7 +22,7 @@ func NewCreateServiceBroker(ui terminal.UI, config configuration.Reader, service
 	return
 }
 
-func (cmd CreateServiceBroker) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd CreateServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 4 {
 		err = errors.New("Incorrect usage")
@@ -30,7 +30,7 @@ func (cmd CreateServiceBroker) GetRequirements(reqFactory requirements.Factory, 
 		return
 	}
 
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 
 	return
 }

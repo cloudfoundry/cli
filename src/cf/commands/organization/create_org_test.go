@@ -39,7 +39,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callCreateOrg(args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
+func callCreateOrg(args []string, requirementsFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-org", args)
 
@@ -56,38 +56,38 @@ func callCreateOrg(args []string, reqFactory *testreq.FakeReqFactory, orgRepo *t
 
 	cmd := NewCreateOrg(fakeUI, config, orgRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestCreateOrgFailsWithUsage", func() {
 		orgRepo := &testapi.FakeOrgRepository{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-		ui := callCreateOrg([]string{}, reqFactory, orgRepo)
+		ui := callCreateOrg([]string{}, requirementsFactory, orgRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+		ui = callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestCreateOrgRequirements", func() {
 
 		orgRepo := &testapi.FakeOrgRepository{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestCreateOrg", func() {
 
 		orgRepo := &testapi.FakeOrgRepository{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		ui := callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		ui := callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating org", "my-org", "my-user"},
@@ -98,8 +98,8 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestCreateOrgWhenAlreadyExists", func() {
 
 		orgRepo := &testapi.FakeOrgRepository{CreateOrgExists: true}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		ui := callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		ui := callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating org", "my-org"},

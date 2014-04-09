@@ -23,9 +23,9 @@ func NewListQuotas(ui terminal.UI, config configuration.Reader, quotaRepo api.Qu
 	return
 }
 
-func (cmd *ListQuotas) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *ListQuotas) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
+		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }

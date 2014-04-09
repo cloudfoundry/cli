@@ -30,7 +30,7 @@ func NewCreateRoute(ui terminal.UI, config configuration.Reader, routeRepo api.R
 	return
 }
 
-func (cmd *CreateRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
@@ -41,12 +41,12 @@ func (cmd *CreateRoute) GetRequirements(reqFactory requirements.Factory, c *cli.
 	spaceName := c.Args()[0]
 	domainName := c.Args()[1]
 
-	cmd.spaceReq = reqFactory.NewSpaceRequirement(spaceName)
-	cmd.domainReq = reqFactory.NewDomainRequirement(domainName)
+	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(spaceName)
+	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedOrgRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 		cmd.domainReq,
 	}

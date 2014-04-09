@@ -28,7 +28,7 @@ func NewCreateService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	return
 }
 
-func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd CreateService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-service")
@@ -36,8 +36,8 @@ func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli
 	}
 
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedSpaceRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
 	return

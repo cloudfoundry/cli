@@ -22,14 +22,14 @@ func NewUpdateServiceBroker(ui terminal.UI, config configuration.Reader, repo ap
 	return
 }
 
-func (cmd UpdateServiceBroker) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd UpdateServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 4 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "update-service-broker")
 		return
 	}
 
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 
 	return
 }

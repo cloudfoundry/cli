@@ -23,13 +23,13 @@ func NewCreateUser(ui terminal.UI, config configuration.Reader, userRepo api.Use
 	return
 }
 
-func (cmd CreateUser) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd CreateUser) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-user")
 	}
 
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 
 	return
 }

@@ -26,17 +26,17 @@ func NewSetEnv(ui terminal.UI, config configuration.Reader, appRepo api.Applicat
 	return
 }
 
-func (cmd *SetEnv) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *SetEnv) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) < 3 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "set-env")
 		return
 	}
 
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
-		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedSpaceRequirement(),
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 	return

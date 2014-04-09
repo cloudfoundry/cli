@@ -41,8 +41,8 @@ func NewContext(cmdName string, args []string) *cli.Context {
 
 func findCommand(cmdName string) (cmd cli.Command) {
 	cmdFactory := commands.ConcreteFactory{}
-	reqFactory := &testreq.FakeReqFactory{}
-	cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
+	requirementsFactory := &testreq.FakeReqFactory{}
+	cmdRunner := commands.NewRunner(cmdFactory, requirementsFactory)
 	myApp, _ := app.NewApp(cmdRunner)
 
 	for _, cmd := range myApp.Commands {

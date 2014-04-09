@@ -39,39 +39,39 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callMapRoute(args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, createRoute *testcmd.FakeRouteCreator) (ui *testterm.FakeUI) {
+func callMapRoute(args []string, requirementsFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, createRoute *testcmd.FakeRouteCreator) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	var ctxt *cli.Context = testcmd.NewContext("map-route", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewMapRoute(ui, configRepo, routeRepo, createRoute)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestMapRouteFailsWithUsage", func() {
-		reqFactory := &testreq.FakeReqFactory{}
+		requirementsFactory := &testreq.FakeReqFactory{}
 		routeRepo := &testapi.FakeRouteRepository{}
 
-		ui := callMapRoute([]string{}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
+		ui := callMapRoute([]string{}, requirementsFactory, routeRepo, &testcmd.FakeRouteCreator{})
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callMapRoute([]string{"foo"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
+		ui = callMapRoute([]string{"foo"}, requirementsFactory, routeRepo, &testcmd.FakeRouteCreator{})
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callMapRoute([]string{"foo", "bar"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
+		ui = callMapRoute([]string{"foo", "bar"}, requirementsFactory, routeRepo, &testcmd.FakeRouteCreator{})
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestMapRouteRequirements", func() {
 
 		routeRepo := &testapi.FakeRouteRepository{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-		callMapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
+		callMapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, requirementsFactory, routeRepo, &testcmd.FakeRouteCreator{})
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		Expect(reqFactory.DomainName).To(Equal("my-domain.com"))
+		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
+		Expect(requirementsFactory.DomainName).To(Equal("my-domain.com"))
 	})
 	It("TestMapRouteWhenBinding", func() {
 
@@ -88,10 +88,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		app.Name = "my-app"
 
 		routeRepo := &testapi.FakeRouteRepository{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app, Domain: domain}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app, Domain: domain}
 		routeCreator := &testcmd.FakeRouteCreator{ReservedRoute: route}
 
-		ui := callMapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator)
+		ui := callMapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, requirementsFactory, routeRepo, routeCreator)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Adding route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
@@ -114,10 +114,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		app.Name = "my-app"
 
 		routeRepo := &testapi.FakeRouteRepository{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
+		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 		routeCreator := &testcmd.FakeRouteCreator{ReservedRoute: route}
 
-		callMapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator)
+		callMapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, requirementsFactory, routeRepo, routeCreator)
 
 		Expect(routeCreator.ReservedRoute).To(Equal(route))
 	})
