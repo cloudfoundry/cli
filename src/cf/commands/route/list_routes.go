@@ -23,9 +23,11 @@ func NewListRoutes(ui terminal.UI, config configuration.Reader, routeRepo api.Ro
 	return
 }
 
-func (cmd ListRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
-	return
+func (cmd ListRoutes) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
+	return []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
+	}, nil
 }
 
 func (cmd ListRoutes) Run(c *cli.Context) {
