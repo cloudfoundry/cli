@@ -35,17 +35,8 @@ func (cmd DeleteServiceBroker) GetRequirements(reqFactory requirements.Factory, 
 }
 func (cmd DeleteServiceBroker) Run(c *cli.Context) {
 	brokerName := c.Args()[0]
-	force := c.Bool("f")
-
-	if !force {
-		response := cmd.ui.Confirm(
-			"Really delete %s?%s",
-			terminal.EntityNameColor(brokerName),
-			terminal.PromptColor(">"),
-		)
-		if !response {
-			return
-		}
+	if !c.Bool("f") && !cmd.ui.ConfirmDelete("service-broker", brokerName) {
+		return
 	}
 
 	cmd.ui.Say("Deleting service broker %s as %s...",

@@ -62,7 +62,7 @@ var _ = Describe("delete-service-broker command", func() {
 			Expect(brokerRepo.DeletedServiceBrokerGuid).To(Equal("service-broker-to-delete-guid"))
 			Expect(len(ui.Outputs)).To(Equal(2))
 			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Really delete", "service-broker-to-delete"},
+				{"Really delete the service-broker service-broker-to-delete"},
 			})
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -91,6 +91,7 @@ var _ = Describe("delete-service-broker command", func() {
 		})
 
 		It("warns the user", func() {
+			ui.Inputs = []string{}
 			runCommand("-f", "service-broker-to-delete")
 
 			Expect(brokerRepo.FindByNameName).To(Equal("service-broker-to-delete"))
