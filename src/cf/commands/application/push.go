@@ -32,6 +32,7 @@ type Push struct {
 	serviceRepo   api.ServiceRepository
 	stackRepo     api.StackRepository
 	appBitsRepo   api.ApplicationBitsRepository
+	authRepo      api.AuthenticationRepository
 	wordGenerator words.WordGenerator
 }
 
@@ -39,7 +40,7 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
 	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
 	stackRepo api.StackRepository, serviceRepo api.ServiceRepository, appBitsRepo api.ApplicationBitsRepository,
-	wordGenerator words.WordGenerator) *Push {
+	authRepo api.AuthenticationRepository, wordGenerator words.WordGenerator) *Push {
 	return &Push{
 		ui:            ui,
 		config:        config,
@@ -53,6 +54,7 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 		serviceRepo:   serviceRepo,
 		stackRepo:     stackRepo,
 		appBitsRepo:   appBitsRepo,
+		authRepo:      authRepo,
 		wordGenerator: wordGenerator,
 	}
 }
@@ -73,6 +75,7 @@ func (cmd *Push) GetRequirements(requirementsFactory requirements.Factory, c *cl
 
 func (cmd *Push) Run(c *cli.Context) {
 	appSet := cmd.findAndValidateAppsToPush(c)
+	cmd.authRepo.RefreshAuthToken()
 
 	for _, appParams := range appSet {
 		cmd.fetchStackGuid(&appParams)

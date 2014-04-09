@@ -16,9 +16,10 @@ type FakeAuthenticationRepository struct {
 		Prompts map[string]configuration.AuthPrompt
 	}
 
-	AuthError    bool
-	AccessToken  string
-	RefreshToken string
+	AuthError          bool
+	AccessToken        string
+	RefreshToken       string
+	RefreshTokenCalled bool
 }
 
 func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiErr error) {
@@ -40,6 +41,7 @@ func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]st
 }
 
 func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr error) {
+	auth.RefreshTokenCalled = true
 	return
 }
 

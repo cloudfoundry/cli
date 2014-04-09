@@ -41,6 +41,7 @@ var _ = Describe("Push Command", func() {
 		serviceRepo         *testapi.FakeServiceRepo
 		wordGenerator       words.WordGenerator
 		requirementsFactory *testreq.FakeReqFactory
+		authRepo            *testapi.FakeAuthenticationRepository
 	)
 
 	BeforeEach(func() {
@@ -58,6 +59,7 @@ var _ = Describe("Push Command", func() {
 		stackRepo = &testapi.FakeStackRepository{}
 		appBitsRepo = &testapi.FakeApplicationBitsRepository{CallbackZipSize: 1, CallbackFileCount: 1}
 		serviceRepo = &testapi.FakeServiceRepo{}
+		authRepo = &testapi.FakeAuthenticationRepository{}
 		wordGenerator = testwords.NewFakeWordGenerator("laughing-cow")
 
 		ui = new(testterm.FakeUI)
@@ -65,7 +67,15 @@ var _ = Describe("Push Command", func() {
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-		cmd = NewPush(ui, configRepo, manifestRepo, starter, stopper, serviceBinder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo, wordGenerator)
+		cmd = NewPush(ui, configRepo, manifestRepo, starter, stopper, serviceBinder,
+			appRepo,
+			domainRepo,
+			routeRepo,
+			stackRepo,
+			serviceRepo,
+			appBitsRepo,
+			authRepo,
+			wordGenerator)
 	})
 
 	callPush := func(args ...string) {
@@ -103,6 +113,12 @@ var _ = Describe("Push Command", func() {
 		BeforeEach(func() {
 			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 			routeRepo.FindByHostAndDomainErr = true
+		})
+
+		It("refreshes the auth token (so fresh)", func() { // so clean
+			callPush("fresh-prince")
+
+			Expect(authRepo.RefreshTokenCalled).To(BeTrue())
 		})
 
 		It("creates an app", func() {
