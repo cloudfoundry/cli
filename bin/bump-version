@@ -34,7 +34,7 @@ echo $version > VERSION
 echo "Committing change"
 git reset .
 git add VERSION
-git commit -m "Bump version to $version"
+git ci -m "Bump version to $version"
 
 echo "Creating v$version tag"
 git tag v$version
