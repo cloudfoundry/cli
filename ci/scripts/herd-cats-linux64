@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+git submodule update --init
+
+GOPATH=$(pwd) go build -v -o cf main
+
+export GOPATH=~/go
+export CATSPATH=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
+cp cf $CATSPATH/gcf
+
+export PATH=$PATH:$CATSPATH
+
+cd $CATSPATH
+$GOPATH/bin/ginkgo -r -v -slowSpecThreshold=300 -skip="admin buildpack"

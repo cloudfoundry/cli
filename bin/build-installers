@@ -71,8 +71,8 @@ echo "building amd64 RPM package"
     RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
     echo "Version: ${RPM_VERSION}" > cf-cli.spec
     cat cf-cli.spec.template >> cf-cli.spec
-    rpmbuild --target amd64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-    mv build/RPMS/amd64/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_amd64.rpm
+    rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+    mv build/RPMS/x86_64/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_amd64.rpm
     rm -rf build cf cf-cli.spec
 )
 
@@ -87,7 +87,8 @@ echo "building OS X installer"
     ( cd cf-cli && find usr | cpio -o --format=odc | gzip -c > ../Payload )
     ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
     mkbom -i bom_list Bom
-    xar -c --compression none -f installer-osx-amd64.pkg Bom PackageInfo Payload
+    mv Bom Payload com.cloudfoundry.cli.pkg
+    xar -c --compression none -f installer-osx-amd64.pkg com.cloudfoundry.cli.pkg Distribution
     mv installer-osx-amd64.pkg ${RELEASE_DIR}/
     rm -rf cf-cli Payload Bom bom_list
 )

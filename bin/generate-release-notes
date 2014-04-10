@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+PREVIOUS_VERSION=$1
+
+if [ -z $PREVIOUS_VERSION ]; then
+    cat <<-INFO
+NAME:
+  generate-release-notes - Generate release notes relative to a given version
+
+USAGE:
+  generate-release-notes PREVIOUS_VERSION [--all]
+
+EXAMPLE:
+  generate-release-notes 6.0.1
+INFO
+
+    exit 1
+fi
+
+if [ -z $(echo $PREVIOUS_VERSION | grep -e 'v') ]; then
+    echo "Error - PREVIOUS_VERSION argument should have this form: v6.0.1"
+    exit 1
+fi
+
+SHOW_ALL_COMMITS=''
+if [ "$2" = "--all" ]; then
+  SHOW_ALL_COMMITS=true
+fi
+
+VERSION=v$(cat VERSION)
+
+cat <<-NOTES
+CF version $VERSION
+===================
+
+Installers
+----------
+- [Debian 32 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-cli_i386.deb)
+- [Debian 64 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-cli_amd64.deb)
+- [Redhat 32 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-cli_i386.rpm)
+- [Redhat 64 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-cli_amd64.rpm)
+- [Mac OS X 64 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/installer-osx-amd64.pkg)
+- [Windows 32 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/installer-windows-386.zip)
+- [Windows 64 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/installer-windows-amd64.zip)
+
+Binaries
+--------
+- [Linux 32 bit binary]   (https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-linux-386.tgz)
+- [Linux 64 bit binary]   (https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-linux-amd64.tgz)
+- [Mac OS X 64 bit binary](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-darwin-amd64.tgz)
+- [Windows 32 bit binary] (https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-windows-386.zip)
+- [Windows 64 bit binary] (https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-windows-amd64.zip)
+
+Change Log
+----------
+NOTES
+
+if [ -z $SHOW_ALL_COMMITS ]; then
+  git --no-pager log \
+    $PREVIOUS_VERSION..$VERSION \
+    --grep "\[.*\d*\]" \
+    --pretty=format:'#### %s%n%b'
+else
+  git --no-pager log \
+    $PREVIOUS_VERSION..$VERSION \
+    --pretty=format:'#### %s%n%b'
+fi

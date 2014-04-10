@@ -1,9 +1,15 @@
 #!/bin/bash
 
 CURRENT_SHA=$(git rev-parse --short HEAD)
+CURRENT_VERSION=$(cat VERSION)
+VERSION_STRING=$CURRENT_VERSION-$CURRENT_SHA
 
 if [ $(uname) == darwin ]; then
-    sed -i "" -e "s/SHA/$CURRENT_SHA/g" $(dirname $0)/../src/cf/app_constants.go
+    DATE_STRING=$(date +"%b %d, %Y %I:%M%p")
+    sed -i "" -e "s/BUILT_FROM_SOURCE/$VERSION_STRING/g" $(dirname $0)/../src/cf/app_constants.go
+    sed -i "" -e "s/BUILT_AT_UNKNOWN_TIME/$DATE_STRING/g" $(dirname $0)/../src/cf/app_constants.go
 else
-    sed -i -e "s/SHA/$CURRENT_SHA/g" $(dirname $0)/../src/cf/app_constants.go
+    DATE_STRING=$(date +"%b %d, %Y %I:%M%p")
+    sed -i -e "s/BUILT_FROM_SOURCE/$VERSION_STRING/g" $(dirname $0)/../src/cf/app_constants.go
+    sed -i -e "s/BUILT_AT_UNKNOWN_TIME/$DATE_STRING/g" $(dirname $0)/../src/cf/app_constants.go
 fi
