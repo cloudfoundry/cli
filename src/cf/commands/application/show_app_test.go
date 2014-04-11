@@ -1,208 +1,175 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/cf/commands/application/delete_app_test.go
-   src/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package application_test
 
 import (
 	. "cf/commands/application"
+	"cf/configuration"
 	"cf/errors"
 	"cf/formatters"
 	"cf/models"
-	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+	testtime "testhelpers/time"
 
 	. "github.com/onsi/ginkgo"
-	"time"
+	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Show App Command", func() {
-	It("requires the user to be logged in and have a targeted space", func() {
-		args := []string{"my-app", "/foo"}
-		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
-		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
+var _ = Describe("app Command", func() {
+	var (
+		ui                  *testterm.FakeUI
+		configRepo          configuration.ReadWriter
+		appSummaryRepo      *testapi.FakeAppSummaryRepo
+		appInstancesRepo    *testapi.FakeAppInstancesRepo
+		requirementsFactory *testreq.FakeReqFactory
+	)
 
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
-		callApp(args, requirementsFactory, appSummaryRepo, appInstancesRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
-		callApp(args, requirementsFactory, appSummaryRepo, appInstancesRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-		callApp(args, requirementsFactory, appSummaryRepo, appInstancesRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
+		appInstancesRepo = &testapi.FakeAppInstancesRepo{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		requirementsFactory = &testreq.FakeReqFactory{
+			LoginSuccess:         true,
+			TargetedSpaceSuccess: true,
+		}
 	})
 
-	It("requires an app name", func() {
-		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
-		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-		ui := callApp([]string{}, requirementsFactory, appSummaryRepo, appInstancesRepo)
+	runCommand := func(args ...string) {
+		cmd := NewShowApp(ui, configRepo, appSummaryRepo, appInstancesRepo)
+		testcmd.RunCommand(cmd, testcmd.NewContext("apps", args), requirementsFactory)
+	}
 
-		Expect(ui.FailedWithUsage).To(BeTrue())
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	Describe("requirements", func() {
+		It("fails if not logged in", func() {
+			requirementsFactory.LoginSuccess = false
+			runCommand("cf-plays-dwarf-fortress")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+
+		It("fails if a space is not targeted", func() {
+			requirementsFactory.TargetedSpaceSuccess = false
+			runCommand("cf-plays-dwarf-fortress")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+
+		It("fails with usage when no arguments are given", func() {
+			runCommand()
+			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+
 	})
 
-	It("displays a summary of the app", func() {
-		reqApp := models.Application{}
-		reqApp.Name = "my-app"
-		reqApp.Guid = "my-app-guid"
+	Describe("displaying a summary of an app", func() {
+		BeforeEach(func() {
+			app := makeAppWithRoute("my-app")
+			appInstance := models.AppInstanceFields{
+				State:     models.InstanceRunning,
+				Since:     testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012"),
+				CpuUsage:  1.0,
+				DiskQuota: 1 * formatters.GIGABYTE,
+				DiskUsage: 32 * formatters.MEGABYTE,
+				MemQuota:  64 * formatters.MEGABYTE,
+				MemUsage:  13 * formatters.BYTE,
+			}
 
-		route1 := models.RouteSummary{}
-		route1.Host = "my-app"
+			appInstance2 := models.AppInstanceFields{
+				State: models.InstanceDown,
+				Since: testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012"),
+			}
 
-		domain := models.DomainFields{}
-		domain.Name = "example.com"
-		route1.Domain = domain
+			instances := []models.AppInstanceFields{appInstance, appInstance2}
 
-		route2 := models.RouteSummary{}
-		route2.Host = "foo"
-		domain2 := models.DomainFields{}
-		domain2.Name = "example.com"
-		route2.Domain = domain2
+			appSummaryRepo.GetSummarySummary = app
+			appInstancesRepo.GetInstancesResponses = [][]models.AppInstanceFields{instances}
+			requirementsFactory.Application = app
+		})
 
-		application := models.Application{}
-		application.State = "started"
-		application.InstanceCount = 2
-		application.RunningInstances = 2
-		application.Memory = 256
-		application.Routes = []models.RouteSummary{route1, route2}
+		It("displays a summary of the app", func() {
+			runCommand("my-app")
 
-		time1, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012")
-		Expect(err).NotTo(HaveOccurred())
+			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
 
-		time2, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012")
-		Expect(err).NotTo(HaveOccurred())
-
-		appInstance := models.AppInstanceFields{}
-		appInstance.State = models.InstanceRunning
-		appInstance.Since = time1
-		appInstance.CpuUsage = 1.0
-		appInstance.DiskQuota = 1 * formatters.GIGABYTE
-		appInstance.DiskUsage = 32 * formatters.MEGABYTE
-		appInstance.MemQuota = 64 * formatters.MEGABYTE
-		appInstance.MemUsage = 13 * formatters.BYTE
-
-		appInstance2 := models.AppInstanceFields{}
-		appInstance2.State = models.InstanceDown
-		appInstance2.Since = time2
-
-		instances := []models.AppInstanceFields{appInstance, appInstance2}
-
-		appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: application}
-		appInstancesRepo := &testapi.FakeAppInstancesRepo{GetInstancesResponses: [][]models.AppInstanceFields{instances}}
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-		ui := callApp([]string{"my-app"}, requirementsFactory, appSummaryRepo, appInstancesRepo)
-
-		Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Showing health and status", "my-app"},
-			{"state", "started"},
-			{"instances", "2/2"},
-			{"usage", "256M x 2 instances"},
-			{"urls", "my-app.example.com", "foo.example.com"},
-			{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
-			{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Showing health and status", "my-app"},
+				{"state", "started"},
+				{"instances", "2/2"},
+				{"usage", "256M x 2 instances"},
+				{"urls", "my-app.example.com", "foo.example.com"},
+				{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
+				{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
+			})
 		})
 	})
 
-	It("TestDisplayingStoppedAppSummary", func() {
-		testDisplayingAppSummaryWithErrorCode(errors.APP_STOPPED)
-	})
+	Describe("when the app is not running", func() {
+		BeforeEach(func() {
+			application := models.Application{}
+			application.Name = "my-app"
+			application.Guid = "my-app-guid"
+			application.State = "stopped"
+			application.InstanceCount = 2
+			application.RunningInstances = 0
+			application.Memory = 256
 
-	It("TestDisplayingNotStagedAppSummary", func() {
-		testDisplayingAppSummaryWithErrorCode(errors.APP_NOT_STAGED)
+			appSummaryRepo.GetSummarySummary = application
+			requirementsFactory.Application = application
+		})
+
+		It("displays nice output when the app is stopped", func() {
+			appSummaryRepo.GetSummaryErrorCode = errors.APP_STOPPED
+			runCommand("my-app")
+
+			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
+			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
+				{"state", "stopped"},
+				{"instances", "0/2"},
+				{"usage", "256M x 2 instances"},
+				{"no running instances"},
+			})
+		})
+
+		It("displays nice output when the app has not yet finished staging", func() {
+			appSummaryRepo.GetSummaryErrorCode = errors.APP_NOT_STAGED
+			runCommand("my-app")
+
+			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
+			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
+				{"state", "stopped"},
+				{"instances", "0/2"},
+				{"usage", "256M x 2 instances"},
+				{"no running instances"},
+			})
+		})
 	})
 })
 
-func testDisplayingAppSummaryWithErrorCode(errorCode string) {
-	reqApp := models.Application{}
-	reqApp.Name = "my-app"
-	reqApp.Guid = "my-app-guid"
-
-	domain3 := models.DomainFields{}
-	domain3.Name = "example.com"
-	domain4 := models.DomainFields{}
-	domain4.Name = "example.com"
-
-	route1 := models.RouteSummary{}
-	route1.Host = "my-app"
-	route1.Domain = domain3
-
-	route2 := models.RouteSummary{}
-	route2.Host = "foo"
-	route2.Domain = domain4
-
-	routes := []models.RouteSummary{
-		route1,
-		route2,
-	}
-
-	app := models.ApplicationFields{}
-	app.State = "stopped"
-	app.InstanceCount = 2
-	app.RunningInstances = 0
-	app.Memory = 256
-
+func makeAppWithRoute(appName string) models.Application {
 	application := models.Application{}
-	application.ApplicationFields = app
-	application.Routes = routes
+	application.Name = appName
+	application.Guid = "app-guid"
 
-	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: application, GetSummaryErrorCode: errorCode}
-	appInstancesRepo := &testapi.FakeAppInstancesRepo{}
-	requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-	ui := callApp([]string{"my-app"}, requirementsFactory, appSummaryRepo, appInstancesRepo)
+	domain := models.DomainFields{}
+	domain.Name = "example.com"
 
-	Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
-	Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
+	route := models.RouteSummary{Host: "foo", Domain: domain}
+	secondRoute := models.RouteSummary{Host: appName, Domain: domain}
 
-	testassert.SliceContains(ui.Outputs, testassert.Lines{
-		{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
-		{"state", "stopped"},
-		{"instances", "0/2"},
-		{"usage", "256M x 2 instances"},
-		{"urls", "my-app.example.com, foo.example.com"},
-		{"no running instances"},
-	})
-}
+	application.State = "started"
+	application.InstanceCount = 2
+	application.RunningInstances = 2
+	application.Memory = 256
+	application.Routes = []models.RouteSummary{route, secondRoute}
 
-func callApp(args []string, requirementsFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo, appInstancesRepo *testapi.FakeAppInstancesRepo) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("app", args)
-
-	configRepo := testconfig.NewRepositoryWithDefaults()
-	cmd := NewShowApp(ui, configRepo, appSummaryRepo, appInstancesRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
-
-	return
+	return application
 }
