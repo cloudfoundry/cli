@@ -34,7 +34,6 @@ type UI interface {
 	ShowConfiguration(configuration.Reader)
 	LoadingIndication()
 	Wait(duration time.Duration)
-	DisplayTable(table [][]string)
 	Table(headers []string) Table
 }
 
@@ -185,30 +184,6 @@ func (c terminalUI) Wait(duration time.Duration) {
 
 func (ui terminalUI) Table(headers []string) Table {
 	return NewTable(ui, headers)
-}
-
-func (ui terminalUI) DisplayTable(table [][]string) {
-
-	columnCount := len(table[0])
-	maxSizes := make([]int, columnCount)
-
-	for _, line := range table {
-		for index, value := range line {
-			cellLength := len(decolorize(value))
-			if maxSizes[index] < cellLength {
-				maxSizes[index] = cellLength
-			}
-		}
-	}
-
-	for row, line := range table {
-		for col, value := range line {
-			padding := strings.Repeat(" ", maxSizes[col]-len(decolorize(value)))
-			value = tableColoringFunc(value, row, col)
-			fmt.Printf("%s%s   ", value, padding)
-		}
-		fmt.Print("\n")
-	}
 }
 
 func tableColoringFunc(value string, row int, col int) string {

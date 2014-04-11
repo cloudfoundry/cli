@@ -129,17 +129,6 @@ func (c FakeUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
 }
 
-func (ui *FakeUI) DisplayTable(table [][]string) {
-
-	for _, line := range table {
-		output := ""
-		for _, value := range line {
-			output = output + value + "  "
-		}
-		ui.Say("%s", output)
-	}
-}
-
 func (ui *FakeUI) Table(headers []string) term.Table {
 	return term.NewTable(ui, headers)
 }
