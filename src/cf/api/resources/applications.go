@@ -51,14 +51,15 @@ type ApplicationEntity struct {
 	HealthCheckTimeout *int                `json:"health_check_timeout,omitempty"`
 }
 
-func (resource AppRouteResource) ToFields() (route models.RouteFields) {
+func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
 	route.Guid = resource.Metadata.Guid
 	route.Host = resource.Entity.Host
 	return
 }
 
 func (resource AppRouteResource) ToModel() (route models.RouteSummary) {
-	route.RouteFields = resource.ToFields()
+	route.Guid = resource.Metadata.Guid
+	route.Host = resource.Entity.Host
 	route.Domain.Guid = resource.Entity.Domain.Metadata.Guid
 	route.Domain.Name = resource.Entity.Domain.Entity.Name
 	return
