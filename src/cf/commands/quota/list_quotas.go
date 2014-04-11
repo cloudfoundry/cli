@@ -6,6 +6,7 @@ import (
 	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
+	"fmt"
 	"github.com/codegangsta/cli"
 )
 
@@ -42,16 +43,17 @@ func (cmd *ListQuotas) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := [][]string{
-		[]string{"name", "memory limit"},
-	}
+	table := terminal.NewTable(cmd.ui, []string{"name", "memory limit", "routes", "service instances"})
+	rows := [][]string{}
 
 	for _, quota := range quotas {
-		table = append(table, []string{
+		rows = append(rows, []string{
 			quota.Name,
 			formatters.ByteSize(quota.MemoryLimit * formatters.MEGABYTE),
+			fmt.Sprintf("%d", quota.RoutesLimit),
+			fmt.Sprintf("%d", quota.ServicesLimit),
 		})
 	}
 
-	cmd.ui.DisplayTable(table)
+	table.Print(rows)
 }
