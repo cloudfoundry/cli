@@ -9,7 +9,6 @@ import (
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
-	"testhelpers/maker"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
@@ -50,7 +49,7 @@ var _ = Describe("delete-route command", func() {
 	Context("when logged in successfully", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
-			route := maker.NewRoute(maker.Overrides{"guid": "route-guid"})
+			route := models.Route{Guid: "route-guid"}
 			route.Domain = models.DomainFields{
 				Guid: "domain-guid",
 				Name: "example.com",

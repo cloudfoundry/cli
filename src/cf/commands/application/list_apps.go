@@ -53,9 +53,16 @@ func (cmd ListApps) Run(c *cli.Context) {
 		return
 	}
 
-	table := [][]string{
-		[]string{"name", "requested state", "instances", "memory", "disk", "urls"},
-	}
+	table := terminal.NewTable(cmd.ui, []string{
+		"name",
+		"requested state",
+		"instances",
+		"memory",
+		"disk",
+		"urls",
+	})
+
+	rows := [][]string{}
 
 	for _, application := range apps {
 		var urls []string
@@ -63,7 +70,7 @@ func (cmd ListApps) Run(c *cli.Context) {
 			urls = append(urls, route.URL())
 		}
 
-		table = append(table, []string{
+		rows = append(rows, []string{
 			application.Name,
 			coloredAppState(application.ApplicationFields),
 			coloredAppInstances(application.ApplicationFields),
@@ -73,5 +80,5 @@ func (cmd ListApps) Run(c *cli.Context) {
 		})
 	}
 
-	cmd.ui.DisplayTable(table)
+	table.Print(rows)
 }

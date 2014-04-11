@@ -125,14 +125,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		routeRepo := &testapi.FakeRouteRepository{
 			CreateInSpaceErr: true,
 			FindByHostAndDomainRoute: models.Route{
-				Space: space.SpaceFields,
-				RouteSummary: models.RouteSummary{
-					RouteFields: models.RouteFields{
-						Guid: "my-route-guid",
-						Host: "host",
-					},
-					Domain: domain,
-				},
+				Space:  space.SpaceFields,
+				Guid:   "my-route-guid",
+				Host:   "host",
+				Domain: domain,
 			},
 		}
 

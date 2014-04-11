@@ -69,13 +69,11 @@ var _ = Describe("Unmap Route Command", func() {
 			Guid: "my-domain-guid",
 			Name: "example.com",
 		}
-		route := models.Route{RouteSummary: models.RouteSummary{
+		route := models.Route{
 			Domain: domain,
-			RouteFields: models.RouteFields{
-				Guid: "my-route-guid",
-				Host: "foo",
-			},
-		}}
+			Guid:   "my-route-guid",
+			Host:   "foo",
+		}
 		app := models.Application{ApplicationFields: models.ApplicationFields{
 			Guid: "my-app-guid",
 			Name: "my-app",
