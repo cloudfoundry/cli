@@ -7,7 +7,10 @@ func NewQuotaFields(name string, memory uint64) (q QuotaFields) {
 }
 
 type QuotaFields struct {
-	Guid        string
-	Name        string
-	MemoryLimit uint64 // in Megabytes
+	Guid                    string `json:"guid,omitempty"`
+	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
+	Name                    string `json:"name"`
+	MemoryLimit             uint64 `json:"memory_limit"` // in Megabytes
+	RoutesLimit             uint   `json:"total_routes"`
+	ServicesLimit           uint   `json:"total_services"`
 }

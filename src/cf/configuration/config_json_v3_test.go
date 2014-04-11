@@ -22,9 +22,11 @@ var exampleJSON = `
 		"Guid": "the-org-guid",
 		"Name": "the-org",
 		"QuotaDefinition": {
-			"Guid": "",
-			"Name": "",
-			"MemoryLimit": 0
+			"non_basic_services_allowed": false,
+			"name":"",
+			"memory_limit":0,
+			"total_routes":0,
+			"total_services":0
 		}
 	},
 	"SpaceFields": {
