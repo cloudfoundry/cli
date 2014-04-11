@@ -8,17 +8,14 @@ type PaginatedQuotaResources struct {
 
 type QuotaResource struct {
 	Resource
-	Entity QuotaEntity
-}
-
-type QuotaEntity struct {
-	Name        string
-	MemoryLimit uint64 `json:"memory_limit"`
+	Entity models.QuotaFields
 }
 
 func (resource QuotaResource) ToFields() (quota models.QuotaFields) {
 	quota.Guid = resource.Metadata.Guid
 	quota.Name = resource.Entity.Name
 	quota.MemoryLimit = resource.Entity.MemoryLimit
+	quota.RoutesLimit = resource.Entity.RoutesLimit
+	quota.ServicesLimit = resource.Entity.ServicesLimit
 	return
 }
