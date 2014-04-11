@@ -5,6 +5,8 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+
+	"code.google.com/p/go.crypto/ssh/terminal"
 )
 
 type Color uint
@@ -114,4 +116,8 @@ func LogAppHeaderColor(message string) string {
 
 func LogSysHeaderColor(message string) string {
 	return ColorizeBold(message, cyan)
+}
+
+func isTerminal() bool {
+	return terminal.IsTerminal(1)
 }
