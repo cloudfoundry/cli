@@ -14,13 +14,14 @@ type RouteEntity struct {
 	Apps   []ApplicationResource
 }
 
-func (resource RouteResource) ToFields() (fields models.RouteFields) {
+func (resource RouteResource) ToFields() (fields models.Route) {
 	fields.Guid = resource.Metadata.Guid
 	fields.Host = resource.Entity.Host
 	return
 }
 func (resource RouteResource) ToModel() (route models.Route) {
-	route.RouteFields = resource.ToFields()
+	route.Host = resource.Entity.Host
+	route.Guid = resource.Metadata.Guid
 	route.Domain = resource.Entity.Domain.ToFields()
 	route.Space = resource.Entity.Space.ToFields()
 	for _, appResource := range resource.Entity.Apps {

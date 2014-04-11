@@ -679,14 +679,15 @@ var _ = Describe("Push Command", func() {
 				}
 
 				domainRepo.ListDomainsForOrgDomains = []models.DomainFields{domain}
+				routeRepo.FindByHostAndDomainRoute = models.Route{
+					Host:   "existing-app",
+					Domain: domain,
+				}
 
-				existingRoute := models.RouteSummary{}
-				existingRoute.Host = "existing-app"
-				existingRoute.Domain = domain
-
-				routeRepo.FindByHostAndDomainRoute = models.Route{RouteSummary: existingRoute}
-
-				existingApp.Routes = []models.RouteSummary{existingRoute}
+				existingApp.Routes = []models.RouteSummary{models.RouteSummary{
+					Host:   "existing-app",
+					Domain: domain,
+				}}
 
 				appRepo.ReadReturns.App = existingApp
 				appRepo.UpdateAppResult = existingApp
