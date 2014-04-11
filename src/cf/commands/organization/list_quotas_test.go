@@ -1,91 +1,59 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/cf/commands/application/delete_app_test.go
-   src/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package organization_test
 
 import (
-	"cf/commands/organization"
-	"cf/configuration"
+	. "cf/commands/organization"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "testhelpers/matchers"
+
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
 
-func callListQuotas(requirementsFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("quotas", []string{})
+var _ = Describe("quotas command", func() {
+	var (
+		ui                  *testterm.FakeUI
+		quotaRepo           *testapi.FakeQuotaRepository
+		requirementsFactory *testreq.FakeReqFactory
+	)
 
-	spaceFields := models.SpaceFields{}
-	spaceFields.Name = "my-space"
-
-	orgFields := models.OrganizationFields{}
-	orgFields.Name = "my-org"
-
-	token := configuration.TokenInfo{Username: "my-user"}
-	config := testconfig.NewRepositoryWithAccessToken(token)
-	config.SetSpaceFields(spaceFields)
-	config.SetOrganizationFields(orgFields)
-
-	cmd := organization.NewListQuotas(fakeUI, config, quotaRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
-	return
-}
-
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestListQuotasRequirements", func() {
-		quotaRepo := &testapi.FakeQuotaRepository{}
-
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callListQuotas(requirementsFactory, quotaRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callListQuotas(requirementsFactory, quotaRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		quotaRepo = &testapi.FakeQuotaRepository{}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
-	It("TestListQuotas", func() {
 
-		quota := models.QuotaFields{}
-		quota.Name = "quota-name"
-		quota.MemoryLimit = 1024
+	runCommand := func() {
+		cmd := NewListQuotas(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
+		testcmd.RunCommand(cmd, testcmd.NewContext("create-quota", []string{}), requirementsFactory)
+	}
 
-		quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: []models.QuotaFields{quota}}
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		ui := callListQuotas(requirementsFactory, quotaRepo)
+	Describe("requirements", func() {
+		It("requires the user to be logged in", func() {
+			requirementsFactory.LoginSuccess = false
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting quotas as", "my-user"},
-			{"OK"},
-			{"name", "memory limit"},
-			{"quota-name", "1g"},
+			runCommand()
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
+	})
+
+	It("lists quotas", func() {
+		quotaRepo.FindAllQuotas = []models.QuotaFields{
+			models.QuotaFields{
+				Name: "quota-name",
+				MemoryLimit: 1024,
+			},
+		}
+		runCommand()
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting quotas as", "my-user"},
+			[]string{"OK"},
+			[]string{"name", "memory limit"},
+			[]string{"quota-name", "1g"},
+		))
 	})
 })
