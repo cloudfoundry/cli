@@ -1,4 +1,4 @@
-package organization_test
+package quota_test
 
 import (
 	. "cf/commands/organization"
@@ -44,7 +44,7 @@ var _ = Describe("quotas command", func() {
 	It("lists quotas", func() {
 		quotaRepo.FindAllQuotas = []models.QuotaFields{
 			models.QuotaFields{
-				Name: "quota-name",
+				Name:        "quota-name",
 				MemoryLimit: 1024,
 			},
 		}

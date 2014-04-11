@@ -1,4 +1,4 @@
-package organization
+package quota
 
 import (
 	"cf/api"
