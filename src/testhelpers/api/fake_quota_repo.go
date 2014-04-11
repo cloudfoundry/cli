@@ -6,7 +6,10 @@ import (
 )
 
 type FakeQuotaRepository struct {
-	FindAllQuotas []models.QuotaFields
+	FindAllReturns struct {
+		Quotas []models.QuotaFields
+		Error  error
+	}
 
 	FindByNameName     string
 	FindByNameQuota    models.QuotaFields
@@ -28,10 +31,8 @@ type FakeQuotaRepository struct {
 	}
 }
 
-func (repo *FakeQuotaRepository) FindAll() (quotas []models.QuotaFields, apiErr error) {
-	quotas = repo.FindAllQuotas
-
-	return
+func (repo *FakeQuotaRepository) FindAll() ([]models.QuotaFields, error) {
+	return repo.FindAllReturns.Quotas, repo.FindAllReturns.Error
 }
 
 func (repo *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiErr error) {

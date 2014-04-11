@@ -1,12 +1,13 @@
 package quota_test
 
 import (
-	. "cf/commands/organization"
+	. "cf/commands/quota"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "testhelpers/matchers"
 
+	"cf/errors"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
@@ -41,19 +42,41 @@ var _ = Describe("quotas command", func() {
 		})
 	})
 
-	It("lists quotas", func() {
-		quotaRepo.FindAllQuotas = []models.QuotaFields{
-			models.QuotaFields{
-				Name:        "quota-name",
-				MemoryLimit: 1024,
-			},
-		}
-		runCommand()
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Getting quotas as", "my-user"},
-			[]string{"OK"},
-			[]string{"name", "memory limit"},
-			[]string{"quota-name", "1g"},
-		))
+	Context("when quotas exist", func() {
+		BeforeEach(func() {
+			quotaRepo.FindAllReturns.Quotas = []models.QuotaFields{
+				models.QuotaFields{
+					Name:          "quota-name",
+					MemoryLimit:   1024,
+					RoutesLimit:   111,
+					ServicesLimit: 222,
+				},
+			}
+		})
+
+		It("lists quotas", func() {
+			runCommand()
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting quotas as", "my-user"},
+				[]string{"OK"},
+				[]string{"name", "memory limit", "routes", "service instances"},
+				[]string{"quota-name", "1G", "111", "222"},
+			))
+		})
 	})
+
+	Context("when an error occurs fetching quotas", func() {
+		BeforeEach(func() {
+			quotaRepo.FindAllReturns.Error = errors.New("I haz a borken!")
+		})
+
+		It("prints an error", func() {
+			runCommand()
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting quotas as", "my-user"},
+				[]string{"FAILED"},
+			))
+		})
+	})
+
 })
