@@ -539,10 +539,23 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		},
 		{
 			Name:        "quotas",
-			Description: "List available usage quotas ",
+			Description: "List available usage quotas",
 			Usage:       fmt.Sprintf("%s quotas", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("quotas", c)
+			},
+		},
+		{
+			Name:        "create-quota",
+			Description: "Define a new resource quota",
+			Usage:       fmt.Sprintf("%s create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES]", cf.Name()),
+			Flags: []cli.Flag{
+				NewStringFlag("m", "Total amount of memory (e.g. 1024M, 1G, 10G)"),
+				NewIntFlag("r", "Total number of routes"),
+				NewIntFlag("s", "Total number of service instances"),
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("create-quota", c)
 			},
 		},
 		{

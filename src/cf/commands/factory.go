@@ -6,6 +6,7 @@ import (
 	"cf/commands/buildpack"
 	"cf/commands/domain"
 	"cf/commands/organization"
+	"cf/commands/quota"
 	"cf/commands/route"
 	"cf/commands/service"
 	"cf/commands/serviceauthtoken"
@@ -68,6 +69,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["passwd"] = NewPassword(ui, repoLocator.GetPasswordRepository(), config)
 	factory.cmdsByName["purge-service-offering"] = service.NewPurgeServiceOffering(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["quotas"] = organization.NewListQuotas(ui, config, repoLocator.GetQuotaRepository())
+	factory.cmdsByName["create-quota"] = quota.NewCreateQuota(ui, config, repoLocator.GetQuotaRepository())
 	factory.cmdsByName["rename"] = application.NewRenameApp(ui, config, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["rename-buildpack"] = buildpack.NewRenameBuildpack(ui, repoLocator.GetBuildpackRepository())
 	factory.cmdsByName["rename-org"] = organization.NewRenameOrg(ui, config, repoLocator.GetOrganizationRepository())

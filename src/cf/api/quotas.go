@@ -14,7 +14,10 @@ import (
 type QuotaRepository interface {
 	FindAll() (quotas []models.QuotaFields, apiErr error)
 	FindByName(name string) (quota models.QuotaFields, apiErr error)
-	Update(orgGuid, quotaGuid string) (apiErr error)
+
+	// CRUD ahoy
+	Create(quota models.QuotaFields) error
+	Update(orgGuid, quotaGuid string) error
 }
 
 type CloudControllerQuotaRepository struct {
@@ -61,6 +64,11 @@ func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models
 
 	quota = quotas[0]
 	return
+}
+
+func (repo CloudControllerQuotaRepository) Create(quota models.QuotaFields) error {
+	path := fmt.Sprintf("%s/v2/quota_definitions", repo.config.ApiEndpoint())
+	return repo.gateway.CreateResourceFromStruct(path, quota)
 }
 
 func (repo CloudControllerQuotaRepository) Update(orgGuid, quotaGuid string) (apiErr error) {

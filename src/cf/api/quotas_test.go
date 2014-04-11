@@ -87,7 +87,34 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
+	})
 
+	Describe("Create", func() {
+		It("creates a new quota with the given name", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "POST",
+				Path:   "/v2/quota_definitions",
+				Matcher: testnet.RequestBodyMatcher(`{
+					"name": "not-so-strict",
+					"non_basic_services_allowed": false,
+					"total_services": 1,
+					"total_routes": 12,
+					"memory_limit": 123
+				}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			})
+			setupTestServer(req)
+
+			quota := models.QuotaFields{
+				Name:          "not-so-strict",
+				ServicesLimit: 1,
+				RoutesLimit:   12,
+				MemoryLimit:   123,
+			}
+			err := repo.Create(quota)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+		})
 	})
 })
 

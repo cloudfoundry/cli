@@ -80,6 +80,15 @@ func (gateway Gateway) GetResource(url string, resource interface{}) (err error)
 	return
 }
 
+func (gateway Gateway) CreateResourceFromStruct(url string, resource interface{}) error {
+	bytes, err := json.Marshal(resource)
+	if err != nil {
+		return err
+	}
+
+	return gateway.CreateResource(url, strings.NewReader(string(bytes)))
+}
+
 func (gateway Gateway) CreateResource(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
 	return gateway.createUpdateOrDeleteResource("POST", url, body, false, resource...)
 }
