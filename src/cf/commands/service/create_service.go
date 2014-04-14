@@ -11,10 +11,6 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type ServiceCreator interface {
-	CreateService(serviceName string, planName string, serviceInstanceName string) (bool, error) // idempotent
-}
-
 type CreateService struct {
 	ui          terminal.UI
 	config      configuration.Reader
