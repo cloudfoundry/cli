@@ -56,7 +56,7 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiErr = cmd.quotaRepo.Update(org.Guid, quota.Guid)
+	apiErr = cmd.quotaRepo.AssignQuotaToOrg(org.Guid, quota.Guid)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

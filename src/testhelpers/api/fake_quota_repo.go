@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf/errors"
 	"cf/models"
 )
 
@@ -11,19 +10,35 @@ type FakeQuotaRepository struct {
 		Error  error
 	}
 
-	FindByNameName     string
-	FindByNameQuota    models.QuotaFields
-	FindByNameNotFound bool
-	FindByNameErr      bool
+	FindByNameCalledWith struct {
+		Name string
+	}
 
-	UpdateOrgGuid   string
-	UpdateQuotaGuid string
+	FindByNameReturns struct {
+		Quota models.QuotaFields
+		Error error
+	}
+
+	AssignQuotaToOrgCalledWith struct {
+		OrgGuid   string
+		QuotaGuid string
+	}
+
+	UpdateCalledWith struct {
+		Name          string
+		MemoryLimit   uint64
+		RoutesLimit   int
+		ServicesLimit int
+	}
+	UpdateReturns struct {
+		Error error
+	}
 
 	CreateCalledWith struct {
 		Name          string
 		MemoryLimit   uint64
-		RoutesLimit   uint
-		ServicesLimit uint
+		RoutesLimit   int
+		ServicesLimit int
 	}
 
 	CreateReturns struct {
@@ -35,23 +50,14 @@ func (repo *FakeQuotaRepository) FindAll() ([]models.QuotaFields, error) {
 	return repo.FindAllReturns.Quotas, repo.FindAllReturns.Error
 }
 
-func (repo *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiErr error) {
-	repo.FindByNameName = name
-	quota = repo.FindByNameQuota
-
-	if repo.FindByNameNotFound {
-		apiErr = errors.NewModelNotFoundError("Org", name)
-	}
-	if repo.FindByNameErr {
-		apiErr = errors.New("Error finding quota")
-	}
-
-	return
+func (repo *FakeQuotaRepository) FindByName(name string) (models.QuotaFields, error) {
+	repo.FindByNameCalledWith.Name = name
+	return repo.FindByNameReturns.Quota, repo.FindByNameReturns.Error
 }
 
-func (repo *FakeQuotaRepository) Update(orgGuid, quotaGuid string) (apiErr error) {
-	repo.UpdateOrgGuid = orgGuid
-	repo.UpdateQuotaGuid = quotaGuid
+func (repo *FakeQuotaRepository) AssignQuotaToOrg(orgGuid, quotaGuid string) (apiErr error) {
+	repo.AssignQuotaToOrgCalledWith.OrgGuid = orgGuid
+	repo.AssignQuotaToOrgCalledWith.QuotaGuid = quotaGuid
 	return
 }
 
@@ -62,4 +68,13 @@ func (repo *FakeQuotaRepository) Create(quota models.QuotaFields) error {
 	repo.CreateCalledWith.ServicesLimit = quota.ServicesLimit
 
 	return repo.CreateReturns.Error
+}
+
+func (repo *FakeQuotaRepository) Update(quota models.QuotaFields) error {
+	repo.UpdateCalledWith.Name = quota.Name
+	repo.UpdateCalledWith.MemoryLimit = quota.MemoryLimit
+	repo.UpdateCalledWith.RoutesLimit = quota.RoutesLimit
+	repo.UpdateCalledWith.ServicesLimit = quota.ServicesLimit
+
+	return repo.UpdateReturns.Error
 }

@@ -79,7 +79,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		})
 	})
 
-	Describe("Update", func() {
+	Describe("AssignQuotaToOrg", func() {
 		It("sets the quota for an organization", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
@@ -90,7 +90,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 			setupTestServer(req)
 
-			err := repo.Update("my-org-guid", "my-quota-guid")
+			err := repo.AssignQuotaToOrg("my-org-guid", "my-quota-guid")
 			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -119,6 +119,35 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				MemoryLimit:   123,
 			}
 			err := repo.Create(quota)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+		})
+	})
+
+	Describe("Update", func() {
+		It("updates an existing quota", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "PUT",
+				Path:   "/v2/quota_definitions/my-quota-guid",
+				Matcher: testnet.RequestBodyMatcher(`{
+					"guid": "my-quota-guid",
+					"non_basic_services_allowed": false,
+					"name": "amazing-quota",
+					"total_services": 1,
+					"total_routes": 12,
+					"memory_limit": 123
+				}`),
+			}))
+
+			quota := models.QuotaFields{
+				Guid:          "my-quota-guid",
+				Name:          "amazing-quota",
+				ServicesLimit: 1,
+				RoutesLimit:   12,
+				MemoryLimit:   123,
+			}
+
+			err := repo.Update(quota)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
 		})

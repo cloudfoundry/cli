@@ -559,6 +559,20 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "update-quota",
+			Description: "Update an existing resource quota",
+			Usage:       fmt.Sprintf("%s update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES]", cf.Name()),
+			Flags: []cli.Flag{
+				NewStringFlag("m", "Total amount of memory (e.g. 1024M, 1G, 10G)"),
+				NewStringFlag("n", "New name"),
+				NewIntFlag("r", "Total number of routes"),
+				NewIntFlag("s", "Total number of service instances"),
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("update-quota", c)
+			},
+		},
+		{
 			Name:        "rename",
 			Description: "Rename an app",
 			Usage:       fmt.Sprintf("%s rename APP_NAME NEW_APP_NAME", cf.Name()),
