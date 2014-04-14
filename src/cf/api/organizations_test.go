@@ -39,7 +39,7 @@ import (
 	testnet "testhelpers/net"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("Organization Repository", func() {
 	It("TestOrganizationsListOrgs", func() {
 		firstPageOrgsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
@@ -69,8 +69,8 @@ var _ = Describe("Testing with ginkgo", func() {
 	]}`},
 		})
 
-		ts, handler, repo := createOrganizationRepo(firstPageOrgsRequest, secondPageOrgsRequest)
-		defer ts.Close()
+		testserver, handler, repo := createOrganizationRepo(firstPageOrgsRequest, secondPageOrgsRequest)
+		defer testserver.Close()
 
 		orgs := []models.Organization{}
 		apiErr := repo.ListOrgs(func(o models.Organization) bool {
@@ -93,8 +93,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 		})
 
-		ts, handler, repo := createOrganizationRepo(emptyOrgsRequest)
-		defer ts.Close()
+		testserver, handler, repo := createOrganizationRepo(emptyOrgsRequest)
+		defer testserver.Close()
 
 		wasCalled := false
 		apiErr := repo.ListOrgs(func(o models.Organization) bool {
@@ -133,8 +133,8 @@ var _ = Describe("Testing with ginkgo", func() {
 	}]}`},
 		})
 
-		ts, handler, repo := createOrganizationRepo(req)
-		defer ts.Close()
+		testserver, handler, repo := createOrganizationRepo(req)
+		defer testserver.Close()
 		existingOrg := models.Organization{}
 		existingOrg.Guid = "org1-guid"
 		existingOrg.Name = "Org1"
@@ -162,13 +162,29 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 		})
 
-		ts, handler, repo := createOrganizationRepo(req)
-		defer ts.Close()
+		testserver, handler, repo := createOrganizationRepo(req)
+		defer testserver.Close()
 
 		_, apiErr := repo.FindByName("org1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
 		Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
+	})
+
+	It("returns an api error when one occurs", func() {
+		requestHandler := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+			Response: testnet.TestResponse{Status: http.StatusBadGateway, Body: `{"resources": []}`},
+		})
+
+		testserver, handler, repo := createOrganizationRepo(requestHandler)
+		defer testserver.Close()
+
+		_, apiErr := repo.FindByName("org1")
+		_, ok := apiErr.(*errors.ModelNotFoundError)
+		Expect(ok).To(BeFalse())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
 	It("TestCreateOrganization", func() {
@@ -179,8 +195,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 
-		ts, handler, repo := createOrganizationRepo(req)
-		defer ts.Close()
+		testserver, handler, repo := createOrganizationRepo(req)
+		defer testserver.Close()
 
 		apiErr := repo.Create("my-org")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
@@ -195,8 +211,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 
-		ts, handler, repo := createOrganizationRepo(req)
-		defer ts.Close()
+		testserver, handler, repo := createOrganizationRepo(req)
+		defer testserver.Close()
 
 		apiErr := repo.Rename("my-org-guid", "my-new-org")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
@@ -210,8 +226,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
 
-		ts, handler, repo := createOrganizationRepo(req)
-		defer ts.Close()
+		testserver, handler, repo := createOrganizationRepo(req)
+		defer testserver.Close()
 
 		apiErr := repo.Delete("my-org-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
@@ -219,11 +235,11 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func createOrganizationRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
-	ts, handler = testnet.NewServer(reqs)
+func createOrganizationRepo(reqs ...testnet.TestRequest) (testserver *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
+	testserver, handler = testnet.NewServer(reqs)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
+	configRepo.SetApiEndpoint(testserver.URL)
 	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 	return
