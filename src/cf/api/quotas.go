@@ -15,9 +15,11 @@ type QuotaRepository interface {
 	FindAll() (quotas []models.QuotaFields, apiErr error)
 	FindByName(name string) (quota models.QuotaFields, apiErr error)
 
+	AssignQuotaToOrg(orgGuid, quotaGuid string) error
+
 	// CRUD ahoy
 	Create(quota models.QuotaFields) error
-	Update(orgGuid, quotaGuid string) error
+	Update(quota models.QuotaFields) error
 }
 
 type CloudControllerQuotaRepository struct {
@@ -71,7 +73,12 @@ func (repo CloudControllerQuotaRepository) Create(quota models.QuotaFields) erro
 	return repo.gateway.CreateResourceFromStruct(path, quota)
 }
 
-func (repo CloudControllerQuotaRepository) Update(orgGuid, quotaGuid string) (apiErr error) {
+func (repo CloudControllerQuotaRepository) Update(quota models.QuotaFields) error {
+	path := fmt.Sprintf("%s/v2/quota_definitions/%s", repo.config.ApiEndpoint(), quota.Guid)
+	return repo.gateway.UpdateResourceFromStruct(path, quota)
+}
+
+func (repo CloudControllerQuotaRepository) AssignQuotaToOrg(orgGuid, quotaGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGuid)
 	return repo.gateway.UpdateResource(path, strings.NewReader(data))
