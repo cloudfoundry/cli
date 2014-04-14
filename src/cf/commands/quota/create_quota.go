@@ -53,11 +53,11 @@ func (cmd CreateQuota) Run(context *cli.Context) {
 	}
 
 	if context.IsSet("r") {
-		quota.RoutesLimit = uint(context.Int("r"))
+		quota.RoutesLimit = context.Int("r")
 	}
 
 	if context.IsSet("s") {
-		quota.ServicesLimit = uint(context.Int("s"))
+		quota.ServicesLimit = context.Int("s")
 	}
 
 	err := cmd.quotaRepo.Create(quota)

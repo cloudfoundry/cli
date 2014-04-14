@@ -11,6 +11,6 @@ type QuotaFields struct {
 	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
 	Name                    string `json:"name"`
 	MemoryLimit             uint64 `json:"memory_limit"` // in Megabytes
-	RoutesLimit             uint   `json:"total_routes"`
-	ServicesLimit           uint   `json:"total_services"`
+	RoutesLimit             int    `json:"total_routes"`
+	ServicesLimit           int    `json:"total_services"`
 }

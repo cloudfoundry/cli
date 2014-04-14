@@ -79,12 +79,12 @@ var _ = Describe("create-quota command", func() {
 		It("sets the route limit", func() {
 			runCommand("-r", "12", "ecstatic")
 
-			Expect(quotaRepo.CreateCalledWith.RoutesLimit).To(Equal(uint(12)))
+			Expect(quotaRepo.CreateCalledWith.RoutesLimit).To(Equal(12))
 		})
 
 		It("sets the service instance limit", func() {
 			runCommand("-s", "42", "black star")
-			Expect(quotaRepo.CreateCalledWith.ServicesLimit).To(Equal(uint(42)))
+			Expect(quotaRepo.CreateCalledWith.ServicesLimit).To(Equal(42))
 		})
 
 		It("alerts the user when creating the quota fails", func() {
