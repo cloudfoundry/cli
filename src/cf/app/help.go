@@ -238,6 +238,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "quotas"),
+					newCmdPresenter(app, maxNameLen, "create-quota"),
 					newCmdPresenter(app, maxNameLen, "set-quota"),
 				},
 			},
