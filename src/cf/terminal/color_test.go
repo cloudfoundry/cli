@@ -44,7 +44,7 @@ var _ = Describe("Terminal colors", func() {
 
 			Context("When the CF_COLOR env variable is specified", func() {
 				BeforeEach(func() { os.Setenv("CF_COLOR", "true") })
-				itDoesntColorize()
+				itColorizes()
 			})
 
 			Context("When the CF_COLOR env variable is not specified", func() {

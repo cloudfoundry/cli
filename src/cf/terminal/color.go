@@ -33,7 +33,9 @@ func init() {
 }
 
 func ResetColorSupport() {
-	if !OsSupportsColors || os.Getenv("CF_COLOR") == "false" || (!TerminalSupportsColors && os.Getenv("CF_COLOR") != "true") {
+	if os.Getenv("CF_COLOR") == "false" ||
+			(!TerminalSupportsColors && os.Getenv("CF_COLOR") != "true") ||
+			(!OsSupportsColors && os.Getenv("CF_COLOR") != "true") {
 		colorize = func(message string, _ Color, _ int) string {
 			return message
 		}
