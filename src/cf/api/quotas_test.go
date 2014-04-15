@@ -152,6 +152,21 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
 		})
 	})
+
+	Describe("Delete", func() {
+		It("deletes the quota with the given name", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "DELETE",
+				Path:     "/v2/quota_definitions/my-quota-guid",
+				Response: testnet.TestResponse{Status: http.StatusNoContent},
+			})
+			setupTestServer(req)
+
+			err := repo.Delete("my-quota-guid")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+		})
+	})
 })
 
 var firstQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{

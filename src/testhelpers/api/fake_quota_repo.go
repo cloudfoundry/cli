@@ -44,6 +44,14 @@ type FakeQuotaRepository struct {
 	CreateReturns struct {
 		Error error
 	}
+
+	DeleteCalledWith struct {
+		Guid string
+	}
+
+	DeleteReturns struct {
+		Error error
+	}
 }
 
 func (repo *FakeQuotaRepository) FindAll() ([]models.QuotaFields, error) {
@@ -77,4 +85,10 @@ func (repo *FakeQuotaRepository) Update(quota models.QuotaFields) error {
 	repo.UpdateCalledWith.ServicesLimit = quota.ServicesLimit
 
 	return repo.UpdateReturns.Error
+}
+
+func (repo *FakeQuotaRepository) Delete(quotaGuid string) (apiErr error) {
+	repo.DeleteCalledWith.Guid = quotaGuid
+
+	return repo.DeleteReturns.Error
 }
