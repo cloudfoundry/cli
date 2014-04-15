@@ -20,6 +20,7 @@ type QuotaRepository interface {
 	// CRUD ahoy
 	Create(quota models.QuotaFields) error
 	Update(quota models.QuotaFields) error
+	Delete(quotaGuid string) error
 }
 
 type CloudControllerQuotaRepository struct {
@@ -82,4 +83,9 @@ func (repo CloudControllerQuotaRepository) AssignQuotaToOrg(orgGuid, quotaGuid s
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGuid)
 	return repo.gateway.UpdateResource(path, strings.NewReader(data))
+}
+
+func (repo CloudControllerQuotaRepository) Delete(quotaGuid string) (apiErr error) {
+	path := fmt.Sprintf("%s/v2/quota_definitions/%s", repo.config.ApiEndpoint(), quotaGuid)
+	return repo.gateway.DeleteResource(path)
 }

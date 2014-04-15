@@ -114,7 +114,6 @@ func (ui *FakeUI) DumpWarnOutputs() string {
 	return "****************************\n" + strings.Join(ui.WarnOutputs, "\n")
 }
 
-
 func (ui *FakeUI) DumpOutputs() string {
 	return "****************************\n" + strings.Join(ui.Outputs, "\n")
 }

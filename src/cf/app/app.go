@@ -573,6 +573,17 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "delete-quota",
+			Description: "Delete a quota",
+			Usage:       fmt.Sprintf("%s delete-quota QUOTA [-f]", cf.Name()),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("delete-quota", c)
+			},
+		},
+		{
 			Name:        "rename",
 			Description: "Rename an app",
 			Usage:       fmt.Sprintf("%s rename APP_NAME NEW_APP_NAME", cf.Name()),
