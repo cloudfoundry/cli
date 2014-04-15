@@ -60,13 +60,27 @@ var _ = Describe("app Command", func() {
 
 		Context("when the -m flag is provided", func() {
 			It("updates the memory limit", func() {
-				runCommand("-m", "15G", "quota-schmuota")
+				runCommand("-m", "15G", "quota-name")
+				Expect(quotaRepo.UpdateCalledWith.Name).To(Equal("quota-name"))
 				Expect(quotaRepo.UpdateCalledWith.MemoryLimit).To(Equal(uint64(15360)))
 			})
 
 			It("fails with usage when the value cannot be parsed", func() {
 				runCommand("-m", "blasé", "le-tired")
 				Expect(ui.FailedWithUsage).To(BeTrue())
+			})
+		})
+
+		Context("when the -n flag is provided", func() {
+			It("updates the quota name", func() {
+				runCommand("-n", "quota-new-name", "quota-name")
+
+				Expect(quotaRepo.UpdateCalledWith.Name).To(Equal("quota-new-name"))
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating quota", "quota-name", "as", "my-user"},
+					[]string{"OK"},
+				))
 			})
 		})
 
