@@ -69,6 +69,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["passwd"] = NewPassword(ui, repoLocator.GetPasswordRepository(), config)
 	factory.cmdsByName["purge-service-offering"] = service.NewPurgeServiceOffering(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["quotas"] = quota.NewListQuotas(ui, config, repoLocator.GetQuotaRepository())
+	factory.cmdsByName["quota"] = quota.NewShowQuota(ui, config, repoLocator.GetQuotaRepository())
 	factory.cmdsByName["create-quota"] = quota.NewCreateQuota(ui, config, repoLocator.GetQuotaRepository())
 	factory.cmdsByName["update-quota"] = quota.NewUpdateQuota(ui, config, repoLocator.GetQuotaRepository())
 	factory.cmdsByName["delete-quota"] = quota.NewDeleteQuota(ui, config, repoLocator.GetQuotaRepository())
