@@ -34,7 +34,9 @@ func (cmd *updateQuota) GetRequirements(requirementsFactory requirements.Factory
 }
 
 func (cmd *updateQuota) Run(c *cli.Context) {
-	quota, err := cmd.quotaRepo.FindByName(c.Args()[0])
+	oldQuotaName := c.Args()[0]
+	quota, err := cmd.quotaRepo.FindByName(oldQuotaName)
+
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -49,6 +51,10 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 		quota.MemoryLimit = memory
 	}
 
+	if c.String("n") != "" {
+		quota.Name = c.String("n")
+	}
+
 	if c.IsSet("s") {
 		quota.ServicesLimit = c.Int("s")
 	}
@@ -58,7 +64,7 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Say("Updating quota %s as %s...",
-		terminal.EntityNameColor(quota.Name),
+		terminal.EntityNameColor(oldQuotaName),
 		terminal.EntityNameColor(cmd.config.Username()))
 
 	err = cmd.quotaRepo.Update(quota)
