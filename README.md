@@ -3,6 +3,35 @@ Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?br
 
 This is the official command line client for Cloud Foundry.
 
+Getting Started
+===============
+Download and run the installer for your platform from the section below. If you are on OS X, you can also install the CLI
+with homebrew--run `brew install cloudfoundry-cli`.
+
+Once installed, you can log in and push an app.
+```
+$ cd [my-app-directory]
+$ cf api api.[my-cloudfoundry].com
+Setting api endpoint to https://api.[my-cloudfoundry].com...
+OK
+
+$ cf login
+API endpoint: https://api.[my-cloudfoundry].com
+
+Email> [my-email]
+
+Password> [my-password]
+Authenticating...
+OK
+
+$ cf push
+```
+#Getting Help
+You can find further documentation at the docs page for the CLI [here](http://docs.cloudfoundry.org/devguide/#cf).  
+There is also help available in the CLI itself; type `cf help` for more information.  
+Each command also has help output available via `cf [command] --help` or `cf [command] -h`.  
+Finally, if you are still stuck, feel free to open a GitHub issue.
+
 Stable Release
 ==============
 
@@ -16,20 +45,11 @@ Installers
 - [Windows 32 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/installer-windows-386.zip)
 - [Windows 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/installer-windows-amd64.zip)
 
-Binaries
---------
-- [Linux 32 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-linux-386.tgz)
-- [Linux 64 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-linux-amd64.tgz)
-- [Mac OS X 64 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-darwin-amd64.tgz)
-- [Windows 32 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-windows-386.zip)
-- [Windows 64 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-windows-amd64.zip)
-
-
 Edge Releases (master)
 ======================
 
 Edge binaries are published to our Amazon S3 bucket with each new commit that passes CI.
-These binaries are *not intended for wider use*, but for developers to test new features and fixes as they are completed:
+These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed:
 
 - [Linux 64 bit binary](http://go-cli.s3.amazonaws.com/master/cf-linux-amd64.tgz)
 - [Linux 32 bit binary](http://go-cli.s3.amazonaws.com/master/cf-linux-386.tgz)
@@ -45,11 +65,6 @@ Troubleshooting / FAQs
 Linux
 -----
 * "bash: .cf: No such file or directory". Ensure that you're using the correct binary or installer for your architecture. See http://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
-
-Mac OS X
---------
-* "Illegal instruction: 4" - This is a known defect with some versions of OS X. Please file an issue. As a workaround, you can build from source or use homebrew.
-
 
 Filing Bugs
 ===========
