@@ -1,32 +1,8 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/cf/commands/application/delete_app_test.go
-   src/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package api_test
 
 import (
 	. "cf/api"
+	"cf/configuration"
 	"cf/errors"
 	"cf/models"
 	"cf/net"
@@ -40,97 +16,117 @@ import (
 )
 
 var _ = Describe("Testing with ginkgo", func() {
-	var defaultCreateRequestBodyMatcher testnet.RequestMatcher
-	var deleteBindingReq testnet.TestRequest
+	var (
+		testServer  *httptest.Server
+		testHandler *testnet.TestHandler
+		configRepo  configuration.ReadWriter
+		repo        CloudControllerServiceBindingRepository
+	)
+
+	setupTestServer := func(reqs ...testnet.TestRequest) {
+		testServer, testHandler = testnet.NewServer(reqs)
+		configRepo.SetApiEndpoint(testServer.URL)
+	}
 
 	BeforeEach(func() {
-		defaultCreateRequestBodyMatcher = testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid","async":true}`)
-		deleteBindingReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "DELETE",
-			Path:     "/v2/service_bindings/service-binding-2-guid",
-			Response: testnet.TestResponse{Status: http.StatusOK},
+		configRepo = testconfig.NewRepositoryWithDefaults()
+
+		gateway := net.NewCloudControllerGateway(configRepo)
+		repo = NewCloudControllerServiceBindingRepository(configRepo, gateway)
+	})
+
+	AfterEach(func() {
+		testServer.Close()
+	})
+
+	Describe("Create", func() {
+		Context("when the service binding can be created", func() {
+			BeforeEach(func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "POST",
+					Path:     "/v2/service_bindings",
+					Matcher:  testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid","async":true}`),
+					Response: testnet.TestResponse{Status: http.StatusCreated},
+				}))
+			})
+
+			It("TestCreateServiceBinding", func() {
+				apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
+
+				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when an error occurs", func() {
+			BeforeEach(func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:  "POST",
+					Path:    "/v2/service_bindings",
+					Matcher: testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid","async":true}`),
+					Response: testnet.TestResponse{
+						Status: http.StatusBadRequest,
+						Body:   `{"code":90003,"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"}`,
+					},
+				}))
+			})
+
+			It("TestCreateServiceBindingIfError", func() {
+				apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
+
+				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(BeNil())
+				Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("90003"))
+			})
 		})
 	})
 
-	It("TestCreateServiceBinding", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "POST",
-			Path:     "/v2/service_bindings",
-			Matcher:  defaultCreateRequestBodyMatcher,
-			Response: testnet.TestResponse{Status: http.StatusCreated},
+	Describe("Delete", func() {
+		Context("when binding does exist", func() {
+			var serviceInstance models.ServiceInstance
+
+			BeforeEach(func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "DELETE",
+					Path:     "/v2/service_bindings/service-binding-2-guid",
+					Response: testnet.TestResponse{Status: http.StatusOK},
+				}))
+
+				serviceInstance.Guid = "my-service-instance-guid"
+
+				binding := models.ServiceBindingFields{}
+				binding.Url = "/v2/service_bindings/service-binding-1-guid"
+				binding.AppGuid = "app-1-guid"
+				binding2 := models.ServiceBindingFields{}
+				binding2.Url = "/v2/service_bindings/service-binding-2-guid"
+				binding2.AppGuid = "app-2-guid"
+				serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
+			})
+
+			It("TestDeleteServiceBinding", func() {
+				found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
+
+				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(found).To(BeTrue())
+			})
 		})
 
-		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{req})
-		defer ts.Close()
+		Context("when binding does not exist", func() {
+			var serviceInstance models.ServiceInstance
 
-		apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr).NotTo(HaveOccurred())
-	})
+			BeforeEach(func() {
+				setupTestServer()
+				serviceInstance.Guid = "my-service-instance-guid"
+			})
 
-	It("TestCreateServiceBindingIfError", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:  "POST",
-			Path:    "/v2/service_bindings",
-			Matcher: defaultCreateRequestBodyMatcher,
-			Response: testnet.TestResponse{
-				Status: http.StatusBadRequest,
-				Body:   `{"code":90003,"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"}`,
-			},
+			It("does not return an error", func() {
+				found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
+
+				Expect(testHandler.CallCount).To(Equal(0))
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(found).To(BeFalse())
+			})
 		})
-
-		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{req})
-		defer ts.Close()
-
-		apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
-
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr).NotTo(BeNil())
-		Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("90003"))
-	})
-
-	It("TestDeleteServiceBinding", func() {
-		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{deleteBindingReq})
-		defer ts.Close()
-
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "my-service-instance-guid"
-
-		binding := models.ServiceBindingFields{}
-		binding.Url = "/v2/service_bindings/service-binding-1-guid"
-		binding.AppGuid = "app-1-guid"
-		binding2 := models.ServiceBindingFields{}
-		binding2.Url = "/v2/service_bindings/service-binding-2-guid"
-		binding2.AppGuid = "app-2-guid"
-		serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
-
-		found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
-
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(found).To(BeTrue())
-	})
-
-	It("TestDeleteServiceBindingWhenBindingDoesNotExist", func() {
-		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{})
-		defer ts.Close()
-
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "my-service-instance-guid"
-
-		found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
-
-		Expect(handler.CallCount).To(Equal(0))
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(found).To(BeFalse())
 	})
 })
-
-func createServiceBindingRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBindingRepository) {
-	ts, handler = testnet.NewServer(requests)
-	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo)
-	repo = NewCloudControllerServiceBindingRepository(configRepo, gateway)
-	return
-}
