@@ -99,7 +99,7 @@ var _ = Describe("app Command", func() {
 
 		runCommand("-m", "50G", "i-love-ui")
 		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating", "i-love-ui", "as", "my-user"},
+			[]string{"Updating quota", "i-love-ui", "as", "my-user"},
 			[]string{"OK"},
 		))
 	})

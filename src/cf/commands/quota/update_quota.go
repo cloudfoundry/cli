@@ -57,7 +57,10 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 		quota.RoutesLimit = c.Int("r")
 	}
 
-	cmd.ui.Say("Updating %s as %s...", quota.Name, cmd.config.Username())
+	cmd.ui.Say("Updating quota %s as %s...",
+		terminal.EntityNameColor(quota.Name),
+		terminal.EntityNameColor(cmd.config.Username()))
+
 	err = cmd.quotaRepo.Update(quota)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
