@@ -64,7 +64,6 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	if c.Bool("r") {
@@ -72,7 +71,6 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 			apiErr = cmd.routeRepo.Delete(route.Guid)
 			if apiErr != nil {
 				cmd.ui.Failed(apiErr.Error())
-				return
 			}
 		}
 	}
@@ -80,9 +78,7 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 	apiErr = cmd.appRepo.Delete(app.Guid)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	cmd.ui.Ok()
-	return
 }
