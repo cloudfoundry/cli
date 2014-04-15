@@ -87,14 +87,27 @@ var _ = Describe("create-quota command", func() {
 			Expect(quotaRepo.CreateCalledWith.ServicesLimit).To(Equal(42))
 		})
 
-		It("alerts the user when creating the quota fails", func() {
-			quotaRepo.CreateReturns.Error = errors.New("WHOOP THERE IT IS")
-			runCommand("my-quota")
+		Context("when creating a quota returns an error", func() {
+			It("alerts the user when creating the quota fails", func() {
+				quotaRepo.CreateReturns.Error = errors.New("WHOOP THERE IT IS")
+				runCommand("my-quota")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"creating quota", "my-quota"},
-				[]string{"FAILED"},
-			))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"creating quota", "my-quota"},
+					[]string{"FAILED"},
+				))
+			})
+
+			It("warns the user when quota already exists", func() {
+				quotaRepo.CreateReturns.Error = errors.NewHttpError(400, "240002", "Quota Definition is taken: quota-sct")
+				runCommand("Banana")
+
+				Expect(ui.Outputs).ToNot(ContainSubstrings(
+					[]string{"FAILED"},
+				))
+				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
+			})
+
 		})
 	})
 })
