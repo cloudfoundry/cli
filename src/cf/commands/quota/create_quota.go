@@ -38,7 +38,10 @@ func (cmd CreateQuota) GetRequirements(requirementsFactory requirements.Factory,
 func (cmd CreateQuota) Run(context *cli.Context) {
 	name := context.Args()[0]
 
-	cmd.ui.Say("Creating quota %s as %s", name, cmd.config.Username())
+	cmd.ui.Say("Creating quota %s as %s...",
+		terminal.EntityNameColor(name),
+		terminal.EntityNameColor(cmd.config.Username()))
+
 	quota := models.QuotaFields{
 		Name: name,
 	}
