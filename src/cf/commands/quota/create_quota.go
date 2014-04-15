@@ -3,6 +3,7 @@ package quota
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/formatters"
 	"cf/models"
 	"cf/requirements"
@@ -61,6 +62,14 @@ func (cmd CreateQuota) Run(context *cli.Context) {
 	}
 
 	err := cmd.quotaRepo.Create(quota)
+
+	httpErr, ok := err.(errors.HttpError)
+	if ok && httpErr.ErrorCode() == errors.QUOTA_EXISTS {
+		cmd.ui.Ok()
+		cmd.ui.Warn("Quota Definition %s already exists", quota.Name)
+		return
+	}
+
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
