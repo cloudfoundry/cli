@@ -110,6 +110,11 @@ func (ui *FakeUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 	ui.Failed("Incorrect Usage.")
 }
 
+func (ui *FakeUI) DumpWarnOutputs() string {
+	return "****************************\n" + strings.Join(ui.WarnOutputs, "\n")
+}
+
+
 func (ui *FakeUI) DumpOutputs() string {
 	return "****************************\n" + strings.Join(ui.Outputs, "\n")
 }
