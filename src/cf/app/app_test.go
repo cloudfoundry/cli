@@ -45,9 +45,9 @@ var _ = Describe("App", func() {
 		})
 
 		cmdFactory := commands.NewFactory(ui, config, manifestRepo, repoLocator)
-		cmdRunner := &FakeRunner{cmdFactory: cmdFactory}
 
 		for _, cmdName := range expectedCommandNames {
+			cmdRunner := &FakeRunner{cmdFactory: cmdFactory}
 			output := bytes.NewBuffer(make([]byte, 1024))
 			trace.SetStdout(output)
 			trace.EnableTrace()
