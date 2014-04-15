@@ -26,7 +26,7 @@ OK
 
 $ cf push
 ```
-#Getting Help
+#Further Reading and Getting Help
 You can find further documentation at the docs page for the CLI [here](http://docs.cloudfoundry.org/devguide/#cf).  
 There is also help available in the CLI itself; type `cf help` for more information.  
 Each command also has help output available via `cf [command] --help` or `cf [command] -h`.  
