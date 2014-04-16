@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -12,6 +13,7 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -78,6 +80,15 @@ func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer Applicat
 	return
 }
 
+func (command *Start) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "start",
+		ShortName:   "st",
+		Description: "Start an app",
+		Usage:       "CF_NAME start APP",
+	}
+}
+
 func (cmd *Start) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
@@ -138,6 +149,16 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 
 func (cmd *Start) SetStartTimeoutSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
+}
+
+func simpleLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
+	msgText = string(logMsg.GetMessage())
+	reg, err := regexp.Compile("[\n\r]+$")
+	if err != nil {
+		return
+	}
+	msgText = reg.ReplaceAllString(msgText, "")
+	return
 }
 
 func (cmd Start) tailStagingLogs(app models.Application, startChan chan bool, stopChan chan bool) {

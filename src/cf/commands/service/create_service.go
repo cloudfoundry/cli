@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -22,6 +23,19 @@ func NewCreateService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	cmd.config = config
 	cmd.serviceRepo = serviceRepo
 	return
+}
+
+func (command CreateService) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-service",
+		ShortName:   "cs",
+		Description: "Create a service instance",
+		Usage: "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE\n\n" +
+			"EXAMPLE:\n" +
+			"   CF_NAME create-service cleardb spark clear-db-mine\n\n" +
+			"TIP:\n" +
+			"   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
+	}
 }
 
 func (cmd CreateService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

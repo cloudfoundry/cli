@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -20,6 +21,17 @@ func NewDeleteUser(ui terminal.UI, config configuration.Reader, userRepo api.Use
 	cmd.config = config
 	cmd.userRepo = userRepo
 	return
+}
+
+func (command DeleteUser) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-user",
+		Description: "Delete a user",
+		Usage:       "CF_NAME delete-user USERNAME [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd DeleteUser) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

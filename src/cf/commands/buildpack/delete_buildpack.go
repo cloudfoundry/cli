@@ -2,6 +2,7 @@ package buildpack
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
@@ -18,6 +19,17 @@ func NewDeleteBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *Dele
 	cmd.ui = ui
 	cmd.buildpackRepo = repo
 	return
+}
+
+func (command *DeleteBuildpack) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-buildpack",
+		Description: "Delete a buildpack",
+		Usage:       "CF_NAME delete-buildpack BUILDPACK [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd *DeleteBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -4,7 +4,8 @@ import (
 	"cf"
 	"cf/api"
 	"cf/app"
-	"cf/commands"
+	"cf/command_factory"
+	"cf/command_runner"
 	"cf/configuration"
 	"cf/manifest"
 	"cf/net"
@@ -52,16 +53,11 @@ func main() {
 	deps := setupDependencies()
 	defer deps.configRepo.Close()
 
-	cmdFactory := commands.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator)
+	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator)
 	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
-	cmdRunner := commands.NewRunner(cmdFactory, requirementsFactory)
+	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
 
-	app, err := app.NewApp(cmdRunner)
-	if err != nil {
-		return
-	}
-
-	app.Run(os.Args)
+	app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...).Run(os.Args)
 }
 
 func init() {

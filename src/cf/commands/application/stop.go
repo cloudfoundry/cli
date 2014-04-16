@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -28,6 +29,15 @@ func NewStop(ui terminal.UI, config configuration.Reader, appRepo api.Applicatio
 	cmd.appRepo = appRepo
 
 	return
+}
+
+func (command *Stop) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "stop",
+		ShortName:   "sp",
+		Description: "Stop an app",
+		Usage:       "CF_NAME stop APP",
+	}
 }
 
 func (cmd *Stop) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

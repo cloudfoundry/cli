@@ -1,7 +1,9 @@
-package commands_test
+package command_runner_test
 
 import (
-	. "cf/commands"
+	"cf/command"
+	"cf/command_metadata"
+	. "cf/command_runner"
 	"cf/requirements"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
@@ -10,14 +12,18 @@ import (
 )
 
 type TestCommandFactory struct {
-	Cmd     Command
+	Cmd     command.Command
 	CmdName string
 }
 
-func (f *TestCommandFactory) GetByCmdName(cmdName string) (cmd Command, err error) {
+func (f *TestCommandFactory) GetByCmdName(cmdName string) (cmd command.Command, err error) {
 	f.CmdName = cmdName
 	cmd = f.Cmd
 	return
+}
+
+func (fake *TestCommandFactory) CommandMetadatas() []command_metadata.CommandMetadata {
+	return []command_metadata.CommandMetadata{}
 }
 
 type TestCommand struct {
@@ -25,9 +31,13 @@ type TestCommand struct {
 	WasRunWith *cli.Context
 }
 
-func (cmd *TestCommand) GetRequirements(factory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *TestCommand) GetRequirements(_ requirements.Factory, _ *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = cmd.Reqs
 	return
+}
+
+func (command *TestCommand) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{}
 }
 
 func (cmd *TestCommand) Run(c *cli.Context) {

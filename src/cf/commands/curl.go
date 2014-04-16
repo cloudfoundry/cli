@@ -2,7 +2,9 @@ package commands
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
+	"cf/flag_helpers"
 	"cf/requirements"
 	"cf/terminal"
 	"cf/trace"
@@ -23,6 +25,21 @@ func NewCurl(ui terminal.UI, config configuration.Reader, curlRepo api.CurlRepos
 	cmd.config = config
 	cmd.curlRepo = curlRepo
 	return
+}
+
+func (command *Curl) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "curl",
+		Description: "Executes a raw request, content-type set to application/json by default",
+		Usage:       "CF_NAME curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "X", Value: "GET", Usage: "HTTP method (GET,POST,PUT,DELETE,etc)"},
+			flag_helpers.NewStringSliceFlag("H", "Custom headers to include in the request, flag can be specified multiple times"),
+			flag_helpers.NewStringFlag("d", "HTTP data to include in the request body"),
+			cli.BoolFlag{Name: "i", Usage: "Include response headers in the output"},
+			cli.BoolFlag{Name: "v", Usage: "Enable CF_TRACE output for all requests and responses"},
+		},
+	}
 }
 
 func (cmd *Curl) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

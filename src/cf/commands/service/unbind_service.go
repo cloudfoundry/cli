@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -23,6 +24,15 @@ func NewUnbindService(ui terminal.UI, config configuration.Reader, serviceBindin
 	cmd.config = config
 	cmd.serviceBindingRepo = serviceBindingRepo
 	return
+}
+
+func (command *UnbindService) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "unbind-service",
+		ShortName:   "us",
+		Description: "Unbind a service instance from an app",
+		Usage:       "CF_NAME unbind-service APP SERVICE_INSTANCE",
+	}
 }
 
 func (cmd *UnbindService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -2,6 +2,7 @@ package quota
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/formatters"
 	"cf/requirements"
@@ -22,6 +23,14 @@ func NewListQuotas(ui terminal.UI, config configuration.Reader, quotaRepo api.Qu
 	cmd.config = config
 	cmd.quotaRepo = quotaRepo
 	return
+}
+
+func (command *ListQuotas) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "quotas",
+		Description: "List available usage quotas",
+		Usage:       "CF_NAME quotas",
+	}
 }
 
 func (cmd *ListQuotas) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

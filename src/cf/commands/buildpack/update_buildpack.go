@@ -2,6 +2,8 @@ package buildpack
 
 import (
 	"cf/api"
+	"cf/command_metadata"
+	"cf/flag_helpers"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -21,6 +23,22 @@ func NewUpdateBuildpack(ui terminal.UI, repo api.BuildpackRepository, bitsRepo a
 	cmd.buildpackRepo = repo
 	cmd.buildpackBitsRepo = bitsRepo
 	return
+}
+
+func (command *UpdateBuildpack) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "update-buildpack",
+		Description: "Update a buildpack",
+		Usage:       "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]",
+		Flags: []cli.Flag{
+			flag_helpers.NewIntFlag("i", "Buildpack position among other buildpacks"),
+			flag_helpers.NewStringFlag("p", "Path to directory or zip file"),
+			cli.BoolFlag{Name: "enable", Usage: "Enable the buildpack"},
+			cli.BoolFlag{Name: "disable", Usage: "Disable the buildpack"},
+			cli.BoolFlag{Name: "lock", Usage: "Lock the buildpack"},
+			cli.BoolFlag{Name: "unlock", Usage: "Unlock the buildpack"},
+		},
+	}
 }
 
 func (cmd *UpdateBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -2,6 +2,7 @@ package servicebroker
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -20,6 +21,14 @@ func NewUpdateServiceBroker(ui terminal.UI, config configuration.Reader, repo ap
 	cmd.config = config
 	cmd.repo = repo
 	return
+}
+
+func (command UpdateServiceBroker) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "update-service-broker",
+		Description: "Update a service broker",
+		Usage:       "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+	}
 }
 
 func (cmd UpdateServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

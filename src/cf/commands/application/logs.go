@@ -2,11 +2,14 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
+	"cf/ui_helpers"
+	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
 	"time"
@@ -25,6 +28,17 @@ func NewLogs(ui terminal.UI, config configuration.Reader, logsRepo api.LogsRepos
 	cmd.config = config
 	cmd.logsRepo = logsRepo
 	return
+}
+
+func (command *Logs) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "logs",
+		Description: "Tail or show recent logs for an app",
+		Usage:       "CF_NAME logs APP",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "recent", Usage: "Dump recent logs instead of tailing"},
+		},
+	}
 }
 
 func (cmd *Logs) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
@@ -99,4 +113,11 @@ func (cmd *Logs) handleError(err error) {
 	default:
 		cmd.ui.Failed(err.Error())
 	}
+}
+
+func LogMessageOutput(msg *logmessage.LogMessage, loc *time.Location) string {
+	logHeader, coloredLogHeader := ui_helpers.ExtractLogHeader(msg, loc)
+	logContent := ui_helpers.ExtractLogContent(msg, logHeader)
+
+	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }

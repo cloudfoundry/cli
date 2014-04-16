@@ -2,6 +2,7 @@ package serviceauthtoken
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -20,6 +21,14 @@ func NewUpdateServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo
 	return
+}
+
+func (command UpdateServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "update-service-auth-token",
+		Description: "Update a service auth token",
+		Usage:       "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
+	}
 }
 
 func (cmd UpdateServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

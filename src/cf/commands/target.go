@@ -2,8 +2,10 @@ package commands
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
+	"cf/flag_helpers"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
@@ -28,6 +30,19 @@ func NewTarget(ui terminal.UI,
 	cmd.spaceRepo = spaceRepo
 
 	return
+}
+
+func (command Target) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "target",
+		ShortName:   "t",
+		Description: "Set or view the targeted org or space",
+		Usage:       "CF_NAME target [-o ORG] [-s SPACE]",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("o", "organization"),
+			flag_helpers.NewStringFlag("s", "space"),
+		},
+	}
 }
 
 func (cmd Target) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

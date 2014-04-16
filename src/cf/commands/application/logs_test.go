@@ -29,6 +29,7 @@ import (
 	. "cf/commands/application"
 	"cf/errors"
 	"cf/models"
+	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -36,6 +37,7 @@ import (
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	testlogs "testhelpers/logs"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"time"
@@ -65,8 +67,8 @@ var _ = Describe("logs command", func() {
 		currentTime := time.Now()
 
 		recentLogs := []*logmessage.LogMessage{
-			NewLogMessage("Log Line 1", app.Guid, "DEA", currentTime),
-			NewLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
+			testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", currentTime),
+			testlogs.NewLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
 		}
 
 		requirementsFactory, logsRepo := getLogsDependencies()
@@ -90,7 +92,7 @@ var _ = Describe("logs command", func() {
 		app.Guid = "my-app-guid"
 
 		recentLogs := []*logmessage.LogMessage{
-			NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
+			testlogs.NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
 		}
 
 		requirementsFactory, logsRepo := getLogsDependencies()
@@ -110,7 +112,7 @@ var _ = Describe("logs command", func() {
 		app.Guid = "my-app-guid"
 
 		logs := []*logmessage.LogMessage{
-			NewLogMessage("Log Line 1", app.Guid, "DEA", time.Now()),
+			testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", time.Now()),
 		}
 
 		requirementsFactory, logsRepo := getLogsDependencies()
@@ -178,6 +180,48 @@ var _ = Describe("logs command", func() {
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Connected, tailing logs for app", "my-org", "my-space", "my-user"},
 			})
+		})
+	})
+
+	Describe("Helpers", func() {
+		date := time.Date(2014, 4, 4, 11, 39, 20, 5, time.UTC)
+
+		createMessage := func(sourceId string, sourceName string, msgType logmessage.LogMessage_MessageType, date time.Time) *logmessage.LogMessage {
+			timestamp := date.UnixNano()
+			return &logmessage.LogMessage{
+				Message:     []byte("Hello World!\n\r\n\r"),
+				AppId:       proto.String("my-app-guid"),
+				MessageType: &msgType,
+				SourceId:    &sourceId,
+				Timestamp:   &timestamp,
+				SourceName:  &sourceName,
+			}
+		}
+
+		Context("when the message comes from an app", func() {
+			It("includes the instance index", func() {
+				msg := createMessage("4", "App", logmessage.LogMessage_OUT, date)
+				Expect(LogMessageOutput(msg, time.UTC)).To(Equal("2014-04-04T11:39:20.00+0000 [App/4]   OUT Hello World!"))
+			})
+		})
+
+		Context("when the message comes from a cloudfoundry component", func() {
+			It("doesn't include the instance index", func() {
+				msg := createMessage("4", "DEA", logmessage.LogMessage_OUT, date)
+				Expect(LogMessageOutput(msg, time.UTC)).To(Equal("2014-04-04T11:39:20.00+0000 [DEA]     OUT Hello World!"))
+			})
+		})
+
+		Context("when the message was written to stderr", func() {
+			It("shows the log type as 'ERR'", func() {
+				msg := createMessage("4", "DEA", logmessage.LogMessage_ERR, date)
+				Expect(LogMessageOutput(msg, time.UTC)).To(Equal("2014-04-04T11:39:20.00+0000 [DEA]     ERR Hello World!"))
+			})
+		})
+
+		It("formats the time in the given time zone", func() {
+			msg := createMessage("4", "DEA", logmessage.LogMessage_ERR, date)
+			Expect(LogMessageOutput(msg, time.FixedZone("the-zone", 3*60*60))).To(Equal("2014-04-04T14:39:20.00+0300 [DEA]     ERR Hello World!"))
 		})
 	})
 })

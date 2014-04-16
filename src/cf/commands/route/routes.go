@@ -2,6 +2,7 @@ package route
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -21,6 +22,15 @@ func NewListRoutes(ui terminal.UI, config configuration.Reader, routeRepo api.Ro
 	cmd.config = config
 	cmd.routeRepo = routeRepo
 	return
+}
+
+func (command ListRoutes) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "routes",
+		ShortName:   "r",
+		Description: "List all routes in the current space",
+		Usage:       "CF_NAME routes",
+	}
 }
 
 func (cmd ListRoutes) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {

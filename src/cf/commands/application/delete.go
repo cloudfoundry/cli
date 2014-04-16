@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -24,6 +25,19 @@ func NewDeleteApp(ui terminal.UI, config configuration.Reader, appRepo api.Appli
 	cmd.appRepo = appRepo
 	cmd.routeRepo = routeRepo
 	return
+}
+
+func (command *DeleteApp) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete",
+		ShortName:   "d",
+		Description: "Delete an app",
+		Usage:       "CF_NAME delete APP [-f -r]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "r", Usage: "Also delete any mapped routes"},
+		},
+	}
 }
 
 func (cmd *DeleteApp) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

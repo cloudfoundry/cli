@@ -2,6 +2,7 @@ package serviceauthtoken
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -21,6 +22,17 @@ func NewDeleteServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo
 	return
+}
+
+func (command DeleteServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-service-auth-token",
+		Description: "Delete a service auth token",
+		Usage:       "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd DeleteServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -2,6 +2,7 @@ package domain
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -22,6 +23,14 @@ func NewCreateDomain(ui terminal.UI, config configuration.Reader, domainRepo api
 	cmd.config = config
 	cmd.domainRepo = domainRepo
 	return
+}
+
+func (command *CreateDomain) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-domain",
+		Description: "Create a domain in an org for later use",
+		Usage:       "CF_NAME create-domain ORG DOMAIN",
+	}
 }
 
 func (cmd *CreateDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

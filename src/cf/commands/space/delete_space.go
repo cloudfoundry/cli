@@ -3,6 +3,7 @@ package space
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -24,6 +25,17 @@ func NewDeleteSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo a
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	return
+}
+
+func (command *DeleteSpace) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-space",
+		Description: "Delete a space",
+		Usage:       "CF_NAME delete-space SPACE [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd *DeleteSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

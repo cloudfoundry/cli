@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -24,6 +25,15 @@ func NewSetEnv(ui terminal.UI, config configuration.Reader, appRepo api.Applicat
 	cmd.config = config
 	cmd.appRepo = appRepo
 	return
+}
+
+func (command *SetEnv) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "set-env",
+		ShortName:   "se",
+		Description: "Set an env variable for an app",
+		Usage:       "CF_NAME set-env APP NAME VALUE",
+	}
 }
 
 func (cmd *SetEnv) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

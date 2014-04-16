@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -32,6 +33,17 @@ func NewOrgUsers(ui terminal.UI, config configuration.Reader, userRepo api.UserR
 	cmd.config = config
 	cmd.userRepo = userRepo
 	return
+}
+
+func (command *OrgUsers) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "org-users",
+		Description: "Show org users by role",
+		Usage:       "CF_NAME org-users ORG",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "a", Usage: "List all users in the org"},
+		},
+	}
 }
 
 func (cmd *OrgUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

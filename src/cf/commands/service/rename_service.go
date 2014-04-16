@@ -3,6 +3,7 @@ package service
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -23,6 +24,14 @@ func NewRenameService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	cmd.config = config
 	cmd.serviceRepo = serviceRepo
 	return
+}
+
+func (command *RenameService) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "rename-service",
+		Description: "Rename a service instance",
+		Usage:       "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
+	}
 }
 
 func (cmd *RenameService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

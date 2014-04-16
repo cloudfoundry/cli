@@ -2,6 +2,7 @@ package domain
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -23,6 +24,14 @@ func NewListDomains(ui terminal.UI, config configuration.Reader, domainRepo api.
 	cmd.config = config
 	cmd.domainRepo = domainRepo
 	return
+}
+
+func (command *ListDomains) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "domains",
+		Description: "List domains in the target org",
+		Usage:       "CF_NAME domains",
+	}
 }
 
 func (cmd *ListDomains) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

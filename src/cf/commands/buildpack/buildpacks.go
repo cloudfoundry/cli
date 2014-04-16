@@ -2,6 +2,7 @@ package buildpack
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
@@ -18,6 +19,14 @@ func NewListBuildpacks(ui terminal.UI, buildpackRepo api.BuildpackRepository) (c
 	cmd.ui = ui
 	cmd.buildpackRepo = buildpackRepo
 	return
+}
+
+func (command ListBuildpacks) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "buildpacks",
+		Description: "List all buildpacks",
+		Usage:       "CF_NAME buildpacks",
+	}
 }
 
 func (cmd ListBuildpacks) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

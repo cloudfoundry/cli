@@ -1,6 +1,7 @@
 package service
 
 import (
+	"cf/command_metadata"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -16,6 +17,14 @@ func NewShowService(ui terminal.UI) (cmd *ShowService) {
 	cmd = new(ShowService)
 	cmd.ui = ui
 	return
+}
+
+func (command *ShowService) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "service",
+		Description: "Show service instance info",
+		Usage:       "CF_NAME service SERVICE_INSTANCE",
+	}
 }
 
 func (cmd *ShowService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

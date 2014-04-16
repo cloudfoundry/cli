@@ -2,6 +2,7 @@ package domain
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -22,6 +23,17 @@ func NewDeleteSharedDomain(ui terminal.UI, config configuration.Reader, repo api
 	cmd.config = config
 	cmd.domainRepo = repo
 	return
+}
+
+func (command *DeleteSharedDomain) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-shared-domain",
+		Description: "Delete a shared domain",
+		Usage:       "CF_NAME delete-shared-domain DOMAIN [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd *DeleteSharedDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

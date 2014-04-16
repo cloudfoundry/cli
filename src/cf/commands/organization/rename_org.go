@@ -2,6 +2,7 @@ package organization
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -22,6 +23,14 @@ func NewRenameOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.O
 	cmd.config = config
 	cmd.orgRepo = orgRepo
 	return
+}
+
+func (command *RenameOrg) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "rename-org",
+		Description: "Rename an org",
+		Usage:       "CF_NAME rename-org ORG NEW_ORG",
+	}
 }
 
 func (cmd *RenameOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

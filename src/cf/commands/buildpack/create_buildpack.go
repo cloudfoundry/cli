@@ -3,6 +3,7 @@ package buildpack
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/errors"
 	"cf/models"
 	"cf/requirements"
@@ -22,6 +23,20 @@ func NewCreateBuildpack(ui terminal.UI, buildpackRepo api.BuildpackRepository, b
 	cmd.buildpackRepo = buildpackRepo
 	cmd.buildpackBitsRepo = buildpackBitsRepo
 	return
+}
+
+func (command CreateBuildpack) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-buildpack",
+		Description: "Create a buildpack",
+		Usage: "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]" +
+			"\n\nTIP:\n" +
+			"   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest.",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "enable", Usage: "Enable the buildpack"},
+			cli.BoolFlag{Name: "disable", Usage: "Disable the buildpack"},
+		},
+	}
 }
 
 func (cmd CreateBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

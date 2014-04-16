@@ -2,6 +2,7 @@ package servicebroker
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -20,6 +21,17 @@ func NewDeleteServiceBroker(ui terminal.UI, config configuration.Reader, repo ap
 	cmd.config = config
 	cmd.repo = repo
 	return
+}
+
+func (command DeleteServiceBroker) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-service-broker",
+		Description: "Delete a service broker",
+		Usage:       "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd DeleteServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -22,6 +23,18 @@ func NewDeleteService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	cmd.config = config
 	cmd.serviceRepo = serviceRepo
 	return
+}
+
+func (command *DeleteService) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-service",
+		ShortName:   "ds",
+		Description: "Delete a service instance",
+		Usage:       "CF_NAME delete-service SERVICE_INSTANCE [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd *DeleteService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

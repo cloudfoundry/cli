@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -24,6 +25,18 @@ func NewSetOrgRole(ui terminal.UI, config configuration.Reader, userRepo api.Use
 	cmd.config = config
 	cmd.userRepo = userRepo
 	return
+}
+
+func (command *SetOrgRole) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "set-org-role",
+		Description: "Assign an org role to a user",
+		Usage: "CF_NAME set-org-role USERNAME ORG ROLE\n\n" +
+			"ROLES:\n" +
+			"   OrgManager - Invite and manage users, select and change plans, and set spending limits\n" +
+			"   BillingManager - Create and manage the billing account and payment info\n" +
+			"   OrgAuditor - Read-only access to org info and reports\n",
+	}
 }
 
 func (cmd *SetOrgRole) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

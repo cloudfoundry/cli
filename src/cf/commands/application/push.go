@@ -2,9 +2,11 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/commands/service"
 	"cf/configuration"
 	"cf/errors"
+	"cf/flag_helpers"
 	"cf/formatters"
 	"cf/manifest"
 	"cf/models"
@@ -56,6 +58,38 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 		appBitsRepo:   appBitsRepo,
 		authRepo:      authRepo,
 		wordGenerator: wordGenerator,
+	}
+}
+
+func (command *Push) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "push",
+		ShortName:   "p",
+		Description: "Push a new app or sync changes to an existing app",
+		Usage: "Push a single app (with or without a manifest):\n" +
+			"   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n" +
+			"   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n" +
+			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]" +
+			"\n\n   Push multiple apps with a manifest:\n" +
+			"   CF_NAME push [-f MANIFEST_PATH]\n",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("b", "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"),
+			flag_helpers.NewStringFlag("c", "Startup command, set to null to reset to default start command"),
+			flag_helpers.NewStringFlag("d", "Domain (e.g. example.com)"),
+			flag_helpers.NewStringFlag("f", "Path to manifest"),
+			flag_helpers.NewIntFlag("i", "Number of instances"),
+			flag_helpers.NewStringFlag("k", "Disk limit (e.g. 256M, 1024M, 1G)"),
+			flag_helpers.NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
+			flag_helpers.NewStringFlag("n", "Hostname (e.g. my-subdomain)"),
+			flag_helpers.NewStringFlag("p", "Path of app directory or zip file"),
+			flag_helpers.NewStringFlag("s", "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"),
+			flag_helpers.NewStringFlag("t", "Start timeout in seconds"),
+			cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
+			cli.BoolFlag{Name: "no-manifest", Usage: "Ignore manifest file"},
+			cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
+			cli.BoolFlag{Name: "no-start", Usage: "Do not start an app after pushing"},
+			cli.BoolFlag{Name: "random-route", Usage: "Create a random route for this app"},
+		},
 	}
 }
 

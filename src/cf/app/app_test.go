@@ -5,7 +5,8 @@ import (
 	"cf"
 	"cf/api"
 	. "cf/app"
-	"cf/commands"
+	"cf/command_factory"
+	"cf/command_metadata"
 	"cf/net"
 	"cf/trace"
 	"github.com/codegangsta/cli"
@@ -44,7 +45,12 @@ var _ = Describe("App", func() {
 			"uaa":              net.NewUAAGateway(config),
 		})
 
-		cmdFactory := commands.NewFactory(ui, config, manifestRepo, repoLocator)
+		cmdFactory := command_factory.NewFactory(ui, config, manifestRepo, repoLocator)
+
+		metadatas := []command_metadata.CommandMetadata{}
+		for _, cmdName := range expectedCommandNames {
+			metadatas = append(metadatas, command_metadata.CommandMetadata{Name: cmdName})
+		}
 
 		for _, cmdName := range expectedCommandNames {
 			cmdRunner := &FakeRunner{cmdFactory: cmdFactory}
@@ -52,9 +58,7 @@ var _ = Describe("App", func() {
 			trace.SetStdout(output)
 			trace.EnableTrace()
 
-			app, err := NewApp(cmdRunner)
-			Expect(err).NotTo(HaveOccurred())
-
+			app := NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
 			Expect(output.String()).To(ContainSubstring("VERSION:\n" + cf.Version))
 
 			app.Run([]string{"", cmdName})
@@ -64,7 +68,7 @@ var _ = Describe("App", func() {
 })
 
 type FakeRunner struct {
-	cmdFactory commands.Factory
+	cmdFactory command_factory.Factory
 	cmdName    string
 }
 

@@ -2,6 +2,7 @@ package quota
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/formatters"
 	"cf/requirements"
@@ -21,6 +22,14 @@ func NewShowQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.Quo
 		ui:        ui,
 		config:    config,
 		quotaRepo: quotaRepo,
+	}
+}
+
+func (command *showQuota) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "quota",
+		Usage:       "CF_NAME quota QUOTA",
+		Description: "Show quota info",
 	}
 }
 

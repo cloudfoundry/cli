@@ -2,6 +2,7 @@ package serviceauthtoken
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -21,6 +22,14 @@ func NewCreateServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo
 	return
+}
+
+func (command CreateServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-service-auth-token",
+		Description: "Create a service auth token",
+		Usage:       "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
+	}
 }
 
 func (cmd CreateServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

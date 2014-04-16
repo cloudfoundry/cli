@@ -2,6 +2,7 @@ package commands
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -19,6 +20,14 @@ func NewListStacks(ui terminal.UI, config configuration.Reader, stacksRepo api.S
 	cmd.config = config
 	cmd.stacksRepo = stacksRepo
 	return
+}
+
+func (command ListStacks) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "stacks",
+		Description: "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
+		Usage:       "CF_NAME stacks",
+	}
 }
 
 func (cmd ListStacks) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

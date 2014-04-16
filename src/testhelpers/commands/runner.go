@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"cf/commands"
+	"cf/command"
 	"github.com/codegangsta/cli"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
@@ -9,7 +9,7 @@ import (
 
 var CommandDidPassRequirements bool
 
-func RunCommand(cmd commands.Command, ctxt *cli.Context, requirementsFactory *testreq.FakeReqFactory) {
+func RunCommand(cmd command.Command, ctxt *cli.Context, requirementsFactory *testreq.FakeReqFactory) {
 	defer func() {
 		errMsg := recover()
 

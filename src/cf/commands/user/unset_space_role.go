@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -26,6 +27,18 @@ func NewUnsetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo ap
 	cmd.spaceRepo = spaceRepo
 	cmd.userRepo = userRepo
 	return
+}
+
+func (command *UnsetSpaceRole) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "unset-space-role",
+		Description: "Remove a space role from a user",
+		Usage: "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n" +
+			"ROLES:\n" +
+			"   SpaceManager - Invite and manage users, and enable features for a given space\n" +
+			"   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n" +
+			"   SpaceAuditor - View logs, reports, and settings on this space\n",
+	}
 }
 
 func (cmd *UnsetSpaceRole) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

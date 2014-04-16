@@ -2,6 +2,7 @@ package organization
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -22,6 +23,16 @@ func NewSetQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.Quot
 	cmd.config = config
 	cmd.quotaRepo = quotaRepo
 	return
+}
+
+func (command *SetQuota) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "set-quota",
+		Description: "Assign a quota to an org",
+		Usage: "CF_NAME set-quota ORG QUOTA\n\n" +
+			"TIP:\n" +
+			"   View allowable quotas with 'CF_NAME quotas'",
+	}
 }
 
 func (cmd *SetQuota) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

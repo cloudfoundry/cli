@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -22,6 +23,15 @@ func NewFiles(ui terminal.UI, config configuration.Reader, appFilesRepo api.AppF
 	cmd.config = config
 	cmd.appFilesRepo = appFilesRepo
 	return
+}
+
+func (command *Files) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "files",
+		ShortName:   "f",
+		Description: "Print out a list of files in a directory or the contents of a specific file",
+		Usage:       "CF_NAME files APP [PATH]",
+	}
 }
 
 func (cmd *Files) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

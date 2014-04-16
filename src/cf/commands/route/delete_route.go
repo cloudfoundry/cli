@@ -2,8 +2,10 @@ package route
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
+	"cf/flag_helpers"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -21,6 +23,18 @@ func NewDeleteRoute(ui terminal.UI, config configuration.Reader, routeRepo api.R
 	cmd.config = config
 	cmd.routeRepo = routeRepo
 	return
+}
+
+func (command *DeleteRoute) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-route",
+		Description: "Delete a route",
+		Usage:       "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			flag_helpers.NewStringFlag("n", "Hostname"),
+		},
+	}
 }
 
 func (cmd *DeleteRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -2,7 +2,9 @@ package route
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
+	"cf/flag_helpers"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -25,6 +27,17 @@ func NewMapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.Rout
 	cmd.routeRepo = routeRepo
 	cmd.routeCreator = routeCreator
 	return
+}
+
+func (command *MapRoute) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "map-route",
+		Description: "Add a url route to an app",
+		Usage:       "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("n", "Hostname"),
+		},
+	}
 }
 
 func (cmd *MapRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -19,6 +20,15 @@ func NewEnv(ui terminal.UI, config configuration.Reader) (cmd *Env) {
 	cmd.ui = ui
 	cmd.config = config
 	return
+}
+
+func (command *Env) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "env",
+		ShortName:   "e",
+		Description: "Show all env variables for an app",
+		Usage:       "CF_NAME env APP",
+	}
 }
 
 func (cmd *Env) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

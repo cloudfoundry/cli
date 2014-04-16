@@ -2,7 +2,9 @@ package service
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
+	"cf/flag_helpers"
 	"cf/requirements"
 	"cf/terminal"
 	"encoding/json"
@@ -22,6 +24,27 @@ func NewCreateUserProvidedService(ui terminal.UI, config configuration.Reader, u
 	cmd.config = config
 	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
 	return
+}
+
+func (command CreateUserProvidedService) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-user-provided-service",
+		ShortName:   "cups",
+		Description: "Make a user-provided service instance available to cf apps",
+		Usage: "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n" +
+			"\n   Pass comma separated parameter names to enable interactive mode:\n" +
+			"   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n" +
+			"\n   Pass parameters as JSON to create a service non-interactively:\n" +
+			"   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n" +
+			"\nEXAMPLE:\n" +
+			"   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n" +
+			"   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n" +
+			"   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("p", "Parameters"),
+			flag_helpers.NewStringFlag("l", "Syslog Drain Url"),
+		},
+	}
 }
 
 func (cmd CreateUserProvidedService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

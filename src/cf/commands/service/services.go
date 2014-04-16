@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -20,6 +21,15 @@ func NewListServices(ui terminal.UI, config configuration.Reader, serviceSummary
 	cmd.config = config
 	cmd.serviceSummaryRepo = serviceSummaryRepo
 	return
+}
+
+func (command ListServices) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "services",
+		ShortName:   "s",
+		Description: "List all service instances in the target space",
+		Usage:       "CF_NAME services",
+	}
 }
 
 func (cmd ListServices) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

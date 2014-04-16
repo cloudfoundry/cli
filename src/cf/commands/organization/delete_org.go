@@ -2,6 +2,7 @@ package organization
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -23,6 +24,17 @@ func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.O
 	cmd.config = config
 	cmd.orgRepo = orgRepo
 	return
+}
+
+func (command *DeleteOrg) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-org",
+		Description: "Delete an org",
+		Usage:       "CF_NAME delete-org ORG [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd *DeleteOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

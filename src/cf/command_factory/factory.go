@@ -1,7 +1,10 @@
-package commands
+package command_factory
 
 import (
 	"cf/api"
+	"cf/command"
+	"cf/command_metadata"
+	"cf/commands"
 	"cf/commands/application"
 	"cf/commands/buildpack"
 	"cf/commands/domain"
@@ -21,19 +24,20 @@ import (
 )
 
 type Factory interface {
-	GetByCmdName(cmdName string) (cmd Command, err error)
+	GetByCmdName(cmdName string) (cmd command.Command, err error)
+	CommandMetadatas() []command_metadata.CommandMetadata
 }
 
-type ConcreteFactory struct {
-	cmdsByName map[string]Command
+type concreteFactory struct {
+	cmdsByName map[string]command.Command
 }
 
-func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
-	factory.cmdsByName = make(map[string]Command)
+func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator) (factory concreteFactory) {
+	factory.cmdsByName = make(map[string]command.Command)
 
-	factory.cmdsByName["api"] = NewApi(ui, config, repoLocator.GetEndpointRepository())
+	factory.cmdsByName["api"] = commands.NewApi(ui, config, repoLocator.GetEndpointRepository())
 	factory.cmdsByName["apps"] = application.NewListApps(ui, config, repoLocator.GetAppSummaryRepository())
-	factory.cmdsByName["auth"] = NewAuthenticate(ui, config, repoLocator.GetAuthenticationRepository())
+	factory.cmdsByName["auth"] = commands.NewAuthenticate(ui, config, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["buildpacks"] = buildpack.NewListBuildpacks(ui, repoLocator.GetBuildpackRepository())
 	factory.cmdsByName["create-buildpack"] = buildpack.NewCreateBuildpack(ui, repoLocator.GetBuildpackRepository(), repoLocator.GetBuildpackBitsRepository())
 	factory.cmdsByName["create-domain"] = domain.NewCreateDomain(ui, config, repoLocator.GetDomainRepository())
@@ -43,7 +47,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["create-service-broker"] = servicebroker.NewCreateServiceBroker(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["create-user"] = user.NewCreateUser(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["create-user-provided-service"] = service.NewCreateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
-	factory.cmdsByName["curl"] = NewCurl(ui, config, repoLocator.GetCurlRepository())
+	factory.cmdsByName["curl"] = commands.NewCurl(ui, config, repoLocator.GetCurlRepository())
 	factory.cmdsByName["delete"] = application.NewDeleteApp(ui, config, repoLocator.GetApplicationRepository(), repoLocator.GetRouteRepository())
 	factory.cmdsByName["delete-buildpack"] = buildpack.NewDeleteBuildpack(ui, repoLocator.GetBuildpackRepository())
 	factory.cmdsByName["delete-domain"] = domain.NewDeleteDomain(ui, config, repoLocator.GetDomainRepository())
@@ -59,14 +63,14 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["env"] = application.NewEnv(ui, config)
 	factory.cmdsByName["events"] = application.NewEvents(ui, config, repoLocator.GetAppEventsRepository())
 	factory.cmdsByName["files"] = application.NewFiles(ui, config, repoLocator.GetAppFilesRepository())
-	factory.cmdsByName["login"] = NewLogin(ui, config, repoLocator.GetAuthenticationRepository(), repoLocator.GetEndpointRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
-	factory.cmdsByName["logout"] = NewLogout(ui, config)
+	factory.cmdsByName["login"] = commands.NewLogin(ui, config, repoLocator.GetAuthenticationRepository(), repoLocator.GetEndpointRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
+	factory.cmdsByName["logout"] = commands.NewLogout(ui, config)
 	factory.cmdsByName["logs"] = application.NewLogs(ui, config, repoLocator.GetLogsRepository())
 	factory.cmdsByName["marketplace"] = service.NewMarketplaceServices(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["org"] = organization.NewShowOrg(ui, config)
 	factory.cmdsByName["org-users"] = user.NewOrgUsers(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, config, repoLocator.GetOrganizationRepository())
-	factory.cmdsByName["passwd"] = NewPassword(ui, repoLocator.GetPasswordRepository(), config)
+	factory.cmdsByName["passwd"] = commands.NewPassword(ui, repoLocator.GetPasswordRepository(), config)
 	factory.cmdsByName["purge-service-offering"] = service.NewPurgeServiceOffering(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["quotas"] = quota.NewListQuotas(ui, config, repoLocator.GetQuotaRepository())
 	factory.cmdsByName["quota"] = quota.NewShowQuota(ui, config, repoLocator.GetQuotaRepository())
@@ -92,8 +96,8 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, config)
 	factory.cmdsByName["space-users"] = user.NewSpaceUsers(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
 	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, config, repoLocator.GetSpaceRepository())
-	factory.cmdsByName["stacks"] = NewListStacks(ui, config, repoLocator.GetStackRepository())
-	factory.cmdsByName["target"] = NewTarget(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
+	factory.cmdsByName["stacks"] = commands.NewListStacks(ui, config, repoLocator.GetStackRepository())
+	factory.cmdsByName["target"] = commands.NewTarget(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, config, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["unset-org-role"] = user.NewUnsetOrgRole(ui, config, repoLocator.GetUserRepository())
@@ -139,10 +143,17 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	return
 }
 
-func (f ConcreteFactory) GetByCmdName(cmdName string) (cmd Command, err error) {
+func (f concreteFactory) GetByCmdName(cmdName string) (cmd command.Command, err error) {
 	cmd, found := f.cmdsByName[cmdName]
 	if !found {
 		err = errors.New("Command not found")
+	}
+	return
+}
+
+func (factory concreteFactory) CommandMetadatas() (commands []command_metadata.CommandMetadata) {
+	for _, command := range factory.cmdsByName {
+		commands = append(commands, command.Metadata())
 	}
 	return
 }

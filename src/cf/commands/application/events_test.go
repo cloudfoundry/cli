@@ -22,6 +22,8 @@ var _ = Describe("events command", func() {
 		ui                  *testterm.FakeUI
 	)
 
+	const TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
+
 	BeforeEach(func() {
 		eventsRepo = &testapi.FakeAppEventsRepo{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}

@@ -2,11 +2,11 @@ package quota
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	//	"errors"
-	"cf/errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 )
@@ -24,6 +24,17 @@ func NewDeleteQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.Q
 	cmd.config = config
 	cmd.quotaRepo = quotaRepo
 	return
+}
+
+func (command *DeleteQuota) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-quota",
+		Description: "Delete a quota",
+		Usage:       "CF_NAME delete-quota QUOTA [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd *DeleteQuota) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

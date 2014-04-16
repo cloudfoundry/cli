@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -22,6 +23,15 @@ func NewMarketplaceServices(ui terminal.UI, config configuration.Reader, service
 	cmd.config = config
 	cmd.serviceRepo = serviceRepo
 	return
+}
+
+func (command MarketplaceServices) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "marketplace",
+		ShortName:   "m",
+		Description: "List available offerings in the marketplace",
+		Usage:       "CF_NAME marketplace",
+	}
 }
 
 func (cmd MarketplaceServices) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

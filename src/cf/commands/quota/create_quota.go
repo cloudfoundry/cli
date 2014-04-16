@@ -2,8 +2,10 @@ package quota
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
+	"cf/flag_helpers"
 	"cf/formatters"
 	"cf/models"
 	"cf/requirements"
@@ -22,6 +24,19 @@ func NewCreateQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.Q
 		ui:        ui,
 		config:    config,
 		quotaRepo: quotaRepo,
+	}
+}
+
+func (command CreateQuota) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-quota",
+		Description: "Define a new resource quota",
+		Usage:       "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES]",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("m", "Total amount of memory (e.g. 1024M, 1G, 10G)"),
+			flag_helpers.NewIntFlag("r", "Total number of routes"),
+			flag_helpers.NewIntFlag("s", "Total number of service instances"),
+		},
 	}
 }
 
