@@ -685,6 +685,7 @@ var _ = Describe("Push Command", func() {
 				}
 
 				existingApp.Routes = []models.RouteSummary{models.RouteSummary{
+					Guid:   "existing-route-guid",
 					Host:   "existing-app",
 					Domain: domain,
 				}}
@@ -750,7 +751,7 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreatedDomainGuid).To(Equal("domain-guid"))
 			})
 
-			It("does not create a route when the --no-route flag is given", func() {
+			It("removes the route when the --no-route flag is given", func() {
 				callPush("--no-route", "existing-app")
 
 				Expect(appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
@@ -759,6 +760,8 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.FindByHostAndDomainHost).To(Equal(""))
 				Expect(routeRepo.CreatedHost).To(Equal(""))
 				Expect(routeRepo.CreatedDomainGuid).To(Equal(""))
+				Expect(routeRepo.UnboundRouteGuid).To(Equal("existing-route-guid"))
+				Expect(routeRepo.UnboundAppGuid).To(Equal("existing-app-guid"))
 			})
 
 			It("binds the root domain route to an app with a pre-existing route when the --no-hostname flag is given", func() {
