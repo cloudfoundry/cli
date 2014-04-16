@@ -1,6 +1,7 @@
 package organization
 
 import (
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -21,6 +22,14 @@ func NewShowOrg(ui terminal.UI, config configuration.Reader) (cmd *ShowOrg) {
 	cmd.ui = ui
 	cmd.config = config
 	return
+}
+
+func (command *ShowOrg) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "org",
+		Description: "Show org info",
+		Usage:       "CF_NAME org ORG",
+	}
 }
 
 func (cmd *ShowOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

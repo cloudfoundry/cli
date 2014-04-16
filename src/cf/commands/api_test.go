@@ -55,7 +55,6 @@ var _ = Describe("api command", func() {
 		Context("when the endpoint is set in the config", func() {
 			var (
 				ui                  *testterm.FakeUI
-				cmd                 Command
 				ctx                 *cli.Context
 				requirementsFactory *testreq.FakeReqFactory
 			)
@@ -66,13 +65,12 @@ var _ = Describe("api command", func() {
 				config.SetSSLDisabled(true)
 
 				ui = new(testterm.FakeUI)
-				cmd = NewApi(ui, config, endpointRepo)
 				ctx = testcmd.NewContext("api", []string{})
 				requirementsFactory = &testreq.FakeReqFactory{}
 			})
 
 			JustBeforeEach(func() {
-				testcmd.RunCommand(cmd, ctx, requirementsFactory)
+				testcmd.RunCommand(NewApi(ui, config, endpointRepo), ctx, requirementsFactory)
 			})
 
 			It("prints out the api endpoint", func() {

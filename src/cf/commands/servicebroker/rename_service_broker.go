@@ -2,6 +2,7 @@ package servicebroker
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -20,6 +21,14 @@ func NewRenameServiceBroker(ui terminal.UI, config configuration.Reader, repo ap
 	cmd.config = config
 	cmd.repo = repo
 	return
+}
+
+func (command RenameServiceBroker) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "rename-service-broker",
+		Description: "Rename a service broker",
+		Usage:       "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
+	}
 }
 
 func (cmd RenameServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

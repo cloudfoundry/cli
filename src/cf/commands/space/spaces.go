@@ -2,6 +2,7 @@ package space
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -20,6 +21,14 @@ func NewListSpaces(ui terminal.UI, config configuration.Reader, spaceRepo api.Sp
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	return
+}
+
+func (command ListSpaces) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "spaces",
+		Description: "List all spaces in an org",
+		Usage:       "CF_NAME spaces",
+	}
 }
 
 func (cmd ListSpaces) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

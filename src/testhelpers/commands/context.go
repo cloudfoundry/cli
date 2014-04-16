@@ -1,13 +1,19 @@
 package commands
 
 import (
+	"cf/api"
 	"cf/app"
-	"cf/commands"
+	"cf/command_factory"
+	"cf/command_runner"
+	"cf/manifest"
+	"cf/net"
 	"flag"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 )
 
 func NewContext(cmdName string, args []string) *cli.Context {
@@ -40,10 +46,19 @@ func NewContext(cmdName string, args []string) *cli.Context {
 }
 
 func findCommand(cmdName string) (cmd cli.Command) {
-	cmdFactory := commands.ConcreteFactory{}
+	fakeUI := &testterm.FakeUI{}
+	configRepo := testconfig.NewRepository()
+	manifestRepo := manifest.NewManifestDiskRepository()
+	apiRepoLocator := api.NewRepositoryLocator(configRepo, map[string]net.Gateway{
+		"auth":             net.NewUAAGateway(configRepo),
+		"cloud-controller": net.NewCloudControllerGateway(configRepo),
+		"uaa":              net.NewUAAGateway(configRepo),
+	})
+
+	cmdFactory := command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator)
 	requirementsFactory := &testreq.FakeReqFactory{}
-	cmdRunner := commands.NewRunner(cmdFactory, requirementsFactory)
-	myApp, _ := app.NewApp(cmdRunner)
+	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
+	myApp := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
 
 	for _, cmd := range myApp.Commands {
 		if cmd.Name == cmdName {

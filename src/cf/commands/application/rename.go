@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -23,6 +24,14 @@ func NewRenameApp(ui terminal.UI, config configuration.Reader, appRepo api.Appli
 	cmd.config = config
 	cmd.appRepo = appRepo
 	return
+}
+
+func (command *RenameApp) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "rename",
+		Description: "Rename an app",
+		Usage:       "CF_NAME rename APP_NAME NEW_APP_NAME",
+	}
 }
 
 func (cmd *RenameApp) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

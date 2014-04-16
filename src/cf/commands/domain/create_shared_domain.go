@@ -2,6 +2,7 @@ package domain
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -22,6 +23,14 @@ func NewCreateSharedDomain(ui terminal.UI, config configuration.Reader, domainRe
 	cmd.config = config
 	cmd.domainRepo = domainRepo
 	return
+}
+
+func (command *CreateSharedDomain) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-shared-domain",
+		Description: "Create a domain that can be used by all orgs (admin-only)",
+		Usage:       "CF_NAME create-shared-domain DOMAIN",
+	}
 }
 
 func (cmd *CreateSharedDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -2,8 +2,10 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
+	"cf/flag_helpers"
 	"cf/formatters"
 	"cf/models"
 	"cf/requirements"
@@ -26,6 +28,20 @@ func NewScale(ui terminal.UI, config configuration.Reader, restarter Application
 	cmd.restarter = restarter
 	cmd.appRepo = appRepo
 	return
+}
+
+func (command *Scale) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "scale",
+		Description: "Change or view the instance count, disk space limit, and memory limit for an app",
+		Usage:       "%s scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+		Flags: []cli.Flag{
+			flag_helpers.NewIntFlag("i", "Number of instances"),
+			flag_helpers.NewStringFlag("k", "Disk limit (e.g. 256M, 1024M, 1G)"),
+			flag_helpers.NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
+			cli.BoolFlag{Name: "f", Usage: "Force restart of app without prompt"},
+		},
+	}
 }
 
 func (cmd *Scale) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

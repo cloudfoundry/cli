@@ -3,6 +3,7 @@ package commands
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -25,7 +26,18 @@ func NewApi(ui terminal.UI, config configuration.ReadWriter, endpointRepo api.En
 	return
 }
 
-func (cmd Api) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Api) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "api",
+		Description: "Set or view target api url",
+		Usage:       "CF_NAME api [URL]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
+		},
+	}
+}
+
+func (cmd Api) GetRequirements(_ requirements.Factory, _ *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

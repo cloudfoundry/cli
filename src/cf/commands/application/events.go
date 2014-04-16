@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -22,6 +23,14 @@ func NewEvents(ui terminal.UI, config configuration.Reader, eventsRepo api.AppEv
 	cmd.config = config
 	cmd.eventsRepo = eventsRepo
 	return
+}
+
+func (command *Events) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "events",
+		Description: "Show recent app events",
+		Usage:       "CF_NAME events APP",
+	}
 }
 
 func (cmd *Events) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
@@ -61,7 +70,7 @@ func (cmd *Events) Run(c *cli.Context) {
 
 	for _, event := range events {
 		table.Print([][]string{{
-			event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
+			event.Timestamp.Local().Format("2006-01-02T15:04:05.00-0700"),
 			event.Name,
 			event.Description,
 		}})

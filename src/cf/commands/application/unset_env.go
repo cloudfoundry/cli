@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -24,6 +25,14 @@ func NewUnsetEnv(ui terminal.UI, config configuration.Reader, appRepo api.Applic
 	cmd.config = config
 	cmd.appRepo = appRepo
 	return
+}
+
+func (command *UnsetEnv) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "unset-env",
+		Description: "Remove an env variable",
+		Usage:       "CF_NAME unset-env APP NAME",
+	}
 }
 
 func (cmd *UnsetEnv) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

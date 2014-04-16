@@ -3,7 +3,9 @@ package service
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
+	"cf/flag_helpers"
 	"cf/requirements"
 	"cf/terminal"
 	"encoding/json"
@@ -24,6 +26,22 @@ func NewUpdateUserProvidedService(ui terminal.UI, config configuration.Reader, u
 	cmd.config = config
 	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
 	return
+}
+
+func (command *UpdateUserProvidedService) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "update-user-provided-service",
+		ShortName:   "uups",
+		Description: "Update user-provided service instance name value pairs",
+		Usage: "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\n" +
+			"EXAMPLE:\n" +
+			"   CF_NAME update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n" +
+			"   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("p", "Parameters"),
+			flag_helpers.NewStringFlag("l", "Syslog Drain Url"),
+		},
+	}
 }
 
 func (cmd *UpdateUserProvidedService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -3,9 +3,11 @@ package space
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/commands/user"
 	"cf/configuration"
 	"cf/errors"
+	"cf/flag_helpers"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
@@ -29,6 +31,17 @@ func NewCreateSpace(ui terminal.UI, config configuration.Reader, spaceRoleSetter
 	cmd.orgRepo = orgRepo
 	cmd.userRepo = userRepo
 	return
+}
+
+func (command CreateSpace) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-space",
+		Description: "Create a space",
+		Usage:       "CF_NAME create-space SPACE [-o ORG]",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("o", "Organization"),
+		},
+	}
 }
 
 func (cmd CreateSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -3,6 +3,7 @@ package commands
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -21,6 +22,18 @@ func NewAuthenticate(ui terminal.UI, config configuration.ReadWriter, authentica
 	cmd.config = config
 	cmd.authenticator = authenticator
 	return
+}
+
+func (cmd Authenticate) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "auth",
+		Description: "Authenticate user non-interactively",
+		Usage: "CF_NAME auth USERNAME PASSWORD\n\n" +
+			terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
+			"EXAMPLE:\n" +
+			"   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n" +
+			"   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
+	}
 }
 
 func (cmd Authenticate) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

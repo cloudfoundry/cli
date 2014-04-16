@@ -3,6 +3,7 @@ package service
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -29,6 +30,15 @@ func NewBindService(ui terminal.UI, config configuration.Reader, serviceBindingR
 	cmd.config = config
 	cmd.serviceBindingRepo = serviceBindingRepo
 	return
+}
+
+func (cmd *BindService) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "bind-service",
+		ShortName:   "bs",
+		Description: "Bind a service instance to an app",
+		Usage:       "CF_NAME bind-service APP SERVICE_INSTANCE",
+	}
 }
 
 func (cmd *BindService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

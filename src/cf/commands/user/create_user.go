@@ -3,6 +3,7 @@ package user
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -21,6 +22,14 @@ func NewCreateUser(ui terminal.UI, config configuration.Reader, userRepo api.Use
 	cmd.config = config
 	cmd.userRepo = userRepo
 	return
+}
+
+func (command CreateUser) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-user",
+		Description: "Create a new user",
+		Usage:       "CF_NAME create-user USERNAME PASSWORD",
+	}
 }
 
 func (cmd CreateUser) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

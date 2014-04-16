@@ -2,7 +2,9 @@ package commands
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
+	"cf/flag_helpers"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
@@ -35,6 +37,29 @@ func NewLogin(ui terminal.UI,
 		endpointRepo:  endpointRepo,
 		orgRepo:       orgRepo,
 		spaceRepo:     spaceRepo,
+	}
+}
+
+func (command Login) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "login",
+		ShortName:   "l",
+		Description: "Log user in",
+		Usage: "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n" +
+			terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
+			"EXAMPLE:\n" +
+			"   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n" +
+			"   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n" +
+			"   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n" +
+			"   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("a", "API endpoint (e.g. https://api.example.com)"),
+			flag_helpers.NewStringFlag("u", "Username"),
+			flag_helpers.NewStringFlag("p", "Password"),
+			flag_helpers.NewStringFlag("o", "Org"),
+			flag_helpers.NewStringFlag("s", "Space"),
+			cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
+		},
 	}
 }
 

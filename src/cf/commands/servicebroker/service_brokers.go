@@ -2,6 +2,7 @@ package servicebroker
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -20,6 +21,14 @@ func NewListServiceBrokers(ui terminal.UI, config configuration.Reader, repo api
 	cmd.config = config
 	cmd.repo = repo
 	return
+}
+
+func (command ListServiceBrokers) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "service-brokers",
+		Description: "List service brokers",
+		Usage:       "CF_NAME service-brokers",
+	}
 }
 
 func (cmd ListServiceBrokers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

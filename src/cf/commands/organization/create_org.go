@@ -3,6 +3,7 @@ package organization
 import (
 	"cf"
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -21,6 +22,15 @@ func NewCreateOrg(ui terminal.UI, config configuration.Reader, orgRepo api.Organ
 	cmd.config = config
 	cmd.orgRepo = orgRepo
 	return
+}
+
+func (command CreateOrg) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-org",
+		ShortName:   "co",
+		Description: "Create an org",
+		Usage:       "CF_NAME create-org ORG",
+	}
 }
 
 func (cmd CreateOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

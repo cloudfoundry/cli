@@ -2,12 +2,14 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/formatters"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
+	"cf/ui_helpers"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
@@ -32,6 +34,14 @@ func NewShowApp(ui terminal.UI, config configuration.Reader, appSummaryRepo api.
 	cmd.appSummaryRepo = appSummaryRepo
 	cmd.appInstancesRepo = appInstancesRepo
 	return
+}
+
+func (cmd *ShowApp) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "app",
+		Description: "Display health and status for app",
+		Usage:       "CF_NAME app APP",
+	}
 }
 
 func (cmd *ShowApp) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
@@ -87,8 +97,8 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s %s", terminal.HeaderColor("requested state:"), coloredAppState(application.ApplicationFields))
-	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstances(application.ApplicationFields))
+	cmd.ui.Say("\n%s %s", terminal.HeaderColor("requested state:"), ui_helpers.ColoredAppState(application.ApplicationFields))
+	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), ui_helpers.ColoredAppInstances(application.ApplicationFields))
 	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), formatters.ByteSize(application.Memory*formatters.MEGABYTE), application.InstanceCount)
 
 	var urls []string
@@ -109,7 +119,7 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	for index, instance := range instances {
 		rows = append(rows, []string{
 			fmt.Sprintf("#%d", index),
-			coloredInstanceState(instance),
+			ui_helpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
 			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
 			fmt.Sprintf("%s of %s", formatters.ByteSize(instance.MemUsage), formatters.ByteSize(instance.MemQuota)),

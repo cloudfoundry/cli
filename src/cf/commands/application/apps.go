@@ -2,10 +2,12 @@ package application
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
+	"cf/ui_helpers"
 	"github.com/codegangsta/cli"
 	"strings"
 )
@@ -21,6 +23,15 @@ func NewListApps(ui terminal.UI, config configuration.Reader, appSummaryRepo api
 	cmd.config = config
 	cmd.appSummaryRepo = appSummaryRepo
 	return
+}
+
+func (command ListApps) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "apps",
+		ShortName:   "a",
+		Description: "List all apps in the target space",
+		Usage:       "CF_NAME apps",
+	}
 }
 
 func (cmd ListApps) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
@@ -72,8 +83,8 @@ func (cmd ListApps) Run(c *cli.Context) {
 
 		rows = append(rows, []string{
 			application.Name,
-			coloredAppState(application.ApplicationFields),
-			coloredAppInstances(application.ApplicationFields),
+			ui_helpers.ColoredAppState(application.ApplicationFields),
+			ui_helpers.ColoredAppInstances(application.ApplicationFields),
 			formatters.ByteSize(application.Memory * formatters.MEGABYTE),
 			formatters.ByteSize(application.DiskQuota * formatters.MEGABYTE),
 			strings.Join(urls, ", "),

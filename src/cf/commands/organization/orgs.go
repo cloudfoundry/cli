@@ -2,6 +2,7 @@ package organization
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -20,6 +21,15 @@ func NewListOrgs(ui terminal.UI, config configuration.Reader, orgRepo api.Organi
 	cmd.config = config
 	cmd.orgRepo = orgRepo
 	return
+}
+
+func (command ListOrgs) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "orgs",
+		ShortName:   "o",
+		Description: "List all orgs",
+		Usage:       "CF_NAME orgs",
+	}
 }
 
 func (cmd ListOrgs) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

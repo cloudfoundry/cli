@@ -1,6 +1,7 @@
-package commands
+package command_runner
 
 import (
+	"cf/command_factory"
 	"cf/requirements"
 	"errors"
 	"fmt"
@@ -8,21 +9,16 @@ import (
 	"os"
 )
 
-type Command interface {
-	GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error)
-	Run(c *cli.Context)
-}
-
 type Runner interface {
 	RunCmdByName(cmdName string, c *cli.Context) (err error)
 }
 
 type ConcreteRunner struct {
-	cmdFactory          Factory
+	cmdFactory          command_factory.Factory
 	requirementsFactory requirements.Factory
 }
 
-func NewRunner(cmdFactory Factory, requirementsFactory requirements.Factory) (runner ConcreteRunner) {
+func NewRunner(cmdFactory command_factory.Factory, requirementsFactory requirements.Factory) (runner ConcreteRunner) {
 	runner.cmdFactory = cmdFactory
 	runner.requirementsFactory = requirementsFactory
 	return

@@ -2,7 +2,9 @@ package route
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
+	"cf/flag_helpers"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -23,6 +25,17 @@ func NewUnmapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.Ro
 	cmd.config = config
 	cmd.routeRepo = routeRepo
 	return
+}
+
+func (command *UnmapRoute) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "unmap-route",
+		Description: "Remove a url route from an app",
+		Usage:       "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("n", "Hostname"),
+		},
+	}
 }
 
 func (cmd *UnmapRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

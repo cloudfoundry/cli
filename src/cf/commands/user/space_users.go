@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -33,6 +34,14 @@ func NewSpaceUsers(ui terminal.UI, config configuration.Reader, spaceRepo api.Sp
 	cmd.spaceRepo = spaceRepo
 	cmd.userRepo = userRepo
 	return
+}
+
+func (command *SpaceUsers) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "space-users",
+		Description: "Show space users by role",
+		Usage:       "CF_NAME space-users ORG SPACE",
+	}
 }
 
 func (cmd *SpaceUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

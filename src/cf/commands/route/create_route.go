@@ -2,8 +2,10 @@ package route
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
+	"cf/flag_helpers"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
@@ -28,6 +30,17 @@ func NewCreateRoute(ui terminal.UI, config configuration.Reader, routeRepo api.R
 	cmd.config = config
 	cmd.routeRepo = routeRepo
 	return
+}
+
+func (command *CreateRoute) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "create-route",
+		Description: "Create a url route in a space for later use",
+		Usage:       "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("n", "Hostname"),
+		},
+	}
 }
 
 func (cmd *CreateRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

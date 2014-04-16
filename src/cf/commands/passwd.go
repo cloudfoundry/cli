@@ -2,6 +2,7 @@ package commands
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -20,6 +21,15 @@ func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, config configur
 	cmd.pwdRepo = pwdRepo
 	cmd.config = config
 	return
+}
+
+func (command Password) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "passwd",
+		ShortName:   "pw",
+		Description: "Change user password",
+		Usage:       "CF_NAME passwd",
+	}
 }
 
 func (cmd Password) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

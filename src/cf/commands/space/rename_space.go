@@ -2,6 +2,7 @@ package space
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -22,6 +23,14 @@ func NewRenameSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo a
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	return
+}
+
+func (command *RenameSpace) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "rename-space",
+		Description: "Rename a space",
+		Usage:       "CF_NAME rename-space SPACE NEW_SPACE",
+	}
 }
 
 func (cmd *RenameSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

@@ -2,6 +2,7 @@ package domain
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -22,6 +23,17 @@ func NewDeleteDomain(ui terminal.UI, config configuration.Reader, repo api.Domai
 	cmd.config = config
 	cmd.domainRepo = repo
 	return
+}
+
+func (command *DeleteDomain) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-domain",
+		Description: "Delete a domain",
+		Usage:       "CF_NAME delete-domain DOMAIN [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd *DeleteDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

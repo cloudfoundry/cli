@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -16,6 +17,15 @@ func NewLogout(ui terminal.UI, config configuration.ReadWriter) (cmd Logout) {
 	cmd.ui = ui
 	cmd.config = config
 	return
+}
+
+func (command Logout) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "logout",
+		ShortName:   "lo",
+		Description: "Log user out",
+		Usage:       "CF_NAME logout",
+	}
 }
 
 func (cmd Logout) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

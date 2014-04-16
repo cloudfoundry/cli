@@ -2,6 +2,7 @@ package buildpack
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
@@ -18,6 +19,14 @@ func NewRenameBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *Rena
 	cmd.ui = ui
 	cmd.buildpackRepo = repo
 	return
+}
+
+func (command *RenameBuildpack) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "rename-buildpack",
+		Description: "Rename a buildpack",
+		Usage:       "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
+	}
 }
 
 func (cmd *RenameBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

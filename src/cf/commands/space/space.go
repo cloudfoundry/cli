@@ -1,6 +1,7 @@
 package space
 
 import (
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
@@ -20,6 +21,14 @@ func NewShowSpace(ui terminal.UI, config configuration.Reader) (cmd *ShowSpace) 
 	cmd.ui = ui
 	cmd.config = config
 	return
+}
+
+func (command *ShowSpace) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "space",
+		Description: "Show space info",
+		Usage:       "CF_NAME space SPACE",
+	}
 }
 
 func (cmd *ShowSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {

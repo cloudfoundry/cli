@@ -1,6 +1,7 @@
 package application
 
 import (
+	"cf/command_metadata"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
@@ -25,6 +26,15 @@ func NewRestart(ui terminal.UI, starter ApplicationStarter, stopper ApplicationS
 	cmd.starter = starter
 	cmd.stopper = stopper
 	return
+}
+
+func (command *Restart) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "restart",
+		ShortName:   "rs",
+		Description: "Restart an app",
+		Usage:       "CF_NAME restart APP",
+	}
 }
 
 func (cmd *Restart) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
