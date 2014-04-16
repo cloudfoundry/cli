@@ -163,7 +163,15 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 
 func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams, c *cli.Context) {
 	if params.NoRoute {
-		cmd.ui.Say("App %s is a worker, skipping route creation", terminal.EntityNameColor(app.Name))
+		if len(app.Routes) == 0 {
+			cmd.ui.Say("App %s is a worker, skipping route creation", terminal.EntityNameColor(app.Name))
+		} else {
+			for _, route := range app.Routes {
+				cmd.ui.Say("Removing route %s...", terminal.EntityNameColor(route.URL()))
+				cmd.routeRepo.Unbind(route.Guid, app.Guid)
+			}
+		}
+
 		return
 	}
 
