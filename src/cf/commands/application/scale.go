@@ -34,7 +34,7 @@ func (command *Scale) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "scale",
 		Description: "Change or view the instance count, disk space limit, and memory limit for an app",
-		Usage:       "%s scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+		Usage:       "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
 		Flags: []cli.Flag{
 			flag_helpers.NewIntFlag("i", "Number of instances"),
 			flag_helpers.NewStringFlag("k", "Disk limit (e.g. 256M, 1024M, 1G)"),
