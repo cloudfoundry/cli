@@ -240,7 +240,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					newCmdPresenter(app, maxNameLen, "quotas"),
 					newCmdPresenter(app, maxNameLen, "quota"),
 					newCmdPresenter(app, maxNameLen, "set-quota"),
-			}, {
+				}, {
 					newCmdPresenter(app, maxNameLen, "create-quota"),
 					newCmdPresenter(app, maxNameLen, "delete-quota"),
 					newCmdPresenter(app, maxNameLen, "update-quota"),
@@ -275,6 +275,10 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		},
 	}
 	return
+}
+
+func ShowAppHelp(helpTemplate string, appToPrint interface{}) {
+	showAppHelp(helpTemplate, appToPrint)
 }
 
 func showAppHelp(helpTemplate string, appToPrint interface{}) {
