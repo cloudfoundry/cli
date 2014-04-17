@@ -57,9 +57,9 @@ func createApp(commandFactory command_factory.Factory) *cli.App {
 	return new_app
 }
 
-func commandInOutput(a string, output []string) bool {
-	for _, b := range output {
-		if strings.TrimSpace(b) == strings.TrimSpace(a) {
+func commandInOutput(cmdName string, output []string) bool {
+	for _, line := range output {
+		if strings.TrimSpace(line) == strings.TrimSpace(cmdName) {
 			return true
 		}
 	}

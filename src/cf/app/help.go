@@ -9,35 +9,6 @@ import (
 	"text/template"
 )
 
-var appHelpTemplate = `{{.Title "NAME:"}}
-   {{.Name}} - {{.Usage}}
-
-{{.Title "USAGE:"}}
-   [environment variables] {{.Name}} [global options] command [arguments...] [command options]
-
-{{.Title "VERSION:"}}
-   {{.Version}}
-
-{{.Title "BUILD TIME:"}}
-   {{.Compiled}}
-   {{range .Commands}}
-{{.SubTitle .Name}}{{range .CommandSubGroups}}
-{{range .}}   {{.Name}} {{.Description}}
-{{end}}{{end}}{{end}}
-{{.Title "ENVIRONMENT VARIABLES"}}
-   CF_COLOR=false                     Do not colorize output
-   CF_HOME=path/to/dir/               Override path to default config directory
-   CF_STAGING_TIMEOUT=15              Max wait time for buildpack staging, in minutes
-   CF_STARTUP_TIMEOUT=5               Max wait time for app instance startup, in minutes
-   CF_TRACE=true                      Print API request diagnostics to stdout
-   CF_TRACE=path/to/trace.log         Append API request diagnostics to a log file
-   HTTP_PROXY=proxy.example.com:8080  Enable HTTP proxying for API requests
-
-{{.Title "GLOBAL OPTIONS"}}
-   --version, -v                      Print the version
-   --help, -h                         Show help
-`
-
 type groupedCommands struct {
 	Name             string
 	CommandSubGroups [][]cmdPresenter
