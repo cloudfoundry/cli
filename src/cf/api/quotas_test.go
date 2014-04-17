@@ -48,11 +48,12 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(quota).To(Equal(models.QuotaFields{
-				Guid:          "my-quota-guid",
-				Name:          "my-remote-quota",
-				MemoryLimit:   1024,
-				RoutesLimit:   123,
-				ServicesLimit: 321,
+				Guid:                    "my-quota-guid",
+				Name:                    "my-remote-quota",
+				MemoryLimit:             1024,
+				RoutesLimit:             123,
+				ServicesLimit:           321,
+				NonBasicServicesAllowed: true,
 			}))
 		})
 	})
@@ -183,7 +184,8 @@ var firstQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestReques
 			  	"name": "my-remote-quota",
 			  	"memory_limit": 1024,
 			  	"total_routes": 123,
-			  	"total_services": 321
+			  	"total_services": 321,
+			  	"non_basic_services_allowed": true
 			  }
 			}
 		]}`,
