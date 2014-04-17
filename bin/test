@@ -13,6 +13,9 @@
 
   trap printStatus EXIT
 
+  echo -e "\n Cleaning build artifacts..."
+  bin/go clean
+
   echo -e "\n Formatting packages..."
   bin/go fmt cf/... testhelpers/... generic/... main/... glob/... words/...
 
