@@ -7,4 +7,5 @@ type EventFields struct {
 	Name        string
 	Timestamp   time.Time
 	Description string
+	ActorName   string
 }
