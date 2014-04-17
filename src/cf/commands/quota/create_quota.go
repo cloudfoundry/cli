@@ -31,11 +31,12 @@ func (command CreateQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-quota",
 		Description: "Define a new resource quota",
-		Usage:       "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES]",
+		Usage:       "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("m", "Total amount of memory (e.g. 1024M, 1G, 10G)"),
 			flag_helpers.NewIntFlag("r", "Total number of routes"),
 			flag_helpers.NewIntFlag("s", "Total number of service instances"),
+			cli.BoolFlag{Name: "allow-paid-service-plans", Usage: "Can provision instances of paid service plans"},
 		},
 	}
 }
@@ -77,6 +78,10 @@ func (cmd CreateQuota) Run(context *cli.Context) {
 
 	if context.IsSet("s") {
 		quota.ServicesLimit = context.Int("s")
+	}
+
+	if context.IsSet("allow-paid-service-plans") {
+		quota.NonBasicServicesAllowed = true
 	}
 
 	err := cmd.quotaRepo.Create(quota)

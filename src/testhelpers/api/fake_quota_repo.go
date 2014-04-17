@@ -35,10 +35,11 @@ type FakeQuotaRepository struct {
 	}
 
 	CreateCalledWith struct {
-		Name          string
-		MemoryLimit   uint64
-		RoutesLimit   int
-		ServicesLimit int
+		Name                    string
+		MemoryLimit             uint64
+		RoutesLimit             int
+		ServicesLimit           int
+		NonBasicServicesAllowed bool
 	}
 
 	CreateReturns struct {
@@ -74,6 +75,7 @@ func (repo *FakeQuotaRepository) Create(quota models.QuotaFields) error {
 	repo.CreateCalledWith.MemoryLimit = quota.MemoryLimit
 	repo.CreateCalledWith.RoutesLimit = quota.RoutesLimit
 	repo.CreateCalledWith.ServicesLimit = quota.ServicesLimit
+	repo.CreateCalledWith.NonBasicServicesAllowed = quota.NonBasicServicesAllowed
 
 	return repo.CreateReturns.Error
 }
