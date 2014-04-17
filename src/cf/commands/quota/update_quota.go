@@ -62,7 +62,7 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 	allowPaidServices := c.Bool("allow-paid-service-plans")
 	disallowPaidServices := c.Bool("disallow-paid-service-plans")
 	if allowPaidServices && disallowPaidServices {
-		cmd.ui.Failed(" (╯°□°）╯︵ ┻━┻ NOPE")
+		cmd.ui.Failed("Please choose either allow or disallow. Both flags are not permitted to be passed in the same command. ")
 	}
 
 	if allowPaidServices {
