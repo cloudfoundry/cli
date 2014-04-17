@@ -52,7 +52,7 @@ func (cmd *ListQuotas) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := terminal.NewTable(cmd.ui, []string{"name", "memory limit", "routes", "service instances"})
+	table := terminal.NewTable(cmd.ui, []string{"name", "memory limit", "routes", "service instances", "paid service plans"})
 	rows := [][]string{}
 
 	for _, quota := range quotas {
@@ -61,6 +61,7 @@ func (cmd *ListQuotas) Run(c *cli.Context) {
 			formatters.ByteSize(quota.MemoryLimit * formatters.MEGABYTE),
 			fmt.Sprintf("%d", quota.RoutesLimit),
 			fmt.Sprintf("%d", quota.ServicesLimit),
+			formatters.Allowed(quota.NonBasicServicesAllowed),
 		})
 	}
 
