@@ -57,15 +57,16 @@ var _ = Describe("quota", func() {
 			Context("that exists", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns.Quota = models.QuotaFields{
-						Guid:          "my-quota-guid",
-						Name:          "muh-muh-muh-my-qua-quota",
-						MemoryLimit:   512,
-						RoutesLimit:   2000,
-						ServicesLimit: 47,
+						Guid:                    "my-quota-guid",
+						Name:                    "muh-muh-muh-my-qua-quota",
+						MemoryLimit:             512,
+						RoutesLimit:             2000,
+						ServicesLimit:           47,
+						NonBasicServicesAllowed: true,
 					}
 				})
 
-				It("Works", func() {
+				It("shows you that quota", func() {
 					runCommand("muh-muh-muh-my-qua-quota")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -74,6 +75,7 @@ var _ = Describe("quota", func() {
 						[]string{"Memory", "512M"},
 						[]string{"Routes", "2000"},
 						[]string{"Services", "47"},
+						[]string{"Paid service plans", "allowed"},
 					))
 				})
 			})

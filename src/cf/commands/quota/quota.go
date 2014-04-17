@@ -54,10 +54,16 @@ func (cmd *showQuota) Run(context *cli.Context) {
 
 	cmd.ui.Ok()
 
+	paidServices := "disallowed"
+	if quota.NonBasicServicesAllowed {
+		paidServices = "allowed"
+	}
+
 	table := terminal.NewTable(cmd.ui, []string{"", ""})
 	table.Print([][]string{
 		[]string{"Memory", formatters.ByteSize(quota.MemoryLimit * formatters.MEGABYTE)},
 		[]string{"Routes", fmt.Sprintf("%d", quota.RoutesLimit)},
 		[]string{"Services", fmt.Sprintf("%d", quota.ServicesLimit)},
+		[]string{"Paid service plans", paidServices},
 	})
 }
