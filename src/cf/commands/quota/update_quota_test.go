@@ -85,13 +85,33 @@ var _ = Describe("app Command", func() {
 		})
 
 		It("updates the total allowed services", func() {
-			runCommand("-s", "9000", "quota-schmuota")
+			runCommand("-s", "9000", "quota-name")
 			Expect(quotaRepo.UpdateCalledWith.ServicesLimit).To(Equal(9000))
 		})
 
 		It("updates the total allowed routes", func() {
-			runCommand("-r", "9001", "quota-schmuota")
+			runCommand("-r", "9001", "quota-name")
 			Expect(quotaRepo.UpdateCalledWith.RoutesLimit).To(Equal(9001))
+		})
+
+		Context("update paid service plans", func() {
+			It("changes to paid service plan when --allow flag is provided", func() {
+				runCommand("--allow-paid-service-plans", "quota-name")
+				Expect(quotaRepo.UpdateCalledWith.AllowPaidServicePlans).To(BeTrue())
+			})
+
+			It("changes to non-paid service plan when --disallow flag is provided", func() {
+				quotaRepo.FindByNameReturns.Quota.NonBasicServicesAllowed = true // updating an existing quota
+
+				runCommand("--disallow-paid-service-plans", "quota-name")
+				Expect(quotaRepo.UpdateCalledWith.AllowPaidServicePlans).To(BeFalse())
+			})
+
+			It("shows an error when both --allow and --disallow flags are provided", func() {
+				runCommand("--allow-paid-service-plans", "--disallow-paid-service-plans", "quota-name")
+
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			})
 		})
 	})
 
