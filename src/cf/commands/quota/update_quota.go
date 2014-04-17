@@ -29,12 +29,14 @@ func (command *updateQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-quota",
 		Description: "Update an existing resource quota",
-		Usage:       "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES]",
+		Usage:       "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("m", "Total amount of memory (e.g. 1024M, 1G, 10G)"),
 			flag_helpers.NewStringFlag("n", "New name"),
 			flag_helpers.NewIntFlag("r", "Total number of routes"),
 			flag_helpers.NewIntFlag("s", "Total number of service instances"),
+			cli.BoolFlag{Name: "allow-paid-service-plans", Usage: "Can provision instances of paid service plans"},
+			cli.BoolFlag{Name: "disallow-paid-service-plans", Usage: "Cannot provision instances of paid service plans"},
 		},
 	}
 }
@@ -55,6 +57,20 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 
 	if err != nil {
 		cmd.ui.Failed(err.Error())
+	}
+
+	allowPaidServices := c.Bool("allow-paid-service-plans")
+	disallowPaidServices := c.Bool("disallow-paid-service-plans")
+	if allowPaidServices && disallowPaidServices {
+		cmd.ui.Failed(" (╯°□°）╯︵ ┻━┻ NOPE")
+	}
+
+	if allowPaidServices {
+		quota.NonBasicServicesAllowed = true
+	}
+
+	if disallowPaidServices {
+		quota.NonBasicServicesAllowed = false
 	}
 
 	if c.String("m") != "" {
