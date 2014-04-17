@@ -87,6 +87,18 @@ var _ = Describe("create-quota command", func() {
 			Expect(quotaRepo.CreateCalledWith.ServicesLimit).To(Equal(42))
 		})
 
+		It("defaults to not allowing paid service plans", func() {
+			runCommand("my-pro-bono-quota")
+			Expect(quotaRepo.CreateCalledWith.NonBasicServicesAllowed).To(BeFalse())
+		})
+
+		Context("when requesting to allow paid service plans", func() {
+			It("creates the quota with paid service plans allowed", func() {
+				runCommand("--allow-paid-service-plans", "my-for-profit-quota")
+				Expect(quotaRepo.CreateCalledWith.NonBasicServicesAllowed).To(BeTrue())
+			})
+		})
+
 		Context("when creating a quota returns an error", func() {
 			It("alerts the user when creating the quota fails", func() {
 				quotaRepo.CreateReturns.Error = errors.New("WHOOP THERE IT IS")
