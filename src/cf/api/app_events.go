@@ -43,6 +43,7 @@ func (repo CloudControllerAppEventsRepository) listEvents(appGuid string, limit 
 		repo.config.ApiEndpoint(),
 		repo.strategy.EventsURL(appGuid, limit),
 		repo.strategy.EventsResource(),
+
 		func(resource interface{}) bool {
 			return cb(resource.(resources.EventResource).ToFields())
 		})

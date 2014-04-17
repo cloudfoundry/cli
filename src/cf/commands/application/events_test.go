@@ -60,12 +60,14 @@ var _ = Describe("events command", func() {
 				Name:        "app crashed",
 				Timestamp:   earlierTimestamp,
 				Description: "reason: app instance exited, exit_status: 78",
+				ActorName:   "George Clooney",
 			},
 			{
 				Guid:        "event-guid-2",
 				Name:        "app crashed",
 				Timestamp:   timestamp,
 				Description: "reason: app instance was stopped, exit_status: 77",
+				ActorName:   "Marcel Marceau",
 			},
 		}
 
@@ -75,9 +77,9 @@ var _ = Describe("events command", func() {
 		Expect(eventsRepo.RecentEventsArgs.AppGuid).To(Equal("my-app-guid"))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
-			{"time", "event", "description"},
-			{earlierTimestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "app instance exited", "78"},
-			{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "app instance was stopped", "77"},
+			{"time", "event", "actor", "description"},
+			{earlierTimestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "George Clooney", "app instance exited", "78"},
+			{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "Marcel Marceau", "app instance was stopped", "77"},
 		})
 	})
 

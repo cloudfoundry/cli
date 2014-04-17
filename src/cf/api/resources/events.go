@@ -18,6 +18,7 @@ type EventResourceNewV2 struct {
 	Entity struct {
 		Timestamp time.Time
 		Type      string
+		ActorName string `json:"actor_name"`
 		Metadata  map[string]interface{}
 	}
 }
@@ -43,6 +44,7 @@ func (resource EventResourceNewV2) ToFields() models.EventFields {
 		Name:        resource.Entity.Type,
 		Timestamp:   resource.Entity.Timestamp,
 		Description: formatDescription(metadata, knownMetadataKeys),
+		ActorName:   resource.Entity.ActorName,
 	}
 }
 

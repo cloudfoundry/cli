@@ -60,7 +60,7 @@ func (cmd *Events) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	table := cmd.ui.Table([]string{"time", "event", "description"})
+	table := cmd.ui.Table([]string{"time", "event", "actor", "description"})
 
 	events, apiErr := cmd.eventsRepo.RecentEvents(app.Guid, 50)
 	if apiErr != nil {
@@ -72,6 +72,7 @@ func (cmd *Events) Run(c *cli.Context) {
 		table.Print([][]string{{
 			event.Timestamp.Local().Format("2006-01-02T15:04:05.00-0700"),
 			event.Name,
+			event.ActorName,
 			event.Description,
 		}})
 	}
