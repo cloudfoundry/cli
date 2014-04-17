@@ -2,4 +2,6 @@
 
 set -e
 
+echo -e "\nFormatting packages..."
+$(dirname $0)/go fmt cf/... testhelpers/... generic/... main/... glob/... words/...
 $(dirname $0)/go build -o $(dirname $0)/../out/cf main
