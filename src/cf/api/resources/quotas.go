@@ -17,5 +17,6 @@ func (resource QuotaResource) ToFields() (quota models.QuotaFields) {
 	quota.MemoryLimit = resource.Entity.MemoryLimit
 	quota.RoutesLimit = resource.Entity.RoutesLimit
 	quota.ServicesLimit = resource.Entity.ServicesLimit
+	quota.NonBasicServicesAllowed = resource.Entity.NonBasicServicesAllowed
 	return
 }
