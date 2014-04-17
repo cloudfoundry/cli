@@ -29,7 +29,7 @@ var _ = Describe("Help", func() {
 		})
 
 		for _, metadata := range commandFactory.CommandMetadatas() {
-			Expect(commandInOutput(metadata.Name, output)).To(BeTrue(), metadata.Name + " not in help")
+			Expect(commandInOutput(metadata.Name, output)).To(BeTrue(), metadata.Name+" not in help")
 		}
 	})
 })

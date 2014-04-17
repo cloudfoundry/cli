@@ -110,7 +110,10 @@ var _ = Describe("app Command", func() {
 			It("shows an error when both --allow and --disallow flags are provided", func() {
 				runCommand("--allow-paid-service-plans", "--disallow-paid-service-plans", "quota-name")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Both flags are not permitted"},
+				))
 			})
 		})
 	})
