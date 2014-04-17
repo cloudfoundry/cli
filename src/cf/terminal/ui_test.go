@@ -1,8 +1,8 @@
 package terminal_test
 
 import (
-	"bytes"
 	"cf/configuration"
+	"cf/io_helpers"
 	"cf/models"
 	. "cf/terminal"
 	. "github.com/onsi/ginkgo"
@@ -17,8 +17,8 @@ import (
 var _ = Describe("UI", func() {
 	Describe("Printing message to stdout with Say", func() {
 		It("prints strings", func() {
-			simulateStdin("", func(reader io.Reader) {
-				output := captureOutput(func() {
+			io_helpers.SimulateStdin("", func(reader io.Reader) {
+				output := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					ui.Say("Hello")
 				})
@@ -28,8 +28,8 @@ var _ = Describe("UI", func() {
 		})
 
 		It("prints formatted strings", func() {
-			simulateStdin("", func(reader io.Reader) {
-				output := captureOutput(func() {
+			io_helpers.SimulateStdin("", func(reader io.Reader) {
+				output := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					ui.Say("Hello %s", "World!")
 				})
@@ -39,7 +39,7 @@ var _ = Describe("UI", func() {
 		})
 
 		It("does not format strings when provided no args", func() {
-			output := captureOutput(func() {
+			output := io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin)
 				ui.Say("Hello %s World!") // whoops
 			})
@@ -50,8 +50,8 @@ var _ = Describe("UI", func() {
 
 	Describe("Confirming user input", func() {
 		It("treats 'y' as an affirmative confirmation", func() {
-			simulateStdin("y\n", func(reader io.Reader) {
-				out := captureOutput(func() {
+			io_helpers.SimulateStdin("y\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
 				})
@@ -61,8 +61,8 @@ var _ = Describe("UI", func() {
 		})
 
 		It("treats 'yes' as an affirmative confirmation", func() {
-			simulateStdin("yes\n", func(reader io.Reader) {
-				out := captureOutput(func() {
+			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
 				})
@@ -72,8 +72,8 @@ var _ = Describe("UI", func() {
 		})
 
 		It("treats other input as a negative confirmation", func() {
-			simulateStdin("wat\n", func(reader io.Reader) {
-				out := captureOutput(func() {
+			io_helpers.SimulateStdin("wat\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					Expect(ui.Confirm("Hello %s", "World?")).To(BeFalse())
 				})
@@ -85,8 +85,8 @@ var _ = Describe("UI", func() {
 
 	Describe("Confirming deletion", func() {
 		It("treats 'y' as an affirmative confirmation", func() {
-			simulateStdin("y\n", func(reader io.Reader) {
-				out := captureOutput(func() {
+			io_helpers.SimulateStdin("y\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeTrue())
 				})
@@ -96,8 +96,8 @@ var _ = Describe("UI", func() {
 		})
 
 		It("treats 'yes' as an affirmative confirmation", func() {
-			simulateStdin("yes\n", func(reader io.Reader) {
-				out := captureOutput(func() {
+			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeTrue())
 				})
@@ -107,8 +107,8 @@ var _ = Describe("UI", func() {
 		})
 
 		It("treats other input as a negative confirmation and warns the user", func() {
-			simulateStdin("wat\n", func(reader io.Reader) {
-				out := captureOutput(func() {
+			io_helpers.SimulateStdin("wat\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeFalse())
 				})
@@ -120,8 +120,8 @@ var _ = Describe("UI", func() {
 
 	Describe("Confirming deletion with associations", func() {
 		It("warns the user that associated objects will also be deleted", func() {
-			simulateStdin("wat\n", func(reader io.Reader) {
-				out := captureOutput(func() {
+			io_helpers.SimulateStdin("wat\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
 					Expect(ui.ConfirmDeleteWithAssociations("modelType", "modelName")).To(BeFalse())
 				})
@@ -139,7 +139,7 @@ var _ = Describe("UI", func() {
 		})
 
 		It("prompts the user to login", func() {
-			output := captureOutput(func() {
+			output := io_helpers.CaptureOutput(func() {
 				ui := NewUI((os.Stdin))
 				ui.ShowConfiguration(config)
 			})
@@ -173,7 +173,7 @@ var _ = Describe("UI", func() {
 			var output []string
 
 			JustBeforeEach(func() {
-				output = captureOutput(func() {
+				output = io_helpers.CaptureOutput(func() {
 					ui := NewUI(os.Stdin)
 					ui.ShowConfiguration(config)
 				})
@@ -229,7 +229,7 @@ var _ = Describe("UI", func() {
 		})
 
 		It("prompts the user to target an org and space when no org or space is targeted", func() {
-			output := captureOutput(func() {
+			output := io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin)
 				ui.ShowConfiguration(config)
 			})
@@ -244,7 +244,7 @@ var _ = Describe("UI", func() {
 			sf.Guid = "guid"
 			sf.Name = "name"
 
-			output := captureOutput(func() {
+			output := io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin)
 				ui.ShowConfiguration(config)
 			})
@@ -259,7 +259,7 @@ var _ = Describe("UI", func() {
 			of.Guid = "of-guid"
 			of.Name = "of-name"
 
-			output := captureOutput(func() {
+			output := io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin)
 				ui.ShowConfiguration(config)
 			})
@@ -272,7 +272,7 @@ var _ = Describe("UI", func() {
 
 	Describe("failing", func() {
 		It("panics with a specific string", func() {
-			captureOutput(func() {
+			io_helpers.CaptureOutput(func() {
 				testassert.AssertPanic(FailedWasCalled, func() {
 					NewUI(os.Stdin).Failed("uh oh")
 				})
@@ -280,30 +280,3 @@ var _ = Describe("UI", func() {
 		})
 	})
 })
-
-func simulateStdin(input string, block func(r io.Reader)) {
-	reader, writer := io.Pipe()
-
-	go func() {
-		writer.Write([]byte(input))
-		defer writer.Close()
-	}()
-
-	block(reader)
-}
-
-func captureOutput(block func()) []string {
-	oldSTDOUT := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-	defer func() {
-		os.Stdout = oldSTDOUT
-	}()
-
-	block()
-	w.Close()
-
-	var buf bytes.Buffer
-	io.Copy(&buf, r)
-	return strings.Split(buf.String(), "\n")
-}
