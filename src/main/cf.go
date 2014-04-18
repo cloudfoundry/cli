@@ -23,6 +23,7 @@ type cliDependencies struct {
 	configRepo     configuration.Repository
 	manifestRepo   manifest.ManifestRepository
 	apiRepoLocator api.RepositoryLocator
+	gateways       map[string]net.Gateway
 }
 
 func setupDependencies() (deps *cliDependencies) {
@@ -38,11 +39,12 @@ func setupDependencies() (deps *cliDependencies) {
 		}
 	})
 
-	deps.apiRepoLocator = api.NewRepositoryLocator(deps.configRepo, map[string]net.Gateway{
+	deps.gateways = map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(deps.configRepo),
 		"cloud-controller": net.NewCloudControllerGateway(deps.configRepo),
 		"uaa":              net.NewUAAGateway(deps.configRepo),
-	})
+	}
+	deps.apiRepoLocator = api.NewRepositoryLocator(deps.configRepo, deps.gateways)
 
 	return
 }
@@ -58,6 +60,17 @@ func main() {
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
 
 	app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...).Run(os.Args)
+
+	gateways := gatewaySliceFromMap(deps.gateways)
+	net.NewWarningsCollector(deps.termUI, gateways...).PrintWarnings()
+}
+
+func gatewaySliceFromMap(gateway_map map[string]net.Gateway) []net.WarningProducer {
+	gateways := []net.WarningProducer{}
+	for _, gateway := range gateway_map {
+		gateways = append(gateways, gateway)
+	}
+	return gateways
 }
 
 func init() {
