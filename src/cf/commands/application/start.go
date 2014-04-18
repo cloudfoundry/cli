@@ -42,7 +42,7 @@ type Start struct {
 }
 
 type ApplicationStarter interface {
-	SetStartTimeoutSeconds(timeout int)
+	SetStartTimeoutInSeconds(timeout int)
 	ApplicationStart(app models.Application) (updatedApp models.Application, err error)
 }
 
@@ -117,7 +117,7 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 
 	go cmd.tailStagingLogs(app, loggingStartedChan, stopLoggingChan)
 
-	<-loggingStartedChan
+	<-loggingStartedChan // block until we have established connection to Loggregator
 
 	cmd.ui.Say("Starting app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
@@ -147,7 +147,7 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 	return
 }
 
-func (cmd *Start) SetStartTimeoutSeconds(timeout int) {
+func (cmd *Start) SetStartTimeoutInSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
