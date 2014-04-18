@@ -15,7 +15,7 @@ func (starter *FakeAppStarter) ApplicationStart(appToStart models.Application) (
 	return
 }
 
-func (starter *FakeAppStarter) SetStartTimeoutSeconds(timeout int) {
+func (starter *FakeAppStarter) SetStartTimeoutInSeconds(timeout int) {
 	starter.Timeout = timeout
 }
 

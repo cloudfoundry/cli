@@ -125,6 +125,7 @@ func (cmd *Push) Run(c *cli.Context) {
 			cmd.ui.Failed(fmt.Sprintf("Error uploading application.\n%s", apiErr.Error()))
 			return
 		}
+		cmd.ui.Ok()
 
 		if appParams.ServicesToBind != nil {
 			cmd.bindAppToServices(*appParams.ServicesToBind, app)
@@ -171,7 +172,6 @@ func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount ui
 	if fileCount > 0 {
 		cmd.ui.Say("Uploading app files from: %s", path)
 		cmd.ui.Say("Uploading %s, %d files", formatters.ByteSize(zipFileBytes), fileCount)
-		cmd.ui.Ok()
 	} else {
 		cmd.ui.Warn("None of your application files have changed. Nothing will be uploaded.")
 	}
@@ -291,7 +291,7 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli
 	}
 
 	if params.HealthCheckTimeout != nil {
-		cmd.appStarter.SetStartTimeoutSeconds(*params.HealthCheckTimeout)
+		cmd.appStarter.SetStartTimeoutInSeconds(*params.HealthCheckTimeout)
 	}
 
 	cmd.appStarter.ApplicationStart(app)

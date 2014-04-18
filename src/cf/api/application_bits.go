@@ -20,6 +20,10 @@ import (
 	"time"
 )
 
+const (
+	DefaultAppUploadBitsTimeout = 15 * time.Minute
+)
+
 type ApplicationBitsRepository interface {
 	UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiErr error)
 }
@@ -126,7 +130,7 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 		request.HttpReq.Header.Set("Content-Type", contentType)
 
 		response := &resources.Resource{}
-		_, apiErr = repo.gateway.PerformPollingRequestForJSONResponse(request, response, 5*time.Minute)
+		_, apiErr = repo.gateway.PerformPollingRequestForJSONResponse(request, response, DefaultAppUploadBitsTimeout)
 		if apiErr != nil {
 			return
 		}
