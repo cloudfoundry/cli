@@ -37,7 +37,7 @@ func NewCloudControllerApplicationBitsRepository(config configuration.Reader, ga
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, cb func(path string, zipSize, fileCount uint64)) (apiErr error) {
+func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, fileSizePrinter func(path string, zipSize, fileCount uint64)) (apiErr error) {
 	fileutils.TempDir("apps", func(uploadDir string, err error) {
 		if err != nil {
 			apiErr = err
@@ -85,7 +85,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 				return
 			}
 
-			cb(appDir, zipFileSize, zipFileCount)
+			fileSizePrinter(appDir, zipFileSize, zipFileCount)
 
 			apiErr = repo.uploadBits(appGuid, zipFile, presentFiles)
 			if apiErr != nil {
