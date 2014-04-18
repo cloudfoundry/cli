@@ -352,6 +352,62 @@ var _ = Describe("Gateway", func() {
 		})
 
 	})
+
+	Describe("collecting warnings", func() {
+		var (
+			apiServer  *httptest.Server
+			authServer *httptest.Server
+		)
+
+		BeforeEach(func() {
+			apiServer = httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+				switch request.URL.Path {
+				case "/v2/happy":
+					fmt.Fprintln(writer, `{ "metadata": { "url": "/v2/jobs/the-job-guid" } }`)
+				case "/v2/warning1":
+					writer.Header().Add("X-Cf-Warnings", url.QueryEscape("Something not too awful has happened"))
+					fmt.Fprintln(writer, `{ "metadata": { "url": "/v2/jobs/the-job-guid" } }`)
+				case "/v2/warning2":
+					writer.Header().Add("X-Cf-Warnings", url.QueryEscape("Something a little awful"))
+					writer.Header().Add("X-Cf-Warnings", url.QueryEscape("Don't worry, but be careful"))
+					writer.WriteHeader(http.StatusInternalServerError)
+					fmt.Fprintf(writer, `{ "key": "value" }`)
+				}
+			}))
+
+			authServer, _ = testnet.NewTLSServer([]testnet.TestRequest{})
+
+			config, authRepo = createAuthenticationRepository(apiServer, authServer)
+			ccGateway.SetTokenRefresher(authRepo)
+			ccGateway.PollingThrottle = 3 * time.Millisecond
+
+			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
+
+			config, authRepo = createAuthenticationRepository(apiServer, authServer)
+		})
+
+		AfterEach(func() {
+			apiServer.Close()
+			authServer.Close()
+		})
+
+		It("saves all X-Cf-Warnings headers and exposes them", func() {
+			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/happy", config.AccessToken(), nil)
+			ccGateway.PerformRequest(request)
+			request, _ = ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/warning1", config.AccessToken(), nil)
+			ccGateway.PerformRequest(request)
+			request, _ = ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/warning2", config.AccessToken(), nil)
+			ccGateway.PerformRequest(request)
+
+			Expect(ccGateway.Warnings()).To(Equal(
+				[]string{"Something not too awful has happened", "Something a little awful", "Don't worry, but be careful"},
+			))
+		})
+
+		It("defaults warnings to an empty slice", func() {
+			Expect(ccGateway.Warnings()).ToNot(BeNil())
+		})
+	})
 })
 
 func getHost(urlString string) string {

@@ -11,6 +11,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
 	"strings"
@@ -57,12 +58,14 @@ type Gateway struct {
 	PollingThrottle time.Duration
 	trustedCerts    []tls.Certificate
 	config          configuration.Reader
+	warnings        *[]string
 }
 
 func newGateway(errHandler apiErrorHandler, config configuration.Reader) (gateway Gateway) {
 	gateway.errHandler = errHandler
 	gateway.config = config
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
+	gateway.warnings = &[]string{}
 	return
 }
 
@@ -286,6 +289,10 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 	return
 }
 
+func (gateway Gateway) Warnings() []string {
+	return *gateway.warnings
+}
+
 func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Duration) (err error) {
 	startTime := time.Now()
 	for true {
@@ -382,6 +389,14 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 	}
 
 	dumpResponse(response)
+
+	header := http.CanonicalHeaderKey("X-Cf-Warnings")
+	raw_warnings := response.Header[header]
+	for _, raw_warning := range raw_warnings {
+		warning, _ := url.QueryUnescape(raw_warning)
+		*gateway.warnings = append(*gateway.warnings, warning)
+	}
+
 	return
 }
 
