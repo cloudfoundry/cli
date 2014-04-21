@@ -46,10 +46,11 @@ func (cmd ListOrgs) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"name"})
 
 	apiErr := cmd.orgRepo.ListOrgs(func(org models.Organization) bool {
-		table.Print([][]string{{org.Name}})
+		table.Add([]string{org.Name})
 		noOrgs = false
 		return true
 	})
+	table.Print()
 
 	if apiErr != nil {
 		cmd.ui.Failed("Failed fetching orgs.\n%s", apiErr)

@@ -77,7 +77,7 @@ func (cmd *Events) Run(c *cli.Context) {
 		})
 	}
 
-	table.Print([][]string{})
+	table.Print()
 
 	if len(events) == 0 {
 		cmd.ui.Say("No events for app %s", terminal.EntityNameColor(app.Name))

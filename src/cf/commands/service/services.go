@@ -63,7 +63,6 @@ func (cmd ListServices) Run(c *cli.Context) {
 	}
 
 	table := terminal.NewTable(cmd.ui, []string{"name", "service", "plan", "bound apps"})
-	rows := [][]string{}
 
 	for _, instance := range serviceInstances {
 		var serviceColumn string
@@ -74,7 +73,7 @@ func (cmd ListServices) Run(c *cli.Context) {
 			serviceColumn = instance.ServiceOffering.Label
 		}
 
-		rows = append(rows, []string{
+		table.Add([]string{
 			instance.Name,
 			serviceColumn,
 			instance.ServicePlan.Name,
@@ -82,5 +81,5 @@ func (cmd ListServices) Run(c *cli.Context) {
 		})
 	}
 
-	table.Print(rows)
+	table.Print()
 }

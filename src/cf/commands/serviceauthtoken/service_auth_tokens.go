@@ -48,11 +48,10 @@ func (cmd ListServiceAuthTokens) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	table := terminal.NewTable(cmd.ui, []string{"label", "provider"})
-	rows := [][]string{}
 
 	for _, authToken := range authTokens {
-		rows = append(rows, []string{authToken.Label, authToken.Provider})
+		table.Add([]string{authToken.Label, authToken.Provider})
 	}
 
-	table.Print(rows)
+	table.Print()
 }

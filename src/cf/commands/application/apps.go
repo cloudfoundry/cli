@@ -73,15 +73,13 @@ func (cmd ListApps) Run(c *cli.Context) {
 		"urls",
 	})
 
-	rows := [][]string{}
-
 	for _, application := range apps {
 		var urls []string
 		for _, route := range application.Routes {
 			urls = append(urls, route.URL())
 		}
 
-		rows = append(rows, []string{
+		table.Add([]string{
 			application.Name,
 			ui_helpers.ColoredAppState(application.ApplicationFields),
 			ui_helpers.ColoredAppInstances(application.ApplicationFields),
@@ -91,5 +89,5 @@ func (cmd ListApps) Run(c *cli.Context) {
 		})
 	}
 
-	table.Print(rows)
+	table.Print()
 }

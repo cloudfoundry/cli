@@ -55,16 +55,17 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 		if buildpack.Locked != nil {
 			locked = strconv.FormatBool(*buildpack.Locked)
 		}
-		table.Print([][]string{{
+		table.Add([]string{
 			buildpack.Name,
 			position,
 			enabled,
 			locked,
 			buildpack.Filename,
-		}})
+		})
 		noBuildpacks = false
 		return true
 	})
+	table.Print()
 
 	if apiErr != nil {
 		cmd.ui.Failed("Failed fetching buildpacks.\n%s", apiErr.Error())

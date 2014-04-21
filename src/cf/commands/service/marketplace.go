@@ -73,7 +73,6 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 	}
 
 	table := terminal.NewTable(cmd.ui, []string{"service", "plans", "description"})
-	rows := [][]string{}
 
 	sort.Sort(serviceOfferings)
 	for _, offering := range serviceOfferings {
@@ -88,13 +87,13 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 
 		planNames = strings.TrimPrefix(planNames, ", ")
 
-		rows = append(rows, []string{
+		table.Add([]string{
 			offering.Label,
 			planNames,
 			offering.Description,
 		})
 	}
 
-	table.Print(rows)
+	table.Print()
 	return
 }

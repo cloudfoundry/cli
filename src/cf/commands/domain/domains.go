@@ -77,17 +77,18 @@ func (cmd *ListDomains) fetchAllDomains(orgGuid string) (domains []models.Domain
 }
 
 func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields) {
-	table := cmd.ui.Table([]string{"name                              ", "status"})
+	table := cmd.ui.Table([]string{"name", "status"})
 
 	for _, domain := range domains {
 		if domain.Shared {
-			table.Print([][]string{{domain.Name, "shared"}})
+			table.Add([]string{domain.Name, "shared"})
 		}
 	}
 
 	for _, domain := range domains {
 		if !domain.Shared {
-			table.Print([][]string{{domain.Name, "owned"}})
+			table.Add([]string{domain.Name, "owned"})
 		}
 	}
+	table.Print()
 }

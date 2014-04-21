@@ -47,10 +47,11 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 	foundSpaces := false
 	table := cmd.ui.Table([]string{"name"})
 	apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
-		table.Print([][]string{{space.Name}})
+		table.Add([]string{space.Name})
 		foundSpaces = true
 		return true
 	})
+	table.Print()
 
 	if apiErr != nil {
 		cmd.ui.Failed("Failed fetching spaces.\n%s", apiErr.Error())
