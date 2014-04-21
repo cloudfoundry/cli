@@ -69,13 +69,15 @@ func (cmd *Events) Run(c *cli.Context) {
 	}
 
 	for _, event := range events {
-		table.Print([][]string{{
+		table.Add([]string{
 			event.Timestamp.Local().Format("2006-01-02T15:04:05.00-0700"),
 			event.Name,
 			event.ActorName,
 			event.Description,
-		}})
+		})
 	}
+
+	table.Print([][]string{})
 
 	if len(events) == 0 {
 		cmd.ui.Say("No events for app %s", terminal.EntityNameColor(app.Name))
