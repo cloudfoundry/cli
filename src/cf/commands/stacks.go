@@ -52,14 +52,13 @@ func (cmd ListStacks) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	table := terminal.NewTable(cmd.ui, []string{"name", "description"})
-	rows := [][]string{}
 
 	for _, stack := range stacks {
-		rows = append(rows, []string{
+		table.Add([]string{
 			stack.Name,
 			stack.Description,
 		})
 	}
 
-	table.Print(rows)
+	table.Print()
 }

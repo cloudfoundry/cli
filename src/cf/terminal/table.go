@@ -7,7 +7,7 @@ import (
 
 type Table interface {
 	Add(row []string)
-	Print(rows [][]string)
+	Print()
 }
 
 type PrintableTable struct {
@@ -30,10 +30,8 @@ func (t *PrintableTable) Add(row []string) {
 	t.rows = append(t.rows, row)
 }
 
-func (t *PrintableTable) Print(rows [][]string) {
-	rows = append(t.rows, rows...)
-
-	for _, row := range append(rows, t.header) {
+func (t *PrintableTable) Print() {
+	for _, row := range append(t.rows, t.header) {
 		t.calculateMaxSize(row)
 	}
 
@@ -42,7 +40,7 @@ func (t *PrintableTable) Print(rows [][]string) {
 		t.headerPrinted = true
 	}
 
-	for _, line := range rows {
+	for _, line := range t.rows {
 		t.printRow(line)
 	}
 

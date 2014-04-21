@@ -114,10 +114,9 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	}
 
 	table := terminal.NewTable(cmd.ui, []string{"", "state", "since", "cpu", "memory", "disk"})
-	rows := [][]string{}
 
 	for index, instance := range instances {
-		rows = append(rows, []string{
+		table.Add([]string{
 			fmt.Sprintf("#%d", index),
 			ui_helpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
@@ -127,5 +126,5 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 		})
 	}
 
-	table.Print(rows)
+	table.Print()
 }

@@ -54,14 +54,15 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 			appNames = appNames + ", " + app.Name
 		}
 		appNames = strings.TrimPrefix(appNames, ", ")
-		table.Print([][]string{{
+		table.Add([]string{
 			route.Host,
 			route.Domain.Name,
 			appNames,
-		}})
+		})
 		noRoutes = false
 		return true
 	})
+	table.Print()
 
 	if apiErr != nil {
 		cmd.ui.Failed("Failed fetching routes.\n%s", apiErr.Error())

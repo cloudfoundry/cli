@@ -55,10 +55,9 @@ func (cmd *showQuota) Run(context *cli.Context) {
 	cmd.ui.Ok()
 
 	table := terminal.NewTable(cmd.ui, []string{"", ""})
-	table.Print([][]string{
-		[]string{"Memory", formatters.ByteSize(quota.MemoryLimit * formatters.MEGABYTE)},
-		[]string{"Routes", fmt.Sprintf("%d", quota.RoutesLimit)},
-		[]string{"Services", fmt.Sprintf("%d", quota.ServicesLimit)},
-		[]string{"Paid service plans", formatters.Allowed(quota.NonBasicServicesAllowed)},
-	})
+	table.Add([]string{"Memory", formatters.ByteSize(quota.MemoryLimit * formatters.MEGABYTE)})
+	table.Add([]string{"Routes", fmt.Sprintf("%d", quota.RoutesLimit)})
+	table.Add([]string{"Services", fmt.Sprintf("%d", quota.ServicesLimit)})
+	table.Add([]string{"Paid service plans", formatters.Allowed(quota.NonBasicServicesAllowed)})
+	table.Print()
 }
