@@ -6,6 +6,7 @@ import (
 )
 
 type Table interface {
+	Add(row []string)
 	Print(rows [][]string)
 }
 
@@ -14,6 +15,7 @@ type PrintableTable struct {
 	header        []string
 	headerPrinted bool
 	maxSizes      []int
+	rows          [][]string
 }
 
 func NewTable(ui UI, header []string) Table {
@@ -24,7 +26,13 @@ func NewTable(ui UI, header []string) Table {
 	}
 }
 
+func (t *PrintableTable) Add(row []string) {
+	t.rows = append(t.rows, row)
+}
+
 func (t *PrintableTable) Print(rows [][]string) {
+	rows = append(t.rows, rows...)
+
 	for _, row := range append(rows, t.header) {
 		t.calculateMaxSize(row)
 	}
@@ -37,6 +45,8 @@ func (t *PrintableTable) Print(rows [][]string) {
 	for _, line := range rows {
 		t.printRow(line)
 	}
+
+	t.rows = [][]string{}
 }
 
 func (t *PrintableTable) calculateMaxSize(row []string) {
