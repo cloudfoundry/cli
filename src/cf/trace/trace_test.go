@@ -89,27 +89,18 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 	})
 
-	It("TestTraceSetToInvalidFile", func() {
+	It("defaults to a StdoutLogger if the CF_TRACE file cannot be opened", func() {
 		if runtime.GOOS != "windows" {
 			stdOut := bytes.NewBuffer([]byte{})
 			trace.SetStdout(stdOut)
 
-			fileutils.TempFile("trace_test", func(file *os.File, err error) {
-				Expect(err).NotTo(HaveOccurred())
+			os.Setenv(trace.CF_TRACE, "/dev/null/whoops")
 
-				file.Chmod(0000)
+			logger := trace.NewLogger()
+			logger.Print("hello world")
 
-				os.Setenv(trace.CF_TRACE, file.Name())
-
-				logger := trace.NewLogger()
-				logger.Print("hello world")
-
-				result, _ := ioutil.ReadAll(file)
-				Expect(string(result)).To(Equal(""))
-
-				result, _ = ioutil.ReadAll(stdOut)
-				Expect(string(result)).To(ContainSubstring("hello world"))
-			})
+			result, _ := ioutil.ReadAll(stdOut)
+			Expect(string(result)).To(ContainSubstring("hello world"))
 		}
 	})
 })
