@@ -13,7 +13,7 @@ import (
 
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
-	FindByHostAndDomain(host, domain string) (route models.Route, apiErr error)
+	FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error)
 	Create(host, domainGuid string) (createdRoute models.Route, apiErr error)
 	CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
@@ -22,15 +22,13 @@ type RouteRepository interface {
 }
 
 type CloudControllerRouteRepository struct {
-	config     configuration.Reader
-	gateway    net.Gateway
-	domainRepo DomainRepository
+	config  configuration.Reader
+	gateway net.Gateway
 }
 
-func NewCloudControllerRouteRepository(config configuration.Reader, gateway net.Gateway, domainRepo DomainRepository) (repo CloudControllerRouteRepository) {
+func NewCloudControllerRouteRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerRouteRepository) {
 	repo.config = config
 	repo.gateway = gateway
-	repo.domainRepo = domainRepo
 	return
 }
 
@@ -44,12 +42,7 @@ func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool
 		})
 }
 
-func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route models.Route, apiErr error) {
-	domain, apiErr := repo.domainRepo.FindByName(domainName)
-	if apiErr != nil {
-		return
-	}
-
+func (repo CloudControllerRouteRepository) FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error) {
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),

@@ -64,7 +64,7 @@ func (cmd *UnmapRoute) Run(c *cli.Context) {
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
-	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
+	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostName, domain)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}

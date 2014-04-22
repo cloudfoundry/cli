@@ -122,14 +122,12 @@ var _ = Describe("Testing with ginkgo", func() {
 			Space:              space,
 		}
 
-		routeRepo := &testapi.FakeRouteRepository{
-			CreateInSpaceErr: true,
-			FindByHostAndDomainRoute: models.Route{
-				Space:  space.SpaceFields,
-				Guid:   "my-route-guid",
-				Host:   "host",
-				Domain: domain,
-			},
+		routeRepo := &testapi.FakeRouteRepository{CreateInSpaceErr: true}
+		routeRepo.FindByHostAndDomainReturns.Route = models.Route{
+			Space:  space.SpaceFields,
+			Guid:   "my-route-guid",
+			Host:   "host",
+			Domain: domain,
 		}
 
 		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, requirementsFactory, routeRepo)

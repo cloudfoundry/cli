@@ -2,6 +2,7 @@ package route_test
 
 import (
 	. "cf/commands/route"
+	"cf/errors"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -54,7 +55,7 @@ var _ = Describe("delete-route command", func() {
 				Guid: "domain-guid",
 				Name: "example.com",
 			}
-			routeRepo.FindByHostAndDomainRoute = route
+			routeRepo.FindByHostAndDomainReturns.Route = route
 		})
 
 		It("fails with usage when given zero args", func() {
@@ -100,7 +101,7 @@ var _ = Describe("delete-route command", func() {
 		})
 
 		It("succeeds with a warning when the route does not exist", func() {
-			routeRepo.FindByHostAndDomainNotFound = true
+			routeRepo.FindByHostAndDomainReturns.Error = errors.NewModelNotFoundError("Org", "not found")
 
 			runCommand("-n", "my-host", "example.com")
 

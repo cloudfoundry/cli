@@ -89,7 +89,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields,
 	route, apiErr = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
 	if apiErr != nil {
 		var findApiResponse error
-		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
+		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain)
 
 		if findApiResponse != nil ||
 			route.Space.Guid != space.Guid ||
