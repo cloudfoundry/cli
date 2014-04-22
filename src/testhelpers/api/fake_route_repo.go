@@ -6,11 +6,15 @@ import (
 )
 
 type FakeRouteRepository struct {
-	FindByHostAndDomainHost     string
-	FindByHostAndDomainDomain   string
-	FindByHostAndDomainRoute    models.Route
-	FindByHostAndDomainErr      bool
-	FindByHostAndDomainNotFound bool
+	FindByHostAndDomainCalledWith struct {
+		Host   string
+		Domain models.DomainFields
+	}
+
+	FindByHostAndDomainReturns struct {
+		Route models.Route
+		Error error
+	}
 
 	CreatedHost       string
 	CreatedDomainGuid string
@@ -49,19 +53,15 @@ func (repo *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr 
 	return
 }
 
-func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route models.Route, apiErr error) {
-	repo.FindByHostAndDomainHost = host
-	repo.FindByHostAndDomainDomain = domain
+func (repo *FakeRouteRepository) FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error) {
+	repo.FindByHostAndDomainCalledWith.Host = host
+	repo.FindByHostAndDomainCalledWith.Domain = domain
 
-	if repo.FindByHostAndDomainErr {
-		apiErr = errors.NewModelNotFoundError("Route", host)
+	if repo.FindByHostAndDomainReturns.Error != nil {
+		apiErr = repo.FindByHostAndDomainReturns.Error
 	}
 
-	if repo.FindByHostAndDomainNotFound {
-		apiErr = errors.NewModelNotFoundError("Org", host+"."+domain)
-	}
-
-	route = repo.FindByHostAndDomainRoute
+	route = repo.FindByHostAndDomainReturns.Route
 	return
 }
 

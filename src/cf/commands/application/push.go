@@ -217,7 +217,7 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 	domain := cmd.findDomain(params)
 	hostname := cmd.hostnameForApp(params, c)
 
-	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostname, domain.Name)
+	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostname, domain)
 
 	switch apiErr.(type) {
 	case nil:

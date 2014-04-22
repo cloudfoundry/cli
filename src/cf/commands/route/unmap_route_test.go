@@ -79,7 +79,8 @@ var _ = Describe("Unmap Route Command", func() {
 			Name: "my-app",
 		}}
 
-		routeRepo := &testapi.FakeRouteRepository{FindByHostAndDomainRoute: route}
+		routeRepo := &testapi.FakeRouteRepository{}
+		routeRepo.FindByHostAndDomainReturns.Route = route
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app, Domain: domain}
 
 		ui := callUnmapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, requirementsFactory, routeRepo)

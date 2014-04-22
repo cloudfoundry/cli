@@ -15,6 +15,7 @@ type DeleteRoute struct {
 	ui        terminal.UI
 	config    configuration.Reader
 	routeRepo api.RouteRepository
+	domainReq requirements.DomainRequirement
 }
 
 func NewDeleteRoute(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd *DeleteRoute) {
@@ -38,15 +39,17 @@ func (command *DeleteRoute) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd *DeleteRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete-route")
 		return
 	}
 
+	cmd.domainReq = requirementsFactory.NewDomainRequirement(c.Args()[0])
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		cmd.domainReq,
 	}
 	return
 }
@@ -67,7 +70,8 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting route %s...", terminal.EntityNameColor(url))
 
-	route, apiErr := cmd.routeRepo.FindByHostAndDomain(host, domainName)
+	domain := cmd.domainReq.GetDomain()
+	route, apiErr := cmd.routeRepo.FindByHostAndDomain(host, domain)
 
 	switch apiErr.(type) {
 	case nil:

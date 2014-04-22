@@ -21,7 +21,6 @@ var _ = Describe("route repository", func() {
 		ts         *httptest.Server
 		handler    *testnet.TestHandler
 		configRepo configuration.Repository
-		domainRepo *testapi.FakeDomainRepository
 		repo       CloudControllerRouteRepository
 	)
 
@@ -32,8 +31,7 @@ var _ = Describe("route repository", func() {
 			Name: "the-space-name",
 		})
 		gateway := net.NewCloudControllerGateway(configRepo)
-		domainRepo = &testapi.FakeDomainRepository{}
-		repo = NewCloudControllerRouteRepository(configRepo, gateway, domainRepo)
+		repo = NewCloudControllerRouteRepository(configRepo, gateway)
 	})
 
 	AfterEach(func() {
@@ -81,13 +79,11 @@ var _ = Describe("route repository", func() {
 
 			domain := models.DomainFields{}
 			domain.Guid = "my-domain-guid"
-			domainRepo.FindByNameDomain = domain
 
-			route, apiErr := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
+			route, apiErr := repo.FindByHostAndDomain("my-cool-app", domain)
 
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(domainRepo.FindByNameName).To(Equal("my-domain.com"))
 			Expect(route.Host).To(Equal("my-cool-app"))
 			Expect(route.Guid).To(Equal("my-route-guid"))
 			Expect(route.Domain.Guid).To(Equal(domain.Guid))
@@ -105,9 +101,8 @@ var _ = Describe("route repository", func() {
 
 			domain := models.DomainFields{}
 			domain.Guid = "my-domain-guid"
-			domainRepo.FindByNameDomain = domain
 
-			_, apiErr := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
+			_, apiErr := repo.FindByHostAndDomain("my-cool-app", domain)
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 
