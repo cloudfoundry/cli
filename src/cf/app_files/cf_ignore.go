@@ -74,7 +74,7 @@ type cfIgnore []ignorePattern
 
 var defaultIgnoreLines = []string{
 	".cfignore",
-	"manifest.yml",
+	"/manifest.yml",
 	".gitignore",
 	".git",
 	".hg",
