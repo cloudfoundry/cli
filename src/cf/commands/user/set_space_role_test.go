@@ -32,11 +32,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func getSetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) {
@@ -78,10 +79,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSetSpaceRole([]string{"my-user", "my-org", "my-space", "my-role"}, requirementsFactory, spaceRepo, userRepo)
+
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
-	It("TestSetSpaceRoleRequirements", func() {
 
+	It("TestSetSpaceRoleRequirements", func() {
 		args := []string{"username", "org", "space", "role"}
 		requirementsFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 
@@ -96,8 +98,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(requirementsFactory.UserUsername).To(Equal("username"))
 		Expect(requirementsFactory.OrganizationName).To(Equal("org"))
 	})
-	It("TestSetSpaceRole", func() {
 
+	It("TestSetSpaceRole", func() {
 		org := models.Organization{}
 		org.Guid = "my-org-guid"
 		org.Name = "my-org"
@@ -118,10 +120,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callSetSpaceRole(args, requirementsFactory, spaceRepo, userRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Assigning role ", "SpaceManager", "my-user", "my-org", "my-space", "current-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Assigning role ", "SpaceManager", "my-user", "my-org", "my-space", "current-user"},
+			[]string{"OK"},
+		))
 
 		Expect(spaceRepo.FindByNameInOrgName).To(Equal("some-space"))
 		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("my-org-guid"))

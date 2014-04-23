@@ -8,11 +8,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("create-service command", func() {
@@ -74,10 +75,10 @@ var _ = Describe("create-service command", func() {
 	It("successfully creates a service", func() {
 		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+		))
 		Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
 		Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
 	})
@@ -87,11 +88,11 @@ var _ = Describe("create-service command", func() {
 
 		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating service", "my-cleardb-service"},
-			{"OK"},
-			{"my-cleardb-service", "already exists"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating service", "my-cleardb-service"},
+			[]string{"OK"},
+			[]string{"my-cleardb-service", "already exists"},
+		))
 		Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
 		Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
 	})
@@ -103,10 +104,10 @@ var _ = Describe("create-service command", func() {
 			serviceRepo.CreateServiceInstanceReturns.Error = errors.NewModelAlreadyExistsError("Service", "my-cleardb-service")
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+			))
 			Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
 			Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
 		})

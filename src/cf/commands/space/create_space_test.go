@@ -32,12 +32,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	"testhelpers/maker"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var (
@@ -119,13 +120,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		resetSpaceDefaults()
 		ui := callCreateSpace([]string{"my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating space", "my-space", "my-org", "my-user"},
-			{"OK"},
-			{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
-			{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_DEVELOPER]},
-			{"TIP"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating space", "my-space", "my-org", "my-user"},
+			[]string{"OK"},
+			[]string{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
+			[]string{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_DEVELOPER]},
+			[]string{"TIP"},
+		))
 
 		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal("my-space"))
 		Expect(defaultSpaceRepo.CreateSpaceOrgGuid).To(Equal("my-org-guid"))
@@ -133,6 +134,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(defaultUserRepo.SetSpaceRoleSpaceGuid).To(Equal("my-space-guid"))
 		Expect(defaultUserRepo.SetSpaceRoleRole).To(Equal(models.SPACE_DEVELOPER))
 	})
+
 	It("TestCreateSpaceInOrg", func() {
 
 		resetSpaceDefaults()
@@ -142,13 +144,13 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callCreateSpace([]string{"-o", "other-org", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating space", "my-space", "other-org", "my-user"},
-			{"OK"},
-			{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
-			{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_DEVELOPER]},
-			{"TIP"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating space", "my-space", "other-org", "my-user"},
+			[]string{"OK"},
+			[]string{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
+			[]string{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_DEVELOPER]},
+			[]string{"TIP"},
+		))
 
 		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal("my-space"))
 		Expect(defaultSpaceRepo.CreateSpaceOrgGuid).To(Equal(org.Guid))
@@ -156,6 +158,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(defaultUserRepo.SetSpaceRoleSpaceGuid).To(Equal("my-space-guid"))
 		Expect(defaultUserRepo.SetSpaceRoleRole).To(Equal(models.SPACE_DEVELOPER))
 	})
+
 	It("TestCreateSpaceInOrgWhenTheOrgDoesNotExist", func() {
 
 		resetSpaceDefaults()
@@ -164,13 +167,14 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callCreateSpace([]string{"-o", "cool-organization", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"cool-organization", "does not exist"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"cool-organization", "does not exist"},
+		))
 
 		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal(""))
 	})
+
 	It("TestCreateSpaceInOrgWhenErrorFindingOrg", func() {
 
 		resetSpaceDefaults()
@@ -179,27 +183,29 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callCreateSpace([]string{"-o", "cool-organization", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"error"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"error"},
+		))
 
 		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal(""))
 	})
+
 	It("TestCreateSpaceWhenItAlreadyExists", func() {
 
 		resetSpaceDefaults()
 		defaultSpaceRepo.CreateSpaceExists = true
 		ui := callCreateSpace([]string{"my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating space", "my-space"},
-			{"OK"},
-			{"my-space", "already exists"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating space", "my-space"},
+			[]string{"OK"},
+			[]string{"my-space", "already exists"},
+		))
+
+		Expect(ui.Outputs).ToNot(ContainSubstrings(
+			[]string{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
+		))
 
 		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal(""))
 		Expect(defaultSpaceRepo.CreateSpaceOrgGuid).To(Equal(""))

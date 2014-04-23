@@ -30,11 +30,12 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callShowSpace(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
@@ -64,8 +65,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		callShowSpace(args, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
-	It("TestShowSpaceInfoSuccess", func() {
 
+	It("TestShowSpaceInfoSuccess", func() {
 		org := models.OrganizationFields{}
 		org.Name = "my-org"
 
@@ -93,14 +94,14 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
 		ui := callShowSpace([]string{"space1"}, requirementsFactory)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting info for space", "space1", "my-org", "my-user"},
-			{"OK"},
-			{"space1"},
-			{"Org", "my-org"},
-			{"Apps", "app1"},
-			{"Domains", "domain1"},
-			{"Services", "service1"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting info for space", "space1", "my-org", "my-user"},
+			[]string{"OK"},
+			[]string{"space1"},
+			[]string{"Org", "my-org"},
+			[]string{"Apps", "app1"},
+			[]string{"Domains", "domain1"},
+			[]string{"Services", "service1"},
+		))
 	})
 })

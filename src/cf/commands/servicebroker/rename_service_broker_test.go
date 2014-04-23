@@ -31,9 +31,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	. "testhelpers/matchers"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
@@ -91,10 +91,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(repo.FindByNameName).To(Equal("my-broker"))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(repo.RenamedServiceBrokerGuid).To(Equal("my-found-broker-guid"))
 		Expect(repo.RenamedServiceBrokerName).To(Equal("my-new-broker"))

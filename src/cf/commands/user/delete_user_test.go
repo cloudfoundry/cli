@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-user command", func() {
@@ -65,14 +66,12 @@ var _ = Describe("delete-user command", func() {
 		It("deletes a user with the given name", func() {
 			runCommand("user-name")
 
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Really delete the user user-name"},
-			})
+			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the user user-name"}))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting user", "user-name", "admin-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting user", "user-name", "admin-user"},
+				[]string{"OK"},
+			))
 
 			Expect(userRepo.FindByUsernameUsername).To(Equal("user-name"))
 			Expect(userRepo.DeleteUserGuid).To(Equal("user-guid"))
@@ -82,7 +81,7 @@ var _ = Describe("delete-user command", func() {
 			ui.Inputs = []string{"nope"}
 			runCommand("user")
 
-			testassert.SliceContains(ui.Prompts, testassert.Lines{{"Really delete"}})
+			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete"}))
 			Expect(userRepo.FindByUsernameUsername).To(Equal(""))
 			Expect(userRepo.DeleteUserGuid).To(Equal(""))
 		})
@@ -91,10 +90,10 @@ var _ = Describe("delete-user command", func() {
 			ui.Inputs = []string{}
 			runCommand("-f", "user-name")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting user", "user-name"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting user", "user-name"},
+				[]string{"OK"},
+			))
 
 			Expect(userRepo.FindByUsernameUsername).To(Equal("user-name"))
 			Expect(userRepo.DeleteUserGuid).To(Equal("user-guid"))
@@ -109,14 +108,12 @@ var _ = Describe("delete-user command", func() {
 		It("prints a warning", func() {
 			runCommand("-f", "user-name")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting user", "user-name"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting user", "user-name"},
+				[]string{"OK"},
+			))
 
-			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-				{"user-name", "does not exist"},
-			})
+			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"user-name", "does not exist"}))
 
 			Expect(userRepo.FindByUsernameUsername).To(Equal("user-name"))
 			Expect(userRepo.DeleteUserGuid).To(Equal(""))

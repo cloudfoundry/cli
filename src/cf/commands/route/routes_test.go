@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("routes command", func() {
@@ -74,12 +75,12 @@ var _ = Describe("routes command", func() {
 		It("lists routes", func() {
 			runCommand()
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Getting routes", "my-user"},
-				{"host", "domain", "apps"},
-				{"hostname-1", "example.com", "dora"},
-				{"hostname-2", "cookieclicker.co", "dora", "bora"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting routes", "my-user"},
+				[]string{"host", "domain", "apps"},
+				[]string{"hostname-1", "example.com", "dora"},
+				[]string{"hostname-2", "cookieclicker.co", "dora", "bora"},
+			))
 		})
 	})
 
@@ -87,10 +88,10 @@ var _ = Describe("routes command", func() {
 		It("tells the user when no routes were found", func() {
 			runCommand()
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Getting routes"},
-				{"No routes found"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting routes"},
+				[]string{"No routes found"},
+			))
 		})
 	})
 
@@ -102,10 +103,10 @@ var _ = Describe("routes command", func() {
 		It("returns an error to the user", func() {
 			runCommand()
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Getting routes"},
-				{"FAILED"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting routes"},
+				[]string{"FAILED"},
+			))
 		})
 	})
 })

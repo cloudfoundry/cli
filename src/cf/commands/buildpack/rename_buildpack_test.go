@@ -7,10 +7,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("rename-buildpack command", func() {
@@ -51,21 +52,21 @@ var _ = Describe("rename-buildpack command", func() {
 			}
 
 			runCommand("my-buildpack", "new-buildpack")
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Renaming buildpack", "my-buildpack"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Renaming buildpack", "my-buildpack"},
+				[]string{"OK"},
+			))
 		})
 
 		It("fails when the buildpack does not exist", func() {
 			fakeRepo.FindByNameNotFound = true
 
 			runCommand("my-buildpack1", "new-buildpack")
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Renaming buildpack", "my-buildpack"},
-				{"FAILED"},
-				{"Buildpack my-buildpack1 not found"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Renaming buildpack", "my-buildpack"},
+				[]string{"FAILED"},
+				[]string{"Buildpack my-buildpack1 not found"},
+			))
 		})
 
 		It("fails when there is an error updating the buildpack", func() {
@@ -76,10 +77,10 @@ var _ = Describe("rename-buildpack command", func() {
 			fakeRepo.UpdateBuildpackReturns.Error = errors.New("SAD TROMBONE")
 
 			runCommand("my-buildpack1", "new-buildpack")
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Renaming buildpack", "my-buildpack"},
-				{"SAD TROMBONE"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Renaming buildpack", "my-buildpack"},
+				[]string{"SAD TROMBONE"},
+			))
 		})
 	})
 })

@@ -6,11 +6,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-service command", func() {
@@ -71,14 +72,12 @@ var _ = Describe("delete-service command", func() {
 				It("deletes the service", func() {
 					runCommand("my-service")
 
-					testassert.SliceContains(ui.Prompts, testassert.Lines{
-						{"Really delete the service my-service"},
-					})
+					Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the service my-service"}))
 
-					testassert.SliceContains(ui.Outputs, testassert.Lines{
-						{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
-						{"OK"},
-					})
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
+						[]string{"OK"},
+					))
 
 					Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
 				})
@@ -88,10 +87,10 @@ var _ = Describe("delete-service command", func() {
 				runCommand("-f", "foo.com")
 
 				Expect(ui.Prompts).To(BeEmpty())
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting service", "foo.com"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting service", "foo.com"},
+					[]string{"OK"},
+				))
 			})
 		})
 
@@ -103,14 +102,12 @@ var _ = Describe("delete-service command", func() {
 			It("warns the user the service does not exist", func() {
 				runCommand("-f", "my-service")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting service", "my-service"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting service", "my-service"},
+					[]string{"OK"},
+				))
 
-				testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-					{"my-service", "does not exist"},
-				})
+				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"my-service", "does not exist"}))
 			})
 		})
 	})

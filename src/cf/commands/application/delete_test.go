@@ -8,11 +8,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete app command", func() {
@@ -73,14 +74,12 @@ var _ = Describe("delete app command", func() {
 				Expect(appRepo.ReadArgs.Name).To(Equal("app-to-delete"))
 				Expect(appRepo.DeletedAppGuid).To(Equal("app-to-delete-guid"))
 
-				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"Really delete the app app-to-delete"},
-				})
+				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the app app-to-delete"}))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting", "app-to-delete", "my-org", "my-space", "my-user"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting", "app-to-delete", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+				))
 			})
 
 			It("does not prompt when the -f flag is provided", func() {
@@ -90,10 +89,10 @@ var _ = Describe("delete app command", func() {
 				Expect(appRepo.DeletedAppGuid).To(Equal("app-to-delete-guid"))
 				Expect(ui.Prompts).To(BeEmpty())
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting", "app-to-delete"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting", "app-to-delete"},
+					[]string{"OK"},
+				))
 			})
 
 			Describe("mapped routes", func() {
@@ -129,10 +128,10 @@ var _ = Describe("delete app command", func() {
 						It("fails with the api error message", func() {
 							runCommand("-f", "-r", "app-to-delete")
 
-							testassert.SliceContains(ui.Outputs, testassert.Lines{
-								{"Deleting", "app-to-delete"},
-								{"FAILED"},
-							})
+							Expect(ui.Outputs).To(ContainSubstrings(
+								[]string{"Deleting", "app-to-delete"},
+								[]string{"FAILED"},
+							))
 						})
 					})
 				})
@@ -157,14 +156,12 @@ var _ = Describe("delete app command", func() {
 				Expect(appRepo.ReadArgs.Name).To(Equal("app-to-delete"))
 				Expect(appRepo.DeletedAppGuid).To(Equal(""))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting", "app-to-delete"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting", "app-to-delete"},
+					[]string{"OK"},
+				))
 
-				testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-					{"app-to-delete", "does not exist"},
-				})
+				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"app-to-delete", "does not exist"}))
 			})
 		})
 	})

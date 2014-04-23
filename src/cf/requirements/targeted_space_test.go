@@ -33,6 +33,8 @@ import (
 	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -56,10 +58,10 @@ var _ = Describe("Testing with ginkgo", func() {
 			NewTargetedSpaceRequirement(ui, config).Execute()
 		})
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"No space targeted"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"No space targeted"},
+		))
 
 		ui.ClearOutputs()
 		config.SetOrganizationFields(models.OrganizationFields{})
@@ -68,9 +70,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			NewTargetedSpaceRequirement(ui, config).Execute()
 		})
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"No org and space targeted"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"No org and space targeted"},
+		))
 	})
 })

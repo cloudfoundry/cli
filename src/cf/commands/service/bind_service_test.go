@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("bind-service command", func() {
@@ -51,11 +52,11 @@ var _ = Describe("bind-service command", func() {
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
-				{"OK"},
-				{"TIP"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+				[]string{"TIP"},
+			))
 			Expect(serviceBindingRepo.CreateServiceInstanceGuid).To(Equal("my-service-guid"))
 			Expect(serviceBindingRepo.CreateApplicationGuid).To(Equal("my-app-guid"))
 		})
@@ -72,11 +73,11 @@ var _ = Describe("bind-service command", func() {
 			serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
 			ui := callBindService([]string{"my-app", "my-service"}, requirementsFactory, serviceBindingRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Binding service"},
-				{"OK"},
-				{"my-app", "is already bound", "my-service"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Binding service"},
+				[]string{"OK"},
+				[]string{"my-app", "is already bound", "my-service"},
+			))
 		})
 
 		It("fails with usage when called without a service instance and app", func() {

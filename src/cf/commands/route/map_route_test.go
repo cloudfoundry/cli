@@ -32,11 +32,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callMapRoute(args []string, requirementsFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, createRoute *testcmd.FakeRouteCreator) (ui *testterm.FakeUI) {
@@ -93,16 +94,16 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callMapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, requirementsFactory, routeRepo, routeCreator)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Adding route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Adding route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(routeRepo.BoundRouteGuid).To(Equal("my-route-guid"))
 		Expect(routeRepo.BoundAppGuid).To(Equal("my-app-guid"))
 	})
-	It("TestMapRouteWhenRouteNotReserved", func() {
 
+	It("TestMapRouteWhenRouteNotReserved", func() {
 		domain := models.DomainFields{}
 		domain.Name = "my-domain.com"
 		route := models.Route{}

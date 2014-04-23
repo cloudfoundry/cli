@@ -7,9 +7,10 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
+
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	. "testhelpers/matchers"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
@@ -97,13 +98,13 @@ var _ = Describe("services", func() {
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting services in org", "my-org", "my-space", "my-user"},
-			{"OK"},
-			{"my-service-1", "cleardb", "spark", "cli1, cli2"},
-			{"my-service-2", "cleardb", "spark-2", "cli1"},
-			{"my-service-provided-by-user", "user-provided"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+			[]string{"my-service-1", "cleardb", "spark", "cli1, cli2"},
+			[]string{"my-service-2", "cleardb", "spark-2", "cli1"},
+			[]string{"my-service-provided-by-user", "user-provided"},
+		))
 	})
 
 	It("lists no services when none are found", func() {
@@ -115,13 +116,14 @@ var _ = Describe("services", func() {
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting services in org", "my-org", "my-space", "my-user"},
-			{"OK"},
-			{"No services found"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"name", "service", "plan", "bound apps"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+			[]string{"No services found"},
+		))
+
+		Expect(ui.Outputs).ToNot(ContainSubstrings(
+			[]string{"name", "service", "plan", "bound apps"},
+		))
 	})
 })

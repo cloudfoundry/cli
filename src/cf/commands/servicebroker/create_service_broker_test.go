@@ -30,9 +30,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	. "testhelpers/matchers"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
@@ -78,10 +78,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-broker", "my username", "my password", "http://example.com"}
 		ui := callCreateServiceBroker(args, requirementsFactory, serviceBrokerRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating service broker", "my-broker", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating service broker", "my-broker", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(serviceBrokerRepo.CreateName).To(Equal("my-broker"))
 		Expect(serviceBrokerRepo.CreateUrl).To(Equal("http://example.com"))

@@ -7,7 +7,8 @@ import (
 	. "github.com/onsi/gomega"
 	"runtime"
 	"strings"
-	testassert "testhelpers/assert"
+
+	. "testhelpers/matchers"
 )
 
 func NewManifest(path string, data generic.Map) (m *manifest.Manifest) {
@@ -185,7 +186,7 @@ var _ = Describe("Manifests", func() {
 			"memory", "instances", "timeout", "no-route", "services", "env", "random-route"}
 
 		for _, key := range manifestKeys {
-			testassert.SliceContains(errorSlice, testassert.Lines{{key, "not be null"}})
+			Expect(errorSlice).To(ContainSubstrings([]string{key, "not be null"}))
 		}
 	})
 

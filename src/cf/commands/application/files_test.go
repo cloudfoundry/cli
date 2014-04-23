@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -76,16 +77,17 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callFiles([]string{"my-app", "/foo"}, requirementsFactory, appFilesRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
-			{"OK"},
-			{"file 1"},
-			{"file 2"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+			[]string{"file 1"},
+			[]string{"file 2"},
+		))
 
 		Expect(appFilesRepo.AppGuid).To(Equal("my-app-guid"))
 		Expect(appFilesRepo.Path).To(Equal("/foo"))
 	})
+
 	It("TestListingFilesWithTemplateTokens", func() {
 
 		app := models.Application{}
@@ -97,9 +99,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callFiles([]string{"my-app", "/foo"}, requirementsFactory, appFilesRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"%s %d %i"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings([]string{"%s %d %i"}))
 	})
 })
 

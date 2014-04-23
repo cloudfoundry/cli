@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("org command", func() {
@@ -59,21 +60,21 @@ var _ = Describe("org command", func() {
 		It("lists orgs", func() {
 			runCommand()
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Getting orgs as my-user"},
-				{"Organization-1"},
-				{"Organization-2"},
-				{"Organization-3"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting orgs as my-user"},
+				[]string{"Organization-1"},
+				[]string{"Organization-2"},
+				[]string{"Organization-3"},
+			))
 		})
 	})
 
 	It("tells the user when no orgs were found", func() {
 		runCommand()
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting orgs as my-user"},
-			{"No orgs found"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting orgs as my-user"},
+			[]string{"No orgs found"},
+		))
 	})
 })

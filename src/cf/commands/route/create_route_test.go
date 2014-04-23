@@ -32,11 +32,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -94,10 +95,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, requirementsFactory, routeRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
 		Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
@@ -132,11 +133,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, requirementsFactory, routeRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating route"},
-			{"OK"},
-			{"host.example.com", "already exists"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating route"},
+			[]string{"OK"},
+			[]string{"host.example.com", "already exists"},
+		))
 
 		Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
 		Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
@@ -171,10 +172,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(apiErr).NotTo(HaveOccurred())
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating route", "my-host.example.com", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating route", "my-host.example.com", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(routeRepo.CreateInSpaceHost).To(Equal("my-host"))
 		Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))

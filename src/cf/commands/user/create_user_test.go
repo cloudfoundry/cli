@@ -6,11 +6,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Create user command", func() {
@@ -42,11 +43,11 @@ var _ = Describe("Create user command", func() {
 	It("creates a user", func() {
 		runCommand("my-user", "my-password")
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating user", "my-user", "current-user"},
-			{"OK"},
-			{"TIP"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user", "my-user", "current-user"},
+			[]string{"OK"},
+			[]string{"TIP"},
+		))
 
 		Expect(userRepo.CreateUserUsername).To(Equal("my-user"))
 	})
@@ -56,13 +57,11 @@ var _ = Describe("Create user command", func() {
 
 		runCommand("my-user", "my-password")
 
-		testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-			{"already exists"},
-		})
+		Expect(ui.WarnOutputs).To(ContainSubstrings(
+			[]string{"already exists"},
+		))
 
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"Failed"},
-		})
+		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Failed"}))
 	})
 
 	It("fails when no arguments are passed", func() {

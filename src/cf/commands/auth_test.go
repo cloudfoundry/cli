@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("auth command", func() {
@@ -63,10 +64,10 @@ var _ = Describe("auth command", func() {
 			testcmd.RunCommand(cmd, context, requirementsFactory)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"foo.example.org/authenticate"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"foo.example.org/authenticate"},
+				[]string{"OK"},
+			))
 
 			Expect(repo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 				{
@@ -89,12 +90,12 @@ var _ = Describe("auth command", func() {
 			})
 
 			It("does not prompt the user when provided username and password", func() {
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{config.ApiEndpoint()},
-					{"Authenticating..."},
-					{"FAILED"},
-					{"Error authenticating"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{config.ApiEndpoint()},
+					[]string{"Authenticating..."},
+					[]string{"FAILED"},
+					[]string{"Error authenticating"},
+				))
 			})
 
 			It("clears the user's session", func() {

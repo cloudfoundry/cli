@@ -32,11 +32,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callCreateOrg(args []string, requirementsFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
@@ -71,8 +72,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui = callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
-	It("TestCreateOrgRequirements", func() {
 
+	It("TestCreateOrgRequirements", func() {
 		orgRepo := &testapi.FakeOrgRepository{}
 
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
@@ -83,28 +84,28 @@ var _ = Describe("Testing with ginkgo", func() {
 		callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
-	It("TestCreateOrg", func() {
 
+	It("TestCreateOrg", func() {
 		orgRepo := &testapi.FakeOrgRepository{}
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		ui := callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating org", "my-org", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating org", "my-org", "my-user"},
+			[]string{"OK"},
+		))
 		Expect(orgRepo.CreateName).To(Equal("my-org"))
 	})
-	It("TestCreateOrgWhenAlreadyExists", func() {
 
+	It("TestCreateOrgWhenAlreadyExists", func() {
 		orgRepo := &testapi.FakeOrgRepository{CreateOrgExists: true}
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		ui := callCreateOrg([]string{"my-org"}, requirementsFactory, orgRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating org", "my-org"},
-			{"OK"},
-			{"my-org", "already exists"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating org", "my-org"},
+			[]string{"OK"},
+			[]string{"my-org", "already exists"},
+		))
 	})
 })

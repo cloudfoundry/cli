@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func getUnsetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) {
@@ -115,10 +116,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
 		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("some-org-guid"))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
+			[]string{"OK"},
+		))
 		Expect(userRepo.UnsetSpaceRoleRole).To(Equal(models.SPACE_MANAGER))
 		Expect(userRepo.UnsetSpaceRoleUserGuid).To(Equal("some-user-guid"))
 		Expect(userRepo.UnsetSpaceRoleSpaceGuid).To(Equal("some-space-guid"))

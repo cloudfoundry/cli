@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callRenameService(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, serviceRepo *testapi.FakeServiceRepo) {
@@ -85,10 +86,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
 		ui, fakeServiceRepo := callRenameService([]string{"my-service", "new-name"}, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Renaming service", "different-name", "new-name", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Renaming service", "different-name", "new-name", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(fakeServiceRepo.RenameServiceServiceInstance).To(Equal(serviceInstance))
 		Expect(fakeServiceRepo.RenameServiceNewName).To(Equal("new-name"))

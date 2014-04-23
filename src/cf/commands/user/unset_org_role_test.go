@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -90,10 +91,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUnsetOrgRole(args, userRepo, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Removing role", "OrgManager", "my-username", "my-org", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Removing role", "OrgManager", "my-username", "my-org", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(userRepo.UnsetOrgRoleRole).To(Equal(models.ORG_MANAGER))
 		Expect(userRepo.UnsetOrgRoleUserGuid).To(Equal("some-user-guid"))

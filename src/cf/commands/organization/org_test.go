@@ -31,11 +31,12 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -89,14 +90,14 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting info for org", "my-org", "my-user"},
-			{"OK"},
-			{"my-org"},
-			{"  domains:", "cfapps.io", "cf-app.com"},
-			{"  quota: ", "cantina-quota", "512M"},
-			{"  spaces:", "development", "staging"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting info for org", "my-org", "my-user"},
+			[]string{"OK"},
+			[]string{"my-org"},
+			[]string{"  domains:", "cfapps.io", "cf-app.com"},
+			[]string{"  quota: ", "cantina-quota", "512M"},
+			[]string{"  spaces:", "development", "staging"},
+		))
 	})
 })
 

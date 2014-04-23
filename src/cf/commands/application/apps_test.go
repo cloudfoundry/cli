@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("list-apps command", func() {
@@ -97,22 +98,22 @@ var _ = Describe("list-apps command", func() {
 
 			runCommand()
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Getting apps in", "my-org", "my-space", "my-user"},
-				{"OK"},
-				{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
-				{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting apps in", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+				[]string{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
+				[]string{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
+			))
 		})
 
 		Context("when there are no apps", func() {
 			It("tells the user that there are no apps", func() {
 				runCommand()
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Getting apps in", "my-org", "my-space", "my-user"},
-					{"OK"},
-					{"No apps found"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting apps in", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"No apps found"},
+				))
 			})
 		})
 	})

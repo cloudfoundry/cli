@@ -33,11 +33,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("domains command", func() {
@@ -92,13 +93,13 @@ var _ = Describe("domains command", func() {
 
 		Expect(domainRepo.ListDomainsForOrgGuid).To(Equal("my-org-guid"))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting domains in org", "my-org", "my-user"},
-			{"name", "status"},
-			{"The-shared-domain", "shared"},
-			{"Private-domain1", "owned"},
-			{"Private-domain2", "owned"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting domains in org", "my-org", "my-user"},
+			[]string{"name", "status"},
+			[]string{"The-shared-domain", "shared"},
+			[]string{"Private-domain1", "owned"},
+			[]string{"Private-domain2", "owned"},
+		))
 	})
 
 	It("displays a message when no domains are found", func() {
@@ -111,10 +112,10 @@ var _ = Describe("domains command", func() {
 
 		ui := callListDomains([]string{}, requirementsFactory, domainRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting domains in org", "my-org", "my-user"},
-			{"No domains found"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting domains in org", "my-org", "my-user"},
+			[]string{"No domains found"},
+		))
 	})
 
 	It("fails when the domains API returns an error", func() {
@@ -129,12 +130,12 @@ var _ = Describe("domains command", func() {
 		}
 		ui := callListDomains([]string{}, requirementsFactory, domainRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting domains in org", "my-org", "my-user"},
-			{"failed"},
-			{"Failed fetching domains"},
-			{"borked!"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting domains in org", "my-org", "my-user"},
+			[]string{"failed"},
+			[]string{"Failed fetching domains"},
+			[]string{"borked!"},
+		))
 	})
 })
 

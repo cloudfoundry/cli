@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callUpdateServiceBroker(args []string, requirementsFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
@@ -70,6 +71,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3", "arg4"}, requirementsFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
+
 	It("TestUpdateServiceBrokerRequirements", func() {
 
 		requirementsFactory := &testreq.FakeReqFactory{}
@@ -84,6 +86,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callUpdateServiceBroker(args, requirementsFactory, repo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
+
 	It("TestUpdateServiceBroker", func() {
 
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
@@ -99,10 +102,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(repo.FindByNameName).To(Equal("my-broker"))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Updating service broker", "my-found-broker", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Updating service broker", "my-found-broker", "my-user"},
+			[]string{"OK"},
+		))
 
 		expectedServiceBroker := models.ServiceBroker{}
 		expectedServiceBroker.Name = "my-found-broker"

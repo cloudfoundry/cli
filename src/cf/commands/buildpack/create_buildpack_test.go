@@ -5,10 +5,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("create-buildpack command", func() {
@@ -50,15 +51,13 @@ var _ = Describe("create-buildpack command", func() {
 		Expect(repo.CreateBuildpack.Enabled).To(BeNil())
 		Expect(ui.FailedWithUsage).To(BeFalse())
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating buildpack", "my-buildpack"},
-			{"OK"},
-			{"Uploading buildpack", "my-buildpack"},
-			{"OK"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating buildpack", "my-buildpack"},
+			[]string{"OK"},
+			[]string{"Uploading buildpack", "my-buildpack"},
+			[]string{"OK"},
+		))
+		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("warns the user when the buildpack already exists", func() {
@@ -66,15 +65,13 @@ var _ = Describe("create-buildpack command", func() {
 		context := testcmd.NewContext("create-buildpack", []string{"my-buildpack", "my.war", "5"})
 		testcmd.RunCommand(cmd, context, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating buildpack", "my-buildpack"},
-			{"OK"},
-			{"my-buildpack", "already exists"},
-			{"tip", "update-buildpack"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating buildpack", "my-buildpack"},
+			[]string{"OK"},
+			[]string{"my-buildpack", "already exists"},
+			[]string{"tip", "update-buildpack"},
+		))
+		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("enables the buildpack when given the --enabled flag", func() {
@@ -95,11 +92,11 @@ var _ = Describe("create-buildpack command", func() {
 		context := testcmd.NewContext("create-buildpack", []string{"my-buildpack", "bogus/path", "5"})
 		testcmd.RunCommand(cmd, context, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating buildpack", "my-buildpack"},
-			{"OK"},
-			{"Uploading buildpack"},
-			{"FAILED"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating buildpack", "my-buildpack"},
+			[]string{"OK"},
+			[]string{"Uploading buildpack"},
+			[]string{"FAILED"},
+		))
 	})
 })

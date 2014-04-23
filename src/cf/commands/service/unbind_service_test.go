@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("unbind-service command", func() {
@@ -56,10 +57,10 @@ var _ = Describe("unbind-service command", func() {
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Unbinding app", "my-service", "my-app", "my-org", "my-space", "my-user"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Unbinding app", "my-service", "my-app", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+				))
 				Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
 				Expect(serviceBindingRepo.DeleteApplicationGuid).To(Equal("my-app-guid"))
 			})
@@ -76,11 +77,11 @@ var _ = Describe("unbind-service command", func() {
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Unbinding app", "my-service", "my-app"},
-					{"OK"},
-					{"my-service", "my-app", "did not exist"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Unbinding app", "my-service", "my-app"},
+					[]string{"OK"},
+					[]string{"my-service", "my-app", "did not exist"},
+				))
 				Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
 				Expect(serviceBindingRepo.DeleteApplicationGuid).To(Equal("my-app-guid"))
 			})

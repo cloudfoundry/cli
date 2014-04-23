@@ -32,11 +32,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("set-env command", func() {
@@ -75,8 +76,8 @@ var _ = Describe("set-env command", func() {
 		ui := callSetEnv(args, requirementsFactory, appRepo)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{
 				"Setting env variable",
 				"DATABASE_URL",
 				"mysql://example.com/my-db",
@@ -85,9 +86,9 @@ var _ = Describe("set-env command", func() {
 				"my-space",
 				"my-user",
 			},
-			{"OK"},
-			{"TIP"},
-		})
+			[]string{"OK"},
+			[]string{"TIP"},
+		))
 
 		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
@@ -98,7 +99,6 @@ var _ = Describe("set-env command", func() {
 	})
 
 	It("TestSetEnvWhenItAlreadyExists", func() {
-
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
@@ -109,9 +109,8 @@ var _ = Describe("set-env command", func() {
 		args := []string{"my-app", "DATABASE_URL", "mysql://example2.com/my-db"}
 		ui := callSetEnv(args, requirementsFactory, appRepo)
 
-		Expect(len(ui.Outputs)).To(Equal(3))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{
 				"Setting env variable",
 				"DATABASE_URL",
 				"mysql://example2.com/my-db",
@@ -120,9 +119,9 @@ var _ = Describe("set-env command", func() {
 				"my-space",
 				"my-user",
 			},
-			{"OK"},
-			{"TIP"},
-		})
+			[]string{"OK"},
+			[]string{"TIP"},
+		))
 
 		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
@@ -142,11 +141,11 @@ var _ = Describe("set-env command", func() {
 		args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
 		ui := callSetEnv(args, requirementsFactory, appRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Setting env variable"},
-			{"FAILED"},
-			{"Error updating app."},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Setting env variable"},
+			[]string{"FAILED"},
+			[]string{"Error updating app."},
+		))
 	})
 
 	It("TestSetEnvFailsWithUsage", func() {

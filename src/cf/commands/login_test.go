@@ -9,11 +9,11 @@ import (
 	. "github.com/onsi/gomega"
 	"strconv"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
-	. "testhelpers/matchers"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Login Command", func() {
@@ -101,14 +101,14 @@ var _ = Describe("Login Command", func() {
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Select an org"},
-					{"1. some-org"},
-					{"2. my-new-org"},
-					{"Select a space"},
-					{"1. my-space"},
-					{"2. some-space"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Select an org"},
+					[]string{"1. some-org"},
+					[]string{"2. my-new-org"},
+					[]string{"Select a space"},
+					[]string{"1. my-space"},
+					[]string{"2. some-space"},
+				))
 
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
@@ -129,14 +129,14 @@ var _ = Describe("Login Command", func() {
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Select an org"},
-					{"1. some-org"},
-					{"2. my-new-org"},
-					{"Select a space"},
-					{"1. my-space"},
-					{"2. some-space"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Select an org"},
+					[]string{"1. some-org"},
+					[]string{"2. my-new-org"},
+					[]string{"Select a space"},
+					[]string{"1. my-space"},
+					[]string{"2. some-space"},
+				))
 
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
@@ -222,9 +222,7 @@ var _ = Describe("Login Command", func() {
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-					{"my-org-2"},
-				})
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"my-org-2"}))
 				Expect(orgRepo.FindByNameName).To(Equal("my-org-1"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid-1"))
 			})
@@ -281,13 +279,11 @@ var _ = Describe("Login Command", func() {
 
 					l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 					testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-					testassert.SliceContains(ui.Prompts, testassert.Lines{
-						{"Account Number>"},
-						{"Username>"},
-					})
-					testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
-						{"Your Password>"},
-					})
+					Expect(ui.Prompts).To(ContainSubstrings(
+						[]string{"Account Number>"},
+						[]string{"Username>"},
+					))
+					Expect(ui.PasswordPrompts).To(ContainSubstrings([]string{"Your Password>"}))
 					Expect(ui.PasswordPrompts).ToNot(ContainSubstrings(
 						[]string{"passcode"},
 					))
@@ -327,10 +323,7 @@ var _ = Describe("Login Command", func() {
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				testassert.SliceDoesNotContain(ui.PasswordPrompts, testassert.Lines{
-					{"Your Password>"},
-				})
-
+				Expect(ui.PasswordPrompts).ToNot(ContainSubstrings([]string{"Your Password>"}))
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
 						"account_number": "the-account-number",
@@ -366,9 +359,7 @@ var _ = Describe("Login Command", func() {
 					},
 				}))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Failed"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Failed"}))
 			})
 
 			It("prompts user for password again if password given on the cmd line fails", func() {
@@ -400,9 +391,7 @@ var _ = Describe("Login Command", func() {
 					},
 				}))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Failed"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Failed"}))
 			})
 		})
 	})
@@ -435,20 +424,14 @@ var _ = Describe("Login Command", func() {
 
 		var ItFails = func() {
 			It("fails", func() {
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Failed"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Failed"}))
 			})
 		}
 
 		var ItSucceeds = func() {
 			It("runs successfully", func() {
-				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-					{"Failed"},
-				})
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"OK"},
-				})
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Failed"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 			})
 		}
 
@@ -539,11 +522,11 @@ var _ = Describe("Login Command", func() {
 				})
 
 				It("fails and suggests the user skip SSL validation", func() {
-					testassert.SliceContains(ui.Outputs, testassert.Lines{
-						{"FAILED"},
-						{"SSL cert", "https://bobs-burgers.com"},
-						{"TIP", "--skip-ssl-validation"},
-					})
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"SSL cert", "https://bobs-burgers.com"},
+						[]string{"TIP", "--skip-ssl-validation"},
+					))
 				})
 
 				ItDoesntShowTheTarget()

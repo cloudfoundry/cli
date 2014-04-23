@@ -31,10 +31,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callListBuildpacks(requirementsFactory *testreq.FakeReqFactory, buildpackRepo *testapi.FakeBuildpackRepository) (ui *testterm.FakeUI) {
@@ -77,13 +78,13 @@ var _ = Describe("ListBuildpacks", func() {
 
 		ui := callListBuildpacks(requirementsFactory, buildpackRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting buildpacks"},
-			{"buildpack", "position", "enabled"},
-			{"Buildpack-1", "5", "true", "false"},
-			{"Buildpack-2", "10", "false", "true"},
-			{"Buildpack-3", "15", "true", "false"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting buildpacks"},
+			[]string{"buildpack", "position", "enabled"},
+			[]string{"Buildpack-1", "5", "true", "false"},
+			[]string{"Buildpack-2", "10", "false", "true"},
+			[]string{"Buildpack-3", "15", "true", "false"},
+		))
 	})
 
 	It("TestListingBuildpacksWhenNoneExist", func() {
@@ -95,9 +96,9 @@ var _ = Describe("ListBuildpacks", func() {
 
 		ui := callListBuildpacks(requirementsFactory, buildpackRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting buildpacks"},
-			{"No buildpacks found"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting buildpacks"},
+			[]string{"No buildpacks found"},
+		))
 	})
 })

@@ -12,6 +12,8 @@ import (
 	"strings"
 	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("UI", func() {
@@ -56,7 +58,7 @@ var _ = Describe("UI", func() {
 					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
 				})
 
-				testassert.SliceContains(out, testassert.Lines{{"Hello World?"}})
+				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
 			})
 		})
 
@@ -67,7 +69,7 @@ var _ = Describe("UI", func() {
 					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
 				})
 
-				testassert.SliceContains(out, testassert.Lines{{"Hello World?"}})
+				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
 			})
 		})
 
@@ -78,7 +80,7 @@ var _ = Describe("UI", func() {
 					Expect(ui.Confirm("Hello %s", "World?")).To(BeFalse())
 				})
 
-				testassert.SliceContains(out, testassert.Lines{{"Hello World?"}})
+				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
 			})
 		})
 	})
@@ -91,7 +93,7 @@ var _ = Describe("UI", func() {
 					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeTrue())
 				})
 
-				testassert.SliceContains(out, testassert.Lines{{"modelType modelName"}})
+				Expect(out).To(ContainSubstrings([]string{"modelType modelName"}))
 			})
 		})
 
@@ -102,7 +104,7 @@ var _ = Describe("UI", func() {
 					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeTrue())
 				})
 
-				testassert.SliceContains(out, testassert.Lines{{"modelType modelName"}})
+				Expect(out).To(ContainSubstrings([]string{"modelType modelName"}))
 			})
 		})
 
@@ -113,7 +115,7 @@ var _ = Describe("UI", func() {
 					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeFalse())
 				})
 
-				testassert.SliceContains(out, testassert.Lines{{"Delete cancelled"}})
+				Expect(out).To(ContainSubstrings([]string{"Delete cancelled"}))
 			})
 		})
 	})
@@ -126,7 +128,7 @@ var _ = Describe("UI", func() {
 					Expect(ui.ConfirmDeleteWithAssociations("modelType", "modelName")).To(BeFalse())
 				})
 
-				testassert.SliceContains(out, testassert.Lines{{"Delete cancelled"}})
+				Expect(out).To(ContainSubstrings([]string{"Delete cancelled"}))
 			})
 		})
 	})
@@ -144,15 +146,9 @@ var _ = Describe("UI", func() {
 				ui.ShowConfiguration(config)
 			})
 
-			testassert.SliceDoesNotContain(output, testassert.Lines{
-				{"API endpoint:"},
-			})
-
-			testassert.SliceContains(output, testassert.Lines{
-				{"Not logged in", "Use", "log in"},
-			})
+			Expect(output).ToNot(ContainSubstrings([]string{"API endpoint:"}))
+			Expect(output).To(ContainSubstrings([]string{"Not logged in", "Use", "log in"}))
 		})
-
 	})
 
 	Context("when an api endpoint is set and the user logged in", func() {
@@ -180,21 +176,15 @@ var _ = Describe("UI", func() {
 			})
 
 			It("tells the user which api endpoint is set", func() {
-				testassert.SliceContains(output, testassert.Lines{
-					{"API endpoint:", "https://test.example.org"},
-				})
+				Expect(output).To(ContainSubstrings([]string{"API endpoint:", "https://test.example.org"}))
 			})
 
 			It("tells the user the api version", func() {
-				testassert.SliceContains(output, testassert.Lines{
-					{"API version:", "☃☃☃"},
-				})
+				Expect(output).To(ContainSubstrings([]string{"API version:", "☃☃☃"}))
 			})
 
 			It("tells the user which user is logged in", func() {
-				testassert.SliceContains(output, testassert.Lines{
-					{"User:", "my-user-email"},
-				})
+				Expect(output).To(ContainSubstrings([]string{"User:", "my-user-email"}))
 			})
 
 			Context("when an org is targeted", func() {
@@ -206,9 +196,7 @@ var _ = Describe("UI", func() {
 				})
 
 				It("tells the user which org is targeted", func() {
-					testassert.SliceContains(output, testassert.Lines{
-						{"Org:", "org-name"},
-					})
+					Expect(output).To(ContainSubstrings([]string{"Org:", "org-name"}))
 				})
 			})
 
@@ -221,9 +209,7 @@ var _ = Describe("UI", func() {
 				})
 
 				It("tells the user which space is targeted", func() {
-					testassert.SliceContains(output, testassert.Lines{
-						{"Space:", "my-space"},
-					})
+					Expect(output).To(ContainSubstrings([]string{"Space:", "my-space"}))
 				})
 			})
 		})
@@ -234,9 +220,7 @@ var _ = Describe("UI", func() {
 				ui.ShowConfiguration(config)
 			})
 
-			testassert.SliceContains(output, testassert.Lines{
-				{"No", "org", "space", "targeted", "-o ORG", "-s SPACE"},
-			})
+			Expect(output).To(ContainSubstrings([]string{"No", "org", "space", "targeted", "-o ORG", "-s SPACE"}))
 		})
 
 		It("prompts the user to target an org when no org is targeted", func() {
@@ -249,9 +233,7 @@ var _ = Describe("UI", func() {
 				ui.ShowConfiguration(config)
 			})
 
-			testassert.SliceContains(output, testassert.Lines{
-				{"No", "org", "targeted", "-o ORG"},
-			})
+			Expect(output).To(ContainSubstrings([]string{"No", "org", "targeted", "-o ORG"}))
 		})
 
 		It("prompts the user to target a space when no space is targeted", func() {
@@ -264,9 +246,7 @@ var _ = Describe("UI", func() {
 				ui.ShowConfiguration(config)
 			})
 
-			testassert.SliceContains(output, testassert.Lines{
-				{"No", "space", "targeted", "-s SPACE"},
-			})
+			Expect(output).To(ContainSubstrings([]string{"No", "space", "targeted", "-s SPACE"}))
 		})
 	})
 

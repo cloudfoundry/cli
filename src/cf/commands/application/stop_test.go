@@ -32,11 +32,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("stop command", func() {
@@ -83,10 +84,10 @@ var _ = Describe("stop command", func() {
 			requirementsFactory.Application = app
 			ui := callStop(args, requirementsFactory, appRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Stopping app", "my-app", "my-org", "my-space", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Stopping app", "my-app", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+			))
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
@@ -102,11 +103,11 @@ var _ = Describe("stop command", func() {
 			requirementsFactory.Application = app
 			ui := callStop(args, requirementsFactory, appRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Stopping", "my-app"},
-				{"FAILED"},
-				{"Error updating app."},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Stopping", "my-app"},
+				[]string{"FAILED"},
+				[]string{"Error updating app."},
+			))
 			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 		})
 
@@ -122,9 +123,7 @@ var _ = Describe("stop command", func() {
 			requirementsFactory.Application = app
 			ui := callStop(args, requirementsFactory, appRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"my-app", "is already stopped"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"my-app", "is already stopped"}))
 			Expect(appRepo.UpdateAppGuid).To(Equal(""))
 		})
 
