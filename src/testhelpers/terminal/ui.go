@@ -81,6 +81,10 @@ func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
 func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) (answer string) {
 	ui.PasswordPrompts = append(ui.PasswordPrompts, fmt.Sprintf(prompt, args...))
 	if len(ui.Inputs) == 0 {
+		println("__________________PANIC__________________")
+		println(ui.DumpOutputs())
+		println(ui.DumpPrompts())
+		println("_________________________________________")
 		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
 	}
 
@@ -116,6 +120,10 @@ func (ui *FakeUI) DumpWarnOutputs() string {
 
 func (ui *FakeUI) DumpOutputs() string {
 	return "****************************\n" + strings.Join(ui.Outputs, "\n")
+}
+
+func (ui *FakeUI) DumpPrompts() string {
+	return "****************************\n" + strings.Join(ui.Prompts, "\n")
 }
 
 func (ui *FakeUI) ClearOutputs() {

@@ -12,6 +12,7 @@ import (
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	. "testhelpers/matchers"
 	testterm "testhelpers/terminal"
 )
 
@@ -255,54 +256,73 @@ var _ = Describe("Login Command", func() {
 		Describe("login prompts", func() {
 			BeforeEach(func() {
 				authRepo.GetLoginPromptsReturns.Prompts = map[string]configuration.AuthPrompt{
-					"pin": configuration.AuthPrompt{
-						DisplayName: "PIN Number",
+					"account_number": configuration.AuthPrompt{
+						DisplayName: "Account Number",
+						Type:        configuration.AuthPromptTypeText,
+					},
+					"username": configuration.AuthPrompt{
+						DisplayName: "Username",
+						Type:        configuration.AuthPromptTypeText,
+					},
+					"passcode": configuration.AuthPrompt{
+						DisplayName: "It's a passcode, what you want it to be???",
 						Type:        configuration.AuthPromptTypePassword,
 					},
 					"password": configuration.AuthPrompt{
 						DisplayName: "Your Password",
 						Type:        configuration.AuthPromptTypePassword,
 					},
-					"account_number": configuration.AuthPrompt{
-						DisplayName: "Account Number",
-						Type:        configuration.AuthPromptTypeText,
-					},
-					"department_number": configuration.AuthPrompt{
-						DisplayName: "Dept Number",
-						Type:        configuration.AuthPromptTypeText,
-					},
 				}
 			})
 
-			It("asks the user for fields given by the login info API", func() {
-				ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number", "the-pin", "the-password"}
+			Context("when the user does not provide the --sso flag", func() {
+				It("prompts the user for 'password' prompt and any text type prompt", func() {
+					ui.Inputs = []string{"api.example.com", "the-account-number", "the-username", "the-password"}
 
-				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+					l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+					testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+					testassert.SliceContains(ui.Prompts, testassert.Lines{
+						{"Account Number>"},
+						{"Username>"},
+					})
+					testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
+						{"Your Password>"},
+					})
+					Expect(ui.PasswordPrompts).ToNot(ContainSubstrings(
+						[]string{"passcode"},
+					))
 
-				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"Account Number>"},
-					{"Dept Number>"},
+					Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+						{
+							"account_number": "the-account-number",
+							"username":       "the-username",
+							"password":       "the-password",
+						},
+					}))
 				})
-				testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
-					{"PIN Number>"},
-					{"Your Password>"},
-				})
-
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-					{
-						"account_number":    "the-account-number",
-						"department_number": "the-department-number",
-						"pin":               "the-pin",
-						"password":          "the-password",
-					},
-				}))
 			})
 
-			It("take the password from the -p flag", func() {
-				Flags = []string{"-p", "the-password"}
+			Context("when the user does provide the --sso flag", func() {
+				It("only prompts the user for the passcode type prompts", func() {
+					Flags = []string{"--sso", "-a", "api.example.com"}
+					ui.Inputs = []string{"the-one-time-code"}
 
-				ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number", "the-pin"}
+					l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+					testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+					Expect(ui.Prompts).To(BeEmpty())
+					Expect(ui.PasswordPrompts).To(ContainSubstrings([]string{"passcode"}))
+					Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+						{
+							"passcode": "the-one-time-code",
+						},
+					}))
+				})
+			})
+
+			It("takes the password from the -p flag", func() {
+				Flags = []string{"-p", "the-password"}
+				ui.Inputs = []string{"api.example.com", "the-account-number", "the-username", "the-pin"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
@@ -313,42 +333,36 @@ var _ = Describe("Login Command", func() {
 
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
-						"account_number":    "the-account-number",
-						"department_number": "the-department-number",
-						"pin":               "the-pin",
-						"password":          "the-password",
+						"account_number": "the-account-number",
+						"username":       "the-username",
+						"password":       "the-password",
 					},
 				}))
 			})
 
 			It("tries 3 times for the password-type prompts", func() {
 				authRepo.AuthError = true
-				ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number",
-					"the-pin-1", "the-password-1",
-					"the-pin-2", "the-password-2",
-					"the-pin-3", "the-password-3"}
+				ui.Inputs = []string{"api.example.com", "the-account-number", "the-username",
+					"the-password-1", "the-password-2", "the-password-3"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
-						"account_number":    "the-account-number",
-						"department_number": "the-department-number",
-						"pin":               "the-pin-1",
-						"password":          "the-password-1",
+						"username":       "the-username",
+						"account_number": "the-account-number",
+						"password":       "the-password-1",
 					},
 					{
-						"account_number":    "the-account-number",
-						"department_number": "the-department-number",
-						"pin":               "the-pin-2",
-						"password":          "the-password-2",
+						"username":       "the-username",
+						"account_number": "the-account-number",
+						"password":       "the-password-2",
 					},
 					{
-						"account_number":    "the-account-number",
-						"department_number": "the-department-number",
-						"pin":               "the-pin-3",
-						"password":          "the-password-3",
+						"username":       "the-username",
+						"account_number": "the-account-number",
+						"password":       "the-password-3",
 					},
 				}))
 
@@ -362,32 +376,27 @@ var _ = Describe("Login Command", func() {
 
 				Flags = []string{"-p", "the-password-1"}
 
-				ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number",
-					"the-pin-1",
-					"the-pin-2", "the-password-2",
-					"the-pin-3", "the-password-3"}
+				ui.Inputs = []string{"api.example.com", "the-account-number", "the-username",
+					"the-password-2", "the-password-3"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
-						"account_number":    "the-account-number",
-						"department_number": "the-department-number",
-						"pin":               "the-pin-1",
-						"password":          "the-password-1",
+						"account_number": "the-account-number",
+						"username":       "the-username",
+						"password":       "the-password-1",
 					},
 					{
-						"account_number":    "the-account-number",
-						"department_number": "the-department-number",
-						"pin":               "the-pin-2",
-						"password":          "the-password-2",
+						"account_number": "the-account-number",
+						"username":       "the-username",
+						"password":       "the-password-2",
 					},
 					{
-						"account_number":    "the-account-number",
-						"department_number": "the-department-number",
-						"pin":               "the-pin-3",
-						"password":          "the-password-3",
+						"account_number": "the-account-number",
+						"username":       "the-username",
+						"password":       "the-password-3",
 					},
 				}))
 
