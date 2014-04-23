@@ -51,19 +51,21 @@ func (command Login) Metadata() command_metadata.CommandMetadata {
 			"   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n" +
 			"   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n" +
 			"   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n" +
-			"   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+			"   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)" +
+			"   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("a", "API endpoint (e.g. https://api.example.com)"),
 			flag_helpers.NewStringFlag("u", "Username"),
 			flag_helpers.NewStringFlag("p", "Password"),
 			flag_helpers.NewStringFlag("o", "Org"),
 			flag_helpers.NewStringFlag("s", "Space"),
+			cli.BoolFlag{Name: "sso", Usage: "Use a one-time password to login"},
 			cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
 		},
 	}
 }
 
-func (cmd Login) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Login) GetRequirements(_ requirements.Factory, _ *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 
@@ -78,7 +80,21 @@ func (cmd Login) Run(c *cli.Context) {
 		cmd.ui.ShowConfiguration(cmd.config)
 	}()
 
-	cmd.authenticate(c)
+	// We thought we would never need to explicitly branch in this code
+	// for anything as simple as authentication, but it turns out that our
+	// assumptions did not match reality.
+
+	// When SAML is enabled (but not configured) then the UAA/Login server
+	// will always returns password prompts that includes the Passcode field.
+	// Users can authenticate with:
+	//   EITHER   username and password
+	//   OR       a one-time passcode
+
+	if c.Bool("sso") {
+		cmd.authenticateSSO(c)
+	} else {
+		cmd.authenticate(c)
+	}
 
 	orgIsSet := cmd.setOrganization(c)
 
@@ -104,6 +120,35 @@ func (cmd Login) decideEndpoint(c *cli.Context) (string, bool) {
 	return endpoint, skipSSL
 }
 
+func (cmd Login) authenticateSSO(c *cli.Context) {
+	prompts, err := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	credentials := make(map[string]string)
+	passcode := prompts["passcode"]
+
+	for i := 0; i < maxLoginTries; i++ {
+		credentials["passcode"] = cmd.ui.AskForPassword("%s%s", passcode.DisplayName, terminal.PromptColor(">"))
+
+		cmd.ui.Say("Authenticating...")
+		err = cmd.authenticator.Authenticate(credentials)
+
+		if err == nil {
+			cmd.ui.Ok()
+			cmd.ui.Say("")
+			break
+		}
+
+		cmd.ui.Say(err.Error())
+	}
+
+	if err != nil {
+		cmd.ui.Failed("Unable to authenticate.")
+	}
+}
+
 func (cmd Login) authenticate(c *cli.Context) {
 	usernameFlagValue := c.String("u")
 	passwordFlagValue := c.String("p")
@@ -116,6 +161,10 @@ func (cmd Login) authenticate(c *cli.Context) {
 	credentials := make(map[string]string)
 	for key, prompt := range prompts {
 		if prompt.Type == configuration.AuthPromptTypePassword {
+			if key == "passcode" {
+				continue
+			}
+
 			passwordKeys = append(passwordKeys, key)
 		} else if key == "username" && usernameFlagValue != "" {
 			credentials[key] = usernameFlagValue
