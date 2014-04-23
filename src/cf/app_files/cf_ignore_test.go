@@ -58,4 +58,22 @@ stuff/exclude.c`)
 		ignore = NewCfIgnore(`!.git`)
 		Expect(ignore.FileShouldBeIgnored(".git/objects")).To(BeFalse())
 	})
+
+	Describe("files named manifest.yml", func() {
+		var (
+			ignore CfIgnore
+		)
+
+		BeforeEach(func() {
+			ignore = NewCfIgnore("")
+		})
+
+		It("ignores manifest.yml at the top level", func() {
+			Expect(ignore.FileShouldBeIgnored("manifest.yml")).To(BeTrue())
+		})
+
+		It("does not ignore nested manifest.yml files", func() {
+			Expect(ignore.FileShouldBeIgnored("public/assets/manifest.yml")).To(BeFalse())
+		})
+	})
 })
