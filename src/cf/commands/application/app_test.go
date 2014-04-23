@@ -7,7 +7,6 @@ import (
 	"cf/formatters"
 	"cf/models"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -16,6 +15,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("app Command", func() {
@@ -94,15 +94,15 @@ var _ = Describe("app Command", func() {
 
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Showing health and status", "my-app"},
-				{"state", "started"},
-				{"instances", "2/2"},
-				{"usage", "256M x 2 instances"},
-				{"urls", "my-app.example.com", "foo.example.com"},
-				{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
-				{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Showing health and status", "my-app"},
+				[]string{"state", "started"},
+				[]string{"instances", "2/2"},
+				[]string{"usage", "256M x 2 instances"},
+				[]string{"urls", "my-app.example.com", "foo.example.com"},
+				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
+				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
+			))
 		})
 	})
 
@@ -127,13 +127,13 @@ var _ = Describe("app Command", func() {
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
 			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
-				{"state", "stopped"},
-				{"instances", "0/2"},
-				{"usage", "256M x 2 instances"},
-				{"no running instances"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
+				[]string{"state", "stopped"},
+				[]string{"instances", "0/2"},
+				[]string{"usage", "256M x 2 instances"},
+				[]string{"no running instances"},
+			))
 		})
 
 		It("displays nice output when the app has not yet finished staging", func() {
@@ -143,13 +143,13 @@ var _ = Describe("app Command", func() {
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
 			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
-				{"state", "stopped"},
-				{"instances", "0/2"},
-				{"usage", "256M x 2 instances"},
-				{"no running instances"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
+				[]string{"state", "stopped"},
+				[]string{"instances", "0/2"},
+				[]string{"usage", "256M x 2 instances"},
+				[]string{"no running instances"},
+			))
 		})
 	})
 })

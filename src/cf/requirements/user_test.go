@@ -33,6 +33,8 @@ import (
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -60,9 +62,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			NewUserRequirement("foo", ui, userRepo).Execute()
 		})
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"not found"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"not found"},
+		))
 	})
 })

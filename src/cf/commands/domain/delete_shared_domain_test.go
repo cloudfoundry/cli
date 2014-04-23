@@ -33,11 +33,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-shared-domain command", func() {
@@ -56,72 +57,70 @@ var _ = Describe("delete-shared-domain command", func() {
 		callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
-	It("TestDeleteSharedDomainNotFound", func() {
 
+	It("TestDeleteSharedDomainNotFound", func() {
 		deps := getDeleteSharedDomainDeps()
 		deps.domainRepo.FindByNameInOrgApiResponse = errors.NewModelNotFoundError("Domain", "foo.com")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting domain", "foo.com"},
-			{"OK"},
-			{"foo.com", "not found"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Deleting domain", "foo.com"},
+			[]string{"OK"},
+			[]string{"foo.com", "not found"},
+		))
 	})
-	It("TestDeleteSharedDomainFindError", func() {
 
+	It("TestDeleteSharedDomainFindError", func() {
 		deps := getDeleteSharedDomainDeps()
 		deps.domainRepo.FindByNameInOrgApiResponse = errors.New("couldn't find the droids you're lookin for")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting domain", "foo.com"},
-			{"FAILED"},
-			{"foo.com"},
-			{"couldn't find the droids you're lookin for"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Deleting domain", "foo.com"},
+			[]string{"FAILED"},
+			[]string{"foo.com"},
+			[]string{"couldn't find the droids you're lookin for"},
+		))
 	})
-	It("TestDeleteSharedDomainDeleteError", func() {
 
+	It("TestDeleteSharedDomainDeleteError", func() {
 		deps := getDeleteSharedDomainDeps()
 		deps.domainRepo.DeleteSharedApiResponse = errors.New("failed badly")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting domain", "foo.com"},
-			{"FAILED"},
-			{"foo.com"},
-			{"failed badly"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Deleting domain", "foo.com"},
+			[]string{"FAILED"},
+			[]string{"foo.com"},
+			[]string{"failed badly"},
+		))
 	})
-	It("TestDeleteSharedDomainHasConfirmation", func() {
 
+	It("TestDeleteSharedDomainHasConfirmation", func() {
 		deps := getDeleteSharedDomainDeps()
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
-		testassert.SliceContains(ui.Prompts, testassert.Lines{
-			{"shared", "foo.com"},
-		})
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting domain", "foo.com"},
-			{"OK"},
-		})
+		Expect(ui.Prompts).To(ContainSubstrings([]string{"shared", "foo.com"}))
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Deleting domain", "foo.com"},
+			[]string{"OK"},
+		))
 	})
-	It("TestDeleteSharedDomainForceFlagSkipsConfirmation", func() {
 
+	It("TestDeleteSharedDomainForceFlagSkipsConfirmation", func() {
 		deps := getDeleteSharedDomainDeps()
 		ui := callDeleteSharedDomain([]string{"-f", "foo.com"}, []string{}, deps)
 
 		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting domain", "foo.com"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Deleting domain", "foo.com"},
+			[]string{"OK"},
+		))
 	})
 })
 

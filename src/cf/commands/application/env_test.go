@@ -30,11 +30,12 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -68,24 +69,24 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callEnv([]string{"my-app"}, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
-			{"OK"},
-			{"my-key", "my-value", "my-key2", "my-value2"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+			[]string{"my-key", "my-value", "my-key2", "my-value2"},
+		))
 	})
-	It("TestEnvShowsEmptyMessage", func() {
 
+	It("TestEnvShowsEmptyMessage", func() {
 		requirementsFactory := getEnvDependencies()
 		requirementsFactory.Application.EnvironmentVars = map[string]string{}
 
 		ui := callEnv([]string{"my-app"}, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting env variables for app", "my-app"},
-			{"OK"},
-			{"No env variables exist"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting env variables for app", "my-app"},
+			[]string{"OK"},
+			[]string{"No env variables exist"},
+		))
 	})
 })
 

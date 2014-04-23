@@ -5,9 +5,10 @@ import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("ApiEndpointRequirement", func() {
@@ -33,6 +34,6 @@ var _ = Describe("ApiEndpointRequirement", func() {
 		success := req.Execute()
 		Expect(success).To(BeFalse())
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{{"No API endpoint"}})
+		Expect(ui.Outputs).To(ContainSubstrings([]string{"No API endpoint"}))
 	})
 })

@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callListServiceBrokers(args []string, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
@@ -68,23 +69,23 @@ var _ = Describe("service-brokers command", func() {
 		context := testcmd.NewContext("service-brokers", []string{})
 		testcmd.RunCommand(cmd, context, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting service brokers as", "my-user"},
-			{"name", "url"},
-			{"service-broker-to-list-a", "http://service-a-url.com"},
-			{"service-broker-to-list-b", "http://service-b-url.com"},
-			{"service-broker-to-list-c", "http://service-c-url.com"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting service brokers as", "my-user"},
+			[]string{"name", "url"},
+			[]string{"service-broker-to-list-a", "http://service-a-url.com"},
+			[]string{"service-broker-to-list-b", "http://service-b-url.com"},
+			[]string{"service-broker-to-list-c", "http://service-c-url.com"},
+		))
 	})
 
 	It("says when no service brokers were found", func() {
 		context := testcmd.NewContext("service-brokers", []string{})
 		testcmd.RunCommand(cmd, context, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting service brokers as", "my-user"},
-			{"No service brokers found"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting service brokers as", "my-user"},
+			[]string{"No service brokers found"},
+		))
 	})
 
 	It("reports errors when listing service brokers", func() {
@@ -92,9 +93,9 @@ var _ = Describe("service-brokers command", func() {
 		context := testcmd.NewContext("service-brokers", []string{})
 		testcmd.RunCommand(cmd, context, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting service brokers as ", "my-user"},
-			{"FAILED"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting service brokers as ", "my-user"},
+			[]string{"FAILED"},
+		))
 	})
 })

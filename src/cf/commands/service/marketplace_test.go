@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("marketplace command", func() {
@@ -79,13 +80,13 @@ var _ = Describe("marketplace command", func() {
 
 				Expect(serviceRepo.GetServiceOfferingsForSpaceArgs.SpaceGuid).To(Equal("the-space-guid"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Getting services from marketplace in org", "my-org", "the-space-name", "my-user"},
-					{"OK"},
-					{"service", "plans", "description"},
-					{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
-					{"zzz-my-service-offering", "service offering 1 description", "service-plan-a", "service-plan-b"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting services from marketplace in org", "my-org", "the-space-name", "my-user"},
+					[]string{"OK"},
+					[]string{"service", "plans", "description"},
+					[]string{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
+					[]string{"zzz-my-service-offering", "service offering 1 description", "service-plan-a", "service-plan-b"},
+				))
 			})
 		})
 
@@ -97,9 +98,9 @@ var _ = Describe("marketplace command", func() {
 			It("tells the user to target a space", func() {
 				cmd := NewMarketplaceServices(ui, config, serviceRepo)
 				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"without", "space"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"without", "space"},
+				))
 			})
 		})
 	})
@@ -116,13 +117,13 @@ var _ = Describe("marketplace command", func() {
 			cmd := NewMarketplaceServices(ui, config, serviceRepo)
 			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Getting all services from marketplace"},
-				{"OK"},
-				{"service", "plans", "description"},
-				{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
-				{"zzz-my-service-offering", "service offering 1 description", "service-plan-a", "service-plan-b"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting all services from marketplace"},
+				[]string{"OK"},
+				[]string{"service", "plans", "description"},
+				[]string{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
+				[]string{"zzz-my-service-offering", "service offering 1 description", "service-plan-a", "service-plan-b"},
+			))
 		})
 
 		It("does not display a table if no service offerings exist", func() {
@@ -132,12 +133,12 @@ var _ = Describe("marketplace command", func() {
 			cmd := NewMarketplaceServices(ui, config, serviceRepo)
 			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"No service offerings found"},
-			})
-			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-				{"service", "plans", "description"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"No service offerings found"},
+			))
+			Expect(ui.Outputs).ToNot(ContainSubstrings(
+				[]string{"service", "plans", "description"},
+			))
 		})
 	})
 })

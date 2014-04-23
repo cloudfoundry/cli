@@ -8,12 +8,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	"testhelpers/maker"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("purge-service command", func() {
@@ -81,23 +82,15 @@ var _ = Describe("purge-service command", func() {
 			deps.requirementsFactory,
 		)
 
-		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
-			{"Warning"},
-		})
-		testassert.SliceContains(deps.ui.Prompts, testassert.Lines{
-			{"Really purge service", "the-service-name"},
-		})
-		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
-			{"Purging service the-service-name..."},
-		})
+		Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"Warning"}))
+		Expect(deps.ui.Prompts).To(ContainSubstrings([]string{"Really purge service", "the-service-name"}))
+		Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"Purging service the-service-name..."}))
 
 		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderName).To(Equal("the-service-name"))
 		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderProvider).To(Equal(""))
 		Expect(deps.serviceRepo.PurgedServiceOffering).To(Equal(offering))
 
-		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
-			{"OK"},
-		})
+		Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 	})
 
 	It("exits when the user does not acknowledge the confirmation", func() {
@@ -142,10 +135,10 @@ var _ = Describe("purge-service command", func() {
 			deps.requirementsFactory,
 		)
 
-		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"oh no!"},
-		})
+		Expect(deps.ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"oh no!"},
+		))
 
 		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
 	})
@@ -163,9 +156,9 @@ var _ = Describe("purge-service command", func() {
 			deps.requirementsFactory,
 		)
 
-		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{{"Service offering", "does not exist"}})
-		testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{{"Warning"}})
-		testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{{"Ok"}})
+		Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"Service offering", "does not exist"}))
+		Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"Warning"}))
+		Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"Ok"}))
 
 		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
 	})

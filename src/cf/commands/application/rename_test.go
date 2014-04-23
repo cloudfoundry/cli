@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -69,10 +70,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
 		Expect(*appRepo.UpdateParams.Name).To(Equal("my-new-app"))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+		))
 	})
 })
 

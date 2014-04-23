@@ -32,11 +32,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -71,10 +72,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-app", "DATABASE_URL"}
 		ui := callUnsetEnv(args, requirementsFactory, appRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Removing env variable", "DATABASE_URL", "my-app", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Removing env variable", "DATABASE_URL", "my-app", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
@@ -97,14 +98,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"does-not-exist", "DATABASE_URL"}
 		ui := callUnsetEnv(args, requirementsFactory, appRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Removing env variable"},
-			{"FAILED"},
-			{"Error updating app."},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Removing env variable"},
+			[]string{"FAILED"},
+			[]string{"Error updating app."},
+		))
 	})
-	It("TestUnsetEnvWhenEnvVarDoesNotExist", func() {
 
+	It("TestUnsetEnvWhenEnvVarDoesNotExist", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
@@ -115,11 +116,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callUnsetEnv(args, requirementsFactory, appRepo)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Removing env variable"},
-			{"OK"},
-			{"DATABASE_URL", "was not set."},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Removing env variable"},
+			[]string{"OK"},
+			[]string{"DATABASE_URL", "was not set."},
+		))
 	})
 
 	It("TestUnsetEnvFailsWithUsage", func() {

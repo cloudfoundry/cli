@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-org command", func() {
@@ -81,14 +82,12 @@ var _ = Describe("delete-org command", func() {
 			It("deletes the org with the given name", func() {
 				runCommand("org-to-delete")
 
-				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"Really delete the org org-to-delete"},
-				})
+				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the org org-to-delete"}))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting", "org-to-delete"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting", "org-to-delete"},
+					[]string{"OK"},
+				))
 				Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
 				Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
 			})
@@ -105,10 +104,10 @@ var _ = Describe("delete-org command", func() {
 			ui.Inputs = []string{}
 			runCommand("-f", "org-to-delete")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting", "org-to-delete"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting", "org-to-delete"},
+				[]string{"OK"},
+			))
 			Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
 			Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
 		})
@@ -120,13 +119,11 @@ var _ = Describe("delete-org command", func() {
 
 			Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting", "org-to-delete"},
-				{"OK"},
-			})
-			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-				{"org-to-delete", "does not exist."},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting", "org-to-delete"},
+				[]string{"OK"},
+			))
+			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"org-to-delete", "does not exist."}))
 		})
 	})
 })

@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callCreateServiceAuthToken(args []string, requirementsFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
@@ -67,8 +68,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui = callCreateServiceAuthToken([]string{"arg1", "arg2", "arg3"}, requirementsFactory, authTokenRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
-	It("TestCreateServiceAuthTokenRequirements", func() {
 
+	It("TestCreateServiceAuthTokenRequirements", func() {
 		authTokenRepo := &testapi.FakeAuthTokenRepo{}
 		requirementsFactory := &testreq.FakeReqFactory{}
 		args := []string{"arg1", "arg2", "arg3"}
@@ -81,17 +82,17 @@ var _ = Describe("Testing with ginkgo", func() {
 		callCreateServiceAuthToken(args, requirementsFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
-	It("TestCreateServiceAuthToken", func() {
 
+	It("TestCreateServiceAuthToken", func() {
 		authTokenRepo := &testapi.FakeAuthTokenRepo{}
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider", "a value"}
 
 		ui := callCreateServiceAuthToken(args, requirementsFactory, authTokenRepo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating service auth token as", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating service auth token as", "my-user"},
+			[]string{"OK"},
+		))
 
 		authToken := models.ServiceAuthTokenFields{}
 		authToken.Label = "a label"

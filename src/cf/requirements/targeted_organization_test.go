@@ -33,6 +33,8 @@ import (
 	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -53,9 +55,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			NewTargetedOrgRequirement(ui, config).Execute()
 		})
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"No org targeted"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"No org targeted"},
+		))
 	})
 })

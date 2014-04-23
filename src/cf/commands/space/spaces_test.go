@@ -33,11 +33,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callSpaces(args []string, requirementsFactory *testreq.FakeReqFactory, config configuration.Reader, spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {
@@ -84,12 +85,12 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callSpaces([]string{}, requirementsFactory, config, spaceRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting spaces in org", "my-org", "my-user"},
-			{"space1"},
-			{"space2"},
-			{"space3"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting spaces in org", "my-org", "my-user"},
+			[]string{"space1"},
+			[]string{"space2"},
+			[]string{"space3"},
+		))
 	})
 
 	It("TestListingSpacesWhenNoSpaces", func() {
@@ -102,10 +103,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callSpaces([]string{}, requirementsFactory, configRepo, spaceRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting spaces in org", "my-org", "my-user"},
-			{"No spaces found"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting spaces in org", "my-org", "my-user"},
+			[]string{"No spaces found"},
+		))
 	})
-
 })

@@ -30,10 +30,12 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	testassert "testhelpers/assert"
+
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callShowService(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
@@ -61,8 +63,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 	})
-	It("TestShowServiceFailsWithUsage", func() {
 
+	It("TestShowServiceFailsWithUsage", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 		ui := callShowService([]string{}, requirementsFactory)
@@ -71,8 +73,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui = callShowService([]string{"my-service"}, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
-	It("TestShowServiceOutput", func() {
 
+	It("TestShowServiceOutput", func() {
 		offering := models.ServiceOfferingFields{}
 		offering.Label = "mysql"
 		offering.DocumentationUrl = "http://documentation.url"
@@ -94,16 +96,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		ui := callShowService([]string{"service1"}, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Service instance:", "service1"},
-			{"Service: ", "mysql"},
-			{"Plan: ", "plan-name"},
-			{"Description: ", "the-description"},
-			{"Documentation url: ", "http://documentation.url"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Service instance:", "service1"},
+			[]string{"Service: ", "mysql"},
+			[]string{"Plan: ", "plan-name"},
+			[]string{"Description: ", "the-description"},
+			[]string{"Documentation url: ", "http://documentation.url"},
+		))
 	})
-	It("TestShowUserProvidedServiceOutput", func() {
 
+	It("TestShowUserProvidedServiceOutput", func() {
 		serviceInstance2 := models.ServiceInstance{}
 		serviceInstance2.Name = "service1"
 		serviceInstance2.Guid = "service1-guid"
@@ -115,9 +117,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callShowService([]string{"service1"}, requirementsFactory)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Service instance: ", "service1"},
-			{"Service: ", "user-provided"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Service instance: ", "service1"},
+			[]string{"Service: ", "user-provided"},
+		))
 	})
 })

@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-route command", func() {
@@ -76,14 +77,12 @@ var _ = Describe("delete-route command", func() {
 		It("deletes routes when the user confirms", func() {
 			runCommand("-n", "my-host", "example.com")
 
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Really delete the route my-host"},
-			})
+			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the route my-host"}))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting route", "my-host.example.com"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting route", "my-host.example.com"},
+				[]string{"OK"},
+			))
 			Expect(routeRepo.DeletedRouteGuids).To(Equal([]string{"route-guid"}))
 		})
 
@@ -93,10 +92,10 @@ var _ = Describe("delete-route command", func() {
 
 			Expect(ui.Prompts).To(BeEmpty())
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting", "my-host.example.com"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting", "my-host.example.com"},
+				[]string{"OK"},
+			))
 			Expect(routeRepo.DeletedRouteGuids).To(Equal([]string{"route-guid"}))
 		})
 
@@ -105,13 +104,9 @@ var _ = Describe("delete-route command", func() {
 
 			runCommand("-n", "my-host", "example.com")
 
-			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-				{"my-host", "does not exist"},
-			})
+			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"my-host", "does not exist"}))
 
-			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-				{"OK"},
-			})
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"OK"}))
 		})
 	})
 })

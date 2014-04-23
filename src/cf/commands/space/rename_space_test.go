@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("rename-space command", func() {
@@ -69,10 +70,10 @@ var _ = Describe("rename-space command", func() {
 			originalSpaceName := configRepo.SpaceFields().Name
 			callRenameSpace([]string{"the-old-space-name", "my-new-space"})
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Renaming space", "the-old-space-name", "my-new-space", "my-org", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Renaming space", "the-old-space-name", "my-new-space", "my-org", "my-user"},
+				[]string{"OK"},
+			))
 
 			Expect(spaceRepo.RenameSpaceGuid).To(Equal("the-old-space-guid"))
 			Expect(spaceRepo.RenameNewName).To(Equal("my-new-space"))

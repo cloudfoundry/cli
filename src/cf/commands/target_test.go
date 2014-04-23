@@ -7,11 +7,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
+
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("target command", func() {
@@ -142,10 +144,10 @@ var _ = Describe("target command", func() {
 			Expect(config.SpaceFields().Guid).To(Equal(""))
 
 			Expect(ui.ShowConfigurationCalled).To(BeFalse())
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"Unable to access space", "my-space"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"Unable to access space", "my-space"},
+			))
 		})
 
 		It("fails when the user does not have access to the specified organization", func() {
@@ -154,7 +156,7 @@ var _ = Describe("target command", func() {
 			orgRepo.FindByNameErr = true
 
 			callTarget([]string{"-o", "my-organization"})
-			testassert.SliceContains(ui.Outputs, testassert.Lines{{"FAILED"}})
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			expectOrgToBeCleared()
 			expectSpaceToBeCleared()
 		})
@@ -164,10 +166,10 @@ var _ = Describe("target command", func() {
 
 			callTarget([]string{"-o", "my-organization"})
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"my-organization", "not found"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"my-organization", "not found"},
+			))
 
 			expectOrgToBeCleared()
 			expectSpaceToBeCleared()
@@ -178,10 +180,10 @@ var _ = Describe("target command", func() {
 
 			callTarget([]string{"-s", "my-space"})
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"An org must be targeted before targeting a space"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"An org must be targeted before targeting a space"},
+			))
 
 			expectSpaceToBeCleared()
 		})
@@ -191,10 +193,10 @@ var _ = Describe("target command", func() {
 
 			callTarget([]string{"-s", "my-space"})
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"Unable to access space", "my-space"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"Unable to access space", "my-space"},
+			))
 
 			Expect(config.SpaceFields().Guid).To(Equal(""))
 			Expect(ui.ShowConfigurationCalled).To(BeFalse())
@@ -209,10 +211,10 @@ var _ = Describe("target command", func() {
 			callTarget([]string{"-s", "my-space"})
 
 			expectSpaceToBeCleared()
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"my-space", "not found"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"my-space", "not found"},
+			))
 		})
 	})
 })

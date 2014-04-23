@@ -34,13 +34,14 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testlogs "testhelpers/logs"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"time"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("logs command", func() {
@@ -79,11 +80,11 @@ var _ = Describe("logs command", func() {
 
 		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		Expect(app.Guid).To(Equal(logsRepo.AppLoggedGuid))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
-			{"Log Line 1"},
-			{"Log Line 2"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
+			[]string{"Log Line 1"},
+			[]string{"Log Line 2"},
+		))
 	})
 
 	It("TestLogsEscapeFormattingVerbs", func() {
@@ -101,9 +102,7 @@ var _ = Describe("logs command", func() {
 
 		ui := callLogs([]string{"--recent", "my-app"}, requirementsFactory, logsRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"hello%2Bworld%v"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings([]string{"hello%2Bworld%v"}))
 	})
 
 	It("TestLogsTailsTheAppLogs", func() {
@@ -123,10 +122,10 @@ var _ = Describe("logs command", func() {
 
 		Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		Expect(app.Guid).To(Equal(logsRepo.AppLoggedGuid))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
-			{"Log Line 1"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
+			[]string{"Log Line 1"},
+		))
 	})
 
 	Context("when the loggregator server has an invalid cert", func() {
@@ -144,20 +143,20 @@ var _ = Describe("logs command", func() {
 				logsRepo.TailLogErr = errors.NewInvalidSSLCert("https://example.com", "it don't work good")
 				ui := callLogs([]string{"my-app"}, requirementsFactory, logsRepo)
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Received invalid SSL certificate", "https://example.com"},
-					{"TIP"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Received invalid SSL certificate", "https://example.com"},
+					[]string{"TIP"},
+				))
 			})
 
 			It("informs the user of the error when they include the --recent flag", func() {
 				logsRepo.RecentLogErr = errors.NewInvalidSSLCert("https://example.com", "how does SSL work???")
 				ui := callLogs([]string{"--recent", "my-app"}, requirementsFactory, logsRepo)
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Received invalid SSL certificate", "https://example.com"},
-					{"TIP"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Received invalid SSL certificate", "https://example.com"},
+					[]string{"TIP"},
+				))
 			})
 		})
 	})
@@ -177,9 +176,9 @@ var _ = Describe("logs command", func() {
 		It("tails logs", func() {
 			ui := callLogs(flags, requirementsFactory, logsRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Connected, tailing logs for app", "my-org", "my-space", "my-user"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Connected, tailing logs for app", "my-org", "my-space", "my-user"},
+			))
 		})
 	})
 

@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 	"syscall"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	"testhelpers/maker"
@@ -22,6 +21,8 @@ import (
 	testterm "testhelpers/terminal"
 	testwords "testhelpers/words"
 	"words"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("Push Command", func() {
@@ -133,11 +134,11 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
 				Expect(routeRepo.BoundRouteGuid).To(Equal("my-route-guid"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Using", "my-new-app.foo.cf-app.com"},
-					{"Binding", "my-new-app.foo.cf-app.com"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Using", "my-new-app.foo.cf-app.com"},
+					[]string{"Binding", "my-new-app.foo.cf-app.com"},
+					[]string{"OK"},
+				))
 			})
 		})
 
@@ -166,16 +167,16 @@ var _ = Describe("Push Command", func() {
 
 				Expect(appBitsRepo.UploadedAppGuid).To(Equal("my-new-app-guid"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating app", "my-new-app", "my-org", "my-space"},
-					{"OK"},
-					{"Creating", "my-new-app.foo.cf-app.com"},
-					{"OK"},
-					{"Binding", "my-new-app.foo.cf-app.com"},
-					{"OK"},
-					{"Uploading my-new-app"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating app", "my-new-app", "my-org", "my-space"},
+					[]string{"OK"},
+					[]string{"Creating", "my-new-app.foo.cf-app.com"},
+					[]string{"OK"},
+					[]string{"Binding", "my-new-app.foo.cf-app.com"},
+					[]string{"OK"},
+					[]string{"Uploading my-new-app"},
+					[]string{"OK"},
+				))
 
 				Expect(stopper.AppToStop.Guid).To(Equal(""))
 				Expect(starter.AppToStart.Guid).To(Equal("my-new-app-guid"))
@@ -190,13 +191,11 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.FindByHostAndDomainCalledWith.Host).To(Equal("tims-1st-crazy-app"))
 				Expect(routeRepo.CreatedHost).To(Equal("tims-1st-crazy-app"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating", "tims-1st-crazy-app.foo.cf-app.com"},
-					{"Binding", "tims-1st-crazy-app.foo.cf-app.com"},
-				})
-				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-					{"FAILED"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating", "tims-1st-crazy-app.foo.cf-app.com"},
+					[]string{"Binding", "tims-1st-crazy-app.foo.cf-app.com"},
+				))
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 			})
 
 			It("sets the app params from the flags", func() {
@@ -223,17 +222,17 @@ var _ = Describe("Push Command", func() {
 					"my-new-app",
 				)
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Using", "customLinux"},
-					{"OK"},
-					{"Creating app", "my-new-app"},
-					{"OK"},
-					{"Creating Route", "my-hostname.bar.cf-app.com"},
-					{"OK"},
-					{"Binding", "my-hostname.bar.cf-app.com", "my-new-app"},
-					{"Uploading", "my-new-app"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Using", "customLinux"},
+					[]string{"OK"},
+					[]string{"Creating app", "my-new-app"},
+					[]string{"OK"},
+					[]string{"Creating Route", "my-hostname.bar.cf-app.com"},
+					[]string{"OK"},
+					[]string{"Binding", "my-hostname.bar.cf-app.com", "my-new-app"},
+					[]string{"Uploading", "my-new-app"},
+					[]string{"OK"},
+				))
 
 				Expect(stackRepo.FindByNameName).To(Equal("customLinux"))
 
@@ -282,16 +281,16 @@ var _ = Describe("Push Command", func() {
 					Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
 					Expect(routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
 
-					testassert.SliceContains(ui.Outputs, testassert.Lines{
-						{"Creating app", "my-new-app", "my-org", "my-space"},
-						{"OK"},
-						{"Creating", "my-new-app.shared.cf-app.com"},
-						{"OK"},
-						{"Binding", "my-new-app.shared.cf-app.com"},
-						{"OK"},
-						{"Uploading my-new-app"},
-						{"OK"},
-					})
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating app", "my-new-app", "my-org", "my-space"},
+						[]string{"OK"},
+						[]string{"Creating", "my-new-app.shared.cf-app.com"},
+						[]string{"OK"},
+						[]string{"Binding", "my-new-app.shared.cf-app.com"},
+						[]string{"OK"},
+						[]string{"Uploading my-new-app"},
+						[]string{"OK"},
+					))
 				})
 			})
 
@@ -314,16 +313,16 @@ var _ = Describe("Push Command", func() {
 					Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
 					Expect(routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
 
-					testassert.SliceContains(ui.Outputs, testassert.Lines{
-						{"Creating app", "my-new-app", "my-org", "my-space"},
-						{"OK"},
-						{"Creating", "my-new-app.private.cf-app.com"},
-						{"OK"},
-						{"Binding", "my-new-app.private.cf-app.com"},
-						{"OK"},
-						{"Uploading my-new-app"},
-						{"OK"},
-					})
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating app", "my-new-app", "my-org", "my-space"},
+						[]string{"OK"},
+						[]string{"Creating", "my-new-app.private.cf-app.com"},
+						[]string{"OK"},
+						[]string{"Binding", "my-new-app.private.cf-app.com"},
+						[]string{"OK"},
+						[]string{"Uploading my-new-app"},
+						[]string{"OK"},
+					))
 				})
 			})
 
@@ -368,10 +367,10 @@ var _ = Describe("Push Command", func() {
 
 				callPush("-f", "bad/manifest/path")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"read manifest error"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"read manifest error"},
+				))
 			})
 
 			It("does not fail when the current working directory does not contain a manifest", func() {
@@ -381,15 +380,13 @@ var _ = Describe("Push Command", func() {
 
 				callPush("--no-route", "app-name")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating app", "app-name"},
-					{"OK"},
-					{"Uploading", "app-name"},
-					{"OK"},
-				})
-				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-					{"FAILED"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating app", "app-name"},
+					[]string{"OK"},
+					[]string{"Uploading", "app-name"},
+					[]string{"OK"},
+				))
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 			})
 
 			It("uses the manifest in the current directory by default", func() {
@@ -398,9 +395,7 @@ var _ = Describe("Push Command", func() {
 
 				callPush("-p", "some/relative/path")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Using manifest file", "manifest.yml"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Using manifest file", "manifest.yml"}))
 
 				cwd, _ := os.Getwd()
 				Expect(manifestRepo.ReadManifestArgs.Path).To(Equal(cwd))
@@ -409,10 +404,10 @@ var _ = Describe("Push Command", func() {
 			It("does not use a manifest if the 'no-manifest' flag is passed", func() {
 				callPush("--no-route", "--no-manifest", "app-name")
 
-				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"hacker-manifesto"},
-				})
+				Expect(ui.Outputs).ToNot(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"hacker-manifesto"},
+				))
 
 				Expect(manifestRepo.ReadManifestArgs.Path).To(Equal(""))
 				Expect(*appRepo.CreatedAppParams().Name).To(Equal("app-name"))
@@ -428,12 +423,12 @@ var _ = Describe("Push Command", func() {
 
 				callPush()
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating route", "manifest-host.manifest-example.com"},
-					{"OK"},
-					{"Binding", "manifest-host.manifest-example.com"},
-					{"manifest-app-name"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route", "manifest-host.manifest-example.com"},
+					[]string{"OK"},
+					[]string{"Binding", "manifest-host.manifest-example.com"},
+					[]string{"manifest-app-name"},
+				))
 
 				Expect(*appRepo.CreatedAppParams().Name).To(Equal("manifest-app-name"))
 				Expect(*appRepo.CreatedAppParams().Memory).To(Equal(uint64(128)))
@@ -455,11 +450,11 @@ var _ = Describe("Push Command", func() {
 
 				callPush()
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"Error", "reading", "manifest"},
-					{"buildpack should not be null"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Error", "reading", "manifest"},
+					[]string{"buildpack should not be null"},
+				))
 			})
 
 			It("does not create a route when provided the --no-route flag", func() {
@@ -498,9 +493,7 @@ var _ = Describe("Push Command", func() {
 
 				callPush("worker-app")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"worker-app", "is a worker", "skipping route creation"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"worker-app", "is a worker", "skipping route creation"}))
 				Expect(routeRepo.BoundAppGuid).To(Equal(""))
 				Expect(routeRepo.BoundRouteGuid).To(Equal(""))
 			})
@@ -508,10 +501,10 @@ var _ = Describe("Push Command", func() {
 			It("fails when given an invalid memory limit", func() {
 				callPush("-m", "abcM", "my-new-app")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"invalid", "memory"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"invalid", "memory"},
+				))
 			})
 
 			Context("when a manifest has many apps", func() {
@@ -522,10 +515,10 @@ var _ = Describe("Push Command", func() {
 				It("pushes each app", func() {
 					callPush()
 
-					testassert.SliceContains(ui.Outputs, testassert.Lines{
-						{"Creating", "app1"},
-						{"Creating", "app2"},
-					})
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating", "app1"},
+						[]string{"Creating", "app2"},
+					))
 					Expect(len(appRepo.CreateAppParams)).To(Equal(2))
 
 					firstApp := appRepo.CreateAppParams[0]
@@ -543,12 +536,8 @@ var _ = Describe("Push Command", func() {
 				It("pushes a single app when given the name of a single app in the manifest", func() {
 					callPush("app2")
 
-					testassert.SliceContains(ui.Outputs, testassert.Lines{
-						{"Creating", "app2"},
-					})
-					testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-						{"Creating", "app1"},
-					})
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"Creating", "app2"}))
+					Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Creating", "app1"}))
 					Expect(len(appRepo.CreateAppParams)).To(Equal(1))
 					Expect(*appRepo.CreateAppParams[0].Name).To(Equal("app2"))
 				})
@@ -556,9 +545,7 @@ var _ = Describe("Push Command", func() {
 				It("fails when given the name of an app that is not in the manifest", func() {
 					callPush("non-existant-app")
 
-					testassert.SliceContains(ui.Outputs, testassert.Lines{
-						{"Failed"},
-					})
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"Failed"}))
 					Expect(len(appRepo.CreateAppParams)).To(Equal(0))
 				})
 			})
@@ -667,10 +654,10 @@ var _ = Describe("Push Command", func() {
 		It("re-uploads the app", func() {
 			callPush("existing-app")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Uploading", "existing-app"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Uploading", "existing-app"},
+				[]string{"OK"},
+			))
 		})
 
 		Describe("when the app has a route bound", func() {
@@ -700,9 +687,7 @@ var _ = Describe("Push Command", func() {
 			It("uses the existing route when an app already has it bound", func() {
 				callPush("-d", "example.com", "existing-app")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Using route", "existing-app", "example.com"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Using route", "existing-app", "example.com"}))
 			})
 
 			It("does not add a route to the app if no route-related flags are given", func() {
@@ -723,11 +708,11 @@ var _ = Describe("Push Command", func() {
 
 				callPush("-d", "newdomain.com", "existing-app")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating route", "existing-app.newdomain.com"},
-					{"OK"},
-					{"Binding", "existing-app.newdomain.com"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route", "existing-app.newdomain.com"},
+					[]string{"OK"},
+					[]string{"Binding", "existing-app.newdomain.com"},
+				))
 
 				Expect(domainRepo.FindByNameInOrgName).To(Equal("newdomain.com"))
 				Expect(domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
@@ -742,11 +727,11 @@ var _ = Describe("Push Command", func() {
 
 				callPush("-n", "new-host", "existing-app")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating route", "new-host.example.com"},
-					{"OK"},
-					{"Binding", "new-host.example.com"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route", "new-host.example.com"},
+					[]string{"OK"},
+					[]string{"Binding", "new-host.example.com"},
+				))
 
 				Expect(routeRepo.FindByHostAndDomainCalledWith.Domain.Name).To(Equal("example.com"))
 				Expect(routeRepo.FindByHostAndDomainCalledWith.Host).To(Equal("new-host"))
@@ -772,14 +757,12 @@ var _ = Describe("Push Command", func() {
 
 				callPush("--no-hostname", "existing-app")
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating route", "example.com"},
-					{"OK"},
-					{"Binding", "example.com"},
-				})
-				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-					{"existing-app.example.com"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route", "example.com"},
+					[]string{"OK"},
+					[]string{"Binding", "example.com"},
+				))
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"existing-app.example.com"}))
 
 				Expect(routeRepo.FindByHostAndDomainCalledWith.Domain.Name).To(Equal("example.com"))
 				Expect(routeRepo.FindByHostAndDomainCalledWith.Host).To(Equal(""))
@@ -818,20 +801,20 @@ var _ = Describe("Push Command", func() {
 				Expect(serviceBinder.InstancesToBindTo[2].Name).To(Equal("app2-service"))
 				Expect(serviceBinder.InstancesToBindTo[3].Name).To(Equal("global-service"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Creating", "app1"},
-					{"OK"},
-					{"Binding service", "app1-service", "app1", "my-org", "my-space", "my-user"},
-					{"OK"},
-					{"Binding service", "global-service", "app1", "my-org", "my-space", "my-user"},
-					{"OK"},
-					{"Creating", "app2"},
-					{"OK"},
-					{"Binding service", "app2-service", "app2", "my-org", "my-space", "my-user"},
-					{"OK"},
-					{"Binding service", "global-service", "app2", "my-org", "my-space", "my-user"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating", "app1"},
+					[]string{"OK"},
+					[]string{"Binding service", "app1-service", "app1", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"Binding service", "global-service", "app1", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"Creating", "app2"},
+					[]string{"OK"},
+					[]string{"Binding service", "app2-service", "app2", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"Binding service", "global-service", "app2", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+				))
 			})
 		})
 
@@ -844,7 +827,7 @@ var _ = Describe("Push Command", func() {
 			It("gracefully continues", func() {
 				callPush()
 				Expect(len(serviceBinder.AppsToBind)).To(Equal(4))
-				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{{"FAILED"}})
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Failed"}))
 			})
 		})
 
@@ -857,10 +840,10 @@ var _ = Describe("Push Command", func() {
 
 			It("fails with an error", func() {
 				callPush()
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"Could not find service", "app1-service", "app1"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Could not find service", "app1-service", "app1"},
+				))
 			})
 		})
 
@@ -870,31 +853,31 @@ var _ = Describe("Push Command", func() {
 		It("fails when non-positive value is given for memory limit", func() {
 			callPush("-m", "0G", "my-new-app")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"memory"},
-				{"positive integer"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"memory"},
+				[]string{"positive integer"},
+			))
 		})
 
 		It("fails when non-positive value is given for instances", func() {
 			callPush("-i", "0", "my-new-app")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"instance count"},
-				{"positive integer"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"instance count"},
+				[]string{"positive integer"},
+			))
 		})
 
 		It("fails when non-positive value is given for disk quota", func() {
 			callPush("-k", "-1G", "my-new-app")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"disk quota"},
-				{"positive integer"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"disk quota"},
+				[]string{"positive integer"},
+			))
 		})
 
 		It("fails when a non-numeric start timeout is given", func() {
@@ -902,10 +885,10 @@ var _ = Describe("Push Command", func() {
 
 			callPush("-t", "FooeyTimeout", "my-new-app")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"invalid", "timeout"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"invalid", "timeout"},
+			))
 		})
 	})
 
@@ -917,10 +900,10 @@ var _ = Describe("Push Command", func() {
 			appBitsRepo.CallbackFileCount = 11
 
 			callPush("appName")
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Uploading", "path/to/app"},
-				{"61M", "11 files"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Uploading", "path/to/app"},
+				[]string{"61M", "11 files"},
+			))
 		})
 
 		It("omits the size when there are no files being uploaded", func() {
@@ -929,9 +912,7 @@ var _ = Describe("Push Command", func() {
 			appBitsRepo.CallbackFileCount = 0
 
 			callPush("appName")
-			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-				{"None of your application files have changed", "nothing will be uploaded"},
-			})
+			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"None of your application files have changed", "nothing will be uploaded"}))
 		})
 	})
 
@@ -940,10 +921,10 @@ var _ = Describe("Push Command", func() {
 
 		callPush("app")
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Uploading"},
-			{"FAILED"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Uploading"},
+			[]string{"FAILED"},
+		))
 	})
 
 	Describe("when binding the route fails", func() {
@@ -957,11 +938,11 @@ var _ = Describe("Push Command", func() {
 
 			callPush("existing-app")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"existing-app.foo.cf-app.com", "already in use"},
-				{"TIP", "random-route"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"existing-app.foo.cf-app.com", "already in use"},
+				[]string{"TIP", "random-route"},
+			))
 		})
 
 		It("does not suggest using 'random-route' for other failures", func() {
@@ -969,23 +950,18 @@ var _ = Describe("Push Command", func() {
 
 			callPush("existing-app")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-			})
-
-			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-				{"TIP", "random-route"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"TIP", "random-route"}))
 		})
 	})
 
 	It("fails when neither a manifest nor a name is given", func() {
 		manifestRepo.ReadManifestReturns.Error = errors.New("No such manifest")
 		callPush()
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"App name"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"App name"},
+		))
 	})
 })
 

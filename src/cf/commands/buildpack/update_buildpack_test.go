@@ -30,10 +30,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callUpdateBuildpack(args []string, requirementsFactory *testreq.FakeReqFactory, fakeRepo *testapi.FakeBuildpackRepository,
@@ -76,11 +77,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo, bitsRepo := getRepositories()
 
 		ui := callUpdateBuildpack([]string{"my-buildpack"}, requirementsFactory, repo, bitsRepo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Updating buildpack", "my-buildpack"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Updating buildpack", "my-buildpack"},
+			[]string{"OK"},
+		))
 	})
+
 	It("TestUpdateBuildpackPosition", func() {
 
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
@@ -89,13 +91,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callUpdateBuildpack([]string{"-i", "999", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
 
 		Expect(*repo.UpdateBuildpackArgs.Buildpack.Position).To(Equal(999))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Updating buildpack", "my-buildpack"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Updating buildpack", "my-buildpack"},
+			[]string{"OK"},
+		))
 	})
-	It("TestUpdateBuildpackNoPosition", func() {
 
+	It("TestUpdateBuildpackNoPosition", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 
@@ -103,8 +105,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(repo.UpdateBuildpackArgs.Buildpack.Position).To(BeNil())
 	})
-	It("TestUpdateBuildpackEnabled", func() {
 
+	It("TestUpdateBuildpackEnabled", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 
@@ -117,8 +119,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(fakeUI.Outputs[0]).To(ContainSubstring("my-buildpack"))
 		Expect(fakeUI.Outputs[1]).To(ContainSubstring("OK"))
 	})
-	It("TestUpdateBuildpackDisabled", func() {
 
+	It("TestUpdateBuildpackDisabled", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 
@@ -127,8 +129,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(repo.UpdateBuildpackArgs.Buildpack.Enabled).NotTo(BeNil())
 		Expect(*repo.UpdateBuildpackArgs.Buildpack.Enabled).To(Equal(false))
 	})
-	It("TestUpdateBuildpackNoEnable", func() {
 
+	It("TestUpdateBuildpackNoEnable", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 
@@ -136,8 +138,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(repo.UpdateBuildpackArgs.Buildpack.Enabled).To(BeNil())
 	})
-	It("TestUpdateBuildpackPath", func() {
 
+	It("TestUpdateBuildpackPath", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 
@@ -145,26 +147,26 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(bitsRepo.UploadBuildpackPath).To(Equal("buildpack.zip"))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Updating buildpack", "my-buildpack"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Updating buildpack", "my-buildpack"},
+			[]string{"OK"},
+		))
 	})
-	It("TestUpdateBuildpackWithInvalidPath", func() {
 
+	It("TestUpdateBuildpackWithInvalidPath", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 		bitsRepo.UploadBuildpackErr = true
 
 		ui := callUpdateBuildpack([]string{"-p", "bogus/path", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Updating buildpack", "my-buildpack"},
-			{"FAILED"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Updating buildpack", "my-buildpack"},
+			[]string{"FAILED"},
+		))
 	})
-	It("TestUpdateBuildpackLock", func() {
 
+	It("TestUpdateBuildpackLock", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 
@@ -177,8 +179,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(ui.Outputs[0]).To(ContainSubstring("my-buildpack"))
 		Expect(ui.Outputs[1]).To(ContainSubstring("OK"))
 	})
-	It("TestUpdateBuildpackUnlock", func() {
 
+	It("TestUpdateBuildpackUnlock", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 
@@ -188,8 +190,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(ui.Outputs[0]).To(ContainSubstring("my-buildpack"))
 		Expect(ui.Outputs[1]).To(ContainSubstring("OK"))
 	})
-	It("TestUpdateBuildpackInvalidLockWithBits", func() {
 
+	It("TestUpdateBuildpackInvalidLockWithBits", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 
@@ -197,8 +199,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(ui.Outputs[1]).To(ContainSubstring("FAILED"))
 	})
-	It("TestUpdateBuildpackInvalidUnlockWithBits", func() {
 
+	It("TestUpdateBuildpackInvalidUnlockWithBits", func() {
 		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		repo, bitsRepo := getRepositories()
 

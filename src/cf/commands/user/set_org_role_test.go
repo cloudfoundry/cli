@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callSetOrgRole(args []string, requirementsFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
@@ -66,8 +67,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui = callSetOrgRole([]string{}, requirementsFactory, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
-	It("TestSetOrgRoleRequirements", func() {
 
+	It("TestSetOrgRoleRequirements", func() {
 		requirementsFactory := &testreq.FakeReqFactory{}
 		userRepo := &testapi.FakeUserRepository{}
 
@@ -82,8 +83,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(requirementsFactory.UserUsername).To(Equal("my-user"))
 		Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
 	})
-	It("TestSetOrgRole", func() {
 
+	It("TestSetOrgRole", func() {
 		org := models.Organization{}
 		org.Guid = "my-org-guid"
 		org.Name = "my-org"
@@ -99,10 +100,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callSetOrgRole([]string{"some-user", "some-org", "OrgManager"}, requirementsFactory, userRepo)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
+			[]string{"OK"},
+		))
 		Expect(userRepo.SetOrgRoleUserGuid).To(Equal("my-user-guid"))
 		Expect(userRepo.SetOrgRoleOrganizationGuid).To(Equal("my-org-guid"))
 		Expect(userRepo.SetOrgRoleRole).To(Equal(models.ORG_MANAGER))

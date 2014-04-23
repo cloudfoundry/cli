@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("rename-org command", func() {
@@ -64,10 +65,10 @@ var _ = Describe("rename-org command", func() {
 		It("renames an organization", func() {
 			targetedOrgName := configRepo.OrganizationFields().Name
 			callRenameOrg([]string{"the-old-org-name", "the-new-org-name"})
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Renaming org", "the-old-org-name", "the-new-org-name", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Renaming org", "the-old-org-name", "the-new-org-name", "my-user"},
+				[]string{"OK"},
+			))
 
 			Expect(requirementsFactory.OrganizationName).To(Equal("the-old-org-name"))
 			Expect(orgRepo.RenameOrganizationGuid).To(Equal("the-old-org-guid"))

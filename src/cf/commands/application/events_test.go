@@ -7,12 +7,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"time"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("events command", func() {
@@ -75,12 +76,12 @@ var _ = Describe("events command", func() {
 
 		Expect(eventsRepo.RecentEventsArgs.Limit).To(Equal(uint64(50)))
 		Expect(eventsRepo.RecentEventsArgs.AppGuid).To(Equal("my-app-guid"))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
-			{"time", "event", "actor", "description"},
-			{earlierTimestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "George Clooney", "app instance exited", "78"},
-			{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "Marcel Marceau", "app instance was stopped", "77"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
+			[]string{"time", "event", "actor", "description"},
+			[]string{earlierTimestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "George Clooney", "app instance exited", "78"},
+			[]string{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "Marcel Marceau", "app instance was stopped", "77"},
+		))
 	})
 
 	It("tells the user when an error occurs", func() {
@@ -92,11 +93,11 @@ var _ = Describe("events command", func() {
 
 		runCommand("my-app")
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"events", "my-app"},
-			{"FAILED"},
-			{"welp"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"events", "my-app"},
+			[]string{"FAILED"},
+			[]string{"welp"},
+		))
 	})
 
 	It("tells the user when no events exist for that app", func() {
@@ -106,9 +107,9 @@ var _ = Describe("events command", func() {
 
 		runCommand("my-app")
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"events", "my-app"},
-			{"No events", "my-app"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"events", "my-app"},
+			[]string{"No events", "my-app"},
+		))
 	})
 })

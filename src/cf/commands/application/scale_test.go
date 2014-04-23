@@ -6,12 +6,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	"testhelpers/maker"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("scale command", func() {
@@ -71,31 +72,31 @@ var _ = Describe("scale command", func() {
 		It("fails when non-positive value is given for memory limit", func() {
 			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-m", "0M", "my-app"}), requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"memory"},
-				{"positive integer"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"memory"},
+				[]string{"positive integer"},
+			))
 		})
 
 		It("fails when non-positive value is given for instances", func() {
 			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "-15", "my-app"}), requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"Instance count"},
-				{"positive integer"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"Instance count"},
+				[]string{"positive integer"},
+			))
 		})
 
 		It("fails when non-positive value is given for disk quota", func() {
 			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-k", "-1G", "my-app"}), requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"disk quota"},
-				{"positive integer"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"disk quota"},
+				[]string{"positive integer"},
+			))
 		})
 	})
 
@@ -114,17 +115,15 @@ var _ = Describe("scale command", func() {
 			It("prints a description of the app's limits", func() {
 				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"my-app"}), requirementsFactory)
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Showing", "my-app", "my-org", "my-space", "my-user"},
-					{"OK"},
-					{"memory", "256M"},
-					{"disk", "1G"},
-					{"instances", "42"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Showing", "my-app", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"memory", "256M"},
+					[]string{"disk", "1G"},
+					[]string{"instances", "42"},
+				))
 
-				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-					{"Scaling", "my-app", "my-org", "my-space", "my-user"},
-				})
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Scaling", "my-app", "my-org", "my-space", "my-user"}))
 			})
 		})
 
@@ -152,14 +151,12 @@ var _ = Describe("scale command", func() {
 			It("can set an app's instance count, memory limit and disk limit", func() {
 				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}), requirementsFactory)
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Scaling", "my-app", "my-org", "my-space", "my-user"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Scaling", "my-app", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+				))
 
-				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"This will cause the app to restart", "Are you sure", "my-app"},
-				})
+				Expect(ui.Prompts).To(ContainSubstrings([]string{"This will cause the app to restart", "Are you sure", "my-app"}))
 				Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
 				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 				Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))

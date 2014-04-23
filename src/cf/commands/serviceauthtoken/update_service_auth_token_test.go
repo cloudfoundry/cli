@@ -31,9 +31,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	. "testhelpers/matchers"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
@@ -99,10 +99,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		expectedAuthToken.Provider = "found provider"
 		expectedAuthToken.Token = "a value"
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Updating service auth token as", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Updating service auth token as", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
 		Expect(authTokenRepo.FindByLabelAndProviderProvider).To(Equal("a provider"))

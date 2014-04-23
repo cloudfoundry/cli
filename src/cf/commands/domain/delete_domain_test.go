@@ -8,11 +8,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-domain command", func() {
@@ -71,13 +72,11 @@ var _ = Describe("delete-domain command", func() {
 
 			Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"really delete the domain foo.com"},
-			})
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting domain", "foo.com", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Prompts).To(ContainSubstrings([]string{"really delete the domain foo.com"}))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting domain", "foo.com", "my-user"},
+				[]string{"OK"},
+			))
 		})
 
 		Context("when there is an error deleting the domain", func() {
@@ -90,12 +89,12 @@ var _ = Describe("delete-domain command", func() {
 
 				Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting domain", "foo.com"},
-					{"FAILED"},
-					{"foo.com"},
-					{"failed badly"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting domain", "foo.com"},
+					[]string{"FAILED"},
+					[]string{"foo.com"},
+					[]string{"failed badly"},
+				))
 			})
 		})
 
@@ -109,9 +108,7 @@ var _ = Describe("delete-domain command", func() {
 
 				Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
-				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"delete", "foo.com"},
-				})
+				Expect(ui.Prompts).To(ContainSubstrings([]string{"delete", "foo.com"}))
 
 				Expect(ui.Outputs).To(BeEmpty())
 			})
@@ -127,10 +124,10 @@ var _ = Describe("delete-domain command", func() {
 
 				Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 				Expect(ui.Prompts).To(BeEmpty())
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting domain", "foo.com"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting domain", "foo.com"},
+					[]string{"OK"},
+				))
 			})
 		})
 	})
@@ -145,10 +142,10 @@ var _ = Describe("delete-domain command", func() {
 
 			Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"OK"},
-				{"foo.com", "not found"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"OK"},
+				[]string{"foo.com", "not found"},
+			))
 		})
 	})
 
@@ -162,11 +159,11 @@ var _ = Describe("delete-domain command", func() {
 
 			Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"foo.com"},
-				{"failed badly"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"foo.com"},
+				[]string{"failed badly"},
+			))
 		})
 	})
 })

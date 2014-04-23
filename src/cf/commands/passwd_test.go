@@ -7,11 +7,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("password command", func() {
@@ -41,17 +42,17 @@ var _ = Describe("password command", func() {
 			deps.PwdRepo.UpdateUnauthorized = false
 			ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
 
-			testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
-				{"Current Password"},
-				{"New Password"},
-				{"Verify Password"},
-			})
+			Expect(ui.PasswordPrompts).To(ContainSubstrings(
+				[]string{"Current Password"},
+				[]string{"New Password"},
+				[]string{"Verify Password"},
+			))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Changing password..."},
-				{"OK"},
-				{"Please log in again"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Changing password..."},
+				[]string{"OK"},
+				[]string{"Please log in again"},
+			))
 
 			Expect(deps.PwdRepo.UpdateNewPassword).To(Equal("new-password"))
 			Expect(deps.PwdRepo.UpdateOldPassword).To(Equal("old-password"))
@@ -64,15 +65,16 @@ var _ = Describe("password command", func() {
 		It("fails when the password verification does not match", func() {
 			ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, deps)
 
-			testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
-				{"Current Password"},
-				{"New Password"},
-				{"Verify Password"},
-			})
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"Password verification does not match"},
-			})
+			Expect(ui.PasswordPrompts).To(ContainSubstrings(
+				[]string{"Current Password"},
+				[]string{"New Password"},
+				[]string{"Verify Password"},
+			))
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"Password verification does not match"},
+			))
 
 			Expect(deps.PwdRepo.UpdateNewPassword).To(Equal(""))
 		})
@@ -81,23 +83,22 @@ var _ = Describe("password command", func() {
 			deps.PwdRepo.UpdateUnauthorized = true
 			ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
 
-			testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
-				{"Current Password"},
-				{"New Password"},
-				{"Verify Password"},
-			})
+			Expect(ui.PasswordPrompts).To(ContainSubstrings(
+				[]string{"Current Password"},
+				[]string{"New Password"},
+				[]string{"Verify Password"},
+			))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Changing password..."},
-				{"FAILED"},
-				{"Current password did not match"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Changing password..."},
+				[]string{"FAILED"},
+				[]string{"Current password did not match"},
+			))
 
 			Expect(deps.PwdRepo.UpdateNewPassword).To(Equal("new-password"))
 			Expect(deps.PwdRepo.UpdateOldPassword).To(Equal("old-password"))
 		})
 	})
-
 })
 
 type passwordDeps struct {

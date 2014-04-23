@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callSpaceUsers(args []string, requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
@@ -115,15 +116,15 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("org1-guid"))
 		Expect(userRepo.ListUsersSpaceGuid).To(Equal("space1-guid"))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting users in org", "Org1", "Space1", "my-user"},
-			{"SPACE MANAGER"},
-			{"user1"},
-			{"user2"},
-			{"SPACE DEVELOPER"},
-			{"user4"},
-			{"SPACE AUDITOR"},
-			{"user3"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting users in org", "Org1", "Space1", "my-user"},
+			[]string{"SPACE MANAGER"},
+			[]string{"user1"},
+			[]string{"user2"},
+			[]string{"SPACE DEVELOPER"},
+			[]string{"user4"},
+			[]string{"SPACE AUDITOR"},
+			[]string{"user3"},
+		))
 	})
 })

@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callListServiceAuthTokens(requirementsFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
@@ -76,12 +77,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		authTokenRepo.FindAllAuthTokens = []models.ServiceAuthTokenFields{authToken, authToken2}
 
 		ui := callListServiceAuthTokens(requirementsFactory, authTokenRepo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting service auth tokens as", "my-user"},
-			{"OK"},
-			{"label", "provider"},
-			{"a label", "a provider"},
-			{"a second label", "a second provider"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting service auth tokens as", "my-user"},
+			[]string{"OK"},
+			[]string{"label", "provider"},
+			[]string{"a label", "a provider"},
+			[]string{"a second label", "a second provider"},
+		))
 	})
 })

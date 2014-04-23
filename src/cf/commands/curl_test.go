@@ -9,11 +9,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("curl command", func() {
@@ -50,40 +51,32 @@ var _ = Describe("curl command", func() {
 
 			Expect(deps.curlRepo.Method).To(Equal("GET"))
 			Expect(deps.curlRepo.Path).To(Equal("/foo"))
-			testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
-				{"response for get"},
-			})
-			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"Content-Size:1024"},
-			})
+			Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"response for get"}))
+			Expect(deps.ui.Outputs).ToNot(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"Content-Size:1024"},
+			))
 		})
 
 		It("makes a post request given -X", func() {
 			runCurlWithInputs(deps, []string{"-X", "post", "/foo"})
 
 			Expect(deps.curlRepo.Method).To(Equal("post"))
-			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
-				{"FAILED"},
-			})
+			Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("sends headers given -H", func() {
 			runCurlWithInputs(deps, []string{"-H", "Content-Type:cat", "/foo"})
 
 			Expect(deps.curlRepo.Header).To(Equal("Content-Type:cat"))
-			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
-				{"FAILED"},
-			})
+			Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("sends multiple headers given multiple -H flags", func() {
 			runCurlWithInputs(deps, []string{"-H", "Content-Type:cat", "-H", "Content-Length:12", "/foo"})
 
 			Expect(deps.curlRepo.Header).To(Equal("Content-Type:cat\nContent-Length:12"))
-			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
-				{"FAILED"},
-			})
+			Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("prints out the response headers given -i", func() {
@@ -91,22 +84,18 @@ var _ = Describe("curl command", func() {
 			deps.curlRepo.ResponseBody = "response for get"
 			runCurlWithInputs(deps, []string{"-i", "/foo"})
 
-			testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
-				{"Content-Size:1024"},
-				{"response for get"},
-			})
-			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
-				{"FAILED"},
-			})
+			Expect(deps.ui.Outputs).To(ContainSubstrings(
+				[]string{"Content-Size:1024"},
+				[]string{"response for get"},
+			))
+			Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("sets the request body given -d", func() {
 			runCurlWithInputs(deps, []string{"-d", "body content to upload", "/foo"})
 
 			Expect(deps.curlRepo.Body).To(Equal("body content to upload"))
-			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
-				{"FAILED"},
-			})
+			Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("prints verbose output given the -v flag", func() {
@@ -116,19 +105,17 @@ var _ = Describe("curl command", func() {
 			runCurlWithInputs(deps, []string{"-v", "/foo"})
 			trace.Logger.Print("logging enabled")
 
-			testassert.SliceContains([]string{output.String()}, testassert.Lines{
-				{"logging enabled"},
-			})
+			Expect([]string{output.String()}).To(ContainSubstrings([]string{"logging enabled"}))
 		})
 
 		It("prints a failure message when the response is not success", func() {
 			deps.curlRepo.Error = errors.New("ooops")
 			runCurlWithInputs(deps, []string{"/foo"})
 
-			testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"ooops"},
-			})
+			Expect(deps.ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"ooops"},
+			))
 		})
 	})
 })

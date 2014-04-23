@@ -31,11 +31,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callOrgUsers(args []string, requirementsFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
@@ -105,16 +106,16 @@ var _ = Describe("Listing users in an org", func() {
 		ui := callOrgUsers([]string{"Org1"}, requirementsFactory, userRepo)
 
 		Expect(userRepo.ListUsersOrganizationGuid).To(Equal("found-org-guid"))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting users in org", "Found Org", "my-user"},
-			{"ORG MANAGER"},
-			{"user1"},
-			{"user2"},
-			{"BILLING MANAGER"},
-			{"user4"},
-			{"ORG AUDITOR"},
-			{"user3"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting users in org", "Found Org", "my-user"},
+			[]string{"ORG MANAGER"},
+			[]string{"user1"},
+			[]string{"user2"},
+			[]string{"BILLING MANAGER"},
+			[]string{"user4"},
+			[]string{"ORG AUDITOR"},
+			[]string{"user3"},
+		))
 	})
 
 	It("lists all org users", func() {
@@ -139,11 +140,11 @@ var _ = Describe("Listing users in an org", func() {
 		ui := callOrgUsers([]string{"-a", "Org1"}, requirementsFactory, userRepo)
 
 		Expect(userRepo.ListUsersOrganizationGuid).To(Equal("found-org-guid"))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting users in org", "Found Org", "my-user"},
-			{"USERS"},
-			{"user1"},
-			{"user2"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting users in org", "Found Org", "my-user"},
+			[]string{"USERS"},
+			[]string{"user1"},
+			[]string{"user2"},
+		))
 	})
 })

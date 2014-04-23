@@ -36,13 +36,14 @@ import (
 	. "github.com/onsi/gomega"
 	"os"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testlogs "testhelpers/logs"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"time"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("start command", func() {
@@ -141,12 +142,12 @@ var _ = Describe("start command", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes, requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"my-app", "my-org", "my-space", "my-user"},
-				{"OK"},
-				{"0 of 2 instances running", "2 starting"},
-				{"Started"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"my-app", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+				[]string{"0 of 2 instances running", "2 starting"},
+				[]string{"Started"},
+			))
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
@@ -181,14 +182,14 @@ var _ = Describe("start command", func() {
 
 			ui := callStart([]string{"my-app"}, testconfig.NewRepository(), requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Log Line 2"},
-				{"Log Line 3"},
-			})
-			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-				{"Log Line 1"},
-				{"Log Line 4"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Log Line 2"},
+				[]string{"Log Line 3"},
+			))
+			Expect(ui.Outputs).ToNot(ContainSubstrings(
+				[]string{"Log Line 1"},
+				[]string{"Log Line 4"},
+			))
 		})
 
 		It("TestStartApplicationWhenAppIsStillStaging", func() {
@@ -219,11 +220,11 @@ var _ = Describe("start command", func() {
 
 			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Log Line 1"},
-				{"Log Line 2"},
-				{"0 of 2 instances running", "2 starting"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Log Line 1"},
+				[]string{"Log Line 2"},
+				[]string{"0 of 2 instances running", "2 starting"},
+			))
 		})
 
 		It("displays an error message when staging fails", func() {
@@ -233,12 +234,12 @@ var _ = Describe("start command", func() {
 
 			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"my-app"},
-				{"OK"},
-				{"FAILED"},
-				{"Error staging app"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"my-app"},
+				[]string{"OK"},
+				[]string{"FAILED"},
+				[]string{"Error staging app"},
+			))
 		})
 
 		It("TestStartApplicationWhenOneInstanceFlaps", func() {
@@ -260,13 +261,13 @@ var _ = Describe("start command", func() {
 
 			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"my-app"},
-				{"OK"},
-				{"0 of 2 instances running", "1 starting", "1 failing"},
-				{"FAILED"},
-				{"Start unsuccessful"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"my-app"},
+				[]string{"OK"},
+				[]string{"0 of 2 instances running", "1 starting", "1 failing"},
+				[]string{"FAILED"},
+				[]string{"Start unsuccessful"},
+			))
 		})
 
 		It("tells the user about the failure when waiting for the app to start times out", func() {
@@ -293,15 +294,13 @@ var _ = Describe("start command", func() {
 
 			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Starting", "my-app"},
-				{"OK"},
-				{"FAILED"},
-				{"Start app timeout"},
-			})
-			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-				{"instances running"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Starting", "my-app"},
+				[]string{"OK"},
+				[]string{"FAILED"},
+				[]string{"Start app timeout"},
+			))
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"instances running"}))
 		})
 
 		It("tells the user about the failure when starting the app fails", func() {
@@ -318,11 +317,11 @@ var _ = Describe("start command", func() {
 			requirementsFactory.Application = app
 			ui := callStart(args, config, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"my-app"},
-				{"FAILED"},
-				{"Error updating app."},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"my-app"},
+				[]string{"FAILED"},
+				[]string{"Error updating app."},
+			))
 			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 		})
 
@@ -343,9 +342,7 @@ var _ = Describe("start command", func() {
 			args := []string{"my-app"}
 			ui := callStart(args, config, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"my-app", "is already started"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"my-app", "is already started"}))
 
 			Expect(appRepo.UpdateAppGuid).To(Equal(""))
 		})
@@ -369,10 +366,10 @@ var _ = Describe("start command", func() {
 
 			ui := callStart([]string{"my-app"}, configRepo, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				testassert.Line{"error tailing logs"},
-				testassert.Line{"Ooops"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"error tailing logs"},
+				[]string{"Ooops"},
+			))
 		})
 	})
 })

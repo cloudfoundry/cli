@@ -6,11 +6,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("set-quota command", func() {
@@ -68,10 +69,10 @@ var _ = Describe("set-quota command", func() {
 
 			runCommand("my-org", "my-quota")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Setting quota", "my-quota", "my-org", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Setting quota", "my-quota", "my-org", "my-user"},
+				[]string{"OK"},
+			))
 
 			Expect(quotaRepo.FindByNameCalledWith.Name).To(Equal("my-quota"))
 			Expect(quotaRepo.AssignQuotaToOrgCalledWith.OrgGuid).To(Equal("my-org-guid"))

@@ -7,12 +7,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	"testhelpers/maker"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-space command", func() {
@@ -69,13 +70,11 @@ var _ = Describe("delete-space command", func() {
 		ui.Inputs = []string{"yes"}
 		runCommand("space-to-delete")
 
-		testassert.SliceContains(ui.Prompts, testassert.Lines{
-			{"Really delete the space space-to-delete"},
-		})
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting space", "space-to-delete", "my-org", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the space space-to-delete"}))
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Deleting space", "space-to-delete", "my-org", "my-user"},
+			[]string{"OK"},
+		))
 		Expect(spaceRepo.DeletedSpaceGuid).To(Equal("space-to-delete-guid"))
 		Expect(config.HasSpace()).To(Equal(true))
 	})
@@ -84,10 +83,10 @@ var _ = Describe("delete-space command", func() {
 		runCommand("-f", "space-to-delete")
 
 		Expect(ui.Prompts).To(BeEmpty())
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting", "space-to-delete"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Deleting", "space-to-delete"},
+			[]string{"OK"},
+		))
 		Expect(spaceRepo.DeletedSpaceGuid).To(Equal("space-to-delete-guid"))
 	})
 

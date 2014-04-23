@@ -6,11 +6,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("create-user-provided-service command", func() {
@@ -43,10 +44,10 @@ var _ = Describe("create-user-provided-service command", func() {
 		args := []string{"my-custom-service"}
 		ctxt := testcmd.NewContext("create-user-provided-service", args)
 		testcmd.RunCommand(cmd, ctxt, requirementsFactory)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating user provided service"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user provided service"},
+			[]string{"OK"},
+		))
 	})
 
 	It("accepts service parameters interactively", func() {
@@ -54,11 +55,11 @@ var _ = Describe("create-user-provided-service command", func() {
 		ctxt := testcmd.NewContext("create-user-provided-service", []string{"-p", `"foo, bar, baz"`, "my-custom-service"})
 		testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
-		testassert.SliceContains(ui.Prompts, testassert.Lines{
-			{"foo"},
-			{"bar"},
-			{"baz"},
-		})
+		Expect(ui.Prompts).To(ContainSubstrings(
+			[]string{"foo"},
+			[]string{"bar"},
+			[]string{"baz"},
+		))
 
 		Expect(repo.CreateName).To(Equal("my-custom-service"))
 		Expect(repo.CreateParams).To(Equal(map[string]string{
@@ -67,10 +68,10 @@ var _ = Describe("create-user-provided-service command", func() {
 			"baz": "baz value",
 		}))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating user provided service", "my-custom-service", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user provided service", "my-custom-service", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+		))
 	})
 
 	It("accepts service parameters as JSON without prompting", func() {
@@ -86,10 +87,10 @@ var _ = Describe("create-user-provided-service command", func() {
 			"baz": "baz value",
 		}))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating user provided service"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user provided service"},
+			[]string{"OK"},
+		))
 	})
 
 	It("creates a user provided service with a syslog drain url", func() {
@@ -98,9 +99,9 @@ var _ = Describe("create-user-provided-service command", func() {
 		testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 
 		Expect(repo.CreateDrainUrl).To(Equal("syslog://example.com"))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating user provided service"},
-			{"OK"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user provided service"},
+			[]string{"OK"},
+		))
 	})
 })

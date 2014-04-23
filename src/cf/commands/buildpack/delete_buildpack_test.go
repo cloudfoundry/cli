@@ -7,10 +7,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-buildpack command", func() {
@@ -63,13 +64,11 @@ var _ = Describe("delete-buildpack command", func() {
 
 				Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
-				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"delete the buildpack my-buildpack"},
-				})
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting buildpack", "my-buildpack"},
-					{"OK"},
-				})
+				Expect(ui.Prompts).To(ContainSubstrings([]string{"delete the buildpack my-buildpack"}))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting buildpack", "my-buildpack"},
+					[]string{"OK"},
+				))
 			})
 
 			Context("when the force flag is provided", func() {
@@ -79,10 +78,10 @@ var _ = Describe("delete-buildpack command", func() {
 					Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
 					Expect(len(ui.Prompts)).To(Equal(0))
-					testassert.SliceContains(ui.Outputs, testassert.Lines{
-						{"Deleting buildpack", "my-buildpack"},
-						{"OK"},
-					})
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Deleting buildpack", "my-buildpack"},
+						[]string{"OK"},
+					))
 				})
 			})
 		})
@@ -99,14 +98,12 @@ var _ = Describe("delete-buildpack command", func() {
 				Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
 				Expect(buildpackRepo.FindByNameNotFound).To(BeTrue())
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting", "my-buildpack"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting", "my-buildpack"},
+					[]string{"OK"},
+				))
 
-				testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-					{"my-buildpack", "does not exist"},
-				})
+				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"my-buildpack", "does not exist"}))
 			})
 		})
 
@@ -126,12 +123,12 @@ var _ = Describe("delete-buildpack command", func() {
 
 				Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Deleting buildpack", "my-buildpack"},
-					{"FAILED"},
-					{"my-buildpack"},
-					{"failed badly"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting buildpack", "my-buildpack"},
+					[]string{"FAILED"},
+					[]string{"my-buildpack"},
+					[]string{"failed badly"},
+				))
 			})
 		})
 	})

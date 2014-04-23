@@ -8,11 +8,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
+
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-service-auth-token command", func() {
@@ -59,10 +61,10 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 		It("deletes the service auth token", func() {
 			runCommand("a label", "a provider")
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting service auth token as", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting service auth token as", "my-user"},
+				[]string{"OK"},
+			))
 
 			Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
 			Expect(authTokenRepo.FindByLabelAndProviderProvider).To(Equal("a provider"))
@@ -73,9 +75,9 @@ var _ = Describe("delete-service-auth-token command", func() {
 			ui.Inputs = []string{"nope"}
 			runCommand("a label", "a provider")
 
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Really delete", "service auth token", "a label", "a provider"},
-			})
+			Expect(ui.Prompts).To(ContainSubstrings(
+				[]string{"Really delete", "service auth token", "a label", "a provider"},
+			))
 			Expect(ui.Outputs).To(BeEmpty())
 			Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(models.ServiceAuthTokenFields{}))
 		})
@@ -85,10 +87,10 @@ var _ = Describe("delete-service-auth-token command", func() {
 			runCommand("-f", "a label", "a provider")
 
 			Expect(ui.Prompts).To(BeEmpty())
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting"},
+				[]string{"OK"},
+			))
 
 			Expect(authTokenRepo.DeletedServiceAuthTokenFields.Guid).To(Equal("the-guid"))
 		})
@@ -102,12 +104,12 @@ var _ = Describe("delete-service-auth-token command", func() {
 		It("warns the user when the specified service auth token does not exist", func() {
 			runCommand("a label", "a provider")
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting service auth token as", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting service auth token as", "my-user"},
+				[]string{"OK"},
+			))
 
-			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{{"does not exist"}})
+			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"does not exist"}))
 		})
 	})
 
@@ -118,11 +120,11 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 		It("TestDeleteServiceAuthTokenFailsWithError", func() {
 			runCommand("a label", "a provider")
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting service auth token as", "my-user"},
-				{"FAILED"},
-				{"OH NOES"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting service auth token as", "my-user"},
+				[]string{"FAILED"},
+				[]string{"OH NOES"},
+			))
 		})
 	})
 })

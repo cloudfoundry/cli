@@ -5,9 +5,11 @@ import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	testassert "testhelpers/assert"
+
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("LoginRequirement", func() {
@@ -32,7 +34,7 @@ var _ = Describe("LoginRequirement", func() {
 		success := req.Execute()
 		Expect(success).To(BeFalse())
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{{"Not logged in."}})
+		Expect(ui.Outputs).To(ContainSubstrings([]string{"Not logged in."}))
 	})
 
 	It("fails when given a config with neither an API endpoint nor authentication", func() {
@@ -41,7 +43,7 @@ var _ = Describe("LoginRequirement", func() {
 		success := req.Execute()
 		Expect(success).To(BeFalse())
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{{"No API endpoint"}})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{{"Not logged in."}})
+		Expect(ui.Outputs).To(ContainSubstrings([]string{"No API endpoint"}))
+		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Not logged in."}))
 	})
 })

@@ -6,11 +6,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("stacks command", func() {
@@ -52,11 +53,11 @@ var _ = Describe("stacks command", func() {
 		context := testcmd.NewContext("stacks", []string{})
 		testcmd.RunCommand(cmd, context, requirementsFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting stacks in org", "my-org", "my-space", "my-user"},
-			{"OK"},
-			{"Stack-1", "Stack 1 Description"},
-			{"Stack-2", "Stack 2 Description"},
-		})
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Getting stacks in org", "my-org", "my-space", "my-user"},
+			[]string{"OK"},
+			[]string{"Stack-1", "Stack 1 Description"},
+			[]string{"Stack-2", "Stack 2 Description"},
+		))
 	})
 })

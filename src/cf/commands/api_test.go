@@ -10,11 +10,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "testhelpers/matchers"
 )
 
 func callApi(args []string, config configuration.ReadWriter, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
@@ -43,11 +44,11 @@ var _ = Describe("api command", func() {
 			endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://buttontomatoes.org", "why? no. go away")
 			ui := callApi([]string{"https://buttontomatoes.org"}, config, endpointRepo)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"SSL cert", "https://buttontomatoes.org"},
-				{"TIP", "--skip-ssl-validation"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"SSL cert", "https://buttontomatoes.org"},
+				[]string{"TIP", "--skip-ssl-validation"},
+			))
 		})
 	})
 
@@ -74,9 +75,7 @@ var _ = Describe("api command", func() {
 			})
 
 			It("prints out the api endpoint", func() {
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"https://api.run.pivotal.io", "2.0"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"https://api.run.pivotal.io", "2.0"}))
 			})
 
 			It("should not change the SSL setting in the config", func() {
@@ -88,9 +87,9 @@ var _ = Describe("api command", func() {
 			It("prompts the user to set an endpoint", func() {
 				ui := callApi([]string{}, config, endpointRepo)
 
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"No api endpoint set", fmt.Sprintf("use '%s api' to set an endpoint", cf.Name())},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"No api endpoint set", fmt.Sprintf("use '%s api' to set an endpoint", cf.Name())},
+				))
 			})
 		})
 	})
@@ -122,19 +121,19 @@ var _ = Describe("api command", func() {
 			It("updates the api endpoint with the given url", func() {
 				ui = callApi([]string{"https://example.com"}, config, endpointRepo)
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Setting api endpoint to", "example.com"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Setting api endpoint to", "example.com"},
+					[]string{"OK"},
+				))
 			})
 
 			It("trims trailing slashes from the api endpoint", func() {
 				ui = callApi([]string{"https://example.com/"}, config, endpointRepo)
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Setting api endpoint to", "example.com"},
-					{"OK"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Setting api endpoint to", "example.com"},
+					[]string{"OK"},
+				))
 			})
 		})
 
@@ -147,19 +146,17 @@ var _ = Describe("api command", func() {
 				ui := callApi([]string{"https://example.com"}, config, endpointRepo)
 
 				Expect(config.ApiEndpoint()).To(Equal(""))
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Invalid SSL Cert", "https://example.com"},
-					{"TIP"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Invalid SSL Cert", "https://example.com"},
+					[]string{"TIP"},
+				))
 			})
 		})
 
 		Describe("unencrypted http endpoints", func() {
 			It("warns the user", func() {
 				ui = callApi([]string{"http://example.com"}, config, endpointRepo)
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Warning"},
-				})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Warning"}))
 			})
 		})
 	})

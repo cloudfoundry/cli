@@ -7,9 +7,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	. "testhelpers/matchers"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
@@ -60,15 +60,12 @@ var _ = Describe("delete-service-broker command", func() {
 
 			Expect(brokerRepo.FindByNameName).To(Equal("service-broker-to-delete"))
 			Expect(brokerRepo.DeletedServiceBrokerGuid).To(Equal("service-broker-to-delete-guid"))
-			Expect(len(ui.Outputs)).To(Equal(2))
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Really delete the service-broker service-broker-to-delete"},
-			})
+			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the service-broker service-broker-to-delete"}))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting service broker", "service-broker-to-delete", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting service broker", "service-broker-to-delete", "my-user"},
+				[]string{"OK"},
+			))
 		})
 
 		It("does not prompt when the -f flag is provided", func() {
@@ -78,10 +75,10 @@ var _ = Describe("delete-service-broker command", func() {
 			Expect(brokerRepo.DeletedServiceBrokerGuid).To(Equal("service-broker-to-delete-guid"))
 
 			Expect(ui.Prompts).To(BeEmpty())
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting service broker", "service-broker-to-delete", "my-user"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting service broker", "service-broker-to-delete", "my-user"},
+				[]string{"OK"},
+			))
 		})
 	})
 
@@ -96,14 +93,12 @@ var _ = Describe("delete-service-broker command", func() {
 
 			Expect(brokerRepo.FindByNameName).To(Equal("service-broker-to-delete"))
 			Expect(brokerRepo.DeletedServiceBrokerGuid).To(Equal(""))
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting service broker", "service-broker-to-delete"},
-				{"OK"},
-			})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting service broker", "service-broker-to-delete"},
+				[]string{"OK"},
+			))
 
-			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
-				{"service-broker-to-delete", "does not exist"},
-			})
+			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"service-broker-to-delete", "does not exist"}))
 		})
 	})
 })
