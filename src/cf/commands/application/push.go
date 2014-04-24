@@ -1,6 +1,7 @@
 package application
 
 import (
+	"cf/actors"
 	"cf/api"
 	"cf/command_metadata"
 	"cf/commands/service"
@@ -69,8 +70,9 @@ func (command *Push) Metadata() command_metadata.CommandMetadata {
 		Usage: "Push a single app (with or without a manifest):\n" +
 			"   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n" +
 			"   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n" +
-			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]" +
-			"\n\n   Push multiple apps with a manifest:\n" +
+			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n" +
+			"\n" +
+			"   Push multiple apps with a manifest:\n" +
 			"   CF_NAME push [-f MANIFEST_PATH]\n",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("b", "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"),
@@ -110,13 +112,14 @@ func (cmd *Push) GetRequirements(requirementsFactory requirements.Factory, c *cl
 func (cmd *Push) Run(c *cli.Context) {
 	appSet := cmd.findAndValidateAppsToPush(c)
 	cmd.authRepo.RefreshAuthToken()
+	routeActor := actors.NewRouteActor(cmd.ui, cmd.routeRepo)
+	noHostname := c.Bool("no-hostname")
 
 	for _, appParams := range appSet {
 		cmd.fetchStackGuid(&appParams)
-
 		app := cmd.createOrUpdateApp(appParams)
 
-		cmd.bindAppToRoute(app, appParams, c)
+		cmd.updateRoutes(routeActor, app, appParams, noHostname)
 
 		cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
@@ -133,6 +136,62 @@ func (cmd *Push) Run(c *cli.Context) {
 
 		cmd.restart(app, appParams, c)
 	}
+}
+
+func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Application, appParams models.AppParams, noHostName bool) {
+	defaultRouteAcceptable := len(app.Routes) == 0
+	routeDefined := appParams.Domain != nil || appParams.Host != nil || noHostName
+
+	domain := cmd.findDomain(appParams.Domain)
+	hostname := cmd.hostnameForApp(appParams.Host, appParams.UseRandomHostname, app.Name, noHostName)
+
+	if appParams.NoRoute {
+		cmd.removeRoutes(app, routeActor)
+	} else if routeDefined || defaultRouteAcceptable {
+		route := routeActor.FindOrCreateRoute(hostname, domain)
+		routeActor.BindRoute(app, route)
+	}
+}
+
+func (cmd *Push) removeRoutes(app models.Application, routeActor actors.RouteActor) {
+	if len(app.Routes) == 0 {
+		cmd.ui.Say("App %s is a worker, skipping route creation", terminal.EntityNameColor(app.Name))
+	} else {
+		routeActor.UnbindAll(app)
+	}
+}
+
+func (cmd *Push) hostnameForApp(host *string, useRandomHostName bool, name string, noHostName bool) string {
+	if noHostName {
+		return ""
+	}
+
+	if host != nil {
+		return *host
+	} else if useRandomHostName {
+		return hostNameForString(name) + "-" + cmd.wordGenerator.Babble()
+	} else {
+		return hostNameForString(name)
+	}
+}
+
+var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")
+var whitespaceRegex = regexp.MustCompile(`[\s_]+`)
+
+func hostNameForString(name string) string {
+	name = strings.ToLower(name)
+	name = whitespaceRegex.ReplaceAllString(name, "-")
+	name = forbiddenHostCharRegex.ReplaceAllString(name, "")
+	return name
+}
+
+func (cmd *Push) findDomain(domainName *string) (domain models.DomainFields) {
+	domain, error := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().Guid, domainName)
+	if error != nil {
+		cmd.ui.Failed(error.Error())
+	}
+
+	return
 }
 
 func (cmd *Push) bindAppToServices(services []string, app models.Application) {
@@ -195,89 +254,6 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 	appParams.StackGuid = &stack.Guid
 }
 
-func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams, c *cli.Context) {
-	if params.NoRoute {
-		if len(app.Routes) == 0 {
-			cmd.ui.Say("App %s is a worker, skipping route creation", terminal.EntityNameColor(app.Name))
-		} else {
-			for _, route := range app.Routes {
-				cmd.ui.Say("Removing route %s...", terminal.EntityNameColor(route.URL()))
-				cmd.routeRepo.Unbind(route.Guid, app.Guid)
-			}
-		}
-
-		return
-	}
-
-	routeFlagsPresent := c.String("n") != "" || c.String("d") != "" || c.Bool("no-hostname")
-	if len(app.Routes) > 0 && !routeFlagsPresent {
-		return
-	}
-
-	domain := cmd.findDomain(params)
-	hostname := cmd.hostnameForApp(params, c)
-
-	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostname, domain)
-
-	switch apiErr.(type) {
-	case nil:
-		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
-	case *errors.ModelNotFoundError:
-		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostname)))
-
-		route, apiErr = cmd.routeRepo.Create(hostname, domain.Guid)
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
-		}
-
-		cmd.ui.Ok()
-		cmd.ui.Say("")
-	default:
-		cmd.ui.Failed(apiErr.Error())
-	}
-
-	if !app.HasRoute(route) {
-		cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostname)), terminal.EntityNameColor(app.Name))
-
-		apiErr = cmd.routeRepo.Bind(route.Guid, app.Guid)
-		switch apiErr := apiErr.(type) {
-		case nil:
-			cmd.ui.Ok()
-			cmd.ui.Say("")
-			return
-		case errors.HttpError:
-			if apiErr.ErrorCode() == errors.INVALID_RELATION {
-				cmd.ui.Failed("The route %s is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", route.URL())
-			}
-		}
-		cmd.ui.Failed(apiErr.Error())
-	}
-}
-
-func (cmd Push) hostnameForApp(appParams models.AppParams, c *cli.Context) string {
-	if c.Bool("no-hostname") {
-		return ""
-	}
-
-	if appParams.Host != nil {
-		return *appParams.Host
-	} else if appParams.UseRandomHostname {
-		return hostNameForString(*appParams.Name) + "-" + cmd.wordGenerator.Babble()
-	} else {
-		return hostNameForString(*appParams.Name)
-	}
-}
-
-var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")
-var whitespaceRegex = regexp.MustCompile(`[\s_]+`)
-
-func hostNameForString(name string) string {
-	name = strings.ToLower(name)
-	name = whitespaceRegex.ReplaceAllString(name, "-")
-	name = forbiddenHostCharRegex.ReplaceAllString(name, "")
-	return name
-}
-
 func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli.Context) {
 	if app.State != "stopped" {
 		cmd.ui.Say("")
@@ -297,40 +273,6 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli
 	cmd.appStarter.ApplicationStart(app)
 }
 
-func (cmd *Push) findDomain(appParams models.AppParams) (domain models.DomainFields) {
-	var err error
-	if appParams.Domain != nil {
-		domain, err = cmd.domainRepo.FindByNameInOrg(*appParams.Domain, cmd.config.OrganizationFields().Guid)
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-		}
-	} else {
-		domain, err = cmd.findDefaultDomain()
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-		}
-		if domain.Guid == "" {
-			cmd.ui.Failed("No default domain exists")
-		}
-	}
-
-	return
-}
-
-func (cmd *Push) findDefaultDomain() (models.DomainFields, error) {
-	var foundDomain *models.DomainFields
-	cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().Guid, func(domain models.DomainFields) bool {
-		foundDomain = &domain
-		return !domain.Shared
-	})
-
-	if foundDomain == nil {
-		return models.DomainFields{}, errors.New("Could not find a default domain")
-	}
-
-	return *foundDomain, nil
-}
-
 func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Application) {
 	if appParams.Name == nil {
 		cmd.ui.Failed("Error: No name found for app")
@@ -342,20 +284,15 @@ func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Appli
 	case nil:
 		app = cmd.updateApp(app, appParams)
 	case *errors.ModelNotFoundError:
-		app, apiErr = cmd.createApp(appParams)
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
-			return
-		}
+		app = cmd.createApp(appParams)
 	default:
 		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	return
 }
 
-func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiErr error) {
+func (cmd *Push) createApp(appParams models.AppParams) (app models.Application) {
 	spaceGuid := cmd.config.SpaceFields().Guid
 	appParams.SpaceGuid = &spaceGuid
 
@@ -366,10 +303,9 @@ func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, 
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	app, apiErr = cmd.appRepo.Create(appParams)
+	app, apiErr := cmd.appRepo.Create(appParams)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	cmd.ui.Ok()
@@ -398,7 +334,6 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 	updatedApp, apiErr = cmd.appRepo.Update(app.Guid, appParams)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	cmd.ui.Ok()

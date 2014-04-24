@@ -14,7 +14,7 @@ import (
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error)
-	Create(host, domainGuid string) (createdRoute models.Route, apiErr error)
+	Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error)
 	CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
 	Unbind(routeGuid, appGuid string) (apiErr error)
@@ -61,8 +61,8 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host string, doma
 	return
 }
 
-func (repo CloudControllerRouteRepository) Create(host, domainGuid string) (createdRoute models.Route, apiErr error) {
-	return repo.CreateInSpace(host, domainGuid, repo.config.SpaceFields().Guid)
+func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error) {
+	return repo.CreateInSpace(host, domain.Guid, repo.config.SpaceFields().Guid)
 }
 
 func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {

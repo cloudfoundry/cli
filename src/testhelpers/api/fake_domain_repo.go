@@ -84,3 +84,26 @@ func (repo *FakeDomainRepository) DeleteSharedDomain(domainGuid string) (apiErr 
 	apiErr = repo.DeleteSharedApiResponse
 	return
 }
+
+func (repo *FakeDomainRepository) FirstOrDefault(orgGuid string, name *string) (domain models.DomainFields, error error) {
+	if name == nil {
+		domain, error = repo.defaultDomain(orgGuid)
+	} else {
+		domain, error = repo.FindByNameInOrg(*name, orgGuid)
+	}
+	return
+}
+
+func (repo *FakeDomainRepository) defaultDomain(orgGuid string) (models.DomainFields, error) {
+	var foundDomain *models.DomainFields
+	repo.ListDomainsForOrg(orgGuid, func(domain models.DomainFields) bool {
+		foundDomain = &domain
+		return !domain.Shared
+	})
+
+	if foundDomain == nil {
+		return models.DomainFields{}, errors.New("Could not find a default domain")
+	}
+
+	return *foundDomain, nil
+}

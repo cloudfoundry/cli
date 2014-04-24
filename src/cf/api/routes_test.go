@@ -150,7 +150,7 @@ var _ = Describe("route repository", func() {
 			})
 			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.Create("my-cool-app", "my-domain-guid")
+			createdRoute, apiErr := repo.Create("my-cool-app", models.DomainFields{Guid: "my-domain-guid"})
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
