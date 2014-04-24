@@ -65,11 +65,13 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host string, domain models.
 	return
 }
 
-func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute models.Route, apiErr error) {
+func (repo *FakeRouteRepository) Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error) {
 	repo.CreatedHost = host
-	repo.CreatedDomainGuid = domainGuid
+	repo.CreatedDomainGuid = domain.Guid
 
 	createdRoute.Guid = host + "-route-guid"
+	createdRoute.Domain = domain
+	createdRoute.Host = host
 
 	return
 }

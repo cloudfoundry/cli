@@ -19,6 +19,7 @@ type DomainRepository interface {
 	CreateSharedDomain(domainName string) (apiErr error)
 	Delete(domainGuid string) (apiErr error)
 	DeleteSharedDomain(domainGuid string) (apiErr error)
+	FirstOrDefault(orgGuid string, name *string) (domain models.DomainFields, error error)
 }
 
 type CloudControllerDomainRepository struct {
@@ -136,4 +137,27 @@ func (repo CloudControllerDomainRepository) Delete(domainGuid string) error {
 func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) error {
 	return repo.gateway.DeleteResource(
 		repo.config.ApiEndpoint() + repo.strategy.DeleteSharedDomainURL(domainGuid))
+}
+
+func (repo CloudControllerDomainRepository) FirstOrDefault(orgGuid string, name *string) (domain models.DomainFields, error error) {
+	if name == nil {
+		domain, error = repo.defaultDomain(orgGuid)
+	} else {
+		domain, error = repo.FindByNameInOrg(*name, orgGuid)
+	}
+	return
+}
+
+func (repo CloudControllerDomainRepository) defaultDomain(orgGuid string) (models.DomainFields, error) {
+	var foundDomain *models.DomainFields
+	repo.ListDomainsForOrg(orgGuid, func(domain models.DomainFields) bool {
+		foundDomain = &domain
+		return !domain.Shared
+	})
+
+	if foundDomain == nil {
+		return models.DomainFields{}, errors.New("Could not find a default domain")
+	}
+
+	return *foundDomain, nil
 }
