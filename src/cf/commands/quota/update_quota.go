@@ -74,9 +74,9 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 	}
 
 	if c.String("m") != "" {
-		memory, err := formatters.ToMegabytes(c.String("m"))
+		memory, formatError := formatters.ToMegabytes(c.String("m"))
 
-		if err != nil {
+		if formatError != nil {
 			cmd.ui.FailWithUsage(c, "update-quota")
 		}
 
