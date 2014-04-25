@@ -113,18 +113,17 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 	}
 
 	if updateBuildpack {
-		buildpack, apiErr := cmd.buildpackRepo.Update(buildpack)
+		newBuildpack, apiErr := cmd.buildpackRepo.Update(buildpack)
 		if apiErr != nil {
 			cmd.ui.Failed("Error updating buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiErr.Error())
-			return
 		}
+		buildpack = newBuildpack
 	}
 
 	if dir != "" {
 		apiErr := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
 		if apiErr != nil {
 			cmd.ui.Failed("Error uploading buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiErr.Error())
-			return
 		}
 	}
 	cmd.ui.Ok()

@@ -59,18 +59,20 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 		} else {
 			buildpackFileName = filepath.Base(buildpackLocation)
 
-			stats, err := os.Stat(buildpackLocation)
-			if err != nil {
-				apiErr = errors.NewWithError("Error opening buildpack file", err)
+			stats, statError := os.Stat(buildpackLocation)
+			if statError != nil {
+				apiErr = errors.NewWithError("Error opening buildpack file", statError)
+				err = statError
 				return
 			}
 
 			if stats.IsDir() {
 				err = repo.zipper.Zip(buildpackLocation, zipFileToUpload)
 			} else {
-				specifiedFile, err := os.Open(buildpackLocation)
-				if err != nil {
-					apiErr = errors.NewWithError("Couldn't open buildpack file", err)
+				specifiedFile, openError := os.Open(buildpackLocation)
+				if openError != nil {
+					apiErr = errors.NewWithError("Couldn't open buildpack file", openError)
+					err = openError
 					return
 				}
 				err = normalizeBuildpackArchive(specifiedFile, zipFileToUpload)
