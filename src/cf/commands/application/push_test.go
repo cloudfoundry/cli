@@ -687,18 +687,42 @@ var _ = Describe("Push Command", func() {
 			It("uses the existing route when an app already has it bound", func() {
 				callPush("-d", "example.com", "existing-app")
 
+				Expect(routeRepo.CreatedHost).To(Equal(""))
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Creating route"}))
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"Using route", "existing-app", "example.com"}))
 			})
 
-			It("does not add a route to the app if no route-related flags are given", func() {
-				callPush("existing-app")
+			Context("and no route-related flags are given", func() {
+				Context("and there is no route in the manifest", func() {
+					It("does not add a route to the app", func() {
+						callPush("existing-app")
 
-				Expect(appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
-				Expect(domainRepo.FindByNameInOrgName).To(Equal(""))
-				Expect(routeRepo.FindByHostAndDomainCalledWith.Domain.Name).To(Equal(""))
-				Expect(routeRepo.FindByHostAndDomainCalledWith.Host).To(Equal(""))
-				Expect(routeRepo.CreatedHost).To(Equal(""))
-				Expect(routeRepo.CreatedDomainGuid).To(Equal(""))
+						Expect(appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
+						Expect(domainRepo.FindByNameInOrgName).To(Equal(""))
+						Expect(routeRepo.FindByHostAndDomainCalledWith.Domain.Name).To(Equal(""))
+						Expect(routeRepo.FindByHostAndDomainCalledWith.Host).To(Equal(""))
+						Expect(routeRepo.CreatedHost).To(Equal(""))
+						Expect(routeRepo.CreatedDomainGuid).To(Equal(""))
+					})
+				})
+
+				Context("and there is a route in the manifest", func() {
+					BeforeEach(func() {
+						manifestRepo.ReadManifestReturns.Manifest = existingAppManifest()
+
+						routeRepo.FindByHostAndDomainReturns.Error = errors.NewModelNotFoundError("Org", "uh oh")
+
+						domainRepo.FindByNameInOrgDomain = models.DomainFields{
+							Name: "example.com",
+							Guid: "example-domain-guid",
+						}
+					})
+
+					It("adds the route", func() {
+						callPush("existing-app")
+						Expect(routeRepo.CreatedHost).To(Equal("new-manifest-host"))
+					})
+				})
 			})
 
 			It("creates and binds a route when a different domain is specified", func() {
@@ -964,6 +988,32 @@ var _ = Describe("Push Command", func() {
 		))
 	})
 })
+
+func existingAppManifest() *manifest.Manifest {
+	return &manifest.Manifest{
+		Path: "manifest.yml",
+		Data: generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				generic.NewMap(map[interface{}]interface{}{
+					"name":      "manifest-app-name",
+					"memory":    "128MB",
+					"instances": 1,
+					"host":      "new-manifest-host",
+					"domain":    "example.com",
+					"stack":     "custom-stack",
+					"timeout":   360,
+					"buildpack": "some-buildpack",
+					"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
+					"path":      filepath.Clean("some/path/from/manifest"),
+					"env": generic.NewMap(map[interface{}]interface{}{
+						"FOO":  "baz",
+						"PATH": "/u/apps/my-app/bin",
+					}),
+				}),
+			},
+		}),
+	}
+}
 
 func singleAppManifest() *manifest.Manifest {
 	return &manifest.Manifest{
