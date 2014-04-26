@@ -69,7 +69,7 @@ func (cmd *RenameService) Run(c *cli.Context) {
 		if httpError, ok := err.(errors.HttpError); ok && httpError.ErrorCode() == errors.SERVICE_INSTANCE_NAME_TAKEN {
 			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", httpError.Error(), cf.Name())
 		} else {
-			cmd.ui.Failed(httpError.Error())
+			cmd.ui.Failed(err.Error())
 		}
 	}
 

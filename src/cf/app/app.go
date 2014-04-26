@@ -92,6 +92,7 @@ func getCommand(metadata command_metadata.CommandMetadata, runner command_runner
 		Action: func(context *cli.Context) {
 			runner.RunCmdByName(metadata.Name, context)
 		},
-		Flags: metadata.Flags,
+		Flags:           metadata.Flags,
+		SkipFlagParsing: true,
 	}
 }
