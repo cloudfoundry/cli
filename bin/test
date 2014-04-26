@@ -26,10 +26,11 @@
   bin/go test cf/... generic/... -parallel 4 $@
 
   echo -e "\n Vetting packages for potential issues..."
-  for file in $(find src/{cf,fileutils,generic,glob,main,testhelpers,words} \( -name "*.go" -not -iname "*test.go" \))
-  do
-    go tool vet -all -shadow=true $file
-  done
+  bin/go tool vet src/cf/.
+# for file in $(find src/{cf,fileutils,generic,glob,main,testhelpers,words} \( -name "*.go" -not -iname "*test.go" \))
+# do
+#   go tool vet -all -shadow=true $file
+# done
 
   echo -e "\n Running build script to confirm everything compiles..."
   bin/build
