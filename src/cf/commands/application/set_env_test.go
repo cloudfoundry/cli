@@ -123,6 +123,28 @@ var _ = Describe("set-env command", func() {
 			})
 		})
 
+		XIt("allows the variable value to begin with a hyphen", func() {
+			args = []string{"my-app", "MY_VAR", "--has-a-cool-value"}
+			ui := callSetEnv(args, requirementsFactory, appRepo)
+
+			Expect(len(ui.Outputs)).To(Equal(3))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{
+					"Setting env variable",
+					"MY_VAR",
+					"--has-a-cool-value",
+				},
+				[]string{"OK"},
+				[]string{"TIP"},
+			))
+
+			Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
+			Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
+				"MY_VAR": "--has-a-cool-value",
+				"foo":    "bar",
+			}))
+		})
+
 		Context("when setting fails", func() {
 			BeforeEach(func() {
 				appRepo.UpdateErr = true

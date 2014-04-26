@@ -19,20 +19,21 @@ type SetEnv struct {
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewSetEnv(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *SetEnv) {
-	cmd = new(SetEnv)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appRepo = appRepo
-	return
+func NewSetEnv(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) *SetEnv {
+	return &SetEnv{
+		ui:      ui,
+		config:  config,
+		appRepo: appRepo,
+	}
 }
 
 func (command *SetEnv) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "set-env",
-		ShortName:   "se",
-		Description: "Set an env variable for an app",
-		Usage:       "CF_NAME set-env APP NAME VALUE",
+		Name:            "set-env",
+		ShortName:       "se",
+		Description:     "Set an env variable for an app",
+		Usage:           "CF_NAME set-env APP NAME VALUE",
+		SkipFlagParsing: true,
 	}
 }
 

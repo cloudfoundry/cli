@@ -91,7 +91,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 
 	space, err := cmd.spaceRepo.Create(spaceName, orgGuid)
 	if err != nil {
-		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.SPACE_EXISTS {
+		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SPACE_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Space %s already exists", spaceName)
 			return
