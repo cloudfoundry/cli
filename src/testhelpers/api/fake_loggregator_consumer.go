@@ -11,8 +11,9 @@ type FakeLoggregatorConsumer struct {
 	}
 
 	RecentReturns struct {
-		Messages []*logmessage.LogMessage
-		Err      error
+		Messages  []*logmessage.LogMessage
+		Err       []error
+		callIndex int
 	}
 
 	TailFunc func(appGuid, token string) (<-chan *logmessage.LogMessage, error)
@@ -34,7 +35,13 @@ func (c *FakeLoggregatorConsumer) Recent(appGuid string, authToken string) ([]*l
 	c.RecentCalledWith.AppGuid = appGuid
 	c.RecentCalledWith.AuthToken = authToken
 
-	return c.RecentReturns.Messages, c.RecentReturns.Err
+	var err error
+	if c.RecentReturns.callIndex < len(c.RecentReturns.Err) {
+		err = c.RecentReturns.Err[c.RecentReturns.callIndex]
+		c.RecentReturns.callIndex++
+	}
+
+	return c.RecentReturns.Messages, err
 }
 
 func (c *FakeLoggregatorConsumer) Close() error {
