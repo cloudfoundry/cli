@@ -7,7 +7,6 @@ import (
 	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"fmt"
 	"github.com/codegangsta/cli"
 )
 
