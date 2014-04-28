@@ -79,7 +79,6 @@ func (cmd *DeleteQuota) Run(c *cli.Context) {
 
 	apiErr = cmd.quotaRepo.Delete(quota.Guid)
 	if apiErr != nil {
-		fmt.Println("Failed to delete")
 		cmd.ui.Failed(apiErr.Error())
 	}
 
