@@ -1,28 +1,3 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/cf/commands/application/delete_app_test.go
-   src/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package models_test
 
 import (
@@ -31,8 +6,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("DomainFields", func() {
 	var route Route
+
 	BeforeEach(func() {
 		route = Route{}
 
@@ -41,13 +17,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		route.Domain = domain
 	})
 
-	It("TestRouteURL", func() {
+	It("uses the hostname as part of the URL", func() {
 		route.Host = "foo"
 		Expect(route.URL()).To(Equal("foo.example.com"))
 	})
 
-	It("TestRouteURLWithoutHost", func() {
-		route.Host = ""
+	It("omits the hostname when none is given", func() {
 		Expect(route.URL()).To(Equal("example.com"))
 	})
 })
