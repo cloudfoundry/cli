@@ -16,13 +16,14 @@ type LogsRepository interface {
 }
 
 type LoggregatorLogsRepository struct {
-	consumer     consumer.LoggregatorConsumer
-	config       configuration.Reader
-	TrustedCerts []tls.Certificate
+	consumer       consumer.LoggregatorConsumer
+	config         configuration.Reader
+	TrustedCerts   []tls.Certificate
+	tokenRefresher TokenRefresher
 }
 
-func NewLoggregatorLogsRepository(config configuration.Reader, consumer consumer.LoggregatorConsumer) LoggregatorLogsRepository {
-	return LoggregatorLogsRepository{config: config, consumer: consumer}
+func NewLoggregatorLogsRepository(config configuration.Reader, consumer consumer.LoggregatorConsumer, refresher TokenRefresher) LoggregatorLogsRepository {
+	return LoggregatorLogsRepository{config: config, consumer: consumer, tokenRefresher: refresher}
 }
 
 func (repo LoggregatorLogsRepository) Close() {
@@ -31,6 +32,16 @@ func (repo LoggregatorLogsRepository) Close() {
 
 func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
 	messages, err := repo.consumer.Recent(appGuid, repo.config.AccessToken())
+
+	switch err.(type) {
+	case nil: // do nothing
+	case *consumer.UnauthorizedError:
+		repo.tokenRefresher.RefreshAuthToken()
+		messages, err = repo.consumer.Recent(appGuid, repo.config.AccessToken())
+	default:
+		return messages, err
+	}
+
 	consumer.SortRecent(messages)
 	return messages, err
 }
@@ -43,7 +54,12 @@ func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, bufferTime tim
 
 	repo.consumer.SetOnConnectCallback(onConnect)
 	logChan, err := repo.consumer.Tail(appGuid, repo.config.AccessToken())
-	if err != nil {
+	switch err.(type) {
+	case nil: // do nothing
+	case *consumer.UnauthorizedError:
+		repo.tokenRefresher.RefreshAuthToken()
+		logChan, err = repo.consumer.Tail(appGuid, repo.config.AccessToken())
+	default:
 		return err
 	}
 

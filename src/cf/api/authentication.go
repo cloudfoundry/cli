@@ -12,9 +12,13 @@ import (
 	"strings"
 )
 
-type AuthenticationRepository interface {
-	Authenticate(credentials map[string]string) (apiErr error)
+type TokenRefresher interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
+}
+
+type AuthenticationRepository interface {
+	RefreshAuthToken() (updatedToken string, apiErr error)
+	Authenticate(credentials map[string]string) (apiErr error)
 	GetLoginPromptsAndSaveUAAServerURL() (map[string]configuration.AuthPrompt, error)
 }
 

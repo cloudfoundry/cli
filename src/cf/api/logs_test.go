@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/errors"
 	"code.google.com/p/gogoprotobuf/proto"
+	"github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,9 +16,10 @@ import (
 
 var _ = Describe("loggregator logs repository", func() {
 	var (
-		fakeConsumer *testapi.FakeLoggregatorConsumer
-		logsRepo     *LoggregatorLogsRepository
-		configRepo   configuration.ReadWriter
+		fakeConsumer       *testapi.FakeLoggregatorConsumer
+		logsRepo           LoggregatorLogsRepository
+		configRepo         configuration.ReadWriter
+		fakeTokenRefresher *testapi.FakeAuthenticationRepository
 	)
 
 	BeforeEach(func() {
@@ -25,14 +27,30 @@ var _ = Describe("loggregator logs repository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
 		configRepo.SetAccessToken("the-access-token")
-		repo := NewLoggregatorLogsRepository(configRepo, fakeConsumer)
-		logsRepo = &repo
+		fakeTokenRefresher = &testapi.FakeAuthenticationRepository{}
+
+		logsRepo = NewLoggregatorLogsRepository(configRepo, fakeConsumer, fakeTokenRefresher)
 	})
 
 	Describe("RecentLogsFor", func() {
+		Context("when a LoggregatorConsumer.UnauthorizedError occurs", func() {
+			BeforeEach(func() {
+				fakeConsumer.RecentReturns.Err = []error{
+					loggregator_consumer.NewUnauthorizedError("i'm sorry dave"),
+					nil,
+				}
+			})
+
+			It("refreshes the access token", func() {
+				_, err := logsRepo.RecentLogsFor("app-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeTokenRefresher.RefreshTokenCalled).To(BeTrue())
+			})
+		})
+
 		Context("when an error occurs", func() {
 			BeforeEach(func() {
-				fakeConsumer.RecentReturns.Err = errors.New("oops")
+				fakeConsumer.RecentReturns.Err = []error{errors.New("oops")}
 			})
 
 			It("returns the error", func() {
@@ -73,10 +91,28 @@ var _ = Describe("loggregator logs repository", func() {
 			})
 
 			It("returns an error", func() {
-				err := logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() {}, func(*logmessage.LogMessage) {
-
-				})
+				err := logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() {}, func(*logmessage.LogMessage) {})
 				Expect(err).To(Equal(errors.New("oops")))
+			})
+		})
+
+		Context("when a LoggregatorConsumer.UnauthorizedError occurs", func() {
+
+			It("refreshes the access token", func(done Done) {
+				calledOnce := false
+				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+					if !calledOnce {
+						calledOnce = true
+						return nil, loggregator_consumer.NewUnauthorizedError("i'm sorry dave")
+					} else {
+						close(done)
+						return nil, nil
+					}
+				}
+
+				err := logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() {}, func(*logmessage.LogMessage) {})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeTokenRefresher.RefreshTokenCalled).To(BeTrue())
 			})
 		})
 
