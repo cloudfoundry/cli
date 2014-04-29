@@ -1,3 +1,12 @@
+## v6.1.1
+- New quota CRUD commands for admins
+- Only ignore `manifest.yml` at the app root directory [#70044992]
+- Updating loggregator library experimental support for proxies [#70022322]
+- Provide a `--sso` flag to `cf login` for SAML [#69963402, #69963432]
+- Do not use deprecated domain endpoints in `cf push` [#69827262]
+- Display `X-Cf-Warnings` at the end of all commands [#69300730]
+* Add an `actor` column to the `cf events` table [#68771710]
+
 ## v6.1.0
 * Refresh auth token at the beginning of 'cf push' [#69034628]
 * 'cf routes' should have an org and space requirement [#68917070]
