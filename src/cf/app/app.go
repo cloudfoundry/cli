@@ -93,6 +93,6 @@ func getCommand(metadata command_metadata.CommandMetadata, runner command_runner
 			runner.RunCmdByName(metadata.Name, context)
 		},
 		Flags:           metadata.Flags,
-		SkipFlagParsing: true,
+		SkipFlagParsing: metadata.SkipFlagParsing,
 	}
 }
