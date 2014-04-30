@@ -1,6 +1,7 @@
 package matchers
 
 import (
+	"cf/terminal"
 	"fmt"
 	"github.com/onsi/gomega"
 	"strings"
@@ -25,7 +26,7 @@ func (matcher SliceMatcher) Match(actual interface{}) (success bool, err error) 
 	for _, actualValue := range actualStrings {
 		allStringsFound := true
 		for _, expectedValue := range matcher.expected[matcher.failedAtIndex] {
-			allStringsFound = allStringsFound && strings.Contains(strings.ToLower(actualValue), strings.ToLower(expectedValue))
+			allStringsFound = allStringsFound && strings.Contains(terminal.Decolorize(strings.ToLower(actualValue)), strings.ToLower(expectedValue))
 		}
 
 		if allStringsFound {
