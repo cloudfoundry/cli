@@ -4,17 +4,20 @@ import (
 	"bytes"
 	"cf"
 	"cf/api"
-	. "cf/app"
 	"cf/command_factory"
 	"cf/command_metadata"
 	"cf/net"
 	"cf/trace"
 	"github.com/codegangsta/cli"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"strings"
 	testconfig "testhelpers/configuration"
 	testmanifest "testhelpers/manifest"
 	testterm "testhelpers/terminal"
+
+	. "cf/app"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "testhelpers/matchers"
 )
 
 var expectedCommandNames = []string{
@@ -59,7 +62,10 @@ var _ = Describe("App", func() {
 			trace.EnableTrace()
 
 			app := NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
-			Expect(output.String()).To(ContainSubstring("VERSION:\n" + cf.Version))
+			Expect(strings.Split(output.String(), "\n")).To(ContainSubstrings(
+				[]string{"VERSION:"},
+				[]string{cf.Version},
+			))
 
 			app.Run([]string{"", cmdName})
 			Expect(cmdRunner.cmdName).To(Equal(cmdName))
