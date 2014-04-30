@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+  echo "Need to set AWS_ACCESS_KEY_ID"
+  exit 1
+fi
+
+if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+  echo "Need to set AWS_SECRET_ACCESS_KEY"
+  exit 1
+fi
+
+root_dir=$(cd $(dirname $0) && pwd)/..
+s3_config_file=$root_dir/ci/s3cfg
+
+function upload_artifacts {
+  s3_path_prefix=$1
+
+  for file in $(ls release)
+  do
+    echo s3cmd --config=$s3_config_file put release/$file s3://go-cli/$s3_path_prefix/$file
+    s3cmd --config=$s3_config_file put release/$file s3://go-cli/$s3_path_prefix/$file
+  done
+}
+
+release_tags=$(git show-ref --tags -d | grep $(git rev-parse HEAD) | cut -d'/' -f3 | egrep 'v[0-9]'; exit 0)
+latest_release_tag=$(git tag | egrep 'v[0-9]' | sort | tail -n 1; exit 0)
+
+for tag in $release_tags
+do
+  echo "Uploading artifacts for release" $tag
+  upload_artifacts "releases/$tag"
+done
+
+# Only upload to the 'latest' bucket if we're building some
+# commit *after* the latest release
+
+# this tries to avoid uploading a release to the "latest" bucket if we're
+# actually building an older tag, which would result in us overwriting the
+# edge build with an older version.
+git merge-base --is-ancestor $latest_release_tag HEAD
+if [ $? -eq 0 ]
+then
+  echo "Uploading master artifacts"
+  upload_artifacts "master"
+fi
