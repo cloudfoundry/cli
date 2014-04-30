@@ -40,6 +40,9 @@ var _ = Describe("factory", func() {
 			if strings.HasSuffix(path, "_test.go") || info.IsDir() {
 				return nil
 			}
+			if strings.HasSuffix(path, ".test") {
+				return nil
+			}
 
 			extension := filepath.Ext(info.Name())
 			expectedCommandName := strings.Replace(info.Name()[0:len(info.Name())-len(extension)], "_", "-", -1)
@@ -51,7 +54,7 @@ var _ = Describe("factory", func() {
 				}
 			}
 
-			Expect(matchingCount).To(Equal(1))
+			Expect(matchingCount).To(Equal(1), "this command is not tested: "+info.Name())
 			return nil
 		})
 
