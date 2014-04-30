@@ -40,3 +40,5 @@ release/*
 tmp/
 
 .hg/
+
+*.test
