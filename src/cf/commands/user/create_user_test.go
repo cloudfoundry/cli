@@ -61,7 +61,7 @@ var _ = Describe("Create user command", func() {
 			[]string{"already exists"},
 		))
 
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Failed"}))
+		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("fails when no arguments are passed", func() {

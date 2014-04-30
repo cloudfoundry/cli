@@ -58,8 +58,8 @@ var _ = Describe("create-quota command", func() {
 			runCommand("my-quota")
 			Expect(quotaRepo.CreateCalledWith.Name).To(Equal("my-quota"))
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"creating quota", "my-quota", "my-user", "..."},
-				[]string{"Ok"},
+				[]string{"Creating quota", "my-quota", "my-user", "..."},
+				[]string{"OK"},
 			))
 		})
 
@@ -105,7 +105,7 @@ var _ = Describe("create-quota command", func() {
 				runCommand("my-quota")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"creating quota", "my-quota"},
+					[]string{"Creating quota", "my-quota"},
 					[]string{"FAILED"},
 				))
 			})

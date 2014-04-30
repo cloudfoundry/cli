@@ -84,8 +84,8 @@ var _ = Describe("scale command", func() {
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"FAILED"},
-				[]string{"Instance count"},
-				[]string{"positive integer"},
+				[]string{"Invalid instance count"},
+				[]string{"must be a positive integer"},
 			))
 		})
 

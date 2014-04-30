@@ -46,7 +46,7 @@ var _ = Describe("api command", func() {
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"FAILED"},
-				[]string{"SSL cert", "https://buttontomatoes.org"},
+				[]string{"SSL Cert", "https://buttontomatoes.org"},
 				[]string{"TIP", "--skip-ssl-validation"},
 			))
 		})
@@ -88,7 +88,7 @@ var _ = Describe("api command", func() {
 				ui := callApi([]string{}, config, endpointRepo)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"No api endpoint set", fmt.Sprintf("use '%s api' to set an endpoint", cf.Name())},
+					[]string{"No api endpoint set", fmt.Sprintf("Use '%s api' to set an endpoint", cf.Name())},
 				))
 			})
 		})

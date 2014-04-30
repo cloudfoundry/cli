@@ -1,17 +1,18 @@
 package quota_test
 
 import (
-	. "cf/commands/quota"
 	"cf/errors"
 	"cf/models"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
 	"testhelpers/configuration"
-	. "testhelpers/matchers"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "cf/commands/quota"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-quota command", func() {
@@ -74,8 +75,8 @@ var _ = Describe("delete-quota command", func() {
 				))
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"deleting quota", "my-quota", "my-user"},
-					[]string{"Ok"},
+					[]string{"Deleting quota", "my-quota", "my-user"},
+					[]string{"OK"},
 				))
 			})
 

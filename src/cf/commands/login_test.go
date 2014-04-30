@@ -361,7 +361,7 @@ var _ = Describe("Login Command", func() {
 					},
 				}))
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Failed"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
 
 			It("prompts user for password again if password given on the cmd line fails", func() {
@@ -393,7 +393,7 @@ var _ = Describe("Login Command", func() {
 					},
 				}))
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Failed"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 	})
@@ -426,13 +426,13 @@ var _ = Describe("Login Command", func() {
 
 		var ItFails = func() {
 			It("fails", func() {
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Failed"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		}
 
 		var ItSucceeds = func() {
 			It("runs successfully", func() {
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Failed"}))
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 			})
 		}
@@ -526,7 +526,7 @@ var _ = Describe("Login Command", func() {
 				It("fails and suggests the user skip SSL validation", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
-						[]string{"SSL cert", "https://bobs-burgers.com"},
+						[]string{"SSL Cert", "https://bobs-burgers.com"},
 						[]string{"TIP", "--skip-ssl-validation"},
 					))
 				})

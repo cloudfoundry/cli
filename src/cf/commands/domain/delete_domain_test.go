@@ -72,7 +72,7 @@ var _ = Describe("delete-domain command", func() {
 
 			Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 
-			Expect(ui.Prompts).To(ContainSubstrings([]string{"really delete the domain foo.com"}))
+			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the domain foo.com"}))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Deleting domain", "foo.com", "my-user"},
 				[]string{"OK"},
