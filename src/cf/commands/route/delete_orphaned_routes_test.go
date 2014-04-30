@@ -1,16 +1,17 @@
 package route_test
 
 import (
-	. "cf/commands/route"
 	"cf/models"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "cf/commands/route"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("delete-orphaned-routes command", func() {
@@ -59,15 +60,15 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			ui = callDeleteOrphanedRoutes("y", []string{}, reqFactory, routeRepo)
 
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Really delete orphaned routes"},
-			})
+			Expect(ui.Prompts).To(ContainSubstrings(
+				[]string{"Really delete orphaned routes"},
+			))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting route", "hostname-2.cookieclicker.co"},
-				{"OK"},
-			})
-			Expect(routeRepo.DeleteRouteGuid).To(Equal("route2-guid"))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting route", "hostname-2.cookieclicker.co"},
+				[]string{"OK"},
+			))
+			Expect(routeRepo.DeletedRouteGuids).To(ContainElement("route2-guid"))
 		})
 
 		It("passes when the force flag is used", func() {
@@ -93,11 +94,11 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			Expect(len(ui.Prompts)).To(Equal(0))
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting route", "hostname-2.cookieclicker.co"},
-				{"OK"},
-			})
-			Expect(routeRepo.DeleteRouteGuid).To(Equal("route2-guid"))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Deleting route", "hostname-2.cookieclicker.co"},
+				[]string{"OK"},
+			))
+			Expect(routeRepo.DeletedRouteGuids).To(ContainElement("route2-guid"))
 		})
 	})
 })

@@ -175,6 +175,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					newCmdPresenter(app, maxNameLen, "map-route"),
 					newCmdPresenter(app, maxNameLen, "unmap-route"),
 					newCmdPresenter(app, maxNameLen, "delete-route"),
+					newCmdPresenter(app, maxNameLen, "delete-orphaned-routes"),
 				},
 			},
 		}, {
