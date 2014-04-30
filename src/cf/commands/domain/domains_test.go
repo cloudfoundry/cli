@@ -132,7 +132,7 @@ var _ = Describe("domains command", func() {
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting domains in org", "my-org", "my-user"},
-			[]string{"failed"},
+			[]string{"FAILED"},
 			[]string{"Failed fetching domains"},
 			[]string{"borked!"},
 		))

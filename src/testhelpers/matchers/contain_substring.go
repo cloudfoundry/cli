@@ -13,10 +13,10 @@ type SliceMatcher struct {
 }
 
 func ContainSubstrings(substrings ...[]string) gomega.OmegaMatcher {
-	return SliceMatcher{expected: substrings}
+	return &SliceMatcher{expected: substrings}
 }
 
-func (matcher SliceMatcher) Match(actual interface{}) (success bool, err error) {
+func (matcher *SliceMatcher) Match(actual interface{}) (success bool, err error) {
 	actualStrings, ok := actual.([]string)
 	if !ok {
 		return false, nil
@@ -26,7 +26,7 @@ func (matcher SliceMatcher) Match(actual interface{}) (success bool, err error) 
 	for _, actualValue := range actualStrings {
 		allStringsFound := true
 		for _, expectedValue := range matcher.expected[matcher.failedAtIndex] {
-			allStringsFound = allStringsFound && strings.Contains(terminal.Decolorize(strings.ToLower(actualValue)), strings.ToLower(expectedValue))
+			allStringsFound = allStringsFound && strings.Contains(terminal.Decolorize(actualValue), expectedValue)
 		}
 
 		if allStringsFound {
@@ -40,10 +40,10 @@ func (matcher SliceMatcher) Match(actual interface{}) (success bool, err error) 
 	return false, nil
 }
 
-func (matcher SliceMatcher) FailureMessage(actual interface{}) string {
+func (matcher *SliceMatcher) FailureMessage(actual interface{}) string {
 	return fmt.Sprintf("expected to find \"%s\" in actual:\n'%s'\n", matcher.expected[matcher.failedAtIndex], actual)
 }
 
-func (matcher SliceMatcher) NegatedFailureMessage(actual interface{}) string {
+func (matcher *SliceMatcher) NegatedFailureMessage(actual interface{}) string {
 	return fmt.Sprintf("expected to not find \"%s\" in actual:\n'%s'\n", matcher.expected[matcher.failedAtIndex], actual)
 }

@@ -1,14 +1,15 @@
 package buildpack_test
 
 import (
-	. "cf/commands/buildpack"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"cf"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 
+	. "cf/commands/buildpack"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	. "testhelpers/matchers"
 )
 
@@ -69,7 +70,7 @@ var _ = Describe("create-buildpack command", func() {
 			[]string{"Creating buildpack", "my-buildpack"},
 			[]string{"OK"},
 			[]string{"my-buildpack", "already exists"},
-			[]string{"tip", "update-buildpack"},
+			[]string{"TIP", "use", cf.Name(), "update-buildpack"},
 		))
 		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})

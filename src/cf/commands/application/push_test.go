@@ -227,7 +227,7 @@ var _ = Describe("Push Command", func() {
 					[]string{"OK"},
 					[]string{"Creating app", "my-new-app"},
 					[]string{"OK"},
-					[]string{"Creating Route", "my-hostname.bar.cf-app.com"},
+					[]string{"Creating route", "my-hostname.bar.cf-app.com"},
 					[]string{"OK"},
 					[]string{"Binding", "my-hostname.bar.cf-app.com", "my-new-app"},
 					[]string{"Uploading", "my-new-app"},
@@ -503,7 +503,7 @@ var _ = Describe("Push Command", func() {
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
-					[]string{"invalid", "memory"},
+					[]string{"Invalid", "memory limit", "abcM"},
 				))
 			})
 
@@ -545,7 +545,7 @@ var _ = Describe("Push Command", func() {
 				It("fails when given the name of an app that is not in the manifest", func() {
 					callPush("non-existant-app")
 
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"Failed"}))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 					Expect(len(appRepo.CreateAppParams)).To(Equal(0))
 				})
 			})
@@ -851,7 +851,7 @@ var _ = Describe("Push Command", func() {
 			It("gracefully continues", func() {
 				callPush()
 				Expect(len(serviceBinder.AppsToBind)).To(Equal(4))
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Failed"}))
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
@@ -911,7 +911,7 @@ var _ = Describe("Push Command", func() {
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"FAILED"},
-				[]string{"invalid", "timeout"},
+				[]string{"Invalid", "timeout", "FooeyTimeout"},
 			))
 		})
 	})
@@ -936,7 +936,9 @@ var _ = Describe("Push Command", func() {
 			appBitsRepo.CallbackFileCount = 0
 
 			callPush("appName")
-			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"None of your application files have changed", "nothing will be uploaded"}))
+			Expect(ui.WarnOutputs).To(ContainSubstrings(
+				[]string{"None of your application files have changed", "Nothing will be uploaded"},
+			))
 		})
 	})
 

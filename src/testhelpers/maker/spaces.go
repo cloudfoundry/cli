@@ -25,5 +25,10 @@ func NewSpaceFields(overrides Overrides) (space models.SpaceFields) {
 
 func NewSpace(overrides Overrides) (space models.Space) {
 	space.SpaceFields = NewSpaceFields(overrides)
+
+	if overrides.Has("Organization") {
+		space.Organization = overrides.Get("Organization").(models.OrganizationFields)
+	}
+
 	return
 }

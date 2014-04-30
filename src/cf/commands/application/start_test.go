@@ -146,7 +146,7 @@ var _ = Describe("start command", func() {
 				[]string{"my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{"0 of 2 instances running", "2 starting"},
-				[]string{"Started"},
+				[]string{"started"},
 			))
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
