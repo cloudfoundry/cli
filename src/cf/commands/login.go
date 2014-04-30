@@ -112,7 +112,7 @@ func (cmd Login) decideEndpoint(c *cli.Context) (string, bool) {
 	}
 
 	if endpoint == "" {
-		endpoint = cmd.ui.Ask("API endpoint%s", terminal.PromptColor(">"))
+		endpoint = cmd.ui.Ask("API endpoint")
 	} else {
 		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(endpoint))
 	}
@@ -130,7 +130,7 @@ func (cmd Login) authenticateSSO(c *cli.Context) {
 	passcode := prompts["passcode"]
 
 	for i := 0; i < maxLoginTries; i++ {
-		credentials["passcode"] = cmd.ui.AskForPassword("%s%s", passcode.DisplayName, terminal.PromptColor(">"))
+		credentials["passcode"] = cmd.ui.AskForPassword("%s", passcode.DisplayName)
 
 		cmd.ui.Say("Authenticating...")
 		err = cmd.authenticator.Authenticate(credentials)
@@ -169,7 +169,7 @@ func (cmd Login) authenticate(c *cli.Context) {
 		} else if key == "username" && usernameFlagValue != "" {
 			credentials[key] = usernameFlagValue
 		} else {
-			credentials[key] = cmd.ui.Ask("%s%s", prompt.DisplayName, terminal.PromptColor(">"))
+			credentials[key] = cmd.ui.Ask("%s", prompt.DisplayName)
 		}
 	}
 
@@ -179,7 +179,7 @@ func (cmd Login) authenticate(c *cli.Context) {
 				credentials[key] = passwordFlagValue
 				passwordFlagValue = ""
 			} else {
-				credentials[key] = cmd.ui.AskForPassword("%s%s", prompts[key].DisplayName, terminal.PromptColor(">"))
+				credentials[key] = cmd.ui.AskForPassword("%s", prompts[key].DisplayName)
 			}
 		}
 
@@ -314,7 +314,7 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 			cmd.ui.Say("There are too many options to display, please type in the name.")
 		}
 
-		nameString = cmd.ui.Ask("%s%s", itemPrompt, terminal.PromptColor(">"))
+		nameString = cmd.ui.Ask("%s", itemPrompt)
 		if nameString == "" {
 			return ""
 		}
