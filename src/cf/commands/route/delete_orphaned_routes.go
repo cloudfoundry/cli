@@ -2,6 +2,7 @@ package route
 
 import (
 	"cf/api"
+	"cf/command_metadata"
 	"cf/configuration"
 	"cf/models"
 	"cf/requirements"
@@ -20,6 +21,17 @@ func NewDeleteOrphanedRoutes(ui terminal.UI, config configuration.Reader, routeR
 	cmd.config = config
 	cmd.routeRepo = routeRepo
 	return
+}
+
+func (cmd DeleteOrphanedRoutes) Metadata() command_metadata.CommandMetadata {
+	return command_metadata.CommandMetadata{
+		Name:        "delete-orphaned-routes",
+		Description: "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+		Usage:       "CF_NAME delete-orphaned-routes [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
+	}
 }
 
 func (cmd DeleteOrphanedRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
