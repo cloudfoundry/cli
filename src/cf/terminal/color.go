@@ -61,7 +61,7 @@ func ColorizeBold(message string, color Color) string {
 
 var decolorizerRegex = regexp.MustCompile(`\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]`)
 
-func decolorize(message string) string {
+func Decolorize(message string) string {
 	return string(decolorizerRegex.ReplaceAll([]byte(message), []byte("")))
 }
 

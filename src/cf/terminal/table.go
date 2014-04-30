@@ -49,7 +49,7 @@ func (t *PrintableTable) Print() {
 
 func (t *PrintableTable) calculateMaxSize(row []string) {
 	for index, value := range row {
-		cellLength := len(decolorize(value))
+		cellLength := len(Decolorize(value))
 		if t.maxSizes[index] < cellLength {
 			t.maxSizes[index] = cellLength
 		}
@@ -79,7 +79,7 @@ func (t *PrintableTable) printRow(row []string) {
 func (t *PrintableTable) cellValue(col int, value string) string {
 	padding := ""
 	if col < len(t.header)-1 {
-		padding = strings.Repeat(" ", t.maxSizes[col]-len(decolorize(value)))
+		padding = strings.Repeat(" ", t.maxSizes[col]-len(Decolorize(value)))
 	}
 	return fmt.Sprintf("%s%s   ", value, padding)
 }
