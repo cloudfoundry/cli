@@ -90,7 +90,7 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 func (cmd CreateUserProvidedService) mapValuesFromPrompt(params string, paramsMap map[string]string) map[string]string {
 	for _, param := range strings.Split(params, ",") {
 		param = strings.Trim(param, " ")
-		paramsMap[param] = cmd.ui.Ask("%s%s", param, terminal.PromptColor(">"))
+		paramsMap[param] = cmd.ui.Ask("%s", param)
 	}
 	return paramsMap
 }

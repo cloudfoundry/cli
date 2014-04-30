@@ -279,11 +279,13 @@ var _ = Describe("Login Command", func() {
 
 					l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 					testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
 					Expect(ui.Prompts).To(ContainSubstrings(
-						[]string{"Account Number>"},
-						[]string{"Username>"},
+						[]string{"API endpoint"},
+						[]string{"Account Number"},
+						[]string{"Username"},
 					))
-					Expect(ui.PasswordPrompts).To(ContainSubstrings([]string{"Your Password>"}))
+					Expect(ui.PasswordPrompts).To(ContainSubstrings([]string{"Your Password"}))
 					Expect(ui.PasswordPrompts).ToNot(ContainSubstrings(
 						[]string{"passcode"},
 					))
@@ -323,7 +325,7 @@ var _ = Describe("Login Command", func() {
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				Expect(ui.PasswordPrompts).ToNot(ContainSubstrings([]string{"Your Password>"}))
+				Expect(ui.PasswordPrompts).ToNot(ContainSubstrings([]string{"Your Password"}))
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
 						"account_number": "the-account-number",

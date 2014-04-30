@@ -106,7 +106,7 @@ func (c terminalUI) Confirm(message string, args ...interface{}) bool {
 
 func (c terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	fmt.Println("")
-	fmt.Printf(prompt+" ", args...)
+	fmt.Printf(prompt+PromptColor(">")+" ", args...)
 	fmt.Fscanln(c.stdin, &answer)
 	return
 }

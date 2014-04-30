@@ -31,7 +31,7 @@ func (ui terminalUI) AskForPassword(prompt string, args ...interface{}) (passwd 
 
 	// Display the prompt.
 	fmt.Println("")
-	fmt.Printf(prompt+" ", args...)
+	fmt.Printf(prompt+PromptColor(">")+" ", args...)
 
 	// File descriptors for stdin, stdout, and stderr.
 	fd := []uintptr{os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd()}
