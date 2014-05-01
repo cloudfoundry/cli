@@ -1,4 +1,4 @@
-$APP_CONST_FILE = $(split-path $MyInvocation.MyCommand.Definition) + "\..\src\cf\app_constants.go"
+$APP_CONST_FILE = $(split-path $MyInvocation.MyCommand.Definition) + "\..\cf\app_constants.go"
 $APP_CONST_FILE_TMP = $APP_CONST_FILE + ".tmp"
 $CURRENT_SHA = $(git rev-parse --short HEAD)
 $CURRENT_VERSION = get-content VERSION

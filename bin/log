@@ -4,4 +4,4 @@ set -e
 
 touch ./trace.log
 rm ./trace.log
-CF_TRACE=trace.log $(dirname $0)/go run src/main/cf.go $*
+CF_TRACE=trace.log go run main/cf.go $*

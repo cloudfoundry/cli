@@ -9,8 +9,8 @@ class CfSrc < Formula
   depends_on 'go' => :build
 
   def install
-    inreplace 'src/cf/app_constants.go', 'SHA', 'homebrew'
-    inreplace 'src/cf/app_constants.go', 'BUILT_FROM_SOURCE', 'homebrew'
+    inreplace 'cf/app_constants.go', 'SHA', 'homebrew'
+    inreplace 'cf/app_constants.go', 'BUILT_FROM_SOURCE', 'homebrew'
     system 'bin/build'
     bin.install 'out/cf'
     doc.install 'LICENSE'
