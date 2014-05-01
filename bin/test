@@ -14,20 +14,17 @@
   trap printStatus EXIT
 
   echo -e "\n Cleaning build artifacts..."
-  bin/go clean
+  go clean
 
   echo -e "\n Formatting packages..."
-  bin/go fmt cf/... testhelpers/... generic/... main/... glob/... words/...
-
-  echo -e "\n Installing package dependencies..."
-  bin/go test -i cf/... generic/...
+  go fmt github.com/cloudfoundry/cli/cf/... github.com/cloudfoundry/cli/testhelpers/... github.com/cloudfoundry/cli/generic/... github.com/cloudfoundry/cli/main/... github.com/cloudfoundry/cli/glob/... github.com/cloudfoundry/cli/words/...
 
   echo -e "\n Testing packages:"
-  bin/go test cf/... generic/... -parallel 4 $@
+  go test github.com/cloudfoundry/cli/cf/... github.com/cloudfoundry/cli/generic/... -parallel 4 $@
 
   echo -e "\n Vetting packages for potential issues..."
-  bin/go tool vet src/cf/.
-# for file in $(find src/{cf,fileutils,generic,glob,main,testhelpers,words} \( -name "*.go" -not -iname "*test.go" \))
+  go tool vet cf/.
+# for file in $(find {cf,fileutils,generic,glob,main,testhelpers,words} \( -name "*.go" -not -iname "*test.go" \))
 # do
 #   go tool vet -all -shadow=true $file
 # done

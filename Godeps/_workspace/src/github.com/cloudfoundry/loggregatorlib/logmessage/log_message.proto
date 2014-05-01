@@ -1,0 +1,22 @@
+package logmessage;
+
+message LogMessage {
+    enum MessageType {
+        OUT = 1;
+        ERR = 2;
+    }
+
+    required bytes message = 1;
+    required MessageType message_type = 2;
+    required sint64 timestamp = 3;
+    required string app_id = 4;
+    optional string source_id = 6;
+    repeated string drain_urls = 7;
+    optional string source_name = 8;
+}
+
+message LogEnvelope {
+    required string routing_key = 1;
+    required bytes signature = 2;
+    required LogMessage log_message = 3;
+}

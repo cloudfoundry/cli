@@ -1,0 +1,26 @@
+language: go
+notifications:
+  email:
+  - cf-lamb@pivotallabs.com
+
+before_install:
+- go get code.google.com/p/go.tools/cmd/cover
+- go get github.com/mattn/goveralls
+- go get github.com/onsi/ginkgo/ginkgo
+
+after_success:
+- 'echo "mode: set" > all.coverprofile'
+- 'find . -name "*.coverprofile" -exec grep -v mode: {} >> all.coverprofile \;'
+- PATH=$HOME/gopath/bin:$PATH goveralls -coverprofile=all.coverprofile -repotoken=$COVERALLS_TOKEN
+
+install:
+- go get -d -v -t ./...
+
+script: PATH=$HOME/gopath/bin:$PATH ginkgo -r --race --randomizeAllSpecs --failOnPending --skipMeasurements --cover
+
+go:
+- 1.2.1
+
+env:
+  global:
+    secure: B8pgLMTc+VaGra0bpSOvNLkbxADjrsIylF6wCNQNnLRzUeqtfnJy+M1nz8y4MEalc6hxj5iuwfn67K5AQo8vTkAzE/n+jxxL2pKa0VZS0yLiYxMoWdcOhu7yWNRY6u9t2P0bpJ9zrLN2AjKo+V2FtadNMK0O3yFhEmFzNDEBQ1g=
