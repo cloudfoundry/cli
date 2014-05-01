@@ -25,8 +25,8 @@ func (wg wordGenerator) Babble() (word string) {
 }
 
 func NewWordGenerator() WordGenerator {
-	adjectiveBytes, _ := Asset("src/words/dict/adjectives.txt")
-	nounBytes, _ := Asset("src/words/dict/nouns.txt")
+	adjectiveBytes, _ := Asset("words/dict/adjectives.txt")
+	nounBytes, _ := Asset("words/dict/nouns.txt")
 	source := rand.NewSource(time.Now().UnixNano())
 
 	return wordGenerator{

@@ -2,6 +2,5 @@
 
 set -e
 
-echo -e "\nFormatting packages..."
-#go fmt github.com/cloudfoundry.com/cli/cf/... github.com/cloudfoundry.com/cli/testhelpers/... github.com/cloudfoundry.com/cli/generic/... github.com/cloudfoundry.com/cli/main/... github.com/cloudfoundry.com/cli/glob/... github.com/cloudfoundry.com/cli/words/...
+echo -e "\nGenerating Binary..."
 go build -o $(dirname $0)/../out/cf ./main

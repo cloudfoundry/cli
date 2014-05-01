@@ -118,39 +118,39 @@ Contributing
 Architecture overview
 ---------------------
 
-The app (in `src/cf/app/app.go`) declares the list of available commands, which are composed of a Name,
+The app (in `cf/app/app.go`) declares the list of available commands, which are composed of a Name,
 Description, Usage and any optional Flags. The action for each command is to instantiate a command object,
- which is invoked by the runner (in `src/cf/commands/runner.go`).
+ which is invoked by the runner (in `cf/commands/runner.go`).
 
 A command has `Requirements`, and a `Run` function. Requirements are used as filters before running the command.
-If any of them fails, the command will not run (see `src/cf/requirements` for examples of requirements).
+If any of them fails, the command will not run (see `cf/requirements` for examples of requirements).
 
-When the command is run, it communicates with api using repositories (they are in `src/cf/api`).
+When the command is run, it communicates with api using repositories (they are in `cf/api`).
 
 Dependencies are injected into each command, so tests can inject a fake. This means that dependencies are
-typically declared as an interface type, and not a concrete type. (see `src/cf/commands/factory.go`)
+typically declared as an interface type, and not a concrete type. (see `cf/commands/factory.go`)
 
-Some dependencies are managed by a repository locator in `src/cf/api/repository_locator.go`.
+Some dependencies are managed by a repository locator in `cf/api/repository_locator.go`.
 
-Repositories communicate with the api endpoints through a Gateway (see `src/cf/net`).
+Repositories communicate with the api endpoints through a Gateway (see `cf/net`).
 
-Models are data structures related to Cloud Foundry (see `src/cf/models`). For example, some models are
+Models are data structures related to Cloud Foundry (see `cf/models`). For example, some models are
 apps, buildpacks, domains, etc.
 
 
 Managing dependencies
 ---------------------
 
-Command dependencies are managed by the commands factory. The app uses the command factory (in `src/cf/commands/factory.go`)
+Command dependencies are managed by the commands factory. The app uses the command factory (in `cf/commands/factory.go`)
 to instantiate them, this allows not sharing the knowledge of their dependencies with the app itself.
 
-As for repositories, we use the repository locator to handle their dependencies. You can find it in `src/cf/api/repository_locator.go`.
+As for repositories, we use the repository locator to handle their dependencies. You can find it in `cf/api/repository_locator.go`.
 
 Example command
 ---------------
 
 Create Space is a good example of a command. Its tests include checking arguments, requiring the user
-to be logged in, and the actual behavior of the command itself. You can find it in `src/cf/commands/space/create_space.go`.
+to be logged in, and the actual behavior of the command itself. You can find it in `cf/commands/space/create_space.go`.
 
 Current conventions
 ===================
@@ -159,7 +159,7 @@ Creating Commands
 -----------------
 
 Resources that include several commands have been broken out into their own sub-package using the Resource name. An example
-of this convention is the Space resource and package (see `src/cf/commands/space`)
+of this convention is the Space resource and package (see `cf/commands/space`)
 
 In addition, command file and methods naming follows a CRUD like convention. For example, the Space resource includes commands
 such a CreateSpace, ListSpaces, DeleteSpace, etc.

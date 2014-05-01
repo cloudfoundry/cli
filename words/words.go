@@ -28984,7 +28984,7 @@ func src_words_dict_nouns_txt() ([]byte, error) {
 		0xb0, 0xf9, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xba, 0x00, 0xb9, 0xcd,
 		0x8d, 0xbe, 0x09, 0x00,
 	},
-		"src/words/dict/nouns.txt",
+		"words/dict/nouns.txt",
 	)
 }
 
@@ -29000,6 +29000,6 @@ func Asset(name string) ([]byte, error) {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() ([]byte, error){
-	"src/words/dict/adjectives.txt": src_words_dict_adjectives_txt,
-	"src/words/dict/nouns.txt":      src_words_dict_nouns_txt,
+	"words/dict/adjectives.txt": src_words_dict_adjectives_txt,
+	"words/dict/nouns.txt":      src_words_dict_nouns_txt,
 }
