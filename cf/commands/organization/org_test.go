@@ -79,7 +79,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		org := models.Organization{}
 		org.Name = "my-org"
 		org.Guid = "my-org-guid"
-		org.QuotaDefinition = models.NewQuotaFields("cantina-quota", 512)
+		org.QuotaDefinition = models.NewQuotaFields("cantina-quota", 512, 2, 5, true)
 		org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 		org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
 
@@ -95,7 +95,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			[]string{"OK"},
 			[]string{"my-org"},
 			[]string{"  domains:", "cfapps.io", "cf-app.com"},
-			[]string{"  quota: ", "cantina-quota", "512M"},
+			[]string{"  quota: ", "cantina-quota", "512M", "2 routes", "5 services", "paid services allowed"},
 			[]string{"  spaces:", "development", "staging"},
 		))
 	})
