@@ -3,5 +3,5 @@
 set -e
 
 echo -e "\nFormatting packages..."
-$(dirname $0)/go fmt cf/... testhelpers/... generic/... main/... glob/... words/...
-$(dirname $0)/go build -o $(dirname $0)/../out/cf main
+#go fmt github.com/cloudfoundry.com/cli/cf/... github.com/cloudfoundry.com/cli/testhelpers/... github.com/cloudfoundry.com/cli/generic/... github.com/cloudfoundry.com/cli/main/... github.com/cloudfoundry.com/cli/glob/... github.com/cloudfoundry.com/cli/words/...
+go build -o $(dirname $0)/../out/cf ./main

@@ -1,0 +1,130 @@
+{
+	"ImportPath": "github.com/cloudfoundry/cli",
+	"GoVersion": "go1.2.1",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go.crypto/blowfish",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/cast5",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/curve25519",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/hkdf",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/nacl/secretbox",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/openpgp",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/pbkdf2",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/poly1305",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/salsa20/salsa",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/ssh",
+			"Comment": "null-200",
+			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.net/html",
+			"Comment": "null-123",
+			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.net/ipv4",
+			"Comment": "null-123",
+			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.net/ipv6",
+			"Comment": "null-123",
+			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.net/websocket",
+			"Comment": "null-123",
+			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.text/encoding",
+			"Comment": "null-84",
+			"Rev": "e4132d00dbd1075fe02eca2845c79950e376ba0c"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.text/transform",
+			"Comment": "null-84",
+			"Rev": "e4132d00dbd1075fe02eca2845c79950e376ba0c"
+		},
+		{
+			"ImportPath": "code.google.com/p/gogoprotobuf/proto",
+			"Rev": "dc9b8350fb4568b6562900df872672f378242552"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
+			"Rev": "e493791d041a7c736105f369603f61e28a1586ae"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
+			"Rev": "a141d15d255568a910ba2716c915ffc3b298a741"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
+			"Rev": "a7b1d695fef548542ef92df0412f68ef2798b701"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
+			"Rev": "90e9aee1f6ae4ba750c6656c3fb529bf217b4908"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/loggregatorlib/signature",
+			"Rev": "90e9aee1f6ae4ba750c6656c3fb529bf217b4908"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.0.0-65-g820deef",
+			"Rev": "820deefc9031d101f085ef773425fc6ca7a5363e"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Rev": "1e6e1281b05fe5eaaf3300bdedb8e75880b9c6fd"
+		},
+		{
+			"ImportPath": "github.com/onsi/ginkgo",
+			"Rev": "1e48048b2e01c7f1830144e30eea21db3cd3b574"
+		},
+		{
+			"ImportPath": "github.com/onsi/gomega",
+			"Rev": "660b70079010c9eeeffdc381fcb3a8cde45ce495"
+		}
+	]
+}
