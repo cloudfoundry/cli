@@ -36,9 +36,7 @@ var _ = Describe("quotas command", func() {
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
-
-			Expect(runCommand()).To(HavePassedRequirements())
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 	})
 
