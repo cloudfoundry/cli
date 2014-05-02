@@ -6,84 +6,14 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "code.google.com/p/go.crypto/blowfish",
+			"ImportPath": "code.google.com/p/go.crypto/ssh/terminal",
 			"Comment": "null-200",
 			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/cast5",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/curve25519",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/hkdf",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/nacl/secretbox",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/openpgp",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/pbkdf2",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/poly1305",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/salsa20/salsa",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/ssh",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.net/html",
-			"Comment": "null-123",
-			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.net/ipv4",
-			"Comment": "null-123",
-			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.net/ipv6",
-			"Comment": "null-123",
-			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
 		},
 		{
 			"ImportPath": "code.google.com/p/go.net/websocket",
 			"Comment": "null-123",
 			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.text/encoding",
-			"Comment": "null-84",
-			"Rev": "e4132d00dbd1075fe02eca2845c79950e376ba0c"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.text/transform",
-			"Comment": "null-84",
-			"Rev": "e4132d00dbd1075fe02eca2845c79950e376ba0c"
 		},
 		{
 			"ImportPath": "code.google.com/p/gogoprotobuf/proto",
