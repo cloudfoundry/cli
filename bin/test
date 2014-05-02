@@ -17,10 +17,11 @@
   go clean
 
   echo -e "\n Formatting packages..."
-  go fmt github.com/cloudfoundry/cli/cf/... github.com/cloudfoundry/cli/testhelpers/... github.com/cloudfoundry/cli/generic/... github.com/cloudfoundry/cli/main/... github.com/cloudfoundry/cli/glob/... github.com/cloudfoundry/cli/words/...
+  go fmt ./cf/... ./testhelpers/... ./generic/... ./main/... ./glob/... ./words/...
 
   echo -e "\n Testing packages:"
-  go test github.com/cloudfoundry/cli/cf/... github.com/cloudfoundry/cli/generic/... -parallel 4 $@
+  go test ./cf/... ./generic/... -parallel 4 $@
+
 
   echo -e "\n Vetting packages for potential issues..."
   go tool vet cf/.
