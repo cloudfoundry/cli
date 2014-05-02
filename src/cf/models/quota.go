@@ -1,8 +1,11 @@
 package models
 
-func NewQuotaFields(name string, memory uint64) (q QuotaFields) {
+func NewQuotaFields(name string, memory uint64, routes int, services int, nonbasicservices bool) (q QuotaFields) {
 	q.Name = name
 	q.MemoryLimit = memory
+	q.RoutesLimit = routes
+	q.ServicesLimit = services
+	q.NonBasicServicesAllowed = nonbasicservices
 	return
 }
 

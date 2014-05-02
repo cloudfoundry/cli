@@ -3,6 +3,7 @@ package organization
 import (
 	"cf/command_metadata"
 	"cf/configuration"
+	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -67,9 +68,11 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 		spaces = append(spaces, space.Name)
 	}
 
-	orgMemoryLimit := fmt.Sprintf("%s (%dM memory limit)", org.QuotaDefinition.Name, org.QuotaDefinition.MemoryLimit)
+	quota := org.QuotaDefinition
+	orgQuota := fmt.Sprintf("%s (%dM memory limit, %d routes, %d services, paid services %s)",
+		quota.Name, quota.MemoryLimit, quota.RoutesLimit, quota.ServicesLimit, formatters.Allowed(quota.NonBasicServicesAllowed))
 
 	cmd.ui.Say("  domains: %s", terminal.EntityNameColor(strings.Join(domains, ", ")))
-	cmd.ui.Say("  quota:   %s", terminal.EntityNameColor(orgMemoryLimit))
+	cmd.ui.Say("  quota:   %s", terminal.EntityNameColor(orgQuota))
 	cmd.ui.Say("  spaces:  %s", terminal.EntityNameColor(strings.Join(spaces, ", ")))
 }
