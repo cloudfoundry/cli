@@ -30,6 +30,7 @@ func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 
 		if fileInfo.IsDir() {
 			appFile.Sha1 = "0"
+			appFile.Size = 0
 		} else {
 			hash := sha1.New()
 			err = fileutils.CopyPathToWriter(fullPath, hash)
