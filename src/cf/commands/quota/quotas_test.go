@@ -1,18 +1,18 @@
 package quota_test
 
 import (
-	. "cf/commands/quota"
-	"cf/models"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	. "testhelpers/matchers"
-
 	"cf/errors"
+	"cf/models"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+
+	. "cf/commands/quota"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "testhelpers/matchers"
 )
 
 var _ = Describe("quotas command", func() {
@@ -28,16 +28,16 @@ var _ = Describe("quotas command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
-	runCommand := func() {
+	runCommand := func() bool {
 		cmd := NewListQuotas(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("create-quota", []string{}), requirementsFactory)
+		return testcmd.RunCommand(cmd, testcmd.NewContext("create-quota", []string{}), requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
 
-			runCommand()
+			Expect(runCommand()).To(HavePassedRequirements())
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
@@ -63,7 +63,7 @@ var _ = Describe("quotas command", func() {
 		})
 
 		It("lists quotas", func() {
-			runCommand()
+			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting quotas as", "my-user"},
 				[]string{"OK"},
@@ -80,7 +80,7 @@ var _ = Describe("quotas command", func() {
 		})
 
 		It("prints an error", func() {
-			runCommand()
+			Expect(runCommand()).To(HavePassedRequirements())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting quotas as", "my-user"},
 				[]string{"FAILED"},
