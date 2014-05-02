@@ -96,6 +96,10 @@ func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users 
 		return
 	}
 
+	if len(guidFilters) == 0 {
+		return
+	}
+
 	uaaEndpoint, apiErr := repo.getAuthEndpoint()
 	if apiErr != nil {
 		return
