@@ -9,7 +9,7 @@ import (
 
 var CommandDidPassRequirements bool
 
-func RunCommand(cmd command.Command, ctxt *cli.Context, requirementsFactory *testreq.FakeReqFactory) bool {
+func RunCommand(cmd command.Command, ctxt *cli.Context, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
 	defer func() {
 		errMsg := recover()
 
@@ -22,18 +22,19 @@ func RunCommand(cmd command.Command, ctxt *cli.Context, requirementsFactory *tes
 
 	requirements, err := cmd.GetRequirements(requirementsFactory, ctxt)
 	if err != nil {
-		return false
+		return
 	}
 
 	for _, requirement := range requirements {
 		success := requirement.Execute()
 		if !success {
-			return false
+			return
 		}
 	}
 
+	passedRequirements = true
 	CommandDidPassRequirements = true
 	cmd.Run(ctxt)
 
-	return true
+	return
 }
