@@ -19,13 +19,11 @@ call %environment.bat
 cd %CATSPATH%
 SET CONFIG=%CATSPATH%\config.json
 
-# bin/goenv
 SET LOCAL_GOPATH=%CATSPATH%\Godeps\_workspace
 MKDIR %LOCAL_GOPATH%\bin
 
 SET GOPATH=%LOCAL_GOPATH%;%GOPATH%
 SET PATH=%LOCAL_GOPATH%\bin;%PATH%
 
-# bin/test
 go install -v github.com/onsi/ginkgo/ginkgo
-ginkgo -r -slowSpecThreshold=120
+ginkgo -r -slowSpecThreshold=120 -skip="makes the app reachable via its bound route"
