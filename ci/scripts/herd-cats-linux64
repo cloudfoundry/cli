@@ -3,8 +3,8 @@
 set -e
 
 export GOPATH=~/go
-go get -d github.com/jfoley/cf-acceptance-tests/
-export CATSPATH=$GOPATH/src/github.com/jfoley/cf-acceptance-tests
+go get -d github.com/cloudfoundry/cf-acceptance-tests/
+export CATSPATH=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
 
 curl https://s3.amazonaws.com/go-cli/builds/cf-linux-amd64 > $CATSPATH/gcf
 
