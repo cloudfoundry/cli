@@ -3,6 +3,8 @@
 set -e
 
 export GOPATH=~/go
+rm -rf $GOPATH/pkg/*
+
 go get -d github.com/cloudfoundry/cf-acceptance-tests/
 export CATSPATH=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
 
@@ -14,4 +16,4 @@ cd $CATSPATH
 git checkout master
 git pull
 
-$GOPATH/bin/ginkgo -r -v -slowSpecThreshold=300 -skip="admin buildpack"
+CONFIG=$CATSPATH/config.json bin/test
