@@ -2,7 +2,7 @@ git submodule update --init
 
 SET CLIPATH=c:\jenkins\workspace\go-cli-tests-windows64Bit
 SET GOPATH=%CLIPATH%
-c:\Go\bin\go build -v -o cf-windows-amd64.exe main
+c:\Go\bin\go build -v -o cf-windows-amd64.exe .\main
 
 SET GOPATH=c:\Users\Administrator\go
 SET CATSPATH=%GOPATH%\src\github.com\cloudfoundry\cf-acceptance-tests
