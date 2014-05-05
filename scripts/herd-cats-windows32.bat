@@ -14,8 +14,6 @@ bitsadmin.exe /transfer "DownloadStableCLI" https://s3.amazonaws.com/go-cli/buil
 
 SET PATH=%PATH%;%CATSPATH%;C:\Program Files\cURL\bin
 
-call %environment.bat
-
 cd %CATSPATH%
 SET CONFIG=%CATSPATH%\config.json
 
@@ -26,4 +24,4 @@ SET GOPATH=%LOCAL_GOPATH%;%GOPATH%
 SET PATH=%LOCAL_GOPATH%\bin;%PATH%
 
 go install -v github.com/onsi/ginkgo/ginkgo
-ginkgo -r -slowSpecThreshold=120 -skip="makes the app reachable via its bound route"
+ginkgo -r -slowSpecThreshold=120 -skip="go makes the app reachable via its bound route"
