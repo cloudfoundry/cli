@@ -4,13 +4,13 @@ SET CLIPATH=c:\jenkins\workspace\go-cli-tests-windows64Bit
 SET GOPATH=%CLIPATH%
 
 SET GOPATH=c:\Users\Administrator\go
-go get -d github.com/jfoley/cf-acceptance-tests/
+go get -d github.com/cloudfoundry/cf-acceptance-tests/
 
-cd %GOPATH%\src/github.com\jfoley\cf-acceptance-tests
+cd %GOPATH%\src/github.com\cloudfoundry\cf-acceptance-tests
 git pull
 
-SET CATSPATH=%GOPATH%\src\github.com\jfoley\cf-acceptance-tests
-bitsadmin.exe /transfer "DownloadStableCLI" https://s3.amazonaws.com/go-cli/builds/cf-windows-amd64.exe c:\Users\Administrator\go\src\github.com\jfoley\cf-acceptance-tests\gcf.exe
+SET CATSPATH=%GOPATH%\src\github.com\cloudfoundry\cf-acceptance-tests
+bitsadmin.exe /transfer "DownloadStableCLI" https://s3.amazonaws.com/go-cli/builds/cf-windows-amd64.exe c:\Users\Administrator\go\src\github.com\cloudfoundry\cf-acceptance-tests\gcf.exe
 
 SET PATH=%PATH%;%CATSPATH%;C:\Program Files\cURL\bin
 
