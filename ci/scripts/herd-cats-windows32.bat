@@ -18,4 +18,14 @@ call %environment.bat
 
 cd %CATSPATH%
 SET CONFIG=%CATSPATH%\config.json
-%GOPATH%\bin\ginkgo -r -v -slowSpecThreshold=300 -skip="admin buildpack"
+
+# bin/goenv
+SET LOCAL_GOPATH=%CATSPATH%\Godeps\_workspace
+MKDIR %LOCAL_GOPATH%\bin
+
+SET GOPATH=%LOCAL_GOPATH%;%GOPATH%
+SET PATH=%LOCAL_GOPATH%\bin;%PATH%
+
+# bin/test
+go install -v github.com/onsi/ginkgo/ginkgo
+ginkgo -r -slowSpecThreshold=120
