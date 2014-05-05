@@ -16,4 +16,4 @@ cd $CATSPATH
 git checkout master
 git pull
 
-CONFIG=$CATSPATH/config.json bin/test
+CONFIG=$CATSPATH/config.json bin/test -skip="makes the app reachable via its bound route"
