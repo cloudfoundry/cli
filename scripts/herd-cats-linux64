@@ -11,6 +11,7 @@ curl https://s3.amazonaws.com/go-cli/builds/cf-linux-amd64 > $CATSPATH/gcf
 export PATH=$PATH:$CATSPATH
 
 cd $CATSPATH
+git checkout master
 git pull
 
 $GOPATH/bin/ginkgo -r -v -slowSpecThreshold=300 -skip="admin buildpack"
