@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 git submodule update --init
 
 GOPATH=$(pwd) go build -v -o cf main
