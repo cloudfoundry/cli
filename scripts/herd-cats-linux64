@@ -2,13 +2,10 @@
 
 set -e
 
-git submodule update --init
-
-GOPATH=$(pwd) go build -v -o cf ./main
-
 export GOPATH=~/go
 export CATSPATH=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
-cp cf $CATSPATH/gcf
+
+curl https://s3.amazonaws.com/go-cli/builds/cf-linux-amd64 > $CATSPATH/gcf
 
 export PATH=$PATH:$CATSPATH
 
