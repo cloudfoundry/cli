@@ -10,6 +10,7 @@ export CATSPATH=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
 
 rm -f $CATSPATH/gcf
 curl https://s3.amazonaws.com/go-cli/builds/cf-linux-amd64 > $CATSPATH/gcf
+chmod u+x $CATSPATH/gcf
 
 export PATH=$PATH:$CATSPATH
 
