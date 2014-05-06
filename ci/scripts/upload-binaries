@@ -12,7 +12,7 @@ if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
   exit 1
 fi
 
-root_dir=$(cd $(dirname $0) && pwd)/..
+root_dir=$(cd $(dirname $0) && pwd)/../..
 s3_config_file=$root_dir/ci/s3cfg
 
 function upload_artifacts {
