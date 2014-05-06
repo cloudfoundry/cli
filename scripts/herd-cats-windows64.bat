@@ -25,4 +25,4 @@ SET GOPATH=%LOCAL_GOPATH%;%GOPATH%
 SET PATH=%LOCAL_GOPATH%\bin;%PATH%
 
 go install -v github.com/onsi/ginkgo/ginkgo
-ginkgo -r -slowSpecThreshold=120 -skip="go makes the app reachable via its bound route" -skip="SSO"
+ginkgo -r -slowSpecThreshold=120 -skip="go makes the app reachable via its bound route|SSO"
