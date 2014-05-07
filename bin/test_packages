@@ -1,0 +1,32 @@
+#!/bin/bash
+
+(
+  set -e
+
+  function printStatus {
+      if [ $? -eq 0 ]; then
+          echo -e "\nSWEET SUITE SUCCESS"
+      else
+          echo -e "\nSUITE FAILURE"
+      fi
+  }
+
+  trap printStatus EXIT
+
+  GODEP=$(which godep)
+  if [[ -z $GODEP ]] ; then
+    echo "godep is not installed. Run 'go get github.com/tools/godep'"
+    exit 1
+  fi
+
+  export GOPATH=$($GODEP path):$GOPATH
+
+  echo -e "\n Cleaning build artifacts..."
+  go clean
+
+  echo -e "\n Formatting packages..."
+  go fmt ./cf/... ./testhelpers/... ./generic/... ./main/... ./glob/... ./words/...
+
+  echo -e "\n Testing packages:"
+  go test $@
+)
