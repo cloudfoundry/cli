@@ -11,7 +11,7 @@ import (
 
 type LogsRepository interface {
 	RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error)
-	TailLogsFor(appGuid string, bufferTime time.Duration, onConnect func(), onMessage func(*logmessage.LogMessage)) error
+	TailLogsFor(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error
 	Close()
 }
 
@@ -20,17 +20,28 @@ type LoggregatorLogsRepository struct {
 	config         configuration.Reader
 	TrustedCerts   []tls.Certificate
 	tokenRefresher TokenRefresher
+	messageQueue   *SortedMessageQueue
+
+	onMessage func(*logmessage.LogMessage)
 }
 
-func NewLoggregatorLogsRepository(config configuration.Reader, consumer consumer.LoggregatorConsumer, refresher TokenRefresher) LoggregatorLogsRepository {
-	return LoggregatorLogsRepository{config: config, consumer: consumer, tokenRefresher: refresher}
+var BufferTime time.Duration = 5
+
+func NewLoggregatorLogsRepository(config configuration.Reader, consumer consumer.LoggregatorConsumer, refresher TokenRefresher) LogsRepository {
+	return &LoggregatorLogsRepository{
+		config:         config,
+		consumer:       consumer,
+		tokenRefresher: refresher,
+		messageQueue:   NewSortedMessageQueue(BufferTime, time.Now),
+	}
 }
 
-func (repo LoggregatorLogsRepository) Close() {
+func (repo *LoggregatorLogsRepository) Close() {
 	repo.consumer.Close()
+	repo.flushMessageQueue()
 }
 
-func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
+func (repo *LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
 	messages, err := repo.consumer.Recent(appGuid, repo.config.AccessToken())
 
 	switch err.(type) {
@@ -46,7 +57,9 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmessa
 	return messages, err
 }
 
-func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, bufferTime time.Duration, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+	repo.onMessage = onMessage
+
 	endpoint := repo.config.LoggregatorEndpoint()
 	if endpoint == "" {
 		return errors.New("Loggregator endpoint missing from config file")
@@ -63,28 +76,42 @@ func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, bufferTime tim
 		return err
 	}
 
-	bufferMessages(logChan, onMessage, bufferTime)
+	repo.bufferMessages(logChan, onMessage)
 	return nil
 }
 
-func bufferMessages(logChan <-chan *logmessage.LogMessage, onMessage func(*logmessage.LogMessage), bufferTime time.Duration) {
-	messageQueue := NewSortedMessageQueue(bufferTime, func() time.Time {
-		return time.Now()
-	})
+func (repo *LoggregatorLogsRepository) bufferMessages(logChan <-chan *logmessage.LogMessage, onMessage func(*logmessage.LogMessage)) {
 
 	for {
-		sendMessages(messageQueue, onMessage)
+		sendMessages(repo.messageQueue, onMessage)
 
 		select {
 		case msg, ok := <-logChan:
 			if !ok {
 				return
 			}
-			messageQueue.PushMessage(msg)
+			repo.messageQueue.PushMessage(msg)
 		default:
 			time.Sleep(1 * time.Millisecond)
 		}
 	}
+}
+
+func (repo *LoggregatorLogsRepository) flushMessageQueue() {
+	if repo.onMessage == nil {
+		return
+	}
+
+	for {
+		message := repo.messageQueue.PopMessage()
+		if message == nil {
+			break
+		}
+
+		repo.onMessage(message)
+	}
+
+	repo.onMessage = nil
 }
 
 func sendMessages(queue *SortedMessageQueue, onMessage func(*logmessage.LogMessage)) {

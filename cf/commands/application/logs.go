@@ -96,7 +96,7 @@ func (cmd *Logs) tailLogsFor(app models.Application) {
 		)
 	}
 
-	err := cmd.logsRepo.TailLogsFor(app.Guid, 5*time.Second, onConnect, func(msg *logmessage.LogMessage) {
+	err := cmd.logsRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
 		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
 	})
 

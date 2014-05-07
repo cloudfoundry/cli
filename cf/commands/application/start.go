@@ -166,7 +166,7 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan chan bool, st
 		startChan <- true
 	}
 
-	err := cmd.logRepo.TailLogsFor(app.Guid, 5*time.Second, onConnect, func(msg *logmessage.LogMessage) {
+	err := cmd.logRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
 		select {
 		case <-stopChan:
 			cmd.logRepo.Close()

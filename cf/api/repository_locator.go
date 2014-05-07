@@ -30,7 +30,7 @@ type RepositoryLocator struct {
 	serviceSummaryRepo              CloudControllerServiceSummaryRepository
 	userRepo                        CloudControllerUserRepository
 	passwordRepo                    CloudControllerPasswordRepository
-	logsRepo                        LoggregatorLogsRepository
+	logsRepo                        LogsRepository
 	authTokenRepo                   CloudControllerServiceAuthTokenRepository
 	serviceBrokerRepo               CloudControllerServiceBrokerRepository
 	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
