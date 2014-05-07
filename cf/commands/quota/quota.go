@@ -35,7 +35,7 @@ func (command *showQuota) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *showQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context, "quotas")
+		cmd.ui.FailWithUsage(context)
 	}
 
 	return []requirements.Requirement{

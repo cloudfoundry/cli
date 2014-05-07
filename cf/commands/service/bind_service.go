@@ -45,7 +45,7 @@ func (cmd *BindService) GetRequirements(requirementsFactory requirements.Factory
 
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "bind-service")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 	appName := c.Args()[0]

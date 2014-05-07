@@ -45,7 +45,6 @@ var _ = Describe("purge-service command", func() {
 
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 			Expect(deps.ui.FailedWithUsage).To(BeTrue())
-			Expect(deps.ui.FailedWithUsageCommandName).To(Equal("purge-service-offering"))
 		})
 	})
 

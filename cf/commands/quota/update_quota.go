@@ -43,7 +43,7 @@ func (command *updateQuota) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *updateQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context, "update-quota")
+		cmd.ui.FailWithUsage(context)
 	}
 
 	return []requirements.Requirement{
@@ -77,7 +77,7 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 		memory, formatError := formatters.ToMegabytes(c.String("m"))
 
 		if formatError != nil {
-			cmd.ui.FailWithUsage(c, "update-quota")
+			cmd.ui.FailWithUsage(c)
 		}
 
 		quota.MemoryLimit = memory

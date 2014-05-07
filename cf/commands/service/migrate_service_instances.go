@@ -47,7 +47,7 @@ func (command *MigrateServiceInstances) Metadata() command_metadata.CommandMetad
 func (cmd *MigrateServiceInstances) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 5 {
 		err = errors.New("incorrect usage")
-		cmd.ui.FailWithUsage(c, "migrate-service-instances")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

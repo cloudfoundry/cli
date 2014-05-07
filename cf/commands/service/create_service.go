@@ -41,7 +41,7 @@ func (command CreateService) Metadata() command_metadata.CommandMetadata {
 func (cmd CreateService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "create-service")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

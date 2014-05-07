@@ -43,7 +43,7 @@ func (command *Logs) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *Logs) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c, "logs")
+		cmd.ui.FailWithUsage(c)
 		err = errors.New("Incorrect Usage")
 		return
 	}

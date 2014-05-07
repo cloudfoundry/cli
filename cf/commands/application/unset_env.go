@@ -38,7 +38,7 @@ func (command *UnsetEnv) Metadata() command_metadata.CommandMetadata {
 func (cmd *UnsetEnv) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) < 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "unset-env")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

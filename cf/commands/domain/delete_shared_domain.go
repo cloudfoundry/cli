@@ -39,7 +39,7 @@ func (command *DeleteSharedDomain) Metadata() command_metadata.CommandMetadata {
 func (cmd *DeleteSharedDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "delete-shared-domain")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

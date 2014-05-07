@@ -38,7 +38,7 @@ func (command *SetQuota) Metadata() command_metadata.CommandMetadata {
 func (cmd *SetQuota) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "set-quota")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

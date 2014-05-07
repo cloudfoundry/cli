@@ -108,9 +108,9 @@ func (ui *FakeUI) ConfigFailure(err error) {
 	ui.Failed("Error loading config file.\n%s", err.Error())
 }
 
-func (ui *FakeUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
+func (ui *FakeUI) FailWithUsage(context *cli.Context) {
 	ui.FailedWithUsage = true
-	ui.FailedWithUsageCommandName = cmdName
+	ui.FailedWithUsageCommandName = context.Command.Name
 	ui.Failed("Incorrect Usage.")
 }
 

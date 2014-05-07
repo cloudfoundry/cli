@@ -48,7 +48,7 @@ func (command Target) Metadata() command_metadata.CommandMetadata {
 func (cmd Target) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 0 {
 		err = errors.New("incorrect usage")
-		cmd.ui.FailWithUsage(c, "target")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

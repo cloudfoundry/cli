@@ -29,7 +29,7 @@ type UI interface {
 	ConfirmDeleteWithAssociations(modelType, modelName string) bool
 	Ok()
 	Failed(message string, args ...interface{})
-	FailWithUsage(ctxt *cli.Context, cmdName string)
+	FailWithUsage(context *cli.Context)
 	ConfigFailure(err error)
 	ShowConfiguration(configuration.Reader)
 	LoadingIndication()
@@ -127,10 +127,10 @@ func (c terminalUI) Failed(message string, args ...interface{}) {
 	panic(FailedWasCalled)
 }
 
-func (c terminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
+func (c terminalUI) FailWithUsage(context *cli.Context) {
 	c.Say(FailureColor("FAILED"))
 	c.Say("Incorrect Usage.\n")
-	cli.ShowCommandHelp(ctxt, cmdName)
+	cli.ShowCommandHelp(context, context.Command.Name)
 	c.Say("")
 	os.Exit(1)
 }

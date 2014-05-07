@@ -34,7 +34,7 @@ func (command UpdateServiceBroker) Metadata() command_metadata.CommandMetadata {
 func (cmd UpdateServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 4 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "update-service-broker")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

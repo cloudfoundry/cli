@@ -34,7 +34,7 @@ func (command RenameServiceBroker) Metadata() command_metadata.CommandMetadata {
 func (cmd RenameServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "rename-service-broker")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

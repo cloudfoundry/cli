@@ -36,7 +36,7 @@ func (command *CreateDomain) Metadata() command_metadata.CommandMetadata {
 func (cmd *CreateDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "create-domain")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 
