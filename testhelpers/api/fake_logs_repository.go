@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"time"
 )
 
 type FakeLogsRepository struct {
@@ -21,7 +20,7 @@ func (l *FakeLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMes
 	return l.RecentLogs, l.RecentLogErr
 }
 
-func (l *FakeLogsRepository) TailLogsFor(appGuid string, bufferTime time.Duration, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error) {
+func (l *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error) {
 	l.AppLoggedGuid = appGuid
 
 	err = l.TailLogErr

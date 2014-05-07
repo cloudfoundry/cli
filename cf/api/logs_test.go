@@ -2,33 +2,37 @@ package api_test
 
 import (
 	"code.google.com/p/gogoprotobuf/proto"
-	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"time"
+
+	. "github.com/cloudfoundry/cli/cf/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 var _ = Describe("loggregator logs repository", func() {
 	var (
 		fakeConsumer       *testapi.FakeLoggregatorConsumer
-		logsRepo           LoggregatorLogsRepository
+		logsRepo           LogsRepository
 		configRepo         configuration.ReadWriter
 		fakeTokenRefresher *testapi.FakeAuthenticationRepository
 	)
 
 	BeforeEach(func() {
+		BufferTime = 1 * time.Millisecond
 		fakeConsumer = testapi.NewFakeLoggregatorConsumer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
 		configRepo.SetAccessToken("the-access-token")
 		fakeTokenRefresher = &testapi.FakeAuthenticationRepository{}
+	})
 
+	JustBeforeEach(func() {
 		logsRepo = NewLoggregatorLogsRepository(configRepo, fakeConsumer, fakeTokenRefresher)
 	})
 
@@ -91,7 +95,7 @@ var _ = Describe("loggregator logs repository", func() {
 			})
 
 			It("returns an error", func() {
-				err := logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() {}, func(*logmessage.LogMessage) {})
+				err := logsRepo.TailLogsFor("app-guid", func() {}, func(*logmessage.LogMessage) {})
 				Expect(err).To(Equal(errors.New("oops")))
 			})
 		})
@@ -110,7 +114,7 @@ var _ = Describe("loggregator logs repository", func() {
 					}
 				}
 
-				err := logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() {}, func(*logmessage.LogMessage) {})
+				err := logsRepo.TailLogsFor("app-guid", func() {}, func(*logmessage.LogMessage) {})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeTokenRefresher.RefreshTokenCalled).To(BeTrue())
 			})
@@ -125,7 +129,7 @@ var _ = Describe("loggregator logs repository", func() {
 					return nil, nil
 				}
 
-				logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() {}, func(msg *logmessage.LogMessage) {})
+				logsRepo.TailLogsFor("app-guid", func() {}, func(msg *logmessage.LogMessage) {})
 			})
 
 			It("sets the on connect callback", func(done Done) {
@@ -135,42 +139,91 @@ var _ = Describe("loggregator logs repository", func() {
 				}
 
 				called := false
-				logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() { called = true }, func(msg *logmessage.LogMessage) {})
+				logsRepo.TailLogsFor("app-guid", func() { called = true }, func(msg *logmessage.LogMessage) {})
 				fakeConsumer.OnConnectCallback()
 				Expect(called).To(BeTrue())
 			})
 
-			It("sorts the messages before yielding them", func(done Done) {
-				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
-					logChan := make(chan *logmessage.LogMessage)
-					go func() {
-						logChan <- makeLogMessage("hello3", 300)
-						logChan <- makeLogMessage("hello2", 200)
-						logChan <- makeLogMessage("hello1", 100)
-						fakeConsumer.WaitForClose()
-						close(logChan)
-					}()
-
-					return logChan, nil
-				}
-
-				receivedMessages := []*logmessage.LogMessage{}
-				err := logsRepo.TailLogsFor("app-guid", 250*time.Millisecond, func() {}, func(msg *logmessage.LogMessage) {
-					receivedMessages = append(receivedMessages, msg)
-					if len(receivedMessages) >= 3 {
-						logsRepo.Close()
-					}
+			Context("and the buffer time is sufficient for sorting", func() {
+				BeforeEach(func() {
+					BufferTime = 250 * time.Millisecond
 				})
 
-				Expect(err).NotTo(HaveOccurred())
+				It("sorts the messages before yielding them", func(done Done) {
+					fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+						logChan := make(chan *logmessage.LogMessage)
+						go func() {
+							logChan <- makeLogMessage("hello3", 300)
+							logChan <- makeLogMessage("hello2", 200)
+							logChan <- makeLogMessage("hello1", 100)
+							fakeConsumer.WaitForClose()
+							close(logChan)
+						}()
 
-				Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
-					makeLogMessage("hello1", 100),
-					makeLogMessage("hello2", 200),
-					makeLogMessage("hello3", 300),
-				}))
+						return logChan, nil
+					}
 
-				close(done)
+					receivedMessages := []*logmessage.LogMessage{}
+					err := logsRepo.TailLogsFor("app-guid", func() {}, func(msg *logmessage.LogMessage) {
+						receivedMessages = append(receivedMessages, msg)
+						if len(receivedMessages) >= 3 {
+							logsRepo.Close()
+						}
+					})
+
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
+						makeLogMessage("hello1", 100),
+						makeLogMessage("hello2", 200),
+						makeLogMessage("hello3", 300),
+					}))
+
+					close(done)
+				})
+			})
+
+			Context("and the buffer time is very long", func() {
+				BeforeEach(func() {
+					BufferTime = 30 * time.Second
+				})
+
+				It("flushes remaining log messages when Close is called", func(done Done) {
+					synchronizationChannel := make(chan (bool))
+
+					fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+						fakeConsumer.OnConnectCallback()
+						logChan := make(chan *logmessage.LogMessage)
+						go func() {
+							logChan <- makeLogMessage("One does not simply consume a log message", 1000)
+							synchronizationChannel <- true
+							fakeConsumer.WaitForClose()
+							close(logChan)
+						}()
+
+						return logChan, nil
+					}
+
+					receivedMessages := []*logmessage.LogMessage{}
+
+					go func() {
+						defer GinkgoRecover()
+
+						<-synchronizationChannel
+
+						Expect(receivedMessages).To(BeEmpty())
+						logsRepo.Close()
+						Expect(receivedMessages).ToNot(BeEmpty())
+
+						done <- true
+					}()
+
+					err := logsRepo.TailLogsFor("app-guid", func() {}, func(msg *logmessage.LogMessage) {
+						receivedMessages = append(receivedMessages, msg)
+					})
+
+					Expect(err).NotTo(HaveOccurred())
+				})
 			})
 		})
 	})
@@ -186,5 +239,4 @@ func makeLogMessage(message string, timestamp int64) *logmessage.LogMessage {
 		SourceName:  &sourceName,
 		Timestamp:   proto.Int64(timestamp),
 	}
-
 }
