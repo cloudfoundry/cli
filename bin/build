@@ -3,4 +3,11 @@
 set -e
 
 echo -e "\nGenerating Binary..."
-go build -o $(dirname $0)/../out/cf ./main
+
+GODEP=$(which godep)
+if [[ -z $GODEP ]] ; then
+  echo "godep is not installed. Run 'go get github.com/tools/godep'"
+  exit 1
+fi
+
+GOPATH=$($GODEP path):$GOPATH go build -o $(dirname $0)/../out/cf ./main
