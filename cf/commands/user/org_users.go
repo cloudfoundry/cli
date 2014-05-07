@@ -49,7 +49,7 @@ func (command *OrgUsers) Metadata() command_metadata.CommandMetadata {
 func (cmd *OrgUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect usage")
-		cmd.ui.FailWithUsage(c, "org-users")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

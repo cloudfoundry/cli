@@ -47,7 +47,7 @@ func (command *UpdateUserProvidedService) Metadata() command_metadata.CommandMet
 func (cmd *UpdateUserProvidedService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "update-user-provided-service")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

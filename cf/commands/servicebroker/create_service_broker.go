@@ -35,7 +35,7 @@ func (cmd CreateServiceBroker) GetRequirements(requirementsFactory requirements.
 
 	if len(c.Args()) != 4 {
 		err = errors.New("Incorrect usage")
-		cmd.ui.FailWithUsage(c, "create-service-broker")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

@@ -43,7 +43,7 @@ func (command CreateQuota) Metadata() command_metadata.CommandMetadata {
 
 func (cmd CreateQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context, "create-quota")
+		cmd.ui.FailWithUsage(context)
 	}
 
 	return []requirements.Requirement{

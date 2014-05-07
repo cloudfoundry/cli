@@ -45,7 +45,7 @@ func (command *Curl) Metadata() command_metadata.CommandMetadata {
 func (cmd *Curl) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect number of arguments")
-		cmd.ui.FailWithUsage(c, "curl")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

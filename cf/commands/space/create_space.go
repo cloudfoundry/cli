@@ -47,7 +47,7 @@ func (command CreateSpace) Metadata() command_metadata.CommandMetadata {
 func (cmd CreateSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "create-space")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

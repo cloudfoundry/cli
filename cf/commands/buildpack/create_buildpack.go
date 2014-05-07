@@ -48,7 +48,7 @@ func (cmd CreateBuildpack) GetRequirements(requirementsFactory requirements.Fact
 
 func (cmd CreateBuildpack) Run(c *cli.Context) {
 	if len(c.Args()) != 3 {
-		cmd.ui.FailWithUsage(c, "create-buildpack")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

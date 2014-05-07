@@ -36,7 +36,7 @@ func (command *RenameOrg) Metadata() command_metadata.CommandMetadata {
 func (cmd *RenameOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "rename-org")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])

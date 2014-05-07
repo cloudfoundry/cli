@@ -37,7 +37,7 @@ func (command *RenameApp) Metadata() command_metadata.CommandMetadata {
 func (cmd *RenameApp) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "rename")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])

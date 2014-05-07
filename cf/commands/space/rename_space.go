@@ -36,7 +36,7 @@ func (command *RenameSpace) Metadata() command_metadata.CommandMetadata {
 func (cmd *RenameSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "rename-space")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(c.Args()[0])

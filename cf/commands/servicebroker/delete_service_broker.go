@@ -37,7 +37,7 @@ func (command DeleteServiceBroker) Metadata() command_metadata.CommandMetadata {
 func (cmd DeleteServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "delete-service-broker")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

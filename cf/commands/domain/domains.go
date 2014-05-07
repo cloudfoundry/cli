@@ -37,7 +37,7 @@ func (command *ListDomains) Metadata() command_metadata.CommandMetadata {
 func (cmd *ListDomains) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) > 0 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "domains")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

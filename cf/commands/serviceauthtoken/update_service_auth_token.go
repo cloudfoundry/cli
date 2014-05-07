@@ -34,7 +34,7 @@ func (command UpdateServiceAuthTokenFields) Metadata() command_metadata.CommandM
 func (cmd UpdateServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect usage")
-		cmd.ui.FailWithUsage(c, "update-service-auth-token")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 

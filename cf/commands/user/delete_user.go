@@ -37,7 +37,7 @@ func (command DeleteUser) Metadata() command_metadata.CommandMetadata {
 func (cmd DeleteUser) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Invalid usage")
-		cmd.ui.FailWithUsage(c, "delete-user")
+		cmd.ui.FailWithUsage(c)
 		return
 	}
 
