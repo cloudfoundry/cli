@@ -2,7 +2,6 @@ language: go
 go:
 - 1.2
 before_install:
-- git submodule update --init --recursive
 - ./bin/go get code.google.com/p/go.tools/cmd/vet
 install: ./bin/build
 script: ./bin/test
