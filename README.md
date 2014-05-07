@@ -91,7 +91,7 @@ Cloning the repository
 ======================
 
 1. Install [Go](https://golang.org)
-1. Install [godep](https://github.com/tools/godep) : `go get https://github.com/tools/godep`
+1. Install [godep](https://github.com/tools/godep) : `go get github.com/tools/godep`
 1. Clone (Forking beforehand for development).
 1. [Ensure your $GOPATH is set correctly](http://golang.org/cmd/go/#hdr-GOPATH_environment_variable)
 1. Install dependencies with Godep: `godep restore`
