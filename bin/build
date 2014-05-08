@@ -5,8 +5,9 @@ set -e
 echo -e "\nGenerating Binary..."
 
 GODEP=$(which godep)
+
 if [[ -z $GODEP ]] ; then
-  echo "godep is not installed. Run 'go get github.com/tools/godep'"
+  echo -e "godep is not installed. Run 'go get github.com/tools/godep'"
   exit 1
 fi
 
