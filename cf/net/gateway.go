@@ -22,7 +22,7 @@ const (
 	JOB_FINISHED             = "finished"
 	JOB_FAILED               = "failed"
 	DEFAULT_POLLING_THROTTLE = 5 * time.Second
-	ASYNC_REQUEST_TIMEOUT    = 20 * time.Second
+	ASYNC_REQUEST_TIMEOUT    = 10 * time.Minute
 )
 
 type JobResource struct {
