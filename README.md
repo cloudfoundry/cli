@@ -120,12 +120,32 @@ Contributing
 Architecture overview
 ---------------------
 
-The app (in `cf/app/app.go`) declares the list of available commands, which are composed of a Name,
-Description, Usage and any optional Flags. The action for each command is to instantiate a command object,
- which is invoked by the runner (in `cf/commands/runner.go`).
+A command is a struct that implements this interface:
 
-A command has `Requirements`, and a `Run` function. Requirements are used as filters before running the command.
-If any of them fails, the command will not run (see `cf/requirements` for examples of requirements).
+```
+type Command interface {
+	Metadata() command_metadata.CommandMetadata
+	GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error)
+	Run(c *cli.Context)
+}
+```
+
+`Metadata()` is just a description of the command name, usage and flags:
+```
+type CommandMetadata struct {
+	Name            string
+	ShortName       string
+	Usage           string
+	Description     string
+	Flags           []cli.Flag
+	SkipFlagParsing bool
+}
+```
+
+`GetRequirements()` returns a list of requirements that need to be met before a command can be invoked.
+
+`Run()` is the method that your command implements to do whatever it's supposed to do. The `context` object
+provides flags and arguments.
 
 When the command is run, it communicates with api using repositories (they are in `cf/api`).
 
