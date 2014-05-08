@@ -1,5 +1,12 @@
 #!/bin/bash
 
 set -e
-$(dirname $0)/build
-go run -race $(dirname $0)/../main/cf.go "$@"
+
+GODEP=$(which godep)
+
+if [[ -z $GODEP ]] ; then
+  echo -e "godep is not installed. Run 'go get github.com/tools/godep'"
+  exit 1
+fi
+
+GOPATH=$($GODEP path):$GOPATH go run -race $(dirname $0)/../main/main.go "$@"
