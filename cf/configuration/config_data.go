@@ -28,6 +28,7 @@ type Data struct {
 	OrganizationFields    models.OrganizationFields
 	SpaceFields           models.SpaceFields
 	SSLDisabled           bool
+	AsyncTimeout          uint
 }
 
 func NewData() (data *Data) {

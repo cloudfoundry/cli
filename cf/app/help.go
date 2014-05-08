@@ -242,6 +242,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "curl"),
+					newCmdPresenter(app, maxNameLen, "config"),
 				},
 			},
 		},

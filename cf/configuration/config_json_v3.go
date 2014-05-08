@@ -17,6 +17,7 @@ type configJsonV3 struct {
 	OrganizationFields    models.OrganizationFields
 	SpaceFields           models.SpaceFields
 	SSLDisabled           bool
+	AsyncTimeout          uint
 }
 
 func JsonMarshalV3(config *Data) (output []byte, err error) {
@@ -32,6 +33,7 @@ func JsonMarshalV3(config *Data) (output []byte, err error) {
 		OrganizationFields:    config.OrganizationFields,
 		SpaceFields:           config.SpaceFields,
 		SSLDisabled:           config.SSLDisabled,
+		AsyncTimeout:          config.AsyncTimeout,
 	})
 }
 
@@ -57,6 +59,7 @@ func JsonUnmarshalV3(input []byte, config *Data) (err error) {
 	config.AuthorizationEndpoint = configJson.AuthorizationEndpoint
 	config.UaaEndpoint = configJson.UaaEndpoint
 	config.SSLDisabled = configJson.SSLDisabled
+	config.AsyncTimeout = configJson.AsyncTimeout
 
 	return
 }

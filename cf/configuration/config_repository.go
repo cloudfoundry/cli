@@ -48,6 +48,8 @@ type Reader interface {
 	UserEmail() string
 	IsLoggedIn() bool
 	IsSSLDisabled() bool
+
+	AsyncTimeout() uint
 }
 
 type ReadWriter interface {
@@ -63,6 +65,7 @@ type ReadWriter interface {
 	SetOrganizationFields(models.OrganizationFields)
 	SetSpaceFields(models.SpaceFields)
 	SetSSLDisabled(bool)
+	SetAsyncTimeout(uint)
 }
 
 type Repository interface {
@@ -232,6 +235,13 @@ func (c *configRepository) IsSSLDisabled() (isSSLDisabled bool) {
 	return
 }
 
+func (c *configRepository) AsyncTimeout() (timeout uint) {
+	c.read(func() {
+		timeout = c.data.AsyncTimeout
+	})
+	return
+}
+
 // SETTERS
 
 func (c *configRepository) ClearSession() {
@@ -300,5 +310,11 @@ func (c *configRepository) SetSpaceFields(space models.SpaceFields) {
 func (c *configRepository) SetSSLDisabled(disabled bool) {
 	c.write(func() {
 		c.data.SSLDisabled = disabled
+	})
+}
+
+func (c *configRepository) SetAsyncTimeout(timeout uint) {
+	c.write(func() {
+		c.data.AsyncTimeout = timeout
 	})
 }
