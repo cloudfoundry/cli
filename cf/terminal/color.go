@@ -26,6 +26,7 @@ var (
 	colorize               func(message string, color Color, bold int) string
 	OsSupportsColors       = runtime.GOOS != "windows"
 	TerminalSupportsColors = isTerminal()
+	UserAskedForColors     = ""
 )
 
 func init() {
@@ -45,10 +46,16 @@ func ResetColorSupport() {
 }
 
 func colorsEnabled() bool {
-	userEnabledColors := os.Getenv("CF_COLOR") != "false"
+	return userDidNotDisableColor() &&
+		(userEnabledColors() || (TerminalSupportsColors && OsSupportsColors))
+}
 
-	return userEnabledColors &&
-		(os.Getenv("CF_COLOR") == "true" || (TerminalSupportsColors && OsSupportsColors))
+func userEnabledColors() bool {
+	return UserAskedForColors == "true" || os.Getenv("CF_COLOR") == "true"
+}
+
+func userDidNotDisableColor() bool {
+	return os.Getenv("CF_COLOR") != "false" && (UserAskedForColors != "false" || os.Getenv("CF_COLOR") == "true")
 }
 
 func Colorize(message string, color Color) string {
