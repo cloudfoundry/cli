@@ -69,10 +69,10 @@ var _ = Describe("config command", func() {
 	Context("--color flag", func() {
 		It("stores the color value when --color flag is provided", func() {
 			runCommand("--color", "true")
-			Expect(configRepo.ColorEnabled()).Should(Equal(true))
+			Expect(configRepo.ColorEnabled()).Should(Equal("true"))
 
 			runCommand("--color", "false")
-			Expect(configRepo.ColorEnabled()).Should(Equal(false))
+			Expect(configRepo.ColorEnabled()).Should(Equal("false"))
 		})
 
 		It("fails with usage when a non-bool value is provided", func() {

@@ -52,7 +52,7 @@ type Reader interface {
 	AsyncTimeout() uint
 	Trace() string
 
-	ColorEnabled() bool
+	ColorEnabled() string
 }
 
 type ReadWriter interface {
@@ -70,7 +70,7 @@ type ReadWriter interface {
 	SetSSLDisabled(bool)
 	SetAsyncTimeout(uint)
 	SetTrace(string)
-	SetColorEnabled(bool)
+	SetColorEnabled(string)
 }
 
 type Repository interface {
@@ -254,9 +254,9 @@ func (c *configRepository) Trace() (trace string) {
 	return
 }
 
-func (c *configRepository) ColorEnabled() (flag bool) {
+func (c *configRepository) ColorEnabled() (enabled string) {
 	c.read(func() {
-		flag = c.data.ColorEnabled
+		enabled = c.data.ColorEnabled
 	})
 	return
 }
@@ -344,8 +344,8 @@ func (c *configRepository) SetTrace(value string) {
 	})
 }
 
-func (c *configRepository) SetColorEnabled(flag bool) {
+func (c *configRepository) SetColorEnabled(enabled string) {
 	c.write(func() {
-		c.data.ColorEnabled = flag
+		c.data.ColorEnabled = enabled
 	})
 }

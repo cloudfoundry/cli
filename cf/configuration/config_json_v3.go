@@ -19,7 +19,7 @@ type configJsonV3 struct {
 	SSLDisabled           bool
 	AsyncTimeout          uint
 	Trace                 string
-	ColorEnabled          bool
+	ColorEnabled          string // need to be able to express true, false and undefined
 }
 
 func JsonMarshalV3(config *Data) (output []byte, err error) {

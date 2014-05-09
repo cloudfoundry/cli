@@ -58,9 +58,9 @@ func (cmd ConfigCommands) Run(context *cli.Context) {
 		value := context.String("color")
 		switch value {
 		case "true":
-			cmd.config.SetColorEnabled(true)
+			cmd.config.SetColorEnabled("true")
 		case "false":
-			cmd.config.SetColorEnabled(false)
+			cmd.config.SetColorEnabled("false")
 		default:
 			cmd.ui.FailWithUsage(context)
 		}
