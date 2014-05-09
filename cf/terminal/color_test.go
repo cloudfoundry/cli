@@ -9,6 +9,10 @@ import (
 )
 
 var _ = Describe("Terminal colors", func() {
+	BeforeEach(func() {
+		UserAskedForColors = ""
+	})
+
 	JustBeforeEach(func() {
 		ResetColorSupport()
 	})
@@ -25,6 +29,11 @@ var _ = Describe("Terminal colors", func() {
 			Context("When the CF_COLOR env variable is not specified", func() {
 				BeforeEach(func() { os.Setenv("CF_COLOR", "") })
 				itDoesntColorize()
+
+				Context("when the user DOES ask for colors", func() {
+					BeforeEach(func() { UserAskedForColors = "true" })
+					itColorizes()
+				})
 			})
 		})
 
@@ -37,11 +46,21 @@ var _ = Describe("Terminal colors", func() {
 				Context("And the terminal supports colors", func() {
 					BeforeEach(func() { TerminalSupportsColors = true })
 					itColorizes()
+
+					Context("And user does not ask for color", func() {
+						BeforeEach(func() { UserAskedForColors = "false" })
+						itDoesntColorize()
+					})
 				})
 
 				Context("And the terminal doesn't support colors", func() {
 					BeforeEach(func() { TerminalSupportsColors = false })
 					itDoesntColorize()
+
+					Context("And user asked for color", func() {
+						BeforeEach(func() { UserAskedForColors = "true" })
+						itColorizes()
+					})
 				})
 			})
 
@@ -51,6 +70,16 @@ var _ = Describe("Terminal colors", func() {
 				Context("And the terminal supports colors", func() {
 					BeforeEach(func() { TerminalSupportsColors = true })
 					itColorizes()
+
+					Context("and the user asked for colors", func() {
+						BeforeEach(func() { UserAskedForColors = "true" })
+						itColorizes()
+					})
+
+					Context("and the user did not ask for colors", func() {
+						BeforeEach(func() { UserAskedForColors = "false" })
+						itColorizes()
+					})
 				})
 
 				Context("Even if the terminal doesn't support colors", func() {
@@ -66,6 +95,11 @@ var _ = Describe("Terminal colors", func() {
 				})
 
 				itDoesntColorize()
+
+				Context("and the user asked for colors", func() {
+					BeforeEach(func() { UserAskedForColors = "true" })
+					itDoesntColorize()
+				})
 			})
 		})
 	})
