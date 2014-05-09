@@ -41,6 +41,9 @@ func setupDependencies() (deps *cliDependencies) {
 		}
 	})
 
+	terminal.UserAskedForColors = deps.configRepo.ColorEnabled()
+	terminal.InitColorSupport()
+
 	deps.gateways = map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(deps.configRepo),
 		"cloud-controller": net.NewCloudControllerGateway(deps.configRepo),

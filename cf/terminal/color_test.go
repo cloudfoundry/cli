@@ -14,7 +14,7 @@ var _ = Describe("Terminal colors", func() {
 	})
 
 	JustBeforeEach(func() {
-		ResetColorSupport()
+		InitColorSupport()
 	})
 
 	Describe("CF_COLOR", func() {
@@ -50,6 +50,11 @@ var _ = Describe("Terminal colors", func() {
 					Context("And user does not ask for color", func() {
 						BeforeEach(func() { UserAskedForColors = "false" })
 						itDoesntColorize()
+					})
+
+					Context("And user does ask for color", func() {
+						BeforeEach(func() { UserAskedForColors = "true" })
+						itColorizes()
 					})
 				})
 

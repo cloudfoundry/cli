@@ -30,10 +30,10 @@ var (
 )
 
 func init() {
-	ResetColorSupport()
+	InitColorSupport()
 }
 
-func ResetColorSupport() {
+func InitColorSupport() {
 	if colorsEnabled() {
 		colorize = func(message string, color Color, bold int) string {
 			return fmt.Sprintf("\033[%d;%dm%s\033[0m", bold, color, message)
