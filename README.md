@@ -87,17 +87,18 @@ Filing Bugs
 - the stack trace generated (if any)
 - any other relevant information
 
-Cloning the repository
-======================
+Forking the repository for development
+======================================
 
 1. Install [Go](https://golang.org)
-1. Install [godep](https://github.com/tools/godep) : `go get github.com/tools/godep`
-1. Clone (Forking beforehand for development).
 1. [Ensure your $GOPATH is set correctly](http://golang.org/cmd/go/#hdr-GOPATH_environment_variable)
-1. Install dependencies with Godep: `godep restore`
+1. Install [godep](https://github.com/tools/godep) : `go get github.com/tools/godep`
+1. Get the cli source code: `go get github.com/cloudfoundry/cli`
+1. Fork the repository
+1. Add your fork as a remote: `git remote add your_name https://github.com/your_name/cli`
 
 Building
-=======
+========
 
 1. Run `./bin/build`
 1. The binary will be built into the `./out` directory.
