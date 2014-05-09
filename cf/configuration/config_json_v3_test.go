@@ -33,7 +33,9 @@ var exampleJSON = `
 		"Guid": "the-space-guid",
 		"Name": "the-space"
 	},
-	"SSLDisabled": true
+	"SSLDisabled": true,
+	"AsyncTimeout": 1000,
+	"Trace": "path/to/some/file"
 }`
 
 var exampleConfig = &Data{
@@ -52,7 +54,9 @@ var exampleConfig = &Data{
 		Guid: "the-space-guid",
 		Name: "the-space",
 	},
-	SSLDisabled: true,
+	SSLDisabled:  true,
+	Trace:        "path/to/some/file",
+	AsyncTimeout: 1000,
 }
 
 var _ = Describe("V3 Config files", func() {

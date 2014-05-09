@@ -22,26 +22,34 @@ func (cmd ConfigCommands) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "config",
 		Description: "write default values to the config",
-		Usage:       "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES]",
+		Usage:       "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file]",
 		Flags: []cli.Flag{
 			flag_helpers.NewIntFlag("async-timeout", "Timeout for async HTTP requests"),
+			flag_helpers.NewStringFlag("trace", "Trace HTTP requests"),
 		},
 	}
 }
 
-func (cmd ConfigCommands) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	return
+func (cmd ConfigCommands) GetRequirements(_ requirements.Factory, _ *cli.Context) ([]requirements.Requirement, error) {
+	return nil, nil
 }
 
 func (cmd ConfigCommands) Run(context *cli.Context) {
-	if !context.IsSet("async-timeout") {
+	if !context.IsSet("trace") && !context.IsSet("async-timeout") {
 		cmd.ui.FailWithUsage(context)
+		return
 	}
 
-	asyncTimeout := context.Int("async-timeout")
-	if asyncTimeout < 0 {
-		cmd.ui.FailWithUsage(context)
+	if context.IsSet("async-timeout") {
+		asyncTimeout := context.Int("async-timeout")
+		if asyncTimeout < 0 {
+			cmd.ui.FailWithUsage(context)
+		}
+
+		cmd.config.SetAsyncTimeout(uint(asyncTimeout))
 	}
 
-	cmd.config.SetAsyncTimeout(uint(asyncTimeout))
+	if context.IsSet("trace") {
+		cmd.config.SetTrace(context.String("trace"))
+	}
 }
