@@ -33,22 +33,22 @@ func init() {
 }
 
 func ResetColorSupport() {
-	if colorsDisabled() {
-		colorize = func(message string, _ Color, _ int) string {
-			return message
-		}
-	} else {
+	if colorsEnabled() {
 		colorize = func(message string, color Color, bold int) string {
 			return fmt.Sprintf("\033[%d;%dm%s\033[0m", bold, color, message)
+		}
+	} else {
+		colorize = func(message string, _ Color, _ int) string {
+			return message
 		}
 	}
 }
 
-func colorsDisabled() bool {
-	userDisabledColors := os.Getenv("CF_COLOR") == "false"
+func colorsEnabled() bool {
+	userEnabledColors := os.Getenv("CF_COLOR") != "false"
 
-	return userDisabledColors ||
-		(os.Getenv("CF_COLOR") != "true" && (!TerminalSupportsColors || !OsSupportsColors))
+	return userEnabledColors &&
+		(os.Getenv("CF_COLOR") == "true" || (TerminalSupportsColors && OsSupportsColors))
 }
 
 func Colorize(message string, color Color) string {
