@@ -29,25 +29,40 @@ var _ = Describe("config command", func() {
 		cmd := NewConfig(ui, configRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("config", args), requirementsFactory)
 	}
-
 	It("fails requirements when no args are provided", func() {
 		runCommand()
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
-	It("stores the timeout in minutes when the --async-timeout flag is provided", func() {
-		runCommand("--async-timeout", "12")
-		Expect(configRepo.AsyncTimeout()).Should(Equal(uint(12)))
+	Context("--async-timeout flag", func() {
+
+		It("stores the timeout in minutes when the --async-timeout flag is provided", func() {
+			runCommand("--async-timeout", "12")
+			Expect(configRepo.AsyncTimeout()).Should(Equal(uint(12)))
+		})
+
+		It("fails with usage when a invalid async timeout value is passed, e.g., a string", func() {
+			runCommand("--async-timeout", "lol")
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
+
+		It("fails with usage when a negative timout is passed", func() {
+			runCommand("--async-timeout", "-555")
+			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(configRepo.AsyncTimeout()).To(Equal(uint(0)))
+		})
 	})
 
-	It("fails with usage when a invalid async timeout value is passed, e.g., a string", func() {
-		runCommand("--async-timeout", "lol")
-		Expect(ui.FailedWithUsage).To(BeTrue())
-	})
+	Context("--trace flag", func() {
+		It("stores the trace value when --trace flag is provided", func() {
+			runCommand("--trace", "true")
+			Expect(configRepo.Trace()).Should(Equal("true"))
 
-	It("fails with usage when a negative timout is passed", func() {
-		runCommand("--async-timeout", "-555")
-		Expect(ui.FailedWithUsage).To(BeTrue())
-		Expect(configRepo.AsyncTimeout()).To(Equal(uint(0)))
+			runCommand("--trace", "false")
+			Expect(configRepo.Trace()).Should(Equal("false"))
+
+			runCommand("--trace", "some/file/lol")
+			Expect(configRepo.Trace()).Should(Equal("some/file/lol"))
+		})
 	})
 })

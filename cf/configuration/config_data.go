@@ -29,6 +29,7 @@ type Data struct {
 	SpaceFields           models.SpaceFields
 	SSLDisabled           bool
 	AsyncTimeout          uint
+	Trace                 string
 }
 
 func NewData() (data *Data) {

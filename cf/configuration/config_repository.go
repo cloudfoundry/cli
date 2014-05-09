@@ -50,6 +50,7 @@ type Reader interface {
 	IsSSLDisabled() bool
 
 	AsyncTimeout() uint
+	Trace() string
 }
 
 type ReadWriter interface {
@@ -66,6 +67,7 @@ type ReadWriter interface {
 	SetSpaceFields(models.SpaceFields)
 	SetSSLDisabled(bool)
 	SetAsyncTimeout(uint)
+	SetTrace(string)
 }
 
 type Repository interface {
@@ -242,6 +244,13 @@ func (c *configRepository) AsyncTimeout() (timeout uint) {
 	return
 }
 
+func (c *configRepository) Trace() (trace string) {
+	c.read(func() {
+		trace = c.data.Trace
+	})
+	return
+}
+
 // SETTERS
 
 func (c *configRepository) ClearSession() {
@@ -316,5 +325,11 @@ func (c *configRepository) SetSSLDisabled(disabled bool) {
 func (c *configRepository) SetAsyncTimeout(timeout uint) {
 	c.write(func() {
 		c.data.AsyncTimeout = timeout
+	})
+}
+
+func (c *configRepository) SetTrace(value string) {
+	c.write(func() {
+		c.data.Trace = value
 	})
 }

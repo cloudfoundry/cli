@@ -18,6 +18,7 @@ type configJsonV3 struct {
 	SpaceFields           models.SpaceFields
 	SSLDisabled           bool
 	AsyncTimeout          uint
+	Trace                 string
 }
 
 func JsonMarshalV3(config *Data) (output []byte, err error) {
@@ -33,6 +34,7 @@ func JsonMarshalV3(config *Data) (output []byte, err error) {
 		OrganizationFields:    config.OrganizationFields,
 		SpaceFields:           config.SpaceFields,
 		SSLDisabled:           config.SSLDisabled,
+		Trace:                 config.Trace,
 		AsyncTimeout:          config.AsyncTimeout,
 	})
 }
@@ -60,6 +62,7 @@ func JsonUnmarshalV3(input []byte, config *Data) (err error) {
 	config.UaaEndpoint = configJson.UaaEndpoint
 	config.SSLDisabled = configJson.SSLDisabled
 	config.AsyncTimeout = configJson.AsyncTimeout
+	config.Trace = configJson.Trace
 
 	return
 }
