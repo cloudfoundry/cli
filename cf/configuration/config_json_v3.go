@@ -19,6 +19,7 @@ type configJsonV3 struct {
 	SSLDisabled           bool
 	AsyncTimeout          uint
 	Trace                 string
+	ColorEnabled          bool
 }
 
 func JsonMarshalV3(config *Data) (output []byte, err error) {
@@ -36,6 +37,7 @@ func JsonMarshalV3(config *Data) (output []byte, err error) {
 		SSLDisabled:           config.SSLDisabled,
 		Trace:                 config.Trace,
 		AsyncTimeout:          config.AsyncTimeout,
+		ColorEnabled:          config.ColorEnabled,
 	})
 }
 
@@ -63,6 +65,7 @@ func JsonUnmarshalV3(input []byte, config *Data) (err error) {
 	config.SSLDisabled = configJson.SSLDisabled
 	config.AsyncTimeout = configJson.AsyncTimeout
 	config.Trace = configJson.Trace
+	config.ColorEnabled = configJson.ColorEnabled
 
 	return
 }

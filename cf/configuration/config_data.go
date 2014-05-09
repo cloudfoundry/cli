@@ -30,6 +30,7 @@ type Data struct {
 	SSLDisabled           bool
 	AsyncTimeout          uint
 	Trace                 string
+	ColorEnabled          bool
 }
 
 func NewData() (data *Data) {

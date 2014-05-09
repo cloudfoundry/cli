@@ -29,7 +29,7 @@ var _ = Describe("config command", func() {
 		cmd := NewConfig(ui, configRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("config", args), requirementsFactory)
 	}
-	It("fails requirements when no args are provided", func() {
+	It("fails requirements when no flags are provided", func() {
 		runCommand()
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
@@ -63,6 +63,21 @@ var _ = Describe("config command", func() {
 
 			runCommand("--trace", "some/file/lol")
 			Expect(configRepo.Trace()).Should(Equal("some/file/lol"))
+		})
+	})
+
+	Context("--color flag", func() {
+		It("stores the color value when --color flag is provided", func() {
+			runCommand("--color", "true")
+			Expect(configRepo.ColorEnabled()).Should(Equal(true))
+
+			runCommand("--color", "false")
+			Expect(configRepo.ColorEnabled()).Should(Equal(false))
+		})
+
+		It("fails with usage when a non-bool value is provided", func() {
+			runCommand("--color", "plaid")
+			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 	})
 })
