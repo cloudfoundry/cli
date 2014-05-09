@@ -36,7 +36,7 @@ var exampleJSON = `
 	"SSLDisabled": true,
 	"AsyncTimeout": 1000,
 	"Trace": "path/to/some/file",
-	"ColorEnabled": true
+	"ColorEnabled": "true"
 }`
 
 var exampleConfig = &Data{
@@ -58,7 +58,7 @@ var exampleConfig = &Data{
 	SSLDisabled:  true,
 	Trace:        "path/to/some/file",
 	AsyncTimeout: 1000,
-	ColorEnabled: true,
+	ColorEnabled: "true",
 }
 
 var _ = Describe("V3 Config files", func() {
