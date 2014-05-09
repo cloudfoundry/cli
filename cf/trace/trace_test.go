@@ -2,54 +2,51 @@ package trace_test
 
 import (
 	"bytes"
-	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/gofileutils/fileutils"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"runtime"
+
+	. "github.com/cloudfoundry/cli/cf/trace"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("trace logger", func() {
-	It("does not emit logs when CF_TRACE not set", func() {
-		stdOut := bytes.NewBuffer([]byte{})
-		trace.SetStdout(stdOut)
+	Describe("a new, better API", func() {
+		var (
+			stdout *bytes.Buffer
+		)
 
-		os.Setenv(trace.CF_TRACE, "false")
+		BeforeEach(func() {
+			stdout = bytes.NewBuffer([]byte{})
+			SetStdout(stdout)
+		})
 
-		logger := trace.NewLogger()
-		logger.Print("hello world")
+		It("assumes it should write to stdout", func() {
+			logger := NewLogger("true")
+			logger.Print("hello whirled")
 
-		result, _ := ioutil.ReadAll(stdOut)
-		Expect(string(result)).To(Equal(""))
-	})
+			result, err := ioutil.ReadAll(stdout)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).To(ContainSubstring("hello whirled"))
+		})
 
-	It("emits messages when CF_TRACE is set to 'true'", func() {
-		stdOut := bytes.NewBuffer([]byte{})
-		trace.SetStdout(stdOut)
+		It("prints to nothing when given false", func() {
+			logger := NewLogger("false")
+			logger.Print("hello whirled")
 
-		os.Setenv(trace.CF_TRACE, "true")
+			result, err := ioutil.ReadAll(stdout)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).To(BeEmpty())
+		})
 
-		logger := trace.NewLogger()
-		logger.Print("hello world")
-
-		result, _ := ioutil.ReadAll(stdOut)
-		Expect(string(result)).To(ContainSubstring("hello world"))
-	})
-
-	Context("when CF_TRACE is set to a filename", func() {
-		It("writes logs to that file", func() {
-			stdOut := bytes.NewBuffer([]byte{})
-			trace.SetStdout(stdOut)
-
+		It("prints to a file when given a string", func() {
 			fileutils.TempFile("trace_test", func(file *os.File, err error) {
 				Expect(err).NotTo(HaveOccurred())
 				file.Write([]byte("pre-existing content"))
 
-				os.Setenv(trace.CF_TRACE, file.Name())
-
-				logger := trace.NewLogger()
+				logger := NewLogger(file.Name())
 				logger.Print("hello world")
 
 				file.Seek(0, os.SEEK_SET)
@@ -60,27 +57,24 @@ var _ = Describe("trace logger", func() {
 				Expect(byteString).To(ContainSubstring("pre-existing content"))
 				Expect(byteString).To(ContainSubstring("hello world"))
 
-				result, _ = ioutil.ReadAll(stdOut)
-				Expect(string(result)).To(Equal(""))
+				result, _ = ioutil.ReadAll(stdout)
+				Expect(string(result)).To(BeEmpty())
 			})
 		})
-	})
 
-	Context("when CF_TRACE is set to a file path that cannot be opened", func() {
-		It("defaults to printing to its out pipe", func() {
-			if runtime.GOOS != "windows" {
-				stdOut := bytes.NewBuffer([]byte{})
-				trace.SetStdout(stdOut)
+		Context("when CF_TRACE is set to a file path that cannot be opened", func() {
+			It("defaults to printing to its out pipe", func() {
+				if runtime.GOOS != "windows" {
+					stdOut := bytes.NewBuffer([]byte{})
+					SetStdout(stdOut)
 
-				os.Setenv(trace.CF_TRACE, "/dev/null/whoops")
+					logger := NewLogger("/dev/null/whoops")
+					logger.Print("hello world")
 
-				logger := trace.NewLogger()
-				logger.Print("hello world")
-
-				result, _ := ioutil.ReadAll(stdOut)
-				Expect(string(result)).To(ContainSubstring("hello world"))
-			}
+					result, _ := ioutil.ReadAll(stdOut)
+					Expect(string(result)).To(ContainSubstring("hello world"))
+				}
+			})
 		})
-
 	})
 })
