@@ -42,3 +42,4 @@ tmp/
 .hg/
 
 *.test
+tags
