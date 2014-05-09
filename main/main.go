@@ -18,6 +18,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 )
 
 type cliDependencies struct {
@@ -43,6 +44,12 @@ func setupDependencies() (deps *cliDependencies) {
 
 	terminal.UserAskedForColors = deps.configRepo.ColorEnabled()
 	terminal.InitColorSupport()
+
+	if os.Getenv("CF_TRACE") != "" {
+		trace.Logger = trace.NewLogger(os.Getenv("CF_TRACE"))
+	} else {
+		trace.Logger = trace.NewLogger(deps.configRepo.Trace())
+	}
 
 	deps.gateways = map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(deps.configRepo),

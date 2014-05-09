@@ -25,7 +25,7 @@ var stdOut io.Writer = os.Stdout
 var Logger Printer
 
 func init() {
-	Logger = NewLogger()
+	Logger = NewLogger("")
 }
 
 func EnableTrace() {
@@ -40,16 +40,17 @@ func SetStdout(s io.Writer) {
 	stdOut = s
 }
 
-func NewLogger() Printer {
-	cf_trace := os.Getenv(CF_TRACE)
+func NewLogger(cf_trace string) Printer {
 	switch cf_trace {
 	case "", "false":
-		return new(nullLogger)
+		Logger = new(nullLogger)
 	case "true":
-		return newStdoutLogger()
+		Logger = newStdoutLogger()
 	default:
-		return newFileLogger(cf_trace)
+		Logger = newFileLogger(cf_trace)
 	}
+
+	return Logger
 }
 
 func newStdoutLogger() Printer {
