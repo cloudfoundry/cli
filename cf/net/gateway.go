@@ -59,6 +59,7 @@ type Gateway struct {
 	trustedCerts    []tls.Certificate
 	config          configuration.Reader
 	warnings        *[]string
+	AsyncTimeout    time.Duration
 }
 
 func newGateway(errHandler apiErrorHandler, config configuration.Reader) (gateway Gateway) {
@@ -66,6 +67,13 @@ func newGateway(errHandler apiErrorHandler, config configuration.Reader) (gatewa
 	gateway.config = config
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
 	gateway.warnings = &[]string{}
+
+	if config.AsyncTimeout() > 0 {
+		gateway.AsyncTimeout = time.Duration(config.AsyncTimeout()) * time.Minute
+	} else {
+		gateway.AsyncTimeout = ASYNC_REQUEST_TIMEOUT
+	}
+
 	return
 }
 
