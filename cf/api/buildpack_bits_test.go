@@ -33,11 +33,11 @@ var _ = Describe("BuildpackBitsRepository", func() {
 	)
 
 	BeforeEach(func() {
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		gateway := net.NewCloudControllerGateway(configRepo)
 		pwd, _ := os.Getwd()
 
 		buildpacksDir = filepath.Join(pwd, "../../fixtures/buildpacks")
-		configRepo = testconfig.NewRepositoryWithDefaults()
 		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, app_files.ApplicationZipper{})
 		buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
 

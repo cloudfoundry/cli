@@ -61,13 +61,43 @@ var _ = Describe("Gateway", func() {
 		uaaGateway = NewUAAGateway(config)
 	})
 
-	It("TestNewRequest", func() {
-		request, apiErr := ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+	Describe("async timeout", func() {
+		It("has an async timeout that defaults to a sane value", func() {
+			Expect(ccGateway.AsyncTimeout).To(Equal(ASYNC_REQUEST_TIMEOUT))
+		})
 
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
-		Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
-		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
+		Context("when the config has a positive async timeout", func() {
+			It("inherits the async timeout from the config", func() {
+				config.SetAsyncTimeout(9001)
+				ccGateway = NewCloudControllerGateway(config)
+				Expect(ccGateway.AsyncTimeout).To(Equal(9001 * time.Minute))
+			})
+		})
+	})
+
+	Describe("NewRequest", func() {
+		var (
+			request *Request
+			apiErr  error
+		)
+
+		BeforeEach(func() {
+			request, apiErr = ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("sets the Authorization header", func() {
+			Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
+		})
+
+		It("sets the accept header to application/json", func() {
+			Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
+		})
+
+		It("sets the user agent header", func() {
+			Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
+		})
+
 	})
 
 	Describe("making an async request", func() {
