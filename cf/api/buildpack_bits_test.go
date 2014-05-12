@@ -185,6 +185,8 @@ func uploadBuildpackRequest() testnet.TestRequest {
 			file, err := buildpackFile.Open()
 			Expect(err).NotTo(HaveOccurred())
 
+			Expect(buildpackFile.Filename).To(ContainSubstring(".zip"))
+
 			zipReader, err := zip.NewReader(file, 4096)
 			Expect(err).NotTo(HaveOccurred())
 
