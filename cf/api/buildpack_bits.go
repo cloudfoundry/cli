@@ -67,6 +67,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 			}
 
 			if stats.IsDir() {
+				buildpackFileName += ".zip" // FIXME: remove once #71167394 is fixed
 				err = repo.zipper.Zip(buildpackLocation, zipFileToUpload)
 			} else {
 				specifiedFile, openError := os.Open(buildpackLocation)
