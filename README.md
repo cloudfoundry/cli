@@ -37,13 +37,13 @@ Stable Release
 
 Installers
 ----------
-- [Debian 32 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_i386.deb)
-- [Debian 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_amd64.deb)
-- [Redhat 32 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_i386.rpm)
-- [Redhat 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_amd64.rpm)
-- [Mac OS X 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/installer-osx-amd64.pkg)
-- [Windows 32 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/installer-windows-386.zip)
-- [Windows 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/installer-windows-amd64.zip)
+- [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32)
+- [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64)
+- [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32)
+- [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64)
+- [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64)
+- [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32)
+- [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64)
 
 Edge Releases (master)
 ======================
@@ -51,11 +51,11 @@ Edge Releases (master)
 Edge binaries are published to our Amazon S3 bucket with each new commit that passes CI.
 These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed:
 
-- [Linux 64 bit binary](http://go-cli.s3.amazonaws.com/master/cf-linux-amd64.tgz)
-- [Linux 32 bit binary](http://go-cli.s3.amazonaws.com/master/cf-linux-386.tgz)
-- [Mac OS X 64 bit binary](http://go-cli.s3.amazonaws.com/master/cf-darwin-amd64.tgz)
-- [Windows 64 bit binary](http://go-cli.s3.amazonaws.com/master/cf-windows-amd64.zip)
-- [Windows 32 bit binary](http://go-cli.s3.amazonaws.com/master/cf-windows-386.zip)
+- [Linux 32 bit binary](https://cli.run.pivotal.io/edge?arch=linux32)
+- [Linux 64 bit binary](https://cli.run.pivotal.io/edge?arch=linux64)
+- [Mac OS X 64 bit binary](https://cli.run.pivotal.io/edge?arch=macosx64)
+- [Windows 32 bit binary](https://cli.run.pivotal.io/edge?arch=windows32)
+- [Windows 64 bit binary](https://cli.run.pivotal.io/edge?arch=windows64)
 
 You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
