@@ -39,3 +39,5 @@ git ci -m "Bump version to $version"
 
 echo "Creating v$version tag"
 git tag v$version
+
+echo -e "All Done! You should go update \033[0;37;41mThe CLAW\033[m"
