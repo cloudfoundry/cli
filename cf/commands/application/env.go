@@ -1,24 +1,26 @@
 package application
 
 import (
-	"errors"
+	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type Env struct {
-	ui     terminal.UI
-	config configuration.Reader
-	appReq requirements.ApplicationRequirement
+	ui      terminal.UI
+	config  configuration.Reader
+	appRepo api.ApplicationRepository
 }
 
-func NewEnv(ui terminal.UI, config configuration.Reader) (cmd *Env) {
+func NewEnv(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *Env) {
 	cmd = new(Env)
 	cmd.ui = ui
 	cmd.config = config
+	cmd.appRepo = appRepo
 	return
 }
 
@@ -31,24 +33,19 @@ func (command *Env) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *Env) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) < 1 {
-		err = errors.New("Incorrect Usage")
+func (cmd *Env) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
+	if len(c.Args()) != 1 {
 		cmd.ui.FailWithUsage(c)
-		return
 	}
 
-	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-
-	reqs = []requirements.Requirement{
-		requirementsFactory.NewLoginRequirement(),
-		cmd.appReq,
-	}
-	return
+	return []requirements.Requirement{requirementsFactory.NewLoginRequirement()}, nil
 }
 
 func (cmd *Env) Run(c *cli.Context) {
-	app := cmd.appReq.GetApplication()
+	app, err := cmd.appRepo.Read(c.Args()[0])
+	if notFound, ok := err.(*errors.ModelNotFoundError); ok {
+		cmd.ui.Failed(notFound.Error())
+	}
 
 	cmd.ui.Say("Getting env variables for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
