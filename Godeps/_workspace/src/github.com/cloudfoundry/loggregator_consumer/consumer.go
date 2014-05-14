@@ -4,14 +4,19 @@ package loggregator_consumer
 
 import (
 	"bufio"
+	"bytes"
+	"code.google.com/p/gogoprotobuf/proto"
 	"crypto/tls"
 	"errors"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/gorilla/websocket"
+	"io/ioutil"
+	"mime/multipart"
 	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -19,7 +24,11 @@ import (
 
 var (
 	// KeepAlive sets the interval between keep-alive messages sent by the client to loggregator.
-	KeepAlive = 25 * time.Second
+	KeepAlive      = 25 * time.Second
+	boundaryRegexp = regexp.MustCompile("boundary=(.*)")
+	ErrNotFound    = errors.New("/recent path not found or has issues")
+	ErrBadResponse = errors.New("bad server response")
+	ErrBadRequest  = errors.New("bad client request")
 )
 
 /* LoggregatorConsumer represents the actions that can be performed against a loggregator server.
@@ -35,7 +44,7 @@ type LoggregatorConsumer interface {
 	//	to provide any desired sorting mechanism.
 	Tail(appGuid string, authToken string) (<-chan *logmessage.LogMessage, error)
 
-	//	Recent connects to loggregator via its 'dump' endpoint and returns a slice of recent messages.
+	//	Recent connects to loggregator via its 'recent' endpoint and returns a slice of recent messages.
 	//	It does not guarantee any order of the messages; they are in the order returned by loggregator.
 	//
 	//	The SortRecent method is provided to sort the data returned by this method.
@@ -91,12 +100,102 @@ func (cnsmr *consumer) Tail(appGuid string, authToken string) (<-chan *logmessag
 }
 
 /*
-Recent connects to loggregator via its 'dump' endpoint and returns a slice of recent messages. It does not
-guarantee any order of the messages; they are in the order returned by loggregator.
+Recent connects to loggregator via its 'recent' http(s) endpoint and returns a slice of recent messages.
+If the new http 'recent' endpoint isn't supported (ie you are connecting to an older loggregator server),
+we will fallback to the old Websocket 'dump' endpoint.
+
+It does not guarantee any order of the messages; they are in the order returned by loggregator.
 
 The SortRecent method is provided to sort the data returned by this method.
 */
 func (cnsmr *consumer) Recent(appGuid string, authToken string) ([]*logmessage.LogMessage, error) {
+	messages, err := cnsmr.httpRecent(appGuid, authToken)
+	if err != ErrBadRequest {
+		return messages, err
+	} else {
+		return cnsmr.dump(appGuid, authToken)
+	}
+}
+
+/*
+httpRecent connects to loggregator via its 'recent' http(s) endpoint and returns a slice of recent messages.
+It does not guarantee any order of the messages; they are in the order returned by loggregator.
+*/
+func (cnsmr *consumer) httpRecent(appGuid string, authToken string) ([]*logmessage.LogMessage, error) {
+	endpointUrl, err := url.ParseRequestURI(cnsmr.endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	scheme := "https"
+
+	if endpointUrl.Scheme == "ws" {
+		scheme = "http"
+	}
+
+	recentPath := fmt.Sprintf("%s://%s/recent?app=%s", scheme, endpointUrl.Host, appGuid)
+	transport := &http.Transport{Proxy: cnsmr.proxy, TLSClientConfig: cnsmr.tlsConfig}
+	client := &http.Client{Transport: transport}
+
+	req, _ := http.NewRequest("GET", recentPath, nil)
+	req.Header.Set("Authorization", authToken)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusUnauthorized {
+		data, _ := ioutil.ReadAll(resp.Body)
+		return nil, errors.New(string(data))
+	}
+
+	if resp.StatusCode == http.StatusBadRequest {
+		return nil, ErrBadRequest
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, ErrNotFound
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+
+	if len(strings.TrimSpace(contentType)) == 0 {
+		return nil, ErrBadResponse
+	}
+
+	matches := boundaryRegexp.FindStringSubmatch(contentType)
+
+	if len(matches) != 2 || len(strings.TrimSpace(matches[1])) == 0 {
+		return nil, ErrBadResponse
+	}
+
+	reader := multipart.NewReader(resp.Body, matches[1])
+	buffer := bytes.NewBuffer(make([]byte, resp.ContentLength))
+	messages := make([]*logmessage.LogMessage, 0, 200)
+
+	for part, loopErr := reader.NextPart(); loopErr == nil; part, loopErr = reader.NextPart() {
+		buffer.Reset()
+
+		msg := new(logmessage.LogMessage)
+		_, err := buffer.ReadFrom(part)
+		if err != nil {
+			break
+		}
+		proto.Unmarshal(buffer.Bytes(), msg)
+		messages = append(messages, msg)
+	}
+
+	return messages, err
+}
+
+/*
+dump connects to loggregator via its 'dump' ws(s) endpoint and returns a slice of recent messages. It does not
+guarantee any order of the messages; they are in the order returned by loggregator.
+
+The SortRecent method is provided to sort the data returned by this method.
+*/
+func (cnsmr *consumer) dump(appGuid string, authToken string) ([]*logmessage.LogMessage, error) {
 	var err error
 
 	dumpPath := fmt.Sprintf("/dump/?app=%s", appGuid)
