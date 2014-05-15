@@ -13,6 +13,8 @@ const (
 	DEFAULT_LOCAL = "en_US"
 )
 
+var SUPPORTED_LANGUAGES = []string{"ar", "ca", "zh", "cs", "da", "nl", "en", "fr", "de", "it", "ja", "lt", "pt", "es"}
+
 func Init(packageName string, i18nDirname string) (go_i18n.TranslateFunc, error) {
 	userLocale := getUserLocale()
 	loadTranslationFiles(packageName, i18nDirname, userLocale, DEFAULT_LOCAL)
@@ -27,17 +29,23 @@ func Init(packageName string, i18nDirname string) (go_i18n.TranslateFunc, error)
 }
 
 func ValidateLocale(locale string) bool {
-	return ValidateLanguage(locale) && ValidateTerritory(locale)
+	language, territory := splitLocale(locale)
+	return ValidateLanguage(language) && ValidateTerritory(territory)
 }
 
 func ValidateLanguage(language string) bool {
-	//TODO: complete me!
+	for _, lang := range SUPPORTED_LANGUAGES {
+		if language == lang {
+			return true
+		}
+	}
+
 	return false
 }
 
 func ValidateTerritory(territory string) bool {
 	//TODO: complete me!
-	return false
+	return true
 }
 
 func getOSLocale() string {
@@ -51,29 +59,33 @@ func getOSLocale() string {
 }
 
 func formatLocale(locale string) string {
+	language, territory := splitLocale(locale)
+	return strings.ToLower(language) + "_" + strings.ToUpper(territory)
+}
+
+func splitLocale(locale string) (string, string) {
 	formattedLocale := strings.Split(locale, ".")[0]
 	formattedLocale = strings.Replace(formattedLocale, "-", "_", -1)
 	language := strings.Split(formattedLocale, "_")[0]
 	territory := strings.Split(formattedLocale, "_")[1]
-	return strings.ToLower(language) + "_" + strings.ToUpper(territory)
+	return language, territory
 }
 
 func getUserLocale() string {
 	osLocale := getOSLocale()
 	osLocale = formatLocale(osLocale)
 
-	//TODO: add when ValidateLocale() is completed
-	// if !ValidateLocale(osLocale) {
-	// 	osLocale = DEFAULT_LOCAL
-	// }
+	if !ValidateLocale(osLocale) {
+		osLocale = DEFAULT_LOCAL
+	}
 
 	return osLocale
 }
 
 func loadTranslationFiles(packageName, i18nDirname, userLocale, defaultLocale string) error {
 	pwd := os.Getenv("PWD")
-	go_i18n.MustLoadTranslationFile(filepath.Join(pwd, i18nDirname, packageName, defaultLocale) + ".all.json")
 	go_i18n.MustLoadTranslationFile(filepath.Join(pwd, i18nDirname, packageName, userLocale) + ".all.json")
+	go_i18n.MustLoadTranslationFile(filepath.Join(pwd, i18nDirname, packageName, defaultLocale) + ".all.json")
 
 	return nil
 }
