@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("route repository", func() {
@@ -30,7 +31,7 @@ var _ = Describe("route repository", func() {
 			Guid: "the-space-guid",
 			Name: "the-space-name",
 		})
-		gateway := net.NewCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway((configRepo), time.Now)
 		repo = NewCloudControllerRouteRepository(configRepo, gateway)
 	})
 

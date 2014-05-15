@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("Space Repository", func() {
@@ -280,7 +281,7 @@ func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(reqs)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
 	repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 	return
 }

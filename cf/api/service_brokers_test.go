@@ -37,6 +37,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("Service Brokers Repo", func() {
@@ -243,7 +244,7 @@ func createServiceBrokerRepo(requests ...testnet.TestRequest) (ts *httptest.Serv
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
 	repo = NewCloudControllerServiceBrokerRepository(configRepo, gateway)
 	return
 }

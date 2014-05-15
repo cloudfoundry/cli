@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var failingCloudControllerRequest = func(writer http.ResponseWriter, request *http.Request) {
@@ -30,7 +31,7 @@ var _ = Describe("Cloud Controller Gateway", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
-		gateway = NewCloudControllerGateway(config)
+		gateway = NewCloudControllerGateway(config, time.Now)
 	})
 
 	It("parses error responses", func() {

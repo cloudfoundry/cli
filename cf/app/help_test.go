@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"strings"
+	"time"
 )
 
 var _ = Describe("Help", func() {
@@ -40,7 +41,7 @@ func createCommandFactory() command_factory.Factory {
 	manifestRepo := manifest.NewManifestDiskRepository()
 	apiRepoLocator := api.NewRepositoryLocator(configRepo, map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(configRepo),
-		"cloud-controller": net.NewCloudControllerGateway(configRepo),
+		"cloud-controller": net.NewCloudControllerGateway(configRepo, time.Now),
 		"uaa":              net.NewUAAGateway(configRepo),
 	})
 

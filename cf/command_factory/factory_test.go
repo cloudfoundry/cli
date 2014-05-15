@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -26,7 +27,7 @@ var _ = Describe("factory", func() {
 		manifestRepo := manifest.NewManifestDiskRepository()
 		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
 			"auth":             net.NewUAAGateway(config),
-			"cloud-controller": net.NewCloudControllerGateway(config),
+			"cloud-controller": net.NewCloudControllerGateway(config, time.Now),
 			"uaa":              net.NewUAAGateway(config),
 		})
 

@@ -13,6 +13,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/codegangsta/cli"
 	"strings"
+	"time"
 
 	. "github.com/cloudfoundry/cli/cf/app"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -44,7 +45,7 @@ var _ = Describe("App", func() {
 
 		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
 			"auth":             net.NewUAAGateway(config),
-			"cloud-controller": net.NewCloudControllerGateway(config),
+			"cloud-controller": net.NewCloudControllerGateway(config, time.Now),
 			"uaa":              net.NewUAAGateway(config),
 		})
 

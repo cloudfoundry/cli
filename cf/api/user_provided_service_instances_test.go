@@ -36,6 +36,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -152,7 +153,7 @@ func createUserProvidedServiceInstanceRepo(req testnet.TestRequest) (ts *httptes
 	ts, handler = testnet.NewServer([]testnet.TestRequest{req})
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
 	repo = NewCCUserProvidedServiceInstanceRepository(configRepo, gateway)
 	return
 }

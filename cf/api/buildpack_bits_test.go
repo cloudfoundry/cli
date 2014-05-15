@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"time"
 )
 
 var _ = Describe("BuildpackBitsRepository", func() {
@@ -34,7 +35,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway((configRepo), time.Now)
 		pwd, _ := os.Getwd()
 
 		buildpacksDir = filepath.Join(pwd, "../../fixtures/buildpacks")

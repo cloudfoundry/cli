@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("CloudControllerPasswordRepository", func() {
@@ -35,7 +36,7 @@ func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Serve
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetUaaEndpoint(passwordServer.URL)
-	gateway := net.NewCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
 	repo = NewCloudControllerPasswordRepository(configRepo, gateway)
 	return
 }

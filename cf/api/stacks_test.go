@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("StacksRepo", func() {
@@ -32,7 +33,7 @@ var _ = Describe("StacksRepo", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAccessToken("BEARER my_access_token")
 
-		gateway := net.NewCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway((configRepo), time.Now)
 		repo = NewCloudControllerStackRepository(configRepo, gateway)
 	})
 

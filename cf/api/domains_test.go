@@ -14,6 +14,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("DomainRepository", func() {
@@ -29,7 +30,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	JustBeforeEach(func() {
-		gateway := net.NewCloudControllerGateway(config)
+		gateway := net.NewCloudControllerGateway((config), time.Now)
 		strategy := strategy.NewEndpointStrategy(config.ApiVersion())
 		repo = NewCloudControllerDomainRepository(config, gateway, strategy)
 	})

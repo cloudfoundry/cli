@@ -14,6 +14,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/codegangsta/cli"
 	"strings"
+	"time"
 )
 
 func NewContext(cmdName string, args []string) *cli.Context {
@@ -51,7 +52,7 @@ func findCommand(cmdName string) (cmd cli.Command) {
 	manifestRepo := manifest.NewManifestDiskRepository()
 	apiRepoLocator := api.NewRepositoryLocator(configRepo, map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(configRepo),
-		"cloud-controller": net.NewCloudControllerGateway(configRepo),
+		"cloud-controller": net.NewCloudControllerGateway(configRepo, time.Now),
 		"uaa":              net.NewUAAGateway(configRepo),
 	})
 

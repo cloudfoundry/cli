@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("AppFilesRepository", func() {
@@ -53,7 +54,7 @@ var _ = Describe("AppFilesRepository", func() {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		configRepo.SetApiEndpoint(listFilesRedirectServer.URL)
 
-		gateway := net.NewCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now)
 		repo := NewCloudControllerAppFilesRepository(configRepo, gateway)
 		list, err := repo.ListFiles("my-app-guid", "some/path")
 

@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("App Events Repo", func() {
@@ -31,7 +32,7 @@ var _ = Describe("App Events Repo", func() {
 
 	JustBeforeEach(func() {
 		strategy := strategy.NewEndpointStrategy(config.ApiVersion())
-		gateway := net.NewCloudControllerGateway(config)
+		gateway := net.NewCloudControllerGateway(config, time.Now)
 		repo = NewCloudControllerAppEventsRepository(config, gateway, strategy)
 	})
 
