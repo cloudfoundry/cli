@@ -2,24 +2,86 @@ package i18n_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Initialize i18n handler", func() {
-	Context("#Init", func() {
-		// Confirm T works at all
-		FIt("Returns a usable function", func() {
-			t, err := i18n.Init("main", "test_fixtures")
+var _ = Describe("i18n.Init() function", func() {
+	Context("create a valid T function", func() {
+		BeforeEach(func() {
+			os.Setenv("LC_ALL", "en_US.UTF-8")
+		})
+
+		It("returns a usable T function", func() {
+			T, err := i18n.Init("main", "test_fixtures")
 			Ω(err).ShouldNot(HaveOccurred())
-			Ω(t).ShouldNot(BeNil())
+			Ω(T).ShouldNot(BeNil())
+
+			translation := T("Hello world!")
+			Ω("Hello world!").Should(Equal(translation))
+		})
+	})
+
+	Context("translates correctly", func() {
+		It("T function should return translation if string key exists", func() {
+			os.Setenv("LC_ALL", "fr_FR.UTF-8")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("Hello world!")
+			Ω("Àlo le monde!").Should(Equal(translation))
+		})
+
+		PIt("T function should return en_US translation if string key does not exists", func() {
+			os.Setenv("LC_ALL", "fr_FR.UTF-8")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("LOL")
+			Ω("Laugh out loud").Should(Equal(translation))
+		})
+
+		It("T function should return translation if it exists", func() {
+			os.Setenv("LC_ALL", "fr_FR.UTF-8")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("NSFW")
+			Ω("NSFW").Should(Equal(translation))
 		})
 
 	})
-	//confirm T converts if the key is in the json
-	//confirm t returns the value if the key doesnt exist in the json
-	// Confirm that it reads LC_ALL
+
+	Context("formats locale correctly to xx_YY", func() {
+		It("remove dash to underscore", func() {
+			os.Setenv("LC_ALL", "fr-FR.UTF-8")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("Hello world!")
+			Ω("Àlo le monde!").Should(Equal(translation))
+		})
+
+		It("correcting language", func() {
+			os.Setenv("LC_ALL", "EN_US.UTF-8")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("Hello world!")
+			Ω("Hello world!").Should(Equal(translation))
+		})
+
+		It("correcting teritorry", func() {
+			os.Setenv("LC_ALL", "en_us.UTF-8")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("Hello world!")
+			Ω("Hello world!").Should(Equal(translation))
+		})
+	})
 	// Confirm that it reads LANG if LC_ALL not set
 	// Confirm that it defaults to English if LC_ALL and LANG not set
 })
