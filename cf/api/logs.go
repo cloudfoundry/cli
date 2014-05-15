@@ -3,10 +3,11 @@ package api
 import (
 	"crypto/tls"
 	"errors"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"time"
 )
 
 type LogsRepository interface {
@@ -25,7 +26,7 @@ type LoggregatorLogsRepository struct {
 	onMessage func(*logmessage.LogMessage)
 }
 
-var BufferTime time.Duration = 5
+var BufferTime time.Duration = 5 * time.Second
 
 func NewLoggregatorLogsRepository(config configuration.Reader, consumer consumer.LoggregatorConsumer, refresher TokenRefresher) LogsRepository {
 	return &LoggregatorLogsRepository{
