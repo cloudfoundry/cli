@@ -40,7 +40,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		configRepo.SetApiEndpoint(ts.URL)
-		gateway := net.NewCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway((configRepo), time.Now)
 		gateway.PollingThrottle = time.Duration(0)
 		zipper := app_files.ApplicationZipper{}
 		repo := NewCloudControllerApplicationBitsRepository(configRepo, gateway, zipper)
@@ -67,7 +67,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 	It("returns an error when the directory to upload does not exist", func() {
 		config := testconfig.NewRepository()
-		gateway := net.NewCloudControllerGateway(config)
+		gateway := net.NewCloudControllerGateway((config), time.Now)
 		zipper := &app_files.ApplicationZipper{}
 
 		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)

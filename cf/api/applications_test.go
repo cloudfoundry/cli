@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("ApplicationsRepository", func() {
@@ -298,7 +299,7 @@ func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
 	repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 	return
 }

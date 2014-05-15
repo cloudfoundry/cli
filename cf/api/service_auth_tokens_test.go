@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("ServiceAuthTokensRepo", func() {
@@ -31,7 +32,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		gateway := net.NewCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway((configRepo), time.Now)
 		repo = NewCloudControllerServiceAuthTokenRepository(configRepo, gateway)
 	})
 

@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("Buildpacks repo", func() {
@@ -25,7 +26,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewCloudControllerGateway(config)
+		gateway := net.NewCloudControllerGateway((config), time.Now)
 		repo = NewCloudControllerBuildpackRepository(config, gateway)
 	})
 

@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("CloudControllerQuotaRepository", func() {
@@ -24,7 +25,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway((configRepo), time.Now)
 		repo = NewCloudControllerQuotaRepository(configRepo, gateway)
 	})
 

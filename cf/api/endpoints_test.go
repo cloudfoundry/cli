@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"time"
 )
 
 func validApiInfoEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +68,7 @@ var _ = Describe("Endpoints Repository", func() {
 		testServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			testServerFn(w, r)
 		}))
-		gateway = net.NewCloudControllerGateway(config)
+		gateway = net.NewCloudControllerGateway((config), time.Now)
 		gateway.SetTrustedCerts(testServer.TLS.Certificates)
 		repo = NewEndpointRepository(config, gateway)
 	})

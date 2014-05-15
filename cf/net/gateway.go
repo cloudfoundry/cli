@@ -59,7 +59,7 @@ type Gateway struct {
 	trustedCerts    []tls.Certificate
 	config          configuration.Reader
 	warnings        *[]string
-	AsyncTimeout    time.Duration
+	Clock           func() time.Time
 }
 
 func newGateway(errHandler apiErrorHandler, config configuration.Reader) (gateway Gateway) {
@@ -67,14 +67,17 @@ func newGateway(errHandler apiErrorHandler, config configuration.Reader) (gatewa
 	gateway.config = config
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
 	gateway.warnings = &[]string{}
-
-	if config.AsyncTimeout() > 0 {
-		gateway.AsyncTimeout = time.Duration(config.AsyncTimeout()) * time.Minute
-	} else {
-		gateway.AsyncTimeout = ASYNC_REQUEST_TIMEOUT
-	}
+	gateway.Clock = time.Now
 
 	return
+}
+
+func (gateway *Gateway) AsyncTimeout() time.Duration {
+	if gateway.config.AsyncTimeout() > 0 {
+		return time.Duration(gateway.config.AsyncTimeout()) * time.Minute
+	} else {
+		return ASYNC_REQUEST_TIMEOUT
+	}
 }
 
 func (gateway *Gateway) SetTokenRefresher(auth tokenRefresher) {
@@ -171,7 +174,7 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.Re
 	}
 
 	if gateway.PollingEnabled && !sync {
-		_, apiErr = gateway.PerformPollingRequestForJSONResponse(request, resource, ASYNC_REQUEST_TIMEOUT)
+		_, apiErr = gateway.PerformPollingRequestForJSONResponse(request, resource, gateway.AsyncTimeout())
 		return
 	} else {
 		_, apiErr = gateway.PerformRequestForJSONResponse(request, resource)
@@ -302,17 +305,14 @@ func (gateway Gateway) Warnings() []string {
 }
 
 func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Duration) (err error) {
-	startTime := time.Now()
+	startTime := gateway.Clock()
 	for true {
-		if time.Since(startTime) > timeout {
-			err = errors.NewWithFmt("Error: timed out waiting for async job '%s' to finish", jobUrl)
-			return
+		if gateway.Clock().Sub(startTime) > timeout {
+			return errors.NewAsyncTimeoutError(jobUrl)
 		}
-
 		var request *Request
 		request, err = gateway.NewRequest("GET", jobUrl, accessToken, nil)
 		response := &JobResource{}
-
 		_, err = gateway.PerformRequestForJSONResponse(request, response)
 		if err != nil {
 			return

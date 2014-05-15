@@ -37,6 +37,7 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("Organization Repository", func() {
@@ -240,7 +241,7 @@ func createOrganizationRepo(reqs ...testnet.TestRequest) (testserver *httptest.S
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(testserver.URL)
-	gateway := net.NewCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
 	repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 	return
 }

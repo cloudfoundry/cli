@@ -36,6 +36,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
+	"time"
 )
 
 var expectedJSONResponse = `
@@ -55,7 +56,7 @@ type curlDependencies struct {
 func newCurlDependencies() (deps curlDependencies) {
 	deps.config = testconfig.NewRepository()
 	deps.config.SetAccessToken("BEARER my_access_token")
-	deps.gateway = net.NewCloudControllerGateway(deps.config)
+	deps.gateway = net.NewCloudControllerGateway(deps.config, time.Now)
 	return
 }
 

@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"time"
 )
 
 var _ = Describe("Services Repo", func() {
@@ -36,7 +37,7 @@ var _ = Describe("Services Repo", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAccessToken("BEARER my_access_token")
 
-		gateway := net.NewCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway((configRepo), time.Now)
 		repo = NewCloudControllerServiceRepository(configRepo, gateway)
 	})
 

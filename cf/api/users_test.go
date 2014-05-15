@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"time"
 )
 
 var _ = Describe("User Repository", func() {
@@ -29,7 +30,7 @@ var _ = Describe("User Repository", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepositoryWithDefaults()
-		ccGateway := net.NewCloudControllerGateway(config)
+		ccGateway := net.NewCloudControllerGateway((config), time.Now)
 		uaaGateway := net.NewUAAGateway(config)
 		repo = NewCloudControllerUserRepository(config, uaaGateway, ccGateway)
 	})

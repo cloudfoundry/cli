@@ -49,28 +49,33 @@ import (
 
 var _ = Describe("Gateway", func() {
 	var (
-		ccGateway  Gateway
-		uaaGateway Gateway
-		config     configuration.ReadWriter
-		authRepo   api.AuthenticationRepository
+		ccGateway   Gateway
+		uaaGateway  Gateway
+		config      configuration.ReadWriter
+		authRepo    api.AuthenticationRepository
+		currentTime time.Time
+		clock       func() time.Time
 	)
 
 	BeforeEach(func() {
+		currentTime = time.Unix(0, 0)
+		clock = func() time.Time { return currentTime }
 		config = testconfig.NewRepository()
-		ccGateway = NewCloudControllerGateway(config)
+
+		ccGateway = NewCloudControllerGateway(config, clock)
 		uaaGateway = NewUAAGateway(config)
 	})
 
 	Describe("async timeout", func() {
 		It("has an async timeout that defaults to a sane value", func() {
-			Expect(ccGateway.AsyncTimeout).To(Equal(ASYNC_REQUEST_TIMEOUT))
+			Expect(ccGateway.AsyncTimeout()).To(Equal(ASYNC_REQUEST_TIMEOUT))
 		})
 
 		Context("when the config has a positive async timeout", func() {
 			It("inherits the async timeout from the config", func() {
 				config.SetAsyncTimeout(9001)
-				ccGateway = NewCloudControllerGateway(config)
-				Expect(ccGateway.AsyncTimeout).To(Equal(9001 * time.Minute))
+				ccGateway = NewCloudControllerGateway((config), time.Now)
+				Expect(ccGateway.AsyncTimeout()).To(Equal(9001 * time.Minute))
 			})
 		})
 	})
@@ -97,7 +102,76 @@ var _ = Describe("Gateway", func() {
 		It("sets the user agent header", func() {
 			Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
 		})
+	})
 
+	Describe("CRUD methods", func() {
+		Describe("Delete", func() {
+			var apiServer *httptest.Server
+
+			Context("when the config has an async timeout", func() {
+				BeforeEach(func() {
+					count := 0
+					apiServer = httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+						switch request.URL.Path {
+						case "/v2/foobars/SOME_GUID":
+							writer.WriteHeader(http.StatusNoContent)
+						case "/v2/foobars/TIMEOUT":
+							fmt.Fprintln(writer, `
+{
+  "metadata": {
+    "guid": "8438916f-5c00-4d44-a19b-1df65abe9d52",
+    "created_at": "2014-05-15T19:15:01+00:00",
+    "url": "/v2/jobs/8438916f-5c00-4d44-a19b-1df65abe9d52"
+  },
+  "entity": {
+    "guid": "8438916f-5c00-4d44-a19b-1df65abe9d52",
+    "status": "queued"
+  }
+}`)
+							writer.WriteHeader(http.StatusAccepted)
+						case "/v2/jobs/8438916f-5c00-4d44-a19b-1df65abe9d52":
+							if count == 0 {
+								count++
+								currentTime = currentTime.Add(time.Minute * 31)
+
+								writer.WriteHeader(http.StatusOK)
+								fmt.Fprintln(writer, `
+{
+  "entity": {
+    "guid": "8438916f-5c00-4d44-a19b-1df65abe9d52",
+    "status": "queued"
+  }
+}`)
+							} else {
+								panic("FAIL")
+							}
+						default:
+							panic("shouldn't have made call to this URL: " + request.URL.Path)
+						}
+					}))
+
+					config.SetAsyncTimeout(30)
+					ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
+				})
+
+				AfterEach(func() {
+					apiServer.Close()
+				})
+
+				It("deletes a resource", func() {
+					err := ccGateway.DeleteResource(apiServer.URL + "/v2/foobars/SOME_GUID")
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				Context("when the request would take longer than the async timeout", func() {
+					It("returns an error", func() {
+						apiErr := ccGateway.DeleteResource(apiServer.URL + "/v2/foobars/TIMEOUT")
+						Expect(apiErr).To(HaveOccurred())
+						Expect(apiErr).To(BeAssignableToTypeOf(errors.NewAsyncTimeoutError("http://some.url")))
+					})
+				})
+			})
+		})
 	})
 
 	Describe("making an async request", func() {
@@ -109,6 +183,8 @@ var _ = Describe("Gateway", func() {
 			jobStatus = "queued"
 
 			apiServer = httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+				currentTime = currentTime.Add(time.Millisecond * 11)
+
 				switch request.URL.Path {
 				case "/v2/foo":
 					fmt.Fprintln(writer, `{ "metadata": { "url": "/v2/jobs/the-job-guid" } }`)
@@ -168,7 +244,7 @@ var _ = Describe("Gateway", func() {
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
 			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 10*time.Millisecond)
 			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.Error()).To(ContainSubstring("timed out"))
+			Expect(apiErr).To(BeAssignableToTypeOf(errors.NewAsyncTimeoutError("http://some.url")))
 		})
 	})
 

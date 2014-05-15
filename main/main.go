@@ -5,6 +5,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strings"
+	"time"
 
 	"github.com/codegangsta/cli"
 
@@ -53,7 +54,7 @@ func setupDependencies() (deps *cliDependencies) {
 
 	deps.gateways = map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(deps.configRepo),
-		"cloud-controller": net.NewCloudControllerGateway(deps.configRepo),
+		"cloud-controller": net.NewCloudControllerGateway(deps.configRepo, time.Now),
 		"uaa":              net.NewUAAGateway(deps.configRepo),
 	}
 	deps.apiRepoLocator = api.NewRepositoryLocator(deps.configRepo, deps.gateways)
