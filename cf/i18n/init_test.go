@@ -9,7 +9,39 @@ import (
 )
 
 var _ = Describe("i18n.Init() function", func() {
-	Context("create a valid T function", func() {
+
+	Context("loads correct local", func() {
+		It("selects LC_ALL when set", func() {
+			os.Setenv("LC_ALL", "fr_FR.UTF-8")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("Hello world!")
+			Ω("Àlo le monde!").Should(Equal(translation))
+		})
+
+		It("selects LANG when LC_ALL not set", func() {
+			os.Setenv("LC_ALL", "")
+			os.Setenv("LANG", "fr_FR.UTF-8")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("Hello world!")
+			Ω("Àlo le monde!").Should(Equal(translation))
+		})
+
+		It("defaults to en_US when LC_ALL and LANG not set", func() {
+			os.Setenv("LC_ALL", "")
+			os.Setenv("LANG", "")
+
+			T, _ := i18n.Init("main", "test_fixtures")
+
+			translation := T("Hello world!")
+			Ω("Hello world!").Should(Equal(translation))
+		})
+	})
+
+	Context("creates a valid T function", func() {
 		BeforeEach(func() {
 			os.Setenv("LC_ALL", "en_US.UTF-8")
 		})
@@ -82,6 +114,4 @@ var _ = Describe("i18n.Init() function", func() {
 			Ω("Hello world!").Should(Equal(translation))
 		})
 	})
-	// Confirm that it reads LANG if LC_ALL not set
-	// Confirm that it defaults to English if LC_ALL and LANG not set
 })
