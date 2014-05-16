@@ -86,14 +86,14 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("Confirming deletion", func() {
-		It("treats 'y' as an affirmative confirmation", func() {
+		It("formats a nice output string with exactly one prompt", func() {
 			io_helpers.SimulateStdin("y\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader)
-					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeTrue())
+					Expect(ui.ConfirmDelete("fizzbuzz", "bizzbump")).To(BeTrue())
 				})
 
-				Expect(out).To(ContainSubstrings([]string{"modelType modelName"}))
+				Expect(strings.Join(out, "")).To(Equal("Really delete the fizzbuzz bizzbump?> "))
 			})
 		})
 
