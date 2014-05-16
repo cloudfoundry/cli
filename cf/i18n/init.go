@@ -21,8 +21,7 @@ var SUPPORTED_LANGUAGES = []string{"ar", "ca", "zh", "cs", "da", "nl", "en", "fr
 
 func Init(packageName string, i18nDirname string) (go_i18n.TranslateFunc, error) {
 	userLocale := getUserLocale()
-	assetPath := filepath.Join(i18nDirname, packageName)
-	err := loadTranslationAssets(assetPath, userLocale, DEFAULT_LOCAL)
+	err := loadTranslationAssets(packageName, i18nDirname, userLocale, DEFAULT_LOCAL)
 	if err != nil {
 		return nil, err
 	}
@@ -90,21 +89,13 @@ func getUserLocale() string {
 	return osLocale
 }
 
-func loadTranslationFiles(packageName, i18nDirname, userLocale, defaultLocale string) error {
-	pwd := os.Getenv("PWD")
-	go_i18n.MustLoadTranslationFile(filepath.Join(pwd, i18nDirname, packageName, userLocale) + ".all.json")
-	go_i18n.MustLoadTranslationFile(filepath.Join(pwd, i18nDirname, packageName, defaultLocale) + ".all.json")
-
-	return nil
-}
-
-func loadTranslationAssets(assetPath, userLocale, defaultLocale string) error {
-	err := loadFromAsset(assetPath, userLocale)
+func loadTranslationAssets(packageName, assetPath, userLocale, defaultLocale string) error {
+	err := loadFromAsset(packageName, assetPath, userLocale)
 	if err != nil {
 		return err
 	}
 
-	err = loadFromAsset(assetPath, defaultLocale)
+	err = loadFromAsset(packageName, assetPath, defaultLocale)
 	if err != nil {
 		return err
 	}
@@ -112,9 +103,10 @@ func loadTranslationAssets(assetPath, userLocale, defaultLocale string) error {
 	return nil
 }
 
-func loadFromAsset(assetPath, locale string) error {
+func loadFromAsset(packageName, assetPath, locale string) error {
+	language, _ := splitLocale(locale)
 	assetName := locale + ".all.json"
-	assetKey := filepath.Join(assetPath, assetName)
+	assetKey := filepath.Join(assetPath, language, packageName, assetName)
 
 	byteArray, err := resources.Asset(assetKey)
 	if err != nil {
