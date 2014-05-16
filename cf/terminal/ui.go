@@ -73,11 +73,11 @@ func (c terminalUI) Warn(message string, args ...interface{}) {
 }
 
 func (c terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
-	return c.confirmDelete("Really delete the %s %s and everything associated with it?%s", modelType, modelName)
+	return c.confirmDelete("Really delete the %s %s and everything associated with it?", modelType, modelName)
 }
 
 func (c terminalUI) ConfirmDelete(modelType, modelName string) bool {
-	return c.confirmDelete("Really delete the %s %s?%s", modelType, modelName)
+	return c.confirmDelete("Really delete the %s %s?", modelType, modelName)
 }
 
 func (c terminalUI) confirmDelete(message, modelType, modelName string) bool {
@@ -85,7 +85,6 @@ func (c terminalUI) confirmDelete(message, modelType, modelName string) bool {
 		message,
 		modelType,
 		EntityNameColor(modelName),
-		PromptColor(">"),
 	)
 
 	if !result {
