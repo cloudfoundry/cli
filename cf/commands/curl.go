@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -68,7 +70,7 @@ func (cmd *Curl) Run(c *cli.Context) {
 		trace.EnableTrace()
 	}
 
-	respHeader, respBody, apiErr := cmd.curlRepo.Request(method, path, reqHeader, body)
+	responseHeader, responseBody, apiErr := cmd.curlRepo.Request(method, path, reqHeader, body)
 	if apiErr != nil {
 		cmd.ui.Failed("Error creating request:\n%s", apiErr.Error())
 		return
@@ -79,9 +81,18 @@ func (cmd *Curl) Run(c *cli.Context) {
 	}
 
 	if c.Bool("i") {
-		cmd.ui.Say("%s", respHeader)
+		cmd.ui.Say(responseHeader)
 	}
 
-	cmd.ui.Say("%s", respBody)
+	if strings.Contains(responseHeader, "application/json") {
+		buffer := bytes.Buffer{}
+		err := json.Indent(&buffer, []byte(responseBody), "", "   ")
+		if err == nil {
+			responseBody = buffer.String()
+		}
+	}
+
+	cmd.ui.Say(responseBody)
+
 	return
 }

@@ -117,6 +117,39 @@ var _ = Describe("curl command", func() {
 				[]string{"ooops"},
 			))
 		})
+
+		Context("Whent the content type is JSON", func() {
+			BeforeEach(func() {
+				deps.curlRepo.ResponseHeader = "Content-Type: application/json;charset=utf-8"
+				deps.curlRepo.ResponseBody = `{"total_results":0,"total_pages":1,"prev_url":null,"next_url":null,"resources":[]}`
+			})
+
+			It("pretty-prints the response body", func() {
+				runCurlWithInputs(deps, []string{"/ugly-printed-json-endpoint"})
+
+				Expect(deps.ui.Outputs).To(ContainSubstrings(
+					[]string{"{"},
+					[]string{"  \"total_results", "0"},
+					[]string{"  \"total_pages", "1"},
+					[]string{"  \"prev_url", "null"},
+					[]string{"  \"next_url", "null"},
+					[]string{"  \"resources", "[]"},
+					[]string{"}"},
+				))
+			})
+
+			Context("But the body is not JSON", func() {
+				BeforeEach(func() {
+					deps.curlRepo.ResponseBody = "FAIL: crumpets need MOAR butterz"
+				})
+
+				It("regular-prints the response body", func() {
+					runCurlWithInputs(deps, []string{"/whateverz"})
+
+					Expect(deps.ui.Outputs).To(Equal([]string{"FAIL: crumpets need MOAR butterz"}))
+				})
+			})
+		})
 	})
 })
 
