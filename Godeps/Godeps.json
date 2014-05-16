@@ -29,7 +29,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
-			"Rev": "0661d182b2ca02f9c0813edcddbd839077dde868"
+			"Rev": "d518228353e70f0150c174d17882a93a1e7e01fa"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
@@ -47,6 +47,10 @@
 		{
 			"ImportPath": "github.com/gorilla/websocket",
 			"Rev": "10a95d14a3a215f5e2045d3dbbcd29f1ab209586"
+		},
+		{
+			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
+			"Rev": "029e8da39fe5258903a1f23dae51c55951866032"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",

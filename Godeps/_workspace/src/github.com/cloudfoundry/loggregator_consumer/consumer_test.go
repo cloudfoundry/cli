@@ -94,7 +94,7 @@ var _ = Describe("Loggregator Consumer", func() {
 
 			Context("when the connection can be established", func() {
 				It("receives messages on the incoming channel", func(done Done) {
-					messagesToSend <- marshallMessage(createMessage("hello", 0))
+					messagesToSend <- marshalMessage(createMessage("hello", 0))
 
 					perform()
 					message := <-incomingChan
@@ -147,7 +147,7 @@ var _ = Describe("Loggregator Consumer", func() {
 				Context("when the message fails to parse", func() {
 					It("skips that message but continues to read messages", func(done Done) {
 						messagesToSend <- []byte{0}
-						messagesToSend <- marshallMessage(createMessage("hello", 0))
+						messagesToSend <- marshalMessage(createMessage("hello", 0))
 						perform()
 						close(messagesToSend)
 
@@ -249,14 +249,14 @@ var _ = Describe("Loggregator Consumer", func() {
 		var (
 			appGuid             = "appGuid"
 			authToken           = "authToken"
-			recievedLogMessages []*logmessage.LogMessage
+			receivedLogMessages []*logmessage.LogMessage
 			recentError         error
 		)
 
 		perform := func() {
 			close(messagesToSend)
 			connection = consumer.New(endpoint, nil, nil)
-			recievedLogMessages, recentError = connection.Recent(appGuid, authToken)
+			receivedLogMessages, recentError = connection.Recent(appGuid, authToken)
 		}
 
 		Context("when the connection cannot be established", func() {
@@ -276,15 +276,15 @@ var _ = Describe("Loggregator Consumer", func() {
 			})
 
 			It("returns messages from the server", func() {
-				messagesToSend <- marshallMessage(createMessage("test-message-0", 0))
-				messagesToSend <- marshallMessage(createMessage("test-message-1", 0))
+				messagesToSend <- marshalMessage(createMessage("test-message-0", 0))
+				messagesToSend <- marshalMessage(createMessage("test-message-1", 0))
 
 				perform()
 
 				Expect(recentError).NotTo(HaveOccurred())
-				Expect(recievedLogMessages).To(HaveLen(2))
-				Expect(recievedLogMessages[0].Message).To(Equal([]byte("test-message-0")))
-				Expect(recievedLogMessages[1].Message).To(Equal([]byte("test-message-1")))
+				Expect(receivedLogMessages).To(HaveLen(2))
+				Expect(receivedLogMessages[0].Message).To(Equal([]byte("test-message-0")))
+				Expect(receivedLogMessages[1].Message).To(Equal([]byte("test-message-1")))
 			})
 		})
 
@@ -305,6 +305,23 @@ var _ = Describe("Loggregator Consumer", func() {
 
 				Expect(recentError).To(HaveOccurred())
 				Expect(recentError).To(Equal(consumer.ErrBadResponse))
+			})
+
+		})
+
+		Context("when the content length is unknown", func() {
+			BeforeEach(func() {
+				fakeHandler = &FakeHandler{contentLen: "-1", innerHandler: handlers.NewHttpHandler(messagesToSend)}
+				testServer = httptest.NewServer(fakeHandler)
+				endpoint = "ws://" + testServer.Listener.Addr().String()
+			})
+
+			It("it handles that without throwing an error", func() {
+				messagesToSend <- marshalMessage(createMessage("bad-content-length", 0))
+				perform()
+
+				Expect(recentError).NotTo(HaveOccurred())
+				Expect(receivedLogMessages).To(HaveLen(1))
 			})
 
 		})
@@ -427,8 +444,8 @@ var _ = Describe("Loggregator Consumer", func() {
 			})
 
 			It("returns messages from the server", func() {
-				messagesToSend <- marshallMessage(createMessage("test-message-0", 0))
-				messagesToSend <- marshallMessage(createMessage("test-message-1", 0))
+				messagesToSend <- marshalMessage(createMessage("test-message-0", 0))
+				messagesToSend <- marshalMessage(createMessage("test-message-1", 0))
 				perform()
 
 				Expect(logMessages).To(HaveLen(2))
@@ -505,7 +522,7 @@ func createMessage(message string, timestamp int64) *logmessage.LogMessage {
 	}
 }
 
-func marshallMessage(message *logmessage.LogMessage) []byte {
+func marshalMessage(message *logmessage.LogMessage) []byte {
 	data, err := proto.Marshal(message)
 	if err != nil {
 		log.Println(err.Error())
@@ -548,6 +565,7 @@ type FakeHandler struct {
 	called       bool
 	lastURL      string
 	authHeader   string
+	contentLen   string
 	sync.RWMutex
 }
 
@@ -591,5 +609,8 @@ func (fh *FakeHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	fh.setLastURL(r.URL.String())
 	fh.setAuthHeader(r.Header.Get("Authorization"))
 	fh.call()
+	if len(fh.contentLen) > 0 {
+		rw.Header().Set("Content-Length", fh.contentLen)
+	}
 	fh.innerHandler.ServeHTTP(rw, r)
 }

@@ -171,7 +171,8 @@ func (cnsmr *consumer) httpRecent(appGuid string, authToken string) ([]*logmessa
 	}
 
 	reader := multipart.NewReader(resp.Body, matches[1])
-	buffer := bytes.NewBuffer(make([]byte, resp.ContentLength))
+
+	var buffer bytes.Buffer
 	messages := make([]*logmessage.LogMessage, 0, 200)
 
 	for part, loopErr := reader.NextPart(); loopErr == nil; part, loopErr = reader.NextPart() {
