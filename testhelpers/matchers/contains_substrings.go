@@ -41,9 +41,18 @@ func (matcher *SliceMatcher) Match(actual interface{}) (success bool, err error)
 }
 
 func (matcher *SliceMatcher) FailureMessage(actual interface{}) string {
-	return fmt.Sprintf("expected to find \"%s\" in actual:\n'%s'\n", matcher.expected[matcher.failedAtIndex], actual)
+	actualStrings, ok := actual.([]string)
+	if !ok {
+		return fmt.Sprintf("Expected actual to be a slice of strings, but it's actually a %T", actual)
+	}
+
+	return fmt.Sprintf("expected to find \"%s\" in actual:\n'%s'\n", matcher.expected[matcher.failedAtIndex], strings.Join(actualStrings, "\n"))
 }
 
 func (matcher *SliceMatcher) NegatedFailureMessage(actual interface{}) string {
-	return fmt.Sprintf("expected to not find \"%s\" in actual:\n'%s'\n", matcher.expected[matcher.failedAtIndex], actual)
+	actualStrings, ok := actual.([]string)
+	if !ok {
+		return fmt.Sprintf("Expected actual to be a slice of strings, but it's actually a %T", actual)
+	}
+	return fmt.Sprintf("expected to not find \"%s\" in actual:\n'%s'\n", matcher.expected[matcher.failedAtIndex], strings.Join(actualStrings, "\n"))
 }
