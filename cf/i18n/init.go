@@ -1,10 +1,14 @@
 package i18n
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	resources "github.com/cloudfoundry/cli/cf/resources"
 
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 )
@@ -17,7 +21,11 @@ var SUPPORTED_LANGUAGES = []string{"ar", "ca", "zh", "cs", "da", "nl", "en", "fr
 
 func Init(packageName string, i18nDirname string) (go_i18n.TranslateFunc, error) {
 	userLocale := getUserLocale()
-	loadTranslationFiles(packageName, i18nDirname, userLocale, DEFAULT_LOCAL)
+	assetPath := filepath.Join(i18nDirname, packageName)
+	err := loadTranslationAssets(assetPath, userLocale, DEFAULT_LOCAL)
+	if err != nil {
+		return nil, err
+	}
 
 	T, err := go_i18n.Tfunc(userLocale, DEFAULT_LOCAL)
 	if err != nil {
@@ -86,6 +94,61 @@ func loadTranslationFiles(packageName, i18nDirname, userLocale, defaultLocale st
 	pwd := os.Getenv("PWD")
 	go_i18n.MustLoadTranslationFile(filepath.Join(pwd, i18nDirname, packageName, userLocale) + ".all.json")
 	go_i18n.MustLoadTranslationFile(filepath.Join(pwd, i18nDirname, packageName, defaultLocale) + ".all.json")
+
+	return nil
+}
+
+func loadTranslationAssets(assetPath, userLocale, defaultLocale string) error {
+	err := loadFromAsset(assetPath, userLocale)
+	if err != nil {
+		return err
+	}
+
+	err = loadFromAsset(assetPath, defaultLocale)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func loadFromAsset(assetPath, locale string) error {
+	assetName := locale + ".all.json"
+	assetKey := filepath.Join(assetPath, assetName)
+
+	byteArray, err := resources.Asset(assetKey)
+	if err != nil {
+		return err
+	}
+
+	if len(byteArray) == 0 {
+		return errors.New(fmt.Sprintf("Could not load i18n asset: %v", assetKey))
+	}
+
+	tmpDir, err := ioutil.TempDir("", "cloudfoundry_cli_i18n_res")
+	if err != nil {
+		return err
+	}
+
+	fileName := filepath.Join(tmpDir, assetName)
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(byteArray)
+	if err != nil {
+		return err
+	}
+
+	err = file.Close()
+	if err != nil {
+		return err
+	}
+
+	go_i18n.MustLoadTranslationFile(fileName)
+
+	os.RemoveAll(fileName)
 
 	return nil
 }
