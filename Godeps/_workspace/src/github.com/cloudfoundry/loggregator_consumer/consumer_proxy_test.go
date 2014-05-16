@@ -70,7 +70,7 @@ var _ = Describe("Loggregator Consumer behind a Proxy", func() {
 		}
 
 		It("connects using valid URL to running consumerProxyFunc server", func() {
-			messagesToSend <- marshallMessage(createMessage("hello", 0))
+			messagesToSend <- marshalMessage(createMessage("hello", 0))
 			perform()
 
 			message := <-incomingChan
@@ -142,8 +142,8 @@ var _ = Describe("Loggregator Consumer behind a Proxy", func() {
 		})
 
 		It("returns messages from the server", func() {
-			messagesToSend <- marshallMessage(createMessage("test-message-0", 0))
-			messagesToSend <- marshallMessage(createMessage("test-message-1", 0))
+			messagesToSend <- marshalMessage(createMessage("test-message-0", 0))
+			messagesToSend <- marshalMessage(createMessage("test-message-1", 0))
 
 			perform()
 
