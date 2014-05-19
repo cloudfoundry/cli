@@ -25,7 +25,7 @@ type CreateQuota struct {
 }
 
 func NewCreateQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) CreateQuota {
-	t, err := i18n.Init("quota", i18n.RESOURCES_PATH)
+	t, err := i18n.Init("quota", i18n.GetResourcesPath())
 	if err != nil {
 		ui.Failed(err.Error())
 	}

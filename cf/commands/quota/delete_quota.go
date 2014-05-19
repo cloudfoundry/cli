@@ -23,7 +23,7 @@ type DeleteQuota struct {
 }
 
 func NewDeleteQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) (cmd *DeleteQuota) {
-	t, err := i18n.Init("quota", i18n.RESOURCES_PATH)
+	t, err := i18n.Init("quota", i18n.GetResourcesPath())
 	if err != nil {
 		ui.Failed(err.Error())
 	}
