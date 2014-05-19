@@ -104,15 +104,25 @@ type systemEnvResource struct {
 }
 
 func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (map[string]string, string, error) {
+	var (
+		err          error
+		jsonBytes    []byte
+		vcapServices string
+	)
+
 	path := fmt.Sprintf("%s/v2/apps/%s/env", repo.config.ApiEndpoint(), guid)
 	appResource := new(systemEnvResource)
 
-	var err error
 	err = repo.gateway.GetResource(path, appResource)
 	if err != nil {
 		return nil, "", err
 	}
 
-	jsonBytes, err := json.MarshalIndent(appResource.System, "", "  ")
-	return appResource.Environment, string(jsonBytes), err
+	servicesAsMap, ok := appResource.System["VCAP_SERVICES"].(map[string]interface{})
+	if ok && len(servicesAsMap) > 0 {
+		jsonBytes, err = json.MarshalIndent(appResource.System, "", "  ")
+		vcapServices = string(jsonBytes)
+	}
+
+	return appResource.Environment, vcapServices, err
 }

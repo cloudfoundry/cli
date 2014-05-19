@@ -69,6 +69,8 @@ func (cmd *Env) Run(c *cli.Context) {
 		for _, line := range strings.Split(vcapServices, "\n") {
 			cmd.ui.Say(line)
 		}
+	} else {
+		cmd.ui.Say("No system-provided env variables have been set")
 	}
 
 	if len(envVars) == 0 {

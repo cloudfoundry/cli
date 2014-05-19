@@ -108,6 +108,7 @@ var _ = Describe("env command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting env variables for app", "my-app"},
 				[]string{"OK"},
+				[]string{"No", "system-provided", "env variables", "have been set"},
 				[]string{"No", "env variables", "have been set"},
 			))
 		})
