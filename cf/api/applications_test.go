@@ -1,18 +1,22 @@
 package api_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"time"
 )
 
 var _ = Describe("ApplicationsRepository", func() {
@@ -84,6 +88,42 @@ var _ = Describe("ApplicationsRepository", func() {
 			_, apiErr := repo.Create(params)
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
+		})
+	})
+
+	Describe("reading environment for an app", func() {
+		Context("when the response can be parsed as json", func() {
+			var (
+				testServer   *httptest.Server
+				userEnv      map[string]string
+				vcapServices string
+			)
+
+			BeforeEach(func() {
+				var (
+					err     error
+					handler *testnet.TestHandler
+					repo    ApplicationRepository
+				)
+
+				testServer, handler, repo = createAppRepo([]testnet.TestRequest{appEnvRequest})
+				userEnv, vcapServices, err = repo.ReadEnv("some-cool-app-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(handler).To(testnet.HaveAllRequestsCalled())
+			})
+
+			AfterEach(func() {
+				testServer.Close()
+			})
+
+			It("returns the user environment and vcap services", func() {
+				Expect(userEnv["key"]).To(Equal("value"))
+				Expect(strings.Split(vcapServices, "\n")).To(ContainSubstrings(
+					[]string{"system_hash", ":", "{"},
+					[]string{"system_key", ":", "system_value"},
+					[]string{"}"},
+				))
+			})
 		})
 	})
 
@@ -285,6 +325,26 @@ var updateApplicationResponse = `
         "name": "my-cool-app"
     }
 }`
+
+var appEnvRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/some-cool-app-guid/env",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
+{
+   "system_env_json": {
+      "VCAP_SERVICES": {
+        "system_hash": {
+          "system_key": "system_value"
+        }
+      }
+   },
+   "environment_json": {
+      "key": "value"
+   }
+}
+`}})
 
 var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "PUT",
