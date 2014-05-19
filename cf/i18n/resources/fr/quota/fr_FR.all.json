@@ -1,39 +1,39 @@
 [
     {
         "id": "Define a new resource quota",
-        "translation": "Define a new resource quota"
+        "translation": "Definir un nouvea quota"
     },
     {
         "id": "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-        "translation": "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
+        "translation": "CF_NAME create-quota QUOTA [-m MÉMOIRE] [-r ROUTES] [-s INSTANCE_DE_SERVICES] [--allow-paid-service-plans]"
     },
     {
         "id": "Total number of service instances",
-        "translation": "Total number of service instances"
+        "translation": "Nombres total d'instance de services"
     },
     {
         "id": "Can provision instances of paid service plans",
-        "translation": "Can provision instances of paid service plans"
+        "translation": "Peux provisioner des instances de services pour le plan payé"
     },
     {
-        "id": "Creating quota %s as %s...",
-        "translation": "Creating quota %s as %s..."
+        "id": "Creating quota {{.QuotaName}} as {{.Username}}...",
+        "translation": "Créez quota {{.QuotaName}} étant {{.Username}}..."
     },
     {
         "id": "Total amount of memory (e.g. 1024M, 1G, 10G)",
-        "translation": "Total amount of memory (e.g. 1024M, 1G, 10G)"
+        "translation": "Quantité totale de mémoire (e.g. 1024Mo, 1Go, 10Go)"
     },
     {
         "id": "Total number of routes",
-        "translation": "Total number of routes"
+        "translation": "Quantité totale de routes"
     },
     {
-        "id": "Invalid memory limit: %s\n%s",
-        "translation": "Invalid memory limit: %s\n%s"
+        "id": "Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}",
+        "translation": "Limite de mémoire invalid: {{.MemoryLimit}}\n{{.Err}}"
     },
     {
-        "id": "Quota Definition %s already exists",
-        "translation": "Quota Definition %s already exists"
+        "id": "Quota Definition {{.QuotaName}} already exists",
+        "translation": "La définition de quota {{.QuotaName}} existe déjà"
     },
     {
         "id": "Delete a quota",
@@ -128,18 +128,6 @@
         "translation": "New name"
     },
     {
-        "id": "Total number of routes",
-        "translation": "Total number of routes"
-    },
-    {
-        "id": "Total number of service instances",
-        "translation": "Total number of service instances"
-    },
-    {
-        "id": "Can provision instances of paid service plans",
-        "translation": "Can provision instances of paid service plans"
-    },
-    {
         "id": "Cannot provision instances of paid service plans",
         "translation": "Cannot provision instances of paid service plans"
     },
@@ -150,10 +138,6 @@
     {
         "id": "Update an existing resource quota",
         "translation": "Update an existing resource quota"
-    },
-    {
-        "id": "Total amount of memory (e.g. 1024M, 1G, 10G)",
-        "translation": "Total amount of memory (e.g. 1024M, 1G, 10G)"
     },
     {
         "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command. ",
