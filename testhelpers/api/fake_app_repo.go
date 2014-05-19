@@ -24,6 +24,16 @@ type FakeApplicationRepository struct {
 	UpdateErr       bool
 
 	DeletedAppGuid string
+
+	ReadEnvArgs struct {
+		AppGuid string
+	}
+
+	ReadEnvReturns struct {
+		UserEnv      map[string]string
+		VcapServices string
+		Error        error
+	}
 }
 
 func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiErr error) {
@@ -88,4 +98,10 @@ func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppP
 func (repo *FakeApplicationRepository) Delete(appGuid string) (apiErr error) {
 	repo.DeletedAppGuid = appGuid
 	return
+}
+
+func (repo *FakeApplicationRepository) ReadEnv(appGuid string) (map[string]string, string, error) {
+	repo.ReadEnvArgs.AppGuid = appGuid
+
+	return repo.ReadEnvReturns.UserEnv, repo.ReadEnvReturns.VcapServices, repo.ReadEnvReturns.Error
 }

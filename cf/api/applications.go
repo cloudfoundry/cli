@@ -3,13 +3,14 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type ApplicationRepository interface {
@@ -17,6 +18,7 @@ type ApplicationRepository interface {
 	Read(name string) (app models.Application, apiErr error)
 	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error)
 	Delete(appGuid string) (apiErr error)
+	ReadEnv(guid string) (userEnv map[string]string, vcapServices string, err error)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -94,4 +96,21 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppP
 func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.ApiEndpoint(), appGuid)
 	return repo.gateway.DeleteResource(path)
+}
+
+type systemEnvResource struct {
+	System      map[string]interface{} `json:"system_env_json,omitempty"`
+	Environment map[string]string      `json:"environment_json,omitempty"`
+}
+
+func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (env map[string]string, vcapServices string, apiErr error) {
+	path := fmt.Sprintf("%s/v2/apps/%s/env", repo.config.ApiEndpoint(), guid)
+	appResource := new(systemEnvResource)
+	apiErr = repo.gateway.GetResource(path, appResource)
+	if apiErr != nil {
+		return
+	}
+
+	jsonBytes, err := json.MarshalIndent(appResource.System, "", "  ")
+	return appResource.Environment, string(jsonBytes), err
 }
