@@ -12,6 +12,11 @@ import (
 var _ = Describe("i18n.Init() function", func() {
 	var I18N_PATH = filepath.Join("cf", "i18n", "test_fixtures")
 
+	AfterEach(func() {
+		os.Setenv("LC_ALL", "")
+		os.Setenv("LANG", "en_US.UTF-8")
+	})
+
 	Context("loads correct local", func() {
 		It("selects LC_ALL when set", func() {
 			os.Setenv("LC_ALL", "fr_FR.UTF-8")
@@ -61,7 +66,7 @@ var _ = Describe("i18n.Init() function", func() {
 			os.Setenv("LC_ALL", "en_US.UTF-8")
 		})
 
-		It("returns a usable T function", func() {
+		It("returns a usable T function for simple strings", func() {
 			T, err := i18n.Init("main", I18N_PATH)
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(T).ShouldNot(BeNil())
@@ -69,12 +74,24 @@ var _ = Describe("i18n.Init() function", func() {
 			translation := T("Hello world!")
 			Ω("Hello world!").Should(Equal(translation))
 		})
+
+		It("returns a usable T function for complex strings (interpolated)", func() {
+			T, err := i18n.Init("main", I18N_PATH)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(T).ShouldNot(BeNil())
+
+			translation := T("Hello {{.Name}}!", map[string]interface{}{"Name": "Anand"})
+			Ω("Hello Anand!").Should(Equal(translation))
+		})
+
 	})
 
 	Context("translates correctly", func() {
-		It("T function should return translation if string key exists", func() {
+		BeforeEach(func() {
 			os.Setenv("LC_ALL", "fr_FR.UTF-8")
+		})
 
+		It("T function should return translation if string key exists", func() {
 			T, err := i18n.Init("main", I18N_PATH)
 			Ω(err).ShouldNot(HaveOccurred())
 
@@ -83,8 +100,6 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		It("T function should return translation if it exists", func() {
-			os.Setenv("LC_ALL", "fr_FR.UTF-8")
-
 			T, err := i18n.Init("main", I18N_PATH)
 			Ω(err).ShouldNot(HaveOccurred())
 
@@ -92,6 +107,15 @@ var _ = Describe("i18n.Init() function", func() {
 			Ω("NSFW").Should(Equal(translation))
 		})
 
+		It("returns a usable T function for complex strings (interpolated)", func() {
+			T, err := i18n.Init("main", I18N_PATH)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(T).ShouldNot(BeNil())
+
+			translation := T("Hello {{.Name}}!", map[string]interface{}{"Name": "Anand"})
+			Ω("Àlo Anand!").Should(Equal(translation))
+
+		})
 	})
 
 	Context("formats locale correctly to xx_YY", func() {

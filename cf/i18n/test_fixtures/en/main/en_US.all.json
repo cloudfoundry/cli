@@ -1,1 +1,14 @@
-[{"id":"Hello world!","translation":"Hello world!"},{"id":"LOL","translation":"Laugh out loud"}]
+[
+    {
+        "id": "Hello world!",
+        "translation": "Hello world!"
+    },
+    {
+        "id": "Hello {{.Name}}!",
+        "translation": "Hello {{.Name}}!"
+    },
+    {
+        "id": "LOL",
+        "translation": "Laugh out loud"
+    }
+]

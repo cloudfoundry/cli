@@ -1,1 +1,10 @@
-[{"id":"Hello world!","translation":"Àlo le monde!"}]
+[
+    {
+        "id": "Hello world!",
+        "translation": "\u00c0lo le monde!"
+    },
+    {
+        "id": "Hello {{.Name}}!",
+        "translation": "\u00c0lo {{.Name}}!"
+    }
+]
