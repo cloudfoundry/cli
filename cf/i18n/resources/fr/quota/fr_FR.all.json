@@ -96,16 +96,16 @@
         "translation": "CF_NAME quotas"
     },
     {
-        "id": "Getting quotas as %s...",
-        "translation": "Getting quotas as %s..."
+        "id": "Getting quotas as {{.Username}}...",
+        "translation": "Obtenir les quotas étant {{.Username}}..."
     },
     {
         "id": "name",
-        "translation": "name"
+        "translation": "nom"
     },
     {
         "id": "memory limit",
-        "translation": "memory limit"
+        "translation": "limite de memoire"
     },
     {
         "id": "routes",
@@ -113,34 +113,34 @@
     },
     {
         "id": "service instances",
-        "translation": "service instances"
+        "translation": "instance de services"
     },
     {
         "id": "paid service plans",
-        "translation": "paid service plans"
+        "translation": "plans de service payé"
     },
     {
         "id": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-        "translation": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
+        "translation": "CF_NAME update-quota QUOTA [-m MÉMOIRE] [-n NOUVEAU_NOM] [-r ROUTES] [-s INSTANCE_DE_SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
     },
     {
         "id": "New name",
-        "translation": "New name"
+        "translation": "Nouveau nom"
     },
     {
         "id": "Cannot provision instances of paid service plans",
-        "translation": "Cannot provision instances of paid service plans"
+        "translation": "Incapable de provisioner des instance de service à plan payé"
     },
     {
-        "id": "Updating quota %s as %s...",
-        "translation": "Updating quota %s as %s..."
+        "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
+        "translation": "Réactualisation quota {{.QuotaName}} étant {{.Username}}..."
     },
     {
         "id": "Update an existing resource quota",
-        "translation": "Update an existing resource quota"
+        "translation": "Reactualize un quota éxistant"
     },
     {
-        "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command. ",
-        "translation": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command. "
+        "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
+        "translation": "Choississez allow ou disallow. Les deux options ne sons pas permise dans la même commande."
     }
 ]

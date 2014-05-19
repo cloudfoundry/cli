@@ -96,8 +96,8 @@
         "translation": "CF_NAME quotas"
     },
     {
-        "id": "Getting quotas as %s...",
-        "translation": "Getting quotas as %s..."
+        "id": "Getting quotas as {{.Username}}...",
+        "translation": "Getting quotas as {{.Username}}..."
     },
     {
         "id": "name",
@@ -132,15 +132,15 @@
         "translation": "Cannot provision instances of paid service plans"
     },
     {
-        "id": "Updating quota %s as %s...",
-        "translation": "Updating quota %s as %s..."
+        "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
+        "translation": "Updating quota {{.QuotaName}} as {{.Username}}..."
     },
     {
         "id": "Update an existing resource quota",
         "translation": "Update an existing resource quota"
     },
     {
-        "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command. ",
-        "translation": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command. "
+        "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
+        "translation": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command."
     }
 ]
