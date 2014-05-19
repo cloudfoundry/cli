@@ -34,7 +34,6 @@ var _ = Describe("env command", func() {
 		appRepo.ReadReturns.App = app
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
@@ -72,33 +71,60 @@ var _ = Describe("env command", func() {
 		BeforeEach(func() {
 			app = models.Application{}
 			app.Name = "my-app"
-			app.EnvironmentVars = map[string]string{
+			app.Guid = "the-app-guid"
+
+			appRepo.ReadReturns.App = app
+			appRepo.ReadEnvReturns.UserEnv = map[string]string{
 				"my-key":  "my-value",
 				"my-key2": "my-value2",
 			}
-			appRepo.ReadReturns.App = app
+			appRepo.ReadEnvReturns.VcapServices = `{
+  "VCAP_SERVICES": {
+    "pump-yer-brakes": "drive-slow"
+  }
+}`
 		})
 
-		It("TestEnvListsEnvironmentVariables", func() {
-
+		It("lists those environment variables like it's supposed to", func() {
 			runCommand("my-app")
+			Expect(appRepo.ReadEnvArgs.AppGuid).To(Equal("the-app-guid"))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
+				[]string{"System-Provided:"},
+				[]string{"VCAP_SERVICES", ":", "{"},
+				[]string{"pump-yer-brakes", ":", "drive-slow"},
+				[]string{"}"},
+				[]string{"User-Provided:"},
 				[]string{"my-key", "my-value", "my-key2", "my-value2"},
 			))
 		})
 	})
 
-	Context("when the app has no environment variables", func() {
+	Context("when the app has no user-defined environment variables", func() {
 		It("shows an empty message", func() {
 			runCommand("my-app")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting env variables for app", "my-app"},
 				[]string{"OK"},
-				[]string{"No env variables exist"},
+				[]string{"No", "env variables", "have been set"},
 			))
+		})
+	})
+
+	Context("when the app has no system-provided environment variables", func() {
+		It("does not show the system provided services hash", func() {
+			runCommand("my-app")
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"System-Provided"}))
+		})
+	})
+
+	Context("when reading the environment variables returns an error", func() {
+		It("tells you about that error", func() {
+			appRepo.ReadEnvReturns.Error = errors.New("BOO YOU CANT DO THAT; GO HOME; you're drunk")
+			runCommand("whatever")
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"you're drunk"}))
 		})
 	})
 })

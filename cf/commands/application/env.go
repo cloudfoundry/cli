@@ -1,6 +1,8 @@
 package application
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -53,15 +55,28 @@ func (cmd *Env) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
-	envVars := app.EnvironmentVars
+
+	envVars, vcapServices, err := cmd.appRepo.ReadEnv(app.Guid)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
+	if len(vcapServices) > 0 {
+		cmd.ui.Say("System-Provided:")
+		for _, line := range strings.Split(vcapServices, "\n") {
+			cmd.ui.Say(line)
+		}
+	}
+
 	if len(envVars) == 0 {
-		cmd.ui.Say("No env variables exist")
+		cmd.ui.Say("No user-defined env variables have been set")
 		return
 	}
+
+	cmd.ui.Say("User-Provided:")
 	for key, value := range envVars {
 		cmd.ui.Say("%s: %s", key, terminal.EntityNameColor(value))
 	}
