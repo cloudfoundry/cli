@@ -26,7 +26,7 @@ func NewDeleteRoute(ui terminal.UI, config configuration.Reader, routeRepo api.R
 	return
 }
 
-func (command *DeleteRoute) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-route",
 		Description: "Delete a route",

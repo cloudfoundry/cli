@@ -19,7 +19,7 @@ func NewLogout(ui terminal.UI, config configuration.ReadWriter) (cmd Logout) {
 	return
 }
 
-func (command Logout) Metadata() command_metadata.CommandMetadata {
+func (cmd Logout) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "logout",
 		ShortName:   "lo",

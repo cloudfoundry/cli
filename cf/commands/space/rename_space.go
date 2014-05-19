@@ -25,7 +25,7 @@ func NewRenameSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo a
 	return
 }
 
-func (command *RenameSpace) Metadata() command_metadata.CommandMetadata {
+func (cmd *RenameSpace) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-space",
 		Description: "Rename a space",

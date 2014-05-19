@@ -23,7 +23,7 @@ func NewShowSpace(ui terminal.UI, config configuration.Reader) (cmd *ShowSpace) 
 	return
 }
 
-func (command *ShowSpace) Metadata() command_metadata.CommandMetadata {
+func (cmd *ShowSpace) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "space",
 		Description: "Show space info",

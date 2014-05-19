@@ -33,7 +33,7 @@ func NewSetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo api.
 	return
 }
 
-func (command *SetSpaceRole) Metadata() command_metadata.CommandMetadata {
+func (cmd *SetSpaceRole) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "set-space-role",
 		Description: "Assign a space role to a user",

@@ -29,7 +29,7 @@ func NewUnsetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo ap
 	return
 }
 
-func (command *UnsetSpaceRole) Metadata() command_metadata.CommandMetadata {
+func (cmd *UnsetSpaceRole) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unset-space-role",
 		Description: "Remove a space role from a user",

@@ -21,7 +21,7 @@ func NewListBuildpacks(ui terminal.UI, buildpackRepo api.BuildpackRepository) (c
 	return
 }
 
-func (command ListBuildpacks) Metadata() command_metadata.CommandMetadata {
+func (cmd ListBuildpacks) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "buildpacks",
 		Description: "List all buildpacks",

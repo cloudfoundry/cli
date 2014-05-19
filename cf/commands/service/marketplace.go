@@ -25,7 +25,7 @@ func NewMarketplaceServices(ui terminal.UI, config configuration.Reader, service
 	return
 }
 
-func (command MarketplaceServices) Metadata() command_metadata.CommandMetadata {
+func (cmd MarketplaceServices) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "marketplace",
 		ShortName:   "m",

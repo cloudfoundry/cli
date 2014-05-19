@@ -32,7 +32,7 @@ func NewCreateRoute(ui terminal.UI, config configuration.Reader, routeRepo api.R
 	return
 }
 
-func (command *CreateRoute) Metadata() command_metadata.CommandMetadata {
+func (cmd *CreateRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-route",
 		Description: "Create a url route in a space for later use",

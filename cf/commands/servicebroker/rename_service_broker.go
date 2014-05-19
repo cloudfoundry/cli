@@ -23,7 +23,7 @@ func NewRenameServiceBroker(ui terminal.UI, config configuration.Reader, repo ap
 	return
 }
 
-func (command RenameServiceBroker) Metadata() command_metadata.CommandMetadata {
+func (cmd RenameServiceBroker) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-service-broker",
 		Description: "Rename a service broker",

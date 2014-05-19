@@ -23,7 +23,7 @@ func NewListOrgs(ui terminal.UI, config configuration.Reader, orgRepo api.Organi
 	return
 }
 
-func (command ListOrgs) Metadata() command_metadata.CommandMetadata {
+func (cmd ListOrgs) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "orgs",
 		ShortName:   "o",

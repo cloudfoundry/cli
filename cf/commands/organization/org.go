@@ -25,7 +25,7 @@ func NewShowOrg(ui terminal.UI, config configuration.Reader) (cmd *ShowOrg) {
 	return
 }
 
-func (command *ShowOrg) Metadata() command_metadata.CommandMetadata {
+func (cmd *ShowOrg) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "org",
 		Description: "Show org info",

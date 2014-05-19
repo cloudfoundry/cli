@@ -28,7 +28,7 @@ func NewUpdateUserProvidedService(ui terminal.UI, config configuration.Reader, u
 	return
 }
 
-func (command *UpdateUserProvidedService) Metadata() command_metadata.CommandMetadata {
+func (cmd *UpdateUserProvidedService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-user-provided-service",
 		ShortName:   "uups",

@@ -27,7 +27,7 @@ func NewUnmapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.Ro
 	return
 }
 
-func (command *UnmapRoute) Metadata() command_metadata.CommandMetadata {
+func (cmd *UnmapRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unmap-route",
 		Description: "Remove a url route from an app",

@@ -24,7 +24,7 @@ func NewEnv(ui terminal.UI, config configuration.Reader, appRepo api.Application
 	return
 }
 
-func (command *Env) Metadata() command_metadata.CommandMetadata {
+func (cmd *Env) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "env",
 		ShortName:   "e",

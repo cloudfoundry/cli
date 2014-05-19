@@ -22,7 +22,7 @@ func NewListServiceAuthTokens(ui terminal.UI, config configuration.Reader, authT
 	return
 }
 
-func (command ListServiceAuthTokens) Metadata() command_metadata.CommandMetadata {
+func (cmd ListServiceAuthTokens) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "service-auth-tokens",
 		Description: "List service auth tokens",

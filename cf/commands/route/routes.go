@@ -24,7 +24,7 @@ func NewListRoutes(ui terminal.UI, config configuration.Reader, routeRepo api.Ro
 	return
 }
 
-func (command ListRoutes) Metadata() command_metadata.CommandMetadata {
+func (cmd ListRoutes) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "routes",
 		ShortName:   "r",

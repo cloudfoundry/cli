@@ -36,7 +36,7 @@ func NewSpaceUsers(ui terminal.UI, config configuration.Reader, spaceRepo api.Sp
 	return
 }
 
-func (command *SpaceUsers) Metadata() command_metadata.CommandMetadata {
+func (cmd *SpaceUsers) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "space-users",
 		Description: "Show space users by role",

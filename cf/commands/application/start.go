@@ -80,7 +80,7 @@ func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer Applicat
 	return
 }
 
-func (command *Start) Metadata() command_metadata.CommandMetadata {
+func (cmd *Start) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "start",
 		ShortName:   "st",

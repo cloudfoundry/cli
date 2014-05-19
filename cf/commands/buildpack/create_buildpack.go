@@ -25,7 +25,7 @@ func NewCreateBuildpack(ui terminal.UI, buildpackRepo api.BuildpackRepository, b
 	return
 }
 
-func (command CreateBuildpack) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateBuildpack) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-buildpack",
 		Description: "Create a buildpack",

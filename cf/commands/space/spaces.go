@@ -23,7 +23,7 @@ func NewListSpaces(ui terminal.UI, config configuration.Reader, spaceRepo api.Sp
 	return
 }
 
-func (command ListSpaces) Metadata() command_metadata.CommandMetadata {
+func (cmd ListSpaces) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "spaces",
 		Description: "List all spaces in an org",

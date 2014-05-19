@@ -19,7 +19,7 @@ func NewShowService(ui terminal.UI) (cmd *ShowService) {
 	return
 }
 
-func (command *ShowService) Metadata() command_metadata.CommandMetadata {
+func (cmd *ShowService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "service",
 		Description: "Show service instance info",

@@ -26,7 +26,7 @@ func NewRenameService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	return
 }
 
-func (command *RenameService) Metadata() command_metadata.CommandMetadata {
+func (cmd *RenameService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-service",
 		Description: "Rename a service instance",

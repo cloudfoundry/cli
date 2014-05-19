@@ -23,7 +23,7 @@ func NewDeleteUser(ui terminal.UI, config configuration.Reader, userRepo api.Use
 	return
 }
 
-func (command DeleteUser) Metadata() command_metadata.CommandMetadata {
+func (cmd DeleteUser) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-user",
 		Description: "Delete a user",

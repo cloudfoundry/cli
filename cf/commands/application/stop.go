@@ -31,7 +31,7 @@ func NewStop(ui terminal.UI, config configuration.Reader, appRepo api.Applicatio
 	return
 }
 
-func (command *Stop) Metadata() command_metadata.CommandMetadata {
+func (cmd *Stop) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "stop",
 		ShortName:   "sp",

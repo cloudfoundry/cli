@@ -23,7 +23,7 @@ func NewCreateServiceBroker(ui terminal.UI, config configuration.Reader, service
 	return
 }
 
-func (command CreateServiceBroker) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateServiceBroker) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-service-broker",
 		Description: "Create a service broker",

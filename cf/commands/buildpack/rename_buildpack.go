@@ -21,7 +21,7 @@ func NewRenameBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *Rena
 	return
 }
 
-func (command *RenameBuildpack) Metadata() command_metadata.CommandMetadata {
+func (cmd *RenameBuildpack) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-buildpack",
 		Description: "Rename a buildpack",

@@ -33,7 +33,7 @@ func NewCreateSpace(ui terminal.UI, config configuration.Reader, spaceRoleSetter
 	return
 }
 
-func (command CreateSpace) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateSpace) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-space",
 		Description: "Create a space",

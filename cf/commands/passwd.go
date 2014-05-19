@@ -23,7 +23,7 @@ func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, config configur
 	return
 }
 
-func (command Password) Metadata() command_metadata.CommandMetadata {
+func (cmd Password) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "passwd",
 		ShortName:   "pw",

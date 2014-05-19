@@ -40,7 +40,7 @@ func NewLogin(ui terminal.UI,
 	}
 }
 
-func (command Login) Metadata() command_metadata.CommandMetadata {
+func (cmd Login) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "login",
 		ShortName:   "l",

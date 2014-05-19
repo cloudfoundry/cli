@@ -25,7 +25,7 @@ func NewEvents(ui terminal.UI, config configuration.Reader, eventsRepo api.AppEv
 	return
 }
 
-func (command *Events) Metadata() command_metadata.CommandMetadata {
+func (cmd *Events) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "events",
 		Description: "Show recent app events",

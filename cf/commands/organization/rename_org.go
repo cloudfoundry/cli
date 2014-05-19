@@ -25,7 +25,7 @@ func NewRenameOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.O
 	return
 }
 
-func (command *RenameOrg) Metadata() command_metadata.CommandMetadata {
+func (cmd *RenameOrg) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-org",
 		Description: "Rename an org",

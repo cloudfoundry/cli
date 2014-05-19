@@ -26,7 +26,7 @@ func NewMigrateServiceInstances(ui terminal.UI, configRepo configuration.Reader,
 	return
 }
 
-func (command *MigrateServiceInstances) Metadata() command_metadata.CommandMetadata {
+func (cmd *MigrateServiceInstances) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "migrate-service-instances",
 		Description: "Migrate service instances from one service plan to another",
