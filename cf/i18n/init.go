@@ -18,6 +18,7 @@ const (
 )
 
 var SUPPORTED_LANGUAGES = []string{"ar", "ca", "zh", "cs", "da", "nl", "en", "fr", "de", "it", "ja", "lt", "pt", "es"}
+var RESOURCES_PATH = filepath.Join("cf", "i18n", "resources")
 
 func Init(packageName string, i18nDirname string) (go_i18n.TranslateFunc, error) {
 	userLocale := getUserLocale()

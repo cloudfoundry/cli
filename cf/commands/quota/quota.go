@@ -9,7 +9,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/i18n"
 
@@ -24,7 +23,7 @@ type showQuota struct {
 }
 
 func NewShowQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) *showQuota {
-	t, err := i18n.Init("quota", filepath.Join("cf", "i18n", "resources"))
+	t, err := i18n.Init("quota", i18n.RESOURCES_PATH)
 	if err != nil {
 		ui.Failed(err.Error())
 	}
