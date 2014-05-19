@@ -20,6 +20,7 @@
   fi
 
   export GOPATH=$($GODEP path):$GOPATH
+  export LC_ALL="en_US.UTF-8"
 
   echo -e "\n Cleaning build artifacts..."
   go clean
