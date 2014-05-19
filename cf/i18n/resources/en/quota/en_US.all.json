@@ -52,12 +52,12 @@
         "translation": "Incorrect Usage"
     },
     {
-        "id": "Deleting quota %s as %s...",
-        "translation": "Deleting quota %s as %s..."
+        "id": "Deleting quota {{.QuotaName}} as {{.Username}}...",
+        "translation": "Deleting quota {{.QuotaName}} as {{.Username}}..."
     },
     {
-        "id": "Quota %s does not exist",
-        "translation": "Quota %s does not exist"
+        "id": "Quota {{.QuotaName}} does not exist",
+        "translation": "Quota {{.QuotaName}} does not exist"
     },
     {
         "id": "CF_NAME quota QUOTA",

@@ -37,7 +37,7 @@
     },
     {
         "id": "Delete a quota",
-        "translation": "Delete a quota"
+        "translation": "Suprimmer le quota"
     },
     {
         "id": "CF_NAME delete-quota QUOTA [-f]",
@@ -45,19 +45,19 @@
     },
     {
         "id": "Force deletion without confirmation",
-        "translation": "Force deletion without confirmation"
+        "translation": "Forcer la suppression sans confirmation"
     },
     {
         "id": "Incorrect Usage",
-        "translation": "Incorrect Usage"
+        "translation": "Utilisation Incorrecte"
     },
     {
-        "id": "Deleting quota %s as %s...",
-        "translation": "Deleting quota %s as %s..."
+        "id": "Deleting quota {{.QuotaName}} as {{.Username}}...",
+        "translation": "Sumprimmer le quota %s étant %s..."
     },
     {
-        "id": "Quota %s does not exist",
-        "translation": "Quota %s does not exist"
+        "id": "Quota {{.QuotaName}} does not exist",
+        "translation": "Quota {{.QuotaName}} n'éxiste plus"
     },
     {
         "id": "CF_NAME quota QUOTA",
