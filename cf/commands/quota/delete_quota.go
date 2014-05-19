@@ -8,6 +8,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
+
+	"github.com/cloudfoundry/cli/cf/i18n"
+
+	goi18n "github.com/nicksnyder/go-i18n/i18n"
 )
 
 type DeleteQuota struct {
@@ -15,30 +19,37 @@ type DeleteQuota struct {
 	config    configuration.Reader
 	quotaRepo api.QuotaRepository
 	orgReq    requirements.OrganizationRequirement
+	T         goi18n.TranslateFunc
 }
 
 func NewDeleteQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) (cmd *DeleteQuota) {
-	cmd = new(DeleteQuota)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.quotaRepo = quotaRepo
-	return
+	t, err := i18n.Init("quota", i18n.RESOURCES_PATH)
+	if err != nil {
+		ui.Failed(err.Error())
+	}
+
+	return &DeleteQuota{
+		ui:        ui,
+		config:    config,
+		quotaRepo: quotaRepo,
+		T:         t,
+	}
 }
 
-func (command *DeleteQuota) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-quota",
-		Description: "Delete a quota",
-		Usage:       "CF_NAME delete-quota QUOTA [-f]",
+		Description: cmd.T("Delete a quota"),
+		Usage:       cmd.T("CF_NAME delete-quota QUOTA [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "f", Usage: cmd.T("Force deletion without confirmation")},
 		},
 	}
 }
 
 func (cmd *DeleteQuota) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		err = errors.New("Incorrect Usage")
+		err = errors.New(cmd.T("Incorrect Usage"))
 		cmd.ui.FailWithUsage(c)
 		return
 	}
@@ -59,10 +70,10 @@ func (cmd *DeleteQuota) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting quota %s as %s...",
-		terminal.EntityNameColor(quotaName),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(cmd.T("Deleting quota {{.QuotaName}} as {{.Username}}...", map[string]interface{}{
+		"QuotaName": terminal.EntityNameColor(quotaName),
+		"Username":  terminal.EntityNameColor(cmd.config.Username()),
+	}))
 
 	quota, apiErr := cmd.quotaRepo.FindByName(quotaName)
 
@@ -70,7 +81,7 @@ func (cmd *DeleteQuota) Run(c *cli.Context) {
 	case nil: // no error
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Quota %s does not exist", quotaName)
+		cmd.ui.Warn(cmd.T("Quota {{.QuotaName}} does not exist", map[string]interface{}{"QuotaName": quotaName}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())
