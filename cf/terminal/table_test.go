@@ -99,5 +99,17 @@ var _ = Describe("Table", func() {
 				[]string{"something   something   darkside"},
 			))
 		})
+
+		It("aligns rows to the longest row provided when there are multibyte characters present", func() {
+			table.Add([]string{"x", "ÿ", "z"})
+			table.Add([]string{"something", "something", "darkside"})
+			table.Print()
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"watashi     no          atama!"},
+				[]string{"x           ÿ           z"},
+				[]string{"something   something   darkside"},
+			))
+		})
 	})
 })
