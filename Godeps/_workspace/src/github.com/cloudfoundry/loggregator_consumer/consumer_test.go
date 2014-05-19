@@ -403,6 +403,7 @@ var _ = Describe("Loggregator Consumer", func() {
 
 				Expect(recentError).To(HaveOccurred())
 				Expect(recentError.Error()).To(ContainSubstring("You are not authorized. Helpful message"))
+				Expect(recentError).To(BeAssignableToTypeOf(&consumer.UnauthorizedError{}))
 			})
 		})
 	})

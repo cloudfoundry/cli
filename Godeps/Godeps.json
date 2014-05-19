@@ -2,7 +2,7 @@
 	"ImportPath": "github.com/cloudfoundry/cli",
 	"GoVersion": "go1.2",
 	"Packages": [
-		"./..."
+		"./cf/..."
 	],
 	"Deps": [
 		{
@@ -29,7 +29,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
-			"Rev": "d518228353e70f0150c174d17882a93a1e7e01fa"
+			"Rev": "c9c42074d681db3ca94700c140588292d023c93d"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
