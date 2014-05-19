@@ -103,12 +103,14 @@ type systemEnvResource struct {
 	Environment map[string]string      `json:"environment_json,omitempty"`
 }
 
-func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (env map[string]string, vcapServices string, apiErr error) {
+func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (map[string]string, string, error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/env", repo.config.ApiEndpoint(), guid)
 	appResource := new(systemEnvResource)
-	apiErr = repo.gateway.GetResource(path, appResource)
-	if apiErr != nil {
-		return
+
+	var err error
+	err = repo.gateway.GetResource(path, appResource)
+	if err != nil {
+		return nil, "", err
 	}
 
 	jsonBytes, err := json.MarshalIndent(appResource.System, "", "  ")
