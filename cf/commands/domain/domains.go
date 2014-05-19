@@ -26,7 +26,7 @@ func NewListDomains(ui terminal.UI, config configuration.Reader, domainRepo api.
 	return
 }
 
-func (command *ListDomains) Metadata() command_metadata.CommandMetadata {
+func (cmd *ListDomains) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "domains",
 		Description: "List domains in the target org",

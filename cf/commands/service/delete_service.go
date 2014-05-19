@@ -25,7 +25,7 @@ func NewDeleteService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	return
 }
 
-func (command *DeleteService) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-service",
 		ShortName:   "ds",

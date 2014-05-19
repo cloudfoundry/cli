@@ -25,7 +25,7 @@ func NewCreateDomain(ui terminal.UI, config configuration.Reader, domainRepo api
 	return
 }
 
-func (command *CreateDomain) Metadata() command_metadata.CommandMetadata {
+func (cmd *CreateDomain) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-domain",
 		Description: "Create a domain in an org for later use",

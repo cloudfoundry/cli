@@ -25,7 +25,7 @@ func NewUpdateBuildpack(ui terminal.UI, repo api.BuildpackRepository, bitsRepo a
 	return
 }
 
-func (command *UpdateBuildpack) Metadata() command_metadata.CommandMetadata {
+func (cmd *UpdateBuildpack) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-buildpack",
 		Description: "Update a buildpack",

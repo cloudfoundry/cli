@@ -23,7 +23,7 @@ func NewUpdateServiceBroker(ui terminal.UI, config configuration.Reader, repo ap
 	return
 }
 
-func (command UpdateServiceBroker) Metadata() command_metadata.CommandMetadata {
+func (cmd UpdateServiceBroker) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-service-broker",
 		Description: "Update a service broker",

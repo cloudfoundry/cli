@@ -29,7 +29,7 @@ func NewMapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.Rout
 	return
 }
 
-func (command *MapRoute) Metadata() command_metadata.CommandMetadata {
+func (cmd *MapRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "map-route",
 		Description: "Add a url route to an app",

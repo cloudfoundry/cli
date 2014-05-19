@@ -25,7 +25,7 @@ func NewDeleteSharedDomain(ui terminal.UI, config configuration.Reader, repo api
 	return
 }
 
-func (command *DeleteSharedDomain) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteSharedDomain) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-shared-domain",
 		Description: "Delete a shared domain",

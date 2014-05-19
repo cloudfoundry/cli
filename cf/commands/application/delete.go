@@ -27,7 +27,7 @@ func NewDeleteApp(ui terminal.UI, config configuration.Reader, appRepo api.Appli
 	return
 }
 
-func (command *DeleteApp) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteApp) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete",
 		ShortName:   "d",

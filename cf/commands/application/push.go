@@ -62,7 +62,7 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 	}
 }
 
-func (command *Push) Metadata() command_metadata.CommandMetadata {
+func (cmd *Push) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "push",
 		ShortName:   "p",

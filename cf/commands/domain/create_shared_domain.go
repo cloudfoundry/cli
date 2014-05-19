@@ -25,7 +25,7 @@ func NewCreateSharedDomain(ui terminal.UI, config configuration.Reader, domainRe
 	return
 }
 
-func (command *CreateSharedDomain) Metadata() command_metadata.CommandMetadata {
+func (cmd *CreateSharedDomain) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-shared-domain",
 		Description: "Create a domain that can be used by all orgs (admin-only)",

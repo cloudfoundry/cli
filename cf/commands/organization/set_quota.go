@@ -25,7 +25,7 @@ func NewSetQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.Quot
 	return
 }
 
-func (command *SetQuota) Metadata() command_metadata.CommandMetadata {
+func (cmd *SetQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "set-quota",
 		Description: "Assign a quota to an org",

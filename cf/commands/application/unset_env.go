@@ -27,7 +27,7 @@ func NewUnsetEnv(ui terminal.UI, config configuration.Reader, appRepo api.Applic
 	return
 }
 
-func (command *UnsetEnv) Metadata() command_metadata.CommandMetadata {
+func (cmd *UnsetEnv) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unset-env",
 		Description: "Remove an env variable",

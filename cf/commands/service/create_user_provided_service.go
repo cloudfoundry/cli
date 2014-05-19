@@ -26,7 +26,7 @@ func NewCreateUserProvidedService(ui terminal.UI, config configuration.Reader, u
 	return
 }
 
-func (command CreateUserProvidedService) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateUserProvidedService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",

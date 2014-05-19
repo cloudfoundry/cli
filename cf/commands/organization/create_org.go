@@ -24,7 +24,7 @@ func NewCreateOrg(ui terminal.UI, config configuration.Reader, orgRepo api.Organ
 	return
 }
 
-func (command CreateOrg) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateOrg) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-org",
 		ShortName:   "co",

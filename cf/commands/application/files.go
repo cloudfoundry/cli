@@ -25,7 +25,7 @@ func NewFiles(ui terminal.UI, config configuration.Reader, appFilesRepo api.AppF
 	return
 }
 
-func (command *Files) Metadata() command_metadata.CommandMetadata {
+func (cmd *Files) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "files",
 		ShortName:   "f",

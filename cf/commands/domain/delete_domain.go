@@ -25,7 +25,7 @@ func NewDeleteDomain(ui terminal.UI, config configuration.Reader, repo api.Domai
 	return
 }
 
-func (command *DeleteDomain) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteDomain) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-domain",
 		Description: "Delete a domain",

@@ -24,7 +24,7 @@ func NewDeleteServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	return
 }
 
-func (command DeleteServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
+func (cmd DeleteServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-service-auth-token",
 		Description: "Delete a service auth token",

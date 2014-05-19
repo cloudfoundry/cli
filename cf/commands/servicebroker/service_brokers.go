@@ -23,7 +23,7 @@ func NewListServiceBrokers(ui terminal.UI, config configuration.Reader, repo api
 	return
 }
 
-func (command ListServiceBrokers) Metadata() command_metadata.CommandMetadata {
+func (cmd ListServiceBrokers) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "service-brokers",
 		Description: "List service brokers",

@@ -27,7 +27,7 @@ func NewSetEnv(ui terminal.UI, config configuration.Reader, appRepo api.Applicat
 	}
 }
 
-func (command *SetEnv) Metadata() command_metadata.CommandMetadata {
+func (cmd *SetEnv) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:            "set-env",
 		ShortName:       "se",

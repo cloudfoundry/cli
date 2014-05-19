@@ -26,7 +26,7 @@ func (cmd PurgeServiceOffering) GetRequirements(requirementsFactory requirements
 	return
 }
 
-func (command PurgeServiceOffering) Metadata() command_metadata.CommandMetadata {
+func (cmd PurgeServiceOffering) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "purge-service-offering",
 		Description: "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",

@@ -22,7 +22,7 @@ func NewListStacks(ui terminal.UI, config configuration.Reader, stacksRepo api.S
 	return
 }
 
-func (command ListStacks) Metadata() command_metadata.CommandMetadata {
+func (cmd ListStacks) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "stacks",
 		Description: "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",

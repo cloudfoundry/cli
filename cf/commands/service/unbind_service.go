@@ -26,7 +26,7 @@ func NewUnbindService(ui terminal.UI, config configuration.Reader, serviceBindin
 	return
 }
 
-func (command *UnbindService) Metadata() command_metadata.CommandMetadata {
+func (cmd *UnbindService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unbind-service",
 		ShortName:   "us",

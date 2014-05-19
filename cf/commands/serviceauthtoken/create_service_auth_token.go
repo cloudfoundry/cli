@@ -24,7 +24,7 @@ func NewCreateServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	return
 }
 
-func (command CreateServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-service-auth-token",
 		Description: "Create a service auth token",

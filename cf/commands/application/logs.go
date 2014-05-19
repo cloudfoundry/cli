@@ -30,7 +30,7 @@ func NewLogs(ui terminal.UI, config configuration.Reader, logsRepo api.LogsRepos
 	return
 }
 
-func (command *Logs) Metadata() command_metadata.CommandMetadata {
+func (cmd *Logs) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "logs",
 		Description: "Tail or show recent logs for an app",

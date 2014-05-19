@@ -23,7 +23,7 @@ func NewUpdateServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 	return
 }
 
-func (command UpdateServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
+func (cmd UpdateServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-service-auth-token",
 		Description: "Update a service auth token",

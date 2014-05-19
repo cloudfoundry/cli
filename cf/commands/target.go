@@ -32,7 +32,7 @@ func NewTarget(ui terminal.UI,
 	return
 }
 
-func (command Target) Metadata() command_metadata.CommandMetadata {
+func (cmd Target) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "target",
 		ShortName:   "t",

@@ -35,7 +35,7 @@ func NewOrgUsers(ui terminal.UI, config configuration.Reader, userRepo api.UserR
 	return
 }
 
-func (command *OrgUsers) Metadata() command_metadata.CommandMetadata {
+func (cmd *OrgUsers) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "org-users",
 		Description: "Show org users by role",

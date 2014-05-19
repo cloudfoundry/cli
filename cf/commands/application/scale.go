@@ -30,7 +30,7 @@ func NewScale(ui terminal.UI, config configuration.Reader, restarter Application
 	return
 }
 
-func (command *Scale) Metadata() command_metadata.CommandMetadata {
+func (cmd *Scale) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "scale",
 		Description: "Change or view the instance count, disk space limit, and memory limit for an app",

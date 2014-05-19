@@ -29,7 +29,7 @@ func NewCurl(ui terminal.UI, config configuration.Reader, curlRepo api.CurlRepos
 	return
 }
 
-func (command *Curl) Metadata() command_metadata.CommandMetadata {
+func (cmd *Curl) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "curl",
 		Description: "Executes a raw request, content-type set to application/json by default",

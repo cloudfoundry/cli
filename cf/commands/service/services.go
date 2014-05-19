@@ -23,7 +23,7 @@ func NewListServices(ui terminal.UI, config configuration.Reader, serviceSummary
 	return
 }
 
-func (command ListServices) Metadata() command_metadata.CommandMetadata {
+func (cmd ListServices) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "services",
 		ShortName:   "s",

@@ -26,7 +26,7 @@ func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.O
 	return
 }
 
-func (command *DeleteOrg) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteOrg) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-org",
 		Description: "Delete an org",

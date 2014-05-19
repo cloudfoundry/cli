@@ -25,7 +25,7 @@ func NewListApps(ui terminal.UI, config configuration.Reader, appSummaryRepo api
 	return
 }
 
-func (command ListApps) Metadata() command_metadata.CommandMetadata {
+func (cmd ListApps) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "apps",
 		ShortName:   "a",

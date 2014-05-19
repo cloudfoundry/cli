@@ -27,7 +27,7 @@ func NewSetOrgRole(ui terminal.UI, config configuration.Reader, userRepo api.Use
 	return
 }
 
-func (command *SetOrgRole) Metadata() command_metadata.CommandMetadata {
+func (cmd *SetOrgRole) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "set-org-role",
 		Description: "Assign an org role to a user",

@@ -24,7 +24,7 @@ func NewCreateUser(ui terminal.UI, config configuration.Reader, userRepo api.Use
 	return
 }
 
-func (command CreateUser) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateUser) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-user",
 		Description: "Create a new user",

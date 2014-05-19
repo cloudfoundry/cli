@@ -23,7 +23,7 @@ func NewDeleteServiceBroker(ui terminal.UI, config configuration.Reader, repo ap
 	return
 }
 
-func (command DeleteServiceBroker) Metadata() command_metadata.CommandMetadata {
+func (cmd DeleteServiceBroker) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-service-broker",
 		Description: "Delete a service broker",

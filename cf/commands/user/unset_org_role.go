@@ -28,7 +28,7 @@ func NewUnsetOrgRole(ui terminal.UI, config configuration.Reader, userRepo api.U
 	return
 }
 
-func (command *UnsetOrgRole) Metadata() command_metadata.CommandMetadata {
+func (cmd *UnsetOrgRole) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unset-org-role",
 		Description: "Remove an org role from a user",

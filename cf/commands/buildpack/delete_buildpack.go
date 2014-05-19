@@ -21,7 +21,7 @@ func NewDeleteBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *Dele
 	return
 }
 
-func (command *DeleteBuildpack) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteBuildpack) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-buildpack",
 		Description: "Delete a buildpack",

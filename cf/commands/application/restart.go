@@ -28,7 +28,7 @@ func NewRestart(ui terminal.UI, starter ApplicationStarter, stopper ApplicationS
 	return
 }
 
-func (command *Restart) Metadata() command_metadata.CommandMetadata {
+func (cmd *Restart) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "restart",
 		ShortName:   "rs",

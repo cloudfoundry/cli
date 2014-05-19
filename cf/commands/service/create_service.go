@@ -25,7 +25,7 @@ func NewCreateService(ui terminal.UI, config configuration.Reader, serviceRepo a
 	return
 }
 
-func (command CreateService) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-service",
 		ShortName:   "cs",

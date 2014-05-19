@@ -27,7 +27,7 @@ func NewDeleteSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo a
 	return
 }
 
-func (command *DeleteSpace) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteSpace) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-space",
 		Description: "Delete a space",
