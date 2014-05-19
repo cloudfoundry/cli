@@ -3,6 +3,7 @@ package terminal
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
 type Table interface {
@@ -49,7 +50,7 @@ func (t *PrintableTable) Print() {
 
 func (t *PrintableTable) calculateMaxSize(row []string) {
 	for index, value := range row {
-		cellLength := len(Decolorize(value))
+		cellLength := utf8.RuneCountInString(Decolorize(value))
 		if t.maxSizes[index] < cellLength {
 			t.maxSizes[index] = cellLength
 		}
@@ -79,7 +80,7 @@ func (t *PrintableTable) printRow(row []string) {
 func (t *PrintableTable) cellValue(col int, value string) string {
 	padding := ""
 	if col < len(t.header)-1 {
-		padding = strings.Repeat(" ", t.maxSizes[col]-len(Decolorize(value)))
+		padding = strings.Repeat(" ", t.maxSizes[col]-utf8.RuneCountInString(Decolorize(value)))
 	}
 	return fmt.Sprintf("%s%s   ", value, padding)
 }
