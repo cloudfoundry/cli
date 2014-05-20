@@ -44,10 +44,9 @@ func (cmd *BindService) Metadata() command_metadata.CommandMetadata {
 func (cmd *BindService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 2 {
-		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c)
-		return
 	}
+
 	appName := c.Args()[0]
 	serviceName := c.Args()[1]
 

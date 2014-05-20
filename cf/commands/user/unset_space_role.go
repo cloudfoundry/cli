@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -43,9 +42,7 @@ func (cmd *UnsetSpaceRole) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *UnsetSpaceRole) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 4 {
-		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c)
-		return
 	}
 
 	cmd.userReq = requirementsFactory.NewUserRequirement(c.Args()[0])

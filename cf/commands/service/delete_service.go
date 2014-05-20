@@ -45,9 +45,7 @@ func (cmd *DeleteService) GetRequirements(requirementsFactory requirements.Facto
 	}
 
 	if serviceName == "" {
-		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c)
-		return
 	}
 
 	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
