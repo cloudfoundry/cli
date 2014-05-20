@@ -40,9 +40,7 @@ func (cmd *DeleteRoute) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *DeleteRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c)
-		return
 	}
 
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(c.Args()[0])

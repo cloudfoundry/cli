@@ -3,7 +3,6 @@ package buildpack
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -31,9 +30,7 @@ func (cmd *RenameBuildpack) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *RenameBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
-		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c)
-		return
 	}
 
 	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}

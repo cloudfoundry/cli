@@ -1,7 +1,6 @@
 package servicebroker
 
 import (
-	"errors"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -34,9 +33,7 @@ func (cmd CreateServiceBroker) Metadata() command_metadata.CommandMetadata {
 func (cmd CreateServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 4 {
-		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c)
-		return
 	}
 
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())

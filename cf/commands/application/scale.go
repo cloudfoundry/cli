@@ -4,7 +4,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -46,9 +45,7 @@ func (cmd *Scale) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *Scale) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c)
-		return
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])

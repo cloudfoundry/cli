@@ -4,7 +4,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -46,9 +45,7 @@ func (cmd *CreateRoute) Metadata() command_metadata.CommandMetadata {
 func (cmd *CreateRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 2 {
-		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c)
-		return
 	}
 
 	spaceName := c.Args()[0]
