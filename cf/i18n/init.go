@@ -122,7 +122,15 @@ func loadFromAsset(packageName, assetPath, locale string) error {
 		return errors.New(fmt.Sprintf("Could not load i18n asset: %v", assetKey))
 	}
 
-	fileName, err := saveLanguageFileToDisk(assetName, byteArray)
+	tmpDir, err := ioutil.TempDir("", "cloudfoundry_cli_i18n_res")
+	if err != nil {
+		return err
+	}
+	defer func() {
+		os.RemoveAll(tmpDir)
+	}()
+
+	fileName, err := saveLanguageFileToDisk(tmpDir, assetName, byteArray)
 	if err != nil {
 		return err
 	}
@@ -134,12 +142,7 @@ func loadFromAsset(packageName, assetPath, locale string) error {
 	return nil
 }
 
-func saveLanguageFileToDisk(assetName string, byteArray []byte) (fileName string, err error) {
-	tmpDir, err := ioutil.TempDir("", "cloudfoundry_cli_i18n_res")
-	if err != nil {
-		return
-	}
-
+func saveLanguageFileToDisk(tmpDir, assetName string, byteArray []byte) (fileName string, err error) {
 	fileName = filepath.Join(tmpDir, assetName)
 	file, err := os.Create(fileName)
 	if err != nil {
