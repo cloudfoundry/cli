@@ -87,8 +87,8 @@ var _ = Describe("App", func() {
 		})
 	})
 
-	XIt("includes the built on date in its version string", func() {
-
+	It("includes the built on date in its version string", func() {
+		Expect(app.Version).To(Equal(cf.Version + "-" + cf.BuiltOnDate))
 	})
 })
 
