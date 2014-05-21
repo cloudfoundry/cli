@@ -54,7 +54,6 @@ func init() {
 	null_values["null"] = true
 	null_values["Null"] = true
 	null_values["NULL"] = true
-	null_values[""] = true
 
 	timestamp_regexp = regexp.MustCompile("^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)(?:(?:[Tt]|[ \t]+)([0-9][0-9]?):([0-9][0-9]):([0-9][0-9])(?:\\.([0-9]*))?(?:[ \t]*(?:Z|([-+][0-9][0-9]?)(?::([0-9][0-9])?)?))?)?$")
 	ymd_regexp = regexp.MustCompile("^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)$")
@@ -125,7 +124,7 @@ func resolve_bool(val string, v reflect.Value) (string, error) {
 func resolve_int(val string, v reflect.Value, useNumber bool) (string, error) {
 	original := val
 	val = strings.Replace(val, "_", "", -1)
-	var value int64
+	var value uint64
 
 	isNumberValue := v.Type() == numberType
 
@@ -137,7 +136,7 @@ func resolve_int(val string, v reflect.Value, useNumber bool) (string, error) {
 		val = val[1:]
 	}
 
-	base := 10
+	base := 0
 	if val == "0" {
 		if isNumberValue {
 			v.SetString("0")
@@ -148,59 +147,64 @@ func resolve_int(val string, v reflect.Value, useNumber bool) (string, error) {
 		return "!!int", nil
 	}
 
-	if strings.HasPrefix(val, "0b") {
-		base = 2
-		val = val[2:]
-	} else if strings.HasPrefix(val, "0x") {
-		base = 16
-		val = val[2:]
-	} else if val[0] == '0' {
-		base = 8
-		val = val[1:]
-	} else if strings.Contains(val, ":") {
-		digits := strings.Split(val, ":")
-		bes := int64(1)
-		for j := len(digits) - 1; j >= 0; j-- {
-			n, err := strconv.ParseInt(digits[j], 10, 64)
-			n *= bes
-			if err != nil {
-				return "", errors.New("Integer: " + original)
-			}
-			value += n
-			bes *= 60
-		}
-
-		value *= sign
-
-		if isNumberValue {
-			v.SetString(strconv.FormatInt(value, 10))
-		} else {
-			if v.OverflowInt(value) {
-				return "", errors.New("Integer: " + original)
-			}
-
-			v.SetInt(value)
-		}
-		return "!!int", nil
-	}
-
-	value, err := strconv.ParseInt(val, base, 64)
-	if err != nil {
-		return "", errors.New("Integer: " + original)
-	}
-	value *= sign
-
-	if isNumberValue {
-		v.SetString(strconv.FormatInt(value, 10))
-	} else {
-		if v.OverflowInt(value) {
+	var err error
+	if strings.Contains(val, ":") {
+		value, err = decode_int_base64(val)
+		if err != nil {
 			return "", errors.New("Integer: " + original)
 		}
+	} else {
+		if strings.HasPrefix(val, "0b") {
+			base = 2
+			val = val[2:]
+		}
 
-		v.SetInt(value)
+		value, err = strconv.ParseUint(val, base, 64)
+		if err != nil {
+			return "", errors.New("Integer: " + original)
+		}
+	}
+
+	var val64 int64
+	if value <= math.MaxInt64 {
+		val64 = int64(value)
+		if sign == -1 {
+			val64 = -val64
+		}
+	} else if sign == -1 && value == uint64(math.MaxInt64)+1 {
+		val64 = math.MinInt64
+	} else {
+		return "", errors.New("Integer: " + original)
+	}
+
+	if isNumberValue {
+		v.SetString(strconv.FormatInt(val64, 10))
+	} else {
+		if v.OverflowInt(val64) {
+			return "", errors.New("Integer: " + original)
+		}
+		v.SetInt(val64)
 	}
 
 	return "!!int", nil
+}
+
+func decode_int_base64(val string) (uint64, error) {
+	digits := strings.Split(val, ":")
+
+	bes := uint64(1)
+	var value uint64
+	for j := len(digits) - 1; j >= 0; j-- {
+		n, err := strconv.ParseUint(digits[j], 10, 64)
+		if err != nil {
+			return 0, err
+		}
+
+		n *= bes
+		value += n
+		bes *= 60
+	}
+	return value, nil
 }
 
 func resolve_uint(val string, v reflect.Value, useNumber bool) (string, error) {
@@ -391,13 +395,13 @@ func resolve_time(val string, v reflect.Value) (string, error) {
 }
 
 func resolveInterface(event yaml_event_t, useNumber bool) (string, interface{}) {
-	if len(event.value) == 0 {
-		return "", nil
-	}
-
 	val := string(event.value)
 	if len(event.tag) == 0 && !event.implicit {
 		return "", val
+	}
+
+	if len(val) == 0 {
+		return "!!null", nil
 	}
 
 	var result interface{}

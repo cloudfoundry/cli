@@ -25,7 +25,7 @@ import (
 var _ = Describe("Resolver", func() {
 	var event yaml_event_t
 
-	var nulls = []string{"", "~", "null", "Null", "NULL"}
+	var nulls = []string{"~", "null", "Null", "NULL"}
 
 	BeforeEach(func() {
 		event = yaml_event_t{}
@@ -55,6 +55,18 @@ var _ = Describe("Resolver", func() {
 					Ω(err).ShouldNot(HaveOccurred())
 					Ω(tag).Should(Equal("!!str"))
 					Ω(aString).To(Equal("abc"))
+				})
+
+				It("resolves the empty string", func() {
+					aString := "abc"
+					v := reflect.ValueOf(&aString)
+					event.value = []byte("")
+
+					tag, err := resolve(event, v.Elem(), false)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(tag).Should(Equal("!!str"))
+					Ω(aString).To(Equal(""))
+
 				})
 
 				It("resolves null", func() {
@@ -640,6 +652,15 @@ var _ = Describe("Resolver", func() {
 
 				tag, result := resolveInterface(event, false)
 				Ω(result).To(Equal("1234"))
+				Ω(tag).Should(Equal(""))
+			})
+
+			It("returns the empty string", func() {
+				event.value = []byte("")
+				// event.implicit = true
+
+				tag, result := resolveInterface(event, false)
+				Ω(result).To(Equal(""))
 				Ω(tag).Should(Equal(""))
 			})
 		})

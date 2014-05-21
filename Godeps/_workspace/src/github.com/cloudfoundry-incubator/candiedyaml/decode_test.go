@@ -19,6 +19,7 @@ import (
 	. "github.com/onsi/gomega"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -31,6 +32,35 @@ var _ = Describe("Decode", func() {
 		err := d.Decode(&v)
 
 		Ω(err).ShouldNot(HaveOccurred())
+	})
+
+	Context("strings", func() {
+		It("Decodes an empty string", func() {
+			d := NewDecoder(strings.NewReader(`""
+`))
+			var v string
+			err := d.Decode(&v)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(v).Should(Equal(""))
+		})
+
+		It("Decodes an empty string to an interface", func() {
+			d := NewDecoder(strings.NewReader(`""
+`))
+			var v interface{}
+			err := d.Decode(&v)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(v).Should(Equal(""))
+		})
+
+		It("Decodes a map containing empty strings to an interface", func() {
+			d := NewDecoder(strings.NewReader(`"" : ""
+`))
+			var v interface{}
+			err := d.Decode(&v)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(v).Should(Equal(map[interface{}]interface{}{"": ""}))
+		})
 	})
 
 	Context("Sequence", func() {
@@ -182,7 +212,6 @@ var _ = Describe("Decode", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(v).To(Equal(map[string][]string{"hr": []string{"Mark McGwire", "Sammy Sosa"}, "rbi": []string{"Sammy Sosa", "Ken Griffey"}}))
 		})
-
 	})
 
 	Context("Sequence of Maps", func() {
@@ -251,39 +280,87 @@ var _ = Describe("Decode", func() {
 		}))
 	})
 
-	It("Decodes a variety of ints", func() {
-		f, _ := os.Open("fixtures/specification/example2_19.yaml")
-		d := NewDecoder(f)
-		v := make(map[string]interface{})
+	Context("ints", func() {
+		It("Decodes into an interface{}", func() {
+			f, _ := os.Open("fixtures/specification/example2_19.yaml")
+			d := NewDecoder(f)
+			v := make(map[string]interface{})
 
-		err := d.Decode(&v)
-		Ω(err).ShouldNot(HaveOccurred())
-		Ω(v).Should(Equal(map[string]interface{}{
-			"canonical":   int64(12345),
-			"decimal":     int64(12345),
-			"sexagesimal": int64(12345),
-			"octal":       int64(12),
-			"hexadecimal": int64(12),
-		}))
+			err := d.Decode(&v)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(v).Should(Equal(map[string]interface{}{
+				"canonical":   int64(12345),
+				"decimal":     int64(12345),
+				"sexagesimal": int64(12345),
+				"octal":       int64(12),
+				"hexadecimal": int64(12),
+			}))
+		})
+
+		It("Decodes into int64", func() {
+			f, _ := os.Open("fixtures/specification/example2_19.yaml")
+			d := NewDecoder(f)
+			v := make(map[string]int64)
+
+			err := d.Decode(&v)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(v).Should(Equal(map[string]int64{
+				"canonical":   int64(12345),
+				"decimal":     int64(12345),
+				"sexagesimal": int64(12345),
+				"octal":       int64(12),
+				"hexadecimal": int64(12),
+			}))
+		})
+
+		Context("boundary values", func() {
+			intoInt64 := func(val int64) {
+				It("Decodes into an int64 value", func() {
+					var v int64
+
+					d := NewDecoder(strings.NewReader(strconv.FormatInt(val, 10)))
+					err := d.Decode(&v)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(v).Should(Equal(val))
+
+				})
+			}
+
+			intoInt := func(val int) {
+				It("Decodes into an int value", func() {
+					var v int
+
+					d := NewDecoder(strings.NewReader(strconv.FormatInt(int64(val), 10)))
+					err := d.Decode(&v)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(v).Should(Equal(val))
+
+				})
+			}
+
+			intoInterface := func(val int64) {
+				It("Decodes into an interface{}", func() {
+					var v interface{}
+
+					d := NewDecoder(strings.NewReader(strconv.FormatInt(val, 10)))
+					err := d.Decode(&v)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(v).Should(Equal(val))
+				})
+			}
+
+			intoInt64(math.MaxInt64)
+			intoInterface(math.MaxInt64)
+
+			intoInt64(math.MinInt64)
+			intoInterface(math.MinInt64)
+
+			intoInt(math.MaxInt32)
+			intoInt(math.MinInt32)
+		})
 	})
 
-	It("Decodes a variety of ints", func() {
-		f, _ := os.Open("fixtures/specification/example2_19.yaml")
-		d := NewDecoder(f)
-		v := make(map[string]int64)
-
-		err := d.Decode(&v)
-		Ω(err).ShouldNot(HaveOccurred())
-		Ω(v).Should(Equal(map[string]int64{
-			"canonical":   int64(12345),
-			"decimal":     int64(12345),
-			"sexagesimal": int64(12345),
-			"octal":       int64(12),
-			"hexadecimal": int64(12),
-		}))
-	})
-
-	It("Decodes a variety of flots", func() {
+	It("Decodes a variety of floats", func() {
 		f, _ := os.Open("fixtures/specification/example2_20.yaml")
 		d := NewDecoder(f)
 		v := make(map[string]float64)
