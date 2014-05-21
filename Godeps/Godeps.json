@@ -21,7 +21,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "e493791d041a7c736105f369603f61e28a1586ae"
+			"Rev": "dfcb028513f33935d16a9c278a9b38c39dae6343"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",

@@ -33,66 +33,77 @@ var _ = Describe("Encode", func() {
 
 	Context("Scalars", func() {
 		It("handles strings", func() {
-			enc.Encode("abc")
-			Ω(buf.String()).Should(Equal(`"abc"
+			err := enc.Encode("abc")
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(buf.String()).Should(Equal(`abc
 `))
 		})
 
 		Context("handles ints", func() {
 			It("handles ints", func() {
-				enc.Encode(13)
+				err := enc.Encode(13)
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal("13\n"))
 			})
 
 			It("handles uints", func() {
-				enc.Encode(uint64(1))
+				err := enc.Encode(uint64(1))
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal("1\n"))
 			})
 		})
 
 		Context("handles floats", func() {
 			It("handles float32", func() {
-				enc.Encode(float32(1.234))
+				err := enc.Encode(float32(1.234))
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal("1.234\n"))
 
 			})
 
 			It("handles float64", func() {
-				enc.Encode(float64(1.2e23))
+				err := enc.Encode(float64(1.2e23))
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal("1.2e+23\n"))
 			})
 
 			It("handles NaN", func() {
-				enc.Encode(math.NaN())
+				err := enc.Encode(math.NaN())
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal(".nan\n"))
 			})
 
 			It("handles infinity", func() {
-				enc.Encode(math.Inf(-1))
+				err := enc.Encode(math.Inf(-1))
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal("-.inf\n"))
 			})
 		})
 
 		It("handles bools", func() {
-			enc.Encode(true)
+			err := enc.Encode(true)
+			Ω(err).ShouldNot(HaveOccurred())
 			Ω(buf.String()).Should(Equal("true\n"))
 		})
 
 		It("handles time.Time", func() {
 			t := time.Now()
-			enc.Encode(t)
+			err := enc.Encode(t)
+			Ω(err).ShouldNot(HaveOccurred())
 			bytes, _ := t.MarshalText()
 			Ω(buf.String()).Should(Equal(string(bytes) + "\n"))
 		})
 
 		Context("Null", func() {
 			It("fails on nil", func() {
-				Ω(enc.Encode(nil)).Should(HaveOccurred())
+				err := enc.Encode(nil)
+				Ω(err).Should(HaveOccurred())
 			})
 		})
 
 		It("handles []byte", func() {
-			enc.Encode([]byte{'a', 'b', 'c'})
+			err := enc.Encode([]byte{'a', 'b', 'c'})
+			Ω(err).ShouldNot(HaveOccurred())
 			Ω(buf.String()).Should(Equal("!!binary YWJj\n"))
 		})
 
@@ -100,13 +111,15 @@ var _ = Describe("Encode", func() {
 			It("handles ptr of a type", func() {
 				p := new(int)
 				*p = 10
-				enc.Encode(p)
+				err := enc.Encode(p)
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal("10\n"))
 			})
 
 			It("handles nil ptr", func() {
 				var p *int
-				enc.Encode(p)
+				err := enc.Encode(p)
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal("null\n"))
 			})
 		})
@@ -123,13 +136,14 @@ var _ = Describe("Encode", func() {
 					batter{Name: "Mark McGwire", HR: 65, AVG: 0.278},
 					batter{Name: "Sammy Sosa", HR: 63, AVG: 0.288},
 				}
-				enc.Encode(batters)
-				Ω(buf.String()).Should(Equal(`- "Name": "Mark McGwire"
-  "HR": 65
-  "AVG": 0.278
-- "Name": "Sammy Sosa"
-  "HR": 63
-  "AVG": 0.288
+				err := enc.Encode(batters)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(buf.String()).Should(Equal(`- Name: Mark McGwire
+  HR: 65
+  AVG: 0.278
+- Name: Sammy Sosa
+  HR: 63
+  AVG: 0.288
 `))
 			})
 
@@ -144,13 +158,14 @@ var _ = Describe("Encode", func() {
 					batter{Name: "Mark McGwire", HR: 65, AVG: 0.278},
 					batter{Name: "Sammy Sosa", HR: 63, AVG: 0.288},
 				}
-				enc.Encode(batters)
-				Ω(buf.String()).Should(Equal(`- "name": "Mark McGwire"
-  "HR": 65
-  "avg": 0.278
-- "name": "Sammy Sosa"
-  "HR": 63
-  "avg": 0.288
+				err := enc.Encode(batters)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(buf.String()).Should(Equal(`- name: Mark McGwire
+  HR: 65
+  avg: 0.278
+- name: Sammy Sosa
+  HR: 63
+  avg: 0.288
 `))
 			})
 
@@ -172,12 +187,13 @@ var _ = Describe("Encode", func() {
 					},
 				}
 
-				enc.Encode(cfg)
+				err := enc.Encode(cfg)
+				Ω(err).ShouldNot(HaveOccurred())
 
-				Ω(buf.String()).Should(Equal(`"TopString": "def"
-"Nested":
-  "str": "abc"
-  "int": 123
+				Ω(buf.String()).Should(Equal(`TopString: def
+Nested:
+  str: abc
+  int: 123
 `))
 			})
 
@@ -199,11 +215,12 @@ var _ = Describe("Encode", func() {
 					},
 				}
 
-				enc.Encode(cfg)
+				err := enc.Encode(cfg)
+				Ω(err).ShouldNot(HaveOccurred())
 
-				Ω(buf.String()).Should(Equal(`"TopString": "def"
-"str": "abc"
-"int": 123
+				Ω(buf.String()).Should(Equal(`TopString: def
+str: abc
+int: 123
 `))
 			})
 
@@ -225,10 +242,11 @@ var _ = Describe("Encode", func() {
 					},
 				}
 
-				enc.Encode(cfg)
+				err := enc.Encode(cfg)
+				Ω(err).ShouldNot(HaveOccurred())
 
-				Ω(buf.String()).Should(Equal(`"str": "def"
-"int": 123
+				Ω(buf.String()).Should(Equal(`str: def
+int: 123
 `))
 			})
 
@@ -239,46 +257,49 @@ var _ = Describe("Encode", func() {
 	Context("Sequence", func() {
 		It("handles slices", func() {
 			val := []string{"a", "b", "c"}
-			enc.Encode(val)
+			err := enc.Encode(val)
+			Ω(err).ShouldNot(HaveOccurred())
 
-			Ω(buf.String()).Should(Equal(`- "a"
-- "b"
-- "c"
+			Ω(buf.String()).Should(Equal(`- a
+- b
+- c
 `))
 		})
 	})
 
 	Context("Maps", func() {
 		It("Decodes simple maps", func() {
-			enc.Encode(&map[string]string{
+			err := enc.Encode(&map[string]string{
 				"name": "Mark McGwire",
 				"hr":   "65",
 				"avg":  "0.278",
 			})
+			Ω(err).ShouldNot(HaveOccurred())
 
-			Ω(buf.String()).Should(Equal(`"avg": "0.278"
-"hr": "65"
-"name": "Mark McGwire"
+			Ω(buf.String()).Should(Equal(`avg: "0.278"
+hr: "65"
+name: Mark McGwire
 `))
 		})
 
 		It("Decodes mix types", func() {
-			enc.Encode(&map[string]interface{}{
+			err := enc.Encode(&map[string]interface{}{
 				"name": "Mark McGwire",
 				"hr":   65,
 				"avg":  0.278,
 			})
+			Ω(err).ShouldNot(HaveOccurred())
 
-			Ω(buf.String()).Should(Equal(`"avg": 0.278
-"hr": 65
-"name": "Mark McGwire"
+			Ω(buf.String()).Should(Equal(`avg: 0.278
+hr: 65
+name: Mark McGwire
 `))
 		})
 	})
 
 	Context("Sequence of Maps", func() {
 		It("decodes", func() {
-			enc.Encode([]map[string]interface{}{
+			err := enc.Encode([]map[string]interface{}{
 				{"name": "Mark McGwire",
 					"hr":  65,
 					"avg": 0.278,
@@ -288,34 +309,36 @@ var _ = Describe("Encode", func() {
 					"avg": 0.288,
 				},
 			})
+			Ω(err).ShouldNot(HaveOccurred())
 
-			Ω(buf.String()).Should(Equal(`- "avg": 0.278
-  "hr": 65
-  "name": "Mark McGwire"
-- "avg": 0.288
-  "hr": 63
-  "name": "Sammy Sosa"
+			Ω(buf.String()).Should(Equal(`- avg: 0.278
+  hr: 65
+  name: Mark McGwire
+- avg: 0.288
+  hr: 63
+  name: Sammy Sosa
 `))
 		})
 	})
 
 	Context("Maps of Sequence", func() {
 		It("decodes", func() {
-			enc.Encode(map[string][]interface{}{
+			err := enc.Encode(map[string][]interface{}{
 				"name": []interface{}{"Mark McGwire", "Sammy Sosa"},
 				"hr":   []interface{}{65, 63},
 				"avg":  []interface{}{0.278, 0.288},
 			})
+			Ω(err).ShouldNot(HaveOccurred())
 
-			Ω(buf.String()).Should(Equal(`"avg":
+			Ω(buf.String()).Should(Equal(`avg:
 - 0.278
 - 0.288
-"hr":
+hr:
 - 65
 - 63
-"name":
-- "Mark McGwire"
-- "Sammy Sosa"
+name:
+- Mark McGwire
+- Sammy Sosa
 `))
 		})
 	})
@@ -329,10 +352,11 @@ var _ = Describe("Encode", func() {
 				I i `yaml:"i,flow"`
 			}
 
-			enc.Encode(o{
+			err := enc.Encode(o{
 				I: i{A: "abc"},
 			})
-			Ω(buf.String()).Should(Equal(`"i": {"A": "abc"}
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(buf.String()).Should(Equal(`i: {A: abc}
 `))
 		})
 
@@ -344,10 +368,11 @@ var _ = Describe("Encode", func() {
 				I []i `yaml:"i,flow"`
 			}
 
-			enc.Encode(o{
+			err := enc.Encode(o{
 				I: []i{{A: "abc"}},
 			})
-			Ω(buf.String()).Should(Equal(`"i": [{"A": "abc"}]
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(buf.String()).Should(Equal(`i: [{A: abc}]
 `))
 		})
 	})
@@ -361,10 +386,11 @@ var _ = Describe("Encode", func() {
 				I []i `yaml:"i,flow"`
 			}
 
-			enc.Encode(o{
+			err := enc.Encode(o{
 				I: []i{{A: nil}},
 			})
-			Ω(buf.String()).Should(Equal(`"i": [{}]
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(buf.String()).Should(Equal(`i: [{}]
 `))
 		})
 
@@ -377,8 +403,9 @@ var _ = Describe("Encode", func() {
 				C string
 			}
 
-			enc.Encode(a{B: "b", C: "c"})
-			Ω(buf.String()).Should(Equal(`"C": "c"
+			err := enc.Encode(a{B: "b", C: "c"})
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(buf.String()).Should(Equal(`C: c
 `))
 		})
 	})
@@ -386,29 +413,99 @@ var _ = Describe("Encode", func() {
 	Context("Marshaler support", func() {
 		Context("Receiver is a value", func() {
 			It("uses the Marshaler interface when a value", func() {
-				enc.Encode(hasMarshaler{Value: 123})
+				err := enc.Encode(hasMarshaler{Value: 123})
+				Ω(err).ShouldNot(HaveOccurred())
 				Ω(buf.String()).Should(Equal("123\n"))
 			})
 
 			It("uses the Marshaler interface when a pointer", func() {
-				enc.Encode(&hasMarshaler{Value: "abc"})
-				Ω(buf.String()).Should(Equal(`"abc"
+				err := enc.Encode(&hasMarshaler{Value: "abc"})
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(buf.String()).Should(Equal(`abc
 `))
 			})
 		})
 
 		Context("Receiver is a pointer", func() {
 			It("uses the Marshaler interface when a pointer", func() {
-				enc.Encode(&hasPtrMarshaler{Value: map[string]string{"a": "b"}})
-				Ω(buf.String()).Should(Equal(`"a": "b"
+				err := enc.Encode(&hasPtrMarshaler{Value: map[string]string{"a": "b"}})
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(buf.String()).Should(Equal(`a: b
 `))
 			})
+
 			It("skips the Marshaler when its a value", func() {
-				enc.Encode(hasPtrMarshaler{Value: map[string]string{"a": "b"}})
-				Ω(buf.String()).Should(Equal(`"Tag": ""
-"Value":
-  "a": "b"
+				err := enc.Encode(hasPtrMarshaler{Value: map[string]string{"a": "b"}})
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(buf.String()).Should(Equal(`Tag: ""
+Value:
+  a: b
 `))
+			})
+
+			Context("the receiver is nil", func() {
+				var ptr *hasPtrMarshaler
+
+				It("returns a null", func() {
+					err := enc.Encode(ptr)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(buf.String()).Should(Equal(`null
+`))
+				})
+
+				It("returns a null value for ptr types", func() {
+					err := enc.Encode(map[string]*hasPtrMarshaler{"a": ptr})
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(buf.String()).Should(Equal(`a: null
+`))
+				})
+
+				It("panics when used as a nil interface", func() {
+					Ω(func() { enc.Encode(map[string]Marshaler{"a": ptr}) }).Should(Panic())
+				})
+			})
+
+			Context("the receiver has a nil value", func() {
+				ptr := &hasPtrMarshaler{Value: nil}
+
+				It("returns null", func() {
+					err := enc.Encode(ptr)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(buf.String()).Should(Equal(`null
+`))
+				})
+
+				Context("in a map", func() {
+					It("returns a null value for ptr types", func() {
+						err := enc.Encode(map[string]*hasPtrMarshaler{"a": ptr})
+						Ω(err).ShouldNot(HaveOccurred())
+						Ω(buf.String()).Should(Equal(`a: null
+`))
+					})
+
+					It("returns a null value for interface types", func() {
+						err := enc.Encode(map[string]Marshaler{"a": ptr})
+						Ω(err).ShouldNot(HaveOccurred())
+						Ω(buf.String()).Should(Equal(`a: null
+`))
+					})
+				})
+
+				Context("in a slice", func() {
+					It("returns a null value for ptr types", func() {
+						err := enc.Encode([]*hasPtrMarshaler{ptr})
+						Ω(err).ShouldNot(HaveOccurred())
+						Ω(buf.String()).Should(Equal(`- null
+`))
+					})
+
+					It("returns a null value for interface types", func() {
+						err := enc.Encode([]Marshaler{ptr})
+						Ω(err).ShouldNot(HaveOccurred())
+						Ω(buf.String()).Should(Equal(`- null
+`))
+					})
+				})
 			})
 		})
 	})
@@ -416,7 +513,8 @@ var _ = Describe("Encode", func() {
 	Context("Number type", func() {
 		It("encodes as a number", func() {
 			n := Number("12345")
-			enc.Encode(n)
+			err := enc.Encode(n)
+			Ω(err).ShouldNot(HaveOccurred())
 			Ω(buf.String()).Should(Equal("12345\n"))
 		})
 	})
