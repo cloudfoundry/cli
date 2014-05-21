@@ -67,7 +67,7 @@ func NewApp(cmdRunner command_runner.Runner, metadatas ...command_metadata.Comma
 	app.Version = cf.Version + "-" + cf.BuiltOnDate
 	app.Action = helpCommand.Action
 
-	compiledAtTime, err := time.Parse("Jan 2, 2006 3:04PM", cf.BuiltOnDate)
+	compiledAtTime, err := time.Parse("2006-01-02T03:04:05+00:00", cf.BuiltOnDate)
 
 	if err == nil {
 		app.Compiled = compiledAtTime
