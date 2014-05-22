@@ -41,13 +41,9 @@ import (
 
 func callOrgUsers(args []string, requirementsFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-
 	config := testconfig.NewRepositoryWithDefaults()
-
 	cmd := NewOrgUsers(ui, config, userRepo)
-	ctxt := testcmd.NewContext("org-users", args)
-
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

@@ -99,7 +99,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Select an org"},
@@ -127,7 +127,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-new-org", "my-space"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Select an org"},
@@ -155,7 +155,7 @@ var _ = Describe("Login Command", func() {
 				Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-new-org", "-s", "my-space"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
@@ -180,7 +180,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"user@example.com", "password"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
@@ -220,7 +220,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"my-org-2"}))
 				Expect(orgRepo.FindByNameName).To(Equal("my-org-1"))
@@ -233,7 +233,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
@@ -278,7 +278,7 @@ var _ = Describe("Login Command", func() {
 					ui.Inputs = []string{"api.example.com", "the-account-number", "the-username", "the-password"}
 
 					l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-					testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+					testcmd.RunCommand(l, Flags, nil)
 
 					Expect(ui.Prompts).To(ContainSubstrings(
 						[]string{"API endpoint"},
@@ -306,7 +306,7 @@ var _ = Describe("Login Command", func() {
 					ui.Inputs = []string{"the-one-time-code"}
 
 					l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-					testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+					testcmd.RunCommand(l, Flags, nil)
 
 					Expect(ui.Prompts).To(BeEmpty())
 					Expect(ui.PasswordPrompts).To(ContainSubstrings([]string{"passcode"}))
@@ -323,7 +323,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "the-account-number", "the-username", "the-pin"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(ui.PasswordPrompts).ToNot(ContainSubstrings([]string{"Your Password"}))
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
@@ -341,7 +341,7 @@ var _ = Describe("Login Command", func() {
 					"the-password-1", "the-password-2", "the-password-3"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
@@ -373,7 +373,7 @@ var _ = Describe("Login Command", func() {
 					"the-password-2", "the-password-3"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
@@ -409,7 +409,7 @@ var _ = Describe("Login Command", func() {
 		})
 
 		JustBeforeEach(func() {
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+			testcmd.RunCommand(l, Flags, nil)
 		})
 
 		var ItShowsTheTarget = func() {

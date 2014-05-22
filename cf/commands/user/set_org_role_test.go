@@ -41,12 +41,9 @@ import (
 
 func callSetOrgRole(args []string, requirementsFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("set-org-role", args)
-
 	config := testconfig.NewRepositoryWithDefaults()
-
 	cmd := NewSetOrgRole(ui, config, userRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

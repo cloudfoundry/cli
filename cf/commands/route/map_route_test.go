@@ -33,7 +33,6 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -42,11 +41,9 @@ import (
 
 func callMapRoute(args []string, requirementsFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, createRoute *testcmd.FakeRouteCreator) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	var ctxt *cli.Context = testcmd.NewContext("map-route", args)
-
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewMapRoute(ui, configRepo, routeRepo, createRoute)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

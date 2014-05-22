@@ -148,7 +148,6 @@ func getDeleteSharedDomainDeps() deleteSharedDomainDependencies {
 }
 
 func callDeleteSharedDomain(args []string, inputs []string, deps deleteSharedDomainDependencies) (ui *testterm.FakeUI) {
-	ctxt := testcmd.NewContext("delete-domain", args)
 	ui = &testterm.FakeUI{
 		Inputs: inputs,
 	}
@@ -164,6 +163,6 @@ func callDeleteSharedDomain(args []string, inputs []string, deps deleteSharedDom
 	configRepo.SetOrganizationFields(orgFields)
 
 	cmd := domain.NewDeleteSharedDomain(ui, configRepo, deps.domainRepo)
-	testcmd.RunCommand(cmd, ctxt, deps.requirementsFactory)
+	testcmd.RunCommand(cmd, args, deps.requirementsFactory)
 	return
 }

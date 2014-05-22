@@ -105,11 +105,8 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 func callDeleteOrphanedRoutes(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{Inputs: []string{confirmation}}
-	ctxt := testcmd.NewContext("delete-orphaned-routes", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()
-
 	cmd := NewDeleteOrphanedRoutes(ui, configRepo, routeRepo)
-
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, args, reqFactory)
 	return
 }

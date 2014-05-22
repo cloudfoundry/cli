@@ -45,8 +45,7 @@ func callUpdateServiceBroker(args []string, requirementsFactory *testreq.FakeReq
 	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewUpdateServiceBroker(ui, config, repo)
-	ctxt := testcmd.NewContext("update-service-broker", args)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 
 	return
 }

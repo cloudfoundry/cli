@@ -87,13 +87,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 func callCreateDomain(args []string, requirementsFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("create-domain", args)
-
 	token := configuration.TokenInfo{Username: "my-user"}
 	configRepo := testconfig.NewRepositoryWithAccessToken(token)
 
 	cmd := domain.NewCreateDomain(fakeUI, configRepo, domainRepo)
 
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

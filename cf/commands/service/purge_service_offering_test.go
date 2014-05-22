@@ -26,7 +26,7 @@ var _ = Describe("purge-service command", func() {
 			cmd := NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo)
 			testcmd.RunCommand(
 				cmd,
-				testcmd.NewContext("purge-service-offering", []string{"-f", "whatever"}),
+				[]string{"-f", "whatever"},
 				deps.requirementsFactory,
 			)
 
@@ -39,7 +39,7 @@ var _ = Describe("purge-service command", func() {
 
 			testcmd.RunCommand(
 				NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-				testcmd.NewContext("purge-service-offering", []string{}),
+				[]string{},
 				deps.requirementsFactory,
 			)
 
@@ -58,7 +58,7 @@ var _ = Describe("purge-service command", func() {
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-			testcmd.NewContext("purge-service-offering", []string{"-p", "the-provider", "the-service-name"}),
+			[]string{"-p", "the-provider", "the-service-name"},
 			deps.requirementsFactory,
 		)
 
@@ -77,7 +77,7 @@ var _ = Describe("purge-service command", func() {
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-			testcmd.NewContext("purge-service-offering", []string{"the-service-name"}),
+			[]string{"the-service-name"},
 			deps.requirementsFactory,
 		)
 
@@ -99,7 +99,7 @@ var _ = Describe("purge-service command", func() {
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-			testcmd.NewContext("purge-service-offering", []string{"the-service-name"}),
+			[]string{"the-service-name"},
 			deps.requirementsFactory,
 		)
 
@@ -115,7 +115,7 @@ var _ = Describe("purge-service command", func() {
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-			testcmd.NewContext("purge-service-offering", []string{"-f", "the-service-name"}),
+			[]string{"-f", "the-service-name"},
 			deps.requirementsFactory,
 		)
 
@@ -130,7 +130,7 @@ var _ = Describe("purge-service command", func() {
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-			testcmd.NewContext("purge-service-offering", []string{"-f", "-p", "the-provider", "the-service-name"}),
+			[]string{"-f", "-p", "the-provider", "the-service-name"},
 			deps.requirementsFactory,
 		)
 
@@ -151,7 +151,7 @@ var _ = Describe("purge-service command", func() {
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-			testcmd.NewContext("purge-service-offering", []string{"-p", "the-provider", "the-service-name"}),
+			[]string{"-p", "the-provider", "the-service-name"},
 			deps.requirementsFactory,
 		)
 

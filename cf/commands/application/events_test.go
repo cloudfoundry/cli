@@ -34,7 +34,7 @@ var _ = Describe("events command", func() {
 	runCommand := func(args ...string) {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		cmd := NewEvents(ui, configRepo, eventsRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("events", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails with usage when called without an app name", func() {

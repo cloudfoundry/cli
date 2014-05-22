@@ -32,7 +32,7 @@ var _ = Describe("rename-org command", func() {
 
 	var callRenameOrg = func(args []string) {
 		cmd := organization.NewRenameOrg(ui, configRepo, orgRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("rename-org", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails with usage when given less than two args", func() {

@@ -37,10 +37,9 @@ import (
 
 func callRestart(args []string, requirementsFactory *testreq.FakeReqFactory, starter ApplicationStarter, stopper ApplicationStopper) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("restart", args)
 
 	cmd := NewRestart(ui, starter, stopper)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

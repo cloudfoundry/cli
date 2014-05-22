@@ -46,10 +46,7 @@ func callRenameService(args []string, requirementsFactory *testreq.FakeReqFactor
 	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewRenameService(ui, config, serviceRepo)
-	ctxt := testcmd.NewContext("rename-service", args)
-
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
-
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

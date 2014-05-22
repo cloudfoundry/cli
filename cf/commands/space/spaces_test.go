@@ -43,10 +43,8 @@ import (
 
 func callSpaces(args []string, requirementsFactory *testreq.FakeReqFactory, config configuration.Reader, spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("spaces", args)
-
 	cmd := NewListSpaces(ui, config, spaceRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

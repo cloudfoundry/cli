@@ -29,7 +29,7 @@ var _ = Describe("create-quota command", func() {
 
 	runCommand := func(args ...string) {
 		cmd := NewCreateQuota(ui, configuration.NewRepositoryWithDefaults(), quotaRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("create-quota", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when the user is not logged in", func() {

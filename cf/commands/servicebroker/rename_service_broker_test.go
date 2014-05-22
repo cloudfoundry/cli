@@ -42,8 +42,7 @@ func callRenameServiceBroker(args []string, requirementsFactory *testreq.FakeReq
 	ui = &testterm.FakeUI{}
 	config := testconfig.NewRepositoryWithDefaults()
 	cmd := NewRenameServiceBroker(ui, config, repo)
-	ctxt := testcmd.NewContext("rename-service-broker", args)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 
 	return
 }

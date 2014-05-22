@@ -26,6 +26,8 @@
 package application_test
 
 import (
+	"time"
+
 	"code.google.com/p/gogoprotobuf/proto"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -40,7 +42,6 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
@@ -234,10 +235,9 @@ func getLogsDependencies() (requirementsFactory *testreq.FakeReqFactory, logsRep
 
 func callLogs(args []string, requirementsFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("logs", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewLogs(ui, configRepo, logsRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

@@ -211,9 +211,8 @@ var _ = Describe("set-env command", func() {
 
 func callSetEnv(args []string, requirementsFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("set-env", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewSetEnv(ui, configRepo, appRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

@@ -141,8 +141,6 @@ var _ = Describe("domains command", func() {
 
 func callListDomains(args []string, requirementsFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("domains", args)
-
 	configRepo := testconfig.NewRepositoryWithAccessToken(configuration.TokenInfo{Username: "my-user"})
 
 	spaceFields := models.SpaceFields{}
@@ -155,6 +153,6 @@ func callListDomains(args []string, requirementsFactory *testreq.FakeReqFactory,
 	configRepo.SetOrganizationFields(orgFields)
 
 	cmd := domain.NewListDomains(fakeUI, configRepo, domainRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

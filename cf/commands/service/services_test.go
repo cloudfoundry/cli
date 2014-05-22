@@ -45,7 +45,7 @@ var _ = Describe("services", func() {
 			})
 
 			It("fails requirements", func() {
-				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
+				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 			})
 		})
@@ -56,7 +56,7 @@ var _ = Describe("services", func() {
 			})
 
 			It("fails requirements", func() {
-				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
+				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 			})
 		})
@@ -96,7 +96,7 @@ var _ = Describe("services", func() {
 		}
 
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
+		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
@@ -114,7 +114,7 @@ var _ = Describe("services", func() {
 		}
 
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), requirementsFactory)
+		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},

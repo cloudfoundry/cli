@@ -26,9 +26,8 @@ var _ = Describe("delete-space command", func() {
 	)
 
 	runCommand := func(args ...string) {
-		ctxt := testcmd.NewContext("delete-space", args)
 		cmd := NewDeleteSpace(ui, config, spaceRepo)
-		testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 		return
 	}
 

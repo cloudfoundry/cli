@@ -168,8 +168,7 @@ func newCurlDependencies() (deps curlDependencies) {
 	return
 }
 
-func runCurlWithInputs(deps curlDependencies, inputs []string) {
-	ctxt := testcmd.NewContext("curl", inputs)
+func runCurlWithInputs(deps curlDependencies, args []string) {
 	cmd := NewCurl(deps.ui, deps.config, deps.curlRepo)
-	testcmd.RunCommand(cmd, ctxt, deps.requirementsFactory)
+	testcmd.RunCommand(cmd, args, deps.requirementsFactory)
 }

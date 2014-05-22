@@ -25,7 +25,7 @@ var _ = Describe("org command", func() {
 
 	runCommand := func() {
 		cmd := organization.NewListOrgs(ui, configRepo, orgRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("orgs", []string{}), requirementsFactory)
+		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 	}
 
 	BeforeEach(func() {

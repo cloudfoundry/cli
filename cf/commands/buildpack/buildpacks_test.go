@@ -40,9 +40,8 @@ import (
 
 func callListBuildpacks(requirementsFactory *testreq.FakeReqFactory, buildpackRepo *testapi.FakeBuildpackRepository) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("buildpacks", []string{})
 	cmd := buildpack.NewListBuildpacks(ui, buildpackRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 	return
 }
 

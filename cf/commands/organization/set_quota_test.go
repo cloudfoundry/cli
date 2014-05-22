@@ -23,7 +23,7 @@ var _ = Describe("set-quota command", func() {
 	)
 
 	runCommand := func(args ...string) {
-		testcmd.RunCommand(cmd, testcmd.NewContext("set-quota", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	BeforeEach(func() {

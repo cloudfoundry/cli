@@ -40,13 +40,9 @@ import (
 
 func callUpdateServiceAuthToken(args []string, requirementsFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-
 	config := testconfig.NewRepositoryWithDefaults()
-
 	cmd := NewUpdateServiceAuthToken(ui, config, authTokenRepo)
-	ctxt := testcmd.NewContext("update-service-auth-token", args)
-
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 
