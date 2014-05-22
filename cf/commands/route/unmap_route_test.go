@@ -32,7 +32,7 @@ var _ = Describe("unmap-route command", func() {
 
 	runCommand := func(args ...string) {
 		cmd := NewUnmapRoute(ui, configRepo, routeRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("unmap-route", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when the user is not logged in", func() {

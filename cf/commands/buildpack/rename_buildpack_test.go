@@ -30,8 +30,7 @@ var _ = Describe("rename-buildpack command", func() {
 	})
 
 	runCommand := func(args ...string) {
-		ctxt := testcmd.NewContext("rename-buildpack", args)
-		testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails requirements when called without the current name and the new name to use", func() {

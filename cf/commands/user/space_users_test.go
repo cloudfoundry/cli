@@ -41,13 +41,9 @@ import (
 
 func callSpaceUsers(args []string, requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-
 	config := testconfig.NewRepositoryWithDefaults()
-
 	cmd := NewSpaceUsers(ui, config, spaceRepo, userRepo)
-	ctxt := testcmd.NewContext("space-users", args)
-
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

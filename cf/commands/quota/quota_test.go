@@ -31,7 +31,7 @@ var _ = Describe("quota", func() {
 
 	runCommand := func(args ...string) {
 		cmd := NewShowQuota(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("quotas", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("When not logged in", func() {

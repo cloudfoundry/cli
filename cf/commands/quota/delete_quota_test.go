@@ -30,7 +30,7 @@ var _ = Describe("delete-quota command", func() {
 
 	runCommand := func(args ...string) {
 		cmd := NewDeleteQuota(ui, configuration.NewRepositoryWithDefaults(), quotaRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("delete-quota", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when the user is not logged in", func() {

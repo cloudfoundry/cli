@@ -53,7 +53,7 @@ var _ = Describe("stop command", func() {
 		requirementsFactory.LoginSuccess = false
 		appRepo := &testapi.FakeApplicationRepository{}
 		cmd := NewStop(new(testterm.FakeUI), testconfig.NewRepository(), appRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("stop", []string{"some-app-name"}), requirementsFactory)
+		testcmd.RunCommand(cmd, []string{"some-app-name"}, requirementsFactory)
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
@@ -164,10 +164,8 @@ var _ = Describe("stop command", func() {
 
 func callStop(args []string, requirementsFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("stop", args)
-
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewStop(ui, configRepo, appRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

@@ -79,10 +79,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 func callRename(args []string, requirementsFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("rename", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewRenameApp(ui, configRepo, appRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

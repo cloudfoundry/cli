@@ -147,9 +147,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 func callUnsetEnv(args []string, requirementsFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("unset-env", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewUnsetEnv(ui, configRepo, appRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

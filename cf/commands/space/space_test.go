@@ -40,12 +40,9 @@ import (
 
 func callShowSpace(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("space", args)
-
 	config := testconfig.NewRepositoryWithDefaults()
-
 	cmd := NewShowSpace(ui, config)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

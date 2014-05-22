@@ -105,11 +105,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 func callFiles(args []string, requirementsFactory *testreq.FakeReqFactory, appFilesRepo *testapi.FakeAppFilesRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("files", args)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	cmd := NewFiles(ui, configRepo, appFilesRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 
 	return
 }

@@ -36,7 +36,7 @@ var _ = Describe("delete-service command", func() {
 	runCommand := func(args ...string) {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		cmd := NewDeleteService(ui, configRepo, serviceRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("delete-service", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when not logged in", func() {

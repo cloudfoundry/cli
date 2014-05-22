@@ -185,7 +185,6 @@ var _ = Describe("Testing with ginkgo", func() {
 
 func callCreateRoute(args []string, requirementsFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("create-route", args)
 
 	configRepo := testconfig.NewRepositoryWithAccessToken(configuration.TokenInfo{Username: "my-user"})
 
@@ -199,6 +198,6 @@ func callCreateRoute(args []string, requirementsFactory *testreq.FakeReqFactory,
 
 	cmd := NewCreateRoute(fakeUI, configRepo, routeRepo)
 
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

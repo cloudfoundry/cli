@@ -54,7 +54,7 @@ var _ = Describe("marketplace command", func() {
 			cmd := NewMarketplaceServices(ui, config, serviceRepo)
 			requirementsFactory.ApiEndpointSuccess = false
 
-			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
+			testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
@@ -76,7 +76,7 @@ var _ = Describe("marketplace command", func() {
 				serviceRepo := &testapi.FakeServiceRepo{}
 				serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = fakeServiceOfferings
 				cmd := NewMarketplaceServices(ui, config, serviceRepo)
-				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
+				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 
 				Expect(serviceRepo.GetServiceOfferingsForSpaceArgs.SpaceGuid).To(Equal("the-space-guid"))
 
@@ -97,7 +97,7 @@ var _ = Describe("marketplace command", func() {
 
 			It("tells the user to target a space", func() {
 				cmd := NewMarketplaceServices(ui, config, serviceRepo)
-				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
+				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"without", "space"},
 				))
@@ -115,7 +115,7 @@ var _ = Describe("marketplace command", func() {
 			serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = fakeServiceOfferings
 
 			cmd := NewMarketplaceServices(ui, config, serviceRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
+			testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting all services from marketplace"},
@@ -131,7 +131,7 @@ var _ = Describe("marketplace command", func() {
 			serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = []models.ServiceOffering{}
 
 			cmd := NewMarketplaceServices(ui, config, serviceRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), requirementsFactory)
+			testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"No service offerings found"},

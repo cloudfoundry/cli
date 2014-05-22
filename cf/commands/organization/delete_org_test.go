@@ -38,7 +38,7 @@ var _ = Describe("delete-org command", func() {
 
 	runCommand := func(args ...string) {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails requirements when not logged in", func() {

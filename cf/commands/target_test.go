@@ -35,7 +35,7 @@ var _ = Describe("target command", func() {
 
 	var callTarget = func(args []string) {
 		cmd := NewTarget(ui, config, orgRepo, spaceRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("target", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails with usage when called with an argument but no flags", func() {

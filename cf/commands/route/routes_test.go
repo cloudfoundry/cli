@@ -35,7 +35,7 @@ var _ = Describe("routes command", func() {
 
 	runCommand := func(args ...string) {
 		cmd := NewListRoutes(ui, configRepo, routeRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("routes", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("login requirements", func() {

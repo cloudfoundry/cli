@@ -42,12 +42,10 @@ import (
 
 func callUpdateUserProvidedService(args []string, requirementsFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("update-user-provided-service", args)
-
 	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewUpdateUserProvidedService(fakeUI, config, userProvidedServiceInstanceRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

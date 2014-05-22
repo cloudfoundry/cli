@@ -117,10 +117,8 @@ func getPasswordDeps() passwordDeps {
 
 func callPassword(inputs []string, deps passwordDeps) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{Inputs: inputs}
-
-	ctxt := testcmd.NewContext("passwd", []string{})
 	cmd := NewPassword(ui, deps.PwdRepo, deps.Config)
-	testcmd.RunCommand(cmd, ctxt, deps.ReqFactory)
+	testcmd.RunCommand(cmd, []string{}, deps.ReqFactory)
 
 	return
 }

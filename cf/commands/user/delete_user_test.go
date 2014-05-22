@@ -39,7 +39,7 @@ var _ = Describe("delete-user command", func() {
 
 	runCommand := func(args ...string) {
 		cmd := NewDeleteUser(ui, configRepo, userRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("delete-user", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {

@@ -32,7 +32,7 @@ var _ = Describe("create-space command", func() {
 
 	runCommand := func(args ...string) {
 		cmd := NewCreateSpace(ui, configRepo, spaceRoleSetter, spaceRepo, orgRepo, userRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("create-space", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	BeforeEach(func() {

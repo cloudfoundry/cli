@@ -40,10 +40,9 @@ import (
 func callUpdateBuildpack(args []string, requirementsFactory *testreq.FakeReqFactory, fakeRepo *testapi.FakeBuildpackRepository,
 	fakeBitsRepo *testapi.FakeBuildpackBitsRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("update-buildpack", args)
 
 	cmd := NewUpdateBuildpack(ui, fakeRepo, fakeBitsRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

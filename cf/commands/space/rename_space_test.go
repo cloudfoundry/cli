@@ -32,7 +32,7 @@ var _ = Describe("rename-space command", func() {
 
 	var callRenameSpace = func(args []string) {
 		cmd := NewRenameSpace(ui, configRepo, spaceRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("create-space", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("when the user is not logged in", func() {

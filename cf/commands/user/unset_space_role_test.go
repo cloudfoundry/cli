@@ -48,12 +48,9 @@ func getUnsetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, space
 
 func callUnsetSpaceRole(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("unset-space-role", args)
-
 	config := testconfig.NewRepositoryWithDefaults()
-
 	cmd := NewUnsetSpaceRole(ui, config, spaceRepo, userRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

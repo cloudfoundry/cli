@@ -4,12 +4,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/command"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	"github.com/codegangsta/cli"
 )
 
 var CommandDidPassRequirements bool
 
-func RunCommand(cmd command.Command, ctxt *cli.Context, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
+func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
+	context := NewContext(cmd.Metadata().Name, args)
+
 	defer func() {
 		errMsg := recover()
 
@@ -20,7 +21,7 @@ func RunCommand(cmd command.Command, ctxt *cli.Context, requirementsFactory *tes
 
 	CommandDidPassRequirements = false
 
-	requirements, err := cmd.GetRequirements(requirementsFactory, ctxt)
+	requirements, err := cmd.GetRequirements(requirementsFactory, context)
 	if err != nil {
 		return
 	}
@@ -34,7 +35,7 @@ func RunCommand(cmd command.Command, ctxt *cli.Context, requirementsFactory *tes
 
 	passedRequirements = true
 	CommandDidPassRequirements = true
-	cmd.Run(ctxt)
+	cmd.Run(context)
 
 	return
 }

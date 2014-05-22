@@ -34,7 +34,7 @@ var _ = Describe("delete-route command", func() {
 	runCommand := func(args ...string) {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		cmd := NewDeleteRoute(ui, configRepo, routeRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("delete-route", args), requirementsFactory)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when not logged in", func() {

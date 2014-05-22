@@ -104,11 +104,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 func callUnsetOrgRole(args []string, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("unset-org-role", args)
-
 	configRepo := testconfig.NewRepositoryWithDefaults()
-
 	cmd := NewUnsetOrgRole(ui, configRepo, userRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }

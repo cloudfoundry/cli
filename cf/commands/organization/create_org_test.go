@@ -42,7 +42,6 @@ import (
 
 func callCreateOrg(args []string, requirementsFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("create-org", args)
 
 	space := models.SpaceFields{}
 	space.Name = "my-space"
@@ -57,7 +56,7 @@ func callCreateOrg(args []string, requirementsFactory *testreq.FakeReqFactory, o
 
 	cmd := NewCreateOrg(fakeUI, config, orgRepo)
 
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 

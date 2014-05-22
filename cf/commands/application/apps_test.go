@@ -35,7 +35,7 @@ var _ = Describe("list-apps command", func() {
 
 	runCommand := func() {
 		cmd := NewListApps(ui, configRepo, appSummaryRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("apps", []string{}), requirementsFactory)
+		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 	}
 
 	Describe("requirements", func() {

@@ -49,7 +49,6 @@ func getSetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, spaceRe
 
 func callSetSpaceRole(args []string, requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("set-space-role", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	accessToken, err := testconfig.EncodeAccessToken(configuration.TokenInfo{
 		Username: "current-user",
@@ -58,7 +57,7 @@ func callSetSpaceRole(args []string, requirementsFactory *testreq.FakeReqFactory
 	configRepo.SetAccessToken(accessToken)
 
 	cmd := NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 
