@@ -1,8 +1,6 @@
 package api
 
 import (
-	"time"
-
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 )
@@ -15,7 +13,6 @@ type FakeAppInstancesRepo struct {
 
 func (repo *FakeAppInstancesRepo) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr error) {
 	repo.GetInstancesAppGuid = appGuid
-	time.Sleep(1 * time.Millisecond) //needed for Windows only, otherwise it thinks error codes are not assigned
 
 	if len(repo.GetInstancesResponses) > 0 {
 		instances = repo.GetInstancesResponses[0]

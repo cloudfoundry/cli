@@ -49,6 +49,7 @@ import (
 
 var _ = Describe("start command", func() {
 	var (
+		ui                        *testterm.FakeUI
 		defaultAppForStart        = models.Application{}
 		defaultInstanceReponses   = [][]models.AppInstanceFields{}
 		defaultInstanceErrorCodes = []string{"", ""}
@@ -56,6 +57,7 @@ var _ = Describe("start command", func() {
 	)
 
 	BeforeEach(func() {
+		ui = new(testterm.FakeUI)
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		defaultAppForStart.Name = "my-app"
@@ -90,12 +92,6 @@ var _ = Describe("start command", func() {
 		}
 	})
 
-	It("has sane default timeout values", func() {
-		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
-		Expect(cmd.StagingTimeout).To(Equal(15 * time.Minute))
-		Expect(cmd.StartupTimeout).To(Equal(5 * time.Minute))
-	})
-
 	It("fails requirements when not logged in", func() {
 		requirementsFactory.LoginSuccess = false
 		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
@@ -103,19 +99,76 @@ var _ = Describe("start command", func() {
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
-	It("can read timeout values from environment variables", func() {
-		oldStaging := os.Getenv("CF_STAGING_TIMEOUT")
-		oldStart := os.Getenv("CF_STARTUP_TIMEOUT")
-		defer func() {
-			os.Setenv("CF_STAGING_TIMEOUT", oldStaging)
-			os.Setenv("CF_STARTUP_TIMEOUT", oldStart)
-		}()
+	Describe("timeouts", func() {
+		It("has sane default timeout values", func() {
+			cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
+			Expect(cmd.StagingTimeout).To(Equal(15 * time.Minute))
+			Expect(cmd.StartupTimeout).To(Equal(5 * time.Minute))
+		})
 
-		os.Setenv("CF_STAGING_TIMEOUT", "6")
-		os.Setenv("CF_STARTUP_TIMEOUT", "3")
-		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
-		Expect(cmd.StagingTimeout).To(Equal(6 * time.Minute))
-		Expect(cmd.StartupTimeout).To(Equal(3 * time.Minute))
+		It("can read timeout values from environment variables", func() {
+			oldStaging := os.Getenv("CF_STAGING_TIMEOUT")
+			oldStart := os.Getenv("CF_STARTUP_TIMEOUT")
+			defer func() {
+				os.Setenv("CF_STAGING_TIMEOUT", oldStaging)
+				os.Setenv("CF_STARTUP_TIMEOUT", oldStart)
+			}()
+
+			os.Setenv("CF_STAGING_TIMEOUT", "6")
+			os.Setenv("CF_STARTUP_TIMEOUT", "3")
+			cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
+			Expect(cmd.StagingTimeout).To(Equal(6 * time.Minute))
+			Expect(cmd.StartupTimeout).To(Equal(3 * time.Minute))
+		})
+
+		Describe("when the staging timeout is zero seconds", func() {
+			var (
+				app models.Application
+				cmd *Start
+			)
+
+			BeforeEach(func() {
+				app = defaultAppForStart
+
+				instances := [][]models.AppInstanceFields{[]models.AppInstanceFields{}}
+				appRepo := &testapi.FakeApplicationRepository{
+					UpdateAppResult: app,
+				}
+				appRepo.ReadReturns.App = app
+				appInstancesRepo := &testapi.FakeAppInstancesRepo{
+					GetInstancesResponses:  instances,
+					GetInstancesErrorCodes: []string{"170001"},
+				}
+
+				logRepo := &testapi.FakeLogsRepository{
+					TailLogMessages: []*logmessage.LogMessage{
+						testlogs.NewLogMessage("Log Line 1", app.Guid, LogMessageTypeStaging, time.Now()),
+						testlogs.NewLogMessage("Log Line 2", app.Guid, LogMessageTypeStaging, time.Now()),
+					},
+				}
+
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.Application = app
+				config := testconfig.NewRepository()
+				displayApp := &testcmd.FakeAppDisplayer{}
+
+				cmd = NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
+				cmd.StagingTimeout = 1
+				cmd.PingerThrottle = 1
+				cmd.StartupTimeout = 1
+			})
+
+			It("can still respond to staging failures", func() {
+				testcmd.RunCommand(cmd, []string{"my-app"}, requirementsFactory)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"my-app"},
+					[]string{"OK"},
+					[]string{"FAILED"},
+					[]string{"Error staging app"},
+				))
+			})
+		})
 	})
 
 	Context("when logged in", func() {
