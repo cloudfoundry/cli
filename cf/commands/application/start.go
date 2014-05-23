@@ -2,6 +2,12 @@ package application
 
 import (
 	"fmt"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -12,11 +18,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
-	"os"
-	"regexp"
-	"strconv"
-	"strings"
-	"time"
 )
 
 const (
@@ -182,21 +183,27 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan chan bool, st
 	}
 }
 
+func isStagingError(err error) bool {
+	httpError, ok := err.(errors.HttpError)
+	return ok && httpError.ErrorCode() == errors.APP_NOT_STAGED
+}
+
 func (cmd Start) waitForInstancesToStage(app models.Application) {
 	stagingStartTime := time.Now()
 	_, err := cmd.appInstancesRepo.GetInstances(app.Guid)
 
-	for err != nil && time.Since(stagingStartTime) < cmd.StagingTimeout {
-		if httpError, ok := err.(errors.HttpError); ok && httpError.ErrorCode() != errors.APP_NOT_STAGED {
-			cmd.ui.Say("")
-			cmd.ui.Failed(fmt.Sprintf("%s\n\nTIP: use '%s' for more information",
-				httpError.Error(),
-				terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))))
-			return
-		}
+	for isStagingError(err) && time.Since(stagingStartTime) < cmd.StagingTimeout {
 		cmd.ui.Wait(cmd.PingerThrottle)
 		_, err = cmd.appInstancesRepo.GetInstances(app.Guid)
 	}
+
+	if err != nil && !isStagingError(err) {
+		cmd.ui.Say("")
+		cmd.ui.Failed("%s\n\nTIP: use '%s' for more information",
+			err.Error(),
+			terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name)))
+	}
+
 	return
 }
 
