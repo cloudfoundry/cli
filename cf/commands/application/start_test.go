@@ -1,28 +1,3 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package application_test
 
 import (
@@ -246,7 +221,7 @@ var _ = Describe("start command", func() {
 			))
 		})
 
-		It("TestStartApplicationWhenAppIsStillStaging", func() {
+		It("gracefully handles starting an app that is still staging", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appInstance := models.AppInstanceFields{}
 			appInstance.State = models.InstanceDown
@@ -296,32 +271,34 @@ var _ = Describe("start command", func() {
 			))
 		})
 
-		It("TestStartApplicationWhenOneInstanceFlaps", func() {
-			displayApp := &testcmd.FakeAppDisplayer{}
-			appInstance := models.AppInstanceFields{}
-			appInstance.State = models.InstanceStarting
-			appInstance2 := models.AppInstanceFields{}
-			appInstance2.State = models.InstanceStarting
-			appInstance3 := models.AppInstanceFields{}
-			appInstance3.State = models.InstanceStarting
-			appInstance4 := models.AppInstanceFields{}
-			appInstance4.State = models.InstanceFlapping
-			instances := [][]models.AppInstanceFields{
-				[]models.AppInstanceFields{appInstance, appInstance2},
-				[]models.AppInstanceFields{appInstance3, appInstance4},
-			}
+		Context("when an app instance is flapping", func() {
+			It("fails and alerts the user", func() {
+				displayApp := &testcmd.FakeAppDisplayer{}
+				appInstance := models.AppInstanceFields{}
+				appInstance.State = models.InstanceStarting
+				appInstance2 := models.AppInstanceFields{}
+				appInstance2.State = models.InstanceStarting
+				appInstance3 := models.AppInstanceFields{}
+				appInstance3.State = models.InstanceStarting
+				appInstance4 := models.AppInstanceFields{}
+				appInstance4.State = models.InstanceFlapping
+				instances := [][]models.AppInstanceFields{
+					[]models.AppInstanceFields{appInstance, appInstance2},
+					[]models.AppInstanceFields{appInstance3, appInstance4},
+				}
 
-			errorCodes := []string{"", ""}
+				errorCodes := []string{"", ""}
 
-			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
+				ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"my-app"},
-				[]string{"OK"},
-				[]string{"0 of 2 instances running", "1 starting", "1 failing"},
-				[]string{"FAILED"},
-				[]string{"Start unsuccessful"},
-			))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"my-app"},
+					[]string{"OK"},
+					[]string{"0 of 2 instances running", "1 starting", "1 failing"},
+					[]string{"FAILED"},
+					[]string{"Start unsuccessful"},
+				))
+			})
 		})
 
 		It("tells the user about the failure when waiting for the app to start times out", func() {
