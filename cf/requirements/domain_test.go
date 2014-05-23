@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("DomainRequirement", func() {
 	var config configuration.ReadWriter
 	var ui *testterm.FakeUI
 

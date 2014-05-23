@@ -1,28 +1,3 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package user_test
 
 import (
@@ -39,58 +14,24 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-func getUnsetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) {
-	requirementsFactory = &testreq.FakeReqFactory{}
-	spaceRepo = &testapi.FakeSpaceRepository{}
-	userRepo = &testapi.FakeUserRepository{}
-	return
-}
-
-func callUnsetSpaceRole(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-	config := testconfig.NewRepositoryWithDefaults()
-	cmd := NewUnsetSpaceRole(ui, config, spaceRepo, userRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
-}
-
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestUnsetSpaceRoleFailsWithUsage", func() {
+var _ = Describe("unset-space-role command", func() {
+	It("fails with usage when not called with exactly four args", func() {
 		requirementsFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
 
-		ui := callUnsetSpaceRole([]string{}, spaceRepo, userRepo, requirementsFactory)
+		ui := callUnsetSpaceRole([]string{"username", "org", "space"}, spaceRepo, userRepo, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUnsetSpaceRole([]string{"username"}, spaceRepo, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUnsetSpaceRole([]string{"username", "org"}, spaceRepo, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUnsetSpaceRole([]string{"username", "org", "space"}, spaceRepo, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUnsetSpaceRole([]string{"username", "org", "space", "role"}, spaceRepo, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
-	It("TestUnsetSpaceRoleRequirements", func() {
 
+	It("fails requirements when not logged in", func() {
 		requirementsFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
 		args := []string{"username", "org", "space", "role"}
 
 		requirementsFactory.LoginSuccess = false
 		callUnsetSpaceRole(args, spaceRepo, userRepo, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-		requirementsFactory.LoginSuccess = true
-		callUnsetSpaceRole(args, spaceRepo, userRepo, requirementsFactory)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		Expect(requirementsFactory.UserUsername).To(Equal("username"))
-		Expect(requirementsFactory.OrganizationName).To(Equal("org"))
 	})
 
-	It("TestUnsetSpaceRole", func() {
+	It("unsets the user's space role", func() {
 		user := models.UserFields{}
 		user.Username = "some-user"
 		user.Guid = "some-user-guid"
@@ -122,3 +63,18 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(userRepo.UnsetSpaceRoleSpaceGuid).To(Equal("some-space-guid"))
 	})
 })
+
+func getUnsetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) {
+	requirementsFactory = &testreq.FakeReqFactory{}
+	spaceRepo = &testapi.FakeSpaceRepository{}
+	userRepo = &testapi.FakeUserRepository{}
+	return
+}
+
+func callUnsetSpaceRole(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+	config := testconfig.NewRepositoryWithDefaults()
+	cmd := NewUnsetSpaceRole(ui, config, spaceRepo, userRepo)
+	testcmd.RunCommand(cmd, args, requirementsFactory)
+	return
+}
