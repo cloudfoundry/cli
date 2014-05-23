@@ -19,37 +19,40 @@ type DeleteQuota struct {
 	config    configuration.Reader
 	quotaRepo api.QuotaRepository
 	orgReq    requirements.OrganizationRequirement
-	T         goi18n.TranslateFunc
+}
+
+var T goi18n.TranslateFunc
+
+func init() {
+	var err error
+	T, err = i18n.Init("quota", i18n.GetResourcesPath())
+	if err != nil {
+		panic(err)
+	}
 }
 
 func NewDeleteQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) (cmd *DeleteQuota) {
-	t, err := i18n.Init("quota", i18n.GetResourcesPath())
-	if err != nil {
-		ui.Failed(err.Error())
-	}
-
 	return &DeleteQuota{
 		ui:        ui,
 		config:    config,
 		quotaRepo: quotaRepo,
-		T:         t,
 	}
 }
 
 func (cmd *DeleteQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-quota",
-		Description: cmd.T("Delete a quota"),
-		Usage:       cmd.T("CF_NAME delete-quota QUOTA [-f]"),
+		Description: T("Delete a quota"),
+		Usage:       T("CF_NAME delete-quota QUOTA [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: cmd.T("Force deletion without confirmation")},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
 
 func (cmd *DeleteQuota) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		err = errors.New(cmd.T("Incorrect Usage"))
+		err = errors.New(T("Incorrect Usage"))
 		cmd.ui.FailWithUsage(c)
 		return
 	}
@@ -70,7 +73,7 @@ func (cmd *DeleteQuota) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say(cmd.T("Deleting quota {{.QuotaName}} as {{.Username}}...", map[string]interface{}{
+	cmd.ui.Say(T("Deleting quota {{.QuotaName}} as {{.Username}}...", map[string]interface{}{
 		"QuotaName": terminal.EntityNameColor(quotaName),
 		"Username":  terminal.EntityNameColor(cmd.config.Username()),
 	}))
@@ -81,7 +84,7 @@ func (cmd *DeleteQuota) Run(c *cli.Context) {
 	case nil: // no error
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn(cmd.T("Quota {{.QuotaName}} does not exist", map[string]interface{}{"QuotaName": quotaName}))
+		cmd.ui.Warn(T("Quota {{.QuotaName}} does not exist", map[string]interface{}{"QuotaName": quotaName}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())
