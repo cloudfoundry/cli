@@ -1,28 +1,3 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package requirements_test
 
 import (
@@ -36,33 +11,33 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("ApplicationRequirement", func() {
+	var ui *testterm.FakeUI
+	var appRepo *testapi.FakeApplicationRepository
 
-	It("TestApplicationReqExecute", func() {
+	BeforeEach(func() {
+		ui = new(testterm.FakeUI)
+		appRepo = &testapi.FakeApplicationRepository{}
+	})
+
+	It("succeeds when an app with the given name exists", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
-		appRepo := &testapi.FakeApplicationRepository{}
 		appRepo.ReadReturns.App = app
-		ui := new(testterm.FakeUI)
 
 		appReq := NewApplicationRequirement("foo", ui, appRepo)
-		success := appReq.Execute()
 
-		Expect(success).To(BeTrue())
+		Expect(appReq.Execute()).To(BeTrue())
 		Expect(appRepo.ReadArgs.Name).To(Equal("foo"))
 		Expect(appReq.GetApplication()).To(Equal(app))
 	})
 
-	It("TestApplicationReqExecuteWhenApplicationNotFound", func() {
-		appRepo := &testapi.FakeApplicationRepository{}
+	It("fails when an app with the given name cannot be found", func() {
 		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("app", "foo")
-		ui := new(testterm.FakeUI)
-
-		appReq := NewApplicationRequirement("foo", ui, appRepo)
 
 		testassert.AssertPanic(testterm.FailedWasCalled, func() {
-			appReq.Execute()
+			NewApplicationRequirement("foo", ui, appRepo).Execute()
 		})
 	})
 })
