@@ -53,7 +53,7 @@
     },
     {
         "id": "Deleting quota {{.QuotaName}} as {{.Username}}...",
-        "translation": "Sumprimmer le quota %s étant %s..."
+        "translation": "Sumprimmer le quota {{.QuotaName}} étant {{.Usersname}}..."
     },
     {
         "id": "Quota {{.QuotaName}} does not exist",
