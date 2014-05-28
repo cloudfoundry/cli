@@ -1,32 +1,8 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package servicebroker_test
 
 import (
 	. "github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -39,80 +15,67 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-func callUpdateServiceBroker(args []string, requirementsFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
+var _ = Describe("update-service-broker command", func() {
+	var (
+		ui                  *testterm.FakeUI
+		requirementsFactory *testreq.FakeReqFactory
+		configRepo          configuration.ReadWriter
+		serviceBrokerRepo   *testapi.FakeServiceBrokerRepo
+	)
 
-	config := testconfig.NewRepositoryWithDefaults()
+	BeforeEach(func() {
+		configRepo = testconfig.NewRepositoryWithDefaults()
 
-	cmd := NewUpdateServiceBroker(ui, config, repo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-
-	return
-}
-
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestUpdateServiceBrokerFailsWithUsage", func() {
-		requirementsFactory := &testreq.FakeReqFactory{}
-		repo := &testapi.FakeServiceBrokerRepo{}
-
-		ui := callUpdateServiceBroker([]string{}, requirementsFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUpdateServiceBroker([]string{"arg1"}, requirementsFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUpdateServiceBroker([]string{"arg1", "arg2"}, requirementsFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3"}, requirementsFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3", "arg4"}, requirementsFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
+		ui = &testterm.FakeUI{}
+		requirementsFactory = &testreq.FakeReqFactory{}
+		serviceBrokerRepo = &testapi.FakeServiceBrokerRepo{}
 	})
 
-	It("TestUpdateServiceBrokerRequirements", func() {
+	runCommand := func(args ...string) {
+		testcmd.RunCommand(NewUpdateServiceBroker(ui, configRepo, serviceBrokerRepo), args, requirementsFactory)
+	}
 
-		requirementsFactory := &testreq.FakeReqFactory{}
-		repo := &testapi.FakeServiceBrokerRepo{}
-		args := []string{"arg1", "arg2", "arg3", "arg4"}
+	Describe("requirements", func() {
+		It("fails with usage when invoked without exactly four args", func() {
+			requirementsFactory.LoginSuccess = true
 
-		requirementsFactory.LoginSuccess = false
-		callUpdateServiceBroker(args, requirementsFactory, repo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			runCommand("arg1", "arg2", "arg3")
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 
-		requirementsFactory.LoginSuccess = true
-		callUpdateServiceBroker(args, requirementsFactory, repo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		It("fails when not logged in", func() {
+			runCommand("heeeeeeey", "yooouuuuuuu", "guuuuuuuuys", "ヾ(＠⌒ー⌒＠)ノ")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
 
-	It("TestUpdateServiceBroker", func() {
+	Context("when logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+			broker := models.ServiceBroker{}
+			broker.Name = "my-found-broker"
+			broker.Guid = "my-found-broker-guid"
+			serviceBrokerRepo.FindByNameServiceBroker = broker
+		})
 
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		broker := models.ServiceBroker{}
-		broker.Name = "my-found-broker"
-		broker.Guid = "my-found-broker-guid"
-		repo := &testapi.FakeServiceBrokerRepo{
-			FindByNameServiceBroker: broker,
-		}
-		args := []string{"my-broker", "new-username", "new-password", "new-url"}
+		It("updates the service broker with the provided properties", func() {
+			runCommand("my-broker", "new-username", "new-password", "new-url")
 
-		ui := callUpdateServiceBroker(args, requirementsFactory, repo)
+			Expect(serviceBrokerRepo.FindByNameName).To(Equal("my-broker"))
 
-		Expect(repo.FindByNameName).To(Equal("my-broker"))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Updating service broker", "my-found-broker", "my-user"},
+				[]string{"OK"},
+			))
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating service broker", "my-found-broker", "my-user"},
-			[]string{"OK"},
-		))
+			expectedServiceBroker := models.ServiceBroker{}
+			expectedServiceBroker.Name = "my-found-broker"
+			expectedServiceBroker.Username = "new-username"
+			expectedServiceBroker.Password = "new-password"
+			expectedServiceBroker.Url = "new-url"
+			expectedServiceBroker.Guid = "my-found-broker-guid"
 
-		expectedServiceBroker := models.ServiceBroker{}
-		expectedServiceBroker.Name = "my-found-broker"
-		expectedServiceBroker.Username = "new-username"
-		expectedServiceBroker.Password = "new-password"
-		expectedServiceBroker.Url = "new-url"
-		expectedServiceBroker.Guid = "my-found-broker-guid"
-
-		Expect(repo.UpdatedServiceBroker).To(Equal(expectedServiceBroker))
+			Expect(serviceBrokerRepo.UpdatedServiceBroker).To(Equal(expectedServiceBroker))
+		})
 	})
 })
