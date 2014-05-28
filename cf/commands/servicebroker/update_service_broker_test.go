@@ -44,7 +44,7 @@ var _ = Describe("update-service-broker command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			runCommand("heeeeeeey", "yooouuuuuuu", "guuuuuuuuys", "ヾ(＠⌒ー⌒＠)ノ")
+			runCommand("heeeeeeey", "yooouuuuuuu", "guuuuuuuuys", "ヾ(＠*ー⌒ー*@)ノ")
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
