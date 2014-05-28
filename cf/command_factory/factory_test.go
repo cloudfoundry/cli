@@ -37,12 +37,21 @@ var _ = Describe("factory", func() {
 	It("provides the metadata for its commands", func() {
 		commands := factory.CommandMetadatas()
 
+		suffixesToIgnore := []string{
+			"_test.go", // ignore test files
+			".test",    // ignore generated .test (temporary files)
+			"#",        // emacs autosave files
+		}
+
 		err := filepath.Walk("../commands", func(path string, info os.FileInfo, err error) error {
-			if strings.HasSuffix(path, "_test.go") || info.IsDir() {
+			if info.IsDir() {
 				return nil
 			}
-			if strings.HasSuffix(path, ".test") {
-				return nil
+
+			for _, suffix := range suffixesToIgnore {
+				if strings.HasSuffix(path, suffix) {
+					return nil
+				}
 			}
 
 			extension := filepath.Ext(info.Name())
