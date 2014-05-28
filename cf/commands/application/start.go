@@ -47,6 +47,10 @@ type ApplicationStarter interface {
 	ApplicationStart(app models.Application) (updatedApp models.Application, err error)
 }
 
+type ApplicationStagingWatcher interface {
+	ApplicationWatchStaging(app models.Application, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
+}
+
 func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
@@ -111,6 +115,20 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 		return
 	}
 
+	return cmd.ApplicationWatchStaging(app, func(app models.Application) (models.Application, error) {
+		cmd.ui.Say("Starting app %s in org %s / space %s as %s...",
+			terminal.EntityNameColor(app.Name),
+			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			terminal.EntityNameColor(cmd.config.Username()),
+		)
+
+		state := "STARTED"
+		return cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
+	})
+}
+
+func (cmd *Start) ApplicationWatchStaging(app models.Application, start func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
 	stopLoggingChan := make(chan bool, 1)
 	loggingStartedChan := make(chan bool)
 
@@ -118,15 +136,7 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 
 	<-loggingStartedChan // block until we have established connection to Loggregator
 
-	cmd.ui.Say("Starting app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
-
-	state := "STARTED"
-	updatedApp, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
+	updatedApp, apiErr := start(app)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
