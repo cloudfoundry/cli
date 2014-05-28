@@ -1,32 +1,8 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package user_test
 
 import (
 	. "github.com/cloudfoundry/cli/cf/commands/user"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -47,62 +23,59 @@ func callSetOrgRole(args []string, requirementsFactory *testreq.FakeReqFactory, 
 	return
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestSetOrgRoleFailsWithUsage", func() {
-		requirementsFactory := &testreq.FakeReqFactory{}
-		userRepo := &testapi.FakeUserRepository{}
+var _ = Describe("set-org-role command", func() {
+	var (
+		ui                  *testterm.FakeUI
+		requirementsFactory *testreq.FakeReqFactory
+		userRepo            *testapi.FakeUserRepository
+		configRepo          configuration.ReadWriter
+	)
 
-		ui := callSetOrgRole([]string{"my-user", "my-org", "my-role"}, requirementsFactory, userRepo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
+	BeforeEach(func() {
+		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		ui = callSetOrgRole([]string{"my-user", "my-org"}, requirementsFactory, userRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callSetOrgRole([]string{"my-user"}, requirementsFactory, userRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callSetOrgRole([]string{}, requirementsFactory, userRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		ui = &testterm.FakeUI{}
+		requirementsFactory = &testreq.FakeReqFactory{}
+		userRepo = &testapi.FakeUserRepository{}
 	})
 
-	It("TestSetOrgRoleRequirements", func() {
-		requirementsFactory := &testreq.FakeReqFactory{}
-		userRepo := &testapi.FakeUserRepository{}
+	runCommand := func(args ...string) {
+		testcmd.RunCommand(NewSetOrgRole(ui, configRepo, userRepo), args, requirementsFactory)
+	}
 
-		requirementsFactory.LoginSuccess = false
-		callSetOrgRole([]string{"my-user", "my-org", "my-role"}, requirementsFactory, userRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	Describe("requirements", func() {
+		It("fails when not logged in", func() {
+			runCommand("hey", "there", "jude")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 
-		requirementsFactory.LoginSuccess = true
-		callSetOrgRole([]string{"my-user", "my-org", "my-role"}, requirementsFactory, userRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		Expect(requirementsFactory.UserUsername).To(Equal("my-user"))
-		Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
+		It("fails with usage when not provided exactly three args", func() {
+			runCommand("one fish", "two fish") // red fish, blue fish
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
-	It("TestSetOrgRole", func() {
-		org := models.Organization{}
-		org.Guid = "my-org-guid"
-		org.Name = "my-org"
-		user := models.UserFields{}
-		user.Guid = "my-user-guid"
-		user.Username = "my-user"
-		requirementsFactory := &testreq.FakeReqFactory{
-			LoginSuccess: true,
-			UserFields:   user,
-			Organization: org,
-		}
-		userRepo := &testapi.FakeUserRepository{}
+	Context("when logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
 
-		ui := callSetOrgRole([]string{"some-user", "some-org", "OrgManager"}, requirementsFactory, userRepo)
+			org := models.Organization{}
+			org.Guid = "my-org-guid"
+			org.Name = "my-org"
+			requirementsFactory.UserFields = models.UserFields{Guid: "my-user-guid", Username: "my-user"}
+			requirementsFactory.Organization = org
+		})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
-			[]string{"OK"},
-		))
-		Expect(userRepo.SetOrgRoleUserGuid).To(Equal("my-user-guid"))
-		Expect(userRepo.SetOrgRoleOrganizationGuid).To(Equal("my-org-guid"))
-		Expect(userRepo.SetOrgRoleRole).To(Equal(models.ORG_MANAGER))
+		It("sets the given org role on the given user", func() {
+			runCommand("some-user", "some-org", "OrgManager")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
+				[]string{"OK"},
+			))
+			Expect(userRepo.SetOrgRoleUserGuid).To(Equal("my-user-guid"))
+			Expect(userRepo.SetOrgRoleOrganizationGuid).To(Equal("my-org-guid"))
+			Expect(userRepo.SetOrgRoleRole).To(Equal(models.ORG_MANAGER))
+		})
 	})
 })
