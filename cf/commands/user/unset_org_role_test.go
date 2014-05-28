@@ -1,32 +1,8 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package user_test
 
 import (
 	. "github.com/cloudfoundry/cli/cf/commands/user"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -39,73 +15,77 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestUnsetOrgRoleFailsWithUsage", func() {
-		userRepo := &testapi.FakeUserRepository{}
-		requirementsFactory := &testreq.FakeReqFactory{}
+var _ = Describe("unset-org-role command", func() {
+	var (
+		ui                  *testterm.FakeUI
+		userRepo            *testapi.FakeUserRepository
+		configRepo          configuration.ReadWriter
+		requirementsFactory *testreq.FakeReqFactory
+	)
 
-		ui := callUnsetOrgRole([]string{}, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeTrue())
+	runCommand := func(args ...string) {
+		cmd := NewUnsetOrgRole(ui, configRepo, userRepo)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
+	}
 
-		ui = callUnsetOrgRole([]string{"username"}, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUnsetOrgRole([]string{"username", "org"}, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUnsetOrgRole([]string{"username", "org", "role"}, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeFalse())
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		userRepo = &testapi.FakeUserRepository{}
+		requirementsFactory = &testreq.FakeReqFactory{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
-	It("TestUnsetOrgRoleRequirements", func() {
 
-		userRepo := &testapi.FakeUserRepository{}
-		requirementsFactory := &testreq.FakeReqFactory{}
-		args := []string{"username", "org", "role"}
+	It("fails with usage when invoked without exactly three args", func() {
+		runCommand("username", "org")
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		requirementsFactory.LoginSuccess = false
-		callUnsetOrgRole(args, userRepo, requirementsFactory)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-		requirementsFactory.LoginSuccess = true
-		callUnsetOrgRole(args, userRepo, requirementsFactory)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		Expect(requirementsFactory.UserUsername).To(Equal("username"))
-		Expect(requirementsFactory.OrganizationName).To(Equal("org"))
+		runCommand("woah", "too", "many", "args")
+		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
-	It("TestUnsetOrgRole", func() {
 
-		userRepo := &testapi.FakeUserRepository{}
-		user := models.UserFields{}
-		user.Username = "some-user"
-		user.Guid = "some-user-guid"
-		org := models.Organization{}
-		org.Name = "some-org"
-		org.Guid = "some-org-guid"
-		requirementsFactory := &testreq.FakeReqFactory{
-			LoginSuccess: true,
-			UserFields:   user,
-			Organization: org,
-		}
-		args := []string{"my-username", "my-org", "OrgManager"}
+	Describe("requirements", func() {
+		It("fails when not logged in", func() {
+			requirementsFactory.LoginSuccess = false
+			runCommand("username", "org", "role")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 
-		ui := callUnsetOrgRole(args, userRepo, requirementsFactory)
+		It("succeeds when logged in", func() {
+			requirementsFactory.LoginSuccess = true
+			runCommand("username", "org", "role")
+			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Removing role", "OrgManager", "my-username", "my-org", "my-user"},
-			[]string{"OK"},
-		))
+			Expect(requirementsFactory.UserUsername).To(Equal("username"))
+			Expect(requirementsFactory.OrganizationName).To(Equal("org"))
+		})
+	})
 
-		Expect(userRepo.UnsetOrgRoleRole).To(Equal(models.ORG_MANAGER))
-		Expect(userRepo.UnsetOrgRoleUserGuid).To(Equal("some-user-guid"))
-		Expect(userRepo.UnsetOrgRoleOrganizationGuid).To(Equal("some-org-guid"))
+	Context("when logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+
+			user := models.UserFields{}
+			user.Username = "some-user"
+			user.Guid = "some-user-guid"
+			org := models.Organization{}
+			org.Name = "some-org"
+			org.Guid = "some-org-guid"
+
+			requirementsFactory.UserFields = user
+			requirementsFactory.Organization = org
+		})
+
+		It("unsets a user's org role", func() {
+			runCommand("my-username", "my-org", "OrgManager")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Removing role", "OrgManager", "my-username", "my-org", "my-user"},
+				[]string{"OK"},
+			))
+
+			Expect(userRepo.UnsetOrgRoleRole).To(Equal(models.ORG_MANAGER))
+			Expect(userRepo.UnsetOrgRoleUserGuid).To(Equal("some-user-guid"))
+			Expect(userRepo.UnsetOrgRoleOrganizationGuid).To(Equal("some-org-guid"))
+		})
 	})
 })
-
-func callUnsetOrgRole(args []string, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-	configRepo := testconfig.NewRepositoryWithDefaults()
-	cmd := NewUnsetOrgRole(ui, configRepo, userRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
-}
