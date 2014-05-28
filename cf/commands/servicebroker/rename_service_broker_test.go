@@ -1,32 +1,8 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package servicebroker_test
 
 import (
 	. "github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -38,64 +14,59 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func callRenameServiceBroker(args []string, requirementsFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-	config := testconfig.NewRepositoryWithDefaults()
-	cmd := NewRenameServiceBroker(ui, config, repo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
+var _ = Describe("rename-service-broker command", func() {
+	var (
+		ui                  *testterm.FakeUI
+		requirementsFactory *testreq.FakeReqFactory
+		configRepo          configuration.ReadWriter
+		serviceBrokerRepo   *testapi.FakeServiceBrokerRepo
+	)
 
-	return
-}
+	BeforeEach(func() {
+		configRepo = testconfig.NewRepositoryWithDefaults()
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestRenameServiceBrokerFailsWithUsage", func() {
-		requirementsFactory := &testreq.FakeReqFactory{}
-		repo := &testapi.FakeServiceBrokerRepo{}
-
-		ui := callRenameServiceBroker([]string{}, requirementsFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callRenameServiceBroker([]string{"arg1"}, requirementsFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callRenameServiceBroker([]string{"arg1", "arg2"}, requirementsFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
+		ui = &testterm.FakeUI{}
+		requirementsFactory = &testreq.FakeReqFactory{}
+		serviceBrokerRepo = &testapi.FakeServiceBrokerRepo{}
 	})
-	It("TestRenameServiceBrokerRequirements", func() {
 
-		requirementsFactory := &testreq.FakeReqFactory{}
-		repo := &testapi.FakeServiceBrokerRepo{}
-		args := []string{"arg1", "arg2"}
+	runCommand := func(args ...string) {
+		testcmd.RunCommand(NewRenameServiceBroker(ui, configRepo, serviceBrokerRepo), args, requirementsFactory)
+	}
 
-		requirementsFactory.LoginSuccess = false
-		callRenameServiceBroker(args, requirementsFactory, repo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	Describe("requirements", func() {
+		It("fails with usage when not invoked with exactly two args", func() {
+			requirementsFactory.LoginSuccess = true
+			runCommand("welp")
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 
-		requirementsFactory.LoginSuccess = true
-		callRenameServiceBroker(args, requirementsFactory, repo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		It("fails when not logged in", func() {
+			runCommand("okay", "DO---IIIIT")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
-	It("TestRenameServiceBroker", func() {
 
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		broker := models.ServiceBroker{}
-		broker.Name = "my-found-broker"
-		broker.Guid = "my-found-broker-guid"
-		repo := &testapi.FakeServiceBrokerRepo{
-			FindByNameServiceBroker: broker,
-		}
-		args := []string{"my-broker", "my-new-broker"}
+	Context("when logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+			broker := models.ServiceBroker{}
+			broker.Name = "my-found-broker"
+			broker.Guid = "my-found-broker-guid"
+			serviceBrokerRepo.FindByNameServiceBroker = broker
+		})
 
-		ui := callRenameServiceBroker(args, requirementsFactory, repo)
+		It("renames the given service broker", func() {
+			runCommand("my-broker", "my-new-broker")
+			Expect(serviceBrokerRepo.FindByNameName).To(Equal("my-broker"))
 
-		Expect(repo.FindByNameName).To(Equal("my-broker"))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
+				[]string{"OK"},
+			))
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
-			[]string{"OK"},
-		))
-
-		Expect(repo.RenamedServiceBrokerGuid).To(Equal("my-found-broker-guid"))
-		Expect(repo.RenamedServiceBrokerName).To(Equal("my-new-broker"))
+			Expect(serviceBrokerRepo.RenamedServiceBrokerGuid).To(Equal("my-found-broker-guid"))
+			Expect(serviceBrokerRepo.RenamedServiceBrokerName).To(Equal("my-new-broker"))
+		})
 	})
 })
