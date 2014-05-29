@@ -1,9 +1,6 @@
 package command_factory_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/command_factory"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,6 +11,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
+	. "github.com/cloudfoundry/cli/cf/command_factory"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("factory", func() {
@@ -38,9 +39,10 @@ var _ = Describe("factory", func() {
 		commands := factory.CommandMetadatas()
 
 		suffixesToIgnore := []string{
-			"_test.go", // ignore test files
-			".test",    // ignore generated .test (temporary files)
-			"#",        // emacs autosave files
+			"init_i18n.go", // ignore all i18n initializers
+			"_test.go",     // ignore test files
+			".test",        // ignore generated .test (temporary files)
+			"#",            // emacs autosave files
 		}
 
 		err := filepath.Walk("../commands", func(path string, info os.FileInfo, err error) error {

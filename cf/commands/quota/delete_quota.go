@@ -8,10 +8,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-
-	"github.com/cloudfoundry/cli/cf/i18n"
-
-	goi18n "github.com/nicksnyder/go-i18n/i18n"
 )
 
 type DeleteQuota struct {
@@ -19,16 +15,6 @@ type DeleteQuota struct {
 	config    configuration.Reader
 	quotaRepo api.QuotaRepository
 	orgReq    requirements.OrganizationRequirement
-}
-
-var T goi18n.TranslateFunc
-
-func init() {
-	var err error
-	T, err = i18n.Init("quota", i18n.GetResourcesPath())
-	if err != nil {
-		panic(err)
-	}
 }
 
 func NewDeleteQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) (cmd *DeleteQuota) {
