@@ -118,7 +118,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 			authTokenRepo.FindByLabelAndProviderApiResponse = errors.New("OH NOES")
 		})
 
-		It("TestDeleteServiceAuthTokenFailsWithError", func() {
+		It("shows the user an error", func() {
 			runCommand("a label", "a provider")
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Deleting service auth token as", "my-user"},
