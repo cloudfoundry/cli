@@ -8,8 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	resources "github.com/cloudfoundry/cli/cf/resources"
+	"github.com/XenoPhex/jibber_jabber"
 
+	resources "github.com/cloudfoundry/cli/cf/resources"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 )
 
@@ -24,55 +25,27 @@ func GetResourcesPath() string {
 	return resources_path
 }
 
-func Init(packageName string, i18nDirname string) (go_i18n.TranslateFunc, error) {
-	userLocale := getUserLocale()
-	err := loadTranslationAssets(packageName, i18nDirname, userLocale, DEFAULT_LOCAL)
+func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
+	userLocale, err := jibber_jabber.DetectIETF()
 	if err != nil {
-		return nil, err
+		println("Could not load desired locale:", userLocale, "falling back to default locale", DEFAULT_LOCAL)
+		userLocale = DEFAULT_LOCAL
+	}
+
+	// convert IETF format to XCU format
+	userLocale = strings.Replace(userLocale, "-", "_", 1)
+
+	err = loadTranslationAssets(packageName, i18nDirname, userLocale, DEFAULT_LOCAL)
+	if err != nil { // this should only be from the user locale
+		println("Could not load desired locale:", userLocale, "falling back to default locale", DEFAULT_LOCAL)
 	}
 
 	T, err := go_i18n.Tfunc(userLocale, DEFAULT_LOCAL)
 	if err != nil {
-		fmt.Printf("Could not initialize i18n strings") //TODO: Better Error Handling
-		return nil, err
+		panic(err)
 	}
 
-	return T, nil
-}
-
-func ValidateLocale(locale string) bool {
-	language, territory := splitLocale(locale)
-	return ValidateLanguage(language) && ValidateTerritory(territory)
-}
-
-func ValidateLanguage(language string) bool {
-	for _, lang := range SUPPORTED_LANGUAGES {
-		if language == lang {
-			return true
-		}
-	}
-
-	return false
-}
-
-func ValidateTerritory(territory string) bool {
-	//TODO: complete me!
-	return true
-}
-
-func getOSLocale() string {
-	if os.Getenv("LC_ALL") != "" {
-		return os.Getenv("LC_ALL")
-	} else if os.Getenv("LANG") != "" {
-		return os.Getenv("LANG")
-	} else {
-		return DEFAULT_LOCAL
-	}
-}
-
-func formatLocale(locale string) string {
-	language, territory := splitLocale(locale)
-	return strings.ToLower(language) + "_" + strings.ToUpper(territory)
+	return T
 }
 
 func splitLocale(locale string) (string, string) {
@@ -83,29 +56,15 @@ func splitLocale(locale string) (string, string) {
 	return language, territory
 }
 
-func getUserLocale() string {
-	osLocale := getOSLocale()
-	osLocale = formatLocale(osLocale)
-
-	if !ValidateLocale(osLocale) {
-		osLocale = DEFAULT_LOCAL
-	}
-
-	return osLocale
-}
-
 func loadTranslationAssets(packageName, assetPath, userLocale, defaultLocale string) error {
-	err := loadFromAsset(packageName, assetPath, userLocale)
-	if err != nil {
-		return err
+	userLocaleErr := loadFromAsset(packageName, assetPath, userLocale)
+
+	defaultLocaleErr := loadFromAsset(packageName, assetPath, defaultLocale)
+	if defaultLocaleErr != nil {
+		panic(defaultLocale)
 	}
 
-	err = loadFromAsset(packageName, assetPath, defaultLocale)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return userLocaleErr
 }
 
 func loadFromAsset(packageName, assetPath, locale string) error {
