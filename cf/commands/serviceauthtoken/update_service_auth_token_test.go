@@ -15,14 +15,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func callUpdateServiceAuthToken(args []string, requirementsFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	config := testconfig.NewRepositoryWithDefaults()
-	cmd := NewUpdateServiceAuthToken(ui, config, authTokenRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
-}
-
 var _ = Describe("update-service-auth-token command", func() {
 	var (
 		ui                  *testterm.FakeUI
