@@ -170,6 +170,25 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 	})
 
+	Describe("restaging applications", func() {
+		It("POSTs to the right URL", func() {
+			appRestageRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "POST",
+				Path:   "/v2/apps/some-cool-app-guid/restage",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body:   "",
+				},
+			})
+
+			ts, handler, repo := createAppRepo([]testnet.TestRequest{appRestageRequest})
+			defer ts.Close()
+
+			repo.CreateRestageRequest("some-cool-app-guid")
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
+		})
+	})
+
 	Describe("updating applications", func() {
 		It("makes the right request", func() {
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{updateApplicationRequest})
