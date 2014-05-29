@@ -1,3 +1,5 @@
+// +build darwin freebsd linux netbsd openbsd
+
 package i18n_test
 
 import (
