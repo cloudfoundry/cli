@@ -1,43 +1,19 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package service_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
+	. "github.com/cloudfoundry/cli/cf/commands/service"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
 func callUpdateUserProvidedService(args []string, requirementsFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
@@ -49,136 +25,107 @@ func callUpdateUserProvidedService(args []string, requirementsFactory *testreq.F
 	return
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestUpdateUserProvidedServiceFailsWithUsage", func() {
-		requirementsFactory := &testreq.FakeReqFactory{}
-		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+var _ = Describe("update-user-provided-service test", func() {
+	var (
+		ui                  *testterm.FakeUI
+		configRepo          configuration.ReadWriter
+		serviceRepo         *testapi.FakeUserProvidedServiceInstanceRepo
+		requirementsFactory *testreq.FakeReqFactory
+	)
 
-		ui := callUpdateUserProvidedService([]string{}, requirementsFactory, userProvidedServiceInstanceRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callUpdateUserProvidedService([]string{"foo"}, requirementsFactory, userProvidedServiceInstanceRepo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		serviceRepo = &testapi.FakeUserProvidedServiceInstanceRepo{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	It("TestUpdateUserProvidedServiceRequirements", func() {
-		args := []string{"service-name"}
-		requirementsFactory := &testreq.FakeReqFactory{}
-		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+	runCommand := func(args ...string) {
+		cmd := NewUpdateUserProvidedService(ui, configRepo, serviceRepo)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
+	}
 
-		requirementsFactory.LoginSuccess = false
-		callUpdateUserProvidedService(args, requirementsFactory, userProvidedServiceInstanceRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	Describe("requirements", func() {
+		It("fails with usage when not provided the name of the service to update", func() {
+			requirementsFactory.LoginSuccess = true
+			runCommand()
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 
-		requirementsFactory.LoginSuccess = true
-		callUpdateUserProvidedService(args, requirementsFactory, userProvidedServiceInstanceRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
+		It("fails when not logged in", func() {
+			runCommand("whoops")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
 
-	It("TestUpdateUserProvidedServiceWhenNoFlagsArePresent", func() {
+	Context("when logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
 
-		args := []string{"service-name"}
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Name = "found-service-name"
-		requirementsFactory := &testreq.FakeReqFactory{
-			LoginSuccess:    true,
-			ServiceInstance: serviceInstance,
-		}
-		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(args, requirementsFactory, repo)
+			serviceInstance := models.ServiceInstance{}
+			serviceInstance.Name = "service-name"
+			requirementsFactory.ServiceInstance = serviceInstance
+		})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
-			[]string{"OK"},
-			[]string{"No changes"},
-		))
-	})
+		Context("when no flags are provided", func() {
+			It("tells the user that no changes occurred", func() {
+				runCommand("service-name")
 
-	It("TestUpdateUserProvidedServiceWithJson", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"No changes"},
+				))
+			})
+		})
 
-		args := []string{"-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name"}
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Name = "found-service-name"
-		requirementsFactory := &testreq.FakeReqFactory{
-			LoginSuccess:    true,
-			ServiceInstance: serviceInstance,
-		}
-		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(args, requirementsFactory, repo)
+		Context("when the user provides valid JSON with the -p flag", func() {
+			It("updates the user provided service specified", func() {
+				runCommand("-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name")
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
-			[]string{"OK"},
-			[]string{"TIP"},
-		))
-		Expect(repo.UpdateServiceInstance.Name).To(Equal(serviceInstance.Name))
-		Expect(repo.UpdateServiceInstance.Params).To(Equal(map[string]string{"foo": "bar"}))
-		Expect(repo.UpdateServiceInstance.SysLogDrainUrl).To(Equal("syslog://example.com"))
-	})
+				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"TIP"},
+				))
+				Expect(serviceRepo.UpdateServiceInstance.Name).To(Equal("service-name"))
+				Expect(serviceRepo.UpdateServiceInstance.Params).To(Equal(map[string]string{"foo": "bar"}))
+				Expect(serviceRepo.UpdateServiceInstance.SysLogDrainUrl).To(Equal("syslog://example.com"))
+			})
+		})
 
-	It("TestUpdateUserProvidedServiceWithoutJson", func() {
+		Context("when the user provides invalid JSON with the -p flag", func() {
+			It("tells the user the JSON is invalid", func() {
+				runCommand("-p", `{"foo":"ba WHOOPS OH MY HOW DID THIS GET HERE???`, "service-name")
 
-		args := []string{"-l", "syslog://example.com", "service-name"}
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Name = "found-service-name"
-		requirementsFactory := &testreq.FakeReqFactory{
-			LoginSuccess:    true,
-			ServiceInstance: serviceInstance,
-		}
-		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(args, requirementsFactory, repo)
+				Expect(serviceRepo.UpdateServiceInstance).To(Equal(models.ServiceInstanceFields{}))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"JSON is invalid"},
+				))
+			})
+		})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating user provided service"},
-			[]string{"OK"},
-		))
-	})
+		Context("when the service with the given name is not user provided", func() {
+			BeforeEach(func() {
+				plan := models.ServicePlanFields{Guid: "my-plan-guid"}
+				serviceInstance := models.ServiceInstance{}
+				serviceInstance.Name = "found-service-name"
+				serviceInstance.ServicePlan = plan
 
-	It("TestUpdateUserProvidedServiceWithInvalidJson", func() {
+				requirementsFactory.ServiceInstance = serviceInstance
+			})
 
-		args := []string{"-p", `{"foo":"ba`, "service-name"}
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Name = "found-service-name"
-		requirementsFactory := &testreq.FakeReqFactory{
-			LoginSuccess:    true,
-			ServiceInstance: serviceInstance,
-		}
-		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+			It("fails and tells the user what went wrong", func() {
+				runCommand("-p", `{"foo":"bar"}`, "service-name")
 
-		ui := callUpdateUserProvidedService(args, requirementsFactory, userProvidedServiceInstanceRepo)
-
-		Expect(userProvidedServiceInstanceRepo.UpdateServiceInstance).NotTo(Equal(serviceInstance))
-
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"FAILED"},
-			[]string{"JSON is invalid"},
-		))
-	})
-
-	It("TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided", func() {
-
-		args := []string{"-p", `{"foo":"bar"}`, "service-name"}
-		plan := models.ServicePlanFields{}
-		plan.Guid = "my-plan-guid"
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Name = "found-service-name"
-		serviceInstance.ServicePlan = plan
-
-		requirementsFactory := &testreq.FakeReqFactory{
-			LoginSuccess:    true,
-			ServiceInstance: serviceInstance,
-		}
-		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-
-		ui := callUpdateUserProvidedService(args, requirementsFactory, userProvidedServiceInstanceRepo)
-
-		Expect(userProvidedServiceInstanceRepo.UpdateServiceInstance).NotTo(Equal(serviceInstance))
-
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"FAILED"},
-			[]string{"Service Instance is not user provided"},
-		))
+				Expect(serviceRepo.UpdateServiceInstance).To(Equal(models.ServiceInstanceFields{}))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Service Instance is not user provided"},
+				))
+			})
+		})
 	})
 })
