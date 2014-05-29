@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
@@ -15,15 +14,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
-
-func callUpdateUserProvidedService(args []string, requirementsFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{}
-	config := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewUpdateUserProvidedService(fakeUI, config, userProvidedServiceInstanceRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
-}
 
 var _ = Describe("update-user-provided-service test", func() {
 	var (
