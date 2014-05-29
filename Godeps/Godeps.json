@@ -20,6 +20,10 @@
 			"Rev": "dc9b8350fb4568b6562900df872672f378242552"
 		},
 		{
+			"ImportPath": "github.com/XenoPhex/jibber_jabber",
+			"Rev": "96d0b16fbf236c89948bb68fb8e2ecca91c4738b"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
 			"Rev": "dfcb028513f33935d16a9c278a9b38c39dae6343"
 		},
