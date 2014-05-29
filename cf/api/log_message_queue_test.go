@@ -1,17 +1,19 @@
 package api_test
 
 import (
-	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/api"
+	"time"
+
+	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+
+	. "github.com/cloudfoundry/cli/cf/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("PriorityQueue", func() {
+var _ = Describe("is a priority queue used to sort loggregator messages", func() {
+	It("PriorityQueue returns a new queue", func() {
 		pq := NewSortedMessageQueue(10*time.Millisecond, time.Now)
 
 		msg3 := logMessageWithTime("message 3", 130)
