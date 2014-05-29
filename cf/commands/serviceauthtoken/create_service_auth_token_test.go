@@ -24,7 +24,7 @@ var _ = Describe("create-service-auth-token command", func() {
 	)
 
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{Inputs: []string{"y"}}
+		ui = &testterm.FakeUI{}
 		authTokenRepo = &testapi.FakeAuthTokenRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
