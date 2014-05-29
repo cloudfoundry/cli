@@ -34,6 +34,10 @@ type FakeApplicationRepository struct {
 		VcapServices string
 		Error        error
 	}
+
+	CreateRestageRequestArgs struct {
+		AppGuid string
+	}
 }
 
 func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiErr error) {
@@ -104,4 +108,9 @@ func (repo *FakeApplicationRepository) ReadEnv(appGuid string) (map[string]strin
 	repo.ReadEnvArgs.AppGuid = appGuid
 
 	return repo.ReadEnvReturns.UserEnv, repo.ReadEnvReturns.VcapServices, repo.ReadEnvReturns.Error
+}
+
+func (repo *FakeApplicationRepository) CreateRestageRequest(guid string) (apiErr error) {
+	repo.CreateRestageRequestArgs.AppGuid = guid
+	return nil
 }
