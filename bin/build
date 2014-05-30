@@ -1,14 +1,17 @@
-#!/bin/bash 
+#!/bin/bash
 
 set -e
+set -u
 
 echo -e "\nGenerating Binary..."
 
-GODEP=$(which godep)
+ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
 
-if [[ -z $GODEP ]] ; then
-  echo -e "godep is not installed. Run 'go get github.com/tools/godep'"
-  exit 1
-fi
+CLI_GOPATH=$ROOT_DIR/tmp/cli_gopath
+rm -rf $CLI_GOPATH
+mkdir -p $CLI_GOPATH/src/github.com/cloudfoundry/
+ln -s $ROOT_DIR $CLI_GOPATH/src/github.com/cloudfoundry/cli
 
-GOPATH=$($GODEP path):$GOPATH go build -o $(dirname $0)/../out/cf ./main
+GODEP_GOPATH=$ROOT_DIR/Godeps/_workspace
+
+GOPATH=$CLI_GOPATH:$GODEP_GOPATH:$GOPATH go build -o $ROOT_DIR/out/cf ./main
