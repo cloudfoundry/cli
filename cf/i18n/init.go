@@ -35,7 +35,7 @@ func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
 	// convert IETF format to XCU format
 	userLocale = strings.Replace(userLocale, "-", "_", 1)
 
-	err = loadTranslationAssets(packageName, i18nDirname, userLocale, DEFAULT_LOCAL)
+	err = loadFromAsset(packageName, i18nDirname, userLocale)
 	if err != nil { // this should only be from the user locale
 		println("Could not load desired locale:", userLocale, "falling back to default locale", DEFAULT_LOCAL)
 	}
@@ -54,17 +54,6 @@ func splitLocale(locale string) (string, string) {
 	language := strings.Split(formattedLocale, "_")[0]
 	territory := strings.Split(formattedLocale, "_")[1]
 	return language, territory
-}
-
-func loadTranslationAssets(packageName, assetPath, userLocale, defaultLocale string) error {
-	userLocaleErr := loadFromAsset(packageName, assetPath, userLocale)
-
-	defaultLocaleErr := loadFromAsset(packageName, assetPath, defaultLocale)
-	if defaultLocaleErr != nil {
-		panic(defaultLocale)
-	}
-
-	return userLocaleErr
 }
 
 func loadFromAsset(packageName, assetPath, locale string) error {
