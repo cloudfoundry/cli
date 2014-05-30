@@ -2,8 +2,8 @@
 package api
 
 import (
-	"sync"
 	"github.com/cloudfoundry/cli/cf/models"
+	"sync"
 )
 
 type FakeAppEventsRepository struct {
