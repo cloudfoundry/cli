@@ -1,0 +1,5 @@
+#!/bin/bash
+
+go get github.com/maxbrunsfeld/counterfeiter
+
+counterfeiter -o testhelpers/api/fake_app_events_repo.go cf/api AppEventsRepository
