@@ -1,8 +1,6 @@
 git submodule update --init
 
 SET CLIPATH=c:\jenkins\workspace\go-cli-tests-windows64Bit
-SET GOPATH=%CLIPATH%
-
 SET GOPATH=c:\Users\Administrator\go
 go get -d github.com/cloudfoundry/cf-acceptance-tests/
 
