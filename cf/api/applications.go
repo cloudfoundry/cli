@@ -19,6 +19,7 @@ type ApplicationRepository interface {
 	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error)
 	Delete(appGuid string) (apiErr error)
 	ReadEnv(guid string) (userEnv map[string]string, vcapServices string, err error)
+	CreateRestageRequest(guid string) (apiErr error)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -125,4 +126,9 @@ func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (map[strin
 	}
 
 	return appResource.Environment, vcapServices, err
+}
+
+func (repo CloudControllerApplicationRepository) CreateRestageRequest(guid string) error {
+	path := fmt.Sprintf("%s/v2/apps/%s/restage", repo.config.ApiEndpoint(), guid)
+	return repo.gateway.CreateResource(path, strings.NewReader(""), nil)
 }

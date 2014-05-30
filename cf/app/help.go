@@ -1,12 +1,13 @@
 package app
 
 import (
-	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 	"os"
 	"strings"
 	"text/tabwriter"
 	"text/template"
+
+	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/codegangsta/cli"
 )
 
 type groupedCommands struct {
@@ -100,6 +101,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					newCmdPresenter(app, maxNameLen, "start"),
 					newCmdPresenter(app, maxNameLen, "stop"),
 					newCmdPresenter(app, maxNameLen, "restart"),
+					newCmdPresenter(app, maxNameLen, "restage"),
 				}, {
 					newCmdPresenter(app, maxNameLen, "events"),
 					newCmdPresenter(app, maxNameLen, "files"),
