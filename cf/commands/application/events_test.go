@@ -19,14 +19,14 @@ import (
 var _ = Describe("events command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
-		eventsRepo          *testapi.FakeAppEventsRepo
+		eventsRepo          *testapi.FakeAppEventsRepository
 		ui                  *testterm.FakeUI
 	)
 
 	const TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
 
 	BeforeEach(func() {
-		eventsRepo = &testapi.FakeAppEventsRepo{}
+		eventsRepo = new(testapi.FakeAppEventsRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		ui = new(testterm.FakeUI)
 	})
@@ -55,7 +55,7 @@ var _ = Describe("events command", func() {
 		app.Guid = "my-app-guid"
 		requirementsFactory.Application = app
 
-		eventsRepo.RecentEventsReturns.Events = []models.EventFields{
+		eventsRepo.RecentEventsReturns([]models.EventFields{
 			{
 				Guid:        "event-guid-1",
 				Name:        "app crashed",
@@ -70,12 +70,14 @@ var _ = Describe("events command", func() {
 				Description: "reason: app instance was stopped, exit_status: 77",
 				ActorName:   "Marcel Marceau",
 			},
-		}
+		}, nil)
 
 		runCommand("my-app")
 
-		Expect(eventsRepo.RecentEventsArgs.Limit).To(Equal(uint64(50)))
-		Expect(eventsRepo.RecentEventsArgs.AppGuid).To(Equal("my-app-guid"))
+		Expect(eventsRepo.RecentEventsCallCount()).To(Equal(1))
+		appGuid, limit := eventsRepo.RecentEventsArgsForCall(0)
+		Expect(limit).To(Equal(uint64(50)))
+		Expect(appGuid).To(Equal("my-app-guid"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
 			[]string{"time", "event", "actor", "description"},
@@ -85,7 +87,7 @@ var _ = Describe("events command", func() {
 	})
 
 	It("tells the user when an error occurs", func() {
-		eventsRepo.RecentEventsReturns.Error = errors.New("welp")
+		eventsRepo.RecentEventsReturns(nil, errors.New("welp"))
 
 		app := models.Application{}
 		app.Name = "my-app"
