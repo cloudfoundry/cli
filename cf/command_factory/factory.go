@@ -2,6 +2,7 @@ package command_factory
 
 import (
 	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -118,6 +119,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
 	restart := application.NewRestart(ui, start, stop)
+	restage := application.NewRestage(ui, config, repoLocator.GetApplicationRepository(), start)
 	bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
 
 	factory.cmdsByName["app"] = displayApp
@@ -125,6 +127,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["start"] = start
 	factory.cmdsByName["stop"] = stop
 	factory.cmdsByName["restart"] = restart
+	factory.cmdsByName["restage"] = restage
 	factory.cmdsByName["push"] = application.NewPush(
 		ui, config, manifestRepo, start, stop, bind,
 		repoLocator.GetApplicationRepository(),
