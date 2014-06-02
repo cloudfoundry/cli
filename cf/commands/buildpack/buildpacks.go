@@ -1,13 +1,14 @@
 package buildpack
 
 import (
+	"strconv"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strconv"
 )
 
 type ListBuildpacks struct {
@@ -24,8 +25,8 @@ func NewListBuildpacks(ui terminal.UI, buildpackRepo api.BuildpackRepository) (c
 func (cmd ListBuildpacks) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "buildpacks",
-		Description: "List all buildpacks",
-		Usage:       "CF_NAME buildpacks",
+		Description: T("List all buildpacks"),
+		Usage:       T("CF_NAME buildpacks"),
 	}
 }
 
@@ -37,9 +38,9 @@ func (cmd ListBuildpacks) GetRequirements(requirementsFactory requirements.Facto
 }
 
 func (cmd ListBuildpacks) Run(c *cli.Context) {
-	cmd.ui.Say("Getting buildpacks...\n")
+	cmd.ui.Say(T("Getting buildpacks...\n"))
 
-	table := cmd.ui.Table([]string{"buildpack", "position", "enabled", "locked", "filename"})
+	table := cmd.ui.Table([]string{"buildpack", T("position"), T("enabled"), T("locked"), T("filename")})
 	noBuildpacks := true
 
 	apiErr := cmd.buildpackRepo.ListBuildpacks(func(buildpack models.Buildpack) bool {
@@ -68,11 +69,10 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 	table.Print()
 
 	if apiErr != nil {
-		cmd.ui.Failed("Failed fetching buildpacks.\n%s", apiErr.Error())
-		return
+		cmd.ui.Failed(T("Failed fetching buildpacks.\n{{.Error}}", map[string]interface{}{"Error": apiErr.Error()}))
 	}
 
 	if noBuildpacks {
-		cmd.ui.Say("No buildpacks found")
+		cmd.ui.Say(T("No buildpacks found"))
 	}
 }

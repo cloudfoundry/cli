@@ -24,10 +24,10 @@ func NewDeleteBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *Dele
 func (cmd *DeleteBuildpack) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-buildpack",
-		Description: "Delete a buildpack",
-		Usage:       "CF_NAME delete-buildpack BUILDPACK [-f]",
+		Description: T("Delete a buildpack"),
+		Usage:       T("CF_NAME delete-buildpack BUILDPACK [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
@@ -58,7 +58,7 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting buildpack %s...", terminal.EntityNameColor(buildpackName))
+	cmd.ui.Say(T("Deleting buildpack {{.Arg0}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpackName)}))
 
 	buildpack, apiErr := cmd.buildpackRepo.FindByName(buildpackName)
 
@@ -66,7 +66,7 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 	case nil: //do nothing
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Buildpack %s does not exist.", buildpackName)
+		cmd.ui.Warn(T("Buildpack {{.Arg0}} does not exist.", map[string]interface{}{"Arg0": buildpackName}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())
@@ -76,8 +76,10 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 
 	apiErr = cmd.buildpackRepo.Delete(buildpack.Guid)
 	if apiErr != nil {
-		cmd.ui.Failed("Error deleting buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiErr.Error())
-		return
+		cmd.ui.Failed(T("Error deleting buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
+			"Name":  terminal.EntityNameColor(buildpack.Name),
+			"Error": apiErr.Error(),
+		}))
 	}
 
 	cmd.ui.Ok()

@@ -29,13 +29,12 @@ func NewCreateBuildpack(ui terminal.UI, buildpackRepo api.BuildpackRepository, b
 func (cmd CreateBuildpack) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-buildpack",
-		Description: "Create a buildpack",
-		Usage: "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]" +
-			"\n\nTIP:\n" +
-			"   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest.",
+		Description: T("Create a buildpack"),
+		Usage: T("CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]") +
+			T("\n\nTIP:\n") + T("   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest."),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "enable", Usage: "Enable the buildpack"},
-			cli.BoolFlag{Name: "disable", Usage: "Disable the buildpack"},
+			cli.BoolFlag{Name: "enable", Usage: T("Enable the buildpack")},
+			cli.BoolFlag{Name: "disable", Usage: T("Disable the buildpack")},
 		},
 	}
 }
@@ -55,15 +54,15 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 
 	buildpackName := c.Args()[0]
 
-	cmd.ui.Say("Creating buildpack %s...", terminal.EntityNameColor(buildpackName))
+	cmd.ui.Say(T("Creating buildpack {{.Arg0}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpackName)}))
 
 	buildpack, err := cmd.createBuildpack(buildpackName, c)
 
 	if err != nil {
 		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Warn("Buildpack %s already exists", buildpackName)
-			cmd.ui.Say("TIP: use '%s' to update this buildpack", terminal.CommandColor(cf.Name()+" "+"update-buildpack"))
+			cmd.ui.Warn(T("Buildpack {{.Arg0}} already exists", map[string]interface{}{"Arg0": buildpackName}))
+			cmd.ui.Say(T("TIP: use '{{.Arg0}}' to update this buildpack", map[string]interface{}{"Arg0": terminal.CommandColor(cf.Name() + " " + "update-buildpack")}))
 		} else {
 			cmd.ui.Failed(err.Error())
 		}
@@ -72,7 +71,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	cmd.ui.Say("Uploading buildpack %s...", terminal.EntityNameColor(buildpackName))
+	cmd.ui.Say(T("Uploading buildpack {{.Arg0}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpackName)}))
 
 	dir := c.Args()[1]
 
@@ -88,14 +87,17 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiErr error) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
-		apiErr = errors.NewWithFmt("Invalid position. %s", err.Error())
+		apiErr = errors.NewWithFmt(T("Invalid position. {{.Arg0}}", map[string]interface{}{"Arg0": err.Error()}))
 		return
 	}
 
 	enabled := c.Bool("enable")
 	disabled := c.Bool("disable")
 	if enabled && disabled {
-		apiErr = errors.New("Cannot specify both enabled and disabled.")
+		apiErr = errors.New(T("Cannot specify both {{.Enabled}} and {{.Disabled}}.", map[string]interface{}{
+			"Enabled":  "enabled",
+			"Disabled": "disabled",
+		}))
 		return
 	}
 

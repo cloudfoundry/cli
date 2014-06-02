@@ -1,0 +1,18 @@
+{
+  "excludedStrings": [
+    "buildpacks",
+    "CF_NAME  buildpacks",
+    "create-buildpack",
+    "enable",
+    "disable",
+    "update-buildpack",
+    "delete-buildpack",
+    "buildpack",
+    "rename-buildpack",
+    "lock",
+    "unlock"
+  ],
+  "excludedRegexps": [
+    "^\\w$"
+  ]
+}
