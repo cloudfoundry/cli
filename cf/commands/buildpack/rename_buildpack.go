@@ -23,8 +23,8 @@ func NewRenameBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *Rena
 func (cmd *RenameBuildpack) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-buildpack",
-		Description: "Rename a buildpack",
-		Usage:       "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
+		Description: T("Rename a buildpack"),
+		Usage:       T("CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"),
 	}
 }
 
@@ -41,7 +41,7 @@ func (cmd *RenameBuildpack) Run(c *cli.Context) {
 	buildpackName := c.Args()[0]
 	newBuildpackName := c.Args()[1]
 
-	cmd.ui.Say("Renaming buildpack %s to %s...", terminal.EntityNameColor(buildpackName), terminal.EntityNameColor(newBuildpackName))
+	cmd.ui.Say(T("Renaming buildpack {{.Arg0}} to {{.Arg1}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpackName), "Arg1": terminal.EntityNameColor(newBuildpackName)}))
 
 	buildpack, apiErr := cmd.buildpackRepo.FindByName(buildpackName)
 
@@ -52,8 +52,10 @@ func (cmd *RenameBuildpack) Run(c *cli.Context) {
 	buildpack.Name = newBuildpackName
 	buildpack, apiErr = cmd.buildpackRepo.Update(buildpack)
 	if apiErr != nil {
-		cmd.ui.Failed("Error renaming buildpack %s\n%s", terminal.EntityNameColor(buildpackName), apiErr.Error())
-		return
+		cmd.ui.Failed(T("Error renaming buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
+			"Name":  terminal.EntityNameColor(buildpack.Name),
+			"Error": apiErr.Error(),
+		}))
 	}
 
 	cmd.ui.Ok()
