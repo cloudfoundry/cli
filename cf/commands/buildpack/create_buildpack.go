@@ -1,6 +1,8 @@
 package buildpack
 
 import (
+	"strconv"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -9,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strconv"
 )
 
 type CreateBuildpack struct {
@@ -62,7 +63,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Buildpack %s already exists", buildpackName)
-			cmd.ui.Say("TIP: use '%s' to update this buildpack", terminal.CommandColor(cf.Name()+" update-buildpack"))
+			cmd.ui.Say("TIP: use '%s' to update this buildpack", terminal.CommandColor(cf.Name()+" "+"update-buildpack"))
 		} else {
 			cmd.ui.Failed(err.Error())
 		}
