@@ -39,7 +39,7 @@ var _ = Describe("factory", func() {
 		commands := factory.CommandMetadatas()
 
 		suffixesToIgnore := []string{
-			"init_i18n.go", // ignore all i18n initializers
+			"i18n_init.go", // ignore all i18n initializers
 			"_test.go",     // ignore test files
 			".test",        // ignore generated .test (temporary files)
 			"#",            // emacs autosave files
