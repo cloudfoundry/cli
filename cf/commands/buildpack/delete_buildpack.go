@@ -58,15 +58,14 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say(T("Deleting buildpack {{.Arg0}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpackName)}))
-
+	cmd.ui.Say(T("Deleting buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
 	buildpack, apiErr := cmd.buildpackRepo.FindByName(buildpackName)
 
 	switch apiErr.(type) {
 	case nil: //do nothing
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn(T("Buildpack {{.Arg0}} does not exist.", map[string]interface{}{"Arg0": buildpackName}))
+		cmd.ui.Warn(T("Buildpack {{.BuildpackName}} does not exist.", map[string]interface{}{"BuildpackName": buildpackName}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())

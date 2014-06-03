@@ -12,8 +12,8 @@
       "translation": "position"
    },
    {
-      "id": "TIP: use '{{.Arg0}}' to update this buildpack",
-      "translation": "TIP: use '{{.Arg0}}' to update this buildpack"
+      "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
+      "translation": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack"
    },
    {
       "id": "Failed fetching buildpacks.\n{{.Error}}",
@@ -44,8 +44,8 @@
       "translation": "Enable the buildpack"
    },
    {
-      "id": "Buildpack {{.Arg0}} does not exist.",
-      "translation": "Buildpack {{.Arg0}} does not exist."
+      "id": "Buildpack {{.BuildpackName}} does not exist.",
+      "translation": "Buildpack {{.BuildpackName}} does not exist."
    },
    {
       "id": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
@@ -56,8 +56,8 @@
       "translation": "Lock the buildpack"
    },
    {
-      "id": "Uploading buildpack {{.Arg0}}...",
-      "translation": "Uploading buildpack {{.Arg0}}..."
+      "id": "Uploading buildpack {{.BuildpackName}}...",
+      "translation": "Uploading buildpack {{.BuildpackName}}..."
    },
    {
       "id": "Cannot specify buildpack bits and lock/unlock.",
@@ -120,12 +120,12 @@
       "translation": "Error uploading buildpack {{.Name}}\n{{.Error}}"
    },
    {
-      "id": "Creating buildpack {{.Arg0}}...",
-      "translation": "Creating buildpack {{.Arg0}}..."
+      "id": "Creating buildpack {{.BuildpackName}}...",
+      "translation": "Creating buildpack {{.BuildpackName}}..."
    },
    {
-      "id": "Buildpack {{.Arg0}} already exists",
-      "translation": "Buildpack {{.Arg0}} already exists"
+      "id": "Buildpack {{.BuildpackName}} already exists",
+      "translation": "Buildpack {{.BuildpackName}} already exists"
    },
    {
       "id": "Buildpack position among other buildpacks",
@@ -136,8 +136,8 @@
       "translation": "Error deleting buildpack {{.Name}}\n{{.Error}}"
    },
    {
-      "id": "Renaming buildpack {{.Arg0}} to {{.Arg1}}...",
-      "translation": "Renaming buildpack {{.Arg0}} to {{.Arg1}}..."
+      "id": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}...",
+      "translation": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}..."
    },
    {
       "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest.",
@@ -152,23 +152,23 @@
       "translation": "Disable the buildpack"
    },
    {
-      "id": "Invalid position. {{.Arg0}}",
-      "translation": "Invalid position. {{.Arg0}}"
+      "id": "Invalid position. {{.ErrorDescription}}",
+      "translation": "Invalid position. {{.ErrorDescription}}"
    },
    {
       "id": "List all buildpacks",
       "translation": "List all buildpacks"
    },
    {
-      "id": "Deleting buildpack {{.Arg0}}...",
-      "translation": "Deleting buildpack {{.Arg0}}..."
+      "id": "Deleting buildpack {{.BuildpackName}}...",
+      "translation": "Deleting buildpack {{.BuildpackName}}..."
    },
    {
       "id": "Getting buildpacks...\n",
       "translation": "Getting buildpacks...\n"
    },
    {
-      "id": "Updating buildpack {{.Arg0}}...",
-      "translation": "Updating buildpack {{.Arg0}}..."
+      "id": "Updating buildpack {{.BuildpackName}}...",
+      "translation": "Updating buildpack {{.BuildpackName}}..."
    }
 ]
