@@ -2,6 +2,8 @@
 
 set -e
 
+bin/generate-language-resources
+
 GODEP=$(which godep)
 
 if [[ -z $GODEP ]] ; then
