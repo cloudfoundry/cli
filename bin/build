@@ -7,6 +7,8 @@ echo -e "\nGenerating Binary..."
 
 ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
 
+$ROOT_DIR/bin/generate-language-resources
+
 CLI_GOPATH=$ROOT_DIR/tmp/cli_gopath
 rm -rf $CLI_GOPATH
 mkdir -p $CLI_GOPATH/src/github.com/cloudfoundry/
