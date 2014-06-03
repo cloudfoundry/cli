@@ -1,3 +1,0 @@
-Jibber Jabber
-=============
-Autodetect Language.

@@ -44,7 +44,7 @@ var _ = Describe("ginkgo convert", func() {
 		relPath, err := filepath.Rel(cwd, filepath.Join(tmpDir, "convert_fixtures"))
 		Ω(err).ShouldNot(HaveOccurred())
 
-		err = exec.Command("ginkgo", "convert", relPath).Run()
+		err = exec.Command(pathToGinkgo, "convert", relPath).Run()
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 
