@@ -10,6 +10,12 @@ import (
 // This flag enables bash-completion for all commands and subcommands
 var BashCompletionFlag = BoolFlag{"generate-bash-completion", ""}
 
+// This flag prints the version for the application
+var VersionFlag = BoolFlag{"version, v", "print the version"}
+
+// This flag prints the help for all commands and subcommands
+var HelpFlag = BoolFlag{"help, h", "show help"}
+
 // Flag is a common interface related to parsing flags in cli.
 // For more advanced flag parsing techniques, it is recomended that
 // this interface be implemented.
@@ -35,6 +41,33 @@ func eachName(longName string, fn func(string)) {
 		name = strings.Trim(name, " ")
 		fn(name)
 	}
+}
+
+// Generic is a generic parseable type identified by a specific flag
+type Generic interface {
+	Set(value string) error
+	String() string
+}
+
+// GenericFlag is the flag type for types implementing Generic
+type GenericFlag struct {
+	Name  string
+	Value Generic
+	Usage string
+}
+
+func (f GenericFlag) String() string {
+	return fmt.Sprintf("%s%s %v\t`%v` %s", prefixFor(f.Name), f.Name, f.Value, "-"+f.Name+" option -"+f.Name+" option", f.Usage)
+}
+
+func (f GenericFlag) Apply(set *flag.FlagSet) {
+	eachName(f.Name, func(name string) {
+		set.Var(f.Value, name, f.Usage)
+	})
+}
+
+func (f GenericFlag) getName() string {
+	return f.Name
 }
 
 type StringSlice []string

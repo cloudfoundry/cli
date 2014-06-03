@@ -3,7 +3,7 @@
 package jibber_jabber_test
 
 import (
-	. "github.com/XenoPhex/jibber_jabber"
+	. "github.com/pivotal-cf-experimental/jibber_jabber"
 	"os"
 
 	. "github.com/onsi/ginkgo"

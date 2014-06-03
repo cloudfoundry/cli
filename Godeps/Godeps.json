@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/cloudfoundry/cli",
-	"GoVersion": "go1.2",
+	"GoVersion": "go1.2.2",
 	"Packages": [
 		"./cf/..."
 	],
@@ -18,10 +18,6 @@
 		{
 			"ImportPath": "code.google.com/p/gogoprotobuf/proto",
 			"Rev": "dc9b8350fb4568b6562900df872672f378242552"
-		},
-		{
-			"ImportPath": "github.com/XenoPhex/jibber_jabber",
-			"Rev": "96d0b16fbf236c89948bb68fb8e2ecca91c4738b"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
@@ -45,8 +41,8 @@
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "1.0.0-65-g820deef",
-			"Rev": "820deefc9031d101f085ef773425fc6ca7a5363e"
+			"Comment": "1.0.0-72-gbb91895",
+			"Rev": "bb9189510af1f49580c073c9e59e8bf288f0df27"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
@@ -58,11 +54,16 @@
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Rev": "1e48048b2e01c7f1830144e30eea21db3cd3b574"
+			"Comment": "v1.0.0-8-g291d5d8",
+			"Rev": "291d5d88535787731a9a43acfa0fa00d41aafaa8"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Rev": "660b70079010c9eeeffdc381fcb3a8cde45ce495"
+			"Rev": "05c2b322d514282430789eb9ff8efee6c904cc77"
+		},
+		{
+			"ImportPath": "github.com/pivotal-cf-experimental/jibber_jabber",
+			"Rev": "943c5c8460d9475849f23586453b37c26285ce43"
 		}
 	]
 }

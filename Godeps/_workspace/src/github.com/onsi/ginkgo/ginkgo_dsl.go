@@ -13,6 +13,7 @@ package ginkgo
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -44,7 +45,6 @@ To circumvent this, you should call
 
 at the top of the goroutine that caused this panic.
 `
-
 const defaultTimeout = 1
 
 var globalSuite *suite.Suite
@@ -200,7 +200,12 @@ func RunSpecsWithCustomReporters(t GinkgoTestingT, description string, specRepor
 	for i, reporter := range specReporters {
 		reporters[i] = reporter
 	}
-	return globalSuite.Run(t, description, reporters, writer, config.GinkgoConfig)
+	passed, hasFocusedTests := globalSuite.Run(t, description, reporters, writer, config.GinkgoConfig)
+	if passed && hasFocusedTests {
+		fmt.Println("PASS | FOCUSED")
+		os.Exit(types.GINKGO_FOCUS_EXIT_CODE)
+	}
+	return passed
 }
 
 func buildDefaultReporter() Reporter {
