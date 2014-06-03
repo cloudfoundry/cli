@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-git fetch
-git checkout $GIT_COMMIT
-git submodule update --init
 bin/replace-sha
-go build -v -o cf-linux-386 main
-bin/test
+bin/test -cover
+mv out/cf cf-linux-386
