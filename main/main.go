@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"runtime/debug"
+	"runtime"
 	"strings"
 	"time"
 
@@ -166,6 +166,8 @@ and this stack trace:
 %s
 	`
 
-	stackTrace := "\t" + strings.Replace(string(debug.Stack()), "\n", "\n\t", -1)
+	var bytes []byte
+	runtime.Stack(bytes, true)
+	stackTrace := "\t" + strings.Replace(string(bytes), "\n", "\n\t", -1)
 	println(fmt.Sprintf(formattedString, cf.Name(), strings.Join(os.Args, " "), errorMessage, stackTrace))
 }
