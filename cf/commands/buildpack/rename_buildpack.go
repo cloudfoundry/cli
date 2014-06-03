@@ -41,7 +41,7 @@ func (cmd *RenameBuildpack) Run(c *cli.Context) {
 	buildpackName := c.Args()[0]
 	newBuildpackName := c.Args()[1]
 
-	cmd.ui.Say(T("Renaming buildpack {{.Arg0}} to {{.Arg1}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpackName), "Arg1": terminal.EntityNameColor(newBuildpackName)}))
+	cmd.ui.Say(T("Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}...", map[string]interface{}{"OldBuildpackName": terminal.EntityNameColor(buildpackName), "NewBuildpackName": terminal.EntityNameColor(newBuildpackName)}))
 
 	buildpack, apiErr := cmd.buildpackRepo.FindByName(buildpackName)
 

@@ -54,15 +54,15 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 
 	buildpackName := c.Args()[0]
 
-	cmd.ui.Say(T("Creating buildpack {{.Arg0}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpackName)}))
+	cmd.ui.Say(T("Creating buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
 
 	buildpack, err := cmd.createBuildpack(buildpackName, c)
 
 	if err != nil {
-		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.BUILDPACK_EXISTS {
+		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Warn(T("Buildpack {{.Arg0}} already exists", map[string]interface{}{"Arg0": buildpackName}))
-			cmd.ui.Say(T("TIP: use '{{.Arg0}}' to update this buildpack", map[string]interface{}{"Arg0": terminal.CommandColor(cf.Name() + " " + "update-buildpack")}))
+			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} already exists", map[string]interface{}{"BuildpackName": buildpackName}))
+			cmd.ui.Say(T("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack", map[string]interface{}{"CfUpdateBuildpackCommand": terminal.CommandColor(cf.Name() + " " + "update-buildpack")}))
 		} else {
 			cmd.ui.Failed(err.Error())
 		}
@@ -71,7 +71,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	cmd.ui.Say(T("Uploading buildpack {{.Arg0}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpackName)}))
+	cmd.ui.Say(T("Uploading buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
 
 	dir := c.Args()[1]
 
@@ -87,7 +87,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiErr error) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
-		apiErr = errors.NewWithFmt(T("Invalid position. {{.Arg0}}", map[string]interface{}{"Arg0": err.Error()}))
+		apiErr = errors.NewWithFmt(T("Invalid position. {{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err.Error()}))
 		return
 	}
 

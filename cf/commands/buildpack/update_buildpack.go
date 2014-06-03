@@ -59,7 +59,7 @@ func (cmd *UpdateBuildpack) GetRequirements(requirementsFactory requirements.Fac
 func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 	buildpack := cmd.buildpackReq.GetBuildpack()
 
-	cmd.ui.Say(T("Updating buildpack {{.Arg0}}...", map[string]interface{}{"Arg0": terminal.EntityNameColor(buildpack.Name)}))
+	cmd.ui.Say(T("Updating buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpack.Name)}))
 
 	updateBuildpack := false
 
