@@ -1,12 +1,6 @@
 #!/bin/bash
 
-set -e
+ROOT=$(cd $(dirname $0)/.. ; pwd -P)
+GOPATH=$ROOT/Godeps/_workspace:$GOPATH
 
-GODEP=$(which godep)
-
-if [[ -z $GODEP ]] ; then
-  echo -e "godep is not installed. Run 'go get github.com/tools/godep'"
-  exit 1
-fi
-
-GOPATH=$($GODEP path):$GOPATH go run -race $(dirname $0)/../main/main.go "$@"
+go run -race $ROOT/main/main.go "$@"

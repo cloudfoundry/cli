@@ -1,17 +1,8 @@
 #!/bin/bash
 
-set -e
-set -u
-
 echo -e "\nGenerating Binary..."
 
-ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
+ROOT=$(cd $(dirname $0)/.. ; pwd -P)
+GOPATH=$ROOT/Godeps/_workspace:$GOPATH
 
-CLI_GOPATH=$ROOT_DIR/tmp/cli_gopath
-rm -rf $CLI_GOPATH
-mkdir -p $CLI_GOPATH/src/github.com/cloudfoundry/
-ln -s $ROOT_DIR $CLI_GOPATH/src/github.com/cloudfoundry/cli
-
-GODEP_GOPATH=$ROOT_DIR/Godeps/_workspace
-
-GOPATH=$CLI_GOPATH:$GODEP_GOPATH:$GOPATH go build -o $ROOT_DIR/out/cf ./main
+go build -o $ROOT/out/cf ./main
