@@ -165,9 +165,13 @@ and this stack trace:
 
 %s
 	`
-
+	stackByteCount := 0
+	STACK_SIZE_LIMIT := 1024 * 1024
 	var bytes []byte
-	runtime.Stack(bytes, true)
+	for stackSize := 1024; (stackByteCount == 0 || stackByteCount == stackSize) && stackSize < STACK_SIZE_LIMIT; stackSize = 2 * stackSize {
+		bytes = make([]byte, stackSize)
+		stackByteCount = runtime.Stack(bytes, true)
+	}
 	stackTrace := "\t" + strings.Replace(string(bytes), "\n", "\n\t", -1)
 	println(fmt.Sprintf(formattedString, cf.Name(), strings.Join(os.Args, " "), errorMessage, stackTrace))
 }
