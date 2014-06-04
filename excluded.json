@@ -10,9 +10,30 @@
     "buildpack",
     "rename-buildpack",
     "lock",
-    "unlock"
+    "unlock",
+    "true",
+    "false",
+    "CF_COLOR",
+    "\u001b[%d;%dm%s\u001b[0m",
+    "windows",
+    "\\x1B\\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]",
+    "login",
+    "FailedWasCalled",
+    "%s target -o Org",
+    ".",
+    "%s\n",
+    "/bin/stty",
+    "stty",
+    "-echo",
+    "echo",
+    "\u003e",
+    "kernel32",
+    "SetConsoleMode",
+    "%s target -s SPACE",
+    "%s target -o ORG -s SPACE"
   ],
   "excludedRegexps": [
-    "^\\w$"
+    "^\\w$",
+    "^(?:%s)+\\s*$"
   ]
 }

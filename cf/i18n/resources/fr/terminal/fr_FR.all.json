@@ -1,0 +1,66 @@
+[
+   {
+      "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
+      "translation": "Endpoint API: {{.ApiEndpoint}} (Version API: {{.ApiVersionString}})"
+   },
+   {
+      "id": "OK",
+      "translation": "OK"
+   },
+   {
+      "id": "Incorrect Usage.\n",
+      "translation": "Utilisation incorrecte.\n"
+   },
+   {
+      "id": "Delete cancelled",
+      "translation": "Suprimassion annulé"
+   },
+   {
+      "id": "yes",
+      "translation": "oui"
+   },
+   {
+      "id": "No org or space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "Aucunne org ou espace ciblée, utiliser '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "User:         {{.UserEmail}}",
+      "translation": "Utilisateur:         {{.UserEmail}}"
+   },
+   {
+      "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
+      "translation": "Voulez-vous vraiment effacer cette {{.ModelType}} {{.ModelName}} et tout associé avec?"
+   },
+   {
+      "id": "Not logged in. Use '{{.CFLoginCommand}}' to log in.",
+      "translation": "Pas connecté. Utiliser '{{.CFLoginCommand}}' pour vous connecté."
+   },
+   {
+      "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
+      "translation": "la console écho d'entrée de mot de passe n'a pas pu être déconnectée:\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "Space:        No space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "Espace:        Aucun espace ciblée, utiliser '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "Org:          {{.OrganizationName}}",
+      "translation": "Org:          {{.OrganizationName}}"
+   },
+   {
+      "id": "Really delete the {{.ModelType}} {{.ModelName}}?",
+      "translation": "Voulez-vous vraiment effacer cette {{.ModelType}} {{.ModelName}}?"
+   },
+   {
+      "id": "FAILED",
+      "translation": "RATÉ"
+   },
+   {
+      "id": "Org:          No org targeted, use '{{.CFTargetCommand}}'",
+      "translation": "Org:          Aucunne org ciblée, utiliser '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "Space:        {{.SpaceName}}",
+      "translation": "Espace:        {{.SpaceName}}"
+   }
+]
