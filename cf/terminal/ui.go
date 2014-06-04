@@ -30,7 +30,6 @@ type UI interface {
 	Ok()
 	Failed(message string, args ...interface{})
 	FailWithUsage(context *cli.Context)
-	ConfigFailure(err error)
 	ShowConfiguration(configuration.Reader)
 	LoadingIndication()
 	Wait(duration time.Duration)
@@ -132,10 +131,6 @@ func (c terminalUI) FailWithUsage(context *cli.Context) {
 	cli.ShowCommandHelp(context, context.Command.Name)
 	c.Say("")
 	os.Exit(1)
-}
-
-func (c terminalUI) ConfigFailure(err error) {
-	c.Failed("Please use '%s api' to set an API endpoint and then '%s login' to login.", cf.Name(), cf.Name())
 }
 
 func (ui terminalUI) ShowConfiguration(config configuration.Reader) {

@@ -104,10 +104,6 @@ func (ui *FakeUI) Failed(message string, args ...interface{}) {
 	return
 }
 
-func (ui *FakeUI) ConfigFailure(err error) {
-	ui.Failed("Error loading config file.\n%s", err.Error())
-}
-
 func (ui *FakeUI) FailWithUsage(context *cli.Context) {
 	ui.FailedWithUsage = true
 	ui.FailedWithUsageCommandName = context.Command.Name
