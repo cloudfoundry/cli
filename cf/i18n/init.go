@@ -28,17 +28,12 @@ func GetResourcesPath() string {
 func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
 	userLocale, err := jibber_jabber.DetectIETF()
 	if err != nil {
-		println("Could not load desired locale:", userLocale, "falling back to default locale", DEFAULT_LOCAL)
 		userLocale = DEFAULT_LOCAL
 	}
 
 	// convert IETF format to XCU format
 	userLocale = strings.Replace(userLocale, "-", "_", 1)
-
-	err = loadFromAsset(packageName, i18nDirname, userLocale)
-	if err != nil { // this should only be from the user locale
-		println("Could not load desired locale:", userLocale, "falling back to default locale", DEFAULT_LOCAL)
-	}
+	loadFromAsset(packageName, i18nDirname, userLocale) // ignore returned error for now
 
 	T, err := go_i18n.Tfunc(userLocale, DEFAULT_LOCAL)
 	if err != nil {
