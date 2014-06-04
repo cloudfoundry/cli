@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-
-bin/replace-sha
-bin/test -cover
-mv out/cf cf-linux-amd64

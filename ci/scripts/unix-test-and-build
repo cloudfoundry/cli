@@ -5,4 +5,4 @@ export PATH=$PATH:$GOPATH/bin
 
 bin/replace-sha
 bin/test -cover
-mv out/cf cf-darwin-amd64
+mv out/cf $1
