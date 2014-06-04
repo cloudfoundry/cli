@@ -2,20 +2,21 @@ package terminal
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/trace"
-	"github.com/codegangsta/cli"
 	"io"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/trace"
+	"github.com/codegangsta/cli"
 )
 
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
-	return fmt.Sprintf("Not logged in. Use '%s' to log in.", CommandColor(cf.Name()+" "+"login"))
+	return fmt.Sprintf(T("Not logged in. Use '{{.CFLoginCommand}}' to log in.", map[string]interface{}{"CFLoginCommand": CommandColor(cf.Name() + " " + "login")}))
 }
 
 type UI interface {
@@ -72,22 +73,26 @@ func (c terminalUI) Warn(message string, args ...interface{}) {
 }
 
 func (c terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
-	return c.confirmDelete("Really delete the %s %s and everything associated with it?", modelType, modelName)
+	return c.confirmDelete(T("Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
+		map[string]interface{}{
+			"ModelType": modelType,
+			"ModelName": EntityNameColor(modelName),
+		}))
 }
 
 func (c terminalUI) ConfirmDelete(modelType, modelName string) bool {
-	return c.confirmDelete("Really delete the %s %s?", modelType, modelName)
+	return c.confirmDelete(T("Really delete the {{.ModelType}} {{.ModelName}}?",
+		map[string]interface{}{
+			"ModelType": modelType,
+			"ModelName": EntityNameColor(modelName),
+		}))
 }
 
-func (c terminalUI) confirmDelete(message, modelType, modelName string) bool {
-	result := c.Confirm(
-		message,
-		modelType,
-		EntityNameColor(modelName),
-	)
+func (c terminalUI) confirmDelete(message string) bool {
+	result := c.Confirm(message)
 
 	if !result {
-		c.Warn("Delete cancelled")
+		c.Warn(T("Delete cancelled"))
 	}
 
 	return result
@@ -96,7 +101,7 @@ func (c terminalUI) confirmDelete(message, modelType, modelName string) bool {
 func (c terminalUI) Confirm(message string, args ...interface{}) bool {
 	response := c.Ask(message, args...)
 	switch strings.ToLower(response) {
-	case "y", "yes":
+	case "y", T("yes"):
 		return true
 	}
 	return false
@@ -110,24 +115,24 @@ func (c terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 }
 
 func (c terminalUI) Ok() {
-	c.Say(SuccessColor("OK"))
+	c.Say(SuccessColor(T("OK")))
 }
 
 const FailedWasCalled = "FailedWasCalled"
 
 func (c terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
-	c.Say(FailureColor("FAILED"))
+	c.Say(FailureColor(T("FAILED")))
 	c.Say(message)
 
-	trace.Logger.Print("FAILED")
+	trace.Logger.Print(T("FAILED"))
 	trace.Logger.Print(message)
 	panic(FailedWasCalled)
 }
 
 func (c terminalUI) FailWithUsage(context *cli.Context) {
-	c.Say(FailureColor("FAILED"))
-	c.Say("Incorrect Usage.\n")
+	c.Say(FailureColor(T("FAILED")))
+	c.Say(T("Incorrect Usage.\n"))
 	cli.ShowCommandHelp(context, context.Command.Name)
 	c.Say("")
 	os.Exit(1)
@@ -135,36 +140,34 @@ func (c terminalUI) FailWithUsage(context *cli.Context) {
 
 func (ui terminalUI) ShowConfiguration(config configuration.Reader) {
 	if config.HasAPIEndpoint() {
-		ui.Say("API endpoint: %s (API version: %s)",
-			EntityNameColor(config.ApiEndpoint()),
-			EntityNameColor(config.ApiVersion()))
+		ui.Say(T("API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersionString}})", map[string]interface{}{"ApiEndpoint": EntityNameColor(config.ApiEndpoint()), "ApiVersionString": EntityNameColor(config.ApiVersion())}))
 	}
 
 	if !config.IsLoggedIn() {
 		ui.Say(NotLoggedInText())
 		return
 	} else {
-		ui.Say("User:         %s", EntityNameColor(config.UserEmail()))
+		ui.Say(T("User:         {{.UserEmail}}", map[string]interface{}{"UserEmail": EntityNameColor(config.UserEmail())}))
 	}
 
 	if !config.HasOrganization() && !config.HasSpace() {
 		command := fmt.Sprintf("%s target -o ORG -s SPACE", cf.Name())
-		ui.Say("No org or space targeted, use '%s'", CommandColor(command))
+		ui.Say(T("No org or space targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}))
 		return
 	}
 
 	if config.HasOrganization() {
-		ui.Say("Org:          %s", EntityNameColor(config.OrganizationFields().Name))
+		ui.Say(T("Org:          {{.OrganizationName}}", map[string]interface{}{"OrganizationName": EntityNameColor(config.OrganizationFields().Name)}))
 	} else {
 		command := fmt.Sprintf("%s target -o Org", cf.Name())
-		ui.Say("Org:          No org targeted, use '%s'", CommandColor(command))
+		ui.Say(T("Org:          No org targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}))
 	}
 
 	if config.HasSpace() {
-		ui.Say("Space:        %s", EntityNameColor(config.SpaceFields().Name))
+		ui.Say(T("Space:        {{.SpaceName}}", map[string]interface{}{"SpaceName": EntityNameColor(config.SpaceFields().Name)}))
 	} else {
 		command := fmt.Sprintf("%s target -s SPACE", cf.Name())
-		ui.Say("Space:        No space targeted, use '%s'", CommandColor(command))
+		ui.Say(T("Space:        No space targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}))
 	}
 }
 
