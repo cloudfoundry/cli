@@ -15,7 +15,7 @@ import (
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
-	return fmt.Sprintf("Not logged in. Use '%s' to log in.", CommandColor(cf.Name()+" login"))
+	return fmt.Sprintf("Not logged in. Use '%s' to log in.", CommandColor(cf.Name()+" "+"login"))
 }
 
 type UI interface {
