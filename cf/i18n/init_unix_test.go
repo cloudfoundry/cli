@@ -20,7 +20,7 @@ var _ = Describe("i18n.Init() function", func() {
 		os.Setenv("LANG", "en_US.UTF-8")
 	})
 
-	Context("loads correct local", func() {
+	Context("loads correct locale", func() {
 		It("defaults to en_US when LC_ALL and LANG not set", func() {
 			os.Setenv("LC_ALL", "")
 			os.Setenv("LANG", "")
@@ -29,6 +29,19 @@ var _ = Describe("i18n.Init() function", func() {
 
 			translation := T("Hello world!")
 			Ω("Hello world!").Should(Equal(translation))
+		})
+
+		Context("when there is no territory set", func() {
+			BeforeEach(func() {
+				os.Setenv("LANG", "en")
+			})
+
+			It("still loads the english translation", func() {
+				T := i18n.Init("main", I18N_PATH)
+
+				translation := T("Hello world!")
+				Ω("Hello world!").Should(Equal(translation))
+			})
 		})
 
 		Context("when the desired language is not supported", func() {
@@ -74,15 +87,6 @@ var _ = Describe("i18n.Init() function", func() {
 
 			translation := T("Hello world!")
 			Ω("Àlo le monde!").Should(Equal(translation))
-		})
-	})
-
-	// FIXME: this should use en_US
-	PContext("Loading nonexistant asset", func() {
-		It("should fail", func() {
-			os.Setenv("LC_ALL", "fr_FR.UTF-8")
-
-			// _ := i18n.Init("lol", I18N_PATH)
 		})
 	})
 })
