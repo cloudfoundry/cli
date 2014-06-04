@@ -1,7 +1,10 @@
 package api_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
+	"net/http"
+	"net/http/httptest"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -9,14 +12,13 @@ import (
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"time"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("ServiceBindingsRepository", func() {
 	var (
 		testServer  *httptest.Server
 		testHandler *testnet.TestHandler
@@ -51,7 +53,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				}))
 			})
 
-			It("TestCreateServiceBinding", func() {
+			It("creates the service binding", func() {
 				apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
 
 				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
@@ -72,11 +74,11 @@ var _ = Describe("Testing with ginkgo", func() {
 				}))
 			})
 
-			It("TestCreateServiceBindingIfError", func() {
+			It("returns an error", func() {
 				apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
 
 				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(BeNil())
+				Expect(apiErr).To(HaveOccurred())
 				Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("90003"))
 			})
 		})
@@ -104,7 +106,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 			})
 
-			It("TestDeleteServiceBinding", func() {
+			It("deletes the service binding with the given guid", func() {
 				found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
 
 				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
