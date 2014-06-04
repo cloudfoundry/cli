@@ -1,7 +1,10 @@
 package api_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
+	"net/http"
+	"net/http/httptest"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -9,11 +12,10 @@ import (
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"time"
 )
 
 var _ = Describe("StacksRepo", func() {
@@ -161,5 +163,4 @@ var _ = Describe("StacksRepo", func() {
 			}))
 		})
 	})
-
 })
