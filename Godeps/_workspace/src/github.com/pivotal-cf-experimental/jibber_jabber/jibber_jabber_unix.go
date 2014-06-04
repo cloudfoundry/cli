@@ -5,6 +5,7 @@ package jibber_jabber
 import (
 	"errors"
 	"os"
+	"strings"
 )
 
 func getLangFromEnv() (locale string) {
@@ -12,7 +13,6 @@ func getLangFromEnv() (locale string) {
 	if locale == "" {
 		locale = os.Getenv("LANG")
 	}
-
 	return
 }
 
@@ -29,7 +29,10 @@ func DetectIETF() (locale string, err error) {
 	unix_locale, err := getUnixLocale()
 	if err == nil {
 		language, territory := splitLocale(unix_locale)
-		locale = language + "-" + territory
+		locale = language
+		if territory != "" {
+			locale = strings.Join([]string{language, territory}, "-")
+		}
 	}
 
 	return
