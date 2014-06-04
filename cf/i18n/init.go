@@ -48,16 +48,12 @@ func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
 	return T
 }
 
-func splitLocale(locale string) (string, string) {
-	formattedLocale := strings.Split(locale, ".")[0]
-	formattedLocale = strings.Replace(formattedLocale, "-", "_", -1)
-	language := strings.Split(formattedLocale, "_")[0]
-	territory := strings.Split(formattedLocale, "_")[1]
-	return language, territory
-}
-
 func loadFromAsset(packageName, assetPath, locale string) error {
-	language, _ := splitLocale(locale)
+	language, err := jibber_jabber.DetectLanguage()
+	if err != nil {
+		return err
+	}
+
 	assetName := locale + ".all.json"
 	assetKey := filepath.Join(assetPath, language, packageName, assetName)
 
