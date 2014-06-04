@@ -12,12 +12,6 @@ import (
 
 var spaceRoles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
-var spaceRoleToDisplayName = map[string]string{
-	models.SPACE_MANAGER:   "SPACE MANAGER",
-	models.SPACE_DEVELOPER: "SPACE DEVELOPER",
-	models.SPACE_AUDITOR:   "SPACE AUDITOR",
-}
-
 type SpaceUsers struct {
 	ui        terminal.UI
 	config    configuration.Reader
@@ -38,8 +32,8 @@ func NewSpaceUsers(ui terminal.UI, config configuration.Reader, spaceRepo api.Sp
 func (cmd *SpaceUsers) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "space-users",
-		Description: "Show space users by role",
-		Usage:       "CF_NAME space-users ORG SPACE",
+		Description: T("Show space users by role"),
+		Usage:       T("CF_NAME space-users ORG SPACE"),
 	}
 }
 
@@ -64,11 +58,18 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 		cmd.ui.Failed(apiErr.Error())
 	}
 
-	cmd.ui.Say("Getting users in org %s / space %s as %s",
-		terminal.EntityNameColor(org.Name),
-		terminal.EntityNameColor(space.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
+		map[string]interface{}{
+			"TargetOrg":   terminal.EntityNameColor(org.Name),
+			"TargetSpace": terminal.EntityNameColor(space.Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
+
+	var spaceRoleToDisplayName = map[string]string{
+		models.SPACE_MANAGER:   T("SPACE MANAGER"),
+		models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
+		models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
+	}
 
 	for _, role := range spaceRoles {
 		displayName := spaceRoleToDisplayName[role]
@@ -83,7 +84,11 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 		}
 
 		if apiErr != nil {
-			cmd.ui.Failed("Failed fetching space-users for role %s.\n%s", apiErr.Error(), displayName)
+			cmd.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
+				map[string]interface{}{
+					"Error":                  apiErr.Error(),
+					"SpaceRoleToDisplayName": displayName,
+				}))
 			return
 		}
 	}

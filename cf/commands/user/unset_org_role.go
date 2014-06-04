@@ -30,12 +30,12 @@ func NewUnsetOrgRole(ui terminal.UI, config configuration.Reader, userRepo api.U
 func (cmd *UnsetOrgRole) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unset-org-role",
-		Description: "Remove an org role from a user",
-		Usage: "CF_NAME unset-org-role USERNAME ORG ROLE\n\n" +
-			"ROLES:\n" +
-			"   OrgManager - Invite and manage users, select and change plans, and set spending limits\n" +
-			"   BillingManager - Create and manage the billing account and payment info\n" +
-			"   OrgAuditor - Read-only access to org info and reports\n",
+		Description: T("Remove an org role from a user"),
+		Usage: T("CF_NAME unset-org-role USERNAME ORG ROLE\n\n") +
+			T("ROLES:\n") +
+			T("   OrgManager - Invite and manage users, select and change plans, and set spending limits\n") +
+			T("   BillingManager - Create and manage the billing account and payment info\n") +
+			T("   OrgAuditor - Read-only access to org info and reports\n"),
 	}
 }
 
@@ -61,12 +61,13 @@ func (cmd *UnsetOrgRole) Run(c *cli.Context) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Removing role %s from user %s in org %s as %s...",
-		terminal.EntityNameColor(role),
-		terminal.EntityNameColor(c.Args()[0]),
-		terminal.EntityNameColor(c.Args()[1]),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"Role":        terminal.EntityNameColor(role),
+			"TargetUser":  terminal.EntityNameColor(c.Args()[0]),
+			"TargetOrg":   terminal.EntityNameColor(c.Args()[1]),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	apiErr := cmd.userRepo.UnsetOrgRole(user.Guid, org.Guid, role)
 
