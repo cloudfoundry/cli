@@ -26,8 +26,8 @@ func NewListSpaces(ui terminal.UI, config configuration.Reader, spaceRepo api.Sp
 func (cmd ListSpaces) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "spaces",
-		Description: "List all spaces in an org",
-		Usage:       "CF_NAME spaces",
+		Description: T("List all spaces in an org"),
+		Usage:       T("CF_NAME spaces"),
 	}
 }
 
@@ -40,12 +40,14 @@ func (cmd ListSpaces) GetRequirements(requirementsFactory requirements.Factory, 
 }
 
 func (cmd ListSpaces) Run(c *cli.Context) {
-	cmd.ui.Say("Getting spaces in org %s as %s...\n",
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()))
+	cmd.ui.Say(T("Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
+		map[string]interface{}{
+			"TargetOrgName": terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"CurrentUser":   terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	foundSpaces := false
-	table := cmd.ui.Table([]string{"name"})
+	table := cmd.ui.Table([]string{T("name")})
 	apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
 		table.Add([]string{space.Name})
 		foundSpaces = true
@@ -54,11 +56,14 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 	table.Print()
 
 	if apiErr != nil {
-		cmd.ui.Failed("Failed fetching spaces.\n%s", apiErr.Error())
+		cmd.ui.Failed(T("Failed fetching spaces.\n{{.ErrorDescription}}",
+			map[string]interface{}{
+				"ErrorDescription": apiErr.Error(),
+			}))
 		return
 	}
 
 	if !foundSpaces {
-		cmd.ui.Say("No spaces found")
+		cmd.ui.Say(T("No spaces found"))
 	}
 }

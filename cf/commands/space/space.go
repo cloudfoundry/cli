@@ -1,12 +1,13 @@
 package space
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type ShowSpace struct {
@@ -25,8 +26,8 @@ func NewShowSpace(ui terminal.UI, config configuration.Reader) (cmd *ShowSpace) 
 func (cmd *ShowSpace) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "space",
-		Description: "Show space info",
-		Usage:       "CF_NAME space SPACE",
+		Description: T("Show space info"),
+		Usage:       T("CF_NAME space SPACE"),
 	}
 }
 
@@ -46,30 +47,31 @@ func (cmd *ShowSpace) GetRequirements(requirementsFactory requirements.Factory, 
 
 func (cmd *ShowSpace) Run(c *cli.Context) {
 	space := cmd.spaceReq.GetSpace()
-	cmd.ui.Say("Getting info for space %s in org %s as %s...",
-		terminal.EntityNameColor(space.Name),
-		terminal.EntityNameColor(space.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"TargetSpace": terminal.EntityNameColor(space.Name),
+			"OrgName":     terminal.EntityNameColor(space.Organization.Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 	cmd.ui.Ok()
 	cmd.ui.Say("\n%s:", terminal.EntityNameColor(space.Name))
-	cmd.ui.Say("  Org: %s", terminal.EntityNameColor(space.Organization.Name))
+	cmd.ui.Say(T("  Org: {{.OrgName}}", map[string]interface{}{"OrgName": terminal.EntityNameColor(space.Organization.Name)}))
 
 	apps := []string{}
 	for _, app := range space.Applications {
 		apps = append(apps, app.Name)
 	}
-	cmd.ui.Say("  Apps: %s", terminal.EntityNameColor(strings.Join(apps, ", ")))
+	cmd.ui.Say(T("  Apps: {{.ApplicationNames}}", map[string]interface{}{"ApplicationNames": terminal.EntityNameColor(strings.Join(apps, ", "))}))
 
 	domains := []string{}
 	for _, domain := range space.Domains {
 		domains = append(domains, domain.Name)
 	}
-	cmd.ui.Say("  Domains: %s", terminal.EntityNameColor(strings.Join(domains, ", ")))
+	cmd.ui.Say(T("  Domains: {{.DomainNames}}", map[string]interface{}{"DomainNames": terminal.EntityNameColor(strings.Join(domains, ", "))}))
 
 	services := []string{}
 	for _, service := range space.ServiceInstances {
 		services = append(services, service.Name)
 	}
-	cmd.ui.Say("  Services: %s", terminal.EntityNameColor(strings.Join(services, ", ")))
+	cmd.ui.Say(T("  Services: {{.ServiceNames}}", map[string]interface{}{"ServiceNames": terminal.EntityNameColor(strings.Join(services, ", "))}))
 }

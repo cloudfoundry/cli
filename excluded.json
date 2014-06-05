@@ -24,7 +24,7 @@
     "\\x1B\\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]",
     "login",
     "FailedWasCalled",
-    "%s target -o Org",
+    "%s t -o Org",
     ".",
     "%s\n",
     "/bin/stty",
@@ -35,13 +35,15 @@
     "kernel32",
     "SetConsoleMode",
     "%s target -s SPACE",
-    "%s target -o ORG -s SPACE"
+    "%s target -o ORG -s SPACE",
+    " target -o ",
+    "spaces"
   ],
   "excludedRegexps": [
-   "^(?:\\w+-)+(?:role|user|users|buildpack)$",
+   "^(?:\\w+-)+(?:role|user|users|buildpack|space)$",
    "^(?:[\\W]*%(?:[#v]|[%EGUTXbcdefgopqstvx]))+[\\W]*$",
    "^\\d+$",
-   "^-\\w$",
+   "^\\s*-\\w\\s*$",
    "^\\w$",
    "^json:"
   ]
