@@ -30,8 +30,8 @@ func (cmd CreateUserProvidedService) Metadata() command_metadata.CommandMetadata
 	return command_metadata.CommandMetadata{
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",
-		Description: "Make a user-provided service instance available to cf apps",
-		Usage: `CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]
+		Description: T("Make a user-provided service instance available to cf apps"),
+		Usage: T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]
 
    Pass comma separated parameter names to enable interactive mode:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
@@ -43,10 +43,10 @@ EXAMPLE:
    CF_NAME create-user-provided-service oracle-db-mine -p "host, port, dbname, username, password"
    CF_NAME create-user-provided-service oracle-db-mine -p '{"username":"admin","password":"pa55woRD"}'
    CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
-`,
+`),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", "Parameters"),
-			flag_helpers.NewStringFlag("l", "Syslog Drain Url"),
+			flag_helpers.NewStringFlag("p", T("Parameters")),
+			flag_helpers.NewStringFlag("l", T("Syslog Drain Url")),
 		},
 	}
 }
@@ -73,12 +73,13 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 		paramsMap = cmd.mapValuesFromPrompt(params, paramsMap)
 	}
 
-	cmd.ui.Say("Creating user provided service %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"ServiceName": terminal.EntityNameColor(name),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	apiErr := cmd.userProvidedServiceInstanceRepo.Create(name, drainUrl, paramsMap)
 	if apiErr != nil {
