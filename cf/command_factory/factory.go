@@ -151,7 +151,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 func (f concreteFactory) GetByCmdName(cmdName string) (cmd command.Command, err error) {
 	cmd, found := f.cmdsByName[cmdName]
 	if !found {
-		err = errors.New("Command not found")
+		err = errors.New(T("Command not found"))
 	}
 	return
 }

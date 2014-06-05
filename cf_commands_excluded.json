@@ -1,0 +1,200 @@
+{
+  "excludedStrings": [
+   ".",
+   "\\",
+   "help",
+   ".go",
+   "",
+   "/",
+   "false",
+   "true",
+   
+   "%.1f",
+   ".0",
+   "(?i)^(-?\\d+)([KMGT])B?$",
+
+    "buildpacks",
+    "CF_NAME  buildpacks",
+    "enable",
+    "disable",
+    "buildpack",
+    "lock",
+    "unlock",
+    "true",
+    "false",
+    "CF_COLOR",
+    "\u001b[%d;%dm%s\u001b[0m",
+    "windows",
+    "\\x1B\\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]",
+    "login",
+    "FailedWasCalled",
+    "%s t -o Org",
+    ".",
+    "%s\n",
+    "/bin/stty",
+    "stty",
+    "-echo",
+    "echo",
+    "\u003e",
+    "kernel32",
+    "SetConsoleMode",
+    "%s target -s SPACE",
+    "%s target -o ORG -s SPACE",
+    " target -o ",
+    "spaces",
+	
+	"invalid_token",
+	"Authorization",
+	"Authorization: ",
+	"(?m)^Authorization: .*",
+	"multipart/form-data",
+	"GET",
+	"PUT",
+	"POST",
+	"DELETE",
+	"Content-Type",
+	"access_token",
+	"refresh_token",
+	"token",
+	"password",
+	"oldPassword",
+	"password=",
+	"password=[^\u0026]*\u0026",
+	"\"%s\":\\s*\"[^\"]*\"",
+	"\u0026",
+	"go-cli ",
+	"application/json",
+	"accept",
+	" / ",
+	"/jobs/",
+	"X-Cf-Warnings",
+	"content-type",
+	"User-Agent",
+	
+	"api",
+	"apps",
+	"auth",
+
+	"buildpacks",
+
+	"config",
+
+	"create-buildpack",
+	"create-domain",
+	"create-org",
+	"create-service",
+	"create-service-auth-token",
+	"create-service-broker",
+	"create-user",
+	"create-user-provided-service",
+
+	"curl",
+
+	"delete",
+	"delete-buildpack",
+	"delete-domain",
+	"delete-shared-domain",
+	"delete-org",
+	"delete-orphaned-routes",
+	"delete-route",
+	"delete-service",
+	"delete-service-auth-token",
+	"delete-service-broker",
+	"delete-space",
+	"delete-user",
+
+	"domains",
+
+	"env",
+
+	"events",
+
+	"files",
+
+	"login",
+
+	"logout",
+
+	"logs",
+
+	"marketplace",
+
+	"org",
+	"org-users",
+	"orgs",
+
+	"passwd",
+
+	"purge-service-offering",
+
+	"quotas",
+	"quota",
+
+	"create-quota",
+	"update-quota",
+	"delete-quota",
+
+	"rename",
+	"rename-buildpack",
+	"rename-org",
+	"rename-service", 
+	"rename-service-broker",
+	"rename-space",
+
+	"routes",
+
+	"service",
+	"service-auth-tokens",
+	"service-brokers",
+	"services",
+
+	"migrate-service-instances",
+
+	"set-env",
+	"set-org-role",
+	"set-quota",
+
+	"create-shared-domain",
+
+	"space",
+	"space-users",
+	"spaces",
+
+	"stacks",
+
+	"target",
+
+	"unbind-service",
+
+	"unset-env",
+	"unset-org-role",
+	"unset-space-role",
+
+	"update-buildpack",
+	"update-service-broker",
+	"update-service-auth-token",
+	"update-user-provided-service",
+
+	"create-route",
+	"map-route",
+
+	"unmap-route",
+
+	"app",
+	"bind-service",
+	"scale",	
+	"start",
+	"stop",
+	"restart",
+	"restage",
+	"push"
+  ],
+  "excludedRegexps": [
+   "^(?:\\w+-)+(?:role|user|users|buildpack|space|auth-tokens?)$",
+   "^(?:[\\W]*%(?:[#v]|[%EGUTXbcdefgopqstvx]))+[\\W]*$",
+   "^\\d+$",
+   "^\\s*-\\w\\s*$",
+   "^\\w$",
+   "^json:"
+  ]
+}
