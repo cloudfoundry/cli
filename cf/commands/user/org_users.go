@@ -13,13 +13,6 @@ import (
 
 var orgRoles = []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR}
 
-var orgRoleToDisplayName = map[string]string{
-	models.ORG_USER:        "USERS",
-	models.ORG_MANAGER:     "ORG MANAGER",
-	models.BILLING_MANAGER: "BILLING MANAGER",
-	models.ORG_AUDITOR:     "ORG AUDITOR",
-}
-
 type OrgUsers struct {
 	ui       terminal.UI
 	config   configuration.Reader
@@ -38,17 +31,17 @@ func NewOrgUsers(ui terminal.UI, config configuration.Reader, userRepo api.UserR
 func (cmd *OrgUsers) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "org-users",
-		Description: "Show org users by role",
-		Usage:       "CF_NAME org-users ORG",
+		Description: T("Show org users by role"),
+		Usage:       T("CF_NAME org-users ORG"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "a", Usage: "List all users in the org"},
+			cli.BoolFlag{Name: "a", Usage: T("List all users in the org")},
 		},
 	}
 }
 
 func (cmd *OrgUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		err = errors.New("Incorrect usage")
+		err = errors.New(T("Incorrect usage"))
 		cmd.ui.FailWithUsage(c)
 		return
 	}
@@ -64,14 +57,22 @@ func (cmd *OrgUsers) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 	all := c.Bool("a")
 
-	cmd.ui.Say("Getting users in org %s as %s...",
-		terminal.EntityNameColor(org.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"TargetOrg":   terminal.EntityNameColor(org.Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	roles := orgRoles
 	if all {
 		roles = []string{models.ORG_USER}
+	}
+
+	var orgRoleToDisplayName = map[string]string{
+		models.ORG_USER:        T("USERS"),
+		models.ORG_MANAGER:     T("ORG MANAGER"),
+		models.BILLING_MANAGER: T("BILLING MANAGER"),
+		models.ORG_AUDITOR:     T("ORG AUDITOR"),
 	}
 
 	for _, role := range roles {
@@ -87,7 +88,11 @@ func (cmd *OrgUsers) Run(c *cli.Context) {
 		}
 
 		if apiErr != nil {
-			cmd.ui.Failed("Failed fetching org-users for role %s.\n%s", apiErr.Error(), displayName)
+			cmd.ui.Failed(T("Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
+				map[string]interface{}{
+					"Error":                apiErr.Error(),
+					"OrgRoleToDisplayName": displayName,
+				}))
 			return
 		}
 	}
