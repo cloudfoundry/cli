@@ -8,6 +8,10 @@
    "/",
    "false",
    "true",
+   
+   "%.1f",
+   ".0",
+   "(?i)^(-?\\d+)([KMGT])B?$",
 
     "buildpacks",
     "CF_NAME  buildpacks",
