@@ -36,10 +36,10 @@ func NewCreateSpace(ui terminal.UI, config configuration.Reader, spaceRoleSetter
 func (cmd CreateSpace) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-space",
-		Description: "Create a space",
-		Usage:       "CF_NAME create-space SPACE [-o ORG]",
+		Description: T("Create a space"),
+		Usage:       T("CF_NAME create-space SPACE [-o ORG]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("o", "Organization"),
+			flag_helpers.NewStringFlag("o", T("Organization")),
 		},
 	}
 }
@@ -66,21 +66,26 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 		orgGuid = cmd.config.OrganizationFields().Guid
 	}
 
-	cmd.ui.Say("Creating space %s in org %s as %s...",
-		terminal.EntityNameColor(spaceName),
-		terminal.EntityNameColor(orgName),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"SpaceName":   terminal.EntityNameColor(spaceName),
+			"OrgName":     terminal.EntityNameColor(orgName),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	if orgGuid == "" {
 		org, apiErr := cmd.orgRepo.FindByName(orgName)
 		switch apiErr.(type) {
 		case nil:
 		case *errors.ModelNotFoundError:
-			cmd.ui.Failed("Org %s does not exist or is not accessible", orgName)
+			cmd.ui.Failed(T("Org {{.OrgName}} does not exist or is not accessible", map[string]interface{}{"OrgName": orgName}))
 			return
 		default:
-			cmd.ui.Failed("Error finding org %s\n%s", orgName, apiErr.Error())
+			cmd.ui.Failed(T("Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
+				map[string]interface{}{
+					"OrgName":          orgName,
+					"ErrorDescription": apiErr.Error(),
+				}))
 			return
 		}
 
@@ -91,7 +96,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	if err != nil {
 		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SPACE_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Warn("Space %s already exists", spaceName)
+			cmd.ui.Warn(T("Space {{.SpaceName}} already exists", map[string]interface{}{"SpaceName": spaceName}))
 			return
 		}
 		cmd.ui.Failed(err.Error())
@@ -111,5 +116,8 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("\nTIP: Use '%s' to target new space", terminal.CommandColor(cf.Name()+" target -o "+orgName+" -s "+space.Name))
+	cmd.ui.Say(T("\nTIP: Use '{{.CFTargetCommand}}' to target new space",
+		map[string]interface{}{
+			"CFTargetCommand": terminal.CommandColor(cf.Name() + " target -o " + orgName + " -s " + space.Name),
+		}))
 }
