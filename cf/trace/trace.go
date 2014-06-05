@@ -61,7 +61,8 @@ func newFileLogger(path string) Printer {
 	file, err := fileutils.Open(path)
 	if err != nil {
 		logger := newStdoutLogger()
-		logger.Printf("CF_TRACE ERROR CREATING LOG FILE %s:\n%s", path, err)
+		logger.Printf(T("CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
+			map[string]interface{}{"Path": path, "Err": err}))
 		return logger
 	}
 
