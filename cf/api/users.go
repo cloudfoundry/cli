@@ -208,7 +208,8 @@ func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb, userGuid, orgG
 	rolePath, found := orgRoleToPathMap[role]
 
 	if !found {
-		apiErr = errors.NewWithFmt("Invalid Role %s", role)
+		apiErr = errors.NewWithFmt(T("Invalid Role {{.Role}}",
+			map[string]interface{}{"Role": role}))
 		return
 	}
 
@@ -252,7 +253,8 @@ func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, ro
 	rolePath, found := spaceRoleToPathMap[role]
 
 	if !found {
-		apiErr = errors.NewWithFmt("Invalid Role %s", role)
+		apiErr = errors.NewWithFmt(T("Invalid Role {{.Role}}",
+			map[string]interface{}{"Role": role}))
 	}
 
 	fullPath = fmt.Sprintf("%s/v2/spaces/%s/%s/%s", repo.config.ApiEndpoint(), spaceGuid, rolePath, userGuid)
@@ -267,7 +269,7 @@ func (repo CloudControllerUserRepository) addOrgUserRole(userGuid, orgGuid strin
 func (repo CloudControllerUserRepository) getAuthEndpoint() (string, error) {
 	uaaEndpoint := repo.config.UaaEndpoint()
 	if uaaEndpoint == "" {
-		return "", errors.New("UAA endpoint missing from config file")
+		return "", errors.New(T("UAA endpoint missing from config file"))
 	}
 	return uaaEndpoint, nil
 }

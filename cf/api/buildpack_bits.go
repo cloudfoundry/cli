@@ -41,7 +41,7 @@ func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gate
 func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackLocation string) (apiErr error) {
 	fileutils.TempFile("buildpack-upload", func(zipFileToUpload *os.File, err error) {
 		if err != nil {
-			apiErr = errors.NewWithError("Couldn't create temp file for upload", err)
+			apiErr = errors.NewWithError(T("Couldn't create temp file for upload"), err)
 			return
 		}
 
@@ -61,7 +61,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 
 			stats, statError := os.Stat(buildpackLocation)
 			if statError != nil {
-				apiErr = errors.NewWithError("Error opening buildpack file", statError)
+				apiErr = errors.NewWithError(T("Error opening buildpack file"), statError)
 				err = statError
 				return
 			}
@@ -72,7 +72,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 			} else {
 				specifiedFile, openError := os.Open(buildpackLocation)
 				if openError != nil {
-					apiErr = errors.NewWithError("Couldn't open buildpack file", openError)
+					apiErr = errors.NewWithError(T("Couldn't open buildpack file"), openError)
 					err = openError
 					return
 				}
@@ -81,7 +81,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 		}
 
 		if err != nil {
-			apiErr = errors.NewWithError("Couldn't write zip file", err)
+			apiErr = errors.NewWithError(T("Couldn't write zip file"), err)
 			return
 		}
 
@@ -107,7 +107,7 @@ func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) error {
 	parentPath, hasBuildpack := findBuildpackPath(contents)
 
 	if !hasBuildpack {
-		return errors.New("Zip archive does not contain a buildpack")
+		return errors.New(T("Zip archive does not contain a buildpack"))
 	}
 
 	writer := zip.NewWriter(outputFile)
@@ -232,7 +232,7 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 		writer.Close()
 
 		if err != nil {
-			apiErr = errors.NewWithError("Error creating upload", err)
+			apiErr = errors.NewWithError(T("Error creating upload"), err)
 			return
 		}
 
