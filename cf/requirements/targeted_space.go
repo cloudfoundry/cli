@@ -18,14 +18,13 @@ func NewTargetedSpaceRequirement(ui terminal.UI, config configuration.Reader) Ta
 
 func (req TargetedSpaceRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
-		message := fmt.Sprintf("No org and space targeted, use '%s' to target an org and space",
-			terminal.CommandColor(cf.Name()+" target -o ORG -s SPACE"))
+		message := fmt.Sprintf(T("No org and space targeted, use '{{.Command}}' to target an org and space", map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " target -o ORG -s SPACE")}))
 		req.ui.Failed(message)
 		return false
 	}
 
 	if !req.config.HasSpace() {
-		message := fmt.Sprintf("No space targeted, use '%s' to target a space", terminal.CommandColor("cf target -s"))
+		message := fmt.Sprintf(T("No space targeted, use '{{.Command}}' to target a space", map[string]interface{}{"Command": terminal.CommandColor("cf target -s")}))
 		req.ui.Failed(message)
 		return false
 	}

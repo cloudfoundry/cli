@@ -41,7 +41,7 @@
    },
    {
       "id": "Space:        No space targeted, use '{{.CFTargetCommand}}'",
-      "translation": "Espace:        Aucun espace ciblée, utiliser '{{.CFTargetCommand}}'"
+      "translation": "Espace:        Aucun espace ciblé, utiliser '{{.CFTargetCommand}}'"
    },
    {
       "id": "Org:          {{.OrganizationName}}",
