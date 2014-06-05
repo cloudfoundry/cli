@@ -27,7 +27,7 @@ func NewRunner(cmdFactory command_factory.Factory, requirementsFactory requireme
 func (runner ConcreteRunner) RunCmdByName(cmdName string, c *cli.Context) (err error) {
 	cmd, err := runner.cmdFactory.GetByCmdName(cmdName)
 	if err != nil {
-		fmt.Printf("Error finding command %s\n", cmdName)
+		fmt.Printf(T("Error finding command {{.CmdName}}\n", map[string]interface{}{"CmdName": cmdName}))
 		os.Exit(1)
 		return
 	}
@@ -40,7 +40,7 @@ func (runner ConcreteRunner) RunCmdByName(cmdName string, c *cli.Context) (err e
 	for _, requirement := range requirements {
 		success := requirement.Execute()
 		if !success {
-			err = errors.New("Error in requirement")
+			err = errors.New(T("Error in requirement"))
 			return
 		}
 	}
