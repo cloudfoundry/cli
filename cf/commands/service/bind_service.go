@@ -36,8 +36,8 @@ func (cmd *BindService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "bind-service",
 		ShortName:   "bs",
-		Description: "Bind a service instance to an app",
-		Usage:       "CF_NAME bind-service APP SERVICE_INSTANCE",
+		Description: T("Bind a service instance to an app"),
+		Usage:       T("CF_NAME bind-service APP SERVICE_INSTANCE"),
 	}
 }
 
@@ -61,19 +61,24 @@ func (cmd *BindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Binding service %s to app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(serviceInstance.Name),
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name),
+			"AppName":             terminal.EntityNameColor(app.Name),
+			"OrgName":             terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":           terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	err := cmd.BindApplication(app, serviceInstance)
 	if err != nil {
 		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.APP_ALREADY_BOUND {
 			cmd.ui.Ok()
-			cmd.ui.Warn("App %s is already bound to %s.", app.Name, serviceInstance.Name)
+			cmd.ui.Warn(T("App {{.AppName}} is already bound to {{.ServiceName}}.",
+				map[string]interface{}{
+					"AppName":     app.Name,
+					"ServiceName": serviceInstance.Name,
+				}))
 			return
 		} else {
 			cmd.ui.Failed(err.Error())
@@ -81,7 +86,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("TIP: Use '%s' to ensure your env variable changes take effect", terminal.CommandColor(cf.Name()+" "+"push"))
+	cmd.ui.Say(T("TIP: Use '{{.Arg0}}' to ensure your env variable changes take effect", map[string]interface{}{"Arg0": terminal.CommandColor(cf.Name() + " " + "push")}))
 }
 
 func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiErr error) {
