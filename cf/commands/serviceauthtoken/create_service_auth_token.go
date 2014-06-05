@@ -1,7 +1,6 @@
 package serviceauthtoken
 
 import (
-	"errors"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -27,14 +26,13 @@ func NewCreateServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 func (cmd CreateServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-service-auth-token",
-		Description: "Create a service auth token",
-		Usage:       "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
+		Description: T("Create a service auth token"),
+		Usage:       T("CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"),
 	}
 }
 
 func (cmd CreateServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 3 {
-		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c)
 		return
 	}
@@ -46,7 +44,10 @@ func (cmd CreateServiceAuthTokenFields) GetRequirements(requirementsFactory requ
 }
 
 func (cmd CreateServiceAuthTokenFields) Run(c *cli.Context) {
-	cmd.ui.Say("Creating service auth token as %s...", terminal.EntityNameColor(cmd.config.Username()))
+	cmd.ui.Say(T("Creating service auth token as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	serviceAuthTokenRepo := models.ServiceAuthTokenFields{
 		Label:    c.Args()[0],

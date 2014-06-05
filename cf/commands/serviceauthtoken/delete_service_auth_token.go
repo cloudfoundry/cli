@@ -2,6 +2,7 @@ package serviceauthtoken
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -27,17 +28,16 @@ func NewDeleteServiceAuthToken(ui terminal.UI, config configuration.Reader, auth
 func (cmd DeleteServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-service-auth-token",
-		Description: "Delete a service auth token",
-		Usage:       "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]",
+		Description: T("Delete a service auth token"),
+		Usage:       T("CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
 
 func (cmd DeleteServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
-		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c)
 		return
 	}
@@ -51,19 +51,22 @@ func (cmd DeleteServiceAuthTokenFields) Run(c *cli.Context) {
 	tokenProvider := c.Args()[1]
 
 	if c.Bool("f") == false {
-		if !cmd.ui.ConfirmDelete("service auth token", fmt.Sprintf("%s %s", tokenLabel, tokenProvider)) {
+		if !cmd.ui.ConfirmDelete(T("service auth token"), fmt.Sprintf("%s %s", tokenLabel, tokenProvider)) {
 			return
 		}
 	}
 
-	cmd.ui.Say("Deleting service auth token as %s", terminal.EntityNameColor(cmd.config.Username()))
+	cmd.ui.Say(T("Deleting service auth token as {{.CurrentUser}}",
+		map[string]interface{}{
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 	token, apiErr := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
 
 	switch apiErr.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Service Auth Token %s %s does not exist.", tokenLabel, tokenProvider)
+		cmd.ui.Warn(T("Service Auth Token {{.Label}} {{.Provider}} does not exist.", map[string]interface{}{"Label": tokenLabel, "Provider": tokenProvider}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())
