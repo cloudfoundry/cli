@@ -36,7 +36,6 @@ func (cmd *RenameService) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *RenameService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
-		err = errors.New("incorrect usage")
 		cmd.ui.FailWithUsage(c)
 		return
 	}
