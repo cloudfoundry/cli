@@ -156,7 +156,7 @@ func (repo CloudControllerDomainRepository) defaultDomain(orgGuid string) (model
 	})
 
 	if foundDomain == nil {
-		return models.DomainFields{}, errors.New("Could not find a default domain")
+		return models.DomainFields{}, errors.New(T("Could not find a default domain"))
 	}
 
 	return *foundDomain, nil

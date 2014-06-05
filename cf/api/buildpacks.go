@@ -64,7 +64,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	entity := resources.BuildpackEntity{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	body, err := json.Marshal(entity)
 	if err != nil {
-		apiErr = errors.NewWithError("Could not serialize information", err)
+		apiErr = errors.NewWithError(T("Could not serialize information"), err)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 
 	body, err := json.Marshal(entity)
 	if err != nil {
-		apiErr = errors.NewWithError("Could not serialize updates.", err)
+		apiErr = errors.NewWithError(T("Could not serialize updates."), err)
 		return
 	}
 

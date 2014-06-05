@@ -46,7 +46,7 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	switch response := apiErr.(type) {
 	case errors.HttpError:
 		if response.StatusCode() == 401 {
-			apiErr = errors.New("Credentials were rejected, please try again.")
+			apiErr = errors.New(T("Credentials were rejected, please try again."))
 		}
 	}
 
@@ -122,7 +122,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthenticationEndpoint())
 	request, err := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if err != nil {
-		return errors.NewWithError("Failed to start oauth request", err)
+		return errors.NewWithError(T("Failed to start oauth request"), err)
 	}
 	request.HttpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -134,7 +134,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	case errors.HttpError:
 		return err
 	default:
-		return errors.NewWithError("auth request failed", err)
+		return errors.NewWithError(T("auth request failed"), err)
 	}
 
 	// TODO: get the actual status code

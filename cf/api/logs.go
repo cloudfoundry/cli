@@ -63,7 +63,7 @@ func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect fun
 
 	endpoint := repo.config.LoggregatorEndpoint()
 	if endpoint == "" {
-		return errors.New("Loggregator endpoint missing from config file")
+		return errors.New(T("Loggregator endpoint missing from config file"))
 	}
 
 	repo.consumer.SetOnConnectCallback(onConnect)
