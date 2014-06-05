@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -32,10 +33,11 @@ func (cmd *UpdateUserProvidedService) Metadata() command_metadata.CommandMetadat
 		Name:        "update-user-provided-service",
 		ShortName:   "uups",
 		Description: "Update user-provided service instance name value pairs",
-		Usage: "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\n" +
-			"EXAMPLE:\n" +
-			"   CF_NAME update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n" +
-			"   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n",
+		Usage: `CF_NAME update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'
+
+EXAMPLE:
+   CF_NAME update-user-provided-service oracle-db-mine -p '{"username":"admin","password":"pa55woRD"}'
+   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com`,
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", "Parameters"),
 			flag_helpers.NewStringFlag("l", "Syslog Drain Url"),

@@ -2,6 +2,8 @@ package service
 
 import (
 	"encoding/json"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -9,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type CreateUserProvidedService struct {
@@ -30,15 +31,19 @@ func (cmd CreateUserProvidedService) Metadata() command_metadata.CommandMetadata
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",
 		Description: "Make a user-provided service instance available to cf apps",
-		Usage: "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n" +
-			"\n   Pass comma separated parameter names to enable interactive mode:\n" +
-			"   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n" +
-			"\n   Pass parameters as JSON to create a service non-interactively:\n" +
-			"   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n" +
-			"\nEXAMPLE:\n" +
-			"   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n" +
-			"   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n" +
-			"   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
+		Usage: `CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]
+
+   Pass comma separated parameter names to enable interactive mode:
+   CF_NAME create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
+
+   Pass parameters as JSON to create a service non-interactively:
+   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"name":"value","name":"value"}'
+
+EXAMPLE:
+   CF_NAME create-user-provided-service oracle-db-mine -p "host, port, dbname, username, password"
+   CF_NAME create-user-provided-service oracle-db-mine -p '{"username":"admin","password":"pa55woRD"}'
+   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
+`,
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", "Parameters"),
 			flag_helpers.NewStringFlag("l", "Syslog Drain Url"),

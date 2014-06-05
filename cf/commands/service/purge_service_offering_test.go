@@ -81,7 +81,7 @@ var _ = Describe("purge-service command", func() {
 			deps.requirementsFactory,
 		)
 
-		Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"Warning"}))
+		Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"WARNING"}))
 		Expect(deps.ui.Prompts).To(ContainSubstrings([]string{"Really purge service", "the-service-name"}))
 		Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"Purging service the-service-name..."}))
 
@@ -156,7 +156,7 @@ var _ = Describe("purge-service command", func() {
 		)
 
 		Expect(deps.ui.Outputs).To(ContainSubstrings([]string{"Service offering", "does not exist"}))
-		Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"Warning"}))
+		Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING"}))
 		Expect(deps.ui.Outputs).ToNot(ContainSubstrings([]string{"Ok"}))
 
 		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))

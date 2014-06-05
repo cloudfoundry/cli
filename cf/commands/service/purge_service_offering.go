@@ -26,13 +26,15 @@ func (cmd PurgeServiceOffering) GetRequirements(requirementsFactory requirements
 	return
 }
 
+func scaryWarningMessage() string {
+	return `WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.`
+}
+
 func (cmd PurgeServiceOffering) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "purge-service-offering",
 		Description: "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
-		Usage: "CF_NAME purge-service-offering SERVICE [-p PROVIDER]" +
-			"\n\nWARNING:\n" +
-			"This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
+		Usage:       "CF_NAME purge-service-offering SERVICE [-p PROVIDER]" + "\n\n" + scaryWarningMessage(),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", "Provider"),
 			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
@@ -56,7 +58,7 @@ func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 
 	confirmed := c.Bool("f")
 	if !confirmed {
-		cmd.ui.Warn(`Warning: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.`)
+		cmd.ui.Warn(scaryWarningMessage())
 		confirmed = cmd.ui.Confirm("Really purge service offering %s from Cloud Foundry?", serviceName)
 	}
 

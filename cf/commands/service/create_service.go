@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -30,11 +31,13 @@ func (cmd CreateService) Metadata() command_metadata.CommandMetadata {
 		Name:        "create-service",
 		ShortName:   "cs",
 		Description: "Create a service instance",
-		Usage: "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE\n\n" +
-			"EXAMPLE:\n" +
-			"   CF_NAME create-service cleardb spark clear-db-mine\n\n" +
-			"TIP:\n" +
-			"   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
+		Usage: `CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE
+
+EXAMPLE:
+   CF_NAME create-service cleardb spark clear-db-mine
+
+TIP:
+   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`,
 	}
 }
 
