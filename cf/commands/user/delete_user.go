@@ -26,17 +26,17 @@ func NewDeleteUser(ui terminal.UI, config configuration.Reader, userRepo api.Use
 func (cmd DeleteUser) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-user",
-		Description: "Delete a user",
-		Usage:       "CF_NAME delete-user USERNAME [-f]",
+		Description: T("Delete a user"),
+		Usage:       T("CF_NAME delete-user USERNAME [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
 
 func (cmd DeleteUser) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		err = errors.New("Invalid usage")
+		err = errors.New(T("Invalid usage"))
 		cmd.ui.FailWithUsage(c)
 		return
 	}
@@ -50,21 +50,22 @@ func (cmd DeleteUser) Run(c *cli.Context) {
 	username := c.Args()[0]
 	force := c.Bool("f")
 
-	if !force && !cmd.ui.ConfirmDelete("user", username) {
+	if !force && !cmd.ui.ConfirmDelete(T("user"), username) {
 		return
 	}
 
-	cmd.ui.Say("Deleting user %s as %s...",
-		terminal.EntityNameColor(username),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Deleting user {{.TargetUser}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"TargetUser":  terminal.EntityNameColor(username),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	user, apiErr := cmd.userRepo.FindByUsername(username)
 	switch apiErr.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("User %s does not exist.", username)
+		cmd.ui.Warn(T("User {{.TargetUser}} does not exist.", map[string]interface{}{"TargetUser": username}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())

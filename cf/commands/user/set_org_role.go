@@ -29,12 +29,12 @@ func NewSetOrgRole(ui terminal.UI, config configuration.Reader, userRepo api.Use
 func (cmd *SetOrgRole) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "set-org-role",
-		Description: "Assign an org role to a user",
-		Usage: "CF_NAME set-org-role USERNAME ORG ROLE\n\n" +
-			"ROLES:\n" +
-			"   OrgManager - Invite and manage users, select and change plans, and set spending limits\n" +
-			"   BillingManager - Create and manage the billing account and payment info\n" +
-			"   OrgAuditor - Read-only access to org info and reports\n",
+		Description: T("Assign an org role to a user"),
+		Usage: T("CF_NAME set-org-role USERNAME ORG ROLE\n\n") +
+			T("ROLES:\n") +
+			T("   OrgManager - Invite and manage users, select and change plans, and set spending limits\n") +
+			T("   BillingManager - Create and manage the billing account and payment info\n") +
+			T("   OrgAuditor - Read-only access to org info and reports\n"),
 	}
 }
 
@@ -60,12 +60,13 @@ func (cmd *SetOrgRole) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 	role := models.UserInputToOrgRole[c.Args()[2]]
 
-	cmd.ui.Say("Assigning role %s to user %s in org %s as %s...",
-		terminal.EntityNameColor(role),
-		terminal.EntityNameColor(user.Username),
-		terminal.EntityNameColor(org.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"Role":        terminal.EntityNameColor(role),
+			"TargetUser":  terminal.EntityNameColor(user.Username),
+			"TargetOrg":   terminal.EntityNameColor(org.Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	apiErr := cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)
 	if apiErr != nil {

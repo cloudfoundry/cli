@@ -31,12 +31,12 @@ func NewUnsetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo ap
 func (cmd *UnsetSpaceRole) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unset-space-role",
-		Description: "Remove a space role from a user",
-		Usage: "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n" +
-			"ROLES:\n" +
-			"   SpaceManager - Invite and manage users, and enable features for a given space\n" +
-			"   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n" +
-			"   SpaceAuditor - View logs, reports, and settings on this space\n",
+		Description: T("Remove a space role from a user"),
+		Usage: T("CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n") +
+			T("ROLES:\n") +
+			T("   SpaceManager - Invite and manage users, and enable features for a given space\n") +
+			T("   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n") +
+			T("   SpaceAuditor - View logs, reports, and settings on this space\n"),
 	}
 }
 
@@ -69,13 +69,14 @@ func (cmd *UnsetSpaceRole) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Removing role %s from user %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(role),
-		terminal.EntityNameColor(user.Username),
-		terminal.EntityNameColor(org.Name),
-		terminal.EntityNameColor(space.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"Role":        terminal.EntityNameColor(role),
+			"TargetUser":  terminal.EntityNameColor(user.Username),
+			"TargetOrg":   terminal.EntityNameColor(org.Name),
+			"TargetSpace": terminal.EntityNameColor(space.Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	apiErr = cmd.userRepo.UnsetSpaceRole(user.Guid, space.Guid, role)
 

@@ -1,4 +1,4 @@
-package buildpack
+package user
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
@@ -9,5 +9,5 @@ import (
 var T goi18n.TranslateFunc
 
 func init() {
-	T = i18n.Init(filepath.Join("cf", "commands", "buildpack"), i18n.GetResourcesPath())
+	T = i18n.Init(filepath.Join("cf", "commands", "user"), i18n.GetResourcesPath())
 }

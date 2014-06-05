@@ -1,14 +1,19 @@
 {
   "excludedStrings": [
+   ".",
+   "\\",
+   "help",
+   ".go",
+   "",
+   "/",
+   "false",
+   "true",
+
     "buildpacks",
     "CF_NAME  buildpacks",
-    "create-buildpack",
     "enable",
     "disable",
-    "update-buildpack",
-    "delete-buildpack",
     "buildpack",
-    "rename-buildpack",
     "lock",
     "unlock",
     "true",
@@ -33,7 +38,11 @@
     "%s target -o ORG -s SPACE"
   ],
   "excludedRegexps": [
-    "^\\w$",
-    "^(?:%s)+\\s*$"
+   "^(?:\\w+-)+(?:role|user|users|buildpack)$",
+   "^(?:[\\W]*%(?:[#v]|[%EGUTXbcdefgopqstvx]))+[\\W]*$",
+   "^\\d+$",
+   "^-\\w$",
+   "^\\w$",
+   "^json:"
   ]
 }
