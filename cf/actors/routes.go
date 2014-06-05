@@ -21,9 +21,9 @@ func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.Do
 
 	switch apiErr.(type) {
 	case nil:
-		routeActor.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
+		routeActor.ui.Say(T("Using route {{.RouteURL}}", map[string]interface{}{"RouteURL": terminal.EntityNameColor(route.URL())}))
 	case *errors.ModelNotFoundError:
-		routeActor.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostname)))
+		routeActor.ui.Say(T("Creating route {{.Hostname}}...", map[string]interface{}{"Hostname": terminal.EntityNameColor(domain.UrlForHost(hostname))}))
 
 		route, apiErr = routeActor.routeRepo.Create(hostname, domain)
 		if apiErr != nil {
@@ -41,7 +41,7 @@ func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.Do
 
 func (routeActor RouteActor) BindRoute(app models.Application, route models.Route) {
 	if !app.HasRoute(route) {
-		routeActor.ui.Say("Binding %s to %s...", terminal.EntityNameColor(route.URL()), terminal.EntityNameColor(app.Name))
+		routeActor.ui.Say(T("Binding {{.URL}} to {{.AppName}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL()), "AppName": terminal.EntityNameColor(app.Name)}))
 
 		apiErr := routeActor.routeRepo.Bind(route.Guid, app.Guid)
 		switch apiErr := apiErr.(type) {
@@ -51,7 +51,7 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 			return
 		case errors.HttpError:
 			if apiErr.ErrorCode() == errors.INVALID_RELATION {
-				routeActor.ui.Failed("The route %s is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", route.URL())
+				routeActor.ui.Failed(T("The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", map[string]interface{}{"URL": route.URL()}))
 			}
 		}
 		routeActor.ui.Failed(apiErr.Error())
@@ -60,7 +60,7 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 
 func (routeActor RouteActor) UnbindAll(app models.Application) {
 	for _, route := range app.Routes {
-		routeActor.ui.Say("Removing route %s...", terminal.EntityNameColor(route.URL()))
+		routeActor.ui.Say(T("Removing route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL())}))
 		routeActor.routeRepo.Unbind(route.Guid, app.Guid)
 	}
 }
