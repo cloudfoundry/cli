@@ -40,7 +40,7 @@
     "spaces"
   ],
   "excludedRegexps": [
-   "^(?:\\w+-)+(?:role|user|users|buildpack|space)$",
+   "^(?:\\w+-)+(?:role|user|users|buildpack|space|auth-tokens?)$",
    "^(?:[\\W]*%(?:[#v]|[%EGUTXbcdefgopqstvx]))+[\\W]*$",
    "^\\d+$",
    "^\\s*-\\w\\s*$",

@@ -25,8 +25,8 @@ func NewListServiceAuthTokens(ui terminal.UI, config configuration.Reader, authT
 func (cmd ListServiceAuthTokens) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "service-auth-tokens",
-		Description: "List service auth tokens",
-		Usage:       "CF_NAME service-auth-tokens",
+		Description: T("List service auth tokens"),
+		Usage:       T("CF_NAME service-auth-tokens"),
 	}
 }
 
@@ -38,7 +38,10 @@ func (cmd ListServiceAuthTokens) GetRequirements(requirementsFactory requirement
 }
 
 func (cmd ListServiceAuthTokens) Run(c *cli.Context) {
-	cmd.ui.Say("Getting service auth tokens as %s...", terminal.EntityNameColor(cmd.config.Username()))
+	cmd.ui.Say(T("Getting service auth tokens as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 	authTokens, apiErr := cmd.authTokenRepo.FindAll()
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
@@ -47,7 +50,7 @@ func (cmd ListServiceAuthTokens) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := terminal.NewTable(cmd.ui, []string{"label", "provider"})
+	table := terminal.NewTable(cmd.ui, []string{T("label"), T("provider")})
 
 	for _, authToken := range authTokens {
 		table.Add([]string{authToken.Label, authToken.Provider})
