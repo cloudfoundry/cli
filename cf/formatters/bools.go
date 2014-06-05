@@ -2,8 +2,8 @@ package formatters
 
 func Allowed(allowed bool) string {
 	if allowed {
-		return "allowed"
+		return T("allowed")
 	} else {
-		return "disallowed"
+		return T("disallowed")
 	}
 }

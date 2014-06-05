@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/cloudfoundry/cli/cf/i18n"
 )
 
 const (
@@ -69,6 +71,8 @@ func ToMegabytes(s string) (uint64, error) {
 	return bytes / MEGABYTE, nil
 }
 
-var bytesPattern *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
-
-var invalidByteQuantityError = errors.New("Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB")
+var (
+	bytesPattern             *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
+	t                                       = i18n.Init("cf/formatters", i18n.GetResourcesPath())
+	invalidByteQuantityError                = errors.New(t("Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB"))
+)
