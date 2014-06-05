@@ -1,0 +1,10 @@
+[
+   {
+      "id": "Error in requirement",
+      "translation": "Erreur dans l'exigence"
+   },
+   {
+      "id": "Error finding command {{.CmdName}}\n",
+      "translation": "Erreur trouver la commande {{.CmdName}}\n"
+   }
+]
