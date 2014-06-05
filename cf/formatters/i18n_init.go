@@ -8,7 +8,5 @@ import (
 var T goi18n.TranslateFunc
 
 func init() {
-	if T == nil {
-		T = i18n.Init("cf/formatters", i18n.GetResourcesPath())
-	}
+	T = i18n.Init("cf/formatters", i18n.GetResourcesPath())
 }
