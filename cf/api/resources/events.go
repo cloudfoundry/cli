@@ -50,10 +50,15 @@ func (resource EventResourceNewV2) ToFields() models.EventFields {
 
 func (resource EventResourceOldV2) ToFields() models.EventFields {
 	return models.EventFields{
-		Guid:        resource.Metadata.Guid,
-		Name:        "app crashed",
-		Timestamp:   resource.Entity.Timestamp,
-		Description: fmt.Sprintf("instance: %d, reason: %s, exit_status: %s", resource.Entity.InstanceIndex, resource.Entity.ExitDescription, strconv.Itoa(resource.Entity.ExitStatus)),
+		Guid:      resource.Metadata.Guid,
+		Name:      T("app crashed"),
+		Timestamp: resource.Entity.Timestamp,
+		Description: fmt.Sprintf(T("instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}",
+			map[string]interface{}{
+				"InstanceIndex":   resource.Entity.InstanceIndex,
+				"ExitDescription": resource.Entity.ExitDescription,
+				"ExitStatus":      strconv.Itoa(resource.Entity.ExitStatus),
+			})),
 	}
 }
 
