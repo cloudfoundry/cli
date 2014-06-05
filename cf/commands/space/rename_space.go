@@ -27,8 +27,8 @@ func NewRenameSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo a
 func (cmd *RenameSpace) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-space",
-		Description: "Rename a space",
-		Usage:       "CF_NAME rename-space SPACE NEW_SPACE",
+		Description: T("Rename a space"),
+		Usage:       T("CF_NAME rename-space SPACE NEW_SPACE"),
 	}
 }
 
@@ -49,12 +49,13 @@ func (cmd *RenameSpace) GetRequirements(requirementsFactory requirements.Factory
 func (cmd *RenameSpace) Run(c *cli.Context) {
 	space := cmd.spaceReq.GetSpace()
 	newName := c.Args()[1]
-	cmd.ui.Say("Renaming space %s to %s in org %s as %s...",
-		terminal.EntityNameColor(space.Name),
-		terminal.EntityNameColor(newName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"OldSpaceName": terminal.EntityNameColor(space.Name),
+			"NewSpaceName": terminal.EntityNameColor(newName),
+			"OrgName":      terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"CurrentUser":  terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	apiErr := cmd.spaceRepo.Rename(space.Guid, newName)
 	if apiErr != nil {

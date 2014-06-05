@@ -29,10 +29,10 @@ func NewDeleteSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo a
 func (cmd *DeleteSpace) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-space",
-		Description: "Delete a space",
-		Usage:       "CF_NAME delete-space SPACE [-f]",
+		Description: T("Delete a space"),
+		Usage:       T("CF_NAME delete-space SPACE [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
@@ -55,16 +55,17 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
 
 	if !c.Bool("f") {
-		if !cmd.ui.ConfirmDelete("space", spaceName) {
+		if !cmd.ui.ConfirmDelete(T("space"), spaceName) {
 			return
 		}
 	}
 
-	cmd.ui.Say("Deleting space %s in org %s as %s...",
-		terminal.EntityNameColor(spaceName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"TargetSpace": terminal.EntityNameColor(spaceName),
+			"TargetOrg":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	space := cmd.spaceReq.GetSpace()
 
@@ -78,7 +79,8 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	if cmd.config.SpaceFields().Name == spaceName {
 		cmd.config.SetSpaceFields(models.SpaceFields{})
-		cmd.ui.Say("TIP: No space targeted, use '%s target -s' to target a space", cf.Name())
+		cmd.ui.Say(T("TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+			map[string]interface{}{"CfTargetCommand": cf.Name() + " target -s"}))
 	}
 
 	return
