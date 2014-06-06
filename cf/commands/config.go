@@ -21,12 +21,12 @@ func NewConfig(ui terminal.UI, config configuration.ReadWriter) ConfigCommands {
 func (cmd ConfigCommands) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "config",
-		Description: "write default values to the config",
-		Usage:       "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]",
+		Description: T("write default values to the config"),
+		Usage:       T("CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewIntFlag("async-timeout", "Timeout for async HTTP requests"),
-			flag_helpers.NewStringFlag("trace", "Trace HTTP requests"),
-			flag_helpers.NewStringFlag("color", "Enable or disable color"),
+			flag_helpers.NewIntFlag("async-timeout", T("Timeout for async HTTP requests")),
+			flag_helpers.NewStringFlag("trace", T("Trace HTTP requests")),
+			flag_helpers.NewStringFlag("color", T("Enable or disable color")),
 		},
 	}
 }

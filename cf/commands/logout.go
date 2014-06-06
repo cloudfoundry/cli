@@ -23,8 +23,8 @@ func (cmd Logout) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "logout",
 		ShortName:   "lo",
-		Description: "Log user out",
-		Usage:       "CF_NAME logout",
+		Description: T("Log user out"),
+		Usage:       T("CF_NAME logout"),
 	}
 }
 
@@ -33,7 +33,7 @@ func (cmd Logout) GetRequirements(requirementsFactory requirements.Factory, c *c
 }
 
 func (cmd Logout) Run(c *cli.Context) {
-	cmd.ui.Say("Logging out...")
+	cmd.ui.Say(T("Logging out..."))
 	cmd.config.ClearSession()
 	cmd.ui.Ok()
 }

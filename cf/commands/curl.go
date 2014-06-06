@@ -32,21 +32,21 @@ func NewCurl(ui terminal.UI, config configuration.Reader, curlRepo api.CurlRepos
 func (cmd *Curl) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "curl",
-		Description: "Executes a raw request, content-type set to application/json by default",
-		Usage:       "CF_NAME curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]",
+		Description: T("Executes a raw request, content-type set to application/json by default"),
+		Usage:       T("CF_NAME curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]"),
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "X", Value: "GET", Usage: "HTTP method (GET,POST,PUT,DELETE,etc)"},
-			flag_helpers.NewStringSliceFlag("H", "Custom headers to include in the request, flag can be specified multiple times"),
-			flag_helpers.NewStringFlag("d", "HTTP data to include in the request body"),
-			cli.BoolFlag{Name: "i", Usage: "Include response headers in the output"},
-			cli.BoolFlag{Name: "v", Usage: "Enable CF_TRACE output for all requests and responses"},
+			cli.StringFlag{Name: "X", Value: "GET", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")},
+			flag_helpers.NewStringSliceFlag("H", T("Custom headers to include in the request, flag can be specified multiple times")),
+			flag_helpers.NewStringFlag("d", T("HTTP data to include in the request body")),
+			cli.BoolFlag{Name: "i", Usage: T("Include response headers in the output")},
+			cli.BoolFlag{Name: "v", Usage: T("Enable CF_TRACE output for all requests and responses")},
 		},
 	}
 }
 
 func (cmd *Curl) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		err = errors.New("Incorrect number of arguments")
+		err = errors.New(T("Incorrect number of arguments"))
 		cmd.ui.FailWithUsage(c)
 		return
 	}
@@ -72,7 +72,7 @@ func (cmd *Curl) Run(c *cli.Context) {
 
 	responseHeader, responseBody, apiErr := cmd.curlRepo.Request(method, path, reqHeader, body)
 	if apiErr != nil {
-		cmd.ui.Failed("Error creating request:\n%s", apiErr.Error())
+		cmd.ui.Failed(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 		return
 	}
 
