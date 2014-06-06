@@ -28,7 +28,7 @@ func NewListDomains(ui terminal.UI, config configuration.Reader, domainRepo api.
 func (cmd *ListDomains) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "domains",
-		Description: "List domains in the target org",
+		Description: T("List domains in the target org"),
 		Usage:       "CF_NAME domains",
 	}
 }
@@ -49,16 +49,16 @@ func (cmd *ListDomains) GetRequirements(requirementsFactory requirements.Factory
 func (cmd *ListDomains) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganizationFields()
 
-	cmd.ui.Say("Getting domains in org %s as %s...",
-		terminal.EntityNameColor(org.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting domains in org {{.OrgName}} as {{.Username}}...",
+		map[string]interface{}{
+			"OrgName":  terminal.EntityNameColor(org.Name),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	domains := cmd.fetchAllDomains(org.Guid)
 	cmd.printDomainsTable(domains)
 
 	if len(domains) == 0 {
-		cmd.ui.Say("No domains found")
+		cmd.ui.Say(T("No domains found"))
 	}
 }
 
@@ -68,23 +68,23 @@ func (cmd *ListDomains) fetchAllDomains(orgGuid string) (domains []models.Domain
 		return true
 	})
 	if apiErr != nil {
-		cmd.ui.Failed("Failed fetching domains.\n%s", apiErr.Error())
+		cmd.ui.Failed(T("Failed fetching domains.\n{{.ApiErr}}", map[string]interface{}{"ApiErr": apiErr.Error()}))
 	}
 	return
 }
 
 func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields) {
-	table := cmd.ui.Table([]string{"name", "status"})
+	table := cmd.ui.Table([]string{T("name"), T("status")})
 
 	for _, domain := range domains {
 		if domain.Shared {
-			table.Add([]string{domain.Name, "shared"})
+			table.Add([]string{domain.Name, T("shared")})
 		}
 	}
 
 	for _, domain := range domains {
 		if !domain.Shared {
-			table.Add([]string{domain.Name, "owned"})
+			table.Add([]string{domain.Name, T("owned")})
 		}
 	}
 	table.Print()
