@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"runtime/debug"
+	"runtime"
 	"strings"
 	"time"
 
@@ -165,7 +165,13 @@ and this stack trace:
 
 %s
 	`
-
-	stackTrace := "\t" + strings.Replace(string(debug.Stack()), "\n", "\n\t", -1)
+	stackByteCount := 0
+	STACK_SIZE_LIMIT := 1024 * 1024
+	var bytes []byte
+	for stackSize := 1024; (stackByteCount == 0 || stackByteCount == stackSize) && stackSize < STACK_SIZE_LIMIT; stackSize = 2 * stackSize {
+		bytes = make([]byte, stackSize)
+		stackByteCount = runtime.Stack(bytes, true)
+	}
+	stackTrace := "\t" + strings.Replace(string(bytes), "\n", "\n\t", -1)
 	println(fmt.Sprintf(formattedString, cf.Name(), strings.Join(os.Args, " "), errorMessage, stackTrace))
 }
