@@ -13,5 +13,6 @@ func NewAsyncTimeoutError(url string) error {
 }
 
 func (err *AsyncTimeoutError) Error() string {
-	return fmt.Sprintf("Error: timed out waiting for async job '%s' to finish", err.url)
+	return fmt.Sprintf(T("Error: timed out waiting for async job '{{.ErrURL}}' to finish",
+		map[string]interface{}{"ErrURL": err.url}))
 }

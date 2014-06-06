@@ -13,7 +13,7 @@ func NewInvalidSSLCert(url, reason string) *InvalidSSLCert {
 }
 
 func (err *InvalidSSLCert) Error() string {
-	message := "Received invalid SSL certificate from " + err.URL
+	message := T("Received invalid SSL certificate from ") + err.URL
 	if err.Reason != "" {
 		message += " - " + err.Reason
 	}
