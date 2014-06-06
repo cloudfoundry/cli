@@ -1,7 +1,7 @@
 [
    {
       "id": "enabled",
-      "translation": "enabled"
+      "translation": "permis"
    },
    {
       "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
@@ -13,55 +13,55 @@
    },
    {
       "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
-      "translation": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack"
+      "translation": "TIP: utiliser '{{.CfUpdateBuildpackCommand}}' Pour mettre à jour cette buildpack"
    },
    {
       "id": "Failed fetching buildpacks.\n{{.Error}}",
-      "translation": "Failed fetching buildpacks.\n{{.Error}}"
+      "translation": "Échec aller chercher buildpacks.\n{{.Error}}"
    },
    {
       "id": "Cannot specify both {{.Enabled}} and {{.Disabled}}.",
-      "translation": "Cannot specify both {{.Enabled}} and {{.Disabled}}."
+      "translation": "Vous ne pouvez pas spécifier à la fois {{.Enabled}} et {{.Disabled}}."
    },
    {
       "id": "Cannot specify both lock and unlock options.",
-      "translation": "Cannot specify both lock and unlock options."
+      "translation": "Vous ne pouvez pas spécifier le verrouillage et le déverrouillage des options."
    },
    {
       "id": "Rename a buildpack",
-      "translation": "Rename a buildpack"
+      "translation": "Renommer un buildpack"
    },
    {
       "id": "No buildpacks found",
-      "translation": "No buildpacks found"
+      "translation": "Pas buildpacks trouvés"
    },
    {
       "id": "locked",
-      "translation": "locked"
+      "translation": "fermé"
    },
    {
       "id": "Enable the buildpack",
-      "translation": "Enable the buildpack"
+      "translation": "Activer le buildpack"
    },
    {
       "id": "Buildpack {{.BuildpackName}} does not exist.",
-      "translation": "Buildpack {{.BuildpackName}} does not exist."
+      "translation": "Buildpack {{.BuildpackName}} n'existe pas."
    },
    {
       "id": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
-      "translation": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"
+      "translation": "CF_NAME rename-buildpack NOM_BUILDPACK NOUVEAU_NOM_BUILDPACK"
    },
    {
       "id": "Lock the buildpack",
-      "translation": "Lock the buildpack"
+      "translation": "Verrouiller le buildpack"
    },
    {
       "id": "Uploading buildpack {{.BuildpackName}}...",
-      "translation": "Uploading buildpack {{.BuildpackName}}..."
+      "translation": "L'ajout buildpack {{.BuildpackName}}..."
    },
    {
       "id": "Cannot specify buildpack bits and lock/unlock.",
-      "translation": "Cannot specify buildpack bits and lock/unlock."
+      "translation": "Vous ne pouvez pas spécifier les bits de buildpack et verrouillage / déverrouillage."
    },
    {
       "id": "\n\nTIP:\n",
@@ -77,7 +77,7 @@
    },
    {
       "id": "Error renaming buildpack {{.Name}}\n{{.Error}}",
-      "translation": "Error renaming buildpack {{.Name}}\n{{.Error}}"
+      "translation": "Erreur buildpack renommer {{.Name}}\n{{.Error}}"
    },
    {
       "id": "CF_NAME delete-buildpack BUILDPACK [-f]",
@@ -85,90 +85,86 @@
    },
    {
       "id": "Path to directory or zip file",
-      "translation": "Path to directory or zip file"
+      "translation": "Chemin d'accès au répertoire ou un fichier zip"
    },
    {
       "id": "Unlock the buildpack",
-      "translation": "Unlock the buildpack"
+      "translation": "Déverrouillez le buildpack"
    },
    {
       "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
-      "translation": "Error updating buildpack {{.Name}}\n{{.Error}}"
+      "translation": "Erreur mise à jour buildpack {{.Name}}\n{{.Error}}"
    },
    {
       "id": "filename",
-      "translation": "filename"
-   },
-   {
-      "id": " update-buildpack",
-      "translation": " update-buildpack"
+      "translation": "nom de fichier"
    },
    {
       "id": "Create a buildpack",
-      "translation": "Create a buildpack"
+      "translation": "Créer un buildpack"
    },
    {
       "id": "Delete a buildpack",
-      "translation": "Delete a buildpack"
+      "translation": "Supprimer un buildpack"
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force de supprimer sans confirmation"
+      "translation": "Forcer la suppression sans confirmation"
    },
    {
       "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
-      "translation": "Error uploading buildpack {{.Name}}\n{{.Error}}"
+      "translation": "Erreur ajout buildpack {{.Name}}\n{{.Error}}"
    },
    {
       "id": "Creating buildpack {{.BuildpackName}}...",
-      "translation": "Creating buildpack {{.BuildpackName}}..."
+      "translation": "Création buildpack {{.BuildpackName}}..."
    },
    {
       "id": "Buildpack {{.BuildpackName}} already exists",
-      "translation": "Buildpack {{.BuildpackName}} already exists"
+      "translation": "Buildpack {{.BuildpackName}} existe déjà"
    },
    {
       "id": "Buildpack position among other buildpacks",
-      "translation": "Buildpack position among other buildpacks"
+      "translation": "Buildpack position parmi d'autres buildpacks"
    },
    {
       "id": "Error deleting buildpack {{.Name}}\n{{.Error}}",
-      "translation": "Error deleting buildpack {{.Name}}\n{{.Error}}"
+      "translation": "Erreur de suppression buildpack {{.Name}}\n{{.Error}}"
    },
    {
       "id": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}...",
-      "translation": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}..."
+      "translation": "Renommer buildpack {{.OldBuildpackName}} pour {{.NewBuildpackName}}..."
    },
    {
       "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest.",
-      "translation": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest."
+      "translation": "   Chemin doit être un fichier zip, une URL pour un fichier zip, ou un répertoire local. Position est un nombre entier, définit la priorité, et est triée par ordre croissant."
    },
    {
       "id": "Update a buildpack",
-      "translation": "Update a buildpack"
+      "translation": "Mettre à jour un buildpack"
    },
    {
       "id": "Disable the buildpack",
-      "translation": "Disable the buildpack"
+      "translation": "Désactiver le buildpack"
    },
    {
       "id": "Invalid position. {{.ErrorDescription}}",
-      "translation": "Invalid position. {{.ErrorDescription}}"
+      "translation": "Position non valide. {{.ErrorDescription}}"
    },
    {
       "id": "List all buildpacks",
-      "translation": "List all buildpacks"
+      "translation": "Liste de toutes les buildpacks"
    },
    {
       "id": "Deleting buildpack {{.BuildpackName}}...",
-      "translation": "Deleting buildpack {{.BuildpackName}}..."
+      "translation": "Suppression buildpack {{.BuildpackName}}..."
    },
    {
       "id": "Getting buildpacks...\n",
-      "translation": "Getting buildpacks...\n"
+      "translation": "Obtenir buildpacks...\n"
    },
    {
       "id": "Updating buildpack {{.BuildpackName}}...",
-      "translation": "Updating buildpack {{.BuildpackName}}..."
+      "translation": "Mise à jour buildpack {{.BuildpackName}}..."
    }
 ]

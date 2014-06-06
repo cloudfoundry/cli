@@ -100,10 +100,6 @@
       "translation": "filename"
    },
    {
-      "id": " update-buildpack",
-      "translation": " update-buildpack"
-   },
-   {
       "id": "Create a buildpack",
       "translation": "Create a buildpack"
    },
