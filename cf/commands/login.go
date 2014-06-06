@@ -236,7 +236,7 @@ func (cmd Login) promptForOrgName(orgs []models.Organization) string {
 		orgNames = append(orgNames, org.Name)
 	}
 
-	return cmd.promptForName(orgNames, "Select an org (or press enter to skip):", "Org")
+	return cmd.promptForName(orgNames, T("Select an org (or press enter to skip):"), "Org")
 }
 
 func (cmd Login) targetOrganization(org models.Organization) {
@@ -287,7 +287,7 @@ func (cmd Login) promptForSpaceName(spaces []models.Space) string {
 		spaceNames = append(spaceNames, space.Name)
 	}
 
-	return cmd.promptForName(spaceNames, "Select a space (or press enter to skip):", "Space")
+	return cmd.promptForName(spaceNames, T("Select a space (or press enter to skip):"), "Space")
 }
 
 func (cmd Login) targetSpace(space models.Space) {
