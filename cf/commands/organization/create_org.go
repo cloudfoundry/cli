@@ -28,8 +28,8 @@ func (cmd CreateOrg) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-org",
 		ShortName:   "co",
-		Description: "Create an org",
-		Usage:       "CF_NAME create-org ORG",
+		Description: T("Create an org"),
+		Usage:       T("CF_NAME create-org ORG"),
 	}
 }
 
@@ -47,15 +47,16 @@ func (cmd CreateOrg) GetRequirements(requirementsFactory requirements.Factory, c
 func (cmd CreateOrg) Run(c *cli.Context) {
 	name := c.Args()[0]
 
-	cmd.ui.Say("Creating org %s as %s...",
-		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Creating org {{.OrgName}} as {{.Username}}...",
+		map[string]interface{}{
+			"OrgName":  terminal.EntityNameColor(name),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 	err := cmd.orgRepo.Create(name)
 	if err != nil {
 		if apiErr, ok := err.(errors.HttpError); ok && apiErr.ErrorCode() == errors.ORG_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Warn("Org %s already exists", name)
+			cmd.ui.Warn(T("Org {{.OrgName}} already exists",
+				map[string]interface{}{"OrgName": name}))
 			return
 		} else {
 			cmd.ui.Failed(err.Error())
@@ -63,5 +64,6 @@ func (cmd CreateOrg) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nTIP: Use '%s' to target new org", terminal.CommandColor(cf.Name()+" target -o "+name))
+	cmd.ui.Say(T("\nTIP: Use '{{.Command}}' to target new org",
+		map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " target -o " + name)}))
 }
