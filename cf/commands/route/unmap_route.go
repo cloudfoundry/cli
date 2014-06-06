@@ -29,10 +29,10 @@ func NewUnmapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.Ro
 func (cmd *UnmapRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unmap-route",
-		Description: "Remove a url route from an app",
-		Usage:       "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
+		Description: T("Remove a url route from an app"),
+		Usage:       T("CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("n", "Hostname"),
+			flag_helpers.NewStringFlag("n", T("Hostname")),
 		},
 	}
 }
@@ -65,13 +65,13 @@ func (cmd *UnmapRoute) Run(c *cli.Context) {
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}
-	cmd.ui.Say("Removing route %s from app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(route.URL()),
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"URL":       terminal.EntityNameColor(route.URL()),
+			"AppName":   terminal.EntityNameColor(app.Name),
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	apiErr = cmd.routeRepo.Unbind(route.Guid, app.Guid)
 	if apiErr != nil {

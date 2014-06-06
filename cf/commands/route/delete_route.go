@@ -29,11 +29,11 @@ func NewDeleteRoute(ui terminal.UI, config configuration.Reader, routeRepo api.R
 func (cmd *DeleteRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-route",
-		Description: "Delete a route",
-		Usage:       "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]",
+		Description: T("Delete a route"),
+		Usage:       T("CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
-			flag_helpers.NewStringFlag("n", "Hostname"),
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
+			flag_helpers.NewStringFlag("n", T("Hostname")),
 		},
 	}
 }
@@ -66,7 +66,7 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting route %s...", terminal.EntityNameColor(url))
+	cmd.ui.Say(T("Deleting route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(url)}))
 
 	domain := cmd.domainReq.GetDomain()
 	route, apiErr := cmd.routeRepo.FindByHostAndDomain(host, domain)
@@ -74,7 +74,8 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 	switch apiErr.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
-		cmd.ui.Warn("Unable to delete, route '%s' does not exist.", url)
+		cmd.ui.Warn(T("Unable to delete, route '{{.URL}}' does not exist.",
+			map[string]interface{}{"URL": url}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())

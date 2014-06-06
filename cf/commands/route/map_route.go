@@ -31,10 +31,10 @@ func NewMapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.Rout
 func (cmd *MapRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "map-route",
-		Description: "Add a url route to an app",
-		Usage:       "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
+		Description: T("Add a url route to an app"),
+		Usage:       T("CF_NAME map-route APP DOMAIN [-n HOSTNAME]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("n", "Hostname"),
+			flag_helpers.NewStringFlag("n", T("Hostname")),
 		},
 	}
 }
@@ -65,15 +65,15 @@ func (cmd *MapRoute) Run(c *cli.Context) {
 
 	route, apiErr := cmd.routeCreator.CreateRoute(hostName, domain, cmd.config.SpaceFields())
 	if apiErr != nil {
-		cmd.ui.Failed("Error resolving route:\n%s", apiErr.Error())
+		cmd.ui.Failed(T("Error resolving route:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 	}
-	cmd.ui.Say("Adding route %s to app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(route.URL()),
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"URL":       terminal.EntityNameColor(route.URL()),
+			"AppName":   terminal.EntityNameColor(app.Name),
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	apiErr = cmd.routeRepo.Bind(route.Guid, app.Guid)
 	if apiErr != nil {

@@ -34,10 +34,10 @@ func NewCreateRoute(ui terminal.UI, config configuration.Reader, routeRepo api.R
 func (cmd *CreateRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-route",
-		Description: "Create a url route in a space for later use",
-		Usage:       "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
+		Description: T("Create a url route in a space for later use"),
+		Usage:       T("CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("n", "Hostname"),
+			flag_helpers.NewStringFlag("n", T("Hostname")),
 		},
 	}
 }
@@ -76,12 +76,12 @@ func (cmd *CreateRoute) Run(c *cli.Context) {
 }
 
 func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
-	cmd.ui.Say("Creating route %s for org %s / space %s as %s...",
-		terminal.EntityNameColor(domain.UrlForHost(hostName)),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(space.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"Hostname":  terminal.EntityNameColor(domain.UrlForHost(hostName)),
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(space.Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	route, apiErr = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
 	if apiErr != nil {
@@ -96,7 +96,8 @@ func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields,
 
 		apiErr = nil
 		cmd.ui.Ok()
-		cmd.ui.Warn("Route %s already exists", route.URL())
+		cmd.ui.Warn(T("Route {{.URL}} already exists",
+			map[string]interface{}{"URL": route.URL()}))
 		return
 	}
 
