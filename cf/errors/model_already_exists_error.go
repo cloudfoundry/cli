@@ -15,5 +15,6 @@ func NewModelAlreadyExistsError(modelType, name string) *ModelAlreadyExistsError
 }
 
 func (err *ModelAlreadyExistsError) Error() string {
-	return fmt.Sprintf("%s %s already exists", err.ModelType, err.ModelName)
+	return fmt.Sprintf(T("{{.ModelType}} {{.ModelName}} already exists",
+		map[string]interface{}{"ModelType": err.ModelType, "ModelName": err.ModelName}))
 }
