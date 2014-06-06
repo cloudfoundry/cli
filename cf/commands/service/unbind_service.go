@@ -29,8 +29,8 @@ func (cmd *UnbindService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unbind-service",
 		ShortName:   "us",
-		Description: "Unbind a service instance from an app",
-		Usage:       "CF_NAME unbind-service APP SERVICE_INSTANCE",
+		Description: T("Unbind a service instance from an app"),
+		Usage:       T("CF_NAME unbind-service APP SERVICE_INSTANCE"),
 	}
 }
 
@@ -57,13 +57,14 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Unbinding app %s from service %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(instance.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"AppName":     terminal.EntityNameColor(app.Name),
+			"ServiceName": terminal.EntityNameColor(instance.Name),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	found, apiErr := cmd.serviceBindingRepo.Delete(instance, app.Guid)
 	if apiErr != nil {
@@ -74,7 +75,7 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	if !found {
-		cmd.ui.Warn("Binding between %s and %s did not exist", instance.Name, app.Name)
+		cmd.ui.Warn(T("Binding between {{.Arg0}} and {{.Arg1}} did not exist", map[string]interface{}{"Arg0": instance.Name, "Arg1": app.Name}))
 	}
 
 }

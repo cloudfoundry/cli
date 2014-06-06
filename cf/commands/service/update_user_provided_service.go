@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -31,14 +32,15 @@ func (cmd *UpdateUserProvidedService) Metadata() command_metadata.CommandMetadat
 	return command_metadata.CommandMetadata{
 		Name:        "update-user-provided-service",
 		ShortName:   "uups",
-		Description: "Update user-provided service instance name value pairs",
-		Usage: "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\n" +
-			"EXAMPLE:\n" +
-			"   CF_NAME update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n" +
-			"   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n",
+		Description: T("Update user-provided service instance name value pairs"),
+		Usage: T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'
+
+EXAMPLE:
+   CF_NAME update-user-provided-service oracle-db-mine -p '{"username":"admin","password":"pa55woRD"}'
+   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com`),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", "Parameters"),
-			flag_helpers.NewStringFlag("l", "Syslog Drain Url"),
+			flag_helpers.NewStringFlag("p", T("Parameters")),
+			flag_helpers.NewStringFlag("l", T("Syslog Drain Url")),
 		},
 	}
 }
@@ -62,7 +64,7 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 	if !serviceInstance.IsUserProvided() {
-		cmd.ui.Failed("Service Instance is not user provided")
+		cmd.ui.Failed(T("Service Instance is not user provided"))
 		return
 	}
 
@@ -74,17 +76,18 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 
 		err := json.Unmarshal([]byte(params), &paramsMap)
 		if err != nil {
-			cmd.ui.Failed("JSON is invalid: %s", err.Error())
+			cmd.ui.Failed(T("JSON is invalid: {{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err.Error()}))
 			return
 		}
 	}
 
-	cmd.ui.Say("Updating user provided service %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(serviceInstance.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Updating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"ServiceName": terminal.EntityNameColor(serviceInstance.Name),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	serviceInstance.Params = paramsMap
 	serviceInstance.SysLogDrainUrl = drainUrl
@@ -96,9 +99,14 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("TIP: To make these changes take effect, use '%s unbind-service' to unbind the service, '%s bind-service' to rebind, and then '%s push' to update the app with the new env variables", cf.Name(), cf.Name(), cf.Name())
+	cmd.ui.Say(T("TIP: To make these changes take effect, use '{{.CFUnbindCommand}}' to unbind the service, '{{.CFBindComand}}' to rebind, and then '{{.CFPushCommand}}' to update the app with the new env variables",
+		map[string]interface{}{
+			"CFUnbindCommand": cf.Name() + " " + "unbind-service",
+			"CFBindComand":    cf.Name() + " " + "bind-service",
+			"CFPushCommand":   cf.Name() + " " + "push",
+		}))
 
 	if params == "" && drainUrl == "" {
-		cmd.ui.Warn("No flags specified. No changes were made.")
+		cmd.ui.Warn(T("No flags specified. No changes were made."))
 	}
 }

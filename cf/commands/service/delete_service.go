@@ -29,10 +29,10 @@ func (cmd *DeleteService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-service",
 		ShortName:   "ds",
-		Description: "Delete a service instance",
-		Usage:       "CF_NAME delete-service SERVICE_INSTANCE [-f]",
+		Description: T("Delete a service instance"),
+		Usage:       T("CF_NAME delete-service SERVICE_INSTANCE [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
@@ -56,17 +56,18 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
 
 	if !c.Bool("f") {
-		if !cmd.ui.ConfirmDelete("service", serviceName) {
+		if !cmd.ui.ConfirmDelete(T("service"), serviceName) {
 			return
 		}
 	}
 
-	cmd.ui.Say("Deleting service %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(serviceName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Deleting service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"ServiceName": terminal.EntityNameColor(serviceName),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	instance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceName)
 
@@ -74,7 +75,7 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Service %s does not exist.", serviceName)
+		cmd.ui.Warn(T("Service {{.ServiceName}} does not exist.", map[string]interface{}{"ServiceName": serviceName}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())

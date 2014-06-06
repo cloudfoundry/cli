@@ -1,13 +1,14 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type ListServices struct {
@@ -25,9 +26,9 @@ func NewListServices(ui terminal.UI, config configuration.Reader, serviceSummary
 
 func (cmd ListServices) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "services",
+		Name:        T("services"),
 		ShortName:   "s",
-		Description: "List all service instances in the target space",
+		Description: T("List all service instances in the target space"),
 		Usage:       "CF_NAME services",
 	}
 }
@@ -41,11 +42,12 @@ func (cmd ListServices) GetRequirements(requirementsFactory requirements.Factory
 }
 
 func (cmd ListServices) Run(c *cli.Context) {
-	cmd.ui.Say("Getting services in org %s / space %s as %s...",
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	serviceInstances, apiErr := cmd.serviceSummaryRepo.GetSummariesInCurrentSpace()
 
@@ -58,17 +60,17 @@ func (cmd ListServices) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	if len(serviceInstances) == 0 {
-		cmd.ui.Say("No services found")
+		cmd.ui.Say(T("No services found"))
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{"name", "service", "plan", "bound apps"})
+	table := terminal.NewTable(cmd.ui, []string{T("name"), T("service"), T("plan"), T("bound apps")})
 
 	for _, instance := range serviceInstances {
 		var serviceColumn string
 
 		if instance.IsUserProvided() {
-			serviceColumn = "user-provided"
+			serviceColumn = T("user-provided")
 		} else {
 			serviceColumn = instance.ServiceOffering.Label
 		}
