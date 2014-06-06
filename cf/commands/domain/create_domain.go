@@ -27,8 +27,8 @@ func NewCreateDomain(ui terminal.UI, config configuration.Reader, domainRepo api
 func (cmd *CreateDomain) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-domain",
-		Description: "Create a domain in an org for later use",
-		Usage:       "CF_NAME create-domain ORG DOMAIN",
+		Description: T("Create a domain in an org for later use"),
+		Usage:       T("CF_NAME create-domain ORG DOMAIN"),
 	}
 }
 
@@ -49,11 +49,11 @@ func (cmd *CreateDomain) Run(c *cli.Context) {
 	domainName := c.Args()[1]
 	owningOrg := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Creating domain %s for org %s as %s...",
-		terminal.EntityNameColor(domainName),
-		terminal.EntityNameColor(owningOrg.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
+		map[string]interface{}{
+			"DomainName": terminal.EntityNameColor(domainName),
+			"OrgName":    terminal.EntityNameColor(owningOrg.Name),
+			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
 	_, apiErr := cmd.domainRepo.Create(domainName, owningOrg.Guid)
 	if apiErr != nil {

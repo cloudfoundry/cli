@@ -27,8 +27,8 @@ func NewCreateSharedDomain(ui terminal.UI, config configuration.Reader, domainRe
 func (cmd *CreateSharedDomain) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-shared-domain",
-		Description: "Create a domain that can be used by all orgs (admin-only)",
-		Usage:       "CF_NAME create-shared-domain DOMAIN",
+		Description: T("Create a domain that can be used by all orgs (admin-only)"),
+		Usage:       T("CF_NAME create-shared-domain DOMAIN"),
 	}
 }
 
@@ -46,10 +46,10 @@ func (cmd *CreateSharedDomain) GetRequirements(requirementsFactory requirements.
 func (cmd *CreateSharedDomain) Run(c *cli.Context) {
 	domainName := c.Args()[0]
 
-	cmd.ui.Say("Creating shared domain %s as %s...",
-		terminal.EntityNameColor(domainName),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Creating shared domain {{.DomainName}} as {{.Username}}...",
+		map[string]interface{}{
+			"DomainName": terminal.EntityNameColor(domainName),
+			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
 	apiErr := cmd.domainRepo.CreateSharedDomain(domainName)
 	if apiErr != nil {
