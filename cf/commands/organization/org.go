@@ -27,8 +27,8 @@ func NewShowOrg(ui terminal.UI, config configuration.Reader) (cmd *ShowOrg) {
 func (cmd *ShowOrg) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "org",
-		Description: "Show org info",
-		Usage:       "CF_NAME org ORG",
+		Description: T("Show org info"),
+		Usage:       T("CF_NAME org ORG"),
 	}
 }
 
@@ -48,10 +48,10 @@ func (cmd *ShowOrg) GetRequirements(requirementsFactory requirements.Factory, c 
 
 func (cmd *ShowOrg) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
-	cmd.ui.Say("Getting info for org %s as %s...",
-		terminal.EntityNameColor(org.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting info for org {{.OrgName}} as {{.Username}}...",
+		map[string]interface{}{
+			"OrgName":  terminal.EntityNameColor(org.Name),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 	cmd.ui.Ok()
 	cmd.ui.Say("\n%s:", terminal.EntityNameColor(org.Name))
 
@@ -66,10 +66,15 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 	}
 
 	quota := org.QuotaDefinition
-	orgQuota := fmt.Sprintf("%s (%dM memory limit, %d routes, %d services, paid services %s)",
-		quota.Name, quota.MemoryLimit, quota.RoutesLimit, quota.ServicesLimit, formatters.Allowed(quota.NonBasicServicesAllowed))
+	orgQuota := fmt.Sprintf(T("{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
+		map[string]interface{}{
+			"QuotaName":               quota.Name,
+			"MemoryLimit":             quota.MemoryLimit,
+			"RoutesLimit":             quota.RoutesLimit,
+			"ServicesLimit":           quota.ServicesLimit,
+			"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
 
-	cmd.ui.Say("  domains: %s", terminal.EntityNameColor(strings.Join(domains, ", ")))
-	cmd.ui.Say("  quota:   %s", terminal.EntityNameColor(orgQuota))
-	cmd.ui.Say("  spaces:  %s", terminal.EntityNameColor(strings.Join(spaces, ", ")))
+	cmd.ui.Say(T("  domains: {{.Domains}}", map[string]interface{}{"Domains": terminal.EntityNameColor(strings.Join(domains, ", "))}))
+	cmd.ui.Say(T("  quota:   {{.Quota}}", map[string]interface{}{"Quota": terminal.EntityNameColor(orgQuota)}))
+	cmd.ui.Say(T("  spaces:  {{.Spaces}}", map[string]interface{}{"Spaces": terminal.EntityNameColor(strings.Join(spaces, ", "))}))
 }

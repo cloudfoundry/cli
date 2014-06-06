@@ -29,10 +29,10 @@ func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.O
 func (cmd *DeleteOrg) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-org",
-		Description: "Delete an org",
-		Usage:       "CF_NAME delete-org ORG [-f]",
+		Description: T("Delete an org"),
+		Usage:       T("CF_NAME delete-org ORG [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
@@ -50,15 +50,15 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 	orgName := c.Args()[0]
 
 	if !c.Bool("f") {
-		if !cmd.ui.ConfirmDeleteWithAssociations("org", orgName) {
+		if !cmd.ui.ConfirmDeleteWithAssociations(T("org"), orgName) {
 			return
 		}
 	}
 
-	cmd.ui.Say("Deleting org %s as %s...",
-		terminal.EntityNameColor(orgName),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Deleting org {{.OrgName}} as {{.Username}}...",
+		map[string]interface{}{
+			"OrgName":  terminal.EntityNameColor(orgName),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	org, apiErr := cmd.orgRepo.FindByName(orgName)
 
@@ -66,7 +66,8 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Org %s does not exist.", orgName)
+		cmd.ui.Warn(T("Org {{.OrgName}} does not exist.",
+			map[string]interface{}{"OrgName": orgName}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())

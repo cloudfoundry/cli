@@ -27,8 +27,8 @@ func NewRenameOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.O
 func (cmd *RenameOrg) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-org",
-		Description: "Rename an org",
-		Usage:       "CF_NAME rename-org ORG NEW_ORG",
+		Description: T("Rename an org"),
+		Usage:       T("CF_NAME rename-org ORG NEW_ORG"),
 	}
 }
 
@@ -49,11 +49,11 @@ func (cmd *RenameOrg) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 	newName := c.Args()[1]
 
-	cmd.ui.Say("Renaming org %s to %s as %s...",
-		terminal.EntityNameColor(org.Name),
-		terminal.EntityNameColor(newName),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Renaming org {{.OrgName}} to {{.NewName}} as {{.Username}}...",
+		map[string]interface{}{
+			"OrgName":  terminal.EntityNameColor(org.Name),
+			"NewName":  terminal.EntityNameColor(newName),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	apiErr := cmd.orgRepo.Rename(org.Guid, newName)
 	if apiErr != nil {

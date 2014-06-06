@@ -27,10 +27,8 @@ func NewSetQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.Quot
 func (cmd *SetQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "set-quota",
-		Description: "Assign a quota to an org",
-		Usage: "CF_NAME set-quota ORG QUOTA\n\n" +
-			"TIP:\n" +
-			"   View allowable quotas with 'CF_NAME quotas'",
+		Description: T("Assign a quota to an org"),
+		Usage:       T("CF_NAME set-quota ORG QUOTA\n\n") + T("TIP:\n") + T("   View allowable quotas with 'CF_NAME quotas'"),
 	}
 }
 
@@ -58,11 +56,11 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Setting quota %s to org %s as %s...",
-		terminal.EntityNameColor(quota.Name),
-		terminal.EntityNameColor(org.Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
+		map[string]interface{}{
+			"QuotaName": terminal.EntityNameColor(quota.Name),
+			"OrgName":   terminal.EntityNameColor(org.Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	apiErr = cmd.quotaRepo.AssignQuotaToOrg(org.Guid, quota.Guid)
 	if apiErr != nil {
