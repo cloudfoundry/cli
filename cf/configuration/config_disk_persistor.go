@@ -68,7 +68,8 @@ func (dp DiskPersistor) write(data *Data) (err error) {
 
 	err = ioutil.WriteFile(dp.filePath, bytes, filePermissions)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error writing to manifest file:%s\n%s", dp.filePath, err))
+		err = errors.New(fmt.Sprintf(T("Error writing to manifest file:{{.FilePath}}\n{{.Err}}",
+			map[string]interface{}{"FilePath": dp.filePath, "Err": err})))
 		return
 	}
 	return
