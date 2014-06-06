@@ -33,7 +33,7 @@
    },
    {
       "id": "API endpoint",
-      "translation": "API endpoint"
+      "translation": "Endpoint de l'API"
    },
    {
       "id": "API endpoint (e.g. https://api.example.com)",
@@ -49,7 +49,7 @@
    },
    {
       "id": "API endpoint: {{.Endpoint}}",
-      "translation": "API endpoint: {{.Endpoint}}"
+      "translation": "Endpoint de l'API: {{.Endpoint}}"
    },
    {
       "id": "An org must be targeted before targeting a space",
