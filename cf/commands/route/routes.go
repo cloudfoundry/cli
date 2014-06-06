@@ -28,7 +28,7 @@ func (cmd ListRoutes) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "routes",
 		ShortName:   "r",
-		Description: "List all routes in the current space",
+		Description: T("List all routes in the current space"),
 		Usage:       "CF_NAME routes",
 	}
 }
@@ -41,11 +41,10 @@ func (cmd ListRoutes) GetRequirements(requirementsFactory requirements.Factory, 
 }
 
 func (cmd ListRoutes) Run(c *cli.Context) {
-	cmd.ui.Say("Getting routes as %s ...\n",
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting routes as {{.Username}} ...\n",
+		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	table := cmd.ui.Table([]string{"host", "domain", "apps"})
+	table := cmd.ui.Table([]string{T("host"), T("domain"), T("apps")})
 
 	noRoutes := true
 	apiErr := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
@@ -65,11 +64,11 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 	table.Print()
 
 	if apiErr != nil {
-		cmd.ui.Failed("Failed fetching routes.\n%s", apiErr.Error())
+		cmd.ui.Failed(T("Failed fetching routes.\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 		return
 	}
 
 	if noRoutes {
-		cmd.ui.Say("No routes found")
+		cmd.ui.Say(T("No routes found"))
 	}
 }
