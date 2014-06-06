@@ -29,10 +29,10 @@ func NewApi(ui terminal.UI, config configuration.ReadWriter, endpointRepo api.En
 func (cmd Api) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "api",
-		Description: "Set or view target api url",
-		Usage:       "CF_NAME api [URL]",
+		Description: T("Set or view target api url"),
+		Usage:       T("CF_NAME api [URL]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
+			cli.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")},
 		},
 	}
 }
@@ -44,20 +44,20 @@ func (cmd Api) GetRequirements(_ requirements.Factory, _ *cli.Context) (reqs []r
 func (cmd Api) Run(c *cli.Context) {
 	if len(c.Args()) == 0 {
 		if cmd.config.ApiEndpoint() == "" {
-			cmd.ui.Say(fmt.Sprintf("No api endpoint set. Use '%s' to set an endpoint", terminal.CommandColor(cf.Name()+" api")))
+			cmd.ui.Say(fmt.Sprintf(T("No api endpoint set. Use '{{.Name}}' to set an endpoint",
+				map[string]interface{}{"Name": terminal.CommandColor(cf.Name() + " api")})))
 		} else {
-			cmd.ui.Say(
-				"API endpoint: %s (API version: %s)",
-				terminal.EntityNameColor(cmd.config.ApiEndpoint()),
-				terminal.EntityNameColor(cmd.config.ApiVersion()),
-			)
+			cmd.ui.Say(T("API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
+				map[string]interface{}{"ApiEndpoint": terminal.EntityNameColor(cmd.config.ApiEndpoint()),
+					"ApiVersion": terminal.EntityNameColor(cmd.config.ApiVersion())}))
 		}
 		return
 	}
 
 	endpoint := c.Args()[0]
 
-	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
+	cmd.ui.Say(T("Setting api endpoint to {{.Endpoint}}...",
+		map[string]interface{}{"Endpoint": terminal.EntityNameColor(endpoint)}))
 	cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"))
 	cmd.ui.Ok()
 
@@ -80,14 +80,16 @@ func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool) {
 		switch typedErr := err.(type) {
 		case *errors.InvalidSSLCert:
 			cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s api --skip-ssl-validation", cf.Name()))
-			tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfApiCommand)
-			cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)
+			tipMessage := fmt.Sprintf(T("TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
+				map[string]interface{}{"ApiCommand": cfApiCommand}))
+			cmd.ui.Failed(T("Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
+				map[string]interface{}{"URL": typedErr.URL, "TipMessage": tipMessage}))
 		default:
 			cmd.ui.Failed(typedErr.Error())
 		}
 	}
 
 	if !strings.HasPrefix(endpoint, "https://") {
-		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
+		cmd.ui.Say(terminal.WarningColor(T("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n")))
 	}
 }

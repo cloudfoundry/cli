@@ -44,23 +44,17 @@ func (cmd Login) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "login",
 		ShortName:   "l",
-		Description: "Log user in",
-		Usage: "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n" +
-			terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
-			"EXAMPLE:\n" +
-			"   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n" +
-			"   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n" +
-			"   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n" +
-			"   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)" +
-			"   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
+		Description: T("Log user in"),
+		Usage: T("CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n") +
+			terminal.WarningColor(T("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n")) + T("EXAMPLE:\n") + T("   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n") + T("   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n") + T("   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n") + T("   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)") + T("   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("a", "API endpoint (e.g. https://api.example.com)"),
-			flag_helpers.NewStringFlag("u", "Username"),
-			flag_helpers.NewStringFlag("p", "Password"),
-			flag_helpers.NewStringFlag("o", "Org"),
-			flag_helpers.NewStringFlag("s", "Space"),
-			cli.BoolFlag{Name: "sso", Usage: "Use a one-time password to login"},
-			cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
+			flag_helpers.NewStringFlag("a", T("API endpoint (e.g. https://api.example.com)")),
+			flag_helpers.NewStringFlag("u", T("Username")),
+			flag_helpers.NewStringFlag("p", T("Password")),
+			flag_helpers.NewStringFlag("o", T("Org")),
+			flag_helpers.NewStringFlag("s", T("Space")),
+			cli.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")},
+			cli.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")},
 		},
 	}
 }
@@ -112,9 +106,9 @@ func (cmd Login) decideEndpoint(c *cli.Context) (string, bool) {
 	}
 
 	if endpoint == "" {
-		endpoint = cmd.ui.Ask("API endpoint")
+		endpoint = cmd.ui.Ask(T("API endpoint"))
 	} else {
-		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(endpoint))
+		cmd.ui.Say(T("API endpoint: {{.Endpoint}}", map[string]interface{}{"Endpoint": terminal.EntityNameColor(endpoint)}))
 	}
 
 	return endpoint, skipSSL
@@ -132,7 +126,7 @@ func (cmd Login) authenticateSSO(c *cli.Context) {
 	for i := 0; i < maxLoginTries; i++ {
 		credentials["passcode"] = cmd.ui.AskForPassword("%s", passcode.DisplayName)
 
-		cmd.ui.Say("Authenticating...")
+		cmd.ui.Say(T("Authenticating..."))
 		err = cmd.authenticator.Authenticate(credentials)
 
 		if err == nil {
@@ -145,7 +139,7 @@ func (cmd Login) authenticateSSO(c *cli.Context) {
 	}
 
 	if err != nil {
-		cmd.ui.Failed("Unable to authenticate.")
+		cmd.ui.Failed(T("Unable to authenticate."))
 	}
 }
 
@@ -183,7 +177,7 @@ func (cmd Login) authenticate(c *cli.Context) {
 			}
 		}
 
-		cmd.ui.Say("Authenticating...")
+		cmd.ui.Say(T("Authenticating..."))
 		err = cmd.authenticator.Authenticate(credentials)
 
 		if err == nil {
@@ -196,7 +190,7 @@ func (cmd Login) authenticate(c *cli.Context) {
 	}
 
 	if err != nil {
-		cmd.ui.Failed("Unable to authenticate.")
+		cmd.ui.Failed(T("Unable to authenticate."))
 	}
 }
 
@@ -210,7 +204,8 @@ func (cmd Login) setOrganization(c *cli.Context) (isOrgSet bool) {
 			return len(availableOrgs) < maxChoices
 		})
 		if apiErr != nil {
-			cmd.ui.Failed("Error finding avilable orgs\n%s", apiErr.Error())
+			cmd.ui.Failed(T("Error finding available orgs\n{{.ApiErr}}",
+				map[string]interface{}{"ApiErr": apiErr.Error()}))
 		}
 
 		if len(availableOrgs) == 1 {
@@ -227,7 +222,8 @@ func (cmd Login) setOrganization(c *cli.Context) (isOrgSet bool) {
 
 	org, err := cmd.orgRepo.FindByName(orgName)
 	if err != nil {
-		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), err.Error())
+		cmd.ui.Failed(T("Error finding org {{.OrgName}}\n{{.Err}}",
+			map[string]interface{}{"OrgName": terminal.EntityNameColor(orgName), "Err": err.Error()}))
 	}
 
 	cmd.targetOrganization(org)
@@ -245,7 +241,8 @@ func (cmd Login) promptForOrgName(orgs []models.Organization) string {
 
 func (cmd Login) targetOrganization(org models.Organization) {
 	cmd.config.SetOrganizationFields(org.OrganizationFields)
-	cmd.ui.Say("Targeted org %s\n", terminal.EntityNameColor(org.Name))
+	cmd.ui.Say(T("Targeted org {{.OrgName}}\n",
+		map[string]interface{}{"OrgName": terminal.EntityNameColor(org.Name)}))
 }
 
 func (cmd Login) setSpace(c *cli.Context) {
@@ -258,7 +255,8 @@ func (cmd Login) setSpace(c *cli.Context) {
 			return (len(availableSpaces) < maxChoices)
 		})
 		if err != nil {
-			cmd.ui.Failed("Error finding available spaces\n%s", err.Error())
+			cmd.ui.Failed(T("Error finding available spaces\n{{.Err}}",
+				map[string]interface{}{"Err": err.Error()}))
 		}
 
 		// Target only space if possible
@@ -276,7 +274,8 @@ func (cmd Login) setSpace(c *cli.Context) {
 
 	space, err := cmd.spaceRepo.FindByName(spaceName)
 	if err != nil {
-		cmd.ui.Failed("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), err.Error())
+		cmd.ui.Failed(T("Error finding space {{.SpaceName}}\n{{.Err}}",
+			map[string]interface{}{"SpaceName": terminal.EntityNameColor(spaceName), "Err": err.Error()}))
 	}
 
 	cmd.targetSpace(space)
@@ -293,7 +292,8 @@ func (cmd Login) promptForSpaceName(spaces []models.Space) string {
 
 func (cmd Login) targetSpace(space models.Space) {
 	cmd.config.SetSpaceFields(space.SpaceFields)
-	cmd.ui.Say("Targeted space %s\n", terminal.EntityNameColor(space.Name))
+	cmd.ui.Say(T("Targeted space {{.SpaceName}}\n",
+		map[string]interface{}{"SpaceName": terminal.EntityNameColor(space.Name)}))
 }
 
 func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) string {
@@ -311,7 +311,7 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 				cmd.ui.Say("%d. %s", i+1, name)
 			}
 		} else {
-			cmd.ui.Say("There are too many options to display, please type in the name.")
+			cmd.ui.Say(T("There are too many options to display, please type in the name."))
 		}
 
 		nameString = cmd.ui.Ask("%s", itemPrompt)
