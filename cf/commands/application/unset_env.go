@@ -29,8 +29,8 @@ func NewUnsetEnv(ui terminal.UI, config configuration.Reader, appRepo api.Applic
 func (cmd *UnsetEnv) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unset-env",
-		Description: "Remove an env variable",
-		Usage:       "CF_NAME unset-env APP NAME",
+		Description: T("Remove an env variable"),
+		Usage:       T("CF_NAME unset-env APP NAME"),
 	}
 }
 
@@ -52,19 +52,19 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 	varName := c.Args()[1]
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Removing env variable %s from app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(varName),
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"VarName":     terminal.EntityNameColor(varName),
+			"AppName":     terminal.EntityNameColor(app.Name),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 	envParams := app.EnvironmentVars
 
 	if _, ok := envParams[varName]; !ok {
 		cmd.ui.Ok()
-		cmd.ui.Warn("Env variable %s was not set.", varName)
+		cmd.ui.Warn(T("Env variable {{.VarName}} was not set.", map[string]interface{}{"VarName": varName}))
 		return
 	}
 
@@ -77,5 +77,6 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("TIP: Use '%s' to ensure your env variable changes take effect", terminal.CommandColor(cf.Name()+" push"))
+	cmd.ui.Say(T("TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
+		map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " push")}))
 }

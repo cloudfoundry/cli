@@ -30,8 +30,8 @@ func (cmd *Env) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "env",
 		ShortName:   "e",
-		Description: "Show all env variables for an app",
-		Usage:       "CF_NAME env APP",
+		Description: T("Show all env variables for an app"),
+		Usage:       T("CF_NAME env APP"),
 	}
 }
 
@@ -49,12 +49,12 @@ func (cmd *Env) Run(c *cli.Context) {
 		cmd.ui.Failed(notFound.Error())
 	}
 
-	cmd.ui.Say("Getting env variables for app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"AppName":   terminal.EntityNameColor(app.Name),
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	envVars, vcapServices, err := cmd.appRepo.ReadEnv(app.Guid)
 	if err != nil {
@@ -65,20 +65,20 @@ func (cmd *Env) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	if len(vcapServices) > 0 {
-		cmd.ui.Say("System-Provided:")
+		cmd.ui.Say(T("System-Provided:"))
 		for _, line := range strings.Split(vcapServices, "\n") {
 			cmd.ui.Say(line)
 		}
 	} else {
-		cmd.ui.Say("No system-provided env variables have been set")
+		cmd.ui.Say(T("No system-provided env variables have been set"))
 	}
 
 	if len(envVars) == 0 {
-		cmd.ui.Say("No user-defined env variables have been set")
+		cmd.ui.Say(T("No user-defined env variables have been set"))
 		return
 	}
 
-	cmd.ui.Say("User-Provided:")
+	cmd.ui.Say(T("User-Provided:"))
 	for key, value := range envVars {
 		cmd.ui.Say("%s: %s", key, terminal.EntityNameColor(value))
 	}

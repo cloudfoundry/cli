@@ -33,7 +33,10 @@ func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
 
 	// convert IETF format to XCU format
 	userLocale = strings.Replace(userLocale, "-", "_", 1)
-	loadFromAsset(packageName, i18nDirname, userLocale) // ignore returned error for now
+	loadFromAsset(packageName, i18nDirname, userLocale)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	T, err := go_i18n.Tfunc(userLocale, DEFAULT_LOCAL)
 	if err != nil {

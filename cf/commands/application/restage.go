@@ -31,8 +31,8 @@ func (cmd *Restage) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "restage",
 		ShortName:   "rg",
-		Description: "Restage an app",
-		Usage:       "CF_NAME restage APP",
+		Description: T("Restage an app"),
+		Usage:       T("CF_NAME restage APP"),
 	}
 }
 
@@ -50,12 +50,13 @@ func (cmd *Restage) Run(c *cli.Context) {
 		cmd.ui.Failed(notFound.Error())
 	}
 
-	cmd.ui.Say("Restaging app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"AppName":     terminal.EntityNameColor(app.Name),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	cmd.appStagingWatcher.ApplicationWatchStaging(app, func(app models.Application) (models.Application, error) {
 		return app, cmd.appRepo.CreateRestageRequest(app.Guid)

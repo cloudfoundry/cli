@@ -65,7 +65,8 @@ func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer Applicat
 	if os.Getenv("CF_STAGING_TIMEOUT") != "" {
 		duration, err := strconv.ParseInt(os.Getenv("CF_STAGING_TIMEOUT"), 10, 64)
 		if err != nil {
-			cmd.ui.Failed("invalid value for env var CF_STAGING_TIMEOUT\n%s", err)
+			cmd.ui.Failed(T("invalid value for env var CF_STAGING_TIMEOUT\n{{.Err}}",
+				map[string]interface{}{"Err": err}))
 		}
 		cmd.StagingTimeout = time.Duration(duration) * time.Minute
 	} else {
@@ -75,7 +76,8 @@ func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer Applicat
 	if os.Getenv("CF_STARTUP_TIMEOUT") != "" {
 		duration, err := strconv.ParseInt(os.Getenv("CF_STARTUP_TIMEOUT"), 10, 64)
 		if err != nil {
-			cmd.ui.Failed("invalid value for env var CF_STARTUP_TIMEOUT\n%s", err)
+			cmd.ui.Failed(T("invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
+				map[string]interface{}{"Err": err}))
 		}
 		cmd.StartupTimeout = time.Duration(duration) * time.Minute
 	} else {
@@ -89,8 +91,8 @@ func (cmd *Start) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "start",
 		ShortName:   "st",
-		Description: "Start an app",
-		Usage:       "CF_NAME start APP",
+		Description: T("Start an app"),
+		Usage:       T("CF_NAME start APP"),
 	}
 }
 
@@ -111,17 +113,17 @@ func (cmd *Start) Run(c *cli.Context) {
 
 func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Application, err error) {
 	if app.State == "started" {
-		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already started"))
+		cmd.ui.Say(terminal.WarningColor(T("App ") + app.Name + T(" is already started")))
 		return
 	}
 
 	return cmd.ApplicationWatchStaging(app, func(app models.Application) (models.Application, error) {
-		cmd.ui.Say("Starting app %s in org %s / space %s as %s...",
-			terminal.EntityNameColor(app.Name),
-			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			terminal.EntityNameColor(cmd.config.Username()),
-		)
+		cmd.ui.Say(T("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+			map[string]interface{}{
+				"AppName":     terminal.EntityNameColor(app.Name),
+				"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 		state := "STARTED"
 		return cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
@@ -150,7 +152,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, start func(app
 	cmd.ui.Say("")
 
 	cmd.waitForOneRunningInstance(updatedApp)
-	cmd.ui.Say(terminal.HeaderColor("\nApp started\n"))
+	cmd.ui.Say(terminal.HeaderColor(T("\nApp started\n")))
 
 	cmd.appDisplayer.ShowApp(updatedApp)
 	return
@@ -187,7 +189,7 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan chan bool, st
 	})
 
 	if err != nil {
-		cmd.ui.Warn("Warning: error tailing logs")
+		cmd.ui.Warn(T("Warning: error tailing logs"))
 		cmd.ui.Say("%s", err)
 		startChan <- true
 	}
@@ -209,9 +211,10 @@ func (cmd Start) waitForInstancesToStage(app models.Application) {
 
 	if err != nil && !isStagingError(err) {
 		cmd.ui.Say("")
-		cmd.ui.Failed("%s\n\nTIP: use '%s' for more information",
-			err.Error(),
-			terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name)))
+		cmd.ui.Failed(T("{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
+			map[string]interface{}{
+				"Err":     err.Error(),
+				"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))}))
 	}
 
 	return
@@ -223,7 +226,9 @@ func (cmd Start) waitForOneRunningInstance(app models.Application) {
 
 	for runningCount == 0 {
 		if time.Since(startupStartTime) > cmd.StartupTimeout {
-			cmd.ui.Failed(fmt.Sprintf("Start app timeout\n\nTIP: use '%s' for more information", terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))))
+			cmd.ui.Failed(fmt.Sprintf(T("Start app timeout\n\nTIP: use '{{.Command}}' for more information",
+				map[string]interface{}{
+					"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))})))
 			return
 		}
 
@@ -252,25 +257,30 @@ func (cmd Start) waitForOneRunningInstance(app models.Application) {
 		cmd.ui.Say(instancesDetails(startingCount, downCount, runningCount, flappingCount, totalCount))
 
 		if flappingCount > 0 {
-			cmd.ui.Failed(fmt.Sprintf("Start unsuccessful\n\nTIP: use '%s' for more information", terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))))
+			cmd.ui.Failed(fmt.Sprintf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
+				map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))})))
 			return
 		}
 	}
 }
 
 func instancesDetails(startingCount, downCount, runningCount, flappingCount, totalCount int) string {
-	details := []string{fmt.Sprintf("%d of %d instances running", runningCount, totalCount)}
+	details := []string{fmt.Sprintf(T("{{.RunningCount}} of {{.TotalCount}} instances running",
+		map[string]interface{}{"RunningCount": runningCount, "TotalCount": totalCount}))}
 
 	if startingCount > 0 {
-		details = append(details, fmt.Sprintf("%d starting", startingCount))
+		details = append(details, fmt.Sprintf(T("{{.StartingCount}} starting",
+			map[string]interface{}{"StartingCount": startingCount})))
 	}
 
 	if downCount > 0 {
-		details = append(details, fmt.Sprintf("%d down", downCount))
+		details = append(details, fmt.Sprintf(T("{{.DownCount}} down",
+			map[string]interface{}{"DownCount": downCount})))
 	}
 
 	if flappingCount > 0 {
-		details = append(details, fmt.Sprintf("%d failing", flappingCount))
+		details = append(details, fmt.Sprintf(T("{{.FlappingCount}} failing",
+			map[string]interface{}{"FlappingCount": flappingCount})))
 	}
 
 	return strings.Join(details, ", ")

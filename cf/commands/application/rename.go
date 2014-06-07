@@ -28,8 +28,8 @@ func NewRenameApp(ui terminal.UI, config configuration.Reader, appRepo api.Appli
 func (cmd *RenameApp) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename",
-		Description: "Rename an app",
-		Usage:       "CF_NAME rename APP_NAME NEW_APP_NAME",
+		Description: T("Rename an app"),
+		Usage:       T("CF_NAME rename APP_NAME NEW_APP_NAME"),
 	}
 }
 
@@ -50,13 +50,13 @@ func (cmd *RenameApp) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	newName := c.Args()[1]
 
-	cmd.ui.Say("Renaming app %s to %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(newName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Renaming app {{.AppName}} to {{.NewName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"AppName":   terminal.EntityNameColor(app.Name),
+			"NewName":   terminal.EntityNameColor(newName),
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	params := models.AppParams{Name: &newName}
 

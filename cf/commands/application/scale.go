@@ -32,13 +32,13 @@ func NewScale(ui terminal.UI, config configuration.Reader, restarter Application
 func (cmd *Scale) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "scale",
-		Description: "Change or view the instance count, disk space limit, and memory limit for an app",
-		Usage:       "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+		Description: T("Change or view the instance count, disk space limit, and memory limit for an app"),
+		Usage:       T("CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewIntFlag("i", "Number of instances"),
-			flag_helpers.NewStringFlag("k", "Disk limit (e.g. 256M, 1024M, 1G)"),
-			flag_helpers.NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
-			cli.BoolFlag{Name: "f", Usage: "Force restart of app without prompt"},
+			flag_helpers.NewIntFlag("i", T("Number of instances")),
+			flag_helpers.NewStringFlag("k", T("Disk limit (e.g. 256M, 1024M, 1G)")),
+			flag_helpers.NewStringFlag("m", T("Memory limit (e.g. 256M, 1024M, 1G)")),
+			cli.BoolFlag{Name: "f", Usage: T("Force restart of app without prompt")},
 		},
 	}
 }
@@ -63,18 +63,19 @@ var bytesInAMegabyte uint64 = 1024 * 1024
 func (cmd *Scale) Run(c *cli.Context) {
 	currentApp := cmd.appReq.GetApplication()
 	if !anyFlagsSet(c) {
-		cmd.ui.Say("Showing current scale of app %s in org %s / space %s as %s...",
-			terminal.EntityNameColor(currentApp.Name),
-			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			terminal.EntityNameColor(cmd.config.Username()),
-		)
+		cmd.ui.Say(T("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+			map[string]interface{}{
+				"AppName":     terminal.EntityNameColor(currentApp.Name),
+				"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			}))
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 
-		cmd.ui.Say("%s %s", terminal.HeaderColor("memory:"), formatters.ByteSize(currentApp.Memory*bytesInAMegabyte))
-		cmd.ui.Say("%s %s", terminal.HeaderColor("disk:"), formatters.ByteSize(currentApp.DiskQuota*bytesInAMegabyte))
-		cmd.ui.Say("%s %d", terminal.HeaderColor("instances:"), currentApp.InstanceCount)
+		cmd.ui.Say("%s %s", terminal.HeaderColor(T("memory:")), formatters.ByteSize(currentApp.Memory*bytesInAMegabyte))
+		cmd.ui.Say("%s %s", terminal.HeaderColor(T("disk:")), formatters.ByteSize(currentApp.DiskQuota*bytesInAMegabyte))
+		cmd.ui.Say("%s %d", terminal.HeaderColor(T("instances:")), currentApp.InstanceCount)
 
 		return
 	}
@@ -85,7 +86,11 @@ func (cmd *Scale) Run(c *cli.Context) {
 	if c.String("m") != "" {
 		memory, err := formatters.ToMegabytes(c.String("m"))
 		if err != nil {
-			cmd.ui.Failed("Invalid memory limit: %s\n%s", c.String("m"), err)
+			cmd.ui.Failed(T("Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
+				map[string]interface{}{
+					"Memory":           c.String("m"),
+					"ErrorDescription": err,
+				}))
 		}
 		params.Memory = &memory
 		shouldRestart = true
@@ -94,7 +99,11 @@ func (cmd *Scale) Run(c *cli.Context) {
 	if c.String("k") != "" {
 		diskQuota, err := formatters.ToMegabytes(c.String("k"))
 		if err != nil {
-			cmd.ui.Failed("Invalid disk quota: %s\n%s", c.String("k"), err)
+			cmd.ui.Failed(T("Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
+				map[string]interface{}{
+					"DiskQuota":        c.String("k"),
+					"ErrorDescription": err,
+				}))
 		}
 		params.DiskQuota = &diskQuota
 		shouldRestart = true
@@ -105,7 +114,10 @@ func (cmd *Scale) Run(c *cli.Context) {
 		if instances > 0 {
 			params.InstanceCount = &instances
 		} else {
-			cmd.ui.Failed("Invalid instance count: %d\nInstance count must be a positive integer", instances)
+			cmd.ui.Failed(T("Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer",
+				map[string]interface{}{
+					"InstanceCount": instances,
+				}))
 		}
 	}
 
@@ -113,12 +125,13 @@ func (cmd *Scale) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Scaling app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(currentApp.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"AppName":     terminal.EntityNameColor(currentApp.Name),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	updatedApp, apiErr := cmd.appRepo.Update(currentApp.Guid, params)
 	if apiErr != nil {
@@ -137,7 +150,8 @@ func (cmd *Scale) confirmRestart(context *cli.Context, appName string) bool {
 	if context.Bool("f") {
 		return true
 	} else {
-		result := cmd.ui.Confirm("This will cause the app to restart. Are you sure you want to scale %s?", terminal.EntityNameColor(appName))
+		result := cmd.ui.Confirm(T("This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
+			map[string]interface{}{"AppName": terminal.EntityNameColor(appName)}))
 		cmd.ui.Say("")
 		return result
 	}

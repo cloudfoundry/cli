@@ -31,11 +31,11 @@ func (cmd *DeleteApp) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete",
 		ShortName:   "d",
-		Description: "Delete an app",
-		Usage:       "CF_NAME delete APP [-f -r]",
+		Description: T("Delete an app"),
+		Usage:       T("CF_NAME delete APP [-f -r]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
-			cli.BoolFlag{Name: "r", Usage: "Also delete any mapped routes"},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
+			cli.BoolFlag{Name: "r", Usage: T("Also delete any mapped routes")},
 		},
 	}
 }
@@ -53,18 +53,18 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 	appName := c.Args()[0]
 
 	if !c.Bool("f") {
-		response := cmd.ui.ConfirmDelete("app", appName)
+		response := cmd.ui.ConfirmDelete(T("app"), appName)
 		if !response {
 			return
 		}
 	}
 
-	cmd.ui.Say("Deleting app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(appName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Deleting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"AppName":   terminal.EntityNameColor(appName),
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	app, apiErr := cmd.appRepo.Read(appName)
 
@@ -72,7 +72,7 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 	case nil: // no error
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("App %s does not exist.", appName)
+		cmd.ui.Warn(T("App {{.AppName}} does not exist.", map[string]interface{}{"AppName": appName}))
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())

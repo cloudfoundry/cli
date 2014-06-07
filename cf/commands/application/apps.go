@@ -29,7 +29,7 @@ func (cmd ListApps) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "apps",
 		ShortName:   "a",
-		Description: "List all apps in the target space",
+		Description: T("List all apps in the target space"),
 		Usage:       "CF_NAME apps",
 	}
 }
@@ -43,11 +43,11 @@ func (cmd ListApps) GetRequirements(requirementsFactory requirements.Factory, c 
 }
 
 func (cmd ListApps) Run(c *cli.Context) {
-	cmd.ui.Say("Getting apps in org %s / space %s as %s...",
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	apps, apiErr := cmd.appSummaryRepo.GetSummariesInCurrentSpace()
 
@@ -60,18 +60,11 @@ func (cmd ListApps) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	if len(apps) == 0 {
-		cmd.ui.Say("No apps found")
+		cmd.ui.Say(T("No apps found"))
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{
-		"name",
-		"requested state",
-		"instances",
-		"memory",
-		"disk",
-		"urls",
-	})
+	table := terminal.NewTable(cmd.ui, []string{T("name"), T("requested state"), T("instances"), T("memory"), T("disk"), T("urls")})
 
 	for _, application := range apps {
 		var urls []string
