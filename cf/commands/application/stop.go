@@ -35,8 +35,8 @@ func (cmd *Stop) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "stop",
 		ShortName:   "sp",
-		Description: "Stop an app",
-		Usage:       "CF_NAME stop APP",
+		Description: T("Stop an app"),
+		Usage:       T("CF_NAME stop APP"),
 	}
 }
 
@@ -57,12 +57,12 @@ func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Appl
 		return
 	}
 
-	cmd.ui.Say("Stopping app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"AppName":     terminal.EntityNameColor(app.Name),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 	state := "STOPPED"
 	updatedApp, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
@@ -79,7 +79,7 @@ func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Appl
 func (cmd *Stop) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	if app.State == "stopped" {
-		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already stopped"))
+		cmd.ui.Say(terminal.WarningColor(T("App ") + app.Name + T(" is already stopped")))
 	} else {
 		cmd.ApplicationStop(app)
 	}

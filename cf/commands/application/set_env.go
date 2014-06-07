@@ -30,8 +30,8 @@ func (cmd *SetEnv) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:            "set-env",
 		ShortName:       "se",
-		Description:     "Set an env variable for an app",
-		Usage:           "CF_NAME set-env APP NAME VALUE",
+		Description:     T("Set an env variable for an app"),
+		Usage:           T("CF_NAME set-env APP NAME VALUE"),
 		SkipFlagParsing: true,
 	}
 }
@@ -55,14 +55,14 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	varValue := c.Args()[2]
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Setting env variable '%s' to '%s' for app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(varName),
-		terminal.EntityNameColor(varValue),
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+		map[string]interface{}{
+			"VarName":     terminal.EntityNameColor(varName),
+			"VarValue":    terminal.EntityNameColor(varValue),
+			"AppName":     terminal.EntityNameColor(app.Name),
+			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 	if len(app.EnvironmentVars) == 0 {
 		app.EnvironmentVars = map[string]string{}
@@ -78,5 +78,6 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("TIP: Use '%s' to ensure your env variable changes take effect", terminal.CommandColor(cf.Name()+" push"))
+	cmd.ui.Say(T("TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
+		map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " push")}))
 }

@@ -39,8 +39,8 @@ func NewShowApp(ui terminal.UI, config configuration.Reader, appSummaryRepo api.
 func (cmd *ShowApp) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "app",
-		Description: "Display health and status for app",
-		Usage:       "CF_NAME app APP",
+		Description: T("Display health and status for app"),
+		Usage:       T("CF_NAME app APP"),
 	}
 }
 
@@ -66,12 +66,12 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 
 func (cmd *ShowApp) ShowApp(app models.Application) {
 
-	cmd.ui.Say("Showing health and status for app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"AppName":   terminal.EntityNameColor(app.Name),
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
 
@@ -95,23 +95,27 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s %s", terminal.HeaderColor("requested state:"), ui_helpers.ColoredAppState(application.ApplicationFields))
-	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), ui_helpers.ColoredAppInstances(application.ApplicationFields))
-	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), formatters.ByteSize(application.Memory*formatters.MEGABYTE), application.InstanceCount)
+	cmd.ui.Say("\n%s %s", terminal.HeaderColor(T("requested state:")), ui_helpers.ColoredAppState(application.ApplicationFields))
+	cmd.ui.Say("%s %s", terminal.HeaderColor(T("instances:")), ui_helpers.ColoredAppInstances(application.ApplicationFields))
+	cmd.ui.Say(T("{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
+		map[string]interface{}{
+			"Usage":           terminal.HeaderColor(T("usage:")),
+			"FormattedMemory": formatters.ByteSize(application.Memory * formatters.MEGABYTE),
+			"InstanceCount":   application.InstanceCount}))
 
 	var urls []string
 	for _, route := range application.Routes {
 		urls = append(urls, route.URL())
 	}
 
-	cmd.ui.Say("%s %s\n", terminal.HeaderColor("urls:"), strings.Join(urls, ", "))
+	cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("urls:")), strings.Join(urls, ", "))
 
 	if appIsStopped {
-		cmd.ui.Say("There are no running instances of this app.")
+		cmd.ui.Say(T("There are no running instances of this app."))
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{"", "state", "since", "cpu", "memory", "disk"})
+	table := terminal.NewTable(cmd.ui, []string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk")})
 
 	for index, instance := range instances {
 		table.Add([]string{
@@ -119,8 +123,14 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 			ui_helpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
 			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
-			fmt.Sprintf("%s of %s", formatters.ByteSize(instance.MemUsage), formatters.ByteSize(instance.MemQuota)),
-			fmt.Sprintf("%s of %s", formatters.ByteSize(instance.DiskUsage), formatters.ByteSize(instance.DiskQuota)),
+			fmt.Sprintf(T("{{.MemUsage}} of {{.MemQuota}}",
+				map[string]interface{}{
+					"MemUsage": formatters.ByteSize(instance.MemUsage),
+					"MemQuota": formatters.ByteSize(instance.MemQuota)})),
+			fmt.Sprintf(T("{{.DiskUsage}} of {{.DiskQuota}}",
+				map[string]interface{}{
+					"DiskUsage": formatters.ByteSize(instance.DiskUsage),
+					"DiskQuota": formatters.ByteSize(instance.DiskQuota)})),
 		})
 	}
 

@@ -33,10 +33,10 @@ func NewLogs(ui terminal.UI, config configuration.Reader, logsRepo api.LogsRepos
 func (cmd *Logs) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "logs",
-		Description: "Tail or show recent logs for an app",
-		Usage:       "CF_NAME logs APP",
+		Description: T("Tail or show recent logs for an app"),
+		Usage:       T("CF_NAME logs APP"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "recent", Usage: "Dump recent logs instead of tailing"},
+			cli.BoolFlag{Name: "recent", Usage: T("Dump recent logs instead of tailing")},
 		},
 	}
 }
@@ -67,12 +67,12 @@ func (cmd *Logs) Run(c *cli.Context) {
 }
 
 func (cmd *Logs) recentLogsFor(app models.Application) {
-	cmd.ui.Say("Connected, dumping recent logs for app %s in org %s / space %s as %s...\n",
-		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+		map[string]interface{}{
+			"AppName":   terminal.EntityNameColor(app.Name),
+			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	messages, err := cmd.logsRepo.RecentLogsFor(app.Guid)
 	if err != nil {
@@ -86,12 +86,12 @@ func (cmd *Logs) recentLogsFor(app models.Application) {
 
 func (cmd *Logs) tailLogsFor(app models.Application) {
 	onConnect := func() {
-		cmd.ui.Say("Connected, tailing logs for app %s in org %s / space %s as %s...\n",
-			terminal.EntityNameColor(app.Name),
-			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			terminal.EntityNameColor(cmd.config.Username()),
-		)
+		cmd.ui.Say(T("Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+			map[string]interface{}{
+				"AppName":   terminal.EntityNameColor(app.Name),
+				"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 	}
 
 	err := cmd.logsRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
@@ -107,7 +107,7 @@ func (cmd *Logs) handleError(err error) {
 	switch err.(type) {
 	case nil:
 	case *errors.InvalidSSLCert:
-		cmd.ui.Failed(err.Error() + "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error")
+		cmd.ui.Failed(err.Error() + T("\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error"))
 	default:
 		cmd.ui.Failed(err.Error())
 	}
