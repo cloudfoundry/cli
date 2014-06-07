@@ -12,6 +12,8 @@
   }
 
   trap printStatus EXIT
+  
+  bin/generate-language-resources
 
   GODEP=$(which godep)
   if [[ -z $GODEP ]] ; then
