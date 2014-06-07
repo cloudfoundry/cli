@@ -49,7 +49,7 @@ func (cmd Authenticate) Run(c *cli.Context) {
 		map[string]interface{}{"ApiEndpoint": terminal.EntityNameColor(cmd.config.ApiEndpoint())}))
 	cmd.ui.Say(T("Authenticating..."))
 
-  apiErr := cmd.authenticator.Authenticate(map[string]string{"username": c.Args()[0], "password": c.Args()[1]})
+	apiErr := cmd.authenticator.Authenticate(map[string]string{"username": c.Args()[0], "password": c.Args()[1]})
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
