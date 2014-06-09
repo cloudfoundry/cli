@@ -44,8 +44,8 @@
       "translation": "service"
    },
    {
-      "id": "TIP: Use '{{.Arg0}}' to ensure your env variable changes take effect",
-      "translation": "TIP: Use '{{.Arg0}}' to ensure your env variable changes take effect"
+      "id": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect",
+      "translation": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect"
    },
    {
       "id": "Plan {{.ServicePlanName}} cannot be found",
@@ -84,8 +84,8 @@
       "translation": "{{.CountOfServices}} migrated."
    },
    {
-      "id": "Binding between {{.Arg0}} and {{.Arg1}} did not exist",
-      "translation": "Binding between {{.Arg0}} and {{.Arg1}} did not exist"
+      "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
+      "translation": "Binding between {{.InstanceName}} and {{.AppName}} did not exist"
    },
    {
       "id": "CF_NAME bind-service APP SERVICE_INSTANCE",

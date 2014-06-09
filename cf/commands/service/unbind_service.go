@@ -75,7 +75,8 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	if !found {
-		cmd.ui.Warn(T("Binding between {{.Arg0}} and {{.Arg1}} did not exist", map[string]interface{}{"Arg0": instance.Name, "Arg1": app.Name}))
+		cmd.ui.Warn(T("Binding between {{.InstanceName}} and {{.AppName}} did not exist",
+			map[string]interface{}{"InstanceName": instance.Name, "AppName": app.Name}))
 	}
 
 }
