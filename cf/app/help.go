@@ -74,7 +74,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 
 	presenter.Commands = []groupedCommands{
 		{
-			Name: "GETTING STARTED",
+			Name: T("GETTING STARTED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "login"),
@@ -87,7 +87,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "APPS",
+			Name: T("APPS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "apps"),
@@ -115,7 +115,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "SERVICES",
+			Name: T("SERVICES"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "marketplace"),
@@ -134,7 +134,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "ORGS",
+			Name: T("ORGS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "orgs"),
@@ -146,7 +146,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "SPACES",
+			Name: T("SPACES"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "spaces"),
@@ -158,7 +158,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "DOMAINS",
+			Name: T("DOMAINS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "domains"),
@@ -169,7 +169,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "ROUTES",
+			Name: T("ROUTES"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "routes"),
@@ -181,7 +181,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "BUILDPACKS",
+			Name: T("BUILDPACKS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "buildpacks"),
@@ -192,7 +192,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "USER ADMIN",
+			Name: T("USER ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "create-user"),
@@ -208,7 +208,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "ORG ADMIN",
+			Name: T("ORG ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "quotas"),
@@ -221,7 +221,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "SERVICE ADMIN",
+			Name: T("SERVICE ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "service-auth-tokens"),
@@ -240,7 +240,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "ADVANCED",
+			Name: T("ADVANCED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "curl"),
@@ -253,7 +253,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 }
 
 func ShowAppHelp(helpTemplate string, appToPrint interface{}) {
-	showAppHelp(helpTemplate, appToPrint)
+	translatedTemplatedHelp := T(strings.Replace(helpTemplate, "{{", "[[", -1))
+	translatedTemplatedHelp = strings.Replace(helpTemplate, "[[", "{{", -1)
+	showAppHelp(translatedTemplatedHelp, appToPrint)
 }
 
 func showAppHelp(helpTemplate string, appToPrint interface{}) {

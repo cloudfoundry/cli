@@ -11,43 +11,48 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/codegangsta/cli"
+
+	"github.com/cloudfoundry/cli/cf/i18n"
 )
 
-var appHelpTemplate = `{{.Title "NAME:"}}
+var (
+	t               = i18n.Init("cf/app", i18n.GetResourcesPath())
+	appHelpTemplate = `{{.Title "` + t("NAME:") + `"}}
    {{.Name}} - {{.Usage}}
 
-{{.Title "USAGE:"}}
-   [environment variables] {{.Name}} [global options] command [arguments...] [command options]
+{{.Title "` + t("USAGE:") + `"}}
+   ` + t("[environment variables] {{.Name}} [global options] command [arguments...] [command options]") + `
 
-{{.Title "VERSION:"}}
+{{.Title "` + t("VERSION:") + `"}}
    {{.Version}}
 
-{{.Title "BUILD TIME:"}}
+{{.Title "` + t("BUILD TIME:") + `"}}
    {{.Compiled}}
    {{range .Commands}}
 {{.SubTitle .Name}}{{range .CommandSubGroups}}
 {{range .}}   {{.Name}} {{.Description}}
 {{end}}{{end}}{{end}}
-{{.Title "ENVIRONMENT VARIABLES"}}
-   CF_COLOR=false                     Do not colorize output
-   CF_HOME=path/to/dir/               Override path to default config directory
-   CF_STAGING_TIMEOUT=15              Max wait time for buildpack staging, in minutes
-   CF_STARTUP_TIMEOUT=5               Max wait time for app instance startup, in minutes
-   CF_TRACE=true                      Print API request diagnostics to stdout
-   CF_TRACE=path/to/trace.log         Append API request diagnostics to a log file
-   HTTP_PROXY=proxy.example.com:8080  Enable HTTP proxying for API requests
+{{.Title "` + t("ENVIRONMENT VARIABLES") + `"}}
+   CF_COLOR=false                     ` + t("Do not colorize output") + `
+   CF_HOME=path/to/dir/               ` + t("Override path to default config directory") + `
+   CF_STAGING_TIMEOUT=15              ` + t("Max wait time for buildpack staging, in minutes") + `
+   CF_STARTUP_TIMEOUT=5               ` + t("Max wait time for app instance startup, in minutes") + `
+   CF_TRACE=true                      ` + t("Print API request diagnostics to stdout") + `
+   CF_TRACE=path/to/trace.log         ` + t("Append API request diagnostics to a log file") + `
+   HTTP_PROXY=proxy.example.com:8080  ` + t("Enable HTTP proxying for API requests") + `
 
-{{.Title "GLOBAL OPTIONS"}}
-   --version, -v                      Print the version
-   --help, -h                         Show help
+{{.Title "` + t("GLOBAL OPTIONS") + `"}}
+   --version, -v                      ` + t("Print the version") + `
+   --help, -h                         ` + t("Show help") + `
 `
+)
 
 func NewApp(cmdRunner command_runner.Runner, metadatas ...command_metadata.CommandMetadata) (app *cli.App) {
 	helpCommand := cli.Command{
 		Name:        "help",
 		ShortName:   "h",
-		Description: "Show help",
-		Usage:       fmt.Sprintf("%s help [COMMAND]", cf.Name()),
+		Description: T("Show help"),
+		Usage:       fmt.Sprintf(T("{{.Command}} help [COMMAND]", map[string]interface{}{"Command": cf.Name()})),
 		Action: func(c *cli.Context) {
 			args := c.Args()
 			if len(args) > 0 {
@@ -58,7 +63,7 @@ func NewApp(cmdRunner command_runner.Runner, metadatas ...command_metadata.Comma
 		},
 	}
 
-	trace.Logger.Printf("\n%s\n%s\n\n", terminal.HeaderColor("VERSION:"), cf.Version)
+	trace.Logger.Printf("\n%s\n%s\n\n", terminal.HeaderColor(T("VERSION:")), cf.Version)
 
 	app = cli.NewApp()
 	app.Usage = cf.Usage
