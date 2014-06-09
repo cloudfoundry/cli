@@ -1,15 +1,22 @@
 #!/usr/bin/env ruby
 
+@verbose = false
+
 def split_locale(locale)
   return locale.split('_')
 end
 
 def verify_strings(english_reference_file, language_to_verify, locale_to_verify)
   file_to_verify = english_reference_file.gsub("en_US", locale_to_verify).gsub("/en/", "/#{language_to_verify}/")
-  puts "Verifying: \n\t #{english_reference_file} \n\t #{file_to_verify}"
+  puts "Verifying: \n\t #{english_reference_file} \n\t #{file_to_verify}" if @verbose
   result = system("gi18n -verify-strings -source-language en_US -f #{english_reference_file} -languages #{locale_to_verify} -language-files #{file_to_verify}")
   unless result
     puts "failed verification:"
+    unless File.exist?(file_to_verify)
+      puts "#{file_to_verify} does not exist."
+      exit 1
+    end
+
     `find #{file_to_verify}.* -type f`.split.each do |output_info|
       puts output_info
       puts File.read(output_info)
@@ -18,12 +25,17 @@ def verify_strings(english_reference_file, language_to_verify, locale_to_verify)
   end
 end
 
-english_json_files = `find cf/i18n/resources/en/* -type f`.split
-supported_locales = %w[fr_FR]
+def run
+  english_json_files = `find cf/i18n/resources/en/* -type f`.split
+  supported_locales = %w[fr_FR]
 
-english_json_files.each do |english_reference_file|
-  supported_locales.each do |locale|
-    language, territory = split_locale(locale)
-    verify_strings(english_reference_file, language, locale)
+  english_json_files.each do |english_reference_file|
+    supported_locales.each do |locale|
+      language, territory = split_locale(locale)
+      verify_strings(english_reference_file, language, locale)
+    end
   end
 end
+
+@verbose = ARGV.include?("-v")
+run
