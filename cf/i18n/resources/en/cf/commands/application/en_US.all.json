@@ -356,10 +356,6 @@
       "translation": "Restart an app"
    },
    {
-      "id": "STARTED",
-      "translation": "STARTED"
-   },
-   {
       "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
    },
