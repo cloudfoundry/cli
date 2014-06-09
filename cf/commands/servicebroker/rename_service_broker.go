@@ -25,8 +25,8 @@ func NewRenameServiceBroker(ui terminal.UI, config configuration.Reader, repo ap
 func (cmd RenameServiceBroker) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "rename-service-broker",
-		Description: "Rename a service broker",
-		Usage:       "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
+		Description: T("Rename a service broker"),
+		Usage:       T("CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"),
 	}
 }
 
@@ -47,11 +47,11 @@ func (cmd RenameServiceBroker) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Renaming service broker %s to %s as %s",
-		terminal.EntityNameColor(serviceBroker.Name),
-		terminal.EntityNameColor(c.Args()[1]),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}",
+		map[string]interface{}{
+			"OldName":  terminal.EntityNameColor(serviceBroker.Name),
+			"NewName":  terminal.EntityNameColor(c.Args()[1]),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	newName := c.Args()[1]
 

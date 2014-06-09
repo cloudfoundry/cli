@@ -25,8 +25,8 @@ func NewCreateServiceBroker(ui terminal.UI, config configuration.Reader, service
 func (cmd CreateServiceBroker) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-service-broker",
-		Description: "Create a service broker",
-		Usage:       "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+		Description: T("Create a service broker"),
+		Usage:       T("CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"),
 	}
 }
 
@@ -47,10 +47,10 @@ func (cmd CreateServiceBroker) Run(c *cli.Context) {
 	password := c.Args()[2]
 	url := c.Args()[3]
 
-	cmd.ui.Say("Creating service broker %s as %s...",
-		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
+	cmd.ui.Say(T("Creating service broker {{.Name}} as {{.Username}}...",
+		map[string]interface{}{
+			"Name":     terminal.EntityNameColor(name),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	apiErr := cmd.serviceBrokerRepo.Create(name, url, username, password)
 	if apiErr != nil {
