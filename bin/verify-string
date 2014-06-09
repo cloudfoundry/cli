@@ -6,6 +6,14 @@ def split_locale(locale)
   return locale.split('_')
 end
 
+def install_gi18n
+  result = system("go get github.com/maximilien/i18n4cf/gi18n")
+  unless result
+    puts "Cannot install latest gi18n tool to verify strings"
+    exit 1
+  end
+end
+
 def verify_strings(english_reference_file, language_to_verify, locale_to_verify)
   file_to_verify = english_reference_file.gsub("en_US", locale_to_verify).gsub("/en/", "/#{language_to_verify}/")
   puts "Verifying: \n\t #{english_reference_file} \n\t #{file_to_verify}" if @verbose
@@ -38,4 +46,5 @@ def run
 end
 
 @verbose = ARGV.include?("-v")
+install_gi18n
 run
