@@ -80,8 +80,12 @@
       "translation": "OPTIONS GLOBALES"
    },
    {
-      "id": "[environment variables] {{.Name}} [global options] command [arguments...] [command options]",
-      "translation": "[variables d'environnement] {{.Name}} [options globales] commande [arguments...] [options de commande]"
+      "id": "[environment variables]",
+      "translation": "[variables d'environnement]"
+   },
+   {
+      "id": "[global options] command [arguments...] [command options]",
+      "translation": "[options globales] commande [arguments...] [options de commande]"
    },
    {
       "id": "ENVIRONMENT VARIABLES",

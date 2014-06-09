@@ -21,7 +21,7 @@ var (
    {{.Name}} - {{.Usage}}
 
 {{.Title "` + t("USAGE:") + `"}}
-   ` + t("[environment variables] {{.Name}} [global options] command [arguments...] [command options]") + `
+   ` + t("[environment variables]") + ` {{.Name}} ` + t("[global options] command [arguments...] [command options]") + `
 
 {{.Title "` + t("VERSION:") + `"}}
    {{.Version}}
