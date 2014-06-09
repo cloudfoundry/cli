@@ -24,7 +24,7 @@ func (repo ManifestDiskRepository) ReadManifest(inputPath string) (*Manifest, er
 	manifestPath, err := repo.manifestPath(inputPath)
 
 	if err != nil {
-		return m, errors.NewWithError("Error finding manifest", err)
+		return m, errors.NewWithError(T("Error finding manifest"), err)
 	}
 
 	m.Path = manifestPath
@@ -58,7 +58,7 @@ func (repo ManifestDiskRepository) readAllYAMLFiles(path string) (mergedMap gene
 
 	inheritedPath, ok := mapp.Get("inherit").(string)
 	if !ok {
-		err = errors.New("invalid inherit path in manifest")
+		err = errors.New(T("invalid inherit path in manifest"))
 		return
 	}
 
@@ -84,7 +84,7 @@ func parseManifest(file io.Reader) (yamlMap generic.Map, err error) {
 	}
 
 	if !generic.IsMappable(yamlMap) {
-		err = errors.New("Invalid manifest. Expected a map")
+		err = errors.New(T("Invalid manifest. Expected a map"))
 		return
 	}
 

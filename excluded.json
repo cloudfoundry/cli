@@ -137,7 +137,11 @@
 	"2006-01-02 03:04:05 PM",
 	
 	"CF_STAGING_TIMEOUT",
-	"CF_STARTUP_TIMEOUT"
+	"CF_STARTUP_TIMEOUT",
+	
+	"manifest.yml",
+	"manifest.yaml",
+	"inherit"
 
   ],
   "excludedRegexps": [
