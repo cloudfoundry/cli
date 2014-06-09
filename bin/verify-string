@@ -10,7 +10,7 @@ def split_locale(locale)
 end
 
 def install_gi18n
-  result = system("go get github.com/maximilien/i18n4cf/gi18n")
+  result = system("go get -u github.com/maximilien/i18n4cf/gi18n")
   unless result
     puts "Cannot install latest gi18n tool to verify strings"
     exit 1
