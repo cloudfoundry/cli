@@ -48,11 +48,11 @@
       "translation": "GÉRANT DE FACTURE"
    },
    {
-      "id": "CF_NAME create-user NOM_DE_LUTILISATEUR PASSWORD",
+      "id": "CF_NAME create-user USERNAME PASSWORD",
       "translation": "CF_NAME create-user PSEUDO MOT_DE_PASSE"
    },
    {
-      "id": "CF_NAME delete-user NOM_DE_LUTILISATEUR [-f]",
+      "id": "CF_NAME delete-user USERNAME [-f]",
       "translation": "CF_NAME delete-user NOM_UTILISATEUR [-f]"
    },
    {
@@ -60,11 +60,11 @@
       "translation": "CF_NAME org-users ORG"
    },
    {
-      "id": "CF_NAME set-org-role NOM_DE_LUTILISATEUR ORG ROLE\n\n",
+      "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
       "translation": "CF_NAME set-org-role NOM_DE_LUTILISATEUR ORG RÔLE\n\n"
    },
    {
-      "id": "CF_NAME set-space-role NOM_DE_LUTILISATEUR ORG SPACE ROLE\n\n",
+      "id": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n",
       "translation": "CF_NAME set-espace-role NOM_DE_LUTILISATEUR ORG ESPACE RÔLE\n\n"
    },
    {
@@ -72,11 +72,11 @@
       "translation": "CF_NAME space-users ORG ESPACE"
    },
    {
-      "id": "CF_NAME unset-org-role NOM_DE_LUTILISATEUR ORG ROLE\n\n",
+      "id": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n",
       "translation": "CF_NAME unset-org-role NOM_DE_LUTILISATEUR ORG RÔLE"
    },
    {
-      "id": "CF_NAME unset-space-role NOM_DE_LUTILISATEUR ORG SPACE ROLE\n\n",
+      "id": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n",
       "translation": "CF_NAME unset-espace-rôle NOM_DE_LUTILISATEUR ORG ESPACE RÔLE\n\n"
    },
    {
@@ -97,7 +97,7 @@
    },
    {
       "id": "Error creating user {{.TargetUser}}.\n{{.Error}}",
-      "translation": "Erreur en créant l'utilisateur {{.TargetUser}}.\n{{.Erreur}}"
+      "translation": "Erreur en créant l'utilisateur {{.TargetUser}}.\n{{.Error}}"
    },
    {
       "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
