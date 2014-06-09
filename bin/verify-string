@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+ENV['GOPATH']="#{ENV['HOME']}/go"
+ENV['PATH']="#{ENV['PATH']}:#{ENV['GOPATH']}/bin"
+
 @verbose = false
 
 def split_locale(locale)
