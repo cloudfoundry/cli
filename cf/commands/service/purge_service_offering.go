@@ -67,10 +67,12 @@ func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 		return
 	}
 	cmd.ui.Say(T("Purging service {{.ServiceName}}...", map[string]interface{}{"ServiceName": serviceName}))
-	cmd.serviceRepo.PurgeServiceOffering(offering)
-	cmd.ui.Ok()
+	err := cmd.serviceRepo.PurgeServiceOffering(offering)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 
-	return
+	cmd.ui.Ok()
 }
 
 func NewPurgeServiceOffering(ui terminal.UI, config configuration.Reader, serviceRepo api.ServiceRepository) (cmd PurgeServiceOffering) {
