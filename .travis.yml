@@ -1,9 +1,9 @@
 language: go
 go:
-- 1.2
+  - 1.2
 before_install:
-- go get code.google.com/p/go.tools/cmd/vet
-- go get github.com/tools/godep
+  - go get -u code.google.com/p/go.tools/cmd/vet
+  - go get -u github.com/tools/godep
 install: PATH=$PATH:$HOME/gopath/bin ./bin/build
 script:  PATH=$PATH:$HOME/gopath/bin ./bin/test
 branches:
