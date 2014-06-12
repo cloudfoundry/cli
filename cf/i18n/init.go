@@ -19,7 +19,8 @@ const (
 	DEFAULT_LANGUAGE = "en"
 )
 
-var SUPPORTED_LANGUAGES = []string{"ar", "ca", "zh", "cs", "da", "nl", "en", "fr", "de", "it", "ja", "lt", "pt", "es"}
+var SUPPORTED_LANGUAGES = []string{"en", "fr"}
+var SUPPORTED_LOCALES = map[string]string{"en": "en_US", "fr": "fr_FR"}
 var resources_path = filepath.Join("cf", "i18n", "resources")
 
 func GetResourcesPath() string {
@@ -52,7 +53,18 @@ func initWithUserLocale(packageName, i18nDirname string) (string, error) {
 	}
 
 	userLocale = strings.Replace(userLocale, "-", "_", 1)
-	return userLocale, loadFromAsset(packageName, i18nDirname, userLocale, language)
+	err = loadFromAsset(packageName, i18nDirname, userLocale, language)
+	if err != nil {
+		locale := SUPPORTED_LOCALES[language]
+		if locale == "" {
+			userLocale = DEFAULT_LOCALE
+		} else {
+			userLocale = locale
+		}
+		err = loadFromAsset(packageName, i18nDirname, userLocale, language)
+	}
+
+	return userLocale, err
 }
 
 func mustLoadDefaultLocale(packageName, i18nDirname string) string {

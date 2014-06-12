@@ -55,6 +55,16 @@ var _ = Describe("i18n.Init() function", func() {
 				translation = T("Hello {{.Adj}} new world!", map[string]interface{}{"Adj": "brave"})
 				Ω("Hello brave new world!").Should(Equal(translation))
 			})
+
+			Context("because we don't have the territory", func() {
+				It("defaults to same language in supported territory", func() {
+					os.Setenv("LC_ALL", "fr_CA.UTF-8")
+					T := i18n.Init("main", I18N_PATH)
+
+					translation := T("Hello world!")
+					Ω("Àlo le monde!").Should(Equal(translation))
+				})
+			})
 		})
 
 		Context("when not even the english translation can be loaded", func() {
