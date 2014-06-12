@@ -142,6 +142,21 @@ var _ = Describe("purge-service command", func() {
 		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
 	})
 
+	It("fails with an error message when the purging request fails", func() {
+		deps := setupDependencies()
+		deps.serviceRepo.PurgeServiceOfferingApiResponse = cferrors.New("crumpets insufficiently buttered")
+
+		testcmd.RunCommand(NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
+			[]string{"-f", "-p", "the-provider", "the-service-name"},
+			deps.requirementsFactory,
+		)
+
+		Expect(deps.ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+			[]string{"crumpets insufficiently buttered"},
+		))
+	})
+
 	It("indicates when a service doesn't exist", func() {
 		deps := setupDependencies()
 

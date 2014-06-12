@@ -96,7 +96,7 @@ func (repo *FakeServiceRepo) FindServiceOfferingsForSpaceByLabel(spaceGuid, name
 func (repo *FakeServiceRepo) PurgeServiceOffering(offering models.ServiceOffering) (apiErr error) {
 	repo.PurgedServiceOffering = offering
 	repo.PurgeServiceOfferingCalled = true
-	return
+	return repo.PurgeServiceOfferingApiResponse
 }
 
 func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiErr error) {
