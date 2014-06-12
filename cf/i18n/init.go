@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	DEFAULT_LOCAL = "en_US"
+	DEFAULT_LOCALE   = "en_US"
+	DEFAULT_LANGUAGE = "en"
 )
 
 var SUPPORTED_LANGUAGES = []string{"ar", "ca", "zh", "cs", "da", "nl", "en", "fr", "de", "it", "ja", "lt", "pt", "es"}
@@ -26,19 +27,12 @@ func GetResourcesPath() string {
 }
 
 func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
-	userLocale, err := jibber_jabber.DetectIETF()
+	userLocale, err := initWithUserLocale(packageName, i18nDirname)
 	if err != nil {
-		userLocale = DEFAULT_LOCAL
+		userLocale = mustLoadDefaultLocale(packageName, i18nDirname)
 	}
 
-	// convert IETF format to XCU format
-	userLocale = strings.Replace(userLocale, "-", "_", 1)
-	loadFromAsset(packageName, i18nDirname, userLocale)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	T, err := go_i18n.Tfunc(userLocale, DEFAULT_LOCAL)
+	T, err := go_i18n.Tfunc(userLocale, DEFAULT_LOCALE)
 	if err != nil {
 		panic(err)
 	}
@@ -46,12 +40,33 @@ func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
 	return T
 }
 
-func loadFromAsset(packageName, assetPath, locale string) error {
-	language, err := jibber_jabber.DetectLanguage()
+func initWithUserLocale(packageName, i18nDirname string) (string, error) {
+	userLocale, err := jibber_jabber.DetectIETF()
 	if err != nil {
-		return err
+		userLocale = DEFAULT_LOCALE
 	}
 
+	language, err := jibber_jabber.DetectLanguage()
+	if err != nil {
+		language = DEFAULT_LANGUAGE
+	}
+
+	userLocale = strings.Replace(userLocale, "-", "_", 1)
+	return userLocale, loadFromAsset(packageName, i18nDirname, userLocale, language)
+}
+
+func mustLoadDefaultLocale(packageName, i18nDirname string) string {
+	userLocale := DEFAULT_LOCALE
+
+	err := loadFromAsset(packageName, i18nDirname, DEFAULT_LOCALE, DEFAULT_LANGUAGE)
+	if err != nil {
+		panic("Could not load en_US language files. God save the queen. " + err.Error())
+	}
+
+	return userLocale
+}
+
+func loadFromAsset(packageName, assetPath, locale, language string) error {
 	assetName := locale + ".all.json"
 	assetKey := filepath.Join(assetPath, language, packageName, assetName)
 

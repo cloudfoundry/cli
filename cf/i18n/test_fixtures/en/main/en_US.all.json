@@ -10,5 +10,9 @@
     {
         "id": "LOL",
         "translation": "Laugh out loud"
+    },
+    {
+        "id": "Hello {{.Adj}} new world!",
+        "translation": "Hello {{.Adj}} new world!"
     }
 ]
