@@ -51,6 +51,17 @@ var _ = Describe("i18n.Init() function", func() {
 
 				translation := T("Hello world!")
 				Ω("Hello world!").Should(Equal(translation))
+
+				translation = T("Hello {{.Adj}} new world!", map[string]interface{}{"Adj": "brave"})
+				Ω("Hello brave new world!").Should(Equal(translation))
+			})
+		})
+
+		Context("when not even the english translation can be loaded", func() {
+			It("panics", func() {
+				os.Setenv("LC_ALL", "zz_FF.utf-8")
+				init := func() { i18n.Init("main", "should/not/be/a/valid/path") }
+				Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
 			})
 		})
 	})
