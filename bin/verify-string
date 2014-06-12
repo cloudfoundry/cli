@@ -20,7 +20,7 @@ end
 def verify_strings(english_reference_file, language_to_verify, locale_to_verify)
   file_to_verify = english_reference_file.gsub("en_US", locale_to_verify).gsub("/en/", "/#{language_to_verify}/")
   puts "Verifying: \n\t #{english_reference_file} \n\t #{file_to_verify}" if @verbose
-  result = system("gi18n -verify-strings -source-language en_US -f #{english_reference_file} -languages #{locale_to_verify} -language-files #{file_to_verify}")
+  result = system("gi18n -c verify-strings -source-language en_US -f #{english_reference_file} -languages #{locale_to_verify} -language-files #{file_to_verify}")
   unless result
     puts "failed verification:"
     unless File.exist?(file_to_verify)
