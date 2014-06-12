@@ -5,11 +5,11 @@
    },
    {
       "id": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n",
-      "translation": "CF_NAME auth name@example.com \"mon mot de passe\" (utilisez des guillemets pour les mots de passe avec un espace)"
+      "translation": "CF_NAME auth name@example.com \"mon mot de passe\" (utilisez des guillemets pour les mots de passe avec un espace)\n"
    },
    {
       "id": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n",
-      "translation": "CF_NAME login (nom de l'utilisateur et mot de passe omettre de se connecter de manière interactive - CF_NAME vous invite à la fois pour les deux)"
+      "translation": "CF_NAME login (nom de l'utilisateur et mot de passe omettre de se connecter de manière interactive - CF_NAME vous invite à la fois pour les deux)\n"
    },
    {
       "id": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
@@ -21,11 +21,11 @@
    },
    {
       "id": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n",
-      "translation": "CF_NAME login-u name@example.com-p \"mot de passe\" (utilisez des guillemets pour les mots de passe avec un espace)"
+      "translation": "CF_NAME login-u name@example.com-p \"mot de passe\" (utilisez des guillemets pour les mots de passe avec un espace)\n"
    },
    {
       "id": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n",
-      "translation": "CF_NAME login -u name@example.com -p pa55word (préciser nom de l'utilisateur et mot de passe comme arguments)"
+      "translation": "CF_NAME login -u name@example.com -p pa55word (préciser nom de l'utilisateur et mot de passe comme arguments)\n"
    },
    {
       "id": " target",
@@ -69,7 +69,7 @@
    },
    {
       "id": "CF_NAME auth USERNAME PASSWORD\n\n",
-      "translation": "CF_NAME auth NOM MOT_DE_PASSE"
+      "translation": "CF_NAME auth NOM MOT_DE_PASSE\n\n"
    },
    {
       "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]",
@@ -81,7 +81,7 @@
    },
    {
       "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
-      "translation": "CF_NAME login [-a API_URL] [-u UTILISATEUR] [-p MOT_DE_PASSE] [-o ORG] [-s ESPACE]"
+      "translation": "CF_NAME login [-a API_URL] [-u UTILISATEUR] [-p MOT_DE_PASSE] [-o ORG] [-s ESPACE]\n\n"
    },
    {
       "id": "CF_NAME logout",
@@ -137,15 +137,15 @@
    },
    {
       "id": "Error creating request:\n{{.Err}}",
-      "translation": "demande Erreur de création: {{.Err}}"
+      "translation": "demande Erreur de création:\n{{.Err}}"
    },
    {
       "id": "Error finding available orgs\n{{.ApiErr}}",
-      "translation": "Erreur trouver orgs disponibles {{.ApiErr}}"
+      "translation": "Erreur trouver orgs disponibles\n{{.ApiErr}}"
    },
    {
       "id": "Error finding available spaces\n{{.Err}}",
-      "translation": "Erreur trouver des espaces disponibles {{.Err}}"
+      "translation": "Erreur trouver des espaces disponibles\n{{.Err}}"
    },
    {
       "id": "Error finding org {{.OrgName}}\n{{.Err}}",
@@ -153,7 +153,7 @@
    },
    {
       "id": "Error finding space {{.SpaceName}}\n{{.Err}}",
-      "translation": "espace de constatation d'erreur {{.SpaceName}} {{.Err}}"
+      "translation": "espace de constatation d'erreur {{.SpaceName}}\n{{.Err}}"
    },
    {
       "id": "Executes a raw request, content-type set to application/json by default",
@@ -257,11 +257,11 @@
    },
    {
       "id": "Targeted org {{.OrgName}}\n",
-      "translation": "Org ciblée {{.OrgName}}"
+      "translation": "Org ciblée {{.OrgName}}\n"
    },
    {
       "id": "Targeted space {{.SpaceName}}\n",
-      "translation": "Espace ciblé {{.SpaceName}}"
+      "translation": "Espace ciblé {{.SpaceName}}\n"
    },
    {
       "id": "There are too many options to display, please type in the name.",
@@ -301,11 +301,11 @@
    },
    {
       "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
-      "translation": "AVERTISSEMENT: Fournir votre mot de passe comme une option de ligne de commande est fortement déconseillée. Votre mot de passe peut être visible par les autres et peut être enregistré dans votre historique du shell"
+      "translation": "AVERTISSEMENT:\n   Fournir votre mot de passe comme une option de ligne de commande est fortement déconseillée.\n   Votre mot de passe peut être visible par les autres et peut être enregistré dans votre historique du shell\n\n"
    },
    {
       "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
-      "translation": "Attention: l'insécurité API de point de terminaison HTTP détectée: sécurisés paramètres de l'API https sont recommandés"
+      "translation": "Attention: l'insécurité API de point de terminaison HTTP détectée: sécurisés paramètres de l'API https sont recommandés\n"
    },
    {
       "id": "description",
