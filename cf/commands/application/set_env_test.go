@@ -39,7 +39,7 @@ var _ = Describe("set-env command", func() {
 			args = []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 		})
 
-		It("passes when all requirements are present", func() {
+		It("passes when all requirements are met", func() {
 			requirementsFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 			callSetEnv(args, requirementsFactory, appRepo)
 			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
@@ -123,11 +123,10 @@ var _ = Describe("set-env command", func() {
 			})
 		})
 
-		PIt("allows the variable value to begin with a hyphen", func() {
+		It("allows the variable value to begin with a hyphen", func() {
 			args = []string{"my-app", "MY_VAR", "--has-a-cool-value"}
 			ui := callSetEnv(args, requirementsFactory, appRepo)
 
-			Expect(len(ui.Outputs)).To(Equal(3))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{
 					"Setting env variable",
