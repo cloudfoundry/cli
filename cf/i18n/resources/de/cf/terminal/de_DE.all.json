@@ -1,0 +1,66 @@
+[
+   {
+      "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
+      "translation": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersionString}})"
+   },
+   {
+      "id": "OK",
+      "translation": "OK"
+   },
+   {
+      "id": "Incorrect Usage.\n",
+      "translation": "Incorrect Usage.\n"
+   },
+   {
+      "id": "Delete cancelled",
+      "translation": "Delete cancelled"
+   },
+   {
+      "id": "yes",
+      "translation": "yes"
+   },
+   {
+      "id": "No org or space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "No org or space targeted, use '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "User:         {{.UserEmail}}",
+      "translation": "User:         {{.UserEmail}}"
+   },
+   {
+      "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
+      "translation": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?"
+   },
+   {
+      "id": "Not logged in. Use '{{.CFLoginCommand}}' to log in.",
+      "translation": "Not logged in. Use '{{.CFLoginCommand}}' to log in."
+   },
+   {
+      "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
+      "translation": "failed turning off console echo for password entry:\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "Space:        No space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "Space:        No space targeted, use '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "Org:          {{.OrganizationName}}",
+      "translation": "Org:          {{.OrganizationName}}"
+   },
+   {
+      "id": "Really delete the {{.ModelType}} {{.ModelName}}?",
+      "translation": "Really delete the {{.ModelType}} {{.ModelName}}?"
+   },
+   {
+      "id": "FAILED",
+      "translation": "FAILED"
+   },
+   {
+      "id": "Org:          No org targeted, use '{{.CFTargetCommand}}'",
+      "translation": "Org:          No org targeted, use '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "Space:        {{.SpaceName}}",
+      "translation": "Space:        {{.SpaceName}}"
+   }
+]
