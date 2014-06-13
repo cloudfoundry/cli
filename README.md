@@ -6,7 +6,12 @@ This is the official command line client for Cloud Foundry.
 Getting Started
 ===============
 Download and run the installer for your platform from the section below. If you are on OS X, you can also install the CLI
-with homebrew--run `brew install cloudfoundry-cli`.
+with homebrew--run
+
+```
+$ brew tap pivotal/tap
+$ brew install cloudfoundry-cli
+```
 
 Once installed, you can log in and push an app.
 ```
@@ -27,9 +32,9 @@ OK
 $ cf push
 ```
 #Further Reading and Getting Help
-You can find further documentation at the docs page for the CLI [here](http://docs.cloudfoundry.org/devguide/#cf).  
-There is also help available in the CLI itself; type `cf help` for more information.  
-Each command also has help output available via `cf [command] --help` or `cf [command] -h`.  
+You can find further documentation at the docs page for the CLI [here](http://docs.cloudfoundry.org/devguide/#cf).
+There is also help available in the CLI itself; type `cf help` for more information.
+Each command also has help output available via `cf [command] --help` or `cf [command] -h`.
 Finally, if you are still stuck, feel free to open a GitHub issue.
 
 Stable Release
