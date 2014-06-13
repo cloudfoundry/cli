@@ -1,0 +1,22 @@
+[
+   {
+      "id": "running",
+      "translation": "running"
+   },
+   {
+      "id": "stopped",
+      "translation": "stopped"
+   },
+   {
+      "id": "crashing",
+      "translation": "crashing"
+   },
+   {
+      "id": "down",
+      "translation": "down"
+   },
+   {
+      "id": "starting",
+      "translation": "starting"
+   }
+]
