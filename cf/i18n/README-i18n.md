@@ -61,19 +61,19 @@ Finally, it is also important not to translate the argument names in templated s
 
 Our simple goal is to have translations for the top-tier languages first.  This means accepting contributions (PRs or pull requests) for existing translations (fixes) as well as new translations for the remaining top-tier languages for which we do not yet have translations. The current list of the top-tier languages, default territory, and status of translation follows.
 
-Language	            Locale	  Status
---------              ------  --------
-English               en_US   Complete
-French                fr_FR   Complete
-Spanish               es_ES   English files ready (*)
-German                de_DE   English files ready
-Italian               it_IT   English files ready
-Japanese              ja_JA   English files ready
-Korean                ko_KO   English files ready
-Portuguese (Brazil)   pt_BR   English files ready
-Chinese (simplified)  zh_CN   English files ready
-Chinese (traditional) zh_HK   English files ready
-Russian               ru_RU   English files ready
+| Language              | Locale | Status                  |
+|-----------------------|--------|-------------------------|
+| English               | en_US  | Complete                |
+| French                | fr_FR  | Complete                |
+| Spanish               | es_ES  | English files ready (*) |
+| German                | de_DE  | English files ready     |
+| Italian               | it_IT  | English files ready     |
+| Japanese              | ja_JA  | English files ready     |
+| Korean                | ko_KO  | English files ready     |
+| Portuguese (Brazil)   | pt_BR  | English files ready     |
+| Chinese (simplified)  | zh_CN  | English files ready     |
+| Chinese (traditional) | zh_HK  | English files ready     |
+| Russian               | ru_RU  | English files ready     |
 
 If you are interested in submitting translations for a non-top-tier locale, then please communicate with us via VCAP-DEV mailing list and we will see what we can do.
 
