@@ -3,6 +3,9 @@ package commands
 import (
 	"flag"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
@@ -13,8 +16,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
-	"time"
 )
 
 func NewContext(cmdName string, args []string) *cli.Context {
@@ -26,24 +27,26 @@ func NewContext(cmdName string, args []string) *cli.Context {
 	}
 
 	// move all flag args to the beginning of the list, go requires them all upfront
-	firstFlagIndex := -1
-	for index, arg := range args {
-		if strings.HasPrefix(arg, "-") {
-			firstFlagIndex = index
-			break
+	if targetCommand.SkipFlagParsing == false {
+		firstFlagIndex := -1
+		for index, arg := range args {
+			if strings.HasPrefix(arg, "-") {
+				firstFlagIndex = index
+				break
+			}
 		}
-	}
-	if firstFlagIndex > 0 {
-		args := args[0:firstFlagIndex]
-		flags := args[firstFlagIndex:]
-		flagSet.Parse(append(flags, args...))
+		if firstFlagIndex > 0 {
+			args := args[0:firstFlagIndex]
+			flags := args[firstFlagIndex:]
+			flagSet.Parse(append(flags, args...))
+		} else {
+			flagSet.Parse(args[0:])
+		}
 	} else {
 		flagSet.Parse(args[0:])
 	}
 
-	globalSet := new(flag.FlagSet)
-
-	return cli.NewContext(cli.NewApp(), flagSet, globalSet)
+	return cli.NewContext(cli.NewApp(), flagSet, new(flag.FlagSet))
 }
 
 func findCommand(cmdName string) (cmd cli.Command) {
