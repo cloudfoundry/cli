@@ -221,10 +221,9 @@ func (cmd Start) waitForInstancesToStage(app models.Application) {
 }
 
 func (cmd Start) waitForOneRunningInstance(app models.Application) {
-	var runningCount, startingCount, flappingCount, downCount int
 	startupStartTime := time.Now()
 
-	for runningCount == 0 {
+	for {
 		if time.Since(startupStartTime) > cmd.StartupTimeout {
 			cmd.ui.Failed(fmt.Sprintf(T("Start app timeout\n\nTIP: use '{{.Command}}' for more information",
 				map[string]interface{}{
@@ -232,55 +231,79 @@ func (cmd Start) waitForOneRunningInstance(app models.Application) {
 			return
 		}
 
-		instances, apiErr := cmd.appInstancesRepo.GetInstances(app.Guid)
-		if apiErr != nil {
+		count, err := cmd.fetchInstanceCount(app.Guid)
+		if err != nil {
 			cmd.ui.Wait(cmd.PingerThrottle)
 			continue
 		}
 
-		totalCount := len(instances)
-		runningCount, startingCount, flappingCount, downCount = 0, 0, 0, 0
+		cmd.ui.Say(instancesDetails(count))
 
-		for _, inst := range instances {
-			switch inst.State {
-			case models.InstanceRunning:
-				runningCount++
-			case models.InstanceStarting:
-				startingCount++
-			case models.InstanceFlapping:
-				flappingCount++
-			case models.InstanceDown:
-				downCount++
-			}
+		if count.running > 0 {
+			return
 		}
 
-		cmd.ui.Say(instancesDetails(startingCount, downCount, runningCount, flappingCount, totalCount))
-
-		if flappingCount > 0 {
+		if count.flapping > 0 {
 			cmd.ui.Failed(fmt.Sprintf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
 				map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))})))
 			return
 		}
+
+		cmd.ui.Wait(cmd.PingerThrottle)
 	}
 }
 
-func instancesDetails(startingCount, downCount, runningCount, flappingCount, totalCount int) string {
+type instanceCount struct {
+	running  int
+	starting int
+	flapping int
+	down     int
+	total    int
+}
+
+func (cmd Start) fetchInstanceCount(appGuid string) (instanceCount, error) {
+	count := instanceCount{}
+
+	instances, apiErr := cmd.appInstancesRepo.GetInstances(appGuid)
+	if apiErr != nil {
+		return instanceCount{}, apiErr
+	}
+
+	count.total = len(instances)
+
+	for _, inst := range instances {
+		switch inst.State {
+		case models.InstanceRunning:
+			count.running++
+		case models.InstanceStarting:
+			count.starting++
+		case models.InstanceFlapping:
+			count.flapping++
+		case models.InstanceDown:
+			count.down++
+		}
+	}
+
+	return count, nil
+}
+
+func instancesDetails(count instanceCount) string {
 	details := []string{fmt.Sprintf(T("{{.RunningCount}} of {{.TotalCount}} instances running",
-		map[string]interface{}{"RunningCount": runningCount, "TotalCount": totalCount}))}
+		map[string]interface{}{"RunningCount": count.running, "TotalCount": count.total}))}
 
-	if startingCount > 0 {
+	if count.starting > 0 {
 		details = append(details, fmt.Sprintf(T("{{.StartingCount}} starting",
-			map[string]interface{}{"StartingCount": startingCount})))
+			map[string]interface{}{"StartingCount": count.starting})))
 	}
 
-	if downCount > 0 {
+	if count.down > 0 {
 		details = append(details, fmt.Sprintf(T("{{.DownCount}} down",
-			map[string]interface{}{"DownCount": downCount})))
+			map[string]interface{}{"DownCount": count.down})))
 	}
 
-	if flappingCount > 0 {
+	if count.flapping > 0 {
 		details = append(details, fmt.Sprintf(T("{{.FlappingCount}} failing",
-			map[string]interface{}{"FlappingCount": flappingCount})))
+			map[string]interface{}{"FlappingCount": count.flapping})))
 	}
 
 	return strings.Join(details, ", ")

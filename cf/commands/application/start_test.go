@@ -410,7 +410,7 @@ func callStart(args []string, config configuration.Reader, requirementsFactory *
 
 	cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
 	cmd.StagingTimeout = 50 * time.Millisecond
-	cmd.StartupTimeout = 50 * time.Millisecond
+	cmd.StartupTimeout = 500 * time.Millisecond
 	cmd.PingerThrottle = 50 * time.Millisecond
 
 	testcmd.RunCommand(cmd, args, requirementsFactory)
