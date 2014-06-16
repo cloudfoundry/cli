@@ -49,7 +49,7 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 	foundSpaces := false
 	table := cmd.ui.Table([]string{T("name")})
 	apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
-		table.Add([]string{space.Name})
+		table.Add(space.Name)
 		foundSpaces = true
 		return true
 	})

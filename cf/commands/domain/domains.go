@@ -78,13 +78,13 @@ func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields) {
 
 	for _, domain := range domains {
 		if domain.Shared {
-			table.Add([]string{domain.Name, T("shared")})
+			table.Add(domain.Name, T("shared"))
 		}
 	}
 
 	for _, domain := range domains {
 		if !domain.Shared {
-			table.Add([]string{domain.Name, T("owned")})
+			table.Add(domain.Name, T("owned"))
 		}
 	}
 	table.Print()

@@ -1,6 +1,8 @@
 package application
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -9,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type ListApps struct {
@@ -72,14 +73,14 @@ func (cmd ListApps) Run(c *cli.Context) {
 			urls = append(urls, route.URL())
 		}
 
-		table.Add([]string{
+		table.Add(
 			application.Name,
 			ui_helpers.ColoredAppState(application.ApplicationFields),
 			ui_helpers.ColoredAppInstances(application.ApplicationFields),
-			formatters.ByteSize(application.Memory * formatters.MEGABYTE),
-			formatters.ByteSize(application.DiskQuota * formatters.MEGABYTE),
+			formatters.ByteSize(application.Memory*formatters.MEGABYTE),
+			formatters.ByteSize(application.DiskQuota*formatters.MEGABYTE),
 			strings.Join(urls, ", "),
-		})
+		)
 	}
 
 	table.Print()

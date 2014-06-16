@@ -141,14 +141,14 @@ func (c terminalUI) FailWithUsage(context *cli.Context) {
 func (ui terminalUI) ShowConfiguration(config configuration.Reader) {
 	table := NewTable(ui, []string{"", ""})
 	if config.HasAPIEndpoint() {
-		table.Add([]string{
+		table.Add(
 			T("API endpoint:"),
 			T("{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
 				map[string]interface{}{
 					"ApiEndpoint":      EntityNameColor(config.ApiEndpoint()),
 					"ApiVersionString": EntityNameColor(config.ApiVersion()),
 				}),
-		})
+		)
 	}
 
 	if !config.IsLoggedIn() {
@@ -156,10 +156,10 @@ func (ui terminalUI) ShowConfiguration(config configuration.Reader) {
 		ui.Say(NotLoggedInText())
 		return
 	} else {
-		table.Add([]string{
+		table.Add(
 			T("User:"),
 			EntityNameColor(config.UserEmail()),
-		})
+		)
 	}
 
 	if !config.HasOrganization() && !config.HasSpace() {
@@ -173,32 +173,32 @@ func (ui terminalUI) ShowConfiguration(config configuration.Reader) {
 	}
 
 	if config.HasOrganization() {
-		table.Add([]string{
+		table.Add(
 			T("Org:"),
 			EntityNameColor(config.OrganizationFields().Name),
-		})
+		)
 	} else {
 		command := fmt.Sprintf("%s target -o Org", cf.Name())
-		table.Add([]string{
+		table.Add(
 			T("Org:"),
 			T("No org targeted, use '{{.CFTargetCommand}}'",
 				map[string]interface{}{
 					"CFTargetCommand": CommandColor(command),
 				}),
-		})
+		)
 	}
 
 	if config.HasSpace() {
-		table.Add([]string{
+		table.Add(
 			T("Space:"),
 			EntityNameColor(config.SpaceFields().Name),
-		})
+		)
 	} else {
 		command := fmt.Sprintf("%s target -s SPACE", cf.Name())
-		table.Add([]string{
+		table.Add(
 			T("Space:"),
 			T("No space targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}),
-		})
+		)
 	}
 
 	table.Print()

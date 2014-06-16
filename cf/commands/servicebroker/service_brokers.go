@@ -45,7 +45,7 @@ func (cmd ListServiceBrokers) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{T("name"), T("url")})
 	foundBrokers := false
 	apiErr := cmd.repo.ListServiceBrokers(func(serviceBroker models.ServiceBroker) bool {
-		table.Add([]string{serviceBroker.Name, serviceBroker.Url})
+		table.Add(serviceBroker.Name, serviceBroker.Url)
 		foundBrokers = true
 		return true
 	})

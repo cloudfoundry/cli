@@ -7,7 +7,7 @@ import (
 )
 
 type Table interface {
-	Add(row []string)
+	Add(row ...string)
 	Print()
 }
 
@@ -27,7 +27,7 @@ func NewTable(ui UI, header []string) Table {
 	}
 }
 
-func (t *PrintableTable) Add(row []string) {
+func (t *PrintableTable) Add(row ...string) {
 	t.rows = append(t.rows, row)
 }
 
