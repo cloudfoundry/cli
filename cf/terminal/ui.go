@@ -139,36 +139,69 @@ func (c terminalUI) FailWithUsage(context *cli.Context) {
 }
 
 func (ui terminalUI) ShowConfiguration(config configuration.Reader) {
+	table := NewTable(ui, []string{"", ""})
 	if config.HasAPIEndpoint() {
-		ui.Say(T("API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersionString}})", map[string]interface{}{"ApiEndpoint": EntityNameColor(config.ApiEndpoint()), "ApiVersionString": EntityNameColor(config.ApiVersion())}))
+		table.Add([]string{
+			T("API endpoint:"),
+			T("{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
+				map[string]interface{}{
+					"ApiEndpoint":      EntityNameColor(config.ApiEndpoint()),
+					"ApiVersionString": EntityNameColor(config.ApiVersion()),
+				}),
+		})
 	}
 
 	if !config.IsLoggedIn() {
+		table.Print()
 		ui.Say(NotLoggedInText())
 		return
 	} else {
-		ui.Say(T("User:         {{.UserEmail}}", map[string]interface{}{"UserEmail": EntityNameColor(config.UserEmail())}))
+		table.Add([]string{
+			T("User:"),
+			EntityNameColor(config.UserEmail()),
+		})
 	}
 
 	if !config.HasOrganization() && !config.HasSpace() {
+		table.Print()
 		command := fmt.Sprintf("%s target -o ORG -s SPACE", cf.Name())
-		ui.Say(T("No org or space targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}))
+		ui.Say(T("No org or space targeted, use '{{.CFTargetCommand}}'",
+			map[string]interface{}{
+				"CFTargetCommand": CommandColor(command),
+			}))
 		return
 	}
 
 	if config.HasOrganization() {
-		ui.Say(T("Org:          {{.OrganizationName}}", map[string]interface{}{"OrganizationName": EntityNameColor(config.OrganizationFields().Name)}))
+		table.Add([]string{
+			T("Org:"),
+			EntityNameColor(config.OrganizationFields().Name),
+		})
 	} else {
 		command := fmt.Sprintf("%s target -o Org", cf.Name())
-		ui.Say(T("Org:          No org targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}))
+		table.Add([]string{
+			T("Org:"),
+			T("No org targeted, use '{{.CFTargetCommand}}'",
+				map[string]interface{}{
+					"CFTargetCommand": CommandColor(command),
+				}),
+		})
 	}
 
 	if config.HasSpace() {
-		ui.Say(T("Space:        {{.SpaceName}}", map[string]interface{}{"SpaceName": EntityNameColor(config.SpaceFields().Name)}))
+		table.Add([]string{
+			T("Space:"),
+			EntityNameColor(config.SpaceFields().Name),
+		})
 	} else {
 		command := fmt.Sprintf("%s target -s SPACE", cf.Name())
-		ui.Say(T("Space:        No space targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}))
+		table.Add([]string{
+			T("Space:"),
+			T("No space targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}),
+		})
 	}
+
+	table.Print()
 }
 
 func (c terminalUI) LoadingIndication() {
@@ -181,15 +214,4 @@ func (c terminalUI) Wait(duration time.Duration) {
 
 func (ui terminalUI) Table(headers []string) Table {
 	return NewTable(ui, headers)
-}
-
-func tableColoringFunc(value string, row int, col int) string {
-	switch {
-	case row == 0:
-		return HeaderColor(value)
-	case col == 0 && row > 0:
-		return TableContentHeaderColor(value)
-	default:
-		return value
-	}
 }
