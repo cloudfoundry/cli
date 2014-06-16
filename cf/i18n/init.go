@@ -19,8 +19,18 @@ const (
 	DEFAULT_LANGUAGE = "en"
 )
 
-var SUPPORTED_LANGUAGES = []string{"en", "fr"}
-var SUPPORTED_LOCALES = map[string]string{"en": "en_US", "fr": "fr_FR"}
+var SUPPORTED_LOCALES = map[string]string{
+	"de": "de_DE",
+	"en": "en_US",
+	"es": "es_ES",
+	"fr": "fr_FR",
+	"it": "it_IT",
+	"ja": "ja_JA",
+	"ko": "ko_KO",
+	"pt": "pt_BR",
+	"ru": "ru_RU",
+	"zh": "zh_CN",
+}
 var resources_path = filepath.Join("cf", "i18n", "resources")
 
 func GetResourcesPath() string {
