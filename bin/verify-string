@@ -38,7 +38,7 @@ end
 
 def run
   english_json_files = `find cf/i18n/resources/en/* -type f`.split
-  supported_locales = %w[fr_FR]
+  supported_locales = %w[de_DE es_ES fr_FR it_IT ja_JA ko_KO pt_BR ru_RU zh_CN zh_HK]
 
   english_json_files.each do |english_reference_file|
     supported_locales.each do |locale|
