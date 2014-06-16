@@ -1,7 +1,11 @@
 [
    {
-      "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-      "translation": "Endpoint API: {{.ApiEndpoint}} (Version API: {{.ApiVersionString}})"
+      "id": "API endpoint:",
+      "translation": "Endpoint API:"
+   },
+   {
+      "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
+      "translation": "{{.ApiEndpoint}} (Version API: {{.ApiVersionString}})"
    },
    {
       "id": "OK",
