@@ -56,13 +56,13 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 		if buildpack.Locked != nil {
 			locked = strconv.FormatBool(*buildpack.Locked)
 		}
-		table.Add([]string{
+		table.Add(
 			buildpack.Name,
 			position,
 			enabled,
 			locked,
 			buildpack.Filename,
-		})
+		)
 		noBuildpacks = false
 		return true
 	})

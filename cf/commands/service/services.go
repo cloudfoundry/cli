@@ -75,12 +75,12 @@ func (cmd ListServices) Run(c *cli.Context) {
 			serviceColumn = instance.ServiceOffering.Label
 		}
 
-		table.Add([]string{
+		table.Add(
 			instance.Name,
 			serviceColumn,
 			instance.ServicePlan.Name,
 			strings.Join(instance.ApplicationNames, ", "),
-		})
+		)
 	}
 
 	table.Print()

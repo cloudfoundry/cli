@@ -1,6 +1,8 @@
 package route
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -8,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type ListRoutes struct {
@@ -48,17 +49,13 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 
 	noRoutes := true
 	apiErr := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
-		appNames := ""
-		for _, app := range route.Apps {
-			appNames = appNames + ", " + app.Name
-		}
-		appNames = strings.TrimPrefix(appNames, ", ")
-		table.Add([]string{
-			route.Host,
-			route.Domain.Name,
-			appNames,
-		})
 		noRoutes = false
+		appNames := []string{}
+		for _, app := range route.Apps {
+			appNames = append(appNames, app.Name)
+		}
+
+		table.Add(route.Host, route.Domain.Name, strings.Join(appNames, ","))
 		return true
 	})
 	table.Print()

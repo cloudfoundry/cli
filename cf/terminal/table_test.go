@@ -27,7 +27,7 @@ var _ = Describe("Table", func() {
 	})
 
 	It("prints format string literals as strings", func() {
-		table.Add([]string{"cloak %s", "and", "dagger"})
+		table.Add("cloak %s", "and", "dagger")
 		table.Print()
 
 		Expect(ui.Outputs).To(ContainSubstrings(
@@ -36,7 +36,7 @@ var _ = Describe("Table", func() {
 	})
 
 	It("prints all the rows you give it", func() {
-		table.Add([]string{"something", "and", "nothing"})
+		table.Add("something", "and", "nothing")
 		table.Print()
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"something", "and", "nothing"},
@@ -45,8 +45,8 @@ var _ = Describe("Table", func() {
 
 	Describe("adding rows to be printed later", func() {
 		It("prints them when you call Print()", func() {
-			table.Add([]string{"a", "b", "c"})
-			table.Add([]string{"passed", "to", "print"})
+			table.Add("a", "b", "c")
+			table.Add("passed", "to", "print")
 			table.Print()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -55,8 +55,8 @@ var _ = Describe("Table", func() {
 		})
 
 		It("flushes previously added rows and then outputs passed rows", func() {
-			table.Add([]string{"a", "b", "c"})
-			table.Add([]string{"passed", "to", "print"})
+			table.Add("a", "b", "c")
+			table.Add("passed", "to", "print")
 			table.Print()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -67,8 +67,8 @@ var _ = Describe("Table", func() {
 		})
 
 		It("flushes the buffer of rows when you call print", func() {
-			table.Add([]string{"a", "b", "c"})
-			table.Add([]string{"passed", "to", "print"})
+			table.Add("a", "b", "c")
+			table.Add("passed", "to", "print")
 			table.Print()
 			ui.ClearOutputs()
 
@@ -79,7 +79,7 @@ var _ = Describe("Table", func() {
 
 	Describe("aligning columns", func() {
 		It("aligns rows to the header when the header is longest", func() {
-			table.Add([]string{"a", "b", "c"})
+			table.Add("a", "b", "c")
 			table.Print()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -89,8 +89,8 @@ var _ = Describe("Table", func() {
 		})
 
 		It("aligns rows to the longest row provided", func() {
-			table.Add([]string{"x", "y", "z"})
-			table.Add([]string{"something", "something", "darkside"})
+			table.Add("x", "y", "z")
+			table.Add("something", "something", "darkside")
 			table.Print()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -101,8 +101,8 @@ var _ = Describe("Table", func() {
 		})
 
 		It("aligns rows to the longest row provided when there are multibyte characters present", func() {
-			table.Add([]string{"x", "ÿ", "z"})
-			table.Add([]string{"something", "something", "darkside"})
+			table.Add("x", "ÿ", "z")
+			table.Add("something", "something", "darkside")
 			table.Print()
 
 			Expect(ui.Outputs).To(ContainSubstrings(

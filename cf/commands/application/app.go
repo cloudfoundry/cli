@@ -2,6 +2,8 @@ package application
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -12,7 +14,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type ShowApp struct {
@@ -118,7 +119,7 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	table := terminal.NewTable(cmd.ui, []string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk")})
 
 	for index, instance := range instances {
-		table.Add([]string{
+		table.Add(
 			fmt.Sprintf("#%d", index),
 			ui_helpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
@@ -131,7 +132,7 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 				map[string]interface{}{
 					"DiskUsage": formatters.ByteSize(instance.DiskUsage),
 					"DiskQuota": formatters.ByteSize(instance.DiskQuota)})),
-		})
+		)
 	}
 
 	table.Print()

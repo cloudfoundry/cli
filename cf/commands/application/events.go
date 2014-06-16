@@ -67,12 +67,12 @@ func (cmd *Events) Run(c *cli.Context) {
 	}
 
 	for _, event := range events {
-		table.Add([]string{
+		table.Add(
 			event.Timestamp.Local().Format("2006-01-02T15:04:05.00-0700"),
 			event.Name,
 			event.ActorName,
 			event.Description,
-		})
+		)
 	}
 
 	table.Print()

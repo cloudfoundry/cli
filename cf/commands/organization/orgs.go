@@ -47,7 +47,7 @@ func (cmd ListOrgs) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{T("name")})
 
 	apiErr := cmd.orgRepo.ListOrgs(func(org models.Organization) bool {
-		table.Add([]string{org.Name})
+		table.Add(org.Name)
 		noOrgs = false
 		return true
 	})

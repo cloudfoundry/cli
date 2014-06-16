@@ -89,11 +89,7 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 
 		planNames = strings.TrimPrefix(planNames, ", ")
 
-		table.Add([]string{
-			offering.Label,
-			planNames,
-			offering.Description,
-		})
+		table.Add(offering.Label, planNames, offering.Description)
 	}
 
 	table.Print()

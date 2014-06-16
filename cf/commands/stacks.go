@@ -53,10 +53,7 @@ func (cmd ListStacks) Run(c *cli.Context) {
 	table := terminal.NewTable(cmd.ui, []string{T("name"), T("description")})
 
 	for _, stack := range stacks {
-		table.Add([]string{
-			stack.Name,
-			stack.Description,
-		})
+		table.Add(stack.Name, stack.Description)
 	}
 
 	table.Print()
