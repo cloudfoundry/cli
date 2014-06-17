@@ -1,6 +1,6 @@
 # README for CF CLI Localization
 
-td;lr ** The Cloud Foundry cli is ready to be translated to one of the supported languages. See "How you can contribute" to help in this effort. **
+__td;lr  The Cloud Foundry cli is ready to be translated to one of the supported languages. See "How you can contribute" to help in this effort.__
 
 The CloudFoundry (CF) Command Line Interface (CLI) has been internationalized (i18n) and is now ready for localization (l10n).
 
