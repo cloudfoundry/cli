@@ -1,210 +1,167 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/github.com/cloudfoundry/cli/cf/commands/application/delete_app_test.go
-   src/github.com/cloudfoundry/cli/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package buildpack_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/commands/buildpack"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
+	. "github.com/cloudfoundry/cli/cf/commands/buildpack"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-func callUpdateBuildpack(args []string, requirementsFactory *testreq.FakeReqFactory, fakeRepo *testapi.FakeBuildpackRepository,
-	fakeBitsRepo *testapi.FakeBuildpackBitsRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-
-	cmd := NewUpdateBuildpack(ui, fakeRepo, fakeBitsRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
+func successfulUpdate(ui *testterm.FakeUI, buildpackName string) {
+	Expect(ui.Outputs).To(ContainSubstrings(
+		[]string{"Updating buildpack", buildpackName},
+		[]string{"OK"},
+	))
 }
 
-func getRepositories() (*testapi.FakeBuildpackRepository, *testapi.FakeBuildpackBitsRepository) {
-	return &testapi.FakeBuildpackRepository{}, &testapi.FakeBuildpackBitsRepository{}
+func failedUpdate(ui *testterm.FakeUI, buildpackName string) {
+	Expect(ui.Outputs).To(ContainSubstrings(
+		[]string{"Updating buildpack", buildpackName},
+		[]string{"FAILED"},
+	))
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestUpdateBuildpackRequirements", func() {
-		repo, bitsRepo := getRepositories()
+var _ = Describe("Updating buildpack command", func() {
+	var (
+		requirementsFactory *testreq.FakeReqFactory
+		ui                  *testterm.FakeUI
+		repo                *testapi.FakeBuildpackRepository
+		bitsRepo            *testapi.FakeBuildpackBitsRepository
+	)
 
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		callUpdateBuildpack([]string{"my-buildpack"}, requirementsFactory, repo, bitsRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
-		callUpdateBuildpack([]string{"my-buildpack", "-p", "buildpack.zip", "extraArg"}, requirementsFactory, repo, bitsRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
-		callUpdateBuildpack([]string{"my-buildpack"}, requirementsFactory, repo, bitsRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, BuildpackSuccess: true}
-		callUpdateBuildpack([]string{"my-buildpack"}, requirementsFactory, repo, bitsRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-	})
-	It("TestUpdateBuildpack", func() {
-
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		ui := callUpdateBuildpack([]string{"my-buildpack"}, requirementsFactory, repo, bitsRepo)
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating buildpack", "my-buildpack"},
-			[]string{"OK"},
-		))
+	BeforeEach(func() {
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+		ui = new(testterm.FakeUI)
+		repo = &testapi.FakeBuildpackRepository{}
+		bitsRepo = &testapi.FakeBuildpackBitsRepository{}
 	})
 
-	It("TestUpdateBuildpackPosition", func() {
+	runCommand := func(args ...string) {
+		cmd := NewUpdateBuildpack(ui, repo, bitsRepo)
+		testcmd.RunCommand(cmd, args, requirementsFactory)
+	}
 
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
+	Context("is only successful on login and buildpack success", func() {
+		It("returns success when both are true", func() {
+			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+			runCommand("my-buildpack")
+			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		})
 
-		ui := callUpdateBuildpack([]string{"-i", "999", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
+		It("returns failure when at least one is false", func() {
+			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
+			runCommand("my-buildpack", "-p", "buildpack.zip", "extraArg")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		Expect(*repo.UpdateBuildpackArgs.Buildpack.Position).To(Equal(999))
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating buildpack", "my-buildpack"},
-			[]string{"OK"},
-		))
+			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
+			runCommand("my-buildpack")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, BuildpackSuccess: true}
+			runCommand("my-buildpack")
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
 
-	It("TestUpdateBuildpackNoPosition", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
+	It("updates buildpack", func() {
+		runCommand("my-buildpack")
 
-		callUpdateBuildpack([]string{"my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(repo.UpdateBuildpackArgs.Buildpack.Position).To(BeNil())
+		successfulUpdate(ui, "my-buildpack")
 	})
 
-	It("TestUpdateBuildpackEnabled", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
+	Context("updates buildpack when passed the proper flags", func() {
+		Context("position flag", func() {
+			It("sets the position when passed a value", func() {
+				runCommand("-i", "999", "my-buildpack")
 
-		fakeUI := callUpdateBuildpack([]string{"--enable", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
+				Expect(*repo.UpdateBuildpackArgs.Buildpack.Position).To(Equal(999))
+				successfulUpdate(ui, "my-buildpack")
+			})
 
-		Expect(repo.UpdateBuildpackArgs.Buildpack.Enabled).NotTo(BeNil())
-		Expect(*repo.UpdateBuildpackArgs.Buildpack.Enabled).To(Equal(true))
+			It("defaults to nil when not passed", func() {
+				runCommand("my-buildpack")
 
-		Expect(fakeUI.Outputs[0]).To(ContainSubstring("Updating buildpack"))
-		Expect(fakeUI.Outputs[0]).To(ContainSubstring("my-buildpack"))
-		Expect(fakeUI.Outputs[1]).To(ContainSubstring("OK"))
+				Expect(repo.UpdateBuildpackArgs.Buildpack.Position).To(BeNil())
+			})
+		})
+
+		Context("enabling/disabling buildpacks", func() {
+			It("can enable buildpack", func() {
+				runCommand("--enable", "my-buildpack")
+
+				Expect(repo.UpdateBuildpackArgs.Buildpack.Enabled).NotTo(BeNil())
+				Expect(*repo.UpdateBuildpackArgs.Buildpack.Enabled).To(Equal(true))
+
+				successfulUpdate(ui, "my-buildpack")
+			})
+
+			It("can disable buildpack", func() {
+				runCommand("--disable", "my-buildpack")
+
+				Expect(repo.UpdateBuildpackArgs.Buildpack.Enabled).NotTo(BeNil())
+				Expect(*repo.UpdateBuildpackArgs.Buildpack.Enabled).To(Equal(false))
+			})
+
+			It("defaults to nil when not passed", func() {
+				runCommand("my-buildpack")
+
+				Expect(repo.UpdateBuildpackArgs.Buildpack.Enabled).To(BeNil())
+			})
+		})
+
+		Context("buildpack path", func() {
+			It("uploads buildpack when passed", func() {
+				runCommand("-p", "buildpack.zip", "my-buildpack")
+
+				Expect(bitsRepo.UploadBuildpackPath).To(Equal("buildpack.zip"))
+
+				successfulUpdate(ui, "my-buildpack")
+			})
+
+			It("errors when passed invalid path", func() {
+				bitsRepo.UploadBuildpackErr = true
+
+				runCommand("-p", "bogus/path", "my-buildpack")
+
+				failedUpdate(ui, "my-buildpack")
+			})
+		})
+
+		Context("locking buildpack", func() {
+			It("can lock a buildpack", func() {
+				runCommand("--lock", "my-buildpack")
+
+				Expect(repo.UpdateBuildpackArgs.Buildpack.Locked).NotTo(BeNil())
+				Expect(*repo.UpdateBuildpackArgs.Buildpack.Locked).To(Equal(true))
+
+				successfulUpdate(ui, "my-buildpack")
+			})
+
+			It("can unlock a buildpack", func() {
+				runCommand("--unlock", "my-buildpack")
+
+				successfulUpdate(ui, "my-buildpack")
+			})
+
+			Context("Unsuccessful locking", func() {
+				It("lock fails when passed invalid path", func() {
+					runCommand("--lock", "-p", "buildpack.zip", "my-buildpack")
+
+					failedUpdate(ui, "my-buildpack")
+				})
+
+				It("unlock fails when passed invalid path", func() {
+					runCommand("--unlock", "-p", "buildpack.zip", "my-buildpack")
+
+					failedUpdate(ui, "my-buildpack")
+				})
+			})
+		})
 	})
 
-	It("TestUpdateBuildpackDisabled", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		callUpdateBuildpack([]string{"--disable", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(repo.UpdateBuildpackArgs.Buildpack.Enabled).NotTo(BeNil())
-		Expect(*repo.UpdateBuildpackArgs.Buildpack.Enabled).To(Equal(false))
-	})
-
-	It("TestUpdateBuildpackNoEnable", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		callUpdateBuildpack([]string{"my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(repo.UpdateBuildpackArgs.Buildpack.Enabled).To(BeNil())
-	})
-
-	It("TestUpdateBuildpackPath", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		ui := callUpdateBuildpack([]string{"-p", "buildpack.zip", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(bitsRepo.UploadBuildpackPath).To(Equal("buildpack.zip"))
-
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating buildpack", "my-buildpack"},
-			[]string{"OK"},
-		))
-	})
-
-	It("TestUpdateBuildpackWithInvalidPath", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-		bitsRepo.UploadBuildpackErr = true
-
-		ui := callUpdateBuildpack([]string{"-p", "bogus/path", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating buildpack", "my-buildpack"},
-			[]string{"FAILED"},
-		))
-	})
-
-	It("TestUpdateBuildpackLock", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		ui := callUpdateBuildpack([]string{"--lock", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(repo.UpdateBuildpackArgs.Buildpack.Locked).NotTo(BeNil())
-		Expect(*repo.UpdateBuildpackArgs.Buildpack.Locked).To(Equal(true))
-
-		Expect(ui.Outputs[0]).To(ContainSubstring("Updating buildpack"))
-		Expect(ui.Outputs[0]).To(ContainSubstring("my-buildpack"))
-		Expect(ui.Outputs[1]).To(ContainSubstring("OK"))
-	})
-
-	It("TestUpdateBuildpackUnlock", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		ui := callUpdateBuildpack([]string{"--unlock", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(ui.Outputs[0]).To(ContainSubstring("Updating buildpack"))
-		Expect(ui.Outputs[0]).To(ContainSubstring("my-buildpack"))
-		Expect(ui.Outputs[1]).To(ContainSubstring("OK"))
-	})
-
-	It("TestUpdateBuildpackInvalidLockWithBits", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		ui := callUpdateBuildpack([]string{"--lock", "-p", "buildpack.zip", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(ui.Outputs[1]).To(ContainSubstring("FAILED"))
-	})
-
-	It("TestUpdateBuildpackInvalidUnlockWithBits", func() {
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		ui := callUpdateBuildpack([]string{"--unlock", "-p", "buildpack.zip", "my-buildpack"}, requirementsFactory, repo, bitsRepo)
-
-		Expect(ui.Outputs[1]).To(ContainSubstring("FAILED"))
-	})
 })
