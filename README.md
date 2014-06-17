@@ -5,8 +5,9 @@ This is the official command line client for Cloud Foundry.
 
 Getting Started
 ===============
-Download and run the installer for your platform from the section below. If you are on OS X, you can also install the CLI
-with homebrew--run
+Download and run the installer for your platform from the section below. 
+
+If you are on OS X, you can also install the CLI with homebrew--run (Experimental)
 
 ```
 $ brew tap pivotal/tap
