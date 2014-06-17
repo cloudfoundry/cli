@@ -5,7 +5,7 @@ This is the official command line client for Cloud Foundry.
 
 Getting Started
 ===============
-Download and run the installer for your platform from the section below. 
+Download and run the installer for your platform from the section below.
 
 Once installed, you can log in and push an app.
 ```
@@ -36,13 +36,13 @@ Stable Release
 
 Installers
 ----------
-- [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32)
-- [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64)
-- [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32)
-- [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64)
-- [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64)
-- [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32)
-- [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64)
+- [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&source=github)
+- [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&source=github)
+- [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32&source=github)
+- [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64&source=github)
+- [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64&source=github)
+- [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32&source=github)
+- [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64&source=github)
 
 If you are on OS X, you can also install the CLI with homebrew--run (Experimental)
 
@@ -51,17 +51,17 @@ $ brew tap pivotal/tap
 $ brew install cloudfoundry-cli
 ```
 
-Edge Releases (master)
-======================
+Edge Releases
+=============
 
 Edge binaries are published to our Amazon S3 bucket with each new commit that passes CI.
 These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed:
 
-- [Linux 32 bit binary](https://cli.run.pivotal.io/edge?arch=linux32)
-- [Linux 64 bit binary](https://cli.run.pivotal.io/edge?arch=linux64)
-- [Mac OS X 64 bit binary](https://cli.run.pivotal.io/edge?arch=macosx64)
-- [Windows 32 bit binary](https://cli.run.pivotal.io/edge?arch=windows32)
-- [Windows 64 bit binary](https://cli.run.pivotal.io/edge?arch=windows64)
+- [Linux 32 bit binary](https://cli.run.pivotal.io/edge?arch=linux32&source=github)
+- [Linux 64 bit binary](https://cli.run.pivotal.io/edge?arch=linux64&source=github)
+- [Mac OS X 64 bit binary](https://cli.run.pivotal.io/edge?arch=macosx64&source=github)
+- [Windows 32 bit binary](https://cli.run.pivotal.io/edge?arch=windows32&source=github)
+- [Windows 64 bit binary](https://cli.run.pivotal.io/edge?arch=windows64&source=github)
 
 You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
