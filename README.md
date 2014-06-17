@@ -7,13 +7,6 @@ Getting Started
 ===============
 Download and run the installer for your platform from the section below. 
 
-If you are on OS X, you can also install the CLI with homebrew--run (Experimental)
-
-```
-$ brew tap pivotal/tap
-$ brew install cloudfoundry-cli
-```
-
 Once installed, you can log in and push an app.
 ```
 $ cd [my-app-directory]
@@ -50,6 +43,13 @@ Installers
 - [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64)
 - [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32)
 - [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64)
+
+If you are on OS X, you can also install the CLI with homebrew--run (Experimental)
+
+```
+$ brew tap pivotal/tap
+$ brew install cloudfoundry-cli
+```
 
 Edge Releases (master)
 ======================
