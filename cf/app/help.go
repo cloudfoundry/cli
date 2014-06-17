@@ -5,6 +5,7 @@ import (
 	"strings"
 	"text/tabwriter"
 	"text/template"
+	"unicode/utf8"
 
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -28,7 +29,7 @@ func newCmdPresenter(app *cli.App, maxNameLen int, cmdName string) (presenter cm
 	cmd := app.Command(cmdName)
 
 	presenter.Name = presentCmdName(*cmd)
-	padding := strings.Repeat(" ", maxNameLen-len(presenter.Name))
+	padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
 	presenter.Name = presenter.Name + padding
 	presenter.Description = cmd.Description
 
@@ -55,7 +56,7 @@ func (p appPresenter) Title(name string) string {
 func getMaxCmdNameLength(app *cli.App) (length int) {
 	for _, cmd := range app.Commands {
 		name := presentCmdName(cmd)
-		if len(name) > length {
+		if utf8.RuneCountInString(name) > length {
 			length = len(name)
 		}
 	}

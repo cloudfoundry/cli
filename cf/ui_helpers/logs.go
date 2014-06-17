@@ -2,11 +2,13 @@ package ui_helpers
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
+
+	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
 func max(a, b int) int {
@@ -34,8 +36,8 @@ func ExtractLogHeader(msg *logmessage.LogMessage, loc *time.Location) (logHeader
 
 	// Calculate padding
 	longestHeader := fmt.Sprintf("%s  [App/0]  ", timeFormat)
-	expectedHeaderLength := len(longestHeader)
-	padding := strings.Repeat(" ", max(0, expectedHeaderLength-len(logHeader)))
+	expectedHeaderLength := utf8.RuneCountInString(longestHeader)
+	padding := strings.Repeat(" ", max(0, expectedHeaderLength-utf8.RuneCountInString(logHeader)))
 
 	logHeader = logHeader + padding
 	coloredLogHeader = coloredLogHeader + padding
@@ -50,7 +52,7 @@ func ExtractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logCont
 	msgText = newLinesPattern.ReplaceAllString(msgText, "")
 
 	msgLines := strings.Split(msgText, "\n")
-	padding := strings.Repeat(" ", len(logHeader))
+	padding := strings.Repeat(" ", utf8.RuneCountInString(logHeader))
 	coloringFunc := terminal.LogStdoutColor
 	logType := "OUT"
 

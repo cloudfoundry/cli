@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"strings"
+	"unicode/utf8"
 )
 
 type TokenInfo struct {
@@ -46,7 +47,7 @@ func base64Decode(encodedData string) ([]byte, error) {
 }
 
 func restorePadding(seg string) string {
-	switch len(seg) % 4 {
+	switch utf8.RuneCountInString(seg) % 4 {
 	case 2:
 		seg = seg + "=="
 	case 3:

@@ -2,8 +2,10 @@ package flag_helpers
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
 	"strings"
+	"unicode/utf8"
+
+	"github.com/codegangsta/cli"
 )
 
 func NewIntFlag(name, usage string) IntFlagWithNoDefault {
@@ -49,7 +51,7 @@ func (f StringSliceFlagWithNoDefault) String() string {
 }
 
 func prefixFor(name string) (prefix string) {
-	if len(name) == 1 {
+	if utf8.RuneCountInString(name) == 1 {
 		prefix = "-"
 	} else {
 		prefix = "--"
