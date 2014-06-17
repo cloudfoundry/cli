@@ -28,8 +28,8 @@
       "translation": "Aucunne org ou espace ciblée, utiliser '{{.CFTargetCommand}}'"
    },
    {
-      "id": "User:         {{.UserEmail}}",
-      "translation": "Utilisateur:         {{.UserEmail}}"
+      "id": "User:",
+      "translation": "Utilisateur:"
    },
    {
       "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
@@ -44,12 +44,12 @@
       "translation": "la console écho d'entrée de mot de passe n'a pas pu être déconnectée:\n{{.ErrorDescription}}"
    },
    {
-      "id": "Space:        No space targeted, use '{{.CFTargetCommand}}'",
-      "translation": "Espace:        Aucun espace ciblé, utiliser '{{.CFTargetCommand}}'"
+      "id": "No space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "Aucun espace ciblé, utiliser '{{.CFTargetCommand}}'"
    },
    {
-      "id": "Org:          {{.OrganizationName}}",
-      "translation": "Org:          {{.OrganizationName}}"
+      "id": "Org:",
+      "translation": "Org:"
    },
    {
       "id": "Really delete the {{.ModelType}} {{.ModelName}}?",
@@ -60,11 +60,11 @@
       "translation": "RATÉ"
    },
    {
-      "id": "Org:          No org targeted, use '{{.CFTargetCommand}}'",
-      "translation": "Org:          Aucunne org ciblée, utiliser '{{.CFTargetCommand}}'"
+      "id": "No org targeted, use '{{.CFTargetCommand}}'",
+      "translation": "Aucunne org ciblée, utiliser '{{.CFTargetCommand}}'"
    },
    {
-      "id": "Space:        {{.SpaceName}}",
-      "translation": "Espace:        {{.SpaceName}}"
+      "id": "Space:",
+      "translation": "Espace:"
    }
 ]
