@@ -13,17 +13,17 @@ type Table interface {
 
 type PrintableTable struct {
 	ui            UI
-	header        []string
+	headers       []string
 	headerPrinted bool
 	maxSizes      []int
 	rows          [][]string
 }
 
-func NewTable(ui UI, header []string) Table {
+func NewTable(ui UI, headers []string) Table {
 	return &PrintableTable{
 		ui:       ui,
-		header:   header,
-		maxSizes: make([]int, len(header)),
+		headers:  headers,
+		maxSizes: make([]int, len(headers)),
 	}
 }
 
@@ -32,7 +32,7 @@ func (t *PrintableTable) Add(row ...string) {
 }
 
 func (t *PrintableTable) Print() {
-	for _, row := range append(t.rows, t.header) {
+	for _, row := range append(t.rows, t.headers) {
 		t.calculateMaxSize(row)
 	}
 
@@ -59,7 +59,7 @@ func (t *PrintableTable) calculateMaxSize(row []string) {
 
 func (t *PrintableTable) printHeader() {
 	output := ""
-	for col, value := range t.header {
+	for col, value := range t.headers {
 		output = output + t.cellValue(col, HeaderColor(value))
 	}
 	t.ui.Say(output)
@@ -79,7 +79,7 @@ func (t *PrintableTable) printRow(row []string) {
 
 func (t *PrintableTable) cellValue(col int, value string) string {
 	padding := ""
-	if col < len(t.header)-1 {
+	if col < len(t.headers)-1 {
 		padding = strings.Repeat(" ", t.maxSizes[col]-utf8.RuneCountInString(Decolorize(value)))
 	}
 	return fmt.Sprintf("%s%s   ", value, padding)
