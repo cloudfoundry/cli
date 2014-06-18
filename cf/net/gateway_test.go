@@ -39,6 +39,7 @@ var _ = Describe("Gateway", func() {
 		config = testconfig.NewRepository()
 
 		ccGateway = NewCloudControllerGateway(config, clock)
+		ccGateway.PollingThrottle = 3 * time.Millisecond
 		uaaGateway = NewUAAGateway(config)
 	})
 
@@ -92,6 +93,7 @@ var _ = Describe("Gateway", func() {
 						case "/v2/foobars/SOME_GUID":
 							writer.WriteHeader(http.StatusNoContent)
 						case "/v2/foobars/TIMEOUT":
+							currentTime = currentTime.Add(time.Minute * 31)
 							fmt.Fprintln(writer, `
 {
   "metadata": {
@@ -184,7 +186,6 @@ var _ = Describe("Gateway", func() {
 
 			config, authRepo = createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(authRepo)
-			ccGateway.PollingThrottle = 3 * time.Millisecond
 
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 		})
@@ -461,7 +462,6 @@ var _ = Describe("Gateway", func() {
 
 			config, authRepo = createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(authRepo)
-			ccGateway.PollingThrottle = 3 * time.Millisecond
 
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
