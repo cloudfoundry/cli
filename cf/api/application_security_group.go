@@ -3,19 +3,23 @@ package api
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/net"
 )
 
+type AppSecurityGroup interface {
+	Create(name string) error
+}
+
 type ApplicationSecurityGroupRepo struct {
-	gateway net.Gateway
+	gateway    net.Gateway
 	configRepo configuration.Reader
 }
 
 func NewApplicationSecurityGroupRepo(configRepo configuration.Reader, gateway net.Gateway) ApplicationSecurityGroupRepo {
 	return ApplicationSecurityGroupRepo{
 		configRepo: configRepo,
-		gateway: gateway,
+		gateway:    gateway,
 	}
 }
 

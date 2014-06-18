@@ -1,6 +1,7 @@
 package appsecuritygroup_test
 
 import (
+	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -12,17 +13,19 @@ import (
 
 var _ = Describe("create-app-security-group", func() {
 	var (
-		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		ui                   *testterm.FakeUI
+		appSecurityGroupRepo *testapi.FakeAppSecurityGroup
+		requirementsFactory  *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
+		appSecurityGroupRepo = &testapi.FakeAppSecurityGroup{}
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewCreateAppSecurityGroup(ui)
+		cmd := NewCreateAppSecurityGroup(ui, appSecurityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -42,6 +45,17 @@ var _ = Describe("create-app-security-group", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
+	})
+
+	Context("when the user is logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+		})
+
+		It("creates the application security group", func() {
+			runCommand("my-group")
+			Expect(appSecurityGroupRepo.CreateArgsForCall(0)).To(Equal("my-group"))
 		})
 	})
 })
