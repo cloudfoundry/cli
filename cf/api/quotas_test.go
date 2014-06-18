@@ -1,9 +1,6 @@
 package api_test
 
 import (
-	"net/http"
-	"net/http/httptest"
-	"time"
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -13,6 +10,9 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"net/http"
+	"net/http/httptest"
+	"time"
 )
 
 var _ = Describe("CloudControllerQuotaRepository", func() {

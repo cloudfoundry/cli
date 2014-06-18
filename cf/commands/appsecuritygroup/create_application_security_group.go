@@ -1,6 +1,7 @@
 package appsecuritygroup
 
 import (
+	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -8,12 +9,14 @@ import (
 )
 
 type CreateAppSecurityGroup struct {
-	ui terminal.UI
+	ui   terminal.UI
+	repo api.AppSecurityGroup
 }
 
-func NewCreateAppSecurityGroup(ui terminal.UI) CreateAppSecurityGroup {
+func NewCreateAppSecurityGroup(ui terminal.UI, repo api.AppSecurityGroup) CreateAppSecurityGroup {
 	return CreateAppSecurityGroup{
-		ui: ui,
+		ui:   ui,
+		repo: repo,
 	}
 }
 
@@ -35,5 +38,6 @@ func (cmd CreateAppSecurityGroup) GetRequirements(requirementsFactory requiremen
 }
 
 func (cmd CreateAppSecurityGroup) Run(context *cli.Context) {
-
+	name := context.Args()[0]
+	cmd.repo.Create(name)
 }

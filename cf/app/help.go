@@ -241,6 +241,13 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
+			Name: T("APPLICATION SECURITY GROUP"),
+			CommandSubGroups: [][]cmdPresenter{
+				{
+					newCmdPresenter(app, maxNameLen, "create-application-security-group"),
+				},
+			},
+		}, {
 			Name: T("ADVANCED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
