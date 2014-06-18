@@ -3,9 +3,11 @@ Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?br
 
 This is the official command line client for Cloud Foundry.
 
+You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
+
 Getting Started
 ===============
-Download and run the installer for your platform from the section below.
+Download and run the installer for your platform from the [Downloads Section](#Downloads).
 
 Once installed, you can log in and push an app.
 ```
@@ -31,39 +33,27 @@ There is also help available in the CLI itself; type `cf help` for more informat
 Each command also has help output available via `cf [command] --help` or `cf [command] -h`.
 Finally, if you are still stuck, feel free to open a GitHub issue.
 
-Stable Release
-==============
+Downloads
+=========
+**WARNING:** Edge binaries are published with each new 'push' that passes though CI. These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed. 
 
-Installers
-----------
-- [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&source=github)
-- [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&source=github)
-- [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32&source=github)
-- [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64&source=github)
-- [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64&source=github)
-- [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32&source=github)
-- [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64&source=github)
+| Stable Installers | Stable Binaries | Edge Binaries |
+| :---------------: |:---------------:| :------------:|
+| [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64&source=github) | [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github) | [Mac OS X 64 bit](https://cli.run.pivotal.io/edge?arch=macosx64&source=github) |
+| [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32&source=github) | [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32-exe&source=github) | [Windows 32 bit](https://cli.run.pivotal.io/edge?arch=windows32&source=github) |
+| [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64&source=github) | [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64-exe&source=github) | [Windows 64 bit](https://cli.run.pivotal.io/edge?arch=windows64&source=github) |
+| [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32&source=github) | [Linux 32 bit](https://cli.run.pivotal.io/stable?release=linux32-binary&source=github) | [Linux 32 bit](https://cli.run.pivotal.io/edge?arch=linux32&source=github) |
+| [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64&source=github) | [Linux 64 bit](https://cli.run.pivotal.io/stable?release=linux64-binary&source=github) | [Linux 64 bit](https://cli.run.pivotal.io/edge?arch=linux64&source=github) |
+| [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&source=github)
+| [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&source=github)
 
-If you are on OS X, you can also install the CLI with homebrew--run (Experimental)
+
+**Experimental:** Install CF for OSX through [Homebrew](http://brew.sh/) via the [pivotal's homebrew-tap](https://github.com/pivotal/homebrew-tap):
 
 ```
 $ brew tap pivotal/tap
 $ brew install cloudfoundry-cli
 ```
-
-Edge Releases
-=============
-
-Edge binaries are published to our Amazon S3 bucket with each new commit that passes CI.
-These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed:
-
-- [Linux 32 bit binary](https://cli.run.pivotal.io/edge?arch=linux32&source=github)
-- [Linux 64 bit binary](https://cli.run.pivotal.io/edge?arch=linux64&source=github)
-- [Mac OS X 64 bit binary](https://cli.run.pivotal.io/edge?arch=macosx64&source=github)
-- [Windows 32 bit binary](https://cli.run.pivotal.io/edge?arch=windows32&source=github)
-- [Windows 64 bit binary](https://cli.run.pivotal.io/edge?arch=windows64&source=github)
-
-You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
 Troubleshooting / FAQs
 ======================
