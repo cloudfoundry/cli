@@ -106,6 +106,7 @@ Forking the repository for development
 
 Building
 ========
+To prepare your build environment, run `go get github.com/jteeuwen/go-bindata/...`
 
 1. Run `./bin/build`
 1. The binary will be built into the `./out` directory.
