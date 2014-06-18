@@ -1,19 +1,20 @@
 package terminal_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/io_helpers"
-	"github.com/cloudfoundry/cli/cf/models"
-	. "github.com/cloudfoundry/cli/cf/terminal"
-	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io"
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/io_helpers"
+	"github.com/cloudfoundry/cli/cf/models"
+	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+
+	. "github.com/cloudfoundry/cli/cf/terminal"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("UI", func() {
@@ -93,7 +94,11 @@ var _ = Describe("UI", func() {
 					Expect(ui.ConfirmDelete("fizzbuzz", "bizzbump")).To(BeTrue())
 				})
 
-				Expect(strings.Join(out, "")).To(Equal("Really delete the fizzbuzz bizzbump?> "))
+				Expect(out).To(ContainSubstrings([]string{
+					"Really delete the fizzbuzz",
+					"bizzbump",
+					"?> ",
+				}))
 			})
 		})
 
