@@ -39,18 +39,25 @@ var _ = Describe("app security group api", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 
-	It("can create an app security group, given the name", func() {
+	It("can create an app security group, given some attributes", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "POST",
 			Path:   "/v2/app_security_groups",
+			// FIXME: this matcher depend on the order of the key/value pairs in the map
 			Matcher: testnet.RequestBodyMatcher(`{
-				"name": "mygroup"
+				"name": "mygroup",
+				"rules": [{"my-house": "my-rules"}],
+				"space_guids": ["myspace"]
 			}`),
 			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 		setupTestServer(req)
 
-		err := repo.Create("mygroup")
+		err := repo.Create(ApplicationSecurityGroupFields{
+			Name:       "mygroup",
+			Rules:      []map[string]string{{"my-house": "my-rules"}},
+			SpaceGuids: []string{"myspace"},
+		})
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(testHandler).To(testnet.HaveAllRequestsCalled())
