@@ -1,8 +1,10 @@
 package appsecuritygroup_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/errors"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	"github.com/cloudfoundry/cli/testhelpers/matchers"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -56,6 +58,31 @@ var _ = Describe("create-app-security-group", func() {
 		It("creates the application security group", func() {
 			runCommand("my-group")
 			Expect(appSecurityGroupRepo.CreateArgsForCall(0)).To(Equal("my-group"))
+		})
+
+		It("displays message describing what its going to do", func() {
+			runCommand("my-group")
+			Expect(ui.Outputs).To(matchers.ContainSubstrings([]string{"Creating application security group my-group"}))
+		})
+
+		It("returns OK after successfully completing the command", func() {
+			runCommand("my-group")
+			Expect(ui.Outputs).To(matchers.ContainSubstrings(
+				[]string{"Creating application security group my-group"},
+				[]string{"OK"},
+			))
+		})
+
+		Context("when creating a security group returns an error", func() {
+			It("alerts the user when creating the security group fails", func() {
+				appSecurityGroupRepo.CreateReturns(errors.New("Wops I failed"))
+				runCommand("my-group")
+
+				Expect(ui.Outputs).To(matchers.ContainSubstrings(
+					[]string{"reating application security group", "my-group"},
+					[]string{"FAILED"},
+				))
+			})
 		})
 	})
 })

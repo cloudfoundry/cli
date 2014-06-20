@@ -39,5 +39,13 @@ func (cmd CreateAppSecurityGroup) GetRequirements(requirementsFactory requiremen
 
 func (cmd CreateAppSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
-	cmd.repo.Create(name)
+
+	cmd.ui.Say("Creating application security group %s", name)
+
+	err := cmd.repo.Create(name)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	cmd.ui.Ok()
 }
