@@ -30,5 +30,9 @@
   go fmt ./cf/... ./testhelpers/... ./generic/... ./main/... ./glob/... ./words/...
 
   echo -e "\n Testing packages:"
-  go test $@
+
+  for PKG in $@
+  do
+    go test ./$PKG
+  done
 )
