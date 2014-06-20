@@ -8,27 +8,20 @@ import (
 )
 
 type FakeAppSecurityGroup struct {
-	CreateStub        func(name string) error
 	createMutex       sync.RWMutex
-	createArgsForCall []struct {
-		arg1 string
-	}
+	createArgsForCall []ApplicationSecurityGroupFields
+
 	createReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeAppSecurityGroup) Create(arg1 string) error {
+func (fake *FakeAppSecurityGroup) Create(arg1 ApplicationSecurityGroupFields) error {
 	fake.createMutex.Lock()
 	defer fake.createMutex.Unlock()
-	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1)
-	} else {
-		return fake.createReturns.result1
-	}
+	fake.createArgsForCall = append(fake.createArgsForCall, arg1)
+
+	return fake.createReturns.result1
 }
 
 func (fake *FakeAppSecurityGroup) CreateCallCount() int {
@@ -37,10 +30,10 @@ func (fake *FakeAppSecurityGroup) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeAppSecurityGroup) CreateArgsForCall(i int) string {
+func (fake *FakeAppSecurityGroup) CreateArgsForCall(i int) ApplicationSecurityGroupFields {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].arg1
+	return fake.createArgsForCall[i]
 }
 
 func (fake *FakeAppSecurityGroup) CreateReturns(result1 error) {

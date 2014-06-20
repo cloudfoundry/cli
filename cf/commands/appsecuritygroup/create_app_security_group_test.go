@@ -57,7 +57,7 @@ var _ = Describe("create-app-security-group", func() {
 
 		It("creates the application security group", func() {
 			runCommand("my-group")
-			Expect(appSecurityGroupRepo.CreateArgsForCall(0)).To(Equal("my-group"))
+			Expect(appSecurityGroupRepo.CreateArgsForCall(0).Name).To(Equal("my-group"))
 		})
 
 		It("displays message describing what its going to do", func() {
@@ -70,6 +70,18 @@ var _ = Describe("create-app-security-group", func() {
 			Expect(ui.Outputs).To(matchers.ContainSubstrings(
 				[]string{"Creating application security group my-group"},
 				[]string{"OK"},
+			))
+		})
+
+		It("allows the user to specify rules", func() {
+			runCommand(
+				"-rules",
+				"[{\"protocol\":\"udp\",\"port\":\"8080-9090\",\"destination\":\"198.41.191.47/1\"}]",
+				"app-security-groups-rule-everything-around-me",
+			)
+
+			Expect(appSecurityGroupRepo.CreateArgsForCall(0).Rules).To(Equal(
+				"[{\"protocol\":\"udp\",\"port\":\"8080-9090\",\"destination\":\"198.41.191.47/1\"}]",
 			))
 		})
 
