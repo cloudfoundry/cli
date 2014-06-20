@@ -8,7 +8,7 @@ import (
 )
 
 type AppSecurityGroup interface {
-	Create(name string) error
+	Create(ApplicationSecurityGroupFields) error
 }
 
 type ApplicationSecurityGroupRepo struct {
@@ -23,12 +23,12 @@ func NewApplicationSecurityGroupRepo(configRepo configuration.Reader, gateway ne
 	}
 }
 
-func (repo ApplicationSecurityGroupRepo) Create(name string) error {
+func (repo ApplicationSecurityGroupRepo) Create(groupFields ApplicationSecurityGroupFields) error {
 	path := fmt.Sprintf("%s/v2/app_security_groups", repo.configRepo.ApiEndpoint())
-	group := ApplicationSecurityGroupFields{Name: name}
-	return repo.gateway.CreateResourceFromStruct(path, group)
+	return repo.gateway.CreateResourceFromStruct(path, groupFields)
 }
 
 type ApplicationSecurityGroupFields struct {
 	Name string `json:"name"`
+	Rules string `json:"rules"`
 }

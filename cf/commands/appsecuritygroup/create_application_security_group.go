@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/cf/flag_helpers"
 )
 
 type CreateAppSecurityGroup struct {
@@ -25,6 +26,9 @@ func (cmd CreateAppSecurityGroup) Metadata() command_metadata.CommandMetadata {
 		Name:        "create-application-security-group",
 		Description: "<<< description goes here>>>",
 		Usage:       "CF_NAME create-application-security-group NAME",
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("rules", "THIS IS ALL THE RULES!"),
+		},
 	}
 }
 
@@ -39,10 +43,11 @@ func (cmd CreateAppSecurityGroup) GetRequirements(requirementsFactory requiremen
 
 func (cmd CreateAppSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
+	rules := context.String("rules")
 
 	cmd.ui.Say("Creating application security group %s", name)
 
-	err := cmd.repo.Create(name)
+	err := cmd.repo.Create(api.ApplicationSecurityGroupFields{Name: name, Rules: rules})
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
