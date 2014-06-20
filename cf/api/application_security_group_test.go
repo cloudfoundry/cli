@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -39,27 +41,83 @@ var _ = Describe("app security group api", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 
-	It("can create an app security group, given some attributes", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method: "POST",
-			Path:   "/v2/app_security_groups",
-			// FIXME: this matcher depend on the order of the key/value pairs in the map
-			Matcher: testnet.RequestBodyMatcher(`{
-				"name": "mygroup",
-				"rules": [{"my-house": "my-rules"}],
-				"space_guids": ["myspace"]
-			}`),
-			Response: testnet.TestResponse{Status: http.StatusCreated},
-		})
-		setupTestServer(req)
+	Describe(".Create", func() {
+		It("can create an app security group, given some attributes", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "POST",
+				Path:   "/v2/app_security_groups",
+				// FIXME: this matcher depend on the order of the key/value pairs in the map
+				Matcher: testnet.RequestBodyMatcher(`{
+					"name": "mygroup",
+					"guid": "",
+					"rules": [{"my-house": "my-rules"}],
+					"space_guids": ["myspace"]
+				}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			})
+			setupTestServer(req)
 
-		err := repo.Create(ApplicationSecurityGroupFields{
-			Name:       "mygroup",
-			Rules:      []map[string]string{{"my-house": "my-rules"}},
-			SpaceGuids: []string{"myspace"},
+			err := repo.Create(models.ApplicationSecurityGroupFields{
+				Name:       "mygroup",
+				Guid:       "",
+				Rules:      []map[string]string{{"my-house": "my-rules"}},
+				SpaceGuids: []string{"myspace"},
+			})
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+		})
+	})
+
+	Describe(".Read", func() {
+		It("returns the app security group with the given name", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/app_security_groups?q=name:the-name&inline-relations-depth=1",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body: `
+{
+   "resources": [
+      {
+         "metadata": {
+            "guid": "the-group-guid"
+         },
+         "entity": {
+            "name": "the-name",
+            "rules": [{"key": "value"}]
+         }
+      }
+   ]
+}
+					`,
+				},
+			}))
+
+			group, err := repo.Read("the-name")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(group).To(Equal(models.ApplicationSecurityGroupFields{
+				Name:  "the-name",
+				Guid:  "the-group-guid",
+				Rules: []map[string]string{{"key": "value"}},
+			}))
 		})
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+		It("returns a ModelNotFound error if the security group cannot be found", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/app_security_groups?q=name:the-name&inline-relations-depth=1",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body:   `{"resources": []}`,
+				},
+			}))
+
+			_, err := repo.Read("the-name")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(BeAssignableToTypeOf(errors.NewModelNotFoundError("model-type", "description")))
+		})
 	})
 })

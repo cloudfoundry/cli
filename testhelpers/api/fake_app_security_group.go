@@ -2,37 +2,52 @@
 package api
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
-
-	"sync"
+	"github.com/cloudfoundry/cli/cf/models"
 )
 
 type FakeAppSecurityGroup struct {
-	createMutex       sync.RWMutex
-	createArgsForCall []ApplicationSecurityGroupFields
-
-	createReturns struct {
+	createArgsForCall []models.ApplicationSecurityGroupFields
+	createReturns     struct {
 		result1 error
+	}
+
+	DeleteCalledWith struct {
+		Guid string
+	}
+	DeleteReturns struct {
+		Error error
+	}
+
+	ReadCalledWith struct {
+		Name string
+	}
+	ReadReturns struct {
+		Fields models.ApplicationSecurityGroupFields
+		Error  error
 	}
 }
 
-func (fake *FakeAppSecurityGroup) Create(arg1 ApplicationSecurityGroupFields) error {
-	fake.createMutex.Lock()
-	defer fake.createMutex.Unlock()
-	fake.createArgsForCall = append(fake.createArgsForCall, arg1)
+func (fake *FakeAppSecurityGroup) Create(fields models.ApplicationSecurityGroupFields) error {
+	fake.createArgsForCall = append(fake.createArgsForCall, fields)
 
 	return fake.createReturns.result1
 }
 
+func (fake *FakeAppSecurityGroup) Read(name string) (models.ApplicationSecurityGroupFields, error) {
+	fake.ReadCalledWith.Name = name
+	return fake.ReadReturns.Fields, fake.ReadReturns.Error
+}
+
+func (fake *FakeAppSecurityGroup) Delete(securityGroupGuid string) error {
+	fake.DeleteCalledWith.Guid = securityGroupGuid
+	return fake.DeleteReturns.Error
+}
+
 func (fake *FakeAppSecurityGroup) CreateCallCount() int {
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeAppSecurityGroup) CreateArgsForCall(i int) ApplicationSecurityGroupFields {
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
+func (fake *FakeAppSecurityGroup) CreateArgsForCall(i int) models.ApplicationSecurityGroupFields {
 	return fake.createArgsForCall[i]
 }
 
@@ -41,5 +56,3 @@ func (fake *FakeAppSecurityGroup) CreateReturns(result1 error) {
 		result1 error
 	}{result1}
 }
-
-var _ AppSecurityGroup = new(FakeAppSecurityGroup)

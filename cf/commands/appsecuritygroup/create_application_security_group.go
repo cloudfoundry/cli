@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -77,7 +78,7 @@ func (cmd CreateAppSecurityGroup) Run(context *cli.Context) {
 
 	cmd.ui.Say("Creating application security group '%s' as '%s", name, cmd.configRepo.Username())
 
-	err := cmd.appSecurityGroupRepo.Create(api.ApplicationSecurityGroupFields{Name: name, Rules: ruleMaps, SpaceGuids: spaceGuids})
+	err := cmd.appSecurityGroupRepo.Create(models.ApplicationSecurityGroupFields{Name: name, Rules: ruleMaps, SpaceGuids: spaceGuids})
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
