@@ -29,6 +29,7 @@ func (repo ApplicationSecurityGroupRepo) Create(groupFields ApplicationSecurityG
 }
 
 type ApplicationSecurityGroupFields struct {
-	Name string `json:"name"`
-	Rules string `json:"rules"`
+	Name       string              `json:"name"`
+	Rules      []map[string]string `json:"rules"`
+	SpaceGuids []string            `json:"space_guids"`
 }

@@ -1,23 +1,30 @@
 package appsecuritygroup
 
 import (
+	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 )
 
 type CreateAppSecurityGroup struct {
-	ui   terminal.UI
-	repo api.AppSecurityGroup
+	ui                   terminal.UI
+	appSecurityGroupRepo api.AppSecurityGroup
+	spaceRepo            api.SpaceRepository
+	configRepo           configuration.Reader
 }
 
-func NewCreateAppSecurityGroup(ui terminal.UI, repo api.AppSecurityGroup) CreateAppSecurityGroup {
+func NewCreateAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.AppSecurityGroup, spaceRepo api.SpaceRepository) CreateAppSecurityGroup {
 	return CreateAppSecurityGroup{
-		ui:   ui,
-		repo: repo,
+		ui:                   ui,
+		configRepo:           configRepo,
+		appSecurityGroupRepo: appSecurityGroupRepo,
+		spaceRepo:            spaceRepo,
 	}
 }
 
@@ -27,7 +34,8 @@ func (cmd CreateAppSecurityGroup) Metadata() command_metadata.CommandMetadata {
 		Description: "<<< description goes here>>>",
 		Usage:       "CF_NAME create-application-security-group NAME",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("rules", "THIS IS ALL THE RULES!"),
+			flag_helpers.NewStringSliceFlag("rules", "Create Rules Everything Around Me"),
+			flag_helpers.NewStringSliceFlag("space", "BOOM A SPACE IS HERE"),
 		},
 	}
 }
@@ -43,11 +51,33 @@ func (cmd CreateAppSecurityGroup) GetRequirements(requirementsFactory requiremen
 
 func (cmd CreateAppSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
-	rules := context.String("rules")
+	rules := context.StringSlice("rules")
+	spaces := context.StringSlice("space")
+	spaceGuids := []string{}
+	for _, spaceName := range spaces {
+		space, err := cmd.spaceRepo.FindByName(spaceName)
 
-	cmd.ui.Say("Creating application security group %s", name)
+		if err != nil {
+			cmd.ui.Failed("Could not find space named '%s'", spaceName)
+		}
 
-	err := cmd.repo.Create(api.ApplicationSecurityGroupFields{Name: name, Rules: rules})
+		spaceGuids = append(spaceGuids, space.Guid)
+	}
+
+	ruleMaps := []map[string]string{}
+	for _, rule := range rules {
+		ruleMap := map[string]string{}
+		err := json.Unmarshal([]byte(rule), &ruleMap)
+		if err != nil {
+			cmd.ui.Failed("Incorrect json format: %s", err.Error())
+		}
+
+		ruleMaps = append(ruleMaps, ruleMap)
+	}
+
+	cmd.ui.Say("Creating application security group '%s' as '%s", name, cmd.configRepo.Username())
+
+	err := cmd.appSecurityGroupRepo.Create(api.ApplicationSecurityGroupFields{Name: name, Rules: ruleMaps, SpaceGuids: spaceGuids})
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
