@@ -49,7 +49,6 @@ var _ = Describe("app security group api", func() {
 				// FIXME: this matcher depend on the order of the key/value pairs in the map
 				Matcher: testnet.RequestBodyMatcher(`{
 					"name": "mygroup",
-					"guid": "",
 					"rules": [{"my-house": "my-rules"}],
 					"space_guids": ["myspace"]
 				}`),
@@ -59,7 +58,6 @@ var _ = Describe("app security group api", func() {
 
 			err := repo.Create(models.ApplicationSecurityGroupFields{
 				Name:       "mygroup",
-				Guid:       "",
 				Rules:      []map[string]string{{"my-house": "my-rules"}},
 				SpaceGuids: []string{"myspace"},
 			})
@@ -118,6 +116,23 @@ var _ = Describe("app security group api", func() {
 
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(BeAssignableToTypeOf(errors.NewModelNotFoundError("model-type", "description")))
+		})
+	})
+
+	Describe(".Delete", func() {
+		It("deletes the application security group", func() {
+			appSecurityGroupGuid := "the-security-group-guid"
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "DELETE",
+				Path:   "/v2/app_security_groups/" + appSecurityGroupGuid,
+				Response: testnet.TestResponse{
+					Status: http.StatusNoContent,
+				},
+			}))
+
+			err := repo.Delete(appSecurityGroupGuid)
+
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 })
