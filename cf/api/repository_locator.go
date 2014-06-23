@@ -2,6 +2,7 @@ package api
 
 import (
 	"crypto/tls"
+
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -37,6 +38,7 @@ type RepositoryLocator struct {
 	buildpackRepo                   CloudControllerBuildpackRepository
 	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
 	appSecurityGroupRepo            ApplicationSecurityGroupRepo
+	stagingSecurityGroupRepo        StagingSecurityGroupsRepo
 }
 
 func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
@@ -80,6 +82,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
 	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
 	loc.appSecurityGroupRepo = NewApplicationSecurityGroupRepo(config, cloudControllerGateway)
+	loc.stagingSecurityGroupRepo = NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 
 	return
 }
@@ -190,4 +193,8 @@ func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepos
 
 func (locator RepositoryLocator) GetApplicationSecurityGroupRepository() ApplicationSecurityGroupRepo {
 	return locator.appSecurityGroupRepo
+}
+
+func (locator RepositoryLocator) GetStagingSecurityGroupsRepository() StagingSecurityGroupsRepo {
+	return locator.stagingSecurityGroupRepo
 }
