@@ -12,9 +12,9 @@ import (
 )
 
 type AppSecurityGroup interface {
-	Create(models.ApplicationSecurityGroupFields) error
+	Create(name string, rules []map[string]string, spaceGuids []string) error
 	Delete(string) error
-	Read(string) (models.ApplicationSecurityGroupFields, error)
+	Read(string) (models.ApplicationSecurityGroup, error)
 }
 
 type ApplicationSecurityGroupRepo struct {
@@ -29,14 +29,19 @@ func NewApplicationSecurityGroupRepo(config configuration.Reader, gateway net.Ga
 	}
 }
 
-func (repo ApplicationSecurityGroupRepo) Create(groupFields models.ApplicationSecurityGroupFields) error {
+func (repo ApplicationSecurityGroupRepo) Create(name string, rules []map[string]string, spaceGuids []string) error {
 	path := fmt.Sprintf("%s/v2/app_security_groups", repo.config.ApiEndpoint())
-	return repo.gateway.CreateResourceFromStruct(path, groupFields)
+	params := models.ApplicationSecurityGroupParams{
+		Name:       name,
+		Rules:      rules,
+		SpaceGuids: spaceGuids,
+	}
+	return repo.gateway.CreateResourceFromStruct(path, params)
 }
 
-func (repo ApplicationSecurityGroupRepo) Read(name string) (models.ApplicationSecurityGroupFields, error) {
+func (repo ApplicationSecurityGroupRepo) Read(name string) (models.ApplicationSecurityGroup, error) {
 	path := fmt.Sprintf("/v2/app_security_groups?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+name))
-	group := models.ApplicationSecurityGroupFields{}
+	group := models.ApplicationSecurityGroup{}
 	foundGroup := false
 
 	err := repo.gateway.ListPaginatedResources(
@@ -44,8 +49,8 @@ func (repo ApplicationSecurityGroupRepo) Read(name string) (models.ApplicationSe
 		path,
 		resources.ApplicationSecurityGroupResource{},
 		func(resource interface{}) bool {
-			if g, ok := resource.(resources.ApplicationSecurityGroupResource); ok {
-				group = g.ToFields()
+			if asgr, ok := resource.(resources.ApplicationSecurityGroupResource); ok {
+				group = asgr.ToModel()
 				foundGroup = true
 			}
 

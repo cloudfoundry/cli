@@ -8,12 +8,31 @@ type PaginatedApplicationSecurityGroupResources struct {
 
 type ApplicationSecurityGroupResource struct {
 	Resource
-	Entity models.ApplicationSecurityGroupFields
+	Entity ApplicationSecurityGroup
 }
 
-func (resource ApplicationSecurityGroupResource) ToFields() models.ApplicationSecurityGroupFields {
-	appSecurityGroup := resource.Entity
-	appSecurityGroup.Guid = resource.Metadata.Guid
+// represents a fully instantiated model returned by the CC (e.g.: with its attributes and the fields for its child objects)
+type ApplicationSecurityGroup struct {
+	models.ApplicationSecurityGroupFields
+	Spaces []SpaceResource
+}
 
-	return appSecurityGroup
+func (resource ApplicationSecurityGroupResource) ToFields() (fields models.ApplicationSecurityGroupFields) {
+	fields.Name = resource.Entity.Name
+	fields.Rules = resource.Entity.Rules
+	fields.Guid = resource.Metadata.Guid
+
+	return
+}
+
+func (resource ApplicationSecurityGroupResource) ToModel() (asg models.ApplicationSecurityGroup) {
+	asg.ApplicationSecurityGroupFields = resource.ToFields()
+
+	spaces := []models.SpaceFields{}
+	for _, s := range resource.Entity.Spaces {
+		spaces = append(spaces, s.ToFields())
+	}
+	asg.Spaces = spaces
+
+	return
 }

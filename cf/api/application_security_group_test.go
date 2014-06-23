@@ -56,11 +56,11 @@ var _ = Describe("app security group api", func() {
 			})
 			setupTestServer(req)
 
-			err := repo.Create(models.ApplicationSecurityGroupFields{
-				Name:       "mygroup",
-				Rules:      []map[string]string{{"my-house": "my-rules"}},
-				SpaceGuids: []string{"myspace"},
-			})
+			err := repo.Create(
+				"mygroup",
+				[]map[string]string{{"my-house": "my-rules"}},
+				[]string{"myspace"},
+			)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
@@ -83,7 +83,17 @@ var _ = Describe("app security group api", func() {
          },
          "entity": {
             "name": "the-name",
-            "rules": [{"key": "value"}]
+            "rules": [{"key": "value"}],
+            "spaces": [
+               {
+               	  "metadata":{
+               	  	"guid": "my-space-guid"
+               	  },
+                  "entity": {
+                     "name": "my-space"
+                  }
+               }
+            ]
          }
       }
    ]
@@ -95,10 +105,13 @@ var _ = Describe("app security group api", func() {
 			group, err := repo.Read("the-name")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(group).To(Equal(models.ApplicationSecurityGroupFields{
-				Name:  "the-name",
-				Guid:  "the-group-guid",
-				Rules: []map[string]string{{"key": "value"}},
+			Expect(group).To(Equal(models.ApplicationSecurityGroup{
+				ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
+					Name:  "the-name",
+					Guid:  "the-group-guid",
+					Rules: []map[string]string{{"key": "value"}},
+				},
+				Spaces: []models.SpaceFields{{Guid: "my-space-guid", Name: "my-space"}},
 			}))
 		})
 

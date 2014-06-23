@@ -238,6 +238,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("APPLICATION SECURITY GROUP"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
+					presentCommand("application-security-group"),
 					presentCommand("create-application-security-group"),
 					presentCommand("delete-application-security-group"),
 				},
