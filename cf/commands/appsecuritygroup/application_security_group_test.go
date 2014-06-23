@@ -16,7 +16,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("delete-application-security-group command", func() {
+var _ = Describe("application-security-group command", func() {
 	var (
 		ui                   *testterm.FakeUI
 		appSecurityGroupRepo *testapi.FakeAppSecurityGroup
@@ -32,7 +32,7 @@ var _ = Describe("delete-application-security-group command", func() {
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewDeleteAppSecurityGroup(ui, configRepo, appSecurityGroupRepo)
+		cmd := NewShowAppSecurityGroup(ui, configRepo, appSecurityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -56,39 +56,55 @@ var _ = Describe("delete-application-security-group command", func() {
 
 		Context("when the group with the given name exists", func() {
 			BeforeEach(func() {
+				rulesMap := []map[string]string{{"just-pretend": "that-this-is-correct"}}
+
 				appSecurityGroupRepo.ReadReturns.ApplicationSecurityGroup = models.ApplicationSecurityGroup{
 					ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
-						Name: "my-group",
-						Guid: "group-guid",
+						Name:  "my-group",
+						Guid:  "group-guid",
+						Rules: rulesMap,
 					},
+					Spaces: []models.SpaceFields{{Name: "space-1"}, {Name: "space-2"}},
 				}
 			})
 
-			It("should delete the application security group", func() {
+			It("should fetch the application security group from its repo", func() {
 				runCommand("my-group")
 				Expect(appSecurityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
-				Expect(appSecurityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
 			})
 
-			It("tells the user what it's about to do", func() {
+			It("tells the user what it's about to do and then shows the group", func() {
 				runCommand("my-group")
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Deleting", "application security group", "my-group", "my-user"},
+					[]string{"Getting", "application security group", "my-group", "my-user"},
 					[]string{"OK"},
+					[]string{"Name:", "my-group"},
+					[]string{"Rules:", `[{"just-pretend":"that-this-is-correct"}]`},
+					[]string{"Spaces:", "space-1, space-2"},
+				))
+			})
+
+			It("tells the user if no spaces are assigned", func() {
+				appSecurityGroupRepo.ReadReturns.ApplicationSecurityGroup = models.ApplicationSecurityGroup{
+					ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
+						Name:  "my-group",
+						Guid:  "group-guid",
+						Rules: []map[string]string{},
+					},
+					Spaces: []models.SpaceFields{},
+				}
+
+				runCommand("my-group")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Spaces:", "No spaces"},
 				))
 			})
 		})
 
 		It("fails and warns the user if a group with that name could not be found", func() {
-			appSecurityGroupRepo.ReadReturns.Error = errors.New("pbbbbbbbbbbt")
-			runCommand("whoops")
-
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-		})
-
-		It("fails and warns the user if deleting fails", func() {
-			appSecurityGroupRepo.DeleteReturns.Error = errors.New("raspberry")
-			runCommand("whoops")
+			appSecurityGroupRepo.ReadReturns.Error = errors.New("half-past-tea-time")
+			runCommand("im-late!")
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 		})

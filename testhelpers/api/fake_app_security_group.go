@@ -6,7 +6,7 @@ import (
 )
 
 type FakeAppSecurityGroup struct {
-	createArgsForCall []models.ApplicationSecurityGroupFields
+	createArgsForCall []models.ApplicationSecurityGroupParams
 	createReturns     struct {
 		result1 error
 	}
@@ -22,20 +22,20 @@ type FakeAppSecurityGroup struct {
 		Name string
 	}
 	ReadReturns struct {
-		Fields models.ApplicationSecurityGroupFields
-		Error  error
+		ApplicationSecurityGroup models.ApplicationSecurityGroup
+		Error                    error
 	}
 }
 
-func (fake *FakeAppSecurityGroup) Create(fields models.ApplicationSecurityGroupFields) error {
-	fake.createArgsForCall = append(fake.createArgsForCall, fields)
+func (fake *FakeAppSecurityGroup) Create(name string, rules []map[string]string, spaceGuids []string) error {
+	fake.createArgsForCall = append(fake.createArgsForCall, models.ApplicationSecurityGroupParams{Name: name, Rules: rules, SpaceGuids: spaceGuids})
 
 	return fake.createReturns.result1
 }
 
-func (fake *FakeAppSecurityGroup) Read(name string) (models.ApplicationSecurityGroupFields, error) {
+func (fake *FakeAppSecurityGroup) Read(name string) (models.ApplicationSecurityGroup, error) {
 	fake.ReadCalledWith.Name = name
-	return fake.ReadReturns.Fields, fake.ReadReturns.Error
+	return fake.ReadReturns.ApplicationSecurityGroup, fake.ReadReturns.Error
 }
 
 func (fake *FakeAppSecurityGroup) Delete(securityGroupGuid string) error {
@@ -47,7 +47,7 @@ func (fake *FakeAppSecurityGroup) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeAppSecurityGroup) CreateArgsForCall(i int) models.ApplicationSecurityGroupFields {
+func (fake *FakeAppSecurityGroup) CreateArgsForCall(i int) models.ApplicationSecurityGroupParams {
 	return fake.createArgsForCall[i]
 }
 
