@@ -1,6 +1,7 @@
 package appsecuritygroup
 
 import (
+	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -9,11 +10,17 @@ import (
 )
 
 type addToDefaultStagingGroup struct {
-	ui terminal.UI
+	ui                terminal.UI
+	securityGroupRepo api.AppSecurityGroup
+	stagingGroupRepo  api.StagingSecurityGroupsRepo
 }
 
-func NewAddToDefaultStagingGroup(ui terminal.UI) command.Command {
-	return &addToDefaultStagingGroup{ui: ui}
+func NewAddToDefaultStagingGroup(ui terminal.UI, securityGroupRepo api.AppSecurityGroup, stagingGroupRepo api.StagingSecurityGroupsRepo) command.Command {
+	return &addToDefaultStagingGroup{
+		ui:                ui,
+		securityGroupRepo: securityGroupRepo,
+		stagingGroupRepo:  stagingGroupRepo,
+	}
 }
 
 func (cmd *addToDefaultStagingGroup) Metadata() command_metadata.CommandMetadata {
@@ -34,4 +41,13 @@ func (cmd *addToDefaultStagingGroup) GetRequirements(requirementsFactory require
 	}, nil
 }
 
-func (cmd *addToDefaultStagingGroup) Run(c *cli.Context) {}
+func (cmd *addToDefaultStagingGroup) Run(context *cli.Context) {
+	name := context.Args()[0]
+
+	securityGroup, err := cmd.securityGroupRepo.Read(name)
+	if err != nil {
+		panic("freakout")
+	}
+
+	cmd.stagingGroupRepo.AddToDefaultStagingSet(securityGroup)
+}
