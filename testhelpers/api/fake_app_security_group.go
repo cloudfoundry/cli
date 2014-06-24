@@ -25,6 +25,11 @@ type FakeAppSecurityGroup struct {
 		ApplicationSecurityGroup models.ApplicationSecurityGroup
 		Error                    error
 	}
+
+	FindAllReturns struct {
+		ApplicationSecurityGroups []models.ApplicationSecurityGroup
+		Error                     error
+	}
 }
 
 func (fake *FakeAppSecurityGroup) Create(name string, rules []map[string]string, spaceGuids []string) error {
@@ -55,4 +60,8 @@ func (fake *FakeAppSecurityGroup) CreateReturns(result1 error) {
 	fake.createReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeAppSecurityGroup) FindAll() ([]models.ApplicationSecurityGroup, error) {
+	return fake.FindAllReturns.ApplicationSecurityGroups, fake.FindAllReturns.Error
 }

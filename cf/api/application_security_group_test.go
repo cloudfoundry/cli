@@ -148,4 +148,107 @@ var _ = Describe("app security group api", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
+
+	Describe(".FindAll", func() {
+		It("returns all the application security groups", func() {
+			setupTestServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "GET",
+					Path:   "/v2/app_security_groups?inline-relations-depth=1",
+					Response: testnet.TestResponse{
+						Status: http.StatusOK,
+						Body:   firstListItem(),
+					},
+				}),
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "GET",
+					Path:   "/v2/app_security_groups?inline-relations-depth=1&page=2",
+					Response: testnet.TestResponse{
+						Status: http.StatusOK,
+						Body:   secondListItem(),
+					},
+				}),
+			)
+
+			groups, err := repo.FindAll()
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(groups[0]).To(Equal(models.ApplicationSecurityGroup{
+				ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
+					Name:  "name-71",
+					Guid:  "cd186158-b356-474d-9861-724f34f48502",
+					Rules: []map[string]string{{"protocol": "udp"}},
+				},
+				Spaces: []models.SpaceFields{},
+			}))
+			Expect(groups[1]).To(Equal(models.ApplicationSecurityGroup{
+				ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
+					Name:  "name-72",
+					Guid:  "d3374b62-7eac-4823-afbd-460d2bf44c67",
+					Rules: []map[string]string{{"destination": "198.41.191.47/1"}},
+				},
+				Spaces: []models.SpaceFields{{Guid: "my-space-guid", Name: "my-space"}},
+			}))
+		})
+	})
 })
+
+func firstListItem() string {
+	return `{
+  "next_url": "/v2/app_security_groups?inline-relations-depth=1&page=2",
+  "resources": [
+    {
+      "metadata": {
+        "guid": "cd186158-b356-474d-9861-724f34f48502",
+        "url": "/v2/app_security_groups/cd186158-b356-474d-9861-724f34f48502",
+        "created_at": "2014-06-23T22:55:30+00:00",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-71",
+        "rules": [
+          {
+            "protocol": "udp"
+          }
+        ],
+        "spaces_url": "/v2/app_security_groups/cd186158-b356-474d-9861-724f34f48502/spaces"
+      }
+    }
+  ]
+}`
+}
+
+func secondListItem() string {
+	return `{
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "d3374b62-7eac-4823-afbd-460d2bf44c67",
+        "url": "/v2/app_security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67",
+        "created_at": "2014-06-23T22:55:30+00:00",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-72",
+        "rules": [
+          {
+            "destination": "198.41.191.47/1"
+          } 
+        ],
+        "spaces": [
+               {
+               	  "metadata":{
+               	  	"guid": "my-space-guid"
+               	  },
+                  "entity": {
+                     "name": "my-space"
+                  }
+               }
+            ],
+        "spaces_url": "/v2/app_security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces"
+      }
+    }
+  ]
+}`
+}
