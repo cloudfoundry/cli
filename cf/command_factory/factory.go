@@ -115,6 +115,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["application-security-group"] = appsecuritygroup.NewShowAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
 	factory.cmdsByName["add-default-staging-application-security-group"] = appsecuritygroup.NewAddToDefaultStagingGroup(
 		ui,
+		config,
 		repoLocator.GetApplicationSecurityGroupRepository(),
 		repoLocator.GetStagingSecurityGroupsRepository(),
 	)
