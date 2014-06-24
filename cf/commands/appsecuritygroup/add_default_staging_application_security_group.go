@@ -4,6 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -11,13 +12,15 @@ import (
 
 type addToDefaultStagingGroup struct {
 	ui                terminal.UI
+	configRepo        configuration.Reader
 	securityGroupRepo api.AppSecurityGroup
 	stagingGroupRepo  api.StagingSecurityGroupsRepo
 }
 
-func NewAddToDefaultStagingGroup(ui terminal.UI, securityGroupRepo api.AppSecurityGroup, stagingGroupRepo api.StagingSecurityGroupsRepo) command.Command {
+func NewAddToDefaultStagingGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo api.AppSecurityGroup, stagingGroupRepo api.StagingSecurityGroupsRepo) command.Command {
 	return &addToDefaultStagingGroup{
 		ui:                ui,
+		configRepo:        configRepo,
 		securityGroupRepo: securityGroupRepo,
 		stagingGroupRepo:  stagingGroupRepo,
 	}
@@ -46,8 +49,14 @@ func (cmd *addToDefaultStagingGroup) Run(context *cli.Context) {
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
-		panic("freakout")
+		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.stagingGroupRepo.AddToDefaultStagingSet(securityGroup)
+	cmd.ui.Say("Adding security group '%s' to defaults for staging as '%s'", securityGroup.Name, cmd.configRepo.Username())
+	err = cmd.stagingGroupRepo.AddToDefaultStagingSet(securityGroup)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	cmd.ui.Ok()
 }
