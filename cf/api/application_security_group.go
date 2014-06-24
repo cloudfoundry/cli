@@ -70,7 +70,7 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.Applicati
 }
 
 func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.ApplicationSecurityGroup, error) {
-	path := "/v2/app_security_groups?inline-relations-depth=1"
+	path := "/v2/app_security_groups?inline-relations-depth=2"
 	securityGroups := []models.ApplicationSecurityGroup{}
 
 	err := repo.gateway.ListPaginatedResources(
