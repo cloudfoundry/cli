@@ -75,7 +75,7 @@ func (cmd CreateAppSecurityGroup) Run(context *cli.Context) {
 		ruleMaps = append(ruleMaps, ruleMap)
 	}
 
-	cmd.ui.Say("Creating application security group '%s' as '%s", name, cmd.configRepo.Username())
+	cmd.ui.Say("Creating application security group '%s' as '%s'", name, cmd.configRepo.Username())
 
 	err := cmd.appSecurityGroupRepo.Create(name, ruleMaps, spaceGuids)
 	if err != nil {
