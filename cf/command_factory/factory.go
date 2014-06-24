@@ -113,6 +113,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["create-application-security-group"] = appsecuritygroup.NewCreateSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["delete-application-security-group"] = appsecuritygroup.NewDeleteAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
 	factory.cmdsByName["application-security-group"] = appsecuritygroup.NewShowAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
+	factory.cmdsByName["security-groups"] = appsecuritygroup.NewSecurityGroups(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
 	factory.cmdsByName["add-default-staging-application-security-group"] = appsecuritygroup.NewAddToDefaultStagingGroup(
 		ui,
 		config,

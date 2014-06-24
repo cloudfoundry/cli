@@ -167,7 +167,7 @@ var _ = Describe("app security group api", func() {
 			setupTestServer(
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/app_security_groups?inline-relations-depth=1",
+					Path:   "/v2/app_security_groups?inline-relations-depth=2",
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
 						Body:   firstListItem(),
@@ -175,7 +175,7 @@ var _ = Describe("app security group api", func() {
 				}),
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/app_security_groups?inline-relations-depth=1&page=2",
+					Path:   "/v2/app_security_groups?inline-relations-depth=2&page=2",
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
 						Body:   secondListItem(),
@@ -213,7 +213,7 @@ var _ = Describe("app security group api", func() {
 
 func firstListItem() string {
 	return `{
-  "next_url": "/v2/app_security_groups?inline-relations-depth=1&page=2",
+  "next_url": "/v2/app_security_groups?inline-relations-depth=2&page=2",
   "resources": [
     {
       "metadata": {
