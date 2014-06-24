@@ -15,6 +15,7 @@ type SecurityGroupRepo interface {
 	Create(name string, rules []map[string]string, spaceGuids []string) error
 	Delete(string) error
 	Read(string) (models.ApplicationSecurityGroup, error)
+	FindAll() ([]models.ApplicationSecurityGroup, error)
 }
 
 type cloudControllerSecurityGroupRepo struct {
@@ -66,6 +67,30 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.Applicati
 	}
 
 	return group, err
+}
+
+func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.ApplicationSecurityGroup, error) {
+	path := "/v2/app_security_groups?inline-relations-depth=1"
+	securityGroups := []models.ApplicationSecurityGroup{}
+
+	err := repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		path,
+		resources.ApplicationSecurityGroupResource{},
+		func(resource interface{}) bool {
+			if securityGroupResource, ok := resource.(resources.ApplicationSecurityGroupResource); ok {
+				securityGroups = append(securityGroups, securityGroupResource.ToModel())
+			}
+
+			return true
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return securityGroups, err
 }
 
 func (repo cloudControllerSecurityGroupRepo) Delete(securityGroupGuid string) error {
