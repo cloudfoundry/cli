@@ -11,25 +11,25 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-type AppSecurityGroup interface {
+type SecurityGroupRepo interface {
 	Create(name string, rules []map[string]string, spaceGuids []string) error
 	Delete(string) error
 	Read(string) (models.ApplicationSecurityGroup, error)
 }
 
-type ApplicationSecurityGroupRepo struct {
+type cloudControllerSecurityGroupRepo struct {
 	gateway net.Gateway
 	config  configuration.Reader
 }
 
-func NewApplicationSecurityGroupRepo(config configuration.Reader, gateway net.Gateway) ApplicationSecurityGroupRepo {
-	return ApplicationSecurityGroupRepo{
+func NewSecurityGroupRepo(config configuration.Reader, gateway net.Gateway) SecurityGroupRepo {
+	return cloudControllerSecurityGroupRepo{
 		config:  config,
 		gateway: gateway,
 	}
 }
 
-func (repo ApplicationSecurityGroupRepo) Create(name string, rules []map[string]string, spaceGuids []string) error {
+func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[string]string, spaceGuids []string) error {
 	path := fmt.Sprintf("%s/v2/app_security_groups", repo.config.ApiEndpoint())
 	params := models.ApplicationSecurityGroupParams{
 		Name:       name,
@@ -39,7 +39,7 @@ func (repo ApplicationSecurityGroupRepo) Create(name string, rules []map[string]
 	return repo.gateway.CreateResourceFromStruct(path, params)
 }
 
-func (repo ApplicationSecurityGroupRepo) Read(name string) (models.ApplicationSecurityGroup, error) {
+func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.ApplicationSecurityGroup, error) {
 	path := fmt.Sprintf("/v2/app_security_groups?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+name))
 	group := models.ApplicationSecurityGroup{}
 	foundGroup := false
@@ -68,7 +68,7 @@ func (repo ApplicationSecurityGroupRepo) Read(name string) (models.ApplicationSe
 	return group, err
 }
 
-func (repo ApplicationSecurityGroupRepo) Delete(securityGroupGuid string) error {
+func (repo cloudControllerSecurityGroupRepo) Delete(securityGroupGuid string) error {
 	path := fmt.Sprintf("%s/v2/app_security_groups/%s", repo.config.ApiEndpoint(), securityGroupGuid)
 	return repo.gateway.DeleteResource(path)
 }

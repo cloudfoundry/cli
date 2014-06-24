@@ -23,13 +23,13 @@ var _ = Describe("app security group api", func() {
 		testServer  *httptest.Server
 		testHandler *testnet.TestHandler
 		configRepo  configuration.ReadWriter
-		repo        ApplicationSecurityGroupRepo
+		repo        SecurityGroupRepo
 	)
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		gateway := net.NewCloudControllerGateway((configRepo), time.Now)
-		repo = NewApplicationSecurityGroupRepo(configRepo, gateway)
+		repo = NewSecurityGroupRepo(configRepo, gateway)
 	})
 
 	AfterEach(func() {

@@ -54,10 +54,10 @@ var _ = Describe("add-default-staging-application-security-group command", func(
 	Context("when the user is logged in and provides the name of a group", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
-			securityGroupRepo.ReadReturns.Fields = models.ApplicationSecurityGroupFields{
-				Guid: "just-pretend-this-is-a-guid",
-				Name: "a-security-group-name",
-			}
+			group := models.ApplicationSecurityGroup{}
+			group.Guid = "just-pretend-this-is-a-guid"
+			group.Name = "a-security-group-name"
+			securityGroupRepo.ReadReturns.ApplicationSecurityGroup = group
 		})
 
 		JustBeforeEach(func() {
@@ -66,7 +66,7 @@ var _ = Describe("add-default-staging-application-security-group command", func(
 
 		It("adds the group to the default staging group set", func() {
 			Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("a-security-group-name"))
-			Expect(stagingSecurityGroupRepo.AddToDefaultStagingSetArgsForCall(0).Guid).To(Equal("just-pretend-this-is-a-guid"))
+			Expect(stagingSecurityGroupRepo.AddToDefaultStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
 		})
 
 		It("describes what it's doing to the user", func() {
