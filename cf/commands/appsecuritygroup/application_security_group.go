@@ -2,7 +2,7 @@ package appsecuritygroup
 
 import (
 	"encoding/json"
-	"strings"
+	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -58,21 +58,21 @@ func (cmd ShowApplicationSecurityGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(encodingErr.Error())
 	}
 
-	spaceNames := []string{}
-	for _, space := range appSecurityGroup.Spaces {
-		spaceNames = append(spaceNames, space.Name)
-	}
-
 	cmd.ui.Ok()
 	table := terminal.NewTable(cmd.ui, []string{"", ""})
-	table.Add("Name:", appSecurityGroup.Name)
-	table.Add("Rules:", string(jsonEncodedBytes))
-
-	if len(spaceNames) == 0 {
-		table.Add("Spaces:", "No spaces")
-	} else {
-		table.Add("Spaces:", strings.Join(spaceNames, ", "))
-	}
-
+	table.Add("Name", appSecurityGroup.Name)
+	table.Add("Rules", string(jsonEncodedBytes))
 	table.Print()
+	cmd.ui.Say("")
+
+	if len(appSecurityGroup.Spaces) > 0 {
+		table = terminal.NewTable(cmd.ui, []string{"", "Organization", "Space"})
+
+		for index, space := range appSecurityGroup.Spaces {
+			table.Add(fmt.Sprintf("#%d", index), space.Organization.Name, space.Name)
+		}
+		table.Print()
+	} else {
+		cmd.ui.Say("No spaces assigned")
+	}
 }

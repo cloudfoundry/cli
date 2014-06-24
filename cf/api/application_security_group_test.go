@@ -71,7 +71,7 @@ var _ = Describe("app security group api", func() {
 		It("returns the app security group with the given name", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
-				Path:   "/v2/app_security_groups?q=name:the-name&inline-relations-depth=1",
+				Path:   "/v2/app_security_groups?q=name:the-name&inline-relations-depth=2",
 				Response: testnet.TestResponse{
 					Status: http.StatusOK,
 					Body: `
@@ -90,7 +90,15 @@ var _ = Describe("app security group api", func() {
                	  	"guid": "my-space-guid"
                	  },
                   "entity": {
-                     "name": "my-space"
+                     "name": "my-space",
+                     "organization": {
+                        "metadata": {
+                           "guid": "my-org-guid"
+                        },
+                        "entity": {
+                           "name": "my-org"
+                        }
+                     }
                   }
                }
             ]
@@ -111,14 +119,19 @@ var _ = Describe("app security group api", func() {
 					Guid:  "the-group-guid",
 					Rules: []map[string]string{{"key": "value"}},
 				},
-				Spaces: []models.SpaceFields{{Guid: "my-space-guid", Name: "my-space"}},
+				Spaces: []models.Space{
+					{
+						SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "my-space"},
+						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org"},
+					},
+				},
 			}))
 		})
 
 		It("returns a ModelNotFound error if the security group cannot be found", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
-				Path:   "/v2/app_security_groups?q=name:the-name&inline-relations-depth=1",
+				Path:   "/v2/app_security_groups?q=name:the-name&inline-relations-depth=2",
 				Response: testnet.TestResponse{
 					Status: http.StatusOK,
 					Body:   `{"resources": []}`,
@@ -179,7 +192,7 @@ var _ = Describe("app security group api", func() {
 					Guid:  "cd186158-b356-474d-9861-724f34f48502",
 					Rules: []map[string]string{{"protocol": "udp"}},
 				},
-				Spaces: []models.SpaceFields{},
+				Spaces: []models.Space{},
 			}))
 			Expect(groups[1]).To(Equal(models.ApplicationSecurityGroup{
 				ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
@@ -187,7 +200,12 @@ var _ = Describe("app security group api", func() {
 					Guid:  "d3374b62-7eac-4823-afbd-460d2bf44c67",
 					Rules: []map[string]string{{"destination": "198.41.191.47/1"}},
 				},
-				Spaces: []models.SpaceFields{{Guid: "my-space-guid", Name: "my-space"}},
+				Spaces: []models.Space{
+					{
+						SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "my-space"},
+						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org"},
+					},
+				},
 			}))
 		})
 	})
@@ -242,7 +260,15 @@ func secondListItem() string {
                	  	"guid": "my-space-guid"
                	  },
                   "entity": {
-                     "name": "my-space"
+                     "name": "my-space",
+                     "organization": {
+                        "metadata": {
+                           "guid": "my-org-guid"
+                        },
+                        "entity": {
+                           "name": "my-org"
+                        }
+                     }
                   }
                }
             ],

@@ -18,5 +18,5 @@ type ApplicationSecurityGroupParams struct {
 // represents a fully instantiated model returned by the CC (e.g.: with its attributes and the fields for its child objects)
 type ApplicationSecurityGroup struct {
 	ApplicationSecurityGroupFields
-	Spaces []SpaceFields
+	Spaces []Space
 }
