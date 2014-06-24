@@ -19,23 +19,23 @@ import (
 
 var _ = Describe("add-default-staging-application-security-group command", func() {
 	var (
-		ui                       *testterm.FakeUI
-		configRepo               configuration.ReadWriter
-		requirementsFactory      *testreq.FakeReqFactory
-		securityGroupRepo        *testapi.FakeAppSecurityGroup
-		stagingSecurityGroupRepo *testapi.FakeStagingSecurityGroupsRepo
+		ui                           *testterm.FakeUI
+		configRepo                   configuration.ReadWriter
+		requirementsFactory          *testreq.FakeReqFactory
+		fakeSecurityGroupRepo        *testapi.FakeAppSecurityGroup
+		fakeStagingSecurityGroupRepo *testapi.FakeStagingSecurityGroupsRepo
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &testapi.FakeAppSecurityGroup{}
-		stagingSecurityGroupRepo = &testapi.FakeStagingSecurityGroupsRepo{}
+		fakeSecurityGroupRepo = &testapi.FakeAppSecurityGroup{}
+		fakeStagingSecurityGroupRepo = &testapi.FakeStagingSecurityGroupsRepo{}
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewAddToDefaultStagingGroup(ui, configRepo, securityGroupRepo, stagingSecurityGroupRepo)
+		cmd := NewAddToDefaultStagingGroup(ui, configRepo, fakeSecurityGroupRepo, fakeStagingSecurityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -57,7 +57,7 @@ var _ = Describe("add-default-staging-application-security-group command", func(
 			group := models.ApplicationSecurityGroup{}
 			group.Guid = "just-pretend-this-is-a-guid"
 			group.Name = "a-security-group-name"
-			securityGroupRepo.ReadReturns.ApplicationSecurityGroup = group
+			fakeSecurityGroupRepo.ReadReturns.ApplicationSecurityGroup = group
 		})
 
 		JustBeforeEach(func() {
@@ -65,8 +65,8 @@ var _ = Describe("add-default-staging-application-security-group command", func(
 		})
 
 		It("adds the group to the default staging group set", func() {
-			Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("a-security-group-name"))
-			Expect(stagingSecurityGroupRepo.AddToDefaultStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
+			Expect(fakeSecurityGroupRepo.ReadCalledWith.Name).To(Equal("a-security-group-name"))
+			Expect(fakeStagingSecurityGroupRepo.AddToDefaultStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
 		})
 
 		It("describes what it's doing to the user", func() {
@@ -78,7 +78,7 @@ var _ = Describe("add-default-staging-application-security-group command", func(
 
 		Context("when adding the security group to the default set fails", func() {
 			BeforeEach(func() {
-				stagingSecurityGroupRepo.AddToDefaultStagingSetReturns(errors.New("WOAH. I know kung fu"))
+				fakeStagingSecurityGroupRepo.AddToDefaultStagingSetReturns(errors.New("WOAH. I know kung fu"))
 			})
 
 			It("fails and describes the failure to the user", func() {
@@ -91,11 +91,11 @@ var _ = Describe("add-default-staging-application-security-group command", func(
 
 		Context("when the security group with the given name cannot be found", func() {
 			BeforeEach(func() {
-				securityGroupRepo.ReadReturns.Error = errors.New("Crème insufficiently brûlée'd")
+				fakeSecurityGroupRepo.ReadReturns.Error = errors.New("Crème insufficiently brûlée'd")
 			})
 
 			It("fails and tells the user that the security group does not exist", func() {
-				Expect(stagingSecurityGroupRepo.AddToDefaultStagingSetCallCount()).To(Equal(0))
+				Expect(fakeStagingSecurityGroupRepo.AddToDefaultStagingSetCallCount()).To(Equal(0))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 				))
