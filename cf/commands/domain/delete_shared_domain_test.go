@@ -79,7 +79,6 @@ var _ = Describe("delete-shared-domain command", func() {
 			It("fails when the api returns an error", func() {
 				domainRepo.FindByNameInOrgApiResponse = errors.New("couldn't find the droids you're lookin for")
 				RunCommand("foo.com")
-				println(ui.DumpOutputs())
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
