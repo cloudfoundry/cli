@@ -28,9 +28,9 @@ func (resource ApplicationSecurityGroupResource) ToFields() (fields models.Appli
 func (resource ApplicationSecurityGroupResource) ToModel() (asg models.ApplicationSecurityGroup) {
 	asg.ApplicationSecurityGroupFields = resource.ToFields()
 
-	spaces := []models.SpaceFields{}
+	spaces := []models.Space{}
 	for _, s := range resource.Entity.Spaces {
-		spaces = append(spaces, s.ToFields())
+		spaces = append(spaces, s.ToModel())
 	}
 	asg.Spaces = spaces
 

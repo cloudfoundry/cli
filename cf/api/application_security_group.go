@@ -41,7 +41,7 @@ func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[str
 }
 
 func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.ApplicationSecurityGroup, error) {
-	path := fmt.Sprintf("/v2/app_security_groups?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("/v2/app_security_groups?q=%s&inline-relations-depth=2", url.QueryEscape("name:"+name))
 	group := models.ApplicationSecurityGroup{}
 	foundGroup := false
 

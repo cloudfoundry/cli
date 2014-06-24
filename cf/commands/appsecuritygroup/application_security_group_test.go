@@ -64,7 +64,16 @@ var _ = Describe("application-security-group command", func() {
 						Guid:  "group-guid",
 						Rules: rulesMap,
 					},
-					Spaces: []models.SpaceFields{{Name: "space-1"}, {Name: "space-2"}},
+					Spaces: []models.Space{
+						{
+							SpaceFields:  models.SpaceFields{Guid: "my-space-guid-1", Name: "space-1"},
+							Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-1"},
+						},
+						{
+							SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "space-2"},
+							Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-2"},
+						},
+					},
 				}
 			})
 
@@ -78,9 +87,10 @@ var _ = Describe("application-security-group command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting", "application security group", "my-group", "my-user"},
 					[]string{"OK"},
-					[]string{"Name:", "my-group"},
-					[]string{"Rules:", `[{"just-pretend":"that-this-is-correct"}]`},
-					[]string{"Spaces:", "space-1, space-2"},
+					[]string{"Name", "my-group"},
+					[]string{"Rules", `[{"just-pretend":"that-this-is-correct"}]`},
+					[]string{"#0", "org-1", "space-1"},
+					[]string{"#1", "org-2", "space-2"},
 				))
 			})
 
@@ -91,13 +101,13 @@ var _ = Describe("application-security-group command", func() {
 						Guid:  "group-guid",
 						Rules: []map[string]string{},
 					},
-					Spaces: []models.SpaceFields{},
+					Spaces: []models.Space{},
 				}
 
 				runCommand("my-group")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Spaces:", "No spaces"},
+					[]string{"No spaces assigned"},
 				))
 			})
 		})
