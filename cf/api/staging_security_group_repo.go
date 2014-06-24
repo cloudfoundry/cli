@@ -4,12 +4,11 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
 type StagingSecurityGroupsRepo interface {
-	AddToDefaultStagingSet(group models.ApplicationSecurityGroupFields) error
+	AddToDefaultStagingSet(string) error
 }
 
 type cloudControllerStagingSecurityGroupRepo struct {
@@ -24,7 +23,7 @@ func NewStagingSecurityGroupsRepo(configRepo configuration.Reader, gateway net.G
 	}
 }
 
-func (repo *cloudControllerStagingSecurityGroupRepo) AddToDefaultStagingSet(group models.ApplicationSecurityGroupFields) error {
-	path := fmt.Sprintf("%s/v2/config/staging_security_groups/%s", repo.configRepo.ApiEndpoint(), group.Guid)
+func (repo *cloudControllerStagingSecurityGroupRepo) AddToDefaultStagingSet(groupGuid string) error {
+	path := fmt.Sprintf("%s/v2/config/staging_security_groups/%s", repo.configRepo.ApiEndpoint(), groupGuid)
 	return repo.gateway.CreateResourceFromStruct(path, "")
 }

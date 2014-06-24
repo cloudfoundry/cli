@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -68,7 +67,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 			})
 
 			configRepo.SetApiEndpoint(testServer.URL)
-			err := repo.AddToDefaultStagingSet(models.ApplicationSecurityGroupFields{Guid: "a-real-guid"})
+			err := repo.AddToDefaultStagingSet("a-real-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(testnet.HaveAllRequestsCalled())

@@ -13,11 +13,11 @@ import (
 type addToDefaultStagingGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
-	securityGroupRepo api.AppSecurityGroup
+	securityGroupRepo api.SecurityGroupRepo
 	stagingGroupRepo  api.StagingSecurityGroupsRepo
 }
 
-func NewAddToDefaultStagingGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo api.AppSecurityGroup, stagingGroupRepo api.StagingSecurityGroupsRepo) command.Command {
+func NewAddToDefaultStagingGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo api.SecurityGroupRepo, stagingGroupRepo api.StagingSecurityGroupsRepo) command.Command {
 	return &addToDefaultStagingGroup{
 		ui:                ui,
 		configRepo:        configRepo,
@@ -53,7 +53,7 @@ func (cmd *addToDefaultStagingGroup) Run(context *cli.Context) {
 	}
 
 	cmd.ui.Say("Adding security group '%s' to defaults for staging as '%s'", securityGroup.Name, cmd.configRepo.Username())
-	err = cmd.stagingGroupRepo.AddToDefaultStagingSet(securityGroup)
+	err = cmd.stagingGroupRepo.AddToDefaultStagingSet(securityGroup.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

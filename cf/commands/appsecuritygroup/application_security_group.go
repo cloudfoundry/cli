@@ -14,11 +14,11 @@ import (
 
 type ShowApplicationSecurityGroup struct {
 	ui                   terminal.UI
-	appSecurityGroupRepo api.AppSecurityGroup
+	appSecurityGroupRepo api.SecurityGroupRepo
 	configRepo           configuration.Reader
 }
 
-func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.AppSecurityGroup) ShowApplicationSecurityGroup {
+func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo) ShowApplicationSecurityGroup {
 	return ShowApplicationSecurityGroup{
 		ui:                   ui,
 		configRepo:           configRepo,
