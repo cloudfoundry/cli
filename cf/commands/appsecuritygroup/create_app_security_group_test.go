@@ -44,7 +44,7 @@ var _ = Describe("create-app-security-group", func() {
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewCreateAppSecurityGroup(ui, configRepo, appSecurityGroupRepo, spaceRepo)
+		cmd := NewAppSecurityGroup(ui, configRepo, appSecurityGroupRepo, spaceRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 

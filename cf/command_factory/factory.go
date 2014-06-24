@@ -110,7 +110,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
-	factory.cmdsByName["create-application-security-group"] = appsecuritygroup.NewCreateAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository(), repoLocator.GetSpaceRepository())
+	factory.cmdsByName["create-application-security-group"] = appsecuritygroup.NewCreateSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["delete-application-security-group"] = appsecuritygroup.NewDeleteAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
 	factory.cmdsByName["application-security-group"] = appsecuritygroup.NewShowAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
 	factory.cmdsByName["add-default-staging-application-security-group"] = appsecuritygroup.NewAddToDefaultStagingGroup(
