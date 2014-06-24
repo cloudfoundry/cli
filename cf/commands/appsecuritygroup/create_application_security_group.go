@@ -12,15 +12,15 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type CreateAppSecurityGroup struct {
+type CreateSecurityGroup struct {
 	ui                   terminal.UI
 	appSecurityGroupRepo api.SecurityGroupRepo
 	spaceRepo            api.SpaceRepository
 	configRepo           configuration.Reader
 }
 
-func NewCreateAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo, spaceRepo api.SpaceRepository) CreateAppSecurityGroup {
-	return CreateAppSecurityGroup{
+func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo, spaceRepo api.SpaceRepository) CreateSecurityGroup {
+	return CreateSecurityGroup{
 		ui:                   ui,
 		configRepo:           configRepo,
 		appSecurityGroupRepo: appSecurityGroupRepo,
@@ -28,7 +28,7 @@ func NewCreateAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, 
 	}
 }
 
-func (cmd CreateAppSecurityGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-application-security-group",
 		Description: "<<< description goes here>>>",
@@ -40,7 +40,7 @@ func (cmd CreateAppSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd CreateAppSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd CreateSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -49,7 +49,7 @@ func (cmd CreateAppSecurityGroup) GetRequirements(requirementsFactory requiremen
 	return requirements, nil
 }
 
-func (cmd CreateAppSecurityGroup) Run(context *cli.Context) {
+func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 	rules := context.StringSlice("rules")
 	spaces := context.StringSlice("space")
