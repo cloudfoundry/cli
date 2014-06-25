@@ -80,7 +80,7 @@ var _ = Describe("create-app-security-group", func() {
 		It("displays a message describing what its going to do", func() {
 			runCommand("my-group")
 			Expect(ui.Outputs).To(matchers.ContainSubstrings(
-				[]string{"Creating application security group", "my-group", "my-user"},
+				[]string{"Creating application security group", "my-group", "my-user", "0", "spaces"},
 				[]string{"OK"},
 			))
 		})
