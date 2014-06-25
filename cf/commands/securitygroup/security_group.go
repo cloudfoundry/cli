@@ -1,4 +1,4 @@
-package appsecuritygroup
+package securitygroup
 
 import (
 	"encoding/json"
@@ -28,9 +28,9 @@ func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, ap
 
 func (cmd ShowApplicationSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "application-security-group",
+		Name:        "security-group",
 		Description: "<<< Description goes here >>>",
-		Usage:       "CF_NAME application-security-group NAME",
+		Usage:       "CF_NAME security-group NAME",
 	}
 }
 

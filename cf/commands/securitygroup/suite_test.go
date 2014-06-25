@@ -1,4 +1,4 @@
-package appsecuritygroup_test
+package securitygroup_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -9,5 +9,5 @@ import (
 
 func TestAppSecurityGroup(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "AppSecurityGroup Suite")
+	RunSpecs(t, "SecurityGroup Suite")
 }
