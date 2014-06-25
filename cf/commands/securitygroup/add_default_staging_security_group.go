@@ -1,4 +1,4 @@
-package appsecuritygroup
+package securitygroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
@@ -28,9 +28,9 @@ func NewAddToDefaultStagingGroup(ui terminal.UI, configRepo configuration.Reader
 
 func (cmd *addToDefaultStagingGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "add-default-staging-application-security-group",
+		Name:        "add-default-staging-security-group",
 		Description: "Twee Thundercats 8-bit keffiyeh meggings.",
-		Usage:       "CF_NAME add-default-staging-application-security-group NAME",
+		Usage:       "CF_NAME add-default-staging-security-group NAME",
 	}
 }
 

@@ -8,12 +8,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/commands/appsecuritygroup"
 	"github.com/cloudfoundry/cli/cf/commands/buildpack"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/route"
+	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
@@ -110,11 +110,11 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
-	factory.cmdsByName["create-application-security-group"] = appsecuritygroup.NewCreateSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository(), repoLocator.GetSpaceRepository())
-	factory.cmdsByName["delete-application-security-group"] = appsecuritygroup.NewDeleteAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
-	factory.cmdsByName["application-security-group"] = appsecuritygroup.NewShowAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
-	factory.cmdsByName["security-groups"] = appsecuritygroup.NewSecurityGroups(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
-	factory.cmdsByName["add-default-staging-application-security-group"] = appsecuritygroup.NewAddToDefaultStagingGroup(
+	factory.cmdsByName["create-security-group"] = securitygroup.NewCreateSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository(), repoLocator.GetSpaceRepository())
+	factory.cmdsByName["delete-security-group"] = securitygroup.NewDeleteAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
+	factory.cmdsByName["security-group"] = securitygroup.NewShowAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
+	factory.cmdsByName["security-groups"] = securitygroup.NewSecurityGroups(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
+	factory.cmdsByName["add-default-staging-security-group"] = securitygroup.NewAddToDefaultStagingGroup(
 		ui,
 		config,
 		repoLocator.GetApplicationSecurityGroupRepository(),

@@ -1,4 +1,4 @@
-package appsecuritygroup
+package securitygroup
 
 import (
 	"fmt"

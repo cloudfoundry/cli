@@ -1,4 +1,4 @@
-package appsecuritygroup_test
+package securitygroup_test
 
 import (
 	"errors"
@@ -11,13 +11,13 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/appsecuritygroup"
+	. "github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("add-default-staging-application-security-group command", func() {
+var _ = Describe("add-default-staging-security-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		configRepo                   configuration.ReadWriter

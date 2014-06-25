@@ -1,4 +1,4 @@
-package appsecuritygroup
+package securitygroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
@@ -25,9 +25,9 @@ func NewDeleteAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, 
 
 func (cmd DeleteApplicationSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "delete-application-security-group",
+		Name:        "delete-security-group",
 		Description: "<<< Description goes here >>>",
-		Usage:       "CF_NAME delete-application-security-group NAME",
+		Usage:       "CF_NAME delete-security-group NAME",
 	}
 }
 

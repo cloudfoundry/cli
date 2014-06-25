@@ -1,4 +1,4 @@
-package appsecuritygroup_test
+package securitygroup_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -11,7 +11,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/appsecuritygroup"
+	. "github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
