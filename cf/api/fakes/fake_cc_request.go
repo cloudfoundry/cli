@@ -1,4 +1,4 @@
-package api
+package fakes
 
 import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"

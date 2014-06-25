@@ -1,4 +1,4 @@
-package api
+package fakes
 
 type FakeCurlRepository struct {
 	Method         string

@@ -1,4 +1,4 @@
-package api
+package fakes
 
 import "github.com/cloudfoundry/cli/cf/models"
 

@@ -1,4 +1,4 @@
-package api
+package fakes
 
 type FakeEndpointRepo struct {
 	UpdateEndpointReceived string
