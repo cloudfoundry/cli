@@ -191,7 +191,7 @@ func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepos
 	return locator.buildpackBitsRepo
 }
 
-func (locator RepositoryLocator) GetApplicationSecurityGroupRepository() SecurityGroupRepo {
+func (locator RepositoryLocator) GetSecurityGroupRepository() SecurityGroupRepo {
 	return locator.appSecurityGroupRepo
 }
 

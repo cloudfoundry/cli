@@ -19,7 +19,7 @@ import (
 var _ = Describe("delete-security-group command", func() {
 	var (
 		ui                   *testterm.FakeUI
-		appSecurityGroupRepo *testapi.FakeAppSecurityGroup
+		appSecurityGroupRepo *testapi.FakeSecurityGroup
 		requirementsFactory  *testreq.FakeReqFactory
 		configRepo           configuration.ReadWriter
 	)
@@ -27,7 +27,7 @@ var _ = Describe("delete-security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appSecurityGroupRepo = &testapi.FakeAppSecurityGroup{}
+		appSecurityGroupRepo = &testapi.FakeSecurityGroup{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -56,8 +56,8 @@ var _ = Describe("delete-security-group command", func() {
 
 		Context("when the group with the given name exists", func() {
 			BeforeEach(func() {
-				appSecurityGroupRepo.ReadReturns.ApplicationSecurityGroup = models.ApplicationSecurityGroup{
-					ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
+				appSecurityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+					SecurityGroupFields: models.SecurityGroupFields{
 						Name: "my-group",
 						Guid: "group-guid",
 					},

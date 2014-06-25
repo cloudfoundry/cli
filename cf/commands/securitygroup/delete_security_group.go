@@ -9,21 +9,21 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type DeleteApplicationSecurityGroup struct {
+type DeleteSecurityGroup struct {
 	ui                   terminal.UI
 	appSecurityGroupRepo api.SecurityGroupRepo
 	configRepo           configuration.Reader
 }
 
-func NewDeleteAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo) DeleteApplicationSecurityGroup {
-	return DeleteApplicationSecurityGroup{
+func NewDeleteAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo) DeleteSecurityGroup {
+	return DeleteSecurityGroup{
 		ui:                   ui,
 		configRepo:           configRepo,
 		appSecurityGroupRepo: appSecurityGroupRepo,
 	}
 }
 
-func (cmd DeleteApplicationSecurityGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd DeleteSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-security-group",
 		Description: "<<< Description goes here >>>",
@@ -31,7 +31,7 @@ func (cmd DeleteApplicationSecurityGroup) Metadata() command_metadata.CommandMet
 	}
 }
 
-func (cmd DeleteApplicationSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd DeleteSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -40,7 +40,7 @@ func (cmd DeleteApplicationSecurityGroup) GetRequirements(requirementsFactory re
 	return requirements, nil
 }
 
-func (cmd DeleteApplicationSecurityGroup) Run(context *cli.Context) {
+func (cmd DeleteSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
 	group, err := cmd.appSecurityGroupRepo.Read(name)

@@ -19,7 +19,7 @@ import (
 var _ = Describe("security-group command", func() {
 	var (
 		ui                   *testterm.FakeUI
-		appSecurityGroupRepo *testapi.FakeAppSecurityGroup
+		appSecurityGroupRepo *testapi.FakeSecurityGroup
 		requirementsFactory  *testreq.FakeReqFactory
 		configRepo           configuration.ReadWriter
 	)
@@ -27,7 +27,7 @@ var _ = Describe("security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appSecurityGroupRepo = &testapi.FakeAppSecurityGroup{}
+		appSecurityGroupRepo = &testapi.FakeSecurityGroup{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -58,8 +58,8 @@ var _ = Describe("security-group command", func() {
 			BeforeEach(func() {
 				rulesMap := []map[string]string{{"just-pretend": "that-this-is-correct"}}
 
-				appSecurityGroupRepo.ReadReturns.ApplicationSecurityGroup = models.ApplicationSecurityGroup{
-					ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
+				appSecurityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "group-guid",
 						Rules: rulesMap,
@@ -95,8 +95,8 @@ var _ = Describe("security-group command", func() {
 			})
 
 			It("tells the user if no spaces are assigned", func() {
-				appSecurityGroupRepo.ReadReturns.ApplicationSecurityGroup = models.ApplicationSecurityGroup{
-					ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
+				appSecurityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "group-guid",
 						Rules: []map[string]string{},

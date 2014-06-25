@@ -71,7 +71,7 @@ func (cmd SecurityGroups) Run(context *cli.Context) {
 	table.Print()
 }
 
-func (cmd SecurityGroups) printSpaces(table terminal.Table, securityGroup models.ApplicationSecurityGroup, index int) {
+func (cmd SecurityGroups) printSpaces(table terminal.Table, securityGroup models.SecurityGroup, index int) {
 	outputted_index := false
 
 	for _, space := range securityGroup.Spaces {

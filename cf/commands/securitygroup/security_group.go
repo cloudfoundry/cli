@@ -12,21 +12,21 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type ShowApplicationSecurityGroup struct {
+type ShowSecurityGroup struct {
 	ui                   terminal.UI
 	appSecurityGroupRepo api.SecurityGroupRepo
 	configRepo           configuration.Reader
 }
 
-func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo) ShowApplicationSecurityGroup {
-	return ShowApplicationSecurityGroup{
+func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo) ShowSecurityGroup {
+	return ShowSecurityGroup{
 		ui:                   ui,
 		configRepo:           configRepo,
 		appSecurityGroupRepo: appSecurityGroupRepo,
 	}
 }
 
-func (cmd ShowApplicationSecurityGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd ShowSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "security-group",
 		Description: "<<< Description goes here >>>",
@@ -34,7 +34,7 @@ func (cmd ShowApplicationSecurityGroup) Metadata() command_metadata.CommandMetad
 	}
 }
 
-func (cmd ShowApplicationSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd ShowSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -43,7 +43,7 @@ func (cmd ShowApplicationSecurityGroup) GetRequirements(requirementsFactory requ
 	return requirements, nil
 }
 
-func (cmd ShowApplicationSecurityGroup) Run(context *cli.Context) {
+func (cmd ShowSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
 	cmd.ui.Say("Getting info for application security group '%s' as '%s'", name, cmd.configRepo.Username())

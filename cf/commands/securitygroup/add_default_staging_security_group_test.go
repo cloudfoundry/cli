@@ -22,7 +22,7 @@ var _ = Describe("add-default-staging-security-group command", func() {
 		ui                           *testterm.FakeUI
 		configRepo                   configuration.ReadWriter
 		requirementsFactory          *testreq.FakeReqFactory
-		fakeSecurityGroupRepo        *testapi.FakeAppSecurityGroup
+		fakeSecurityGroupRepo        *testapi.FakeSecurityGroup
 		fakeStagingSecurityGroupRepo *testapi.FakeStagingSecurityGroupsRepo
 	)
 
@@ -30,7 +30,7 @@ var _ = Describe("add-default-staging-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &testapi.FakeAppSecurityGroup{}
+		fakeSecurityGroupRepo = &testapi.FakeSecurityGroup{}
 		fakeStagingSecurityGroupRepo = &testapi.FakeStagingSecurityGroupsRepo{}
 	})
 
@@ -54,10 +54,10 @@ var _ = Describe("add-default-staging-security-group command", func() {
 	Context("when the user is logged in and provides the name of a group", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
-			group := models.ApplicationSecurityGroup{}
+			group := models.SecurityGroup{}
 			group.Guid = "just-pretend-this-is-a-guid"
 			group.Name = "a-security-group-name"
-			fakeSecurityGroupRepo.ReadReturns.ApplicationSecurityGroup = group
+			fakeSecurityGroupRepo.ReadReturns.SecurityGroup = group
 		})
 
 		JustBeforeEach(func() {
