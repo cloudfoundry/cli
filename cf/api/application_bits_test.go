@@ -3,14 +3,6 @@ package api_test
 import (
 	"archive/zip"
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/net"
-	testapi "github.com/cloudfoundry/cli/testhelpers/api"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,6 +10,17 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/net"
+	testapi "github.com/cloudfoundry/cli/testhelpers/api"
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("CloudControllerApplicationBitsRepository", func() {
@@ -51,7 +54,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 			reportedFileCount = fileCount
 		})
 
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 		return
 	}
 

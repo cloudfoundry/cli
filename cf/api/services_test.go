@@ -18,6 +18,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -66,7 +67,7 @@ var _ = Describe("Services Repo", func() {
 		It("gets all public service offerings", func() {
 			offerings, err := repo.GetAllServiceOfferings()
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(len(offerings)).To(Equal(3))
 
@@ -95,7 +96,7 @@ var _ = Describe("Services Repo", func() {
 
 			offerings, err := repo.GetServiceOfferingsForSpace("my-space-guid")
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(offerings)).To(Equal(3))
@@ -128,7 +129,7 @@ var _ = Describe("Services Repo", func() {
 			}))
 
 			err := repo.CreateServiceInstance("instance-name", "plan-guid")
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -149,7 +150,7 @@ var _ = Describe("Services Repo", func() {
 
 			It("returns a ModelAlreadyExistsError if the plan is the same", func() {
 				err := repo.CreateServiceInstance("my-service", "plan-guid")
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
 			})
 		})
@@ -172,7 +173,7 @@ var _ = Describe("Services Repo", func() {
 			It("fails if the plan is different", func() {
 				err := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(BeAssignableToTypeOf(errors.NewHttpError(400, "", "")))
 			})
@@ -185,7 +186,7 @@ var _ = Describe("Services Repo", func() {
 
 			instance, err := repo.FindInstanceByName("my-service")
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Name).To(Equal("my-service"))
@@ -243,7 +244,7 @@ var _ = Describe("Services Repo", func() {
 
 			instance, err := repo.FindInstanceByName("my-service")
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Name).To(Equal("my-service"))
@@ -267,7 +268,7 @@ var _ = Describe("Services Repo", func() {
 
 			_, err := repo.FindInstanceByName("my-service")
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
 		})
 	})
@@ -284,7 +285,7 @@ var _ = Describe("Services Repo", func() {
 			serviceInstance.Guid = "my-service-instance-guid"
 
 			err := repo.DeleteService(serviceInstance)
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -329,7 +330,7 @@ var _ = Describe("Services Repo", func() {
 				}
 
 				err := repo.RenameService(serviceInstance, "new-name")
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
@@ -349,7 +350,7 @@ var _ = Describe("Services Repo", func() {
 				serviceInstance.Guid = "my-service-instance-guid"
 
 				err := repo.RenameService(serviceInstance, "new-name")
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
@@ -445,7 +446,7 @@ var _ = Describe("Services Repo", func() {
 
 			err := repo.PurgeServiceOffering(offering)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
 

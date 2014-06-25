@@ -12,6 +12,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -78,7 +79,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		Expect(len(serviceBrokers)).To(Equal(2))
 		Expect(serviceBrokers[0].Guid).To(Equal("found-guid-1"))
 		Expect(serviceBrokers[1].Guid).To(Equal("found-guid-2"))
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
@@ -112,7 +113,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			expectedBroker.Password = "found-password"
 			expectedBroker.Guid = "found-guid"
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(foundBroker).To(Equal(expectedBroker))
 		})
@@ -129,7 +130,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 			_, apiErr := repo.FindByName("my-broker")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).To(HaveOccurred())
 			Expect(apiErr.Error()).To(Equal("Service Broker my-broker not found"))
 		})
@@ -151,7 +152,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 			apiErr := repo.Create("foobroker", "http://example.com", "foouser", "password")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
@@ -178,7 +179,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 			apiErr := repo.Update(serviceBroker)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
@@ -197,7 +198,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 			apiErr := repo.Rename("my-guid", "update-foobroker")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
@@ -215,7 +216,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 			apiErr := repo.Delete("my-guid")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})

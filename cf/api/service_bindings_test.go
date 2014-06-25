@@ -14,6 +14,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -56,7 +57,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			It("creates the service binding", func() {
 				apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
 
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 		})
@@ -77,7 +78,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			It("returns an error", func() {
 				apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
 
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(apiErr).To(HaveOccurred())
 				Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("90003"))
 			})
@@ -109,7 +110,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			It("deletes the service binding with the given guid", func() {
 				found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
 
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(found).To(BeTrue())
 			})

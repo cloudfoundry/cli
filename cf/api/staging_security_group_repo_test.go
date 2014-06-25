@@ -12,6 +12,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -70,7 +71,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 			err := repo.AddToDefaultStagingSet("a-real-guid")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
 })
