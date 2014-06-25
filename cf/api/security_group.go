@@ -31,7 +31,7 @@ func NewSecurityGroupRepo(config configuration.Reader, gateway net.Gateway) Secu
 }
 
 func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[string]string, spaceGuids []string) error {
-	path := fmt.Sprintf("%s/v2/app_security_groups", repo.config.ApiEndpoint())
+	path := fmt.Sprintf("%s/v2/security_groups", repo.config.ApiEndpoint())
 	params := models.SecurityGroupParams{
 		Name:       name,
 		Rules:      rules,
@@ -41,7 +41,7 @@ func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[str
 }
 
 func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityGroup, error) {
-	path := fmt.Sprintf("/v2/app_security_groups?q=%s&inline-relations-depth=2", url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("/v2/security_groups?q=%s&inline-relations-depth=2", url.QueryEscape("name:"+name))
 	group := models.SecurityGroup{}
 	foundGroup := false
 
@@ -70,7 +70,7 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 }
 
 func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, error) {
-	path := "/v2/app_security_groups?inline-relations-depth=2"
+	path := "/v2/security_groups?inline-relations-depth=2"
 	securityGroups := []models.SecurityGroup{}
 
 	err := repo.gateway.ListPaginatedResources(
@@ -94,6 +94,6 @@ func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, 
 }
 
 func (repo cloudControllerSecurityGroupRepo) Delete(securityGroupGuid string) error {
-	path := fmt.Sprintf("%s/v2/app_security_groups/%s", repo.config.ApiEndpoint(), securityGroupGuid)
+	path := fmt.Sprintf("%s/v2/security_groups/%s", repo.config.ApiEndpoint(), securityGroupGuid)
 	return repo.gateway.DeleteResource(path)
 }

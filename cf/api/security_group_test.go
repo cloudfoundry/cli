@@ -45,7 +45,7 @@ var _ = Describe("app security group api", func() {
 		It("can create an app security group, given some attributes", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "POST",
-				Path:   "/v2/app_security_groups",
+				Path:   "/v2/security_groups",
 				// FIXME: this matcher depend on the order of the key/value pairs in the map
 				Matcher: testnet.RequestBodyMatcher(`{
 					"name": "mygroup",
@@ -71,7 +71,7 @@ var _ = Describe("app security group api", func() {
 		It("returns the app security group with the given name", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
-				Path:   "/v2/app_security_groups?q=name:the-name&inline-relations-depth=2",
+				Path:   "/v2/security_groups?q=name:the-name&inline-relations-depth=2",
 				Response: testnet.TestResponse{
 					Status: http.StatusOK,
 					Body: `
@@ -131,7 +131,7 @@ var _ = Describe("app security group api", func() {
 		It("returns a ModelNotFound error if the security group cannot be found", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
-				Path:   "/v2/app_security_groups?q=name:the-name&inline-relations-depth=2",
+				Path:   "/v2/security_groups?q=name:the-name&inline-relations-depth=2",
 				Response: testnet.TestResponse{
 					Status: http.StatusOK,
 					Body:   `{"resources": []}`,
@@ -150,7 +150,7 @@ var _ = Describe("app security group api", func() {
 			appSecurityGroupGuid := "the-security-group-guid"
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "DELETE",
-				Path:   "/v2/app_security_groups/" + appSecurityGroupGuid,
+				Path:   "/v2/security_groups/" + appSecurityGroupGuid,
 				Response: testnet.TestResponse{
 					Status: http.StatusNoContent,
 				},
@@ -167,7 +167,7 @@ var _ = Describe("app security group api", func() {
 			setupTestServer(
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/app_security_groups?inline-relations-depth=2",
+					Path:   "/v2/security_groups?inline-relations-depth=2",
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
 						Body:   firstListItem(),
@@ -175,7 +175,7 @@ var _ = Describe("app security group api", func() {
 				}),
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/app_security_groups?inline-relations-depth=2&page=2",
+					Path:   "/v2/security_groups?inline-relations-depth=2&page=2",
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
 						Body:   secondListItem(),
@@ -213,12 +213,12 @@ var _ = Describe("app security group api", func() {
 
 func firstListItem() string {
 	return `{
-  "next_url": "/v2/app_security_groups?inline-relations-depth=2&page=2",
+  "next_url": "/v2/security_groups?inline-relations-depth=2&page=2",
   "resources": [
     {
       "metadata": {
         "guid": "cd186158-b356-474d-9861-724f34f48502",
-        "url": "/v2/app_security_groups/cd186158-b356-474d-9861-724f34f48502",
+        "url": "/v2/security_groups/cd186158-b356-474d-9861-724f34f48502",
         "created_at": "2014-06-23T22:55:30+00:00",
         "updated_at": null
       },
@@ -229,7 +229,7 @@ func firstListItem() string {
             "protocol": "udp"
           }
         ],
-        "spaces_url": "/v2/app_security_groups/cd186158-b356-474d-9861-724f34f48502/spaces"
+        "spaces_url": "/v2/security_groups/cd186158-b356-474d-9861-724f34f48502/spaces"
       }
     }
   ]
@@ -243,7 +243,7 @@ func secondListItem() string {
     {
       "metadata": {
         "guid": "d3374b62-7eac-4823-afbd-460d2bf44c67",
-        "url": "/v2/app_security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67",
+        "url": "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67",
         "created_at": "2014-06-23T22:55:30+00:00",
         "updated_at": null
       },
@@ -252,7 +252,7 @@ func secondListItem() string {
         "rules": [
           {
             "destination": "198.41.191.47/1"
-          } 
+          }
         ],
         "spaces": [
                {
@@ -272,7 +272,7 @@ func secondListItem() string {
                   }
                }
             ],
-        "spaces_url": "/v2/app_security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces"
+        "spaces_url": "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces"
       }
     }
   ]
