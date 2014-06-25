@@ -65,14 +65,16 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	}
 
 	ruleMaps := []map[string]string{}
-	err := json.Unmarshal([]byte(rules), &ruleMaps)
-	if err != nil {
-		cmd.ui.Failed("Incorrect json format: %s", err.Error())
+	if rules != "" {
+		err := json.Unmarshal([]byte(rules), &ruleMaps)
+		if err != nil {
+			cmd.ui.Failed("Incorrect json format: %s", err.Error())
+		}
 	}
 
 	cmd.ui.Say("Creating application security group '%s' as '%s', applying to %d spaces", name, cmd.configRepo.Username(), len(spaceGuids))
 
-	err = cmd.appSecurityGroupRepo.Create(name, ruleMaps, spaceGuids)
+	err := cmd.appSecurityGroupRepo.Create(name, ruleMaps, spaceGuids)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
