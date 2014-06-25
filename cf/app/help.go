@@ -61,12 +61,10 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 	}
 
 	presenter.Name = app.Name
+	presenter.Flags = app.Flags
 	presenter.Usage = app.Usage
 	presenter.Version = app.Version
-	presenter.Name = app.Name
-	presenter.Flags = app.Flags
 	presenter.Compiled = app.Compiled
-
 	presenter.Commands = []groupedCommands{
 		{
 			Name: T("GETTING STARTED"),
