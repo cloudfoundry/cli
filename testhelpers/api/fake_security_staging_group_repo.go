@@ -2,24 +2,25 @@
 package api
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
-	"sync"
+	"github.com/cloudfoundry/cli/cf/models"
 )
 
 type FakeStagingSecurityGroupsRepo struct {
 	AddToDefaultStagingSetStub        func(string) error
-	addToDefaultStagingSetMutex       sync.RWMutex
 	addToDefaultStagingSetArgsForCall []struct {
 		guid string
 	}
 	addToDefaultStagingSetReturns struct {
 		result1 error
 	}
+
+	ListReturns struct {
+		Fields []models.SecurityGroupFields
+		Error  error
+	}
 }
 
 func (fake *FakeStagingSecurityGroupsRepo) AddToDefaultStagingSet(guid string) error {
-	fake.addToDefaultStagingSetMutex.Lock()
-	defer fake.addToDefaultStagingSetMutex.Unlock()
 	fake.addToDefaultStagingSetArgsForCall = append(fake.addToDefaultStagingSetArgsForCall, struct {
 		guid string
 	}{guid})
@@ -30,15 +31,15 @@ func (fake *FakeStagingSecurityGroupsRepo) AddToDefaultStagingSet(guid string) e
 	}
 }
 
+func (fake *FakeStagingSecurityGroupsRepo) List() ([]models.SecurityGroupFields, error) {
+	return fake.ListReturns.Fields, fake.ListReturns.Error
+}
+
 func (fake *FakeStagingSecurityGroupsRepo) AddToDefaultStagingSetCallCount() int {
-	fake.addToDefaultStagingSetMutex.RLock()
-	defer fake.addToDefaultStagingSetMutex.RUnlock()
 	return len(fake.addToDefaultStagingSetArgsForCall)
 }
 
 func (fake *FakeStagingSecurityGroupsRepo) AddToDefaultStagingSetArgsForCall(i int) string {
-	fake.addToDefaultStagingSetMutex.RLock()
-	defer fake.addToDefaultStagingSetMutex.RUnlock()
 	return fake.addToDefaultStagingSetArgsForCall[i].guid
 }
 
@@ -47,5 +48,3 @@ func (fake *FakeStagingSecurityGroupsRepo) AddToDefaultStagingSetReturns(result1
 		result1 error
 	}{result1}
 }
-
-var _ StagingSecurityGroupsRepo = new(FakeStagingSecurityGroupsRepo)
