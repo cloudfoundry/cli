@@ -1,7 +1,7 @@
 package buildpack_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/testhelpers/api"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"

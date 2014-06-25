@@ -2,10 +2,10 @@ package service_test
 
 import (
 	"errors"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	cferrors "github.com/cloudfoundry/cli/cf/errors"
-	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"

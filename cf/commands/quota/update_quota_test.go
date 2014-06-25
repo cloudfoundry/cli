@@ -1,9 +1,9 @@
 package quota_test
 
 import (
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/errors"
-	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"

@@ -5,12 +5,12 @@ import (
 	"net/http/httptest"
 	"time"
 
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 

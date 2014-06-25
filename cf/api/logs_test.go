@@ -2,9 +2,9 @@ package api_test
 
 import (
 	"code.google.com/p/gogoprotobuf/proto"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
-	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"

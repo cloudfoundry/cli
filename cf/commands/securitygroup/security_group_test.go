@@ -1,10 +1,10 @@
 package securitygroup_test
 
 import (
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -85,7 +85,7 @@ var _ = Describe("security-group command", func() {
 			It("tells the user what it's about to do and then shows the group", func() {
 				runCommand("my-group")
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Getting", "application security group", "my-group", "my-user"},
+					[]string{"Getting", "security group", "my-group", "my-user"},
 					[]string{"OK"},
 					[]string{"Name", "my-group"},
 					[]string{"Rules", `[{"just-pretend":"that-this-is-correct"}]`},

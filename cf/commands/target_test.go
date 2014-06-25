@@ -1,10 +1,10 @@
 package commands_test
 
 import (
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
-	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
