@@ -34,7 +34,7 @@ func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 		Description: "<<< description goes here >>>",
 		Usage:       "CF_NAME create-security-group NAME",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringSliceFlag("rules", "Create Rules Everything Around Me"),
+			flag_helpers.NewStringFlag("rules", "Create Rules Everything Around Me"),
 			flag_helpers.NewStringSliceFlag("space", "BOOM A SPACE IS HERE"),
 		},
 	}
@@ -51,7 +51,7 @@ func (cmd CreateSecurityGroup) GetRequirements(requirementsFactory requirements.
 
 func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
-	rules := context.StringSlice("rules")
+	rules := context.String("rules")
 	spaces := context.StringSlice("space")
 	spaceGuids := []string{}
 	for _, spaceName := range spaces {
@@ -65,19 +65,14 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	}
 
 	ruleMaps := []map[string]string{}
-	for _, rule := range rules {
-		ruleMap := map[string]string{}
-		err := json.Unmarshal([]byte(rule), &ruleMap)
-		if err != nil {
-			cmd.ui.Failed("Incorrect json format: %s", err.Error())
-		}
-
-		ruleMaps = append(ruleMaps, ruleMap)
+	err := json.Unmarshal([]byte(rules), &ruleMaps)
+	if err != nil {
+		cmd.ui.Failed("Incorrect json format: %s", err.Error())
 	}
 
 	cmd.ui.Say("Creating application security group '%s' as '%s', applying to %d spaces", name, cmd.configRepo.Username(), len(spaceGuids))
 
-	err := cmd.appSecurityGroupRepo.Create(name, ruleMaps, spaceGuids)
+	err = cmd.appSecurityGroupRepo.Create(name, ruleMaps, spaceGuids)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

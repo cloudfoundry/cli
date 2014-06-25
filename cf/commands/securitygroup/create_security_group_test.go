@@ -88,7 +88,7 @@ var _ = Describe("create-app-security-group", func() {
 		It("allows the user to specify rules", func() {
 			runCommand(
 				"-rules",
-				"{\"protocol\":\"udp\",\"port\":\"8080-9090\",\"destination\":\"198.41.191.47/1\"}",
+				"[{\"protocol\":\"udp\",\"port\":\"8080-9090\",\"destination\":\"198.41.191.47/1\"}]",
 				"app-security-groups-rule-everything-around-me",
 			)
 
