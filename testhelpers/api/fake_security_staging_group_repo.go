@@ -48,3 +48,7 @@ func (fake *FakeStagingSecurityGroupsRepo) AddToDefaultStagingSetReturns(result1
 		result1 error
 	}{result1}
 }
+
+func (fake *FakeStagingSecurityGroupsRepo) RemoveFromDefaultStagingSet(guid string) error {
+	return nil
+}

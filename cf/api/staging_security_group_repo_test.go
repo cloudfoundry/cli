@@ -104,6 +104,26 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 			}))
 		})
 	})
+
+	Describe("RemoveFromDefaultStagingSet", func() {
+		It("makes a correct request", func() {
+			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "DELETE",
+					Path:   "/v2/config/staging_security_groups/my-guid",
+					Response: testnet.TestResponse{
+						Status: http.StatusNoContent,
+					},
+				}),
+			})
+
+			configRepo.SetApiEndpoint(testServer.URL)
+			err := repo.RemoveFromDefaultStagingSet("my-guid")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+		})
+	})
 })
 
 var addStagingResponse string = `{
