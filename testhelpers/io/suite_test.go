@@ -1,4 +1,4 @@
-package io_helpers_test
+package io_test
 
 import (
 	. "github.com/onsi/ginkgo"

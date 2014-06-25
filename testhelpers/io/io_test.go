@@ -1,9 +1,9 @@
-package io_helpers_test
+package io_test
 
 import (
 	"os"
 
-	. "github.com/cloudfoundry/cli/cf/io_helpers"
+	. "github.com/cloudfoundry/cli/testhelpers/io"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
