@@ -12,6 +12,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -41,7 +42,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 			headers, body, apiErr = repo.Request("GET", "/v2/endpoint", "", "")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
@@ -78,7 +79,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 
 			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 			headers, body, apiErr = repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 		})
 
 		It("does not return an error", func() {
@@ -104,7 +105,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 
 				repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 				_, body, apiErr = repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
-				Expect(handler).To(testnet.HaveAllRequestsCalled())
+				Expect(handler).To(HaveAllRequestsCalled())
 			})
 
 			It("returns the response body", func() {
@@ -148,7 +149,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 				headers := "content-type: ascii/cats\nx-something-else:5"
 				repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 				_, _, apiErr := repo.Request("POST", "/v2/endpoint", headers, "")
-				Expect(handler).To(testnet.HaveAllRequestsCalled())
+				Expect(handler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 		})

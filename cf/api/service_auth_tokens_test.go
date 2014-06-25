@@ -14,6 +14,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -57,7 +58,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 				Token:    "a token",
 			})
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -124,7 +125,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 		It("finds all service auth tokens", func() {
 			authTokens, err := repo.FindAll()
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(authTokens)).To(Equal(3))
@@ -162,7 +163,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 			It("returns the auth token", func() {
 				serviceAuthToken, err := repo.FindByLabelAndProvider("a-label", "a-provider")
 
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).NotTo(HaveOccurred())
 				Expect(serviceAuthToken).To(Equal(models.ServiceAuthTokenFields{
 					Guid:     "mysql-core-guid",
@@ -186,7 +187,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 			It("returns a ModelNotFoundError", func() {
 				_, err := repo.FindByLabelAndProvider("a-label", "a-provider")
 
-				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
 			})
 		})
@@ -206,7 +207,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 				Token: "a value",
 			})
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -224,7 +225,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 				Guid: "mysql-core-guid",
 			})
 
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

@@ -1,18 +1,21 @@
 package api_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
+	"net/http"
+	"net/http/httptest"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"time"
 )
 
 var _ = Describe("CloudControllerQuotaRepository", func() {
@@ -47,7 +50,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			quota, err := repo.FindByName("my-remote-quota")
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(quota).To(Equal(models.QuotaFields{
 				Guid:                    "my-quota-guid",
 				Name:                    "my-remote-quota",
@@ -68,7 +71,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			quotas, err := repo.FindAll()
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(quotas)).To(Equal(3))
 			Expect(quotas[0].Guid).To(Equal("my-quota-guid"))
 			Expect(quotas[0].Name).To(Equal("my-remote-quota"))
@@ -93,7 +96,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			setupTestServer(req)
 
 			err := repo.AssignQuotaToOrg("my-org-guid", "my-quota-guid")
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -122,7 +125,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			}
 			err := repo.Create(quota)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
 
@@ -151,7 +154,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 			err := repo.Update(quota)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
 
@@ -166,7 +169,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 			err := repo.Delete("my-quota-guid")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
 })

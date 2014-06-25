@@ -2,18 +2,21 @@ package api_test
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/api"
+	"net/http"
+	"net/http/httptest"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"time"
 )
 
 var _ = Describe("Space Repository", func() {
@@ -70,7 +73,7 @@ var _ = Describe("Space Repository", func() {
 		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
 		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
 		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 	})
 
 	Describe("finding spaces by name", func() {
@@ -127,7 +130,7 @@ var _ = Describe("Space Repository", func() {
 		defer ts.Close()
 
 		space, apiErr := repo.Create("space-name", "my-org-guid")
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(space.Guid).To(Equal("space-guid"))
 	})
@@ -144,7 +147,7 @@ var _ = Describe("Space Repository", func() {
 		defer ts.Close()
 
 		apiErr := repo.Rename("my-space-guid", "new-space-name")
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
@@ -159,7 +162,7 @@ var _ = Describe("Space Repository", func() {
 		defer ts.Close()
 
 		apiErr := repo.Delete("my-space-guid")
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
@@ -237,7 +240,7 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	defer ts.Close()
 
 	space, apiErr := findByName(repo, "Space1")
-	Expect(handler).To(testnet.HaveAllRequestsCalled())
+	Expect(handler).To(HaveAllRequestsCalled())
 	Expect(apiErr).NotTo(HaveOccurred())
 	Expect(space.Name).To(Equal("Space1"))
 	Expect(space.Guid).To(Equal("space1-guid"))
@@ -272,7 +275,7 @@ func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepo
 	defer ts.Close()
 
 	_, apiErr := findByName(repo, "Space1")
-	Expect(handler).To(testnet.HaveAllRequestsCalled())
+	Expect(handler).To(HaveAllRequestsCalled())
 
 	Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 }

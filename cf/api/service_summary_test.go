@@ -11,6 +11,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -66,7 +67,7 @@ var _ = Describe("ServiceSummaryRepository", func() {
 		defer ts.Close()
 
 		serviceInstances, apiErr := repo.GetSummariesInCurrentSpace()
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 
 		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(1).To(Equal(len(serviceInstances)))

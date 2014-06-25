@@ -1,7 +1,10 @@
 package api_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
+	"net/http"
+	"net/http/httptest"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -9,11 +12,11 @@ import (
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"time"
 )
 
 var _ = Describe("Buildpacks repo", func() {
@@ -102,7 +105,7 @@ var _ = Describe("Buildpacks repo", func() {
 				Position: &two,
 			},
 		}))
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -128,7 +131,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 			buildpack, apiErr := repo.FindByName("Buildpack1")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(buildpack.Name).To(Equal("Buildpack1"))
@@ -147,7 +150,7 @@ var _ = Describe("Buildpacks repo", func() {
 			}))
 
 			_, apiErr := repo.FindByName("Buildpack1")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 	})
@@ -195,7 +198,7 @@ var _ = Describe("Buildpacks repo", func() {
 			position := 999
 			created, apiErr := repo.Create("my-cool-buildpack", &position, nil, nil)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(created.Guid).NotTo(BeNil())
@@ -226,7 +229,7 @@ var _ = Describe("Buildpacks repo", func() {
 			enabled := true
 			created, apiErr := repo.Create("my-cool-buildpack", &position, &enabled, nil)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(created.Guid).NotTo(BeNil())
@@ -245,7 +248,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		err := repo.Delete("my-cool-buildpack-guid")
 
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -280,7 +283,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 			updated, err := repo.Update(buildpack)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(updated).To(Equal(buildpack))
 		})
@@ -315,7 +318,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 			updated, err := repo.Update(buildpack)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 
 			position := 123

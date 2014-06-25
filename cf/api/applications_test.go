@@ -26,7 +26,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			defer ts.Close()
 
 			app, apiErr := repo.Read("My App")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(app.Name).To(Equal("My App"))
 			Expect(app.Guid).To(Equal("app1-guid"))
@@ -47,7 +47,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			defer ts.Close()
 
 			_, apiErr := repo.Read("My App")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 	})
@@ -60,7 +60,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			params := defaultAppParams()
 			createdApp, apiErr := repo.Create(params)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			app := models.Application{}
@@ -86,7 +86,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			params.Command = nil
 
 			_, apiErr := repo.Create(params)
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
@@ -133,7 +133,7 @@ var _ = Describe("ApplicationsRepository", func() {
 					testServer, handler, repo = createAppRepo([]testnet.TestRequest{appEnvRequest})
 					userEnv, vcapServices, err = repo.ReadEnv("some-cool-app-guid")
 					Expect(err).ToNot(HaveOccurred())
-					Expect(handler).To(testnet.HaveAllRequestsCalled())
+					Expect(handler).To(HaveAllRequestsCalled())
 				})
 
 				It("returns the user environment and vcap services", func() {
@@ -159,7 +159,7 @@ var _ = Describe("ApplicationsRepository", func() {
 					testServer, handler, repo = createAppRepo([]testnet.TestRequest{emptyEnvRequest})
 					userEnv, vcapServices, err = repo.ReadEnv("some-cool-app-guid")
 					Expect(err).ToNot(HaveOccurred())
-					Expect(handler).To(testnet.HaveAllRequestsCalled())
+					Expect(handler).To(HaveAllRequestsCalled())
 				})
 
 				It("returns an empty string", func() {
@@ -185,7 +185,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			defer ts.Close()
 
 			repo.CreateRestageRequest("some-cool-app-guid")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 		})
 	})
 
@@ -209,7 +209,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			updatedApp, apiErr := repo.Update(app.Guid, app.ToParams())
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(updatedApp.Name).To(Equal("my-cool-app"))
 			Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
@@ -231,7 +231,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			_, apiErr := repo.Update("app1-guid", params)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
@@ -251,7 +251,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			_, apiErr := repo.Update("app1-guid", params)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
@@ -267,7 +267,7 @@ var _ = Describe("ApplicationsRepository", func() {
 		defer ts.Close()
 
 		apiErr := repo.Delete("my-cool-app-guid")
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })

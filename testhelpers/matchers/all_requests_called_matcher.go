@@ -1,8 +1,10 @@
-package net
+package matchers
 
 import (
 	"errors"
 	"fmt"
+
+	"github.com/cloudfoundry/cli/testhelpers/net"
 	"github.com/onsi/gomega"
 )
 
@@ -15,7 +17,7 @@ type allRequestsCalledMatcher struct {
 }
 
 func (matcher *allRequestsCalledMatcher) Match(actual interface{}) (bool, error) {
-	testHandler, ok := actual.(*TestHandler)
+	testHandler, ok := actual.(*net.TestHandler)
 	if !ok {
 		return false, errors.New(fmt.Sprintf("Expected a test handler, got %T", actual))
 	}

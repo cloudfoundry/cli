@@ -1,7 +1,10 @@
 package api_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
+	"net/http"
+	"net/http/httptest"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -9,11 +12,11 @@ import (
 	testapi "github.com/cloudfoundry/cli/testhelpers/api"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"time"
 )
 
 var _ = Describe("route repository", func() {
@@ -64,7 +67,7 @@ var _ = Describe("route repository", func() {
 			Expect(len(routes)).To(Equal(2))
 			Expect(routes[0].Guid).To(Equal("route-1-guid"))
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
@@ -84,7 +87,7 @@ var _ = Describe("route repository", func() {
 			route, apiErr := repo.FindByHostAndDomain("my-cool-app", domain)
 
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(route.Host).To(Equal("my-cool-app"))
 			Expect(route.Guid).To(Equal("my-route-guid"))
 			Expect(route.Domain.Guid).To(Equal(domain.Guid))
@@ -105,7 +108,7 @@ var _ = Describe("route repository", func() {
 
 			_, apiErr := repo.FindByHostAndDomain("my-cool-app", domain)
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 
 			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		})
@@ -130,7 +133,7 @@ var _ = Describe("route repository", func() {
 
 			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
 		})
@@ -152,7 +155,7 @@ var _ = Describe("route repository", func() {
 			configRepo.SetApiEndpoint(ts.URL)
 
 			createdRoute, apiErr := repo.Create("my-cool-app", models.DomainFields{Guid: "my-domain-guid"})
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
@@ -172,7 +175,7 @@ var _ = Describe("route repository", func() {
 			configRepo.SetApiEndpoint(ts.URL)
 
 			apiErr := repo.Bind("my-cool-route-guid", "my-cool-app-guid")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
@@ -187,7 +190,7 @@ var _ = Describe("route repository", func() {
 			configRepo.SetApiEndpoint(ts.URL)
 
 			apiErr := repo.Unbind("my-cool-route-guid", "my-cool-app-guid")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
@@ -205,7 +208,7 @@ var _ = Describe("route repository", func() {
 			configRepo.SetApiEndpoint(ts.URL)
 
 			apiErr := repo.Delete("my-cool-route-guid")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})

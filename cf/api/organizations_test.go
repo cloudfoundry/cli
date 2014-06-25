@@ -13,6 +13,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -62,7 +63,7 @@ var _ = Describe("Organization Repository", func() {
 			Expect(orgs[1].Guid).To(Equal("org2-guid"))
 			Expect(orgs[2].Guid).To(Equal("org3-guid"))
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 		})
 
 		It("does not call the provided function when there are no orgs found", func() {
@@ -83,7 +84,7 @@ var _ = Describe("Organization Repository", func() {
 
 			Expect(wasCalled).To(BeFalse())
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 		})
 	})
 
@@ -121,7 +122,7 @@ var _ = Describe("Organization Repository", func() {
 			existingOrg.Name = "Org1"
 
 			org, apiErr := repo.FindByName("Org1")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(org.Name).To(Equal(existingOrg.Name))
@@ -147,7 +148,7 @@ var _ = Describe("Organization Repository", func() {
 			defer testserver.Close()
 
 			_, apiErr := repo.FindByName("org1")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 
@@ -164,7 +165,7 @@ var _ = Describe("Organization Repository", func() {
 			_, apiErr := repo.FindByName("org1")
 			_, ok := apiErr.(*errors.ModelNotFoundError)
 			Expect(ok).To(BeFalse())
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 		})
 	})
 
@@ -181,7 +182,7 @@ var _ = Describe("Organization Repository", func() {
 			defer testserver.Close()
 
 			apiErr := repo.Create("my-org")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
@@ -199,7 +200,7 @@ var _ = Describe("Organization Repository", func() {
 			defer testserver.Close()
 
 			apiErr := repo.Rename("my-org-guid", "my-new-org")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
@@ -216,7 +217,7 @@ var _ = Describe("Organization Repository", func() {
 			defer testserver.Close()
 
 			apiErr := repo.Delete("my-org-guid")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
