@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/io_helpers"
 	"github.com/cloudfoundry/cli/cf/models"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
 
 	. "github.com/cloudfoundry/cli/cf/terminal"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
