@@ -31,7 +31,7 @@ func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, app
 func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-security-group",
-		Description: "<<< description goes here>>>",
+		Description: "<<< description goes here >>>",
 		Usage:       "CF_NAME create-security-group NAME",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringSliceFlag("rules", "Create Rules Everything Around Me"),
@@ -75,7 +75,7 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 		ruleMaps = append(ruleMaps, ruleMap)
 	}
 
-	cmd.ui.Say("Creating application security group '%s' as '%s'", name, cmd.configRepo.Username())
+	cmd.ui.Say("Creating application security group '%s' as '%s', applying to %d spaces", name, cmd.configRepo.Username(), len(spaceGuids))
 
 	err := cmd.appSecurityGroupRepo.Create(name, ruleMaps, spaceGuids)
 	if err != nil {
