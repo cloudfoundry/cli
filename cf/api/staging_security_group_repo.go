@@ -12,6 +12,7 @@ import (
 type StagingSecurityGroupsRepo interface {
 	AddToDefaultStagingSet(string) error
 	List() ([]models.SecurityGroupFields, error)
+	RemoveFromDefaultStagingSet(string) error
 }
 
 type cloudControllerStagingSecurityGroupRepo struct {
@@ -48,4 +49,11 @@ func (repo *cloudControllerStagingSecurityGroupRepo) List() ([]models.SecurityGr
 	)
 
 	return groups, err
+}
+
+//Delete /v2/config/staging_security_groups/a0bd0e1c-8609-45a9-88eb-f719b2e4367c
+//204 No Content
+func (repo *cloudControllerStagingSecurityGroupRepo) RemoveFromDefaultStagingSet(groupGuid string) error {
+	path := fmt.Sprintf("%s/v2/config/staging_security_groups/%s", repo.configRepo.ApiEndpoint(), groupGuid)
+	return repo.gateway.DeleteResource(path)
 }
