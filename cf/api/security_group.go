@@ -14,8 +14,8 @@ import (
 type SecurityGroupRepo interface {
 	Create(name string, rules []map[string]string, spaceGuids []string) error
 	Delete(string) error
-	Read(string) (models.ApplicationSecurityGroup, error)
-	FindAll() ([]models.ApplicationSecurityGroup, error)
+	Read(string) (models.SecurityGroup, error)
+	FindAll() ([]models.SecurityGroup, error)
 }
 
 type cloudControllerSecurityGroupRepo struct {
@@ -32,7 +32,7 @@ func NewSecurityGroupRepo(config configuration.Reader, gateway net.Gateway) Secu
 
 func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[string]string, spaceGuids []string) error {
 	path := fmt.Sprintf("%s/v2/app_security_groups", repo.config.ApiEndpoint())
-	params := models.ApplicationSecurityGroupParams{
+	params := models.SecurityGroupParams{
 		Name:       name,
 		Rules:      rules,
 		SpaceGuids: spaceGuids,
@@ -40,17 +40,17 @@ func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[str
 	return repo.gateway.CreateResourceFromStruct(path, params)
 }
 
-func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.ApplicationSecurityGroup, error) {
+func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityGroup, error) {
 	path := fmt.Sprintf("/v2/app_security_groups?q=%s&inline-relations-depth=2", url.QueryEscape("name:"+name))
-	group := models.ApplicationSecurityGroup{}
+	group := models.SecurityGroup{}
 	foundGroup := false
 
 	err := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		path,
-		resources.ApplicationSecurityGroupResource{},
+		resources.SecurityGroupResource{},
 		func(resource interface{}) bool {
-			if asgr, ok := resource.(resources.ApplicationSecurityGroupResource); ok {
+			if asgr, ok := resource.(resources.SecurityGroupResource); ok {
 				group = asgr.ToModel()
 				foundGroup = true
 			}
@@ -69,16 +69,16 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.Applicati
 	return group, err
 }
 
-func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.ApplicationSecurityGroup, error) {
+func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, error) {
 	path := "/v2/app_security_groups?inline-relations-depth=2"
-	securityGroups := []models.ApplicationSecurityGroup{}
+	securityGroups := []models.SecurityGroup{}
 
 	err := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		path,
-		resources.ApplicationSecurityGroupResource{},
+		resources.SecurityGroupResource{},
 		func(resource interface{}) bool {
-			if securityGroupResource, ok := resource.(resources.ApplicationSecurityGroupResource); ok {
+			if securityGroupResource, ok := resource.(resources.SecurityGroupResource); ok {
 				securityGroups = append(securityGroups, securityGroupResource.ToModel())
 			}
 

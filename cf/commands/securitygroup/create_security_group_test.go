@@ -19,7 +19,7 @@ import (
 var _ = Describe("create-app-security-group", func() {
 	var (
 		ui                   *testterm.FakeUI
-		appSecurityGroupRepo *testapi.FakeAppSecurityGroup
+		appSecurityGroupRepo *testapi.FakeSecurityGroup
 		requirementsFactory  *testreq.FakeReqFactory
 		spaceRepo            *testapi.FakeSpaceRepository
 		configRepo           configuration.ReadWriter
@@ -28,7 +28,7 @@ var _ = Describe("create-app-security-group", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appSecurityGroupRepo = &testapi.FakeAppSecurityGroup{}
+		appSecurityGroupRepo = &testapi.FakeSecurityGroup{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
 		space := models.Space{}

@@ -110,14 +110,14 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
-	factory.cmdsByName["create-security-group"] = securitygroup.NewCreateSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository(), repoLocator.GetSpaceRepository())
-	factory.cmdsByName["delete-security-group"] = securitygroup.NewDeleteAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
-	factory.cmdsByName["security-group"] = securitygroup.NewShowAppSecurityGroup(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
-	factory.cmdsByName["security-groups"] = securitygroup.NewSecurityGroups(ui, config, repoLocator.GetApplicationSecurityGroupRepository())
+	factory.cmdsByName["create-security-group"] = securitygroup.NewCreateSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository(), repoLocator.GetSpaceRepository())
+	factory.cmdsByName["delete-security-group"] = securitygroup.NewDeleteAppSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
+	factory.cmdsByName["security-group"] = securitygroup.NewShowAppSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
+	factory.cmdsByName["security-groups"] = securitygroup.NewSecurityGroups(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["add-default-staging-security-group"] = securitygroup.NewAddToDefaultStagingGroup(
 		ui,
 		config,
-		repoLocator.GetApplicationSecurityGroupRepository(),
+		repoLocator.GetSecurityGroupRepository(),
 		repoLocator.GetStagingSecurityGroupsRepository(),
 	)
 

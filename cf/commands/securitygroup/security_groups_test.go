@@ -19,7 +19,7 @@ import (
 var _ = Describe("list-security-groups command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		repo                *testapi.FakeAppSecurityGroup
+		repo                *testapi.FakeSecurityGroup
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          configuration.ReadWriter
 	)
@@ -27,7 +27,7 @@ var _ = Describe("list-security-groups command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		repo = &testapi.FakeAppSecurityGroup{}
+		repo = &testapi.FakeSecurityGroup{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -72,7 +72,7 @@ var _ = Describe("list-security-groups command", func() {
 
 		Context("when there are no security groups", func() {
 			It("Should tell the user that there are no security groups", func() {
-				repo.FindAllReturns.ApplicationSecurityGroups = []models.ApplicationSecurityGroup{}
+				repo.FindAllReturns.SecurityGroups = []models.SecurityGroup{}
 
 				runCommand()
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"No security groups"}))
@@ -81,20 +81,20 @@ var _ = Describe("list-security-groups command", func() {
 
 		Context("when there is at least one security group", func() {
 			BeforeEach(func() {
-				securityGroup := models.ApplicationSecurityGroup{
-					ApplicationSecurityGroupFields: models.ApplicationSecurityGroupFields{
+				securityGroup := models.SecurityGroup{
+					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "group-guid",
 						Rules: nil,
 					},
 				}
 
-				repo.FindAllReturns.ApplicationSecurityGroups = []models.ApplicationSecurityGroup{securityGroup}
+				repo.FindAllReturns.SecurityGroups = []models.SecurityGroup{securityGroup}
 			})
 
 			Describe("Where there are spaces assigned", func() {
 				BeforeEach(func() {
-					repo.FindAllReturns.ApplicationSecurityGroups[0].Spaces = []models.Space{
+					repo.FindAllReturns.SecurityGroups[0].Spaces = []models.Space{
 						{
 							SpaceFields:  models.SpaceFields{Guid: "my-space-guid-1", Name: "space-1"},
 							Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-1"},
