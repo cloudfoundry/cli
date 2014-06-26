@@ -1,7 +1,8 @@
 package securitygroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/security_groups"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -13,11 +14,11 @@ import (
 type addToDefaultStagingGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
-	securityGroupRepo api.SecurityGroupRepo
-	stagingGroupRepo  api.StagingSecurityGroupsRepo
+	securityGroupRepo security_groups.SecurityGroupRepo
+	stagingGroupRepo  staging.StagingSecurityGroupsRepo
 }
 
-func NewAddToDefaultStagingGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo api.SecurityGroupRepo, stagingGroupRepo api.StagingSecurityGroupsRepo) command.Command {
+func NewAddToDefaultStagingGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, stagingGroupRepo staging.StagingSecurityGroupsRepo) command.Command {
 	return &addToDefaultStagingGroup{
 		ui:                ui,
 		configRepo:        configRepo,
