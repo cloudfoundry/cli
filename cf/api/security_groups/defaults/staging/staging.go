@@ -8,6 +8,8 @@ import (
 	. "github.com/cloudfoundry/cli/cf/api/security_groups/defaults"
 )
 
+const urlPath = "/v2/config/staging_security_groups"
+
 type StagingSecurityGroupsRepo interface {
 	AddToDefaultStagingSet(string) error
 	List() ([]models.SecurityGroupFields, error)
@@ -28,13 +30,13 @@ func NewStagingSecurityGroupsRepo(configRepo configuration.Reader, gateway net.G
 }
 
 func (repo *cloudControllerStagingSecurityGroupRepo) AddToDefaultStagingSet(groupGuid string) error {
-	return repo.repoBase.Add(groupGuid, "/v2/config/staging_security_groups/")
+	return repo.repoBase.Add(groupGuid, urlPath)
 }
 
 func (repo *cloudControllerStagingSecurityGroupRepo) List() ([]models.SecurityGroupFields, error) {
-	return repo.repoBase.List("/v2/config/staging_security_groups")
+	return repo.repoBase.List(urlPath)
 }
 
 func (repo *cloudControllerStagingSecurityGroupRepo) RemoveFromDefaultStagingSet(groupGuid string) error {
-	return repo.repoBase.Delete(groupGuid, "/v2/config/staging_security_groups/")
+	return repo.repoBase.Delete(groupGuid, urlPath)
 }

@@ -9,18 +9,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-type Methods interface {
-	Add(string, string) error
-	List(string) ([]models.SecurityGroupFields, error)
-}
-
 type SecurityGroupsRepoBase struct {
 	ConfigRepo configuration.Reader
 	Gateway    net.Gateway
 }
 
 func (repo *SecurityGroupsRepoBase) Add(groupGuid string, path string) error {
-	updatedPath := fmt.Sprintf("%s%s%s", repo.ConfigRepo.ApiEndpoint(), path, groupGuid)
+	updatedPath := fmt.Sprintf("%s%s/%s", repo.ConfigRepo.ApiEndpoint(), path, groupGuid)
 	return repo.Gateway.UpdateResourceFromStruct(updatedPath, "")
 }
 
@@ -44,6 +39,6 @@ func (repo *SecurityGroupsRepoBase) List(path string) ([]models.SecurityGroupFie
 }
 
 func (repo *SecurityGroupsRepoBase) Delete(groupGuid string, path string) error {
-	updatedPath := fmt.Sprintf("%s%s%s", repo.ConfigRepo.ApiEndpoint(), path, groupGuid)
+	updatedPath := fmt.Sprintf("%s%s/%s", repo.ConfigRepo.ApiEndpoint(), path, groupGuid)
 	return repo.Gateway.DeleteResource(updatedPath)
 }
