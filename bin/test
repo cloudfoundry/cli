@@ -31,7 +31,7 @@
   go fmt ./cf/... ./testhelpers/... ./generic/... ./main/... ./glob/... ./words/...
 
   echo -e "\n Testing packages:"
-  go test ./cf/... ./generic/... -parallel 4 $@
+  go test ./cf/... ./generic/... ./testhelpers/... -parallel 4 $@
 
 
   echo -e "\n Vetting packages for potential issues..."
