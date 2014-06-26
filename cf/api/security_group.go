@@ -63,7 +63,7 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 	}
 
 	if !foundGroup {
-		err = errors.NewModelNotFoundError("application security group", name)
+		err = errors.NewModelNotFoundError("security group", name)
 	}
 
 	return group, err

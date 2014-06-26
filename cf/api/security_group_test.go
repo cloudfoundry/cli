@@ -147,7 +147,7 @@ var _ = Describe("app security group api", func() {
 	})
 
 	Describe(".Delete", func() {
-		It("deletes the application security group", func() {
+		It("deletes the security group", func() {
 			appSecurityGroupGuid := "the-security-group-guid"
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "DELETE",
@@ -164,7 +164,7 @@ var _ = Describe("app security group api", func() {
 	})
 
 	Describe(".FindAll", func() {
-		It("returns all the application security groups", func() {
+		It("returns all the security groups", func() {
 			setupTestServer(
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",

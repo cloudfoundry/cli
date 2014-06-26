@@ -121,6 +121,12 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 		repoLocator.GetStagingSecurityGroupsRepository(),
 	)
 	factory.cmdsByName["default-staging-security-groups"] = securitygroup.NewListDefaultStagingSecurityGroups(ui, config, repoLocator.GetStagingSecurityGroupsRepository())
+	factory.cmdsByName["remove-default-staging-security-group"] = securitygroup.NewRemoveFromDefaultStagingGroup(
+		ui,
+		config,
+		repoLocator.GetSecurityGroupRepository(),
+		repoLocator.GetStagingSecurityGroupsRepository(),
+	)
 
 	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["create-route"] = createRoute
