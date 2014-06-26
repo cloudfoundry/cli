@@ -10,16 +10,16 @@ import (
 )
 
 type DeleteSecurityGroup struct {
-	ui                   terminal.UI
-	appSecurityGroupRepo security_groups.SecurityGroupRepo
-	configRepo           configuration.Reader
+	ui                terminal.UI
+	securityGroupRepo security_groups.SecurityGroupRepo
+	configRepo        configuration.Reader
 }
 
-func NewDeleteAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo security_groups.SecurityGroupRepo) DeleteSecurityGroup {
+func NewDeleteSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo) DeleteSecurityGroup {
 	return DeleteSecurityGroup{
-		ui:                   ui,
-		configRepo:           configRepo,
-		appSecurityGroupRepo: appSecurityGroupRepo,
+		ui:                ui,
+		configRepo:        configRepo,
+		securityGroupRepo: securityGroupRepo,
 	}
 }
 
@@ -43,14 +43,14 @@ func (cmd DeleteSecurityGroup) GetRequirements(requirementsFactory requirements.
 func (cmd DeleteSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
-	group, err := cmd.appSecurityGroupRepo.Read(name)
+	group, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
 	cmd.ui.Say("Deleting application security group '%s' as '%s'", name, cmd.configRepo.Username())
 
-	err = cmd.appSecurityGroupRepo.Delete(group.Guid)
+	err = cmd.securityGroupRepo.Delete(group.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
