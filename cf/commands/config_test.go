@@ -41,8 +41,8 @@ var _ = Describe("config command", func() {
 			Expect(configRepo.AsyncTimeout()).Should(Equal(uint(12)))
 		})
 
-		It("fails with usage when a invalid async timeout value is passed, e.g., a string", func() {
-			runCommand("--async-timeout", "lol")
+		It("fails with usage when a invalid async timeout value is passed", func() {
+			runCommand("--async-timeout", "-1")
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
