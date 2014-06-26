@@ -1,7 +1,6 @@
 package staging
 
 import (
-	"fmt"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -37,6 +36,5 @@ func (repo *cloudControllerStagingSecurityGroupRepo) List() ([]models.SecurityGr
 }
 
 func (repo *cloudControllerStagingSecurityGroupRepo) RemoveFromDefaultStagingSet(groupGuid string) error {
-	path := fmt.Sprintf("%s/v2/config/staging_security_groups/%s", repo.repoBase.ConfigRepo.ApiEndpoint(), groupGuid)
-	return repo.repoBase.Gateway.DeleteResource(path)
+	return repo.repoBase.Delete(groupGuid, "/v2/config/staging_security_groups/")
 }
