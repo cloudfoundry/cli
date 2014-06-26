@@ -2,11 +2,13 @@ package terminal
 
 import (
 	"fmt"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	term "github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
-	"time"
 )
 
 const FailedWasCalled = "FailedWasCalled"
@@ -20,6 +22,8 @@ type FakeUI struct {
 	FailedWithUsage            bool
 	FailedWithUsageCommandName string
 	ShowConfigurationCalled    bool
+
+	sayMutex sync.Mutex
 }
 
 func (ui *FakeUI) PrintPaginator(rows []string, err error) {
@@ -34,6 +38,9 @@ func (ui *FakeUI) PrintPaginator(rows []string, err error) {
 }
 
 func (ui *FakeUI) Say(message string, args ...interface{}) {
+	ui.sayMutex.Lock()
+	defer ui.sayMutex.Unlock()
+
 	message = fmt.Sprintf(message, args...)
 	ui.Outputs = append(ui.Outputs, strings.Split(message, "\n")...)
 	return
