@@ -18,21 +18,21 @@ import (
 
 var _ = Describe("delete-security-group command", func() {
 	var (
-		ui                   *testterm.FakeUI
-		appSecurityGroupRepo *fakeSecurityGroup.FakeSecurityGroup
-		requirementsFactory  *testreq.FakeReqFactory
-		configRepo           configuration.ReadWriter
+		ui                  *testterm.FakeUI
+		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroup
+		requirementsFactory *testreq.FakeReqFactory
+		configRepo          configuration.ReadWriter
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewDeleteAppSecurityGroup(ui, configRepo, appSecurityGroupRepo)
+		cmd := NewDeleteSecurityGroup(ui, configRepo, securityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -56,7 +56,7 @@ var _ = Describe("delete-security-group command", func() {
 
 		Context("when the group with the given name exists", func() {
 			BeforeEach(func() {
-				appSecurityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+				securityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name: "my-group",
 						Guid: "group-guid",
@@ -66,8 +66,8 @@ var _ = Describe("delete-security-group command", func() {
 
 			It("should delete the application security group", func() {
 				runCommand("my-group")
-				Expect(appSecurityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
-				Expect(appSecurityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
+				Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
+				Expect(securityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
 			})
 
 			It("tells the user what it's about to do", func() {
@@ -80,14 +80,14 @@ var _ = Describe("delete-security-group command", func() {
 		})
 
 		It("fails and warns the user if a group with that name could not be found", func() {
-			appSecurityGroupRepo.ReadReturns.Error = errors.New("pbbbbbbbbbbt")
+			securityGroupRepo.ReadReturns.Error = errors.New("pbbbbbbbbbbt")
 			runCommand("whoops")
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("fails and warns the user if deleting fails", func() {
-			appSecurityGroupRepo.DeleteReturns.Error = errors.New("raspberry")
+			securityGroupRepo.DeleteReturns.Error = errors.New("raspberry")
 			runCommand("whoops")
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
