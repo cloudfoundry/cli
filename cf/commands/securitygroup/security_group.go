@@ -29,7 +29,7 @@ func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, ap
 func (cmd ShowSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "security-group",
-		Description: "<<< Description goes here >>>",
+		Description: "Show a single security group",
 		Usage:       "CF_NAME security-group NAME",
 	}
 }

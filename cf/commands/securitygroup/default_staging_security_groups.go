@@ -26,7 +26,7 @@ func NewListDefaultStagingSecurityGroups(ui terminal.UI, configRepo configuratio
 func (cmd listDefaultStagingSecurityGroups) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "default-staging-security-groups",
-		Description: "<<< ALL YOUR COMMAND BELONG TO US >>>",
+		Description: "List security groups in the set of default security groups for staging applications.",
 		Usage:       "CF_NAME default-security-staging-groups",
 	}
 }

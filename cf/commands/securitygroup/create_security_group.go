@@ -31,11 +31,11 @@ func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, app
 func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-security-group",
-		Description: "<<< description goes here >>>",
-		Usage:       "CF_NAME create-security-group NAME",
+		Description: "create a security group",
+		Usage:       "CF_NAME create-security-group NAME [--rules RULES] [--space SpaceName]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("rules", "Create Rules Everything Around Me"),
-			flag_helpers.NewStringSliceFlag("space", "BOOM A SPACE IS HERE"),
+			flag_helpers.NewStringFlag("rules", "JSON encoded array of rules"),
+			flag_helpers.NewStringSliceFlag("space", "The name of a space to apply this rule to. Can be provided multiple times"),
 		},
 	}
 }
