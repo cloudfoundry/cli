@@ -18,21 +18,21 @@ import (
 
 var _ = Describe("security-group command", func() {
 	var (
-		ui                   *testterm.FakeUI
-		appSecurityGroupRepo *fakeSecurityGroup.FakeSecurityGroup
-		requirementsFactory  *testreq.FakeReqFactory
-		configRepo           configuration.ReadWriter
+		ui                  *testterm.FakeUI
+		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroup
+		requirementsFactory *testreq.FakeReqFactory
+		configRepo          configuration.ReadWriter
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewShowAppSecurityGroup(ui, configRepo, appSecurityGroupRepo)
+		cmd := NewShowSecurityGroup(ui, configRepo, securityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -58,7 +58,7 @@ var _ = Describe("security-group command", func() {
 			BeforeEach(func() {
 				rulesMap := []map[string]string{{"just-pretend": "that-this-is-correct"}}
 
-				appSecurityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+				securityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "group-guid",
@@ -79,7 +79,7 @@ var _ = Describe("security-group command", func() {
 
 			It("should fetch the application security group from its repo", func() {
 				runCommand("my-group")
-				Expect(appSecurityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
+				Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
 			})
 
 			It("tells the user what it's about to do and then shows the group", func() {
@@ -88,14 +88,19 @@ var _ = Describe("security-group command", func() {
 					[]string{"Getting", "security group", "my-group", "my-user"},
 					[]string{"OK"},
 					[]string{"Name", "my-group"},
-					[]string{"Rules", `[{"just-pretend":"that-this-is-correct"}]`},
+					[]string{"Rules"},
+					[]string{"["},
+					[]string{"{"},
+					[]string{"just-pretend", "that-this-is-correct"},
+					[]string{"}"},
+					[]string{"]"},
 					[]string{"#0", "org-1", "space-1"},
 					[]string{"#1", "org-2", "space-2"},
 				))
 			})
 
 			It("tells the user if no spaces are assigned", func() {
-				appSecurityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+				securityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "group-guid",
@@ -113,7 +118,7 @@ var _ = Describe("security-group command", func() {
 		})
 
 		It("fails and warns the user if a group with that name could not be found", func() {
-			appSecurityGroupRepo.ReadReturns.Error = errors.New("half-past-tea-time")
+			securityGroupRepo.ReadReturns.Error = errors.New("half-past-tea-time")
 			runCommand("im-late!")
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
