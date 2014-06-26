@@ -1,7 +1,7 @@
 package securitygroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -11,11 +11,11 @@ import (
 
 type DeleteSecurityGroup struct {
 	ui                   terminal.UI
-	appSecurityGroupRepo api.SecurityGroupRepo
+	appSecurityGroupRepo security_groups.SecurityGroupRepo
 	configRepo           configuration.Reader
 }
 
-func NewDeleteAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo) DeleteSecurityGroup {
+func NewDeleteAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo security_groups.SecurityGroupRepo) DeleteSecurityGroup {
 	return DeleteSecurityGroup{
 		ui:                   ui,
 		configRepo:           configRepo,

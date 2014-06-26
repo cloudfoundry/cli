@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/tls"
 
+	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 
@@ -39,7 +40,7 @@ type RepositoryLocator struct {
 	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
 	buildpackRepo                   CloudControllerBuildpackRepository
 	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
-	appSecurityGroupRepo            SecurityGroupRepo
+	appSecurityGroupRepo            security_groups.SecurityGroupRepo
 	stagingSecurityGroupRepo        staging.StagingSecurityGroupsRepo
 }
 
@@ -83,7 +84,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway)
 	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
 	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
-	loc.appSecurityGroupRepo = NewSecurityGroupRepo(config, cloudControllerGateway)
+	loc.appSecurityGroupRepo = security_groups.NewSecurityGroupRepo(config, cloudControllerGateway)
 	loc.stagingSecurityGroupRepo = staging.NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 
 	return
@@ -193,7 +194,7 @@ func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepos
 	return locator.buildpackBitsRepo
 }
 
-func (locator RepositoryLocator) GetSecurityGroupRepository() SecurityGroupRepo {
+func (locator RepositoryLocator) GetSecurityGroupRepository() security_groups.SecurityGroupRepo {
 	return locator.appSecurityGroupRepo
 }
 

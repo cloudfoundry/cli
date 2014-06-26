@@ -3,7 +3,7 @@ package securitygroup
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -14,11 +14,11 @@ import (
 
 type SecurityGroups struct {
 	ui                terminal.UI
-	securityGroupRepo api.SecurityGroupRepo
+	securityGroupRepo security_groups.SecurityGroupRepo
 	configRepo        configuration.Reader
 }
 
-func NewSecurityGroups(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo api.SecurityGroupRepo) SecurityGroups {
+func NewSecurityGroups(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo) SecurityGroups {
 	return SecurityGroups{
 		ui:                ui,
 		configRepo:        configRepo,

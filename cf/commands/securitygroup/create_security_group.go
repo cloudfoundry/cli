@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -14,12 +15,12 @@ import (
 
 type CreateSecurityGroup struct {
 	ui                   terminal.UI
-	appSecurityGroupRepo api.SecurityGroupRepo
+	appSecurityGroupRepo security_groups.SecurityGroupRepo
 	spaceRepo            api.SpaceRepository
 	configRepo           configuration.Reader
 }
 
-func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo, spaceRepo api.SpaceRepository) CreateSecurityGroup {
+func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo security_groups.SecurityGroupRepo, spaceRepo api.SpaceRepository) CreateSecurityGroup {
 	return CreateSecurityGroup{
 		ui:                   ui,
 		configRepo:           configRepo,

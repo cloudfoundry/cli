@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,11 +14,11 @@ import (
 
 type ShowSecurityGroup struct {
 	ui                   terminal.UI
-	appSecurityGroupRepo api.SecurityGroupRepo
+	appSecurityGroupRepo security_groups.SecurityGroupRepo
 	configRepo           configuration.Reader
 }
 
-func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo api.SecurityGroupRepo) ShowSecurityGroup {
+func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo security_groups.SecurityGroupRepo) ShowSecurityGroup {
 	return ShowSecurityGroup{
 		ui:                   ui,
 		configRepo:           configRepo,
