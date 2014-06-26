@@ -2,9 +2,10 @@ package matchers
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/onsi/gomega"
-	"strings"
 )
 
 type SliceMatcher struct {

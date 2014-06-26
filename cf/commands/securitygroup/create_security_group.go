@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -73,9 +74,17 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Creating application security group '%s' as '%s', applying to %d spaces", name, cmd.configRepo.Username(), len(spaceGuids))
+	cmd.ui.Say("Creating security group '%s' as '%s', applying to %d spaces", name, cmd.configRepo.Username(), len(spaceGuids))
 
 	err := cmd.appSecurityGroupRepo.Create(name, ruleMaps, spaceGuids)
+
+	httpErr, ok := err.(errors.HttpError)
+	if ok && httpErr.ErrorCode() == errors.SECURITY_GROUP_EXISTS {
+		cmd.ui.Ok()
+		cmd.ui.Warn("Security group '%s' already exists", name)
+		return
+	}
+
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
