@@ -30,7 +30,7 @@ func NewRemoveFromDefaultStagingGroup(ui terminal.UI, configRepo configuration.R
 func (cmd *removeFromDefaultStagingGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "remove-default-staging-security-group",
-		Description: "Twee Thundercats 8-bit keffiyeh meggings.",
+		Description: "Remove a security group from the set of default security groups for staging",
 		Usage:       "CF_NAME remove-default-staging-security-group NAME",
 	}
 }

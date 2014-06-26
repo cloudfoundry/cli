@@ -29,7 +29,7 @@ func NewAddToDefaultStagingGroup(ui terminal.UI, configRepo configuration.Reader
 func (cmd *addToDefaultStagingGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "add-default-staging-security-group",
-		Description: "Twee Thundercats 8-bit keffiyeh meggings.",
+		Description: "Add a security group to the list of security groups to be used for staging Applications",
 		Usage:       "CF_NAME add-default-staging-security-group NAME",
 	}
 }
