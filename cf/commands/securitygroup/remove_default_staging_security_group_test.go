@@ -1,7 +1,8 @@
 package securitygroup_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakeStagingDefaults "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/fakes"
+	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -21,16 +22,16 @@ var _ = Describe("add-default-staging-security-group command", func() {
 		ui                            *testterm.FakeUI
 		configRepo                    configuration.ReadWriter
 		requirementsFactory           *testreq.FakeReqFactory
-		fakeSecurityGroupRepo         *testapi.FakeSecurityGroup
-		fakeStagingSecurityGroupsRepo *testapi.FakeStagingSecurityGroupsRepo
+		fakeSecurityGroupRepo         *fakeSecurityGroup.FakeSecurityGroup
+		fakeStagingSecurityGroupsRepo *fakeStagingDefaults.FakeStagingSecurityGroupsRepo
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &testapi.FakeSecurityGroup{}
-		fakeStagingSecurityGroupsRepo = &testapi.FakeStagingSecurityGroupsRepo{}
+		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		fakeStagingSecurityGroupsRepo = &fakeStagingDefaults.FakeStagingSecurityGroupsRepo{}
 	})
 
 	runCommand := func(args ...string) {

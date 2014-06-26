@@ -1,4 +1,4 @@
-package api_test
+package security_groups_test
 
 import (
 	"net/http"
