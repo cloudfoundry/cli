@@ -2,6 +2,7 @@ package io_test
 
 import (
 	"os"
+	"strings"
 
 	. "github.com/cloudfoundry/cli/testhelpers/io"
 	. "github.com/onsi/ginkgo"
@@ -10,10 +11,12 @@ import (
 
 var _ = Describe("io helpers", func() {
 	It("will never overflow the pipe", func() {
-		str := ""
+		characters := make([]string, 0, 75000)
 		for i := 0; i < 75000; i++ {
-			str += "abc"
+			characters = append(characters, "z")
 		}
+
+		str := strings.Join(characters, "")
 
 		output := CaptureOutput(func() {
 			os.Stdout.Write([]byte(str))
