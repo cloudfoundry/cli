@@ -45,7 +45,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 		It("makes a correct request", func() {
 			setupTestServer(
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method: "POST",
+					Method: "PUT",
 					Path:   "/v2/config/staging_security_groups/a-real-guid",
 					Response: testnet.TestResponse{
 						Status: http.StatusCreated,

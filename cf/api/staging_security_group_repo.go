@@ -28,7 +28,7 @@ func NewStagingSecurityGroupsRepo(configRepo configuration.Reader, gateway net.G
 
 func (repo *cloudControllerStagingSecurityGroupRepo) AddToDefaultStagingSet(groupGuid string) error {
 	path := fmt.Sprintf("%s/v2/config/staging_security_groups/%s", repo.configRepo.ApiEndpoint(), groupGuid)
-	return repo.gateway.CreateResourceFromStruct(path, "")
+	return repo.gateway.UpdateResourceFromStruct(path, "")
 }
 
 func (repo *cloudControllerStagingSecurityGroupRepo) List() ([]models.SecurityGroupFields, error) {
