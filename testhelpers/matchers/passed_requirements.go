@@ -2,6 +2,7 @@ package matchers
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
+	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/onsi/gomega"
 )
 
@@ -12,12 +13,16 @@ func HavePassedRequirements() gomega.OmegaMatcher {
 }
 
 func (matcher havePassedRequirementsMatcher) Match(actual interface{}) (bool, error) {
-	asBool, ok := actual.(bool)
-	if !ok {
-		return false, errors.NewWithFmt("Expected actual value to be a bool, but it was a %T", actual)
+	switch actual.(type) {
+	case bool:
+		asBool := actual.(bool)
+		return asBool == true, nil
+	case testcmd.RunCommandResult:
+		result := actual.(testcmd.RunCommandResult)
+		return result == testcmd.RunCommandResultSuccess, nil
+	default:
+		return false, errors.NewWithFmt("Expected actual value to be a bool or enum, but it was a %T", actual)
 	}
-
-	return asBool == true, nil
 }
 
 func (matcher havePassedRequirementsMatcher) FailureMessage(_ interface{}) string {
