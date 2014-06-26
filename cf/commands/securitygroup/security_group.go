@@ -13,16 +13,16 @@ import (
 )
 
 type ShowSecurityGroup struct {
-	ui                   terminal.UI
-	appSecurityGroupRepo security_groups.SecurityGroupRepo
-	configRepo           configuration.Reader
+	ui                terminal.UI
+	securityGroupRepo security_groups.SecurityGroupRepo
+	configRepo        configuration.Reader
 }
 
-func NewShowAppSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo security_groups.SecurityGroupRepo) ShowSecurityGroup {
+func NewShowSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo) ShowSecurityGroup {
 	return ShowSecurityGroup{
-		ui:                   ui,
-		configRepo:           configRepo,
-		appSecurityGroupRepo: appSecurityGroupRepo,
+		ui:                ui,
+		configRepo:        configRepo,
+		securityGroupRepo: securityGroupRepo,
 	}
 }
 
@@ -46,29 +46,31 @@ func (cmd ShowSecurityGroup) GetRequirements(requirementsFactory requirements.Fa
 func (cmd ShowSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
-	cmd.ui.Say("Getting info for application security group '%s' as '%s'", name, cmd.configRepo.Username())
+	cmd.ui.Say("Getting info for security group '%s' as '%s'", name, cmd.configRepo.Username())
 
-	appSecurityGroup, err := cmd.appSecurityGroupRepo.Read(name)
+	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	jsonEncodedBytes, encodingErr := json.Marshal(appSecurityGroup.Rules)
+	jsonEncodedBytes, encodingErr := json.MarshalIndent(securityGroup.Rules, "\t", "\t")
 	if encodingErr != nil {
 		cmd.ui.Failed(encodingErr.Error())
 	}
 
 	cmd.ui.Ok()
 	table := terminal.NewTable(cmd.ui, []string{"", ""})
-	table.Add("Name", appSecurityGroup.Name)
-	table.Add("Rules", string(jsonEncodedBytes))
+	table.Add("Name", securityGroup.Name)
+	table.Add("Rules", "")
 	table.Print()
+	cmd.ui.Say("\t" + string(jsonEncodedBytes))
+
 	cmd.ui.Say("")
 
-	if len(appSecurityGroup.Spaces) > 0 {
+	if len(securityGroup.Spaces) > 0 {
 		table = terminal.NewTable(cmd.ui, []string{"", "Organization", "Space"})
 
-		for index, space := range appSecurityGroup.Spaces {
+		for index, space := range securityGroup.Spaces {
 			table.Add(fmt.Sprintf("#%d", index), space.Organization.Name, space.Name)
 		}
 		table.Print()
