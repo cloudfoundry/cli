@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestAppSecurityGroup(t *testing.T) {
+func TestSecurityGroup(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "SecurityGroup Suite")
 }

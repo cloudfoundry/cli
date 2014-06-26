@@ -40,7 +40,7 @@ type RepositoryLocator struct {
 	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
 	buildpackRepo                   CloudControllerBuildpackRepository
 	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
-	appSecurityGroupRepo            security_groups.SecurityGroupRepo
+	securityGroupRepo               security_groups.SecurityGroupRepo
 	stagingSecurityGroupRepo        staging.StagingSecurityGroupsRepo
 }
 
@@ -84,7 +84,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway)
 	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
 	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
-	loc.appSecurityGroupRepo = security_groups.NewSecurityGroupRepo(config, cloudControllerGateway)
+	loc.securityGroupRepo = security_groups.NewSecurityGroupRepo(config, cloudControllerGateway)
 	loc.stagingSecurityGroupRepo = staging.NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 
 	return
@@ -195,7 +195,7 @@ func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepos
 }
 
 func (locator RepositoryLocator) GetSecurityGroupRepository() security_groups.SecurityGroupRepo {
-	return locator.appSecurityGroupRepo
+	return locator.securityGroupRepo
 }
 
 func (locator RepositoryLocator) GetStagingSecurityGroupsRepository() staging.StagingSecurityGroupsRepo {

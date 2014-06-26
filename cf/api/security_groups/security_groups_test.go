@@ -149,16 +149,16 @@ var _ = Describe("app security group api", func() {
 
 	Describe(".Delete", func() {
 		It("deletes the security group", func() {
-			appSecurityGroupGuid := "the-security-group-guid"
+			securityGroupGuid := "the-security-group-guid"
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "DELETE",
-				Path:   "/v2/security_groups/" + appSecurityGroupGuid,
+				Path:   "/v2/security_groups/" + securityGroupGuid,
 				Response: testnet.TestResponse{
 					Status: http.StatusNoContent,
 				},
 			}))
 
-			err := repo.Delete(appSecurityGroupGuid)
+			err := repo.Delete(securityGroupGuid)
 
 			Expect(err).ToNot(HaveOccurred())
 		})

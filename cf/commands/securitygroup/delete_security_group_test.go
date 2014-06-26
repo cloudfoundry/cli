@@ -64,7 +64,7 @@ var _ = Describe("delete-security-group command", func() {
 				}
 			})
 
-			It("should delete the application security group", func() {
+			It("should delete the security group", func() {
 				runCommand("my-group")
 				Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
 				Expect(securityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
@@ -73,7 +73,7 @@ var _ = Describe("delete-security-group command", func() {
 			It("tells the user what it's about to do", func() {
 				runCommand("my-group")
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Deleting", "application security group", "my-group", "my-user"},
+					[]string{"Deleting", "security group", "my-group", "my-user"},
 					[]string{"OK"},
 				))
 			})
