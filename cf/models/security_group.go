@@ -1,6 +1,6 @@
 package models
 
-// represents just the attributes for an application security group
+// represents just the attributes for an security group
 type SecurityGroupFields struct {
 	Name  string
 	Guid  string

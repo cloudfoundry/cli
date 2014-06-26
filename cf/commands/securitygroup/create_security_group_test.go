@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("create-app-security-group", func() {
+var _ = Describe("create-security-group", func() {
 	var (
 		ui                  *testterm.FakeUI
 		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroup
@@ -90,7 +90,7 @@ var _ = Describe("create-app-security-group", func() {
 			runCommand(
 				"-rules",
 				"[{\"protocol\":\"udp\",\"port\":\"8080-9090\",\"destination\":\"198.41.191.47/1\"}]",
-				"app-security-groups-rule-everything-around-me",
+				"security-groups-rule-everything-around-me",
 			)
 
 			Expect(securityGroupRepo.CreateArgsForCall(0).Rules).To(Equal([]map[string]string{

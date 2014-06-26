@@ -48,7 +48,7 @@ func (cmd DeleteSecurityGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Deleting application security group '%s' as '%s'", name, cmd.configRepo.Username())
+	cmd.ui.Say("Deleting security group '%s' as '%s'", name, cmd.configRepo.Username())
 
 	err = cmd.securityGroupRepo.Delete(group.Guid)
 	if err != nil {

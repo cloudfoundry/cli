@@ -77,7 +77,7 @@ var _ = Describe("security-group command", func() {
 				}
 			})
 
-			It("should fetch the application security group from its repo", func() {
+			It("should fetch the security group from its repo", func() {
 				runCommand("my-group")
 				Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
 			})

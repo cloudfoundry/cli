@@ -15,18 +15,18 @@ import (
 )
 
 type CreateSecurityGroup struct {
-	ui                   terminal.UI
-	appSecurityGroupRepo security_groups.SecurityGroupRepo
-	spaceRepo            api.SpaceRepository
-	configRepo           configuration.Reader
+	ui                terminal.UI
+	securityGroupRepo security_groups.SecurityGroupRepo
+	spaceRepo         api.SpaceRepository
+	configRepo        configuration.Reader
 }
 
-func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, appSecurityGroupRepo security_groups.SecurityGroupRepo, spaceRepo api.SpaceRepository) CreateSecurityGroup {
+func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, spaceRepo api.SpaceRepository) CreateSecurityGroup {
 	return CreateSecurityGroup{
-		ui:                   ui,
-		configRepo:           configRepo,
-		appSecurityGroupRepo: appSecurityGroupRepo,
-		spaceRepo:            spaceRepo,
+		ui:                ui,
+		configRepo:        configRepo,
+		securityGroupRepo: securityGroupRepo,
+		spaceRepo:         spaceRepo,
 	}
 }
 
@@ -76,7 +76,7 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 
 	cmd.ui.Say("Creating security group '%s' as '%s', applying to %d spaces", name, cmd.configRepo.Username(), len(spaceGuids))
 
-	err := cmd.appSecurityGroupRepo.Create(name, ruleMaps, spaceGuids)
+	err := cmd.securityGroupRepo.Create(name, ruleMaps, spaceGuids)
 
 	httpErr, ok := err.(errors.HttpError)
 	if ok && httpErr.ErrorCode() == errors.SECURITY_GROUP_EXISTS {
