@@ -66,12 +66,17 @@ var _ = Describe("space command", func() {
 			serviceInstance.Guid = "service1-guid"
 			services := []models.ServiceInstanceFields{serviceInstance}
 
+			securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security"}
+			securityGroup2 := models.SecurityGroupFields{Name: "Nacho Prime"}
+			securityGroups := []models.SecurityGroupFields{securityGroup1, securityGroup2}
+
 			space := models.Space{}
 			space.Name = "whose-space-is-it-anyway"
 			space.Organization = org
 			space.Applications = apps
 			space.Domains = domains
 			space.ServiceInstances = services
+			space.SecurityGroups = securityGroups
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
@@ -88,6 +93,7 @@ var _ = Describe("space command", func() {
 				[]string{"Apps", "app1"},
 				[]string{"Domains", "domain1"},
 				[]string{"Services", "service1"},
+				[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
 			))
 		})
 	})

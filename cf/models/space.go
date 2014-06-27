@@ -11,4 +11,5 @@ type Space struct {
 	Applications     []ApplicationFields
 	ServiceInstances []ServiceInstanceFields
 	Domains          []DomainFields
+	SecurityGroups   []SecurityGroupFields
 }
