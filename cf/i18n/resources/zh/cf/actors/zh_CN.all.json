@@ -1,22 +1,23 @@
 [
    {
       "id": "Creating route {{.Hostname}}...",
-      "translation": "Creating route {{.Hostname}}..."
+      "translation": "创建路径 {{.Hostname}}..."
    },
    {
       "id": "Binding {{.URL}} to {{.AppName}}...",
-      "translation": "Binding {{.URL}} to {{.AppName}}..."
+      "translation": "绑定 {{.URL}} 和 {{.AppName}}..."
    },
+
    {
       "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
-      "translation": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again."
+      "translation": "路径 {{.URL}} 已被使用\nTIP: 使用-n HOSTNAME 命令行改变主机名称，或使用--random-route命令生成一个新路径，然后使用push命令"
    },
    {
       "id": "Removing route {{.URL}}...",
-      "translation": "Removing route {{.URL}}..."
+      "translation": "删除路径 {{.URL}}..."
    },
    {
       "id": "Using route {{.RouteURL}}",
-      "translation": "Using route {{.RouteURL}}"
+      "translation": "使用路径 {{.RouteURL}}"
    }
 ]

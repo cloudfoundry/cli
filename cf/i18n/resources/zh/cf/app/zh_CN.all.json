@@ -1,11 +1,11 @@
 [
    {
       "id": "ADVANCED",
-      "translation": "ADVANCED"
+      "translation": "高级"
    },
    {
       "id": "APPS",
-      "translation": "APPS"
+      "translation": "应用程序"
    },
    {
       "id": "BUILDPACKS",
@@ -13,110 +13,110 @@
    },
    {
       "id": "DOMAINS",
-      "translation": "DOMAINS"
+      "translation": "域"
    },
    {
       "id": "GETTING STARTED",
-      "translation": "GETTING STARTED"
+      "translation": "入门"
    },
    {
       "id": "ORG ADMIN",
-      "translation": "ORG ADMIN"
+      "translation": "组织管理"
    },
    {
       "id": "ORGS",
-      "translation": "ORGS"
+      "translation": "组织"
    },
    {
       "id": "ROUTES",
-      "translation": "ROUTES"
+      "translation": "路径"
    },
    {
       "id": "SERVICE ADMIN",
-      "translation": "SERVICE ADMIN"
+      "translation": "服务管理员"
    },
    {
       "id": "SERVICES",
-      "translation": "SERVICES"
+      "translation": "服务"
    },
    {
       "id": "SPACES",
-      "translation": "SPACES"
+      "translation": "空间"
    },
    {
       "id": "Show help",
-      "translation": "Show help"
+      "translation": "显示帮助"
    },
    {
       "id": "USER ADMIN",
-      "translation": "USER ADMIN"
+      "translation": "用户管理员"
    },
    {
       "id": "VERSION:",
-      "translation": "VERSION:"
+      "translation": "版本:"
    },
    {
       "id": "{{.Command}} help [COMMAND]",
-      "translation": "{{.Command}} help [COMMAND]"
+      "translation": "{{.Command}} help [命令]"
    },
    {
       "id": "Do not colorize output",
-      "translation": "Do not colorize output"
+      "translation": "禁止彩打输出"
    },
    {
       "id": "Print API request diagnostics to stdout",
-      "translation": "Print API request diagnostics to stdout"
+      "translation": "打印API请求诊断到标准输出"
    },
    {
       "id": "NAME:",
-      "translation": "NAME:"
+      "translation": "名称:"
    },
    {
       "id": "USAGE:",
-      "translation": "USAGE:"
+      "translation": "用法:"
    },
    {
       "id": "GLOBAL OPTIONS",
-      "translation": "GLOBAL OPTIONS"
+      "translation": "全局选项"
    },
    {
       "id": "[environment variables]",
-      "translation": "[environment variables]"
+      "translation": "[环境变量]"
    },
    {
       "id": "[global options] command [arguments...] [command options]",
-      "translation": "[global options] command [arguments...] [command options]"
+      "translation": "[全局选项] 命令 [参数...] [命令选项]"
    },
    {
       "id": "ENVIRONMENT VARIABLES",
-      "translation": "ENVIRONMENT VARIABLES"
+      "translation": "环境变量"
    },
    {
       "id": "Override path to default config directory",
-      "translation": "Override path to default config directory"
+      "translation": "将默认配置路径替换成path/to/dir"
    },
    {
       "id": "Print the version",
-      "translation": "Print the version"
+      "translation": "打印版本号"
    },
    {
       "id": "BUILD TIME:",
-      "translation": "BUILD TIME:"
+      "translation": "生成时间:"
    },
    {
       "id": "Max wait time for app instance startup, in minutes",
-      "translation": "Max wait time for app instance startup, in minutes"
+      "translation": "应用实例启动的最大等待时间，以分钟为单位"
    },
    {
       "id": "Append API request diagnostics to a log file",
-      "translation": "Append API request diagnostics to a log file"
+      "translation": "追加API请求诊断到日志文件"
    },
    {
       "id": "Enable HTTP proxying for API requests",
-      "translation": "Enable HTTP proxying for API requests"
+      "translation": "启用API请求的HTTP代理"
    },
    {
       "id": "Max wait time for buildpack staging, in minutes",
-      "translation": "Max wait time for buildpack staging, in minutes"
+      "translation": "buildpack staging升级的最大等待时间，以分钟为单位"
    }
 ]
