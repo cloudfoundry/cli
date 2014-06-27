@@ -153,15 +153,24 @@ var _ = Describe("Gateway", func() {
 	})
 
 	Describe("making an async request", func() {
-		var jobStatus string
-		var apiServer *httptest.Server
-		var authServer *httptest.Server
+		var (
+			jobStatus     string
+			apiServer     *httptest.Server
+			authServer    *httptest.Server
+			statusChannel chan string
+		)
 
 		BeforeEach(func() {
 			jobStatus = "queued"
+			statusChannel = make(chan string, 10)
 
 			apiServer = httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 				currentTime = currentTime.Add(time.Millisecond * 11)
+
+				updateStatus, ok := <-statusChannel
+				if ok {
+					jobStatus = updateStatus
+				}
 
 				switch request.URL.Path {
 				case "/v2/foo":
@@ -197,8 +206,8 @@ var _ = Describe("Gateway", func() {
 
 		It("returns the last response if the job completes before the timeout", func() {
 			go func() {
-				time.Sleep(25 * time.Millisecond)
-				jobStatus = "finished"
+				statusChannel <- "queued"
+				statusChannel <- "finished"
 			}()
 
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
@@ -208,8 +217,8 @@ var _ = Describe("Gateway", func() {
 
 		It("returns an error with the right message when the job fails", func() {
 			go func() {
-				time.Sleep(25 * time.Millisecond)
-				jobStatus = "failed"
+				statusChannel <- "queued"
+				statusChannel <- "failed"
 			}()
 
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
@@ -218,6 +227,10 @@ var _ = Describe("Gateway", func() {
 		})
 
 		It("returns an error if jobs takes longer than the timeout", func() {
+			go func() {
+				statusChannel <- "queued"
+				statusChannel <- "OHNOES"
+			}()
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
 			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 10*time.Millisecond)
 			Expect(apiErr).To(HaveOccurred())
