@@ -7,6 +7,7 @@ import (
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -79,6 +80,50 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
+
+	Describe(".List", func() {
+		It("returns a list of security groups that are the defaults for running", func() {
+			setupTestServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "GET",
+					Path:   "/v2/config/running_security_groups",
+					Response: testnet.TestResponse{
+						Status: http.StatusOK,
+						Body:   firstRunningListItem,
+					},
+				}),
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "GET",
+					Path:   "/v2/config/running_security_groups",
+					Response: testnet.TestResponse{
+						Status: http.StatusOK,
+						Body:   secondRunningListItem,
+					},
+				}),
+			)
+
+			defaults, err := repo.List()
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(defaults).To(Equal([]models.SecurityGroupFields{
+				{
+					Name: "name-71",
+					Guid: "cd186158-b356-474d-9861-724f34f48502",
+					Rules: []map[string]string{{
+						"protocol": "udp",
+					}},
+				},
+				{
+					Name: "name-72",
+					Guid: "d3374b62-7eac-4823-afbd-460d2bf44c67",
+					Rules: []map[string]string{{
+						"destination": "198.41.191.47/1",
+					}},
+				},
+			}))
+		})
+	})
 })
 
 var addRunningResponse string = `{
@@ -98,4 +143,50 @@ var addRunningResponse string = `{
       }
     ]
   }
+}`
+
+var firstRunningListItem string = `{
+  "next_url": "/v2/config/running_security_groups?page=2",
+  "resources": [
+    {
+      "metadata": {
+        "guid": "cd186158-b356-474d-9861-724f34f48502",
+        "url": "/v2/security_groups/cd186158-b356-474d-9861-724f34f48502",
+        "created_at": "2014-06-23T22:55:30+00:00",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-71",
+        "rules": [
+          {
+            "protocol": "udp"
+          }
+        ],
+        "spaces_url": "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces"
+      }
+    }
+  ]
+}`
+
+var secondRunningListItem string = `{
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "d3374b62-7eac-4823-afbd-460d2bf44c67",
+        "url": "/v2/config/running_security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67",
+        "created_at": "2014-06-23T22:55:30+00:00",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-72",
+        "rules": [
+          {
+            "destination": "198.41.191.47/1"
+          }
+        ],
+        "spaces_url": "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces"
+      }
+    }
+  ]
 }`
