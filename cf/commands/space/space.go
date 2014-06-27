@@ -53,31 +53,37 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 			"OrgName":     terminal.EntityNameColor(space.Organization.Name),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
+
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s:", terminal.EntityNameColor(space.Name))
-	cmd.ui.Say(T("  Org: {{.OrgName}}", map[string]interface{}{"OrgName": terminal.EntityNameColor(space.Organization.Name)}))
+	cmd.ui.Say("")
+	cmd.ui.Say(terminal.EntityNameColor(space.Name) + ":")
+
+	table := terminal.NewTable(cmd.ui, []string{"", "", ""})
+	table.Add("", T("Org:"), terminal.EntityNameColor(space.Organization.Name))
 
 	apps := []string{}
 	for _, app := range space.Applications {
-		apps = append(apps, app.Name)
+		apps = append(apps, terminal.EntityNameColor(app.Name))
 	}
-	cmd.ui.Say(T("  Apps: {{.ApplicationNames}}", map[string]interface{}{"ApplicationNames": terminal.EntityNameColor(strings.Join(apps, ", "))}))
+	table.Add("", T("Apps:"), strings.Join(apps, ", "))
 
 	domains := []string{}
 	for _, domain := range space.Domains {
-		domains = append(domains, domain.Name)
+		domains = append(domains, terminal.EntityNameColor(domain.Name))
 	}
-	cmd.ui.Say(T("  Domains: {{.DomainNames}}", map[string]interface{}{"DomainNames": terminal.EntityNameColor(strings.Join(domains, ", "))}))
+	table.Add("", T("Domains:"), strings.Join(domains, ", "))
 
 	services := []string{}
 	for _, service := range space.ServiceInstances {
-		services = append(services, service.Name)
+		services = append(services, terminal.EntityNameColor(service.Name))
 	}
-	cmd.ui.Say(T("  Services: {{.ServiceNames}}", map[string]interface{}{"ServiceNames": terminal.EntityNameColor(strings.Join(services, ", "))}))
+	table.Add("", T("Services:"), strings.Join(services, ", "))
 
 	securityGroups := []string{}
 	for _, group := range space.SecurityGroups {
 		securityGroups = append(securityGroups, terminal.EntityNameColor(group.Name))
 	}
-	cmd.ui.Say("Security Groups: %s", strings.Join(securityGroups, ", "))
+	table.Add("", T("Security Groups:"), strings.Join(securityGroups, ", "))
+
+	table.Print()
 }
