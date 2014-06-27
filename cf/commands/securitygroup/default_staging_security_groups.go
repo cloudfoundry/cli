@@ -27,7 +27,7 @@ func (cmd listDefaultStagingSecurityGroups) Metadata() command_metadata.CommandM
 	return command_metadata.CommandMetadata{
 		Name:        "default-staging-security-groups",
 		Description: "List security groups in the set of default security groups for staging applications.",
-		Usage:       "CF_NAME default-security-staging-groups",
+		Usage:       "CF_NAME default-staging-security-groups",
 	}
 }
 
