@@ -44,7 +44,7 @@ func (cmd SecurityGroups) GetRequirements(requirementsFactory requirements.Facto
 }
 
 func (cmd SecurityGroups) Run(context *cli.Context) {
-	cmd.ui.Say("Getting security groups as '%s'", cmd.configRepo.Username())
+	cmd.ui.Say("Getting security groups as %s", terminal.EntityNameColor(cmd.configRepo.Username()))
 
 	securityGroups, err := cmd.securityGroupRepo.FindAll()
 	if err != nil {

@@ -41,7 +41,8 @@ func (cmd listDefaultStagingSecurityGroups) GetRequirements(requirementsFactory 
 }
 
 func (cmd listDefaultStagingSecurityGroups) Run(context *cli.Context) {
-	cmd.ui.Say("Acquiring default security groups as '%s'", terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say("Acquiring default security groups as %s",
+		terminal.EntityNameColor(cmd.configRepo.Username()))
 
 	defaultSecurityGroupsFields, err := cmd.stagingSecurityGroupRepo.List()
 	if err != nil {

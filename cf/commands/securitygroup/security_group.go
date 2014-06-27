@@ -46,7 +46,9 @@ func (cmd ShowSecurityGroup) GetRequirements(requirementsFactory requirements.Fa
 func (cmd ShowSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
-	cmd.ui.Say("Getting info for security group '%s' as '%s'", name, cmd.configRepo.Username())
+	cmd.ui.Say("Getting info for security group %s as %s",
+		terminal.EntityNameColor(name),
+		terminal.EntityNameColor(cmd.configRepo.Username()))
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
