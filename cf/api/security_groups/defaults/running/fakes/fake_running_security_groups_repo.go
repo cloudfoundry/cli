@@ -2,10 +2,11 @@
 package fakes
 
 import (
+	"sync"
+
 	. "github.com/cloudfoundry/cli/cf/api/security_groups/defaults"
 	. "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
-
-	"sync"
+	"github.com/cloudfoundry/cli/cf/models"
 )
 
 type FakeRunningSecurityGroupsRepo struct {
@@ -16,6 +17,13 @@ type FakeRunningSecurityGroupsRepo struct {
 	}
 	addToDefaultRunningSetReturns struct {
 		result1 error
+	}
+	ListStub        func() ([]models.SecurityGroupFields, error)
+	listMutex       sync.RWMutex
+	listArgsForCall []struct{}
+	ListReturns     struct {
+		Fields []models.SecurityGroupFields
+		Error  error
 	}
 	RemoveFromRunningSetStub        func(string) error
 	removeFromRunningSetMutex       sync.RWMutex
@@ -56,6 +64,16 @@ func (fake *FakeRunningSecurityGroupsRepo) AddToDefaultRunningSetReturns(result1
 	fake.addToDefaultRunningSetReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeRunningSecurityGroupsRepo) List() ([]models.SecurityGroupFields, error) {
+	return fake.ListReturns.Fields, fake.ListReturns.Error
+}
+
+func (fake *FakeRunningSecurityGroupsRepo) ListCallCount() int {
+	fake.listMutex.RLock()
+	defer fake.listMutex.RUnlock()
+	return len(fake.listArgsForCall)
 }
 
 func (fake *FakeRunningSecurityGroupsRepo) RemoveFromRunningSet(arg1 string) error {
