@@ -4,8 +4,8 @@
       "translation": "CF_NAME rename-space SPACE NEW_SPACE"
    },
    {
-      "id": "  Apps: {{.ApplicationNames}}",
-      "translation": "  Apps: {{.ApplicationNames}}"
+      "id": "Apps:",
+      "translation": "Apps:"
    },
    {
       "id": "space",
@@ -68,8 +68,8 @@
       "translation": "\nTIP: Use '{{.CFTargetCommand}}' to target new space"
    },
    {
-      "id": "  Domains: {{.DomainNames}}",
-      "translation": "  Domains: {{.DomainNames}}"
+      "id": "Domains:",
+      "translation": "Domains:"
    },
    {
       "id": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
@@ -96,8 +96,8 @@
       "translation": "CF_NAME create-space SPACE [-o ORG]"
    },
    {
-      "id": "  Org: {{.OrgName}}",
-      "translation": "  Org: {{.OrgName}}"
+      "id": "Org:",
+      "translation": "Org:"
    },
    {
       "id": "Org {{.OrgName}} does not exist or is not accessible",
@@ -116,7 +116,11 @@
       "translation": "CF_NAME delete-space SPACE [-f]"
    },
    {
-      "id": "  Services: {{.ServiceNames}}",
-      "translation": "  Services: {{.ServiceNames}}"
+     "id": "Security Groups:",
+     "translation": "Security Groups:"
+   },
+   {
+      "id": "Services:",
+      "translation": "Services:"
    }
 ]
