@@ -54,13 +54,17 @@ func (cmd *removeFromDefaultStagingGroup) Run(context *cli.Context) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Security group '%s' does not exist.", name)
+		cmd.ui.Warn("Security group %s %s",
+			terminal.EntityNameColor(name),
+			terminal.WarningColor("does not exist."))
 		return
 	default:
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Removing security group '%s' from defaults for staging as '%s'", securityGroup.Name, cmd.configRepo.Username())
+	cmd.ui.Say("Removing security group %s from defaults for staging as %s",
+		terminal.EntityNameColor(securityGroup.Name),
+		terminal.EntityNameColor(cmd.configRepo.Username()))
 	err = cmd.stagingGroupRepo.RemoveFromDefaultStagingSet(securityGroup.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

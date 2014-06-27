@@ -53,7 +53,10 @@ func (cmd *addToDefaultRunningGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Adding security group '%s' to defaults for running as '%s'", securityGroup.Name, cmd.configRepo.Username())
+	cmd.ui.Say("Adding security group %s to defaults for running as %s",
+		terminal.EntityNameColor(securityGroup.Name),
+		terminal.EntityNameColor(cmd.configRepo.Username()))
+
 	err = cmd.runningGroupRepo.AddToDefaultRunningSet(securityGroup.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

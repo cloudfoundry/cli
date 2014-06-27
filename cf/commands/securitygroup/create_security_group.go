@@ -2,6 +2,7 @@ package securitygroup
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
@@ -60,7 +61,7 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 		space, err := cmd.spaceRepo.FindByName(spaceName)
 
 		if err != nil {
-			cmd.ui.Failed("Could not find space named '%s'", spaceName)
+			cmd.ui.Failed("Could not find space named %s", terminal.EntityNameColor(spaceName))
 		}
 
 		spaceGuids = append(spaceGuids, space.Guid)
@@ -74,14 +75,19 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Creating security group '%s' as '%s', applying to %d spaces", name, cmd.configRepo.Username(), len(spaceGuids))
+	cmd.ui.Say("Creating security group %s as %s, applying to %s spaces",
+		terminal.EntityNameColor(name),
+		terminal.EntityNameColor(cmd.configRepo.Username()),
+		terminal.EntityNameColor(strconv.Itoa(len(spaceGuids))))
 
 	err := cmd.securityGroupRepo.Create(name, ruleMaps, spaceGuids)
 
 	httpErr, ok := err.(errors.HttpError)
 	if ok && httpErr.ErrorCode() == errors.SECURITY_GROUP_EXISTS {
 		cmd.ui.Ok()
-		cmd.ui.Warn("Security group '%s' already exists", name)
+		cmd.ui.Warn("Security group %s %s",
+			terminal.EntityNameColor(name),
+			terminal.WarningColor("already exists"))
 		return
 	}
 
