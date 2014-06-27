@@ -7,7 +7,7 @@ You can follow our development progress on [Pivotal Tracker](https://www.pivotal
 
 Getting Started
 ===============
-Download and run the installer for your platform from the [Downloads Section](#Downloads).
+Download and run the installer for your platform from the [Downloads Section](#downloads).
 
 Once installed, you can log in and push an app.
 ```
