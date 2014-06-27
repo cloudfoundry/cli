@@ -11,13 +11,7 @@ import (
 
 var _ = Describe("io helpers", func() {
 	It("will never overflow the pipe", func() {
-		characters := make([]string, 0, 75000)
-		for i := 0; i < 75000; i++ {
-			characters = append(characters, "z")
-		}
-
-		str := strings.Join(characters, "")
-
+		str := strings.Repeat("z", 75000)
 		output := CaptureOutput(func() {
 			os.Stdout.Write([]byte(str))
 		})
