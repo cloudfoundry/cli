@@ -11,6 +11,7 @@ const urlPath = "/v2/config/running_security_groups"
 
 type RunningSecurityGroupsRepo interface {
 	AddToDefaultRunningSet(string) error
+	RemoveFromRunningSet(string) error
 }
 
 type cloudControllerRunningSecurityGroupRepo struct {
@@ -28,4 +29,8 @@ func NewRunningSecurityGroupsRepo(configRepo configuration.Reader, gateway net.G
 
 func (repo *cloudControllerRunningSecurityGroupRepo) AddToDefaultRunningSet(groupGuid string) error {
 	return repo.repoBase.Add(groupGuid, urlPath)
+}
+
+func (repo *cloudControllerRunningSecurityGroupRepo) RemoveFromRunningSet(groupGuid string) error {
+	return repo.repoBase.Delete(groupGuid, urlPath)
 }
