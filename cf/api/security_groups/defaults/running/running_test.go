@@ -59,6 +59,26 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
+
+	Describe("RemoveFromRunningSet", func() {
+		It("makes a correct request", func() {
+			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "DELETE",
+					Path:   "/v2/config/running_security_groups/my-guid",
+					Response: testnet.TestResponse{
+						Status: http.StatusNoContent,
+					},
+				}),
+			})
+
+			configRepo.SetApiEndpoint(testServer.URL)
+			err := repo.RemoveFromRunningSet("my-guid")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+		})
+	})
 })
 
 var addRunningResponse string = `{

@@ -133,6 +133,12 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 		repoLocator.GetSecurityGroupRepository(),
 		repoLocator.GetRunningSecurityGroupsRepository(),
 	)
+	factory.cmdsByName["remove-running-security-group"] = securitygroup.NewRemoveFromRunningGroup(
+		ui,
+		config,
+		repoLocator.GetSecurityGroupRepository(),
+		repoLocator.GetRunningSecurityGroupsRepository(),
+	)
 
 	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["create-route"] = createRoute
