@@ -1,10 +1,10 @@
 [
    {
       "id": "app crashed",
-      "translation": "app crashed"
+      "translation": "应用程序崩溃"
    },
    {
       "id": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}",
-      "translation": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}"
+      "translation": "实例: {{.InstanceIndex}}, 原因: {{.ExitDescription}}, 退出状态/返回码: {{.ExitStatus}}"
    }
 ]
