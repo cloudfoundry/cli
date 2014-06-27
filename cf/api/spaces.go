@@ -2,13 +2,14 @@ package api
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type SpaceRepository interface {
@@ -34,7 +35,7 @@ func NewCloudControllerSpaceRepository(config configuration.Reader, gateway net.
 func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.OrganizationFields().Guid),
+		fmt.Sprintf("/v2/organizations/%s/spaces?inline-relations-depth=1", repo.config.OrganizationFields().Guid),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
 			return callback(resource.(resources.SpaceResource).ToModel())

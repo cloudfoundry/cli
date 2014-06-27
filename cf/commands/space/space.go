@@ -74,4 +74,10 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 		services = append(services, service.Name)
 	}
 	cmd.ui.Say(T("  Services: {{.ServiceNames}}", map[string]interface{}{"ServiceNames": terminal.EntityNameColor(strings.Join(services, ", "))}))
+
+	securityGroups := []string{}
+	for _, group := range space.SecurityGroups {
+		securityGroups = append(securityGroups, terminal.EntityNameColor(group.Name))
+	}
+	cmd.ui.Say("Security Groups: %s", strings.Join(securityGroups, ", "))
 }

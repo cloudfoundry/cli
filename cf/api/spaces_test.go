@@ -23,19 +23,29 @@ var _ = Describe("Space Repository", func() {
 	It("lists all the spaces", func() {
 		firstPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
-			Path:   "/v2/organizations/my-org-guid/spaces",
+			Path:   "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1",
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
 				Body: `
 				{
-					"next_url": "/v2/organizations/my-org-guid/spaces?page=2",
+					"next_url": "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1&page=2",
 					"resources": [
 						{
 							"metadata": {
 								"guid": "acceptance-space-guid"
 							},
 							"entity": {
-								"name": "acceptance"
+								"name": "acceptance",
+		            "security_groups": [
+		               {
+		                  "metadata": {
+		                     "guid": "4302b3b4-4afc-4f12-ae6d-ed1bb815551f"
+		                  },
+		                  "entity": {
+		                     "name": "imma-security-group"
+		                  }
+		               }
+                ]
 							}
 						}
 					]
@@ -43,7 +53,7 @@ var _ = Describe("Space Repository", func() {
 
 		secondPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
-			Path:   "/v2/organizations/my-org-guid/spaces?page=2",
+			Path:   "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1&page=2",
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
 				Body: `
@@ -54,7 +64,8 @@ var _ = Describe("Space Repository", func() {
 								"guid": "staging-space-guid"
 							},
 							"entity": {
-								"name": "staging"
+								"name": "staging",
+		            "security_groups": []
 							}
 						}
 					]
@@ -71,6 +82,7 @@ var _ = Describe("Space Repository", func() {
 
 		Expect(len(spaces)).To(Equal(2))
 		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
+		Expect(spaces[0].SecurityGroups[0].Name).To(Equal("imma-security-group"))
 		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
 		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(HaveAllRequestsCalled())
