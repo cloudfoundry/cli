@@ -79,11 +79,28 @@ var _ = Describe("delete-security-group command", func() {
 			})
 		})
 
-		It("fails and warns the user if a group with that name could not be found", func() {
-			securityGroupRepo.ReadReturns.Error = errors.New("pbbbbbbbbbbt")
-			runCommand("whoops")
+		Context("when finding the group returns an error", func() {
+			BeforeEach(func() {
+				securityGroupRepo.ReadReturns.Error = errors.New("pbbbbbbbbbbt")
+			})
 
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			It("fails and tells the user", func() {
+				runCommand("whoops")
+
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			})
+		})
+
+		Context("when a group with that name does not exist", func() {
+			BeforeEach(func() {
+				securityGroupRepo.ReadReturns.Error = errors.NewModelNotFoundError("Security group", "uh uh uh -- you didn't sahy the magick word")
+			})
+
+			It("fails and tells the user", func() {
+				runCommand("whoop")
+
+				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"whoop", "does not exist"}))
+			})
 		})
 
 		It("fails and warns the user if deleting fails", func() {
