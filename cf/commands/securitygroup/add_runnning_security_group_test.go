@@ -3,7 +3,7 @@ package securitygroup_test
 import (
 	"errors"
 
-	fakeRunningDefaults "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/fakes"
+	fakeRunning "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/fakes"
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,13 +18,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("add-default-running-security-group command", func() {
+var _ = Describe("add-running-security-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		configRepo                   configuration.ReadWriter
 		requirementsFactory          *testreq.FakeReqFactory
 		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroup
-		fakeRunningSecurityGroupRepo *fakeRunningDefaults.FakeRunningSecurityGroupsRepo
+		fakeRunningSecurityGroupRepo *fakeRunning.FakeRunningSecurityGroupsRepo
 	)
 
 	BeforeEach(func() {
@@ -32,11 +32,11 @@ var _ = Describe("add-default-running-security-group command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
-		fakeRunningSecurityGroupRepo = &fakeRunningDefaults.FakeRunningSecurityGroupsRepo{}
+		fakeRunningSecurityGroupRepo = &fakeRunning.FakeRunningSecurityGroupsRepo{}
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewAddToDefaultRunningGroup(ui, configRepo, fakeSecurityGroupRepo, fakeRunningSecurityGroupRepo)
+		cmd := NewAddToRunningGroup(ui, configRepo, fakeSecurityGroupRepo, fakeRunningSecurityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -72,14 +72,14 @@ var _ = Describe("add-default-running-security-group command", func() {
 			))
 		})
 
-		It("adds the group to the default running group set", func() {
+		It("adds the group to the running group set", func() {
 			Expect(fakeSecurityGroupRepo.ReadCalledWith.Name).To(Equal("security-group-name"))
-			Expect(fakeRunningSecurityGroupRepo.AddToDefaultRunningSetArgsForCall(0)).To(Equal("being-a-guid"))
+			Expect(fakeRunningSecurityGroupRepo.AddToRunningSetArgsForCall(0)).To(Equal("being-a-guid"))
 		})
 
-		Context("when adding the security group to the default set fails", func() {
+		Context("when adding the security group to the running set fails", func() {
 			BeforeEach(func() {
-				fakeRunningSecurityGroupRepo.AddToDefaultRunningSetReturns(errors.New("WOAH. I know kung fu"))
+				fakeRunningSecurityGroupRepo.AddToRunningSetReturns(errors.New("WOAH. I know kung fu"))
 			})
 
 			It("fails and describes the failure to the user", func() {
@@ -96,7 +96,7 @@ var _ = Describe("add-default-running-security-group command", func() {
 			})
 
 			It("fails and tells the user that the security group does not exist", func() {
-				Expect(fakeRunningSecurityGroupRepo.AddToDefaultRunningSetCallCount()).To(Equal(0))
+				Expect(fakeRunningSecurityGroupRepo.AddToRunningSetCallCount()).To(Equal(0))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 				))

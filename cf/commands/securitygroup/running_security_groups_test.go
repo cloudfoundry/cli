@@ -52,11 +52,11 @@ var _ = Describe("Running-security-groups command", func() {
 
 		Context("when there are some security groups set in the Running group", func() {
 			BeforeEach(func() {
-				fakeRunningSecurityGroupRepo.ListReturns.Fields = []models.SecurityGroupFields{
+				fakeRunningSecurityGroupRepo.ListReturns([]models.SecurityGroupFields{
 					{Name: "hiphopopotamus"},
 					{Name: "my lyrics are bottomless"},
 					{Name: "steve"},
-				}
+				}, nil)
 			})
 
 			It("shows the user the name of the security groups of the Running set", func() {
@@ -72,7 +72,7 @@ var _ = Describe("Running-security-groups command", func() {
 
 		Context("when the API returns an error", func() {
 			BeforeEach(func() {
-				fakeRunningSecurityGroupRepo.ListReturns.Error = errors.New("uh oh")
+				fakeRunningSecurityGroupRepo.ListReturns(nil, errors.New("uh oh"))
 			})
 
 			It("fails loudly", func() {

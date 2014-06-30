@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("remove-default-staging-security-group command", func() {
+var _ = Describe("remove-staging-security-group command", func() {
 	var (
 		ui                            *testterm.FakeUI
 		configRepo                    configuration.ReadWriter
@@ -35,7 +35,7 @@ var _ = Describe("remove-default-staging-security-group command", func() {
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewRemoveFromDefaultStagingGroup(ui, configRepo, fakeSecurityGroupRepo, fakeStagingSecurityGroupsRepo)
+		cmd := NewRemoveFromStagingGroup(ui, configRepo, fakeSecurityGroupRepo, fakeStagingSecurityGroupsRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -75,7 +75,7 @@ var _ = Describe("remove-default-staging-security-group command", func() {
 				))
 
 				Expect(fakeSecurityGroupRepo.ReadCalledWith.Name).To(Equal("a-security-group-name"))
-				Expect(fakeStagingSecurityGroupsRepo.RemoveFromDefaultStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
+				Expect(fakeStagingSecurityGroupsRepo.RemoveFromStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
 			})
 		})
 

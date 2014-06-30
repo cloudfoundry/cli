@@ -11,15 +11,15 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type addToDefaultRunningGroup struct {
+type addToRunningGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
 	runningGroupRepo  running.RunningSecurityGroupsRepo
 }
 
-func NewAddToDefaultRunningGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, runningGroupRepo running.RunningSecurityGroupsRepo) command.Command {
-	return &addToDefaultRunningGroup{
+func NewAddToRunningGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, runningGroupRepo running.RunningSecurityGroupsRepo) command.Command {
+	return &addToRunningGroup{
 		ui:                ui,
 		configRepo:        configRepo,
 		securityGroupRepo: securityGroupRepo,
@@ -27,15 +27,15 @@ func NewAddToDefaultRunningGroup(ui terminal.UI, configRepo configuration.Reader
 	}
 }
 
-func (cmd *addToDefaultRunningGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd *addToRunningGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "add-default-running-security-group",
-		Description: "Add a security group to the list of security groups to be used for running Applications",
-		Usage:       "CF_NAME add-default-running-security-group NAME",
+		Name:        "add-running-security-group",
+		Description: "Add a security group to the list of security groups to be used for running applications",
+		Usage:       "CF_NAME add-running-security-group NAME",
 	}
 }
 
-func (cmd *addToDefaultRunningGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd *addToRunningGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -45,7 +45,7 @@ func (cmd *addToDefaultRunningGroup) GetRequirements(requirementsFactory require
 	}, nil
 }
 
-func (cmd *addToDefaultRunningGroup) Run(context *cli.Context) {
+func (cmd *addToRunningGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
@@ -57,7 +57,7 @@ func (cmd *addToDefaultRunningGroup) Run(context *cli.Context) {
 		terminal.EntityNameColor(securityGroup.Name),
 		terminal.EntityNameColor(cmd.configRepo.Username()))
 
-	err = cmd.runningGroupRepo.AddToDefaultRunningSet(securityGroup.Guid)
+	err = cmd.runningGroupRepo.AddToRunningSet(securityGroup.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

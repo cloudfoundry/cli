@@ -114,20 +114,20 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["delete-security-group"] = securitygroup.NewDeleteSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["security-group"] = securitygroup.NewShowSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["security-groups"] = securitygroup.NewSecurityGroups(ui, config, repoLocator.GetSecurityGroupRepository())
-	factory.cmdsByName["add-default-staging-security-group"] = securitygroup.NewAddToDefaultStagingGroup(
+	factory.cmdsByName["add-staging-security-group"] = securitygroup.NewAddToStagingGroup(
 		ui,
 		config,
 		repoLocator.GetSecurityGroupRepository(),
 		repoLocator.GetStagingSecurityGroupsRepository(),
 	)
-	factory.cmdsByName["default-staging-security-groups"] = securitygroup.NewListDefaultStagingSecurityGroups(ui, config, repoLocator.GetStagingSecurityGroupsRepository())
-	factory.cmdsByName["remove-default-staging-security-group"] = securitygroup.NewRemoveFromDefaultStagingGroup(
+	factory.cmdsByName["staging-security-groups"] = securitygroup.NewListStagingSecurityGroups(ui, config, repoLocator.GetStagingSecurityGroupsRepository())
+	factory.cmdsByName["remove-staging-security-group"] = securitygroup.NewRemoveFromStagingGroup(
 		ui,
 		config,
 		repoLocator.GetSecurityGroupRepository(),
 		repoLocator.GetStagingSecurityGroupsRepository(),
 	)
-	factory.cmdsByName["add-default-running-security-group"] = securitygroup.NewAddToDefaultRunningGroup(
+	factory.cmdsByName["add-running-security-group"] = securitygroup.NewAddToRunningGroup(
 		ui,
 		config,
 		repoLocator.GetSecurityGroupRepository(),
