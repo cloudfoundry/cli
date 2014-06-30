@@ -3,14 +3,16 @@ package securitygroup
 import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type AssignSecurityGroup struct {
+	ui terminal.UI
 }
 
-func NewAssignSecurityGroup() AssignSecurityGroup {
-	return AssignSecurityGroup{}
+func NewAssignSecurityGroup(ui terminal.UI) AssignSecurityGroup {
+	return AssignSecurityGroup{ui: ui}
 }
 
 func (cmd AssignSecurityGroup) Metadata() command_metadata.CommandMetadata {
@@ -22,6 +24,10 @@ func (cmd AssignSecurityGroup) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd AssignSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(context.Args()) != 1 {
+		cmd.ui.FailWithUsage(context)
+	}
+
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	return
 }
