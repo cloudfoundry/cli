@@ -1,11 +1,9 @@
 package securitygroup_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -22,7 +20,6 @@ var _ = Describe("create-security-group command", func() {
 		ui                  *testterm.FakeUI
 		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroup
 		requirementsFactory *testreq.FakeReqFactory
-		spaceRepo           *testapi.FakeSpaceRepository
 		configRepo          configuration.ReadWriter
 	)
 
@@ -31,21 +28,10 @@ var _ = Describe("create-security-group command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-
-		space := models.Space{}
-		space.Guid = "space-guid-1"
-		space.Name = "space-1"
-		space2 := models.Space{}
-		space2.Guid = "space-guid-2"
-		space2.Name = "space-2"
-
-		spaceRepo = &testapi.FakeSpaceRepository{
-			Spaces: []models.Space{space, space2},
-		}
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewCreateSecurityGroup(ui, configRepo, securityGroupRepo, spaceRepo)
+		cmd := NewCreateSecurityGroup(ui, configRepo, securityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -81,7 +67,7 @@ var _ = Describe("create-security-group command", func() {
 		It("displays a message describing what its going to do", func() {
 			runCommand("my-group")
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating security group", "my-group", "my-user", "0", "spaces"},
+				[]string{"Creating security group", "my-group", "my-user"},
 				[]string{"OK"},
 			))
 		})
@@ -110,20 +96,6 @@ var _ = Describe("create-security-group command", func() {
 			))
 		})
 
-		It("allows the user to specify multiple spaces", func() {
-			runCommand(
-				"-space",
-				"space-1",
-				"-space",
-				"space-2",
-				"Multi space security group",
-			)
-
-			Expect(securityGroupRepo.CreateArgsForCall(0).SpaceGuids).To(Equal(
-				[]string{"space-guid-1", "space-guid-2"},
-			))
-		})
-
 		Context("when the API returns an error", func() {
 			Context("some sort of awful terrible error that we were not prescient enough to anticipate", func() {
 				It("fails loudly", func() {
@@ -145,21 +117,6 @@ var _ = Describe("create-security-group command", func() {
 					Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 					Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
 				})
-			})
-		})
-
-		Context("when the user specifies a space that does not exist", func() {
-			It("Fails", func() {
-				runCommand(
-					"-space",
-					"space-does-not-exist",
-					"why-would-this-ever-work",
-				)
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"space-does-not-exist"},
-				))
 			})
 		})
 	})

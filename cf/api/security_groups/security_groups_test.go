@@ -51,8 +51,7 @@ var _ = Describe("app security group api", func() {
 				// FIXME: this matcher depend on the order of the key/value pairs in the map
 				Matcher: testnet.RequestBodyMatcher(`{
 					"name": "mygroup",
-					"rules": [{"my-house": "my-rules"}],
-					"space_guids": ["myspace"]
+					"rules": [{"my-house": "my-rules"}]
 				}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
@@ -61,7 +60,6 @@ var _ = Describe("app security group api", func() {
 			err := repo.Create(
 				"mygroup",
 				[]map[string]string{{"my-house": "my-rules"}},
-				[]string{"myspace"},
 			)
 
 			Expect(err).NotTo(HaveOccurred())

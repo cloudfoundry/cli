@@ -12,7 +12,7 @@ import (
 )
 
 type SecurityGroupRepo interface {
-	Create(name string, rules []map[string]string, spaceGuids []string) error
+	Create(name string, rules []map[string]string) error
 	Delete(string) error
 	Read(string) (models.SecurityGroup, error)
 	FindAll() ([]models.SecurityGroup, error)
@@ -30,12 +30,11 @@ func NewSecurityGroupRepo(config configuration.Reader, gateway net.Gateway) Secu
 	}
 }
 
-func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[string]string, spaceGuids []string) error {
+func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[string]string) error {
 	path := fmt.Sprintf("%s/v2/security_groups", repo.config.ApiEndpoint())
 	params := models.SecurityGroupParams{
-		Name:       name,
-		Rules:      rules,
-		SpaceGuids: spaceGuids,
+		Name:  name,
+		Rules: rules,
 	}
 	return repo.gateway.CreateResourceFromStruct(path, params)
 }
