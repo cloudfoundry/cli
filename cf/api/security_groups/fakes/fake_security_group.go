@@ -32,8 +32,8 @@ type FakeSecurityGroup struct {
 	}
 }
 
-func (fake *FakeSecurityGroup) Create(name string, rules []map[string]string, spaceGuids []string) error {
-	fake.createArgsForCall = append(fake.createArgsForCall, models.SecurityGroupParams{Name: name, Rules: rules, SpaceGuids: spaceGuids})
+func (fake *FakeSecurityGroup) Create(name string, rules []map[string]string) error {
+	fake.createArgsForCall = append(fake.createArgsForCall, models.SecurityGroupParams{Name: name, Rules: rules})
 
 	return fake.createReturns.result1
 }
