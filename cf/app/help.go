@@ -241,11 +241,11 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("create-security-group"),
 					presentCommand("delete-security-group"),
 				}, {
-					presentCommand("add-default-staging-security-group"),
-					presentCommand("default-staging-security-groups"),
-					presentCommand("remove-default-staging-security-group"),
+					presentCommand("add-staging-security-group"),
+					presentCommand("staging-security-groups"),
+					presentCommand("remove-staging-security-group"),
 				}, {
-					presentCommand("add-default-running-security-group"),
+					presentCommand("add-running-security-group"),
 					presentCommand("running-security-groups"),
 					presentCommand("remove-running-security-group"),
 				},

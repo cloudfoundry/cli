@@ -40,7 +40,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 
-	Describe("AddToDefaultStagingSet", func() {
+	Describe("AddToStagingSet", func() {
 		It("makes a correct request", func() {
 			setupTestServer(
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -53,7 +53,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 				}),
 			)
 
-			err := repo.AddToDefaultStagingSet("a-real-guid")
+			err := repo.AddToStagingSet("a-real-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
@@ -104,7 +104,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 		})
 	})
 
-	Describe("RemoveFromDefaultStagingSet", func() {
+	Describe("RemoveFromStagingSet", func() {
 		It("makes a correct request", func() {
 			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -117,7 +117,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 			})
 
 			configRepo.SetApiEndpoint(testServer.URL)
-			err := repo.RemoveFromDefaultStagingSet("my-guid")
+			err := repo.RemoveFromStagingSet("my-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())

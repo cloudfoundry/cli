@@ -27,7 +27,7 @@ func NewDeleteSecurityGroup(ui terminal.UI, configRepo configuration.Reader, sec
 func (cmd DeleteSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-security-group",
-		Description: "Deletes a security group.",
+		Description: "Deletes a security group",
 		Usage:       "CF_NAME delete-security-group NAME",
 	}
 }

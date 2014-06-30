@@ -11,9 +11,9 @@ import (
 const urlPath = "/v2/config/staging_security_groups"
 
 type StagingSecurityGroupsRepo interface {
-	AddToDefaultStagingSet(string) error
+	AddToStagingSet(string) error
 	List() ([]models.SecurityGroupFields, error)
-	RemoveFromDefaultStagingSet(string) error
+	RemoveFromStagingSet(string) error
 }
 
 type cloudControllerStagingSecurityGroupRepo struct {
@@ -29,7 +29,7 @@ func NewStagingSecurityGroupsRepo(configRepo configuration.Reader, gateway net.G
 	}
 }
 
-func (repo *cloudControllerStagingSecurityGroupRepo) AddToDefaultStagingSet(groupGuid string) error {
+func (repo *cloudControllerStagingSecurityGroupRepo) AddToStagingSet(groupGuid string) error {
 	return repo.repoBase.Add(groupGuid, urlPath)
 }
 
@@ -37,6 +37,6 @@ func (repo *cloudControllerStagingSecurityGroupRepo) List() ([]models.SecurityGr
 	return repo.repoBase.List(urlPath)
 }
 
-func (repo *cloudControllerStagingSecurityGroupRepo) RemoveFromDefaultStagingSet(groupGuid string) error {
+func (repo *cloudControllerStagingSecurityGroupRepo) RemoveFromStagingSet(groupGuid string) error {
 	return repo.repoBase.Delete(groupGuid, urlPath)
 }

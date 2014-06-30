@@ -41,7 +41,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 
-	Describe(".AddToDefaultRunningSet", func() {
+	Describe(".AddToRunningSet", func() {
 		It("makes a correct request", func() {
 			setupTestServer(
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -54,7 +54,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 				}),
 			)
 
-			err := repo.AddToDefaultRunningSet("a-real-guid")
+			err := repo.AddToRunningSet("a-real-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())

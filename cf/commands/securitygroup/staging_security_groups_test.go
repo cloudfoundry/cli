@@ -18,7 +18,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("default-staging-security-groups command", func() {
+var _ = Describe("staging-security-groups command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		configRepo                   configuration.ReadWriter
@@ -31,7 +31,7 @@ var _ = Describe("default-staging-security-groups command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		fakeStagingSecurityGroupRepo = &testapi.FakeStagingSecurityGroupsRepo{}
-		cmd = NewListDefaultStagingSecurityGroups(ui, configRepo, fakeStagingSecurityGroupRepo)
+		cmd = NewListStagingSecurityGroups(ui, configRepo, fakeStagingSecurityGroupRepo)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
@@ -50,19 +50,19 @@ var _ = Describe("default-staging-security-groups command", func() {
 			requirementsFactory.LoginSuccess = true
 		})
 
-		Context("when there are some security groups set as the staging default", func() {
+		Context("when there are some security groups set for staging", func() {
 			BeforeEach(func() {
-				fakeStagingSecurityGroupRepo.ListReturns.Fields = []models.SecurityGroupFields{
+				fakeStagingSecurityGroupRepo.ListReturns([]models.SecurityGroupFields{
 					{Name: "hiphopopotamus"},
 					{Name: "my lyrics are bottomless"},
 					{Name: "steve"},
-				}
+				}, nil)
 			})
 
-			It("shows the user the name of the security groups of the default staging set", func() {
+			It("shows the user the name of the security groups for staging", func() {
 				Expect(runCommand()).To(HaveSucceeded())
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Acquiring", "security groups", "my-user"},
+					[]string{"Acquiring", "staging security group", "my-user"},
 					[]string{"hiphopopotamus"},
 					[]string{"my lyrics are bottomless"},
 					[]string{"steve"},
@@ -72,7 +72,7 @@ var _ = Describe("default-staging-security-groups command", func() {
 
 		Context("when the API returns an error", func() {
 			BeforeEach(func() {
-				fakeStagingSecurityGroupRepo.ListReturns.Error = errors.New("uh oh")
+				fakeStagingSecurityGroupRepo.ListReturns(nil, errors.New("uh oh"))
 			})
 
 			It("fails loudly", func() {
@@ -81,11 +81,11 @@ var _ = Describe("default-staging-security-groups command", func() {
 			})
 		})
 
-		Context("when there are no security groups set as the staging default", func() {
+		Context("when there are no security groups set for staging", func() {
 			It("tells the user that there are none", func() {
 				runCommand()
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"No", "security groups", "set"},
+					[]string{"No", "staging security group", "set"},
 				))
 			})
 		})

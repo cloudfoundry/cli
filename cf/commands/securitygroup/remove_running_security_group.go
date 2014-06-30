@@ -31,7 +31,7 @@ func NewRemoveFromRunningGroup(ui terminal.UI, configRepo configuration.Reader, 
 func (cmd *removeFromRunningGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "remove-running-security-group",
-		Description: "Remove a security group from the set of security groups for Running",
+		Description: "Remove a security group from the set of security groups for running applications",
 		Usage:       "CF_NAME remove-Running-security-group NAME",
 	}
 }

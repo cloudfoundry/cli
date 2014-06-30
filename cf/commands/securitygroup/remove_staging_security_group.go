@@ -12,15 +12,15 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type removeFromDefaultStagingGroup struct {
+type removeFromStagingGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
 	stagingGroupRepo  staging.StagingSecurityGroupsRepo
 }
 
-func NewRemoveFromDefaultStagingGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, stagingGroupRepo staging.StagingSecurityGroupsRepo) command.Command {
-	return &removeFromDefaultStagingGroup{
+func NewRemoveFromStagingGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, stagingGroupRepo staging.StagingSecurityGroupsRepo) command.Command {
+	return &removeFromStagingGroup{
 		ui:                ui,
 		configRepo:        configRepo,
 		securityGroupRepo: securityGroupRepo,
@@ -28,15 +28,15 @@ func NewRemoveFromDefaultStagingGroup(ui terminal.UI, configRepo configuration.R
 	}
 }
 
-func (cmd *removeFromDefaultStagingGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd *removeFromStagingGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "remove-default-staging-security-group",
-		Description: "Remove a security group from the set of default security groups for staging",
-		Usage:       "CF_NAME remove-default-staging-security-group NAME",
+		Name:        "remove-staging-security-group",
+		Description: "Remove a security group from the set of default security groups for staging applications",
+		Usage:       "CF_NAME remove-staging-security-group NAME",
 	}
 }
 
-func (cmd *removeFromDefaultStagingGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd *removeFromStagingGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -46,8 +46,12 @@ func (cmd *removeFromDefaultStagingGroup) GetRequirements(requirementsFactory re
 	}, nil
 }
 
-func (cmd *removeFromDefaultStagingGroup) Run(context *cli.Context) {
+func (cmd *removeFromStagingGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
+
+	cmd.ui.Say("Removing security group %s from defaults for staging as %s",
+		terminal.EntityNameColor(name),
+		terminal.EntityNameColor(cmd.configRepo.Username()))
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	switch (err).(type) {
@@ -62,10 +66,7 @@ func (cmd *removeFromDefaultStagingGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Removing security group %s from defaults for staging as %s",
-		terminal.EntityNameColor(securityGroup.Name),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
-	err = cmd.stagingGroupRepo.RemoveFromDefaultStagingSet(securityGroup.Guid)
+	err = cmd.stagingGroupRepo.RemoveFromStagingSet(securityGroup.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

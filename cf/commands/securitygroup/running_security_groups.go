@@ -26,7 +26,7 @@ func NewListRunningSecurityGroups(ui terminal.UI, configRepo configuration.Reade
 func (cmd listRunningSecurityGroups) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "running-security-groups",
-		Description: "List security groups in the set of security groups for Running applications.",
+		Description: "List security groups in the set of security groups for running applications",
 		Usage:       "CF_NAME running-security-groups",
 	}
 }
