@@ -61,4 +61,22 @@ var _ = Describe("SecurityGroupSpaceBinder", func() {
 			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
+
+	Describe(".UnbindSpace", func() {
+		It("removes the associated security group from the space", func() {
+			setupTestServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "DELETE",
+					Path:   "/v2/security_groups/this-is-a-security-group-guid/spaces/yes-its-a-space-guid",
+					Response: testnet.TestResponse{
+						Status: http.StatusNoContent,
+					},
+				}))
+
+			err := repo.UnbindSpace("this-is-a-security-group-guid", "yes-its-a-space-guid")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+		})
+	})
 })
