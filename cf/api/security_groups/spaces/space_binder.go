@@ -10,6 +10,7 @@ import (
 
 type SecurityGroupSpaceBinder interface {
 	BindSpace(securityGroupGuid, spaceGuid string) error
+	UnbindSpace(securityGroupGuid, spaceGuid string) error
 }
 
 type securityGroupSpaceBinder struct {
@@ -24,7 +25,7 @@ func NewSecurityGroupSpaceBinder(configRepo configuration.Reader, gateway net.Ga
 	}
 }
 
-func (repo securityGroupSpaceBinder) BindSpace(securityGroupGuid, spaceGuid string) error {
+func (repo securityGroupSpaceBinder) BindSpace(securityGroupGuid string, spaceGuid string) error {
 	url := fmt.Sprintf("%s/v2/security_groups/%s/spaces/%s",
 		repo.configRepo.ApiEndpoint(),
 		securityGroupGuid,
@@ -32,4 +33,14 @@ func (repo securityGroupSpaceBinder) BindSpace(securityGroupGuid, spaceGuid stri
 	)
 
 	return repo.gateway.UpdateResourceFromStruct(url, models.SecurityGroupParams{})
+}
+
+func (repo securityGroupSpaceBinder) UnbindSpace(securityGroupGuid string, spaceGuid string) error {
+	url := fmt.Sprintf("%s/v2/security_groups/%s/spaces/%s",
+		repo.configRepo.ApiEndpoint(),
+		securityGroupGuid,
+		spaceGuid,
+	)
+
+	return repo.gateway.DeleteResource(url)
 }
