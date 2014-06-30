@@ -8,6 +8,6 @@ import (
 
 type Command interface {
 	Metadata() command_metadata.CommandMetadata
-	GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error)
-	Run(c *cli.Context)
+	GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) (reqs []requirements.Requirement, err error)
+	Run(context *cli.Context)
 }
