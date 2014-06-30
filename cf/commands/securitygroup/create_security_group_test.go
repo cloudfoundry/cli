@@ -41,12 +41,6 @@ var _ = Describe("create-security-group command", func() {
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 
-		It("succeeds when the user is logged in", func() {
-			requirementsFactory.LoginSuccess = true
-			runCommand("the-security-group")
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		})
-
 		It("fails with usage when a name is not provided", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
