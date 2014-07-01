@@ -9,8 +9,8 @@ import (
 )
 
 type SecurityGroupSpaceBinder interface {
-	BindSpace(securityGroupGuid, spaceGuid string) error
-	UnbindSpace(securityGroupGuid, spaceGuid string) error
+	BindSpace(securityGroupGuid string, spaceGuid string) error
+	UnbindSpace(securityGroupGuid string, spaceGuid string) error
 }
 
 type securityGroupSpaceBinder struct {
