@@ -1,6 +1,9 @@
 package securitygroup_test
 
 import (
+	"io/ioutil"
+	"os"
+
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -66,28 +69,45 @@ var _ = Describe("create-security-group command", func() {
 			))
 		})
 
-		It("allows the user to specify rules", func() {
-			runCommand(
-				"-rules",
-				"[{\"protocol\":\"udp\",\"port\":\"8080-9090\",\"destination\":\"198.41.191.47/1\"}]",
-				"security-groups-rule-everything-around-me",
-			)
+		Context("when the user specifies rules", func() {
+			var tempFile *os.File
 
-			Expect(securityGroupRepo.CreateArgsForCall(0).Rules).To(Equal([]map[string]string{
-				{"protocol": "udp", "port": "8080-9090", "destination": "198.41.191.47/1"},
-			}))
-		})
+			BeforeEach(func() {
+				tempFile, _ = ioutil.TempFile("", "")
+			})
 
-		It("freaks out if the user specifies a rule incorrectly", func() {
-			runCommand(
-				"-rules",
-				"Im so not right",
-				"security group",
-			)
+			AfterEach(func() {
+				tempFile.Close()
+				os.Remove(tempFile.Name())
+			})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-			))
+			JustBeforeEach(func() {
+				runCommand("--json", tempFile.Name(), "security-groups-rule-everything-around-me")
+			})
+
+			Context("when the file specified has valid json", func() {
+				BeforeEach(func() {
+					tempFile.Write([]byte(`[{"protocol":"udp","port":"8080-9090","destination":"198.41.191.47/1"}]`))
+				})
+
+				It("creates the security group with those rules, obviously", func() {
+					Expect(securityGroupRepo.CreateArgsForCall(0).Rules).To(Equal([]map[string]string{
+						{"protocol": "udp", "port": "8080-9090", "destination": "198.41.191.47/1"},
+					}))
+				})
+			})
+
+			Context("when the file specified has invalid json", func() {
+				BeforeEach(func() {
+					tempFile.Write([]byte(`[{noquote: thiswontwork}]`))
+				})
+
+				It("freaks out", func() {
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+					))
+				})
+			})
 		})
 
 		Context("when the API returns an error", func() {
