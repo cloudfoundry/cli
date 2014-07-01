@@ -1,22 +1,22 @@
 [
    {
       "id": "running",
-      "translation": "running"
+      "translation": "运行"
    },
    {
       "id": "stopped",
-      "translation": "stopped"
+      "translation": "已停止"
    },
    {
       "id": "crashing",
-      "translation": "crashing"
+      "translation": "崩溃"
    },
    {
       "id": "down",
-      "translation": "down"
+      "translation": "没在运行"
    },
    {
       "id": "starting",
-      "translation": "starting"
+      "translation": "启动中"
    }
 ]

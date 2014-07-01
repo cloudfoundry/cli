@@ -1,67 +1,67 @@
 [
    {
       "id": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
-      "translation": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"
+      "translation": "   CF_NAME auth name@example.com \"\\\"密码\\\"\" (密码中若有引号，需采用转义引号)"
    },
    {
       "id": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n",
-      "translation": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n"
+      "translation": "   CF_NAME auth name@example.com \"my password\" (密码中若有空格，需要转义空格)\n"
    },
    {
       "id": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n",
-      "translation": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n"
+      "translation": "   CF_NAME login (不指定用户名和密码参数，CF_NAME将进一步提示你输入用户名和密码)\n"
    },
    {
       "id": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
-      "translation": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"
+      "translation": "   CF_NAME login --sso (CF_NAME 将提供一个可以获得一次性密码的链接)\n"
    },
    {
       "id": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
-      "translation": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"
+      "translation": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (密码中若有引号，需采用转义引号)\n"
    },
    {
       "id": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n",
-      "translation": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n"
+      "translation": "   CF_NAME login -u name@example.com -p \"my password\" (密码中若有空格，需要转义空格)\n"
    },
    {
       "id": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n",
-      "translation": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n"
+      "translation": "   CF_NAME login -u name@example.com -p pa55woRD (指定用户名和密码作为参数)\n"
    },
    {
       "id": " target",
-      "translation": " target"
+      "translation": " 选择/指向"
    },
    {
       "id": "API endpoint",
-      "translation": "API endpoint"
+      "translation": "API 终端"
    },
    {
       "id": "API endpoint (e.g. https://api.example.com)",
-      "translation": "API endpoint (e.g. https://api.example.com)"
+      "translation": "API 终端 (e.g. https://api.example.com)"
    },
    {
       "id": "API endpoint: {{.ApiEndpoint}}",
-      "translation": "API endpoint: {{.ApiEndpoint}}"
+      "translation": "API 终端: {{.ApiEndpoint}}"
    },
    {
       "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-      "translation": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})"
+      "translation": "API 终端: {{.ApiEndpoint}} (API 版本: {{.ApiVersion}})"
    },
    {
       "id": "API endpoint: {{.Endpoint}}",
-      "translation": "API endpoint: {{.Endpoint}}"
+      "translation": "API 终端: {{.Endpoint}}"
    },
    {
       "id": "An org must be targeted before targeting a space",
-      "translation": "An org must be targeted before targeting a space"
+      "translation": "在选择空间之前必须选择一个组织"
    },
    {
       "id": "Authenticate user non-interactively",
-      "translation": "Authenticate user non-interactively"
+      "translation": "非交互式用户身份验证"
    },
    {
       "id": "Authenticating...",
-      "translation": "Authenticating..."
+      "translation": "正在验证，请等待..."
    },
    {
       "id": "CF_NAME api [URL]",
@@ -69,11 +69,11 @@
    },
    {
       "id": "CF_NAME auth USERNAME PASSWORD\n\n",
-      "translation": "CF_NAME auth USERNAME PASSWORD\n\n"
+      "translation": "CF_NAME auth 用户名 密码\n\n"
    },
    {
       "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]",
-      "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]"
+      "translation": "CF_NAME config [--async-timeout 超时_以分钟为单位] [--trace true | false | 文件访问路径] [--color true | false]"
    },
    {
       "id": "CF_NAME curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]",
@@ -81,7 +81,7 @@
    },
    {
       "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
-      "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"
+      "translation": "CF_NAME login [-a API_URL] [-u 用户名] [-p 密码] [-o 组织] [-s 空间]\n\n"
    },
    {
       "id": "CF_NAME logout",
@@ -97,75 +97,75 @@
    },
    {
       "id": "CF_NAME target [-o ORG] [-s SPACE]",
-      "translation": "CF_NAME target [-o ORG] [-s SPACE]"
+      "translation": "CF_NAME target [-o 组织] [-s 空间]"
    },
    {
       "id": "Change user password",
-      "translation": "Change user password"
+      "translation": "更改用户密码"
    },
    {
       "id": "Changing password...",
-      "translation": "Changing password..."
+      "translation": "正在更改密码..."
    },
    {
       "id": "Could not target org.\n{{.ApiErr}}",
-      "translation": "Could not target org.\n{{.ApiErr}}"
+      "translation": "无法选择组织.\n{{.ApiErr}}"
    },
    {
       "id": "Current Password",
-      "translation": "Current Password"
+      "translation": "当前密码"
    },
    {
       "id": "Current password did not match",
-      "translation": "Current password did not match"
+      "translation": "密码不匹配"
    },
    {
       "id": "Custom headers to include in the request, flag can be specified multiple times",
-      "translation": "Custom headers to include in the request, flag can be specified multiple times"
+      "translation": "在请求中自定义HTTP报头， 可以多次使用"
    },
    {
       "id": "EXAMPLE:\n",
-      "translation": "EXAMPLE:\n"
+      "translation": "例子:\n"
    },
    {
       "id": "Enable CF_TRACE output for all requests and responses",
-      "translation": "Enable CF_TRACE output for all requests and responses"
+      "translation": "启动CF_TRACE输出所有请求和响应"
    },
    {
       "id": "Enable or disable color",
-      "translation": "Enable or disable color"
+      "translation": "启用或禁用彩打输出"
    },
    {
       "id": "Error creating request:\n{{.Err}}",
-      "translation": "Error creating request:\n{{.Err}}"
+      "translation": "创建请求错误:\n{{.Err}}"
    },
    {
       "id": "Error finding available orgs\n{{.ApiErr}}",
-      "translation": "Error finding available orgs\n{{.ApiErr}}"
+      "translation": "无法找到可用的组织\n{{.ApiErr}}"
    },
    {
       "id": "Error finding available spaces\n{{.Err}}",
-      "translation": "Error finding available spaces\n{{.Err}}"
+      "translation": "无法找到可用的空间\n{{.Err}}"
    },
    {
       "id": "Error finding org {{.OrgName}}\n{{.Err}}",
-      "translation": "Error finding org {{.OrgName}}\n{{.Err}}"
+      "translation": "无法找到组织 {{.OrgName}}\n{{.Err}}"
    },
    {
       "id": "Error finding space {{.SpaceName}}\n{{.Err}}",
-      "translation": "Error finding space {{.SpaceName}}\n{{.Err}}"
+      "translation": "无法找到空间 {{.SpaceName}}\n{{.Err}}"
    },
    {
       "id": "Executes a raw request, content-type set to application/json by default",
-      "translation": "Executes a raw request, content-type set to application/json by default"
+      "translation": "执行原始请求，content-type默认设置为application / json"
    },
    {
       "id": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "用户{{.Username}}请求分配组织{.OrganizationName}}/空间{{.SpaceName}}中的stacks..."
    },
    {
       "id": "HTTP data to include in the request body",
-      "translation": "HTTP data to include in the request body"
+      "translation": "包含到请求语句中的HTTP数据"
    },
    {
       "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
@@ -173,35 +173,35 @@
    },
    {
       "id": "Include response headers in the output",
-      "translation": "Include response headers in the output"
+      "translation": "输出包含HTTP响应头"
    },
    {
       "id": "Incorrect number of arguments",
-      "translation": "Incorrect number of arguments"
+      "translation": "参数个数错误"
    },
    {
       "id": "Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
-      "translation": "Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}"
+      "translation": "访问{{.URL}}的无效SSL证书\n{{.TipMessage}}"
    },
    {
       "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "translation": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"
+      "translation": "列出所有stacks (stack是预先建立好的文件系统， 包含可以运行应用程序的操作系统)"
    },
    {
       "id": "Log user in",
-      "translation": "Log user in"
+      "translation": "用户登录"
    },
    {
       "id": "Log user out",
-      "translation": "Log user out"
+      "translation": "用户退出"
    },
    {
       "id": "Logging out...",
-      "translation": "Logging out..."
+      "translation": "正在退出..."
    },
    {
       "id": "New Password",
-      "translation": "New Password"
+      "translation": "新的密码"
    },
    {
       "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
@@ -209,130 +209,130 @@
    },
    {
       "id": "Org",
-      "translation": "Org"
+      "translation": "组织"
    },
    {
       "id": "Password",
-      "translation": "Password"
+      "translation": "密码"
    },
    {
       "id": "Password verification does not match",
-      "translation": "Password verification does not match"
+      "translation": "密码验证不匹配"
    },
    {
       "id": "Please don't",
-      "translation": "Please don't"
+      "translation": "请不要"
    },
    {
       "id": "Please log in again",
-      "translation": "Please log in again"
+      "translation": "请重新登录"
    },
    {
       "id": "Select a space (or press enter to skip):",
-      "translation": "Select a space (or press enter to skip):"
+      "translation": "选择一个空间（或按回车继续）:"
    },
    {
       "id": "Select an org (or press enter to skip):",
-      "translation": "Select an org (or press enter to skip):"
+      "translation": "选择一个组织（或按回车继续）:"
    },
    {
       "id": "Set or view target api url",
-      "translation": "Set or view target api url"
+      "translation": "设置或查看指定的API网络地址"
    },
    {
       "id": "Set or view the targeted org or space",
-      "translation": "Set or view the targeted org or space"
+      "translation": "设置或查看指定的组织或空间"
    },
    {
       "id": "Setting api endpoint to {{.Endpoint}}...",
-      "translation": "Setting api endpoint to {{.Endpoint}}..."
+      "translation": "将API终端设置为 {{.Endpoint}}..."
    },
    {
       "id": "Space",
-      "translation": "Space"
+      "translation": "空间"
    },
    {
       "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-      "translation": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint"
+      "translation": "提示: 使用'{{.ApiCommand}}'继续非安全的API终端访问"
    },
    {
       "id": "Targeted org {{.OrgName}}\n",
-      "translation": "Targeted org {{.OrgName}}\n"
+      "translation": "已选择组织 {{.OrgName}}\n"
    },
    {
       "id": "Targeted space {{.SpaceName}}\n",
-      "translation": "Targeted space {{.SpaceName}}\n"
+      "translation": "已选择空间 {{.SpaceName}}\n"
    },
    {
       "id": "There are too many options to display, please type in the name.",
-      "translation": "There are too many options to display, please type in the name."
+      "translation": "内容太多，无法显示，请输入名称"
    },
    {
       "id": "Timeout for async HTTP requests",
-      "translation": "Timeout for async HTTP requests"
+      "translation": "异步HTTP请求超时"
    },
    {
       "id": "Trace HTTP requests",
-      "translation": "Trace HTTP requests"
+      "translation": "跟踪HTTP请求"
    },
    {
       "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-      "translation": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}"
+      "translation": "无法访问空间{{.SpaceName}}，\n错误: {{.ApiErr}}"
    },
    {
       "id": "Unable to authenticate.",
-      "translation": "Unable to authenticate."
+      "translation": "无法验证."
    },
    {
       "id": "Use '{{.Name}}' to view or set your target org and space",
-      "translation": "Use '{{.Name}}' to view or set your target org and space"
+      "translation": "使用'{{.Name}}'来查看或设置你选择的组织和空间"
    },
    {
       "id": "Use a one-time password to login",
-      "translation": "Use a one-time password to login"
+      "translation": "使用一次性密码登录"
    },
    {
       "id": "Username",
-      "translation": "Username"
+      "translation": "用户名"
    },
    {
       "id": "Verify Password",
-      "translation": "Verify Password"
+      "translation": "校验密码"
    },
    {
       "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
-      "translation": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n"
+      "translation": "警告:\n   强烈建议不要在命令行参数里指定密码，\n   以防他人读取或通过命令历史记录查找到密码\n\n"
    },
    {
       "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
-      "translation": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"
+      "translation": "警告: 检测到不安全的HTTP APT终端，建议使用HTTP安全版 API终端\n"
    },
    {
       "id": "description",
-      "translation": "description"
+      "translation": "描述"
    },
    {
       "id": "incorrect usage",
-      "translation": "incorrect usage"
+      "translation": "不正确的使用"
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "名称"
    },
    {
       "id": "organization",
-      "translation": "organization"
+      "translation": "组织"
    },
    {
       "id": "space",
-      "translation": "space"
+      "translation": "空间"
    },
    {
       "id": "username",
-      "translation": "username"
+      "translation": "用户名"
    },
    {
       "id": "write default values to the config",
-      "translation": "write default values to the config"
+      "translation": "在配置文件中写入默认配置"
    }
 ]

@@ -1,66 +1,66 @@
 [
    {
       "id": "Error finding manifest",
-      "translation": "Error finding manifest"
+      "translation": "无法找到 manifest"
    },
    {
       "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
-      "translation": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'"
+      "translation": "预计申请成为键/值pairs\n错误列表发生在舱单附近:\n'{{.YmlSnippet}}'"
    },
    {
       "id": "Expected applications to be a list",
-      "translation": "Expected applications to be a list"
+      "translation": "应用程序集应该是一个列表"
    },
    {
       "id": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
-      "translation": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}."
+      "translation": "环境变量{{.PropertyName}}应是字符串，不是{{.PropertyType}}"
    },
    {
-      "id": "Expected {{.Name}} to be a set of key =\u003e value, but it was a {{.Type}}.",
-      "translation": "Expected {{.Name}} to be a set of key =\u003e value, but it was a {{.Type}}."
+      "id": "Expected  to be a set of key =\u003e value, but it was a .",
+      "translation": "预期令{{.Name}}为一组关键=\u003e 价值，但它是一{{.Type}}"
    },
    {
       "id": "Expected {{.PropertyName}} to be a boolean.",
-      "translation": "Expected {{.PropertyName}} to be a boolean."
+      "translation": "{{.PropertyName}} 应为布尔变量"
    },
    {
       "id": "Expected {{.PropertyName}} to be a list of strings.",
-      "translation": "Expected {{.PropertyName}} to be a list of strings."
+      "translation": "{{.PropertyName}} 应为字符串"
    },
    {
       "id": "Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}.",
-      "translation": "Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}."
+      "translation": "{{.PropertyName}} 应为数字，不是{{.PropertyType}}."
    },
    {
       "id": "Invalid manifest. Expected a map",
-      "translation": "Invalid manifest. Expected a map"
+      "translation": "无效的体现。预期地图"
    },
    {
       "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
-      "translation": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again."
+      "translation": "清单中有'{{.PropertyName}}'。不再支持此功能。请删除它，再试一次"
    },
    {
       "id": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
-      "translation": "Unexpected value for {{.PropertyName}} :\n{{.Error}}"
+      "translation": "非法{{.PropertyName}}值:\n错误: {{.Error}}"
    },
    {
       "id": "env var '{{.PropertyName}}' should not be null",
-      "translation": "env var '{{.PropertyName}}' should not be null"
+      "translation": "环境变量'{{.PropertyName}}'不能为空"
    },
    {
       "id": "invalid inherit path in manifest",
-      "translation": "invalid inherit path in manifest"
+      "translation": "清单中无效继承路径"
    },
    {
       "id": "{{.PropertyName}} must be a string or null value",
-      "translation": "{{.PropertyName}} must be a string or null value"
+      "translation": "{{.PropertyName}} 必须是一个字符串或空值"
    },
    {
       "id": "{{.PropertyName}} must be a string value",
-      "translation": "{{.PropertyName}} must be a string value"
+      "translation": "{{.PropertyName}} 必须是一个字符串值"
    },
    {
       "id": "{{.PropertyName}} should not be null",
-      "translation": "{{.PropertyName}} should not be null"
+      "translation": "{{.PropertyName}} 不能为空"
    }
 ]

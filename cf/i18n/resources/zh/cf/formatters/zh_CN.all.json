@@ -1,14 +1,14 @@
 [
    {
       "id": "Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB",
-      "translation": "Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB"
+      "translation": "字节数量，必须是以M，MB，G或GB为单位的正整数"
    },
    {
       "id": "allowed",
-      "translation": "allowed"
+      "translation": "允许"
    },
    {
       "id": "disallowed",
-      "translation": "disallowed"
+      "translation": "禁止"
    }
 ]
