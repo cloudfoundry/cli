@@ -18,6 +18,7 @@ type FakeSpaceRepository struct {
 	FindByNameInOrgName    string
 	FindByNameInOrgOrgGuid string
 	FindByNameInOrgSpace   models.Space
+	FindByNameInOrgError   error
 
 	SummarySpace models.Space
 
@@ -72,6 +73,7 @@ func (repo *FakeSpaceRepository) FindByNameInOrg(name, orgGuid string) (space mo
 	repo.FindByNameInOrgName = name
 	repo.FindByNameInOrgOrgGuid = orgGuid
 	space = repo.FindByNameInOrgSpace
+	apiErr = repo.FindByNameInOrgError
 	return
 }
 
