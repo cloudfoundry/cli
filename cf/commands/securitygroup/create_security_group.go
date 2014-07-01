@@ -2,6 +2,8 @@ package securitygroup
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"os"
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -31,9 +33,9 @@ func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-security-group",
 		Description: "create a security group",
-		Usage:       "CF_NAME create-security-group NAME [--rules RULES]",
+		Usage:       "CF_NAME create-security-group NAME [--json PATH_TO_JSON_FILE]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("rules", "JSON encoded array of rules"),
+			flag_helpers.NewStringFlag("json", "Path to a file containing rules in JSON format"),
 		},
 	}
 }
@@ -49,21 +51,17 @@ func (cmd CreateSecurityGroup) GetRequirements(requirementsFactory requirements.
 
 func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
-	rules := context.String("rules")
-
-	ruleMaps := []map[string]string{}
-	if rules != "" {
-		err := json.Unmarshal([]byte(rules), &ruleMaps)
-		if err != nil {
-			cmd.ui.Failed("Incorrect json format: %s", err.Error())
-		}
+	pathToJSONFile := context.String("json")
+	rules, err := cmd.parseJSON(pathToJSONFile)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 
 	cmd.ui.Say("Creating security group %s as %s",
 		terminal.EntityNameColor(name),
 		terminal.EntityNameColor(cmd.configRepo.Username()))
 
-	err := cmd.securityGroupRepo.Create(name, ruleMaps)
+	err = cmd.securityGroupRepo.Create(name, rules)
 
 	httpErr, ok := err.(errors.HttpError)
 	if ok && httpErr.ErrorCode() == errors.SECURITY_GROUP_EXISTS {
@@ -79,4 +77,28 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+}
+
+func (cmd CreateSecurityGroup) parseJSON(path string) ([]map[string]string, error) {
+	if path == "" {
+		return []map[string]string{}, nil
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	ruleMaps := []map[string]string{}
+	err = json.Unmarshal(bytes, &ruleMaps)
+	if err != nil {
+		cmd.ui.Failed("Incorrect json format: %s", err.Error())
+	}
+
+	return ruleMaps, nil
 }
