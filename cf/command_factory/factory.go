@@ -111,6 +111,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
 	factory.cmdsByName["create-security-group"] = securitygroup.NewCreateSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
+	factory.cmdsByName["update-security-group"] = securitygroup.NewUpdateSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["delete-security-group"] = securitygroup.NewDeleteSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["security-group"] = securitygroup.NewShowSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["security-groups"] = securitygroup.NewSecurityGroups(ui, config, repoLocator.GetSecurityGroupRepository())
