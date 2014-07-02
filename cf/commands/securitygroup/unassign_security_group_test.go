@@ -24,7 +24,7 @@ import (
 var _ = Describe("unassign-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroup
+		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
 		orgRepo             *fakes.FakeOrgRepository
 		spaceRepo           *fakes.FakeSpaceRepository
 		secBinder           *fakeBinder.FakeSecurityGroupSpaceBinder
@@ -35,7 +35,7 @@ var _ = Describe("unassign-security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
 		orgRepo = &fakes.FakeOrgRepository{}
 		spaceRepo = &fakes.FakeSpaceRepository{}
 		secBinder = &fakeBinder.FakeSecurityGroupSpaceBinder{}
@@ -77,13 +77,15 @@ var _ = Describe("unassign-security-group command", func() {
 
 		Context("when everything exists", func() {
 			BeforeEach(func() {
-				securityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "my-group-guid",
 						Rules: []map[string]string{},
 					},
 				}
+
+				securityGroupRepo.ReadReturns(securityGroup, nil)
 
 				orgRepo.Organizations = []models.Organization{
 					{OrganizationFields: models.OrganizationFields{Name: "my-org", Guid: "my-org-guid"}},
@@ -119,7 +121,7 @@ var _ = Describe("unassign-security-group command", func() {
 
 		Context("when one of the things does not exist", func() {
 			BeforeEach(func() {
-				securityGroupRepo.ReadReturns.Error = errors.New("I accidentally the")
+				securityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.New("I accidentally the"))
 			})
 
 			It("fails with an error", func() {

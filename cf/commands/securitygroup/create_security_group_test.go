@@ -21,7 +21,7 @@ import (
 var _ = Describe("create-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroup
+		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          configuration.ReadWriter
 	)
@@ -29,7 +29,7 @@ var _ = Describe("create-security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -58,7 +58,9 @@ var _ = Describe("create-security-group command", func() {
 
 		It("creates the security group", func() {
 			runCommand("my-group")
-			Expect(securityGroupRepo.CreateArgsForCall(0).Name).To(Equal("my-group"))
+
+			name, _ := securityGroupRepo.CreateArgsForCall(0)
+			Expect(name).To(Equal("my-group"))
 		})
 
 		It("displays a message describing what its going to do", func() {
@@ -91,7 +93,8 @@ var _ = Describe("create-security-group command", func() {
 				})
 
 				It("creates the security group with those rules, obviously", func() {
-					Expect(securityGroupRepo.CreateArgsForCall(0).Rules).To(Equal([]map[string]string{
+					_, rules := securityGroupRepo.CreateArgsForCall(0)
+					Expect(rules).To(Equal([]map[string]string{
 						{"protocol": "udp", "port": "8080-9090", "destination": "198.41.191.47/1"},
 					}))
 				})

@@ -19,7 +19,7 @@ import (
 var _ = Describe("list-security-groups command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		repo                *fakeSecurityGroup.FakeSecurityGroup
+		repo                *fakeSecurityGroup.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          configuration.ReadWriter
 	)
@@ -27,7 +27,7 @@ var _ = Describe("list-security-groups command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		repo = &fakeSecurityGroup.FakeSecurityGroup{}
+		repo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -62,7 +62,7 @@ var _ = Describe("list-security-groups command", func() {
 		})
 
 		It("handles api errors with an error message", func() {
-			repo.FindAllReturns.Error = errors.New("YO YO YO, ERROR YO")
+			repo.FindAllReturns([]models.SecurityGroup{}, errors.New("YO YO YO, ERROR YO"))
 
 			runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -72,7 +72,7 @@ var _ = Describe("list-security-groups command", func() {
 
 		Context("when there are no security groups", func() {
 			It("Should tell the user that there are no security groups", func() {
-				repo.FindAllReturns.SecurityGroups = []models.SecurityGroup{}
+				repo.FindAllReturns([]models.SecurityGroup{}, nil)
 
 				runCommand()
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"No security groups"}))
@@ -81,29 +81,35 @@ var _ = Describe("list-security-groups command", func() {
 
 		Context("when there is at least one security group", func() {
 			BeforeEach(func() {
-				securityGroup := models.SecurityGroup{
-					SecurityGroupFields: models.SecurityGroupFields{
-						Name:  "my-group",
-						Guid:  "group-guid",
-						Rules: nil,
-					},
-				}
+				securityGroup := models.SecurityGroup{}
+				securityGroup.Name = "my-group"
+				securityGroup.Guid = "group-guid"
 
-				repo.FindAllReturns.SecurityGroups = []models.SecurityGroup{securityGroup}
+				repo.FindAllReturns([]models.SecurityGroup{securityGroup}, nil)
 			})
 
 			Describe("Where there are spaces assigned", func() {
 				BeforeEach(func() {
-					repo.FindAllReturns.SecurityGroups[0].Spaces = []models.Space{
+					securityGroups := []models.SecurityGroup{
 						{
-							SpaceFields:  models.SpaceFields{Guid: "my-space-guid-1", Name: "space-1"},
-							Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-1"},
-						},
-						{
-							SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "space-2"},
-							Organization: models.OrganizationFields{Guid: "my-org-guid-2", Name: "org-2"},
+							SecurityGroupFields: models.SecurityGroupFields{
+								Name: "my-group",
+								Guid: "group-guid",
+							},
+							Spaces: []models.Space{
+								{
+									SpaceFields:  models.SpaceFields{Guid: "my-space-guid-1", Name: "space-1"},
+									Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-1"},
+								},
+								{
+									SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "space-2"},
+									Organization: models.OrganizationFields{Guid: "my-org-guid-2", Name: "org-2"},
+								},
+							},
 						},
 					}
+
+					repo.FindAllReturns(securityGroups, nil)
 				})
 
 				It("lists out the security group's: name, organization and space", func() {

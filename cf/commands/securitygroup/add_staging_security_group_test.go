@@ -23,7 +23,7 @@ var _ = Describe("add-staging-security-group command", func() {
 		ui                           *testterm.FakeUI
 		configRepo                   configuration.ReadWriter
 		requirementsFactory          *testreq.FakeReqFactory
-		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroup
+		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroupRepo
 		fakeStagingSecurityGroupRepo *fakeStaging.FakeStagingSecurityGroupsRepo
 	)
 
@@ -31,7 +31,7 @@ var _ = Describe("add-staging-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
 		fakeStagingSecurityGroupRepo = &fakeStaging.FakeStagingSecurityGroupsRepo{}
 	})
 
@@ -58,7 +58,7 @@ var _ = Describe("add-staging-security-group command", func() {
 			group := models.SecurityGroup{}
 			group.Guid = "just-pretend-this-is-a-guid"
 			group.Name = "a-security-group-name"
-			fakeSecurityGroupRepo.ReadReturns.SecurityGroup = group
+			fakeSecurityGroupRepo.ReadReturns(group, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -66,7 +66,7 @@ var _ = Describe("add-staging-security-group command", func() {
 		})
 
 		It("adds the group to the default staging group set", func() {
-			Expect(fakeSecurityGroupRepo.ReadCalledWith.Name).To(Equal("a-security-group-name"))
+			Expect(fakeSecurityGroupRepo.ReadArgsForCall(0)).To(Equal("a-security-group-name"))
 			Expect(fakeStagingSecurityGroupRepo.AddToStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
 		})
 
@@ -92,7 +92,7 @@ var _ = Describe("add-staging-security-group command", func() {
 
 		Context("when the security group with the given name cannot be found", func() {
 			BeforeEach(func() {
-				fakeSecurityGroupRepo.ReadReturns.Error = errors.New("Crème insufficiently brûlée'd")
+				fakeSecurityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.New("Crème insufficiently brûlée'd"))
 			})
 
 			It("fails and tells the user that the security group does not exist", func() {

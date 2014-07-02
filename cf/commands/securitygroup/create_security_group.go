@@ -1,10 +1,6 @@
 package securitygroup
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"os"
-
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -12,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/json"
 	"github.com/codegangsta/cli"
 )
 
@@ -32,7 +29,7 @@ func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, sec
 func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-security-group",
-		Description: "create a security group",
+		Description: "Create a security group",
 		Usage:       "CF_NAME create-security-group NAME [--json PATH_TO_JSON_FILE]",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("json", "Path to a file containing rules in JSON format"),
@@ -52,7 +49,7 @@ func (cmd CreateSecurityGroup) GetRequirements(requirementsFactory requirements.
 func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 	pathToJSONFile := context.String("json")
-	rules, err := cmd.parseJSON(pathToJSONFile)
+	rules, err := json.ParseJSON(pathToJSONFile)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -77,28 +74,4 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-}
-
-func (cmd CreateSecurityGroup) parseJSON(path string) ([]map[string]string, error) {
-	if path == "" {
-		return []map[string]string{}, nil
-	}
-
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-
-	bytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	ruleMaps := []map[string]string{}
-	err = json.Unmarshal(bytes, &ruleMaps)
-	if err != nil {
-		cmd.ui.Failed("Incorrect json format: %s", err.Error())
-	}
-
-	return ruleMaps, nil
 }
