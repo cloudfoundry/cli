@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+export PATH=$PATH:$HOME/gopath/bin
+export GOPATH=$(godep path):$(pwd):$GOPATH
+
+echo "go path is $GOPATH"
+ginkgo -r cf --randomizeAllSpecs --randomizeSuites --failOnPending --trace
