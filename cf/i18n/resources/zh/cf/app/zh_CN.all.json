@@ -21,7 +21,7 @@
    },
    {
       "id": "ORG ADMIN",
-      "translation": "组织管理"
+      "translation": "组织管理员"
    },
    {
       "id": "ORGS",
@@ -61,7 +61,7 @@
    },
    {
       "id": "Do not colorize output",
-      "translation": "禁止彩打输出"
+      "translation": "禁止彩色输出, 彩打"
    },
    {
       "id": "Print API request diagnostics to stdout",
@@ -105,7 +105,7 @@
    },
    {
       "id": "Max wait time for app instance startup, in minutes",
-      "translation": "应用实例启动的最大等待时间，以分钟为单位"
+      "translation": "应用实例启动的最长等待时间，以分钟为单位"
    },
    {
       "id": "Append API request diagnostics to a log file",
@@ -113,10 +113,10 @@
    },
    {
       "id": "Enable HTTP proxying for API requests",
-      "translation": "启用API请求的HTTP代理"
+      "translation": "为API请求启用HTTP代理"
    },
    {
       "id": "Max wait time for buildpack staging, in minutes",
-      "translation": "buildpack staging升级的最大等待时间，以分钟为单位"
+      "translation": "buildpack打包的最长等待时间，以分钟为单位"
    }
 ]

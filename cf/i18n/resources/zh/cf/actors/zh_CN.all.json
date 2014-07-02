@@ -5,7 +5,7 @@
    },
    {
       "id": "Binding {{.URL}} to {{.AppName}}...",
-      "translation": "绑定 {{.URL}} 和 {{.AppName}}..."
+      "translation": "绑定{{.URL}}到{{.AppName}}..."
    },
 
    {
