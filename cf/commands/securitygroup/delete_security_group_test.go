@@ -64,14 +64,42 @@ var _ = Describe("delete-security-group command", func() {
 				}
 			})
 
-			It("should delete the security group", func() {
-				runCommand("my-group")
-				Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
-				Expect(securityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
+			Context("delete a security group", func() {
+				It("when passed the -f flag", func() {
+					runCommand("-f", "my-group")
+					Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
+					Expect(securityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
+
+					Expect(ui.Prompts).To(BeEmpty())
+				})
+
+				It("should prompt user when -f flag is not present", func() {
+					ui.Inputs = []string{"y"}
+
+					runCommand("my-group")
+					Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
+					Expect(securityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
+
+					Expect(ui.Prompts).To(ContainSubstrings(
+						[]string{"Really delete the security group", "my-group"},
+					))
+				})
+
+				It("should not delete when user passes 'n' to prompt", func() {
+					ui.Inputs = []string{"n"}
+
+					runCommand("my-group")
+					Expect(securityGroupRepo.ReadCalledWith.Name).NotTo(Equal("my-group"))
+					Expect(securityGroupRepo.DeleteCalledWith.Guid).NotTo(Equal("group-guid"))
+
+					Expect(ui.Prompts).To(ContainSubstrings(
+						[]string{"Really delete the security group", "my-group"},
+					))
+				})
 			})
 
 			It("tells the user what it's about to do", func() {
-				runCommand("my-group")
+				runCommand("-f", "my-group")
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Deleting", "security group", "my-group", "my-user"},
 					[]string{"OK"},
@@ -85,7 +113,7 @@ var _ = Describe("delete-security-group command", func() {
 			})
 
 			It("fails and tells the user", func() {
-				runCommand("whoops")
+				runCommand("-f", "whoops")
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
@@ -97,7 +125,7 @@ var _ = Describe("delete-security-group command", func() {
 			})
 
 			It("fails and tells the user", func() {
-				runCommand("whoop")
+				runCommand("-f", "whoop")
 
 				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"whoop", "does not exist"}))
 			})
@@ -105,7 +133,7 @@ var _ = Describe("delete-security-group command", func() {
 
 		It("fails and warns the user if deleting fails", func() {
 			securityGroupRepo.DeleteReturns.Error = errors.New("raspberry")
-			runCommand("whoops")
+			runCommand("-f", "whoops")
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 		})

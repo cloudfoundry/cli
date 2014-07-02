@@ -28,7 +28,10 @@ func (cmd DeleteSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-security-group",
 		Description: "Deletes a security group",
-		Usage:       "CF_NAME delete-security-group NAME",
+		Usage:       "CF_NAME delete-security-group NAME [-f]",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+		},
 	}
 }
 
@@ -46,6 +49,13 @@ func (cmd DeleteSecurityGroup) Run(context *cli.Context) {
 	cmd.ui.Say("Deleting security group %s as %s",
 		terminal.EntityNameColor(name),
 		terminal.EntityNameColor(cmd.configRepo.Username()))
+
+	if !context.Bool("f") {
+		response := cmd.ui.ConfirmDelete("security group", name)
+		if !response {
+			return
+		}
+	}
 
 	group, err := cmd.securityGroupRepo.Read(name)
 	switch err.(type) {
