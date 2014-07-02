@@ -10,20 +10,20 @@ import (
 )
 
 type FakeSecurityGroupRepo struct {
-	CreateStub        func(name string, rules []map[string]string) error
+	CreateStub        func(name string, rules []map[string]interface{}) error
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
 		arg1 string
-		arg2 []map[string]string
+		arg2 []map[string]interface{}
 	}
 	createReturns struct {
 		result1 error
 	}
-	UpdateStub        func(guid string, rules []map[string]string) error
+	UpdateStub        func(guid string, rules []map[string]interface{}) error
 	updateMutex       sync.RWMutex
 	updateArgsForCall []struct {
 		arg1 string
-		arg2 []map[string]string
+		arg2 []map[string]interface{}
 	}
 	updateReturns struct {
 		result1 error
@@ -54,12 +54,12 @@ type FakeSecurityGroupRepo struct {
 	}
 }
 
-func (fake *FakeSecurityGroupRepo) Create(arg1 string, arg2 []map[string]string) error {
+func (fake *FakeSecurityGroupRepo) Create(arg1 string, arg2 []map[string]interface{}) error {
 	fake.createMutex.Lock()
 	defer fake.createMutex.Unlock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		arg1 string
-		arg2 []map[string]string
+		arg2 []map[string]interface{}
 	}{arg1, arg2})
 	if fake.CreateStub != nil {
 		return fake.CreateStub(arg1, arg2)
@@ -74,7 +74,7 @@ func (fake *FakeSecurityGroupRepo) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeSecurityGroupRepo) CreateArgsForCall(i int) (string, []map[string]string) {
+func (fake *FakeSecurityGroupRepo) CreateArgsForCall(i int) (string, []map[string]interface{}) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
 	return fake.createArgsForCall[i].arg1, fake.createArgsForCall[i].arg2
@@ -86,12 +86,12 @@ func (fake *FakeSecurityGroupRepo) CreateReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeSecurityGroupRepo) Update(arg1 string, arg2 []map[string]string) error {
+func (fake *FakeSecurityGroupRepo) Update(arg1 string, arg2 []map[string]interface{}) error {
 	fake.updateMutex.Lock()
 	defer fake.updateMutex.Unlock()
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		arg1 string
-		arg2 []map[string]string
+		arg2 []map[string]interface{}
 	}{arg1, arg2})
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(arg1, arg2)
@@ -106,7 +106,7 @@ func (fake *FakeSecurityGroupRepo) UpdateCallCount() int {
 	return len(fake.updateArgsForCall)
 }
 
-func (fake *FakeSecurityGroupRepo) UpdateArgsForCall(i int) (string, []map[string]string) {
+func (fake *FakeSecurityGroupRepo) UpdateArgsForCall(i int) (string, []map[string]interface{}) {
 	fake.updateMutex.RLock()
 	defer fake.updateMutex.RUnlock()
 	return fake.updateArgsForCall[i].arg1, fake.updateArgsForCall[i].arg2

@@ -81,7 +81,7 @@ var _ = Describe("unassign-security-group command", func() {
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "my-group-guid",
-						Rules: []map[string]string{},
+						Rules: []map[string]interface{}{},
 					},
 				}
 

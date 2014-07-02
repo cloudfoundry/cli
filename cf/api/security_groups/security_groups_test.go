@@ -59,7 +59,7 @@ var _ = Describe("app security group api", func() {
 
 			err := repo.Create(
 				"mygroup",
-				[]map[string]string{{"my-house": "my-rules"}},
+				[]map[string]interface{}{{"my-house": "my-rules"}},
 			)
 
 			Expect(err).NotTo(HaveOccurred())
@@ -117,7 +117,7 @@ var _ = Describe("app security group api", func() {
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name:  "the-name",
 					Guid:  "the-group-guid",
-					Rules: []map[string]string{{"key": "value"}},
+					Rules: []map[string]interface{}{{"key": "value"}},
 				},
 				Spaces: []models.Space{
 					{
@@ -190,7 +190,7 @@ var _ = Describe("app security group api", func() {
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name:  "name-71",
 					Guid:  "cd186158-b356-474d-9861-724f34f48502",
-					Rules: []map[string]string{{"protocol": "udp"}},
+					Rules: []map[string]interface{}{{"protocol": "udp"}},
 				},
 				Spaces: []models.Space{},
 			}))
@@ -198,7 +198,7 @@ var _ = Describe("app security group api", func() {
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name:  "name-72",
 					Guid:  "d3374b62-7eac-4823-afbd-460d2bf44c67",
-					Rules: []map[string]string{{"destination": "198.41.191.47/1"}},
+					Rules: []map[string]interface{}{{"destination": "198.41.191.47/1"}},
 				},
 				Spaces: []models.Space{
 					{

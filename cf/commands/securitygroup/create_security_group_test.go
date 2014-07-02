@@ -94,7 +94,7 @@ var _ = Describe("create-security-group command", func() {
 
 				It("creates the security group with those rules, obviously", func() {
 					_, rules := securityGroupRepo.CreateArgsForCall(0)
-					Expect(rules).To(Equal([]map[string]string{
+					Expect(rules).To(Equal([]map[string]interface{}{
 						{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
 					}))
 				})

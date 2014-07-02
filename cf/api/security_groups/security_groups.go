@@ -12,8 +12,8 @@ import (
 )
 
 type SecurityGroupRepo interface {
-	Create(name string, rules []map[string]string) error
-	Update(guid string, rules []map[string]string) error
+	Create(name string, rules []map[string]interface{}) error
+	Update(guid string, rules []map[string]interface{}) error
 	Read(string) (models.SecurityGroup, error)
 	Delete(string) error
 	FindAll() ([]models.SecurityGroup, error)
@@ -31,7 +31,7 @@ func NewSecurityGroupRepo(config configuration.Reader, gateway net.Gateway) Secu
 	}
 }
 
-func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[string]string) error {
+func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[string]interface{}) error {
 	path := fmt.Sprintf("%s/v2/security_groups", repo.config.ApiEndpoint())
 	params := models.SecurityGroupParams{
 		Name:  name,
@@ -69,7 +69,7 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 	return group, err
 }
 
-func (repo cloudControllerSecurityGroupRepo) Update(guid string, rules []map[string]string) error {
+func (repo cloudControllerSecurityGroupRepo) Update(guid string, rules []map[string]interface{}) error {
 	url := fmt.Sprintf("%s/v2/security_groups/%s", repo.config.ApiEndpoint(), guid)
 	return repo.gateway.UpdateResourceFromStruct(url, models.SecurityGroupParams{Rules: rules})
 }
