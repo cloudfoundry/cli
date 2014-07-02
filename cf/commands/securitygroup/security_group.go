@@ -30,7 +30,7 @@ func (cmd ShowSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "security-group",
 		Description: "Show a single security group",
-		Usage:       "CF_NAME security-group NAME",
+		Usage:       "CF_NAME security-group SECURITY_GROUP",
 	}
 }
 

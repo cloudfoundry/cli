@@ -32,7 +32,7 @@ func (cmd *removeFromStagingGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "remove-staging-security-group",
 		Description: "Remove a security group from the set of default security groups for staging applications",
-		Usage:       "CF_NAME remove-staging-security-group NAME",
+		Usage:       "CF_NAME remove-staging-security-group SECURITY_GROUP",
 	}
 }
 

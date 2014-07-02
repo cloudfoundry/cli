@@ -35,7 +35,7 @@ func (cmd UnassignSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unassign-security-group",
 		Description: "Unassigns a security group from a given space",
-		Usage:       "CF_NAME unassign-security-group NAME ORG SPACE", //TODO: look up how other commands call these
+		Usage:       "CF_NAME unassign-security-group SECURITY_GROUP ORG SPACE",
 	}
 }
 
