@@ -66,7 +66,7 @@ var _ = Describe("factory", func() {
 				}
 			}
 
-			Expect(matchingCount).To(Equal(1), "this command is not tested: "+info.Name())
+			Expect(matchingCount).To(Equal(1), "this file has no corresponding command: "+info.Name())
 			return nil
 		})
 

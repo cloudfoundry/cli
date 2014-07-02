@@ -7,6 +7,7 @@ import (
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -18,7 +19,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("create-security-group command", func() {
+var _ = Describe("update-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
@@ -34,7 +35,7 @@ var _ = Describe("create-security-group command", func() {
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewCreateSecurityGroup(ui, configRepo, securityGroupRepo)
+		cmd := NewUpdateSecurityGroup(ui, configRepo, securityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -54,19 +55,25 @@ var _ = Describe("create-security-group command", func() {
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			securityGroup := models.SecurityGroup{
+				SecurityGroupFields: models.SecurityGroupFields{
+					Name: "my-group-name",
+					Guid: "my-group-guid",
+				},
+			}
+			securityGroupRepo.ReadReturns(securityGroup, nil)
 		})
 
-		It("creates the security group", func() {
+		It("updates the security group", func() {
 			runCommand("my-group")
-
-			name, _ := securityGroupRepo.CreateArgsForCall(0)
-			Expect(name).To(Equal("my-group"))
+			arg1, _ := securityGroupRepo.UpdateArgsForCall(0)
+			Expect(arg1).To(Equal("my-group-guid"))
 		})
 
 		It("displays a message describing what its going to do", func() {
 			runCommand("my-group")
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating security group", "my-group", "my-user"},
+				[]string{"Updating security group", "my-group", "my-user"},
 				[]string{"OK"},
 			))
 		})
@@ -89,14 +96,17 @@ var _ = Describe("create-security-group command", func() {
 
 			Context("when the file specified has valid json", func() {
 				BeforeEach(func() {
-					tempFile.Write([]byte(`[{"protocol":"udp","ports":"8080-9090","destination":"198.41.191.47/1"}]`))
+					tempFile.Write([]byte(`[{"protocol":"udp","port":"8080-9090","destination":"198.41.191.47/1"}]`))
 				})
 
-				It("creates the security group with those rules, obviously", func() {
-					_, rules := securityGroupRepo.CreateArgsForCall(0)
-					Expect(rules).To(Equal([]map[string]string{
-						{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
-					}))
+				It("updates the security group with those rules, obviously", func() {
+					jsonData := []map[string]string{
+						{"protocol": "udp", "port": "8080-9090", "destination": "198.41.191.47/1"},
+					}
+
+					_, jsonArg := securityGroupRepo.UpdateArgsForCall(0)
+
+					Expect(jsonArg).To(Equal(jsonData))
 				})
 			})
 
@@ -116,23 +126,13 @@ var _ = Describe("create-security-group command", func() {
 		Context("when the API returns an error", func() {
 			Context("some sort of awful terrible error that we were not prescient enough to anticipate", func() {
 				It("fails loudly", func() {
-					securityGroupRepo.CreateReturns(errors.New("Wops I failed"))
+					securityGroupRepo.UpdateReturns(errors.New("Wops I failed"))
 					runCommand("my-group")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Creating security group", "my-group"},
+						[]string{"Updating security group", "my-group"},
 						[]string{"FAILED"},
 					))
-				})
-			})
-
-			Context("when the group already exists", func() {
-				It("warns the user when group already exists", func() {
-					securityGroupRepo.CreateReturns(errors.NewHttpError(400, "300005", "The security group is taken: my-group"))
-					runCommand("my-group")
-
-					Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
-					Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
 				})
 			})
 		})

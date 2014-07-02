@@ -9,7 +9,7 @@ type SecurityGroupFields struct {
 
 // represents the JSON that we send up to CC when the user creates / updates a record
 type SecurityGroupParams struct {
-	Name  string              `json:"name"`
+	Name  string              `json:"name,omitempty"`
 	Guid  string              `json:"guid,omitempty"`
 	Rules []map[string]string `json:"rules"`
 }
