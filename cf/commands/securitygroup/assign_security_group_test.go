@@ -143,14 +143,21 @@ var _ = Describe("assign-security-group command", func() {
 				fakeSecurityGroupRepo.ReadReturns.SecurityGroup = securityGroup
 			})
 
-			It("assigns the security group to the space", func() {
+			JustBeforeEach(func() {
 				runCommand("security-group", "org-name", "space-name")
+			})
 
-				Expect(fakeSpaceBinder.BindSpaceCallCount()).To(Equal(1))
-
+			It("assigns the security group to the space", func() {
 				secGroupGuid, spaceGuid := fakeSpaceBinder.BindSpaceArgsForCall(0)
 				Expect(secGroupGuid).To(Equal("security-group-guid"))
 				Expect(spaceGuid).To(Equal("space-guid"))
+			})
+
+			It("describes what it is doing for the user's benefit", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Assigning", "security-group", "space-name", "org-name", "my-user"},
+					[]string{"OK"},
+				))
 			})
 		})
 	})
