@@ -41,7 +41,7 @@ func NewAssignSecurityGroup(
 func (cmd AssignSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "assign-security-group",
-		Description: "Assign a security group to one or more spaces in one or more orgs",
+		Description: "Assign a security group to a space",
 		Usage:       "CF_NAME assign-security-group SECURITY_GROUP ORG SPACE",
 	}
 }

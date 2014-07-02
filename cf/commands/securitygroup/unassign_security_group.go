@@ -34,7 +34,7 @@ func NewUnassignSecurityGroup(ui terminal.UI, configRepo configuration.Reader, s
 func (cmd UnassignSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unassign-security-group",
-		Description: "Unassigns a security group from a given space",
+		Description: "Unassign a security group from a space",
 		Usage:       "CF_NAME unassign-security-group SECURITY_GROUP ORG SPACE",
 	}
 }
