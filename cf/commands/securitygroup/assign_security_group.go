@@ -42,7 +42,7 @@ func (cmd AssignSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "assign-security-group",
 		Description: "Assign a security group to one or more spaces in one or more orgs",
-		Usage:       "CF_NAME assign-security-group", // TODO: fix this
+		Usage:       "CF_NAME assign-security-group SECURITY_GROUP ORG SPACE",
 	}
 }
 
@@ -57,20 +57,23 @@ func (cmd AssignSecurityGroup) GetRequirements(requirementsFactory requirements.
 
 func (cmd AssignSecurityGroup) Run(context *cli.Context) {
 	securityGroupName := context.Args()[0]
+	orgName := context.Args()[1]
+	spaceName := context.Args()[2]
+
+	cmd.ui.Say("Assigning security group %s to space %s in org %s as %s...", securityGroupName, orgName, spaceName, cmd.configRepo.Username())
+
 	securityGroup, err := cmd.securityGroupRepo.Read(securityGroupName)
 
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	orgName := context.Args()[1]
 	org, err := cmd.orgRepo.FindByName(orgName)
 
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	spaceName := context.Args()[2]
 	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
 
 	if err != nil {
@@ -81,4 +84,6 @@ func (cmd AssignSecurityGroup) Run(context *cli.Context) {
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
+
+	cmd.ui.Ok()
 }
