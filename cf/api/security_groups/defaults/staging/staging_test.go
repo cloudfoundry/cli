@@ -89,14 +89,14 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 				{
 					Name: "name-71",
 					Guid: "cd186158-b356-474d-9861-724f34f48502",
-					Rules: []map[string]string{{
+					Rules: []map[string]interface{}{{
 						"protocol": "udp",
 					}},
 				},
 				{
 					Name: "name-72",
 					Guid: "d3374b62-7eac-4823-afbd-460d2bf44c67",
-					Rules: []map[string]string{{
+					Rules: []map[string]interface{}{{
 						"destination": "198.41.191.47/1",
 					}},
 				},

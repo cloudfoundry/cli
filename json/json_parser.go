@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 )
 
-func ParseJSON(path string) ([]map[string]string, error) {
+func ParseJSON(path string) ([]map[string]interface{}, error) {
 	if path == "" {
 		return nil, nil
 	}
@@ -23,7 +23,7 @@ func ParseJSON(path string) ([]map[string]string, error) {
 		return nil, err
 	}
 
-	stringMaps := []map[string]string{}
+	stringMaps := []map[string]interface{}{}
 	err = json.Unmarshal(bytes, &stringMaps)
 	if err != nil {
 		return nil, errors.NewWithFmt("Incorrect json format: %s", err.Error())

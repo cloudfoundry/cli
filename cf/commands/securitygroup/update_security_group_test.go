@@ -100,7 +100,7 @@ var _ = Describe("update-security-group command", func() {
 				})
 
 				It("updates the security group with those rules, obviously", func() {
-					jsonData := []map[string]string{
+					jsonData := []map[string]interface{}{
 						{"protocol": "udp", "port": "8080-9090", "destination": "198.41.191.47/1"},
 					}
 

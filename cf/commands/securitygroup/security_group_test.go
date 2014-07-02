@@ -56,7 +56,7 @@ var _ = Describe("security-group command", func() {
 
 		Context("when the group with the given name exists", func() {
 			BeforeEach(func() {
-				rulesMap := []map[string]string{{"just-pretend": "that-this-is-correct"}}
+				rulesMap := []map[string]interface{}{{"just-pretend": "that-this-is-correct"}}
 				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
@@ -105,7 +105,7 @@ var _ = Describe("security-group command", func() {
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "group-guid",
-						Rules: []map[string]string{},
+						Rules: []map[string]interface{}{},
 					},
 					Spaces: []models.Space{},
 				}
