@@ -28,7 +28,7 @@ func (cmd DeleteSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-security-group",
 		Description: "Deletes a security group",
-		Usage:       "CF_NAME delete-security-group NAME [-f]",
+		Usage:       "CF_NAME delete-security-group SECURITY_GROUP [-f]",
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 		},

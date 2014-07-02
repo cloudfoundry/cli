@@ -31,7 +31,7 @@ func (cmd *addToRunningGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "add-running-security-group",
 		Description: "Add a security group to the list of security groups to be used for running applications",
-		Usage:       "CF_NAME add-running-security-group NAME",
+		Usage:       "CF_NAME add-running-security-group SECURITY_GROUP",
 	}
 }
 

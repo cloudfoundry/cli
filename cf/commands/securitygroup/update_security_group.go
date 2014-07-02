@@ -29,7 +29,7 @@ func (cmd UpdateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-security-group",
 		Description: "Update a security group",
-		Usage:       "CF_NAME updaate-security-group NAME [--json PATH_TO_JSON_FILE]",
+		Usage:       "CF_NAME update-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("json", "Path to a file containing rules in JSON format"),
 		},

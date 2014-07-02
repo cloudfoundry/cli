@@ -32,7 +32,7 @@ func (cmd *removeFromRunningGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "remove-running-security-group",
 		Description: "Remove a security group from the set of security groups for running applications",
-		Usage:       "CF_NAME remove-running-security-group NAME",
+		Usage:       "CF_NAME remove-running-security-group SECURITY_GROUP",
 	}
 }
 
