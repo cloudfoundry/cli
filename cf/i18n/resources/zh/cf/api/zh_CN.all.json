@@ -29,7 +29,7 @@
    },
    {
       "id": "Error creating upload",
-      "translation": "生成上传文件错误"
+      "translation": "创建上传任务错误"
    },
    {
       "id": "Error marshaling JSON",
@@ -41,7 +41,7 @@
    },
    {
       "id": "Error parsing headers",
-      "translation": "头文件解析文件"
+      "translation": "头域解析错误"
    },
    {
       "id": "Error reading response",
@@ -69,11 +69,11 @@
    },
    {
       "id": "Loggregator endpoint missing from config file",
-      "translation": "配置文件中没有loggregator API终端信息"
+      "translation": "配置文件中没有loggregator地址信息"
    },
    {
       "id": "UAA endpoint missing from config file",
-      "translation": "配置文件中没有UAA API终端信息"
+      "translation": "配置文件中没有UAA API地址信息"
    },
    {
       "id": "Zip archive does not contain a buildpack",

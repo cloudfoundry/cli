@@ -113,7 +113,7 @@
    },
    {
       "id": "Enable HTTP proxying for API requests",
-      "translation": "启用API请求的HTTP代理"
+      "translation": "启用HTTP代理用于API请求"
    },
    {
       "id": "Max wait time for buildpack staging, in minutes",
