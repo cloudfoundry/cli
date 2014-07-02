@@ -57,7 +57,7 @@
    },
    {
       "id": "Failed to create json for resource_match request",
-      "translation": "无法创建resource_match请求的JSON文件"
+      "translation": "无法创建JSON格式的resource_match请求"
    },
    {
       "id": "Failed to marshal JSON",
