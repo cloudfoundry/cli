@@ -148,6 +148,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 		repoLocator.GetOrganizationRepository(),
 		repoLocator.GetSecurityGroupSpaceBinder(),
 	)
+	factory.cmdsByName["unassign-security-group"] = securitygroup.NewUnassignSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository(), repoLocator.GetSecurityGroupSpaceBinder())
 
 	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["create-route"] = createRoute
