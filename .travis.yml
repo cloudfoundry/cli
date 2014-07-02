@@ -1,11 +1,13 @@
 language: go
 go:
   - 1.2
-before_install:
-  - go get -u code.google.com/p/go.tools/cmd/vet
-  - go get -u github.com/tools/godep
-install: PATH=$PATH:$HOME/gopath/bin ./bin/build
-script:  PATH=$PATH:$HOME/gopath/bin ./bin/test
+install:
+  - go get -v code.google.com/p/go.tools/cmd/vet
+  - go get -v github.com/tools/godep
+  - go get -v github.com/onsi/ginkgo/ginkgo
+  - PATH=$PATH:$HOME/gopath/bin bin/generate-language-resources
+  - go get -v -t ./...
+script:  bin/travis
 branches:
   only:
   - master
