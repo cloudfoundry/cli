@@ -19,7 +19,7 @@ import (
 var _ = Describe("delete-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroup
+		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          configuration.ReadWriter
 	)
@@ -27,7 +27,7 @@ var _ = Describe("delete-security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -56,19 +56,19 @@ var _ = Describe("delete-security-group command", func() {
 
 		Context("when the group with the given name exists", func() {
 			BeforeEach(func() {
-				securityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+				securityGroupRepo.ReadReturns(models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name: "my-group",
 						Guid: "group-guid",
 					},
-				}
+				}, nil)
 			})
 
 			Context("delete a security group", func() {
 				It("when passed the -f flag", func() {
 					runCommand("-f", "my-group")
-					Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
-					Expect(securityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
+					Expect(securityGroupRepo.ReadArgsForCall(0)).To(Equal("my-group"))
+					Expect(securityGroupRepo.DeleteArgsForCall(0)).To(Equal("group-guid"))
 
 					Expect(ui.Prompts).To(BeEmpty())
 				})
@@ -77,8 +77,8 @@ var _ = Describe("delete-security-group command", func() {
 					ui.Inputs = []string{"y"}
 
 					runCommand("my-group")
-					Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
-					Expect(securityGroupRepo.DeleteCalledWith.Guid).To(Equal("group-guid"))
+					Expect(securityGroupRepo.ReadArgsForCall(0)).To(Equal("my-group"))
+					Expect(securityGroupRepo.DeleteArgsForCall(0)).To(Equal("group-guid"))
 
 					Expect(ui.Prompts).To(ContainSubstrings(
 						[]string{"Really delete the security group", "my-group"},
@@ -89,8 +89,8 @@ var _ = Describe("delete-security-group command", func() {
 					ui.Inputs = []string{"n"}
 
 					runCommand("my-group")
-					Expect(securityGroupRepo.ReadCalledWith.Name).NotTo(Equal("my-group"))
-					Expect(securityGroupRepo.DeleteCalledWith.Guid).NotTo(Equal("group-guid"))
+					Expect(securityGroupRepo.ReadCallCount()).To(Equal(0))
+					Expect(securityGroupRepo.DeleteCallCount()).To(Equal(0))
 
 					Expect(ui.Prompts).To(ContainSubstrings(
 						[]string{"Really delete the security group", "my-group"},
@@ -109,7 +109,7 @@ var _ = Describe("delete-security-group command", func() {
 
 		Context("when finding the group returns an error", func() {
 			BeforeEach(func() {
-				securityGroupRepo.ReadReturns.Error = errors.New("pbbbbbbbbbbt")
+				securityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.New("pbbbbbbbbbbt"))
 			})
 
 			It("fails and tells the user", func() {
@@ -121,7 +121,7 @@ var _ = Describe("delete-security-group command", func() {
 
 		Context("when a group with that name does not exist", func() {
 			BeforeEach(func() {
-				securityGroupRepo.ReadReturns.Error = errors.NewModelNotFoundError("Security group", "uh uh uh -- you didn't sahy the magick word")
+				securityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.NewModelNotFoundError("Security group", "uh uh uh -- you didn't sahy the magick word"))
 			})
 
 			It("fails and tells the user", func() {
@@ -132,7 +132,7 @@ var _ = Describe("delete-security-group command", func() {
 		})
 
 		It("fails and warns the user if deleting fails", func() {
-			securityGroupRepo.DeleteReturns.Error = errors.New("raspberry")
+			securityGroupRepo.DeleteReturns(errors.New("raspberry"))
 			runCommand("-f", "whoops")
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))

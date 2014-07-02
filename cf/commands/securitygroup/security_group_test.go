@@ -19,7 +19,7 @@ import (
 var _ = Describe("security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroup
+		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          configuration.ReadWriter
 	)
@@ -27,7 +27,7 @@ var _ = Describe("security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -57,8 +57,7 @@ var _ = Describe("security-group command", func() {
 		Context("when the group with the given name exists", func() {
 			BeforeEach(func() {
 				rulesMap := []map[string]string{{"just-pretend": "that-this-is-correct"}}
-
-				securityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "group-guid",
@@ -75,11 +74,13 @@ var _ = Describe("security-group command", func() {
 						},
 					},
 				}
+
+				securityGroupRepo.ReadReturns(securityGroup, nil)
 			})
 
 			It("should fetch the security group from its repo", func() {
 				runCommand("my-group")
-				Expect(securityGroupRepo.ReadCalledWith.Name).To(Equal("my-group"))
+				Expect(securityGroupRepo.ReadArgsForCall(0)).To(Equal("my-group"))
 			})
 
 			It("tells the user what it's about to do and then shows the group", func() {
@@ -100,7 +101,7 @@ var _ = Describe("security-group command", func() {
 			})
 
 			It("tells the user if no spaces are assigned", func() {
-				securityGroupRepo.ReadReturns.SecurityGroup = models.SecurityGroup{
+				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
 						Guid:  "group-guid",
@@ -108,6 +109,8 @@ var _ = Describe("security-group command", func() {
 					},
 					Spaces: []models.Space{},
 				}
+
+				securityGroupRepo.ReadReturns(securityGroup, nil)
 
 				runCommand("my-group")
 
@@ -118,7 +121,7 @@ var _ = Describe("security-group command", func() {
 		})
 
 		It("fails and warns the user if a group with that name could not be found", func() {
-			securityGroupRepo.ReadReturns.Error = errors.New("half-past-tea-time")
+			securityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.New("half-past-tea-time"))
 			runCommand("im-late!")
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))

@@ -23,7 +23,7 @@ var _ = Describe("add-running-security-group command", func() {
 		ui                           *testterm.FakeUI
 		configRepo                   configuration.ReadWriter
 		requirementsFactory          *testreq.FakeReqFactory
-		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroup
+		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroupRepo
 		fakeRunningSecurityGroupRepo *fakeRunning.FakeRunningSecurityGroupsRepo
 	)
 
@@ -31,7 +31,7 @@ var _ = Describe("add-running-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
 		fakeRunningSecurityGroupRepo = &fakeRunning.FakeRunningSecurityGroupsRepo{}
 	})
 
@@ -58,7 +58,7 @@ var _ = Describe("add-running-security-group command", func() {
 			group := models.SecurityGroup{}
 			group.Guid = "being-a-guid"
 			group.Name = "security-group-name"
-			fakeSecurityGroupRepo.ReadReturns.SecurityGroup = group
+			fakeSecurityGroupRepo.ReadReturns(group, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -73,7 +73,7 @@ var _ = Describe("add-running-security-group command", func() {
 		})
 
 		It("adds the group to the running group set", func() {
-			Expect(fakeSecurityGroupRepo.ReadCalledWith.Name).To(Equal("security-group-name"))
+			Expect(fakeSecurityGroupRepo.ReadArgsForCall(0)).To(Equal("security-group-name"))
 			Expect(fakeRunningSecurityGroupRepo.AddToRunningSetArgsForCall(0)).To(Equal("being-a-guid"))
 		})
 
@@ -92,7 +92,7 @@ var _ = Describe("add-running-security-group command", func() {
 
 		Context("when the security group with the given name cannot be found", func() {
 			BeforeEach(func() {
-				fakeSecurityGroupRepo.ReadReturns.Error = errors.New("Crème insufficiently brûlée'd")
+				fakeSecurityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.New("Crème insufficiently brûlée'd"))
 			})
 
 			It("fails and tells the user that the security group does not exist", func() {

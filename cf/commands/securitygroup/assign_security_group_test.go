@@ -23,7 +23,7 @@ var _ = Describe("assign-security-group command", func() {
 		ui                    *testterm.FakeUI
 		cmd                   AssignSecurityGroup
 		configRepo            configuration.ReadWriter
-		fakeSecurityGroupRepo *testapi.FakeSecurityGroup
+		fakeSecurityGroupRepo *testapi.FakeSecurityGroupRepo
 		requirementsFactory   *testreq.FakeReqFactory
 		fakeSpaceRepo         *fakes.FakeSpaceRepository
 		fakeOrgRepo           *fakes.FakeOrgRepository
@@ -35,7 +35,7 @@ var _ = Describe("assign-security-group command", func() {
 		fakeOrgRepo = &fakes.FakeOrgRepository{}
 		fakeSpaceRepo = &fakes.FakeSpaceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &testapi.FakeSecurityGroup{}
+		fakeSecurityGroupRepo = &testapi.FakeSecurityGroupRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		fakeSpaceBinder = &zoidberg.FakeSecurityGroupSpaceBinder{}
 		cmd = NewAssignSecurityGroup(ui, configRepo, fakeSecurityGroupRepo, fakeSpaceRepo, fakeOrgRepo, fakeSpaceBinder)
@@ -74,13 +74,13 @@ var _ = Describe("assign-security-group command", func() {
 
 		Context("when a security group with that name does not exist", func() {
 			BeforeEach(func() {
-				fakeSecurityGroupRepo.ReadReturns.Error = errors.NewModelNotFoundError("security group", "my-nonexistent-security-group")
+				fakeSecurityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.NewModelNotFoundError("security group", "my-nonexistent-security-group"))
 			})
 
 			It("fails and tells the user", func() {
 				runCommand("my-nonexistent-security-group", "my-org", "my-space")
 
-				Expect(fakeSecurityGroupRepo.ReadCalledWith.Name).To(Equal("my-nonexistent-security-group"))
+				Expect(fakeSecurityGroupRepo.ReadArgsForCall(0)).To(Equal("my-nonexistent-security-group"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"security group", "my-nonexistent-security-group", "not found"},
@@ -140,7 +140,7 @@ var _ = Describe("assign-security-group command", func() {
 				securityGroup := models.SecurityGroup{}
 				securityGroup.Name = "security-group"
 				securityGroup.Guid = "security-group-guid"
-				fakeSecurityGroupRepo.ReadReturns.SecurityGroup = securityGroup
+				fakeSecurityGroupRepo.ReadReturns(securityGroup, nil)
 			})
 
 			JustBeforeEach(func() {

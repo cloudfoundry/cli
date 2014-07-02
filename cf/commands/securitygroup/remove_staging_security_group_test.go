@@ -22,7 +22,7 @@ var _ = Describe("remove-staging-security-group command", func() {
 		ui                            *testterm.FakeUI
 		configRepo                    configuration.ReadWriter
 		requirementsFactory           *testreq.FakeReqFactory
-		fakeSecurityGroupRepo         *fakeSecurityGroup.FakeSecurityGroup
+		fakeSecurityGroupRepo         *fakeSecurityGroup.FakeSecurityGroupRepo
 		fakeStagingSecurityGroupsRepo *fakeStagingDefaults.FakeStagingSecurityGroupsRepo
 	)
 
@@ -30,7 +30,7 @@ var _ = Describe("remove-staging-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroup{}
+		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
 		fakeStagingSecurityGroupsRepo = &fakeStagingDefaults.FakeStagingSecurityGroupsRepo{}
 	})
 
@@ -61,7 +61,7 @@ var _ = Describe("remove-staging-security-group command", func() {
 				group := models.SecurityGroup{}
 				group.Guid = "just-pretend-this-is-a-guid"
 				group.Name = "a-security-group-name"
-				fakeSecurityGroupRepo.ReadReturns.SecurityGroup = group
+				fakeSecurityGroupRepo.ReadReturns(group, nil)
 			})
 
 			JustBeforeEach(func() {
@@ -74,14 +74,14 @@ var _ = Describe("remove-staging-security-group command", func() {
 					[]string{"OK"},
 				))
 
-				Expect(fakeSecurityGroupRepo.ReadCalledWith.Name).To(Equal("a-security-group-name"))
+				Expect(fakeSecurityGroupRepo.ReadArgsForCall(0)).To(Equal("a-security-group-name"))
 				Expect(fakeStagingSecurityGroupsRepo.RemoveFromStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
 			})
 		})
 
 		Context("when the security group does not exist", func() {
 			BeforeEach(func() {
-				fakeSecurityGroupRepo.ReadReturns.Error = errors.NewModelNotFoundError("security group", "anana-qui-parle")
+				fakeSecurityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.NewModelNotFoundError("security group", "anana-qui-parle"))
 			})
 
 			It("warns the user", func() {
