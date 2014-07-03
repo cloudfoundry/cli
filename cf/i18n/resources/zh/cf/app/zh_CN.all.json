@@ -93,7 +93,7 @@
    },
    {
       "id": "Override path to default config directory",
-      "translation": "修改配置文件config.json的路径（默认为～/.cf）"
+      "translation": "修改cf配置文件config.json的路径（该路径默认为～/.cf）"
    },
    {
       "id": "Print the version",
