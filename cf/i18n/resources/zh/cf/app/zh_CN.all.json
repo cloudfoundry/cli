@@ -61,11 +61,11 @@
    },
    {
       "id": "Do not colorize output",
-      "translation": "禁止彩色输出, 彩打"
+      "translation": "禁止彩色输出"
    },
    {
       "id": "Print API request diagnostics to stdout",
-      "translation": "打印API请求诊断到标准输出"
+      "translation": "打印API请求诊断信息到标准输出"
    },
    {
       "id": "NAME:",
@@ -93,7 +93,7 @@
    },
    {
       "id": "Override path to default config directory",
-      "translation": "将默认配置路径替换成path/to/dir"
+      "translation": "修改配置文件config.json的路径（默认为～/.cf）"
    },
    {
       "id": "Print the version",
@@ -101,7 +101,7 @@
    },
    {
       "id": "BUILD TIME:",
-      "translation": "生成时间:"
+      "translation": "构建时间:"
    },
    {
       "id": "Max wait time for app instance startup, in minutes",
@@ -109,7 +109,7 @@
    },
    {
       "id": "Append API request diagnostics to a log file",
-      "translation": "追加API请求诊断到日志文件"
+      "translation": "追加API请求诊断信息到日志文件"
    },
    {
       "id": "Enable HTTP proxying for API requests",
