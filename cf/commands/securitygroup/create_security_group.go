@@ -29,10 +29,10 @@ func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, sec
 func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-security-group",
-		Description: "Create a security group",
-		Usage:       "CF_NAME create-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]",
+		Description: T("Create a security group"),
+		Usage:       T("CF_NAME create-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("json", "Path to a file containing rules in JSON format"),
+			flag_helpers.NewStringFlag("json", T("Path to a file containing rules in JSON format")),
 		},
 	}
 }
@@ -54,18 +54,22 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Creating security group %s as %s",
-		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Creating security group {{.security_group}} as {{.username}}",
+		map[string]interface{}{
+			"security_group": terminal.EntityNameColor(name),
+			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 
 	err = cmd.securityGroupRepo.Create(name, rules)
 
 	httpErr, ok := err.(errors.HttpError)
 	if ok && httpErr.ErrorCode() == errors.SECURITY_GROUP_EXISTS {
 		cmd.ui.Ok()
-		cmd.ui.Warn("Security group %s %s",
-			terminal.EntityNameColor(name),
-			terminal.WarningColor("already exists"))
+		cmd.ui.Warn(T("Security group {{.security_group}} {{.error_message}}",
+			map[string]interface{}{
+				"security_group": terminal.EntityNameColor(name),
+				"error_message":  terminal.WarningColor(T("already exists")),
+			}))
 		return
 	}
 

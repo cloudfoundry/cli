@@ -31,8 +31,8 @@ func NewRemoveFromRunningGroup(ui terminal.UI, configRepo configuration.Reader, 
 func (cmd *removeFromRunningGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "remove-running-security-group",
-		Description: "Remove a security group from the set of security groups for running applications",
-		Usage:       "CF_NAME remove-running-security-group SECURITY_GROUP",
+		Description: T("Remove a security group from the set of security groups for running applications"),
+		Usage:       T("CF_NAME remove-running-security-group SECURITY_GROUP"),
 	}
 }
 
@@ -54,17 +54,21 @@ func (cmd *removeFromRunningGroup) Run(context *cli.Context) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Security group %s %s",
-			terminal.EntityNameColor(name),
-			terminal.WarningColor("does not exist."))
+		cmd.ui.Warn(T("Security group {{.security_group}} {{.error_message}}",
+			map[string]interface{}{
+				"security_group": terminal.EntityNameColor(name),
+				"error_message":  terminal.WarningColor(T("does not exist.")),
+			}))
 		return
 	default:
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Removing security group %s from defaults for running as %s",
-		terminal.EntityNameColor(securityGroup.Name),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Removing security group {{.security_group}} from defaults for running as {{.username}}",
+		map[string]interface{}{
+			"security_group": terminal.EntityNameColor(securityGroup.Name),
+			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 	err = cmd.runningGroupRepo.RemoveFromRunningSet(securityGroup.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

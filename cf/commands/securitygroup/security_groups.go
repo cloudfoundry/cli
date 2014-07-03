@@ -29,7 +29,7 @@ func NewSecurityGroups(ui terminal.UI, configRepo configuration.Reader, security
 func (cmd SecurityGroups) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "security-groups",
-		Description: "List all security groups",
+		Description: T("List all security groups"),
 		Usage:       "CF_NAME security-group",
 	}
 }
@@ -44,7 +44,10 @@ func (cmd SecurityGroups) GetRequirements(requirementsFactory requirements.Facto
 }
 
 func (cmd SecurityGroups) Run(context *cli.Context) {
-	cmd.ui.Say("Getting security groups as %s", terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Getting security groups as {{.username}}",
+		map[string]interface{}{
+			"username": terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 
 	securityGroups, err := cmd.securityGroupRepo.FindAll()
 	if err != nil {
@@ -55,11 +58,11 @@ func (cmd SecurityGroups) Run(context *cli.Context) {
 	cmd.ui.Say("")
 
 	if len(securityGroups) == 0 {
-		cmd.ui.Say("No security groups")
+		cmd.ui.Say(T("No security groups"))
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{"", "Name", "Organization", "Space"})
+	table := terminal.NewTable(cmd.ui, []string{"", T("Name"), T("Organization"), T("Space")})
 
 	for index, securityGroup := range securityGroups {
 		if len(securityGroup.Spaces) > 0 {

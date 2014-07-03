@@ -30,8 +30,8 @@ func NewAddToRunningGroup(ui terminal.UI, configRepo configuration.Reader, secur
 func (cmd *addToRunningGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "add-running-security-group",
-		Description: "Add a security group to the list of security groups to be used for running applications",
-		Usage:       "CF_NAME add-running-security-group SECURITY_GROUP",
+		Description: T("Add a security group to the list of security groups to be used for running applications"),
+		Usage:       T("CF_NAME add-running-security-group SECURITY_GROUP"),
 	}
 }
 
@@ -53,9 +53,11 @@ func (cmd *addToRunningGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Adding security group %s to defaults for running as %s",
-		terminal.EntityNameColor(securityGroup.Name),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Adding security group {{.security_group}} to defaults for running as {{.username}}",
+		map[string]interface{}{
+			"security_group": terminal.EntityNameColor(securityGroup.Name),
+			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 
 	err = cmd.runningGroupRepo.AddToRunningSet(securityGroup.Guid)
 	if err != nil {

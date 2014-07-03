@@ -31,8 +31,8 @@ func NewRemoveFromStagingGroup(ui terminal.UI, configRepo configuration.Reader, 
 func (cmd *removeFromStagingGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "remove-staging-security-group",
-		Description: "Remove a security group from the set of default security groups for staging applications",
-		Usage:       "CF_NAME remove-staging-security-group SECURITY_GROUP",
+		Description: T("Remove a security group from the set of default security groups for staging applications"),
+		Usage:       T("CF_NAME remove-staging-security-group SECURITY_GROUP"),
 	}
 }
 
@@ -49,18 +49,22 @@ func (cmd *removeFromStagingGroup) GetRequirements(requirementsFactory requireme
 func (cmd *removeFromStagingGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
-	cmd.ui.Say("Removing security group %s from defaults for staging as %s",
-		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Removing security group {{.security_group}} from defaults for staging as {{.username}}",
+		map[string]interface{}{
+			"security_group": terminal.EntityNameColor(name),
+			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	switch (err).(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Security group %s %s",
-			terminal.EntityNameColor(name),
-			terminal.WarningColor("does not exist."))
+		cmd.ui.Warn(T("Security group {{.security_group}} {{.error_message}}",
+			map[string]interface{}{
+				"security_group": terminal.EntityNameColor(name),
+				"error_message":  terminal.WarningColor(T("does not exist.")),
+			}))
 		return
 	default:
 		cmd.ui.Failed(err.Error())
