@@ -3,6 +3,7 @@ package space
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -17,13 +18,13 @@ import (
 type CreateSpace struct {
 	ui              terminal.UI
 	config          configuration.Reader
-	spaceRepo       api.SpaceRepository
+	spaceRepo       spaces.SpaceRepository
 	orgRepo         api.OrganizationRepository
 	userRepo        api.UserRepository
 	spaceRoleSetter user.SpaceRoleSetter
 }
 
-func NewCreateSpace(ui terminal.UI, config configuration.Reader, spaceRoleSetter user.SpaceRoleSetter, spaceRepo api.SpaceRepository, orgRepo api.OrganizationRepository, userRepo api.UserRepository) (cmd CreateSpace) {
+func NewCreateSpace(ui terminal.UI, config configuration.Reader, spaceRoleSetter user.SpaceRoleSetter, spaceRepo spaces.SpaceRepository, orgRepo api.OrganizationRepository, userRepo api.UserRepository) (cmd CreateSpace) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRoleSetter = spaceRoleSetter

@@ -1,7 +1,7 @@
 package requirements
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
@@ -14,11 +14,11 @@ type SpaceRequirement interface {
 type spaceApiRequirement struct {
 	name      string
 	ui        terminal.UI
-	spaceRepo api.SpaceRepository
+	spaceRepo spaces.SpaceRepository
 	space     models.Space
 }
 
-func NewSpaceRequirement(name string, ui terminal.UI, sR api.SpaceRepository) (req *spaceApiRequirement) {
+func NewSpaceRequirement(name string, ui terminal.UI, sR spaces.SpaceRepository) (req *spaceApiRequirement) {
 	req = new(spaceApiRequirement)
 	req.name = name
 	req.ui = ui

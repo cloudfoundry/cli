@@ -2,7 +2,7 @@ package space
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -14,11 +14,11 @@ import (
 type DeleteSpace struct {
 	ui        terminal.UI
 	config    configuration.ReadWriter
-	spaceRepo api.SpaceRepository
+	spaceRepo spaces.SpaceRepository
 	spaceReq  requirements.SpaceRequirement
 }
 
-func NewDeleteSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo api.SpaceRepository) (cmd *DeleteSpace) {
+func NewDeleteSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo spaces.SpaceRepository) (cmd *DeleteSpace) {
 	cmd = new(DeleteSpace)
 	cmd.ui = ui
 	cmd.config = config

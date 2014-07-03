@@ -7,7 +7,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	securitygroupspaces "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 
 	"github.com/cloudfoundry/cli/cf/app_files"
@@ -22,7 +23,7 @@ type RepositoryLocator struct {
 	endpointRepo                    RemoteEndpointRepository
 	organizationRepo                CloudControllerOrganizationRepository
 	quotaRepo                       CloudControllerQuotaRepository
-	spaceRepo                       CloudControllerSpaceRepository
+	spaceRepo                       spaces.CloudControllerSpaceRepository
 	appRepo                         CloudControllerApplicationRepository
 	appBitsRepo                     CloudControllerApplicationBitsRepository
 	appSummaryRepo                  CloudControllerAppSummaryRepository
@@ -46,7 +47,7 @@ type RepositoryLocator struct {
 	securityGroupRepo               security_groups.SecurityGroupRepo
 	stagingSecurityGroupRepo        staging.StagingSecurityGroupsRepo
 	runningSecurityGroupRepo        running.RunningSecurityGroupsRepo
-	securityGroupSpaceBinder        spaces.SecurityGroupSpaceBinder
+	securityGroupSpaceBinder        securitygroupspaces.SecurityGroupSpaceBinder
 }
 
 func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
@@ -84,7 +85,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.serviceBindingRepo = NewCloudControllerServiceBindingRepository(config, cloudControllerGateway)
 	loc.serviceBrokerRepo = NewCloudControllerServiceBrokerRepository(config, cloudControllerGateway)
 	loc.serviceSummaryRepo = NewCloudControllerServiceSummaryRepository(config, cloudControllerGateway)
-	loc.spaceRepo = NewCloudControllerSpaceRepository(config, cloudControllerGateway)
+	loc.spaceRepo = spaces.NewCloudControllerSpaceRepository(config, cloudControllerGateway)
 	loc.userProvidedServiceInstanceRepo = NewCCUserProvidedServiceInstanceRepository(config, cloudControllerGateway)
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway)
 	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
@@ -92,7 +93,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.securityGroupRepo = security_groups.NewSecurityGroupRepo(config, cloudControllerGateway)
 	loc.stagingSecurityGroupRepo = staging.NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.runningSecurityGroupRepo = running.NewRunningSecurityGroupsRepo(config, cloudControllerGateway)
-	loc.securityGroupSpaceBinder = spaces.NewSecurityGroupSpaceBinder(config, cloudControllerGateway)
+	loc.securityGroupSpaceBinder = securitygroupspaces.NewSecurityGroupSpaceBinder(config, cloudControllerGateway)
 
 	return
 }
@@ -117,7 +118,7 @@ func (locator RepositoryLocator) GetQuotaRepository() QuotaRepository {
 	return locator.quotaRepo
 }
 
-func (locator RepositoryLocator) GetSpaceRepository() SpaceRepository {
+func (locator RepositoryLocator) GetSpaceRepository() spaces.SpaceRepository {
 	return locator.spaceRepo
 }
 
@@ -213,6 +214,6 @@ func (locator RepositoryLocator) GetRunningSecurityGroupsRepository() running.Ru
 	return locator.runningSecurityGroupRepo
 }
 
-func (locator RepositoryLocator) GetSecurityGroupSpaceBinder() spaces.SecurityGroupSpaceBinder {
+func (locator RepositoryLocator) GetSecurityGroupSpaceBinder() securitygroupspaces.SecurityGroupSpaceBinder {
 	return locator.securityGroupSpaceBinder
 }

@@ -1,7 +1,7 @@
 package space
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -13,10 +13,10 @@ import (
 type ListSpaces struct {
 	ui        terminal.UI
 	config    configuration.Reader
-	spaceRepo api.SpaceRepository
+	spaceRepo spaces.SpaceRepository
 }
 
-func NewListSpaces(ui terminal.UI, config configuration.Reader, spaceRepo api.SpaceRepository) (cmd ListSpaces) {
+func NewListSpaces(ui terminal.UI, config configuration.Reader, spaceRepo spaces.SpaceRepository) (cmd ListSpaces) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
