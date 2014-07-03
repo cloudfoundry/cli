@@ -113,7 +113,7 @@
    },
    {
       "id": "Name",
-      "translation": "Name"
+      "translation": "Nom"
    },
    {
       "id": "No running security groups set",
@@ -133,7 +133,7 @@
    },
    {
       "id": "Organization",
-      "translation": "Organization"
+      "translation": "Organisation"
    },
    {
       "id": "Path to a file containing rules in JSON format",
@@ -161,7 +161,7 @@
    },
    {
       "id": "Rules",
-      "translation": "Rules"
+      "translation": "Règlements"
    },
    {
       "id": "Security group {{.security_group}} does not exist",
@@ -177,7 +177,7 @@
    },
    {
       "id": "Space",
-      "translation": "Space"
+      "translation": "Espace"
    },
    {
       "id": "Unassign a security group from a space",
