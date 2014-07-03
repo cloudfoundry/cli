@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
@@ -28,7 +28,7 @@ var _ = Describe("Gateway", func() {
 		ccGateway   Gateway
 		uaaGateway  Gateway
 		config      configuration.ReadWriter
-		authRepo    api.AuthenticationRepository
+		authRepo    authentication.AuthenticationRepository
 		currentTime time.Time
 		clock       func() time.Time
 	)
@@ -538,7 +538,7 @@ func refreshTokenApiEndPoint(unauthorizedBody string, secondReqResp testnet.Test
 	}
 }
 
-func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (configuration.ReadWriter, api.AuthenticationRepository) {
+func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (configuration.ReadWriter, authentication.AuthenticationRepository) {
 	config := testconfig.NewRepository()
 	config.SetAuthenticationEndpoint(authServer.URL)
 	config.SetApiEndpoint(apiServer.URL)
@@ -548,7 +548,7 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	authGateway := NewUAAGateway(config)
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
-	authenticator := api.NewUAAAuthenticationRepository(authGateway, config)
+	authenticator := authentication.NewUAAAuthenticationRepository(authGateway, config)
 
 	return config, authenticator
 }
