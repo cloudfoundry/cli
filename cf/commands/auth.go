@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,10 +13,10 @@ import (
 type Authenticate struct {
 	ui            terminal.UI
 	config        configuration.ReadWriter
-	authenticator api.AuthenticationRepository
+	authenticator authentication.AuthenticationRepository
 }
 
-func NewAuthenticate(ui terminal.UI, config configuration.ReadWriter, authenticator api.AuthenticationRepository) (cmd Authenticate) {
+func NewAuthenticate(ui terminal.UI, config configuration.ReadWriter, authenticator authentication.AuthenticationRepository) (cmd Authenticate) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.authenticator = authenticator

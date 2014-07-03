@@ -1,7 +1,10 @@
 package commands
 
 import (
+	"strconv"
+
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -9,7 +12,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strconv"
 )
 
 const maxLoginTries = 3
@@ -18,7 +20,7 @@ const maxChoices = 50
 type Login struct {
 	ui            terminal.UI
 	config        configuration.ReadWriter
-	authenticator api.AuthenticationRepository
+	authenticator authentication.AuthenticationRepository
 	endpointRepo  api.EndpointRepository
 	orgRepo       api.OrganizationRepository
 	spaceRepo     api.SpaceRepository
@@ -26,7 +28,7 @@ type Login struct {
 
 func NewLogin(ui terminal.UI,
 	config configuration.ReadWriter,
-	authenticator api.AuthenticationRepository,
+	authenticator authentication.AuthenticationRepository,
 	endpointRepo api.EndpointRepository,
 	orgRepo api.OrganizationRepository,
 	spaceRepo api.SpaceRepository) (cmd Login) {

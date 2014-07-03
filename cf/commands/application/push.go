@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -36,7 +37,7 @@ type Push struct {
 	serviceRepo   api.ServiceRepository
 	stackRepo     api.StackRepository
 	appBitsRepo   api.ApplicationBitsRepository
-	authRepo      api.AuthenticationRepository
+	authRepo      authentication.AuthenticationRepository
 	wordGenerator words.WordGenerator
 }
 
@@ -44,7 +45,7 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
 	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
 	stackRepo api.StackRepository, serviceRepo api.ServiceRepository, appBitsRepo api.ApplicationBitsRepository,
-	authRepo api.AuthenticationRepository, wordGenerator words.WordGenerator) *Push {
+	authRepo authentication.AuthenticationRepository, wordGenerator words.WordGenerator) *Push {
 	return &Push{
 		ui:            ui,
 		config:        config,

@@ -24,10 +24,6 @@
       "translation": "Impossible d'écrire fichier zip"
    },
    {
-      "id": "Credentials were rejected, please try again.",
-      "translation": "Pouvoirs ont été rejetées, s'il vous plaît essayez de nouveau."
-   },
-   {
       "id": "Error creating tmp file: {{.Err}}",
       "translation": "Erreur de création de fichier temporaire: {{.Err}}"
    },
@@ -68,10 +64,6 @@
       "translation": "Impossible de marshal JSON"
    },
    {
-      "id": "Failed to start oauth request",
-      "translation": "Impossible de démarrer demande oauth"
-   },
-   {
       "id": "Invalid Role {{.Role}}",
       "translation": "Rôle invalide {{.Role}}"
    },
@@ -86,9 +78,5 @@
    {
       "id": "Zip archive does not contain a buildpack",
       "translation": "Zip archive ne contient pas de buildpack"
-   },
-   {
-      "id": "auth request failed",
-      "translation": "auth request failed"
    }
 ]

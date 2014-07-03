@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/tls"
 
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
@@ -16,7 +17,7 @@ import (
 )
 
 type RepositoryLocator struct {
-	authRepo                        AuthenticationRepository
+	authRepo                        authentication.AuthenticationRepository
 	curlRepo                        CurlRepository
 	endpointRepo                    RemoteEndpointRepository
 	organizationRepo                CloudControllerOrganizationRepository
@@ -54,7 +55,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	authGateway := gatewaysByName["auth"]
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	uaaGateway := gatewaysByName["uaa"]
-	loc.authRepo = NewUAAAuthenticationRepository(authGateway, config)
+	loc.authRepo = authentication.NewUAAAuthenticationRepository(authGateway, config)
 
 	// ensure gateway refreshers are set before passing them by value to repositories
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
@@ -96,7 +97,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	return
 }
 
-func (locator RepositoryLocator) GetAuthenticationRepository() AuthenticationRepository {
+func (locator RepositoryLocator) GetAuthenticationRepository() authentication.AuthenticationRepository {
 	return locator.authRepo
 }
 

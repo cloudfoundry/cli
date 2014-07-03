@@ -1,4 +1,4 @@
-package api_test
+package authentication_test
 
 import (
 	"encoding/base64"
@@ -11,7 +11,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
-	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/cf/api/authentication"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
