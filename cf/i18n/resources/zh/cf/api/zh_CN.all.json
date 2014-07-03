@@ -13,7 +13,7 @@
    },
    {
       "id": "Couldn't create temp file for upload",
-      "translation": "无法创建可以上传的临时文件"
+      "translation": "无法创建上传所需的临时文件"
    },
    {
       "id": "Couldn't open buildpack file",
@@ -37,7 +37,7 @@
    },
    {
       "id": "Error opening buildpack file",
-      "translation": "打开buildpack文件错误"
+      "translation": "打开buildpack文件时出错"
    },
    {
       "id": "Error parsing headers",
