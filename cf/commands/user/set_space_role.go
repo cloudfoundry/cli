@@ -2,7 +2,9 @@ package user
 
 import (
 	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,13 +20,13 @@ type SpaceRoleSetter interface {
 type SetSpaceRole struct {
 	ui        terminal.UI
 	config    configuration.Reader
-	spaceRepo api.SpaceRepository
+	spaceRepo spaces.SpaceRepository
 	userRepo  api.UserRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SetSpaceRole) {
+func NewSetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo spaces.SpaceRepository, userRepo api.UserRepository) (cmd *SetSpaceRole) {
 	cmd = new(SetSpaceRole)
 	cmd.ui = ui
 	cmd.config = config

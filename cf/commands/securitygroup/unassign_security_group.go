@@ -4,6 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	sgbinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -16,11 +17,11 @@ type UnassignSecurityGroup struct {
 	configRepo        configuration.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
 	orgRepo           api.OrganizationRepository
-	spaceRepo         api.SpaceRepository
+	spaceRepo         spaces.SpaceRepository
 	secBinder         sgbinder.SecurityGroupSpaceBinder
 }
 
-func NewUnassignSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, secBinder sgbinder.SecurityGroupSpaceBinder) UnassignSecurityGroup {
+func NewUnassignSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, orgRepo api.OrganizationRepository, spaceRepo spaces.SpaceRepository, secBinder sgbinder.SecurityGroupSpaceBinder) UnassignSecurityGroup {
 	return UnassignSecurityGroup{
 		ui:                ui,
 		configRepo:        configRepo,

@@ -3,7 +3,8 @@ package securitygroup
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	sgbinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -15,18 +16,18 @@ type AssignSecurityGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
 	orgRepo           api.OrganizationRepository
-	spaceRepo         api.SpaceRepository
+	spaceRepo         spaces.SpaceRepository
 	securityGroupRepo security_groups.SecurityGroupRepo
-	spaceBinder       spaces.SecurityGroupSpaceBinder
+	spaceBinder       sgbinder.SecurityGroupSpaceBinder
 }
 
 func NewAssignSecurityGroup(
 	ui terminal.UI,
 	configRepo configuration.Reader,
 	securityGroupRepo security_groups.SecurityGroupRepo,
-	spaceRepo api.SpaceRepository,
+	spaceRepo spaces.SpaceRepository,
 	orgRepo api.OrganizationRepository,
-	spaceBinder spaces.SecurityGroupSpaceBinder,
+	spaceBinder sgbinder.SecurityGroupSpaceBinder,
 ) AssignSecurityGroup {
 	return AssignSecurityGroup{
 		ui:                ui,

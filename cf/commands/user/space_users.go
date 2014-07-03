@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -15,12 +16,12 @@ var spaceRoles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.S
 type SpaceUsers struct {
 	ui        terminal.UI
 	config    configuration.Reader
-	spaceRepo api.SpaceRepository
+	spaceRepo spaces.SpaceRepository
 	userRepo  api.UserRepository
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSpaceUsers(ui terminal.UI, config configuration.Reader, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SpaceUsers) {
+func NewSpaceUsers(ui terminal.UI, config configuration.Reader, spaceRepo spaces.SpaceRepository, userRepo api.UserRepository) (cmd *SpaceUsers) {
 	cmd = new(SpaceUsers)
 	cmd.ui = ui
 	cmd.config = config
