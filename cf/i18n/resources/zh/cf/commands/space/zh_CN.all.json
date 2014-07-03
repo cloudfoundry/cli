@@ -1,87 +1,87 @@
 [
    {
       "id": "CF_NAME rename-space SPACE NEW_SPACE",
-      "translation": "CF_NAME rename-space SPACE NEW_SPACE"
+      "translation": "CF_NAME rename-space 空间 新空间"
    },
    {
       "id": "Apps:",
-      "translation": "Apps:"
+      "translation": "应用程序:"
    },
    {
       "id": "space",
-      "translation": "space"
+      "translation": "空间"
    },
    {
       "id": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "重新命名{{.OldSpaceName}}到{{.NewSpaceName}}组织中{{.OrgName}}为用户{{.CurrentUser}}..."
    },
    {
       "id": "Rename a space",
-      "translation": "Rename a space"
+      "translation": "重新命名空间"
    },
    {
       "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
-      "translation": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n"
+      "translation": "用户{{.CurrentUser}}请求分配组织{{.TargetOrgName}}中的空间...\n"
    },
    {
       "id": "CF_NAME space SPACE",
-      "translation": "CF_NAME space SPACE"
+      "translation": "CF_NAME space 空间"
    },
    {
       "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
-      "translation": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space"
+      "translation": "提示: 没有指定空间，使用'{{.CfTargetCommand}}'指定空间"
    },
    {
       "id": "List all spaces in an org",
-      "translation": "List all spaces in an org"
+      "translation": "列出组织中所有的空间"
    },
    {
       "id": "Create a space",
-      "translation": "Create a space"
+      "translation": "创造空间"
    },
    {
       "id": "Delete a space",
-      "translation": "Delete a space"
+      "translation": "删除空间"
    },
    {
       "id": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "用户{{.CurrentUser}}在组织{{.OrgName}}中创建空间{{.SpaceName}}..."
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force deletion without confirmation"
+      "translation": "强制删除"
    },
    {
       "id": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
-      "translation": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}..."
+      "translation": "用户{{.CurrentUser}}删除组织{{.TargetOrg}}中的空间{{.TargetSpace}}..."
    },
    {
       "id": "Show space info",
-      "translation": "Show space info"
+      "translation": "显示空间信息"
    },
    {
       "id": "Space {{.SpaceName}} already exists",
-      "translation": "Space {{.SpaceName}} already exists"
+      "translation": "空间{{.SpaceName}}已经存在"
    },
    {
       "id": "\nTIP: Use '{{.CFTargetCommand}}' to target new space",
-      "translation": "\nTIP: Use '{{.CFTargetCommand}}' to target new space"
+      "translation": "\n提示: 使用'{{.CFTargetCommand}}'指定空间"
    },
    {
       "id": "Domains:",
-      "translation": "Domains:"
+      "translation": "域:"
    },
    {
       "id": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
-      "translation": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}"
+      "translation": "无法找组织到{{.OrgName}}\n错误: {{.ErrorDescription}}"
    },
    {
       "id": "Organization",
-      "translation": "Organization"
+      "translation": "组织"
    },
    {
       "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
-      "translation": "Failed fetching spaces.\n{{.ErrorDescription}}"
+      "translation": "空间提取失败.\n错误: {{.ErrorDescription}}"
    },
    {
       "id": "CF_NAME spaces",
@@ -89,38 +89,38 @@
    },
    {
       "id": "No spaces found",
-      "translation": "No spaces found"
+      "translation": "没有找到空间"
    },
    {
       "id": "CF_NAME create-space SPACE [-o ORG]",
-      "translation": "CF_NAME create-space SPACE [-o ORG]"
+      "translation": "CF_NAME create-space 空间 [-o 组织]"
    },
    {
       "id": "Org:",
-      "translation": "Org:"
+      "translation": "组织:"
    },
    {
       "id": "Org {{.OrgName}} does not exist or is not accessible",
-      "translation": "Org {{.OrgName}} does not exist or is not accessible"
+      "translation": "组织{{.OrgName}}不存在或无法访问"
    },
    {
       "id": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "用户{{.CurrentUser}}请求组织{{.OrgName}}中空间{{.TargetSpace}}的信息..."
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "名称"
    },
    {
       "id": "CF_NAME delete-space SPACE [-f]",
-      "translation": "CF_NAME delete-space SPACE [-f]"
+      "translation": "CF_NAME delete-space 空间 [-f]"
    },
    {
      "id": "Security Groups:",
-     "translation": "Security Groups:"
+     "translation": "安全组:"
    },
    {
       "id": "Services:",
-      "translation": "Services:"
+      "translation": "服务:"
    }
 ]
