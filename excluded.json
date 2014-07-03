@@ -100,7 +100,7 @@
     "%s target -o ORG -s SPACE",
     " target -o ",
     "spaces",
-	
+
 	"invalid_token",
 	"Authorization",
 	"Authorization: ",
@@ -128,17 +128,17 @@
 	"X-Cf-Warnings",
 	"content-type",
 	"User-Agent",
-	
+
 	"private_domains",
 	"shared_domains",
-	
+
 	"%s logs %s --recent",
 	"2006-01-02T15:04:05.00-0700",
 	"2006-01-02 03:04:05 PM",
-	
+
 	"CF_STAGING_TIMEOUT",
 	"CF_STARTUP_TIMEOUT",
-	
+
 	"manifest.yml",
 	"manifest.yaml",
 	"inherit"
@@ -146,13 +146,13 @@
   ],
   "excludedRegexps": [
    "^CF_NAME (?:[\\w-]+)$",
-   "^(?:\\w+-)+(?:role|users?|buildpack|space|auth-tokens?|services?)(?:-\\w+)*$",
+   "^(?:\\w+-)*(?:role|users?|buildpack|space|auth-tokens?|services?|security-groups?)(?:-\\w+)*$",
    "^(?:[\\W]*%(?:[#v]|[%EGUTXbcdefgopqstvx]))+[\\W]*$",
    "^\\d+$",
    "^\\s*-\\w\\s*$",
    "^\\w$",
    "^\\w{2}$",
-   "^json:",
+   "^json",
    "^\\W+$"
   ]
 }

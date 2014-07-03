@@ -28,10 +28,10 @@ func NewUpdateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, sec
 func (cmd UpdateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-security-group",
-		Description: "Update a security group",
-		Usage:       "CF_NAME update-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]",
+		Description: T("Update a security group"),
+		Usage:       T("CF_NAME update-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("json", "Path to a file containing rules in JSON format"),
+			flag_helpers.NewStringFlag("json", T("Path to a file containing rules in JSON format")),
 		},
 	}
 }
@@ -58,9 +58,11 @@ func (cmd UpdateSecurityGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Updating security group %s as %s",
-		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Updating security group {{.security_group}} as {{.username}}",
+		map[string]interface{}{
+			"security_group": terminal.EntityNameColor(name),
+			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 	err = cmd.securityGroupRepo.Update(securityGroup.Guid, rules)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

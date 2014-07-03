@@ -34,8 +34,8 @@ func NewUnassignSecurityGroup(ui terminal.UI, configRepo configuration.Reader, s
 func (cmd UnassignSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unassign-security-group",
-		Description: "Unassign a security group from a space",
-		Usage:       "CF_NAME unassign-security-group SECURITY_GROUP ORG SPACE",
+		Description: T("Unassign a security group from a space"),
+		Usage:       T("CF_NAME unassign-security-group SECURITY_GROUP ORG SPACE"),
 	}
 }
 
@@ -83,11 +83,13 @@ func (cmd UnassignSecurityGroup) Run(context *cli.Context) {
 }
 
 func (cmd UnassignSecurityGroup) flavorText(secName string, orgName string, spaceName string) {
-	cmd.ui.Say("Removing security group %s from %s/%s as %s",
-		terminal.EntityNameColor(secName),
-		terminal.EntityNameColor(orgName),
-		terminal.EntityNameColor(spaceName),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Removing security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
+		map[string]interface{}{
+			"security_group": terminal.EntityNameColor(secName),
+			"organization":   terminal.EntityNameColor(orgName),
+			"space":          terminal.EntityNameColor(spaceName),
+			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 }
 
 func (cmd UnassignSecurityGroup) lookupSpaceGuid(orgName string, spaceName string) string {

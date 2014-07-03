@@ -26,7 +26,7 @@ func NewListRunningSecurityGroups(ui terminal.UI, configRepo configuration.Reade
 func (cmd listRunningSecurityGroups) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "running-security-groups",
-		Description: "List security groups in the set of security groups for running applications",
+		Description: T("List security groups in the set of security groups for running applications"),
 		Usage:       "CF_NAME running-security-groups",
 	}
 }
@@ -41,7 +41,9 @@ func (cmd listRunningSecurityGroups) GetRequirements(requirementsFactory require
 }
 
 func (cmd listRunningSecurityGroups) Run(context *cli.Context) {
-	cmd.ui.Say("Acquiring running security groups as '%s'", terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Acquiring running security groups as '{{.username}}'", map[string]interface{}{
+		"username": terminal.EntityNameColor(cmd.configRepo.Username()),
+	}))
 
 	defaultSecurityGroupsFields, err := cmd.runningSecurityGroupRepo.List()
 	if err != nil {
@@ -56,6 +58,6 @@ func (cmd listRunningSecurityGroups) Run(context *cli.Context) {
 			cmd.ui.Say(value.Name)
 		}
 	} else {
-		cmd.ui.Say("No running security groups set")
+		cmd.ui.Say(T("No running security groups set"))
 	}
 }

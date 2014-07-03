@@ -27,10 +27,10 @@ func NewDeleteSecurityGroup(ui terminal.UI, configRepo configuration.Reader, sec
 func (cmd DeleteSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-security-group",
-		Description: "Deletes a security group",
-		Usage:       "CF_NAME delete-security-group SECURITY_GROUP [-f]",
+		Description: T("Deletes a security group"),
+		Usage:       T("CF_NAME delete-security-group SECURITY_GROUP [-f]"),
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
@@ -46,12 +46,14 @@ func (cmd DeleteSecurityGroup) GetRequirements(requirementsFactory requirements.
 
 func (cmd DeleteSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
-	cmd.ui.Say("Deleting security group %s as %s",
-		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Deleting security group {{.security_group}} as {{.username}}",
+		map[string]interface{}{
+			"security_group": terminal.EntityNameColor(name),
+			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 
 	if !context.Bool("f") {
-		response := cmd.ui.ConfirmDelete("security group", name)
+		response := cmd.ui.ConfirmDelete(T("security group"), name)
 		if !response {
 			return
 		}
@@ -62,7 +64,7 @@ func (cmd DeleteSecurityGroup) Run(context *cli.Context) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn("Security group %s does not exist", name)
+		cmd.ui.Warn(T("Security group {{.security_group}} does not exist", map[string]interface{}{"security_group": name}))
 		return
 	default:
 		cmd.ui.Failed(err.Error())

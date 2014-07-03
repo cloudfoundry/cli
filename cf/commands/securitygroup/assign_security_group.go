@@ -41,8 +41,8 @@ func NewAssignSecurityGroup(
 func (cmd AssignSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "assign-security-group",
-		Description: "Assign a security group to a space",
-		Usage:       "CF_NAME assign-security-group SECURITY_GROUP ORG SPACE",
+		Description: T("Assign a security group to a space"),
+		Usage:       T("CF_NAME assign-security-group SECURITY_GROUP ORG SPACE"),
 	}
 }
 
@@ -60,7 +60,13 @@ func (cmd AssignSecurityGroup) Run(context *cli.Context) {
 	orgName := context.Args()[1]
 	spaceName := context.Args()[2]
 
-	cmd.ui.Say("Assigning security group %s to space %s in org %s as %s...", securityGroupName, orgName, spaceName, cmd.configRepo.Username())
+	cmd.ui.Say(T("Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
+		map[string]interface{}{
+			"security_group": securityGroupName,
+			"space":          orgName,
+			"organization":   spaceName,
+			"username":       cmd.configRepo.Username(),
+		}))
 
 	securityGroup, err := cmd.securityGroupRepo.Read(securityGroupName)
 

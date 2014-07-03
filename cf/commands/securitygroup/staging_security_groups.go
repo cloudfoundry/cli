@@ -26,7 +26,7 @@ func NewListStagingSecurityGroups(ui terminal.UI, configRepo configuration.Reade
 func (cmd listStagingSecurityGroups) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "staging-security-groups",
-		Description: "List security groups in the staging set for applications",
+		Description: T("List security groups in the staging set for applications"),
 		Usage:       "CF_NAME staging-security-groups",
 	}
 }
@@ -41,8 +41,10 @@ func (cmd listStagingSecurityGroups) GetRequirements(requirementsFactory require
 }
 
 func (cmd listStagingSecurityGroups) Run(context *cli.Context) {
-	cmd.ui.Say("Acquiring staging security group as %s",
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Acquiring staging security group as {{.username}}",
+		map[string]interface{}{
+			"username": terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 
 	SecurityGroupsFields, err := cmd.stagingSecurityGroupRepo.List()
 	if err != nil {
@@ -57,6 +59,6 @@ func (cmd listStagingSecurityGroups) Run(context *cli.Context) {
 			cmd.ui.Say(value.Name)
 		}
 	} else {
-		cmd.ui.Say("No staging security group set")
+		cmd.ui.Say(T("No staging security group set"))
 	}
 }

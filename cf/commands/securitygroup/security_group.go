@@ -29,8 +29,8 @@ func NewShowSecurityGroup(ui terminal.UI, configRepo configuration.Reader, secur
 func (cmd ShowSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "security-group",
-		Description: "Show a single security group",
-		Usage:       "CF_NAME security-group SECURITY_GROUP",
+		Description: T("Show a single security group"),
+		Usage:       T("CF_NAME security-group SECURITY_GROUP"),
 	}
 }
 
@@ -46,9 +46,11 @@ func (cmd ShowSecurityGroup) GetRequirements(requirementsFactory requirements.Fa
 func (cmd ShowSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
-	cmd.ui.Say("Getting info for security group %s as %s",
-		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.configRepo.Username()))
+	cmd.ui.Say(T("Getting info for security group {{.security_group}} as {{.username}}",
+		map[string]interface{}{
+			"security_group": terminal.EntityNameColor(name),
+			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
+		}))
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
@@ -62,21 +64,21 @@ func (cmd ShowSecurityGroup) Run(context *cli.Context) {
 
 	cmd.ui.Ok()
 	table := terminal.NewTable(cmd.ui, []string{"", ""})
-	table.Add("Name", securityGroup.Name)
-	table.Add("Rules", "")
+	table.Add(T("Name"), securityGroup.Name)
+	table.Add(T("Rules"), "")
 	table.Print()
 	cmd.ui.Say("\t" + string(jsonEncodedBytes))
 
 	cmd.ui.Say("")
 
 	if len(securityGroup.Spaces) > 0 {
-		table = terminal.NewTable(cmd.ui, []string{"", "Organization", "Space"})
+		table = terminal.NewTable(cmd.ui, []string{"", T("Organization"), T("Space")})
 
 		for index, space := range securityGroup.Spaces {
 			table.Add(fmt.Sprintf("#%d", index), space.Organization.Name, space.Name)
 		}
 		table.Print()
 	} else {
-		cmd.ui.Say("No spaces assigned")
+		cmd.ui.Say(T("No spaces assigned"))
 	}
 }
