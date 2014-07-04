@@ -1,7 +1,7 @@
 [
    {
       "id": "\nTIP: Assign roles with '{{.CurrentUser}} set-org-role' and '{{.CurrentUser}} set-space-role'",
-      "translation": "\n提示: 分配与'{{.CurrentUser}} set-org-role'和'{{.CurrentUser}} set-space-role'的角色"
+      "translation": "\n提示: 使用'{{.CurrentUser}} set-org-role'和'{{.CurrentUser}} set-space-role'的分配角色"
    },
    {
       "id": "   BillingManager - Create and manage the billing account and payment info\n",
@@ -9,7 +9,7 @@
    },
    {
       "id": "   OrgAuditor - Read-only access to org info and reports\n",
-      "translation": "   OrgAuditor - 只读访问组织信息和报告\n"
+      "translation": "   OrgAuditor - 只读权限访问组织信息和报告\n"
    },
    {
       "id": "   OrgManager - Invite and manage users, select and change plans, and set spending limits\n",
@@ -17,7 +17,7 @@
    },
    {
       "id": "   SpaceAuditor - View logs, reports, and settings on this space\n",
-      "translation": "   SpaceAuditor - 查看此空间中的日志，报告和设置\n"
+      "translation": "   SpaceAuditor - 查看此空间中的日志，报告和设置信息\n"
    },
    {
       "id": "   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n",
@@ -25,7 +25,7 @@
    },
    {
       "id": "   SpaceManager - Invite and manage users, and enable features for a given space\n",
-      "translation": "   SpaceManager - 邀请和管理用户，并启用功能对于一个给定的空间\n"
+      "translation": "   SpaceManager - 邀请和管理用户，并对一个给定的空间启用功能\n"
    },
    {
       "id": "Assign a space role to a user",
