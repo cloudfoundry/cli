@@ -1,7 +1,7 @@
 [
    {
       "id": "\nTIP: Assign roles with '{{.CurrentUser}} set-org-role' and '{{.CurrentUser}} set-space-role'",
-      "translation": "\n提示: 使用'{{.CurrentUser}} set-org-role'和'{{.CurrentUser}} set-space-role'的分配角色"
+      "translation": "\n提示: 使用'{{.CurrentUser}} set-org-role'和'{{.CurrentUser}} set-space-role'来分配角色"
    },
    {
       "id": "   BillingManager - Create and manage the billing account and payment info\n",
@@ -9,7 +9,7 @@
    },
    {
       "id": "   OrgAuditor - Read-only access to org info and reports\n",
-      "translation": "   OrgAuditor - 只读权限访问组织信息和报告\n"
+      "translation": "   OrgAuditor - 只读的访问组织信息和报告\n"
    },
    {
       "id": "   OrgManager - Invite and manage users, select and change plans, and set spending limits\n",
@@ -25,7 +25,7 @@
    },
    {
       "id": "   SpaceManager - Invite and manage users, and enable features for a given space\n",
-      "translation": "   SpaceManager - 邀请和管理用户，并对一个给定的空间启用功能\n"
+      "translation": "   SpaceManager - 邀请和管理用户，针对一个指定的空间启用各项功能\n"
    },
    {
       "id": "Assign a space role to a user",
@@ -37,11 +37,11 @@
    },
    {
       "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
-      "translation": "用户{{.CurrentUser}}分配角色{{.Role}}给组织{{.TargetOrg}}/空间{{.TargetSpace}}中的用户{{.TargetUser}}..."
+      "translation": "用户{{.CurrentUser}}正在给组织{{.TargetOrg}}/空间{{.TargetSpace}}中的用户{{.TargetUser}}分配角色{{.Role}}..."
    },
    {
       "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
-      "translation": "用户{{.CurrentUser}}分配角色{{.Role}}给组织{{.TargetOrg}}中的用户{{.TargetUser}}..."
+      "translation": "用户{{.CurrentUser}}正在分配角色{{.Role}}给组织{{.TargetOrg}}中的用户{{.TargetUser}}..."
    },
    {
       "id": "BILLING MANAGER",
