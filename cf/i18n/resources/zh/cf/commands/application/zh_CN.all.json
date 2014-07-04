@@ -437,7 +437,7 @@
    },
    {
       "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
-      "translation": "这将导致应用程序重新启动。您确定要扩大应用{{.AppName}}？"
+      "translation": "这将导致应用程序重新启动。您确定要这样更改应用{{.AppName}}？"
    },
    {
       "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -461,7 +461,7 @@
    },
    {
       "id": "Using manifest file {{.Path}}\n",
-      "translation": "使用清单文件{{.Path}}\n"
+      "translation": "使用配置文件{{.Path}}\n"
    },
    {
       "id": "Using stack {{.StackName}}...",
@@ -481,7 +481,7 @@
    },
    {
       "id": "cpu",
-      "translation": "中央处理器"
+      "translation": "CPU内核"
    },
    {
       "id": "description",
@@ -537,7 +537,7 @@
    },
    {
       "id": "since",
-      "translation": "自"
+      "translation": "从"
    },
    {
       "id": "state",
@@ -569,15 +569,15 @@
    },
    {
       "id": "{{.DownCount}} down",
-      "translation": "{{.DownCount}}向下"
+      "translation": "{{.DownCount}}启动失败"
    },
    {
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "{{.Err}}\n\n提示: 使用'{{.Command}}'的更多信息"
+      "translation": "{{.Err}}\n\n提示: 使用'{{.Command}}'获取更多信息"
    },
    {
       "id": "{{.FlappingCount}} failing",
-      "translation": "{{.FlappingCount}} 失败"
+      "translation": "{{.FlappingCount}} 出现错误"
    },
    {
       "id": "{{.MemUsage}} of {{.MemQuota}}",
@@ -585,7 +585,7 @@
    },
    {
       "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
-      "translation": "{{.RunningCount}}的{{.TotalCount}}号正在运行的实例"
+      "translation": "{{.TotalCount}}个中的{{.RunningCount}}个实例正在运行"
    },
    {
       "id": "{{.StartingCount}} starting",
@@ -593,6 +593,6 @@
    },
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
-      "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}}实例数"
+      "translation": "{{.Usage}} {{.FormattedMemory}} 乘以 {{.InstanceCount}}实例数"
    }
 ]
