@@ -385,7 +385,7 @@
    },
    {
       "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "translation": "堆栈使用（堆栈是一个预先构建的文件系统，包括一个可以运行应用程序的操作系统）"
+      "translation": "堆栈使用（堆栈是一个预先构建的文件系统，包括一个操作系统，可以用来运行应用程序）"
    },
    {
       "id": "Start an app",
@@ -437,7 +437,7 @@
    },
    {
       "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
-      "translation": "这将导致应用程序重新启动。您确定要这样更改应用{{.AppName}}？"
+      "translation": "这将导致应用程序重新启动。您确定要伸缩{{.AppName}}？"
    },
    {
       "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -565,11 +565,11 @@
    },
    {
       "id": "{{.DiskUsage}} of {{.DiskQuota}}",
-      "translation": "{{.DiskUsage}}已使用，共{{.DiskQuota}}"
+      "translation": "{{.DiskQuota}}中的{{.DiskUsage}}"
    },
    {
       "id": "{{.DownCount}} down",
-      "translation": "{{.DownCount}}启动失败"
+      "translation": "{{.DownCount}}停止运行"
    },
    {
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
@@ -577,15 +577,15 @@
    },
    {
       "id": "{{.FlappingCount}} failing",
-      "translation": "{{.FlappingCount}} 出现错误"
+      "translation": "{{.FlappingCount}} 失败"
    },
    {
       "id": "{{.MemUsage}} of {{.MemQuota}}",
-      "translation": "{{.MemUsage}}已使用，共{{.MemQuota}}"
+      "translation": "{{.MemQuota}}中的{{.MemUsage}}"
    },
    {
       "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
-      "translation": "{{.TotalCount}}个中的{{.RunningCount}}个实例正在运行"
+      "translation": "{{.TotalCount}}中的{{.RunningCount}}个实例正在运行"
    },
    {
       "id": "{{.StartingCount}} starting",
