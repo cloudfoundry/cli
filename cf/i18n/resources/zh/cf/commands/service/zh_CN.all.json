@@ -45,7 +45,7 @@
    },
    {
       "id": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect",
-      "translation": "提示: 使用'{{.CFCommand}}'，来确保您的环境变量更改生效"
+      "translation": "小贴士: 使用'{{.CFCommand}}'，来确保您的环境变量更改生效"
    },
    {
       "id": "Plan {{.ServicePlanName}} cannot be found",
@@ -141,7 +141,7 @@
    },
    {
       "id": "Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.",
-      "translation": "服务不存在\n提示: 如果你想清理一个v1的服务，请设置-p参数。"
+      "translation": "服务不存在\n小贴士: 如果你想清理一个v1的服务，请设置-p参数。"
    },
    {
       "id": "Service: {{.ServiceDescription}}",
@@ -178,7 +178,7 @@
    },
    {
       "id": "TIP: To make these changes take effect, use '{{.CFUnbindCommand}}' to unbind the service, '{{.CFBindComand}}' to rebind, and then '{{.CFRestageCommand}}' to update the app with the new env variables",
-      "translation": "提示: 为了使这些更改生效， 使用'{{.CFUnbindCommand}}解除绑定的服务，使用'{{.CFBindComand}}重新绑定服务，然后使用'{{.CFPushCommand}}'更新应用使环境变量生效。"
+      "translation": "小贴士: 为了使这些更改生效， 使用'{{.CFUnbindCommand}}解除绑定的服务，使用'{{.CFBindComand}}重新绑定服务，然后使用'{{.CFPushCommand}}'更新应用使环境变量生效。"
    },
    {
       "id": "Renaming service {{.ServiceName}} to {{.NewServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -206,7 +206,7 @@
    },
    {
       "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME create-service cleardb spark clear-db-mine\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-      "translation": "CF_NAME create-service 服务类型 服务计划 实例名称\n\n示例:\n   CF_NAME create-service cleardb spark clear-db-mine\n\n提示:\n   使用'CF_NAME create-user-provided-service'来创建由用户提供的服务供应用使用。"
+      "translation": "CF_NAME create-service 服务类型 服务计划 实例名称\n\n示例:\n   CF_NAME create-service cleardb spark clear-db-mine\n\n小贴士:\n   使用'CF_NAME create-user-provided-service'来创建由用户提供的服务供应用使用。"
    },
    {
       "id": "Cannot list marketplace services without a targeted space",
@@ -226,7 +226,7 @@
    },
    {
       "id": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
-      "translation": "{{.ErrorDescription}}\n提示: 使用'{{.CFServicesCommand}}'来查看这个组织和空间里的所有服务。"
+      "translation": "{{.ErrorDescription}}\n小贴士: 使用'{{.CFServicesCommand}}'来查看这个组织和空间里的所有服务。"
    },
    {
       "id": "Bind a service instance to an app",

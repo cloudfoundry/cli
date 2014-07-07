@@ -1,7 +1,7 @@
 [
    {
       "id": "\nTIP: Use '{{.Command}}' to target new org",
-      "translation": "\n提示: 使用'{{.Command}}'选择新组织"
+      "translation": "\n小贴士: 使用'{{.Command}}'选择新组织"
    },
    {
       "id": "   View allowable quotas with 'CF_NAME quotas'",
@@ -109,7 +109,7 @@
    },
    {
       "id": "TIP:\n",
-      "translation": "提示:\n"
+      "translation": "小贴士:\n"
    },
    {
       "id": "name",

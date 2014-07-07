@@ -1,7 +1,7 @@
 [
    {
       "id": "enabled",
-      "translation": "启用"
+      "translation": "已启用"
    },
    {
       "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
@@ -13,11 +13,11 @@
    },
    {
       "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
-      "translation": "提示: 使用'{{.CfUpdateBuildpackCommand}}'来更新这个buildpack"
+      "translation": "小贴士: 使用'{{.CfUpdateBuildpackCommand}}' 来更新此buildpack"
    },
    {
       "id": "Failed fetching buildpacks.\n{{.Error}}",
-      "translation": "抓取失败buildpack\n错误：{{.Error}}"
+      "translation": "抓取buildpack失败\n错误：{{.Error}}"
    },
    {
       "id": "Cannot specify both {{.Enabled}} and {{.Disabled}}.",
@@ -53,7 +53,7 @@
    },
    {
       "id": "Lock the buildpack",
-      "translation": "Lock the buildpack"
+      "translation": "锁定该 buildpack"
    },
    {
       "id": "Uploading buildpack {{.BuildpackName}}...",
@@ -61,11 +61,11 @@
    },
    {
       "id": "Cannot specify buildpack bits and lock/unlock.",
-      "translation": "不能同时指定buildpack bits和lock/unlock."
+      "translation": "无法指定buildpack以及对其加锁/解锁"
    },
    {
       "id": "\n\nTIP:\n",
-      "translation": "\n\n提示:\n"
+      "translation": "\n\n小贴士:\n"
    },
    {
       "id": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]",
@@ -113,7 +113,7 @@
    },
    {
       "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
-      "translation": "错误上传buildpack {{.Name}}\n错误：{{.Error}}"
+      "translation": "上传buildpack {{.Name}},\n错误：{{.Error}}"
    },
    {
       "id": "Creating buildpack {{.BuildpackName}}...",
@@ -129,7 +129,7 @@
    },
    {
       "id": "Error deleting buildpack {{.Name}}\n{{.Error}}",
-      "translation": "删除 buildpack {{.Name}}\n错误：{{.Error}}"
+      "translation": "删除 buildpack {{.Name}},\n错误：{{.Error}}"
    },
    {
       "id": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}...",
@@ -161,7 +161,7 @@
    },
    {
       "id": "Getting buildpacks...\n",
-      "translation": "越来越buildpacks...\n"
+      "translation": "获取buildpacks...\n"
    },
    {
       "id": "Updating buildpack {{.BuildpackName}}...",

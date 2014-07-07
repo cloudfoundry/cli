@@ -29,7 +29,7 @@
    },
    {
       "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
-      "translation": "提示: 没有指定空间，使用'{{.CfTargetCommand}}'指定空间"
+      "translation": "小贴士: 没有指定空间，使用'{{.CfTargetCommand}}'指定空间"
    },
    {
       "id": "List all spaces in an org",
@@ -65,7 +65,7 @@
    },
    {
       "id": "\nTIP: Use '{{.CFTargetCommand}}' to target new space",
-      "translation": "\n提示: 使用'{{.CFTargetCommand}}'指定空间"
+      "translation": "\n小贴士: 使用'{{.CFTargetCommand}}'指定空间"
    },
    {
       "id": "Domains:",
