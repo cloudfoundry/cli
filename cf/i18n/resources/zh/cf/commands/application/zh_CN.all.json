@@ -1,23 +1,23 @@
 [
    {
       "id": "\nApp started\n",
-      "translation": "\应用程序已启动\n"
+      "translation": "\n应用程序已启动\n"
    },
    {
       "id": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error",
-      "translation": "\n小贴士: 使用'cf login -a API --skip-ssl-validation'或'cf api API --skip-ssl-validation'要制止这种错误"
+      "translation": "\n小贴士: 通过cf login或者cf api命令来忽略'--skip-ssl-validation'错误"
    },
    {
       "id": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
-      "translation": "   CF_NAME push 应用程序名称 [-b BUILDPACK名称] [-c 命令] [-d 域名] [-f 配置文件路径]\n"
+      "translation": "   CF_NAME push 应用程序[-b 包名] [-c 命令] [-d 域名] [-f 部署描述文件路径]\n"
    },
    {
       "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-      "translation": "   CF_NAME push [-f 配置文件路径]\n"
+      "translation": "   CF_NAME push 应用程序 [-f 部署描述文件路径]\n"
    },
    {
       "id": "   Push multiple apps with a manifest:\n",
-      "translation": "   使用配置文件上传多个应用程序:\n"
+      "translation": "   使用部署描述文件部署多个应用程序:\n"
    },
    {
       "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
@@ -33,7 +33,7 @@
    },
    {
       "id": "Also delete any mapped routes",
-      "translation": "同时删除所有映射路由"
+      "translation": "同时删除所有绑定的域名"
    },
    {
       "id": "App ",
@@ -45,15 +45,15 @@
    },
    {
       "id": "App {{.AppName}} does not exist.",
-      "translation": "应用程序{{.AppName}}不存在."
+      "translation": "应用程序{{.AppName}}不存在"
    },
    {
       "id": "App {{.AppName}} is a worker, skipping route creation",
-      "translation": "应用程序{{.AppName}} 是工作者进程，跳过路由创建过程"
+      "translation": "应用程序 {{.AppName}}是一个worker程序，跳过路由的创建"
    },
    {
       "id": "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "作为{{.Username}}用户绑定服务{{.ServiceName}}到组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}}..."
+      "translation": "通过用户{{.Username}}给到组织{{.OrgName}}/空间{{.SpaceName}}下的应用 {{.AppName}} 绑定服务 {{.ServiceName}}..."
    },
    {
       "id": "CF_NAME app APP",
@@ -93,7 +93,7 @@
    },
    {
       "id": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
-      "translation": "CF_NAME scale 应用程序名称 [-i 实例数] [-k 磁盘配额] [-m 内存配额] [-f]"
+      "translation": "CF_NAME scale 应用程序 [-i 实例数] [-k 磁盘] [-m 内存] [-f]"
    },
    {
       "id": "CF_NAME set-env APP NAME VALUE",
@@ -117,11 +117,11 @@
    },
    {
       "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
-      "translation": "已连接，输出应用程序{{.AppName}}在组织{{.OrgName}}中/空间{{.SpaceName}}，用户{{.Username}}的最新日志...\n"
+      "translation": "已连接，用户{{.Username}}生成组织 {{.OrgName}} / 空间 {{.SpaceName}}下应用程序{{.AppName}} 的日志...\n"
    },
    {
       "id": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
-      "translation": "已连接，输出在组织{{.OrgName}}/空间{{.SpaceName}}中，用户{{.Username}}的应用程序{{.AppName}}最新日志...\n"
+      "translation": "已连接，用户{{.Username}}读取组织 {{.OrgName}} / 空间 {{.SpaceName}}下应用程序{{.AppName}} 的日志...\n"
    },
    {
       "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
@@ -133,7 +133,7 @@
    },
    {
       "id": "Could not find app named '{{.AppName}}' in manifest",
-      "translation": "无法在配置文件中找到名为'{{.AppName}}'的应用程序"
+      "translation": "无法在部署描述文件中找到名为'{{.AppName}}'的应用程序"
    },
    {
       "id": "Could not find service {{.ServiceName}} to bind to {{.AppName}}",
@@ -149,7 +149,7 @@
    },
    {
       "id": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)",
-      "translation": "按名称自定义本地buildpack (例如： my-buildpack)或GIT网址(例如： https://github.com/heroku/heroku-buildpack-play.git)"
+      "translation": "使用名称(e.g. my-buildpack)或GIT网址(e.g. https://github.com/heroku/heroku-buildpack-play.git) 自定义buildpack"
    },
    {
       "id": "Delete an app",
@@ -169,11 +169,11 @@
    },
    {
       "id": "Do not map a route to this app",
-      "translation": "不映射到这个程序的路由"
+      "translation": "不为这个应用映射一个路由"
    },
    {
       "id": "Do not start an app after pushing",
-      "translation": "上传后不启动应用程序"
+      "translation": "推送后不启动应用"
    },
    {
       "id": "Domain (e.g. example.com)",
@@ -181,7 +181,7 @@
    },
    {
       "id": "Dump recent logs instead of tailing",
-      "translation": "存储，而不是输出尾部日志"
+      "translation": "生成最近的日志文件，而非读取日志内容"
    },
    {
       "id": "Env variable {{.VarName}} was not set.",
@@ -189,15 +189,15 @@
    },
    {
       "id": "Error reading manifest file:\n{{.Err}}",
-      "translation": "读取清单错误:\n{{.Err}}"
+      "translation": "读取部署描述文件错误:\n{{.Err}}"
    },
    {
       "id": "Error uploading application.\n{{.ApiErr}}",
-      "translation": "错误上传应用程序:\n{{.ApiErr}}"
+      "translation": "上传应用程序:\n{{.ApiErr}}错误"
    },
    {
       "id": "Error: No name found for app",
-      "translation": "错误: 没有应用程序集的名称"
+      "translation": "错误: 没有找到该应用程序名"
    },
    {
       "id": "Error: {{.Err}}",
@@ -237,11 +237,11 @@
    },
    {
       "id": "Ignore manifest file",
-      "translation": "忽略请求清单文件"
+      "translation": "忽略部署描述文件"
    },
    {
       "id": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
-      "translation": "不正确使用方法。从一个配置文件获得的命令行参数无法应用于多个应用程序同时上传（除了-f参数）"
+      "translation": "不正确使用方法。利用部署描述文件部署多个应用程序时，不能使用命令行标志（除了-f）"
    },
    {
       "id": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
@@ -253,7 +253,7 @@
    },
    {
       "id": "Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer",
-      "translation": "无效的实例数: {{.InstanceCount}}\n实例数量必须是个正整数"
+      "translation": "无效的实例数: {{.InstanceCount}}\n实例数必须是正整数"
    },
    {
       "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
@@ -309,11 +309,11 @@
    },
    {
       "id": "Path of app directory or zip file",
-      "translation": "应用程序或zip压缩文件的路径"
+      "translation": "应用程序目录或zip压缩文件路径"
    },
    {
       "id": "Path to manifest",
-      "translation": "配置文件路径"
+      "translation": "部署描述文件的路径"
    },
    {
       "id": "Print out a list of files in a directory or the contents of a specific file",
@@ -321,11 +321,11 @@
    },
    {
       "id": "Push a new app or sync changes to an existing app",
-      "translation": "上传一个新的应用或同步现有应用程序的变更"
+      "translation": "部署新的应用程序或同步更改已存在的应用程序"
    },
    {
       "id": "Push a single app (with or without a manifest):\n",
-      "translation": "上传单个应用程序（带或不带配置文件）:\n"
+      "translation": "部署单一应用程序（带或不带部署描述文件）:\n"
    },
    {
       "id": "Remove an env variable",
@@ -333,7 +333,7 @@
    },
    {
       "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "作为用户{{.CurrentUser}}删除组织{{.OrgName}}/空间{{.SpaceName}}中应用程序{{.AppName}}的环境变量{{.VarName}}..."
+      "translation": "用户{{.CurrentUser}}删除组织{{.OrgName}}/空间{{.SpaceName}}中应用程序{{.AppName}}的环境变量{{.VarName}}..."
    },
    {
       "id": "Rename an app",
@@ -341,7 +341,7 @@
    },
    {
       "id": "Renaming app {{.AppName}} to {{.NewName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "作为用户{{.Username}}，重命名组织{{.OrgName}} /空间{{.SpaceName}}中的应用程序名{{.AppName}}为新的名字{{.NewName}}..."
+      "translation": "用户{{.Username}}将组织{{.OrgName}} /空间{{.SpaceName}}中的应用程序{{.AppName}}重命名为{{.NewName}}..."
    },
    {
       "id": "Restage an app",
@@ -349,7 +349,7 @@
    },
    {
       "id": "Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "作为用户{{.CurrentUser}}，重新装载组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}} ..."
+      "translation": "用户{{.CurrentUser}}，在组织{{.OrgName}}/空间{{.SpaceName}}中restaging 应用程序{{.AppName}}..."
    },
    {
       "id": "Restart an app",
@@ -357,7 +357,7 @@
    },
    {
       "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "作为用户{{.CurrentUser}}，扩展组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}}..."
+      "translation": "用户{{.CurrentUser}}伸缩组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}}..."
    },
    {
       "id": "Set an env variable for an app",
@@ -377,7 +377,7 @@
    },
    {
       "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "作为用户{{.CurrentUser}}显示组织{{.OrgName}}/空间{{.SpaceName}}应用程序{{.AppName}}的规模 ..."
+      "translation": "用户{{.CurrentUser}}显示组织{{.OrgName}}/空间{{.SpaceName}}中应用程序{{.AppName}}的实例数 ..."
    },
    {
       "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

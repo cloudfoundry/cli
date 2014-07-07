@@ -13,15 +13,15 @@
    },
    {
       "id": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "重新命名{{.OldSpaceName}}到{{.NewSpaceName}}组织中{{.OrgName}}为用户{{.CurrentUser}}..."
+      "translation": "重命名空间:用户{{.CurrentUser}}在组织{{.OrgName}}中将{{.OldSpaceName}}重命名为{{.NewSpaceName}}..."
    },
    {
       "id": "Rename a space",
-      "translation": "重新命名空间"
+      "translation": "重命名空间"
    },
    {
       "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
-      "translation": "用户{{.CurrentUser}}请求分配组织{{.TargetOrgName}}中的空间...\n"
+      "translation": "获取空间:用户{{.CurrentUser}}在组织{{.TargetOrgName}}中获取空间...\n"
    },
    {
       "id": "CF_NAME space SPACE",
@@ -45,7 +45,7 @@
    },
    {
       "id": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "用户{{.CurrentUser}}在组织{{.OrgName}}中创建空间{{.SpaceName}}..."
+      "translation": "创建空间中:用户{{.CurrentUser}}在组织{{.OrgName}}中创建空间{{.SpaceName}}..."
    },
    {
       "id": "Force deletion without confirmation",
@@ -65,15 +65,15 @@
    },
    {
       "id": "\nTIP: Use '{{.CFTargetCommand}}' to target new space",
-      "translation": "\n小贴士: 使用'{{.CFTargetCommand}}'指定空间"
+      "translation": "\n小贴士: 使用'{{.CFTargetCommand}}'指定新空间"
    },
    {
       "id": "Domains:",
-      "translation": "域:"
+      "translation": "域名:"
    },
    {
       "id": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
-      "translation": "无法找组织到{{.OrgName}}\n错误: {{.ErrorDescription}}"
+      "translation": "找不到组织{{.OrgName}}\n错误信息: {{.ErrorDescription}}"
    },
    {
       "id": "Organization",
@@ -81,7 +81,7 @@
    },
    {
       "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
-      "translation": "空间提取失败.\n错误: {{.ErrorDescription}}"
+      "translation": "获取不到空间.\n错误信息: {{.ErrorDescription}}"
    },
    {
       "id": "CF_NAME spaces",
@@ -105,7 +105,7 @@
    },
    {
       "id": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "用户{{.CurrentUser}}请求组织{{.OrgName}}中空间{{.TargetSpace}}的信息..."
+      "translation": "获取空间信息中:用户{{.CurrentUser}}在组织{{.OrgName}}中的空间{{.TargetSpace}}信息..."
    },
    {
       "id": "name",
