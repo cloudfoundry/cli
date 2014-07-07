@@ -1,7 +1,7 @@
 [
    {
       "id": "\nTIP: Assign roles with '{{.CurrentUser}} set-org-role' and '{{.CurrentUser}} set-space-role'",
-      "translation": "\n提示: 使用'{{.CurrentUser}} set-org-role'和'{{.CurrentUser}} set-space-role'来分配角色"
+      "translation": "\n小贴士: 使用'{{.CurrentUser}} set-org-role'和'{{.CurrentUser}} set-space-role'来分配角色"
    },
    {
       "id": "   BillingManager - Create and manage the billing account and payment info\n",

@@ -5,7 +5,7 @@
    },
    {
       "id": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error",
-      "translation": "\n提示: 使用'cf login -a API --skip-ssl-validation'或'cf api API --skip-ssl-validation'来处理这种错误"
+      "translation": "\n小贴士: 使用'cf login -a API --skip-ssl-validation'或'cf api API --skip-ssl-validation'要制止这种错误"
    },
    {
       "id": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
@@ -393,7 +393,7 @@
    },
    {
       "id": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "启动应用程序超时\n\n提示: 使用'{{.Command}}'以获取更多信息"
+      "translation": "启动应用程序超时\n\n小贴士: 使用'{{.Command}}'以获取更多信息"
    },
    {
       "id": "Start timeout in seconds",
@@ -401,7 +401,7 @@
    },
    {
       "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "启动不成功\n\n提示: 使用'{{.Command}}'以获取更多信息"
+      "translation": "启动不成功\n\n小贴士: 使用'{{.Command}}'以获取更多信息"
    },
    {
       "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -425,7 +425,7 @@
    },
    {
       "id": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
-      "translation": "提示: 使用'{{.Command}}'来确保你的环境变量更改生效"
+      "translation": "小贴士: 使用'{{.Command}}'来确保你的环境变量更改生效"
    },
    {
       "id": "Tail or show recent logs for an app",
@@ -573,7 +573,7 @@
    },
    {
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "{{.Err}}\n\n提示: 使用'{{.Command}}'获取更多信息"
+      "translation": "{{.Err}}\n\n小贴士: 使用'{{.Command}}'的更多信息"
    },
    {
       "id": "{{.FlappingCount}} failing",

@@ -33,7 +33,7 @@
    },
    {
       "id": "Invalid manifest. Expected a map",
-      "translation": "无效的体现。预期地图"
+      "translation": "无效的配置"
    },
    {
       "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",

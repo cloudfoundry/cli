@@ -253,7 +253,7 @@
    },
    {
       "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-      "translation": "提示: 使用'{{.ApiCommand}}'继续非安全的API终端访问"
+      "translation": "小贴士: 使用'{{.ApiCommand}}'继续非安全的API终端访问"
    },
    {
       "id": "Targeted org {{.OrgName}}\n",
