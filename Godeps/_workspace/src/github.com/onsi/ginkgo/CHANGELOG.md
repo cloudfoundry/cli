@@ -4,10 +4,15 @@ New Features:
 - Test suites with a programmatic focus (`FIt`, `FDescribe`, etc...) exit with non-zero status code, evne when they pass.  This allows CI systems to detect accidental commits of focused test suites.
 - `ginkgo -p` runs the testsuite in parallel with an auto-detected number of nodes.
 - `ginkgo -tags=TAG_LIST` passes a list of tags down to the `go build` command.
+- `ginkgo --failFast` aborts the test suite after the first failure.
+- `ginkgo generate file_1 file_2` can take multiple file arguments.
+- Ginkgo now summarizes any spec failures that occured at the end of the test run. 
+- `ginkgo --randomizeSuites` will run tests *suites* in random order using the generated/passed-in seed.
 
 Bug Fixes:
 
 - `ginkgo boostrap` and `ginkgo generate` no longer fail when dealing with `hyphen-separated-packages`.
+- parallel specs are now better distributed across nodes - fixed a crashing bug where (for example) distributing 11 tests across 7 nodes would panic
 
 ## 1.0.0 (5/24/214)
 New Features:

@@ -148,4 +148,15 @@ var _ = Describe("Flags Specs", func() {
 
 		Ω(output).Should(ContainSubstring("Full Stack Trace"))
 	})
+
+	It("should fail fast when told to", func() {
+		pathToTest = tmpPath("fail")
+		copyIn("fail_fixture", pathToTest)
+		session := startGinkgo(pathToTest, "--failFast")
+		Eventually(session).Should(gexec.Exit(1))
+		output := string(session.Out.Contents())
+
+		Ω(output).Should(ContainSubstring("1 Failed"))
+		Ω(output).Should(ContainSubstring("15 Skipped"))
+	})
 })

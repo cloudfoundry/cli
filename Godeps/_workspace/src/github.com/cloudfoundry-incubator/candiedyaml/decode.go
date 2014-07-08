@@ -51,7 +51,7 @@ type Decoder struct {
 	event     yaml_event_t
 	useNumber bool
 
-	anchors map[string]reflect.Value
+	anchors map[string]interface{}
 }
 
 type ParserError struct {
@@ -104,7 +104,7 @@ func Unmarshal(data []byte, v interface{}) error {
 
 func NewDecoder(r io.Reader) *Decoder {
 	d := &Decoder{
-		anchors: make(map[string]reflect.Value),
+		anchors: make(map[string]interface{}),
 	}
 	yaml_parser_initialize(&d.parser)
 	yaml_parser_set_input_reader(&d.parser, r)
@@ -184,16 +184,17 @@ func (d *Decoder) parse(rv reflect.Value) {
 		return
 	}
 
+	anchor := string(d.event.anchor)
 	switch d.event.event_type {
 	case yaml_SEQUENCE_START_EVENT:
-		d.anchor(rv)
 		d.sequence(rv)
+		d.anchor(anchor, rv)
 	case yaml_MAPPING_START_EVENT:
-		d.anchor(rv)
 		d.mapping(rv)
+		d.anchor(anchor, rv)
 	case yaml_SCALAR_EVENT:
-		d.anchor(rv)
 		d.scalar(rv)
+		d.anchor(anchor, rv)
 	case yaml_ALIAS_EVENT:
 		d.alias(rv)
 	case yaml_DOCUMENT_END_EVENT:
@@ -206,9 +207,9 @@ func (d *Decoder) parse(rv reflect.Value) {
 	}
 }
 
-func (d *Decoder) anchor(rv reflect.Value) {
-	if d.event.anchor != nil {
-		d.anchors[string(d.event.anchor)] = rv
+func (d *Decoder) anchor(anchor string, rv reflect.Value) {
+	if anchor != "" {
+		d.anchors[anchor] = rv.Interface()
 	}
 }
 
@@ -472,10 +473,56 @@ func (d *Decoder) scalar(v reflect.Value) {
 
 func (d *Decoder) alias(rv reflect.Value) {
 	if val, ok := d.anchors[string(d.event.anchor)]; ok {
-		rv.Set(val)
+		rv.Set(reflect.ValueOf(val))
 	}
 
 	d.nextEvent()
+}
+
+func (d *Decoder) valueInterface() interface{} {
+	var v interface{}
+
+	anchor := string(d.event.anchor)
+	switch d.event.event_type {
+	case yaml_SEQUENCE_START_EVENT:
+		v = d.sequenceInterface()
+	case yaml_MAPPING_START_EVENT:
+		v = d.mappingInterface()
+	case yaml_SCALAR_EVENT:
+		v = d.scalarInterface()
+	case yaml_ALIAS_EVENT:
+		return d.aliasInterface()
+	case yaml_DOCUMENT_END_EVENT:
+		d.error(&UnexpectedEventError{
+			Value:     string(d.event.value),
+			EventType: d.event.event_type,
+			At:        d.event.start_mark,
+		})
+
+	}
+
+	d.anchorInterface(anchor, v)
+	return v
+}
+
+func (d *Decoder) scalarInterface() interface{} {
+	_, v := resolveInterface(d.event, d.useNumber)
+
+	d.nextEvent()
+	return v
+}
+
+func (d *Decoder) anchorInterface(anchor string, i interface{}) {
+	if anchor != "" {
+		d.anchors[anchor] = i
+	}
+}
+
+func (d *Decoder) aliasInterface() interface{} {
+	v := d.anchors[string(d.event.anchor)]
+
+	d.nextEvent()
+	return v
 }
 
 // arrayInterface is like array but returns []interface{}.
@@ -514,33 +561,4 @@ func (d *Decoder) mappingInterface() map[interface{}]interface{} {
 
 	d.nextEvent()
 	return m
-}
-
-func (d *Decoder) valueInterface() interface{} {
-	switch d.event.event_type {
-	case yaml_SEQUENCE_START_EVENT:
-		return d.sequenceInterface()
-	case yaml_MAPPING_START_EVENT:
-		return d.mappingInterface()
-	case yaml_SCALAR_EVENT:
-		return d.scalarInterface()
-	case yaml_ALIAS_EVENT:
-		d.error(errors.New("alias interface??"))
-	case yaml_DOCUMENT_END_EVENT:
-	}
-
-	d.error(&UnexpectedEventError{
-		Value:     string(d.event.value),
-		EventType: d.event.event_type,
-		At:        d.event.start_mark,
-	})
-
-	panic("unreachable")
-}
-
-func (d *Decoder) scalarInterface() interface{} {
-	_, v := resolveInterface(d.event, d.useNumber)
-
-	d.nextEvent()
-	return v
 }

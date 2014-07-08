@@ -1,13 +1,13 @@
 package integration_test
 
 import (
-	"runtime"
-	"strings"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/types"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
+	"runtime"
+	"strings"
 )
 
 var _ = Describe("Running Specs", func() {
@@ -106,6 +106,29 @@ var _ = Describe("Running Specs", func() {
 			Ω(output).Should(ContainSubstring("Passing_ginkgo_tests Suite"))
 			Ω(output).ShouldNot(ContainSubstring("More_ginkgo_tests Suite"))
 			Ω(output).Should(ContainSubstring("Test Suite Passed"))
+		})
+	})
+
+	Context("when told to randomizeSuites", func() {
+		BeforeEach(func() {
+			pathToTest = tmpPath("ginkgo")
+			otherPathToTest := tmpPath("other")
+			copyIn("passing_ginkgo_tests", pathToTest)
+			copyIn("more_ginkgo_tests", otherPathToTest)
+		})
+
+		It("should skip packages that match the regexp", func() {
+			session := startGinkgo(tmpDir, "--noColor", "--randomizeSuites", "-r", "--seed=2")
+			Eventually(session).Should(gexec.Exit(0))
+
+			Ω(session).Should(gbytes.Say("More_ginkgo_tests Suite"))
+			Ω(session).Should(gbytes.Say("Passing_ginkgo_tests Suite"))
+
+			session = startGinkgo(tmpDir, "--noColor", "--randomizeSuites", "-r", "--seed=3")
+			Eventually(session).Should(gexec.Exit(0))
+
+			Ω(session).Should(gbytes.Say("Passing_ginkgo_tests Suite"))
+			Ω(session).Should(gbytes.Say("More_ginkgo_tests Suite"))
 		})
 	})
 
@@ -244,6 +267,9 @@ var _ = Describe("Running Specs", func() {
 				Ω(output).Should(ContainSubstring("• Failure"))
 				Ω(output).ShouldNot(ContainSubstring("More_ginkgo_tests Suite"))
 				Ω(output).Should(ContainSubstring("Test Suite Failed"))
+
+				Ω(output).Should(ContainSubstring("Summarizing 1 Failure:"))
+				Ω(output).Should(ContainSubstring("[Fail] FailingGinkgoTests [It] should fail"))
 			})
 		})
 
