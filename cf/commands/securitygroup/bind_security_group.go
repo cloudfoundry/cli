@@ -12,7 +12,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type AssignSecurityGroup struct {
+type BindSecurityGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
 	orgRepo           api.OrganizationRepository
@@ -21,15 +21,15 @@ type AssignSecurityGroup struct {
 	spaceBinder       sgbinder.SecurityGroupSpaceBinder
 }
 
-func NewAssignSecurityGroup(
+func NewBindSecurityGroup(
 	ui terminal.UI,
 	configRepo configuration.Reader,
 	securityGroupRepo security_groups.SecurityGroupRepo,
 	spaceRepo spaces.SpaceRepository,
 	orgRepo api.OrganizationRepository,
 	spaceBinder sgbinder.SecurityGroupSpaceBinder,
-) AssignSecurityGroup {
-	return AssignSecurityGroup{
+) BindSecurityGroup {
+	return BindSecurityGroup{
 		ui:                ui,
 		configRepo:        configRepo,
 		spaceRepo:         spaceRepo,
@@ -39,15 +39,15 @@ func NewAssignSecurityGroup(
 	}
 }
 
-func (cmd AssignSecurityGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd BindSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "assign-security-group",
-		Description: T("Assign a security group to a space"),
-		Usage:       T("CF_NAME assign-security-group SECURITY_GROUP ORG SPACE"),
+		Name:        "bind-security-group",
+		Description: T("Bind a security group to a space"),
+		Usage:       T("CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"),
 	}
 }
 
-func (cmd AssignSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd BindSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(context.Args()) != 3 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -56,7 +56,7 @@ func (cmd AssignSecurityGroup) GetRequirements(requirementsFactory requirements.
 	return
 }
 
-func (cmd AssignSecurityGroup) Run(context *cli.Context) {
+func (cmd BindSecurityGroup) Run(context *cli.Context) {
 	securityGroupName := context.Args()[0]
 	orgName := context.Args()[1]
 	spaceName := context.Args()[2]

@@ -18,10 +18,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("assign-security-group command", func() {
+var _ = Describe("bind-security-group command", func() {
 	var (
 		ui                    *testterm.FakeUI
-		cmd                   AssignSecurityGroup
+		cmd                   BindSecurityGroup
 		configRepo            configuration.ReadWriter
 		fakeSecurityGroupRepo *testapi.FakeSecurityGroupRepo
 		requirementsFactory   *testreq.FakeReqFactory
@@ -38,7 +38,7 @@ var _ = Describe("assign-security-group command", func() {
 		fakeSecurityGroupRepo = &testapi.FakeSecurityGroupRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		fakeSpaceBinder = &zoidberg.FakeSecurityGroupSpaceBinder{}
-		cmd = NewAssignSecurityGroup(ui, configRepo, fakeSecurityGroupRepo, fakeSpaceRepo, fakeOrgRepo, fakeSpaceBinder)
+		cmd = NewBindSecurityGroup(ui, configRepo, fakeSecurityGroupRepo, fakeSpaceRepo, fakeOrgRepo, fakeSpaceBinder)
 	})
 
 	runCommand := func(args ...string) {

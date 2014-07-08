@@ -141,7 +141,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 		repoLocator.GetRunningSecurityGroupsRepository(),
 	)
 	factory.cmdsByName["running-security-groups"] = securitygroup.NewListRunningSecurityGroups(ui, config, repoLocator.GetRunningSecurityGroupsRepository())
-	factory.cmdsByName["assign-security-group"] = securitygroup.NewAssignSecurityGroup(
+	factory.cmdsByName["bind-security-group"] = securitygroup.NewBindSecurityGroup(
 		ui,
 		config,
 		repoLocator.GetSecurityGroupRepository(),
@@ -149,7 +149,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 		repoLocator.GetOrganizationRepository(),
 		repoLocator.GetSecurityGroupSpaceBinder(),
 	)
-	factory.cmdsByName["unassign-security-group"] = securitygroup.NewUnassignSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository(), repoLocator.GetSecurityGroupSpaceBinder())
+	factory.cmdsByName["unbind-security-group"] = securitygroup.NewUnbindSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository(), repoLocator.GetSecurityGroupSpaceBinder())
 
 	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["create-route"] = createRoute
