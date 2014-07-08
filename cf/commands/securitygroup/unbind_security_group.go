@@ -12,7 +12,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type UnassignSecurityGroup struct {
+type UnbindSecurityGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
@@ -21,8 +21,8 @@ type UnassignSecurityGroup struct {
 	secBinder         sgbinder.SecurityGroupSpaceBinder
 }
 
-func NewUnassignSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, orgRepo api.OrganizationRepository, spaceRepo spaces.SpaceRepository, secBinder sgbinder.SecurityGroupSpaceBinder) UnassignSecurityGroup {
-	return UnassignSecurityGroup{
+func NewUnbindSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, orgRepo api.OrganizationRepository, spaceRepo spaces.SpaceRepository, secBinder sgbinder.SecurityGroupSpaceBinder) UnbindSecurityGroup {
+	return UnbindSecurityGroup{
 		ui:                ui,
 		configRepo:        configRepo,
 		securityGroupRepo: securityGroupRepo,
@@ -32,15 +32,15 @@ func NewUnassignSecurityGroup(ui terminal.UI, configRepo configuration.Reader, s
 	}
 }
 
-func (cmd UnassignSecurityGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd UnbindSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "unassign-security-group",
-		Description: T("Unassign a security group from a space"),
-		Usage:       T("CF_NAME unassign-security-group SECURITY_GROUP ORG SPACE"),
+		Name:        "unbind-security-group",
+		Description: T("Unbind a security group from a space"),
+		Usage:       T("CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"),
 	}
 }
 
-func (cmd UnassignSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd UnbindSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	argLength := len(context.Args())
 	if argLength == 0 || argLength == 2 || argLength >= 4 {
 		cmd.ui.FailWithUsage(context)
@@ -50,7 +50,7 @@ func (cmd UnassignSecurityGroup) GetRequirements(requirementsFactory requirement
 	return requirements, nil
 }
 
-func (cmd UnassignSecurityGroup) Run(context *cli.Context) {
+func (cmd UnbindSecurityGroup) Run(context *cli.Context) {
 	var spaceGuid string
 	secName := context.Args()[0]
 
@@ -83,7 +83,7 @@ func (cmd UnassignSecurityGroup) Run(context *cli.Context) {
 	cmd.ui.Ok()
 }
 
-func (cmd UnassignSecurityGroup) flavorText(secName string, orgName string, spaceName string) {
+func (cmd UnbindSecurityGroup) flavorText(secName string, orgName string, spaceName string) {
 	cmd.ui.Say(T("Removing security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
 		map[string]interface{}{
 			"security_group": terminal.EntityNameColor(secName),
@@ -93,7 +93,7 @@ func (cmd UnassignSecurityGroup) flavorText(secName string, orgName string, spac
 		}))
 }
 
-func (cmd UnassignSecurityGroup) lookupSpaceGuid(orgName string, spaceName string) string {
+func (cmd UnbindSecurityGroup) lookupSpaceGuid(orgName string, spaceName string) string {
 	organization, err := cmd.orgRepo.FindByName(orgName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

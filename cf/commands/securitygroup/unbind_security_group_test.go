@@ -21,7 +21,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("unassign-security-group command", func() {
+var _ = Describe("unbind-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
@@ -43,7 +43,7 @@ var _ = Describe("unassign-security-group command", func() {
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewUnassignSecurityGroup(ui, configRepo, securityGroupRepo, orgRepo, spaceRepo, secBinder)
+		cmd := NewUnbindSecurityGroup(ui, configRepo, securityGroupRepo, orgRepo, spaceRepo, secBinder)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
