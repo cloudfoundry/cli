@@ -87,31 +87,6 @@ func gatewaySliceFromMap(gateway_map map[string]net.Gateway) []net.WarningProduc
 }
 
 func init() {
-	cli.AppHelpTemplate = `NAME:
-   {{.Name}} - {{.Usage}}
-
-USAGE:
-   [environment variables] {{.Name}} [global options] command [arguments...] [command options]
-
-VERSION:
-   {{.Version}}
-
-COMMANDS:
-   {{range .Commands}}{{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Description}}
-   {{end}}
-GLOBAL OPTIONS:
-   {{range .Flags}}{{.}}
-   {{end}}
-ENVIRONMENT VARIABLES:
-   CF_COLOR=false - will not colorize output
-   CF_HOME=path/to/config/ override default config directory
-   CF_STAGING_TIMEOUT=15 max wait time for buildpack staging, in minutes
-   CF_STARTUP_TIMEOUT=5 max wait time for app instance startup, in minutes
-   CF_TRACE=true - print API request diagnostics to stdout
-   CF_TRACE=path/to/trace.log - append API request diagnostics to a log file
-   HTTP_PROXY=http://proxy.example.com:8080 - enable HTTP proxying for API requests
-`
-
 	cli.CommandHelpTemplate = `NAME:
    {{.Name}} - {{.Description}}
 {{with .ShortName}}

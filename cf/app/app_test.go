@@ -14,6 +14,7 @@ import (
 	testmanifest "github.com/cloudfoundry/cli/testhelpers/manifest"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/codegangsta/cli"
+	"github.com/maximilien/i18n4cf/Godeps/_workspace/src/github.com/cloudfoundry/cli/cf/io_helpers"
 
 	. "github.com/cloudfoundry/cli/cf/app"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -83,6 +84,22 @@ var _ = Describe("App", func() {
 			for _, cmdName := range expectedCommandNames {
 				app.Run([]string{"", cmdName})
 				Expect(cmdRunner.cmdName).To(Equal(cmdName))
+			}
+		})
+	})
+
+	Context("when running 'cf --help'", func() {
+		It("should output the help in our custom format", func() {
+
+			output := io_helpers.CaptureOutput(func() {
+				app.Run([]string{"", "--help"})
+			})
+
+			mergedOutput := strings.Join(output, "\n")
+			Expect(mergedOutput).To(ContainSubstring("CF_TRACE=true"), "CF_TRACE=true not in help")
+
+			for _, name := range expectedCommandNames {
+				Expect(mergedOutput).To(ContainSubstring(name), name+" not in help")
 			}
 		})
 	})
