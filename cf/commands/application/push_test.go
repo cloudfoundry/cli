@@ -1,6 +1,10 @@
 package application_test
 
 import (
+	"os"
+	"path/filepath"
+	"syscall"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -18,9 +22,6 @@ import (
 	"github.com/cloudfoundry/cli/words"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
-	"path/filepath"
-	"syscall"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
@@ -151,6 +152,21 @@ var _ = Describe("Push Command", func() {
 				callPush("fresh-prince")
 
 				Expect(authRepo.RefreshTokenCalled).To(BeTrue())
+			})
+
+			Context("when refreshing the auth token fails", func() {
+				BeforeEach(func() {
+					authRepo.RefreshTokenError = errors.New("I accidentally the UAA")
+				})
+
+				It("it displays an error", func() {
+					callPush("of-bel-air")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"accidentally the UAA"},
+					))
+				})
 			})
 
 			It("creates an app", func() {

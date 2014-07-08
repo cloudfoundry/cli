@@ -3,13 +3,12 @@ package authentication
 import (
 	"encoding/base64"
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/terminal"
-	"net/url"
-	"os"
-	"strings"
 )
 
 type TokenRefresher interface {
@@ -88,22 +87,17 @@ func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (pro
 	return
 }
 
-func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr error) {
+func (uaa UAAAuthenticationRepository) RefreshAuthToken() (string, error) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken()},
 		"grant_type":    {"refresh_token"},
 		"scope":         {""},
 	}
 
-	apiErr = uaa.getAuthToken(data)
-	updatedToken = uaa.config.AccessToken()
+	apiErr := uaa.getAuthToken(data)
+	updatedToken := uaa.config.AccessToken()
 
-	if apiErr != nil {
-		fmt.Printf("%s\n\n", terminal.NotLoggedInText())
-		os.Exit(1)
-	}
-
-	return
+	return updatedToken, apiErr
 }
 
 func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {

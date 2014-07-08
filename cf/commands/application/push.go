@@ -107,7 +107,12 @@ func (cmd *Push) GetRequirements(requirementsFactory requirements.Factory, c *cl
 
 func (cmd *Push) Run(c *cli.Context) {
 	appSet := cmd.findAndValidateAppsToPush(c)
-	cmd.authRepo.RefreshAuthToken()
+	_, apiErr := cmd.authRepo.RefreshAuthToken()
+	if apiErr != nil {
+		cmd.ui.Failed(fmt.Sprintf("Error refreshing auth token.\n%s", apiErr.Error()))
+		return
+	}
+
 	routeActor := actors.NewRouteActor(cmd.ui, cmd.routeRepo)
 	noHostname := c.Bool("no-hostname")
 
