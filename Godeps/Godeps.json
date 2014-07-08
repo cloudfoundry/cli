@@ -2,7 +2,7 @@
 	"ImportPath": "github.com/cloudfoundry/cli",
 	"GoVersion": "go1.2.2",
 	"Packages": [
-		"./cf/..."
+		"./..."
 	],
 	"Deps": [
 		{
@@ -47,6 +47,10 @@
 		{
 			"ImportPath": "github.com/gorilla/websocket",
 			"Rev": "10a95d14a3a215f5e2045d3dbbcd29f1ab209586"
+		},
+		{
+			"ImportPath": "github.com/maximilien/i18n4cf/Godeps/_workspace/src/github.com/cloudfoundry/cli/cf/io_helpers",
+			"Rev": "6cdd6cd89577a7ea4e4eaf6f05f25c154b27465b"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
