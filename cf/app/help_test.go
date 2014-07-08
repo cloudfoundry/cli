@@ -27,7 +27,7 @@ var _ = Describe("Help", func() {
 {{end}}{{end}}{{end}}
 `
 		output := io_helpers.CaptureOutput(func() {
-			app.ShowAppHelp(dummyTemplate, createApp(commandFactory))
+			app.ShowHelp(dummyTemplate, createApp(commandFactory))
 		})
 
 		for _, metadata := range commandFactory.CommandMetadatas() {

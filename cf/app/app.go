@@ -64,7 +64,7 @@ func NewApp(cmdRunner command_runner.Runner, metadatas ...command_metadata.Comma
 	}
 
 	cli.AppHelpTemplate = appHelpTemplate
-	cli.HelpPrinter = ShowAppHelp
+	cli.HelpPrinter = ShowHelp
 
 	trace.Logger.Printf("\n%s\n%s\n\n", terminal.HeaderColor(T("VERSION:")), cf.Version)
 
