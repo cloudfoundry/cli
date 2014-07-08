@@ -166,6 +166,24 @@ var _ = Describe("AuthenticationRepository", func() {
 		})
 	})
 
+	Describe("refreshing the auth token", func() {
+		var refreshedToken string
+		var apiErr error
+
+		JustBeforeEach(func() {
+			refreshedToken, apiErr = auth.RefreshAuthToken()
+		})
+
+		Context("when there is a UAA error", func() {
+			BeforeEach(func() {
+				setupTestServer(errorLoginRequest)
+			})
+
+			It("returns the API error", func() {
+				Expect(apiErr).NotTo(BeNil())
+			})
+		})
+	})
 })
 
 var authHeaders = http.Header{

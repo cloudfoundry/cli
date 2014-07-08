@@ -20,6 +20,7 @@ type FakeAuthenticationRepository struct {
 	AccessToken        string
 	RefreshToken       string
 	RefreshTokenCalled bool
+	RefreshTokenError  error
 }
 
 func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiErr error) {
@@ -40,9 +41,9 @@ func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]st
 	return
 }
 
-func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr error) {
+func (auth *FakeAuthenticationRepository) RefreshAuthToken() (string, error) {
 	auth.RefreshTokenCalled = true
-	return
+	return "", auth.RefreshTokenError
 }
 
 func (auth *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]configuration.AuthPrompt, apiErr error) {
