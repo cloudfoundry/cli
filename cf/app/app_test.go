@@ -11,10 +11,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/trace"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
 	testmanifest "github.com/cloudfoundry/cli/testhelpers/manifest"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/codegangsta/cli"
-	"github.com/maximilien/i18n4cf/Godeps/_workspace/src/github.com/cloudfoundry/cli/cf/io_helpers"
 
 	. "github.com/cloudfoundry/cli/cf/app"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"

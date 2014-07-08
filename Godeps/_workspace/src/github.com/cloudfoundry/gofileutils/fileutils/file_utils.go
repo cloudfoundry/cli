@@ -2,7 +2,9 @@ package fileutils
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -27,19 +29,31 @@ func Create(path string) (file *os.File, err error) {
 func CopyPathToPath(fromPath, toPath string) (err error) {
 	srcFileInfo, err := os.Stat(fromPath)
 	if err != nil {
-		return
+		return err
 	}
 
 	if srcFileInfo.IsDir() {
 		err = os.MkdirAll(toPath, srcFileInfo.Mode())
 		if err != nil {
-			return
+			return err
+		}
+
+		files, err := ioutil.ReadDir(fromPath)
+		if err != nil {
+			return err
+		}
+
+		for _, file := range files {
+			err = CopyPathToPath(path.Join(fromPath, file.Name()), path.Join(toPath, file.Name()))
+			if err != nil {
+				return err
+			}
 		}
 	} else {
 		var dst *os.File
 		dst, err = Create(toPath)
 		if err != nil {
-			return
+			return err
 		}
 		defer dst.Close()
 

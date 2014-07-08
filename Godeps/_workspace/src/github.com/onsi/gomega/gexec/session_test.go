@@ -75,6 +75,13 @@ var _ = Describe("Session", func() {
 		})
 	})
 
+	Describe("exited", func() {
+		It("should close when the command exits", func() {
+			Eventually(session.Exited).Should(BeClosed())
+			Ω(session.ExitCode()).ShouldNot(Equal(-1))
+		})
+	})
+
 	Describe("kill", func() {
 		It("should kill the command and wait for it to exit", func() {
 			session, err := Start(exec.Command("sleep", "10000000"), GinkgoWriter, GinkgoWriter)
@@ -82,7 +89,7 @@ var _ = Describe("Session", func() {
 
 			session.Kill()
 			Ω(session).ShouldNot(Exit(), "Should not exit immediately...")
-			Eventually(session).Should(Exit(INVALID_EXIT_CODE), "Go handles processes the exit with signals in a weird way.  It doesn't return a valid status code!")
+			Eventually(session).Should(Exit(128 + 9))
 		})
 	})
 
@@ -93,7 +100,7 @@ var _ = Describe("Session", func() {
 
 			session.Interrupt()
 			Ω(session).ShouldNot(Exit(), "Should not exit immediately...")
-			Eventually(session).Should(Exit(INVALID_EXIT_CODE), "Go handles processes the exit with signals in a weird way.  It doesn't return a valid status code!")
+			Eventually(session).Should(Exit(128 + 2))
 		})
 	})
 
@@ -104,18 +111,18 @@ var _ = Describe("Session", func() {
 
 			session.Terminate()
 			Ω(session).ShouldNot(Exit(), "Should not exit immediately...")
-			Eventually(session).Should(Exit(INVALID_EXIT_CODE), "Go handles processes the exit with signals in a weird way.  It doesn't return a valid status code!")
+			Eventually(session).Should(Exit(128 + 15))
 		})
 	})
 
-	Describe("singal", func() {
+	Describe("signal", func() {
 		It("should send the signal to the command", func() {
 			session, err := Start(exec.Command("sleep", "10000000"), GinkgoWriter, GinkgoWriter)
 			Ω(err).ShouldNot(HaveOccurred())
 
 			session.Signal(syscall.SIGABRT)
 			Ω(session).ShouldNot(Exit(), "Should not exit immediately...")
-			Eventually(session).Should(Exit(INVALID_EXIT_CODE), "Go handles processes the exit with signals in a weird way.  It doesn't return a valid status code!")
+			Eventually(session).Should(Exit(128 + 6))
 		})
 	})
 

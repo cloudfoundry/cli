@@ -7,25 +7,25 @@
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go.crypto/ssh/terminal",
-			"Comment": "null-200",
-			"Rev": "5478be1963aafa9025e9bf0837aff6013eb92e5b"
+			"Comment": "null-213",
+			"Rev": "aa2644fe4aa50e3b38d75187b4799b1f0c9ddcef"
 		},
 		{
 			"ImportPath": "code.google.com/p/go.net/websocket",
-			"Comment": "null-123",
-			"Rev": "424a15ce8b2f02f6324f2727c5fde92875f62990"
+			"Comment": "null-136",
+			"Rev": "28ff664507e453c4455b8c65e701bbe2b2ac980d"
 		},
 		{
 			"ImportPath": "code.google.com/p/gogoprotobuf/proto",
-			"Rev": "dc9b8350fb4568b6562900df872672f378242552"
+			"Rev": "d228c1a206c3a756d7ec6cc3579d92d00c35a161"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "dfcb028513f33935d16a9c278a9b38c39dae6343"
+			"Rev": "746fed644c930c0635f84866d433fd7de5f444cf"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
-			"Rev": "a141d15d255568a910ba2716c915ffc3b298a741"
+			"Rev": "a4a0cae5ff8a342ba01fce700b9e41c6942c0e5e"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
@@ -33,41 +33,37 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
-			"Rev": "b2f1c6577e09b5727076c72f4096e3cc5cfd737d"
+			"Rev": "da9f8b85c0175500cbb836bdb9c5488939e20c43"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/signature",
-			"Rev": "b2f1c6577e09b5727076c72f4096e3cc5cfd737d"
+			"Rev": "da9f8b85c0175500cbb836bdb9c5488939e20c43"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "1.0.0-72-gbb91895",
-			"Rev": "bb9189510af1f49580c073c9e59e8bf288f0df27"
+			"Comment": "1.0.0-74-g5ddbbe3",
+			"Rev": "5ddbbe33e57edd8bdbe29a1592cd842a82752074"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "10a95d14a3a215f5e2045d3dbbcd29f1ab209586"
-		},
-		{
-			"ImportPath": "github.com/maximilien/i18n4cf/Godeps/_workspace/src/github.com/cloudfoundry/cli/cf/io_helpers",
-			"Rev": "6cdd6cd89577a7ea4e4eaf6f05f25c154b27465b"
+			"Rev": "aef42a8ae63a680a8c5d4ca25b01ca57a97ffa5c"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
-			"Rev": "029e8da39fe5258903a1f23dae51c55951866032"
+			"Rev": "b0885ba0e4ae0991d6253671feae085a01bd704d"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.0.0-8-g291d5d8",
-			"Rev": "291d5d88535787731a9a43acfa0fa00d41aafaa8"
+			"Comment": "v1.0.0-17-gd3d2576",
+			"Rev": "d3d25767b7af0efa7b12a900d0f4ac5477ed9fa1"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Rev": "05c2b322d514282430789eb9ff8efee6c904cc77"
+			"Rev": "f082bb88f22b295e1152e2ee1cee1ba174ad6f07"
 		},
 		{
 			"ImportPath": "github.com/pivotal-cf-experimental/jibber_jabber",
-			"Rev": "1522f96b6afceccc5c1bb80a7bdbbe8296ae9200"
+			"Rev": "7998cf99dcec89f995f9da1351b0b38b45e3a83a"
 		}
 	]
 }

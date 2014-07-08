@@ -15,13 +15,13 @@ limitations under the License.
 package candiedyaml
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"math"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Decode", func() {
@@ -440,17 +440,102 @@ var _ = Describe("Decode", func() {
 		}))
 	})
 
-	It("Decodes aliases", func() {
-		f, _ := os.Open("fixtures/specification/example2_10.yaml")
-		d := NewDecoder(f)
-		v := make(map[string][]string)
+	Context("Aliases", func() {
+		Context("to known types", func() {
+			It("aliases scalars", func() {
+				f, _ := os.Open("fixtures/specification/example2_10.yaml")
+				d := NewDecoder(f)
+				v := make(map[string][]string)
 
-		err := d.Decode(&v)
-		Ω(err).ShouldNot(HaveOccurred())
-		Ω(v).Should(Equal(map[string][]string{
-			"hr":  []string{"Mark McGwire", "Sammy Sosa"},
-			"rbi": []string{"Sammy Sosa", "Ken Griffey"},
-		}))
+				err := d.Decode(&v)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(v).Should(Equal(map[string][]string{
+					"hr":  {"Mark McGwire", "Sammy Sosa"},
+					"rbi": {"Sammy Sosa", "Ken Griffey"},
+				}))
+			})
+
+			It("aliases sequences", func() {
+				d := NewDecoder(strings.NewReader(`
+---
+hr: &ss
+  - MG
+  - SS
+rbi: *ss
+`))
+				v := make(map[string][]string)
+				err := d.Decode(&v)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(v).Should(Equal(map[string][]string{
+					"hr":  {"MG", "SS"},
+					"rbi": {"MG", "SS"},
+				}))
+			})
+
+			It("aliases maps", func() {
+				d := NewDecoder(strings.NewReader(`
+---
+hr: &ss
+  MG : SS
+rbi: *ss
+`))
+				v := make(map[string]map[string]string)
+				err := d.Decode(&v)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(v).Should(Equal(map[string]map[string]string{
+					"hr":  {"MG": "SS"},
+					"rbi": {"MG": "SS"},
+				}))
+			})
+		})
+
+		Context("to Interface", func() {
+			It("aliases scalars", func() {
+				f, _ := os.Open("fixtures/specification/example2_10.yaml")
+				d := NewDecoder(f)
+				v := make(map[string]interface{})
+
+				err := d.Decode(&v)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(v).Should(Equal(map[string]interface{}{
+					"hr":  []interface{}{"Mark McGwire", "Sammy Sosa"},
+					"rbi": []interface{}{"Sammy Sosa", "Ken Griffey"},
+				}))
+			})
+
+			It("aliases sequences", func() {
+				d := NewDecoder(strings.NewReader(`
+---
+hr: &ss
+  - MG
+  - SS
+rbi: *ss
+`))
+				v := make(map[string]interface{})
+				err := d.Decode(&v)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(v).Should(Equal(map[string]interface{}{
+					"hr":  []interface{}{"MG", "SS"},
+					"rbi": []interface{}{"MG", "SS"},
+				}))
+			})
+
+			It("aliases maps", func() {
+				d := NewDecoder(strings.NewReader(`
+---
+hr: &ss
+  MG : SS
+rbi: *ss
+`))
+				v := make(map[string]interface{})
+				err := d.Decode(&v)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(v).Should(Equal(map[string]interface{}{
+					"hr":  map[interface{}]interface{}{"MG": "SS"},
+					"rbi": map[interface{}]interface{}{"MG": "SS"},
+				}))
+			})
+		})
 	})
 
 	Context("When decoding fails", func() {
@@ -474,7 +559,6 @@ var _ = Describe("Decode", func() {
 				Ω(err).ShouldNot(HaveOccurred())
 				Ω(v.Value).Should(BeNil())
 			})
-
 		})
 
 		Context("Receiver is a pointer", func() {

@@ -27,6 +27,9 @@ type Session struct {
 	//A *gbytes.Buffer connected to the command's stderr
 	Err *gbytes.Buffer
 
+	//A channel that will close when the command exits
+	Exited <-chan struct{}
+
 	lock     *sync.Mutex
 	exitCode int
 }
@@ -60,10 +63,13 @@ When the session exits it closes the stdout and stderr gbytes buffers.  This wil
 Eventuallys waiting fo the buffers to Say something.
 */
 func Start(command *exec.Cmd, outWriter io.Writer, errWriter io.Writer) (*Session, error) {
+	exited := make(chan struct{})
+
 	session := &Session{
 		Command:  command,
 		Out:      gbytes.NewBuffer(),
 		Err:      gbytes.NewBuffer(),
+		Exited:   exited,
 		lock:     &sync.Mutex{},
 		exitCode: -1,
 	}
@@ -85,7 +91,7 @@ func Start(command *exec.Cmd, outWriter io.Writer, errWriter io.Writer) (*Sessio
 
 	err := command.Start()
 	if err == nil {
-		go session.monitorForExit()
+		go session.monitorForExit(exited)
 	}
 
 	return session, err
@@ -107,6 +113,10 @@ ExitCode returns the wrapped command's exit code.  If the command hasn't exited 
 To assert that the command has exited it is more convenient to use the Exit matcher:
 
 	Eventually(s).Should(gexec.Exit())
+
+When the process exits because it has received a particular signal, the exit code will be 128+signal-value
+(See http://www.tldp.org/LDP/abs/html/exitcodes.html and http://man7.org/linux/man-pages/man7/signal.7.html)
+
 */
 func (s *Session) ExitCode() int {
 	s.lock.Lock()
@@ -183,16 +193,22 @@ func (s *Session) Signal(signal os.Signal) *Session {
 	return s
 }
 
-func (s *Session) monitorForExit() {
+func (s *Session) monitorForExit(exited chan<- struct{}) {
 	err := s.Command.Wait()
 	s.lock.Lock()
-	s.exitCode = s.Command.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
 	s.Out.Close()
 	s.Err.Close()
-	if s.exitCode == -1 && err != nil {
-		//The process has exited, but probably received a signal.
-		//This returns an error to s.Command.Wait, but s.Command.ProcessState.Sys().(syscall.WaitStatus).ExitStatus() returns -1
-		s.exitCode = INVALID_EXIT_CODE
+	status := s.Command.ProcessState.Sys().(syscall.WaitStatus)
+	if status.Signaled() {
+		s.exitCode = 128 + int(status.Signal())
+	} else {
+		exitStatus := status.ExitStatus()
+		if exitStatus == -1 && err != nil {
+			s.exitCode = INVALID_EXIT_CODE
+		}
+		s.exitCode = exitStatus
 	}
 	s.lock.Unlock()
+
+	close(exited)
 }

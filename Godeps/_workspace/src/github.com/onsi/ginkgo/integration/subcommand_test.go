@@ -177,6 +177,25 @@ var _ = Describe("Subcommand", func() {
 			})
 		})
 
+		Context("with multiple arguments", func() {
+			It("should generate a test file named after the argument", func() {
+				session := startGinkgo(pkgPath, "generate", "baz", "buzz")
+				Eventually(session).Should(gexec.Exit(0))
+				output := session.Out.Contents()
+
+				Ω(output).Should(ContainSubstring("baz_test.go"))
+				Ω(output).Should(ContainSubstring("buzz_test.go"))
+
+				content, err := ioutil.ReadFile(filepath.Join(pkgPath, "baz_test.go"))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(content).Should(ContainSubstring(`var _ = Describe("Baz", func() {`))
+
+				content, err = ioutil.ReadFile(filepath.Join(pkgPath, "buzz_test.go"))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(content).Should(ContainSubstring(`var _ = Describe("Buzz", func() {`))
+			})
+		})
+
 		Context("with nodot", func() {
 			It("should not import ginkgo or gomega", func() {
 				session := startGinkgo(pkgPath, "generate", "--nodot")

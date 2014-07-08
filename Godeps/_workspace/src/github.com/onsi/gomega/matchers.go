@@ -1,6 +1,8 @@
 package gomega
 
 import (
+	"time"
+
 	"github.com/onsi/gomega/matchers"
 )
 
@@ -172,10 +174,41 @@ func BeZero() OmegaMatcher {
 //    Ω([]string{"Foo", "FooBar"}).Should(ContainElement(ContainSubstring("Bar")))
 //
 //Actual must be an array, slice or map.
-//For maps, containElement searches through the map's values.
+//For maps, ContainElement searches through the map's values.
 func ContainElement(element interface{}) OmegaMatcher {
 	return &matchers.ContainElementMatcher{
 		Element: element,
+	}
+}
+
+//ConsistOf succeeds if actual contains preciely the elements passed into the matcher.  The ordering of the elements does not matter.
+//By default ConsistOf() uses Equal() to match the elements, however custom matchers can be passed in instead.  Here are some examples:
+//
+//    Ω([]string{"Foo", "FooBar"}).Should(ConsistOf("FooBar", "Foo"))
+//    Ω([]string{"Foo", "FooBar"}).Should(ConsistOf(ContainSubstring("Bar"), "Foo"))
+//    Ω([]string{"Foo", "FooBar"}).Should(ConsistOf(ContainSubstring("Foo"), ContainSubstring("Foo")))
+//
+//Actual must be an array, slice or map.  For maps, ConsistOf matches against the map's values.
+//
+//You typically pass variadic arguments to ConsistOf (as in the examples above).  However, if you need to pass in a slice you can provided that it
+//is the only element passed in to ConsistOf:
+//
+//    Ω([]string{"Foo", "FooBar"}).Should(ConsistOf([]string{"FooBar", "Foo"}))
+//
+//Note that Go's type system does not allow you to write this as ConsistOf([]string{"FooBar", "Foo"}...) as []string and []interface{} are different types - hence the need for this special rule.
+//When using `ConsistOf` with custom matchers you should be wary of cases where a matcher is under-specified and may match *more* than the element it is intended to match.  Consider this example:
+//
+//     Ω([]string{"Foo", "FooBar"}).ShouldConsistOf(ContainSubstring("Foo"), ContainSubstring("Bar"))
+//
+// will pass, but:
+//
+//     Ω([]string{"FooBar", "Foo"}).ShouldConsistOf(ContainSubstring("Foo"), ContainSubstring("Bar"))
+//
+// will fail as the first `ContainSubstring` matcher will greedily match the `"FooBar"` leaving nothing for the second `ContainSubstring` matcher to match against.
+
+func ConsistOf(elements ...interface{}) OmegaMatcher {
+	return &matchers.ConsistOfMatcher{
+		Elements: elements,
 	}
 }
 
@@ -186,6 +219,18 @@ func ContainElement(element interface{}) OmegaMatcher {
 func HaveKey(key interface{}) OmegaMatcher {
 	return &matchers.HaveKeyMatcher{
 		Key: key,
+	}
+}
+
+//HaveKeyWithValue succeeds if actual is a map with the passed in key and value.
+//By default HaveKeyWithValue uses Equal() to perform the match, however a
+//matcher can be passed in instead:
+//    Ω(map[string]string{"Foo": "Bar", "BazFoo": "Duck"}).Should(HaveKeyWithValue("Foo", "Bar"))
+//    Ω(map[string]string{"Foo": "Bar", "BazFoo": "Duck"}).Should(HaveKeyWithValue(MatchRegexp(`.+Foo$`), "Bar"))
+func HaveKeyWithValue(key interface{}, value interface{}) OmegaMatcher {
+	return &matchers.HaveKeyWithValueMatcher{
+		Key:   key,
+		Value: value,
 	}
 }
 
@@ -204,6 +249,18 @@ func BeNumerically(comparator string, compareTo ...interface{}) OmegaMatcher {
 	return &matchers.BeNumericallyMatcher{
 		Comparator: comparator,
 		CompareTo:  compareTo,
+	}
+}
+
+//BeTemporally compares time.Time's like BeNumerically
+//Actual and expected must be time.Time. The comparators are the same as for BeNumerically
+//    Ω(time.Now()).Should(BeTemporally(">", time.Time{}))
+//    Ω(time.Now()).Should(BeTemporally("~", time.Now(), time.Second))
+func BeTemporally(comparator string, compareTo time.Time, threshold ...time.Duration) OmegaMatcher {
+	return &matchers.BeTemporallyMatcher{
+		Comparator: comparator,
+		CompareTo:  compareTo,
+		Threshold:  threshold,
 	}
 }
 

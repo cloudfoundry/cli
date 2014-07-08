@@ -1,12 +1,14 @@
 package fileutils_test
 
 import (
+	"io/ioutil"
+	"os"
+	"path"
+	"path/filepath"
+
 	"github.com/cloudfoundry/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 var _ = Describe("Fileutils File", func() {
@@ -127,6 +129,12 @@ var _ = Describe("Fileutils File", func() {
 				fileInfo, err := os.Stat(destPath)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(fileInfo.IsDir()).To(BeTrue())
+			})
+
+			It("copies all of the files from the src directory", func() {
+				fileInfo, err := os.Stat(path.Join(destPath, "some-file"))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fileInfo.IsDir()).To(BeFalse())
 			})
 
 			It("preserves the directory's mode", func() {
