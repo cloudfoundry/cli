@@ -50,9 +50,16 @@ var _ = Describe("update-security-group command", func() {
 			runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
+
+		It("fails with usage when a file path is not provided", func() {
+			requirementsFactory.LoginSuccess = true
+			runCommand("my-group-name")
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
 	Context("when the user is logged in", func() {
+		var tempFile *os.File
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			securityGroup := models.SecurityGroup{
@@ -62,51 +69,52 @@ var _ = Describe("update-security-group command", func() {
 				},
 			}
 			securityGroupRepo.ReadReturns(securityGroup, nil)
+			tempFile, _ = ioutil.TempFile("", "")
 		})
 
-		It("updates the security group", func() {
-			runCommand("my-group")
-			arg1, _ := securityGroupRepo.UpdateArgsForCall(0)
-			Expect(arg1).To(Equal("my-group-guid"))
+		AfterEach(func() {
+			tempFile.Close()
+			os.Remove(tempFile.Name())
 		})
 
-		It("displays a message describing what its going to do", func() {
-			runCommand("my-group")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Updating security group", "my-group", "my-user"},
-				[]string{"OK"},
-			))
+		JustBeforeEach(func() {
+			runCommand("my-group-name", tempFile.Name())
 		})
 
-		Context("when the user specifies rules", func() {
-			var tempFile *os.File
-
+		Context("when the file specified has valid json", func() {
 			BeforeEach(func() {
-				tempFile, _ = ioutil.TempFile("", "")
+				tempFile.Write([]byte(`[{"protocol":"udp","port":"8080-9090","destination":"198.41.191.47/1"}]`))
 			})
 
-			AfterEach(func() {
-				tempFile.Close()
-				os.Remove(tempFile.Name())
+			It("displays a message describing what its going to do", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating security group", "my-group-name", "my-user"},
+					[]string{"OK"},
+				))
 			})
 
-			JustBeforeEach(func() {
-				runCommand("--json", tempFile.Name(), "security-groups-rule-everything-around-me")
+			It("updates the security group with those rules, obviously", func() {
+				jsonData := []map[string]interface{}{
+					{"protocol": "udp", "port": "8080-9090", "destination": "198.41.191.47/1"},
+				}
+
+				_, jsonArg := securityGroupRepo.UpdateArgsForCall(0)
+
+				Expect(jsonArg).To(Equal(jsonData))
 			})
 
-			Context("when the file specified has valid json", func() {
-				BeforeEach(func() {
-					tempFile.Write([]byte(`[{"protocol":"udp","port":"8080-9090","destination":"198.41.191.47/1"}]`))
-				})
+			Context("when the API returns an error", func() {
+				Context("some sort of awful terrible error that we were not prescient enough to anticipate", func() {
+					BeforeEach(func() {
+						securityGroupRepo.UpdateReturns(errors.New("Wops I failed"))
+					})
 
-				It("updates the security group with those rules, obviously", func() {
-					jsonData := []map[string]interface{}{
-						{"protocol": "udp", "port": "8080-9090", "destination": "198.41.191.47/1"},
-					}
-
-					_, jsonArg := securityGroupRepo.UpdateArgsForCall(0)
-
-					Expect(jsonArg).To(Equal(jsonData))
+					It("fails loudly", func() {
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Updating security group", "my-group-name"},
+							[]string{"FAILED"},
+						))
+					})
 				})
 			})
 
@@ -117,20 +125,6 @@ var _ = Describe("update-security-group command", func() {
 
 				It("freaks out", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-					))
-				})
-			})
-		})
-
-		Context("when the API returns an error", func() {
-			Context("some sort of awful terrible error that we were not prescient enough to anticipate", func() {
-				It("fails loudly", func() {
-					securityGroupRepo.UpdateReturns(errors.New("Wops I failed"))
-					runCommand("my-group")
-
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Updating security group", "my-group"},
 						[]string{"FAILED"},
 					))
 				})
