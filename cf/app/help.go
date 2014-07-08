@@ -1,7 +1,9 @@
 package app
 
 import (
+	"fmt"
 	"os"
+	"reflect"
 	"strings"
 	"text/tabwriter"
 	"text/template"
@@ -266,15 +268,28 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 	return
 }
 
-func ShowAppHelp(helpTemplate string, appToPrint interface{}) {
+func ShowHelp(helpTemplate string, thingToPrint interface{}) {
 	translatedTemplatedHelp := T(strings.Replace(helpTemplate, "{{", "[[", -1))
-	translatedTemplatedHelp = strings.Replace(helpTemplate, "[[", "{{", -1)
-	showAppHelp(translatedTemplatedHelp, appToPrint)
+	translatedTemplatedHelp = strings.Replace(translatedTemplatedHelp, "[[", "{{", -1)
+
+	switch thing := thingToPrint.(type) {
+	case *cli.App:
+		showAppHelp(translatedTemplatedHelp, thing)
+	case cli.Command:
+		showCommandHelp(translatedTemplatedHelp, thing)
+	default:
+		panic(fmt.Sprintf("Help printer has received something that is neither app nor command! The beast (%s) looks like this: %s", reflect.TypeOf(thing), thing))
+	}
 }
 
-func showAppHelp(helpTemplate string, appToPrint interface{}) {
-	app := appToPrint.(*cli.App)
-	presenter := newAppPresenter(app)
+var CodeGangstaHelpPrinter = cli.HelpPrinter
+
+func showCommandHelp(helpTemplate string, commandToPrint cli.Command) {
+	CodeGangstaHelpPrinter(helpTemplate, commandToPrint)
+}
+
+func showAppHelp(helpTemplate string, appToPrint *cli.App) {
+	presenter := newAppPresenter(appToPrint)
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
 	t := template.Must(template.New("help").Parse(helpTemplate))
