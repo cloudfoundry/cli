@@ -79,5 +79,5 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
-		map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " push")}))
+		map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " restage")}))
 }
