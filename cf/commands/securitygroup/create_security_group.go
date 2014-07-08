@@ -5,7 +5,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/json"
@@ -30,15 +29,12 @@ func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-security-group",
 		Description: T("Create a security group"),
-		Usage:       T("CF_NAME create-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("json", T("Path to a file containing rules in JSON format")),
-		},
+		Usage:       T("CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"),
 	}
 }
 
 func (cmd CreateSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
+	if len(context.Args()) != 2 {
 		cmd.ui.FailWithUsage(context)
 	}
 
@@ -48,7 +44,7 @@ func (cmd CreateSecurityGroup) GetRequirements(requirementsFactory requirements.
 
 func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
-	pathToJSONFile := context.String("json")
+	pathToJSONFile := context.Args()[1]
 	rules, err := json.ParseJSON(pathToJSONFile)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

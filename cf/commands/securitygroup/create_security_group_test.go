@@ -49,91 +49,86 @@ var _ = Describe("create-security-group command", func() {
 			runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
+
+		It("fails with usage when a rules file is not provided", func() {
+			requirementsFactory.LoginSuccess = true
+			runCommand("AWESOME_SECURITY_GROUP_NAME")
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
 	Context("when the user is logged in", func() {
+		var tempFile *os.File
+
 		BeforeEach(func() {
+			tempFile, _ = ioutil.TempFile("", "")
 			requirementsFactory.LoginSuccess = true
 		})
 
-		It("creates the security group", func() {
-			runCommand("my-group")
-
-			name, _ := securityGroupRepo.CreateArgsForCall(0)
-			Expect(name).To(Equal("my-group"))
+		AfterEach(func() {
+			tempFile.Close()
+			os.Remove(tempFile.Name())
 		})
 
-		It("displays a message describing what its going to do", func() {
-			runCommand("my-group")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating security group", "my-group", "my-user"},
-				[]string{"OK"},
-			))
+		JustBeforeEach(func() {
+			runCommand("my-group", tempFile.Name())
 		})
 
-		Context("when the user specifies rules", func() {
-			var tempFile *os.File
-
+		Context("when the file specified has valid json", func() {
 			BeforeEach(func() {
-				tempFile, _ = ioutil.TempFile("", "")
+				tempFile.Write([]byte(`[{"protocol":"udp","ports":"8080-9090","destination":"198.41.191.47/1"}]`))
 			})
 
-			AfterEach(func() {
-				tempFile.Close()
-				os.Remove(tempFile.Name())
+			It("displays a message describing what its going to do", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating security group", "my-group", "my-user"},
+					[]string{"OK"},
+				))
 			})
 
-			JustBeforeEach(func() {
-				runCommand("--json", tempFile.Name(), "security-groups-rule-everything-around-me")
+			It("creates the security group with those rules", func() {
+				_, rules := securityGroupRepo.CreateArgsForCall(0)
+				Expect(rules).To(Equal([]map[string]interface{}{
+					{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
+				}))
 			})
 
-			Context("when the file specified has valid json", func() {
-				BeforeEach(func() {
-					tempFile.Write([]byte(`[{"protocol":"udp","ports":"8080-9090","destination":"198.41.191.47/1"}]`))
+			Context("when the API returns an error", func() {
+				Context("some sort of awful terrible error that we were not prescient enough to anticipate", func() {
+					BeforeEach(func() {
+						securityGroupRepo.CreateReturns(errors.New("Wops I failed"))
+					})
+
+					It("fails loudly", func() {
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Creating security group", "my-group"},
+							[]string{"FAILED"},
+						))
+					})
 				})
 
-				It("creates the security group with those rules, obviously", func() {
-					_, rules := securityGroupRepo.CreateArgsForCall(0)
-					Expect(rules).To(Equal([]map[string]interface{}{
-						{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
-					}))
-				})
-			})
+				Context("when the group already exists", func() {
+					BeforeEach(func() {
+						securityGroupRepo.CreateReturns(errors.NewHttpError(400, "300005", "The security group is taken: my-group"))
+					})
 
-			Context("when the file specified has invalid json", func() {
-				BeforeEach(func() {
-					tempFile.Write([]byte(`[{noquote: thiswontwork}]`))
-				})
-
-				It("freaks out", func() {
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-					))
+					It("warns the user when group already exists", func() {
+						Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+						Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
+					})
 				})
 			})
 		})
 
-		Context("when the API returns an error", func() {
-			Context("some sort of awful terrible error that we were not prescient enough to anticipate", func() {
-				It("fails loudly", func() {
-					securityGroupRepo.CreateReturns(errors.New("Wops I failed"))
-					runCommand("my-group")
-
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Creating security group", "my-group"},
-						[]string{"FAILED"},
-					))
-				})
+		Context("when the file specified has invalid json", func() {
+			BeforeEach(func() {
+				tempFile.Write([]byte(`[{noquote: thiswontwork}]`))
 			})
 
-			Context("when the group already exists", func() {
-				It("warns the user when group already exists", func() {
-					securityGroupRepo.CreateReturns(errors.NewHttpError(400, "300005", "The security group is taken: my-group"))
-					runCommand("my-group")
-
-					Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
-					Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
-				})
+			It("freaks out", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+				))
 			})
 		})
 	})
