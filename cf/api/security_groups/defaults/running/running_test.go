@@ -41,7 +41,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 
-	Describe(".AddToRunningSet", func() {
+	Describe(".BindToRunningSet", func() {
 		It("makes a correct request", func() {
 			setupTestServer(
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -49,19 +49,19 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 					Path:   "/v2/config/running_security_groups/a-real-guid",
 					Response: testnet.TestResponse{
 						Status: http.StatusCreated,
-						Body:   addRunningResponse,
+						Body:   bindRunningResponse,
 					},
 				}),
 			)
 
-			err := repo.AddToRunningSet("a-real-guid")
+			err := repo.BindToRunningSet("a-real-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
 
-	Describe("RemoveFromRunningSet", func() {
+	Describe(".UnbindFromRunningSet", func() {
 		It("makes a correct request", func() {
 			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -74,7 +74,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 			})
 
 			configRepo.SetApiEndpoint(testServer.URL)
-			err := repo.RemoveFromRunningSet("my-guid")
+			err := repo.UnbindFromRunningSet("my-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
@@ -126,7 +126,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 	})
 })
 
-var addRunningResponse string = `{
+var bindRunningResponse string = `{
   "metadata": {
     "guid": "897341eb-ef31-406f-b57b-414f51583a3a",
     "url": "/v2/config/running_security_groups/897341eb-ef31-406f-b57b-414f51583a3a",

@@ -98,7 +98,7 @@ var _ = Describe("unbind-security-group command", func() {
 				runCommand("my-group")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Removing security group", "my-org", "my-space", "my-user"},
+					[]string{"Unbinding security group", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
 				securityGroupGuid, spaceGuid := secBinder.UnbindSpaceArgsForCall(0)
@@ -110,7 +110,7 @@ var _ = Describe("unbind-security-group command", func() {
 				runCommand("my-group", "my-org", "my-space")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Removing security group", "my-org", "my-space", "my-user"},
+					[]string{"Unbinding security group", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
 				securityGroupGuid, spaceGuid := secBinder.UnbindSpaceArgsForCall(0)

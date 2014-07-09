@@ -3,7 +3,7 @@ package securitygroup_test
 import (
 	"errors"
 
-	fakeRunning "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/fakes"
+	fakeStaging "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/fakes"
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,13 +18,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("add-running-security-group command", func() {
+var _ = Describe("bind-staging-security-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		configRepo                   configuration.ReadWriter
 		requirementsFactory          *testreq.FakeReqFactory
 		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroupRepo
-		fakeRunningSecurityGroupRepo *fakeRunning.FakeRunningSecurityGroupsRepo
+		fakeStagingSecurityGroupRepo *fakeStaging.FakeStagingSecurityGroupsRepo
 	)
 
 	BeforeEach(func() {
@@ -32,11 +32,11 @@ var _ = Describe("add-running-security-group command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
-		fakeRunningSecurityGroupRepo = &fakeRunning.FakeRunningSecurityGroupsRepo{}
+		fakeStagingSecurityGroupRepo = &fakeStaging.FakeStagingSecurityGroupsRepo{}
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewAddToRunningGroup(ui, configRepo, fakeSecurityGroupRepo, fakeRunningSecurityGroupRepo)
+		cmd := NewBindToStagingGroup(ui, configRepo, fakeSecurityGroupRepo, fakeStagingSecurityGroupRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -56,30 +56,30 @@ var _ = Describe("add-running-security-group command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			group := models.SecurityGroup{}
-			group.Guid = "being-a-guid"
-			group.Name = "security-group-name"
+			group.Guid = "just-pretend-this-is-a-guid"
+			group.Name = "a-security-group-name"
 			fakeSecurityGroupRepo.ReadReturns(group, nil)
 		})
 
 		JustBeforeEach(func() {
-			runCommand("security-group-name")
+			runCommand("a-security-group-name")
 		})
 
-		It("Describes what it is doing to the user", func() {
+		It("binds the group to the default staging group set", func() {
+			Expect(fakeSecurityGroupRepo.ReadArgsForCall(0)).To(Equal("a-security-group-name"))
+			Expect(fakeStagingSecurityGroupRepo.BindToStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
+		})
+
+		It("describes what it's doing to the user", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Adding", "security-group-name", "as", "my-user"},
+				[]string{"Binding", "a-security-group-name", "as", "my-user"},
 				[]string{"OK"},
 			))
 		})
 
-		It("adds the group to the running group set", func() {
-			Expect(fakeSecurityGroupRepo.ReadArgsForCall(0)).To(Equal("security-group-name"))
-			Expect(fakeRunningSecurityGroupRepo.AddToRunningSetArgsForCall(0)).To(Equal("being-a-guid"))
-		})
-
-		Context("when adding the security group to the running set fails", func() {
+		Context("when binding the security group to the default set fails", func() {
 			BeforeEach(func() {
-				fakeRunningSecurityGroupRepo.AddToRunningSetReturns(errors.New("WOAH. I know kung fu"))
+				fakeStagingSecurityGroupRepo.BindToStagingSetReturns(errors.New("WOAH. I know kung fu"))
 			})
 
 			It("fails and describes the failure to the user", func() {
@@ -96,7 +96,7 @@ var _ = Describe("add-running-security-group command", func() {
 			})
 
 			It("fails and tells the user that the security group does not exist", func() {
-				Expect(fakeRunningSecurityGroupRepo.AddToRunningSetCallCount()).To(Equal(0))
+				Expect(fakeStagingSecurityGroupRepo.BindToStagingSetCallCount()).To(Equal(0))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 				))

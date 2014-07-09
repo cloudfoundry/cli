@@ -12,15 +12,15 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type removeFromRunningGroup struct {
+type unbindFromRunningGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
 	runningGroupRepo  running.RunningSecurityGroupsRepo
 }
 
-func NewRemoveFromRunningGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, runningGroupRepo running.RunningSecurityGroupsRepo) command.Command {
-	return &removeFromRunningGroup{
+func NewUnbindFromRunningGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, runningGroupRepo running.RunningSecurityGroupsRepo) command.Command {
+	return &unbindFromRunningGroup{
 		ui:                ui,
 		configRepo:        configRepo,
 		securityGroupRepo: securityGroupRepo,
@@ -28,15 +28,15 @@ func NewRemoveFromRunningGroup(ui terminal.UI, configRepo configuration.Reader, 
 	}
 }
 
-func (cmd *removeFromRunningGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd *unbindFromRunningGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "remove-running-security-group",
-		Description: T("Remove a security group from the set of security groups for running applications"),
-		Usage:       T("CF_NAME remove-running-security-group SECURITY_GROUP"),
+		Name:        "unbind-running-security-group",
+		Description: T("Unbind a security group from the set of security groups for running applications"),
+		Usage:       T("CF_NAME unbind-running-security-group SECURITY_GROUP"),
 	}
 }
 
-func (cmd *removeFromRunningGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd *unbindFromRunningGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -46,7 +46,7 @@ func (cmd *removeFromRunningGroup) GetRequirements(requirementsFactory requireme
 	}, nil
 }
 
-func (cmd *removeFromRunningGroup) Run(context *cli.Context) {
+func (cmd *unbindFromRunningGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
@@ -64,12 +64,12 @@ func (cmd *removeFromRunningGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say(T("Removing security group {{.security_group}} from defaults for running as {{.username}}",
+	cmd.ui.Say(T("Unbinding security group {{.security_group}} from defaults for running as {{.username}}",
 		map[string]interface{}{
 			"security_group": terminal.EntityNameColor(securityGroup.Name),
 			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
 		}))
-	err = cmd.runningGroupRepo.RemoveFromRunningSet(securityGroup.Guid)
+	err = cmd.runningGroupRepo.UnbindFromRunningSet(securityGroup.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

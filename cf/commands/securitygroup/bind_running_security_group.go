@@ -2,7 +2,7 @@ package securitygroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -11,31 +11,31 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type addToStagingGroup struct {
+type bindToRunningGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
-	stagingGroupRepo  staging.StagingSecurityGroupsRepo
+	runningGroupRepo  running.RunningSecurityGroupsRepo
 }
 
-func NewAddToStagingGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, stagingGroupRepo staging.StagingSecurityGroupsRepo) command.Command {
-	return &addToStagingGroup{
+func NewBindToRunningGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, runningGroupRepo running.RunningSecurityGroupsRepo) command.Command {
+	return &bindToRunningGroup{
 		ui:                ui,
 		configRepo:        configRepo,
 		securityGroupRepo: securityGroupRepo,
-		stagingGroupRepo:  stagingGroupRepo,
+		runningGroupRepo:  runningGroupRepo,
 	}
 }
 
-func (cmd *addToStagingGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd *bindToRunningGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "add-staging-security-group",
-		Description: T("Add a security group to the list of security groups to be used for staging applications"),
-		Usage:       T("CF_NAME add-staging-security-group SECURITY_GROUP"),
+		Name:        "bind-running-security-group",
+		Description: T("Bind a security group to the list of security groups to be used for running applications"),
+		Usage:       T("CF_NAME bind-running-security-group SECURITY_GROUP"),
 	}
 }
 
-func (cmd *addToStagingGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd *bindToRunningGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -45,7 +45,7 @@ func (cmd *addToStagingGroup) GetRequirements(requirementsFactory requirements.F
 	}, nil
 }
 
-func (cmd *addToStagingGroup) Run(context *cli.Context) {
+func (cmd *bindToRunningGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
@@ -53,13 +53,13 @@ func (cmd *addToStagingGroup) Run(context *cli.Context) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say(T("Adding security group {{.security_group}} to staging as {{.username}}",
+	cmd.ui.Say(T("Binding security group {{.security_group}} to defaults for running as {{.username}}",
 		map[string]interface{}{
 			"security_group": terminal.EntityNameColor(securityGroup.Name),
 			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
 		}))
 
-	err = cmd.stagingGroupRepo.AddToStagingSet(securityGroup.Guid)
+	err = cmd.runningGroupRepo.BindToRunningSet(securityGroup.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

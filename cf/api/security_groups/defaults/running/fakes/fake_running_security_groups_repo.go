@@ -10,12 +10,12 @@ import (
 )
 
 type FakeRunningSecurityGroupsRepo struct {
-	AddToRunningSetStub        func(string) error
-	addToRunningSetMutex       sync.RWMutex
-	addToRunningSetArgsForCall []struct {
+	BindToRunningSetStub        func(string) error
+	bindToRunningSetMutex       sync.RWMutex
+	bindToRunningSetArgsForCall []struct {
 		arg1 string
 	}
-	addToRunningSetReturns struct {
+	bindToRunningSetReturns struct {
 		result1 error
 	}
 	ListStub        func() ([]models.SecurityGroupFields, error)
@@ -25,43 +25,43 @@ type FakeRunningSecurityGroupsRepo struct {
 		result1 []models.SecurityGroupFields
 		result2 error
 	}
-	RemoveFromRunningSetStub        func(string) error
-	removeFromRunningSetMutex       sync.RWMutex
-	removeFromRunningSetArgsForCall []struct {
+	UnbindFromRunningSetStub        func(string) error
+	unbindFromRunningSetMutex       sync.RWMutex
+	unbindFromRunningSetArgsForCall []struct {
 		arg1 string
 	}
-	removeFromRunningSetReturns struct {
+	unbindFromRunningSetReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) AddToRunningSet(arg1 string) error {
-	fake.addToRunningSetMutex.Lock()
-	defer fake.addToRunningSetMutex.Unlock()
-	fake.addToRunningSetArgsForCall = append(fake.addToRunningSetArgsForCall, struct {
+func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSet(arg1 string) error {
+	fake.bindToRunningSetMutex.Lock()
+	defer fake.bindToRunningSetMutex.Unlock()
+	fake.bindToRunningSetArgsForCall = append(fake.bindToRunningSetArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	if fake.AddToRunningSetStub != nil {
-		return fake.AddToRunningSetStub(arg1)
+	if fake.BindToRunningSetStub != nil {
+		return fake.BindToRunningSetStub(arg1)
 	} else {
-		return fake.addToRunningSetReturns.result1
+		return fake.bindToRunningSetReturns.result1
 	}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) AddToRunningSetCallCount() int {
-	fake.addToRunningSetMutex.RLock()
-	defer fake.addToRunningSetMutex.RUnlock()
-	return len(fake.addToRunningSetArgsForCall)
+func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSetCallCount() int {
+	fake.bindToRunningSetMutex.RLock()
+	defer fake.bindToRunningSetMutex.RUnlock()
+	return len(fake.bindToRunningSetArgsForCall)
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) AddToRunningSetArgsForCall(i int) string {
-	fake.addToRunningSetMutex.RLock()
-	defer fake.addToRunningSetMutex.RUnlock()
-	return fake.addToRunningSetArgsForCall[i].arg1
+func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSetArgsForCall(i int) string {
+	fake.bindToRunningSetMutex.RLock()
+	defer fake.bindToRunningSetMutex.RUnlock()
+	return fake.bindToRunningSetArgsForCall[i].arg1
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) AddToRunningSetReturns(result1 error) {
-	fake.addToRunningSetReturns = struct {
+func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSetReturns(result1 error) {
+	fake.bindToRunningSetReturns = struct {
 		result1 error
 	}{result1}
 }
@@ -90,33 +90,33 @@ func (fake *FakeRunningSecurityGroupsRepo) ListReturns(result1 []models.Security
 	}{result1, result2}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) RemoveFromRunningSet(arg1 string) error {
-	fake.removeFromRunningSetMutex.Lock()
-	defer fake.removeFromRunningSetMutex.Unlock()
-	fake.removeFromRunningSetArgsForCall = append(fake.removeFromRunningSetArgsForCall, struct {
+func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSet(arg1 string) error {
+	fake.unbindFromRunningSetMutex.Lock()
+	defer fake.unbindFromRunningSetMutex.Unlock()
+	fake.unbindFromRunningSetArgsForCall = append(fake.unbindFromRunningSetArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	if fake.RemoveFromRunningSetStub != nil {
-		return fake.RemoveFromRunningSetStub(arg1)
+	if fake.UnbindFromRunningSetStub != nil {
+		return fake.UnbindFromRunningSetStub(arg1)
 	} else {
-		return fake.removeFromRunningSetReturns.result1
+		return fake.unbindFromRunningSetReturns.result1
 	}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) RemoveFromRunningSetCallCount() int {
-	fake.removeFromRunningSetMutex.RLock()
-	defer fake.removeFromRunningSetMutex.RUnlock()
-	return len(fake.removeFromRunningSetArgsForCall)
+func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSetCallCount() int {
+	fake.unbindFromRunningSetMutex.RLock()
+	defer fake.unbindFromRunningSetMutex.RUnlock()
+	return len(fake.unbindFromRunningSetArgsForCall)
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) RemoveFromRunningSetArgsForCall(i int) string {
-	fake.removeFromRunningSetMutex.RLock()
-	defer fake.removeFromRunningSetMutex.RUnlock()
-	return fake.removeFromRunningSetArgsForCall[i].arg1
+func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSetArgsForCall(i int) string {
+	fake.unbindFromRunningSetMutex.RLock()
+	defer fake.unbindFromRunningSetMutex.RUnlock()
+	return fake.unbindFromRunningSetArgsForCall[i].arg1
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) RemoveFromRunningSetReturns(result1 error) {
-	fake.removeFromRunningSetReturns = struct {
+func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSetReturns(result1 error) {
+	fake.unbindFromRunningSetReturns = struct {
 		result1 error
 	}{result1}
 }

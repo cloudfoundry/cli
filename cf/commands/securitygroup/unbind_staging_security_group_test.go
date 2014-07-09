@@ -1,7 +1,7 @@
 package securitygroup_test
 
 import (
-	fakeRunningDefaults "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/fakes"
+	fakeStagingDefaults "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/fakes"
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -17,13 +17,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("remove-running-security-group command", func() {
+var _ = Describe("unbind-staging-security-group command", func() {
 	var (
 		ui                            *testterm.FakeUI
 		configRepo                    configuration.ReadWriter
 		requirementsFactory           *testreq.FakeReqFactory
 		fakeSecurityGroupRepo         *fakeSecurityGroup.FakeSecurityGroupRepo
-		fakeRunningSecurityGroupsRepo *fakeRunningDefaults.FakeRunningSecurityGroupsRepo
+		fakeStagingSecurityGroupsRepo *fakeStagingDefaults.FakeStagingSecurityGroupsRepo
 	)
 
 	BeforeEach(func() {
@@ -31,11 +31,11 @@ var _ = Describe("remove-running-security-group command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
-		fakeRunningSecurityGroupsRepo = &fakeRunningDefaults.FakeRunningSecurityGroupsRepo{}
+		fakeStagingSecurityGroupsRepo = &fakeStagingDefaults.FakeStagingSecurityGroupsRepo{}
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewRemoveFromRunningGroup(ui, configRepo, fakeSecurityGroupRepo, fakeRunningSecurityGroupsRepo)
+		cmd := NewUnbindFromStagingGroup(ui, configRepo, fakeSecurityGroupRepo, fakeStagingSecurityGroupsRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -68,14 +68,14 @@ var _ = Describe("remove-running-security-group command", func() {
 				runCommand("a-security-group-name")
 			})
 
-			It("removes the group from the running group set", func() {
+			It("unbinds the group from the default staging group set", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Removing", "security group", "a-security-group-name", "my-user"},
+					[]string{"Unbinding", "security group", "a-security-group-name", "my-user"},
 					[]string{"OK"},
 				))
 
 				Expect(fakeSecurityGroupRepo.ReadArgsForCall(0)).To(Equal("a-security-group-name"))
-				Expect(fakeRunningSecurityGroupsRepo.RemoveFromRunningSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
+				Expect(fakeStagingSecurityGroupsRepo.UnbindFromStagingSetArgsForCall(0)).To(Equal("just-pretend-this-is-a-guid"))
 			})
 		})
 

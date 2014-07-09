@@ -16,12 +16,12 @@
       "translation": "Add a security group to the list of security groups to be used for staging applications"
    },
    {
-      "id": "Adding security group {{.security_group}} to defaults for running as {{.username}}",
-      "translation": "Adding security group {{.security_group}} to defaults for running as {{.username}}"
+      "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
+      "translation": "Binding security group {{.security_group}} to defaults for running as {{.username}}"
    },
    {
-      "id": "Adding security group {{.security_group}} to staging as {{.username}}",
-      "translation": "Adding security group {{.security_group}} to staging as {{.username}}"
+      "id": "Binding security group {{.security_group}} to staging as {{.username}}",
+      "translation": "Binding security group {{.security_group}} to staging as {{.username}}"
    },
    {
       "id": "Bind a security group to a space",
@@ -148,16 +148,16 @@
       "translation": "Remove a security group from the set of security groups for running applications"
    },
    {
-      "id": "Removing security group {{.security_group}} from defaults for running as {{.username}}",
-      "translation": "Removing security group {{.security_group}} from defaults for running as {{.username}}"
+      "id": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}"
    },
    {
-      "id": "Removing security group {{.security_group}} from defaults for staging as {{.username}}",
-      "translation": "Removing security group {{.security_group}} from defaults for staging as {{.username}}"
+      "id": "Unbinding security group {{.security_group}} from defaults for staging as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from defaults for staging as {{.username}}"
    },
    {
-      "id": "Removing security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
-      "translation": "Removing security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}"
+      "id": "Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}"
    },
    {
       "id": "Rules",
