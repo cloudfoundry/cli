@@ -3,8 +3,8 @@
 package jibber_jabber_test
 
 import (
-	"os"
 	. "github.com/pivotal-cf-experimental/jibber_jabber"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
