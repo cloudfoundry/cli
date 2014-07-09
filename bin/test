@@ -21,16 +21,10 @@
     exit 1
   fi
 
-  export GOPATH=$($GODEP path):$GOPATH
-  export PATH=$($GODEP path)/bin:$PATH
-  go install github.com/onsi/ginkgo/ginkgo
-
-  export LC_ALL="en_US.UTF-8"
-
   echo -e "\n Cleaning build artifacts..."
-  go clean
 
-  # Attempt to clean up old .a files in GOPATH
+  # Clean up old .a files in GOPATH
+  # It seems like `go clean` should do this but ... not so much
   if [[ -d $GOPATH/pkg ]] ; then
     pushd $GOPATH/pkg
     rm -Rf *
@@ -42,6 +36,11 @@
     rm -Rf *
     popd
   fi
+
+  export LC_ALL="en_US.UTF-8"
+  export GOPATH=$($GODEP path):$GOPATH
+  export PATH=$($GODEP path)/bin:$PATH
+  go install github.com/onsi/ginkgo/ginkgo
 
   echo -e "\n Formatting packages..."
   go fmt ./...
