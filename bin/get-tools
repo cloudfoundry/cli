@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 go get code.google.com/p/go.tools/cmd/vet
-go get github.com/maximilien/i18n4cf/...
+go get github.com/maximilien/i18n4go/...
 go get github.com/jteeuwen/go-bindata
