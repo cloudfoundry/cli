@@ -3,9 +3,9 @@ Jibber Jabber is a GoLang Library that can be used to detect an operating system
 
 ### OS Support
 
-OSX and Linux via the LC_ALL and LANG environment variables.
+OSX and Linux via the `LC_ALL` and `LANG` environment variables. These are standard variables that are used in ALL versions of UNIX for language detection.
 
-Windows has limited support, it will only check the system language.
+Windows via [GetUserDefaultLocaleName](http://msdn.microsoft.com/en-us/library/windows/desktop/dd318136.aspx) and [GetSystemDefaultLocaleName](http://msdn.microsoft.com/en-us/library/windows/desktop/dd318122.aspx) system calls. These calls are supported in Windows Vista and up.
 
 # Usage
 Add the following line to your go `import`:
