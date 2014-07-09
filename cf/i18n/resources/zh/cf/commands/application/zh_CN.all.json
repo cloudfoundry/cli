@@ -569,7 +569,7 @@
    },
    {
       "id": "{{.DownCount}} down",
-      "translation": "{{.DownCount}}停止运行"
+      "translation": "{{.DownCount}}失效的运行"
    },
    {
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
