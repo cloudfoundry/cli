@@ -1,6 +1,8 @@
 package securitygroup
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -26,10 +28,13 @@ func NewCreateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, sec
 }
 
 func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
+	primaryUsage := T("CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE")
+	secondaryUsage := T("   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.")
+
 	return command_metadata.CommandMetadata{
 		Name:        "create-security-group",
 		Description: T("Create a security group"),
-		Usage:       T("CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"),
+		Usage:       strings.Join([]string{primaryUsage, secondaryUsage}, "\n\n"),
 	}
 }
 
