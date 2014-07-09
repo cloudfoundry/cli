@@ -30,6 +30,19 @@
   echo -e "\n Cleaning build artifacts..."
   go clean
 
+  # Attempt to clean up old .a files in GOPATH
+  if [[ -d $GOPATH/pkg ]] ; then
+    pushd $GOPATH/pkg
+    rm -Rf *
+    popd
+  fi
+
+  if [[ -d $($GODEP path)/pkg ]] ; then
+    pushd $($GODEP path)/pkg
+    rm -Rf *
+    popd
+  fi
+
   echo -e "\n Formatting packages..."
   go fmt ./...
 
