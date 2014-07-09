@@ -1,4 +1,4 @@
-package gbytes_test
+package assertion_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestGbytes(t *testing.T) {
+func TestAssertion(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Gbytes Suite")
+	RunSpecs(t, "Assertion Suite")
 }

@@ -1,4 +1,4 @@
-package gbytes_test
+package asyncassertion_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestGbytes(t *testing.T) {
+func TestAsyncAssertion(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Gbytes Suite")
+	RunSpecs(t, "AsyncAssertion Suite")
 }
