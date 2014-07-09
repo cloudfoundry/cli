@@ -13,7 +13,6 @@
 
   trap printStatus EXIT
 
-  go get github.com/onsi/ginkgo/ginkgo
   bin/generate-language-resources
 
   GODEP=$(which godep)
@@ -23,6 +22,9 @@
   fi
 
   export GOPATH=$($GODEP path):$GOPATH
+  export PATH=$($GODEP path)/bin:$PATH
+  go install github.com/onsi/ginkgo/ginkgo
+
   export LC_ALL="en_US.UTF-8"
 
   echo -e "\n Cleaning build artifacts..."
