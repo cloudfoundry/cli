@@ -23,7 +23,7 @@ type configJsonV3 struct {
 }
 
 func JsonMarshalV3(config *Data) (output []byte, err error) {
-	return json.Marshal(configJsonV3{
+	return json.MarshalIndent(configJsonV3{
 		ConfigVersion:         3,
 		Target:                config.Target,
 		ApiVersion:            config.ApiVersion,
@@ -38,7 +38,7 @@ func JsonMarshalV3(config *Data) (output []byte, err error) {
 		Trace:                 config.Trace,
 		AsyncTimeout:          config.AsyncTimeout,
 		ColorEnabled:          config.ColorEnabled,
-	})
+	}, "", "  ")
 }
 
 func JsonUnmarshalV3(input []byte, config *Data) (err error) {
