@@ -54,16 +54,16 @@
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.0.0-17-gd3d2576",
-			"Rev": "d3d25767b7af0efa7b12a900d0f4ac5477ed9fa1"
+			"Comment": "v1.0.0-18-gb8a1dc9",
+			"Rev": "b8a1dc909067ac17581903a056b5a709fc74c779"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Rev": "f082bb88f22b295e1152e2ee1cee1ba174ad6f07"
+			"Rev": "efd113280743f90026f1dc18b93ca5355d8df0bf"
 		},
 		{
 			"ImportPath": "github.com/pivotal-cf-experimental/jibber_jabber",
-			"Rev": "4f063ae5c2cae7f3444c8b16af0f9f5e4323b31b"
+			"Rev": "46c8eac0be3185a1e13e6381d0a5d8bed8476282"
 		}
 	]
 }
