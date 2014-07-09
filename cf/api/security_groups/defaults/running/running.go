@@ -11,32 +11,32 @@ import (
 const urlPath = "/v2/config/running_security_groups"
 
 type RunningSecurityGroupsRepo interface {
-	AddToRunningSet(string) error
+	BindToRunningSet(string) error
 	List() ([]models.SecurityGroupFields, error)
-	RemoveFromRunningSet(string) error
+	UnbindFromRunningSet(string) error
 }
 
 type cloudControllerRunningSecurityGroupRepo struct {
-	repoBase SecurityGroupsRepoBase
+	repoBase DefaultSecurityGroupsRepoBase
 }
 
 func NewRunningSecurityGroupsRepo(configRepo configuration.Reader, gateway net.Gateway) RunningSecurityGroupsRepo {
 	return &cloudControllerRunningSecurityGroupRepo{
-		repoBase: SecurityGroupsRepoBase{
+		repoBase: DefaultSecurityGroupsRepoBase{
 			ConfigRepo: configRepo,
 			Gateway:    gateway,
 		},
 	}
 }
 
-func (repo *cloudControllerRunningSecurityGroupRepo) AddToRunningSet(groupGuid string) error {
-	return repo.repoBase.Add(groupGuid, urlPath)
+func (repo *cloudControllerRunningSecurityGroupRepo) BindToRunningSet(groupGuid string) error {
+	return repo.repoBase.Bind(groupGuid, urlPath)
 }
 
 func (repo *cloudControllerRunningSecurityGroupRepo) List() ([]models.SecurityGroupFields, error) {
 	return repo.repoBase.List(urlPath)
 }
 
-func (repo *cloudControllerRunningSecurityGroupRepo) RemoveFromRunningSet(groupGuid string) error {
+func (repo *cloudControllerRunningSecurityGroupRepo) UnbindFromRunningSet(groupGuid string) error {
 	return repo.repoBase.Delete(groupGuid, urlPath)
 }

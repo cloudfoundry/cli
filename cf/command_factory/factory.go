@@ -115,26 +115,26 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["delete-security-group"] = securitygroup.NewDeleteSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["security-group"] = securitygroup.NewShowSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["security-groups"] = securitygroup.NewSecurityGroups(ui, config, repoLocator.GetSecurityGroupRepository())
-	factory.cmdsByName["add-staging-security-group"] = securitygroup.NewAddToStagingGroup(
+	factory.cmdsByName["bind-staging-security-group"] = securitygroup.NewBindToStagingGroup(
 		ui,
 		config,
 		repoLocator.GetSecurityGroupRepository(),
 		repoLocator.GetStagingSecurityGroupsRepository(),
 	)
 	factory.cmdsByName["staging-security-groups"] = securitygroup.NewListStagingSecurityGroups(ui, config, repoLocator.GetStagingSecurityGroupsRepository())
-	factory.cmdsByName["remove-staging-security-group"] = securitygroup.NewRemoveFromStagingGroup(
+	factory.cmdsByName["unbind-staging-security-group"] = securitygroup.NewUnbindFromStagingGroup(
 		ui,
 		config,
 		repoLocator.GetSecurityGroupRepository(),
 		repoLocator.GetStagingSecurityGroupsRepository(),
 	)
-	factory.cmdsByName["add-running-security-group"] = securitygroup.NewAddToRunningGroup(
+	factory.cmdsByName["bind-running-security-group"] = securitygroup.NewBindToRunningGroup(
 		ui,
 		config,
 		repoLocator.GetSecurityGroupRepository(),
 		repoLocator.GetRunningSecurityGroupsRepository(),
 	)
-	factory.cmdsByName["remove-running-security-group"] = securitygroup.NewRemoveFromRunningGroup(
+	factory.cmdsByName["unbind-running-security-group"] = securitygroup.NewUnbindFromRunningGroup(
 		ui,
 		config,
 		repoLocator.GetSecurityGroupRepository(),

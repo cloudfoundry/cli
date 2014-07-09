@@ -10,12 +10,12 @@ import (
 )
 
 type FakeStagingSecurityGroupsRepo struct {
-	AddToStagingSetStub        func(string) error
-	addToStagingSetMutex       sync.RWMutex
-	addToStagingSetArgsForCall []struct {
+	BindToStagingSetStub        func(string) error
+	bindToStagingSetMutex       sync.RWMutex
+	bindToStagingSetArgsForCall []struct {
 		arg1 string
 	}
-	addToStagingSetReturns struct {
+	bindToStagingSetReturns struct {
 		result1 error
 	}
 	ListStub        func() ([]models.SecurityGroupFields, error)
@@ -25,43 +25,43 @@ type FakeStagingSecurityGroupsRepo struct {
 		result1 []models.SecurityGroupFields
 		result2 error
 	}
-	RemoveFromStagingSetStub        func(string) error
-	removeFromStagingSetMutex       sync.RWMutex
-	removeFromStagingSetArgsForCall []struct {
+	UnbindFromStagingSetStub        func(string) error
+	unbindFromStagingSetMutex       sync.RWMutex
+	unbindFromStagingSetArgsForCall []struct {
 		arg1 string
 	}
-	removeFromStagingSetReturns struct {
+	unbindFromStagingSetReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) AddToStagingSet(arg1 string) error {
-	fake.addToStagingSetMutex.Lock()
-	defer fake.addToStagingSetMutex.Unlock()
-	fake.addToStagingSetArgsForCall = append(fake.addToStagingSetArgsForCall, struct {
+func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSet(arg1 string) error {
+	fake.bindToStagingSetMutex.Lock()
+	defer fake.bindToStagingSetMutex.Unlock()
+	fake.bindToStagingSetArgsForCall = append(fake.bindToStagingSetArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	if fake.AddToStagingSetStub != nil {
-		return fake.AddToStagingSetStub(arg1)
+	if fake.BindToStagingSetStub != nil {
+		return fake.BindToStagingSetStub(arg1)
 	} else {
-		return fake.addToStagingSetReturns.result1
+		return fake.bindToStagingSetReturns.result1
 	}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) AddToStagingSetCallCount() int {
-	fake.addToStagingSetMutex.RLock()
-	defer fake.addToStagingSetMutex.RUnlock()
-	return len(fake.addToStagingSetArgsForCall)
+func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSetCallCount() int {
+	fake.bindToStagingSetMutex.RLock()
+	defer fake.bindToStagingSetMutex.RUnlock()
+	return len(fake.bindToStagingSetArgsForCall)
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) AddToStagingSetArgsForCall(i int) string {
-	fake.addToStagingSetMutex.RLock()
-	defer fake.addToStagingSetMutex.RUnlock()
-	return fake.addToStagingSetArgsForCall[i].arg1
+func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSetArgsForCall(i int) string {
+	fake.bindToStagingSetMutex.RLock()
+	defer fake.bindToStagingSetMutex.RUnlock()
+	return fake.bindToStagingSetArgsForCall[i].arg1
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) AddToStagingSetReturns(result1 error) {
-	fake.addToStagingSetReturns = struct {
+func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSetReturns(result1 error) {
+	fake.bindToStagingSetReturns = struct {
 		result1 error
 	}{result1}
 }
@@ -90,33 +90,33 @@ func (fake *FakeStagingSecurityGroupsRepo) ListReturns(result1 []models.Security
 	}{result1, result2}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) RemoveFromStagingSet(arg1 string) error {
-	fake.removeFromStagingSetMutex.Lock()
-	defer fake.removeFromStagingSetMutex.Unlock()
-	fake.removeFromStagingSetArgsForCall = append(fake.removeFromStagingSetArgsForCall, struct {
+func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSet(arg1 string) error {
+	fake.unbindFromStagingSetMutex.Lock()
+	defer fake.unbindFromStagingSetMutex.Unlock()
+	fake.unbindFromStagingSetArgsForCall = append(fake.unbindFromStagingSetArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	if fake.RemoveFromStagingSetStub != nil {
-		return fake.RemoveFromStagingSetStub(arg1)
+	if fake.UnbindFromStagingSetStub != nil {
+		return fake.UnbindFromStagingSetStub(arg1)
 	} else {
-		return fake.removeFromStagingSetReturns.result1
+		return fake.unbindFromStagingSetReturns.result1
 	}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) RemoveFromStagingSetCallCount() int {
-	fake.removeFromStagingSetMutex.RLock()
-	defer fake.removeFromStagingSetMutex.RUnlock()
-	return len(fake.removeFromStagingSetArgsForCall)
+func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSetCallCount() int {
+	fake.unbindFromStagingSetMutex.RLock()
+	defer fake.unbindFromStagingSetMutex.RUnlock()
+	return len(fake.unbindFromStagingSetArgsForCall)
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) RemoveFromStagingSetArgsForCall(i int) string {
-	fake.removeFromStagingSetMutex.RLock()
-	defer fake.removeFromStagingSetMutex.RUnlock()
-	return fake.removeFromStagingSetArgsForCall[i].arg1
+func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSetArgsForCall(i int) string {
+	fake.unbindFromStagingSetMutex.RLock()
+	defer fake.unbindFromStagingSetMutex.RUnlock()
+	return fake.unbindFromStagingSetArgsForCall[i].arg1
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) RemoveFromStagingSetReturns(result1 error) {
-	fake.removeFromStagingSetReturns = struct {
+func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSetReturns(result1 error) {
+	fake.unbindFromStagingSetReturns = struct {
 		result1 error
 	}{result1}
 }

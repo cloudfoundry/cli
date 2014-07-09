@@ -11,32 +11,32 @@ import (
 const urlPath = "/v2/config/staging_security_groups"
 
 type StagingSecurityGroupsRepo interface {
-	AddToStagingSet(string) error
+	BindToStagingSet(string) error
 	List() ([]models.SecurityGroupFields, error)
-	RemoveFromStagingSet(string) error
+	UnbindFromStagingSet(string) error
 }
 
 type cloudControllerStagingSecurityGroupRepo struct {
-	repoBase SecurityGroupsRepoBase
+	repoBase DefaultSecurityGroupsRepoBase
 }
 
 func NewStagingSecurityGroupsRepo(configRepo configuration.Reader, gateway net.Gateway) StagingSecurityGroupsRepo {
 	return &cloudControllerStagingSecurityGroupRepo{
-		repoBase: SecurityGroupsRepoBase{
+		repoBase: DefaultSecurityGroupsRepoBase{
 			ConfigRepo: configRepo,
 			Gateway:    gateway,
 		},
 	}
 }
 
-func (repo *cloudControllerStagingSecurityGroupRepo) AddToStagingSet(groupGuid string) error {
-	return repo.repoBase.Add(groupGuid, urlPath)
+func (repo *cloudControllerStagingSecurityGroupRepo) BindToStagingSet(groupGuid string) error {
+	return repo.repoBase.Bind(groupGuid, urlPath)
 }
 
 func (repo *cloudControllerStagingSecurityGroupRepo) List() ([]models.SecurityGroupFields, error) {
 	return repo.repoBase.List(urlPath)
 }
 
-func (repo *cloudControllerStagingSecurityGroupRepo) RemoveFromStagingSet(groupGuid string) error {
+func (repo *cloudControllerStagingSecurityGroupRepo) UnbindFromStagingSet(groupGuid string) error {
 	return repo.repoBase.Delete(groupGuid, urlPath)
 }

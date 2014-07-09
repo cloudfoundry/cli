@@ -84,7 +84,7 @@ func (cmd UnbindSecurityGroup) Run(context *cli.Context) {
 }
 
 func (cmd UnbindSecurityGroup) flavorText(secName string, orgName string, spaceName string) {
-	cmd.ui.Say(T("Removing security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
+	cmd.ui.Say(T("Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
 		map[string]interface{}{
 			"security_group": terminal.EntityNameColor(secName),
 			"organization":   terminal.EntityNameColor(orgName),

@@ -40,7 +40,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 
-	Describe("AddToStagingSet", func() {
+	Describe("BindToStagingSet", func() {
 		It("makes a correct request", func() {
 			setupTestServer(
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -48,12 +48,12 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 					Path:   "/v2/config/staging_security_groups/a-real-guid",
 					Response: testnet.TestResponse{
 						Status: http.StatusCreated,
-						Body:   addStagingResponse,
+						Body:   bindStagingResponse,
 					},
 				}),
 			)
 
-			err := repo.AddToStagingSet("a-real-guid")
+			err := repo.BindToStagingSet("a-real-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
@@ -104,7 +104,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 		})
 	})
 
-	Describe("RemoveFromStagingSet", func() {
+	Describe("UnbindFromStagingSet", func() {
 		It("makes a correct request", func() {
 			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -117,7 +117,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 			})
 
 			configRepo.SetApiEndpoint(testServer.URL)
-			err := repo.RemoveFromStagingSet("my-guid")
+			err := repo.UnbindFromStagingSet("my-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
@@ -125,7 +125,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 	})
 })
 
-var addStagingResponse string = `{
+var bindStagingResponse string = `{
   "metadata": {
     "guid": "897341eb-ef31-406f-b57b-414f51583a3a",
     "url": "/v2/config/staging_security_groups/897341eb-ef31-406f-b57b-414f51583a3a",
