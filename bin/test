@@ -13,6 +13,7 @@
 
   trap printStatus EXIT
 
+  go get github.com/onsi/ginkgo/ginkgo
   bin/generate-language-resources
 
   GODEP=$(which godep)
@@ -30,9 +31,8 @@
   echo -e "\n Formatting packages..."
   go fmt ./cf/... ./testhelpers/... ./generic/... ./main/... ./glob/... ./words/...
 
-  echo -e "\n Testing packages:"
-  go test ./cf/... ./generic/... ./testhelpers/... $@
-
+  echo -e "\n Testing packages..."
+  ginkgo -r $@
 
   echo -e "\n Vetting packages for potential issues..."
   go tool vet cf/.
