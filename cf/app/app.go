@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/command_runner"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/codegangsta/cli"
@@ -47,6 +48,8 @@ var (
 `
 )
 
+const UnknownCommand = "cf: '%s' is not a registered command. See 'cf help'"
+
 func NewApp(cmdRunner command_runner.Runner, metadatas ...command_metadata.CommandMetadata) (app *cli.App) {
 	helpCommand := cli.Command{
 		Name:        "help",
@@ -72,6 +75,12 @@ func NewApp(cmdRunner command_runner.Runner, metadatas ...command_metadata.Comma
 	app.Usage = cf.Usage
 	app.Version = cf.Version + "-" + cf.BuiltOnDate
 	app.Action = helpCommand.Action
+	app.CommandNotFound = func(c *cli.Context, command string) {
+		panic(errors.Exception{
+			Message:            fmt.Sprintf(UnknownCommand, command),
+			DisplayCrashDialog: false,
+		})
+	}
 
 	compiledAtTime, err := time.Parse("2006-01-02T03:04:05+00:00", cf.BuiltOnDate)
 

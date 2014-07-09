@@ -104,6 +104,16 @@ var _ = Describe("App", func() {
 		})
 	})
 
+	Context("when the user provides an unknown command name", func() {
+		It("should complain loudly and then panic", func() {
+			Expect(func() {
+				io_helpers.CaptureOutput(func() {
+					app.Run([]string{"cf", "zoidberg"})
+				})
+			}).To(Panic())
+		})
+	})
+
 	It("includes the built on date in its version string", func() {
 		Expect(app.Version).To(Equal(cf.Version + "-" + cf.BuiltOnDate))
 	})

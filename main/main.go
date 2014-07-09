@@ -15,6 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/command_runner"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -107,6 +108,12 @@ func handlePanics() {
 	err := recover()
 	if err != nil && err != terminal.FailedWasCalled {
 		switch err := err.(type) {
+		case errors.Exception:
+			if err.DisplayCrashDialog {
+				displayCrashDialog(err.Message)
+			} else {
+				fmt.Println(err.Message)
+			}
 		case error:
 			displayCrashDialog(err.Error())
 		case string:
