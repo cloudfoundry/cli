@@ -73,7 +73,10 @@ func main() {
 	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
 
-	app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...).Run(os.Args)
+	err := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...).Run(os.Args)
+	if err != nil {
+		os.Exit(1)
+	}
 
 	gateways := gatewaySliceFromMap(deps.gateways)
 	net.NewWarningsCollector(deps.termUI, gateways...).PrintWarnings()
