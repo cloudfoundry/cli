@@ -116,6 +116,13 @@ Developing
 Contributing
 ============
 
+Major new feature proposals are given as a publically viewable google document with commenting allowed and discussed on the [vcap-dev](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev) mailing list.
+
+Pull Requests
+---------------------
+
+Pull Requests should be made against the `master` branch.
+
 Architecture overview
 ---------------------
 
