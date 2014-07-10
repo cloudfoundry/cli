@@ -80,7 +80,7 @@ var _ = Describe("update-user-provided-service test", func() {
 					[]string{"TIP"},
 				))
 				Expect(serviceRepo.UpdateServiceInstance.Name).To(Equal("service-name"))
-				Expect(serviceRepo.UpdateServiceInstance.Params).To(Equal(map[string]string{"foo": "bar"}))
+				Expect(serviceRepo.UpdateServiceInstance.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
 				Expect(serviceRepo.UpdateServiceInstance.SysLogDrainUrl).To(Equal("syslog://example.com"))
 			})
 		})

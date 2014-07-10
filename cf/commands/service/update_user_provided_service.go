@@ -71,7 +71,7 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 	drainUrl := c.String("l")
 	params := c.String("p")
 
-	paramsMap := make(map[string]string)
+	paramsMap := make(map[string]interface{})
 	if params != "" {
 
 		err := json.Unmarshal([]byte(params), &paramsMap)

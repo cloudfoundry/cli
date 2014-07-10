@@ -58,7 +58,7 @@ var _ = Describe("create-user-provided-service command", func() {
 		))
 
 		Expect(repo.CreateName).To(Equal("my-custom-service"))
-		Expect(repo.CreateParams).To(Equal(map[string]string{
+		Expect(repo.CreateParams).To(Equal(map[string]interface{}{
 			"foo": "foo value",
 			"bar": "bar value",
 			"baz": "baz value",
@@ -71,15 +71,15 @@ var _ = Describe("create-user-provided-service command", func() {
 	})
 
 	It("accepts service parameters as JSON without prompting", func() {
-		args := []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"}
+		args := []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": 4}`, "my-custom-service"}
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 
 		Expect(ui.Prompts).To(BeEmpty())
 		Expect(repo.CreateName).To(Equal("my-custom-service"))
-		Expect(repo.CreateParams).To(Equal(map[string]string{
+		Expect(repo.CreateParams).To(Equal(map[string]interface{}{
 			"foo": "foo value",
 			"bar": "bar value",
-			"baz": "baz value",
+			"baz": float64(4),
 		}))
 
 		Expect(ui.Outputs).To(ContainSubstrings(

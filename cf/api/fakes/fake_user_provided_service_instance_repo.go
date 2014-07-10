@@ -5,12 +5,12 @@ import "github.com/cloudfoundry/cli/cf/models"
 type FakeUserProvidedServiceInstanceRepo struct {
 	CreateName     string
 	CreateDrainUrl string
-	CreateParams   map[string]string
+	CreateParams   map[string]interface{}
 
 	UpdateServiceInstance models.ServiceInstanceFields
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Create(name, drainUrl string, params map[string]string) (apiErr error) {
+func (repo *FakeUserProvidedServiceInstanceRepo) Create(name, drainUrl string, params map[string]interface{}) (apiErr error) {
 	repo.CreateName = name
 	repo.CreateDrainUrl = drainUrl
 	repo.CreateParams = params

@@ -5,7 +5,7 @@ type ServiceInstanceFields struct {
 	Name             string
 	SysLogDrainUrl   string
 	ApplicationNames []string
-	Params           map[string]string
+	Params           map[string]interface{}
 }
 
 type ServiceInstance struct {
