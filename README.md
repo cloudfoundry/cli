@@ -35,7 +35,7 @@ Finally, if you are still stuck, feel free to open a GitHub issue.
 
 Downloads
 =========
-**WARNING:** Edge binaries are published with each new 'push' that passes though CI. These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed. 
+**WARNING:** Edge binaries are published with each new 'push' that passes though CI. These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed.
 
 | Stable Installers | Stable Binaries | Edge Binaries |
 | :---------------: |:---------------:| :------------:|
@@ -111,7 +111,7 @@ Developing
 1. Write a Ginkgo test.
 1. Run `bin/test` and watch the test fail.
 1. Make the test pass.
-1. Submit a pull request.
+1. Submit a pull request to the `master` branch.
 
 Contributing
 ============
