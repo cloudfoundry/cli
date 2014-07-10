@@ -146,7 +146,7 @@
   ],
   "excludedRegexps": [
    "^CF_NAME (?:[\\w-]+)$",
-   "^(?:\\w+-)*(?:role|users?|buildpack|space|auth-tokens?|services?|security-groups?)(?:-\\w+)*$",
+   "^(?:\\w+-)*(?:role|users?|buildpack|space|auth-tokens?|services?|security-groups?|quotas?)(?:-\\w+)*$",
    "^(?:[\\W]*%(?:[#v]|[%EGUTXbcdefgopqstvx]))+[\\W]*$",
    "^\\d+$",
    "^\\s*-\\w\\s*$",
