@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -109,7 +108,7 @@ func getCommand(metadata command_metadata.CommandMetadata, runner command_runner
 		Action: func(context *cli.Context) {
 			err := runner.RunCmdByName(metadata.Name, context)
 			if err != nil {
-				os.Exit(1)
+				panic(terminal.QuietPanic)
 			}
 		},
 		Flags:           metadata.Flags,

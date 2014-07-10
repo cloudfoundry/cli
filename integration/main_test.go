@@ -19,8 +19,13 @@ var _ = Describe("exit codes", func() {
 	It("exits non-zero when an unknown command is invoked", func() {
 		result := Cf("some-command-that-should-never-actually-be-a-real-thing-i-can-use")
 
-		Eventually(result, 10).Should(Say("not a registered command"))
-		Eventually(result, 10).Should(Exit(1))
+		Eventually(result).Should(Say("not a registered command"))
+		Eventually(result).Should(Exit(1))
+	})
+
+	It("exits non-zero when known command is invoked with invalid option", func() {
+		result := Cf("push", "--crazy")
+		Eventually(result).Should(Exit(1))
 	})
 })
 
