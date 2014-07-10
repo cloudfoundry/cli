@@ -20,7 +20,7 @@ var _ = Describe("exit codes", func() {
 		result := Cf("some-command-that-should-never-actually-be-a-real-thing-i-can-use")
 
 		Eventually(result, 10).Should(Say("not a registered command"))
-		Expect(result).Should(Exit(1))
+		Eventually(result, 10).Should(Exit(1))
 	})
 })
 
