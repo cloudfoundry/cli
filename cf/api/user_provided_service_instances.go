@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -11,7 +12,7 @@ import (
 )
 
 type UserProvidedServiceInstanceRepository interface {
-	Create(name, drainUrl string, params map[string]string) (apiErr error)
+	Create(name, drainUrl string, params map[string]interface{}) (apiErr error)
 	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error)
 }
 
@@ -26,14 +27,14 @@ func NewCCUserProvidedServiceInstanceRepository(config configuration.Reader, gat
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiErr error) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]interface{}) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
 
 	type RequestBody struct {
-		Name           string            `json:"name"`
-		Credentials    map[string]string `json:"credentials"`
-		SpaceGuid      string            `json:"space_guid"`
-		SysLogDrainUrl string            `json:"syslog_drain_url"`
+		Name           string                 `json:"name"`
+		Credentials    map[string]interface{} `json:"credentials"`
+		SpaceGuid      string                 `json:"space_guid"`
+		SysLogDrainUrl string                 `json:"syslog_drain_url"`
 	}
 
 	jsonBytes, err := json.Marshal(RequestBody{
@@ -55,8 +56,8 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.ApiEndpoint(), serviceInstanceFields.Guid)
 
 	type RequestBody struct {
-		Credentials    map[string]string `json:"credentials,omitempty"`
-		SysLogDrainUrl string            `json:"syslog_drain_url,omitempty"`
+		Credentials    map[string]interface{} `json:"credentials,omitempty"`
+		SysLogDrainUrl string                 `json:"syslog_drain_url,omitempty"`
 	}
 
 	reqBody := RequestBody{serviceInstanceFields.Params, serviceInstanceFields.SysLogDrainUrl}

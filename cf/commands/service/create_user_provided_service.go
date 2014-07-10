@@ -66,7 +66,7 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 
 	params := c.String("p")
 	params = strings.Trim(params, `"`)
-	paramsMap := make(map[string]string)
+	paramsMap := make(map[string]interface{})
 
 	err := json.Unmarshal([]byte(params), &paramsMap)
 	if err != nil && params != "" {
@@ -90,7 +90,7 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 	cmd.ui.Ok()
 }
 
-func (cmd CreateUserProvidedService) mapValuesFromPrompt(params string, paramsMap map[string]string) map[string]string {
+func (cmd CreateUserProvidedService) mapValuesFromPrompt(params string, paramsMap map[string]interface{}) map[string]interface{} {
 	for _, param := range strings.Split(params, ",") {
 		param = strings.Trim(param, " ")
 		paramsMap[param] = cmd.ui.Ask("%s", param)

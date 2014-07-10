@@ -29,7 +29,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 		ts, handler, repo := createUserProvidedServiceInstanceRepo(req)
 		defer ts.Close()
 
-		apiErr := repo.Create("my-custom-service", "", map[string]string{
+		apiErr := repo.Create("my-custom-service", "", map[string]interface{}{
 			"host":     "example.com",
 			"user":     "me",
 			"password": "secret",
@@ -49,7 +49,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 		ts, handler, repo := createUserProvidedServiceInstanceRepo(req)
 		defer ts.Close()
 
-		apiErr := repo.Create("my-custom-service", "syslog://example.com", map[string]string{
+		apiErr := repo.Create("my-custom-service", "syslog://example.com", map[string]interface{}{
 			"host":     "example.com",
 			"user":     "me",
 			"password": "secret",
@@ -69,7 +69,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 		ts, handler, repo := createUserProvidedServiceInstanceRepo(req)
 		defer ts.Close()
 
-		params := map[string]string{
+		params := map[string]interface{}{
 			"host":     "example.com",
 			"user":     "me",
 			"password": "secret",
