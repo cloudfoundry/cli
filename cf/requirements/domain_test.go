@@ -39,7 +39,7 @@ var _ = Describe("DomainRequirement", func() {
 		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: errors.NewModelNotFoundError("Domain", "")}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
-		testassert.AssertPanic(testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.QuietPanic, func() {
 			domainReq.Execute()
 		})
 	})
@@ -48,7 +48,7 @@ var _ = Describe("DomainRequirement", func() {
 		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: errors.NewWithError("", errors.New(""))}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
-		testassert.AssertPanic(testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.QuietPanic, func() {
 			domainReq.Execute()
 		})
 	})

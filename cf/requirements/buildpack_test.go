@@ -33,7 +33,7 @@ var _ = Describe("BuildpackRequirement", func() {
 	It("fails when the buildpack cannot be found", func() {
 		buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameNotFound: true}
 
-		testassert.AssertPanic(testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.QuietPanic, func() {
 			NewBuildpackRequirement("foo", ui, buildpackRepo).Execute()
 		})
 	})

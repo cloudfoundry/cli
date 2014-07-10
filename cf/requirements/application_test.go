@@ -36,7 +36,7 @@ var _ = Describe("ApplicationRequirement", func() {
 	It("fails when an app with the given name cannot be found", func() {
 		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("app", "foo")
 
-		testassert.AssertPanic(testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.QuietPanic, func() {
 			NewApplicationRequirement("foo", ui, appRepo).Execute()
 		})
 	})

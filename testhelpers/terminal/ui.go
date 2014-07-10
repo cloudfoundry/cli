@@ -11,7 +11,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-const FailedWasCalled = "FailedWasCalled"
+const QuietPanic = "I should not print anything"
 
 type FakeUI struct {
 	Outputs                    []string
@@ -21,6 +21,7 @@ type FakeUI struct {
 	Inputs                     []string
 	FailedWithUsage            bool
 	FailedWithUsageCommandName string
+	PanickedQuietly            bool
 	ShowConfigurationCalled    bool
 
 	sayMutex sync.Mutex
@@ -107,7 +108,7 @@ func (ui *FakeUI) Ok() {
 func (ui *FakeUI) Failed(message string, args ...interface{}) {
 	ui.Say("FAILED")
 	ui.Say(message, args...)
-	panic(FailedWasCalled)
+	panic(QuietPanic)
 	return
 }
 
@@ -115,6 +116,11 @@ func (ui *FakeUI) FailWithUsage(context *cli.Context) {
 	ui.FailedWithUsage = true
 	ui.FailedWithUsageCommandName = context.Command.Name
 	ui.Failed("Incorrect Usage.")
+	ui.PanickedQuietly = true
+}
+
+func (ui *FakeUI) PanicQuietly() {
+	ui.PanickedQuietly = true
 }
 
 func (ui *FakeUI) DumpWarnOutputs() string {

@@ -258,7 +258,7 @@ var _ = Describe("UI", func() {
 	Describe("failing", func() {
 		It("panics with a specific string", func() {
 			io_helpers.CaptureOutput(func() {
-				testassert.AssertPanic(FailedWasCalled, func() {
+				testassert.AssertPanic(QuietPanic, func() {
 					NewUI(os.Stdin).Failed("uh oh")
 				})
 			})

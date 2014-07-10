@@ -79,6 +79,9 @@ func (cmd Target) Run(c *cli.Context) {
 	}
 
 	cmd.ui.ShowConfiguration(cmd.config)
+	if !cmd.config.IsLoggedIn() {
+		cmd.ui.PanicQuietly()
+	}
 	return
 }
 

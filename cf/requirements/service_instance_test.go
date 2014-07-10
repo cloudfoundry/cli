@@ -37,7 +37,7 @@ var _ = Describe("ServiceInstanceRequirement", func() {
 	Context("when a service instance with the given name can't be found", func() {
 		It("fails", func() {
 			repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
-			testassert.AssertPanic(testterm.FailedWasCalled, func() {
+			testassert.AssertPanic(testterm.QuietPanic, func() {
 				NewServiceInstanceRequirement("foo", ui, repo).Execute()
 			})
 		})

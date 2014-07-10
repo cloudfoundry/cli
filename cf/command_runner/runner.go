@@ -3,10 +3,10 @@ package command_runner
 import (
 	"errors"
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/codegangsta/cli"
-	"os"
 )
 
 type Runner interface {
@@ -24,27 +24,26 @@ func NewRunner(cmdFactory command_factory.Factory, requirementsFactory requireme
 	return
 }
 
-func (runner ConcreteRunner) RunCmdByName(cmdName string, c *cli.Context) (err error) {
+func (runner ConcreteRunner) RunCmdByName(cmdName string, c *cli.Context) error {
 	cmd, err := runner.cmdFactory.GetByCmdName(cmdName)
 	if err != nil {
 		fmt.Printf(T("Error finding command {{.CmdName}}\n", map[string]interface{}{"CmdName": cmdName}))
-		os.Exit(1)
-		return
+		return err
 	}
 
 	requirements, err := cmd.GetRequirements(runner.requirementsFactory, c)
 	if err != nil {
-		return
+		return err
 	}
 
 	for _, requirement := range requirements {
 		success := requirement.Execute()
 		if !success {
 			err = errors.New(T("Error in requirement"))
-			return
+			return err
 		}
 	}
 
 	cmd.Run(c)
-	return
+	return nil
 }
