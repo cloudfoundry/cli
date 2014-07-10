@@ -36,7 +36,7 @@ var _ = Describe("OrganizationRequirement", func() {
 	It("fails when the org with the given name does not exist", func() {
 		orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
 
-		testassert.AssertPanic(testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.QuietPanic, func() {
 			NewOrganizationRequirement("foo", ui, orgRepo).Execute()
 		})
 	})

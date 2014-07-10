@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -106,7 +107,10 @@ func getCommand(metadata command_metadata.CommandMetadata, runner command_runner
 		Description: metadata.Description,
 		Usage:       strings.Replace(metadata.Usage, "CF_NAME", cf.Name(), -1),
 		Action: func(context *cli.Context) {
-			runner.RunCmdByName(metadata.Name, context)
+			err := runner.RunCmdByName(metadata.Name, context)
+			if err != nil {
+				os.Exit(1)
+			}
 		},
 		Flags:           metadata.Flags,
 		SkipFlagParsing: metadata.SkipFlagParsing,

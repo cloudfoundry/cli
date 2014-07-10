@@ -22,7 +22,7 @@ func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq
 	defer func() {
 		errMsg := recover()
 
-		if errMsg != nil && errMsg != testterm.FailedWasCalled {
+		if errMsg != nil && errMsg != testterm.QuietPanic {
 			panic(errMsg)
 		}
 	}()
@@ -55,7 +55,7 @@ func RunCommandMoreBetter(cmd command.Command, requirementsFactory *testreq.Fake
 			return
 		}
 
-		if errMsg != nil && errMsg != testterm.FailedWasCalled {
+		if errMsg != nil && errMsg != testterm.QuietPanic {
 			panic(errMsg)
 		}
 

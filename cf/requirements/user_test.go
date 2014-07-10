@@ -36,7 +36,7 @@ var _ = Describe("UserRequirement", func() {
 			userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
 			ui := new(testterm.FakeUI)
 
-			testassert.AssertPanic(testterm.FailedWasCalled, func() {
+			testassert.AssertPanic(testterm.QuietPanic, func() {
 				NewUserRequirement("foo", ui, userRepo).Execute()
 			})
 

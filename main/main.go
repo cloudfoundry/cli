@@ -106,7 +106,7 @@ OPTIONS:
 
 func handlePanics() {
 	err := recover()
-	if err != nil && err != terminal.FailedWasCalled {
+	if err != nil && err != terminal.QuietPanic {
 		switch err := err.(type) {
 		case errors.Exception:
 			if err.DisplayCrashDialog {

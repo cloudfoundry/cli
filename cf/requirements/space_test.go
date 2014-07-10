@@ -37,7 +37,7 @@ var _ = Describe("SpaceRequirement", func() {
 	Context("when a space with the given name does not exist", func() {
 		It("fails", func() {
 			spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
-			testassert.AssertPanic(testterm.FailedWasCalled, func() {
+			testassert.AssertPanic(testterm.QuietPanic, func() {
 				NewSpaceRequirement("foo", ui, spaceRepo).Execute()
 			})
 		})

@@ -31,6 +31,7 @@ type UI interface {
 	Ok()
 	Failed(message string, args ...interface{})
 	FailWithUsage(context *cli.Context)
+	PanicQuietly()
 	ShowConfiguration(configuration.Reader)
 	LoadingIndication()
 	Wait(duration time.Duration)
@@ -118,7 +119,7 @@ func (c terminalUI) Ok() {
 	c.Say(SuccessColor(T("OK")))
 }
 
-const FailedWasCalled = "FailedWasCalled"
+const QuietPanic = "This shouldn't print anything"
 
 func (c terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
@@ -127,7 +128,11 @@ func (c terminalUI) Failed(message string, args ...interface{}) {
 
 	trace.Logger.Print(T("FAILED"))
 	trace.Logger.Print(message)
-	panic(FailedWasCalled)
+	c.PanicQuietly()
+}
+
+func (c terminalUI) PanicQuietly() {
+	panic(QuietPanic)
 }
 
 func (c terminalUI) FailWithUsage(context *cli.Context) {

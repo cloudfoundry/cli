@@ -37,7 +37,7 @@ var _ = Describe("TargetedOrganizationRequirement", func() {
 		It("fails", func() {
 			config.SetOrganizationFields(models.OrganizationFields{})
 
-			testassert.AssertPanic(testterm.FailedWasCalled, func() {
+			testassert.AssertPanic(testterm.QuietPanic, func() {
 				NewTargetedOrgRequirement(ui, config).Execute()
 			})
 

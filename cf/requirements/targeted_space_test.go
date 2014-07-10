@@ -35,7 +35,7 @@ var _ = Describe("TargetedSpaceRequirement", func() {
 		It("fails", func() {
 			config.SetSpaceFields(models.SpaceFields{})
 
-			testassert.AssertPanic(testterm.FailedWasCalled, func() {
+			testassert.AssertPanic(testterm.QuietPanic, func() {
 				NewTargetedSpaceRequirement(ui, config).Execute()
 			})
 

@@ -27,7 +27,7 @@
     "windows",
     "\\x1B\\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]",
     "login",
-    "FailedWasCalled",
+    "QuietPanic",
     "%s t -o Org",
     ".",
     "%s\n",
