@@ -8,6 +8,7 @@ type DomainsEndpointStrategy interface {
 	SharedDomainsURL() string
 	DeleteDomainURL(guid string) string
 	DeleteSharedDomainURL(guid string) string
+	PrivateDomainsByOrgURL(guid string) string
 }
 
 type domainsEndpointStrategy struct{}
@@ -38,6 +39,10 @@ func (s domainsEndpointStrategy) SharedDomainsURL() string {
 	return v2("domains")
 }
 
+func (s domainsEndpointStrategy) PrivateDomainsByOrgURL(orgGuid string) string {
+	return v2("domains")
+}
+
 func (s domainsEndpointStrategy) DeleteDomainURL(guid string) string {
 	return buildURL(v2("domains", guid), params{recursive: true})
 }
@@ -56,6 +61,10 @@ func (s separatedDomainsEndpointStrategy) PrivateDomainsURL() string {
 
 func (s separatedDomainsEndpointStrategy) SharedDomainsURL() string {
 	return v2("shared_domains")
+}
+
+func (s separatedDomainsEndpointStrategy) PrivateDomainsByOrgURL(orgGuid string) string {
+	return v2("organizations", orgGuid, "private_domains")
 }
 
 func (s separatedDomainsEndpointStrategy) DeleteDomainURL(guid string) string {

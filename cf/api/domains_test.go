@@ -50,10 +50,10 @@ var _ = Describe("DomainRepository", func() {
 	Describe("listing domains", func() {
 		BeforeEach(func() {
 			config.SetApiVersion("2.2.0")
-			setupTestServer(firstPageDomainsRequest, secondPageDomainsRequest)
+			setupTestServer(firstPageSharedDomainsRequest, secondPageSharedDomainsRequest, firstPagePrivateDomainsRequest, secondPagePrivateDomainsRequest)
 		})
 
-		It("uses the organization-scoped domains endpoint", func() {
+		It("uses the organization-scoped domains endpoints", func() {
 			receivedDomains := []models.DomainFields{}
 			apiErr := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
 				receivedDomains = append(receivedDomains, d)
@@ -61,9 +61,13 @@ var _ = Describe("DomainRepository", func() {
 			})
 
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(len(receivedDomains)).To(Equal(3))
-			Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
-			Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
+			Expect(len(receivedDomains)).To(Equal(6))
+			Expect(receivedDomains[0].Guid).To(Equal("shared-domain1-guid"))
+			Expect(receivedDomains[1].Guid).To(Equal("shared-domain2-guid"))
+			Expect(receivedDomains[2].Guid).To(Equal("shared-domain3-guid"))
+			Expect(receivedDomains[3].Guid).To(Equal("domain1-guid"))
+			Expect(receivedDomains[4].Guid).To(Equal("domain2-guid"))
+			Expect(receivedDomains[5].Guid).To(Equal("domain3-guid"))
 			Expect(handler).To(HaveAllRequestsCalled())
 		})
 	})
@@ -400,14 +404,14 @@ var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Te
 
 var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/organizations/my-org-guid/domains",
+	Path:   "/v2/organizations/my-org-guid/private_domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
 {
 	"next_url": "/v2/organizations/my-org-guid/domains?page=2",
 	"resources": [
 		{
 		  "metadata": {
-			"guid": "domain1-guid"
+			"guid": "domain1-guid",
 		  },
 		  "entity": {
 			"name": "example.com",
@@ -440,6 +444,51 @@ var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 		  "entity": {
 			"name": "example.com",
 			"owning_organization_guid": "my-org-guid"
+		  }
+		}
+	]
+}`},
+})
+
+var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/shared_domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "/v2/shared_domains?page=2",
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "shared-domain1-guid"
+		  },
+		  "entity": {
+			"name": "sharedexample.com"
+		  }
+		},
+		{
+		  "metadata": {
+			"guid": "shared-domain2-guid"
+		  },
+		  "entity": {
+			"name": "some-other-shared-example.com"
+		  }
+		}
+	]
+}`},
+})
+
+var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/shared_domains?page=2",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "shared-domain3-guid"
+		  },
+		  "entity": {
+			"name": "yet-another-shared-example.com"
 		  }
 		}
 	]
