@@ -4,11 +4,12 @@ import (
 	"crypto/tls"
 	"fmt"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
+	"os"
 )
 
-var LoggregatorAddress = "loggregator.10.244.0.34.xip.io:443"
-var appGuid = "<get your app guid and paste it here>"
-var authToken = "<get your auth token and paste it here>"
+var LoggregatorAddress = "wss://loggregator.10.244.0.34.xip.io:443"
+var appGuid = os.Getenv("APP_GUID")
+var authToken = os.Getenv("CF_ACCESS_TOKEN")
 
 func main() {
 	connection := consumer.New(LoggregatorAddress, &tls.Config{InsecureSkipVerify: true}, nil)

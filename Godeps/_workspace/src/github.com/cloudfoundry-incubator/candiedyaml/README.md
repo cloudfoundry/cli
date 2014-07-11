@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cloudfoundry-incubator/candiedyaml.svg)](https://travis-ci.org/cloudfoundry-incubator/candiedyaml)
+
 candiedyaml
 ===========
 
