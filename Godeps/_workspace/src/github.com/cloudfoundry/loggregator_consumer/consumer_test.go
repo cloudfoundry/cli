@@ -1,6 +1,7 @@
 package loggregator_consumer_test
 
 import (
+	"bytes"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
 	"crypto/tls"
@@ -36,6 +37,11 @@ var _ = Describe("Loggregator Consumer", func() {
 		err error
 	)
 
+	BeforeSuite(func() {
+		buf := &bytes.Buffer{}
+		log.SetOutput(buf)
+	})
+
 	BeforeEach(func() {
 		messagesToSend = make(chan []byte, 256)
 	})
@@ -64,17 +70,42 @@ var _ = Describe("Loggregator Consumer", func() {
 			Eventually(func() bool { return called }).Should(BeTrue())
 		})
 
-		It("does not call the callback if the connection fails", func() {
-			endpoint = "!!!bad-endpoint"
+		Context("when the connection fails", func() {
+			It("does not call the callback", func() {
+				endpoint = "!!!bad-endpoint"
 
-			called := false
-			cb := func() { called = true }
+				called := false
+				cb := func() { called = true }
 
-			connection = consumer.New(endpoint, tlsSettings, nil)
-			connection.SetOnConnectCallback(cb)
-			connection.Tail(appGuid, authToken)
+				connection = consumer.New(endpoint, tlsSettings, nil)
+				connection.SetOnConnectCallback(cb)
+				connection.Tail(appGuid, authToken)
 
-			Consistently(func() bool { return called }).Should(BeFalse())
+				Consistently(func() bool { return called }).Should(BeFalse())
+			})
+		})
+
+		Context("when authorization fails", func() {
+			var failer authFailer
+			var endpoint string
+
+			BeforeEach(func() {
+				failer = authFailer{Message: "Helpful message"}
+				testServer = httptest.NewServer(failer)
+				endpoint = "ws://" + testServer.Listener.Addr().String()
+			})
+
+			It("does not call the callback", func() {
+				called := false
+				cb := func() { called = true }
+
+				connection = consumer.New(endpoint, tlsSettings, nil)
+				connection.SetOnConnectCallback(cb)
+				connection.Tail(appGuid, authToken)
+
+				Consistently(func() bool { return called }).Should(BeFalse())
+			})
+
 		})
 	})
 
@@ -169,6 +200,7 @@ var _ = Describe("Loggregator Consumer", func() {
 					perform()
 
 					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(ContainSubstring("Please ask your Cloud Foundry Operator"))
 
 					close(done)
 				})
@@ -326,7 +358,7 @@ var _ = Describe("Loggregator Consumer", func() {
 
 		})
 
-		Context("when the content type is doesn't have a boundary", func() {
+		Context("when the content type doesn't have a boundary", func() {
 			BeforeEach(func() {
 
 				serverMux := http.NewServeMux()

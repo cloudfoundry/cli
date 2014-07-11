@@ -21,7 +21,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "746fed644c930c0635f84866d433fd7de5f444cf"
+			"Rev": "9d6da703654a1d6897de218799c1ff4eccf49b85"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
@@ -29,15 +29,15 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
-			"Rev": "c9c42074d681db3ca94700c140588292d023c93d"
+			"Rev": "dc21be9b7619ac99357fa44c77295e465f0d1e89"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
-			"Rev": "da9f8b85c0175500cbb836bdb9c5488939e20c43"
+			"Rev": "c6465651f46ea42bbaf444381e083b41b6cb2ff3"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/signature",
-			"Rev": "da9f8b85c0175500cbb836bdb9c5488939e20c43"
+			"Rev": "c6465651f46ea42bbaf444381e083b41b6cb2ff3"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
@@ -46,7 +46,7 @@
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "aef42a8ae63a680a8c5d4ca25b01ca57a97ffa5c"
+			"Rev": "10afcadf69098c003a97f23349c25ca16f0543e3"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
