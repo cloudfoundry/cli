@@ -1,122 +1,122 @@
 [
-   {
-      "id": "ADVANCED",
-      "translation": "ADVANCED"
-   },
-   {
-      "id": "APPS",
-      "translation": "APPS"
-   },
-   {
-      "id": "BUILDPACKS",
-      "translation": "BUILDPACKS"
-   },
-   {
-      "id": "DOMAINS",
-      "translation": "DOMAINS"
-   },
-   {
-      "id": "GETTING STARTED",
-      "translation": "GETTING STARTED"
-   },
-   {
-      "id": "ORG ADMIN",
-      "translation": "ORG ADMIN"
-   },
-   {
-      "id": "ORGS",
-      "translation": "ORGS"
-   },
-   {
-      "id": "ROUTES",
-      "translation": "ROUTES"
-   },
-   {
-      "id": "SERVICE ADMIN",
-      "translation": "SERVICE ADMIN"
-   },
-   {
-      "id": "SERVICES",
-      "translation": "SERVICES"
-   },
-   {
-      "id": "SPACES",
-      "translation": "SPACES"
-   },
-   {
-      "id": "Show help",
-      "translation": "Show help"
-   },
-   {
-      "id": "USER ADMIN",
-      "translation": "USER ADMIN"
-   },
-   {
-      "id": "VERSION:",
-      "translation": "VERSION:"
-   },
-   {
-      "id": "{{.Command}} help [COMMAND]",
-      "translation": "{{.Command}} help [COMMAND]"
-   },
-   {
-      "id": "Do not colorize output",
-      "translation": "Do not colorize output"
-   },
-   {
-      "id": "Print API request diagnostics to stdout",
-      "translation": "Print API request diagnostics to stdout"
-   },
-   {
-      "id": "NAME:",
-      "translation": "NAME:"
-   },
-   {
-      "id": "USAGE:",
-      "translation": "USAGE:"
-   },
-   {
-      "id": "GLOBAL OPTIONS",
-      "translation": "GLOBAL OPTIONS"
-   },
-   {
-      "id": "[environment variables]",
-      "translation": "[environment variables]"
-   },
-   {
-      "id": "[global options] command [arguments...] [command options]",
-      "translation": "[global options] command [arguments...] [command options]"
-   },
-   {
-      "id": "ENVIRONMENT VARIABLES",
-      "translation": "ENVIRONMENT VARIABLES"
-   },
-   {
-      "id": "Override path to default config directory",
-      "translation": "Override path to default config directory"
-   },
-   {
-      "id": "Print the version",
-      "translation": "Print the version"
-   },
-   {
-      "id": "BUILD TIME:",
-      "translation": "BUILD TIME:"
-   },
-   {
-      "id": "Max wait time for app instance startup, in minutes",
-      "translation": "Max wait time for app instance startup, in minutes"
-   },
-   {
-      "id": "Append API request diagnostics to a log file",
-      "translation": "Append API request diagnostics to a log file"
-   },
-   {
-      "id": "Enable HTTP proxying for API requests",
-      "translation": "Enable HTTP proxying for API requests"
-   },
-   {
-      "id": "Max wait time for buildpack staging, in minutes",
-      "translation": "Max wait time for buildpack staging, in minutes"
-   }
+  {
+    "id": "ADVANCED",
+    "translation": "ADVANCED"
+  },
+  {
+    "id": "APPS",
+    "translation": "APPS"
+  },
+  {
+    "id": "BUILDPACKS",
+    "translation": "BUILDPACKS"
+  },
+  {
+    "id": "DOMAINS",
+    "translation": "DOMINIOS"
+  },
+  {
+    "id": "GETTING STARTED",
+    "translation": "GETTING STARTED"
+  },
+  {
+    "id": "ORG ADMIN",
+    "translation": "ORG ADMIN"
+  },
+  {
+    "id": "ORGS",
+    "translation": "ORGS"
+  },
+  {
+    "id": "ROUTES",
+    "translation": "ROUTES"
+  },
+  {
+    "id": "SERVICE ADMIN",
+    "translation": "SERVICE ADMIN"
+  },
+  {
+    "id": "SERVICES",
+    "translation": "SERVICES"
+  },
+  {
+    "id": "SPACES",
+    "translation": "SPACES"
+  },
+  {
+    "id": "Show help",
+    "translation": "Mostrar ayuda"
+  },
+  {
+    "id": "USER ADMIN",
+    "translation": "USER ADMIN"
+  },
+  {
+    "id": "VERSION:",
+    "translation": "VERSION:"
+  },
+  {
+    "id": "{{.Command}} help [COMMAND]",
+    "translation": "{{.Command}} help [COMMAND]"
+  },
+  {
+    "id": "Do not colorize output",
+    "translation": "No coloriza la salida"
+  },
+  {
+    "id": "Print API request diagnostics to stdout",
+    "translation": "Imprime el diagnostico de solicitudes API a stdout"
+  },
+  {
+    "id": "NAME:",
+    "translation": "NOMBRE:"
+  },
+  {
+    "id": "USAGE:",
+    "translation": "USO:"
+  },
+  {
+    "id": "GLOBAL OPTIONS",
+    "translation": "OPCIONES GLOBALES"
+  },
+  {
+    "id": "[environment variables]",
+    "translation": "[variables de entorno]"
+  },
+  {
+    "id": "[global options] command [arguments...] [command options]",
+    "translation": "[opciones globales] comando [argumentos...] [opciones del comando]"
+  },
+  {
+    "id": "ENVIRONMENT VARIABLES",
+    "translation": "ENVIRONMENT VARIABLES"
+  },
+  {
+    "id": "Override path to default config directory",
+    "translation": "Sobreescribe la ruta al directorio de configuración por default"
+  },
+  {
+    "id": "Print the version",
+    "translation": "Imprime la version"
+  },
+  {
+    "id": "BUILD TIME:",
+    "translation": "Tiempo de construcción:"
+  },
+  {
+    "id": "Max wait time for app instance startup, in minutes",
+    "translation": "Tiempo máximo de espera para comienzo de instancia, en minutos"
+  },
+  {
+    "id": "Append API request diagnostics to a log file",
+    "translation": "Anade diagnósticos de solicitud API al archivo de log"
+  },
+  {
+    "id": "Enable HTTP proxying for API requests",
+    "translation": "Habilita HTTP proxying para solicitudes API"
+  },
+  {
+    "id": "Max wait time for buildpack staging, in minutes",
+    "translation": "Tiempo máximo de espera máximo para buildpack staging, en minutos"
+  }
 ]
