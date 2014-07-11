@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+ENV['GOPATH']="#{ENV['HOME']}/go"
+ENV['PATH']="#{ENV['PATH']}:#{ENV['GOPATH']}/bin"
+CLI_ROOT = File.expand_path(File.join(File.dirname(__FILE__), ".."))
+
+@exit_code = 0
+
+def install_gi18n
+  output = `go get -u github.com/maximilien/i18n4go/gi18n`
+  unless $?.exitstatus == 0
+    puts "Cannot install latest gi18n tool to verify strings:\n#{output}"
+    exit 1
+  end
+end
+
+def show_missing_strings(english_reference_file, directory_to_verify)
+  puts "\nVerifying: \n\t #{english_reference_file} \n\t #{directory_to_verify}\n\n"
+
+  result = system("gi18n -c show-missing-strings -d #{directory_to_verify} --i18n-strings-filename #{english_reference_file}")
+  unless result
+    puts "===> Failed Verification!"
+    unless File.exist?(english_reference_file)
+      puts "#{english_reference_file} does not exist."
+      exit 1
+    end
+    @exit_code = 1
+  end
+end
+
+def get_matching_directory(path_to_i18n)
+  i18n_resources_dir = File.join("cf", "i18n", "resources", "en")
+  File.expand_path(File.dirname(path_to_i18n.gsub(i18n_resources_dir, '')))
+end
+
+def run
+  path = File.join(CLI_ROOT, *%w[cf i18n resources en *])
+  english_json_files = `find #{path} -type f`.split
+
+  english_json_files.each do |english_reference_file|
+    show_missing_strings(english_reference_file, get_matching_directory(english_reference_file))
+  end
+end
+
+install_gi18n
+run
+exit(@exit_code)
