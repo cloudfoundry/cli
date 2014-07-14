@@ -36,6 +36,10 @@
       "translation": "GRUPOS DE SEGURANÇA"
    },
    {
+      "id": "SECURITY GROUP",
+      "translation": "SECURITY GROUP"
+   },
+   {
       "id": "SERVICE ADMIN",
       "translation": "ADMINISTRADOR DE SERVIÇOS"
    },

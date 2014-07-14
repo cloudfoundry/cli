@@ -4,12 +4,12 @@
       "translation": "Acquiring staging security group as {{.username}}"
    },
    {
-      "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
-      "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
+      "id": "Bind a security group to the list of security groups to be used for running applications",
+      "translation": "Bind a security group to the list of security groups to be used for running applications"
    },
    {
-      "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
-      "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
+      "id": "Bind a security group to the list of security groups to be used for staging applications",
+      "translation": "Bind a security group to the list of security groups to be used for staging applications"
    },
    {
       "id": "Force deletion without confirmation",
@@ -24,32 +24,32 @@
       "translation": "List security groups in the staging set for applications"
    },
    {
-      "id": "Security group {{.security_group}} {{.error_message}}",
-      "translation": "Security group {{.security_group}} {{.error_message}}"
+      "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
    },
    {
-      "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
-      "translation": "Binding security group {{.security_group}} to defaults for running as {{.username}}"
+      "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
    },
    {
       "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
       "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
    },
    {
-      "id": "Rules",
-      "translation": "Rules"
+      "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
    },
    {
       "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
       "translation": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules."
    },
    {
-      "id": "Bind a security group to the list of security groups to be used for running applications",
-      "translation": "Bind a security group to the list of security groups to be used for running applications"
+      "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
    },
    {
-      "id": "Bind a security group to a space",
-      "translation": "Bind a security group to a space"
+      "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
    },
    {
       "id": "Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
@@ -60,8 +60,8 @@
       "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
    },
    {
-      "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
-      "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
+      "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
    },
    {
       "id": "Create a security group",
@@ -124,16 +124,12 @@
       "translation": "Bind a security group to the list of security groups to be used for staging applications"
    },
    {
-      "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
-      "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
+      "id": "Unbind a security group from the set of security groups for staging applications",
+      "translation": "Unbind a security group from the set of security groups for staging applications"
    },
    {
-      "id": "Deleting security group {{.security_group}} as {{.username}}",
-      "translation": "Deleting security group {{.security_group}} as {{.username}}"
-   },
-   {
-      "id": "List all security groups",
-      "translation": "List all security groups"
+      "id": "Unbind a security group from the set of security groups for running applications",
+      "translation": "Unbind a security group from the set of security groups for running applications"
    },
    {
       "id": "Security group {{.security_group}} does not exist",
