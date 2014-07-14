@@ -73,8 +73,10 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 	enabled := c.Bool("enable")
 	disabled := c.Bool("disable")
 	if enabled && disabled {
-		cmd.ui.Failed(T("Cannot specify both enabled and disabled."))
-		return
+		cmd.ui.Failed(T("Cannot specify both {{.Enabled}} and {{.Disabled}}.", map[string]interface{}{
+			"Enabled":  "enabled",
+			"Disabled": "disabled",
+		}))
 	}
 
 	if enabled {
