@@ -2,15 +2,16 @@ package manifest
 
 import (
 	"fmt"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/generic"
 	"github.com/cloudfoundry/cli/words"
-	"path/filepath"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 type Manifest struct {
@@ -326,15 +327,15 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]string {
 			case float32, float64:
 				result[key.(string)] = fmt.Sprintf("%f", value)
 			default:
-				*errs = append(*errs, errors.NewWithFmt(T("Expected environment variable {{.Name}} to have a string value, but it was a {{.Type}}.",
-					map[string]interface{}{"Name": key, "Type": value})))
+				*errs = append(*errs, errors.NewWithFmt(T("Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
+					map[string]interface{}{"PropertyName": key, "PropertyType": value})))
 			}
 
 		})
 		return &result
 	default:
-		*errs = append(*errs, errors.NewWithFmt(T("Expected {{.PropertyName}} to be a set of key => value, but it was a {{.PropertyType}}.",
-			map[string]interface{}{"PropertyName": key, "PropertyType": envVars})))
+		*errs = append(*errs, errors.NewWithFmt(T("Expected {{.Name}} to be a set of key => value, but it was a {{.Type}}.",
+			map[string]interface{}{"Name": key, "Type": envVars})))
 		return nil
 	}
 }
