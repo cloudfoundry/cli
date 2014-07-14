@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+set -ex
 
 export PATH=$PATH:$HOME/gopath/bin
 export GOPATH=$(godep path):$(pwd):$GOPATH
 
 ginkgo -r cf --randomizeAllSpecs --randomizeSuites --failOnPending --trace
+$(dirname $0)/verify-strings
+$(dirname $0)/show-missing-strings
