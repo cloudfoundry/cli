@@ -308,6 +308,10 @@
       "translation": "Write curl body to FILE instead of stdout"
    },
    {
+      "id": "Write curl body to FILE instead of stdout",
+      "translation": "Write curl body to FILE instead of stdout"
+   },
+   {
       "id": "description",
       "translation": "descripción"
    },
