@@ -32,6 +32,10 @@
       "translation": "ROUTES"
    },
    {
+      "id": "SECURITY GROUP",
+      "translation": "SECURITY GROUP"
+   },
+   {
       "id": "SERVICE ADMIN",
       "translation": "ADMIN DE SERVICE"
    },

@@ -31,7 +31,7 @@ func NewUnbindFromStagingGroup(ui terminal.UI, configRepo configuration.Reader, 
 func (cmd *unbindFromStagingGroup) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unbind-staging-security-group",
-		Description: T("Unbind a security group from the set of default security groups for staging applications"),
+		Description: T("Unbind a security group from the set of security groups for staging applications"),
 		Usage:       T("CF_NAME unbind-staging-security-group SECURITY_GROUP"),
 	}
 }
