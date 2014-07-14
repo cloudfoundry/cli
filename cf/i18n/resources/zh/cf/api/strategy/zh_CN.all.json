@@ -1,6 +1,6 @@
 [
    {
       "id": "Could not parse version number: {{.Input}}",
-      "translation": "Could not parse version number: {{.Input}}"
+      "translation": "无法解析版本号: {{.Input}}"
    }
 ]

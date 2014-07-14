@@ -1,75 +1,75 @@
 [
    {
       "id": "enabled",
-      "translation": "enabled"
+      "translation": "已启用"
    },
    {
       "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
-      "translation": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]"
+      "translation": "CF_NAME create-buildpack <BUILDPACK> <路径> <位置> [--enable|--disable]"
    },
    {
       "id": "position",
-      "translation": "position"
+      "translation": "位置"
    },
    {
       "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
-      "translation": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack"
+      "translation": "小贴士: 使用'{{.CfUpdateBuildpackCommand}}' 来更新此buildpack"
    },
    {
       "id": "Failed fetching buildpacks.\n{{.Error}}",
-      "translation": "Failed fetching buildpacks.\n{{.Error}}"
+      "translation": "抓取buildpack失败\n错误：{{.Error}}"
    },
    {
       "id": "Cannot specify both {{.Enabled}} and {{.Disabled}}.",
-      "translation": "Cannot specify both {{.Enabled}} and {{.Disabled}}."
+      "translation": "不能同时指定{{.Enabled}}和{{.Disabled}}."
    },
    {
       "id": "Cannot specify both lock and unlock options.",
-      "translation": "Cannot specify both lock and unlock options."
+      "translation": "不能同时指定锁定和解锁选项"
    },
    {
       "id": "Rename a buildpack",
-      "translation": "Rename a buildpack"
+      "translation": "重命名buildpack"
    },
    {
       "id": "No buildpacks found",
-      "translation": "No buildpacks found"
+      "translation": "buildpack未找到"
    },
    {
       "id": "locked",
-      "translation": "locked"
+      "translation": "锁定"
    },
    {
       "id": "Enable the buildpack",
-      "translation": "Enable the buildpack"
+      "translation": "启用buildpack"
    },
    {
       "id": "Buildpack {{.BuildpackName}} does not exist.",
-      "translation": "Buildpack {{.BuildpackName}} does not exist."
+      "translation": "buildpack {{.BuildpackName}} 不存在"
    },
    {
       "id": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
-      "translation": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"
+      "translation": "CF_NAME rename-buildpack buildpack名称 新的buildpack名称"
    },
    {
       "id": "Lock the buildpack",
-      "translation": "Lock the buildpack"
+      "translation": "锁定该 buildpack"
    },
    {
       "id": "Uploading buildpack {{.BuildpackName}}...",
-      "translation": "Uploading buildpack {{.BuildpackName}}..."
+      "translation": "上传buildpack {{.BuildpackName}}..."
    },
    {
       "id": "Cannot specify buildpack bits and lock/unlock.",
-      "translation": "Cannot specify buildpack bits and lock/unlock."
+      "translation": "无法指定buildpack以及对其加锁/解锁"
    },
    {
       "id": "\n\nTIP:\n",
-      "translation": "\n\nTIP:\n"
+      "translation": "\n\n小贴士:\n"
    },
    {
       "id": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]",
-      "translation": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]"
+      "translation": "CF_NAME update-buildpack BUILDPACK [-p 路径] [-i 位置] [--enable|--disable] [--lock|--unlock]"
    },
    {
       "id": "CF_NAME buildpacks",
@@ -77,7 +77,7 @@
    },
    {
       "id": "Error renaming buildpack {{.Name}}\n{{.Error}}",
-      "translation": "Error renaming buildpack {{.Name}}\n{{.Error}}"
+      "translation": "重命名buildpack {{.Name}}\n错误：{{.Error}}"
    },
    {
       "id": "CF_NAME delete-buildpack BUILDPACK [-f]",
@@ -85,67 +85,67 @@
    },
    {
       "id": "Path to directory or zip file",
-      "translation": "Path to directory or zip file"
+      "translation": "目录或zip文件路径"
    },
    {
       "id": "Unlock the buildpack",
-      "translation": "Unlock the buildpack"
+      "translation": "解锁buildpack"
    },
    {
       "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
-      "translation": "Error updating buildpack {{.Name}}\n{{.Error}}"
+      "translation": "更新错误 buildpack {{.Name}}\n错误：{{.Error}}"
    },
    {
       "id": "filename",
-      "translation": "filename"
+      "translation": "文件名"
    },
    {
       "id": "Create a buildpack",
-      "translation": "Create a buildpack"
+      "translation": "创建 buildpack"
    },
    {
       "id": "Delete a buildpack",
-      "translation": "Delete a buildpack"
+      "translation": "删除buildpack"
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force deletion without confirmation"
+      "translation": "强制删除"
    },
    {
       "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
-      "translation": "Error uploading buildpack {{.Name}}\n{{.Error}}"
+      "translation": "上传buildpack {{.Name}},\n错误：{{.Error}}"
    },
    {
       "id": "Creating buildpack {{.BuildpackName}}...",
-      "translation": "Creating buildpack {{.BuildpackName}}..."
+      "translation": "创建buildpack {{.BuildpackName}}..."
    },
    {
       "id": "Buildpack {{.BuildpackName}} already exists",
-      "translation": "Buildpack {{.BuildpackName}} already exists"
+      "translation": "buildpack {{.BuildpackName}} 已经存在"
    },
    {
       "id": "Buildpack position among other buildpacks",
-      "translation": "Buildpack position among other buildpacks"
+      "translation": "其中buildpack buildpacks位置"
    },
    {
       "id": "Error deleting buildpack {{.Name}}\n{{.Error}}",
-      "translation": "Error deleting buildpack {{.Name}}\n{{.Error}}"
+      "translation": "删除 buildpack {{.Name}},\n错误：{{.Error}}"
    },
    {
       "id": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}...",
-      "translation": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}..."
+      "translation": "重命名 buildpack {{.OldBuildpackName}} 到 {{.NewBuildpackName}}..."
    },
    {
       "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest.",
-      "translation": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest."
+      "translation": "   路径应该是一个zip文件，一个URL到一个zip文件，或本地目录。位置是一个整数，设置优先级，并进行排序，从最低到最高"
    },
    {
       "id": "Update a buildpack",
-      "translation": "Update a buildpack"
+      "translation": "更新buildpack"
    },
    {
       "id": "Disable the buildpack",
-      "translation": "Disable the buildpack"
+      "translation": "禁用buildpack"
    },
    {
       "id": "Invalid position. {{.ErrorDescription}}",
@@ -153,18 +153,18 @@
    },
    {
       "id": "List all buildpacks",
-      "translation": "List all buildpacks"
+      "translation": "列出所有buildpacks"
    },
    {
       "id": "Deleting buildpack {{.BuildpackName}}...",
-      "translation": "Deleting buildpack {{.BuildpackName}}..."
+      "translation": "删除buildpack {{.BuildpackName}}..."
    },
    {
       "id": "Getting buildpacks...\n",
-      "translation": "Getting buildpacks...\n"
+      "translation": "获取buildpacks...\n"
    },
    {
       "id": "Updating buildpack {{.BuildpackName}}...",
-      "translation": "Updating buildpack {{.BuildpackName}}..."
+      "translation": "更新buildpack {{.BuildpackName}}..."
    }
 ]
