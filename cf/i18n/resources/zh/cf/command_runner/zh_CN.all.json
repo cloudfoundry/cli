@@ -1,10 +1,10 @@
 [
    {
       "id": "Error in requirement",
-      "translation": "Error in requirement"
+      "translation": "请求错误"
    },
    {
       "id": "Error finding command {{.CmdName}}\n",
-      "translation": "Error finding command {{.CmdName}}\n"
+      "translation": "未找到命令 {.CmdName}}\n"
    }
 ]

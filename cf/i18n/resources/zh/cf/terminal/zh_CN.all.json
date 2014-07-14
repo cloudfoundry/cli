@@ -1,70 +1,71 @@
 [
    {
       "id": "API endpoint:",
-      "translation": "API endpoint:"
+      "translation": "API 终端:"
    },
    {
       "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-      "translation": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})"
+      "translation": "{{.ApiEndpoint}} (API 版本: {{.ApiVersionString}})"
    },
    {
       "id": "OK",
-      "translation": "OK"
+      "translation": "通过"
    },
    {
       "id": "Incorrect Usage.\n",
-      "translation": "Incorrect Usage.\n"
+      "translation": "不正确的使用\n"
    },
    {
       "id": "Delete cancelled",
-      "translation": "Delete cancelled"
+      "translation": "撤销删除"
    },
    {
       "id": "yes",
-      "translation": "yes"
+      "translation": "是的"
    },
    {
       "id": "No org or space targeted, use '{{.CFTargetCommand}}'",
-      "translation": "No org or space targeted, use '{{.CFTargetCommand}}'"
+      "translation": "没有指定组织或空间，使用'{{.CFTargetCommand}}'选择组织或空间"
    },
    {
       "id": "User:",
-      "translation": "User:"
+      "translation": "用户:"
    },
    {
       "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
-      "translation": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?"
-   },
-   {
+      "translation": "确定删除{{.ModelType}} {{.ModelName}}以及所有相关数据和文件？"
+  ,
+  {
       "id": "Not logged in. Use '{{.CFLoginCommand}}' to log in.",
-      "translation": "Not logged in. Use '{{.CFLoginCommand}}' to log in."
+      "translation": "尚未登录，请使用'{{.CFLoginCommand}}'来登录"
    },
    {
       "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
-      "translation": "failed turning off console echo for password entry:\n{{.ErrorDescription}}"
+      "translation": "没有关闭输入显示，你的密码将被显示:\n{{.ErrorDescription}}"
    },
    {
       "id": "No space targeted, use '{{.CFTargetCommand}}'",
-      "translation": "No space targeted, use '{{.CFTargetCommand}}'"
+      "translation": "没有指定空间，使用'{{.CFTargetCommand}}'指定空间"
    },
    {
       "id": "Org:",
-      "translation": "Org:"
+      "translation": "组织:"
    },
    {
       "id": "Really delete the {{.ModelType}} {{.ModelName}}?",
-      "translation": "Really delete the {{.ModelType}} {{.ModelName}}?"
+      "translation": "确定删除{{.ModelType}} {{.ModelName}}？"
    },
    {
       "id": "FAILED",
-      "translation": "FAILED"
+      "translation": "失败"
    },
    {
       "id": "No org targeted, use '{{.CFTargetCommand}}'",
-      "translation": "No org targeted, use '{{.CFTargetCommand}}'"
+      "translation": "没有指定组织，使用'{{.CFTargetCommand}}'选择组织"
    },
    {
       "id": "Space:",
-      "translation": "Space:"
+      "translation": "空间:"
    }
 ]
+   {
