@@ -28,10 +28,6 @@
       "translation": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n"
    },
    {
-      "id": " target",
-      "translation": " target"
-   },
-   {
       "id": "API endpoint",
       "translation": "API endpoint"
    },
@@ -330,10 +326,6 @@
    {
       "id": "space",
       "translation": "space"
-   },
-   {
-      "id": "username",
-      "translation": "username"
    },
    {
       "id": "write default values to the config",
