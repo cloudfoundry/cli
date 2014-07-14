@@ -76,8 +76,8 @@
       "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]"
    },
    {
-      "id": "CF_NAME curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]",
-      "translation": "CF_NAME curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]"
+      "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
+      "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]"
    },
    {
       "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
@@ -306,6 +306,10 @@
    {
       "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
       "translation": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"
+   },
+   {
+      "id": "Write curl body to FILE instead of stdout",
+      "translation": "Write curl body to FILE instead of stdout"
    },
    {
       "id": "description",
