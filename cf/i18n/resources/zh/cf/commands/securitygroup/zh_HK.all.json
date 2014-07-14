@@ -8,12 +8,12 @@
       "translation": "Acquiring staging security group as {{.username}}"
    },
    {
-      "id": "Add a security group to the list of security groups to be used for running applications",
-      "translation": "Add a security group to the list of security groups to be used for running applications"
+      "id": "Bind a security group to the list of security groups to be used for running applications",
+      "translation": "Bind a security group to the list of security groups to be used for running applications"
    },
    {
-      "id": "Add a security group to the list of security groups to be used for staging applications",
-      "translation": "Add a security group to the list of security groups to be used for staging applications"
+      "id": "Bind a security group to the list of security groups to be used for staging applications",
+      "translation": "Bind a security group to the list of security groups to be used for staging applications"
    },
    {
       "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
@@ -32,32 +32,32 @@
       "translation": "Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}..."
    },
    {
-      "id": "CF_NAME add-running-security-group SECURITY_GROUP",
-      "translation": "CF_NAME add-running-security-group SECURITY_GROUP"
+      "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
    },
    {
-      "id": "CF_NAME add-staging-security-group SECURITY_GROUP",
-      "translation": "CF_NAME add-staging-security-group SECURITY_GROUP"
+      "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
    },
    {
       "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
       "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
    },
    {
-      "id": "CF_NAME create-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]",
-      "translation": "CF_NAME create-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]"
+      "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
    },
    {
       "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
       "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
    },
    {
-      "id": "CF_NAME remove-running-security-group SECURITY_GROUP",
-      "translation": "CF_NAME remove-running-security-group SECURITY_GROUP"
+      "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
    },
    {
-      "id": "CF_NAME remove-staging-security-group SECURITY_GROUP",
-      "translation": "CF_NAME remove-staging-security-group SECURITY_GROUP"
+      "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
    },
    {
       "id": "CF_NAME security-group SECURITY_GROUP",
@@ -68,8 +68,8 @@
       "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
    },
    {
-      "id": "CF_NAME update-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]",
-      "translation": "CF_NAME update-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]"
+      "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
    },
    {
       "id": "Create a security group",
@@ -136,16 +136,12 @@
       "translation": "Organization"
    },
    {
-      "id": "Path to a file containing rules in JSON format",
-      "translation": "Path to a file containing rules in JSON format"
+      "id": "Unbind a security group from the set of security groups for staging applications",
+      "translation": "Unbind a security group from the set of security groups for staging applications"
    },
    {
-      "id": "Remove a security group from the set of default security groups for staging applications",
-      "translation": "Remove a security group from the set of default security groups for staging applications"
-   },
-   {
-      "id": "Remove a security group from the set of security groups for running applications",
-      "translation": "Remove a security group from the set of security groups for running applications"
+      "id": "Unbind a security group from the set of security groups for running applications",
+      "translation": "Unbind a security group from the set of security groups for running applications"
    },
    {
       "id": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}",
