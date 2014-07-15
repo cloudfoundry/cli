@@ -38,11 +38,11 @@ func NewCloudControllerDomainRepository(config configuration.Reader, gateway net
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
-	err := repo.listDomains(repo.strategy.SharedDomainsURL(), cb)
+	err := repo.listDomains(repo.strategy.PrivateDomainsByOrgURL(orgGuid), cb)
 	if err != nil {
 		return err
 	}
-	err = repo.listDomains(repo.strategy.PrivateDomainsByOrgURL(orgGuid), cb)
+	err = repo.listDomains(repo.strategy.SharedDomainsURL(), cb)
 	return err
 }
 

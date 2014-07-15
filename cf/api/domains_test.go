@@ -50,7 +50,7 @@ var _ = Describe("DomainRepository", func() {
 	Describe("listing domains", func() {
 		BeforeEach(func() {
 			config.SetApiVersion("2.2.0")
-			setupTestServer(firstPageSharedDomainsRequest, secondPageSharedDomainsRequest, firstPagePrivateDomainsRequest, secondPagePrivateDomainsRequest)
+			setupTestServer(firstPagePrivateDomainsRequest, secondPagePrivateDomainsRequest, firstPageSharedDomainsRequest, secondPageSharedDomainsRequest)
 		})
 
 		It("uses the organization-scoped domains endpoints", func() {
@@ -62,13 +62,27 @@ var _ = Describe("DomainRepository", func() {
 
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(len(receivedDomains)).To(Equal(6))
-			Expect(receivedDomains[0].Guid).To(Equal("shared-domain1-guid"))
-			Expect(receivedDomains[1].Guid).To(Equal("shared-domain2-guid"))
-			Expect(receivedDomains[2].Guid).To(Equal("shared-domain3-guid"))
-			Expect(receivedDomains[3].Guid).To(Equal("domain1-guid"))
-			Expect(receivedDomains[4].Guid).To(Equal("domain2-guid"))
-			Expect(receivedDomains[5].Guid).To(Equal("domain3-guid"))
+			Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
+			Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
+			Expect(receivedDomains[2].Guid).To(Equal("domain3-guid"))
+			Expect(receivedDomains[3].Guid).To(Equal("shared-domain1-guid"))
+			Expect(receivedDomains[4].Guid).To(Equal("shared-domain2-guid"))
+			Expect(receivedDomains[5].Guid).To(Equal("shared-domain3-guid"))
 			Expect(handler).To(HaveAllRequestsCalled())
+		})
+	})
+
+	Describe("getting default domain", func() {
+		BeforeEach(func() {
+			config.SetApiVersion("2.2.0")
+			setupTestServer(firstPagePrivateDomainsRequest, secondPagePrivateDomainsRequest, firstPageSharedDomainsRequest, secondPageSharedDomainsRequest)
+		})
+
+		It("should always return back the first shared domain", func() {
+			domain, apiErr := repo.FirstOrDefault("my-org-guid", nil)
+
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(domain.Guid).To(Equal("shared-domain1-guid"))
 		})
 	})
 
