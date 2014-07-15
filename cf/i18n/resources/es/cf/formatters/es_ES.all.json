@@ -1,14 +1,14 @@
 [
    {
       "id": "Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB",
-      "translation": "Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB"
+      "translation": "La cantidad de bytes debe ser un número entero positivo con la unidad medida en M, MB, G, o GB"
    },
    {
       "id": "allowed",
-      "translation": "allowed"
+      "translation": "permitido"
    },
    {
       "id": "disallowed",
-      "translation": "disallowed"
+      "translation": "denegado"
    }
 ]

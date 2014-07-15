@@ -1,11 +1,11 @@
 [
    {
       "id": "Creating service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Creating service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Creando servicio {{.ServiceName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Documentation url: {{.URL}}",
-      "translation": "Documentation url: {{.URL}}"
+      "translation": "Url de documentacion: {{.URL}}"
    },
    {
       "id": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
@@ -13,23 +13,23 @@
    },
    {
       "id": "Service {{.ServiceName}} does not exist.",
-      "translation": "Service {{.ServiceName}} does not exist."
+      "translation": "El servicio {{.ServiceName}} no existe."
    },
    {
       "id": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Creando servicio provisto por el usuario {{.ServiceName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
-      "translation": "WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup."
+      "translation": "ADVERTENCIA: Esta operacion asume que el corredor de servicio responsable de esta oferta ya no esta disponible, Y todas las instancias del servicio han sido borradas, dejando servicios huérfanos en los registros de la base de datos de Cloud Foundry. Todo los conocimientos del servicio van a ser removidos de Cloud Foundry, incluyendo instancias del servicio y asociaciones al mismo. No se intentará contactar al corredor de servicio; correr este comando sin destruir el corredor de servicio causará instancias del servicio huérfanas. Despues de correr este comando tal vez quiera correr o delete-service-auth-token o delete-service-broker para completar la limpieza."
    },
    {
       "id": "Could not find any offerings with name {{.ServiceOfferingName}}",
-      "translation": "Could not find any offerings with name {{.ServiceOfferingName}}"
+      "translation": "No se pudo encontrar ninguna oferta con este nombre {{.ServiceOfferingName}}"
    },
    {
       "id": "Description: {{.ServiceDescription}}",
-      "translation": "Description: {{.ServiceDescription}}"
+      "translation": "Descripcion: {{.ServiceDescription}}"
    },
    {
       "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
@@ -45,35 +45,35 @@
    },
    {
       "id": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect",
-      "translation": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect"
+      "translation": "TIP: Usar '{{.CFCommand}}' para asegurarse que los cambios en tus variables de entorno surtan efecto"
    },
    {
       "id": "Plan {{.ServicePlanName}} cannot be found",
-      "translation": "Plan {{.ServicePlanName}} cannot be found"
+      "translation": "El plan {{.ServicePlanName}} no se pudo encontrar"
    },
    {
       "id": "Force migration without confirmation",
-      "translation": "Force migration without confirmation"
+      "translation": "Forza migracion sin confirmacion"
    },
    {
       "id": "Syslog Drain Url",
-      "translation": "Syslog Drain Url"
+      "translation": "Url para drenar Syslog"
    },
    {
       "id": "App {{.AppName}} is already bound to {{.ServiceName}}.",
-      "translation": "App {{.AppName}} is already bound to {{.ServiceName}}."
+      "translation": "La app {{.AppName}} ya esta ligada a {{.ServiceName}}."
    },
    {
       "id": "bound apps",
-      "translation": "bound apps"
+      "translation": "apps ligadas"
    },
    {
       "id": "Really purge service offering {{.ServiceName}} from Cloud Foundry?",
-      "translation": "Really purge service offering {{.ServiceName}} from Cloud Foundry?"
+      "translation": "Purgar realmente la oferta del servicio {{.ServiceName}} de Cloud Foundry?"
    },
    {
       "id": "Make a user-provided service instance available to cf apps",
-      "translation": "Make a user-provided service instance available to cf apps"
+      "translation": "Hace que un servicio provisto por el usuario este disponible en las apps de cf"
    },
    {
       "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
@@ -93,7 +93,7 @@
    },
    {
       "id": "No service offerings found",
-      "translation": "No service offerings found"
+      "translation": "No se encontraron ofertas de servicio"
    },
    {
       "id": "List all service instances in the target space",
@@ -121,15 +121,15 @@
    },
    {
       "id": "Deleting service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Deleting service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Deleting service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Getting services in org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
-      "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?>",
-      "translation": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?>"
+      "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?\u003e",
+      "translation": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?\u003e"
    },
    {
       "id": "Service instance: {{.ServiceName}}",
@@ -181,11 +181,11 @@
    },
    {
       "id": "Renaming service {{.ServiceName}} to {{.NewServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Renaming service {{.ServiceName}} to {{.NewServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Renaming service {{.ServiceName}} to {{.NewServiceName}} in org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "description",
@@ -213,15 +213,15 @@
    },
    {
       "id": "Getting all services from marketplace...",
-      "translation": "Getting all services from marketplace..."
+      "translation": "Obteniendo todos los servicios del mercado..."
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "nombre"
    },
    {
       "id": "plans",
-      "translation": "plans"
+      "translation": "planes"
    },
    {
       "id": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
@@ -237,7 +237,7 @@
    },
    {
       "id": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "user-provided",
@@ -289,7 +289,7 @@
    },
    {
       "id": "Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "No flags specified. No changes were made.",
@@ -297,10 +297,10 @@
    },
    {
       "id": "Migrate service instances from one service plan to another",
-      "translation": "Migrate service instances from one service plan to another"
+      "translation": "Migra instancias de servicios un plan a otro"
    },
    {
       "id": "Updating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Updating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Updating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    }
 ]

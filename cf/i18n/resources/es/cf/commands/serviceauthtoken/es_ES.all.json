@@ -9,11 +9,11 @@
    },
    {
       "id": "Deleting service auth token as {{.CurrentUser}}",
-      "translation": "Deleting service auth token as {{.CurrentUser}}"
+      "translation": "Deleting service auth token como {{.CurrentUser}}"
    },
    {
       "id": "List service auth tokens",
-      "translation": "List service auth tokens"
+      "translation": "Lista los tokens de autenticacion de servicios"
    },
    {
       "id": "provider",
@@ -29,11 +29,11 @@
    },
    {
       "id": "Getting service auth tokens as {{.CurrentUser}}...",
-      "translation": "Getting service auth tokens as {{.CurrentUser}}..."
+      "translation": "Getting service auth tokens como {{.CurrentUser}}..."
    },
    {
       "id": "Creating service auth token as {{.CurrentUser}}...",
-      "translation": "Creating service auth token as {{.CurrentUser}}..."
+      "translation": "Creating service auth token como {{.CurrentUser}}..."
    },
    {
       "id": "Delete a service auth token",
@@ -65,6 +65,6 @@
    },
    {
       "id": "Updating service auth token as {{.CurrentUser}}...",
-      "translation": "Updating service auth token as {{.CurrentUser}}..."
+      "translation": "Updating service auth token como {{.CurrentUser}}..."
    }
 ]

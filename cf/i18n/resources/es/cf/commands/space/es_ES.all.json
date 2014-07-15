@@ -13,7 +13,7 @@
    },
    {
       "id": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Rename a space",
@@ -21,7 +21,7 @@
    },
    {
       "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
-      "translation": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n"
+      "translation": "Getting spaces in org {{.TargetOrgName}} como {{.CurrentUser}}...\n"
    },
    {
       "id": "CF_NAME space SPACE",
@@ -45,7 +45,7 @@
    },
    {
       "id": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "Creating space {{.SpaceName}} in org {{.OrgName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Force deletion without confirmation",
@@ -53,7 +53,7 @@
    },
    {
       "id": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
-      "translation": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}..."
+      "translation": "Deleting space {{.TargetSpace}} en la org {{.TargetOrg}} como {{.CurrentUser}}..."
    },
    {
       "id": "Show space info",
@@ -105,22 +105,22 @@
    },
    {
       "id": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "Obteniendo info del space {{.TargetSpace}} en org {{.OrgName}} como {{.CurrentUser}}..."
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "nombre"
    },
    {
       "id": "CF_NAME delete-space SPACE [-f]",
-      "translation": "CF_NAME delete-space SPACE [-f]"
+      "translation": "CF_NAME borra-space SPACE [-f]"
    },
    {
-     "id": "Security Groups:",
-     "translation": "Security Groups:"
+      "id": "Security Groups:",
+      "translation": "Grupos de seguridad:"
    },
    {
       "id": "Services:",
-      "translation": "Services:"
+      "translation": "Servicios:"
    }
 ]

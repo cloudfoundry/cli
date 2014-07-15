@@ -1,11 +1,11 @@
 [
    {
       "id": "\nApp started\n",
-      "translation": "\nApp started\n"
+      "translation": "\nLa App empezo\n"
    },
    {
       "id": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error",
-      "translation": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error"
+      "translation": "\nTIP: usar 'cf login -a API --skip-ssl-validation' o 'cf api API --skip-ssl-validation' para evitar este error"
    },
    {
       "id": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
@@ -21,19 +21,19 @@
    },
    {
       "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
-      "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n"
+      "translation": "   [-i NUMERO_DE_INSTANCIAS] [-k DISCO] [-m MEMORIA] [-n HOST] [-p RUTA] [-s STACK] [-t TIMEOUT]\n"
    },
    {
       "id": " is already started",
-      "translation": " is already started"
+      "translation": " Ya ha comenzado"
    },
    {
       "id": " is already stopped",
-      "translation": " is already stopped"
+      "translation": " ya ha parado"
    },
    {
       "id": "Also delete any mapped routes",
-      "translation": "Also delete any mapped routes"
+      "translation": "También borra cualquier ruta mapeada"
    },
    {
       "id": "App ",
@@ -41,19 +41,19 @@
    },
    {
       "id": "App name is a required field",
-      "translation": "App name is a required field"
+      "translation": "El nombre de la App también es un campo requerido"
    },
    {
       "id": "App {{.AppName}} does not exist.",
-      "translation": "App {{.AppName}} does not exist."
+      "translation": "La app {{.AppName}} no existe."
    },
    {
       "id": "App {{.AppName}} is a worker, skipping route creation",
-      "translation": "App {{.AppName}} is a worker, skipping route creation"
+      "translation": "La app {{.AppName}} es un worker, saltando la ruta de creación"
    },
    {
       "id": "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Binding servicio {{.ServiceName}} a la app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "CF_NAME app APP",
@@ -93,11 +93,11 @@
    },
    {
       "id": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
-      "translation": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"
+      "translation": "CF_NAME scale APP [-i INSTANCIAS] [-k DISCO] [-m MEMORIA] [-f]"
    },
    {
       "id": "CF_NAME set-env APP NAME VALUE",
-      "translation": "CF_NAME set-env APP NAME VALUE"
+      "translation": "CF_NAME set-env APP NOMBRE VALOR"
    },
    {
       "id": "CF_NAME start APP",
@@ -109,95 +109,95 @@
    },
    {
       "id": "CF_NAME unset-env APP NAME",
-      "translation": "CF_NAME unset-env APP NAME"
+      "translation": "CF_NAME unset-env APP NOMBRE"
    },
    {
       "id": "Change or view the instance count, disk space limit, and memory limit for an app",
-      "translation": "Change or view the instance count, disk space limit, and memory limit for an app"
+      "translation": "Cambia o muestra el contador de instancias, y límites de memoria de una app"
    },
    {
       "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
-      "translation": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n"
+      "translation": "Conectando, dumping logs recientes de la app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}...\n"
    },
    {
       "id": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
-      "translation": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n"
+      "translation": "Conectando, tailing logs para la app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}...\n"
    },
    {
       "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
-      "translation": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}"
+      "translation": "No se pudo asociar el servicio {{.ServiceName}}\nError: {{.Err}}"
    },
    {
       "id": "Could not determine the current working directory!",
-      "translation": "Could not determine the current working directory!"
+      "translation": "No se pudo determinar el directorio de trabajo actual!"
    },
    {
       "id": "Could not find app named '{{.AppName}}' in manifest",
-      "translation": "Could not find app named '{{.AppName}}' in manifest"
+      "translation": "No se pudo encontrar la app llamada Could not find app named '{{.AppName}}' en el manifest"
    },
    {
       "id": "Could not find service {{.ServiceName}} to bind to {{.AppName}}",
-      "translation": "Could not find service {{.ServiceName}} to bind to {{.AppName}}"
+      "translation": "No se pudo encontrar el servicio {{.ServiceName}} para asociar a {{.AppName}}"
    },
    {
       "id": "Create a random route for this app",
-      "translation": "Create a random route for this app"
+      "translation": "Crea una ruta aleatoria para esta app"
    },
    {
       "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Creando app {{.AppName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)",
-      "translation": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"
+      "translation": "buildpack personalizado por nombre (ej. my-buildpack) o por GIT URL (ej. https://github.com/heroku/heroku-buildpack-play.git)"
    },
    {
       "id": "Delete an app",
-      "translation": "Delete an app"
+      "translation": "Borra una app"
    },
    {
       "id": "Deleting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Deleting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Borrando app {{.AppName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "Disk limit (e.g. 256M, 1024M, 1G)",
-      "translation": "Disk limit (e.g. 256M, 1024M, 1G)"
+      "translation": "Limite de Disco (ej. 256M, 1024M, 1G)"
    },
    {
       "id": "Display health and status for app",
-      "translation": "Display health and status for app"
+      "translation": "Muestra salud y estado de una app"
    },
    {
       "id": "Do not map a route to this app",
-      "translation": "Do not map a route to this app"
+      "translation": "Do mapea ruta a esta app"
    },
    {
       "id": "Do not start an app after pushing",
-      "translation": "Do not start an app after pushing"
+      "translation": "No empieza una app después de subirse"
    },
    {
       "id": "Domain (e.g. example.com)",
-      "translation": "Domain (e.g. example.com)"
+      "translation": "Domain (ej. ejemplo.com)"
    },
    {
       "id": "Dump recent logs instead of tailing",
-      "translation": "Dump recent logs instead of tailing"
+      "translation": "Arroja logs recientes en vez de tailing"
    },
    {
       "id": "Env variable {{.VarName}} was not set.",
-      "translation": "Env variable {{.VarName}} was not set."
+      "translation": "Variable de Env {{.VarName}} no fue establecido."
    },
    {
       "id": "Error reading manifest file:\n{{.Err}}",
-      "translation": "Error reading manifest file:\n{{.Err}}"
+      "translation": "Error leyendo el archivo de manifiesto:\n{{.Err}}"
    },
    {
       "id": "Error uploading application.\n{{.ApiErr}}",
-      "translation": "Error uploading application.\n{{.ApiErr}}"
+      "translation": "Error subiendo aplicacion.\n{{.ApiErr}}"
    },
    {
       "id": "Error: No name found for app",
-      "translation": "Error: No name found for app"
+      "translation": "Error: ningun nombre encontrado para la app"
    },
    {
       "id": "Error: {{.Err}}",
@@ -205,271 +205,271 @@
    },
    {
       "id": "Failed fetching events.\n{{.ApiErr}}",
-      "translation": "Failed fetching events.\n{{.ApiErr}}"
+      "translation": "Fallo al recuperar eventos.\n{{.ApiErr}}"
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force deletion without confirmation"
+      "translation": "Fuerza borrado sin confirmacion"
    },
    {
       "id": "Force restart of app without prompt",
-      "translation": "Force restart of app without prompt"
+      "translation": "Fuerza reinicio de la app sin sugerencias."
    },
    {
       "id": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Obteniendo apps en org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Obteniendo variables de env para app {{.AppName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "Getting events for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
-      "translation": "Getting events for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n"
+      "translation": "Obteniendo eventos para app {{.AppName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}...\n"
    },
    {
       "id": "Getting files for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Getting files for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Obteniendo archivos para app {{.AppName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "Hostname (e.g. my-subdomain)",
-      "translation": "Hostname (e.g. my-subdomain)"
+      "translation": "Nombre de host (ej. my-subdomain)"
    },
    {
       "id": "Ignore manifest file",
-      "translation": "Ignore manifest file"
+      "translation": "Ignora archivo de manifesto"
    },
    {
       "id": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
-      "translation": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file."
+      "translation": "Uso incorrecto. Banderas de línea de comando (excepto -f) no pudieron ser aplicadas subiendo multiples apps de un archivo de manifiesto."
    },
    {
       "id": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
-      "translation": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}"
+      "translation": "Cuota de disco invalida: {{.DiskQuota}}\n{{.ErrorDescription}}"
    },
    {
       "id": "Invalid disk quota: {{.DiskQuota}}\n{{.Err}}",
-      "translation": "Invalid disk quota: {{.DiskQuota}}\n{{.Err}}"
+      "translation": "Cuota de disco invalida: {{.DiskQuota}}\n{{.Err}}"
    },
    {
       "id": "Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer",
-      "translation": "Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer"
+      "translation": "cantidad de instancias invalido: {{.InstanceCount}}\nEl contador de instancias debe ser un integer positivo"
    },
    {
       "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
-      "translation": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer"
+      "translation": "cantidad de instancias invalido: {{.InstancesCount}}\nEl contador de instancias deber ser un integer positivo"
    },
    {
       "id": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
-      "translation": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}"
+      "translation": "Limite de memoria invalido: {{.MemLimit}}\n{{.Err}}"
    },
    {
       "id": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
-      "translation": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}"
+      "translation": "Limite de memoria invalido: {{.Memory}}\n{{.ErrorDescription}}"
    },
    {
       "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
-      "translation": "Invalid timeout param: {{.Timeout}}\n{{.Err}}"
+      "translation": "Parametro de timeout invalido: {{.Timeout}}\n{{.Err}}"
    },
    {
       "id": "List all apps in the target space",
-      "translation": "List all apps in the target space"
+      "translation": "Lista todas las apps en el space seleccionado"
    },
    {
       "id": "Map the root domain to this app",
-      "translation": "Map the root domain to this app"
+      "translation": "Mapea el dominio raiz a esta app"
    },
    {
       "id": "Memory limit (e.g. 256M, 1024M, 1G)",
-      "translation": "Memory limit (e.g. 256M, 1024M, 1G)"
+      "translation": "Limite de memoria (ej. 256M, 1024M, 1G)"
    },
    {
       "id": "No apps found",
-      "translation": "No apps found"
+      "translation": "Apps no encontradas"
    },
    {
       "id": "No events for app {{.AppName}}",
-      "translation": "No events for app {{.AppName}}"
+      "translation": "No hay eventos para la app {{.AppName}}"
    },
    {
       "id": "No system-provided env variables have been set",
-      "translation": "No system-provided env variables have been set"
+      "translation": "Ninguna variable de entorno provista por el sistema ha sido establecida"
    },
    {
       "id": "No user-defined env variables have been set",
-      "translation": "No user-defined env variables have been set"
+      "translation": "Ninguna variable de entorno provista por el usuario ha sido establecida"
    },
    {
       "id": "None of your application files have changed. Nothing will be uploaded.",
-      "translation": "None of your application files have changed. Nothing will be uploaded."
+      "translation": "Ninguno archivo de la aplicación ha cambiado. Nada sera subido."
    },
    {
       "id": "Number of instances",
-      "translation": "Number of instances"
+      "translation": "Numero de instancias"
    },
    {
       "id": "Path of app directory or zip file",
-      "translation": "Path of app directory or zip file"
+      "translation": "Ruta del directorio de la aplicacion o archivo zip"
    },
    {
       "id": "Path to manifest",
-      "translation": "Path to manifest"
+      "translation": "Ruta al manifesto"
    },
    {
       "id": "Print out a list of files in a directory or the contents of a specific file",
-      "translation": "Print out a list of files in a directory or the contents of a specific file"
+      "translation": "Imprime una lista de archivos en un directorio o los contenidos de un archivo específico."
    },
    {
       "id": "Push a new app or sync changes to an existing app",
-      "translation": "Push a new app or sync changes to an existing app"
+      "translation": "Sube una nueva app o sincroniza cambios a una existente"
    },
    {
       "id": "Push a single app (with or without a manifest):\n",
-      "translation": "Push a single app (with or without a manifest):\n"
+      "translation": "Sube una unica app (con o sin un archivo de manifiesto):\n"
    },
    {
       "id": "Remove an env variable",
-      "translation": "Remove an env variable"
+      "translation": "Remueve una variable de entorno"
    },
    {
       "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Removiendo variable de entorno {{.VarName}} de la app {{.AppName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Rename an app",
-      "translation": "Rename an app"
+      "translation": "Renombrar una app"
    },
    {
       "id": "Renaming app {{.AppName}} to {{.NewName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Renaming app {{.AppName}} to {{.NewName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Renombrando app {{.AppName}} a {{.NewName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "Restage an app",
-      "translation": "Restage an app"
+      "translation": "re-stageing de una app"
    },
    {
       "id": "Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "re-stagging de app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Restart an app",
-      "translation": "Restart an app"
+      "translation": "Reiniciar una app"
    },
    {
       "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Escala app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Set an env variable for an app",
-      "translation": "Set an env variable for an app"
+      "translation": "Configura una variable de entorno para una app"
    },
    {
       "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Estableciendo variable de entorno '{{.VarName}}' a '{{.VarValue}}' para app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Show all env variables for an app",
-      "translation": "Show all env variables for an app"
+      "translation": "Muestra todas las variables de entorno para una app"
    },
    {
       "id": "Show recent app events",
-      "translation": "Show recent app events"
+      "translation": "Muestra eventos recientes de una app"
    },
    {
       "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Mostrando como escala la app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Mostrando saludo y estado de la app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "translation": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"
+      "translation": "Stack a usar(un stack es un sistema de archivos ya construido, incluyendo un sistema operativo, que puede correr las apps)"
    },
    {
       "id": "Start an app",
-      "translation": "Start an app"
+      "translation": "Inicia una app"
    },
    {
       "id": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "Start app timeout\n\nTIP: use '{{.Command}}' for more information"
+      "translation": "Tiempo de espera para comienzo de app\n\nTIP: usar '{{.Command}}' para mas informacion"
    },
    {
       "id": "Start timeout in seconds",
-      "translation": "Start timeout in seconds"
+      "translation": "Tiempo de espera en segundos"
    },
    {
       "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information"
+      "translation": "Comienzo fracasado\n\nTIP: usar '{{.Command}}' para mas informacion"
    },
    {
       "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Comenzando app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Startup command, set to null to reset to default start command",
-      "translation": "Startup command, set to null to reset to default start command"
+      "translation": "Comando de inicio, establecer a null para resetear al comando por defecto de inicio"
    },
    {
       "id": "Stop an app",
-      "translation": "Stop an app"
+      "translation": "Para una app"
    },
    {
       "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+      "translation": "Parando app {{.AppName}} en org {{.OrgName}} / space {{.SpaceName}} como {{.CurrentUser}}..."
    },
    {
       "id": "System-Provided:",
-      "translation": "System-Provided:"
+      "translation": "Provisto-por-el-sistema:"
    },
    {
       "id": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
-      "translation": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect"
+      "translation": "TIP: Usar '{{.Command}}' para asegurar que los cambios en las variables de entorno hagan efecto"
    },
    {
       "id": "Tail or show recent logs for an app",
-      "translation": "Tail or show recent logs for an app"
+      "translation": "Tail o muestra logs recientes de una app"
    },
    {
       "id": "There are no running instances of this app.",
-      "translation": "There are no running instances of this app."
+      "translation": "No hay instancias en marcha de esta app."
    },
    {
       "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
-      "translation": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?"
+      "translation": "Esto causará que la app reinicie. Esta seguro que quiere escalar {{.AppName}}?"
    },
    {
       "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Actualizando app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "Uploading app files from: {{.Path}}",
-      "translation": "Uploading app files from: {{.Path}}"
+      "translation": "Subiendo archivos de la app desde: {{.Path}}"
    },
    {
       "id": "Uploading {{.AppName}}...",
-      "translation": "Uploading {{.AppName}}..."
+      "translation": "Subiendo {{.AppName}}..."
    },
    {
       "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
-      "translation": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files"
+      "translation": "Subiendo {{.ZipFileBytes}}, {{.FileCount}} archivos"
    },
    {
       "id": "User-Provided:",
-      "translation": "User-Provided:"
+      "translation": "Provisto-por-el-Usuario:"
    },
    {
       "id": "Using manifest file {{.Path}}\n",
-      "translation": "Using manifest file {{.Path}}\n"
+      "translation": "Usando archivo de manifest {{.Path}}\n"
    },
    {
       "id": "Using stack {{.StackName}}...",
-      "translation": "Using stack {{.StackName}}..."
+      "translation": "Usando stack {{.StackName}}..."
    },
    {
       "id": "Warning: error tailing logs",
-      "translation": "Warning: error tailing logs"
+      "translation": "Advertencia: error al hacer tail a los logs"
    },
    {
       "id": "actor",
@@ -485,43 +485,43 @@
    },
    {
       "id": "description",
-      "translation": "description"
+      "translation": "descripcion"
    },
    {
       "id": "disk",
-      "translation": "disk"
+      "translation": "disco"
    },
    {
       "id": "disk:",
-      "translation": "disk:"
+      "translation": "disco:"
    },
    {
       "id": "event",
-      "translation": "event"
+      "translation": "evento"
    },
    {
       "id": "instances",
-      "translation": "instances"
+      "translation": "instancias"
    },
    {
       "id": "instances:",
-      "translation": "instances:"
+      "translation": "instancias:"
    },
    {
       "id": "invalid value for env var CF_STAGING_TIMEOUT\n{{.Err}}",
-      "translation": "invalid value for env var CF_STAGING_TIMEOUT\n{{.Err}}"
+      "translation": "Valor invalido para la variable de entorno CF_STAGING_TIMEOUT\n{{.Err}}"
    },
    {
       "id": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
-      "translation": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}"
+      "translation": "Valor invalido para la variable de entorno CF_STARTUP_TIMEOUT\n{{.Err}}"
    },
    {
       "id": "memory",
-      "translation": "memory"
+      "translation": "memoria"
    },
    {
       "id": "memory:",
-      "translation": "memory:"
+      "translation": "memoria:"
    },
    {
       "id": "name",
@@ -529,27 +529,27 @@
    },
    {
       "id": "requested state",
-      "translation": "requested state"
+      "translation": "Estado solicitado"
    },
    {
       "id": "requested state:",
-      "translation": "requested state:"
+      "translation": "Estado solicitado:"
    },
    {
       "id": "since",
-      "translation": "since"
+      "translation": "desde"
    },
    {
       "id": "state",
-      "translation": "state"
+      "translation": "estado"
    },
    {
       "id": "stopped",
-      "translation": "stopped"
+      "translation": "paro"
    },
    {
       "id": "time",
-      "translation": "time"
+      "translation": "tiempo"
    },
    {
       "id": "urls",
@@ -561,38 +561,38 @@
    },
    {
       "id": "usage:",
-      "translation": "usage:"
+      "translation": "uso:"
    },
    {
       "id": "{{.DiskUsage}} of {{.DiskQuota}}",
-      "translation": "{{.DiskUsage}} of {{.DiskQuota}}"
+      "translation": "{{.DiskUsage}} de {{.DiskQuota}}"
    },
    {
       "id": "{{.DownCount}} down",
-      "translation": "{{.DownCount}} down"
+      "translation": "{{.DownCount}} caidas"
    },
    {
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information"
+      "translation": "{{.Err}}\n\nTIP: usar '{{.Command}}' para mas informacion"
    },
    {
       "id": "{{.FlappingCount}} failing",
-      "translation": "{{.FlappingCount}} failing"
+      "translation": "{{.FlappingCount}} fallando"
    },
    {
       "id": "{{.MemUsage}} of {{.MemQuota}}",
-      "translation": "{{.MemUsage}} of {{.MemQuota}}"
+      "translation": "{{.MemUsage}} de {{.MemQuota}}"
    },
    {
       "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
-      "translation": "{{.RunningCount}} of {{.TotalCount}} instances running"
+      "translation": "{{.RunningCount}} de {{.TotalCount}} instancias en marcha"
    },
    {
       "id": "{{.StartingCount}} starting",
-      "translation": "{{.StartingCount}} starting"
+      "translation": "{{.StartingCount}} iniciando"
    },
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
-      "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances"
+      "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instancias"
    }
 ]

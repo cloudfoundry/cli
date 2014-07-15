@@ -1,10 +1,10 @@
 [
    {
       "id": "app crashed",
-      "translation": "app crashed"
+      "translation": "La app rompio"
    },
    {
       "id": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}",
-      "translation": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}"
+      "translation": "instancia: {{.InstanceIndex}}, razon: {{.ExitDescription}}, exit_status: {{.ExitStatus}}"
    }
 ]

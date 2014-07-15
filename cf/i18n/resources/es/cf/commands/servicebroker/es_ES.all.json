@@ -1,7 +1,7 @@
 [
    {
       "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-      "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+      "translation": "CF_NAME create-service-broker SERVICE_BROKER USUARIO CLAVE URL"
    },
    {
       "id": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
@@ -13,23 +13,23 @@
    },
    {
       "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-      "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+      "translation": "CF_NAME update-service-broker SERVICE_BROKER USUARIO CLAVE URL"
    },
    {
       "id": "Create a service broker",
-      "translation": "Create a service broker"
+      "translation": "Crea un corredor de servicio"
    },
    {
       "id": "Creating service broker {{.Name}} as {{.Username}}...",
-      "translation": "Creating service broker {{.Name}} as {{.Username}}..."
+      "translation": "Creating service broker {{.Name}} como {{.Username}}..."
    },
    {
       "id": "Delete a service broker",
-      "translation": "Delete a service broker"
+      "translation": "Borra un corredor de servicio"
    },
    {
       "id": "Deleting service broker {{.Name}} as {{.Username}}...",
-      "translation": "Deleting service broker {{.Name}} as {{.Username}}..."
+      "translation": "Deleting service broker {{.Name}} como {{.Username}}..."
    },
    {
       "id": "Failed fetching service brokers.\n{{.Error}}",
@@ -41,11 +41,11 @@
    },
    {
       "id": "Getting service brokers as {{.Username}}...\n",
-      "translation": "Getting service brokers as {{.Username}}...\n"
+      "translation": "Getting service brokers como {{.Username}}...\n"
    },
    {
       "id": "List service brokers",
-      "translation": "List service brokers"
+      "translation": "List los corredores de servicios"
    },
    {
       "id": "No service brokers found",
@@ -57,7 +57,7 @@
    },
    {
       "id": "Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}",
-      "translation": "Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}"
+      "translation": "Renaming service broker {{.OldName}} to {{.NewName}} como {{.Username}}"
    },
    {
       "id": "Service Broker {{.Name}} does not exist.",
@@ -65,11 +65,11 @@
    },
    {
       "id": "Update a service broker",
-      "translation": "Update a service broker"
+      "translation": "Actualiza un corredor de serivicio"
    },
    {
       "id": "Updating service broker {{.Name}} as {{.Username}}...",
-      "translation": "Updating service broker {{.Name}} as {{.Username}}..."
+      "translation": "Updating service broker {{.Name}} como {{.Username}}..."
    },
    {
       "id": "name",
