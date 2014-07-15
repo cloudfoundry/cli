@@ -7,7 +7,6 @@
       "id": "Binding {{.URL}} to {{.AppName}}...",
       "translation": "绑定{{.URL}}到{{.AppName}}..."
    },
-
    {
       "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
       "translation": "路由 {{.URL}} 已被占用\n小贴士: 请使用-n HOSTNAME 命令行改变主机名称，或使用--random-route命令生成一个新路由，然后重新使用push命令"

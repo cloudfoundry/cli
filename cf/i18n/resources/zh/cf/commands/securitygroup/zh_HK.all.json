@@ -198,7 +198,8 @@
    {
       "id": "security group",
       "translation": "security group"
-   }, {
+   },
+   {
       "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
       "translation": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules."
    }

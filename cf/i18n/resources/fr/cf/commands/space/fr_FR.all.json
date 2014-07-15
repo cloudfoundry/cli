@@ -116,8 +116,8 @@
       "translation": "CF_NAME delete-space SPACE [-f]"
    },
    {
-     "id": "Security Groups:",
-     "translation": "Security Groups:"
+      "id": "Security Groups:",
+      "translation": "Security Groups:"
    },
    {
       "id": "Services:",

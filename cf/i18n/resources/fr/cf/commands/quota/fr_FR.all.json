@@ -1,146 +1,146 @@
 [
-    {
-        "id": "Define a new resource quota",
-        "translation": "Definir un nouvea quota"
-    },
-    {
-        "id": "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-        "translation": "CF_NAME create-quota QUOTA [-m MÉMOIRE] [-r ROUTES] [-s INSTANCE_DE_SERVICES] [--allow-paid-service-plans]"
-    },
-    {
-        "id": "Total number of service instances",
-        "translation": "Nombres total d'instance de services"
-    },
-    {
-        "id": "Can provision instances of paid service plans",
-        "translation": "Peux provisioner des instances de services pour le plan payé"
-    },
-    {
-        "id": "Creating quota {{.QuotaName}} as {{.Username}}...",
-        "translation": "Créez quota {{.QuotaName}} étant {{.Username}}..."
-    },
-    {
-        "id": "Total amount of memory (e.g. 1024M, 1G, 10G)",
-        "translation": "Quantité totale de mémoire (e.g. 1024Mo, 1Go, 10Go)"
-    },
-    {
-        "id": "Total number of routes",
-        "translation": "Quantité totale de routes"
-    },
-    {
-        "id": "Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}",
-        "translation": "Limite de mémoire invalid: {{.MemoryLimit}}\n{{.Err}}"
-    },
-    {
-        "id": "Quota Definition {{.QuotaName}} already exists",
-        "translation": "La définition de quota {{.QuotaName}} existe déjà"
-    },
-    {
-        "id": "Delete a quota",
-        "translation": "Suprimmer le quota"
-    },
-    {
-        "id": "CF_NAME delete-quota QUOTA [-f]",
-        "translation": "CF_NAME delete-quota QUOTA [-f]"
-    },
-    {
-        "id": "Force deletion without confirmation",
-        "translation": "Forcer la suppression sans confirmation"
-    },
-    {
-        "id": "Incorrect Usage",
-        "translation": "Utilisation Incorrecte"
-    },
-    {
-        "id": "Deleting quota {{.QuotaName}} as {{.Username}}...",
-        "translation": "Sumprimmer le quota {{.QuotaName}} étant {{.Username}}..."
-    },
-    {
-        "id": "Quota {{.QuotaName}} does not exist",
-        "translation": "Quota {{.QuotaName}} n'éxiste plus"
-    },
-    {
-        "id": "CF_NAME quota QUOTA",
-        "translation": "NOM_CF quota QUOTA"
-    },
-    {
-        "id": "Show quota info",
-        "translation": "Montrez l'information de quota"
-    },
-    {
-        "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
-        "translation": "Trouver l'information quota pour {{.QuotaName}} ètant {{.Username}}..."
-    },
-    {
-        "id": "Memory",
-        "translation": "Memoire"
-    },
-    {
-        "id": "Routes",
-        "translation": "Routes"
-    },
-    {
-        "id": "Services",
-        "translation": "Services"
-    },
-    {
-        "id": "Paid service plans",
-        "translation": "Plan de service payè"
-    },
-    {
-        "id": "List available usage quotas",
-        "translation": "List available usage quotas"
-    },
-    {
-        "id": "CF_NAME quotas",
-        "translation": "CF_NAME quotas"
-    },
-    {
-        "id": "Getting quotas as {{.Username}}...",
-        "translation": "Obtenir les quotas étant {{.Username}}..."
-    },
-    {
-        "id": "name",
-        "translation": "nom"
-    },
-    {
-        "id": "memory limit",
-        "translation": "limite de memoire"
-    },
-    {
-        "id": "routes",
-        "translation": "routes"
-    },
-    {
-        "id": "service instances",
-        "translation": "instance de services"
-    },
-    {
-        "id": "paid service plans",
-        "translation": "plans de service payé"
-    },
-    {
-        "id": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-        "translation": "CF_NAME update-quota QUOTA [-m MÉMOIRE] [-n NOUVEAU_NOM] [-r ROUTES] [-s INSTANCE_DE_SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
-    },
-    {
-        "id": "New name",
-        "translation": "Nouveau nom"
-    },
-    {
-        "id": "Cannot provision instances of paid service plans",
-        "translation": "Incapable de provisioner des instance de service à plan payé"
-    },
-    {
-        "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
-        "translation": "Réactualisation quota {{.QuotaName}} étant {{.Username}}..."
-    },
-    {
-        "id": "Update an existing resource quota",
-        "translation": "Reactualize un quota éxistant"
-    },
-    {
-        "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
-        "translation": "Choississez allow ou disallow. Les deux options ne sons pas permise dans la même commande."
-    }
+   {
+      "id": "Define a new resource quota",
+      "translation": "Definir un nouvea quota"
+   },
+   {
+      "id": "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
+      "translation": "CF_NAME create-quota QUOTA [-m MÉMOIRE] [-r ROUTES] [-s INSTANCE_DE_SERVICES] [--allow-paid-service-plans]"
+   },
+   {
+      "id": "Total number of service instances",
+      "translation": "Nombres total d'instance de services"
+   },
+   {
+      "id": "Can provision instances of paid service plans",
+      "translation": "Peux provisioner des instances de services pour le plan payé"
+   },
+   {
+      "id": "Creating quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Créez quota {{.QuotaName}} étant {{.Username}}..."
+   },
+   {
+      "id": "Total amount of memory (e.g. 1024M, 1G, 10G)",
+      "translation": "Quantité totale de mémoire (e.g. 1024Mo, 1Go, 10Go)"
+   },
+   {
+      "id": "Total number of routes",
+      "translation": "Quantité totale de routes"
+   },
+   {
+      "id": "Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}",
+      "translation": "Limite de mémoire invalid: {{.MemoryLimit}}\n{{.Err}}"
+   },
+   {
+      "id": "Quota Definition {{.QuotaName}} already exists",
+      "translation": "La définition de quota {{.QuotaName}} existe déjà"
+   },
+   {
+      "id": "Delete a quota",
+      "translation": "Suprimmer le quota"
+   },
+   {
+      "id": "CF_NAME delete-quota QUOTA [-f]",
+      "translation": "CF_NAME delete-quota QUOTA [-f]"
+   },
+   {
+      "id": "Force deletion without confirmation",
+      "translation": "Forcer la suppression sans confirmation"
+   },
+   {
+      "id": "Incorrect Usage",
+      "translation": "Utilisation Incorrecte"
+   },
+   {
+      "id": "Deleting quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Sumprimmer le quota {{.QuotaName}} étant {{.Username}}..."
+   },
+   {
+      "id": "Quota {{.QuotaName}} does not exist",
+      "translation": "Quota {{.QuotaName}} n'éxiste plus"
+   },
+   {
+      "id": "CF_NAME quota QUOTA",
+      "translation": "NOM_CF quota QUOTA"
+   },
+   {
+      "id": "Show quota info",
+      "translation": "Montrez l'information de quota"
+   },
+   {
+      "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
+      "translation": "Trouver l'information quota pour {{.QuotaName}} ètant {{.Username}}..."
+   },
+   {
+      "id": "Memory",
+      "translation": "Memoire"
+   },
+   {
+      "id": "Routes",
+      "translation": "Routes"
+   },
+   {
+      "id": "Services",
+      "translation": "Services"
+   },
+   {
+      "id": "Paid service plans",
+      "translation": "Plan de service payè"
+   },
+   {
+      "id": "List available usage quotas",
+      "translation": "List available usage quotas"
+   },
+   {
+      "id": "CF_NAME quotas",
+      "translation": "CF_NAME quotas"
+   },
+   {
+      "id": "Getting quotas as {{.Username}}...",
+      "translation": "Obtenir les quotas étant {{.Username}}..."
+   },
+   {
+      "id": "name",
+      "translation": "nom"
+   },
+   {
+      "id": "memory limit",
+      "translation": "limite de memoire"
+   },
+   {
+      "id": "routes",
+      "translation": "routes"
+   },
+   {
+      "id": "service instances",
+      "translation": "instance de services"
+   },
+   {
+      "id": "paid service plans",
+      "translation": "plans de service payé"
+   },
+   {
+      "id": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
+      "translation": "CF_NAME update-quota QUOTA [-m MÉMOIRE] [-n NOUVEAU_NOM] [-r ROUTES] [-s INSTANCE_DE_SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
+   },
+   {
+      "id": "New name",
+      "translation": "Nouveau nom"
+   },
+   {
+      "id": "Cannot provision instances of paid service plans",
+      "translation": "Incapable de provisioner des instance de service à plan payé"
+   },
+   {
+      "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Réactualisation quota {{.QuotaName}} étant {{.Username}}..."
+   },
+   {
+      "id": "Update an existing resource quota",
+      "translation": "Reactualize un quota éxistant"
+   },
+   {
+      "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
+      "translation": "Choississez allow ou disallow. Les deux options ne sons pas permise dans la même commande."
+   }
 ]
