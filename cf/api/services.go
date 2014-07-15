@@ -2,13 +2,14 @@ package api
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type ServiceRepository interface {
@@ -22,6 +23,7 @@ type ServiceRepository interface {
 	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
 	DeleteService(instance models.ServiceInstance) (apiErr error)
 	FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error)
+	ListServicesFromBroker(brokerGuid string) (services []models.ServiceOffering, err error)
 	GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiErr error)
 	MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiErr error)
 }
@@ -199,6 +201,20 @@ func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDe
 	apiErr = errors.NewModelNotFoundError("Plan", planDescription.String())
 
 	return planGuid, apiErr
+}
+
+func (repo CloudControllerServiceRepository) ListServicesFromBroker(brokerGuid string) (offerings []models.ServiceOffering, err error) {
+	err = repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("service_broker_guid:"+brokerGuid)),
+		resources.ServiceOfferingResource{},
+		func(resource interface{}) bool {
+			if offering, ok := resource.(resources.ServiceOfferingResource); ok {
+				offerings = append(offerings, offering.ToModel())
+			}
+			return true
+		})
+	return
 }
 
 func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiErr error) {
