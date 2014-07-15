@@ -73,6 +73,6 @@ func ToMegabytes(s string) (uint64, error) {
 
 var (
 	bytesPattern             *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
-	t                                       = i18n.Init("cf/formatters", i18n.GetResourcesPath())
+	t                                       = i18n.Init()
 	invalidByteQuantityError                = errors.New(t("Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB"))
 )

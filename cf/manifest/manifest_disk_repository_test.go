@@ -1,10 +1,11 @@
 package manifest_test
 
 import (
+	"path/filepath"
+
 	. "github.com/cloudfoundry/cli/cf/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"path/filepath"
 )
 
 var _ = Describe("ManifestDiskRepository", func() {

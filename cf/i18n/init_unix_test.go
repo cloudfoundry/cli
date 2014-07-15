@@ -13,9 +13,15 @@ import (
 )
 
 var _ = Describe("i18n.Init() function", func() {
-	var I18N_PATH = filepath.Join("cf", "i18n", "test_fixtures")
+	var oldResourcesPath string
+
+	BeforeEach(func() {
+		oldResourcesPath = i18n.GetResourcesPath()
+		i18n.Resources_path = filepath.Join("cf", "i18n", "test_fixtures")
+	})
 
 	AfterEach(func() {
+		i18n.Resources_path = oldResourcesPath
 		os.Setenv("LC_ALL", "")
 		os.Setenv("LANG", "en_US.UTF-8")
 	})
@@ -25,7 +31,7 @@ var _ = Describe("i18n.Init() function", func() {
 			os.Setenv("LC_ALL", "")
 			os.Setenv("LANG", "")
 
-			T := i18n.Init("main", I18N_PATH)
+			T := i18n.Init()
 
 			translation := T("Hello world!")
 			Ω("Hello world!").Should(Equal(translation))
@@ -37,7 +43,7 @@ var _ = Describe("i18n.Init() function", func() {
 			})
 
 			It("still loads the english translation", func() {
-				T := i18n.Init("main", I18N_PATH)
+				T := i18n.Init()
 
 				translation := T("Hello world!")
 				Ω("Hello world!").Should(Equal(translation))
@@ -47,7 +53,7 @@ var _ = Describe("i18n.Init() function", func() {
 		Context("when the desired language is not supported", func() {
 			It("defaults to en_US when langauge is not supported", func() {
 				os.Setenv("LC_ALL", "zz_FF.UTF-8")
-				T := i18n.Init("main", I18N_PATH)
+				T := i18n.Init()
 
 				translation := T("Hello world!")
 				Ω("Hello world!").Should(Equal(translation))
@@ -59,7 +65,7 @@ var _ = Describe("i18n.Init() function", func() {
 			Context("because we don't have the territory", func() {
 				It("defaults to same language in supported territory", func() {
 					os.Setenv("LC_ALL", "fr_CA.UTF-8")
-					T := i18n.Init("main", I18N_PATH)
+					T := i18n.Init()
 
 					translation := T("Hello world!")
 					Ω("Àlo le monde!").Should(Equal(translation))
@@ -68,9 +74,14 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		Context("when not even the english translation can be loaded", func() {
+			BeforeEach(func() {
+				i18n.Resources_path = filepath.Join("should", "not", "be_valid")
+			})
+
 			It("panics", func() {
 				os.Setenv("LC_ALL", "zz_FF.utf-8")
-				init := func() { i18n.Init("main", "should/not/be/a/valid/path") }
+
+				init := func() { i18n.Init() }
 				Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
 			})
 		})
@@ -82,7 +93,7 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		It("returns a usable T function for simple strings", func() {
-			T := i18n.Init("main", I18N_PATH)
+			T := i18n.Init()
 			Ω(T).ShouldNot(BeNil())
 
 			translation := T("Hello world!")
@@ -90,7 +101,7 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		It("returns a usable T function for complex strings (interpolated)", func() {
-			T := i18n.Init("main", I18N_PATH)
+			T := i18n.Init()
 			Ω(T).ShouldNot(BeNil())
 
 			translation := T("Hello {{.Name}}!", map[string]interface{}{"Name": "Anand"})
@@ -104,7 +115,7 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		It("T function should return translation if string key exists", func() {
-			T := i18n.Init("main", I18N_PATH)
+			T := i18n.Init()
 
 			translation := T("Hello world!")
 			Ω("Àlo le monde!").Should(Equal(translation))

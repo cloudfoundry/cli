@@ -31,16 +31,16 @@ var SUPPORTED_LOCALES = map[string]string{
 	//	"ru": "ru_RU", - Will add support for Russian when nicksnyder/go-i18n supports Russian
 	"zh": "zh_CN",
 }
-var resources_path = filepath.Join("cf", "i18n", "resources")
+var Resources_path = filepath.Join("cf", "i18n", "resources")
 
 func GetResourcesPath() string {
-	return resources_path
+	return Resources_path
 }
 
-func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
-	userLocale, err := initWithUserLocale(packageName, i18nDirname)
+func Init() go_i18n.TranslateFunc {
+	userLocale, err := initWithUserLocale()
 	if err != nil {
-		userLocale = mustLoadDefaultLocale(packageName, i18nDirname)
+		userLocale = mustLoadDefaultLocale()
 	}
 
 	T, err := go_i18n.Tfunc(userLocale, DEFAULT_LOCALE)
@@ -51,7 +51,7 @@ func Init(packageName string, i18nDirname string) go_i18n.TranslateFunc {
 	return T
 }
 
-func initWithUserLocale(packageName, i18nDirname string) (string, error) {
+func initWithUserLocale() (string, error) {
 	userLocale, err := jibber_jabber.DetectIETF()
 	if err != nil {
 		userLocale = DEFAULT_LOCALE
@@ -63,7 +63,7 @@ func initWithUserLocale(packageName, i18nDirname string) (string, error) {
 	}
 
 	userLocale = strings.Replace(userLocale, "-", "_", 1)
-	err = loadFromAsset(packageName, i18nDirname, userLocale, language)
+	err = loadFromAsset(userLocale, language)
 	if err != nil {
 		locale := SUPPORTED_LOCALES[language]
 		if locale == "" {
@@ -71,16 +71,16 @@ func initWithUserLocale(packageName, i18nDirname string) (string, error) {
 		} else {
 			userLocale = locale
 		}
-		err = loadFromAsset(packageName, i18nDirname, userLocale, language)
+		err = loadFromAsset(userLocale, language)
 	}
 
 	return userLocale, err
 }
 
-func mustLoadDefaultLocale(packageName, i18nDirname string) string {
+func mustLoadDefaultLocale() string {
 	userLocale := DEFAULT_LOCALE
 
-	err := loadFromAsset(packageName, i18nDirname, DEFAULT_LOCALE, DEFAULT_LANGUAGE)
+	err := loadFromAsset(DEFAULT_LOCALE, DEFAULT_LANGUAGE)
 	if err != nil {
 		panic("Could not load en_US language files. God save the queen. " + err.Error())
 	}
@@ -88,9 +88,9 @@ func mustLoadDefaultLocale(packageName, i18nDirname string) string {
 	return userLocale
 }
 
-func loadFromAsset(packageName, assetPath, locale, language string) error {
+func loadFromAsset(locale, language string) error {
 	assetName := locale + ".all.json"
-	assetKey := filepath.Join(assetPath, language, packageName, assetName)
+	assetKey := filepath.Join(GetResourcesPath(), assetName)
 
 	byteArray, err := resources.Asset(assetKey)
 	if err != nil {
