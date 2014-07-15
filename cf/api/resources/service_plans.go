@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -12,6 +13,9 @@ type ServicePlanResource struct {
 
 type ServicePlanEntity struct {
 	Name                string
+	Free                bool
+	Public              bool
+	Active              bool
 	ServiceOfferingGuid string                  `json:"service_guid"`
 	ServiceOffering     ServiceOfferingResource `json:"service"`
 }
@@ -25,6 +29,9 @@ type ServicePlanDescription struct {
 func (resource ServicePlanResource) ToFields() (fields models.ServicePlanFields) {
 	fields.Guid = resource.Metadata.Guid
 	fields.Name = resource.Entity.Name
+	fields.Free = resource.Entity.Free
+	fields.Public = resource.Entity.Public
+	fields.Active = resource.Entity.Active
 	return
 }
 
