@@ -13,7 +13,7 @@
    },
    {
       "id": "DOMAINS",
-      "translation": "DOMAINS"
+      "translation": "DOMINIOS"
    },
    {
       "id": "GETTING STARTED",
@@ -33,7 +33,7 @@
    },
    {
       "id": "SECURITY GROUP",
-      "translation": "SECURITY GROUP"
+      "translation": "GRUPO DE SEGURIDAD"
    },
    {
       "id": "SERVICE ADMIN",
@@ -49,7 +49,7 @@
    },
    {
       "id": "Show help",
-      "translation": "Show help"
+      "translation": "Mostrar ayuda"
    },
    {
       "id": "USER ADMIN",
@@ -65,31 +65,31 @@
    },
    {
       "id": "Do not colorize output",
-      "translation": "Do not colorize output"
+      "translation": "No coloriza la salida"
    },
    {
       "id": "Print API request diagnostics to stdout",
-      "translation": "Print API request diagnostics to stdout"
+      "translation": "Imprime el diagnostico de solicitudes API a stdout"
    },
    {
       "id": "NAME:",
-      "translation": "NAME:"
+      "translation": "NOMBRE:"
    },
    {
       "id": "USAGE:",
-      "translation": "USAGE:"
+      "translation": "USO:"
    },
    {
       "id": "GLOBAL OPTIONS",
-      "translation": "GLOBAL OPTIONS"
+      "translation": "OPCIONES GLOBALES"
    },
    {
       "id": "[environment variables]",
-      "translation": "[environment variables]"
+      "translation": "[variables de entorno]"
    },
    {
       "id": "[global options] command [arguments...] [command options]",
-      "translation": "[global options] command [arguments...] [command options]"
+      "translation": "[opciones globales] comando [argumentos...] [opciones del comando]"
    },
    {
       "id": "ENVIRONMENT VARIABLES",
@@ -97,30 +97,30 @@
    },
    {
       "id": "Override path to default config directory",
-      "translation": "Override path to default config directory"
+      "translation": "Sobreescribe la ruta al directorio de configuración por default"
    },
    {
       "id": "Print the version",
-      "translation": "Print the version"
+      "translation": "Imprime la version"
    },
    {
       "id": "BUILD TIME:",
-      "translation": "BUILD TIME:"
+      "translation": "Tiempo de construcción:"
    },
    {
       "id": "Max wait time for app instance startup, in minutes",
-      "translation": "Max wait time for app instance startup, in minutes"
+      "translation": "Tiempo máximo de espera para comienzo de instancia, en minutos"
    },
    {
       "id": "Append API request diagnostics to a log file",
-      "translation": "Append API request diagnostics to a log file"
+      "translation": "Anade diagnósticos de solicitud API al archivo de log"
    },
    {
       "id": "Enable HTTP proxying for API requests",
-      "translation": "Enable HTTP proxying for API requests"
+      "translation": "Habilita HTTP proxying para solicitudes API"
    },
    {
       "id": "Max wait time for buildpack staging, in minutes",
-      "translation": "Max wait time for buildpack staging, in minutes"
+      "translation": "Tiempo máximo de espera máximo para buildpack staging, en minutos"
    }
 ]

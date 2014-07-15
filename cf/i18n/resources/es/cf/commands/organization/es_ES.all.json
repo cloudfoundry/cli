@@ -1,19 +1,19 @@
 [
    {
       "id": "\nTIP: Use '{{.Command}}' to target new org",
-      "translation": "\nTIP: Use '{{.Command}}' to target new org"
+      "translation": "\nTIP: Usar '{{.Command}}' para seleccionar una nueva org"
    },
    {
       "id": "   View allowable quotas with 'CF_NAME quotas'",
-      "translation": "   View allowable quotas with 'CF_NAME quotas'"
+      "translation": "   Muestra cuotas permitidas con 'CF_NAME quotas'"
    },
    {
       "id": "  domains: {{.Domains}}",
-      "translation": "  domains: {{.Domains}}"
+      "translation": "  dominios: {{.Domains}}"
    },
    {
       "id": "  quota:   {{.Quota}}",
-      "translation": "  quota:   {{.Quota}}"
+      "translation": "  quotas:   {{.Quota}}"
    },
    {
       "id": "  spaces:  {{.Spaces}}",
@@ -21,7 +21,7 @@
    },
    {
       "id": "Assign a quota to an org",
-      "translation": "Assign a quota to an org"
+      "translation": "Asigna una cuota a una org"
    },
    {
       "id": "CF_NAME create-org ORG",
@@ -29,7 +29,7 @@
    },
    {
       "id": "CF_NAME delete-org ORG [-f]",
-      "translation": "CF_NAME delete-org ORG [-f]"
+      "translation": "CF_NAME borrar-org ORG [-f]"
    },
    {
       "id": "CF_NAME org ORG",
@@ -37,75 +37,75 @@
    },
    {
       "id": "CF_NAME rename-org ORG NEW_ORG",
-      "translation": "CF_NAME rename-org ORG NEW_ORG"
+      "translation": "CF_NAME renombrar-org ORG NEW_ORG"
    },
    {
       "id": "CF_NAME set-quota ORG QUOTA\n\n",
-      "translation": "CF_NAME set-quota ORG QUOTA\n\n"
+      "translation": "CF_NAME establecer-quota ORG CUOTA\n\n"
    },
    {
       "id": "Create an org",
-      "translation": "Create an org"
+      "translation": "Crea una org"
    },
    {
       "id": "Creating org {{.OrgName}} as {{.Username}}...",
-      "translation": "Creating org {{.OrgName}} as {{.Username}}..."
+      "translation": "Creando org {{.OrgName}} como {{.Username}}..."
    },
    {
       "id": "Delete an org",
-      "translation": "Delete an org"
+      "translation": "Borra una org"
    },
    {
       "id": "Deleting org {{.OrgName}} as {{.Username}}...",
-      "translation": "Deleting org {{.OrgName}} as {{.Username}}..."
+      "translation": "Borrando org {{.OrgName}} como {{.Username}}..."
    },
    {
       "id": "Failed fetching orgs.\n{{.ApiErr}}",
-      "translation": "Failed fetching orgs.\n{{.ApiErr}}"
+      "translation": "Fallo al obtener orgs.\n{{.ApiErr}}"
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force deletion without confirmation"
+      "translation": "Borrado forzado sin confirmacion"
    },
    {
       "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
-      "translation": "Getting info for org {{.OrgName}} as {{.Username}}..."
+      "translation": "Obteniendo info para la org {{.OrgName}} como {{.Username}}..."
    },
    {
       "id": "Getting orgs as {{.Username}}...\n",
-      "translation": "Getting orgs as {{.Username}}...\n"
+      "translation": "Trayendo las orgs como {{.Username}}...\n"
    },
    {
       "id": "List all orgs",
-      "translation": "List all orgs"
+      "translation": "Lista todas las orgs"
    },
    {
       "id": "No orgs found",
-      "translation": "No orgs found"
+      "translation": "No se encontraron orgs"
    },
    {
       "id": "Org {{.OrgName}} already exists",
-      "translation": "Org {{.OrgName}} already exists"
+      "translation": "La org {{.OrgName}} todavia existe"
    },
    {
       "id": "Org {{.OrgName}} does not exist.",
-      "translation": "Org {{.OrgName}} does not exist."
+      "translation": "La org {{.OrgName}} no existe."
    },
    {
       "id": "Rename an org",
-      "translation": "Rename an org"
+      "translation": "Renombra una org"
    },
    {
       "id": "Renaming org {{.OrgName}} to {{.NewName}} as {{.Username}}...",
-      "translation": "Renaming org {{.OrgName}} to {{.NewName}} as {{.Username}}..."
+      "translation": "Renombrando la org {{.OrgName}} a {{.NewName}} como {{.Username}}..."
    },
    {
       "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
-      "translation": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}..."
+      "translation": "Estableciendo cuota {{.QuotaName}} a la org {{.OrgName}} como {{.Username}}..."
    },
    {
       "id": "Show org info",
-      "translation": "Show org info"
+      "translation": "Muestra info de org"
    },
    {
       "id": "TIP:\n",
@@ -113,7 +113,7 @@
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "nombre"
    },
    {
       "id": "org",

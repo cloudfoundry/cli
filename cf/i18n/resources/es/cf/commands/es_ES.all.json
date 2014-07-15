@@ -1,31 +1,31 @@
 [
    {
       "id": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
-      "translation": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"
+      "translation": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (Escapar comillas de ser usadas en la password)"
    },
    {
       "id": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n",
-      "translation": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n"
+      "translation": "   CF_NAME auth name@example.com \"my password\" (Usar comillas para passwords con espacios)\n"
    },
    {
       "id": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n",
-      "translation": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n"
+      "translation": "   CF_NAME login (omitir nombre de usuario y clave para loguearse interactivamente -- CF_NAME preguntará por ambas)\n"
    },
    {
       "id": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
-      "translation": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"
+      "translation": "   CF_NAME login --sso (CF_NAME provee un password que se podrá usar una vez para el login)"
    },
    {
       "id": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
-      "translation": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"
+      "translation": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (Escapar comillas de ser usadas en la clave)"
    },
    {
       "id": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n",
-      "translation": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n"
+      "translation": "   CF_NAME login -u name@example.com -p \"my password\" (Usar comillas para claves con espacios)\n"
    },
    {
       "id": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n",
-      "translation": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n"
+      "translation": "   CF_NAME login -u name@example.com -p pa55woRD (especifica nombre de usuario y password como argumentos)\n"
    },
    {
       "id": "API endpoint",
@@ -33,7 +33,7 @@
    },
    {
       "id": "API endpoint (e.g. https://api.example.com)",
-      "translation": "API endpoint (e.g. https://api.example.com)"
+      "translation": "API endpoint (ej. https://api.example.com)"
    },
    {
       "id": "API endpoint: {{.ApiEndpoint}}",
@@ -49,15 +49,15 @@
    },
    {
       "id": "An org must be targeted before targeting a space",
-      "translation": "An org must be targeted before targeting a space"
+      "translation": "una org debe estar seleccionada antes de seleccionar el space"
    },
    {
       "id": "Authenticate user non-interactively",
-      "translation": "Authenticate user non-interactively"
+      "translation": "Auténtica usuario no interactivamente"
    },
    {
       "id": "Authenticating...",
-      "translation": "Authenticating..."
+      "translation": "Autenticando..."
    },
    {
       "id": "CF_NAME api [URL]",
@@ -65,23 +65,23 @@
    },
    {
       "id": "CF_NAME auth USERNAME PASSWORD\n\n",
-      "translation": "CF_NAME auth USERNAME PASSWORD\n\n"
+      "translation": "CF_NAME auth USUARIO CLAVE\n\n"
    },
    {
       "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]",
-      "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]"
+      "translation": "CF_NAME config [--async-timeout TIEMPO DE ESPERA EN MINUTOS] [--trace true | false | path/to/file] [--color true | false]"
    },
    {
       "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
-      "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]"
+      "translation": "CF_NAME curl PATH [-iv] [-X METODO] [-H CABECERA] [-d DATA] [--output ARCHIVO]"
    },
    {
       "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
-      "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"
+      "translation": "CF_NAME login [-a API_URL] [-u USUARIO] [-p CLAVE] [-o ORG] [-s SPACE]\n\n"
    },
    {
       "id": "CF_NAME logout",
-      "translation": "CF_NAME logout"
+      "translation": "CF_NAME salio"
    },
    {
       "id": "CF_NAME passwd",
@@ -97,111 +97,111 @@
    },
    {
       "id": "Change user password",
-      "translation": "Change user password"
+      "translation": "Cambia clave de usuario"
    },
    {
       "id": "Changing password...",
-      "translation": "Changing password..."
+      "translation": "Cambiando clave..."
    },
    {
       "id": "Could not target org.\n{{.ApiErr}}",
-      "translation": "Could not target org.\n{{.ApiErr}}"
+      "translation": "No se pudo seleccionar la org.\n{{.ApiErr}}"
    },
    {
       "id": "Current Password",
-      "translation": "Current Password"
+      "translation": "Clave Actual"
    },
    {
       "id": "Current password did not match",
-      "translation": "Current password did not match"
+      "translation": "La clave actual no coincide"
    },
    {
       "id": "Custom headers to include in the request, flag can be specified multiple times",
-      "translation": "Custom headers to include in the request, flag can be specified multiple times"
+      "translation": "Cabeceras personalizadas a ser incluidas en la solicitud, La bandera puede ser especificada múltiples veces"
    },
    {
       "id": "EXAMPLE:\n",
-      "translation": "EXAMPLE:\n"
+      "translation": "EJEMPLO:\n"
    },
    {
       "id": "Enable CF_TRACE output for all requests and responses",
-      "translation": "Enable CF_TRACE output for all requests and responses"
+      "translation": "Habilita la salida de CF_TRACE para todas las solicitudes y respuestas"
    },
    {
       "id": "Enable or disable color",
-      "translation": "Enable or disable color"
+      "translation": "Habilitar o desabilitar color"
    },
    {
       "id": "Error creating request:\n{{.Err}}",
-      "translation": "Error creating request:\n{{.Err}}"
+      "translation": "Error creando solicitud:\n{{.Err}}"
    },
    {
       "id": "Error finding available orgs\n{{.ApiErr}}",
-      "translation": "Error finding available orgs\n{{.ApiErr}}"
+      "translation": "Error encontrando orgs disponibles\n{{.ApiErr}}"
    },
    {
       "id": "Error finding available spaces\n{{.Err}}",
-      "translation": "Error finding available spaces\n{{.Err}}"
+      "translation": "Error encontrando spaces disponibles\n{{.Err}}"
    },
    {
       "id": "Error finding org {{.OrgName}}\n{{.Err}}",
-      "translation": "Error finding org {{.OrgName}}\n{{.Err}}"
+      "translation": "Error encontrando org {{.OrgName}}\n{{.Err}}"
    },
    {
       "id": "Error finding space {{.SpaceName}}\n{{.Err}}",
-      "translation": "Error finding space {{.SpaceName}}\n{{.Err}}"
+      "translation": "Error encontrando space {{.SpaceName}}\n{{.Err}}"
    },
    {
       "id": "Executes a raw request, content-type set to application/json by default",
-      "translation": "Executes a raw request, content-type set to application/json by default"
+      "translation": "Ejecuta una solicitud cruda, el content-type está configurado por defecto a application/json"
    },
    {
       "id": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}..."
+      "translation": "Obteniendo stacks en org {{.OrganizationName}} / space {{.SpaceName}} como {{.Username}}..."
    },
    {
       "id": "HTTP data to include in the request body",
-      "translation": "HTTP data to include in the request body"
+      "translation": "Data HTTP a incluir en el cuerpo de la solicitud"
    },
    {
       "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
-      "translation": "HTTP method (GET,POST,PUT,DELETE,etc)"
+      "translation": "Metodo HTTP (GET,POST,PUT,DELETE,etc)"
    },
    {
       "id": "Include response headers in the output",
-      "translation": "Include response headers in the output"
+      "translation": "Incluye las cabeceras de la respuesta en la salida"
    },
    {
       "id": "Incorrect number of arguments",
-      "translation": "Incorrect number of arguments"
+      "translation": "Numero incorrecto de argumentos"
    },
    {
       "id": "Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
-      "translation": "Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}"
+      "translation": "Certificado SSL invalido para {{.URL}}\n{{.TipMessage}}"
    },
    {
       "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "translation": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"
+      "translation": "Lista todos los stacks(un stack es un sistema de archivos pre construid, Incluyendo un sistema operativo, que puede correr apps)"
    },
    {
       "id": "Log user in",
-      "translation": "Log user in"
+      "translation": "Inicia sesión con usuario"
    },
    {
       "id": "Log user out",
-      "translation": "Log user out"
+      "translation": "Cierra sesion con usuario"
    },
    {
       "id": "Logging out...",
-      "translation": "Logging out..."
+      "translation": "Cerrando sesión..."
    },
    {
       "id": "New Password",
-      "translation": "New Password"
+      "translation": "Nueva Clave"
    },
    {
       "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
-      "translation": "No api endpoint set. Use '{{.Name}}' to set an endpoint"
+      "translation": "No hay un edpoint para la api establecido. Usar '{{.Name}}' para establecer un endpoint"
    },
    {
       "id": "Org",
@@ -209,39 +209,39 @@
    },
    {
       "id": "Password",
-      "translation": "Password"
+      "translation": "Clave"
    },
    {
       "id": "Password verification does not match",
-      "translation": "Password verification does not match"
+      "translation": "La verificacion de la Clave no coincide"
    },
    {
       "id": "Please don't",
-      "translation": "Please don't"
+      "translation": "Por favor no"
    },
    {
       "id": "Please log in again",
-      "translation": "Please log in again"
+      "translation": "Por favor iniciar sesión nuevamente"
    },
    {
       "id": "Select a space (or press enter to skip):",
-      "translation": "Select a space (or press enter to skip):"
+      "translation": "Elegir un space (o presionar enter para omitir):"
    },
    {
       "id": "Select an org (or press enter to skip):",
-      "translation": "Select an org (or press enter to skip):"
+      "translation": "Elegir una org(o presionar enter para omitir):"
    },
    {
       "id": "Set or view target api url",
-      "translation": "Set or view target api url"
+      "translation": "Configura o muestra la url de api seleccionada"
    },
    {
       "id": "Set or view the targeted org or space",
-      "translation": "Set or view the targeted org or space"
+      "translation": "Configura o muestra la org y space seleccionada"
    },
    {
       "id": "Setting api endpoint to {{.Endpoint}}...",
-      "translation": "Setting api endpoint to {{.Endpoint}}..."
+      "translation": "Configurando endpoint api a {{.Endpoint}}..."
    },
    {
       "id": "Space",
@@ -249,59 +249,59 @@
    },
    {
       "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-      "translation": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint"
+      "translation": "TIP: Usar '{{.ApiCommand}}' para continuar con un endpoint API inseguro"
    },
    {
       "id": "Targeted org {{.OrgName}}\n",
-      "translation": "Targeted org {{.OrgName}}\n"
+      "translation": "Org seleccionada {{.OrgName}}\n"
    },
    {
       "id": "Targeted space {{.SpaceName}}\n",
-      "translation": "Targeted space {{.SpaceName}}\n"
+      "translation": "Space seleccionado {{.SpaceName}}\n"
    },
    {
       "id": "There are too many options to display, please type in the name.",
-      "translation": "There are too many options to display, please type in the name."
+      "translation": "Hay muchas opciones para mostrar, por favor ingrese el nombre."
    },
    {
       "id": "Timeout for async HTTP requests",
-      "translation": "Timeout for async HTTP requests"
+      "translation": "Tiempo de espera para solicitudes HTTP asíncronas"
    },
    {
       "id": "Trace HTTP requests",
-      "translation": "Trace HTTP requests"
+      "translation": "Reastea solicitudes HTTP"
    },
    {
       "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-      "translation": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}"
+      "translation": "No se pudo acceder al space {{.SpaceName}}.\n{{.ApiErr}}"
    },
    {
       "id": "Unable to authenticate.",
-      "translation": "Unable to authenticate."
+      "translation": "No se pudo autenticar."
    },
    {
       "id": "Use '{{.Name}}' to view or set your target org and space",
-      "translation": "Use '{{.Name}}' to view or set your target org and space"
+      "translation": "Usar '{{.Name}}' para mostrar o establecer la org y space seleccionadas"
    },
    {
       "id": "Use a one-time password to login",
-      "translation": "Use a one-time password to login"
+      "translation": "Usar un clave por única vez para iniciar sesión"
    },
    {
       "id": "Username",
-      "translation": "Username"
+      "translation": "Usuario"
    },
    {
       "id": "Verify Password",
-      "translation": "Verify Password"
+      "translation": "Verificar Clave"
    },
    {
       "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
-      "translation": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n"
+      "translation": "ADVERTENCIA:\n   Proporcionar tu clave como una opción de línea de comando es desaconsejable\n   Tu clave puede ser visible por otros y ser grabada de el historial del shell\n\n"
    },
    {
       "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
-      "translation": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"
+      "translation": "Advertencia: endpoint inseguro de API http detectado: se recomienda usar https para API\n"
    },
    {
       "id": "Write curl body to FILE instead of stdout",
@@ -309,19 +309,19 @@
    },
    {
       "id": "description",
-      "translation": "description"
+      "translation": "descripción"
    },
    {
       "id": "incorrect usage",
-      "translation": "incorrect usage"
+      "translation": "uso incorrecto"
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "nombre"
    },
    {
       "id": "organization",
-      "translation": "organization"
+      "translation": "organización"
    },
    {
       "id": "space",
@@ -329,6 +329,6 @@
    },
    {
       "id": "write default values to the config",
-      "translation": "write default values to the config"
+      "translation": "escribe valores por defecto en la configuración"
    }
 ]

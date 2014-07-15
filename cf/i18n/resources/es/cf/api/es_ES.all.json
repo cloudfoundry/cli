@@ -1,82 +1,82 @@
 [
    {
       "id": "Could not find a default domain",
-      "translation": "Could not find a default domain"
+      "translation": "No se pudo encontrar el dominio por defecto"
    },
    {
       "id": "Could not serialize information",
-      "translation": "Could not serialize information"
+      "translation": "No se pudo serializar la información"
    },
    {
       "id": "Could not serialize updates.",
-      "translation": "Could not serialize updates."
+      "translation": "No se pudo serializar la actualización."
    },
    {
       "id": "Couldn't create temp file for upload",
-      "translation": "Couldn't create temp file for upload"
+      "translation": "No se pudo crear el archivo temporal de subida."
    },
    {
       "id": "Couldn't open buildpack file",
-      "translation": "Couldn't open buildpack file"
+      "translation": "No se pudo abrir el archivo de buildpack"
    },
    {
       "id": "Couldn't write zip file",
-      "translation": "Couldn't write zip file"
+      "translation": "No se pudo escribir el archivo zip"
    },
    {
       "id": "Error creating tmp file: {{.Err}}",
-      "translation": "Error creating tmp file: {{.Err}}"
+      "translation": "Error al crear el archivo temporal: {{.Err}}"
    },
    {
       "id": "Error creating upload",
-      "translation": "Error creating upload"
+      "translation": "Error creando subida"
    },
    {
       "id": "Error marshaling JSON",
-      "translation": "Error marshaling JSON"
+      "translation": "Error calculando las referencias del JSON"
    },
    {
       "id": "Error opening buildpack file",
-      "translation": "Error opening buildpack file"
+      "translation": "Error al abrir el archivo de buildpack"
    },
    {
       "id": "Error parsing headers",
-      "translation": "Error parsing headers"
+      "translation": "Error analizando las cabeceras"
    },
    {
       "id": "Error reading response",
-      "translation": "Error reading response"
+      "translation": "Error al leer la respuesta"
    },
    {
       "id": "Error writing to tmp file: {{.Err}}",
-      "translation": "Error writing to tmp file: {{.Err}}"
+      "translation": "Error escribiendo el archivo temporal: {{.Err}}"
    },
    {
       "id": "Error zipping application",
-      "translation": "Error zipping application"
+      "translation": "Error al comprimir la aplicacion"
    },
    {
       "id": "Failed to create json for resource_match request",
-      "translation": "Failed to create json for resource_match request"
+      "translation": "Error al crear json para la solicitud de resource_match"
    },
    {
       "id": "Failed to marshal JSON",
-      "translation": "Failed to marshal JSON"
+      "translation": "Fallo en calcular las referencias del JSON"
    },
    {
       "id": "Invalid Role {{.Role}}",
-      "translation": "Invalid Role {{.Role}}"
+      "translation": "Rol Invalido {{.Role}}"
    },
    {
       "id": "Loggregator endpoint missing from config file",
-      "translation": "Loggregator endpoint missing from config file"
+      "translation": "El endpoint de Loggregator no esta presente en el config file"
    },
    {
       "id": "UAA endpoint missing from config file",
-      "translation": "UAA endpoint missing from config file"
+      "translation": "UAA endpoint no esta presente en el config file"
    },
    {
       "id": "Zip archive does not contain a buildpack",
-      "translation": "Zip archive does not contain a buildpack"
+      "translation": "El archivo Zip no contiene un builpack"
    }
 ]
