@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -17,23 +18,23 @@ import (
 )
 
 type ShowApp struct {
-	ui               terminal.UI
-	config           configuration.Reader
-	appSummaryRepo   api.AppSummaryRepository
-	appInstancesRepo api.AppInstancesRepository
-	appReq           requirements.ApplicationRequirement
+	ui             terminal.UI
+	config         configuration.Reader
+	appSummaryRepo api.AppSummaryRepository
+	appStatsRepo   api.AppStatsRepository
+	appReq         requirements.ApplicationRequirement
 }
 
 type ApplicationDisplayer interface {
 	ShowApp(app models.Application)
 }
 
-func NewShowApp(ui terminal.UI, config configuration.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo api.AppInstancesRepository) (cmd *ShowApp) {
+func NewShowApp(ui terminal.UI, config configuration.Reader, appSummaryRepo api.AppSummaryRepository, appStatsRepo api.AppStatsRepository) (cmd *ShowApp) {
 	cmd = new(ShowApp)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appSummaryRepo = appSummaryRepo
-	cmd.appInstancesRepo = appInstancesRepo
+	cmd.appStatsRepo = appStatsRepo
 	return
 }
 
@@ -88,8 +89,8 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 		return
 	}
 
-	var instances []models.AppInstanceFields
-	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.Guid)
+	var stats []models.AppStatsFields
+	stats, apiErr = cmd.appStatsRepo.GetStats(app.Guid)
 	if apiErr != nil && !appIsStopped {
 		cmd.ui.Failed(apiErr.Error())
 		return
@@ -118,20 +119,30 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 
 	table := terminal.NewTable(cmd.ui, []string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk")})
 
-	for index, instance := range instances {
+	for index, stat := range stats {
+		since, err := time.Parse("2006-01-02 15:04:05 +0000", stat.Stats.Usage.Time)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+			return
+		}
+
+		uptime := time.Duration(stat.Stats.Uptime) * time.Second
+
+		since = since.Add(-uptime)
+
 		table.Add(
 			fmt.Sprintf("#%d", index),
-			ui_helpers.ColoredInstanceState(instance),
-			instance.Since.Format("2006-01-02 03:04:05 PM"),
-			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
+			ui_helpers.ColoredInstanceState(stat.State),
+			since.Format("2006-01-02 03:04:05 PM"),
+			fmt.Sprintf("%.1f%%", stat.Stats.Usage.Cpu*100),
 			fmt.Sprintf(T("{{.MemUsage}} of {{.MemQuota}}",
 				map[string]interface{}{
-					"MemUsage": formatters.ByteSize(instance.MemUsage),
-					"MemQuota": formatters.ByteSize(instance.MemQuota)})),
+					"MemUsage": formatters.ByteSize(stat.Stats.Usage.Mem),
+					"MemQuota": formatters.ByteSize(stat.Stats.MemQuota)})),
 			fmt.Sprintf(T("{{.DiskUsage}} of {{.DiskQuota}}",
 				map[string]interface{}{
-					"DiskUsage": formatters.ByteSize(instance.DiskUsage),
-					"DiskQuota": formatters.ByteSize(instance.DiskQuota)})),
+					"DiskUsage": formatters.ByteSize(stat.Stats.Usage.Disk),
+					"DiskQuota": formatters.ByteSize(stat.Stats.DiskQuota)})),
 		)
 	}
 

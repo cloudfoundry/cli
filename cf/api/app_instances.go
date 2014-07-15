@@ -2,12 +2,13 @@ package api
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/net"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/net"
 )
 
 type InstancesApiResponse map[string]InstanceApiResponse
@@ -18,15 +19,19 @@ type InstanceApiResponse struct {
 }
 
 type StatsApiResponse map[string]InstanceStatsApiResponse
+type StatsApiResponse2 map[string]models.AppStatsFields
 
 type InstanceStatsApiResponse struct {
+	State string
 	Stats struct {
 		DiskQuota uint64 `json:"disk_quota"`
 		MemQuota  uint64 `json:"mem_quota"`
+		Uptime    uint64
 		Usage     struct {
 			Cpu  float64
 			Disk uint64
 			Mem  uint64
+			Time string
 		}
 	}
 }
