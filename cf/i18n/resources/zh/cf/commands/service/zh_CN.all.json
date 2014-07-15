@@ -178,7 +178,7 @@
    },
    {
       "id": "TIP: To make these changes take effect, use '{{.CFUnbindCommand}}' to unbind the service, '{{.CFBindComand}}' to rebind, and then '{{.CFRestageCommand}}' to update the app with the new env variables",
-      "translation": "小贴士: 为了使这些更改生效， 使用'{{.CFUnbindCommand}}解除绑定的服务，使用'{{.CFBindComand}}重新绑定服务，然后使用'{{.CFPushCommand}}'更新应用使环境变量生效。"
+      "translation": "小贴士: 为了使这些更改生效， 使用'{{.CFUnbindCommand}}解除绑定的服务，使用'{{.CFBindComand}}重新绑定服务，然后使用'{{.CFRestageCommand}}'更新应用使环境变量生效。"
    },
    {
       "id": "Renaming service {{.ServiceName}} to {{.NewServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",

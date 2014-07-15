@@ -34,8 +34,8 @@
    {
       "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
       "translation": "确定删除{{.ModelType}} {{.ModelName}}以及所有相关数据和文件？"
-  ,
-  {
+   },
+   {
       "id": "Not logged in. Use '{{.CFLoginCommand}}' to log in.",
       "translation": "尚未登录，请使用'{{.CFLoginCommand}}'来登录"
    },
@@ -68,4 +68,3 @@
       "translation": "空间:"
    }
 ]
-   {

@@ -157,7 +157,7 @@
    },
    {
       "id": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "用户{{.Username}}请求分配组织{.OrganizationName}}/空间{{.SpaceName}}中的stacks..."
+      "translation": "用户{{.Username}}请求分配组织{{.OrganizationName}}/空间{{.SpaceName}}中的stacks..."
    },
    {
       "id": "HTTP data to include in the request body",
