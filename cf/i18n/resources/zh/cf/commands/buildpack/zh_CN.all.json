@@ -5,7 +5,7 @@
    },
    {
       "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
-      "translation": "CF_NAME create-buildpack <BUILDPACK> <路径> <位置> [--enable|--disable]"
+      "translation": "CF_NAME create-buildpack \u003cBUILDPACK\u003e \u003c路径\u003e \u003c位置\u003e [--enable|--disable]"
    },
    {
       "id": "position",

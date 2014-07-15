@@ -128,8 +128,8 @@
       "translation": "获取用户{{.CurrentUser}}在组织{{.OrgName}}/空间{{.SpaceName}}中的服务..."
    },
    {
-      "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?>",
-      "translation": "您确定要将服务{{.ServiceInstanceDescription}}从服务计划{{.OldServicePlanName}}迁移到计划{{.NewServicePlanName}}？>"
+      "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?\u003e",
+      "translation": "您确定要将服务{{.ServiceInstanceDescription}}从服务计划{{.OldServicePlanName}}迁移到计划{{.NewServicePlanName}}？\u003e"
    },
    {
       "id": "Service instance: {{.ServiceName}}",
@@ -151,7 +151,6 @@
       "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
       "translation": " 警告:这是一个Cloud Foundry内部操作;Service Broker不会被通知，服务实例所分配的资源也不会被改变。此项操作的主要适用场景是通过将服务实例从v1服务计划映射到v2服务计划，来将对应的v1 API的Service Broker替换为v2版本。我们建议您关闭v1的Service Brocker并设置v1的服务计划为私有，以防止后续操作创建额外的实例。一旦服务已经迁移完成，就可以从Cloud Foundry中删除v1的服务和服务计划。"
    },
-
    {
       "id": "Show service instance info",
       "translation": "显示服务实例的信息"

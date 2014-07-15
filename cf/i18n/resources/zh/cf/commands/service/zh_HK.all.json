@@ -128,8 +128,8 @@
       "translation": "Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
    },
    {
-      "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?>",
-      "translation": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?>"
+      "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?\u003e",
+      "translation": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?\u003e"
    },
    {
       "id": "Service instance: {{.ServiceName}}",

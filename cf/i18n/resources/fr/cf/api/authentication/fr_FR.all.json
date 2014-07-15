@@ -1,14 +1,14 @@
 [
-    {
-        "id": "Credentials were rejected, please try again.",
-        "translation": "Pouvoirs ont été rejetées, s'il vous plaît essayez de nouveau."
-    },
-    {
-        "id": "Failed to start oauth request",
-        "translation": "Impossible de démarrer demande oauth"
-    },
-    {
-        "id": "auth request failed",
-        "translation": "auth request failed"
-    }
+   {
+      "id": "Credentials were rejected, please try again.",
+      "translation": "Pouvoirs ont été rejetées, s'il vous plaît essayez de nouveau."
+   },
+   {
+      "id": "Failed to start oauth request",
+      "translation": "Impossible de démarrer demande oauth"
+   },
+   {
+      "id": "auth request failed",
+      "translation": "auth request failed"
+   }
 ]

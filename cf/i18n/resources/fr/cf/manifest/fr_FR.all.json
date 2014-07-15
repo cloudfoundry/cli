@@ -16,8 +16,8 @@
       "translation": "Variable d'environnement {{.PropertyName}} prévue d'avoir une valeur de string, mais c'était une {{.PropertyType}}."
    },
    {
-      "id": "Expected {{.Name}} to be a set of key => value, but it was a {{.Type}}.",
-      "translation": "{{.Name}} d'un ensemble de clé => valeur attendue, mais c'était une {{.Type}}."
+      "id": "Expected {{.Name}} to be a set of key =\u003e value, but it was a {{.Type}}.",
+      "translation": "{{.Name}} d'un ensemble de clé =\u003e valeur attendue, mais c'était une {{.Type}}."
    },
    {
       "id": "Expected {{.PropertyName}} to be a boolean.",
