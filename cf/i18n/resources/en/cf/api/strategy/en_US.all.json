@@ -1,6 +1,0 @@
-[
-   {
-      "id": "Could not parse version number: {{.Input}}",
-      "translation": "Could not parse version number: {{.Input}}"
-   }
-]

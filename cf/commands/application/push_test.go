@@ -1,10 +1,6 @@
 package application_test
 
 import (
-	"os"
-	"path/filepath"
-	"syscall"
-
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -22,6 +18,9 @@ import (
 	"github.com/cloudfoundry/cli/words"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
+	"path/filepath"
+	"syscall"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )

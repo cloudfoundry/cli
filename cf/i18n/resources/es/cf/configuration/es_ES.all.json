@@ -1,6 +1,0 @@
-[
-   {
-      "id": "Error writing to manifest file:{{.FilePath}}\n{{.Err}}",
-      "translation": "Error escribiendo el archivo de manifiesto:{{.FilePath}}\n{{.Err}}"
-   }
-]

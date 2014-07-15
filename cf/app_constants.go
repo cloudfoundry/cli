@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	t     = i18n.Init("cf", i18n.GetResourcesPath())
+	t     = i18n.Init()
 	Usage = t("A command line tool to interact with Cloud Foundry")
 )
 

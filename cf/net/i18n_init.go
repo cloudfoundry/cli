@@ -8,5 +8,5 @@ import (
 var T goi18n.TranslateFunc
 
 func init() {
-	T = i18n.Init("cf/net", i18n.GetResourcesPath())
+	T = i18n.Init()
 }

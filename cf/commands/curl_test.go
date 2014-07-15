@@ -2,10 +2,6 @@ package commands_test
 
 import (
 	"bytes"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -15,6 +11,9 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/gofileutils/fileutils"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	. "github.com/cloudfoundry/cli/cf/commands"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"

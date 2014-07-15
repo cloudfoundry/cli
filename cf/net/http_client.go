@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	t                        = i18n.Init("cf/net", i18n.GetResourcesPath())
+	t                        = i18n.Init()
 	PRIVATE_DATA_PLACEHOLDER = t("[PRIVATE DATA HIDDEN]")
 )
 

@@ -14,9 +14,8 @@ import (
 )
 
 var _ = Describe("i18n.Init() function", func() {
-	var I18N_PATH = filepath.Join("cf", "i18n", "test_fixtures")
-
 	BeforeEach(func() {
+		i18n.Resources_path = filepath.Join("cf", "i18n", "test_fixtures")
 		//All these tests require the system language to be English
 		Ω(jibber_jabber.DetectIETF()).Should(Equal("en-US"))
 	})
@@ -27,7 +26,7 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		It("returns a usable T function for simple strings", func() {
-			T := i18n.Init("main", I18N_PATH)
+			T := i18n.Init()
 			Ω(T).ShouldNot(BeNil())
 
 			translation := T("Hello world!")
@@ -35,7 +34,7 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		It("returns a usable T function for complex strings (interpolated)", func() {
-			T := i18n.Init("main", I18N_PATH)
+			T := i18n.Init()
 			Ω(T).ShouldNot(BeNil())
 
 			translation := T("Hello {{.Name}}!", map[string]interface{}{"Name": "Anand"})

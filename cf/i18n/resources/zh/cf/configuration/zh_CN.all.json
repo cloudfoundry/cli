@@ -1,6 +1,0 @@
-[
-   {
-      "id": "Error writing to manifest file:{{.FilePath}}\n{{.Err}}",
-      "translation": "写入清单文件错误: {{.FilePath}}\n错误: {{.Err}}"
-   }
-]
