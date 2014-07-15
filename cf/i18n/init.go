@@ -28,7 +28,7 @@ var SUPPORTED_LOCALES = map[string]string{
 	"ja": "ja_JA",
 	"ko": "ko_KO",
 	"pt": "pt_BR",
-	"ru": "ru_RU",
+	//	"ru": "ru_RU", - Will add support for Russian when nicksnyder/go-i18n supports Russian
 	"zh": "zh_CN",
 }
 var resources_path = filepath.Join("cf", "i18n", "resources")
