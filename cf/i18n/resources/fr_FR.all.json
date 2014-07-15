@@ -284,6 +284,14 @@
       "translation": "Bind a security group to a space"
    },
    {
+      "id": "Bind a security group to the list of security groups to be used for running applications",
+      "translation": "Bind a security group to the list of security groups to be used for running applications"
+   },
+   {
+      "id": "Bind a security group to the list of security groups to be used for staging applications",
+      "translation": "Bind a security group to the list of security groups to be used for staging applications"
+   },
+   {
       "id": "Bind a service instance to an app",
       "translation": "Liez une instance de service à une application"
    },
@@ -348,12 +356,20 @@
       "translation": "CF_NAME auth NOM MOT_DE_PASSE\n\n"
    },
    {
+      "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
+   },
+   {
       "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
       "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
    },
    {
       "id": "CF_NAME bind-service APP SERVICE_INSTANCE",
       "translation": "CF_NAME bind service APP SERVICE_INSTANCE"
+   },
+   {
+      "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
    },
    {
       "id": "CF_NAME buildpacks",
@@ -382,6 +398,10 @@
    {
       "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
       "translation": "CF_NAME create-route ESPACE DOMAIN [-n NOM_DE_HÔTE]"
+   },
+   {
+      "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
    },
    {
       "id": "CF_NAME create-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]",
@@ -418,6 +438,10 @@
    {
       "id": "CF_NAME curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]",
       "translation": "CF_NAME curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]"
+   },
+   {
+      "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
+      "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]"
    },
    {
       "id": "CF_NAME delete APP [-f -r]",
@@ -632,12 +656,20 @@
       "translation": "CF_NAME target [-o ORG] [-s ESPACE]"
    },
    {
+      "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
+   },
+   {
       "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE",
       "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
    },
    {
       "id": "CF_NAME unbind-service APP SERVICE_INSTANCE",
       "translation": "CF_NAME unbind-service APP INSTANCE_DE_SERVICE"
+   },
+   {
+      "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
    },
    {
       "id": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
@@ -662,6 +694,10 @@
    {
       "id": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
       "translation": "CF_NAME update-quota QUOTA [-m MÉMOIRE] [-n NOUVEAU_NOM] [-r ROUTES] [-s INSTANCE_DE_SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
+   },
+   {
+      "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
    },
    {
       "id": "CF_NAME update-security-group SECURITY_GROUP [--json PATH_TO_JSON_FILE]",
@@ -2108,6 +2144,10 @@
       "translation": "Règlements"
    },
    {
+      "id": "SECURITY GROUP",
+      "translation": "SECURITY GROUP"
+   },
+   {
       "id": "SERVICE ADMIN",
       "translation": "ADMIN DE SERVICE"
    },
@@ -2436,6 +2476,14 @@
       "translation": "Unbind a security group from a space"
    },
    {
+      "id": "Unbind a security group from the set of security groups for running applications",
+      "translation": "Unbind a security group from the set of security groups for running applications"
+   },
+   {
+      "id": "Unbind a security group from the set of security groups for staging applications",
+      "translation": "Unbind a security group from the set of security groups for staging applications"
+   },
+   {
       "id": "Unbind a service instance from an app",
       "translation": "Délier une instance de service d'une application"
    },
@@ -2594,6 +2642,10 @@
    {
       "id": "Warning: error tailing logs",
       "translation": "Avertissement: journaux en erreurs"
+   },
+   {
+      "id": "Write curl body to FILE instead of stdout",
+      "translation": "Write curl body to FILE instead of stdout"
    },
    {
       "id": "Zip archive does not contain a buildpack",
