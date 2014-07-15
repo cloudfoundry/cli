@@ -36,7 +36,7 @@
       "translation": "CF_NAME org 组织"
    },
    {
-      "id": "CF_NAME rename-org 组织 NEW_ORG",
+      "id": "CF_NAME rename-org ORG NEW_ORG",
       "translation": "CF_NAME rename-org 组织 新组织"
    },
    {

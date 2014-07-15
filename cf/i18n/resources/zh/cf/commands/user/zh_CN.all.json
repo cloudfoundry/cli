@@ -37,11 +37,11 @@
    },
    {
       "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
-      "translation": "分配角色:在组织{{.TargetOrg}}或空间{{.TargetSpace}}中分配权限给用户{{.TargetUser}} (作为用户{{.CurrentUser}}) ...
+      "translation": "分配角色:{{.Role}}在组织{{.TargetOrg}}或空间{{.TargetSpace}}中分配权限给用户{{.TargetUser}} (作为用户{{.CurrentUser}}) ..."
    },
    {
       "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
-      "translation": "分配角色:在组织{{.TargetOrg}}中分配权限给用户{{.TargetUser}} (作为用户{{.CurrentUser}})..."
+      "translation": "分配角色:{{.Role}}在组织{{.TargetOrg}}中分配权限给用户{{.TargetUser}} (作为用户{{.CurrentUser}})..."
    },
    {
       "id": "BILLING MANAGER",

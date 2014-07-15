@@ -257,7 +257,7 @@
    },
    {
       "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
-      "translation": "无效的实例数: {{.InstanceCount}}\n实例数量必须是个正整数"
+      "translation": "无效的实例数: {{.InstancesCount}}\n实例数量必须是个正整数"
    },
    {
       "id": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
@@ -417,7 +417,7 @@
    },
    {
       "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "作为用户{{.CurrentUser}}停止组织{{.OrgName}}中/空间{{{.SpaceName}}中的应用程序{{.AppName}}..."
+      "translation": "作为用户{{.CurrentUser}}停止组织{{.OrgName}}中/空间{{.SpaceName}}中的应用程序{{.AppName}}..."
    },
    {
       "id": "System-Provided:",
