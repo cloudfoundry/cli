@@ -1,0 +1,2990 @@
+[
+   {
+      "id": "\n\nTIP:\n",
+      "translation": "\n\nTIP:\n"
+   },
+   {
+      "id": "\nApp started\n",
+      "translation": "\nApp started\n"
+   },
+   {
+      "id": "\nTIP: Assign roles with '{{.CurrentUser}} set-org-role' and '{{.CurrentUser}} set-space-role'",
+      "translation": "\nTIP: Assign roles with '{{.CurrentUser}} set-org-role' and '{{.CurrentUser}} set-space-role'"
+   },
+   {
+      "id": "\nTIP: Use '{{.CFTargetCommand}}' to target new space",
+      "translation": "\nTIP: Use '{{.CFTargetCommand}}' to target new space"
+   },
+   {
+      "id": "\nTIP: Use '{{.Command}}' to target new org",
+      "translation": "\nTIP: Use '{{.Command}}' to target new org"
+   },
+   {
+      "id": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error",
+      "translation": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error"
+   },
+   {
+      "id": "   BillingManager - Create and manage the billing account and payment info\n",
+      "translation": "   BillingManager - Create and manage the billing account and payment info\n"
+   },
+   {
+      "id": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
+      "translation": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"
+   },
+   {
+      "id": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n",
+      "translation": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n"
+   },
+   {
+      "id": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n",
+      "translation": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n"
+   },
+   {
+      "id": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
+      "translation": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"
+   },
+   {
+      "id": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+      "translation": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"
+   },
+   {
+      "id": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n",
+      "translation": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n"
+   },
+   {
+      "id": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n",
+      "translation": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n"
+   },
+   {
+      "id": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
+      "translation": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n"
+   },
+   {
+      "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
+      "translation": "   CF_NAME push [-f MANIFEST_PATH]\n"
+   },
+   {
+      "id": "   OrgAuditor - Read-only access to org info and reports\n",
+      "translation": "   OrgAuditor - Read-only access to org info and reports\n"
+   },
+   {
+      "id": "   OrgManager - Invite and manage users, select and change plans, and set spending limits\n",
+      "translation": "   OrgManager - Invite and manage users, select and change plans, and set spending limits\n"
+   },
+   {
+      "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest.",
+      "translation": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest."
+   },
+   {
+      "id": "   Push multiple apps with a manifest:\n",
+      "translation": "   Push multiple apps with a manifest:\n"
+   },
+   {
+      "id": "   SpaceAuditor - View logs, reports, and settings on this space\n",
+      "translation": "   SpaceAuditor - View logs, reports, and settings on this space\n"
+   },
+   {
+      "id": "   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n",
+      "translation": "   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n"
+   },
+   {
+      "id": "   SpaceManager - Invite and manage users, and enable features for a given space\n",
+      "translation": "   SpaceManager - Invite and manage users, and enable features for a given space\n"
+   },
+   {
+      "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
+      "translation": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules."
+   },
+   {
+      "id": "   View allowable quotas with 'CF_NAME quotas'",
+      "translation": "   View allowable quotas with 'CF_NAME quotas'"
+   },
+   {
+      "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
+      "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n"
+   },
+   {
+      "id": "  domains: {{.Domains}}",
+      "translation": "  domains: {{.Domains}}"
+   },
+   {
+      "id": "  quota:   {{.Quota}}",
+      "translation": "  quota:   {{.Quota}}"
+   },
+   {
+      "id": "  spaces:  {{.Spaces}}",
+      "translation": "  spaces:  {{.Spaces}}"
+   },
+   {
+      "id": " is already started",
+      "translation": " is already started"
+   },
+   {
+      "id": " is already stopped",
+      "translation": " is already stopped"
+   },
+   {
+      "id": " is empty",
+      "translation": " is empty"
+   },
+   {
+      "id": " not found",
+      "translation": " not found"
+   },
+   {
+      "id": "A command line tool to interact with Cloud Foundry",
+      "translation": "A command line tool to interact with Cloud Foundry"
+   },
+   {
+      "id": "ADVANCED",
+      "translation": "ADVANCED"
+   },
+   {
+      "id": "API endpoint",
+      "translation": "API endpoint"
+   },
+   {
+      "id": "API endpoint (e.g. https://api.example.com)",
+      "translation": "API endpoint (e.g. https://api.example.com)"
+   },
+   {
+      "id": "API endpoint:",
+      "translation": "API endpoint:"
+   },
+   {
+      "id": "API endpoint: {{.ApiEndpoint}}",
+      "translation": "API endpoint: {{.ApiEndpoint}}"
+   },
+   {
+      "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
+      "translation": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})"
+   },
+   {
+      "id": "API endpoint: {{.Endpoint}}",
+      "translation": "API endpoint: {{.Endpoint}}"
+   },
+   {
+      "id": "APPS",
+      "translation": "APPS"
+   },
+   {
+      "id": "Acquiring running security groups as '{{.username}}'",
+      "translation": "Acquiring running security groups as '{{.username}}'"
+   },
+   {
+      "id": "Acquiring staging security group as {{.username}}",
+      "translation": "Acquiring staging security group as {{.username}}"
+   },
+   {
+      "id": "Add a url route to an app",
+      "translation": "Add a url route to an app"
+   },
+   {
+      "id": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Also delete any mapped routes",
+      "translation": "Also delete any mapped routes"
+   },
+   {
+      "id": "An org must be targeted before targeting a space",
+      "translation": "An org must be targeted before targeting a space"
+   },
+   {
+      "id": "App ",
+      "translation": "App "
+   },
+   {
+      "id": "App name is a required field",
+      "translation": "App name is a required field"
+   },
+   {
+      "id": "App {{.AppName}} does not exist.",
+      "translation": "App {{.AppName}} does not exist."
+   },
+   {
+      "id": "App {{.AppName}} is a worker, skipping route creation",
+      "translation": "App {{.AppName}} is a worker, skipping route creation"
+   },
+   {
+      "id": "App {{.AppName}} is already bound to {{.ServiceName}}.",
+      "translation": "App {{.AppName}} is already bound to {{.ServiceName}}."
+   },
+   {
+      "id": "Append API request diagnostics to a log file",
+      "translation": "Append API request diagnostics to a log file"
+   },
+   {
+      "id": "Apps:",
+      "translation": "Apps:"
+   },
+   {
+      "id": "Assign a quota to an org",
+      "translation": "Assign a quota to an org"
+   },
+   {
+      "id": "Assign a space role to a user",
+      "translation": "Assign a space role to a user"
+   },
+   {
+      "id": "Assign an org role to a user",
+      "translation": "Assign an org role to a user"
+   },
+   {
+      "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
+      "translation": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+      "translation": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
+      "translation": "Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}..."
+   },
+   {
+      "id": "Attempting to migrate {{.ServiceInstanceDescription}}...",
+      "translation": "Attempting to migrate {{.ServiceInstanceDescription}}..."
+   },
+   {
+      "id": "Authenticate user non-interactively",
+      "translation": "Authenticate user non-interactively"
+   },
+   {
+      "id": "Authenticating...",
+      "translation": "Authenticating..."
+   },
+   {
+      "id": "BILLING MANAGER",
+      "translation": "BILLING MANAGER"
+   },
+   {
+      "id": "BUILD TIME:",
+      "translation": "BUILD TIME:"
+   },
+   {
+      "id": "BUILDPACKS",
+      "translation": "BUILDPACKS"
+   },
+   {
+      "id": "Bind a security group to a space",
+      "translation": "Bind a security group to a space"
+   },
+   {
+      "id": "Bind a security group to the list of security groups to be used for running applications",
+      "translation": "Bind a security group to the list of security groups to be used for running applications"
+   },
+   {
+      "id": "Bind a security group to the list of security groups to be used for staging applications",
+      "translation": "Bind a security group to the list of security groups to be used for staging applications"
+   },
+   {
+      "id": "Bind a service instance to an app",
+      "translation": "Bind a service instance to an app"
+   },
+   {
+      "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
+      "translation": "Binding between {{.InstanceName}} and {{.AppName}} did not exist"
+   },
+   {
+      "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
+      "translation": "Binding security group {{.security_group}} to defaults for running as {{.username}}"
+   },
+   {
+      "id": "Binding security group {{.security_group}} to staging as {{.username}}",
+      "translation": "Binding security group {{.security_group}} to staging as {{.username}}"
+   },
+   {
+      "id": "Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Binding {{.URL}} to {{.AppName}}...",
+      "translation": "Binding {{.URL}} to {{.AppName}}..."
+   },
+   {
+      "id": "Buildpack position among other buildpacks",
+      "translation": "Buildpack position among other buildpacks"
+   },
+   {
+      "id": "Buildpack {{.BuildpackName}} already exists",
+      "translation": "Buildpack {{.BuildpackName}} already exists"
+   },
+   {
+      "id": "Buildpack {{.BuildpackName}} does not exist.",
+      "translation": "Buildpack {{.BuildpackName}} does not exist."
+   },
+   {
+      "id": "Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB",
+      "translation": "Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB"
+   },
+   {
+      "id": "CF_NAME api [URL]",
+      "translation": "CF_NAME api [URL]"
+   },
+   {
+      "id": "CF_NAME app APP",
+      "translation": "CF_NAME app APP"
+   },
+   {
+      "id": "CF_NAME auth USERNAME PASSWORD\n\n",
+      "translation": "CF_NAME auth USERNAME PASSWORD\n\n"
+   },
+   {
+      "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
+      "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
+   },
+   {
+      "id": "CF_NAME bind-service APP SERVICE_INSTANCE",
+      "translation": "CF_NAME bind-service APP SERVICE_INSTANCE"
+   },
+   {
+      "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME buildpacks",
+      "translation": "CF_NAME buildpacks"
+   },
+   {
+      "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]",
+      "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]"
+   },
+   {
+      "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
+      "translation": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]"
+   },
+   {
+      "id": "CF_NAME create-domain ORG DOMAIN",
+      "translation": "CF_NAME create-domain ORG DOMAIN"
+   },
+   {
+      "id": "CF_NAME create-org ORG",
+      "translation": "CF_NAME create-org ORG"
+   },
+   {
+      "id": "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
+      "translation": "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
+   },
+   {
+      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
+      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]"
+   },
+   {
+      "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
+   },
+   {
+      "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME create-service cleardb spark clear-db-mine\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
+      "translation": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME create-service cleardb spark clear-db-mine\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps"
+   },
+   {
+      "id": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
+      "translation": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"
+   },
+   {
+      "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+      "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+   },
+   {
+      "id": "CF_NAME create-shared-domain DOMAIN",
+      "translation": "CF_NAME create-shared-domain DOMAIN"
+   },
+   {
+      "id": "CF_NAME create-space SPACE [-o ORG]",
+      "translation": "CF_NAME create-space SPACE [-o ORG]"
+   },
+   {
+      "id": "CF_NAME create-user USERNAME PASSWORD",
+      "translation": "CF_NAME create-user USERNAME PASSWORD"
+   },
+   {
+      "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
+      "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n"
+   },
+   {
+      "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
+      "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]"
+   },
+   {
+      "id": "CF_NAME delete APP [-f -r]",
+      "translation": "CF_NAME delete APP [-f -r]"
+   },
+   {
+      "id": "CF_NAME delete-buildpack BUILDPACK [-f]",
+      "translation": "CF_NAME delete-buildpack BUILDPACK [-f]"
+   },
+   {
+      "id": "CF_NAME delete-domain DOMAIN [-f]",
+      "translation": "CF_NAME delete-domain DOMAIN [-f]"
+   },
+   {
+      "id": "CF_NAME delete-org ORG [-f]",
+      "translation": "CF_NAME delete-org ORG [-f]"
+   },
+   {
+      "id": "CF_NAME delete-orphaned-routes [-f]",
+      "translation": "CF_NAME delete-orphaned-routes [-f]"
+   },
+   {
+      "id": "CF_NAME delete-quota QUOTA [-f]",
+      "translation": "CF_NAME delete-quota QUOTA [-f]"
+   },
+   {
+      "id": "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]",
+      "translation": "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]"
+   },
+   {
+      "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
+      "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
+   },
+   {
+      "id": "CF_NAME delete-service SERVICE_INSTANCE [-f]",
+      "translation": "CF_NAME delete-service SERVICE_INSTANCE [-f]"
+   },
+   {
+      "id": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]",
+      "translation": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"
+   },
+   {
+      "id": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
+      "translation": "CF_NAME delete-service-broker SERVICE_BROKER [-f]"
+   },
+   {
+      "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
+      "translation": "CF_NAME delete-shared-domain DOMAIN [-f]"
+   },
+   {
+      "id": "CF_NAME delete-space SPACE [-f]",
+      "translation": "CF_NAME delete-space SPACE [-f]"
+   },
+   {
+      "id": "CF_NAME delete-user USERNAME [-f]",
+      "translation": "CF_NAME delete-user USERNAME [-f]"
+   },
+   {
+      "id": "CF_NAME env APP",
+      "translation": "CF_NAME env APP"
+   },
+   {
+      "id": "CF_NAME events APP",
+      "translation": "CF_NAME events APP"
+   },
+   {
+      "id": "CF_NAME files APP [PATH]",
+      "translation": "CF_NAME files APP [PATH]"
+   },
+   {
+      "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
+      "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"
+   },
+   {
+      "id": "CF_NAME logout",
+      "translation": "CF_NAME logout"
+   },
+   {
+      "id": "CF_NAME logs APP",
+      "translation": "CF_NAME logs APP"
+   },
+   {
+      "id": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
+      "translation": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]"
+   },
+   {
+      "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
+      "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n"
+   },
+   {
+      "id": "CF_NAME org ORG",
+      "translation": "CF_NAME org ORG"
+   },
+   {
+      "id": "CF_NAME org-users ORG",
+      "translation": "CF_NAME org-users ORG"
+   },
+   {
+      "id": "CF_NAME passwd",
+      "translation": "CF_NAME passwd"
+   },
+   {
+      "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]",
+      "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]"
+   },
+   {
+      "id": "CF_NAME quota QUOTA",
+      "translation": "CF_NAME quota QUOTA"
+   },
+   {
+      "id": "CF_NAME quotas",
+      "translation": "CF_NAME quotas"
+   },
+   {
+      "id": "CF_NAME rename APP_NAME NEW_APP_NAME",
+      "translation": "CF_NAME rename APP_NAME NEW_APP_NAME"
+   },
+   {
+      "id": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
+      "translation": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"
+   },
+   {
+      "id": "CF_NAME rename-org ORG NEW_ORG",
+      "translation": "CF_NAME rename-org ORG NEW_ORG"
+   },
+   {
+      "id": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
+      "translation": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"
+   },
+   {
+      "id": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
+      "translation": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"
+   },
+   {
+      "id": "CF_NAME rename-space SPACE NEW_SPACE",
+      "translation": "CF_NAME rename-space SPACE NEW_SPACE"
+   },
+   {
+      "id": "CF_NAME restage APP",
+      "translation": "CF_NAME restage APP"
+   },
+   {
+      "id": "CF_NAME restart APP",
+      "translation": "CF_NAME restart APP"
+   },
+   {
+      "id": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+      "translation": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"
+   },
+   {
+      "id": "CF_NAME security-group SECURITY_GROUP",
+      "translation": "CF_NAME security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME service SERVICE_INSTANCE",
+      "translation": "CF_NAME service SERVICE_INSTANCE"
+   },
+   {
+      "id": "CF_NAME service-auth-tokens",
+      "translation": "CF_NAME service-auth-tokens"
+   },
+   {
+      "id": "CF_NAME set-env APP NAME VALUE",
+      "translation": "CF_NAME set-env APP NAME VALUE"
+   },
+   {
+      "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
+      "translation": "CF_NAME set-org-role USERNAME ORG ROLE\n\n"
+   },
+   {
+      "id": "CF_NAME set-quota ORG QUOTA\n\n",
+      "translation": "CF_NAME set-quota ORG QUOTA\n\n"
+   },
+   {
+      "id": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n",
+      "translation": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n"
+   },
+   {
+      "id": "CF_NAME space SPACE",
+      "translation": "CF_NAME space SPACE"
+   },
+   {
+      "id": "CF_NAME space-users ORG SPACE",
+      "translation": "CF_NAME space-users ORG SPACE"
+   },
+   {
+      "id": "CF_NAME spaces",
+      "translation": "CF_NAME spaces"
+   },
+   {
+      "id": "CF_NAME stacks",
+      "translation": "CF_NAME stacks"
+   },
+   {
+      "id": "CF_NAME start APP",
+      "translation": "CF_NAME start APP"
+   },
+   {
+      "id": "CF_NAME stop APP",
+      "translation": "CF_NAME stop APP"
+   },
+   {
+      "id": "CF_NAME target [-o ORG] [-s SPACE]",
+      "translation": "CF_NAME target [-o ORG] [-s SPACE]"
+   },
+   {
+      "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE",
+      "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
+   },
+   {
+      "id": "CF_NAME unbind-service APP SERVICE_INSTANCE",
+      "translation": "CF_NAME unbind-service APP SERVICE_INSTANCE"
+   },
+   {
+      "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
+      "translation": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]"
+   },
+   {
+      "id": "CF_NAME unset-env APP NAME",
+      "translation": "CF_NAME unset-env APP NAME"
+   },
+   {
+      "id": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n",
+      "translation": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n"
+   },
+   {
+      "id": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n",
+      "translation": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n"
+   },
+   {
+      "id": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]",
+      "translation": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]"
+   },
+   {
+      "id": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
+      "translation": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
+   },
+   {
+      "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
+   },
+   {
+      "id": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
+      "translation": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"
+   },
+   {
+      "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+      "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+   },
+   {
+      "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\nEXAMPLE:\n   CF_NAME update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com",
+      "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\nEXAMPLE:\n   CF_NAME update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com"
+   },
+   {
+      "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
+      "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
+   },
+   {
+      "id": "Can provision instances of paid service plans",
+      "translation": "Can provision instances of paid service plans"
+   },
+   {
+      "id": "Cannot list marketplace services without a targeted space",
+      "translation": "Cannot list marketplace services without a targeted space"
+   },
+   {
+      "id": "Cannot provision instances of paid service plans",
+      "translation": "Cannot provision instances of paid service plans"
+   },
+   {
+      "id": "Cannot specify both lock and unlock options.",
+      "translation": "Cannot specify both lock and unlock options."
+   },
+   {
+      "id": "Cannot specify both {{.Enabled}} and {{.Disabled}}.",
+      "translation": "Cannot specify both {{.Enabled}} and {{.Disabled}}."
+   },
+   {
+      "id": "Cannot specify buildpack bits and lock/unlock.",
+      "translation": "Cannot specify buildpack bits and lock/unlock."
+   },
+   {
+      "id": "Change or view the instance count, disk space limit, and memory limit for an app",
+      "translation": "Change or view the instance count, disk space limit, and memory limit for an app"
+   },
+   {
+      "id": "Change user password",
+      "translation": "Change user password"
+   },
+   {
+      "id": "Changing password...",
+      "translation": "Changing password..."
+   },
+   {
+      "id": "Command not found",
+      "translation": "Command not found"
+   },
+   {
+      "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+      "translation": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n"
+   },
+   {
+      "id": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+      "translation": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n"
+   },
+   {
+      "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
+      "translation": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}"
+   },
+   {
+      "id": "Could not determine the current working directory!",
+      "translation": "Could not determine the current working directory!"
+   },
+   {
+      "id": "Could not find a default domain",
+      "translation": "Could not find a default domain"
+   },
+   {
+      "id": "Could not find any offerings with name {{.ServiceOfferingName}}",
+      "translation": "Could not find any offerings with name {{.ServiceOfferingName}}"
+   },
+   {
+      "id": "Could not find app named '{{.AppName}}' in manifest",
+      "translation": "Could not find app named '{{.AppName}}' in manifest"
+   },
+   {
+      "id": "Could not find plan with name {{.ServicePlanName}}",
+      "translation": "Could not find plan with name {{.ServicePlanName}}"
+   },
+   {
+      "id": "Could not find service {{.ServiceName}} to bind to {{.AppName}}",
+      "translation": "Could not find service {{.ServiceName}} to bind to {{.AppName}}"
+   },
+   {
+      "id": "Could not parse version number: {{.Input}}",
+      "translation": "Could not parse version number: {{.Input}}"
+   },
+   {
+      "id": "Could not serialize information",
+      "translation": "Could not serialize information"
+   },
+   {
+      "id": "Could not serialize updates.",
+      "translation": "Could not serialize updates."
+   },
+   {
+      "id": "Could not target org.\n{{.ApiErr}}",
+      "translation": "Could not target org.\n{{.ApiErr}}"
+   },
+   {
+      "id": "Couldn't create temp file for upload",
+      "translation": "Couldn't create temp file for upload"
+   },
+   {
+      "id": "Couldn't open buildpack file",
+      "translation": "Couldn't open buildpack file"
+   },
+   {
+      "id": "Couldn't write zip file",
+      "translation": "Couldn't write zip file"
+   },
+   {
+      "id": "Create a buildpack",
+      "translation": "Create a buildpack"
+   },
+   {
+      "id": "Create a domain in an org for later use",
+      "translation": "Create a domain in an org for later use"
+   },
+   {
+      "id": "Create a domain that can be used by all orgs (admin-only)",
+      "translation": "Create a domain that can be used by all orgs (admin-only)"
+   },
+   {
+      "id": "Create a new user",
+      "translation": "Create a new user"
+   },
+   {
+      "id": "Create a random route for this app",
+      "translation": "Create a random route for this app"
+   },
+   {
+      "id": "Create a security group",
+      "translation": "Create a security group"
+   },
+   {
+      "id": "Create a service auth token",
+      "translation": "Create a service auth token"
+   },
+   {
+      "id": "Create a service broker",
+      "translation": "Create a service broker"
+   },
+   {
+      "id": "Create a service instance",
+      "translation": "Create a service instance"
+   },
+   {
+      "id": "Create a space",
+      "translation": "Create a space"
+   },
+   {
+      "id": "Create a url route in a space for later use",
+      "translation": "Create a url route in a space for later use"
+   },
+   {
+      "id": "Create an org",
+      "translation": "Create an org"
+   },
+   {
+      "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating buildpack {{.BuildpackName}}...",
+      "translation": "Creating buildpack {{.BuildpackName}}..."
+   },
+   {
+      "id": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
+      "translation": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating org {{.OrgName}} as {{.Username}}...",
+      "translation": "Creating org {{.OrgName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Creating quota {{.QuotaName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating route {{.Hostname}}...",
+      "translation": "Creating route {{.Hostname}}..."
+   },
+   {
+      "id": "Creating security group {{.security_group}} as {{.username}}",
+      "translation": "Creating security group {{.security_group}} as {{.username}}"
+   },
+   {
+      "id": "Creating service auth token as {{.CurrentUser}}...",
+      "translation": "Creating service auth token as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Creating service broker {{.Name}} as {{.Username}}...",
+      "translation": "Creating service broker {{.Name}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Creating service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Creating shared domain {{.DomainName}} as {{.Username}}...",
+      "translation": "Creating shared domain {{.DomainName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+      "translation": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Creating user {{.TargetUser}} as {{.CurrentUser}}...",
+      "translation": "Creating user {{.TargetUser}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Credentials were rejected, please try again.",
+      "translation": "Credentials were rejected, please try again."
+   },
+   {
+      "id": "Current Password",
+      "translation": "Current Password"
+   },
+   {
+      "id": "Current password did not match",
+      "translation": "Current password did not match"
+   },
+   {
+      "id": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)",
+      "translation": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"
+   },
+   {
+      "id": "Custom headers to include in the request, flag can be specified multiple times",
+      "translation": "Custom headers to include in the request, flag can be specified multiple times"
+   },
+   {
+      "id": "DOMAINS",
+      "translation": "DOMAINS"
+   },
+   {
+      "id": "Define a new resource quota",
+      "translation": "Define a new resource quota"
+   },
+   {
+      "id": "Delete a buildpack",
+      "translation": "Delete a buildpack"
+   },
+   {
+      "id": "Delete a domain",
+      "translation": "Delete a domain"
+   },
+   {
+      "id": "Delete a quota",
+      "translation": "Delete a quota"
+   },
+   {
+      "id": "Delete a route",
+      "translation": "Delete a route"
+   },
+   {
+      "id": "Delete a service auth token",
+      "translation": "Delete a service auth token"
+   },
+   {
+      "id": "Delete a service broker",
+      "translation": "Delete a service broker"
+   },
+   {
+      "id": "Delete a service instance",
+      "translation": "Delete a service instance"
+   },
+   {
+      "id": "Delete a shared domain",
+      "translation": "Delete a shared domain"
+   },
+   {
+      "id": "Delete a space",
+      "translation": "Delete a space"
+   },
+   {
+      "id": "Delete a user",
+      "translation": "Delete a user"
+   },
+   {
+      "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+      "translation": "Delete all orphaned routes (e.g.: those that are not mapped to an app)"
+   },
+   {
+      "id": "Delete an app",
+      "translation": "Delete an app"
+   },
+   {
+      "id": "Delete an org",
+      "translation": "Delete an org"
+   },
+   {
+      "id": "Delete cancelled",
+      "translation": "Delete cancelled"
+   },
+   {
+      "id": "Deletes a security group",
+      "translation": "Deletes a security group"
+   },
+   {
+      "id": "Deleting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Deleting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Deleting buildpack {{.BuildpackName}}...",
+      "translation": "Deleting buildpack {{.BuildpackName}}..."
+   },
+   {
+      "id": "Deleting domain {{.DomainName}} as {{.ApiErr}}...",
+      "translation": "Deleting domain {{.DomainName}} as {{.ApiErr}}..."
+   },
+   {
+      "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
+      "translation": "Deleting domain {{.DomainName}} as {{.Username}}..."
+   },
+   {
+      "id": "Deleting org {{.OrgName}} as {{.Username}}...",
+      "translation": "Deleting org {{.OrgName}} as {{.Username}}..."
+   },
+   {
+      "id": "Deleting quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Deleting quota {{.QuotaName}} as {{.Username}}..."
+   },
+   {
+      "id": "Deleting route {{.Route}}...",
+      "translation": "Deleting route {{.Route}}..."
+   },
+   {
+      "id": "Deleting route {{.URL}}...",
+      "translation": "Deleting route {{.URL}}..."
+   },
+   {
+      "id": "Deleting security group {{.security_group}} as {{.username}}",
+      "translation": "Deleting security group {{.security_group}} as {{.username}}"
+   },
+   {
+      "id": "Deleting service auth token as {{.CurrentUser}}",
+      "translation": "Deleting service auth token as {{.CurrentUser}}"
+   },
+   {
+      "id": "Deleting service broker {{.Name}} as {{.Username}}...",
+      "translation": "Deleting service broker {{.Name}} as {{.Username}}..."
+   },
+   {
+      "id": "Deleting service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Deleting service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+      "translation": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Deleting user {{.TargetUser}} as {{.CurrentUser}}...",
+      "translation": "Deleting user {{.TargetUser}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Description: {{.ServiceDescription}}",
+      "translation": "Description: {{.ServiceDescription}}"
+   },
+   {
+      "id": "Disable the buildpack",
+      "translation": "Disable the buildpack"
+   },
+   {
+      "id": "Disk limit (e.g. 256M, 1024M, 1G)",
+      "translation": "Disk limit (e.g. 256M, 1024M, 1G)"
+   },
+   {
+      "id": "Display health and status for app",
+      "translation": "Display health and status for app"
+   },
+   {
+      "id": "Do not colorize output",
+      "translation": "Do not colorize output"
+   },
+   {
+      "id": "Do not map a route to this app",
+      "translation": "Do not map a route to this app"
+   },
+   {
+      "id": "Do not start an app after pushing",
+      "translation": "Do not start an app after pushing"
+   },
+   {
+      "id": "Documentation url: {{.URL}}",
+      "translation": "Documentation url: {{.URL}}"
+   },
+   {
+      "id": "Domain (e.g. example.com)",
+      "translation": "Domain (e.g. example.com)"
+   },
+   {
+      "id": "Domains:",
+      "translation": "Domains:"
+   },
+   {
+      "id": "Dump recent logs instead of tailing",
+      "translation": "Dump recent logs instead of tailing"
+   },
+   {
+      "id": "ENVIRONMENT VARIABLES",
+      "translation": "ENVIRONMENT VARIABLES"
+   },
+   {
+      "id": "EXAMPLE:\n",
+      "translation": "EXAMPLE:\n"
+   },
+   {
+      "id": "Enable CF_TRACE output for all requests and responses",
+      "translation": "Enable CF_TRACE output for all requests and responses"
+   },
+   {
+      "id": "Enable HTTP proxying for API requests",
+      "translation": "Enable HTTP proxying for API requests"
+   },
+   {
+      "id": "Enable or disable color",
+      "translation": "Enable or disable color"
+   },
+   {
+      "id": "Enable the buildpack",
+      "translation": "Enable the buildpack"
+   },
+   {
+      "id": "Env variable {{.VarName}} was not set.",
+      "translation": "Env variable {{.VarName}} was not set."
+   },
+   {
+      "id": "Error building request",
+      "translation": "Error building request"
+   },
+   {
+      "id": "Error creating request:\n{{.Err}}",
+      "translation": "Error creating request:\n{{.Err}}"
+   },
+   {
+      "id": "Error creating tmp file: {{.Err}}",
+      "translation": "Error creating tmp file: {{.Err}}"
+   },
+   {
+      "id": "Error creating upload",
+      "translation": "Error creating upload"
+   },
+   {
+      "id": "Error creating user {{.TargetUser}}.\n{{.Error}}",
+      "translation": "Error creating user {{.TargetUser}}.\n{{.Error}}"
+   },
+   {
+      "id": "Error deleting buildpack {{.Name}}\n{{.Error}}",
+      "translation": "Error deleting buildpack {{.Name}}\n{{.Error}}"
+   },
+   {
+      "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
+      "translation": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}"
+   },
+   {
+      "id": "Error dumping request\n{{.Err}}\n",
+      "translation": "Error dumping request\n{{.Err}}\n"
+   },
+   {
+      "id": "Error dumping response\n{{.Err}}\n",
+      "translation": "Error dumping response\n{{.Err}}\n"
+   },
+   {
+      "id": "Error finding available orgs\n{{.ApiErr}}",
+      "translation": "Error finding available orgs\n{{.ApiErr}}"
+   },
+   {
+      "id": "Error finding available spaces\n{{.Err}}",
+      "translation": "Error finding available spaces\n{{.Err}}"
+   },
+   {
+      "id": "Error finding command {{.CmdName}}\n",
+      "translation": "Error finding command {{.CmdName}}\n"
+   },
+   {
+      "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
+      "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}"
+   },
+   {
+      "id": "Error finding manifest",
+      "translation": "Error finding manifest"
+   },
+   {
+      "id": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
+      "translation": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "Error finding org {{.OrgName}}\n{{.Err}}",
+      "translation": "Error finding org {{.OrgName}}\n{{.Err}}"
+   },
+   {
+      "id": "Error finding space {{.SpaceName}}\n{{.Err}}",
+      "translation": "Error finding space {{.SpaceName}}\n{{.Err}}"
+   },
+   {
+      "id": "Error in requirement",
+      "translation": "Error in requirement"
+   },
+   {
+      "id": "Error marshaling JSON",
+      "translation": "Error marshaling JSON"
+   },
+   {
+      "id": "Error opening buildpack file",
+      "translation": "Error opening buildpack file"
+   },
+   {
+      "id": "Error parsing JSON",
+      "translation": "Error parsing JSON"
+   },
+   {
+      "id": "Error parsing headers",
+      "translation": "Error parsing headers"
+   },
+   {
+      "id": "Error performing request",
+      "translation": "Error performing request"
+   },
+   {
+      "id": "Error reading manifest file:\n{{.Err}}",
+      "translation": "Error reading manifest file:\n{{.Err}}"
+   },
+   {
+      "id": "Error reading response",
+      "translation": "Error reading response"
+   },
+   {
+      "id": "Error renaming buildpack {{.Name}}\n{{.Error}}",
+      "translation": "Error renaming buildpack {{.Name}}\n{{.Error}}"
+   },
+   {
+      "id": "Error resolving route:\n{{.Err}}",
+      "translation": "Error resolving route:\n{{.Err}}"
+   },
+   {
+      "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
+      "translation": "Error updating buildpack {{.Name}}\n{{.Error}}"
+   },
+   {
+      "id": "Error uploading application.\n{{.ApiErr}}",
+      "translation": "Error uploading application.\n{{.ApiErr}}"
+   },
+   {
+      "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
+      "translation": "Error uploading buildpack {{.Name}}\n{{.Error}}"
+   },
+   {
+      "id": "Error writing to manifest file:{{.FilePath}}\n{{.Err}}",
+      "translation": "Error writing to manifest file:{{.FilePath}}\n{{.Err}}"
+   },
+   {
+      "id": "Error writing to tmp file: {{.Err}}",
+      "translation": "Error writing to tmp file: {{.Err}}"
+   },
+   {
+      "id": "Error zipping application",
+      "translation": "Error zipping application"
+   },
+   {
+      "id": "Error: No name found for app",
+      "translation": "Error: No name found for app"
+   },
+   {
+      "id": "Error: timed out waiting for async job '{{.ErrURL}}' to finish",
+      "translation": "Error: timed out waiting for async job '{{.ErrURL}}' to finish"
+   },
+   {
+      "id": "Error: {{.Err}}",
+      "translation": "Error: {{.Err}}"
+   },
+   {
+      "id": "Executes a raw request, content-type set to application/json by default",
+      "translation": "Executes a raw request, content-type set to application/json by default"
+   },
+   {
+      "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
+      "translation": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'"
+   },
+   {
+      "id": "Expected applications to be a list",
+      "translation": "Expected applications to be a list"
+   },
+   {
+      "id": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
+      "translation": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}."
+   },
+   {
+      "id": "Expected {{.Name}} to be a set of key => value, but it was a {{.Type}}.",
+      "translation": "Expected {{.Name}} to be a set of key => value, but it was a {{.Type}}."
+   },
+   {
+      "id": "Expected {{.PropertyName}} to be a boolean.",
+      "translation": "Expected {{.PropertyName}} to be a boolean."
+   },
+   {
+      "id": "Expected {{.PropertyName}} to be a list of strings.",
+      "translation": "Expected {{.PropertyName}} to be a list of strings."
+   },
+   {
+      "id": "Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}.",
+      "translation": "Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}."
+   },
+   {
+      "id": "FAILED",
+      "translation": "FAILED"
+   },
+   {
+      "id": "Failed fetching buildpacks.\n{{.Error}}",
+      "translation": "Failed fetching buildpacks.\n{{.Error}}"
+   },
+   {
+      "id": "Failed fetching domains.\n{{.ApiErr}}",
+      "translation": "Failed fetching domains.\n{{.ApiErr}}"
+   },
+   {
+      "id": "Failed fetching events.\n{{.ApiErr}}",
+      "translation": "Failed fetching events.\n{{.ApiErr}}"
+   },
+   {
+      "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
+      "translation": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}"
+   },
+   {
+      "id": "Failed fetching orgs.\n{{.ApiErr}}",
+      "translation": "Failed fetching orgs.\n{{.ApiErr}}"
+   },
+   {
+      "id": "Failed fetching routes.\n{{.Err}}",
+      "translation": "Failed fetching routes.\n{{.Err}}"
+   },
+   {
+      "id": "Failed fetching service brokers.\n{{.Error}}",
+      "translation": "Failed fetching service brokers.\n{{.Error}}"
+   },
+   {
+      "id": "Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
+      "translation": "Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}"
+   },
+   {
+      "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
+      "translation": "Failed fetching spaces.\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "Failed to create json for resource_match request",
+      "translation": "Failed to create json for resource_match request"
+   },
+   {
+      "id": "Failed to marshal JSON",
+      "translation": "Failed to marshal JSON"
+   },
+   {
+      "id": "Failed to start oauth request",
+      "translation": "Failed to start oauth request"
+   },
+   {
+      "id": "Force deletion without confirmation",
+      "translation": "Force deletion without confirmation"
+   },
+   {
+      "id": "Force migration without confirmation",
+      "translation": "Force migration without confirmation"
+   },
+   {
+      "id": "Force restart of app without prompt",
+      "translation": "Force restart of app without prompt"
+   },
+   {
+      "id": "GETTING STARTED",
+      "translation": "GETTING STARTED"
+   },
+   {
+      "id": "GLOBAL OPTIONS",
+      "translation": "GLOBAL OPTIONS"
+   },
+   {
+      "id": "Getting all services from marketplace...",
+      "translation": "Getting all services from marketplace..."
+   },
+   {
+      "id": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Getting buildpacks...\n",
+      "translation": "Getting buildpacks...\n"
+   },
+   {
+      "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
+      "translation": "Getting domains in org {{.OrgName}} as {{.Username}}..."
+   },
+   {
+      "id": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Getting events for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+      "translation": "Getting events for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n"
+   },
+   {
+      "id": "Getting files for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Getting files for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
+      "translation": "Getting info for org {{.OrgName}} as {{.Username}}..."
+   },
+   {
+      "id": "Getting info for security group {{.security_group}} as {{.username}}",
+      "translation": "Getting info for security group {{.security_group}} as {{.username}}"
+   },
+   {
+      "id": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
+      "translation": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Getting orgs as {{.Username}}...\n",
+      "translation": "Getting orgs as {{.Username}}...\n"
+   },
+   {
+      "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
+      "translation": "Getting quota {{.QuotaName}} info as {{.Username}}..."
+   },
+   {
+      "id": "Getting quotas as {{.Username}}...",
+      "translation": "Getting quotas as {{.Username}}..."
+   },
+   {
+      "id": "Getting routes as {{.Username}} ...\n",
+      "translation": "Getting routes as {{.Username}} ...\n"
+   },
+   {
+      "id": "Getting security groups as {{.username}}",
+      "translation": "Getting security groups as {{.username}}"
+   },
+   {
+      "id": "Getting service auth tokens as {{.CurrentUser}}...",
+      "translation": "Getting service auth tokens as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Getting service brokers as {{.Username}}...\n",
+      "translation": "Getting service brokers as {{.Username}}...\n"
+   },
+   {
+      "id": "Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
+      "translation": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n"
+   },
+   {
+      "id": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
+      "translation": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}"
+   },
+   {
+      "id": "Getting users in org {{.TargetOrg}} as {{.CurrentUser}}...",
+      "translation": "Getting users in org {{.TargetOrg}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "HTTP data to include in the request body",
+      "translation": "HTTP data to include in the request body"
+   },
+   {
+      "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
+      "translation": "HTTP method (GET,POST,PUT,DELETE,etc)"
+   },
+   {
+      "id": "Hostname",
+      "translation": "Hostname"
+   },
+   {
+      "id": "Hostname (e.g. my-subdomain)",
+      "translation": "Hostname (e.g. my-subdomain)"
+   },
+   {
+      "id": "Ignore manifest file",
+      "translation": "Ignore manifest file"
+   },
+   {
+      "id": "Include response headers in the output",
+      "translation": "Include response headers in the output"
+   },
+   {
+      "id": "Incorrect Usage",
+      "translation": "Incorrect Usage"
+   },
+   {
+      "id": "Incorrect Usage.\n",
+      "translation": "Incorrect Usage.\n"
+   },
+   {
+      "id": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
+      "translation": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file."
+   },
+   {
+      "id": "Incorrect number of arguments",
+      "translation": "Incorrect number of arguments"
+   },
+   {
+      "id": "Incorrect usage",
+      "translation": "Incorrect usage"
+   },
+   {
+      "id": "Invalid JSON response from server",
+      "translation": "Invalid JSON response from server"
+   },
+   {
+      "id": "Invalid Role {{.Role}}",
+      "translation": "Invalid Role {{.Role}}"
+   },
+   {
+      "id": "Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
+      "translation": "Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}"
+   },
+   {
+      "id": "Invalid async response from server",
+      "translation": "Invalid async response from server"
+   },
+   {
+      "id": "Invalid auth token: ",
+      "translation": "Invalid auth token: "
+   },
+   {
+      "id": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
+      "translation": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "Invalid disk quota: {{.DiskQuota}}\n{{.Err}}",
+      "translation": "Invalid disk quota: {{.DiskQuota}}\n{{.Err}}"
+   },
+   {
+      "id": "Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer",
+      "translation": "Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer"
+   },
+   {
+      "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
+      "translation": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer"
+   },
+   {
+      "id": "Invalid manifest. Expected a map",
+      "translation": "Invalid manifest. Expected a map"
+   },
+   {
+      "id": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
+      "translation": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}"
+   },
+   {
+      "id": "Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}",
+      "translation": "Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}"
+   },
+   {
+      "id": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
+      "translation": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "Invalid position. {{.ErrorDescription}}",
+      "translation": "Invalid position. {{.ErrorDescription}}"
+   },
+   {
+      "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
+      "translation": "Invalid timeout param: {{.Timeout}}\n{{.Err}}"
+   },
+   {
+      "id": "Invalid usage",
+      "translation": "Invalid usage"
+   },
+   {
+      "id": "JSON is invalid: {{.ErrorDescription}}",
+      "translation": "JSON is invalid: {{.ErrorDescription}}"
+   },
+   {
+      "id": "List all apps in the target space",
+      "translation": "List all apps in the target space"
+   },
+   {
+      "id": "List all buildpacks",
+      "translation": "List all buildpacks"
+   },
+   {
+      "id": "List all orgs",
+      "translation": "List all orgs"
+   },
+   {
+      "id": "List all routes in the current space",
+      "translation": "List all routes in the current space"
+   },
+   {
+      "id": "List all security groups",
+      "translation": "List all security groups"
+   },
+   {
+      "id": "List all service instances in the target space",
+      "translation": "List all service instances in the target space"
+   },
+   {
+      "id": "List all spaces in an org",
+      "translation": "List all spaces in an org"
+   },
+   {
+      "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"
+   },
+   {
+      "id": "List all users in the org",
+      "translation": "List all users in the org"
+   },
+   {
+      "id": "List available offerings in the marketplace",
+      "translation": "List available offerings in the marketplace"
+   },
+   {
+      "id": "List available usage quotas",
+      "translation": "List available usage quotas"
+   },
+   {
+      "id": "List domains in the target org",
+      "translation": "List domains in the target org"
+   },
+   {
+      "id": "List security groups in the set of security groups for running applications",
+      "translation": "List security groups in the set of security groups for running applications"
+   },
+   {
+      "id": "List security groups in the staging set for applications",
+      "translation": "List security groups in the staging set for applications"
+   },
+   {
+      "id": "List service auth tokens",
+      "translation": "List service auth tokens"
+   },
+   {
+      "id": "List service brokers",
+      "translation": "List service brokers"
+   },
+   {
+      "id": "Lock the buildpack",
+      "translation": "Lock the buildpack"
+   },
+   {
+      "id": "Log user in",
+      "translation": "Log user in"
+   },
+   {
+      "id": "Log user out",
+      "translation": "Log user out"
+   },
+   {
+      "id": "Logging out...",
+      "translation": "Logging out..."
+   },
+   {
+      "id": "Loggregator endpoint missing from config file",
+      "translation": "Loggregator endpoint missing from config file"
+   },
+   {
+      "id": "Make a user-provided service instance available to cf apps",
+      "translation": "Make a user-provided service instance available to cf apps"
+   },
+   {
+      "id": "Map the root domain to this app",
+      "translation": "Map the root domain to this app"
+   },
+   {
+      "id": "Max wait time for app instance startup, in minutes",
+      "translation": "Max wait time for app instance startup, in minutes"
+   },
+   {
+      "id": "Max wait time for buildpack staging, in minutes",
+      "translation": "Max wait time for buildpack staging, in minutes"
+   },
+   {
+      "id": "Memory",
+      "translation": "Memory"
+   },
+   {
+      "id": "Memory limit (e.g. 256M, 1024M, 1G)",
+      "translation": "Memory limit (e.g. 256M, 1024M, 1G)"
+   },
+   {
+      "id": "Migrate service instances from one service plan to another",
+      "translation": "Migrate service instances from one service plan to another"
+   },
+   {
+      "id": "NAME:",
+      "translation": "NAME:"
+   },
+   {
+      "id": "Name",
+      "translation": "Name"
+   },
+   {
+      "id": "New Password",
+      "translation": "New Password"
+   },
+   {
+      "id": "New name",
+      "translation": "New name"
+   },
+   {
+      "id": "No API endpoint targeted. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
+      "translation": "No API endpoint targeted. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint."
+   },
+   {
+      "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
+      "translation": "No api endpoint set. Use '{{.Name}}' to set an endpoint"
+   },
+   {
+      "id": "No apps found",
+      "translation": "No apps found"
+   },
+   {
+      "id": "No buildpacks found",
+      "translation": "No buildpacks found"
+   },
+   {
+      "id": "No domains found",
+      "translation": "No domains found"
+   },
+   {
+      "id": "No events for app {{.AppName}}",
+      "translation": "No events for app {{.AppName}}"
+   },
+   {
+      "id": "No flags specified. No changes were made.",
+      "translation": "No flags specified. No changes were made."
+   },
+   {
+      "id": "No org and space targeted, use '{{.Command}}' to target an org and space",
+      "translation": "No org and space targeted, use '{{.Command}}' to target an org and space"
+   },
+   {
+      "id": "No org or space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "No org or space targeted, use '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "No org targeted, use '{{.CFTargetCommand}}'",
+      "translation": "No org targeted, use '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "No org targeted, use '{{.Command}}' to target an org.",
+      "translation": "No org targeted, use '{{.Command}}' to target an org."
+   },
+   {
+      "id": "No orgs found",
+      "translation": "No orgs found"
+   },
+   {
+      "id": "No routes found",
+      "translation": "No routes found"
+   },
+   {
+      "id": "No running security groups set",
+      "translation": "No running security groups set"
+   },
+   {
+      "id": "No security groups",
+      "translation": "No security groups"
+   },
+   {
+      "id": "No service brokers found",
+      "translation": "No service brokers found"
+   },
+   {
+      "id": "No service offerings found",
+      "translation": "No service offerings found"
+   },
+   {
+      "id": "No services found",
+      "translation": "No services found"
+   },
+   {
+      "id": "No space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "No space targeted, use '{{.CFTargetCommand}}'"
+   },
+   {
+      "id": "No space targeted, use '{{.Command}}' to target a space",
+      "translation": "No space targeted, use '{{.Command}}' to target a space"
+   },
+   {
+      "id": "No spaces assigned",
+      "translation": "No spaces assigned"
+   },
+   {
+      "id": "No spaces found",
+      "translation": "No spaces found"
+   },
+   {
+      "id": "No staging security group set",
+      "translation": "No staging security group set"
+   },
+   {
+      "id": "No system-provided env variables have been set",
+      "translation": "No system-provided env variables have been set"
+   },
+   {
+      "id": "No user-defined env variables have been set",
+      "translation": "No user-defined env variables have been set"
+   },
+   {
+      "id": "None of your application files have changed. Nothing will be uploaded.",
+      "translation": "None of your application files have changed. Nothing will be uploaded."
+   },
+   {
+      "id": "Not logged in. Use '{{.CFLoginCommand}}' to log in.",
+      "translation": "Not logged in. Use '{{.CFLoginCommand}}' to log in."
+   },
+   {
+      "id": "Number of instances",
+      "translation": "Number of instances"
+   },
+   {
+      "id": "OK",
+      "translation": "OK"
+   },
+   {
+      "id": "ORG ADMIN",
+      "translation": "ORG ADMIN"
+   },
+   {
+      "id": "ORG AUDITOR",
+      "translation": "ORG AUDITOR"
+   },
+   {
+      "id": "ORG MANAGER",
+      "translation": "ORG MANAGER"
+   },
+   {
+      "id": "ORGS",
+      "translation": "ORGS"
+   },
+   {
+      "id": "Org",
+      "translation": "Org"
+   },
+   {
+      "id": "Org {{.OrgName}} already exists",
+      "translation": "Org {{.OrgName}} already exists"
+   },
+   {
+      "id": "Org {{.OrgName}} does not exist or is not accessible",
+      "translation": "Org {{.OrgName}} does not exist or is not accessible"
+   },
+   {
+      "id": "Org {{.OrgName}} does not exist.",
+      "translation": "Org {{.OrgName}} does not exist."
+   },
+   {
+      "id": "Org:",
+      "translation": "Org:"
+   },
+   {
+      "id": "Organization",
+      "translation": "Organization"
+   },
+   {
+      "id": "Override path to default config directory",
+      "translation": "Override path to default config directory"
+   },
+   {
+      "id": "Paid service plans",
+      "translation": "Paid service plans"
+   },
+   {
+      "id": "Parameters",
+      "translation": "Parameters"
+   },
+   {
+      "id": "Password",
+      "translation": "Password"
+   },
+   {
+      "id": "Password verification does not match",
+      "translation": "Password verification does not match"
+   },
+   {
+      "id": "Path of app directory or zip file",
+      "translation": "Path of app directory or zip file"
+   },
+   {
+      "id": "Path to directory or zip file",
+      "translation": "Path to directory or zip file"
+   },
+   {
+      "id": "Path to manifest",
+      "translation": "Path to manifest"
+   },
+   {
+      "id": "Plan {{.ServicePlanName}} cannot be found",
+      "translation": "Plan {{.ServicePlanName}} cannot be found"
+   },
+   {
+      "id": "Plan {{.ServicePlanName}} has no service instances to migrate",
+      "translation": "Plan {{.ServicePlanName}} has no service instances to migrate"
+   },
+   {
+      "id": "Plan: {{.ServicePlanName}}",
+      "translation": "Plan: {{.ServicePlanName}}"
+   },
+   {
+      "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
+      "translation": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command."
+   },
+   {
+      "id": "Please don't",
+      "translation": "Please don't"
+   },
+   {
+      "id": "Please log in again",
+      "translation": "Please log in again"
+   },
+   {
+      "id": "Print API request diagnostics to stdout",
+      "translation": "Print API request diagnostics to stdout"
+   },
+   {
+      "id": "Print out a list of files in a directory or the contents of a specific file",
+      "translation": "Print out a list of files in a directory or the contents of a specific file"
+   },
+   {
+      "id": "Print the version",
+      "translation": "Print the version"
+   },
+   {
+      "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
+      "translation": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again."
+   },
+   {
+      "id": "Provider",
+      "translation": "Provider"
+   },
+   {
+      "id": "Purging service {{.ServiceName}}...",
+      "translation": "Purging service {{.ServiceName}}..."
+   },
+   {
+      "id": "Push a new app or sync changes to an existing app",
+      "translation": "Push a new app or sync changes to an existing app"
+   },
+   {
+      "id": "Push a single app (with or without a manifest):\n",
+      "translation": "Push a single app (with or without a manifest):\n"
+   },
+   {
+      "id": "Quota Definition {{.QuotaName}} already exists",
+      "translation": "Quota Definition {{.QuotaName}} already exists"
+   },
+   {
+      "id": "Quota {{.QuotaName}} does not exist",
+      "translation": "Quota {{.QuotaName}} does not exist"
+   },
+   {
+      "id": "REQUEST:",
+      "translation": "REQUEST:"
+   },
+   {
+      "id": "RESPONSE:",
+      "translation": "RESPONSE:"
+   },
+   {
+      "id": "ROLES:\n",
+      "translation": "ROLES:\n"
+   },
+   {
+      "id": "ROUTES",
+      "translation": "ROUTES"
+   },
+   {
+      "id": "Really delete orphaned routes?{{.Prompt}}",
+      "translation": "Really delete orphaned routes?{{.Prompt}}"
+   },
+   {
+      "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
+      "translation": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?"
+   },
+   {
+      "id": "Really delete the {{.ModelType}} {{.ModelName}}?",
+      "translation": "Really delete the {{.ModelType}} {{.ModelName}}?"
+   },
+   {
+      "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?>",
+      "translation": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?>"
+   },
+   {
+      "id": "Really purge service offering {{.ServiceName}} from Cloud Foundry?",
+      "translation": "Really purge service offering {{.ServiceName}} from Cloud Foundry?"
+   },
+   {
+      "id": "Received invalid SSL certificate from ",
+      "translation": "Received invalid SSL certificate from "
+   },
+   {
+      "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
+      "translation": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"
+   },
+   {
+      "id": "Remove a space role from a user",
+      "translation": "Remove a space role from a user"
+   },
+   {
+      "id": "Remove a url route from an app",
+      "translation": "Remove a url route from an app"
+   },
+   {
+      "id": "Remove an env variable",
+      "translation": "Remove an env variable"
+   },
+   {
+      "id": "Remove an org role from a user",
+      "translation": "Remove an org role from a user"
+   },
+   {
+      "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
+      "translation": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+      "translation": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Removing route {{.URL}}...",
+      "translation": "Removing route {{.URL}}..."
+   },
+   {
+      "id": "Rename a buildpack",
+      "translation": "Rename a buildpack"
+   },
+   {
+      "id": "Rename a service broker",
+      "translation": "Rename a service broker"
+   },
+   {
+      "id": "Rename a service instance",
+      "translation": "Rename a service instance"
+   },
+   {
+      "id": "Rename a space",
+      "translation": "Rename a space"
+   },
+   {
+      "id": "Rename an app",
+      "translation": "Rename an app"
+   },
+   {
+      "id": "Rename an org",
+      "translation": "Rename an org"
+   },
+   {
+      "id": "Renaming app {{.AppName}} to {{.NewName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Renaming app {{.AppName}} to {{.NewName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}...",
+      "translation": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}..."
+   },
+   {
+      "id": "Renaming org {{.OrgName}} to {{.NewName}} as {{.Username}}...",
+      "translation": "Renaming org {{.OrgName}} to {{.NewName}} as {{.Username}}..."
+   },
+   {
+      "id": "Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}",
+      "translation": "Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}"
+   },
+   {
+      "id": "Renaming service {{.ServiceName}} to {{.NewServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Renaming service {{.ServiceName}} to {{.NewServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+      "translation": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Restage an app",
+      "translation": "Restage an app"
+   },
+   {
+      "id": "Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Restart an app",
+      "translation": "Restart an app"
+   },
+   {
+      "id": "Route {{.URL}} already exists",
+      "translation": "Route {{.URL}} already exists"
+   },
+   {
+      "id": "Routes",
+      "translation": "Routes"
+   },
+   {
+      "id": "Rules",
+      "translation": "Rules"
+   },
+   {
+      "id": "SECURITY GROUP",
+      "translation": "SECURITY GROUP"
+   },
+   {
+      "id": "SERVICE ADMIN",
+      "translation": "SERVICE ADMIN"
+   },
+   {
+      "id": "SERVICES",
+      "translation": "SERVICES"
+   },
+   {
+      "id": "SPACE AUDITOR",
+      "translation": "SPACE AUDITOR"
+   },
+   {
+      "id": "SPACE DEVELOPER",
+      "translation": "SPACE DEVELOPER"
+   },
+   {
+      "id": "SPACE MANAGER",
+      "translation": "SPACE MANAGER"
+   },
+   {
+      "id": "SPACES",
+      "translation": "SPACES"
+   },
+   {
+      "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Security Groups:",
+      "translation": "Security Groups:"
+   },
+   {
+      "id": "Security group {{.security_group}} does not exist",
+      "translation": "Security group {{.security_group}} does not exist"
+   },
+   {
+      "id": "Security group {{.security_group}} {{.error_message}}",
+      "translation": "Security group {{.security_group}} {{.error_message}}"
+   },
+   {
+      "id": "Select a space (or press enter to skip):",
+      "translation": "Select a space (or press enter to skip):"
+   },
+   {
+      "id": "Select an org (or press enter to skip):",
+      "translation": "Select an org (or press enter to skip):"
+   },
+   {
+      "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
+      "translation": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}"
+   },
+   {
+      "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
+      "translation": "Service Auth Token {{.Label}} {{.Provider}} does not exist."
+   },
+   {
+      "id": "Service Broker {{.Name}} does not exist.",
+      "translation": "Service Broker {{.Name}} does not exist."
+   },
+   {
+      "id": "Service Instance is not user provided",
+      "translation": "Service Instance is not user provided"
+   },
+   {
+      "id": "Service instance: {{.ServiceName}}",
+      "translation": "Service instance: {{.ServiceName}}"
+   },
+   {
+      "id": "Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.",
+      "translation": "Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag."
+   },
+   {
+      "id": "Service {{.ServiceName}} does not exist.",
+      "translation": "Service {{.ServiceName}} does not exist."
+   },
+   {
+      "id": "Service: {{.ServiceDescription}}",
+      "translation": "Service: {{.ServiceDescription}}"
+   },
+   {
+      "id": "Services",
+      "translation": "Services"
+   },
+   {
+      "id": "Services:",
+      "translation": "Services:"
+   },
+   {
+      "id": "Set an env variable for an app",
+      "translation": "Set an env variable for an app"
+   },
+   {
+      "id": "Set or view target api url",
+      "translation": "Set or view target api url"
+   },
+   {
+      "id": "Set or view the targeted org or space",
+      "translation": "Set or view the targeted org or space"
+   },
+   {
+      "id": "Setting api endpoint to {{.Endpoint}}...",
+      "translation": "Setting api endpoint to {{.Endpoint}}..."
+   },
+   {
+      "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
+      "translation": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}..."
+   },
+   {
+      "id": "Show a single security group",
+      "translation": "Show a single security group"
+   },
+   {
+      "id": "Show all env variables for an app",
+      "translation": "Show all env variables for an app"
+   },
+   {
+      "id": "Show help",
+      "translation": "Show help"
+   },
+   {
+      "id": "Show org info",
+      "translation": "Show org info"
+   },
+   {
+      "id": "Show org users by role",
+      "translation": "Show org users by role"
+   },
+   {
+      "id": "Show quota info",
+      "translation": "Show quota info"
+   },
+   {
+      "id": "Show recent app events",
+      "translation": "Show recent app events"
+   },
+   {
+      "id": "Show service instance info",
+      "translation": "Show service instance info"
+   },
+   {
+      "id": "Show space info",
+      "translation": "Show space info"
+   },
+   {
+      "id": "Show space users by role",
+      "translation": "Show space users by role"
+   },
+   {
+      "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Space",
+      "translation": "Space"
+   },
+   {
+      "id": "Space {{.SpaceName}} already exists",
+      "translation": "Space {{.SpaceName}} already exists"
+   },
+   {
+      "id": "Space:",
+      "translation": "Space:"
+   },
+   {
+      "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"
+   },
+   {
+      "id": "Start an app",
+      "translation": "Start an app"
+   },
+   {
+      "id": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
+      "translation": "Start app timeout\n\nTIP: use '{{.Command}}' for more information"
+   },
+   {
+      "id": "Start timeout in seconds",
+      "translation": "Start timeout in seconds"
+   },
+   {
+      "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
+      "translation": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information"
+   },
+   {
+      "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Startup command, set to null to reset to default start command",
+      "translation": "Startup command, set to null to reset to default start command"
+   },
+   {
+      "id": "Stop an app",
+      "translation": "Stop an app"
+   },
+   {
+      "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Syslog Drain Url",
+      "translation": "Syslog Drain Url"
+   },
+   {
+      "id": "System-Provided:",
+      "translation": "System-Provided:"
+   },
+   {
+      "id": "TIP:\n",
+      "translation": "TIP:\n"
+   },
+   {
+      "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+      "translation": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space"
+   },
+   {
+      "id": "TIP: To make these changes take effect, use '{{.CFUnbindCommand}}' to unbind the service, '{{.CFBindComand}}' to rebind, and then '{{.CFRestageCommand}}' to update the app with the new env variables",
+      "translation": "TIP: To make these changes take effect, use '{{.CFUnbindCommand}}' to unbind the service, '{{.CFBindComand}}' to rebind, and then '{{.CFRestageCommand}}' to update the app with the new env variables"
+   },
+   {
+      "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
+      "translation": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint"
+   },
+   {
+      "id": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect",
+      "translation": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect"
+   },
+   {
+      "id": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
+      "translation": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect"
+   },
+   {
+      "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
+      "translation": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack"
+   },
+   {
+      "id": "Tail or show recent logs for an app",
+      "translation": "Tail or show recent logs for an app"
+   },
+   {
+      "id": "Targeted org {{.OrgName}}\n",
+      "translation": "Targeted org {{.OrgName}}\n"
+   },
+   {
+      "id": "Targeted space {{.SpaceName}}\n",
+      "translation": "Targeted space {{.SpaceName}}\n"
+   },
+   {
+      "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
+      "translation": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again."
+   },
+   {
+      "id": "There are no running instances of this app.",
+      "translation": "There are no running instances of this app."
+   },
+   {
+      "id": "There are too many options to display, please type in the name.",
+      "translation": "There are too many options to display, please type in the name."
+   },
+   {
+      "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
+      "translation": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? "
+   },
+   {
+      "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
+      "translation": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?"
+   },
+   {
+      "id": "Timeout for async HTTP requests",
+      "translation": "Timeout for async HTTP requests"
+   },
+   {
+      "id": "Total amount of memory (e.g. 1024M, 1G, 10G)",
+      "translation": "Total amount of memory (e.g. 1024M, 1G, 10G)"
+   },
+   {
+      "id": "Total number of routes",
+      "translation": "Total number of routes"
+   },
+   {
+      "id": "Total number of service instances",
+      "translation": "Total number of service instances"
+   },
+   {
+      "id": "Trace HTTP requests",
+      "translation": "Trace HTTP requests"
+   },
+   {
+      "id": "UAA endpoint missing from config file",
+      "translation": "UAA endpoint missing from config file"
+   },
+   {
+      "id": "USAGE:",
+      "translation": "USAGE:"
+   },
+   {
+      "id": "USER ADMIN",
+      "translation": "USER ADMIN"
+   },
+   {
+      "id": "USERS",
+      "translation": "USERS"
+   },
+   {
+      "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
+      "translation": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}"
+   },
+   {
+      "id": "Unable to authenticate.",
+      "translation": "Unable to authenticate."
+   },
+   {
+      "id": "Unable to delete, route '{{.URL}}' does not exist.",
+      "translation": "Unable to delete, route '{{.URL}}' does not exist."
+   },
+   {
+      "id": "Unbind a security group from a space",
+      "translation": "Unbind a security group from a space"
+   },
+   {
+      "id": "Unbind a security group from the set of security groups for running applications",
+      "translation": "Unbind a security group from the set of security groups for running applications"
+   },
+   {
+      "id": "Unbind a security group from the set of security groups for staging applications",
+      "translation": "Unbind a security group from the set of security groups for staging applications"
+   },
+   {
+      "id": "Unbind a service instance from an app",
+      "translation": "Unbind a service instance from an app"
+   },
+   {
+      "id": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}"
+   },
+   {
+      "id": "Unbinding security group {{.security_group}} from defaults for staging as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from defaults for staging as {{.username}}"
+   },
+   {
+      "id": "Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}"
+   },
+   {
+      "id": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
+      "translation": "Unexpected value for {{.PropertyName}} :\n{{.Error}}"
+   },
+   {
+      "id": "Unlock the buildpack",
+      "translation": "Unlock the buildpack"
+   },
+   {
+      "id": "Update a buildpack",
+      "translation": "Update a buildpack"
+   },
+   {
+      "id": "Update a security group",
+      "translation": "Update a security group"
+   },
+   {
+      "id": "Update a service auth token",
+      "translation": "Update a service auth token"
+   },
+   {
+      "id": "Update a service broker",
+      "translation": "Update a service broker"
+   },
+   {
+      "id": "Update an existing resource quota",
+      "translation": "Update an existing resource quota"
+   },
+   {
+      "id": "Update user-provided service instance name value pairs",
+      "translation": "Update user-provided service instance name value pairs"
+   },
+   {
+      "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Updating buildpack {{.BuildpackName}}...",
+      "translation": "Updating buildpack {{.BuildpackName}}..."
+   },
+   {
+      "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Updating quota {{.QuotaName}} as {{.Username}}..."
+   },
+   {
+      "id": "Updating security group {{.security_group}} as {{.username}}",
+      "translation": "Updating security group {{.security_group}} as {{.username}}"
+   },
+   {
+      "id": "Updating service auth token as {{.CurrentUser}}...",
+      "translation": "Updating service auth token as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Updating service broker {{.Name}} as {{.Username}}...",
+      "translation": "Updating service broker {{.Name}} as {{.Username}}..."
+   },
+   {
+      "id": "Updating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Updating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Uploading app files from: {{.Path}}",
+      "translation": "Uploading app files from: {{.Path}}"
+   },
+   {
+      "id": "Uploading buildpack {{.BuildpackName}}...",
+      "translation": "Uploading buildpack {{.BuildpackName}}..."
+   },
+   {
+      "id": "Uploading {{.AppName}}...",
+      "translation": "Uploading {{.AppName}}..."
+   },
+   {
+      "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
+      "translation": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files"
+   },
+   {
+      "id": "Use '{{.Name}}' to view or set your target org and space",
+      "translation": "Use '{{.Name}}' to view or set your target org and space"
+   },
+   {
+      "id": "Use a one-time password to login",
+      "translation": "Use a one-time password to login"
+   },
+   {
+      "id": "User {{.TargetUser}} does not exist.",
+      "translation": "User {{.TargetUser}} does not exist."
+   },
+   {
+      "id": "User-Provided:",
+      "translation": "User-Provided:"
+   },
+   {
+      "id": "User:",
+      "translation": "User:"
+   },
+   {
+      "id": "Username",
+      "translation": "Username"
+   },
+   {
+      "id": "Using manifest file {{.Path}}\n",
+      "translation": "Using manifest file {{.Path}}\n"
+   },
+   {
+      "id": "Using route {{.RouteURL}}",
+      "translation": "Using route {{.RouteURL}}"
+   },
+   {
+      "id": "Using stack {{.StackName}}...",
+      "translation": "Using stack {{.StackName}}..."
+   },
+   {
+      "id": "VERSION:",
+      "translation": "VERSION:"
+   },
+   {
+      "id": "Verify Password",
+      "translation": "Verify Password"
+   },
+   {
+      "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
+      "translation": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n"
+   },
+   {
+      "id": "WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
+      "translation": "WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup."
+   },
+   {
+      "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
+      "translation": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry."
+   },
+   {
+      "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
+      "translation": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"
+   },
+   {
+      "id": "Warning: error tailing logs",
+      "translation": "Warning: error tailing logs"
+   },
+   {
+      "id": "Write curl body to FILE instead of stdout",
+      "translation": "Write curl body to FILE instead of stdout"
+   },
+   {
+      "id": "Zip archive does not contain a buildpack",
+      "translation": "Zip archive does not contain a buildpack"
+   },
+   {
+      "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",
+      "translation": "[MULTIPART/FORM-DATA CONTENT HIDDEN]"
+   },
+   {
+      "id": "[PRIVATE DATA HIDDEN]",
+      "translation": "[PRIVATE DATA HIDDEN]"
+   },
+   {
+      "id": "[environment variables]",
+      "translation": "[environment variables]"
+   },
+   {
+      "id": "[global options] command [arguments...] [command options]",
+      "translation": "[global options] command [arguments...] [command options]"
+   },
+   {
+      "id": "actor",
+      "translation": "actor"
+   },
+   {
+      "id": "allowed",
+      "translation": "allowed"
+   },
+   {
+      "id": "already exists",
+      "translation": "already exists"
+   },
+   {
+      "id": "app",
+      "translation": "app"
+   },
+   {
+      "id": "app crashed",
+      "translation": "app crashed"
+   },
+   {
+      "id": "apps",
+      "translation": "apps"
+   },
+   {
+      "id": "auth request failed",
+      "translation": "auth request failed"
+   },
+   {
+      "id": "bound apps",
+      "translation": "bound apps"
+   },
+   {
+      "id": "cpu",
+      "translation": "cpu"
+   },
+   {
+      "id": "crashing",
+      "translation": "crashing"
+   },
+   {
+      "id": "description",
+      "translation": "description"
+   },
+   {
+      "id": "disallowed",
+      "translation": "disallowed"
+   },
+   {
+      "id": "disk",
+      "translation": "disk"
+   },
+   {
+      "id": "disk:",
+      "translation": "disk:"
+   },
+   {
+      "id": "does not exist.",
+      "translation": "does not exist."
+   },
+   {
+      "id": "domain",
+      "translation": "domain"
+   },
+   {
+      "id": "down",
+      "translation": "down"
+   },
+   {
+      "id": "enabled",
+      "translation": "enabled"
+   },
+   {
+      "id": "env var '{{.PropertyName}}' should not be null",
+      "translation": "env var '{{.PropertyName}}' should not be null"
+   },
+   {
+      "id": "event",
+      "translation": "event"
+   },
+   {
+      "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
+      "translation": "failed turning off console echo for password entry:\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "filename",
+      "translation": "filename"
+   },
+   {
+      "id": "host",
+      "translation": "host"
+   },
+   {
+      "id": "incorrect usage",
+      "translation": "incorrect usage"
+   },
+   {
+      "id": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}",
+      "translation": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}"
+   },
+   {
+      "id": "instances",
+      "translation": "instances"
+   },
+   {
+      "id": "instances:",
+      "translation": "instances:"
+   },
+   {
+      "id": "invalid inherit path in manifest",
+      "translation": "invalid inherit path in manifest"
+   },
+   {
+      "id": "invalid value for env var CF_STAGING_TIMEOUT\n{{.Err}}",
+      "translation": "invalid value for env var CF_STAGING_TIMEOUT\n{{.Err}}"
+   },
+   {
+      "id": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
+      "translation": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}"
+   },
+   {
+      "id": "label",
+      "translation": "label"
+   },
+   {
+      "id": "locked",
+      "translation": "locked"
+   },
+   {
+      "id": "memory",
+      "translation": "memory"
+   },
+   {
+      "id": "memory limit",
+      "translation": "memory limit"
+   },
+   {
+      "id": "memory:",
+      "translation": "memory:"
+   },
+   {
+      "id": "name",
+      "translation": "name"
+   },
+   {
+      "id": "not valid for the requested host",
+      "translation": "not valid for the requested host"
+   },
+   {
+      "id": "org",
+      "translation": "org"
+   },
+   {
+      "id": "organization",
+      "translation": "organization"
+   },
+   {
+      "id": "owned",
+      "translation": "owned"
+   },
+   {
+      "id": "paid service plans",
+      "translation": "paid service plans"
+   },
+   {
+      "id": "plan",
+      "translation": "plan"
+   },
+   {
+      "id": "plans",
+      "translation": "plans"
+   },
+   {
+      "id": "position",
+      "translation": "position"
+   },
+   {
+      "id": "provider",
+      "translation": "provider"
+   },
+   {
+      "id": "requested state",
+      "translation": "requested state"
+   },
+   {
+      "id": "requested state:",
+      "translation": "requested state:"
+   },
+   {
+      "id": "routes",
+      "translation": "routes"
+   },
+   {
+      "id": "running",
+      "translation": "running"
+   },
+   {
+      "id": "security group",
+      "translation": "security group"
+   },
+   {
+      "id": "service",
+      "translation": "service"
+   },
+   {
+      "id": "service auth token",
+      "translation": "service auth token"
+   },
+   {
+      "id": "service instance",
+      "translation": "service instance"
+   },
+   {
+      "id": "service instances",
+      "translation": "service instances"
+   },
+   {
+      "id": "service-broker",
+      "translation": "service-broker"
+   },
+   {
+      "id": "services",
+      "translation": "services"
+   },
+   {
+      "id": "shared",
+      "translation": "shared"
+   },
+   {
+      "id": "since",
+      "translation": "since"
+   },
+   {
+      "id": "space",
+      "translation": "space"
+   },
+   {
+      "id": "starting",
+      "translation": "starting"
+   },
+   {
+      "id": "state",
+      "translation": "state"
+   },
+   {
+      "id": "status",
+      "translation": "status"
+   },
+   {
+      "id": "stopped",
+      "translation": "stopped"
+   },
+   {
+      "id": "stopped after 1 redirect",
+      "translation": "stopped after 1 redirect"
+   },
+   {
+      "id": "time",
+      "translation": "time"
+   },
+   {
+      "id": "unknown authority",
+      "translation": "unknown authority"
+   },
+   {
+      "id": "url",
+      "translation": "url"
+   },
+   {
+      "id": "urls",
+      "translation": "urls"
+   },
+   {
+      "id": "urls:",
+      "translation": "urls:"
+   },
+   {
+      "id": "usage:",
+      "translation": "usage:"
+   },
+   {
+      "id": "user",
+      "translation": "user"
+   },
+   {
+      "id": "user-provided",
+      "translation": "user-provided"
+   },
+   {
+      "id": "write default values to the config",
+      "translation": "write default values to the config"
+   },
+   {
+      "id": "yes",
+      "translation": "yes"
+   },
+   {
+      "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
+      "translation": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})"
+   },
+   {
+      "id": "{{.CFName}} api",
+      "translation": "{{.CFName}} api"
+   },
+   {
+      "id": "{{.CFName}} login",
+      "translation": "{{.CFName}} login"
+   },
+   {
+      "id": "{{.Command}} help [COMMAND]",
+      "translation": "{{.Command}} help [COMMAND]"
+   },
+   {
+      "id": "{{.CountOfServices}} migrated.",
+      "translation": "{{.CountOfServices}} migrated."
+   },
+   {
+      "id": "{{.DiskUsage}} of {{.DiskQuota}}",
+      "translation": "{{.DiskUsage}} of {{.DiskQuota}}"
+   },
+   {
+      "id": "{{.DownCount}} down",
+      "translation": "{{.DownCount}} down"
+   },
+   {
+      "id": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
+      "translation": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space."
+   },
+   {
+      "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
+      "translation": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information"
+   },
+   {
+      "id": "{{.FlappingCount}} failing",
+      "translation": "{{.FlappingCount}} failing"
+   },
+   {
+      "id": "{{.MemUsage}} of {{.MemQuota}}",
+      "translation": "{{.MemUsage}} of {{.MemQuota}}"
+   },
+   {
+      "id": "{{.ModelType}} {{.ModelName}} already exists",
+      "translation": "{{.ModelType}} {{.ModelName}} already exists"
+   },
+   {
+      "id": "{{.PropertyName}} must be a string or null value",
+      "translation": "{{.PropertyName}} must be a string or null value"
+   },
+   {
+      "id": "{{.PropertyName}} must be a string value",
+      "translation": "{{.PropertyName}} must be a string value"
+   },
+   {
+      "id": "{{.PropertyName}} should not be null",
+      "translation": "{{.PropertyName}} should not be null"
+   },
+   {
+      "id": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
+      "translation": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})"
+   },
+   {
+      "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
+      "translation": "{{.RunningCount}} of {{.TotalCount}} instances running"
+   },
+   {
+      "id": "{{.StartingCount}} starting",
+      "translation": "{{.StartingCount}} starting"
+   },
+   {
+      "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
+      "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances"
+   }
+]
