@@ -1,0 +1,2990 @@
+[
+   {
+      "id": "\n\nTIP:\n",
+      "translation": "\n\n小贴士:\n"
+   },
+   {
+      "id": "\nApp started\n",
+      "translation": "\n应用程序已启动\n"
+   },
+   {
+      "id": "\nTIP: Assign roles with '{{.CurrentUser}} set-org-role' and '{{.CurrentUser}} set-space-role'",
+      "translation": "\n小贴士: 为用户{{.CurrentUser}}分配 '组织权限'及'空间权限"
+   },
+   {
+      "id": "\nTIP: Use '{{.CFTargetCommand}}' to target new space",
+      "translation": "\n小贴士: 使用'{{.CFTargetCommand}}'指定新空间"
+   },
+   {
+      "id": "\nTIP: Use '{{.Command}}' to target new org",
+      "translation": "\n小贴士: 使用'{{.Command}}'选择新组织"
+   },
+   {
+      "id": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error",
+      "translation": "\n小贴士: 通过cf login或者cf api命令来忽略'--skip-ssl-validation'错误"
+   },
+   {
+      "id": "   BillingManager - Create and manage the billing account and payment info\n",
+      "translation": "   BillingManager - 创建和管理计费账户和付款信息\n"
+   },
+   {
+      "id": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
+      "translation": "   CF_NAME auth name@example.com \"\\\"密码\\\"\" (密码中若有引号，需采用转义引号)"
+   },
+   {
+      "id": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n",
+      "translation": "   CF_NAME auth name@example.com \"my password\" (密码中若有空格，需要转义空格)\n"
+   },
+   {
+      "id": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n",
+      "translation": "   CF_NAME login (不指定用户名和密码参数，CF_NAME将进一步提示你输入用户名和密码)\n"
+   },
+   {
+      "id": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
+      "translation": "   CF_NAME login --sso (CF_NAME 将提供一个可以获得一次性密码的链接)\n"
+   },
+   {
+      "id": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+      "translation": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (密码中若有引号，需采用转义引号)\n"
+   },
+   {
+      "id": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n",
+      "translation": "   CF_NAME login -u name@example.com -p \"my password\" (密码中若有空格，需要转义空格)\n"
+   },
+   {
+      "id": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n",
+      "translation": "   CF_NAME login -u name@example.com -p pa55woRD (指定用户名和密码作为参数)\n"
+   },
+   {
+      "id": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
+      "translation": "   CF_NAME push 应用程序[-b 包名] [-c 命令] [-d 域名] [-f 部署描述文件路径]\n"
+   },
+   {
+      "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
+      "translation": "   CF_NAME push 应用程序 [-f 部署描述文件路径]\n"
+   },
+   {
+      "id": "   OrgAuditor - Read-only access to org info and reports\n",
+      "translation": "   OrgAuditor - 只能访问组织的信息和报告\n"
+   },
+   {
+      "id": "   OrgManager - Invite and manage users, select and change plans, and set spending limits\n",
+      "translation": "   OrgManager - 邀请和管理用户，选择和改变服务计划，设置配额限制\n"
+   },
+   {
+      "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest.",
+      "translation": "   路径应该是一个zip文件，一个URL到一个zip文件，或本地目录。位置是一个整数，设置优先级，并进行排序，从最低到最高"
+   },
+   {
+      "id": "   Push multiple apps with a manifest:\n",
+      "translation": "   使用部署描述文件部署多个应用程序:\n"
+   },
+   {
+      "id": "   SpaceAuditor - View logs, reports, and settings on this space\n",
+      "translation": "   SpaceAuditor - 查看此空间中的日志，报告和设置信息\n"
+   },
+   {
+      "id": "   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n",
+      "translation": "   SpaceDeveloper - 创建和管理应用程序和服务，查看日志和报告\n"
+   },
+   {
+      "id": "   SpaceManager - Invite and manage users, and enable features for a given space\n",
+      "translation": "   SpaceManager - 邀请和管理用户，针对一个指定的空间启用各项功能\n"
+   },
+   {
+      "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
+      "translation": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules."
+   },
+   {
+      "id": "   View allowable quotas with 'CF_NAME quotas'",
+      "translation": "   查看允许配额而'CF_NAME quotas'"
+   },
+   {
+      "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
+      "translation": "   [-i 实例数] [-k 磁盘配额] [-m 内存配额] [-n 主机] [-p 应用本地包所在路径] [-s 栈深度] [-t 超时时间]\n"
+   },
+   {
+      "id": "  domains: {{.Domains}}",
+      "translation": "  域: {{.Domains}}"
+   },
+   {
+      "id": "  quota:   {{.Quota}}",
+      "translation": "  配额:   {{.Quota}}"
+   },
+   {
+      "id": "  spaces:  {{.Spaces}}",
+      "translation": "  空间:  {{.Spaces}}"
+   },
+   {
+      "id": " is already started",
+      "translation": " 已启动"
+   },
+   {
+      "id": " is already stopped",
+      "translation": " 已停止"
+   },
+   {
+      "id": " is empty",
+      "translation": " 是空的"
+   },
+   {
+      "id": " not found",
+      "translation": " 未找到"
+   },
+   {
+      "id": "A command line tool to interact with Cloud Foundry",
+      "translation": "与Cloud Foundry交互的命令行工具"
+   },
+   {
+      "id": "ADVANCED",
+      "translation": "高级"
+   },
+   {
+      "id": "API endpoint",
+      "translation": "API 终端"
+   },
+   {
+      "id": "API endpoint (e.g. https://api.example.com)",
+      "translation": "API 终端 (e.g. https://api.example.com)"
+   },
+   {
+      "id": "API endpoint:",
+      "translation": "API 终端:"
+   },
+   {
+      "id": "API endpoint: {{.ApiEndpoint}}",
+      "translation": "API 终端: {{.ApiEndpoint}}"
+   },
+   {
+      "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
+      "translation": "API 终端: {{.ApiEndpoint}} (API 版本: {{.ApiVersion}})"
+   },
+   {
+      "id": "API endpoint: {{.Endpoint}}",
+      "translation": "API 终端: {{.Endpoint}}"
+   },
+   {
+      "id": "APPS",
+      "translation": "应用程序"
+   },
+   {
+      "id": "Acquiring running security groups as '{{.username}}'",
+      "translation": "Acquiring running security groups as '{{.username}}'"
+   },
+   {
+      "id": "Acquiring staging security group as {{.username}}",
+      "translation": "Acquiring staging security group as {{.username}}"
+   },
+   {
+      "id": "Add a url route to an app",
+      "translation": "Add a url route to an app"
+   },
+   {
+      "id": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Also delete any mapped routes",
+      "translation": "同时删除所有绑定的域名"
+   },
+   {
+      "id": "An org must be targeted before targeting a space",
+      "translation": "在选择空间之前必须选择一个组织"
+   },
+   {
+      "id": "App ",
+      "translation": "应用程序 "
+   },
+   {
+      "id": "App name is a required field",
+      "translation": "应用程序名称为必填字段"
+   },
+   {
+      "id": "App {{.AppName}} does not exist.",
+      "translation": "应用程序{{.AppName}}不存在"
+   },
+   {
+      "id": "App {{.AppName}} is a worker, skipping route creation",
+      "translation": "应用程序 {{.AppName}}是一个worker程序，跳过路由的创建"
+   },
+   {
+      "id": "App {{.AppName}} is already bound to {{.ServiceName}}.",
+      "translation": "应用{{.AppName}}已经与服务{{.ServiceName}}绑定了."
+   },
+   {
+      "id": "Append API request diagnostics to a log file",
+      "translation": "追加API请求诊断信息到日志文件"
+   },
+   {
+      "id": "Apps:",
+      "translation": "应用程序:"
+   },
+   {
+      "id": "Assign a quota to an org",
+      "translation": "给组织分配配额"
+   },
+   {
+      "id": "Assign a space role to a user",
+      "translation": "给用户分配空间角色"
+   },
+   {
+      "id": "Assign an org role to a user",
+      "translation": "给用户分配组织角色"
+   },
+   {
+      "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
+      "translation": "分配角色:{{.Role}}在组织{{.TargetOrg}}或空间{{.TargetSpace}}中分配权限给用户{{.TargetUser}} (作为用户{{.CurrentUser}}) ..."
+   },
+   {
+      "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+      "translation": "分配角色:{{.Role}}在组织{{.TargetOrg}}中分配权限给用户{{.TargetUser}} (作为用户{{.CurrentUser}})..."
+   },
+   {
+      "id": "Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
+      "translation": "Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}..."
+   },
+   {
+      "id": "Attempting to migrate {{.ServiceInstanceDescription}}...",
+      "translation": "正尝试迁移{{.ServiceInstanceDescription}}..."
+   },
+   {
+      "id": "Authenticate user non-interactively",
+      "translation": "非交互式用户身份验证"
+   },
+   {
+      "id": "Authenticating...",
+      "translation": "正在验证，请等待..."
+   },
+   {
+      "id": "BILLING MANAGER",
+      "translation": "计费管理"
+   },
+   {
+      "id": "BUILD TIME:",
+      "translation": "构建时间:"
+   },
+   {
+      "id": "BUILDPACKS",
+      "translation": "BUILDPACKS"
+   },
+   {
+      "id": "Bind a security group to a space",
+      "translation": "Bind a security group to a space"
+   },
+   {
+      "id": "Bind a security group to the list of security groups to be used for running applications",
+      "translation": "Bind a security group to the list of security groups to be used for running applications"
+   },
+   {
+      "id": "Bind a security group to the list of security groups to be used for staging applications",
+      "translation": "Bind a security group to the list of security groups to be used for staging applications"
+   },
+   {
+      "id": "Bind a service instance to an app",
+      "translation": "绑定一个服务实例到应用程序"
+   },
+   {
+      "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
+      "translation": "{{.InstanceName}}和{{.AppName}}之间没有绑定关系"
+   },
+   {
+      "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
+      "translation": "Binding security group {{.security_group}} to defaults for running as {{.username}}"
+   },
+   {
+      "id": "Binding security group {{.security_group}} to staging as {{.username}}",
+      "translation": "Binding security group {{.security_group}} to staging as {{.username}}"
+   },
+   {
+      "id": "Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}正在绑定服务{{.ServiceInstanceName}}到属于组织{{.OrgName}}和空间{{.SpaceName}}中的应用程序{{.AppName}}..."
+   },
+   {
+      "id": "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "通过用户{{.Username}}给到组织{{.OrgName}}/空间{{.SpaceName}}下的应用 {{.AppName}} 绑定服务 {{.ServiceName}}..."
+   },
+   {
+      "id": "Binding {{.URL}} to {{.AppName}}...",
+      "translation": "绑定{{.URL}}到{{.AppName}}..."
+   },
+   {
+      "id": "Buildpack position among other buildpacks",
+      "translation": "其中buildpack buildpacks位置"
+   },
+   {
+      "id": "Buildpack {{.BuildpackName}} already exists",
+      "translation": "buildpack {{.BuildpackName}} 已经存在"
+   },
+   {
+      "id": "Buildpack {{.BuildpackName}} does not exist.",
+      "translation": "buildpack {{.BuildpackName}} 不存在"
+   },
+   {
+      "id": "Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB",
+      "translation": "字节数量，必须是以M，MB，G或GB为单位的正整数"
+   },
+   {
+      "id": "CF_NAME api [URL]",
+      "translation": "CF_NAME api [URL]"
+   },
+   {
+      "id": "CF_NAME app APP",
+      "translation": "CF_NAME app 应用程序名"
+   },
+   {
+      "id": "CF_NAME auth USERNAME PASSWORD\n\n",
+      "translation": "CF_NAME auth 用户名 密码\n\n"
+   },
+   {
+      "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
+      "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
+   },
+   {
+      "id": "CF_NAME bind-service APP SERVICE_INSTANCE",
+      "translation": "CF_NAME bind-service 应用程序 服务实例"
+   },
+   {
+      "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME buildpacks",
+      "translation": "CF_NAME buildpacks"
+   },
+   {
+      "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]",
+      "translation": "CF_NAME config [--async-timeout 超时_以分钟为单位] [--trace true | false | 文件访问路径] [--color true | false]"
+   },
+   {
+      "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
+      "translation": "CF_NAME create-buildpack <BUILDPACK> <路径> <位置> [--enable|--disable]"
+   },
+   {
+      "id": "CF_NAME create-domain ORG DOMAIN",
+      "translation": "CF_NAME create-domain ORG DOMAIN"
+   },
+   {
+      "id": "CF_NAME create-org ORG",
+      "translation": "CF_NAME create-org 组织"
+   },
+   {
+      "id": "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
+      "translation": "CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
+   },
+   {
+      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
+      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]"
+   },
+   {
+      "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
+   },
+   {
+      "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME create-service cleardb spark clear-db-mine\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
+      "translation": "CF_NAME create-service 服务类型 服务计划 实例名称\n\n示例:\n   CF_NAME create-service cleardb spark clear-db-mine\n\n小贴士:\n   使用'CF_NAME create-user-provided-service'来创建由用户提供的服务供应用使用。"
+   },
+   {
+      "id": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
+      "translation": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"
+   },
+   {
+      "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+      "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+   },
+   {
+      "id": "CF_NAME create-shared-domain DOMAIN",
+      "translation": "CF_NAME create-shared-domain DOMAIN"
+   },
+   {
+      "id": "CF_NAME create-space SPACE [-o ORG]",
+      "translation": "CF_NAME create-space 空间 [-o 组织]"
+   },
+   {
+      "id": "CF_NAME create-user USERNAME PASSWORD",
+      "translation": "CF_NAME create-user 用户名 密码"
+   },
+   {
+      "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
+      "translation": "CF_NAME create-user-provided-service 服务实例 [-p 参数] [-l SYSLOG-syslog转发地址]\n\n   通过逗号分隔参数来使用交互模式:\n   CF_NAME create-user-provided-service 服务实例 -p \"逗号，分隔的，参数，名称\"\n\n   传递JSON格式的参数来使用非交互方式创建服务:\n   CF_NAME create-user-provided-service 服务实例 -p '{\"名称\":\"值\",\"名称\":\"值\"}'\n\n示例:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"主机, 端口, 数据库名, 用户名, 密码\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"用户名\":\"admin\",\"密码\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n"
+   },
+   {
+      "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
+      "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]"
+   },
+   {
+      "id": "CF_NAME delete APP [-f -r]",
+      "translation": "CF_NAME delete 应用程序名 [-f -r]"
+   },
+   {
+      "id": "CF_NAME delete-buildpack BUILDPACK [-f]",
+      "translation": "CF_NAME delete-buildpack BUILDPACK [-f]"
+   },
+   {
+      "id": "CF_NAME delete-domain DOMAIN [-f]",
+      "translation": "CF_NAME delete-domain DOMAIN [-f]"
+   },
+   {
+      "id": "CF_NAME delete-org ORG [-f]",
+      "translation": "CF_NAME delete-org 组织 [-f]"
+   },
+   {
+      "id": "CF_NAME delete-orphaned-routes [-f]",
+      "translation": "CF_NAME delete-orphaned-routes [-f]"
+   },
+   {
+      "id": "CF_NAME delete-quota QUOTA [-f]",
+      "translation": "CF_NAME delete-quota QUOTA [-f]"
+   },
+   {
+      "id": "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]",
+      "translation": "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]"
+   },
+   {
+      "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
+      "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
+   },
+   {
+      "id": "CF_NAME delete-service SERVICE_INSTANCE [-f]",
+      "translation": "CF_NAME delete-service 服务实例 [-f]"
+   },
+   {
+      "id": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]",
+      "translation": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"
+   },
+   {
+      "id": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
+      "translation": "CF_NAME delete-service-broker SERVICE_BROKER [-f]"
+   },
+   {
+      "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
+      "translation": "CF_NAME delete-shared-domain DOMAIN [-f]"
+   },
+   {
+      "id": "CF_NAME delete-space SPACE [-f]",
+      "translation": "CF_NAME delete-space 空间 [-f]"
+   },
+   {
+      "id": "CF_NAME delete-user USERNAME [-f]",
+      "translation": "CF_NAME delete-user 用户名 [-f]"
+   },
+   {
+      "id": "CF_NAME env APP",
+      "translation": "CF_NAME env 应用程序名"
+   },
+   {
+      "id": "CF_NAME events APP",
+      "translation": "CF_NAME events 应用程序名"
+   },
+   {
+      "id": "CF_NAME files APP [PATH]",
+      "translation": "CF_NAME files 应用程序名 [路径]"
+   },
+   {
+      "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
+      "translation": "CF_NAME login [-a API_URL] [-u 用户名] [-p 密码] [-o 组织] [-s 空间]\n\n"
+   },
+   {
+      "id": "CF_NAME logout",
+      "translation": "CF_NAME logout"
+   },
+   {
+      "id": "CF_NAME logs APP",
+      "translation": "CF_NAME logs 应用程序名"
+   },
+   {
+      "id": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
+      "translation": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]"
+   },
+   {
+      "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
+      "translation": "CF_NAME migrate-service-instances v1_服务名称 v1_提供者 v1_服务计划 v2_服务名称 v2_服务计划\n\n"
+   },
+   {
+      "id": "CF_NAME org ORG",
+      "translation": "CF_NAME org 组织"
+   },
+   {
+      "id": "CF_NAME org-users ORG",
+      "translation": "CF_NAME org-users 组织"
+   },
+   {
+      "id": "CF_NAME passwd",
+      "translation": "CF_NAME passwd"
+   },
+   {
+      "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]",
+      "translation": "CF_NAME purge-service-offering 服务 [-p 提供者]"
+   },
+   {
+      "id": "CF_NAME quota QUOTA",
+      "translation": "CF_NAME quota QUOTA"
+   },
+   {
+      "id": "CF_NAME quotas",
+      "translation": "CF_NAME quotas"
+   },
+   {
+      "id": "CF_NAME rename APP_NAME NEW_APP_NAME",
+      "translation": "CF_NAME rename 应用程序名 新应用程序名"
+   },
+   {
+      "id": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
+      "translation": "CF_NAME rename-buildpack buildpack名称 新的buildpack名称"
+   },
+   {
+      "id": "CF_NAME rename-org ORG NEW_ORG",
+      "translation": "CF_NAME rename-org 组织 新组织"
+   },
+   {
+      "id": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
+      "translation": "CF_NAME rename-service 原服务实例名称 新服务实例名称"
+   },
+   {
+      "id": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
+      "translation": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"
+   },
+   {
+      "id": "CF_NAME rename-space SPACE NEW_SPACE",
+      "translation": "CF_NAME rename-space 空间 新空间"
+   },
+   {
+      "id": "CF_NAME restage APP",
+      "translation": "CF_NAME restage 应用程序名"
+   },
+   {
+      "id": "CF_NAME restart APP",
+      "translation": "CF_NAME restart 应用程序名"
+   },
+   {
+      "id": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+      "translation": "CF_NAME scale 应用程序 [-i 实例数] [-k 磁盘] [-m 内存] [-f]"
+   },
+   {
+      "id": "CF_NAME security-group SECURITY_GROUP",
+      "translation": "CF_NAME security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME service SERVICE_INSTANCE",
+      "translation": "CF_NAME service 服务实例"
+   },
+   {
+      "id": "CF_NAME service-auth-tokens",
+      "translation": "CF_NAME service-auth-tokens"
+   },
+   {
+      "id": "CF_NAME set-env APP NAME VALUE",
+      "translation": "CF_NAME set-env 应用程序名 环境名 值"
+   },
+   {
+      "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
+      "translation": "CF_NAME set-org-role 用户名 组织 角色\n\n"
+   },
+   {
+      "id": "CF_NAME set-quota ORG QUOTA\n\n",
+      "translation": "CF_NAME set-quota 组织 配额\n\n"
+   },
+   {
+      "id": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n",
+      "translation": "CF_NAME set-space-role 用户名 组织 空间 角色\n\n"
+   },
+   {
+      "id": "CF_NAME space SPACE",
+      "translation": "CF_NAME space 空间"
+   },
+   {
+      "id": "CF_NAME space-users ORG SPACE",
+      "translation": "CF_NAME space-users 组织 空间"
+   },
+   {
+      "id": "CF_NAME spaces",
+      "translation": "CF_NAME spaces"
+   },
+   {
+      "id": "CF_NAME stacks",
+      "translation": "CF_NAME stacks"
+   },
+   {
+      "id": "CF_NAME start APP",
+      "translation": "CF_NAME start 应用程序名"
+   },
+   {
+      "id": "CF_NAME stop APP",
+      "translation": "CF_NAME stop 应用程序"
+   },
+   {
+      "id": "CF_NAME target [-o ORG] [-s SPACE]",
+      "translation": "CF_NAME target [-o 组织] [-s 空间]"
+   },
+   {
+      "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE",
+      "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
+   },
+   {
+      "id": "CF_NAME unbind-service APP SERVICE_INSTANCE",
+      "translation": "CF_NAME unbind-service 应用程序 服务实例"
+   },
+   {
+      "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
+      "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
+   },
+   {
+      "id": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
+      "translation": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]"
+   },
+   {
+      "id": "CF_NAME unset-env APP NAME",
+      "translation": "CF_NAME unset-env 应用程序 名称"
+   },
+   {
+      "id": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n",
+      "translation": "CF_NAME unset-org-role 用户名 组织 角色\n\n"
+   },
+   {
+      "id": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n",
+      "translation": "CF_NAME unset-space-role 用户名 组织 空间 角色\n\n"
+   },
+   {
+      "id": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]",
+      "translation": "CF_NAME update-buildpack BUILDPACK [-p 路径] [-i 位置] [--enable|--disable] [--lock|--unlock]"
+   },
+   {
+      "id": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
+      "translation": "CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
+   },
+   {
+      "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+      "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
+   },
+   {
+      "id": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
+      "translation": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"
+   },
+   {
+      "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+      "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+   },
+   {
+      "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\nEXAMPLE:\n   CF_NAME update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com",
+      "translation": "CF_NAME update-user-provided-service 服务实例 [-p 参数] [-l SYSLOG-syslog转发地址]'\n\n示例:\n   CF_NAME update-user-provided-service oracle-db-mine -p '{\"用户名\":\"admin\",\"密码\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com"
+   },
+   {
+      "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
+      "translation": "CF_TRACE 创建日志文件错误 {{.Path}}:\n{{.Err}}"
+   },
+   {
+      "id": "Can provision instances of paid service plans",
+      "translation": "Can provision instances of paid service plans"
+   },
+   {
+      "id": "Cannot list marketplace services without a targeted space",
+      "translation": "在没有指定空间的情况下无法获取服务列表"
+   },
+   {
+      "id": "Cannot provision instances of paid service plans",
+      "translation": "Cannot provision instances of paid service plans"
+   },
+   {
+      "id": "Cannot specify both lock and unlock options.",
+      "translation": "不能同时指定锁定和解锁选项"
+   },
+   {
+      "id": "Cannot specify both {{.Enabled}} and {{.Disabled}}.",
+      "translation": "不能同时指定{{.Enabled}}和{{.Disabled}}."
+   },
+   {
+      "id": "Cannot specify buildpack bits and lock/unlock.",
+      "translation": "无法指定buildpack以及对其加锁/解锁"
+   },
+   {
+      "id": "Change or view the instance count, disk space limit, and memory limit for an app",
+      "translation": "更改或查看应用程序的实例个数，磁盘空间配额和内存配额"
+   },
+   {
+      "id": "Change user password",
+      "translation": "更改用户密码"
+   },
+   {
+      "id": "Changing password...",
+      "translation": "正在更改密码..."
+   },
+   {
+      "id": "Command not found",
+      "translation": "无效命令"
+   },
+   {
+      "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+      "translation": "已连接，用户{{.Username}}生成组织 {{.OrgName}} / 空间 {{.SpaceName}}下应用程序{{.AppName}} 的日志...\n"
+   },
+   {
+      "id": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+      "translation": "已连接，用户{{.Username}}读取组织 {{.OrgName}} / 空间 {{.SpaceName}}下应用程序{{.AppName}} 的日志...\n"
+   },
+   {
+      "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
+      "translation": "无法绑定到服务{{.ServiceName}}\n错误为: {{.Err}}"
+   },
+   {
+      "id": "Could not determine the current working directory!",
+      "translation": "无法确定当前的工作目录！"
+   },
+   {
+      "id": "Could not find a default domain",
+      "translation": "找不到默认域名"
+   },
+   {
+      "id": "Could not find any offerings with name {{.ServiceOfferingName}}",
+      "translation": "找不到名为{{.ServiceOfferingName}}的服务"
+   },
+   {
+      "id": "Could not find app named '{{.AppName}}' in manifest",
+      "translation": "无法在部署描述文件中找到名为'{{.AppName}}'的应用程序"
+   },
+   {
+      "id": "Could not find plan with name {{.ServicePlanName}}",
+      "translation": "无法找到名为{{.ServicePlanName}}的服务计划"
+   },
+   {
+      "id": "Could not find service {{.ServiceName}} to bind to {{.AppName}}",
+      "translation": "无法找到可用服务{{.ServiceName}}绑定到{{.AppName}}"
+   },
+   {
+      "id": "Could not parse version number: {{.Input}}",
+      "translation": "无法解析版本号: {{.Input}}"
+   },
+   {
+      "id": "Could not serialize information",
+      "translation": "无法序列化信息"
+   },
+   {
+      "id": "Could not serialize updates.",
+      "translation": "无法序列化更新部分"
+   },
+   {
+      "id": "Could not target org.\n{{.ApiErr}}",
+      "translation": "无法选择组织.\n{{.ApiErr}}"
+   },
+   {
+      "id": "Couldn't create temp file for upload",
+      "translation": "无法创建上传所需的临时文件"
+   },
+   {
+      "id": "Couldn't open buildpack file",
+      "translation": "无法打开buildpack文件"
+   },
+   {
+      "id": "Couldn't write zip file",
+      "translation": "无法写入zip文件"
+   },
+   {
+      "id": "Create a buildpack",
+      "translation": "创建 buildpack"
+   },
+   {
+      "id": "Create a domain in an org for later use",
+      "translation": "Create a domain in an org for later use"
+   },
+   {
+      "id": "Create a domain that can be used by all orgs (admin-only)",
+      "translation": "Create a domain that can be used by all orgs (admin-only)"
+   },
+   {
+      "id": "Create a new user",
+      "translation": "创建一个新用户"
+   },
+   {
+      "id": "Create a random route for this app",
+      "translation": "为当前应用程序创建随机路由"
+   },
+   {
+      "id": "Create a security group",
+      "translation": "Create a security group"
+   },
+   {
+      "id": "Create a service auth token",
+      "translation": "Create a service auth token"
+   },
+   {
+      "id": "Create a service broker",
+      "translation": "Create a service broker"
+   },
+   {
+      "id": "Create a service instance",
+      "translation": "创建服务实例"
+   },
+   {
+      "id": "Create a space",
+      "translation": "创造空间"
+   },
+   {
+      "id": "Create a url route in a space for later use",
+      "translation": "Create a url route in a space for later use"
+   },
+   {
+      "id": "Create an org",
+      "translation": "创建组织"
+   },
+   {
+      "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "用户{{.Username}}在组织{{.OrgName}}/空间{{.SpaceName}}中创建应用程序{{.AppName}}..."
+   },
+   {
+      "id": "Creating buildpack {{.BuildpackName}}...",
+      "translation": "创建buildpack {{.BuildpackName}}..."
+   },
+   {
+      "id": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
+      "translation": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating org {{.OrgName}} as {{.Username}}...",
+      "translation": "用户{{.Username}}创建组织{{.OrgName}}..."
+   },
+   {
+      "id": "Creating quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Creating quota {{.QuotaName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating route {{.Hostname}}...",
+      "translation": "创建路由 {{.Hostname}}..."
+   },
+   {
+      "id": "Creating security group {{.security_group}} as {{.username}}",
+      "translation": "Creating security group {{.security_group}} as {{.username}}"
+   },
+   {
+      "id": "Creating service auth token as {{.CurrentUser}}...",
+      "translation": "Creating service auth token as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Creating service broker {{.Name}} as {{.Username}}...",
+      "translation": "Creating service broker {{.Name}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}在组织{{.OrgName}}/空间{{.SpaceName}}中创建服务{{.ServiceName}}..."
+   },
+   {
+      "id": "Creating shared domain {{.DomainName}} as {{.Username}}...",
+      "translation": "Creating shared domain {{.DomainName}} as {{.Username}}..."
+   },
+   {
+      "id": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+      "translation": "创建空间中:用户{{.CurrentUser}}在组织{{.OrgName}}中创建空间{{.SpaceName}}..."
+   },
+   {
+      "id": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}在组织{{.OrgName}}/空间{{.SpaceName}}中创建由用户提供的服务{{.ServiceName}}..."
+   },
+   {
+      "id": "Creating user {{.TargetUser}} as {{.CurrentUser}}...",
+      "translation": "创建用户中:当前用户{{.CurrentUser}}正在创建新用户{{.TargetUser}}..."
+   },
+   {
+      "id": "Credentials were rejected, please try again.",
+      "translation": "验证失败，请重试"
+   },
+   {
+      "id": "Current Password",
+      "translation": "当前密码"
+   },
+   {
+      "id": "Current password did not match",
+      "translation": "密码不匹配"
+   },
+   {
+      "id": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)",
+      "translation": "使用名称(e.g. my-buildpack)或GIT网址(e.g. https://github.com/heroku/heroku-buildpack-play.git) 自定义buildpack"
+   },
+   {
+      "id": "Custom headers to include in the request, flag can be specified multiple times",
+      "translation": "在请求中自定义HTTP报头， 可以多次使用"
+   },
+   {
+      "id": "DOMAINS",
+      "translation": "域"
+   },
+   {
+      "id": "Define a new resource quota",
+      "translation": "Define a new resource quota"
+   },
+   {
+      "id": "Delete a buildpack",
+      "translation": "删除buildpack"
+   },
+   {
+      "id": "Delete a domain",
+      "translation": "Delete a domain"
+   },
+   {
+      "id": "Delete a quota",
+      "translation": "Delete a quota"
+   },
+   {
+      "id": "Delete a route",
+      "translation": "Delete a route"
+   },
+   {
+      "id": "Delete a service auth token",
+      "translation": "Delete a service auth token"
+   },
+   {
+      "id": "Delete a service broker",
+      "translation": "Delete a service broker"
+   },
+   {
+      "id": "Delete a service instance",
+      "translation": "删除服务实例"
+   },
+   {
+      "id": "Delete a shared domain",
+      "translation": "Delete a shared domain"
+   },
+   {
+      "id": "Delete a space",
+      "translation": "删除空间"
+   },
+   {
+      "id": "Delete a user",
+      "translation": "删除用户"
+   },
+   {
+      "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+      "translation": "Delete all orphaned routes (e.g.: those that are not mapped to an app)"
+   },
+   {
+      "id": "Delete an app",
+      "translation": "删除一个应用程序"
+   },
+   {
+      "id": "Delete an org",
+      "translation": "删除组织"
+   },
+   {
+      "id": "Delete cancelled",
+      "translation": "撤销删除"
+   },
+   {
+      "id": "Deletes a security group",
+      "translation": "Deletes a security group"
+   },
+   {
+      "id": "Deleting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "作为用户{{.Username}}在组织{{.OrgName}}/空间{{.SpaceName}}中删除应用程序{{.AppName}} ..."
+   },
+   {
+      "id": "Deleting buildpack {{.BuildpackName}}...",
+      "translation": "删除buildpack {{.BuildpackName}}..."
+   },
+   {
+      "id": "Deleting domain {{.DomainName}} as {{.ApiErr}}...",
+      "translation": "Deleting domain {{.DomainName}} as {{.ApiErr}}..."
+   },
+   {
+      "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
+      "translation": "Deleting domain {{.DomainName}} as {{.Username}}..."
+   },
+   {
+      "id": "Deleting org {{.OrgName}} as {{.Username}}...",
+      "translation": "用户{{.Username}}删除组织{{.OrgName}}..."
+   },
+   {
+      "id": "Deleting quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Deleting quota {{.QuotaName}} as {{.Username}}..."
+   },
+   {
+      "id": "Deleting route {{.Route}}...",
+      "translation": "Deleting route {{.Route}}..."
+   },
+   {
+      "id": "Deleting route {{.URL}}...",
+      "translation": "Deleting route {{.URL}}..."
+   },
+   {
+      "id": "Deleting security group {{.security_group}} as {{.username}}",
+      "translation": "Deleting security group {{.security_group}} as {{.username}}"
+   },
+   {
+      "id": "Deleting service auth token as {{.CurrentUser}}",
+      "translation": "Deleting service auth token as {{.CurrentUser}}"
+   },
+   {
+      "id": "Deleting service broker {{.Name}} as {{.Username}}...",
+      "translation": "Deleting service broker {{.Name}} as {{.Username}}..."
+   },
+   {
+      "id": "Deleting service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "删除用户{{.CurrentUser}}在组织{{.OrgName}}/空间{{.ServiceName}}中的服务{{.SpaceName}}..."
+   },
+   {
+      "id": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}删除组织{{.TargetOrg}}中的空间{{.TargetSpace}}..."
+   },
+   {
+      "id": "Deleting user {{.TargetUser}} as {{.CurrentUser}}...",
+      "translation": "删除用户中:当前用户{{.CurrentUser}}正在删除用户{{.TargetUser}}..."
+   },
+   {
+      "id": "Description: {{.ServiceDescription}}",
+      "translation": "描述: {{.ServiceDescription}}"
+   },
+   {
+      "id": "Disable the buildpack",
+      "translation": "禁用buildpack"
+   },
+   {
+      "id": "Disk limit (e.g. 256M, 1024M, 1G)",
+      "translation": "磁盘限额（例如256M，1024M，1G）"
+   },
+   {
+      "id": "Display health and status for app",
+      "translation": "显示应用程序的健康状态"
+   },
+   {
+      "id": "Do not colorize output",
+      "translation": "禁止彩色输出"
+   },
+   {
+      "id": "Do not map a route to this app",
+      "translation": "不为这个应用映射一个路由"
+   },
+   {
+      "id": "Do not start an app after pushing",
+      "translation": "推送后不启动应用"
+   },
+   {
+      "id": "Documentation url: {{.URL}}",
+      "translation": "文档URL: {{.URL}}"
+   },
+   {
+      "id": "Domain (e.g. example.com)",
+      "translation": "域名（例如example.com）"
+   },
+   {
+      "id": "Domains:",
+      "translation": "域名:"
+   },
+   {
+      "id": "Dump recent logs instead of tailing",
+      "translation": "生成最近的日志文件，而非读取日志内容"
+   },
+   {
+      "id": "ENVIRONMENT VARIABLES",
+      "translation": "环境变量"
+   },
+   {
+      "id": "EXAMPLE:\n",
+      "translation": "例子:\n"
+   },
+   {
+      "id": "Enable CF_TRACE output for all requests and responses",
+      "translation": "启动CF_TRACE输出所有请求和响应"
+   },
+   {
+      "id": "Enable HTTP proxying for API requests",
+      "translation": "为API请求启用HTTP代理"
+   },
+   {
+      "id": "Enable or disable color",
+      "translation": "启用或禁用彩打输出"
+   },
+   {
+      "id": "Enable the buildpack",
+      "translation": "启用buildpack"
+   },
+   {
+      "id": "Env variable {{.VarName}} was not set.",
+      "translation": "环境变量{{.VarName}}未设置"
+   },
+   {
+      "id": "Error building request",
+      "translation": "生成请求错误"
+   },
+   {
+      "id": "Error creating request:\n{{.Err}}",
+      "translation": "创建请求错误:\n{{.Err}}"
+   },
+   {
+      "id": "Error creating tmp file: {{.Err}}",
+      "translation": "无法创建临时文件: {{.Err}}"
+   },
+   {
+      "id": "Error creating upload",
+      "translation": "创建上传任务错误"
+   },
+   {
+      "id": "Error creating user {{.TargetUser}}.\n{{.Error}}",
+      "translation": "创建用户{{.TargetUser}}错误.\n错误: {{.Error}}"
+   },
+   {
+      "id": "Error deleting buildpack {{.Name}}\n{{.Error}}",
+      "translation": "删除 buildpack {{.Name}},\n错误：{{.Error}}"
+   },
+   {
+      "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
+      "translation": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}"
+   },
+   {
+      "id": "Error dumping request\n{{.Err}}\n",
+      "translation": "打印请求体错误\n{{.Err}}\n"
+   },
+   {
+      "id": "Error dumping response\n{{.Err}}\n",
+      "translation": "打印响应错误\n{{.Err}}\n"
+   },
+   {
+      "id": "Error finding available orgs\n{{.ApiErr}}",
+      "translation": "无法找到可用的组织\n{{.ApiErr}}"
+   },
+   {
+      "id": "Error finding available spaces\n{{.Err}}",
+      "translation": "无法找到可用的空间\n{{.Err}}"
+   },
+   {
+      "id": "Error finding command {{.CmdName}}\n",
+      "translation": "未找到命令 {.CmdName}}\n"
+   },
+   {
+      "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
+      "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}"
+   },
+   {
+      "id": "Error finding manifest",
+      "translation": "无法找到 manifest"
+   },
+   {
+      "id": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
+      "translation": "找不到组织{{.OrgName}}\n错误信息: {{.ErrorDescription}}"
+   },
+   {
+      "id": "Error finding org {{.OrgName}}\n{{.Err}}",
+      "translation": "无法找到组织 {{.OrgName}}\n{{.Err}}"
+   },
+   {
+      "id": "Error finding space {{.SpaceName}}\n{{.Err}}",
+      "translation": "无法找到空间 {{.SpaceName}}\n{{.Err}}"
+   },
+   {
+      "id": "Error in requirement",
+      "translation": "请求错误"
+   },
+   {
+      "id": "Error marshaling JSON",
+      "translation": "转换JSON格式错误"
+   },
+   {
+      "id": "Error opening buildpack file",
+      "translation": "打开buildpack文件时出错"
+   },
+   {
+      "id": "Error parsing JSON",
+      "translation": "解析JSON错误"
+   },
+   {
+      "id": "Error parsing headers",
+      "translation": "头域解析错误"
+   },
+   {
+      "id": "Error performing request",
+      "translation": "执行请求错误"
+   },
+   {
+      "id": "Error reading manifest file:\n{{.Err}}",
+      "translation": "读取部署描述文件错误:\n{{.Err}}"
+   },
+   {
+      "id": "Error reading response",
+      "translation": "读取响应错误"
+   },
+   {
+      "id": "Error renaming buildpack {{.Name}}\n{{.Error}}",
+      "translation": "重命名buildpack {{.Name}}\n错误：{{.Error}}"
+   },
+   {
+      "id": "Error resolving route:\n{{.Err}}",
+      "translation": "Error resolving route:\n{{.Err}}"
+   },
+   {
+      "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
+      "translation": "更新错误 buildpack {{.Name}}\n错误：{{.Error}}"
+   },
+   {
+      "id": "Error uploading application.\n{{.ApiErr}}",
+      "translation": "上传应用程序:\n{{.ApiErr}}错误"
+   },
+   {
+      "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
+      "translation": "上传buildpack {{.Name}},\n错误：{{.Error}}"
+   },
+   {
+      "id": "Error writing to manifest file:{{.FilePath}}\n{{.Err}}",
+      "translation": "写入清单文件错误: {{.FilePath}}\n错误: {{.Err}}"
+   },
+   {
+      "id": "Error writing to tmp file: {{.Err}}",
+      "translation": "临时文件写入错误: {{.Err}}"
+   },
+   {
+      "id": "Error zipping application",
+      "translation": "压缩应用程序错误"
+   },
+   {
+      "id": "Error: No name found for app",
+      "translation": "错误: 没有找到该应用程序名"
+   },
+   {
+      "id": "Error: timed out waiting for async job '{{.ErrURL}}' to finish",
+      "translation": "错误: timed out waiting for async job '{{.ErrURL}}' to finish"
+   },
+   {
+      "id": "Error: {{.Err}}",
+      "translation": "错误: {{.Err}}"
+   },
+   {
+      "id": "Executes a raw request, content-type set to application/json by default",
+      "translation": "执行原始请求，content-type默认设置为application / json"
+   },
+   {
+      "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
+      "translation": "预计申请成为键/值pairs\n错误列表发生在舱单附近:\n'{{.YmlSnippet}}'"
+   },
+   {
+      "id": "Expected applications to be a list",
+      "translation": "应用程序集应该是一个列表"
+   },
+   {
+      "id": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
+      "translation": "环境变量{{.PropertyName}}应是字符串，不是{{.PropertyType}}"
+   },
+   {
+      "id": "Expected {{.Name}} to be a set of key => value, but it was a {{.Type}}.",
+      "translation": "预期令{{.Name}}为一组关键=> 价值，但它是一{{.Type}}"
+   },
+   {
+      "id": "Expected {{.PropertyName}} to be a boolean.",
+      "translation": "{{.PropertyName}} 应为布尔变量"
+   },
+   {
+      "id": "Expected {{.PropertyName}} to be a list of strings.",
+      "translation": "{{.PropertyName}} 应为字符串"
+   },
+   {
+      "id": "Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}.",
+      "translation": "{{.PropertyName}} 应为数字，不是{{.PropertyType}}."
+   },
+   {
+      "id": "FAILED",
+      "translation": "失败"
+   },
+   {
+      "id": "Failed fetching buildpacks.\n{{.Error}}",
+      "translation": "抓取buildpack失败\n错误：{{.Error}}"
+   },
+   {
+      "id": "Failed fetching domains.\n{{.ApiErr}}",
+      "translation": "Failed fetching domains.\n{{.ApiErr}}"
+   },
+   {
+      "id": "Failed fetching events.\n{{.ApiErr}}",
+      "translation": "提取事件失败\n错误: {{.ApiErr}}"
+   },
+   {
+      "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
+      "translation": "无法获取组织用户的角色{{.OrgRoleToDisplayName}}.\n错误: {{.Error}}"
+   },
+   {
+      "id": "Failed fetching orgs.\n{{.ApiErr}}",
+      "translation": "提取组织失败.\n错误: {{.ApiErr}}"
+   },
+   {
+      "id": "Failed fetching routes.\n{{.Err}}",
+      "translation": "Failed fetching routes.\n{{.Err}}"
+   },
+   {
+      "id": "Failed fetching service brokers.\n{{.Error}}",
+      "translation": "Failed fetching service brokers.\n{{.Error}}"
+   },
+   {
+      "id": "Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
+      "translation": "未能获取空间用户的角色{{.SpaceRoleToDisplayName}}.\n错误: {{.Error}}"
+   },
+   {
+      "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
+      "translation": "获取不到空间.\n错误信息: {{.ErrorDescription}}"
+   },
+   {
+      "id": "Failed to create json for resource_match request",
+      "translation": "无法创建JSON格式的resource_match请求"
+   },
+   {
+      "id": "Failed to marshal JSON",
+      "translation": "转换JSON格式错误"
+   },
+   {
+      "id": "Failed to start oauth request",
+      "translation": "无法启动开放授权请求"
+   },
+   {
+      "id": "Force deletion without confirmation",
+      "translation": "不通过确认强制删除"
+   },
+   {
+      "id": "Force migration without confirmation",
+      "translation": "强制迁移"
+   },
+   {
+      "id": "Force restart of app without prompt",
+      "translation": "无推送强制重启应用"
+   },
+   {
+      "id": "GETTING STARTED",
+      "translation": "入门"
+   },
+   {
+      "id": "GLOBAL OPTIONS",
+      "translation": "全局选项"
+   },
+   {
+      "id": "Getting all services from marketplace...",
+      "translation": "从服务市场获取所有服务..."
+   },
+   {
+      "id": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "作为用户{{.Username}}获取在组织 {{.OrgName}} / 空间 {{.SpaceName}} 中的应用列表..."
+   },
+   {
+      "id": "Getting buildpacks...\n",
+      "translation": "获取buildpacks...\n"
+   },
+   {
+      "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
+      "translation": "Getting domains in org {{.OrgName}} as {{.Username}}..."
+   },
+   {
+      "id": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "作为用户{{.Username}}获取在组织{{.OrgName}} / 空间{{.SpaceName}} 中的应用{{.AppName}} 的环境变量 ..."
+   },
+   {
+      "id": "Getting events for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+      "translation": "作为用户{{.Username}}获取在组织{{.OrgName}} / 空间{{.SpaceName}} 中的应用{{.AppName}} 的事件信息 ..."
+   },
+   {
+      "id": "Getting files for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "作为用户{{.Username}}获取在组织{{.OrgName}} / 空间{{.SpaceName}} 中的应用{{.AppName}} 的文件信息 ..."
+   },
+   {
+      "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
+      "translation": "用户{{.Username}}请求组织{{.OrgName}}的信息..."
+   },
+   {
+      "id": "Getting info for security group {{.security_group}} as {{.username}}",
+      "translation": "Getting info for security group {{.security_group}} as {{.username}}"
+   },
+   {
+      "id": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
+      "translation": "获取空间信息中:用户{{.CurrentUser}}在组织{{.OrgName}}中的空间{{.TargetSpace}}信息..."
+   },
+   {
+      "id": "Getting orgs as {{.Username}}...\n",
+      "translation": "用户{{.Username}}请求组织...\n"
+   },
+   {
+      "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
+      "translation": "Getting quota {{.QuotaName}} info as {{.Username}}..."
+   },
+   {
+      "id": "Getting quotas as {{.Username}}...",
+      "translation": "Getting quotas as {{.Username}}..."
+   },
+   {
+      "id": "Getting routes as {{.Username}} ...\n",
+      "translation": "Getting routes as {{.Username}} ...\n"
+   },
+   {
+      "id": "Getting security groups as {{.username}}",
+      "translation": "Getting security groups as {{.username}}"
+   },
+   {
+      "id": "Getting service auth tokens as {{.CurrentUser}}...",
+      "translation": "Getting service auth tokens as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Getting service brokers as {{.Username}}...\n",
+      "translation": "Getting service brokers as {{.Username}}...\n"
+   },
+   {
+      "id": "Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "从服务市场获取用户{{.CurrentUser}}分配在组织{{.OrgName}}/空间{{.SpaceName}}中的服务..."
+   },
+   {
+      "id": "Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "获取用户{{.CurrentUser}}在组织{{.OrgName}}/空间{{.SpaceName}}中的服务..."
+   },
+   {
+      "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
+      "translation": "获取空间:用户{{.CurrentUser}}在组织{{.TargetOrgName}}中获取空间...\n"
+   },
+   {
+      "id": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "用户{{.Username}}请求分配组织{{.OrganizationName}}/空间{{.SpaceName}}中的stacks..."
+   },
+   {
+      "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
+      "translation": "用户{{.CurrentUser}}请求分配组织{{.TargetOrg}}/空间{{.TargetSpace}}中的用户"
+   },
+   {
+      "id": "Getting users in org {{.TargetOrg}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}请求分配组织{{.TargetOrg}}中的用户..."
+   },
+   {
+      "id": "HTTP data to include in the request body",
+      "translation": "包含到请求语句中的HTTP数据"
+   },
+   {
+      "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
+      "translation": "HTTP method (GET,POST,PUT,DELETE,etc)"
+   },
+   {
+      "id": "Hostname",
+      "translation": "Hostname"
+   },
+   {
+      "id": "Hostname (e.g. my-subdomain)",
+      "translation": "域名前缀 (例如： my-subdomain)"
+   },
+   {
+      "id": "Ignore manifest file",
+      "translation": "忽略部署描述文件"
+   },
+   {
+      "id": "Include response headers in the output",
+      "translation": "输出包含HTTP响应头"
+   },
+   {
+      "id": "Incorrect Usage",
+      "translation": "Incorrect Usage"
+   },
+   {
+      "id": "Incorrect Usage.\n",
+      "translation": "不正确的使用\n"
+   },
+   {
+      "id": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
+      "translation": "不正确使用方法。利用部署描述文件部署多个应用程序时，不能使用命令行标志（除了-f）"
+   },
+   {
+      "id": "Incorrect number of arguments",
+      "translation": "参数个数错误"
+   },
+   {
+      "id": "Incorrect usage",
+      "translation": "不正确的使用"
+   },
+   {
+      "id": "Invalid JSON response from server",
+      "translation": "无效的服务器JSON响应"
+   },
+   {
+      "id": "Invalid Role {{.Role}}",
+      "translation": "无效的角色 {{.Role}}"
+   },
+   {
+      "id": "Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
+      "translation": "访问{{.URL}}的无效SSL证书\n{{.TipMessage}}"
+   },
+   {
+      "id": "Invalid async response from server",
+      "translation": "服务器无效的异步响应"
+   },
+   {
+      "id": "Invalid auth token: ",
+      "translation": "无效的身份验证令牌: "
+   },
+   {
+      "id": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
+      "translation": "无效的磁盘配额: {{.DiskQuota}}\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "Invalid disk quota: {{.DiskQuota}}\n{{.Err}}",
+      "translation": "无效的磁盘配额: {{.DiskQuota}}\n{{.Err}}"
+   },
+   {
+      "id": "Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer",
+      "translation": "无效的实例数: {{.InstanceCount}}\n实例数必须是正整数"
+   },
+   {
+      "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
+      "translation": "无效的实例数: {{.InstancesCount}}\n实例数量必须是个正整数"
+   },
+   {
+      "id": "Invalid manifest. Expected a map",
+      "translation": "无效的配置"
+   },
+   {
+      "id": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
+      "translation": "无效的内存配额: {{.MemLimit}}\n{{.Err}}"
+   },
+   {
+      "id": "Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}",
+      "translation": "Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}"
+   },
+   {
+      "id": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
+      "translation": "无效的内存配额: {{.Memory}}\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "Invalid position. {{.ErrorDescription}}",
+      "translation": "Invalid position. {{.ErrorDescription}}"
+   },
+   {
+      "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
+      "translation": "无效的超时参数设定: {{.Timeout}}\n{{.Err}}"
+   },
+   {
+      "id": "Invalid usage",
+      "translation": "无效使用"
+   },
+   {
+      "id": "JSON is invalid: {{.ErrorDescription}}",
+      "translation": "无效的JSON: {{.ErrorDescription}}"
+   },
+   {
+      "id": "List all apps in the target space",
+      "translation": "列出目标空间中的所有应用程序"
+   },
+   {
+      "id": "List all buildpacks",
+      "translation": "列出所有buildpacks"
+   },
+   {
+      "id": "List all orgs",
+      "translation": "列出所有组织"
+   },
+   {
+      "id": "List all routes in the current space",
+      "translation": "List all routes in the current space"
+   },
+   {
+      "id": "List all security groups",
+      "translation": "List all security groups"
+   },
+   {
+      "id": "List all service instances in the target space",
+      "translation": "列出目标空间中的所有服务实例"
+   },
+   {
+      "id": "List all spaces in an org",
+      "translation": "列出组织中所有的空间"
+   },
+   {
+      "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "列出所有stacks (stack是预先建立好的文件系统， 包含可以运行应用程序的操作系统)"
+   },
+   {
+      "id": "List all users in the org",
+      "translation": "列出组织中所有的机构"
+   },
+   {
+      "id": "List available offerings in the marketplace",
+      "translation": "列出所有可用的服务"
+   },
+   {
+      "id": "List available usage quotas",
+      "translation": "List available usage quotas"
+   },
+   {
+      "id": "List domains in the target org",
+      "translation": "List domains in the target org"
+   },
+   {
+      "id": "List security groups in the set of security groups for running applications",
+      "translation": "List security groups in the set of security groups for running applications"
+   },
+   {
+      "id": "List security groups in the staging set for applications",
+      "translation": "List security groups in the staging set for applications"
+   },
+   {
+      "id": "List service auth tokens",
+      "translation": "List service auth tokens"
+   },
+   {
+      "id": "List service brokers",
+      "translation": "List service brokers"
+   },
+   {
+      "id": "Lock the buildpack",
+      "translation": "锁定该 buildpack"
+   },
+   {
+      "id": "Log user in",
+      "translation": "用户登录"
+   },
+   {
+      "id": "Log user out",
+      "translation": "用户退出"
+   },
+   {
+      "id": "Logging out...",
+      "translation": "正在退出..."
+   },
+   {
+      "id": "Loggregator endpoint missing from config file",
+      "translation": "配置文件中没有loggregator地址信息"
+   },
+   {
+      "id": "Make a user-provided service instance available to cf apps",
+      "translation": "使这个由用户提供的服务实例对应用生效"
+   },
+   {
+      "id": "Map the root domain to this app",
+      "translation": "映射根域名到此应用程序"
+   },
+   {
+      "id": "Max wait time for app instance startup, in minutes",
+      "translation": "应用实例启动的最长等待时间，以分钟为单位"
+   },
+   {
+      "id": "Max wait time for buildpack staging, in minutes",
+      "translation": "buildpack打包的最长等待时间，以分钟为单位"
+   },
+   {
+      "id": "Memory",
+      "translation": "Memory"
+   },
+   {
+      "id": "Memory limit (e.g. 256M, 1024M, 1G)",
+      "translation": "内存配额（例如256M，1024M，1G）"
+   },
+   {
+      "id": "Migrate service instances from one service plan to another",
+      "translation": "将服务实例从一个服务计划迁移到另一个"
+   },
+   {
+      "id": "NAME:",
+      "translation": "名称:"
+   },
+   {
+      "id": "Name",
+      "translation": "Name"
+   },
+   {
+      "id": "New Password",
+      "translation": "新的密码"
+   },
+   {
+      "id": "New name",
+      "translation": "New name"
+   },
+   {
+      "id": "No API endpoint targeted. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
+      "translation": "没有指定API终端。使用'{{.LoginTip}}'或'{{.APITip}}'选择终端"
+   },
+   {
+      "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
+      "translation": "No api endpoint set. Use '{{.Name}}' to set an endpoint"
+   },
+   {
+      "id": "No apps found",
+      "translation": "没有找到应用程序"
+   },
+   {
+      "id": "No buildpacks found",
+      "translation": "buildpack未找到"
+   },
+   {
+      "id": "No domains found",
+      "translation": "No domains found"
+   },
+   {
+      "id": "No events for app {{.AppName}}",
+      "translation": "没有找到应用程序{{.AppName}}的事件"
+   },
+   {
+      "id": "No flags specified. No changes were made.",
+      "translation": "没有指定的参数。未进行任何更改。"
+   },
+   {
+      "id": "No org and space targeted, use '{{.Command}}' to target an org and space",
+      "translation": "没有指定组织和空间，使用'{{.Command}}'选择组织和空间"
+   },
+   {
+      "id": "No org or space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "没有指定组织或空间，使用'{{.CFTargetCommand}}'选择组织或空间"
+   },
+   {
+      "id": "No org targeted, use '{{.CFTargetCommand}}'",
+      "translation": "没有指定组织，使用'{{.CFTargetCommand}}'选择组织"
+   },
+   {
+      "id": "No org targeted, use '{{.Command}}' to target an org.",
+      "translation": "没有指定组织，使用'{{.Command}}'选择组织."
+   },
+   {
+      "id": "No orgs found",
+      "translation": "没有找到任何组织"
+   },
+   {
+      "id": "No routes found",
+      "translation": "No routes found"
+   },
+   {
+      "id": "No running security groups set",
+      "translation": "No running security groups set"
+   },
+   {
+      "id": "No security groups",
+      "translation": "No security groups"
+   },
+   {
+      "id": "No service brokers found",
+      "translation": "No service brokers found"
+   },
+   {
+      "id": "No service offerings found",
+      "translation": "没有找到服务"
+   },
+   {
+      "id": "No services found",
+      "translation": "没有找到服务"
+   },
+   {
+      "id": "No space targeted, use '{{.CFTargetCommand}}'",
+      "translation": "没有指定空间，使用'{{.CFTargetCommand}}'指定空间"
+   },
+   {
+      "id": "No space targeted, use '{{.Command}}' to target a space",
+      "translation": "没有指定空间，使用'{{.Command}}'指定空间"
+   },
+   {
+      "id": "No spaces assigned",
+      "translation": "No spaces assigned"
+   },
+   {
+      "id": "No spaces found",
+      "translation": "没有找到空间"
+   },
+   {
+      "id": "No staging security group set",
+      "translation": "No staging security group set"
+   },
+   {
+      "id": "No system-provided env variables have been set",
+      "translation": "系统提供的环境变量未设置"
+   },
+   {
+      "id": "No user-defined env variables have been set",
+      "translation": "用户定义的环境变量未设置"
+   },
+   {
+      "id": "None of your application files have changed. Nothing will be uploaded.",
+      "translation": "你的应用程序文件没有发生变动，不会上传任何内容"
+   },
+   {
+      "id": "Not logged in. Use '{{.CFLoginCommand}}' to log in.",
+      "translation": "尚未登录，请使用'{{.CFLoginCommand}}'来登录"
+   },
+   {
+      "id": "Number of instances",
+      "translation": "实例数"
+   },
+   {
+      "id": "OK",
+      "translation": "通过"
+   },
+   {
+      "id": "ORG ADMIN",
+      "translation": "组织管理员"
+   },
+   {
+      "id": "ORG AUDITOR",
+      "translation": "组织审计"
+   },
+   {
+      "id": "ORG MANAGER",
+      "translation": "组织管理"
+   },
+   {
+      "id": "ORGS",
+      "translation": "组织"
+   },
+   {
+      "id": "Org",
+      "translation": "组织"
+   },
+   {
+      "id": "Org {{.OrgName}} already exists",
+      "translation": "组织{{.OrgName}}已经存在"
+   },
+   {
+      "id": "Org {{.OrgName}} does not exist or is not accessible",
+      "translation": "组织{{.OrgName}}不存在或无法访问"
+   },
+   {
+      "id": "Org {{.OrgName}} does not exist.",
+      "translation": "组织{{.OrgName}}不存在"
+   },
+   {
+      "id": "Org:",
+      "translation": "组织:"
+   },
+   {
+      "id": "Organization",
+      "translation": "Organization"
+   },
+   {
+      "id": "Override path to default config directory",
+      "translation": "修改cf配置文件config.json的路径（该路径默认为～/.cf）"
+   },
+   {
+      "id": "Paid service plans",
+      "translation": "Paid service plans"
+   },
+   {
+      "id": "Parameters",
+      "translation": "参数"
+   },
+   {
+      "id": "Password",
+      "translation": "密码"
+   },
+   {
+      "id": "Password verification does not match",
+      "translation": "密码验证不匹配"
+   },
+   {
+      "id": "Path of app directory or zip file",
+      "translation": "应用程序目录或zip压缩文件路径"
+   },
+   {
+      "id": "Path to directory or zip file",
+      "translation": "目录或zip文件路径"
+   },
+   {
+      "id": "Path to manifest",
+      "translation": "部署描述文件的路径"
+   },
+   {
+      "id": "Plan {{.ServicePlanName}} cannot be found",
+      "translation": "无效的服务计划{{.ServicePlanName}}"
+   },
+   {
+      "id": "Plan {{.ServicePlanName}} has no service instances to migrate",
+      "translation": "服务计划{{.ServicePlanName}}没有服务实例可迁移"
+   },
+   {
+      "id": "Plan: {{.ServicePlanName}}",
+      "translation": "Plan: {{.ServicePlanName}}"
+   },
+   {
+      "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
+      "translation": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command."
+   },
+   {
+      "id": "Please don't",
+      "translation": "请不要"
+   },
+   {
+      "id": "Please log in again",
+      "translation": "请重新登录"
+   },
+   {
+      "id": "Print API request diagnostics to stdout",
+      "translation": "打印API请求诊断信息到标准输出"
+   },
+   {
+      "id": "Print out a list of files in a directory or the contents of a specific file",
+      "translation": "打印目录下的文件清单，或者特定文件的内容"
+   },
+   {
+      "id": "Print the version",
+      "translation": "打印版本号"
+   },
+   {
+      "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
+      "translation": "清单中有'{{.PropertyName}}'。不再支持此功能。请删除它，再试一次"
+   },
+   {
+      "id": "Provider",
+      "translation": "提供者"
+   },
+   {
+      "id": "Purging service {{.ServiceName}}...",
+      "translation": "清理服务{{.ServiceName}}..."
+   },
+   {
+      "id": "Push a new app or sync changes to an existing app",
+      "translation": "部署新的应用程序或同步更改已存在的应用程序"
+   },
+   {
+      "id": "Push a single app (with or without a manifest):\n",
+      "translation": "部署单一应用程序（带或不带部署描述文件）:\n"
+   },
+   {
+      "id": "Quota Definition {{.QuotaName}} already exists",
+      "translation": "Quota Definition {{.QuotaName}} already exists"
+   },
+   {
+      "id": "Quota {{.QuotaName}} does not exist",
+      "translation": "Quota {{.QuotaName}} does not exist"
+   },
+   {
+      "id": "REQUEST:",
+      "translation": "请求:"
+   },
+   {
+      "id": "RESPONSE:",
+      "translation": "响应:"
+   },
+   {
+      "id": "ROLES:\n",
+      "translation": "角色:\n"
+   },
+   {
+      "id": "ROUTES",
+      "translation": "路由"
+   },
+   {
+      "id": "Really delete orphaned routes?{{.Prompt}}",
+      "translation": "Really delete orphaned routes?{{.Prompt}}"
+   },
+   {
+      "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
+      "translation": "确定删除{{.ModelType}} {{.ModelName}}以及所有相关数据和文件？"
+   },
+   {
+      "id": "Really delete the {{.ModelType}} {{.ModelName}}?",
+      "translation": "确定删除{{.ModelType}} {{.ModelName}}？"
+   },
+   {
+      "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?>",
+      "translation": "您确定要将服务{{.ServiceInstanceDescription}}从服务计划{{.OldServicePlanName}}迁移到计划{{.NewServicePlanName}}？>"
+   },
+   {
+      "id": "Really purge service offering {{.ServiceName}} from Cloud Foundry?",
+      "translation": "确定要从Cloud Foundry的清理服务{{.ServiceName}}吗?"
+   },
+   {
+      "id": "Received invalid SSL certificate from ",
+      "translation": "接收到无效的SSL证书, 从: "
+   },
+   {
+      "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
+      "translation": "不经过请求服务令牌，递归地从Cloud Foundry的数据库中删除一个服务对象和子对象"
+   },
+   {
+      "id": "Remove a space role from a user",
+      "translation": "删除用户在空间中的角色"
+   },
+   {
+      "id": "Remove a url route from an app",
+      "translation": "Remove a url route from an app"
+   },
+   {
+      "id": "Remove an env variable",
+      "translation": "删除一个环境变量"
+   },
+   {
+      "id": "Remove an org role from a user",
+      "translation": "删除用户在组织中的角色"
+   },
+   {
+      "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}删除组织{{.OrgName}}/空间{{.SpaceName}}中应用程序{{.AppName}}的环境变量{{.VarName}}..."
+   },
+   {
+      "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
+      "translation": "删除角色:用户{{.CurrentUser}}在组织{{.TargetOrg}}或者空间{{.TargetSpace}}中删除用户{{.TargetUser}}的角色{{.Role}}..."
+   },
+   {
+      "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
+      "translation": "删除角色:用户{{.CurrentUser}}在组织中{{.TargetOrg}}中删除用户{{.TargetUser}}的角色{{.Role}}..."
+   },
+   {
+      "id": "Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+   },
+   {
+      "id": "Removing route {{.URL}}...",
+      "translation": "删除路由 {{.URL}}..."
+   },
+   {
+      "id": "Rename a buildpack",
+      "translation": "重命名buildpack"
+   },
+   {
+      "id": "Rename a service broker",
+      "translation": "Rename a service broker"
+   },
+   {
+      "id": "Rename a service instance",
+      "translation": "重命名服务实例"
+   },
+   {
+      "id": "Rename a space",
+      "translation": "重命名空间"
+   },
+   {
+      "id": "Rename an app",
+      "translation": "重命名一个应用程序"
+   },
+   {
+      "id": "Rename an org",
+      "translation": "重命名一个组织"
+   },
+   {
+      "id": "Renaming app {{.AppName}} to {{.NewName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "用户{{.Username}}将组织{{.OrgName}} /空间{{.SpaceName}}中的应用程序{{.AppName}}重命名为{{.NewName}}..."
+   },
+   {
+      "id": "Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}...",
+      "translation": "重命名 buildpack {{.OldBuildpackName}} 到 {{.NewBuildpackName}}..."
+   },
+   {
+      "id": "Renaming org {{.OrgName}} to {{.NewName}} as {{.Username}}...",
+      "translation": "重命名组织{{.OrgName}}到{{.NewName}}为用户{{.Username}}..."
+   },
+   {
+      "id": "Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}",
+      "translation": "Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}"
+   },
+   {
+      "id": "Renaming service {{.ServiceName}} to {{.NewServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "将服务{{.ServiceName}}重命名为{{.NewServiceName}}，该服务属于组织{{.OrgName}} /空间{{.SpaceName}}的{{.CurrentUser}}用户..."
+   },
+   {
+      "id": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+      "translation": "重命名空间:用户{{.CurrentUser}}在组织{{.OrgName}}中将{{.OldSpaceName}}重命名为{{.NewSpaceName}}..."
+   },
+   {
+      "id": "Restage an app",
+      "translation": "重新装载一个应用程序"
+   },
+   {
+      "id": "Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}，在组织{{.OrgName}}/空间{{.SpaceName}}中restaging 应用程序{{.AppName}}..."
+   },
+   {
+      "id": "Restart an app",
+      "translation": "重新启动一个应用程序"
+   },
+   {
+      "id": "Route {{.URL}} already exists",
+      "translation": "Route {{.URL}} already exists"
+   },
+   {
+      "id": "Routes",
+      "translation": "Routes"
+   },
+   {
+      "id": "Rules",
+      "translation": "Rules"
+   },
+   {
+      "id": "SECURITY GROUP",
+      "translation": "SECURITY GROUP"
+   },
+   {
+      "id": "SERVICE ADMIN",
+      "translation": "服务管理员"
+   },
+   {
+      "id": "SERVICES",
+      "translation": "服务"
+   },
+   {
+      "id": "SPACE AUDITOR",
+      "translation": "空间审计"
+   },
+   {
+      "id": "SPACE DEVELOPER",
+      "translation": "空间开发者"
+   },
+   {
+      "id": "SPACE MANAGER",
+      "translation": "空间管理者"
+   },
+   {
+      "id": "SPACES",
+      "translation": "空间"
+   },
+   {
+      "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}伸缩组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}}..."
+   },
+   {
+      "id": "Security Groups:",
+      "translation": "安全组:"
+   },
+   {
+      "id": "Security group {{.security_group}} does not exist",
+      "translation": "Security group {{.security_group}} does not exist"
+   },
+   {
+      "id": "Security group {{.security_group}} {{.error_message}}",
+      "translation": "Security group {{.security_group}} {{.error_message}}"
+   },
+   {
+      "id": "Select a space (or press enter to skip):",
+      "translation": "选择一个空间（或按回车继续）:"
+   },
+   {
+      "id": "Select an org (or press enter to skip):",
+      "translation": "选择一个组织（或按回车继续）:"
+   },
+   {
+      "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
+      "translation": "服务器错误，状态代码: {{.ErrStatusCode}}, 错误代码: {{.ErrApiErrorCode}}, 信息: {{.ErrDescription}}"
+   },
+   {
+      "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
+      "translation": "Service Auth Token {{.Label}} {{.Provider}} does not exist."
+   },
+   {
+      "id": "Service Broker {{.Name}} does not exist.",
+      "translation": "Service Broker {{.Name}} does not exist."
+   },
+   {
+      "id": "Service Instance is not user provided",
+      "translation": "不是用户定义的服务实例"
+   },
+   {
+      "id": "Service instance: {{.ServiceName}}",
+      "translation": "服务实例: {{.ServiceName}}"
+   },
+   {
+      "id": "Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.",
+      "translation": "服务不存在\n小贴士: 如果你想清理一个v1的服务，请设置-p参数。"
+   },
+   {
+      "id": "Service {{.ServiceName}} does not exist.",
+      "translation": "服务{{.ServiceName}}不存在"
+   },
+   {
+      "id": "Service: {{.ServiceDescription}}",
+      "translation": "服务描述: {{.ServiceDescription}}"
+   },
+   {
+      "id": "Services",
+      "translation": "Services"
+   },
+   {
+      "id": "Services:",
+      "translation": "服务:"
+   },
+   {
+      "id": "Set an env variable for an app",
+      "translation": "为一个应用程序设置环境变量"
+   },
+   {
+      "id": "Set or view target api url",
+      "translation": "设置或查看指定的API网络地址"
+   },
+   {
+      "id": "Set or view the targeted org or space",
+      "translation": "设置或查看指定的组织或空间"
+   },
+   {
+      "id": "Setting api endpoint to {{.Endpoint}}...",
+      "translation": "将API终端设置为 {{.Endpoint}}..."
+   },
+   {
+      "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "作为用户{{.CurrentUser}}设置组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}}的环境变量'{{.VarName}}'为'{{.VarValue}}'..."
+   },
+   {
+      "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
+      "translation": "用户{{.Username}}为组织{{.OrgName}}设置配额{{.QuotaName}}..."
+   },
+   {
+      "id": "Show a single security group",
+      "translation": "Show a single security group"
+   },
+   {
+      "id": "Show all env variables for an app",
+      "translation": "显示应用程序所有环境变量"
+   },
+   {
+      "id": "Show help",
+      "translation": "显示帮助"
+   },
+   {
+      "id": "Show org info",
+      "translation": "展示组织信息"
+   },
+   {
+      "id": "Show org users by role",
+      "translation": "通过角色展现组织的用户"
+   },
+   {
+      "id": "Show quota info",
+      "translation": "Show quota info"
+   },
+   {
+      "id": "Show recent app events",
+      "translation": "显示应用程序最近的事件"
+   },
+   {
+      "id": "Show service instance info",
+      "translation": "显示服务实例的信息"
+   },
+   {
+      "id": "Show space info",
+      "translation": "显示空间信息"
+   },
+   {
+      "id": "Show space users by role",
+      "translation": "通过角色展现空间的用户"
+   },
+   {
+      "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}显示组织{{.OrgName}}/空间{{.SpaceName}}中应用程序{{.AppName}}的实例数 ..."
+   },
+   {
+      "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "作为用户{{.Username}}显示组织{{.OrgName}}/空间{{.SpaceName}}应用程序{{.AppName}}的健康状态..."
+   },
+   {
+      "id": "Space",
+      "translation": "Space"
+   },
+   {
+      "id": "Space {{.SpaceName}} already exists",
+      "translation": "空间{{.SpaceName}}已经存在"
+   },
+   {
+      "id": "Space:",
+      "translation": "空间:"
+   },
+   {
+      "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "堆栈使用（堆栈是一个预先构建的文件系统，包括一个操作系统，可以用来运行应用程序）"
+   },
+   {
+      "id": "Start an app",
+      "translation": "启动应用程序"
+   },
+   {
+      "id": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
+      "translation": "启动应用程序超时\n\n小贴士: 使用'{{.Command}}'以获取更多信息"
+   },
+   {
+      "id": "Start timeout in seconds",
+      "translation": "在数秒内启动超时"
+   },
+   {
+      "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
+      "translation": "启动不成功\n\n小贴士: 使用'{{.Command}}'以获取更多信息"
+   },
+   {
+      "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "作为用户{{.CurrentUser}}启动组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}}..."
+   },
+   {
+      "id": "Startup command, set to null to reset to default start command",
+      "translation": "启动命令，设置为null可以重置为默认启动命令"
+   },
+   {
+      "id": "Stop an app",
+      "translation": "停止一个应用程序"
+   },
+   {
+      "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "作为用户{{.CurrentUser}}停止组织{{.OrgName}}中/空间{{.SpaceName}}中的应用程序{{.AppName}}..."
+   },
+   {
+      "id": "Syslog Drain Url",
+      "translation": "Syslog转发地址"
+   },
+   {
+      "id": "System-Provided:",
+      "translation": "系统提供的:"
+   },
+   {
+      "id": "TIP:\n",
+      "translation": "小贴士:\n"
+   },
+   {
+      "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+      "translation": "小贴士: 没有指定空间，使用'{{.CfTargetCommand}}'指定空间"
+   },
+   {
+      "id": "TIP: To make these changes take effect, use '{{.CFUnbindCommand}}' to unbind the service, '{{.CFBindComand}}' to rebind, and then '{{.CFRestageCommand}}' to update the app with the new env variables",
+      "translation": "小贴士: 为了使这些更改生效， 使用'{{.CFUnbindCommand}}解除绑定的服务，使用'{{.CFBindComand}}重新绑定服务，然后使用'{{.CFRestageCommand}}'更新应用使环境变量生效。"
+   },
+   {
+      "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
+      "translation": "小贴士: 使用'{{.ApiCommand}}'继续非安全的API终端访问"
+   },
+   {
+      "id": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect",
+      "translation": "小贴士: 使用'{{.CFCommand}}'，来确保您的环境变量更改生效"
+   },
+   {
+      "id": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
+      "translation": "小贴士: 使用'{{.Command}}'来确保你的环境变量更改生效"
+   },
+   {
+      "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
+      "translation": "小贴士: 使用'{{.CfUpdateBuildpackCommand}}' 来更新此buildpack"
+   },
+   {
+      "id": "Tail or show recent logs for an app",
+      "translation": "获取一个应用程序尾部信息或最近的日志"
+   },
+   {
+      "id": "Targeted org {{.OrgName}}\n",
+      "translation": "已选择组织 {{.OrgName}}\n"
+   },
+   {
+      "id": "Targeted space {{.SpaceName}}\n",
+      "translation": "已选择空间 {{.SpaceName}}\n"
+   },
+   {
+      "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
+      "translation": "路由 {{.URL}} 已被占用\n小贴士: 请使用-n HOSTNAME 命令行改变主机名称，或使用--random-route命令生成一个新路由，然后重新使用push命令"
+   },
+   {
+      "id": "There are no running instances of this app.",
+      "translation": "这个程序没有正在运行的实例"
+   },
+   {
+      "id": "There are too many options to display, please type in the name.",
+      "translation": "内容太多，无法显示，请输入名称"
+   },
+   {
+      "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
+      "translation": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? "
+   },
+   {
+      "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
+      "translation": "这将导致应用程序重新启动。您确定要伸缩{{.AppName}}？"
+   },
+   {
+      "id": "Timeout for async HTTP requests",
+      "translation": "异步HTTP请求超时"
+   },
+   {
+      "id": "Total amount of memory (e.g. 1024M, 1G, 10G)",
+      "translation": "Total amount of memory (e.g. 1024M, 1G, 10G)"
+   },
+   {
+      "id": "Total number of routes",
+      "translation": "Total number of routes"
+   },
+   {
+      "id": "Total number of service instances",
+      "translation": "Total number of service instances"
+   },
+   {
+      "id": "Trace HTTP requests",
+      "translation": "跟踪HTTP请求"
+   },
+   {
+      "id": "UAA endpoint missing from config file",
+      "translation": "配置文件中没有UAA API地址信息"
+   },
+   {
+      "id": "USAGE:",
+      "translation": "用法:"
+   },
+   {
+      "id": "USER ADMIN",
+      "translation": "用户管理员"
+   },
+   {
+      "id": "USERS",
+      "translation": "用户"
+   },
+   {
+      "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
+      "translation": "无法访问空间{{.SpaceName}}，\n错误: {{.ApiErr}}"
+   },
+   {
+      "id": "Unable to authenticate.",
+      "translation": "无法验证."
+   },
+   {
+      "id": "Unable to delete, route '{{.URL}}' does not exist.",
+      "translation": "Unable to delete, route '{{.URL}}' does not exist."
+   },
+   {
+      "id": "Unbind a security group from a space",
+      "translation": "Unbind a security group from a space"
+   },
+   {
+      "id": "Unbind a security group from the set of security groups for running applications",
+      "translation": "Unbind a security group from the set of security groups for running applications"
+   },
+   {
+      "id": "Unbind a security group from the set of security groups for staging applications",
+      "translation": "Unbind a security group from the set of security groups for staging applications"
+   },
+   {
+      "id": "Unbind a service instance from an app",
+      "translation": "从一个应用程序解绑一个服务实例"
+   },
+   {
+      "id": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}正在将应用程序{{.AppName}}从属于组织{{.OrgName}}/空间{{.SpaceName}}的服务{{.ServiceName}}上解绑..."
+   },
+   {
+      "id": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}"
+   },
+   {
+      "id": "Unbinding security group {{.security_group}} from defaults for staging as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from defaults for staging as {{.username}}"
+   },
+   {
+      "id": "Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
+      "translation": "Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}"
+   },
+   {
+      "id": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
+      "translation": "非法{{.PropertyName}}值:\n错误: {{.Error}}"
+   },
+   {
+      "id": "Unlock the buildpack",
+      "translation": "解锁buildpack"
+   },
+   {
+      "id": "Update a buildpack",
+      "translation": "更新buildpack"
+   },
+   {
+      "id": "Update a security group",
+      "translation": "Update a security group"
+   },
+   {
+      "id": "Update a service auth token",
+      "translation": "Update a service auth token"
+   },
+   {
+      "id": "Update a service broker",
+      "translation": "Update a service broker"
+   },
+   {
+      "id": "Update an existing resource quota",
+      "translation": "Update an existing resource quota"
+   },
+   {
+      "id": "Update user-provided service instance name value pairs",
+      "translation": "更新用户提供的服务实例名称值对"
+   },
+   {
+      "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "作为用户{{.Username}}更新组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}}..."
+   },
+   {
+      "id": "Updating buildpack {{.BuildpackName}}...",
+      "translation": "更新buildpack {{.BuildpackName}}..."
+   },
+   {
+      "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
+      "translation": "Updating quota {{.QuotaName}} as {{.Username}}..."
+   },
+   {
+      "id": "Updating security group {{.security_group}} as {{.username}}",
+      "translation": "Updating security group {{.security_group}} as {{.username}}"
+   },
+   {
+      "id": "Updating service auth token as {{.CurrentUser}}...",
+      "translation": "Updating service auth token as {{.CurrentUser}}..."
+   },
+   {
+      "id": "Updating service broker {{.Name}} as {{.Username}}...",
+      "translation": "Updating service broker {{.Name}} as {{.Username}}..."
+   },
+   {
+      "id": "Updating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}正在更新属于组织{{.OrgName}}/空间{{.SpaceName}}的由用户提供的服务{{.ServiceName}}..."
+   },
+   {
+      "id": "Uploading app files from: {{.Path}}",
+      "translation": "上传应用程序文件,从: {{.Path}}"
+   },
+   {
+      "id": "Uploading buildpack {{.BuildpackName}}...",
+      "translation": "上传buildpack {{.BuildpackName}}..."
+   },
+   {
+      "id": "Uploading {{.AppName}}...",
+      "translation": "上传应用程序{{.AppName}}..."
+   },
+   {
+      "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
+      "translation": "上传{{.ZipFileBytes}}, {{.FileCount}}文件"
+   },
+   {
+      "id": "Use '{{.Name}}' to view or set your target org and space",
+      "translation": "使用'{{.Name}}'来查看或设置你选择的组织和空间"
+   },
+   {
+      "id": "Use a one-time password to login",
+      "translation": "使用一次性密码登录"
+   },
+   {
+      "id": "User {{.TargetUser}} does not exist.",
+      "translation": "用户{{.TargetUser}}不存在."
+   },
+   {
+      "id": "User-Provided:",
+      "translation": "用户提供的:"
+   },
+   {
+      "id": "User:",
+      "translation": "用户:"
+   },
+   {
+      "id": "Username",
+      "translation": "用户名"
+   },
+   {
+      "id": "Using manifest file {{.Path}}\n",
+      "translation": "使用配置文件{{.Path}}\n"
+   },
+   {
+      "id": "Using route {{.RouteURL}}",
+      "translation": "使用路由 {{.RouteURL}}"
+   },
+   {
+      "id": "Using stack {{.StackName}}...",
+      "translation": "使用堆栈{{.StackName}}..."
+   },
+   {
+      "id": "VERSION:",
+      "translation": "版本:"
+   },
+   {
+      "id": "Verify Password",
+      "translation": "校验密码"
+   },
+   {
+      "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
+      "translation": "警告:\n   强烈建议不要在命令行参数里指定密码，\n   以防他人读取或通过命令历史记录查找到密码\n\n"
+   },
+   {
+      "id": "WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
+      "translation": "警告: 此操作认为Service Broker所负责这项服务已经不再可用，所有服务实例已被删除，并且已经在Cloud Foundry的数据库中留下了孤儿记录。该操作执行后Cloud Foundry中所有有关该服务的信息都将被删除，包括服务实例和服务绑定。该操作不会尝试通知Service Brocker;所以在不删除Service Brocker的情况下运行此命令将会遗留孤儿服务实例。故运行此命令后，建议您执行delete-service-auth-token或者delete-service-broker来完成这次清理工作."
+   },
+   {
+      "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
+      "translation": " 警告:这是一个Cloud Foundry内部操作;Service Broker不会被通知，服务实例所分配的资源也不会被改变。此项操作的主要适用场景是通过将服务实例从v1服务计划映射到v2服务计划，来将对应的v1 API的Service Broker替换为v2版本。我们建议您关闭v1的Service Brocker并设置v1的服务计划为私有，以防止后续操作创建额外的实例。一旦服务已经迁移完成，就可以从Cloud Foundry中删除v1的服务和服务计划。"
+   },
+   {
+      "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
+      "translation": "警告: 检测到不安全的HTTP APT终端，建议使用HTTP安全版 API终端\n"
+   },
+   {
+      "id": "Warning: error tailing logs",
+      "translation": "警告: 获取日志出错"
+   },
+   {
+      "id": "Write curl body to FILE instead of stdout",
+      "translation": "Write curl body to FILE instead of stdout"
+   },
+   {
+      "id": "Zip archive does not contain a buildpack",
+      "translation": "压缩文档中没有buildpack"
+   },
+   {
+      "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",
+      "translation": "[MULTIPART/FORM-DATA 数据内容隐藏]"
+   },
+   {
+      "id": "[PRIVATE DATA HIDDEN]",
+      "translation": "[私有数据隐藏]"
+   },
+   {
+      "id": "[environment variables]",
+      "translation": "[环境变量]"
+   },
+   {
+      "id": "[global options] command [arguments...] [command options]",
+      "translation": "[全局选项] 命令 [参数...] [命令选项]"
+   },
+   {
+      "id": "actor",
+      "translation": "执行者"
+   },
+   {
+      "id": "allowed",
+      "translation": "允许"
+   },
+   {
+      "id": "already exists",
+      "translation": "already exists"
+   },
+   {
+      "id": "app",
+      "translation": "应用程序"
+   },
+   {
+      "id": "app crashed",
+      "translation": "应用程序崩溃"
+   },
+   {
+      "id": "apps",
+      "translation": "apps"
+   },
+   {
+      "id": "auth request failed",
+      "translation": "身份验证请求失败"
+   },
+   {
+      "id": "bound apps",
+      "translation": "已绑定的应用"
+   },
+   {
+      "id": "cpu",
+      "translation": "CPU内核"
+   },
+   {
+      "id": "crashing",
+      "translation": "崩溃"
+   },
+   {
+      "id": "description",
+      "translation": "描述"
+   },
+   {
+      "id": "disallowed",
+      "translation": "禁止"
+   },
+   {
+      "id": "disk",
+      "translation": "磁盘"
+   },
+   {
+      "id": "disk:",
+      "translation": "磁盘:"
+   },
+   {
+      "id": "does not exist.",
+      "translation": "does not exist."
+   },
+   {
+      "id": "domain",
+      "translation": "domain"
+   },
+   {
+      "id": "down",
+      "translation": "没在运行"
+   },
+   {
+      "id": "enabled",
+      "translation": "已启用"
+   },
+   {
+      "id": "env var '{{.PropertyName}}' should not be null",
+      "translation": "环境变量'{{.PropertyName}}'不能为空"
+   },
+   {
+      "id": "event",
+      "translation": "事件"
+   },
+   {
+      "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
+      "translation": "没有关闭输入显示，你的密码将被显示:\n{{.ErrorDescription}}"
+   },
+   {
+      "id": "filename",
+      "translation": "文件名"
+   },
+   {
+      "id": "host",
+      "translation": "host"
+   },
+   {
+      "id": "incorrect usage",
+      "translation": "不正确的使用"
+   },
+   {
+      "id": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}",
+      "translation": "实例: {{.InstanceIndex}}, 原因: {{.ExitDescription}}, 退出状态/返回码: {{.ExitStatus}}"
+   },
+   {
+      "id": "instances",
+      "translation": "实例"
+   },
+   {
+      "id": "instances:",
+      "translation": "实例:"
+   },
+   {
+      "id": "invalid inherit path in manifest",
+      "translation": "清单中无效继承路径"
+   },
+   {
+      "id": "invalid value for env var CF_STAGING_TIMEOUT\n{{.Err}}",
+      "translation": "无效的环境变量值CF_STAGING_TIMEOUT\n{{.Err}}"
+   },
+   {
+      "id": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
+      "translation": "无效的环境变量值CF_STARTUP_TIMEOUT\n{{.Err}}"
+   },
+   {
+      "id": "label",
+      "translation": "label"
+   },
+   {
+      "id": "locked",
+      "translation": "锁定"
+   },
+   {
+      "id": "memory",
+      "translation": "内存"
+   },
+   {
+      "id": "memory limit",
+      "translation": "memory limit"
+   },
+   {
+      "id": "memory:",
+      "translation": "内存:"
+   },
+   {
+      "id": "name",
+      "translation": "名称"
+   },
+   {
+      "id": "not valid for the requested host",
+      "translation": "请求的主机名无效"
+   },
+   {
+      "id": "org",
+      "translation": "组织"
+   },
+   {
+      "id": "organization",
+      "translation": "组织"
+   },
+   {
+      "id": "owned",
+      "translation": "owned"
+   },
+   {
+      "id": "paid service plans",
+      "translation": "paid service plans"
+   },
+   {
+      "id": "plan",
+      "translation": "服务计划"
+   },
+   {
+      "id": "plans",
+      "translation": "服务计划"
+   },
+   {
+      "id": "position",
+      "translation": "位置"
+   },
+   {
+      "id": "provider",
+      "translation": "provider"
+   },
+   {
+      "id": "requested state",
+      "translation": "请求状态"
+   },
+   {
+      "id": "requested state:",
+      "translation": "请求状态:"
+   },
+   {
+      "id": "routes",
+      "translation": "routes"
+   },
+   {
+      "id": "running",
+      "translation": "运行"
+   },
+   {
+      "id": "security group",
+      "translation": "security group"
+   },
+   {
+      "id": "service",
+      "translation": "服务"
+   },
+   {
+      "id": "service auth token",
+      "translation": "service auth token"
+   },
+   {
+      "id": "service instance",
+      "translation": "服务实例"
+   },
+   {
+      "id": "service instances",
+      "translation": "service instances"
+   },
+   {
+      "id": "service-broker",
+      "translation": "service-broker"
+   },
+   {
+      "id": "services",
+      "translation": "服务"
+   },
+   {
+      "id": "shared",
+      "translation": "shared"
+   },
+   {
+      "id": "since",
+      "translation": "从"
+   },
+   {
+      "id": "space",
+      "translation": "空间"
+   },
+   {
+      "id": "starting",
+      "translation": "启动中"
+   },
+   {
+      "id": "state",
+      "translation": "状态"
+   },
+   {
+      "id": "status",
+      "translation": "status"
+   },
+   {
+      "id": "stopped",
+      "translation": "已停止"
+   },
+   {
+      "id": "stopped after 1 redirect",
+      "translation": "一次重定位后停止"
+   },
+   {
+      "id": "time",
+      "translation": "时间"
+   },
+   {
+      "id": "unknown authority",
+      "translation": "未知的认证"
+   },
+   {
+      "id": "url",
+      "translation": "url"
+   },
+   {
+      "id": "urls",
+      "translation": "网址"
+   },
+   {
+      "id": "urls:",
+      "translation": "网址:"
+   },
+   {
+      "id": "usage:",
+      "translation": "用法:"
+   },
+   {
+      "id": "user",
+      "translation": "用户"
+   },
+   {
+      "id": "user-provided",
+      "translation": "由用户提供的"
+   },
+   {
+      "id": "write default values to the config",
+      "translation": "在配置文件中写入默认配置"
+   },
+   {
+      "id": "yes",
+      "translation": "是的"
+   },
+   {
+      "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
+      "translation": "{{.ApiEndpoint}} (API 版本: {{.ApiVersionString}})"
+   },
+   {
+      "id": "{{.CFName}} api",
+      "translation": "{{.CFName}} api"
+   },
+   {
+      "id": "{{.CFName}} login",
+      "translation": "{{.CFName}} login"
+   },
+   {
+      "id": "{{.Command}} help [COMMAND]",
+      "translation": "{{.Command}} help [命令]"
+   },
+   {
+      "id": "{{.CountOfServices}} migrated.",
+      "translation": "{{.CountOfServices}} 迁移."
+   },
+   {
+      "id": "{{.DiskUsage}} of {{.DiskQuota}}",
+      "translation": "{{.DiskQuota}}中的{{.DiskUsage}}"
+   },
+   {
+      "id": "{{.DownCount}} down",
+      "translation": "{{.DownCount}} 失效"
+   },
+   {
+      "id": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
+      "translation": "{{.ErrorDescription}}\n小贴士: 使用'{{.CFServicesCommand}}'来查看这个组织和空间里的所有服务。"
+   },
+   {
+      "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
+      "translation": "{{.Err}}\n\n小贴士: 使用'{{.Command}}'的更多信息"
+   },
+   {
+      "id": "{{.FlappingCount}} failing",
+      "translation": "{{.FlappingCount}} 失败"
+   },
+   {
+      "id": "{{.MemUsage}} of {{.MemQuota}}",
+      "translation": "{{.MemQuota}}中的{{.MemUsage}}"
+   },
+   {
+      "id": "{{.ModelType}} {{.ModelName}} already exists",
+      "translation": "{{.ModelType}} {{.ModelName}} 已存在"
+   },
+   {
+      "id": "{{.PropertyName}} must be a string or null value",
+      "translation": "{{.PropertyName}} 必须是一个字符串或空值"
+   },
+   {
+      "id": "{{.PropertyName}} must be a string value",
+      "translation": "{{.PropertyName}} 必须是一个字符串值"
+   },
+   {
+      "id": "{{.PropertyName}} should not be null",
+      "translation": "{{.PropertyName}} 不能为空"
+   },
+   {
+      "id": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
+      "translation": "{{.QuotaName}} ({{.MemoryLimit}}M 内存限制, {{.RoutesLimit}} 路由, {{.ServicesLimit}} 服务, 有偿服务 {{.NonBasicServicesAllowed}})"
+   },
+   {
+      "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
+      "translation": "{{.TotalCount}}中的{{.RunningCount}}个实例正在运行"
+   },
+   {
+      "id": "{{.StartingCount}} starting",
+      "translation": "{{.StartingCount}}正在启动"
+   },
+   {
+      "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
+      "translation": "{{.Usage}} {{.FormattedMemory}} 乘以 {{.InstanceCount}}实例数"
+   }
+]
