@@ -28,6 +28,7 @@ type RepositoryLocator struct {
 	appBitsRepo                     CloudControllerApplicationBitsRepository
 	appSummaryRepo                  CloudControllerAppSummaryRepository
 	appInstancesRepo                CloudControllerAppInstancesRepository
+	appStatsRepo                    CloudControllerAppStatsRepository
 	appEventsRepo                   CloudControllerAppEventsRepository
 	appFilesRepo                    CloudControllerAppFilesRepository
 	domainRepo                      CloudControllerDomainRepository
@@ -71,6 +72,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
 	loc.appInstancesRepo = NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
+	loc.appStatsRepo = NewCloudControllerAppStatsRepository(config, cloudControllerGateway)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
@@ -136,6 +138,10 @@ func (locator RepositoryLocator) GetAppSummaryRepository() AppSummaryRepository 
 
 func (locator RepositoryLocator) GetAppInstancesRepository() AppInstancesRepository {
 	return locator.appInstancesRepo
+}
+
+func (locator RepositoryLocator) GetAppStatsRepository() AppStatsRepository {
+	return locator.appStatsRepo
 }
 
 func (locator RepositoryLocator) GetAppEventsRepository() AppEventsRepository {
