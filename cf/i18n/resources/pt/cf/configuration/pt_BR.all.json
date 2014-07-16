@@ -1,6 +1,6 @@
 [
    {
       "id": "Error writing to manifest file:{{.FilePath}}\n{{.Err}}",
-      "translation": "Error writing to manifest file:{{.FilePath}}\n{{.Err}}"
+      "translation": "Erro ao gravar no arquivo de manifesto:{{.FilePath}}\n{{.Err}}"
    }
 ]

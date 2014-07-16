@@ -1,7 +1,7 @@
 [
    {
       "id": "Update a service auth token",
-      "translation": "Update a service auth token"
+      "translation": "Atualizar token de autenticação do serviço"
    },
    {
       "id": "CF_NAME service-auth-tokens",
@@ -9,62 +9,62 @@
    },
    {
       "id": "Deleting service auth token as {{.CurrentUser}}",
-      "translation": "Deleting service auth token as {{.CurrentUser}}"
+      "translation": "Removendo token de autenticação de serviço como {{.CurrentUser}}"
    },
    {
       "id": "List service auth tokens",
-      "translation": "List service auth tokens"
+      "translation": "Listar tokens de autenticação de serviços"
    },
    {
       "id": "provider",
-      "translation": "provider"
+      "translation": "provedor"
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force deletion without confirmation"
+      "translation": "Forçar remoção sem confirmação"
    },
    {
       "id": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
-      "translation": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"
+      "translation": "CF_NAME update-service-auth-token LEGENDA PROVEDOR TOKEN"
    },
    {
       "id": "Getting service auth tokens as {{.CurrentUser}}...",
-      "translation": "Getting service auth tokens as {{.CurrentUser}}..."
+      "translation": "Obtendo tokens de autenticação de serviços como {{.CurrentUser}}..."
    },
    {
       "id": "Creating service auth token as {{.CurrentUser}}...",
-      "translation": "Creating service auth token as {{.CurrentUser}}..."
+      "translation": "Criando tokens de autenticação de serviços como {{.CurrentUser}}..."
    },
    {
       "id": "Delete a service auth token",
-      "translation": "Delete a service auth token"
+      "translation": "Remover um token de autenticação de serviço"
    },
    {
       "id": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
-      "translation": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"
+      "translation": "CF_NAME create-service-auth-token LEGENDA PROVEDOR TOKEN"
    },
    {
       "id": "service auth token",
-      "translation": "service auth token"
+      "translation": "token de autenticação de serviço"
    },
    {
       "id": "label",
-      "translation": "label"
+      "translation": "legenda"
    },
    {
       "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
-      "translation": "Service Auth Token {{.Label}} {{.Provider}} does not exist."
+      "translation": "Token de autenticação de serviço {{.Label}} {{.Provider}} não existe."
    },
    {
       "id": "Create a service auth token",
-      "translation": "Create a service auth token"
+      "translation": "Criar um token de autenticação de serviço"
    },
    {
       "id": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]",
-      "translation": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"
+      "translation": "CF_NAME delete-service-auth-token LEGENDA PROVEDOR [-f]"
    },
    {
       "id": "Updating service auth token as {{.CurrentUser}}...",
-      "translation": "Updating service auth token as {{.CurrentUser}}..."
+      "translation": "Atualizando token de autenticação de serviço como {{.CurrentUser}}..."
    }
 ]
