@@ -45,6 +45,35 @@ var _ = Describe("AppInstancesRepo", func() {
 	})
 })
 
+var appStatsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-cool-app-guid/stats",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+  "1":{
+    "stats": {
+        "disk_quota": 10000,
+        "mem_quota": 1024,
+        "usage": {
+            "cpu": 0.3,
+            "disk": 10000,
+            "mem": 1024
+        }
+    }
+  },
+  "0":{
+    "stats": {
+        "disk_quota": 1073741824,
+        "mem_quota": 67108864,
+        "usage": {
+            "cpu": 3.659571249238058e-05,
+            "disk": 56037376,
+            "mem": 19218432
+        }
+    }
+  }
+}`}})
+
 var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/apps/my-cool-app-guid/instances",
