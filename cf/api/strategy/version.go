@@ -2,6 +2,7 @@ package strategy
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strconv"
 	"strings"
 )

@@ -2,6 +2,7 @@ package ui_helpers
 
 import (
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/models"

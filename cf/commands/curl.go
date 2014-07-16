@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"io/ioutil"
 	"os"
 	"path/filepath"

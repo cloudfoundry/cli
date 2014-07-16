@@ -1,6 +1,7 @@
 package commands
 
 import (
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/api"

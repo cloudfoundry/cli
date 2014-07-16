@@ -1,5 +1,9 @@
 package errors
 
+import (
+	. "github.com/cloudfoundry/cli/cf/i18n"
+)
+
 type InvalidSSLCert struct {
 	URL    string
 	Reason string

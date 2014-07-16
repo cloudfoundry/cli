@@ -3,6 +3,7 @@ package command_runner
 import (
 	"errors"
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/requirements"

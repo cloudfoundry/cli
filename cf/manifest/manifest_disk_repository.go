@@ -3,6 +3,7 @@ package manifest
 import (
 	"github.com/cloudfoundry-incubator/candiedyaml"
 	"github.com/cloudfoundry/cli/cf/errors"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/generic"
 	"io"
 	"os"

@@ -1,5 +1,9 @@
 package errors
 
+import (
+	. "github.com/cloudfoundry/cli/cf/i18n"
+)
+
 type EmptyDirError struct {
 	dir string
 }

@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api"

@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type AsyncTimeoutError struct {

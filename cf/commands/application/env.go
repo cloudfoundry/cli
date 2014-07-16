@@ -1,6 +1,7 @@
 package application
 
 import (
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api"
