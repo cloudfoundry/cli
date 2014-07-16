@@ -26,7 +26,7 @@ var SUPPORTED_LOCALES = map[string]string{
 	"fr": "fr_FR",
 	"it": "it_IT",
 	"ja": "ja_JA",
-	"ko": "ko_KO",
+	//	"ko": "ko_KO", - Will add support for Korean when nicksnyder/go-i18n supports Korean
 	"pt": "pt_BR",
 	//	"ru": "ru_RU", - Will add support for Russian when nicksnyder/go-i18n supports Russian
 	"zh": "zh_CN",

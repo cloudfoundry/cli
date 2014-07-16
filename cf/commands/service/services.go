@@ -26,7 +26,7 @@ func NewListServices(ui terminal.UI, config configuration.Reader, serviceSummary
 
 func (cmd ListServices) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        T("services"),
+		Name:        "services",
 		ShortName:   "s",
 		Description: T("List all service instances in the target space"),
 		Usage:       "CF_NAME services",
