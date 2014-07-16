@@ -1,7 +1,7 @@
 [
    {
       "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-      "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+      "translation": "CF_NAME create-service-broker SERVICE_BROKER USUÁRIO SENHA URL"
    },
    {
       "id": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
@@ -13,67 +13,67 @@
    },
    {
       "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-      "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+      "translation": "CF_NAME update-service-broker SERVICE_BROKER USUÁRIO SENHA URL"
    },
    {
       "id": "Create a service broker",
-      "translation": "Create a service broker"
+      "translation": "Criar um corretor de serviços"
    },
    {
       "id": "Creating service broker {{.Name}} as {{.Username}}...",
-      "translation": "Creating service broker {{.Name}} as {{.Username}}..."
+      "translation": "Criando corretor de serviços {{.Name}} como {{.Username}}..."
    },
    {
       "id": "Delete a service broker",
-      "translation": "Delete a service broker"
+      "translation": "Remover um corretor de serviços"
    },
    {
       "id": "Deleting service broker {{.Name}} as {{.Username}}...",
-      "translation": "Deleting service broker {{.Name}} as {{.Username}}..."
+      "translation": "Removendo corretor de serviços {{.Name}} como {{.Username}}..."
    },
    {
       "id": "Failed fetching service brokers.\n{{.Error}}",
-      "translation": "Failed fetching service brokers.\n{{.Error}}"
+      "translation": "Falha ao obter corretores de serviços.\n{{.Error}}"
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force deletion without confirmation"
+      "translation": "Forçar remoção sem confirmação"
    },
    {
       "id": "Getting service brokers as {{.Username}}...\n",
-      "translation": "Getting service brokers as {{.Username}}...\n"
+      "translation": "Listando corretores de serviços como {{.Username}}...\n"
    },
    {
       "id": "List service brokers",
-      "translation": "List service brokers"
+      "translation": "Listar corretores de serviços"
    },
    {
       "id": "No service brokers found",
-      "translation": "No service brokers found"
+      "translation": "Nenhum corretor de serviço encontrado"
    },
    {
       "id": "Rename a service broker",
-      "translation": "Rename a service broker"
+      "translation": "Renomear um corretor de serviços"
    },
    {
       "id": "Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}",
-      "translation": "Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}"
+      "translation": "Renomenando corretor de serviço {{.OldName}} para {{.NewName}} como {{.Username}}"
    },
    {
       "id": "Service Broker {{.Name}} does not exist.",
-      "translation": "Service Broker {{.Name}} does not exist."
+      "translation": "Corretor de serviço {{.Name}} não existe."
    },
    {
       "id": "Update a service broker",
-      "translation": "Update a service broker"
+      "translation": "Atualizar corretor de serviço"
    },
    {
       "id": "Updating service broker {{.Name}} as {{.Username}}...",
-      "translation": "Updating service broker {{.Name}} as {{.Username}}..."
+      "translation": "Atualizando corretor de serviço {{.Name}} como {{.Username}}..."
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "nome"
    },
    {
       "id": "service-broker",

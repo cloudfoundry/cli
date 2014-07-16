@@ -1,66 +1,66 @@
 [
    {
       "id": "Error finding manifest",
-      "translation": "Error finding manifest"
+      "translation": "Arquivo de manifesto não encontrado"
    },
    {
       "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
-      "translation": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'"
+      "translation": "Aplicativos deverá ser uma lista de chave/valores\nErro encontrado no manifesto próximo a:\n'{{.YmlSnippet}}'"
    },
    {
       "id": "Expected applications to be a list",
-      "translation": "Expected applications to be a list"
+      "translation": "Aplicativos deverá ser uma lista"
    },
    {
       "id": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
-      "translation": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}."
+      "translation": "Variável de ambiente {{.PropertyName}} deverá ser do tipo string, ao invés de {{.PropertyType}}."
    },
    {
       "id": "Expected {{.Name}} to be a set of key =\u003e value, but it was a {{.Type}}.",
-      "translation": "Expected {{.Name}} to be a set of key =\u003e value, but it was a {{.Type}}."
+      "translation": "{{.Name}} deverá ser uma combinação de chave => valor, ao invés de {{.Type}}."
    },
    {
       "id": "Expected {{.PropertyName}} to be a boolean.",
-      "translation": "Expected {{.PropertyName}} to be a boolean."
+      "translation": "{{.PropertyName}} deverá ser booliano."
    },
    {
       "id": "Expected {{.PropertyName}} to be a list of strings.",
-      "translation": "Expected {{.PropertyName}} to be a list of strings."
+      "translation": "{{.PropertyName}} deverá ser uma lista de strings."
    },
    {
       "id": "Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}.",
-      "translation": "Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}."
+      "translation": "{{.PropertyName}} deverá ser um número, ao invés de {{.PropertyType}}."
    },
    {
       "id": "Invalid manifest. Expected a map",
-      "translation": "Invalid manifest. Expected a map"
+      "translation": "Arquivo de manifesto inválido. Deve ser um mapa"
    },
    {
       "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
-      "translation": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again."
+      "translation": "Propriedade '{{.PropertyName}}' encontrada no manifesto. Esta função não é mais suportada. Por favor remova e tente novamente."
    },
    {
       "id": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
-      "translation": "Unexpected value for {{.PropertyName}} :\n{{.Error}}"
+      "translation": "Valor para {{.PropertyName}} inesperado:\n{{.Error}}"
    },
    {
       "id": "env var '{{.PropertyName}}' should not be null",
-      "translation": "env var '{{.PropertyName}}' should not be null"
+      "translation": "variável de ambiente '{{.PropertyName}}' não deve ser nula"
    },
    {
       "id": "invalid inherit path in manifest",
-      "translation": "invalid inherit path in manifest"
+      "translation": "Caminho de herança inválido no manifesto"
    },
    {
       "id": "{{.PropertyName}} must be a string or null value",
-      "translation": "{{.PropertyName}} must be a string or null value"
+      "translation": "{{.PropertyName}} deve ser uma string ou valor nulo"
    },
    {
       "id": "{{.PropertyName}} must be a string value",
-      "translation": "{{.PropertyName}} must be a string value"
+      "translation": "{{.PropertyName}} deve ser uma string"
    },
    {
       "id": "{{.PropertyName}} should not be null",
-      "translation": "{{.PropertyName}} should not be null"
+      "translation": "{{.PropertyName}} não deve ser nula"
    }
 ]
