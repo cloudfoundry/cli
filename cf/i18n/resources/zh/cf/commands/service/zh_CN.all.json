@@ -272,10 +272,6 @@
       "translation": "更新用户提供的服务实例名称值对"
    },
    {
-      "id": "services",
-      "translation": "服务"
-   },
-   {
       "id": "Delete a service instance",
       "translation": "删除服务实例"
    },

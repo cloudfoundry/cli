@@ -272,10 +272,6 @@
       "translation": "Update user-provided service instance name value pairs"
    },
    {
-      "id": "services",
-      "translation": "services"
-   },
-   {
       "id": "Delete a service instance",
       "translation": "Delete a service instance"
    },

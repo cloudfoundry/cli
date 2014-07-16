@@ -272,10 +272,6 @@
       "translation": "Mettre à jour les noms et valeurs d'un instance de service fournie par l'utilisateur"
    },
    {
-      "id": "services",
-      "translation": "services"
-   },
-   {
       "id": "Delete a service instance",
       "translation": "Supprimer une instance de service"
    },
