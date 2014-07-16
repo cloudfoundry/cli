@@ -2,6 +2,7 @@ package command_factory
 
 import (
 	"errors"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api"

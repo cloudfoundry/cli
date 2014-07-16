@@ -1,6 +1,7 @@
 package trace
 
 import (
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io"
 	"log"

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"

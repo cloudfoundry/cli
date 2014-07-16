@@ -19,6 +19,8 @@ const (
 	DEFAULT_LANGUAGE = "en"
 )
 
+var T = Init()
+
 var SUPPORTED_LOCALES = map[string]string{
 	"de": "de_DE",
 	"en": "en_US",

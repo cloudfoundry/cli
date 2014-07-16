@@ -2,6 +2,7 @@ package manifest
 
 import (
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"path/filepath"
 	"regexp"
 	"strconv"

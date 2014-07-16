@@ -1,6 +1,9 @@
 package errors
 
-import "fmt"
+import (
+	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
+)
 
 type HttpError interface {
 	error

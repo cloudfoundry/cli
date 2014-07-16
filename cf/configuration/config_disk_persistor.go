@@ -3,6 +3,7 @@ package configuration
 import (
 	"errors"
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"io/ioutil"
 	"os"
 	"path/filepath"

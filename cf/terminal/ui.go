@@ -2,6 +2,7 @@ package terminal
 
 import (
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"io"
 	"os"
 	"strings"

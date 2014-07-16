@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"net/url"
 	"strings"
 

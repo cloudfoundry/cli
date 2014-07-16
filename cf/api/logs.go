@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/tls"
 	"errors"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"

@@ -3,6 +3,7 @@ package authentication
 import (
 	"encoding/base64"
 	"fmt"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"net/url"
 	"strings"
 

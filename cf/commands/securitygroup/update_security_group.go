@@ -1,6 +1,7 @@
 package securitygroup
 
 import (
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
