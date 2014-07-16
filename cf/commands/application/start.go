@@ -29,13 +29,13 @@ const (
 const LogMessageTypeStaging = "STG"
 
 type Start struct {
-	ui           terminal.UI
-	config       configuration.Reader
-	appDisplayer ApplicationDisplayer
-	appReq       requirements.ApplicationRequirement
-	appRepo      api.ApplicationRepository
-	appStatsRepo api.AppStatsRepository
-	logRepo      api.LogsRepository
+	ui               terminal.UI
+	config           configuration.Reader
+	appDisplayer     ApplicationDisplayer
+	appReq           requirements.ApplicationRequirement
+	appRepo          api.ApplicationRepository
+	appInstancesRepo api.AppInstancesRepository
+	logRepo          api.LogsRepository
 
 	StartupTimeout time.Duration
 	StagingTimeout time.Duration
@@ -51,13 +51,13 @@ type ApplicationStagingWatcher interface {
 	ApplicationWatchStaging(app models.Application, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appStatsRepo api.AppStatsRepository, logRepo api.LogsRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appDisplayer = appDisplayer
 	cmd.appRepo = appRepo
-	cmd.appStatsRepo = appStatsRepo
+	cmd.appInstancesRepo = appInstancesRepo
 	cmd.logRepo = logRepo
 
 	cmd.PingerThrottle = DefaultPingerThrottle
@@ -202,11 +202,11 @@ func isStagingError(err error) bool {
 
 func (cmd Start) waitForInstancesToStage(app models.Application) {
 	stagingStartTime := time.Now()
-	_, err := cmd.appStatsRepo.GetStats(app.Guid)
+	_, err := cmd.appInstancesRepo.GetInstances(app.Guid)
 
 	for isStagingError(err) && time.Since(stagingStartTime) < cmd.StagingTimeout {
 		cmd.ui.Wait(cmd.PingerThrottle)
-		_, err = cmd.appStatsRepo.GetStats(app.Guid)
+		_, err = cmd.appInstancesRepo.GetInstances(app.Guid)
 	}
 
 	if err != nil && !isStagingError(err) {
@@ -264,15 +264,15 @@ type instanceCount struct {
 func (cmd Start) fetchInstanceCount(appGuid string) (instanceCount, error) {
 	count := instanceCount{}
 
-	stats, apiErr := cmd.appStatsRepo.GetStats(appGuid)
+	instances, apiErr := cmd.appInstancesRepo.GetInstances(appGuid)
 	if apiErr != nil {
 		return instanceCount{}, apiErr
 	}
 
-	count.total = len(stats)
+	count.total = len(instances)
 
-	for _, stat := range stats {
-		switch stat.State {
+	for _, inst := range instances {
+		switch inst.State {
 		case models.InstanceRunning:
 			count.running++
 		case models.InstanceStarting:
