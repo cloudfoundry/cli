@@ -23,14 +23,14 @@ var _ = Describe("app Command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          configuration.ReadWriter
 		appSummaryRepo      *testapi.FakeAppSummaryRepo
-		appStatsRepo        *testapi.FakeAppStatsRepo
+		appInstancesRepo    *testapi.FakeAppInstancesRepo
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
-		appStatsRepo = &testapi.FakeAppStatsRepo{}
+		appInstancesRepo = &testapi.FakeAppInstancesRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
@@ -39,7 +39,7 @@ var _ = Describe("app Command", func() {
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewShowApp(ui, configRepo, appSummaryRepo, appStatsRepo)
+		cmd := NewShowApp(ui, configRepo, appSummaryRepo, appInstancesRepo)
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -67,43 +67,25 @@ var _ = Describe("app Command", func() {
 	Describe("displaying a summary of an app", func() {
 		BeforeEach(func() {
 			app := makeAppWithRoute("my-app")
-
-			curTime := testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jul 1 15:04:05 -0700 MST 2014")
-			startTime := testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2014")
-
-			uptime := uint64((curTime.Sub(startTime)).Seconds())
-
-			appStats := models.AppStatsFields{
-				State: models.InstanceRunning,
-				Stats: models.AppStatsStatsFields{
-					Uptime:    uptime,
-					DiskQuota: 1 * formatters.GIGABYTE,
-					MemQuota:  64 * formatters.MEGABYTE,
-					Usage: models.AppStatsUsageFields{
-						Time: curTime.Format("2006-01-02 15:04:05 +0000"),
-						Disk: 32 * formatters.MEGABYTE,
-						Cpu:  1.0,
-						Mem:  13 * formatters.BYTE,
-					},
-				},
+			appInstance := models.AppInstanceFields{
+				State:     models.InstanceRunning,
+				Since:     testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012"),
+				CpuUsage:  1.0,
+				DiskQuota: 1 * formatters.GIGABYTE,
+				DiskUsage: 32 * formatters.MEGABYTE,
+				MemQuota:  64 * formatters.MEGABYTE,
+				MemUsage:  13 * formatters.BYTE,
 			}
 
-			startTime2 := testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012")
-			uptime2 := uint64((curTime.Sub(startTime2)).Seconds())
-			appStats2 := models.AppStatsFields{
+			appInstance2 := models.AppInstanceFields{
 				State: models.InstanceDown,
-				Stats: models.AppStatsStatsFields{
-					Uptime: uptime2,
-					Usage: models.AppStatsUsageFields{
-						Time: curTime.Format("2006-01-02 15:04:05 +0000"),
-					},
-				},
+				Since: testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012"),
 			}
 
-			stats := []models.AppStatsFields{appStats, appStats2}
+			instances := []models.AppInstanceFields{appInstance, appInstance2}
 
 			appSummaryRepo.GetSummarySummary = app
-			appStatsRepo.GetStatsResponses = [][]models.AppStatsFields{stats}
+			appInstancesRepo.GetInstancesResponses = [][]models.AppInstanceFields{instances}
 			requirementsFactory.Application = app
 		})
 
@@ -118,7 +100,7 @@ var _ = Describe("app Command", func() {
 				[]string{"instances", "2/2"},
 				[]string{"usage", "256M x 2 instances"},
 				[]string{"urls", "my-app.example.com", "foo.example.com"},
-				[]string{"#0", "running", "2014-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
+				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
 				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
 			))
 		})
@@ -143,7 +125,7 @@ var _ = Describe("app Command", func() {
 			runCommand("my-app")
 
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
-			Expect(appStatsRepo.GetStatsAppGuid).To(Equal("my-app-guid"))
+			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
@@ -159,7 +141,7 @@ var _ = Describe("app Command", func() {
 			runCommand("my-app")
 
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
-			Expect(appStatsRepo.GetStatsAppGuid).To(Equal("my-app-guid"))
+			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},

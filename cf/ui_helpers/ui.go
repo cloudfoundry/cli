@@ -44,9 +44,9 @@ func ColoredAppInstances(app models.ApplicationFields) string {
 	return healthString
 }
 
-func ColoredInstanceState(state models.InstanceState) (colored string) {
-	stringState := string(state)
-	switch stringState {
+func ColoredInstanceState(instance models.AppInstanceFields) (colored string) {
+	state := string(instance.State)
+	switch state {
 	case "started", "running":
 		colored = T("running")
 	case "stopped":
@@ -58,7 +58,7 @@ func ColoredInstanceState(state models.InstanceState) (colored string) {
 	case "starting":
 		colored = terminal.AdvisoryColor(T("starting"))
 	default:
-		colored = terminal.WarningColor(stringState)
+		colored = terminal.WarningColor(state)
 	}
 
 	return
