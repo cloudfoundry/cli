@@ -7,8 +7,8 @@ go get -d github.com/cloudfoundry/cf-acceptance-tests/
 cd %GOPATH%\src/github.com\cloudfoundry\cf-acceptance-tests
 
 SET CATSPATH=%GOPATH%\src\github.com\cloudfoundry\cf-acceptance-tests
-DEL c:\Users\Administrator\go\src\github.com\cloudfoundry\cf-acceptance-tests\gcf.exe
-bitsadmin.exe /transfer "DownloadStableCLI" https://s3.amazonaws.com/go-cli/builds/cf-windows-386.exe c:\Users\Administrator\go\src\github.com\cloudfoundry\cf-acceptance-tests\gcf.exe
+DEL c:\Users\Administrator\go\src\github.com\cloudfoundry\cf-acceptance-tests\cf.exe
+bitsadmin.exe /transfer "DownloadStableCLI" https://s3.amazonaws.com/go-cli/builds/cf-windows-386.exe c:\Users\Administrator\go\src\github.com\cloudfoundry\cf-acceptance-tests\cf.exe
 
 SET PATH=%PATH%;%CATSPATH%;C:\Program Files\cURL\bin
 
