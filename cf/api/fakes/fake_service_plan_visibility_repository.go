@@ -2,16 +2,16 @@
 package fakes
 
 import (
-	"sync"
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
+	"sync"
 )
 
 type FakeServicePlanVisibilityRepository struct {
 	ListStub        func() ([]models.ServicePlanVisibilityFields, error)
 	listMutex       sync.RWMutex
 	listArgsForCall []struct{}
-	listReturns struct {
+	listReturns     struct {
 		result1 []models.ServicePlanVisibilityFields
 		result2 error
 	}
