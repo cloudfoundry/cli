@@ -47,7 +47,6 @@ func (actor ServiceHandler) GetBrokersWithDependencies() ([]models.ServiceBroker
 }
 
 func (actor ServiceHandler) getServiceBrokers() (brokers []models.ServiceBroker, err error) {
-	//CALLBACK BE HERE! FIX?
 	err = actor.brokerRepo.ListServiceBrokers(func(broker models.ServiceBroker) bool {
 		brokers = append(brokers, broker)
 		return true
@@ -99,6 +98,7 @@ func (actor ServiceHandler) getOrgs(brokers []models.ServiceBroker) ([]models.Se
 		visMap[vis.ServicePlanGuid] = append(visMap[vis.ServicePlanGuid], orgLookup[vis.OrganizationGuid])
 	}
 
+	//Is there a cleaner way to do this?
 	for brokerIndex, _ := range brokers {
 		broker := &brokers[brokerIndex]
 		for serviceIndex, _ := range broker.Services {
