@@ -1,7 +1,7 @@
 [
    {
       "id": "CF_NAME rename-space SPACE NEW_SPACE",
-      "translation": "CF_NAME rename-space SPACE NEW_SPACE"
+      "translation": "CF_NAME rename-space ESPAÇO NOVO-ESPAÇO"
    },
    {
       "id": "Apps:",
@@ -9,79 +9,79 @@
    },
    {
       "id": "space",
-      "translation": "space"
+      "translation": "espaço"
    },
    {
       "id": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "Renomenado espaço {{.OldSpaceName}} para {{.NewSpaceName}} na org {{.OrgName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Rename a space",
-      "translation": "Rename a space"
+      "translation": "Renomear um espaço"
    },
    {
       "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
-      "translation": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n"
+      "translation": "Obtendo espaços na org {{.TargetOrgName}} como {{.CurrentUser}}...\n"
    },
    {
       "id": "CF_NAME space SPACE",
-      "translation": "CF_NAME space SPACE"
+      "translation": "CF_NAME space ESPAÇO"
    },
    {
       "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
-      "translation": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space"
+      "translation": "DICA: Espaço alvo não definido, utilize '{{.CfTargetCommand}}' para definir."
    },
    {
       "id": "List all spaces in an org",
-      "translation": "List all spaces in an org"
+      "translation": "Listar todos os espaços em uma org"
    },
    {
       "id": "Create a space",
-      "translation": "Create a space"
+      "translation": "Criar um espaço"
    },
    {
       "id": "Delete a space",
-      "translation": "Delete a space"
+      "translation": "Remover um espaço"
    },
    {
       "id": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "Criando espaço {{.SpaceName}} na org {{.OrgName}} como {{.CurrentUser}}..."
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force deletion without confirmation"
+      "translation": "Forçar remoção sem confirmação"
    },
    {
       "id": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
-      "translation": "Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}..."
+      "translation": "Removendo espaço {{.TargetSpace}} na org {{.TargetOrg}} como {{.CurrentUser}}..."
    },
    {
       "id": "Show space info",
-      "translation": "Show space info"
+      "translation": "Mostrar informações de espaço"
    },
    {
       "id": "Space {{.SpaceName}} already exists",
-      "translation": "Space {{.SpaceName}} already exists"
+      "translation": "Espaço {{.SpaceName}} já existe"
    },
    {
       "id": "\nTIP: Use '{{.CFTargetCommand}}' to target new space",
-      "translation": "\nTIP: Use '{{.CFTargetCommand}}' to target new space"
+      "translation": "\nDICA: Utilize '{{.CFTargetCommand}}' para definir espaço alvo"
    },
    {
       "id": "Domains:",
-      "translation": "Domains:"
+      "translation": "Domínios:"
    },
    {
       "id": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
-      "translation": "Error finding org {{.OrgName}}\n{{.ErrorDescription}}"
+      "translation": "Error encontrando org {{.OrgName}}\n{{.ErrorDescription}}"
    },
    {
       "id": "Organization",
-      "translation": "Organization"
+      "translation": "Organização"
    },
    {
       "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
-      "translation": "Failed fetching spaces.\n{{.ErrorDescription}}"
+      "translation": "Falha obtendo espaços.\n{{.ErrorDescription}}"
    },
    {
       "id": "CF_NAME spaces",
@@ -89,11 +89,11 @@
    },
    {
       "id": "No spaces found",
-      "translation": "No spaces found"
+      "translation": "Nenhum espaço encontrado"
    },
    {
       "id": "CF_NAME create-space SPACE [-o ORG]",
-      "translation": "CF_NAME create-space SPACE [-o ORG]"
+      "translation": "CF_NAME create-space ESPAÇO [-o ORG]"
    },
    {
       "id": "Org:",
@@ -101,26 +101,26 @@
    },
    {
       "id": "Org {{.OrgName}} does not exist or is not accessible",
-      "translation": "Org {{.OrgName}} does not exist or is not accessible"
+      "translation": "Org {{.OrgName}} não existe ou está inacessível"
    },
    {
       "id": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
-      "translation": "Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}..."
+      "translation": "Obtendo informações para espaço {{.TargetSpace}} na org {{.OrgName}} como {{.CurrentUser}}..."
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "nome"
    },
    {
       "id": "CF_NAME delete-space SPACE [-f]",
-      "translation": "CF_NAME delete-space SPACE [-f]"
+      "translation": "CF_NAME delete-space ESPAÇO [-f]"
    },
    {
       "id": "Security Groups:",
-      "translation": "Security Groups:"
+      "translation": "Grupos de Segurança:"
    },
    {
       "id": "Services:",
-      "translation": "Services:"
+      "translation": "Serviços:"
    }
 ]
