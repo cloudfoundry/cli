@@ -1,3 +1,13 @@
+## v6.3.1
+* Remove Korean as a supported language. - goi18n does not currently support it, so it is in the same boat as Russian.
+* Forcing default domain to be the first shared domain. Closes #209 [#75067850]
+* The ru_RU locale is not supported. The go-i18n tool that we use does not support this locale at the moment and thus we should not be offering translation until such time as that changes. Closes #208 [#75021420]
+* Adding in tool to fix json formatting
+* Fixes spacing and file permissions for all JSON files. Spacing i/s now a standard 3 spaces. Permissions are now 0644.
+* Merges Spanish Translations. Thanks, @bonzofenix! Merge pr/207 [#74857552]
+* Merge Chinese Translations. Thanks, @tsjsdbd, @isuperbb, @shenyefeng, @hujie5592427, @haojun, @wsxiaozhang and @Kaixiang! Closes #205 [#74772500]
+* Travis-CI builds should run i18n tests Also, fail if any of those other commands fail
+
 ## v6.3.0
 * Add commands for managing security groups
 * Push no longer uses deprecated endpoint for domains. [#74737286]
