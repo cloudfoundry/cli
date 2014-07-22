@@ -5,6 +5,9 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,10 +16,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/errors"
 )
 
 const (
@@ -133,9 +132,9 @@ func (gateway Gateway) ListPaginatedResources(target string,
 	path string,
 	resource interface{},
 	cb func(interface{}) bool) (apiErr error) {
+
 	for path != "" {
 		pagination := NewPaginatedResources(resource)
-
 		apiErr = gateway.GetResource(fmt.Sprintf("%s%s", target, path), &pagination)
 		if apiErr != nil {
 			return
