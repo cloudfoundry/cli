@@ -1,99 +1,99 @@
 [
    {
       "id": "CF_NAME create-domain ORG DOMAIN",
-      "translation": "CF_NAME create-domain ORG DOMAIN"
+      "translation": "CF_NAME create-domain ORG DOMÍNIO"
    },
    {
       "id": "CF_NAME create-shared-domain DOMAIN",
-      "translation": "CF_NAME create-shared-domain DOMAIN"
+      "translation": "CF_NAME create-shared-domain DOMÍNIO"
    },
    {
       "id": "CF_NAME delete-domain DOMAIN [-f]",
-      "translation": "CF_NAME delete-domain DOMAIN [-f]"
+       "translation": "CF_NAME delete-domain DOMÍNIO [-f]"
    },
    {
       "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
-      "translation": "CF_NAME delete-shared-domain DOMAIN [-f]"
+      "translation": "CF_NAME delete-shared-domain DOMÍNIO [-f]"
    },
    {
       "id": "Create a domain in an org for later use",
-      "translation": "Create a domain in an org for later use"
+      "translation": "Criar um domínio em uma organização para uso posterior"
    },
    {
       "id": "Create a domain that can be used by all orgs (admin-only)",
-      "translation": "Create a domain that can be used by all orgs (admin-only)"
+      "translation": "Criar um domínio que pode ser utilizado por todas as organizações (somente admin)"
    },
    {
       "id": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
-      "translation": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}..."
+      "translation": "Criando domínio {{.DomainName}} para org {{.OrgName}} como {{.Username}}..."
    },
    {
       "id": "Creating shared domain {{.DomainName}} as {{.Username}}...",
-      "translation": "Creating shared domain {{.DomainName}} as {{.Username}}..."
+      "translation": "Criando domínio compartilhado {{.DomainName}} como {{.Username}}..."
    },
    {
       "id": "Delete a domain",
-      "translation": "Delete a domain"
+      "translation": "Remover um domínio"
    },
    {
       "id": "Delete a shared domain",
-      "translation": "Delete a shared domain"
+      "translation": "Remover um domínio compartilhado"
    },
    {
       "id": "Deleting domain {{.DomainName}} as {{.ApiErr}}...",
-      "translation": "Deleting domain {{.DomainName}} as {{.ApiErr}}..."
+      "translation": "Removendo domínio {{.DomainName}} como {{.ApiErr}}..."
    },
    {
       "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
-      "translation": "Deleting domain {{.DomainName}} as {{.Username}}..."
+      "translation": "Removendo domínio {{.DomainName}} como {{.Username}}..."
    },
    {
       "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-      "translation": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}"
+      "translation": "Falha ao remover domínio {{.DomainName}}\n{{.ApiErr}}"
    },
    {
       "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-      "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}"
+      "translation": "Domínio não encontrado {{.DomainName}}\n{{.ApiErr}}"
    },
    {
       "id": "Failed fetching domains.\n{{.ApiErr}}",
-      "translation": "Failed fetching domains.\n{{.ApiErr}}"
+      "translation": "Falha obtendo domínios.\n{{.ApiErr}}"
    },
    {
       "id": "Force deletion without confirmation",
-      "translation": "Force deletion without confirmation"
+      "translation": "Forçar remoção sem confirmação"
    },
    {
       "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
-      "translation": "Getting domains in org {{.OrgName}} as {{.Username}}..."
+      "translation": "Obtendo domínios na organização {{.OrgName}} como {{.Username}}..."
    },
    {
       "id": "List domains in the target org",
-      "translation": "List domains in the target org"
+      "translation": "Listar domínios na organização alvo"
    },
    {
       "id": "No domains found",
-      "translation": "No domains found"
+      "translation": "Nenhum domínio encontrado"
    },
    {
       "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
-      "translation": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? "
+      "translation": "Este domínio é compartilhado com todas as organizações.\nRemovendo-o irá remover todas as rotas associadas, e fará qualquer aplicativo inacessivle através deste domínio. Tem certeza que deseja remover domínio {{.DomainName}}?"
    },
    {
       "id": "domain",
-      "translation": "domain"
+      "translation": "domínio"
    },
    {
       "id": "name",
-      "translation": "name"
+      "translation": "nome"
    },
    {
       "id": "owned",
-      "translation": "owned"
+      "translation": "próprio"
    },
    {
       "id": "shared",
-      "translation": "shared"
+      "translation": "compartilhado"
    },
    {
       "id": "status",

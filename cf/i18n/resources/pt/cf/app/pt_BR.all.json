@@ -1,7 +1,7 @@
 [
    {
       "id": "ADVANCED",
-      "translation": "ADVANCED"
+      "translation": "AVANÇADO"
    },
    {
       "id": "APPS",
@@ -13,15 +13,15 @@
    },
    {
       "id": "DOMAINS",
-      "translation": "DOMAINS"
+      "translation": "DOMÍNIOS"
    },
    {
       "id": "GETTING STARTED",
-      "translation": "GETTING STARTED"
+      "translation": "COMEÇANDO"
    },
    {
       "id": "ORG ADMIN",
-      "translation": "ORG ADMIN"
+      "translation": "ADMINISTRADOR DA ORG"
    },
    {
       "id": "ORGS",
@@ -29,35 +29,35 @@
    },
    {
       "id": "ROUTES",
-      "translation": "ROUTES"
+      "translation": "ROTAS"
    },
    {
       "id": "SECURITY GROUP",
-      "translation": "SECURITY GROUP"
+      "translation": "GRUPOS DE SEGURANÇA"
    },
    {
       "id": "SERVICE ADMIN",
-      "translation": "SERVICE ADMIN"
+      "translation": "ADMINISTRADOR DE SERVIÇOS"
    },
    {
       "id": "SERVICES",
-      "translation": "SERVICES"
+      "translation": "SERVIÇOS"
    },
    {
       "id": "SPACES",
-      "translation": "SPACES"
+      "translation": "ESPAÇOS"
    },
    {
       "id": "Show help",
-      "translation": "Show help"
+      "translation": "Mostrar ajuda"
    },
    {
       "id": "USER ADMIN",
-      "translation": "USER ADMIN"
+      "translation": "ADMINISTRADOR DE USUÁRIOS"
    },
    {
       "id": "VERSION:",
-      "translation": "VERSION:"
+      "translation": "VERSÃO:"
    },
    {
       "id": "{{.Command}} help [COMMAND]",
@@ -65,62 +65,62 @@
    },
    {
       "id": "Do not colorize output",
-      "translation": "Do not colorize output"
+      "translation": "Não colorir saída"
    },
    {
       "id": "Print API request diagnostics to stdout",
-      "translation": "Print API request diagnostics to stdout"
+      "translation": "Mostrar diagnósticos de pedidos API"
    },
    {
       "id": "NAME:",
-      "translation": "NAME:"
+      "translation": "NOME:"
    },
    {
       "id": "USAGE:",
-      "translation": "USAGE:"
+      "translation": "USO:"
    },
    {
       "id": "GLOBAL OPTIONS",
-      "translation": "GLOBAL OPTIONS"
+      "translation": "OPÇÕES GLOBAIS"
    },
    {
       "id": "[environment variables]",
-      "translation": "[environment variables]"
+      "translation": "[variáveis de ambiente]"
    },
    {
       "id": "[global options] command [arguments...] [command options]",
-      "translation": "[global options] command [arguments...] [command options]"
+      "translation": "[opções globais] comando [argumentos...] [opções de comando]"
    },
    {
       "id": "ENVIRONMENT VARIABLES",
-      "translation": "ENVIRONMENT VARIABLES"
+      "translation": "VARIÁVEIS DE AMBIENTE"
    },
    {
       "id": "Override path to default config directory",
-      "translation": "Override path to default config directory"
+      "translation": "Substituir caminho para o diretório de configuração padrão"
    },
    {
       "id": "Print the version",
-      "translation": "Print the version"
+      "translation": "Mostrar versão"
    },
    {
       "id": "BUILD TIME:",
-      "translation": "BUILD TIME:"
+      "translation": "TEMPO DE CONSTRUÇÃO:"
    },
    {
       "id": "Max wait time for app instance startup, in minutes",
-      "translation": "Max wait time for app instance startup, in minutes"
+      "translation": "Tempo de espera máximo para inicialização do app, em minutos"
    },
    {
       "id": "Append API request diagnostics to a log file",
-      "translation": "Append API request diagnostics to a log file"
+      "translation": "Anexar informações de diagnóstico para pedidos API em arquivo de log"
    },
    {
       "id": "Enable HTTP proxying for API requests",
-      "translation": "Enable HTTP proxying for API requests"
+      "translation": "Habilitar proxy HTTP para pedidos API"
    },
    {
       "id": "Max wait time for buildpack staging, in minutes",
-      "translation": "Max wait time for buildpack staging, in minutes"
+      "translation": "Tempo de espera máximo para encenação do buildpack, em minutos"
    }
 ]
