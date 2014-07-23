@@ -6,5 +6,4 @@ type ServiceBroker struct {
 	Username string
 	Password string
 	Url      string
-	Services []ServiceOffering
 }
