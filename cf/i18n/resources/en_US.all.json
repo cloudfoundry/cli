@@ -1456,18 +1456,6 @@
       "translation": "HTTP method (GET,POST,PUT,DELETE,etc)"
    },
    {
-      "id": "Hello world!",
-      "translation": "Hello world!"
-   },
-   {
-      "id": "Hello {{.Adj}} new world!",
-      "translation": "Hello {{.Adj}} new world!"
-   },
-   {
-      "id": "Hello {{.Name}}!",
-      "translation": "Hello {{.Name}}!"
-   },
-   {
       "id": "Hostname",
       "translation": "Hostname"
    },
@@ -1570,10 +1558,6 @@
    {
       "id": "JSON is invalid: {{.ErrorDescription}}",
       "translation": "JSON is invalid: {{.ErrorDescription}}"
-   },
-   {
-      "id": "LOL",
-      "translation": "Laugh out loud"
    },
    {
       "id": "List all apps in the target space",
@@ -2850,10 +2834,6 @@
    {
       "id": "service-broker",
       "translation": "service-broker"
-   },
-   {
-      "id": "services",
-      "translation": "services"
    },
    {
       "id": "shared",
