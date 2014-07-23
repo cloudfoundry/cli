@@ -5,7 +5,7 @@
 * Adding in tool to fix json formatting
 * Fixes spacing and file permissions for all JSON files. Spacing i/s now a standard 3 spaces. Permissions are now 0644.
 * Merges Spanish Translations. Thanks, @bonzofenix! Merge pr/207 [#74857552]
-* Merge Chinese Translations. Thanks, @tsjsdbd, @isuperbb, @shenyefeng, @hujie5592427, @haojun, @wsxiaozhang and @Kaixiang! Closes #205 [#74772500]
+* Merge Chinese Translations from a lot of effort by @wayneeseguin. Thanks also to @tsjsdbd, @isuperbb, @shenyefeng, @hujie5592427, @haojun, @wsxiaozhang and @Kaixiang! Closes #205 [#74772500]
 * Travis-CI builds should run i18n tests Also, fail if any of those other commands fail
 
 ## v6.3.0
