@@ -2,6 +2,8 @@ package app_files_test
 
 import (
 	. "github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/models"
+	cffileutils "github.com/cloudfoundry/cli/fileutils"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 	"os"
 	"path/filepath"
@@ -66,6 +68,38 @@ var _ = Describe("AppFiles", func() {
 
 				Expect(sizes).To(Equal([]int64{0}))
 			})
+		})
+	})
+
+	Describe("CopyFiles", func() {
+		It("copies only the files specified", func() {
+			copyDir := filepath.Join(fixturePath, "app-copy-test")
+
+			filesToCopy := []models.AppFileFields{
+				{Path: filepath.Join("dir1")},
+				{Path: filepath.Join("dir1", "child-dir", "file2.txt")},
+			}
+
+			files := []string{}
+
+			cffileutils.TempDir("copyToDir", func(tmpDir string, err error) {
+				copyErr := CopyFiles(filesToCopy, copyDir, tmpDir)
+				Expect(copyErr).ToNot(HaveOccurred())
+
+				filepath.Walk(tmpDir, func(path string, fileInfo os.FileInfo, err error) error {
+					Expect(err).ToNot(HaveOccurred())
+
+					if !fileInfo.IsDir() {
+						files = append(files, fileInfo.Name())
+					}
+					return nil
+				})
+			})
+
+			// file2.txt is in lowest subtree, thus is walked first.
+			Expect(files).To(Equal([]string{
+				"file2.txt",
+			}))
 		})
 	})
 })
