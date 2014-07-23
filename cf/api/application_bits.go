@@ -5,6 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/textproto"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -13,12 +20,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/gofileutils/fileutils"
-	"io"
-	"mime/multipart"
-	"net/textproto"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 const (
