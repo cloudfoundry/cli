@@ -3,12 +3,13 @@ package app_files
 import (
 	"crypto/sha1"
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/models"
-	cffileutils "github.com/cloudfoundry/cli/fileutils"
-	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/cloudfoundry/cli/cf/models"
+	cffileutils "github.com/cloudfoundry/cli/fileutils"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
 func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
@@ -54,12 +55,38 @@ func CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err erro
 	for _, file := range appFiles {
 		fromPath := filepath.Join(fromDir, file.Path)
 		toPath := filepath.Join(toDir, file.Path)
-		err = fileutils.CopyPathToPath(fromPath, toPath)
+		err = copyPathToPath(fromPath, toPath)
 		if err != nil {
 			return
 		}
 	}
 	return
+}
+
+func copyPathToPath(fromPath, toPath string) (err error) {
+	srcFileInfo, err := os.Stat(fromPath)
+	if err != nil {
+		return
+	}
+
+	if srcFileInfo.IsDir() {
+		err = os.MkdirAll(toPath, srcFileInfo.Mode())
+		if err != nil {
+			return
+		}
+	} else {
+		var dst *os.File
+		dst, err = fileutils.Create(toPath)
+		if err != nil {
+			return
+		}
+		defer dst.Close()
+
+		dst.Chmod(srcFileInfo.Mode())
+
+		err = fileutils.CopyPathToWriter(fromPath, dst)
+	}
+	return err
 }
 
 func CountFiles(directory string) uint64 {
