@@ -134,9 +134,9 @@ func (gateway Gateway) ListPaginatedResources(target string,
 	path string,
 	resource interface{},
 	cb func(interface{}) bool) (apiErr error) {
+
 	for path != "" {
 		pagination := NewPaginatedResources(resource)
-
 		apiErr = gateway.GetResource(fmt.Sprintf("%s%s", target, path), &pagination)
 		if apiErr != nil {
 			return

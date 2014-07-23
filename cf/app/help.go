@@ -233,8 +233,6 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				}, {
 					presentCommand("migrate-service-instances"),
 					presentCommand("purge-service-offering"),
-				}, {
-					presentCommand("service-access"),
 				},
 			},
 		}, {
