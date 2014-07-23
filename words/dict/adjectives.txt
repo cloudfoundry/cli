@@ -952,7 +952,6 @@ anaglyptical
 anagogic
 anagrammatic
 anagrammatical
-anal
 analectic
 analemmatic
 analeptic
@@ -3034,7 +3033,6 @@ bonniest
 bonny
 bony
 bonzer
-boobyish
 bookish
 bookless
 booklike
@@ -5556,8 +5554,6 @@ crankous
 cranky
 crannied
 crapelike
-crapulent
-crapulous
 crashing
 crass
 crassulaceous
@@ -5986,10 +5982,7 @@ dainty
 daisied
 daltonic
 damageable
-damnable
 damnatory
-damndest
-damned
 damning
 damoda
 damp
@@ -9402,7 +9395,6 @@ fsiest
 fubsier
 fubsiest
 fubsy
-fucking
 fucoid
 fugacious
 fugal
@@ -10018,15 +10010,6 @@ goatish
 goatlike
 gobioid
 gobony
-goddamndest
-goddamned
-goddamnedest
-godforsaken
-godless
-godlier
-godliest
-godlike
-godly
 godsent
 gogetting
 goitrous
@@ -15532,7 +15515,6 @@ muddiest
 muddleheaded
 muddy
 mudfat
-muffy
 muggier
 muggiest
 muggy
@@ -23905,8 +23887,6 @@ pushing
 pushy
 pusillanimous
 puslike
-pussier
-pussiest
 pusslike
 pustulant
 pustular
@@ -24038,7 +24018,6 @@ queenlier
 queenliest
 queenlike
 queenly
-queer
 quellable
 quenchable
 quenchless
@@ -26061,12 +26040,10 @@ sexagesimal
 sexangular
 sexavalent
 sexcentenary
-sexed
 sexennial
 sexier
 sexiest
 sexivalent
-sexless
 sexological
 sexpartite
 sextan
@@ -26173,9 +26150,6 @@ shippable
 shipshape
 shirtless
 shirty
-shittier
-shittiest
-shitty
 shivery
 shockheaded
 shocking
@@ -28222,7 +28196,6 @@ succubous
 succulent
 succursal
 suchlike
-suckerlike
 sucking
 suctional
 suctorial
@@ -39726,8 +39699,6 @@ vadose
 vagabondish
 vagal
 vagarious
-vaginal
-vaginate
 vagotropic
 vagrom
 vague
@@ -40359,7 +40330,6 @@ wholemeal
 wholesome
 wholistic
 whopping
-whorish
 whorled
 wicked
 wickless
