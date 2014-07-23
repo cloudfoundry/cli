@@ -2836,10 +2836,6 @@
       "translation": "service-broker"
    },
    {
-      "id": "services",
-      "translation": "服务"
-   },
-   {
       "id": "shared",
       "translation": "shared"
    },
