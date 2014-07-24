@@ -2,44 +2,84 @@
 package fakes
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors"
+	. "github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"sync"
 )
 
 type FakeServiceActor struct {
-	GetAllBrokersWithDependenciesStub     func() ([]models.ServiceBroker, error)
-	getBrokersWithDependenciesMutex       sync.RWMutex
-	getBrokersWithDependenciesArgsForCall []struct{}
-	getBrokersWithDependenciesReturns     struct {
+	GetAllBrokersWithDependenciesStub        func() ([]models.ServiceBroker, error)
+	getAllBrokersWithDependenciesMutex       sync.RWMutex
+	getAllBrokersWithDependenciesArgsForCall []struct{}
+	getAllBrokersWithDependenciesReturns     struct {
+		result1 []models.ServiceBroker
+		result2 error
+	}
+	GetBrokerWithDependenciesStub        func(string) ([]models.ServiceBroker, error)
+	getBrokerWithDependenciesMutex       sync.RWMutex
+	getBrokerWithDependenciesArgsForCall []struct {
+		arg1 string
+	}
+	getBrokerWithDependenciesReturns struct {
 		result1 []models.ServiceBroker
 		result2 error
 	}
 }
 
 func (fake *FakeServiceActor) GetAllBrokersWithDependencies() ([]models.ServiceBroker, error) {
-	fake.getBrokersWithDependenciesMutex.Lock()
-	defer fake.getBrokersWithDependenciesMutex.Unlock()
-	fake.getBrokersWithDependenciesArgsForCall = append(fake.getBrokersWithDependenciesArgsForCall, struct{}{})
+	fake.getAllBrokersWithDependenciesMutex.Lock()
+	defer fake.getAllBrokersWithDependenciesMutex.Unlock()
+	fake.getAllBrokersWithDependenciesArgsForCall = append(fake.getAllBrokersWithDependenciesArgsForCall, struct{}{})
 	if fake.GetAllBrokersWithDependenciesStub != nil {
 		return fake.GetAllBrokersWithDependenciesStub()
 	} else {
-		return fake.getBrokersWithDependenciesReturns.result1, fake.getBrokersWithDependenciesReturns.result2
+		return fake.getAllBrokersWithDependenciesReturns.result1, fake.getAllBrokersWithDependenciesReturns.result2
 	}
 }
 
 func (fake *FakeServiceActor) GetAllBrokersWithDependenciesCallCount() int {
-	fake.getBrokersWithDependenciesMutex.RLock()
-	defer fake.getBrokersWithDependenciesMutex.RUnlock()
-	return len(fake.getBrokersWithDependenciesArgsForCall)
+	fake.getAllBrokersWithDependenciesMutex.RLock()
+	defer fake.getAllBrokersWithDependenciesMutex.RUnlock()
+	return len(fake.getAllBrokersWithDependenciesArgsForCall)
 }
 
 func (fake *FakeServiceActor) GetAllBrokersWithDependenciesReturns(result1 []models.ServiceBroker, result2 error) {
-	fake.GetAllBrokersWithDependenciesStub = nil
-	fake.getBrokersWithDependenciesReturns = struct {
+	fake.getAllBrokersWithDependenciesReturns = struct {
 		result1 []models.ServiceBroker
 		result2 error
 	}{result1, result2}
 }
 
-var _ actors.ServiceActor = new(FakeServiceActor)
+func (fake *FakeServiceActor) GetBrokerWithDependencies(arg1 string) ([]models.ServiceBroker, error) {
+	fake.getBrokerWithDependenciesMutex.Lock()
+	defer fake.getBrokerWithDependenciesMutex.Unlock()
+	fake.getBrokerWithDependenciesArgsForCall = append(fake.getBrokerWithDependenciesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.GetBrokerWithDependenciesStub != nil {
+		return fake.GetBrokerWithDependenciesStub(arg1)
+	} else {
+		return fake.getBrokerWithDependenciesReturns.result1, fake.getBrokerWithDependenciesReturns.result2
+	}
+}
+
+func (fake *FakeServiceActor) GetBrokerWithDependenciesCallCount() int {
+	fake.getBrokerWithDependenciesMutex.RLock()
+	defer fake.getBrokerWithDependenciesMutex.RUnlock()
+	return len(fake.getBrokerWithDependenciesArgsForCall)
+}
+
+func (fake *FakeServiceActor) GetBrokerWithDependenciesArgsForCall(i int) string {
+	fake.getBrokerWithDependenciesMutex.RLock()
+	defer fake.getBrokerWithDependenciesMutex.RUnlock()
+	return fake.getBrokerWithDependenciesArgsForCall[i].arg1
+}
+
+func (fake *FakeServiceActor) GetBrokerWithDependenciesReturns(result1 []models.ServiceBroker, result2 error) {
+	fake.getBrokerWithDependenciesReturns = struct {
+		result1 []models.ServiceBroker
+		result2 error
+	}{result1, result2}
+}
+
+var _ ServiceActor = new(FakeServiceActor)
