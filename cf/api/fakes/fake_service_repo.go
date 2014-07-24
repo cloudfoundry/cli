@@ -61,6 +61,9 @@ type FakeServiceRepo struct {
 	FindServiceOfferingByLabelAndProviderApiResponse     error
 	FindServiceOfferingByLabelAndProviderCalled          bool
 
+	ListServicesFromBrokerReturns map[string][]models.ServiceOffering
+	ListServicesFromBrokerErr     error
+
 	V1ServicePlanDescription                resources.ServicePlanDescription
 	V2ServicePlanDescription                resources.ServicePlanDescription
 	FindServicePlanByDescriptionArguments   []resources.ServicePlanDescription
@@ -159,6 +162,18 @@ func (repo *FakeServiceRepo) FindServicePlanByDescription(planDescription resour
 	}
 	repo.findServicePlanByDescriptionCallCount += 1
 	return
+}
+
+func (repo *FakeServiceRepo) ListServicesFromBroker(brokerGuid string) ([]models.ServiceOffering, error) {
+	if repo.ListServicesFromBrokerErr != nil {
+		return nil, repo.ListServicesFromBrokerErr
+	}
+
+	if repo.ListServicesFromBrokerReturns[brokerGuid] != nil {
+		return repo.ListServicesFromBrokerReturns[brokerGuid], nil
+	}
+
+	return []models.ServiceOffering{}, nil
 }
 
 func (repo *FakeServiceRepo) GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiErr error) {

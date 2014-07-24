@@ -41,6 +41,8 @@ type RepositoryLocator struct {
 	logsRepo                        LogsRepository
 	authTokenRepo                   CloudControllerServiceAuthTokenRepository
 	serviceBrokerRepo               CloudControllerServiceBrokerRepository
+	servicePlanRepo                 CloudControllerServicePlanRepository
+	servicePlanVisibilityRepo       ServicePlanVisibilityRepository
 	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
 	buildpackRepo                   CloudControllerBuildpackRepository
 	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
@@ -84,6 +86,8 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.serviceRepo = NewCloudControllerServiceRepository(config, cloudControllerGateway)
 	loc.serviceBindingRepo = NewCloudControllerServiceBindingRepository(config, cloudControllerGateway)
 	loc.serviceBrokerRepo = NewCloudControllerServiceBrokerRepository(config, cloudControllerGateway)
+	loc.servicePlanRepo = NewCloudControllerServicePlanRepository(config, cloudControllerGateway)
+	loc.servicePlanVisibilityRepo = NewCloudControllerServicePlanVisibilityRepository(config, cloudControllerGateway)
 	loc.serviceSummaryRepo = NewCloudControllerServiceSummaryRepository(config, cloudControllerGateway)
 	loc.spaceRepo = spaces.NewCloudControllerSpaceRepository(config, cloudControllerGateway)
 	loc.userProvidedServiceInstanceRepo = NewCCUserProvidedServiceInstanceRepository(config, cloudControllerGateway)
@@ -94,7 +98,6 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.stagingSecurityGroupRepo = staging.NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.runningSecurityGroupRepo = running.NewRunningSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.securityGroupSpaceBinder = securitygroupspaces.NewSecurityGroupSpaceBinder(config, cloudControllerGateway)
-
 	return
 }
 
@@ -190,6 +193,10 @@ func (locator RepositoryLocator) GetServiceBrokerRepository() ServiceBrokerRepos
 	return locator.serviceBrokerRepo
 }
 
+func (locator RepositoryLocator) GetServicePlanRepository() ServicePlanRepository {
+	return locator.servicePlanRepo
+}
+
 func (locator RepositoryLocator) GetUserProvidedServiceInstanceRepository() UserProvidedServiceInstanceRepository {
 	return locator.userProvidedServiceInstanceRepo
 }
@@ -216,4 +223,8 @@ func (locator RepositoryLocator) GetRunningSecurityGroupsRepository() running.Ru
 
 func (locator RepositoryLocator) GetSecurityGroupSpaceBinder() securitygroupspaces.SecurityGroupSpaceBinder {
 	return locator.securityGroupSpaceBinder
+}
+
+func (locator RepositoryLocator) GetServicePlanVisibilityRepository() ServicePlanVisibilityRepository {
+	return locator.servicePlanVisibilityRepo
 }
