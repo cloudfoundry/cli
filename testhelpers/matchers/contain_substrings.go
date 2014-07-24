@@ -33,6 +33,7 @@ func (matcher *SliceMatcher) Match(actual interface{}) (success bool, err error)
 		if allStringsFound {
 			matcher.failedAtIndex++
 			if matcher.failedAtIndex == len(matcher.expected) {
+				matcher.failedAtIndex--
 				return true, nil
 			}
 		}
