@@ -1,3 +1,10 @@
+## v6.3.2
+* Provides "pretty printed" output of config JSON. [#74664516]
+* Undo recursive copy of files [#75530934]
+* Merge all translations into monolithic files. [#74408246]
+* Remove some words from dictionary [#75469600]
+* Merge pull request #210 from wdneto/pt_br Initial pt-br translation [#75083626]
+
 ## v6.3.1
 * Remove Korean as a supported language. - goi18n does not currently support it, so it is in the same boat as Russian.
 * Forcing default domain to be the first shared domain. Closes #209 [#75067850]
