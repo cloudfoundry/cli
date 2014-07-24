@@ -42,7 +42,7 @@ func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *ServiceAccess) Run(c *cli.Context) {
-	brokers, err := cmd.actor.GetBrokersWithDependencies()
+	brokers, err := cmd.actor.GetAllBrokersWithDependencies()
 
 	if err != nil {
 		cmd.ui.Failed("Failed fetching service brokers.\n%s", err)

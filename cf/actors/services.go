@@ -6,7 +6,7 @@ import (
 )
 
 type ServiceActor interface {
-	GetBrokersWithDependencies() ([]models.ServiceBroker, error)
+	GetAllBrokersWithDependencies() ([]models.ServiceBroker, error)
 }
 
 type ServiceHandler struct {
@@ -27,7 +27,7 @@ func NewServiceHandler(broker api.ServiceBrokerRepository, service api.ServiceRe
 	}
 }
 
-func (actor ServiceHandler) GetBrokersWithDependencies() ([]models.ServiceBroker, error) {
+func (actor ServiceHandler) GetAllBrokersWithDependencies() ([]models.ServiceBroker, error) {
 	brokers, err := actor.getServiceBrokers()
 	if err != nil {
 		return nil, err

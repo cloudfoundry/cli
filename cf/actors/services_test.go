@@ -70,7 +70,7 @@ var _ = Describe("Services", func() {
 			})
 
 			It("Populates Services", func() {
-				brokers, err := actor.GetBrokersWithDependencies()
+				brokers, err := actor.GetAllBrokersWithDependencies()
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(brokers)).To(Equal(2))
