@@ -7,6 +7,7 @@ import (
 
 type ServiceActor interface {
 	GetAllBrokersWithDependencies() ([]models.ServiceBroker, error)
+	GetBrokerWithDependencies(string) ([]models.ServiceBroker, error)
 }
 
 type ServiceHandler struct {
@@ -27,12 +28,12 @@ func NewServiceHandler(broker api.ServiceBrokerRepository, service api.ServiceRe
 	}
 }
 
-func (actor ServiceHandler) GetAllBrokersWithDependencies() ([]models.ServiceBroker, error) {
-	brokers, err := actor.getServiceBrokers()
+func (actor ServiceHandler) GetBrokerWithDependencies(brokerName string) ([]models.ServiceBroker, error) {
+	broker, err := actor.brokerRepo.FindByName(brokerName)
 	if err != nil {
 		return nil, err
 	}
-
+	brokers := []models.ServiceBroker{broker}
 	brokers, err = actor.getServices(brokers)
 	if err != nil {
 		return nil, err
@@ -46,7 +47,25 @@ func (actor ServiceHandler) GetAllBrokersWithDependencies() ([]models.ServiceBro
 	return actor.getOrgs(brokers)
 }
 
-func (actor ServiceHandler) getServiceBrokers() (brokers []models.ServiceBroker, err error) {
+func (actor ServiceHandler) GetAllBrokersWithDependencies() ([]models.ServiceBroker, error) {
+	brokers, err := actor.getAllServiceBrokers()
+	if err != nil {
+		return nil, err
+	}
+
+	brokers, err = actor.getServices(brokers)
+	if err != nil {
+		return nil, err
+	}
+
+	brokers, err = actor.getServicePlans(brokers)
+	if err != nil {
+		return nil, err
+	}
+	return actor.getOrgs(brokers)
+}
+
+func (actor ServiceHandler) getAllServiceBrokers() (brokers []models.ServiceBroker, err error) {
 	err = actor.brokerRepo.ListServiceBrokers(func(broker models.ServiceBroker) bool {
 		brokers = append(brokers, broker)
 		return true
