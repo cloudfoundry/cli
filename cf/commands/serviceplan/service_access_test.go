@@ -41,7 +41,7 @@ var _ = Describe("service-access command", func() {
 
 	Describe("when logged in", func() {
 		BeforeEach(func() {
-			actor.GetBrokersWithDependenciesReturns([]models.ServiceBroker{
+			actor.GetAllBrokersWithDependenciesReturns([]models.ServiceBroker{
 				{
 					Guid: "broker1",
 					Name: "brokername1",
