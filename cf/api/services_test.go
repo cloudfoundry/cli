@@ -119,6 +119,78 @@ var _ = Describe("Services Repo", func() {
 		})
 	})
 
+	Describe("find by service broker", func() {
+		BeforeEach(func() {
+			body1 := `
+{
+   "total_results": 2,
+   "total_pages": 2,
+   "prev_url": null,
+   "next_url": "/v2/services?q=service_broker_guid%3Amy-service-broker-guid&page=2",
+   "resources": [
+      {
+         "metadata": {
+            "guid": "my-service-guid"
+         },
+         "entity": {
+            "label": "my-service",
+            "provider": "androsterone-ensphere",
+            "description": "Dummy addon that is cool",
+            "version": "damageableness-preheat",
+            "documentation_url": "YESWECAN.com"
+         }
+      }
+   ]
+}`
+			body2 := `
+{
+   "total_results": 1,
+   "total_pages": 1,
+   "next_url": null,
+   "resources": [
+      {
+         "metadata": {
+            "guid": "my-service-guid2"
+         },
+         "entity": {
+            "label": "my-service2",
+            "provider": "androsterone-ensphere",
+            "description": "Dummy addon that is cooler",
+            "version": "seraphine-lowdah",
+            "documentation_url": "YESWECAN.com"
+         }
+      }
+   ]
+}`
+
+			setupTestServer(
+				testapi.NewCloudControllerTestRequest(
+					testnet.TestRequest{
+						Method:   "GET",
+						Path:     "/v2/services?q=service_broker_guid%3Amy-service-broker-guid",
+						Response: testnet.TestResponse{Status: http.StatusOK, Body: body1},
+					}),
+				testapi.NewCloudControllerTestRequest(
+					testnet.TestRequest{
+						Method:   "GET",
+						Path:     "/v2/services?q=service_broker_guid%3Amy-service-broker-guid",
+						Response: testnet.TestResponse{Status: http.StatusOK, Body: body2},
+					}),
+			)
+		})
+
+		It("returns the service brokers services", func() {
+			services, err := repo.ListServicesFromBroker("my-service-broker-guid")
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(len(services)).To(Equal(2))
+
+			Expect(services[0].Guid).To(Equal("my-service-guid"))
+			Expect(services[1].Guid).To(Equal("my-service-guid2"))
+		})
+	})
+
 	Describe("creating a service instance", func() {
 		It("makes the right request", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
