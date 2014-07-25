@@ -227,6 +227,7 @@ func (gateway Gateway) performRequestForResponseBytes(request *Request) (bytes [
 	if apiErr != nil {
 		return
 	}
+	defer rawResponse.Body.Close()
 
 	bytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -269,6 +270,7 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 	if apiErr != nil {
 		return
 	}
+	defer rawResponse.Body.Close()
 
 	if rawResponse.StatusCode > 203 || strings.TrimSpace(string(bytes)) == "" {
 		return
