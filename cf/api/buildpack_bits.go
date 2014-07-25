@@ -5,13 +5,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/errors"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -19,6 +12,14 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/errors"
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
 type BuildpackBitsRepository interface {
@@ -199,6 +200,7 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 			cb(nil, err)
 			return
 		}
+		defer response.Body.Close()
 
 		io.Copy(tempfile, response.Body)
 		tempfile.Seek(0, 0)
