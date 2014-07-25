@@ -1,14 +1,9 @@
 package net
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/errors"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/trace"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -16,6 +11,12 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"code.google.com/p/go.net/websocket"
+	"github.com/cloudfoundry/cli/cf/errors"
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 
 	"github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -27,6 +28,7 @@ var (
 
 func newHttpClient(trustedCerts []tls.Certificate, disableSSL bool) *http.Client {
 	tr := &http.Transport{
+		Dial:            (&net.Dialer{Timeout: 5 * time.Second}).Dial,
 		TLSClientConfig: NewTLSConfig(trustedCerts, disableSSL),
 		Proxy:           http.ProxyFromEnvironment,
 	}
