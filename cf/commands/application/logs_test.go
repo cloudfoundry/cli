@@ -78,15 +78,22 @@ var _ = Describe("logs command", func() {
 			}
 
 			requirementsFactory.Application = app
-			logsRepo.RecentLogs = recentLogs
-			logsRepo.TailLogMessages = appLogs
+			logsRepo.RecentLogsForReturns(recentLogs, nil)
+
+			logsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+				onConnect()
+				for _, log := range appLogs {
+					onMessage(log)
+				}
+				return nil
+			}
 		})
 
 		It("shows the recent logs when the --recent flag is provided", func() {
 			runCommand("--recent", "my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(app.Guid).To(Equal(logsRepo.AppLoggedGuid))
+			Expect(app.Guid).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
@@ -96,9 +103,9 @@ var _ = Describe("logs command", func() {
 
 		Context("when the log messages contain format string identifiers", func() {
 			BeforeEach(func() {
-				logsRepo.RecentLogs = []*logmessage.LogMessage{
+				logsRepo.RecentLogsForReturns([]*logmessage.LogMessage{
 					testlogs.NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
-				}
+				}, nil)
 			})
 
 			It("does not treat them as format strings", func() {
@@ -111,7 +118,8 @@ var _ = Describe("logs command", func() {
 			runCommand("my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(app.Guid).To(Equal(logsRepo.AppLoggedGuid))
+			appGuid, _, _ := logsRepo.TailLogsForArgsForCall(0)
+			Expect(app.Guid).To(Equal(appGuid))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
@@ -121,7 +129,7 @@ var _ = Describe("logs command", func() {
 		Context("when the loggregator server has an invalid cert", func() {
 			Context("when the skip-ssl-validation flag is not set", func() {
 				It("fails and informs the user about the skip-ssl-validation flag", func() {
-					logsRepo.TailLogErr = errors.NewInvalidSSLCert("https://example.com", "it don't work good")
+					logsRepo.TailLogsForReturns(errors.NewInvalidSSLCert("https://example.com", "it don't work good"))
 					runCommand("my-app")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -131,7 +139,7 @@ var _ = Describe("logs command", func() {
 				})
 
 				It("informs the user of the error when they include the --recent flag", func() {
-					logsRepo.RecentLogErr = errors.NewInvalidSSLCert("https://example.com", "how does SSL work???")
+					logsRepo.RecentLogsForReturns(nil, errors.NewInvalidSSLCert("https://example.com", "how does SSL work???"))
 					runCommand("--recent", "my-app")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
