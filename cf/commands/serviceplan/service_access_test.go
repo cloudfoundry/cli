@@ -19,6 +19,9 @@ var _ = Describe("service-access command", func() {
 		ui                  *testterm.FakeUI
 		actor               *testactor.FakeServiceActor
 		requirementsFactory *testreq.FakeReqFactory
+		serviceBroker1      models.ServiceBroker
+		serviceBroker2      models.ServiceBroker
+		serviceBroker3      models.ServiceBroker
 	)
 
 	BeforeEach(func() {
@@ -41,7 +44,7 @@ var _ = Describe("service-access command", func() {
 
 	Describe("when logged in", func() {
 		BeforeEach(func() {
-			serviceBroker1 := models.ServiceBroker{
+			serviceBroker1 = models.ServiceBroker{
 				Guid: "broker1",
 				Name: "brokername1",
 				Services: []models.ServiceOffering{
@@ -60,14 +63,28 @@ var _ = Describe("service-access command", func() {
 					},
 				},
 			}
-			serviceBroker2 := models.ServiceBroker{
+			serviceBroker2 = models.ServiceBroker{
 				Guid: "broker2",
 				Name: "brokername2",
 				Services: []models.ServiceOffering{
 					{ServiceOfferingFields: models.ServiceOfferingFields{Label: "my-service-3"}},
 				},
 			}
+			serviceBroker3 = models.ServiceBroker{
+				Guid: "broker3",
+				Name: "brokername3",
+				Services: []models.ServiceOffering{
+					{
+						ServiceOfferingFields: models.ServiceOfferingFields{Label: "my-service-4"},
+						Plans: []models.ServicePlanFields{
+							{Name: "weepweep", Public: true},
+							{Name: "aoooga", Public: false, OrgNames: []string{"plink", "plonk"}},
+						},
+					},
+				},
+			}
 
+			actor.GetBrokerWithSingleServiceReturns([]models.ServiceBroker{serviceBroker3}, nil)
 			actor.GetBrokerWithDependenciesReturns([]models.ServiceBroker{serviceBroker1}, nil)
 
 			actor.GetAllBrokersWithDependenciesReturns([]models.ServiceBroker{
@@ -106,8 +123,39 @@ var _ = Describe("service-access command", func() {
 				))
 				Expect(ui.Outputs).ToNot(ContainSubstrings(
 					[]string{"broker: brokername2"},
-					[]string{"service", "plan", "access", "orgs"},
 					[]string{"my-service-3"},
+				))
+			})
+		})
+
+		Context("with a -s flag", func() {
+			It("only prints out the specified service's information", func() {
+				args := []string{"-s", "my-service-4"}
+				runCommand(args)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"broker: brokername3"},
+					[]string{"service", "plan", "access", "orgs"},
+					[]string{"my-service-4", "weepweep", "public"},
+					[]string{"my-service-4", "aoooga", "limited", "plink", "plonk"},
+				))
+				Expect(ui.Outputs).ToNot(ContainSubstrings(
+					[]string{"my-service-1", "beep", "public"},
+					[]string{"my-service-1", "boop", "limited", "fwip", "brzzt"},
+					[]string{"my-service-2", "petaloideous-noncelebration"},
+					[]string{"broker: brokername1"},
+					[]string{"broker: brokername2"},
+					[]string{"my-service-3"},
+				))
+			})
+		})
+
+		Context("when both -b and -s are in play", func() {
+			It("prints the intersection set", func() {
+				args := []string{"-b", "broker1", "-s", "my-service-4"}
+				runCommand(args)
+				Expect(ui.Outputs).ToNot(ContainSubstrings(
+					[]string{"broker: brokername3"},
 				))
 			})
 		})

@@ -24,6 +24,15 @@ type FakeServiceActor struct {
 		result1 []models.ServiceBroker
 		result2 error
 	}
+	GetBrokerWithSingleServiceStub        func(string) ([]models.ServiceBroker, error)
+	getBrokerWithSingleServiceMutex       sync.RWMutex
+	getBrokerWithSingleServiceArgsForCall []struct {
+		arg1 string
+	}
+	getBrokerWithSingleServiceReturns struct {
+		result1 []models.ServiceBroker
+		result2 error
+	}
 }
 
 func (fake *FakeServiceActor) GetAllBrokersWithDependencies() ([]models.ServiceBroker, error) {
@@ -77,6 +86,38 @@ func (fake *FakeServiceActor) GetBrokerWithDependenciesArgsForCall(i int) string
 
 func (fake *FakeServiceActor) GetBrokerWithDependenciesReturns(result1 []models.ServiceBroker, result2 error) {
 	fake.getBrokerWithDependenciesReturns = struct {
+		result1 []models.ServiceBroker
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceActor) GetBrokerWithSingleService(arg1 string) ([]models.ServiceBroker, error) {
+	fake.getBrokerWithSingleServiceMutex.Lock()
+	defer fake.getBrokerWithSingleServiceMutex.Unlock()
+	fake.getBrokerWithSingleServiceArgsForCall = append(fake.getBrokerWithSingleServiceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.GetBrokerWithSingleServiceStub != nil {
+		return fake.GetBrokerWithSingleServiceStub(arg1)
+	} else {
+		return fake.getBrokerWithSingleServiceReturns.result1, fake.getBrokerWithSingleServiceReturns.result2
+	}
+}
+
+func (fake *FakeServiceActor) GetBrokerWithSingleServiceCallCount() int {
+	fake.getBrokerWithSingleServiceMutex.RLock()
+	defer fake.getBrokerWithSingleServiceMutex.RUnlock()
+	return len(fake.getBrokerWithSingleServiceArgsForCall)
+}
+
+func (fake *FakeServiceActor) GetBrokerWithSingleServiceArgsForCall(i int) string {
+	fake.getBrokerWithSingleServiceMutex.RLock()
+	defer fake.getBrokerWithSingleServiceMutex.RUnlock()
+	return fake.getBrokerWithSingleServiceArgsForCall[i].arg1
+}
+
+func (fake *FakeServiceActor) GetBrokerWithSingleServiceReturns(result1 []models.ServiceBroker, result2 error) {
+	fake.getBrokerWithSingleServiceReturns = struct {
 		result1 []models.ServiceBroker
 		result2 error
 	}{result1, result2}

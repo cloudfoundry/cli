@@ -14,6 +14,7 @@ import (
 
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) error
+	FindServiceOfferingByLabel(name string) (offering models.ServiceOffering, apiErr error)
 	FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiErr error)
 	FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offering models.ServiceOfferings, apiErr error)
 	GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr error)
@@ -163,6 +164,20 @@ func (repo CloudControllerServiceRepository) DeleteService(instance models.Servi
 func (repo CloudControllerServiceRepository) PurgeServiceOffering(offering models.ServiceOffering) error {
 	url := fmt.Sprintf("%s/v2/services/%s?purge=true", repo.config.ApiEndpoint(), offering.Guid)
 	return repo.gateway.DeleteResource(url)
+}
+
+func (repo CloudControllerServiceRepository) FindServiceOfferingByLabel(label string) (models.ServiceOffering, error) {
+	path := fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:"+label))
+	offerings, apiErr := repo.getServiceOfferings(path)
+
+	if apiErr != nil {
+		return models.ServiceOffering{}, apiErr
+	} else if len(offerings) == 0 {
+		apiErr = errors.NewModelNotFoundError("Service offering", label)
+		return models.ServiceOffering{}, apiErr
+	}
+
+	return offerings[0], apiErr
 }
 
 func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvider(label, provider string) (models.ServiceOffering, error) {

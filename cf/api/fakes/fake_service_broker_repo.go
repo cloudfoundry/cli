@@ -10,6 +10,10 @@ type FakeServiceBrokerRepo struct {
 	FindByNameServiceBroker models.ServiceBroker
 	FindByNameNotFound      bool
 
+	FindByGuidGuid          string
+	FindByGuidServiceBroker models.ServiceBroker
+	FindByGuidNotFound      bool
+
 	CreateName     string
 	CreateUrl      string
 	CreateUsername string
@@ -30,6 +34,17 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models
 
 	if repo.FindByNameNotFound {
 		apiErr = errors.NewModelNotFoundError("Service Broker", name)
+	}
+
+	return
+}
+
+func (repo *FakeServiceBrokerRepo) FindByGuid(guid string) (serviceBroker models.ServiceBroker, apiErr error) {
+	repo.FindByGuidGuid = guid
+	serviceBroker = repo.FindByNameServiceBroker
+
+	if repo.FindByGuidNotFound {
+		apiErr = errors.NewModelNotFoundError("Service Broker", guid)
 	}
 
 	return

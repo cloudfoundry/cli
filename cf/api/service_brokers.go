@@ -2,18 +2,20 @@ package api
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type ServiceBrokerRepository interface {
 	ListServiceBrokers(callback func(models.ServiceBroker) bool) error
 	FindByName(name string) (serviceBroker models.ServiceBroker, apiErr error)
+	FindByGuid(guid string) (serviceBroker models.ServiceBroker, apiErr error)
 	Create(name, url, username, password string) (apiErr error)
 	Update(serviceBroker models.ServiceBroker) (apiErr error)
 	Rename(guid, name string) (apiErr error)
@@ -58,6 +60,12 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 		apiErr = errors.NewModelNotFoundError("Service Broker", name)
 	}
 
+	return
+}
+func (repo CloudControllerServiceBrokerRepository) FindByGuid(guid string) (serviceBroker models.ServiceBroker, apiErr error) {
+	broker := new(resources.ServiceBrokerResource)
+	apiErr = repo.gateway.GetResource(repo.config.ApiEndpoint()+fmt.Sprintf("/v2/service_brokers/%s", guid), broker)
+	serviceBroker = broker.ToFields()
 	return
 }
 

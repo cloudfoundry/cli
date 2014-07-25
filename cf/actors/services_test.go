@@ -46,6 +46,10 @@ var _ = Describe("Services", func() {
 			},
 		}
 
+		service2 := models.ServiceOffering{ServiceOfferingFields: models.ServiceOfferingFields{Label: "my-service2", Guid: "service-guid2"}}
+
+		serviceRepo.FindServiceOfferingByLabelServiceOffering = service2
+
 		servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
 			"service-guid":  {{Name: "service-plan", Guid: "service-plan-guid"}, {Name: "other-plan", Guid: "other-plan-guid"}},
 			"service-guid2": {{Name: "service-plan2", Guid: "service-plan2-guid"}},
@@ -70,6 +74,20 @@ var _ = Describe("Services", func() {
 		}
 	})
 
+	Describe("GetBrokerWithSingleService", func() {
+		It("Returns a single broker contained in a slice with all dependencies populated", func() {
+			brokers, err := actor.GetBrokerWithSingleService("my-service2")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(len(brokers)).To(Equal(1))
+			Expect(len(brokers[0].Services)).To(Equal(1))
+
+			Expect(brokers[0].Services[0].Guid).To(Equal("service-guid2"))
+			Expect(brokers[0].Services[0].Plans[0].Name).To(Equal("service-plan2"))
+			Expect(brokers[0].Services[0].Plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
+		})
+	})
+
 	Describe("GetBrokerWithDependencies", func() {
 		It("Returns a single broker contained in a slice with all dependencies populated", func() {
 			brokers, err := actor.GetBrokerWithDependencies("my-service-broker2")
@@ -87,6 +105,7 @@ var _ = Describe("Services", func() {
 		})
 
 	})
+
 	Describe("GetAllBrokersWithDependencies", func() {
 		It("Returns a slice of all brokers with all their dependencies populated", func() {
 			brokers, err := actor.GetAllBrokersWithDependencies()

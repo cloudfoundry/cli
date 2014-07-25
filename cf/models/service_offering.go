@@ -2,6 +2,7 @@ package models
 
 type ServiceOfferingFields struct {
 	Guid             string
+	BrokerGuid       string
 	Label            string
 	Provider         string
 	Version          string

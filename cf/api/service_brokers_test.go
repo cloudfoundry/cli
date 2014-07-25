@@ -136,6 +136,64 @@ var _ = Describe("Service Brokers Repo", func() {
 		})
 	})
 
+	Describe("FindByGuid", func() {
+		It("returns the service broker with the given guid", func() {
+			responseBody := `
+{
+   "metadata": {
+      "guid": "found-guid",
+      "url": "/v2/service_brokers/found-guid",
+      "created_at": "2014-07-24T21:21:54+00:00",
+      "updated_at": "2014-07-25T17:03:40+00:00"
+   },
+   "entity": {
+      "name": "found-name",
+      "broker_url": "http://found.example.com",
+      "auth_username": "found-username"
+   }
+}
+`
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/service_brokers/found-guid",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: responseBody},
+			})
+
+			ts, handler, repo := createServiceBrokerRepo(req)
+			defer ts.Close()
+
+			foundBroker, apiErr := repo.FindByGuid("found-guid")
+			expectedBroker := models.ServiceBroker{}
+			expectedBroker.Name = "found-name"
+			expectedBroker.Url = "http://found.example.com"
+			expectedBroker.Username = "found-username"
+			expectedBroker.Guid = "found-guid"
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(foundBroker).To(Equal(expectedBroker))
+		})
+
+		It("returns an error when the service broker cannot be found", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/service_brokers/bogus-guid",
+				//This error code may not reflect reality.  Check it, change the code to match, and remove this comment.
+				Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{"error_code":"ServiceBrokerNotFound","description":"Service Broker bogus-guid not found","code":270042}`},
+			})
+
+			ts, handler, repo := createServiceBrokerRepo(req)
+			defer ts.Close()
+
+			_, apiErr := repo.FindByGuid("bogus-guid")
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).To(HaveOccurred())
+			Expect(apiErr.Error()).To(Equal("Server error, status code: 404, error code: 270042, message: Service Broker bogus-guid not found"))
+		})
+	})
+
 	Describe("Create", func() {
 		It("creates the service broker with the given name, URL, username and password", func() {
 			expectedReqBody := `{"name":"foobroker","broker_url":"http://example.com","auth_username":"foouser","auth_password":"password"}`

@@ -12,11 +12,12 @@ type ServiceOfferingResource struct {
 }
 
 type ServiceOfferingEntity struct {
-	Label            string
-	Version          string
-	Description      string
-	DocumentationUrl string `json:"documentation_url"`
-	Provider         string
+	Label            string                `json:"label"`
+	Version          string                `json:"version"`
+	Description      string                `json:"description"`
+	DocumentationUrl string                `json:"documentation_url"`
+	Provider         string                `json:"provider"`
+	BrokerGuid       string                `json:"service_broker_guid"`
 	ServicePlans     []ServicePlanResource `json:"service_plans"`
 }
 
@@ -25,6 +26,7 @@ func (resource ServiceOfferingResource) ToFields() (fields models.ServiceOfferin
 	fields.Version = resource.Entity.Version
 	fields.Provider = resource.Entity.Provider
 	fields.Description = resource.Entity.Description
+	fields.BrokerGuid = resource.Entity.BrokerGuid
 	fields.Guid = resource.Metadata.Guid
 	fields.DocumentationUrl = resource.Entity.DocumentationUrl
 	return
