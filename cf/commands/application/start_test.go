@@ -69,7 +69,6 @@ var _ = Describe("start command", func() {
 		}
 
 		logsForTail = []*logmessage.LogMessage{}
-
 		logRepo = new(testapi.FakeLogsRepository)
 		logRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
 			onConnect()
@@ -262,24 +261,32 @@ var _ = Describe("start command", func() {
 
 		It("gracefully handles starting an app that is still staging", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
-			appInstance := models.AppInstanceFields{}
-			appInstance.State = models.InstanceDown
-			appInstance2 := models.AppInstanceFields{}
-			appInstance2.State = models.InstanceStarting
-			appInstance3 := models.AppInstanceFields{}
-			appInstance3.State = models.InstanceStarting
-			appInstance4 := models.AppInstanceFields{}
-			appInstance4.State = models.InstanceStarting
-			appInstance5 := models.AppInstanceFields{}
-			appInstance5.State = models.InstanceRunning
-			appInstance6 := models.AppInstanceFields{}
-			appInstance6.State = models.InstanceRunning
+
+			logRepoClosed := make(chan struct{})
+
+			logRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+				onConnect()
+				onMessage(testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, time.Now()))
+
+				<-logRepoClosed
+
+				time.Sleep(50 * time.Millisecond)
+				onMessage(testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, time.Now()))
+				onMessage(testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, time.Now()))
+
+				return nil
+			}
+
+			logRepo.CloseStub = func() {
+				close(logRepoClosed)
+			}
+
 			instances := [][]models.AppInstanceFields{
 				[]models.AppInstanceFields{},
 				[]models.AppInstanceFields{},
-				[]models.AppInstanceFields{appInstance, appInstance2},
-				[]models.AppInstanceFields{appInstance3, appInstance4},
-				[]models.AppInstanceFields{appInstance5, appInstance6},
+				[]models.AppInstanceFields{{State: models.InstanceDown}, {State: models.InstanceStarting}},
+				[]models.AppInstanceFields{{State: models.InstanceStarting}, {State: models.InstanceStarting}},
+				[]models.AppInstanceFields{{State: models.InstanceRunning}, {State: models.InstanceRunning}},
 			}
 
 			errorCodes := []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, "", "", ""}
@@ -289,8 +296,9 @@ var _ = Describe("start command", func() {
 			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Log Line 1"},
-				[]string{"Log Line 2"},
+				[]string{"Before close"},
+				[]string{"After close 1"},
+				[]string{"After close 2"},
 				[]string{"0 of 2 instances running", "2 starting"},
 			))
 		})

@@ -134,9 +134,13 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 func (cmd *Start) ApplicationWatchStaging(app models.Application, start func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
 	stopLoggingChan := make(chan bool, 1)
 	loggingStartedChan := make(chan bool)
+	doneLoggingChan := make(chan bool)
 
-	go cmd.tailStagingLogs(app, loggingStartedChan, stopLoggingChan)
-
+	go cmd.tailStagingLogs(app, loggingStartedChan, doneLoggingChan)
+	go func() {
+		<-stopLoggingChan
+		cmd.logRepo.Close()
+	}()
 	<-loggingStartedChan // block until we have established connection to Loggregator
 
 	updatedApp, apiErr := start(app)
@@ -149,6 +153,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, start func(app
 
 	cmd.waitForInstancesToStage(updatedApp)
 	stopLoggingChan <- true
+	<-doneLoggingChan
 
 	cmd.ui.Say("")
 
@@ -173,19 +178,14 @@ func simpleLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
 	return
 }
 
-func (cmd Start) tailStagingLogs(app models.Application, startChan chan bool, stopChan chan bool) {
+func (cmd Start) tailStagingLogs(app models.Application, startChan, doneChan chan bool) {
 	onConnect := func() {
 		startChan <- true
 	}
 
 	err := cmd.logRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
-		select {
-		case <-stopChan:
-			cmd.logRepo.Close()
-		default:
-			if msg.GetSourceName() == LogMessageTypeStaging {
-				cmd.ui.Say(simpleLogMessageOutput(msg))
-			}
+		if msg.GetSourceName() == LogMessageTypeStaging {
+			cmd.ui.Say(simpleLogMessageOutput(msg))
 		}
 	})
 
@@ -194,6 +194,8 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan chan bool, st
 		cmd.ui.Say("%s", err)
 		startChan <- true
 	}
+
+	close(doneChan)
 }
 
 func isStagingError(err error) bool {
