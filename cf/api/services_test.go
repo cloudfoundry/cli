@@ -504,6 +504,89 @@ var _ = Describe("Services Repo", func() {
 		})
 	})
 
+	Describe("FindServiceOfferingByLabel", func() {
+		Context("when the service offering can be found", func() {
+			BeforeEach(func() {
+				setupTestServer(testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1")),
+					Response: testnet.TestResponse{
+						Status: 200,
+						Body: `
+						{
+							"next_url": null,
+							"resources": [
+								{
+								  "metadata": {
+									"guid": "offering-1-guid"
+								  },
+								  "entity": {
+									"label": "offering-1",
+									"provider": "provider-1",
+									"description": "offering 1 description",
+									"version" : "1.0",
+									"service_plans": [],
+                  "service_broker_guid": "broker-1-guid"
+								  }
+								}
+							]
+						}`}})
+			})
+
+			It("finds service offerings by label", func() {
+				offering, err := repo.FindServiceOfferingByLabel("offering-1")
+				Expect(offering.Guid).To(Equal("offering-1-guid"))
+				Expect(offering.Label).To(Equal("offering-1"))
+				Expect(offering.Provider).To(Equal("provider-1"))
+				Expect(offering.Description).To(Equal("offering 1 description"))
+				Expect(offering.Version).To(Equal("1.0"))
+				Expect(offering.BrokerGuid).To(Equal("broker-1-guid"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when the service offering cannot be found", func() {
+			BeforeEach(func() {
+				setupTestServer(testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1")),
+					Response: testnet.TestResponse{
+						Status: 200,
+						Body: `
+						{
+							"next_url": null,
+							"resources": []
+						}`,
+					},
+				})
+			})
+
+			It("returns a ModelNotFoundError", func() {
+				offering, err := repo.FindServiceOfferingByLabel("offering-1")
+
+				Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
+				Expect(offering.Guid).To(Equal(""))
+			})
+		})
+
+		It("handles api errors when finding service offerings", func() {
+			setupTestServer(testnet.TestRequest{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1")),
+				Response: testnet.TestResponse{
+					Status: 400,
+					Body: `
+					{
+            			"code": 10005,
+            			"description": "The query parameter is invalid"
+					}`}})
+
+			_, err := repo.FindServiceOfferingByLabel("offering-1")
+			Expect(err).To(HaveOccurred())
+			Expect(err.(errors.HttpError).ErrorCode()).To(Equal("10005"))
+		})
+	})
+
 	Describe("PurgeServiceOffering", func() {
 		It("purges service offerings", func() {
 			setupTestServer(testnet.TestRequest{

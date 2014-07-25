@@ -36,6 +36,7 @@ func (cmd *ServiceAccess) Metadata() command_metadata.CommandMetadata {
 		Usage:       "CF_NAME service-access",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("b", T("settings for a specific broker")),
+			flag_helpers.NewStringFlag("s", T("settings for a specific service")),
 		},
 	}
 }
@@ -49,11 +50,22 @@ func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Facto
 
 func (cmd *ServiceAccess) Run(c *cli.Context) {
 	brokerToFilter := c.String("b")
+	serviceToFilter := c.String("s")
 	var brokers []models.ServiceBroker
 	var err error
+
 	if brokerToFilter != "" {
 		brokers, err = cmd.actor.GetBrokerWithDependencies(brokerToFilter)
-	} else {
+	}
+
+	if serviceToFilter != "" {
+		brokers, err = cmd.actor.GetBrokerWithSingleService(serviceToFilter)
+		if brokerToFilter != "" && brokerToFilter != brokers[0].Name {
+			brokers = nil
+		}
+	}
+
+	if brokerToFilter == "" && serviceToFilter == "" {
 		brokers, err = cmd.actor.GetAllBrokersWithDependencies()
 	}
 

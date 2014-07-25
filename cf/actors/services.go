@@ -8,6 +8,7 @@ import (
 type ServiceActor interface {
 	GetAllBrokersWithDependencies() ([]models.ServiceBroker, error)
 	GetBrokerWithDependencies(string) ([]models.ServiceBroker, error)
+	GetBrokerWithSingleService(string) ([]models.ServiceBroker, error)
 }
 
 type ServiceHandler struct {
@@ -26,6 +27,29 @@ func NewServiceHandler(broker api.ServiceBrokerRepository, service api.ServiceRe
 		servicePlanVisibilityRepo: vis,
 		orgRepo:                   org,
 	}
+}
+
+func (actor ServiceHandler) GetBrokerWithSingleService(serviceLabel string) ([]models.ServiceBroker, error) {
+	service, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceLabel)
+	if err != nil {
+		return nil, err
+	}
+
+	broker, err := actor.brokerRepo.FindByGuid(service.BrokerGuid)
+	if err != nil {
+		println("ERROR IN ACTOR IS THIS:" + err.Error())
+		return nil, err
+	}
+
+	broker.Services = []models.ServiceOffering{service}
+	brokers := []models.ServiceBroker{broker}
+
+	brokers, err = actor.getServicePlans(brokers)
+	if err != nil {
+		return nil, err
+	}
+
+	return actor.getOrgs(brokers)
 }
 
 func (actor ServiceHandler) GetBrokerWithDependencies(brokerName string) ([]models.ServiceBroker, error) {
