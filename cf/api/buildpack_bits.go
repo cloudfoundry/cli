@@ -5,6 +5,16 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io"
+	"mime/multipart"
+	gonet "net"
+	"net/http"
+	"os"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -12,13 +22,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/gofileutils/fileutils"
-	"io"
-	"mime/multipart"
-	"net/http"
-	"os"
-	"path"
-	"path/filepath"
-	"strings"
 )
 
 type BuildpackBitsRepository interface {
@@ -189,6 +192,7 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 
 		client := &http.Client{
 			Transport: &http.Transport{
+				Dial:            (&gonet.Dialer{Timeout: 5 * time.Second}).Dial,
 				TLSClientConfig: &tls.Config{RootCAs: certPool},
 				Proxy:           http.ProxyFromEnvironment,
 			},
