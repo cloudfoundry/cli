@@ -14,8 +14,8 @@ if [[ -d $GOPATH/pkg ]] ; then
   popd
 fi
 
-if [[ -d $($GODEP path)/pkg ]] ; then
-  pushd $($GODEP path)/pkg
+if [[ -d $(godep path)/pkg ]] ; then
+  pushd $(godep path)/pkg
   rm -Rf *
   popd
 fi
