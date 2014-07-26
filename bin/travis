@@ -4,20 +4,4 @@ set -ex
 export PATH=$PATH:$HOME/gopath/bin
 export GOPATH=$(godep path):$(pwd):$GOPATH
 
-go clean -r -i
-
-# Clean up old .a files in GOPATH
-# It seems like `go clean` should do this but ... not so much
-if [[ -d $GOPATH/pkg ]] ; then
-  pushd $GOPATH/pkg
-  rm -Rf *
-  popd
-fi
-
-if [[ -d $(godep path)/pkg ]] ; then
-  pushd $(godep path)/pkg
-  rm -Rf *
-  popd
-fi
-
 ginkgo -r cf --randomizeAllSpecs --randomizeSuites --failOnPending --trace
