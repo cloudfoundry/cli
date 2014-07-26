@@ -41,8 +41,8 @@
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "1.0.0-74-g5ddbbe3",
-			"Rev": "5ddbbe33e57edd8bdbe29a1592cd842a82752074"
+			"Comment": "1.0.0-88-g27ecc97",
+			"Rev": "27ecc97192df1bf053a22b04463f2b51b8b8373e"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
