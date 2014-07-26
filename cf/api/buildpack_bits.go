@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	gonet "net"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -190,6 +192,7 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 
 		client := &http.Client{
 			Transport: &http.Transport{
+				Dial:            (&gonet.Dialer{Timeout: 5 * time.Second}).Dial,
 				TLSClientConfig: &tls.Config{RootCAs: certPool},
 				Proxy:           http.ProxyFromEnvironment,
 			},
