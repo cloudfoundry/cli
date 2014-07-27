@@ -75,8 +75,9 @@ var _ = Describe("env command", func() {
 
 			appRepo.ReadReturns.App = app
 			appRepo.ReadEnvReturns.UserEnv = map[string]string{
-				"my-key":  "my-value",
-				"my-key2": "my-value2",
+				"my-key":    "my-value",
+				"my-key2":   "my-value2",
+				"first-key": "Zer0",
 			}
 			appRepo.ReadEnvReturns.VcapServices = `{
   "VCAP_SERVICES": {
@@ -85,7 +86,7 @@ var _ = Describe("env command", func() {
 }`
 		})
 
-		It("lists those environment variables like it's supposed to", func() {
+		It("lists those environment variables, in sorted order for provided services", func() {
 			runCommand("my-app")
 			Expect(appRepo.ReadEnvArgs.AppGuid).To(Equal("the-app-guid"))
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -96,7 +97,9 @@ var _ = Describe("env command", func() {
 				[]string{"pump-yer-brakes", ":", "drive-slow"},
 				[]string{"}"},
 				[]string{"User-Provided:"},
-				[]string{"my-key", "my-value", "my-key2", "my-value2"},
+				[]string{"first-key", "Zer0"},
+				[]string{"my-key", "my-value"},
+				[]string{"my-key2", "my-value2"},
 			))
 		})
 	})
