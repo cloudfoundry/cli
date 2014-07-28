@@ -33,10 +33,10 @@ func (cmd *ServiceAccess) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "service-access",
 		Description: T("List service access settings"),
-		Usage:       "CF_NAME service-access",
+		Usage:       "CF_NAME service-access [-b BROKER] [-e SERVICE]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("b", T("settings for a specific broker")),
-			flag_helpers.NewStringFlag("s", T("settings for a specific service")),
+			flag_helpers.NewStringFlag("b", T("access for plans of a particular broker")),
+			flag_helpers.NewStringFlag("e", T("access for plans of a particular service offering")),
 		},
 	}
 }
@@ -49,17 +49,30 @@ func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *ServiceAccess) Run(c *cli.Context) {
+	brokers := cmd.filterBrokers(c)
+	cmd.printTable(brokers)
+}
+
+func (cmd ServiceAccess) filterBrokers(c *cli.Context) []models.ServiceBroker {
 	brokerToFilter := c.String("b")
-	serviceToFilter := c.String("s")
+	serviceToFilter := c.String("e")
 	var brokers []models.ServiceBroker
 	var err error
 
 	if brokerToFilter != "" {
 		brokers, err = cmd.actor.GetBrokerWithDependencies(brokerToFilter)
+		if err != nil {
+			cmd.ui.Failed(T("Failed fetching service brokers.\n%s"), err)
+			return nil
+		}
 	}
 
 	if serviceToFilter != "" {
 		brokers, err = cmd.actor.GetBrokerWithSingleService(serviceToFilter)
+		if err != nil {
+			cmd.ui.Failed(T("Failed fetching service.\n%s"), err)
+			return nil
+		}
 		if brokerToFilter != "" && brokerToFilter != brokers[0].Name {
 			brokers = nil
 		}
@@ -67,13 +80,15 @@ func (cmd *ServiceAccess) Run(c *cli.Context) {
 
 	if brokerToFilter == "" && serviceToFilter == "" {
 		brokers, err = cmd.actor.GetAllBrokersWithDependencies()
+		if err != nil {
+			cmd.ui.Failed(T("Failed fetching service brokers.\n%s"), err)
+			return nil
+		}
 	}
+	return brokers
+}
 
-	if err != nil {
-		cmd.ui.Failed(T("Failed fetching service brokers.\n%s"), err)
-		return
-	}
-
+func (cmd ServiceAccess) printTable(brokers []models.ServiceBroker) {
 	for _, serviceBroker := range brokers {
 		cmd.ui.Say(fmt.Sprintf(T("broker: %s"), serviceBroker.Name))
 
@@ -91,6 +106,7 @@ func (cmd *ServiceAccess) Run(c *cli.Context) {
 
 		cmd.ui.Say("")
 	}
+	return
 }
 
 func (cmd ServiceAccess) formatAccess(public bool, orgNames []string) string {
