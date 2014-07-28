@@ -2,12 +2,13 @@ package api
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
 type AppFilesRepository interface {
-	ListFiles(appGuid, path string) (files string, apiErr error)
+	ListFiles(appGuid string, instance int, path string) (files string, apiErr error)
 }
 
 type CloudControllerAppFilesRepository struct {
@@ -21,8 +22,8 @@ func NewCloudControllerAppFilesRepository(config configuration.Reader, gateway n
 	return
 }
 
-func (repo CloudControllerAppFilesRepository) ListFiles(appGuid, path string) (files string, apiErr error) {
-	url := fmt.Sprintf("%s/v2/apps/%s/instances/0/files/%s", repo.config.ApiEndpoint(), appGuid, path)
+func (repo CloudControllerAppFilesRepository) ListFiles(appGuid string, instance int, path string) (files string, apiErr error) {
+	url := fmt.Sprintf("%s/v2/apps/%s/instances/%d/files/%s", repo.config.ApiEndpoint(), appGuid, instance, path)
 	request, apiErr := repo.gateway.NewRequest("GET", url, repo.config.AccessToken(), nil)
 	if apiErr != nil {
 		return

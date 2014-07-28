@@ -88,5 +88,31 @@ var _ = Describe("files command", func() {
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"%s %d %i"}))
 		})
+
+		Context("checking for bad flags", func() {
+			It("fails when non-positive value is given for instance", func() {
+				runCommand("-i", "-1", "my-app")
+
+				println(ui.Outputs)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Invalid instance"},
+					[]string{"Instance must be a positive integer"},
+				))
+			})
+
+			It("fails when instance is larger than instance count", func() {
+				runCommand("-i", "5", "my-app")
+
+				println(ui.Outputs)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Invalid instance"},
+					[]string{"Instance must be less than"},
+				))
+			})
+
+		})
+
 	})
 })
