@@ -2,12 +2,13 @@ package net
 
 import (
 	"fmt"
-	"github.com/onsi/ginkgo"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"strings"
+
+	"github.com/onsi/ginkgo"
 )
 
 type TestRequest struct {
@@ -46,6 +47,8 @@ func urlQueryContains(container, containee url.Values) bool {
 }
 
 func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer ginkgo.GinkgoRecover()
+
 	if len(h.Requests) <= h.CallCount {
 		h.logError("Index out of range! Test server called too many times. Final Request:", r.Method, r.RequestURI)
 		return

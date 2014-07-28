@@ -42,7 +42,7 @@ var _ = Describe("AppFilesRepository", func() {
 
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
-			Path:   "/v2/apps/my-app-guid/instances/0/files/some/path",
+			Path:   "/v2/apps/my-app-guid/instances/1/files/some/path",
 			Response: testnet.TestResponse{
 				Status: http.StatusTemporaryRedirect,
 				Header: http.Header{
@@ -59,7 +59,7 @@ var _ = Describe("AppFilesRepository", func() {
 
 		gateway := net.NewCloudControllerGateway(configRepo, time.Now)
 		repo := NewCloudControllerAppFilesRepository(configRepo, gateway)
-		list, err := repo.ListFiles("my-app-guid", "some/path")
+		list, err := repo.ListFiles("my-app-guid", 1, "some/path")
 
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(err).ToNot(HaveOccurred())
