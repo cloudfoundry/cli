@@ -1,6 +1,8 @@
 package serviceplan_test
 
 import (
+	"errors"
+
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -130,7 +132,7 @@ var _ = Describe("service-access command", func() {
 
 		Context("with a -s flag", func() {
 			It("only prints out the specified service's information", func() {
-				args := []string{"-s", "my-service-4"}
+				args := []string{"-e", "my-service-4"}
 				runCommand(args)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -152,10 +154,32 @@ var _ = Describe("service-access command", func() {
 
 		Context("when both -b and -s are in play", func() {
 			It("prints the intersection set", func() {
-				args := []string{"-b", "broker1", "-s", "my-service-4"}
+				args := []string{"-b", "broker1", "-e", "my-service-4"}
 				runCommand(args)
 				Expect(ui.Outputs).ToNot(ContainSubstrings(
 					[]string{"broker: brokername3"},
+				))
+			})
+
+			It("returns an error message when the broker does not exist", func() {
+				actor.GetBrokerWithDependenciesReturns(nil, errors.New("Service broker BroKer1 not found."))
+				args := []string{"-b", "BroKer1", "-e", "my-service-4"}
+				runCommand(args)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Failed fetching service brokers."},
+					[]string{"Service broker BroKer1 not found."},
+				))
+			})
+
+			It("returns an error message when the service does not exist", func() {
+				actor.GetBrokerWithSingleServiceReturns(nil, errors.New("Service My-Service-4 not found."))
+				args := []string{"-b", "broker1", "-e", "My-Service-4"}
+				runCommand(args)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Failed fetching service."},
+					[]string{"Service My-Service-4 not found."},
 				))
 			})
 		})
