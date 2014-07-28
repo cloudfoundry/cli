@@ -7,20 +7,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/codegangsta/cli"
-
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/command_runner"
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/panic_printer"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
+	"github.com/codegangsta/cli"
 )
 
 type cliDependencies struct {
@@ -108,48 +106,20 @@ OPTIONS:
 }
 
 func handlePanics() {
+	panic_printer.UI = terminal.NewUI(os.Stdin)
+
+	commandArgs := strings.Join(os.Args, " ")
+	stackTrace := generateBacktrace()
+
 	err := recover()
-	if err != nil && err != terminal.QuietPanic {
-		switch err := err.(type) {
-		case errors.Exception:
-			if err.DisplayCrashDialog {
-				displayCrashDialog(err.Message)
-			} else {
-				fmt.Println(err.Message)
-			}
-		case error:
-			displayCrashDialog(err.Error())
-		case string:
-			displayCrashDialog(err)
-		default:
-			displayCrashDialog("An unexpected type of error")
-		}
-	}
+	panic_printer.DisplayCrashDialog(err, commandArgs, stackTrace)
 
 	if err != nil {
 		os.Exit(1)
 	}
 }
 
-func displayCrashDialog(errorMessage string) {
-	formattedString := `
-
-Aww shucks.
-
-Something completely unexpected happened. This is a bug in %s.
-Please file this bug : https://github.com/cloudfoundry/cli/issues
-Tell us that you ran this command:
-
-	%s
-
-this error occurred:
-
-	%s
-
-and this stack trace:
-
-%s
-	`
+func generateBacktrace() string {
 	stackByteCount := 0
 	STACK_SIZE_LIMIT := 1024 * 1024
 	var bytes []byte
@@ -158,5 +128,5 @@ and this stack trace:
 		stackByteCount = runtime.Stack(bytes, true)
 	}
 	stackTrace := "\t" + strings.Replace(string(bytes), "\n", "\n\t", -1)
-	println(fmt.Sprintf(formattedString, cf.Name(), strings.Join(os.Args, " "), errorMessage, stackTrace))
+	return stackTrace
 }
