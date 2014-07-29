@@ -37,7 +37,7 @@ var _ = Describe("i18n.Init() function", func() {
 			T := i18n.Init()
 			Ω(T).ShouldNot(BeNil())
 
-			translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo", "Name": "Anand"})
+			translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo", "Username": "Anand"})
 			Ω("Deleting domain foo as Anand...").Should(Equal(translation))
 		})
 	})
