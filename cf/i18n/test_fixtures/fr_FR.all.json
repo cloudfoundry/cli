@@ -1,10 +1,22 @@
 [
-    {
-        "id": "Hello world!",
-        "translation": "\u00c0lo le monde!"
-    },
-    {
-        "id": "Hello {{.Name}}!",
-        "translation": "\u00c0lo {{.Name}}!"
-    }
+   {
+      "id": "Deletes a security group",
+      "translation": "Deletes a security group",
+      "modified": false
+   },
+   {
+      "id": "No buildpacks found",
+      "translation": "Pas buildpacks trouvés",
+      "modified": false
+   },
+   {
+      "id": "Change user password",
+      "translation": "Changer mot de passe de l'utilisateur",
+      "modified": false
+   },
+   {
+      "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
+      "translation": "Suppression domaine {{.DomainName}} comme {{.Username}}...",
+      "modified": false
+   }
 ]

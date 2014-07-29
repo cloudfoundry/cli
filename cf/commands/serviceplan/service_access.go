@@ -81,7 +81,7 @@ func (cmd ServiceAccess) filterBrokers(c *cli.Context) []models.ServiceBroker {
 	if brokerToFilter == "" && serviceToFilter == "" {
 		brokers, err = cmd.actor.GetAllBrokersWithDependencies()
 		if err != nil {
-			cmd.ui.Failed(T("Failed fetching service brokers.\n%s"), err)
+			cmd.ui.Failed(T("Failed fetching service brokers.\n{{.Error}}", map[string]interface{}{"Error": err.Error()}))
 			return nil
 		}
 	}
@@ -90,7 +90,7 @@ func (cmd ServiceAccess) filterBrokers(c *cli.Context) []models.ServiceBroker {
 
 func (cmd ServiceAccess) printTable(brokers []models.ServiceBroker) {
 	for _, serviceBroker := range brokers {
-		cmd.ui.Say(fmt.Sprintf(T("broker: %s"), serviceBroker.Name))
+		cmd.ui.Say(fmt.Sprintf(T("broker: {{.Name}}", map[string]interface{}{"Name": serviceBroker.Name})))
 
 		table := terminal.NewTable(cmd.ui, []string{"", T("service"), T("plan"), T("access"), T("orgs")})
 		for _, service := range serviceBroker.Services {

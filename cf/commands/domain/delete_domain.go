@@ -75,10 +75,10 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say(T("Deleting domain {{.DomainName}} as {{.ApiErr}}...",
+	cmd.ui.Say(T("Deleting domain {{.DomainName}} as {{.Username}}...",
 		map[string]interface{}{
 			"DomainName": terminal.EntityNameColor(domainName),
-			"ApiErr":     terminal.EntityNameColor(cmd.config.Username())}))
+			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
 	apiErr = cmd.domainRepo.Delete(domain.Guid)
 	if apiErr != nil {
