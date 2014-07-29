@@ -62,7 +62,7 @@ func (cmd ServiceAccess) filterBrokers(c *cli.Context) []models.ServiceBroker {
 	if brokerToFilter != "" {
 		brokers, err = cmd.actor.GetBrokerWithDependencies(brokerToFilter)
 		if err != nil {
-			cmd.ui.Failed(T("Failed fetching service brokers.\n%s"), err)
+			cmd.ui.Failed(T("Failed fetching service brokers.\n{{.Error}}", map[string]interface{}{"Error": err.Error()}))
 			return nil
 		}
 	}
@@ -70,7 +70,7 @@ func (cmd ServiceAccess) filterBrokers(c *cli.Context) []models.ServiceBroker {
 	if serviceToFilter != "" {
 		brokers, err = cmd.actor.GetBrokerWithSingleService(serviceToFilter)
 		if err != nil {
-			cmd.ui.Failed(T("Failed fetching service.\n%s"), err)
+			cmd.ui.Failed(T("Failed fetching service.\n{{.Error}}", map[string]interface{}{"Error": err.Error()}))
 			return nil
 		}
 		if brokerToFilter != "" && brokerToFilter != brokers[0].Name {

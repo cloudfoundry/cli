@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+ENV['GOPATH']="#{ENV['HOME']}/go"
+ENV['PATH']="#{ENV['PATH']}:#{ENV['GOPATH']}/bin"
+CLI_ROOT = File.expand_path(File.join(File.dirname(__FILE__), ".."))
+
+@exit_code = 0
+
+def install_gi18n
+  output = `go get -u github.com/maximilien/i18n4go/gi18n`
+  unless $?.exitstatus == 0
+    puts "Cannot install latest gi18n tool to verify strings:\n#{output}"
+    exit 1
+  end
+end
+
+
+
+def run
+  results = `gi18n -c checkup`.split("\n")
+
+  if results.length > 1
+    puts results
+    exit(1)
+  end
+end
+
+install_gi18n
+run
