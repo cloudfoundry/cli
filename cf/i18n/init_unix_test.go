@@ -58,8 +58,8 @@ var _ = Describe("i18n.Init() function", func() {
 				translation := T("Hello world!")
 				Ω("Hello world!").Should(Equal(translation))
 
-				translation = T("Hello {{.Adj}} new world!", map[string]interface{}{"Adj": "brave"})
-				Ω("Hello brave new world!").Should(Equal(translation))
+				translation = T("No buildpacks found")
+				Ω("No buildpacks found").Should(Equal(translation))
 			})
 
 			Context("because we don't have the territory", func() {
@@ -67,8 +67,8 @@ var _ = Describe("i18n.Init() function", func() {
 					os.Setenv("LC_ALL", "fr_CA.UTF-8")
 					T := i18n.Init()
 
-					translation := T("Hello world!")
-					Ω("Àlo le monde!").Should(Equal(translation))
+					translation := T("No buildpacks found")
+					Ω("Pas buildpacks trouvés").Should(Equal(translation))
 				})
 			})
 		})
@@ -104,8 +104,8 @@ var _ = Describe("i18n.Init() function", func() {
 			T := i18n.Init()
 			Ω(T).ShouldNot(BeNil())
 
-			translation := T("Hello {{.Name}}!", map[string]interface{}{"Name": "Anand"})
-			Ω("Hello Anand!").Should(Equal(translation))
+			translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo.com", "Username": "Anand"})
+			Ω("Deleting domain foo.com as Anand...").Should(Equal(translation))
 		})
 	})
 
@@ -117,8 +117,8 @@ var _ = Describe("i18n.Init() function", func() {
 		It("T function should return translation if string key exists", func() {
 			T := i18n.Init()
 
-			translation := T("Hello world!")
-			Ω("Àlo le monde!").Should(Equal(translation))
+			translation := T("No buildpacks found")
+			Ω("Pas buildpacks trouvés").Should(Equal(translation))
 		})
 	})
 })
