@@ -54,6 +54,7 @@ var _ = Describe("service-access command", func() {
 						ServiceOfferingFields: models.ServiceOfferingFields{Label: "my-service-1"},
 						Plans: []models.ServicePlanFields{
 							{Name: "beep", Public: true},
+							{Name: "bot", Public: false},
 							{Name: "boop", Public: false, OrgNames: []string{"fwip", "brzzt"}},
 						},
 					},
@@ -102,7 +103,8 @@ var _ = Describe("service-access command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"broker: brokername1"},
 				[]string{"service", "plan", "access", "orgs"},
-				[]string{"my-service-1", "beep", "public"},
+				[]string{"my-service-1", "beep", "all"},
+				[]string{"my-service-1", "bot", "none"},
 				[]string{"my-service-1", "boop", "limited", "fwip", "brzzt"},
 				[]string{"my-service-2", "petaloideous-noncelebration"},
 				[]string{"broker: brokername2"},
@@ -119,7 +121,7 @@ var _ = Describe("service-access command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"broker: brokername1"},
 					[]string{"service", "plan", "access", "orgs"},
-					[]string{"my-service-1", "beep", "public"},
+					[]string{"my-service-1", "beep", "all"},
 					[]string{"my-service-1", "boop", "limited", "fwip", "brzzt"},
 					[]string{"my-service-2", "petaloideous-noncelebration"},
 				))
@@ -138,11 +140,11 @@ var _ = Describe("service-access command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"broker: brokername3"},
 					[]string{"service", "plan", "access", "orgs"},
-					[]string{"my-service-4", "weepweep", "public"},
+					[]string{"my-service-4", "weepweep", "all"},
 					[]string{"my-service-4", "aoooga", "limited", "plink", "plonk"},
 				))
 				Expect(ui.Outputs).ToNot(ContainSubstrings(
-					[]string{"my-service-1", "beep", "public"},
+					[]string{"my-service-1", "beep", "all"},
 					[]string{"my-service-1", "boop", "limited", "fwip", "brzzt"},
 					[]string{"my-service-2", "petaloideous-noncelebration"},
 					[]string{"broker: brokername1"},

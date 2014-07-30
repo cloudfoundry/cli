@@ -111,10 +111,10 @@ func (cmd ServiceAccess) printTable(brokers []models.ServiceBroker) {
 
 func (cmd ServiceAccess) formatAccess(public bool, orgNames []string) string {
 	if public {
-		return T("public")
+		return T("all")
 	}
 	if len(orgNames) > 0 {
 		return T("limited")
 	}
-	return T("private")
+	return T("none")
 }
