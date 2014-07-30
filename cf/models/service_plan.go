@@ -1,10 +1,11 @@
 package models
 
 type ServicePlanFields struct {
-	Guid                string
-	Name                string
-	Free                bool
-	Public              bool
+	Guid   string
+	Name   string
+	Free   bool
+	Public bool
+	Description
 	Active              bool
 	ServiceOfferingGuid string
 	OrgNames            []string

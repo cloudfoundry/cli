@@ -16,6 +16,9 @@ var _ = Describe("Service Plans", func() {
 		servicePlanRepo           *fakes.FakeServicePlanRepo
 		servicePlanVisibilityRepo *fakes.FakeServicePlanVisibilityRepository
 		orgRepo                   *fakes.FakeOrgRepository
+
+		publicServicePlan  models.ServicePlanFields
+		privateServicePlan models.ServicePlanFields
 	)
 
 	BeforeEach(func() {
@@ -30,21 +33,44 @@ var _ = Describe("Service Plans", func() {
 
 		serviceRepo.FindServiceOfferingByLabelServiceOffering = service
 
+		publicServicePlan = models.ServicePlanFields{
+			Name:   "public-service-plan",
+			Guid:   "public-service-plan-guid",
+			Public: true,
+		}
+
+		privateServicePlan = models.ServicePlanFields{
+			Name:   "private-service-plan",
+			Guid:   "private-service-plan-guid",
+			Public: false,
+			OrgNames: []string{
+				"org-1",
+				"org-2",
+			},
+		}
+
 		servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
 			"my-service-guid": {
-				{Name: "small-service-plan", Guid: "small-service-plan-guid"},
-				{Name: "large-service-plan", Guid: "large-service-plan-guid"},
+				publicServicePlan,
+				privateServicePlan,
 			},
 		}
 	})
 
-	Describe(".GetServicePlanForService", func() {
+	Describe(".GetSingleServicePlan", func() {
 		It("Returns a single service plan", func() {
-			servicePlan, err := actor.GetSingleServicePlanForService("my-service", "small-service-plan")
+			servicePlan, err := actor.GetSingleServicePlanForService("my-service", "public-service-plan")
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(servicePlan.Name).To(Equal("small-service-plan"))
-			Expect(servicePlan.Guid).To(Equal("small-service-plan-guid"))
+			Expect(servicePlan.Name).To(Equal("public-service-plan"))
+			Expect(servicePlan.Guid).To(Equal("public-service-plan-guid"))
+		})
+	})
+
+	Describe(".SetServicePlanPublic", func() {
+		It("sets a service plan to public", func() {
+			err := actor.SetServicePlanPublic(privateServicePlan)
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 })

@@ -7,6 +7,7 @@ import (
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -86,6 +87,31 @@ var _ = Describe("Service Plan Repository", func() {
 				Expect(servicePlansFields[1].Public).To(BeFalse())
 				Expect(servicePlansFields[1].Active).To(BeFalse())
 			})
+		})
+	})
+
+	Describe(".Update", func() {
+		BeforeEach(func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/service_plans/my-service-plan-guid",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-service-plan", "free":true, "description":"descriptive text", "public":true, "service_guid":"service-guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			}))
+		})
+
+		It("Updates the service to public", func() {
+			servicePlan := models.ServicePlanFields{
+				Name:        "my-service-plan",
+				Guid:        "my-service-plan-guid",
+				Description: "descriptive text",
+				Free:        true,
+				Public:      false,
+			}
+
+			err := repo.Update(servicePlan, "service-guid", true)
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 })
@@ -169,7 +195,7 @@ var firstPlanRequestWithParams = testapi.NewCloudControllerTestRequest(testnet.T
 
 var secondPlanRequestWithParams = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/service_plans??q=service_guid%3AFoo&page=2",
+	Path:   "/v2/service_plans?q=service_guid%3AFoo&page=2",
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `{

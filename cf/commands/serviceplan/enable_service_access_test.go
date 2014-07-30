@@ -30,20 +30,20 @@ var _ = Describe("enable-service-access command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) bool {
+	runCommand := func(args []string) bool {
 		cmd := NewEnableServiceAccess(ui, configuration.NewRepositoryWithDefaults(), actor)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
-			runCommand("foo")
+			runCommand([]string{"foo"})
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 
 		It("fails with usage when it does not recieve any arguments", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand()
+			runCommand(nil)
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 	})
@@ -51,6 +51,7 @@ var _ = Describe("enable-service-access command", func() {
 	Describe("when logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+
 			publicServicePlan = models.ServicePlanFields{
 				Guid:   "public-service-plan-guid",
 				Name:   "public-service-plan",
@@ -74,9 +75,9 @@ var _ = Describe("enable-service-access command", func() {
 
 			Context("The user provides a plan", func() {
 				It("tells the user if the plan is already public", func() {
-					actor.GetSingleServicePlanForServiceReturns(publicServicePlan, nil)
+					actor.GetSingleServicePlanReturns(publicServicePlan, nil)
 
-					Expect(runCommand("public-service-plan", "p", "public-service-plan")).To(BeTrue())
+					Expect(runCommand([]string{"public-service-plan", "-p", "public-service-plan"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Plan", "for service", "is already public"},
 						[]string{"OK"},
