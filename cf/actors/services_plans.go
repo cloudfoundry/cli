@@ -6,7 +6,8 @@ import (
 )
 
 type ServicePlanActor interface {
-	GetSingleServicePlanForService(string, string) (models.ServicePlanFields, error)
+	GetSingleServicePlan(string, string) (models.ServicePlanFields, error)
+	SetServicePlanPublic(models.ServicePlanFields) error
 }
 
 type ServicePlanHandler struct {
@@ -25,7 +26,7 @@ func NewServicePlanHandler(service api.ServiceRepository, plan api.ServicePlanRe
 	}
 }
 
-func (actor ServicePlanHandler) GetSingleServicePlanForService(serviceName string, planName string) (models.ServicePlanFields, error) {
+func (actor ServicePlanHandler) GetSingleServicePlan(serviceName string, planName string) (models.ServicePlanFields, error) {
 	//find service guid
 	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
 	if err != nil {
@@ -47,4 +48,10 @@ func (actor ServicePlanHandler) GetSingleServicePlanForService(serviceName strin
 	}
 
 	return plan, nil
+}
+
+func (actor ServicePlanHandler) SetServicePlanPublic(servicePlan models.ServicePlanFields) error {
+	//post to service_plan guids [] and public: true
+
+	return nil
 }

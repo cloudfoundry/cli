@@ -27,6 +27,21 @@ func NewCloudControllerServicePlanRepository(config configuration.Reader, gatewa
 	}
 }
 
+func (repo CloudControllerServicePlanRepository) Update(servicePlan models.ServicePlanFields, serviceGuid string, public bool) error {
+	var body string
+
+	body = fmt.Sprintf(`{"name":"%s", "free":%t, "description":"%s", "public":%t, "service_guid":"%s"}`,
+		servicePlan.Name,
+		servicePlan.Free,
+		servicePlan.Description,
+		public,
+		serviceGuid,
+	)
+
+	url := fmt.Sprintf("%s/v2/service_plans/%s", repo.config.ApiEndpoint(), servicePlan.Guid)
+	return repo.gateway.UpdateResource(url, strings.NewReader(body))
+}
+
 func (repo CloudControllerServicePlanRepository) Search(queryParams map[string]string) (plans []models.ServicePlanFields, err error) {
 	err = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),

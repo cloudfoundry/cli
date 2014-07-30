@@ -1,6 +1,8 @@
 package serviceplan
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -48,11 +50,13 @@ func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 	planToFilter := c.String("p")
 	serviceName := c.Args()[0]
 
+	fmt.Println("Plan: ", planToFilter)
+
 	var err error
 	var plan models.ServicePlanFields
 
 	if planToFilter != "" {
-		plan, err = cmd.actor.GetSingleServicePlanForService(serviceName, planToFilter)
+		plan, err = cmd.actor.GetSingleServicePlan(serviceName, planToFilter)
 		if err != nil {
 			cmd.ui.Failed("Could not find service plan.\n%s", err)
 		}
