@@ -199,8 +199,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 		))
 	factory.cmdsByName["enable-service-access"] = serviceplan.NewEnableServiceAccess(
 		ui, config,
-		actors.NewServiceHandler(
-			repoLocator.GetServiceBrokerRepository(),
+		actors.NewServicePlanHandler(
 			repoLocator.GetServiceRepository(),
 			repoLocator.GetServicePlanRepository(),
 			repoLocator.GetServicePlanVisibilityRepository(),

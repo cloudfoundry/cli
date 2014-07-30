@@ -235,6 +235,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("purge-service-offering"),
 				}, {
 					presentCommand("service-access"),
+				}, {
+					presentCommand("enable-service-access"),
 				},
 			},
 		}, {
