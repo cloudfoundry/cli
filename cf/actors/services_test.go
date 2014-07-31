@@ -139,6 +139,13 @@ var _ = Describe("Services", func() {
 		})
 
 		Context("when the -o flag is passed", func() {
+			It("returns an error if the org does not actually exist", func() {
+				orgRepo.Organizations = []models.Organization{}
+				_, err := actor.FilterBrokers("", "", "org-that-shall-not-be-found")
+
+				Expect(err).To(HaveOccurred())
+			})
+
 			It("returns a slice of brokers containing Services/Service Plans visible to the org", func() {
 				servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
 					"service-guid": {

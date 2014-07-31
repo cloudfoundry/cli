@@ -31,6 +31,10 @@ func (actor ServiceHandler) FilterBrokers(brokerFlag string, serviceFlag string,
 	if orgFlag == "" {
 		return actor.buildBrokerTreeFromTop(brokerFlag, serviceFlag)
 	} else {
+		_, err := actor.orgRepo.FindByName(orgFlag)
+		if err != nil {
+			return nil, err
+		}
 		return actor.buildBrokerTreeFromBottom(brokerFlag, serviceFlag, orgFlag)
 	}
 }
@@ -67,6 +71,72 @@ func (actor ServiceHandler) buildBrokerTreeFromTop(brokerFlag string, serviceFla
 	}
 
 	return brokersToReturn, nil
+}
+
+func (actor ServiceHandler) attachServicesToBrokers(brokers []models.ServiceBroker, serviceFlag string) ([]models.ServiceBroker, error) {
+	var err error
+	var service models.ServiceOffering
+
+	serviceFlagEnabled := serviceFlag != ""
+
+	if serviceFlagEnabled {
+		service, err = actor.serviceRepo.FindServiceOfferingByLabel(serviceFlag)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for index, _ := range brokers {
+		if serviceFlagEnabled {
+			if brokers[index].Guid == service.BrokerGuid {
+				//check to see if its guid is contained in the list of the broker's service guid
+				brokers[index].Services, err = actor.attachPlansToServices([]models.ServiceOffering{service})
+				if err != nil {
+					return nil, err
+				}
+				return brokers, nil
+			} else {
+				continue
+			}
+		}
+		services, err := actor.serviceRepo.ListServicesFromBroker(brokers[index].Guid)
+		if err != nil {
+			return nil, err
+		}
+		brokers[index].Services, err = actor.attachPlansToServices(services)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return brokers, nil
+}
+
+func (actor ServiceHandler) attachPlansToServices(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
+	for serviceIndex, _ := range services {
+		service := &services[serviceIndex]
+		plans, err := actor.servicePlanRepo.Search(map[string]string{"service_guid": service.Guid})
+		if err != nil {
+			return nil, err
+		}
+		service.Plans, err = actor.attachOrgsToPlans(plans)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return services, nil
+}
+
+func (actor ServiceHandler) attachOrgsToPlans(plans []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
+	visMap, err := actor.buildPlanToOrgsVisibilityMap()
+	if err != nil {
+		return nil, err
+	}
+	for planIndex, _ := range plans {
+		plan := &plans[planIndex]
+		plan.OrgNames = visMap[plan.Guid]
+	}
+
+	return plans, nil
 }
 
 func (actor ServiceHandler) buildBrokerTreeFromBottom(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error) {
@@ -178,72 +248,6 @@ func (actor ServiceHandler) getAllServiceBrokers() (brokers []models.ServiceBrok
 		return true
 	})
 	return
-}
-
-func (actor ServiceHandler) attachServicesToBrokers(brokers []models.ServiceBroker, serviceFlag string) ([]models.ServiceBroker, error) {
-	var err error
-	var service models.ServiceOffering
-
-	serviceFlagEnabled := serviceFlag != ""
-
-	if serviceFlagEnabled {
-		service, err = actor.serviceRepo.FindServiceOfferingByLabel(serviceFlag)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	for index, _ := range brokers {
-		if serviceFlagEnabled {
-			if brokers[index].Guid == service.BrokerGuid {
-				//check to see if its guid is contained in the list of the broker's service guid
-				brokers[index].Services, err = actor.attachPlansToServices([]models.ServiceOffering{service})
-				if err != nil {
-					return nil, err
-				}
-				return brokers, nil
-			} else {
-				continue
-			}
-		}
-		services, err := actor.serviceRepo.ListServicesFromBroker(brokers[index].Guid)
-		if err != nil {
-			return nil, err
-		}
-		brokers[index].Services, err = actor.attachPlansToServices(services)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return brokers, nil
-}
-
-func (actor ServiceHandler) attachPlansToServices(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
-	for serviceIndex, _ := range services {
-		service := &services[serviceIndex]
-		plans, err := actor.servicePlanRepo.Search(map[string]string{"service_guid": service.Guid})
-		if err != nil {
-			return nil, err
-		}
-		service.Plans, err = actor.attachOrgsToPlans(plans)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return services, nil
-}
-
-func (actor ServiceHandler) attachOrgsToPlans(plans []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
-	visMap, err := actor.buildPlanToOrgsVisibilityMap()
-	if err != nil {
-		return nil, err
-	}
-	for planIndex, _ := range plans {
-		plan := &plans[planIndex]
-		plan.OrgNames = visMap[plan.Guid]
-	}
-
-	return plans, nil
 }
 
 func (actor ServiceHandler) buildPlanToOrgsVisibilityMap() (map[string][]string, error) {
