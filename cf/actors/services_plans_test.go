@@ -19,6 +19,8 @@ var _ = Describe("Service Plans", func() {
 
 		publicServicePlan  models.ServicePlanFields
 		privateServicePlan models.ServicePlanFields
+
+		service models.ServiceOffering
 	)
 
 	BeforeEach(func() {
@@ -28,10 +30,6 @@ var _ = Describe("Service Plans", func() {
 		orgRepo = &fakes.FakeOrgRepository{}
 
 		actor = actors.NewServicePlanHandler(serviceRepo, servicePlanRepo, servicePlanVisibilityRepo, orgRepo)
-
-		service := models.ServiceOffering{ServiceOfferingFields: models.ServiceOfferingFields{Label: "my-service", Guid: "my-service-guid"}}
-
-		serviceRepo.FindServiceOfferingByLabelServiceOffering = service
 
 		publicServicePlan = models.ServicePlanFields{
 			Name:   "public-service-plan",
@@ -49,6 +47,19 @@ var _ = Describe("Service Plans", func() {
 			},
 		}
 
+		service = models.ServiceOffering{
+			ServiceOfferingFields: models.ServiceOfferingFields{
+				Label: "my-service",
+				Guid:  "my-service-guid",
+			},
+			Plans: []models.ServicePlanFields{
+				publicServicePlan,
+				privateServicePlan,
+			},
+		}
+
+		serviceRepo.FindServiceOfferingByLabelServiceOffering = service
+
 		servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
 			"my-service-guid": {
 				publicServicePlan,
@@ -57,20 +68,35 @@ var _ = Describe("Service Plans", func() {
 		}
 	})
 
-	Describe(".GetSingleServicePlan", func() {
-		It("Returns a single service plan", func() {
-			servicePlan, err := actor.GetSingleServicePlanForService("my-service", "public-service-plan")
+	Describe(".GetServiceWithSinglePlan", func() {
+		It("Returns a single service", func() {
+			serviceOffering, err := actor.GetServiceWithSinglePlan("my-service", "public-service-plan")
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(servicePlan.Name).To(Equal("public-service-plan"))
-			Expect(servicePlan.Guid).To(Equal("public-service-plan-guid"))
+			Expect(len(serviceOffering.Plans)).To(Equal(1))
+			Expect(serviceOffering.Plans[0].Name).To(Equal("public-service-plan"))
+			Expect(serviceOffering.Plans[0].Guid).To(Equal("public-service-plan-guid"))
 		})
 	})
 
-	Describe(".SetServicePlanPublic", func() {
+	Describe(".UpdateServicePlanAvailability", func() {
 		It("sets a service plan to public", func() {
-			err := actor.SetServicePlanPublic(privateServicePlan)
+			err := actor.UpdateServicePlanAvailability(service, true)
 			Expect(err).ToNot(HaveOccurred())
+
+			servicePlan, serviceGuid, public := servicePlanRepo.UpdateArgsForCall(0)
+			Expect(servicePlan.Public).To(BeTrue())
+			Expect(serviceGuid).To(Equal("my-service-guid"))
+			Expect(public).To(BeTrue())
+		})
+	})
+
+	Describe(".RemoveServicePlanVisabilities", func() {
+		It("removes all service plan visabilites for a service plan", func() {
+			err := actor.RemoveServicePlanVisabilities(service)
+			Expect(err).ToNot(HaveOccurred())
+
+			
 		})
 	})
 })
