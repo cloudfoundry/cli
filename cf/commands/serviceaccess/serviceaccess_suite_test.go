@@ -1,4 +1,4 @@
-package serviceplan_test
+package serviceaccess_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestServicePlan(t *testing.T) {
+func TestServiceAccess(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Service Plan Suite")
+	RunSpecs(t, "Service Access Suite")
 }
