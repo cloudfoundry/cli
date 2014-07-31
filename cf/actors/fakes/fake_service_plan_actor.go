@@ -8,88 +8,90 @@ import (
 )
 
 type FakeServicePlanActor struct {
-	GetSingleServicePlanStub        func(string, string) (models.ServicePlanFields, error)
-	getSingleServicePlanMutex       sync.RWMutex
-	getSingleServicePlanArgsForCall []struct {
+	GetServiceWithSinglePlanStub        func(string, string) (models.ServiceOffering, error)
+	getServiceWithSinglePlanMutex       sync.RWMutex
+	getServiceWithSinglePlanArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	getSingleServicePlanReturns struct {
-		result1 models.ServicePlanFields
+	getServiceWithSinglePlanReturns struct {
+		result1 models.ServiceOffering
 		result2 error
 	}
-	SetServicePlanPublicStub        func(models.ServicePlanFields) error
-	setServicePlanPublicMutex       sync.RWMutex
-	setServicePlanPublicArgsForCall []struct {
-		arg1 models.ServicePlanFields
+	UpdateServicePlanAvailabilityStub        func(models.ServiceOffering, bool) error
+	updateServicePlanAvailabilityMutex       sync.RWMutex
+	updateServicePlanAvailabilityArgsForCall []struct {
+		arg1 models.ServiceOffering
+		arg2 bool
 	}
-	setServicePlanPublicReturns struct {
+	updateServicePlanAvailabilityReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeServicePlanActor) GetSingleServicePlan(arg1 string, arg2 string) (models.ServicePlanFields, error) {
-	fake.getSingleServicePlanMutex.Lock()
-	defer fake.getSingleServicePlanMutex.Unlock()
-	fake.getSingleServicePlanArgsForCall = append(fake.getSingleServicePlanArgsForCall, struct {
+func (fake *FakeServicePlanActor) GetServiceWithSinglePlan(arg1 string, arg2 string) (models.ServiceOffering, error) {
+	fake.getServiceWithSinglePlanMutex.Lock()
+	defer fake.getServiceWithSinglePlanMutex.Unlock()
+	fake.getServiceWithSinglePlanArgsForCall = append(fake.getServiceWithSinglePlanArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	if fake.GetSingleServicePlanStub != nil {
-		return fake.GetSingleServicePlanStub(arg1, arg2)
+	if fake.GetServiceWithSinglePlanStub != nil {
+		return fake.GetServiceWithSinglePlanStub(arg1, arg2)
 	} else {
-		return fake.getSingleServicePlanReturns.result1, fake.getSingleServicePlanReturns.result2
+		return fake.getServiceWithSinglePlanReturns.result1, fake.getServiceWithSinglePlanReturns.result2
 	}
 }
 
-func (fake *FakeServicePlanActor) GetSingleServicePlanCallCount() int {
-	fake.getSingleServicePlanMutex.RLock()
-	defer fake.getSingleServicePlanMutex.RUnlock()
-	return len(fake.getSingleServicePlanArgsForCall)
+func (fake *FakeServicePlanActor) GetServiceWithSinglePlanCallCount() int {
+	fake.getServiceWithSinglePlanMutex.RLock()
+	defer fake.getServiceWithSinglePlanMutex.RUnlock()
+	return len(fake.getServiceWithSinglePlanArgsForCall)
 }
 
-func (fake *FakeServicePlanActor) GetSingleServicePlanArgsForCall(i int) (string, string) {
-	fake.getSingleServicePlanMutex.RLock()
-	defer fake.getSingleServicePlanMutex.RUnlock()
-	return fake.getSingleServicePlanArgsForCall[i].arg1, fake.getSingleServicePlanArgsForCall[i].arg2
+func (fake *FakeServicePlanActor) GetServiceWithSinglePlanArgsForCall(i int) (string, string) {
+	fake.getServiceWithSinglePlanMutex.RLock()
+	defer fake.getServiceWithSinglePlanMutex.RUnlock()
+	return fake.getServiceWithSinglePlanArgsForCall[i].arg1, fake.getServiceWithSinglePlanArgsForCall[i].arg2
 }
 
-func (fake *FakeServicePlanActor) GetSingleServicePlanReturns(result1 models.ServicePlanFields, result2 error) {
-	fake.GetSingleServicePlanStub = nil
-	fake.getSingleServicePlanReturns = struct {
-		result1 models.ServicePlanFields
+func (fake *FakeServicePlanActor) GetServiceWithSinglePlanReturns(result1 models.ServiceOffering, result2 error) {
+	fake.GetServiceWithSinglePlanStub = nil
+	fake.getServiceWithSinglePlanReturns = struct {
+		result1 models.ServiceOffering
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeServicePlanActor) SetServicePlanPublic(arg1 models.ServicePlanFields) error {
-	fake.setServicePlanPublicMutex.Lock()
-	defer fake.setServicePlanPublicMutex.Unlock()
-	fake.setServicePlanPublicArgsForCall = append(fake.setServicePlanPublicArgsForCall, struct {
-		arg1 models.ServicePlanFields
-	}{arg1})
-	if fake.SetServicePlanPublicStub != nil {
-		return fake.SetServicePlanPublicStub(arg1)
+func (fake *FakeServicePlanActor) UpdateServicePlanAvailability(arg1 models.ServiceOffering, arg2 bool) error {
+	fake.updateServicePlanAvailabilityMutex.Lock()
+	defer fake.updateServicePlanAvailabilityMutex.Unlock()
+	fake.updateServicePlanAvailabilityArgsForCall = append(fake.updateServicePlanAvailabilityArgsForCall, struct {
+		arg1 models.ServiceOffering
+		arg2 bool
+	}{arg1, arg2})
+	if fake.UpdateServicePlanAvailabilityStub != nil {
+		return fake.UpdateServicePlanAvailabilityStub(arg1, arg2)
 	} else {
-		return fake.setServicePlanPublicReturns.result1
+		return fake.updateServicePlanAvailabilityReturns.result1
 	}
 }
 
-func (fake *FakeServicePlanActor) SetServicePlanPublicCallCount() int {
-	fake.setServicePlanPublicMutex.RLock()
-	defer fake.setServicePlanPublicMutex.RUnlock()
-	return len(fake.setServicePlanPublicArgsForCall)
+func (fake *FakeServicePlanActor) UpdateServicePlanAvailabilityCallCount() int {
+	fake.updateServicePlanAvailabilityMutex.RLock()
+	defer fake.updateServicePlanAvailabilityMutex.RUnlock()
+	return len(fake.updateServicePlanAvailabilityArgsForCall)
 }
 
-func (fake *FakeServicePlanActor) SetServicePlanPublicArgsForCall(i int) models.ServicePlanFields {
-	fake.setServicePlanPublicMutex.RLock()
-	defer fake.setServicePlanPublicMutex.RUnlock()
-	return fake.setServicePlanPublicArgsForCall[i].arg1
+func (fake *FakeServicePlanActor) UpdateServicePlanAvailabilityArgsForCall(i int) (models.ServiceOffering, bool) {
+	fake.updateServicePlanAvailabilityMutex.RLock()
+	defer fake.updateServicePlanAvailabilityMutex.RUnlock()
+	return fake.updateServicePlanAvailabilityArgsForCall[i].arg1, fake.updateServicePlanAvailabilityArgsForCall[i].arg2
 }
 
-func (fake *FakeServicePlanActor) SetServicePlanPublicReturns(result1 error) {
-	fake.SetServicePlanPublicStub = nil
-	fake.setServicePlanPublicReturns = struct {
+func (fake *FakeServicePlanActor) UpdateServicePlanAvailabilityReturns(result1 error) {
+	fake.UpdateServicePlanAvailabilityStub = nil
+	fake.updateServicePlanAvailabilityReturns = struct {
 		result1 error
 	}{result1}
 }

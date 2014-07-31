@@ -20,8 +20,8 @@ var _ = Describe("enable-service-access command", func() {
 		actor               *testactor.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
 
-		publicServicePlan  models.ServicePlanFields
-		privateServicePlan models.ServicePlanFields
+		publicServiceSinglePlan  models.ServiceOffering
+		privateServiceSinglePlan models.ServiceOffering
 	)
 
 	BeforeEach(func() {
@@ -52,16 +52,32 @@ var _ = Describe("enable-service-access command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 
-			publicServicePlan = models.ServicePlanFields{
-				Guid:   "public-service-plan-guid",
-				Name:   "public-service-plan",
-				Public: true,
+			publicServiceSinglePlan = models.ServiceOffering{
+				ServiceOfferingFields: models.ServiceOfferingFields{
+					Label: "service",
+					Guid:  "service-guid",
+				},
+				Plans: []models.ServicePlanFields{
+					{
+						Guid:   "public-service-plan-guid",
+						Name:   "public-service-plan",
+						Public: true,
+					},
+				},
 			}
 
-			privateServicePlan = models.ServicePlanFields{
-				Guid:   "private-service-plan-guid",
-				Name:   "private-service-plan",
-				Public: false,
+			privateServiceSinglePlan = models.ServiceOffering{
+				ServiceOfferingFields: models.ServiceOfferingFields{
+					Label: "service",
+					Guid:  "service-guid",
+				},
+				Plans: []models.ServicePlanFields{
+					{
+						Guid:   "private-service-plan-guid",
+						Name:   "private-service-plan",
+						Public: false,
+					},
+				},
 			}
 		})
 
@@ -75,11 +91,21 @@ var _ = Describe("enable-service-access command", func() {
 
 			Context("The user provides a plan", func() {
 				It("tells the user if the plan is already public", func() {
-					actor.GetSingleServicePlanReturns(publicServicePlan, nil)
+					actor.GetServiceWithSinglePlanReturns(publicServiceSinglePlan, nil)
 
-					Expect(runCommand([]string{"public-service-plan", "-p", "public-service-plan"})).To(BeTrue())
+					Expect(runCommand([]string{"-p", "public-service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Plan", "for service", "is already public"},
+						[]string{"OK"},
+					))
+				})
+
+				It("tells the user the plan is being updated if it is not public", func() {
+					actor.GetServiceWithSinglePlanReturns(privateServiceSinglePlan, nil)
+
+					Expect(runCommand([]string{"-p", "private-service-plan", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Enabling access of plan private-service-plan for service service"},
 						[]string{"OK"},
 					))
 				})

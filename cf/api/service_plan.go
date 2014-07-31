@@ -13,6 +13,7 @@ import (
 
 type ServicePlanRepository interface {
 	Search(searchParameters map[string]string) ([]models.ServicePlanFields, error)
+	Update(models.ServicePlanFields, string, bool) error
 }
 
 type CloudControllerServicePlanRepository struct {
