@@ -32,6 +32,7 @@ func (resource ServicePlanResource) ToFields() (fields models.ServicePlanFields)
 	fields.Free = resource.Entity.Free
 	fields.Public = resource.Entity.Public
 	fields.Active = resource.Entity.Active
+	fields.ServiceOfferingGuid = resource.Entity.ServiceOfferingGuid
 	return
 }
 

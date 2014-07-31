@@ -41,7 +41,7 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models
 
 func (repo *FakeServiceBrokerRepo) FindByGuid(guid string) (serviceBroker models.ServiceBroker, apiErr error) {
 	repo.FindByGuidGuid = guid
-	serviceBroker = repo.FindByNameServiceBroker
+	serviceBroker = repo.FindByGuidServiceBroker
 
 	if repo.FindByGuidNotFound {
 		apiErr = errors.NewModelNotFoundError("Service Broker", guid)
