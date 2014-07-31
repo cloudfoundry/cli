@@ -52,7 +52,7 @@ func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Facto
 func (cmd *ServiceAccess) Run(c *cli.Context) {
 	brokers, err := cmd.actor.FilterBrokers(c.String("b"), c.String("e"), c.String("o"))
 	if err != nil {
-		cmd.ui.Failed(T("Failed fetching service brokers.\n%s"), err)
+		cmd.ui.Failed(T("Failed fetching service brokers.\n{{.Error}}", map[string]interface{}{"Error": err}))
 		return
 	}
 	cmd.printTable(brokers)
