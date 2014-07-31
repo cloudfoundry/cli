@@ -17,6 +17,15 @@ func (fake FakeServicePlanRepo) Search(queryParams map[string]string) ([]models.
 		return nil, fake.SearchErr
 	}
 
+	if queryParams == nil {
+		//return everything
+		var returnPlans []models.ServicePlanFields
+		for _, value := range fake.SearchReturns {
+			returnPlans = append(returnPlans, value...)
+		}
+		return returnPlans, nil
+	}
+
 	searchKey := combineKeys(queryParams)
 	if fake.SearchReturns[searchKey] != nil {
 		return fake.SearchReturns[searchKey], nil

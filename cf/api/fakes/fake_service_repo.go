@@ -8,6 +8,11 @@ import (
 )
 
 type FakeServiceRepo struct {
+	GetServiceOfferingByGuidReturns struct {
+		ServiceOffering models.ServiceOffering
+		Error           error
+	}
+
 	GetAllServiceOfferingsReturns struct {
 		ServiceOfferings []models.ServiceOffering
 		Error            error
@@ -84,6 +89,10 @@ type FakeServiceRepo struct {
 	MigrateServicePlanFromV1ToV2Called        bool
 	MigrateServicePlanFromV1ToV2ReturnedCount int
 	MigrateServicePlanFromV1ToV2Response      error
+}
+
+func (repo *FakeServiceRepo) GetServiceOfferingByGuid(guid string) (models.ServiceOffering, error) {
+	return repo.GetServiceOfferingByGuidReturns.ServiceOffering, repo.GetServiceOfferingByGuidReturns.Error
 }
 
 func (repo *FakeServiceRepo) GetAllServiceOfferings() (models.ServiceOfferings, error) {

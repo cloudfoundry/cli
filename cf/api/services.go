@@ -14,6 +14,7 @@ import (
 
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) error
+	GetServiceOfferingByGuid(serviceGuid string) (offering models.ServiceOffering, apiErr error)
 	FindServiceOfferingByLabel(name string) (offering models.ServiceOffering, apiErr error)
 	FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiErr error)
 	FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offering models.ServiceOfferings, apiErr error)
@@ -38,6 +39,13 @@ func NewCloudControllerServiceRepository(config configuration.Reader, gateway ne
 	repo.config = config
 	repo.gateway = gateway
 	return
+}
+
+func (repo CloudControllerServiceRepository) GetServiceOfferingByGuid(serviceGuid string) (models.ServiceOffering, error) {
+	offering := new(resources.ServiceOfferingResource)
+	apiErr := repo.gateway.GetResource(repo.config.ApiEndpoint()+fmt.Sprintf("/v2/services/%s", serviceGuid), offering)
+	serviceOffering := offering.ToFields()
+	return models.ServiceOffering{ServiceOfferingFields: serviceOffering}, apiErr
 }
 
 func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offerings models.ServiceOfferings, err error) {
