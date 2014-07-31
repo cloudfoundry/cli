@@ -1,4 +1,4 @@
-package serviceplan
+package serviceaccess
 
 import (
 	"fmt"
