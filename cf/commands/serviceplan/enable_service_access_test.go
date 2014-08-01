@@ -1,8 +1,9 @@
 package serviceplan_test
 
 import (
+	"errors"
+
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
-	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -19,9 +20,6 @@ var _ = Describe("enable-service-access command", func() {
 		ui                  *testterm.FakeUI
 		actor               *testactor.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
-
-		publicServiceSinglePlan  models.ServiceOffering
-		privateServiceSinglePlan models.ServiceOffering
 	)
 
 	BeforeEach(func() {
@@ -51,47 +49,28 @@ var _ = Describe("enable-service-access command", func() {
 	Describe("when logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
-
-			publicServiceSinglePlan = models.ServiceOffering{
-				ServiceOfferingFields: models.ServiceOfferingFields{
-					Label: "service",
-					Guid:  "service-guid",
-				},
-				Plans: []models.ServicePlanFields{
-					{
-						Guid:   "public-service-plan-guid",
-						Name:   "public-service-plan",
-						Public: true,
-					},
-				},
-			}
-
-			privateServiceSinglePlan = models.ServiceOffering{
-				ServiceOfferingFields: models.ServiceOfferingFields{
-					Label: "service",
-					Guid:  "service-guid",
-				},
-				Plans: []models.ServicePlanFields{
-					{
-						Guid:   "private-service-plan-guid",
-						Name:   "private-service-plan",
-						Public: false,
-					},
-				},
-			}
 		})
 
 		Context("when the named service exists", func() {
-			It("tells the user the service is already public if all plans are public", func() {
-			})
-
-			It("tells the user private services have been set to public", func() {
-
+			It("returns OK when ran successfully", func() {
+				Expect(runCommand([]string{"service"})).To(BeTrue())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"OK"},
+				))
 			})
 
 			Context("The user provides a plan", func() {
+				It("prints an error if the service does not exist", func() {
+					actor.UpdateSinglePlanForServiceReturns(true, errors.New("could not find service"))
+
+					Expect(runCommand([]string{"-p", "service-plan", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"could not find service"},
+					))
+				})
+
 				It("tells the user if the plan is already public", func() {
-					actor.GetServiceWithSinglePlanReturns(publicServiceSinglePlan, nil)
+					actor.UpdateSinglePlanForServiceReturns(true, nil)
 
 					Expect(runCommand([]string{"-p", "public-service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -101,7 +80,7 @@ var _ = Describe("enable-service-access command", func() {
 				})
 
 				It("tells the user the plan is being updated if it is not public", func() {
-					actor.GetServiceWithSinglePlanReturns(privateServiceSinglePlan, nil)
+					actor.UpdateSinglePlanForServiceReturns(false, nil)
 
 					Expect(runCommand([]string{"-p", "private-service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(

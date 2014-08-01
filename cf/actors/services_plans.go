@@ -1,13 +1,15 @@
 package actors
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
 type ServicePlanActor interface {
-	GetServiceWithSinglePlan(string, string) (models.ServiceOffering, error)
-	UpdateServicePlanAvailability(models.ServiceOffering, bool) error
+	UpdateSinglePlanForService(string, string) (bool, error)
 }
 
 type ServicePlanHandler struct {
@@ -26,56 +28,63 @@ func NewServicePlanHandler(service api.ServiceRepository, plan api.ServicePlanRe
 	}
 }
 
-//service
-func (actor ServicePlanHandler) GetServiceWithAllPlans(serviceName string) (models.ServiceOffering, error) {
-	return models.ServiceOffering{}, nil
-}
+func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, planName string) (bool, error) {
+	var servicePlan models.ServicePlanFields
 
-// service -p
-func (actor ServicePlanHandler) GetServiceWithSinglePlan(serviceName string, planName string) (models.ServiceOffering, error) {
-	//find service guid
 	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
 	if err != nil {
-		return models.ServiceOffering{}, err
+		return false, err
 	}
 
 	//get all service plans for the one specific service
+	//if there are no plans for the service it returns an empty set
 	servicePlans, err := actor.servicePlanRepo.Search(map[string]string{"service_guid": serviceOffering.Guid})
 	if err != nil {
-		return models.ServiceOffering{}, err
+		return false, err
 	}
 
-	//find the service plan and replace it
+	//find the service plan and set it as the only service plan for update
+	serviceOffering.Plans = nil //set it to nil initialy
 	for _, servicePlan := range servicePlans {
 		if servicePlan.Name == planName {
-			serviceOffering.Plans = []models.ServicePlanFields{servicePlan} //he has the org inside him!!!
+			serviceOffering.Plans = []models.ServicePlanFields{servicePlan} //he has the orgs inside him!!!
+			break
 		}
 	}
 
-	return serviceOffering, nil
+	if serviceOffering.Plans == nil {
+		return false, errors.New(fmt.Sprintf("The plan %s could not be found for service %s", planName, serviceName))
+	} else {
+		servicePlan = serviceOffering.Plans[0]
+	}
+
+	err = actor.updateServicePlanAvailability(serviceOffering.Guid, servicePlan, true)
+	if err != nil {
+		return false, err
+	}
+
+	return servicePlan.Public, nil
 }
 
-//service -p -o
-func (actor ServicePlanHandler) GetServiceWithSinglePlanAndOrg(serviceName, planName, orgName string) (models.ServiceOffering, error) {
-	return models.ServiceOffering{}, nil
+func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string, servicePlan models.ServicePlanFields, public bool) error {
+	//delete service_plan_visibility guids[] and public: true
+	err := actor.removeServicePlanVisibilities(servicePlan.Guid)
+	if err != nil {
+		return err
+	}
+
+	return actor.servicePlanRepo.Update(servicePlan, serviceGuid, public)
 }
 
-//service -o
-func (actor ServicePlanHandler) GeServiceWithAllPlansSingleOrg(serviceName, orgName string) (models.ServiceOffering, error) {
-	return models.ServiceOffering{}, nil
-}
+func (actor ServicePlanHandler) removeServicePlanVisibilities(servicePlanGuid string) error {
+	planVisibilities, err := actor.servicePlanVisibilityRepo.List()
+	if err != nil {
+		return err
+	}
 
-func (actor ServicePlanHandler) UpdateServicePlanAvailability(service models.ServiceOffering, public bool) error {
-	//post to service_plan guids [] and public: true
-	return actor.servicePlanRepo.Update(service.Plans[0], service.Guid, public)
-}
-
-func (actor ServicePlanHandler) RemoveServicePlanVisabilities(service models.ServiceOffering) error {
-	planVisibilities := actor.servicePlanVisibilityRepo.List()
-
-	for _, planVisability := range planVisibilities {
-		if planVisability.Guid == service.Plan[0].Guid {
-			err := actor.servicePlanVisibilityRepo.Delete(planVisability.Guid)
+	for _, planVisibility := range planVisibilities {
+		if planVisibility.ServicePlanGuid == servicePlanGuid {
+			err := actor.servicePlanVisibilityRepo.Delete(planVisibility.Guid)
 			if err != nil {
 				return err
 			}
