@@ -1,4 +1,4 @@
-package serviceplan_test
+package serviceaccess_test
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/serviceplan"
+	. "github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

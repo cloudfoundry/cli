@@ -1,4 +1,4 @@
-package serviceplan
+package serviceaccess
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors"
