@@ -2,7 +2,7 @@ package application
 
 import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"strings"
+	"sort"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -65,22 +65,34 @@ func (cmd *Env) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	if len(vcapServices) > 0 {
-		cmd.ui.Say(T("System-Provided:"))
-		for _, line := range strings.Split(vcapServices, "\n") {
-			cmd.ui.Say(line)
-		}
-	} else {
-		cmd.ui.Say(T("No system-provided env variables have been set"))
-	}
+	cmd.displaySystemProvidedEnvironment(vcapServices)
+	cmd.ui.Say("")
+	cmd.displayUserProvidedEnvironment(envVars)
+}
 
+func (cmd *Env) displaySystemProvidedEnvironment(vcapServices string) {
+	if len(vcapServices) == 0 {
+		cmd.ui.Say(T("No system-provided env variables have been set"))
+		return
+	}
+	cmd.ui.Say(T("System-Provided:"))
+	cmd.ui.Say(vcapServices)
+}
+
+func (cmd *Env) displayUserProvidedEnvironment(envVars map[string]string) {
 	if len(envVars) == 0 {
 		cmd.ui.Say(T("No user-defined env variables have been set"))
 		return
 	}
 
+	keys := make([]string, 0, len(envVars))
+	for key, _ := range envVars {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
 	cmd.ui.Say(T("User-Provided:"))
-	for key, value := range envVars {
-		cmd.ui.Say("%s: %s", key, terminal.EntityNameColor(value))
+	for _, key := range keys {
+		cmd.ui.Say("%s: %s", key, terminal.EntityNameColor(envVars[key]))
 	}
 }
