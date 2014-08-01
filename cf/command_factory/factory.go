@@ -205,6 +205,15 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 			repoLocator.GetServicePlanVisibilityRepository(),
 			repoLocator.GetOrganizationRepository(),
 		))
+	factory.cmdsByName["disable-service-access"] = serviceaccess.NewDisableServiceAccess(
+		ui, config,
+		actors.NewServicePlanHandler(
+			repoLocator.GetServiceRepository(),
+			repoLocator.GetServicePlanRepository(),
+			repoLocator.GetServicePlanVisibilityRepository(),
+			repoLocator.GetOrganizationRepository(),
+		))
+
 	return
 }
 
