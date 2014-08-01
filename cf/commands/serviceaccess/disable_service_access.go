@@ -57,7 +57,7 @@ func (cmd *DisableServiceAccess) Run(c *cli.Context) {
 		if !planOriginallyPublic {
 			cmd.ui.Say("Plan %s for service %s is already private", planName, serviceName)
 		} else {
-			cmd.ui.Say("Disabling access of plan %s for service %s", planName, serviceName)
+			cmd.ui.Say("Disabling access of plan %s for service %s as %s...", planName, serviceName, cmd.config.Username())
 		}
 	}
 
