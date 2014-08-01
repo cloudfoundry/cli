@@ -73,6 +73,10 @@ func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string
 		return err
 	}
 
+	if servicePlan.Public {
+		return nil
+	}
+
 	return actor.servicePlanRepo.Update(servicePlan, serviceGuid, public)
 }
 
@@ -94,33 +98,3 @@ func (actor ServicePlanHandler) removeServicePlanVisibilities(servicePlanGuid st
 
 	return nil
 }
-
-/*
-func (actor ServicePlanHandler) GetSingleServicePlan(serviceName string, planName string) (models.ServicePlanFields, error) {
-	//find service guid
-	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
-	if err != nil {
-		return models.ServicePlanFields{}, err
-	}
-
-	//get all service plans for the service
-	servicePlans, err := actor.servicePlanRepo.Search(map[string]string{"service_guid": serviceOffering.Guid})
-	if err != nil {
-		return models.ServicePlanFields{}, err
-	}
-
-	//find the service plan
-	var plan models.ServicePlanFields //he has the orgs inside him!!!!
-	for _, servicePlan := range servicePlans {
-		if servicePlan.Name == planName {
-
-			serviceOffering.Plan = plan
-
-			//plan = servicePlan
-		}
-	}
-
-	return serviceOffering, nil
-	//return plan, nil
-}
-*/
