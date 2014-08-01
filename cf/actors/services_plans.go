@@ -9,7 +9,7 @@ import (
 )
 
 type ServicePlanActor interface {
-	UpdateSinglePlanForService(string, string) (bool, error)
+	UpdateSinglePlanForService(string, string, bool) (bool, error)
 }
 
 type ServicePlanHandler struct {
@@ -28,7 +28,7 @@ func NewServicePlanHandler(service api.ServiceRepository, plan api.ServicePlanRe
 	}
 }
 
-func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, planName string) (bool, error) {
+func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, planName string, setPlanVisibility bool) (bool, error) {
 	var servicePlan models.ServicePlanFields
 
 	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
@@ -58,7 +58,7 @@ func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, p
 		servicePlan = serviceOffering.Plans[0]
 	}
 
-	err = actor.updateServicePlanAvailability(serviceOffering.Guid, servicePlan, true)
+	err = actor.updateServicePlanAvailability(serviceOffering.Guid, servicePlan, setPlanVisibility)
 	if err != nil {
 		return false, err
 	}
@@ -66,18 +66,18 @@ func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, p
 	return servicePlan.Public, nil
 }
 
-func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string, servicePlan models.ServicePlanFields, public bool) error {
+func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string, servicePlan models.ServicePlanFields, setPlanVisibility bool) error {
 	//delete service_plan_visibility guids[] and public: true
 	err := actor.removeServicePlanVisibilities(servicePlan.Guid)
 	if err != nil {
 		return err
 	}
 
-	if servicePlan.Public {
+	if servicePlan.Public == setPlanVisibility {
 		return nil
 	}
 
-	return actor.servicePlanRepo.Update(servicePlan, serviceGuid, public)
+	return actor.servicePlanRepo.Update(servicePlan, serviceGuid, setPlanVisibility)
 }
 
 func (actor ServicePlanHandler) removeServicePlanVisibilities(servicePlanGuid string) error {

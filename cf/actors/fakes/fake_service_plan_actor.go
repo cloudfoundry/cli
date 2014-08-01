@@ -7,11 +7,12 @@ import (
 )
 
 type FakeServicePlanActor struct {
-	UpdateSinglePlanForServiceStub        func(string, string) (bool, error)
+	UpdateSinglePlanForServiceStub        func(string, string, bool) (bool, error)
 	updateSinglePlanForServiceMutex       sync.RWMutex
 	updateSinglePlanForServiceArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 bool
 	}
 	updateSinglePlanForServiceReturns struct {
 		result1 bool
@@ -19,15 +20,16 @@ type FakeServicePlanActor struct {
 	}
 }
 
-func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string) (bool, error) {
+func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string, arg3 bool) (bool, error) {
 	fake.updateSinglePlanForServiceMutex.Lock()
 	defer fake.updateSinglePlanForServiceMutex.Unlock()
 	fake.updateSinglePlanForServiceArgsForCall = append(fake.updateSinglePlanForServiceArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
+		arg3 bool
+	}{arg1, arg2, arg3})
 	if fake.UpdateSinglePlanForServiceStub != nil {
-		return fake.UpdateSinglePlanForServiceStub(arg1, arg2)
+		return fake.UpdateSinglePlanForServiceStub(arg1, arg2, arg3)
 	} else {
 		return fake.updateSinglePlanForServiceReturns.result1, fake.updateSinglePlanForServiceReturns.result2
 	}
@@ -39,10 +41,10 @@ func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceCallCount() int {
 	return len(fake.updateSinglePlanForServiceArgsForCall)
 }
 
-func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceArgsForCall(i int) (string, string) {
+func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceArgsForCall(i int) (string, string, bool) {
 	fake.updateSinglePlanForServiceMutex.RLock()
 	defer fake.updateSinglePlanForServiceMutex.RUnlock()
-	return fake.updateSinglePlanForServiceArgsForCall[i].arg1, fake.updateSinglePlanForServiceArgsForCall[i].arg2
+	return fake.updateSinglePlanForServiceArgsForCall[i].arg1, fake.updateSinglePlanForServiceArgsForCall[i].arg2, fake.updateSinglePlanForServiceArgsForCall[i].arg3
 }
 
 func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturns(result1 bool, result2 error) {
