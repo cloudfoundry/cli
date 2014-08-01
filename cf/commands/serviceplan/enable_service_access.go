@@ -5,7 +5,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
-	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -46,23 +45,19 @@ func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 
 func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
-	planToFilter := c.String("p")
+	planName := c.String("p")
 
-	var err error
-	var service models.ServiceOffering
+	if planName != "" {
 
-	if planToFilter != "" {
-		service, err = cmd.actor.GetServiceWithSinglePlan(serviceName, planToFilter)
+		planOriginallyPublic, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
 
-		if service.Plans[0].Public {
-			cmd.ui.Say("Plan %s for service %s is already public", planToFilter, serviceName)
+		if planOriginallyPublic {
+			cmd.ui.Say("Plan %s for service %s is already public", planName, serviceName)
 		} else {
-			cmd.ui.Say("Enabling access of plan %s for service %s", planToFilter, serviceName)
-			//DOIT
-			cmd.actor.UpdateServicePlanAvailability(service, true)
+			cmd.ui.Say("Enabling access of plan %s for service %s", planName, serviceName)
 		}
 	}
 

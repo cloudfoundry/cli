@@ -59,6 +59,22 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 			Expect(servicePlansVisibilitiesFields[1].OrganizationGuid).To(Equal("org-guid-2"))
 		})
 	})
+
+	Describe(".Delete", func() {
+		It("deletes a service plan visibility", func() {
+			servicePlanVisibilityGuid := "the-service-plan-visibility-guid"
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "DELETE",
+				Path:   "/v2/service_plan_visibilities/" + servicePlanVisibilityGuid,
+				Response: testnet.TestResponse{
+					Status: http.StatusNoContent,
+				},
+			}))
+
+			err := repo.Delete(servicePlanVisibilityGuid)
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
 })
 
 var firstPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{

@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -9,6 +11,7 @@ import (
 
 type ServicePlanVisibilityRepository interface {
 	List() ([]models.ServicePlanVisibilityFields, error)
+	Delete(string) error
 }
 
 type CloudControllerServicePlanVisibilityRepository struct {
@@ -35,4 +38,9 @@ func (repo CloudControllerServicePlanVisibilityRepository) List() (plans []model
 			return true
 		})
 	return
+}
+
+func (repo CloudControllerServicePlanVisibilityRepository) Delete(servicePlanGuid string) error {
+	path := fmt.Sprintf("%s/v2/service_plan_visibilities/%s", repo.config.ApiEndpoint(), servicePlanGuid)
+	return repo.gateway.DeleteResource(path)
 }

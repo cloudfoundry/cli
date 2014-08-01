@@ -2,7 +2,7 @@
 package fakes
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
 	"sync"
 )
@@ -14,6 +14,14 @@ type FakeServicePlanVisibilityRepository struct {
 	listReturns     struct {
 		result1 []models.ServicePlanVisibilityFields
 		result2 error
+	}
+	DeleteStub        func(string) error
+	deleteMutex       sync.RWMutex
+	deleteArgsForCall []struct {
+		arg1 string
+	}
+	deleteReturns struct {
+		result1 error
 	}
 }
 
@@ -35,10 +43,43 @@ func (fake *FakeServicePlanVisibilityRepository) ListCallCount() int {
 }
 
 func (fake *FakeServicePlanVisibilityRepository) ListReturns(result1 []models.ServicePlanVisibilityFields, result2 error) {
+	fake.ListStub = nil
 	fake.listReturns = struct {
 		result1 []models.ServicePlanVisibilityFields
 		result2 error
 	}{result1, result2}
 }
 
-var _ ServicePlanVisibilityRepository = new(FakeServicePlanVisibilityRepository)
+func (fake *FakeServicePlanVisibilityRepository) Delete(arg1 string) error {
+	fake.deleteMutex.Lock()
+	defer fake.deleteMutex.Unlock()
+	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.DeleteStub != nil {
+		return fake.DeleteStub(arg1)
+	} else {
+		return fake.deleteReturns.result1
+	}
+}
+
+func (fake *FakeServicePlanVisibilityRepository) DeleteCallCount() int {
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return len(fake.deleteArgsForCall)
+}
+
+func (fake *FakeServicePlanVisibilityRepository) DeleteArgsForCall(i int) string {
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return fake.deleteArgsForCall[i].arg1
+}
+
+func (fake *FakeServicePlanVisibilityRepository) DeleteReturns(result1 error) {
+	fake.DeleteStub = nil
+	fake.deleteReturns = struct {
+		result1 error
+	}{result1}
+}
+
+var _ api.ServicePlanVisibilityRepository = new(FakeServicePlanVisibilityRepository)
