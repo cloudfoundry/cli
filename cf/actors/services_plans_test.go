@@ -21,12 +21,17 @@ var _ = Describe("Service Plans", func() {
 
 		privateServicePlanVisibilityFields models.ServicePlanVisibilityFields
 		publicServicePlanVisibilityFields  models.ServicePlanVisibilityFields
+		limitedServicePlanVisibilityFields models.ServicePlanVisibilityFields
 
 		publicServicePlan  models.ServicePlanFields
 		privateServicePlan models.ServicePlanFields
+		limitedServicePlan models.ServicePlanFields
 
 		publicService models.ServiceOffering
 		mixedService  models.ServiceOffering
+
+		org1 models.Organization
+		org2 models.Organization
 	)
 
 	BeforeEach(func() {
@@ -34,8 +39,20 @@ var _ = Describe("Service Plans", func() {
 		servicePlanRepo = &fakes.FakeServicePlanRepo{}
 		servicePlanVisibilityRepo = &fakes.FakeServicePlanVisibilityRepository{}
 		orgRepo = &fakes.FakeOrgRepository{}
-
 		actor = actors.NewServicePlanHandler(serviceRepo, servicePlanRepo, servicePlanVisibilityRepo, orgRepo)
+
+		org1 = models.Organization{}
+		org1.Name = "org-1"
+		org1.Guid = "org-1-guid"
+
+		org2 = models.Organization{}
+		org2.Name = "org-2"
+		org2.Guid = "org-2-guid"
+
+		orgRepo.Organizations = []models.Organization{
+			org1,
+			org2,
+		}
 
 		publicServicePlanVisibilityFields = models.ServicePlanVisibilityFields{
 			Guid:            "public-service-plan-visibility-guid",
@@ -47,6 +64,12 @@ var _ = Describe("Service Plans", func() {
 			ServicePlanGuid: "private-service-plan-guid",
 		}
 
+		limitedServicePlanVisibilityFields = models.ServicePlanVisibilityFields{
+			Guid:             "limited-service-plan-visibility-guid",
+			ServicePlanGuid:  "limited-service-plan-guid",
+			OrganizationGuid: "org-1-guid",
+		}
+
 		publicServicePlan = models.ServicePlanFields{
 			Name:   "public-service-plan",
 			Guid:   "public-service-plan-guid",
@@ -54,12 +77,18 @@ var _ = Describe("Service Plans", func() {
 		}
 
 		privateServicePlan = models.ServicePlanFields{
-			Name:   "private-service-plan",
-			Guid:   "private-service-plan-guid",
+			Name:     "private-service-plan",
+			Guid:     "private-service-plan-guid",
+			Public:   false,
+			OrgNames: []string{},
+		}
+
+		limitedServicePlan = models.ServicePlanFields{
+			Name:   "limited-service-plan",
+			Guid:   "limited-service-plan-guid",
 			Public: false,
 			OrgNames: []string{
 				"org-1",
-				"org-2",
 			},
 		}
 
@@ -82,6 +111,7 @@ var _ = Describe("Service Plans", func() {
 			Plans: []models.ServicePlanFields{
 				publicServicePlan,
 				privateServicePlan,
+				limitedServicePlan,
 			},
 		}
 	})
@@ -275,8 +305,77 @@ var _ = Describe("Service Plans", func() {
 				"my-mixed-service-guid": {
 					publicServicePlan,
 					privateServicePlan,
+					limitedServicePlan,
 				},
 			}
+
+			orgRepo.FindByNameOrganization = org1
+		})
+
+		It("returns an error if the service cannot be found", func() {
+			serviceRepo.FindServiceOfferingByLabelApiResponse = errors.New("service was not found")
+
+			_, err := actor.UpdatePlanAndOrgForService("not-a-service", "public-service-plan", "public-org", true)
+			Expect(err.Error()).To(Equal("service was not found"))
+		})
+
+		It("returns an error if the org cannot be found", func() {
+			orgRepo.Organizations = []models.Organization{}
+			_, err := actor.UpdatePlanAndOrgForService("a-real-service", "public-service-plan", "not-an-org", true)
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("returns an error if the plan cannot be found", func() {
+			servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{}
+
+			_, err := actor.UpdatePlanAndOrgForService("a-real-service", "not-a-plan", "org-1", true)
+			Expect(err).To(HaveOccurred())
+		})
+
+		Context("setting visibility to true", func() {
+			Context("for a public plan", func() {
+				It("returns true", func() {
+					serviceOriginallyPublic, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "public-service-plan", "org-1", true)
+
+					Expect(err).NotTo(HaveOccurred())
+					Expect(serviceOriginallyPublic).To(BeTrue())
+				})
+
+				It("does not try and create the visibility", func() {
+					serviceOriginallyPublic, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "public-service-plan", "org-1", true)
+
+					Expect(servicePlanVisibilityRepo.CreateCallCount()).To(Equal(0))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(serviceOriginallyPublic).To(BeTrue())
+				})
+			})
+
+			Context("for a private plan", func() {
+				It("returns false", func() {
+					serviceOriginallyPublic, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "private-service-plan", "org-1", true)
+
+					Expect(err).NotTo(HaveOccurred())
+					Expect(serviceOriginallyPublic).To(BeFalse())
+				})
+
+				It("returns an error if the service plan visibility already exists", func() {
+					servicePlanVisibilityRepo.ListReturns([]models.ServicePlanVisibilityFields{limitedServicePlanVisibilityFields}, nil)
+
+					_, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "limited-service-plan", "org-1", true)
+
+					Expect(err).To(HaveOccurred())
+				})
+
+				It("creates a service plan visibility", func() {
+					serviceOriginallyPublic, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "private-service-plan", "org-1", true)
+
+					servicePlanGuid, orgGuid := servicePlanVisibilityRepo.CreateArgsForCall(0)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(serviceOriginallyPublic).To(BeFalse())
+					Expect(servicePlanGuid).To(Equal("private-service-plan-guid"))
+					Expect(orgGuid).To(Equal("org-1-guid"))
+				})
+			})
 		})
 	})
 })

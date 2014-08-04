@@ -52,11 +52,46 @@ func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string) (bo
 }
 
 func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName, orgName string, setPlanVisibility bool) (bool, error) {
+	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
+	if err != nil {
+		return false, err
+	}
 
-	//make sure org exists
-	//set service plan visibility for plan <-> org, if the plan is private.
+	org, err := actor.orgRepo.FindByName(orgName)
+	if err != nil {
+		return false, err
+	}
 
-	return true, nil
+	servicePlans, err := actor.servicePlanRepo.Search(map[string]string{"service_guid": serviceOffering.Guid})
+	if err != nil {
+		return false, err
+	}
+
+	found := false
+	var servicePlan models.ServicePlanFields
+	for i, val := range servicePlans {
+		if val.Name == planName {
+			found = true
+			servicePlan = servicePlans[i]
+		}
+	}
+	if !found {
+		return false, errors.New(fmt.Sprintf("Service plan %s not found", planName))
+	}
+
+	if !servicePlan.Public {
+		for _, planOrgName := range servicePlan.OrgNames {
+			if planOrgName == orgName {
+				return false, errors.New(fmt.Sprintf("Service plan visibility for org %s already exists", planOrgName))
+			}
+		}
+
+		err = actor.servicePlanVisibilityRepo.Create(servicePlan.Guid, org.Guid)
+		if err != nil {
+			return false, err
+		}
+	}
+	return servicePlan.Public, nil
 }
 
 func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, planName string, setPlanVisibility bool) (bool, error) {

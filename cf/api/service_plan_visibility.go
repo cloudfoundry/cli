@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -10,6 +11,7 @@ import (
 )
 
 type ServicePlanVisibilityRepository interface {
+	Create(string, string) error
 	List() ([]models.ServicePlanVisibilityFields, error)
 	Delete(string) error
 }
@@ -24,6 +26,12 @@ func NewCloudControllerServicePlanVisibilityRepository(config configuration.Read
 		config:  config,
 		gateway: gateway,
 	}
+}
+
+func (repo CloudControllerServicePlanVisibilityRepository) Create(serviceGuid, orgGuid string) error {
+	url := repo.config.ApiEndpoint() + "/v2/service_plan_visibilities"
+	data := fmt.Sprintf(`{"service_plan_guid":"%s", "organization_guid":"%s"}`, serviceGuid, orgGuid)
+	return repo.gateway.CreateResource(url, strings.NewReader(data))
 }
 
 func (repo CloudControllerServicePlanVisibilityRepository) List() (plans []models.ServicePlanVisibilityFields, err error) {
