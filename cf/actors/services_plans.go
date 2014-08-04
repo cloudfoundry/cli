@@ -11,6 +11,7 @@ import (
 type ServicePlanActor interface {
 	UpdateAllPlansForService(string) (bool, error)
 	UpdateSinglePlanForService(string, string, bool) (bool, error)
+	UpdatePlanAndOrgForService(string, string, string, bool) (bool, error)
 }
 
 type ServicePlanHandler struct {
@@ -50,6 +51,14 @@ func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string) (bo
 	return allPlansWerePublic, nil
 }
 
+func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName, orgName string, setPlanVisibility bool) (bool, error) {
+
+	//make sure org exists
+	//set service plan visibility for plan <-> org, if the plan is private.
+
+	return true, nil
+}
+
 func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, planName string, setPlanVisibility bool) (bool, error) {
 	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
 	if err != nil {
@@ -69,7 +78,8 @@ func (actor ServicePlanHandler) updateSinglePlan(serviceOffering models.ServiceO
 	}
 
 	//find the service plan and set it as the only service plan for update
-	serviceOffering.Plans = nil //set it to nil initialy
+	serviceOffering.Plans = nil //set it to nil initially
+
 	for _, servicePlan := range servicePlans {
 		if servicePlan.Name == planName {
 			serviceOffering.Plans = []models.ServicePlanFields{servicePlan} //he has the orgs inside him!!!

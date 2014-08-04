@@ -118,6 +118,37 @@ var _ = Describe("enable-service-access command", func() {
 					))
 				})
 			})
+
+			Context("the user provides a plan and org", func() {
+				It("fails if the org does not exist", func() {
+					actor.UpdatePlanAndOrgForServiceReturns(true, errors.New("could not find org"))
+
+					Expect(runCommand([]string{"-p", "service-plan", "-o", "not-findable-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"could not find org"},
+					))
+				})
+
+				It("tells the user if the plan is already public", func() {
+					actor.UpdatePlanAndOrgForServiceReturns(true, nil)
+
+					Expect(runCommand([]string{"-p", "public-service-plan", "-o", "my-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Plan", "of service", "for org", "is already public"},
+						[]string{"OK"},
+					))
+				})
+
+				It("tells the user the plan is being updated if it is not public", func() {
+					actor.UpdatePlanAndOrgForServiceReturns(false, nil)
+
+					Expect(runCommand([]string{"-p", "private-service-plan", "-o", "my-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Enabling access to plan private-service-plan of service service for org my-org as"},
+						[]string{"OK"},
+					))
+				})
+			})
 		})
 	})
 })

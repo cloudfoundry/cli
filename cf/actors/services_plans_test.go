@@ -266,4 +266,17 @@ var _ = Describe("Service Plans", func() {
 			})
 		})
 	})
+
+	Describe(".UpdatePlanAndOrgForService", func() {
+		BeforeEach(func() {
+			serviceRepo.FindServiceOfferingByLabelServiceOffering = mixedService
+
+			servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
+				"my-mixed-service-guid": {
+					publicServicePlan,
+					privateServicePlan,
+				},
+			}
+		})
+	})
 })
