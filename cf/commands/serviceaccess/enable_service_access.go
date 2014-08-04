@@ -36,9 +36,10 @@ func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "enable-service-access",
 		Description: "Set a service to public",
-		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN]",
+		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", "name of a particular plan to enable"),
+			flag_helpers.NewStringFlag("o", "name of a particular org to enable"),
 		},
 	}
 }
@@ -46,9 +47,20 @@ func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
 	planName := c.String("p")
+	orgName := c.String("o")
 
-	if planName != "" {
+	if planName != "" && orgName != "" {
+		planOriginallyPublic, err := cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
 
+		if planOriginallyPublic {
+			cmd.ui.Say("Plan %s of service %s for org %s is already public", planName, serviceName, orgName)
+		} else {
+			cmd.ui.Say("Enabling access to plan %s of service %s for org %s as %s...", planName, serviceName, orgName, cmd.config.Username())
+		}
+	} else if planName != "" {
 		planOriginallyPublic, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
