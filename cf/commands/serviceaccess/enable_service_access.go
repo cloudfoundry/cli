@@ -60,7 +60,7 @@ func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 			cmd.ui.Say("Enabling access of plan %s for service %s as %s...", planName, serviceName, cmd.config.Username())
 		}
 	} else {
-		plansOriginallyPublic, err := cmd.actor.UpdateAllPlansForService(serviceName)
+		plansOriginallyPublic, err := cmd.actor.UpdateAllPlansForService(serviceName, true)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}

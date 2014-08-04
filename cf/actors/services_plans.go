@@ -9,7 +9,7 @@ import (
 )
 
 type ServicePlanActor interface {
-	UpdateAllPlansForService(string) (bool, error)
+	UpdateAllPlansForService(string, bool) (bool, error)
 	UpdateSinglePlanForService(string, string, bool) (bool, error)
 }
 
@@ -32,7 +32,7 @@ func NewServicePlanHandler(service api.ServiceRepository, plan api.ServicePlanRe
 	}
 }
 
-func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string) (bool, error) {
+func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string, setPlanVisibility bool) (bool, error) {
 	service, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
 	if err != nil {
 		return false, err
@@ -41,7 +41,7 @@ func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string) (bo
 	service, err = actor.serviceHandler.AttachPlansToService(service)
 	allPlansWerePublic := true
 	for _, plan := range service.Plans {
-		planWasPublic, err := actor.updateSinglePlan(service, plan.Name, true)
+		planWasPublic, err := actor.updateSinglePlan(service, plan.Name, setPlanVisibility)
 		if err != nil {
 			return false, err
 		}

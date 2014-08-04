@@ -8,10 +8,11 @@ import (
 )
 
 type FakeServicePlanActor struct {
-	UpdateAllPlansForServiceStub        func(string) (bool, error)
+	UpdateAllPlansForServiceStub        func(string, bool) (bool, error)
 	updateAllPlansForServiceMutex       sync.RWMutex
 	updateAllPlansForServiceArgsForCall []struct {
 		arg1 string
+		arg2 bool
 	}
 	updateAllPlansForServiceReturns struct {
 		result1 bool
@@ -30,14 +31,15 @@ type FakeServicePlanActor struct {
 	}
 }
 
-func (fake *FakeServicePlanActor) UpdateAllPlansForService(arg1 string) (bool, error) {
+func (fake *FakeServicePlanActor) UpdateAllPlansForService(arg1 string, arg2 bool) (bool, error) {
 	fake.updateAllPlansForServiceMutex.Lock()
 	defer fake.updateAllPlansForServiceMutex.Unlock()
 	fake.updateAllPlansForServiceArgsForCall = append(fake.updateAllPlansForServiceArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 bool
+	}{arg1, arg2})
 	if fake.UpdateAllPlansForServiceStub != nil {
-		return fake.UpdateAllPlansForServiceStub(arg1)
+		return fake.UpdateAllPlansForServiceStub(arg1, arg2)
 	} else {
 		return fake.updateAllPlansForServiceReturns.result1, fake.updateAllPlansForServiceReturns.result2
 	}
@@ -49,10 +51,10 @@ func (fake *FakeServicePlanActor) UpdateAllPlansForServiceCallCount() int {
 	return len(fake.updateAllPlansForServiceArgsForCall)
 }
 
-func (fake *FakeServicePlanActor) UpdateAllPlansForServiceArgsForCall(i int) string {
+func (fake *FakeServicePlanActor) UpdateAllPlansForServiceArgsForCall(i int) (string, bool) {
 	fake.updateAllPlansForServiceMutex.RLock()
 	defer fake.updateAllPlansForServiceMutex.RUnlock()
-	return fake.updateAllPlansForServiceArgsForCall[i].arg1
+	return fake.updateAllPlansForServiceArgsForCall[i].arg1, fake.updateAllPlansForServiceArgsForCall[i].arg2
 }
 
 func (fake *FakeServicePlanActor) UpdateAllPlansForServiceReturns(result1 bool, result2 error) {

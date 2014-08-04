@@ -25,8 +25,9 @@ var _ = Describe("Service Plans", func() {
 		publicServicePlan  models.ServicePlanFields
 		privateServicePlan models.ServicePlanFields
 
-		publicService models.ServiceOffering
-		mixedService  models.ServiceOffering
+		publicService  models.ServiceOffering
+		mixedService   models.ServiceOffering
+		privateService models.ServiceOffering
 	)
 
 	BeforeEach(func() {
@@ -84,6 +85,17 @@ var _ = Describe("Service Plans", func() {
 				privateServicePlan,
 			},
 		}
+
+		privateService = models.ServiceOffering{
+			ServiceOfferingFields: models.ServiceOfferingFields{
+				Label: "my-private-service",
+				Guid:  "my-private-service-guid",
+			},
+			Plans: []models.ServicePlanFields{
+				privateServicePlan,
+				privateServicePlan,
+			},
+		}
 	})
 
 	Describe(".UpdateAllPlansForService", func() {
@@ -104,64 +116,113 @@ var _ = Describe("Service Plans", func() {
 		It("Returns an error if the service cannot be found", func() {
 			serviceRepo.FindServiceOfferingByLabelApiResponse = errors.New("service was not found")
 
-			_, err := actor.UpdateAllPlansForService("not-a-service")
+			_, err := actor.UpdateAllPlansForService("not-a-service", true)
 			Expect(err.Error()).To(Equal("service was not found"))
 		})
 
-		It("Sets all non-public service plans to public", func() {
-			_, err := actor.UpdateAllPlansForService("my-mixed-service")
-			Expect(err).ToNot(HaveOccurred())
-
-			servicePlan, serviceGuid, public := servicePlanRepo.UpdateArgsForCall(0)
-			Expect(servicePlan.Public).To(BeFalse())
-			Expect(serviceGuid).To(Equal("my-mixed-service-guid"))
-			Expect(public).To(BeTrue())
-		})
-
-		It("Returns true if all the plans were public", func() {
-			serviceRepo.FindServiceOfferingByLabelServiceOffering = publicService
-			servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
-				"my-public-service-guid": {
-					publicServicePlan,
-					publicServicePlan,
-				},
-			}
-
-			servicesOriginallyPublic, err := actor.UpdateAllPlansForService("my-public-service")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(servicesOriginallyPublic).To(BeTrue())
-		})
-
-		It("Returns false if any of the plans were not public", func() {
-			serviceRepo.FindServiceOfferingByLabelServiceOffering = mixedService
-			servicesOriginallyPublic, err := actor.UpdateAllPlansForService("my-mixed-service")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(servicesOriginallyPublic).To(BeFalse())
-		})
-
-		It("Does not try to update service plans if they are all already public", func() {
-			serviceRepo.FindServiceOfferingByLabelServiceOffering = publicService
-			servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
-				"my-public-service-guid": {
-					publicServicePlan,
-					publicServicePlan,
-				},
-			}
-
-			_, err := actor.UpdateAllPlansForService("my-public-service")
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(servicePlanRepo.UpdateCallCount()).To(Equal(0))
-		})
-
 		It("Removes the service plan visibilities for any non-public service plans", func() {
-			_, err := actor.UpdateAllPlansForService("my-mixed-service")
+			_, err := actor.UpdateAllPlansForService("my-mixed-service", true)
 			Expect(err).ToNot(HaveOccurred())
 
 			servicePlanVisibilityGuid := servicePlanVisibilityRepo.DeleteArgsForCall(0)
 			Expect(servicePlanVisibilityGuid).To(Equal("private-service-plan-visibility-guid"))
 		})
 
+		Context("when setting all plans to public", func() {
+			It("Sets all non-public service plans to public", func() {
+				_, err := actor.UpdateAllPlansForService("my-mixed-service", true)
+				Expect(err).ToNot(HaveOccurred())
+
+				servicePlan, serviceGuid, public := servicePlanRepo.UpdateArgsForCall(0)
+				Expect(servicePlan.Public).To(BeFalse())
+				Expect(serviceGuid).To(Equal("my-mixed-service-guid"))
+				Expect(public).To(BeTrue())
+			})
+
+			It("Returns true if all the plans were public", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = publicService
+				servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
+					"my-public-service-guid": {
+						publicServicePlan,
+						publicServicePlan,
+					},
+				}
+
+				servicesOriginallyPublic, err := actor.UpdateAllPlansForService("my-public-service", true)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(servicesOriginallyPublic).To(BeTrue())
+			})
+
+			It("Returns false if any of the plans were not public", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = mixedService
+				servicesOriginallyPublic, err := actor.UpdateAllPlansForService("my-mixed-service", true)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(servicesOriginallyPublic).To(BeFalse())
+			})
+
+			It("Does not try to update service plans if they are all already public", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = publicService
+				servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
+					"my-public-service-guid": {
+						publicServicePlan,
+						publicServicePlan,
+					},
+				}
+
+				_, err := actor.UpdateAllPlansForService("my-public-service", true)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(servicePlanRepo.UpdateCallCount()).To(Equal(0))
+			})
+		})
+
+		Context("when setting all plans to private", func() {
+			It("Sets all public service plans to private", func() {
+				_, err := actor.UpdateAllPlansForService("my-mixed-service", false)
+				Expect(err).ToNot(HaveOccurred())
+
+				servicePlan, serviceGuid, public := servicePlanRepo.UpdateArgsForCall(0)
+				Expect(servicePlan.Public).To(BeTrue())
+				Expect(serviceGuid).To(Equal("my-mixed-service-guid"))
+				Expect(public).To(BeFalse())
+			})
+
+			PIt("Returns SOMETHING if all the plans were private", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = publicService
+				servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
+					"my-public-service-guid": {
+						publicServicePlan,
+						publicServicePlan,
+					},
+				}
+
+				servicesOriginallyPublic, err := actor.UpdateAllPlansForService("my-public-service", false)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(servicesOriginallyPublic).To(BeTrue())
+			})
+
+			PIt("Returns SOMETHING if any of the plans were not private", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = mixedService
+				servicesOriginallyPublic, err := actor.UpdateAllPlansForService("my-mixed-service", false)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(servicesOriginallyPublic).To(BeFalse())
+			})
+
+			It("Does not try to update service plans if they are all already private", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = privateService
+				servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
+					"my-private-service-guid": {
+						privateServicePlan,
+						privateServicePlan,
+					},
+				}
+
+				_, err := actor.UpdateAllPlansForService("my-private-service", false)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(servicePlanRepo.UpdateCallCount()).To(Equal(0))
+			})
+		})
 	})
 
 	Describe(".UpdateSinglePlanForService", func() {
