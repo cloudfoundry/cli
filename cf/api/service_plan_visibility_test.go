@@ -40,6 +40,24 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 
+	Describe(".Create", func() {
+		BeforeEach(func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/service_plan_visibilities",
+				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"service_plan_guid", "organization_guid":"org_guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			}))
+		})
+
+		It("creates a service plan visibility", func() {
+			err := repo.Create("service_plan_guid", "org_guid")
+
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+		})
+	})
+
 	Describe(".List", func() {
 		BeforeEach(func() {
 			setupTestServer(firstPlanVisibilityRequest, secondPlanVisibilityRequest)
