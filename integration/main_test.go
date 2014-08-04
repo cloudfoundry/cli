@@ -38,3 +38,8 @@ func Cf(args ...string) *Session {
 
 	return session
 }
+
+// gexec.Build leaves a compiled binary behind in /tmp.
+var _ = AfterSuite(func() {
+	CleanupBuildArtifacts()
+})
