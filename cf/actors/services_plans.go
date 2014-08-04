@@ -9,6 +9,7 @@ import (
 )
 
 type ServicePlanActor interface {
+	UpdateAllPlansForService(string) (bool, error)
 	UpdateSinglePlanForService(string, string, bool) (bool, error)
 }
 
@@ -17,24 +18,48 @@ type ServicePlanHandler struct {
 	servicePlanRepo           api.ServicePlanRepository
 	servicePlanVisibilityRepo api.ServicePlanVisibilityRepository
 	orgRepo                   api.OrganizationRepository
+	serviceHandler            ServiceActor
 }
 
 func NewServicePlanHandler(service api.ServiceRepository, plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org api.OrganizationRepository) ServicePlanHandler {
+	serviceHandler := NewServiceHandler(nil, service, plan, vis, org)
 	return ServicePlanHandler{
 		serviceRepo:               service,
 		servicePlanRepo:           plan,
 		servicePlanVisibilityRepo: vis,
 		orgRepo:                   org,
+		serviceHandler:            serviceHandler,
 	}
 }
 
-func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, planName string, setPlanVisibility bool) (bool, error) {
-	var servicePlan models.ServicePlanFields
+func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string) (bool, error) {
+	service, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
+	if err != nil {
+		return false, err
+	}
 
+	service, err = actor.serviceHandler.AttachPlansToService(service)
+	allPlansWerePublic := true
+	for _, plan := range service.Plans {
+		planWasPublic, err := actor.updateSinglePlan(service, plan.Name, true)
+		if err != nil {
+			return false, err
+		}
+		allPlansWerePublic = allPlansWerePublic && planWasPublic
+	}
+	return allPlansWerePublic, nil
+}
+
+func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, planName string, setPlanVisibility bool) (bool, error) {
 	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
 	if err != nil {
 		return false, err
 	}
+	return actor.updateSinglePlan(serviceOffering, planName, setPlanVisibility)
+}
+
+func (actor ServicePlanHandler) updateSinglePlan(serviceOffering models.ServiceOffering, planName string, setPlanVisibility bool) (bool, error) {
+	var servicePlan models.ServicePlanFields
 
 	//get all service plans for the one specific service
 	//if there are no plans for the service it returns an empty set
@@ -53,7 +78,7 @@ func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, p
 	}
 
 	if serviceOffering.Plans == nil {
-		return false, errors.New(fmt.Sprintf("The plan %s could not be found for service %s", planName, serviceName))
+		return false, errors.New(fmt.Sprintf("The plan %s could not be found for service %s", planName, serviceOffering.Label))
 	} else {
 		servicePlan = serviceOffering.Plans[0]
 	}

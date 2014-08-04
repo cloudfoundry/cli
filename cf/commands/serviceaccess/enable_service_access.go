@@ -59,7 +59,17 @@ func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 		} else {
 			cmd.ui.Say("Enabling access of plan %s for service %s as %s...", planName, serviceName, cmd.config.Username())
 		}
-	}
+	} else {
+		plansOriginallyPublic, err := cmd.actor.UpdateAllPlansForService(serviceName)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
 
+		if plansOriginallyPublic {
+			cmd.ui.Say("All plans for service %s are already public", serviceName)
+		} else {
+			cmd.ui.Say("Enabling access to all plans of service %s for all orgs as admin...", serviceName)
+		}
+	}
 	cmd.ui.Say("OK")
 }

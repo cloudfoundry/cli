@@ -7,6 +7,7 @@ import (
 
 type ServiceActor interface {
 	FilterBrokers(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error)
+	AttachPlansToService(models.ServiceOffering) (models.ServiceOffering, error)
 }
 
 type ServiceHandler struct {
@@ -112,18 +113,27 @@ func (actor ServiceHandler) attachServicesToBrokers(brokers []models.ServiceBrok
 }
 
 func (actor ServiceHandler) attachPlansToServices(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
+	var err error
 	for serviceIndex, _ := range services {
-		service := &services[serviceIndex]
-		plans, err := actor.servicePlanRepo.Search(map[string]string{"service_guid": service.Guid})
-		if err != nil {
-			return nil, err
-		}
-		service.Plans, err = actor.attachOrgsToPlans(plans)
+		service := services[serviceIndex]
+		services[serviceIndex], err = actor.AttachPlansToService(service)
 		if err != nil {
 			return nil, err
 		}
 	}
 	return services, nil
+}
+
+func (actor ServiceHandler) AttachPlansToService(service models.ServiceOffering) (models.ServiceOffering, error) {
+	plans, err := actor.servicePlanRepo.Search(map[string]string{"service_guid": service.Guid})
+	if err != nil {
+		return models.ServiceOffering{}, err
+	}
+	service.Plans, err = actor.attachOrgsToPlans(plans)
+	if err != nil {
+		return models.ServiceOffering{}, err
+	}
+	return service, nil
 }
 
 func (actor ServiceHandler) attachOrgsToPlans(plans []models.ServicePlanFields) ([]models.ServicePlanFields, error) {

@@ -8,183 +8,38 @@ import (
 )
 
 type FakeServiceActor struct {
-	GetAllBrokersWithDependenciesStub        func() ([]models.ServiceBroker, error)
-	getAllBrokersWithDependenciesMutex       sync.RWMutex
-	getAllBrokersWithDependenciesArgsForCall []struct{}
-	getAllBrokersWithDependenciesReturns     struct {
-		result1 []models.ServiceBroker
-		result2 error
-	}
-	GetBrokerWithDependenciesStub        func(string) ([]models.ServiceBroker, error)
-	getBrokerWithDependenciesMutex       sync.RWMutex
-	getBrokerWithDependenciesArgsForCall []struct {
-		arg1 string
-	}
-	getBrokerWithDependenciesReturns struct {
-		result1 []models.ServiceBroker
-		result2 error
-	}
-	GetBrokerWithSingleServiceStub        func(string) ([]models.ServiceBroker, error)
-	getBrokerWithSingleServiceMutex       sync.RWMutex
-	getBrokerWithSingleServiceArgsForCall []struct {
-		arg1 string
-	}
-	getBrokerWithSingleServiceReturns struct {
-		result1 []models.ServiceBroker
-		result2 error
-	}
-	GetBrokersWithVisibilityFromASingleOrgStub        func(string) ([]models.ServiceBroker, error)
-	getBrokersWithVisibilityFromASingleOrgMutex       sync.RWMutex
-	getBrokersWithVisibilityFromASingleOrgArgsForCall []struct {
-		arg1 string
-	}
-	getBrokersWithVisibilityFromASingleOrgReturns struct {
-		result1 []models.ServiceBroker
-		result2 error
-	}
 	FilterBrokersStub        func(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error)
 	filterBrokersMutex       sync.RWMutex
 	filterBrokersArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 string
+		brokerFlag  string
+		serviceFlag string
+		orgFlag     string
 	}
 	filterBrokersReturns struct {
 		result1 []models.ServiceBroker
 		result2 error
 	}
-}
-
-func (fake *FakeServiceActor) GetAllBrokersWithDependencies() ([]models.ServiceBroker, error) {
-	fake.getAllBrokersWithDependenciesMutex.Lock()
-	defer fake.getAllBrokersWithDependenciesMutex.Unlock()
-	fake.getAllBrokersWithDependenciesArgsForCall = append(fake.getAllBrokersWithDependenciesArgsForCall, struct{}{})
-	if fake.GetAllBrokersWithDependenciesStub != nil {
-		return fake.GetAllBrokersWithDependenciesStub()
-	} else {
-		return fake.getAllBrokersWithDependenciesReturns.result1, fake.getAllBrokersWithDependenciesReturns.result2
+	AttachPlansToServiceStub        func(models.ServiceOffering) (models.ServiceOffering, error)
+	attachPlansToServiceMutex       sync.RWMutex
+	attachPlansToServiceArgsForCall []struct {
+		arg1 models.ServiceOffering
+	}
+	attachPlansToServiceReturns struct {
+		result1 models.ServiceOffering
+		result2 error
 	}
 }
 
-func (fake *FakeServiceActor) GetAllBrokersWithDependenciesCallCount() int {
-	fake.getAllBrokersWithDependenciesMutex.RLock()
-	defer fake.getAllBrokersWithDependenciesMutex.RUnlock()
-	return len(fake.getAllBrokersWithDependenciesArgsForCall)
-}
-
-func (fake *FakeServiceActor) GetAllBrokersWithDependenciesReturns(result1 []models.ServiceBroker, result2 error) {
-	fake.getAllBrokersWithDependenciesReturns = struct {
-		result1 []models.ServiceBroker
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeServiceActor) GetBrokerWithDependencies(arg1 string) ([]models.ServiceBroker, error) {
-	fake.getBrokerWithDependenciesMutex.Lock()
-	defer fake.getBrokerWithDependenciesMutex.Unlock()
-	fake.getBrokerWithDependenciesArgsForCall = append(fake.getBrokerWithDependenciesArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	if fake.GetBrokerWithDependenciesStub != nil {
-		return fake.GetBrokerWithDependenciesStub(arg1)
-	} else {
-		return fake.getBrokerWithDependenciesReturns.result1, fake.getBrokerWithDependenciesReturns.result2
-	}
-}
-
-func (fake *FakeServiceActor) GetBrokerWithDependenciesCallCount() int {
-	fake.getBrokerWithDependenciesMutex.RLock()
-	defer fake.getBrokerWithDependenciesMutex.RUnlock()
-	return len(fake.getBrokerWithDependenciesArgsForCall)
-}
-
-func (fake *FakeServiceActor) GetBrokerWithDependenciesArgsForCall(i int) string {
-	fake.getBrokerWithDependenciesMutex.RLock()
-	defer fake.getBrokerWithDependenciesMutex.RUnlock()
-	return fake.getBrokerWithDependenciesArgsForCall[i].arg1
-}
-
-func (fake *FakeServiceActor) GetBrokerWithDependenciesReturns(result1 []models.ServiceBroker, result2 error) {
-	fake.getBrokerWithDependenciesReturns = struct {
-		result1 []models.ServiceBroker
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeServiceActor) GetBrokerWithSingleService(arg1 string) ([]models.ServiceBroker, error) {
-	fake.getBrokerWithSingleServiceMutex.Lock()
-	defer fake.getBrokerWithSingleServiceMutex.Unlock()
-	fake.getBrokerWithSingleServiceArgsForCall = append(fake.getBrokerWithSingleServiceArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	if fake.GetBrokerWithSingleServiceStub != nil {
-		return fake.GetBrokerWithSingleServiceStub(arg1)
-	} else {
-		return fake.getBrokerWithSingleServiceReturns.result1, fake.getBrokerWithSingleServiceReturns.result2
-	}
-}
-
-func (fake *FakeServiceActor) GetBrokerWithSingleServiceCallCount() int {
-	fake.getBrokerWithSingleServiceMutex.RLock()
-	defer fake.getBrokerWithSingleServiceMutex.RUnlock()
-	return len(fake.getBrokerWithSingleServiceArgsForCall)
-}
-
-func (fake *FakeServiceActor) GetBrokerWithSingleServiceArgsForCall(i int) string {
-	fake.getBrokerWithSingleServiceMutex.RLock()
-	defer fake.getBrokerWithSingleServiceMutex.RUnlock()
-	return fake.getBrokerWithSingleServiceArgsForCall[i].arg1
-}
-
-func (fake *FakeServiceActor) GetBrokerWithSingleServiceReturns(result1 []models.ServiceBroker, result2 error) {
-	fake.getBrokerWithSingleServiceReturns = struct {
-		result1 []models.ServiceBroker
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeServiceActor) GetBrokersWithVisibilityFromASingleOrg(arg1 string) ([]models.ServiceBroker, error) {
-	fake.getBrokersWithVisibilityFromASingleOrgMutex.Lock()
-	defer fake.getBrokersWithVisibilityFromASingleOrgMutex.Unlock()
-	fake.getBrokersWithVisibilityFromASingleOrgArgsForCall = append(fake.getBrokersWithVisibilityFromASingleOrgArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	if fake.GetBrokersWithVisibilityFromASingleOrgStub != nil {
-		return fake.GetBrokersWithVisibilityFromASingleOrgStub(arg1)
-	} else {
-		return fake.getBrokersWithVisibilityFromASingleOrgReturns.result1, fake.getBrokersWithVisibilityFromASingleOrgReturns.result2
-	}
-}
-
-func (fake *FakeServiceActor) GetBrokersWithVisibilityFromASingleOrgCallCount() int {
-	fake.getBrokersWithVisibilityFromASingleOrgMutex.RLock()
-	defer fake.getBrokersWithVisibilityFromASingleOrgMutex.RUnlock()
-	return len(fake.getBrokersWithVisibilityFromASingleOrgArgsForCall)
-}
-
-func (fake *FakeServiceActor) GetBrokersWithVisibilityFromASingleOrgArgsForCall(i int) string {
-	fake.getBrokersWithVisibilityFromASingleOrgMutex.RLock()
-	defer fake.getBrokersWithVisibilityFromASingleOrgMutex.RUnlock()
-	return fake.getBrokersWithVisibilityFromASingleOrgArgsForCall[i].arg1
-}
-
-func (fake *FakeServiceActor) GetBrokersWithVisibilityFromASingleOrgReturns(result1 []models.ServiceBroker, result2 error) {
-	fake.getBrokersWithVisibilityFromASingleOrgReturns = struct {
-		result1 []models.ServiceBroker
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeServiceActor) FilterBrokers(arg1 string, arg2 string, arg3 string) ([]models.ServiceBroker, error) {
+func (fake *FakeServiceActor) FilterBrokers(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error) {
 	fake.filterBrokersMutex.Lock()
 	defer fake.filterBrokersMutex.Unlock()
 	fake.filterBrokersArgsForCall = append(fake.filterBrokersArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 string
-	}{arg1, arg2, arg3})
+		brokerFlag  string
+		serviceFlag string
+		orgFlag     string
+	}{brokerFlag, serviceFlag, orgFlag})
 	if fake.FilterBrokersStub != nil {
-		return fake.FilterBrokersStub(arg1, arg2, arg3)
+		return fake.FilterBrokersStub(brokerFlag, serviceFlag, orgFlag)
 	} else {
 		return fake.filterBrokersReturns.result1, fake.filterBrokersReturns.result2
 	}
@@ -199,12 +54,44 @@ func (fake *FakeServiceActor) FilterBrokersCallCount() int {
 func (fake *FakeServiceActor) FilterBrokersArgsForCall(i int) (string, string, string) {
 	fake.filterBrokersMutex.RLock()
 	defer fake.filterBrokersMutex.RUnlock()
-	return fake.filterBrokersArgsForCall[i].arg1, fake.filterBrokersArgsForCall[i].arg2, fake.filterBrokersArgsForCall[i].arg3
+	return fake.filterBrokersArgsForCall[i].brokerFlag, fake.filterBrokersArgsForCall[i].serviceFlag, fake.filterBrokersArgsForCall[i].orgFlag
 }
 
 func (fake *FakeServiceActor) FilterBrokersReturns(result1 []models.ServiceBroker, result2 error) {
 	fake.filterBrokersReturns = struct {
 		result1 []models.ServiceBroker
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceActor) AttachPlansToService(arg1 models.ServiceOffering) (models.ServiceOffering, error) {
+	fake.attachPlansToServiceMutex.Lock()
+	defer fake.attachPlansToServiceMutex.Unlock()
+	fake.attachPlansToServiceArgsForCall = append(fake.attachPlansToServiceArgsForCall, struct {
+		arg1 models.ServiceOffering
+	}{arg1})
+	if fake.AttachPlansToServiceStub != nil {
+		return fake.AttachPlansToServiceStub(arg1)
+	} else {
+		return fake.attachPlansToServiceReturns.result1, fake.attachPlansToServiceReturns.result2
+	}
+}
+
+func (fake *FakeServiceActor) AttachPlansToServiceCallCount() int {
+	fake.attachPlansToServiceMutex.RLock()
+	defer fake.attachPlansToServiceMutex.RUnlock()
+	return len(fake.attachPlansToServiceArgsForCall)
+}
+
+func (fake *FakeServiceActor) AttachPlansToServiceArgsForCall(i int) models.ServiceOffering {
+	fake.attachPlansToServiceMutex.RLock()
+	defer fake.attachPlansToServiceMutex.RUnlock()
+	return fake.attachPlansToServiceArgsForCall[i].arg1
+}
+
+func (fake *FakeServiceActor) AttachPlansToServiceReturns(result1 models.ServiceOffering, result2 error) {
+	fake.attachPlansToServiceReturns = struct {
+		result1 models.ServiceOffering
 		result2 error
 	}{result1, result2}
 }

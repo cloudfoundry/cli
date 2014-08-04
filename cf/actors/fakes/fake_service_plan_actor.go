@@ -2,11 +2,21 @@
 package fakes
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors"
+	. "github.com/cloudfoundry/cli/cf/actors"
+
 	"sync"
 )
 
 type FakeServicePlanActor struct {
+	UpdateAllPlansForServiceStub        func(string) (bool, error)
+	updateAllPlansForServiceMutex       sync.RWMutex
+	updateAllPlansForServiceArgsForCall []struct {
+		arg1 string
+	}
+	updateAllPlansForServiceReturns struct {
+		result1 bool
+		result2 error
+	}
 	UpdateSinglePlanForServiceStub        func(string, string, bool) (bool, error)
 	updateSinglePlanForServiceMutex       sync.RWMutex
 	updateSinglePlanForServiceArgsForCall []struct {
@@ -18,6 +28,38 @@ type FakeServicePlanActor struct {
 		result1 bool
 		result2 error
 	}
+}
+
+func (fake *FakeServicePlanActor) UpdateAllPlansForService(arg1 string) (bool, error) {
+	fake.updateAllPlansForServiceMutex.Lock()
+	defer fake.updateAllPlansForServiceMutex.Unlock()
+	fake.updateAllPlansForServiceArgsForCall = append(fake.updateAllPlansForServiceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.UpdateAllPlansForServiceStub != nil {
+		return fake.UpdateAllPlansForServiceStub(arg1)
+	} else {
+		return fake.updateAllPlansForServiceReturns.result1, fake.updateAllPlansForServiceReturns.result2
+	}
+}
+
+func (fake *FakeServicePlanActor) UpdateAllPlansForServiceCallCount() int {
+	fake.updateAllPlansForServiceMutex.RLock()
+	defer fake.updateAllPlansForServiceMutex.RUnlock()
+	return len(fake.updateAllPlansForServiceArgsForCall)
+}
+
+func (fake *FakeServicePlanActor) UpdateAllPlansForServiceArgsForCall(i int) string {
+	fake.updateAllPlansForServiceMutex.RLock()
+	defer fake.updateAllPlansForServiceMutex.RUnlock()
+	return fake.updateAllPlansForServiceArgsForCall[i].arg1
+}
+
+func (fake *FakeServicePlanActor) UpdateAllPlansForServiceReturns(result1 bool, result2 error) {
+	fake.updateAllPlansForServiceReturns = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string, arg3 bool) (bool, error) {
@@ -48,11 +90,10 @@ func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceArgsForCall(i int) (
 }
 
 func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturns(result1 bool, result2 error) {
-	fake.UpdateSinglePlanForServiceStub = nil
 	fake.updateSinglePlanForServiceReturns = struct {
 		result1 bool
 		result2 error
 	}{result1, result2}
 }
 
-var _ actors.ServicePlanActor = new(FakeServicePlanActor)
+var _ ServicePlanActor = new(FakeServicePlanActor)
