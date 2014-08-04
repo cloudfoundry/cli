@@ -360,10 +360,10 @@ var _ = Describe("Service Plans", func() {
 
 				It("returns an error if the service plan visibility already exists", func() {
 					servicePlanVisibilityRepo.ListReturns([]models.ServicePlanVisibilityFields{limitedServicePlanVisibilityFields}, nil)
-
+					servicePlanVisibilityRepo.CreateReturns(errors.New("Plan for org already exists"))
 					_, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "limited-service-plan", "org-1", true)
 
-					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("Plan for org already exists"))
 				})
 
 				It("creates a service plan visibility", func() {
