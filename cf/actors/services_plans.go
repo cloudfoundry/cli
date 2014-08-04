@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
 )
@@ -18,17 +19,17 @@ type ServicePlanHandler struct {
 	servicePlanRepo           api.ServicePlanRepository
 	servicePlanVisibilityRepo api.ServicePlanVisibilityRepository
 	orgRepo                   api.OrganizationRepository
-	serviceHandler            ServiceActor
+	serviceBuilder            service_builder.ServiceBuilder
 }
 
 func NewServicePlanHandler(service api.ServiceRepository, plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org api.OrganizationRepository) ServicePlanHandler {
-	serviceHandler := NewServiceHandler(nil, service, plan, vis, org)
+	serviceBuilder := service_builder.NewBuilder(service, plan, vis, org)
 	return ServicePlanHandler{
 		serviceRepo:               service,
 		servicePlanRepo:           plan,
 		servicePlanVisibilityRepo: vis,
 		orgRepo:                   org,
-		serviceHandler:            serviceHandler,
+		serviceBuilder:            serviceBuilder,
 	}
 }
 
@@ -38,7 +39,7 @@ func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string, set
 		return false, err
 	}
 
-	service, err = actor.serviceHandler.AttachPlansToService(service)
+	service, err = actor.serviceBuilder.AttachPlansToService(service)
 	allPlansWerePublic := true
 	for _, plan := range service.Plans {
 		planWasPublic, err := actor.updateSinglePlan(service, plan.Name, setPlanVisibility)
