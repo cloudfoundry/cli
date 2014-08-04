@@ -80,12 +80,6 @@ func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName
 	}
 
 	if !servicePlan.Public {
-		for _, planOrgName := range servicePlan.OrgNames {
-			if planOrgName == orgName {
-				return false, errors.New(fmt.Sprintf("Service plan visibility for org %s already exists", planOrgName))
-			}
-		}
-
 		err = actor.servicePlanVisibilityRepo.Create(servicePlan.Guid, org.Guid)
 		if err != nil {
 			return false, err
