@@ -59,6 +59,35 @@ var _ = Describe("enable-service-access command", func() {
 				))
 			})
 
+			It("tells the user if all plans were already public", func() {
+				actor.UpdateAllPlansForServiceReturns(true, nil)
+
+				Expect(runCommand([]string{"service"})).To(BeTrue())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"All plans", "for service", "are already public"},
+					[]string{"OK"},
+				))
+			})
+
+			It("tells the user the plans are being updated if they weren't all already public", func() {
+				actor.UpdateAllPlansForServiceReturns(false, nil)
+
+				Expect(runCommand([]string{"service"})).To(BeTrue())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Enabling access to all plans of service service for all orgs as admin..."},
+					[]string{"OK"},
+				))
+			})
+
+			It("prints an error if updating one of the plans fails", func() {
+				actor.UpdateAllPlansForServiceReturns(true, errors.New("Kaboom!"))
+
+				Expect(runCommand([]string{"service"})).To(BeTrue())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Kaboom!"},
+				))
+			})
+
 			Context("The user provides a plan", func() {
 				It("prints an error if the service does not exist", func() {
 					actor.UpdateSinglePlanForServiceReturns(true, errors.New("could not find service"))

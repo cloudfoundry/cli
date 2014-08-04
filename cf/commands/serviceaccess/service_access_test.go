@@ -71,8 +71,6 @@ var _ = Describe("service-access command", func() {
 				},
 			}
 
-			actor.GetBrokerWithDependenciesReturns([]models.ServiceBroker{serviceBroker1}, nil)
-
 			actor.FilterBrokersReturns([]models.ServiceBroker{
 				serviceBroker1,
 				serviceBroker2,
