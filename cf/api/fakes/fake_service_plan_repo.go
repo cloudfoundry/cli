@@ -24,7 +24,7 @@ type FakeServicePlanRepo struct {
 	}
 }
 
-func (fake FakeServicePlanRepo) Search(queryParams map[string]string) ([]models.ServicePlanFields, error) {
+func (fake *FakeServicePlanRepo) Search(queryParams map[string]string) ([]models.ServicePlanFields, error) {
 	if fake.SearchErr != nil {
 		return nil, fake.SearchErr
 	}

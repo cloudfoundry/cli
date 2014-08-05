@@ -2,7 +2,7 @@ package serviceaccess_test
 
 import (
 	"errors"
-
+	"github.com/cloudfoundry/cli/cf/actors"
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -90,7 +90,7 @@ var _ = Describe("enable-service-access command", func() {
 
 			Context("The user provides a plan", func() {
 				It("prints an error if the service does not exist", func() {
-					actor.UpdateSinglePlanForServiceReturns(true, errors.New("could not find service"))
+					actor.UpdateSinglePlanForServiceReturns(actors.All, errors.New("could not find service"))
 
 					Expect(runCommand([]string{"-p", "service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -99,7 +99,7 @@ var _ = Describe("enable-service-access command", func() {
 				})
 
 				It("tells the user if the plan is already public", func() {
-					actor.UpdateSinglePlanForServiceReturns(true, nil)
+					actor.UpdateSinglePlanForServiceReturns(actors.All, nil)
 
 					Expect(runCommand([]string{"-p", "public-service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -109,7 +109,7 @@ var _ = Describe("enable-service-access command", func() {
 				})
 
 				It("tells the user the plan is being updated if it is not public", func() {
-					actor.UpdateSinglePlanForServiceReturns(false, nil)
+					actor.UpdateSinglePlanForServiceReturns(actors.None, nil)
 
 					Expect(runCommand([]string{"-p", "private-service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -121,7 +121,7 @@ var _ = Describe("enable-service-access command", func() {
 
 			Context("the user provides a plan and org", func() {
 				It("fails if the org does not exist", func() {
-					actor.UpdatePlanAndOrgForServiceReturns(true, errors.New("could not find org"))
+					actor.UpdatePlanAndOrgForServiceReturns(actors.All, errors.New("could not find org"))
 
 					Expect(runCommand([]string{"-p", "service-plan", "-o", "not-findable-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -130,7 +130,7 @@ var _ = Describe("enable-service-access command", func() {
 				})
 
 				It("tells the user if the plan is already public", func() {
-					actor.UpdatePlanAndOrgForServiceReturns(true, nil)
+					actor.UpdatePlanAndOrgForServiceReturns(actors.All, nil)
 
 					Expect(runCommand([]string{"-p", "public-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -140,7 +140,7 @@ var _ = Describe("enable-service-access command", func() {
 				})
 
 				It("tells the user the plan is being updated if it is not public", func() {
-					actor.UpdatePlanAndOrgForServiceReturns(false, nil)
+					actor.UpdatePlanAndOrgForServiceReturns(actors.None, nil)
 
 					Expect(runCommand([]string{"-p", "private-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(

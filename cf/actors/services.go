@@ -8,6 +8,7 @@ import (
 type ServiceActor interface {
 	FilterBrokers(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error)
 	AttachPlansToService(models.ServiceOffering) (models.ServiceOffering, error)
+	AttachOrgsToPlans([]models.ServicePlanFields) ([]models.ServicePlanFields, error)
 }
 
 type ServiceHandler struct {
@@ -129,14 +130,14 @@ func (actor ServiceHandler) AttachPlansToService(service models.ServiceOffering)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
-	service.Plans, err = actor.attachOrgsToPlans(plans)
+	service.Plans, err = actor.AttachOrgsToPlans(plans)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
 	return service, nil
 }
 
-func (actor ServiceHandler) attachOrgsToPlans(plans []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
+func (actor ServiceHandler) AttachOrgsToPlans(plans []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
 	visMap, err := actor.buildPlanToOrgsVisibilityMap()
 	if err != nil {
 		return nil, err
