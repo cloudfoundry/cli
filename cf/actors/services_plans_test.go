@@ -213,16 +213,16 @@ var _ = Describe("Service Plans", func() {
 			Expect(err.Error()).To(Equal("service was not found"))
 		})
 
-		It("Returns false if the original plan was private", func() {
-			serviceOriginallyPublic, err := actor.UpdateSinglePlanForService("my-mixed-service", "private-service-plan", true)
+		It("Returns None if the original plan was private", func() {
+			originalAccessValue, err := actor.UpdateSinglePlanForService("my-mixed-service", "private-service-plan", true)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(serviceOriginallyPublic).To(BeFalse())
+			Expect(originalAccessValue).To(Equal(actors.None))
 		})
 
-		It("Returns true if the original plan was public", func() {
-			serviceOriginallyPublic, err := actor.UpdateSinglePlanForService("my-mixed-service", "public-service-plan", true)
+		It("Returns All if the original plan was public", func() {
+			originalAccessValue, err := actor.UpdateSinglePlanForService("my-mixed-service", "public-service-plan", true)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(serviceOriginallyPublic).To(BeTrue())
+			Expect(originalAccessValue).To(Equal(actors.All))
 		})
 
 		It("Returns an error if the plan cannot be found", func() {
@@ -332,30 +332,91 @@ var _ = Describe("Service Plans", func() {
 			Expect(err).To(HaveOccurred())
 		})
 
-		Context("setting visibility to true", func() {
+		Context("when disabling access to a single plan for a single org", func() {
 			Context("for a public plan", func() {
-				It("returns true", func() {
-					serviceOriginallyPublic, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "public-service-plan", "org-1", true)
+				It("returns All", func() {
+					originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "public-service-plan", "org-1", false)
 
 					Expect(err).NotTo(HaveOccurred())
-					Expect(serviceOriginallyPublic).To(BeTrue())
+					Expect(originalAccessValue).To(Equal(actors.All))
 				})
 
-				It("does not try and create the visibility", func() {
-					serviceOriginallyPublic, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "public-service-plan", "org-1", true)
+				It("does not try and delete the visibility", func() {
+					originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "public-service-plan", "org-1", false)
 
-					Expect(servicePlanVisibilityRepo.CreateCallCount()).To(Equal(0))
+					Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(0))
 					Expect(err).NotTo(HaveOccurred())
-					Expect(serviceOriginallyPublic).To(BeTrue())
+					Expect(originalAccessValue).To(Equal(actors.All))
 				})
 			})
 
 			Context("for a private plan", func() {
-				It("returns false", func() {
-					serviceOriginallyPublic, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "private-service-plan", "org-1", true)
+				Context("with no service plan visibilities", func() {
+					It("returns None", func() {
+						originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "private-service-plan", "org-1", false)
+
+						Expect(err).NotTo(HaveOccurred())
+						Expect(originalAccessValue).To(Equal(actors.None))
+					})
+					It("does not try and delete the visibility", func() {
+						originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "private-service-plan", "org-1", false)
+
+						Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(0))
+						Expect(err).NotTo(HaveOccurred())
+						Expect(originalAccessValue).To(Equal(actors.None))
+					})
+				})
+
+				Context("with service plan visibilities", func() {
+					BeforeEach(func() {
+						servicePlanVisibilityRepo.ListReturns(
+							[]models.ServicePlanVisibilityFields{limitedServicePlanVisibilityFields}, nil)
+
+					})
+					It("deletes a service plan visibility", func() {
+						originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "limited-service-plan", "org-1", false)
+
+						servicePlanVisGuid := servicePlanVisibilityRepo.DeleteArgsForCall(0)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(originalAccessValue).To(Equal(actors.Limited))
+						Expect(servicePlanVisGuid).To(Equal("limited-service-plan-visibility-guid"))
+					})
+
+					It("does not call delete if the specified service plan visibility does not exist", func() {
+						originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "limited-service-plan", "org-2", false)
+
+						Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(0))
+						Expect(err).NotTo(HaveOccurred())
+						Expect(originalAccessValue).To(Equal(actors.Limited))
+					})
+				})
+			})
+		})
+
+		Context("setting visibility to All", func() {
+			Context("for a public plan", func() {
+				It("returns All", func() {
+					originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "public-service-plan", "org-1", true)
 
 					Expect(err).NotTo(HaveOccurred())
-					Expect(serviceOriginallyPublic).To(BeFalse())
+					Expect(originalAccessValue).To(Equal(actors.All))
+				})
+
+				It("does not try and create the visibility", func() {
+					originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "public-service-plan", "org-1", true)
+
+					Expect(servicePlanVisibilityRepo.CreateCallCount()).To(Equal(0))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(originalAccessValue).To(Equal(actors.All))
+				})
+			})
+
+			Context("for a private plan", func() {
+				It("returns None", func() {
+					originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "private-service-plan", "org-1", true)
+
+					Expect(err).NotTo(HaveOccurred())
+					Expect(originalAccessValue).To(Equal(actors.None))
 				})
 
 				It("returns an error if the service plan visibility already exists", func() {
@@ -367,11 +428,11 @@ var _ = Describe("Service Plans", func() {
 				})
 
 				It("creates a service plan visibility", func() {
-					serviceOriginallyPublic, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "private-service-plan", "org-1", true)
+					originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "private-service-plan", "org-1", true)
 
 					servicePlanGuid, orgGuid := servicePlanVisibilityRepo.CreateArgsForCall(0)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(serviceOriginallyPublic).To(BeFalse())
+					Expect(originalAccessValue).To(Equal(actors.None))
 					Expect(servicePlanGuid).To(Equal("private-service-plan-guid"))
 					Expect(orgGuid).To(Equal("org-1-guid"))
 				})
