@@ -152,6 +152,50 @@ var _ = Describe("app Command", func() {
 			))
 		})
 	})
+
+	Describe("when running instances is unknown", func() {
+		BeforeEach(func() {
+			app := makeAppWithRoute("my-app")
+			app.RunningInstances = -1
+			appInstance := models.AppInstanceFields{
+				State:     models.InstanceRunning,
+				Since:     testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012"),
+				CpuUsage:  5.0,
+				DiskQuota: 4 * formatters.GIGABYTE,
+				DiskUsage: 3 * formatters.GIGABYTE,
+				MemQuota:  2 * formatters.GIGABYTE,
+				MemUsage:  1 * formatters.GIGABYTE,
+			}
+
+			appInstance2 := models.AppInstanceFields{
+				State: models.InstanceRunning,
+				Since: testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012"),
+			}
+
+			instances := []models.AppInstanceFields{appInstance, appInstance2}
+
+			appSummaryRepo.GetSummarySummary = app
+			appInstancesRepo.GetInstancesResponses = [][]models.AppInstanceFields{instances}
+			requirementsFactory.Application = app
+		})
+
+		It("displays a '?' for running instances", func() {
+			runCommand("my-app")
+
+			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
+			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Showing health and status", "my-app"},
+				[]string{"state", "started"},
+				[]string{"instances", "?/2"},
+				[]string{"usage", "256M x 2 instances"},
+				[]string{"urls", "my-app.example.com", "foo.example.com"},
+				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "500.0%", "1G of 2G", "3G of 4G"},
+				[]string{"#1", "running", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
+			))
+		})
+	})
 })
 
 func makeAppWithRoute(appName string) models.Application {
