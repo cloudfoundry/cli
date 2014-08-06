@@ -35,11 +35,11 @@ func (cmd *EnableServiceAccess) GetRequirements(requirementsFactory requirements
 func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "enable-service-access",
-		Description: "Set a service to public",
+		Description: "Enable access to a service or service plan for one or all orgs",
 		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", "name of a particular plan to enable"),
-			flag_helpers.NewStringFlag("o", "name of a particular org to enable"),
+			flag_helpers.NewStringFlag("p", "Enable access to a particular service plan"),
+			flag_helpers.NewStringFlag("o", "Enable access to a particular organization"),
 		},
 	}
 }
@@ -56,7 +56,7 @@ func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 		}
 
 		if planOriginalAccess == actors.All {
-			cmd.ui.Say("Plan %s of service %s for org %s is already public", planName, serviceName, orgName)
+			cmd.ui.Say("This plan is already accessible for all orgs")
 		} else {
 			cmd.ui.Say("Enabling access to plan %s of service %s for org %s as %s...", planName, serviceName, orgName, cmd.config.Username())
 		}
@@ -67,7 +67,7 @@ func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 		}
 
 		if planOriginalAccess == actors.All {
-			cmd.ui.Say("Plan %s for service %s is already public", planName, serviceName)
+			cmd.ui.Say("This plan is already accessible for all orgs")
 		} else {
 			cmd.ui.Say("Enabling access of plan %s for service %s as %s...", planName, serviceName, cmd.config.Username())
 		}
@@ -78,7 +78,7 @@ func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 		}
 
 		if allPlansInServicePublic {
-			cmd.ui.Say("All plans for service %s are already public", serviceName)
+			cmd.ui.Say("These plans are already accessible for all orgs")
 		} else {
 			cmd.ui.Say("Enabling access to all plans of service %s for all orgs as admin...", serviceName)
 		}

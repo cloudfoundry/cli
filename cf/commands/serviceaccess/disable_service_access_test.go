@@ -70,7 +70,7 @@ var _ = Describe("disable-service-access command", func() {
 
 					Expect(runCommand([]string{"-p", "private-service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Plan", "for service", "is already private"},
+						[]string{"This plan is already inaccessible for all orgs"},
 						[]string{"OK"},
 					))
 				})
@@ -131,7 +131,7 @@ var _ = Describe("disable-service-access command", func() {
 
 					Expect(runCommand([]string{"-p", "private-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Plan", "of service", "is already inaccessible for all orgs"},
+						[]string{"This plan is already inaccessible for all orgs"},
 						[]string{"OK"},
 					))
 				})
@@ -151,7 +151,7 @@ var _ = Describe("disable-service-access command", func() {
 
 					Expect(runCommand([]string{"-p", "public-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"The plan public-service-plan is accessible to all orgs."},
+						[]string{"This plan is already accessible for all orgs"},
 						[]string{"OK"},
 					))
 				})

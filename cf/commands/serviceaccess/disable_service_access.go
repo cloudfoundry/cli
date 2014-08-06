@@ -37,12 +37,12 @@ func (cmd *DisableServiceAccess) GetRequirements(requirementsFactory requirement
 func (cmd *DisableServiceAccess) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "disable-service-access",
-		Description: T("Disable access to a service or service plan for one or all orgs."),
+		Description: T("Disable access to a service or service plan for one or all orgs"),
 		Usage:       "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Disable access to a particular service plan.")),
-			flag_helpers.NewStringFlag("o", T("Disable access to a particular organization.")),
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation.")},
+			flag_helpers.NewStringFlag("p", T("Disable access to a particular service plan")),
+			flag_helpers.NewStringFlag("o", T("Disable access to a particular organization")),
+			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
@@ -82,11 +82,11 @@ func (cmd *DisableServiceAccess) DisablePlanAndOrgForService(serviceName string,
 	}
 
 	if planOriginalAccess == actors.None {
-		cmd.ui.Say("Plan %s of service %s is already inaccessible for all orgs", planName, serviceName)
+		cmd.ui.Say("This plan is already inaccessible for all orgs")
 	} else if planOriginalAccess == actors.Limited {
 		cmd.ui.Say("Disabling access to plan %s of service %s for org %s as %s...", planName, serviceName, orgName, cmd.config.Username())
 	} else {
-		cmd.ui.Say("The plan %s is accessible to all orgs.", planName)
+		cmd.ui.Say("This plan is already accessible for all orgs")
 	}
 	return
 }
@@ -98,7 +98,7 @@ func (cmd *DisableServiceAccess) DisableSinglePlanForService(serviceName string,
 	}
 
 	if planOriginalAccess == actors.None {
-		cmd.ui.Say("Plan %s for service %s is already private", planName, serviceName)
+		cmd.ui.Say("This plan is already inaccessible for all orgs")
 	} else {
 		cmd.ui.Say("Disabling access of plan %s for service %s as %s...", planName, serviceName, cmd.config.Username())
 	}
