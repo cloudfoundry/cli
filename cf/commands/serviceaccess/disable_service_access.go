@@ -1,7 +1,6 @@
 package serviceaccess
 
 import (
-	"fmt"
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -42,7 +41,6 @@ func (cmd *DisableServiceAccess) Metadata() command_metadata.CommandMetadata {
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Disable access to a particular service plan")),
 			flag_helpers.NewStringFlag("o", T("Disable access to a particular organization")),
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 		},
 	}
 }
@@ -51,31 +49,17 @@ func (cmd *DisableServiceAccess) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
 	planName := c.String("p")
 	orgName := c.String("o")
-	force := c.Bool("f")
 
 	if planName != "" && orgName != "" {
-		cmd.DisablePlanAndOrgForService(serviceName, planName, orgName, force)
+		cmd.DisablePlanAndOrgForService(serviceName, planName, orgName)
 	} else if planName != "" {
-		cmd.DisableSinglePlanForService(serviceName, planName, force)
+		cmd.DisableSinglePlanForService(serviceName, planName)
 	}
 
 	cmd.ui.Say("OK")
 }
 
-func (cmd *DisableServiceAccess) DisablePlanAndOrgForService(serviceName string, planName string, orgName string, force bool) {
-	prompt := fmt.Sprintf(
-		"Really disable access to plan %s of service %s for org %s?",
-		terminal.EntityNameColor(planName),
-		terminal.EntityNameColor(serviceName),
-		terminal.EntityNameColor(orgName),
-	)
-
-	if !force {
-		if !cmd.confirmDisable(prompt) {
-			return
-		}
-	}
-
+func (cmd *DisableServiceAccess) DisablePlanAndOrgForService(serviceName string, planName string, orgName string) {
 	planOriginalAccess, err := cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, false)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -91,7 +75,7 @@ func (cmd *DisableServiceAccess) DisablePlanAndOrgForService(serviceName string,
 	return
 }
 
-func (cmd *DisableServiceAccess) DisableSinglePlanForService(serviceName string, planName string, force bool) {
+func (cmd *DisableServiceAccess) DisableSinglePlanForService(serviceName string, planName string) {
 	planOriginalAccess, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, false)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -103,13 +87,4 @@ func (cmd *DisableServiceAccess) DisableSinglePlanForService(serviceName string,
 		cmd.ui.Say("Disabling access of plan %s for service %s as %s...", planName, serviceName, cmd.config.Username())
 	}
 	return
-}
-
-func (cmd *DisableServiceAccess) confirmDisable(message string) bool {
-	result := cmd.ui.Confirm(message)
-
-	if !result {
-		cmd.ui.Warn(T("Disable cancelled"))
-	}
-	return result
 }

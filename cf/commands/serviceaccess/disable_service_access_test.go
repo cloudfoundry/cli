@@ -87,36 +87,6 @@ var _ = Describe("disable-service-access command", func() {
 			})
 
 			Context("the user provides a plan and org", func() {
-				Context("when the command is confirmed", func() {
-					It("returns OK when ran successfully", func() {
-						actor.UpdatePlanAndOrgForServiceReturns(actors.Limited, nil)
-						Expect(runCommand([]string{"-p", "limited-service-plan", "-o", "my-org", "service"})).To(BeTrue())
-						Expect(ui.Prompts).To(ContainSubstrings([]string{
-							"Really disable access",
-							"plan limited-service-plan",
-							"service service",
-							"org my-org",
-						}))
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Disabling access to",
-								"plan limited-service-plan",
-								"service service",
-								"org my-org",
-							},
-							[]string{"OK"},
-						))
-					})
-					It("skips confirmation when the -f flag is given", func() {
-						actor.UpdatePlanAndOrgForServiceReturns(actors.Limited, nil)
-						runCommand([]string{"-f", "-p", "limited-service-plan", "-o", "my-org", "service"})
-
-						Expect(ui.Prompts).To(BeEmpty())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Disabling access to plan limited-service-plan of service service for org my-org as"},
-							[]string{"OK"},
-						))
-					})
-				})
 				It("fails if the org does not exist", func() {
 					actor.UpdatePlanAndOrgForServiceReturns(actors.All, errors.New("could not find org"))
 
