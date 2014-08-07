@@ -3,7 +3,6 @@ package fakes
 
 import (
 	. "github.com/cloudfoundry/cli/cf/actors"
-
 	"sync"
 )
 
@@ -18,7 +17,7 @@ type FakeServicePlanActor struct {
 		result1 bool
 		result2 error
 	}
-	UpdateSinglePlanForServiceStub        func(string, string, bool) (bool, error)
+	UpdateSinglePlanForServiceStub        func(string, string, bool) (Access, error)
 	updateSinglePlanForServiceMutex       sync.RWMutex
 	updateSinglePlanForServiceArgsForCall []struct {
 		arg1 string
@@ -26,7 +25,19 @@ type FakeServicePlanActor struct {
 		arg3 bool
 	}
 	updateSinglePlanForServiceReturns struct {
-		result1 bool
+		result1 Access
+		result2 error
+	}
+	UpdatePlanAndOrgForServiceStub        func(string, string, string, bool) (Access, error)
+	updatePlanAndOrgForServiceMutex       sync.RWMutex
+	updatePlanAndOrgForServiceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 bool
+	}
+	updatePlanAndOrgForServiceReturns struct {
+		result1 Access
 		result2 error
 	}
 }
@@ -64,7 +75,7 @@ func (fake *FakeServicePlanActor) UpdateAllPlansForServiceReturns(result1 bool, 
 	}{result1, result2}
 }
 
-func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string, arg3 bool) (bool, error) {
+func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string, arg3 bool) (Access, error) {
 	fake.updateSinglePlanForServiceMutex.Lock()
 	defer fake.updateSinglePlanForServiceMutex.Unlock()
 	fake.updateSinglePlanForServiceArgsForCall = append(fake.updateSinglePlanForServiceArgsForCall, struct {
@@ -91,9 +102,44 @@ func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceArgsForCall(i int) (
 	return fake.updateSinglePlanForServiceArgsForCall[i].arg1, fake.updateSinglePlanForServiceArgsForCall[i].arg2, fake.updateSinglePlanForServiceArgsForCall[i].arg3
 }
 
-func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturns(result1 bool, result2 error) {
+func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturns(result1 Access, result2 error) {
 	fake.updateSinglePlanForServiceReturns = struct {
-		result1 bool
+		result1 Access
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServicePlanActor) UpdatePlanAndOrgForService(arg1 string, arg2 string, arg3 string, arg4 bool) (Access, error) {
+	fake.updatePlanAndOrgForServiceMutex.Lock()
+	defer fake.updatePlanAndOrgForServiceMutex.Unlock()
+	fake.updatePlanAndOrgForServiceArgsForCall = append(fake.updatePlanAndOrgForServiceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 bool
+	}{arg1, arg2, arg3, arg4})
+	if fake.UpdatePlanAndOrgForServiceStub != nil {
+		return fake.UpdatePlanAndOrgForServiceStub(arg1, arg2, arg3, arg4)
+	} else {
+		return fake.updatePlanAndOrgForServiceReturns.result1, fake.updatePlanAndOrgForServiceReturns.result2
+	}
+}
+
+func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceCallCount() int {
+	fake.updatePlanAndOrgForServiceMutex.RLock()
+	defer fake.updatePlanAndOrgForServiceMutex.RUnlock()
+	return len(fake.updatePlanAndOrgForServiceArgsForCall)
+}
+
+func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceArgsForCall(i int) (string, string, string, bool) {
+	fake.updatePlanAndOrgForServiceMutex.RLock()
+	defer fake.updatePlanAndOrgForServiceMutex.RUnlock()
+	return fake.updatePlanAndOrgForServiceArgsForCall[i].arg1, fake.updatePlanAndOrgForServiceArgsForCall[i].arg2, fake.updatePlanAndOrgForServiceArgsForCall[i].arg3, fake.updatePlanAndOrgForServiceArgsForCall[i].arg4
+}
+
+func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceReturns(result1 Access, result2 error) {
+	fake.updatePlanAndOrgForServiceReturns = struct {
+		result1 Access
 		result2 error
 	}{result1, result2}
 }

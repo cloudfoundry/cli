@@ -35,10 +35,11 @@ func (cmd *EnableServiceAccess) GetRequirements(requirementsFactory requirements
 func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "enable-service-access",
-		Description: "Set a service to public",
-		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN]",
+		Description: "Enable access to a service or service plan for one or all orgs",
+		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", "name of a particular plan to enable"),
+			flag_helpers.NewStringFlag("p", "Enable access to a particular service plan"),
+			flag_helpers.NewStringFlag("o", "Enable access to a particular organization"),
 		},
 	}
 }
@@ -46,27 +47,38 @@ func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
 	planName := c.String("p")
+	orgName := c.String("o")
 
-	if planName != "" {
-
-		planOriginallyPublic, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
+	if planName != "" && orgName != "" {
+		planOriginalAccess, err := cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
 
-		if planOriginallyPublic {
-			cmd.ui.Say("Plan %s for service %s is already public", planName, serviceName)
+		if planOriginalAccess == actors.All {
+			cmd.ui.Say("This plan is already accessible for all orgs")
+		} else {
+			cmd.ui.Say("Enabling access to plan %s of service %s for org %s as %s...", planName, serviceName, orgName, cmd.config.Username())
+		}
+	} else if planName != "" {
+		planOriginalAccess, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+
+		if planOriginalAccess == actors.All {
+			cmd.ui.Say("This plan is already accessible for all orgs")
 		} else {
 			cmd.ui.Say("Enabling access of plan %s for service %s as %s...", planName, serviceName, cmd.config.Username())
 		}
 	} else {
-		plansOriginallyPublic, err := cmd.actor.UpdateAllPlansForService(serviceName, true)
+		allPlansInServicePublic, err := cmd.actor.UpdateAllPlansForService(serviceName, true)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
 
-		if plansOriginallyPublic {
-			cmd.ui.Say("All plans for service %s are already public", serviceName)
+		if allPlansInServicePublic {
+			cmd.ui.Say("These plans are already accessible for all orgs")
 		} else {
 			cmd.ui.Say("Enabling access to all plans of service %s for all orgs as admin...", serviceName)
 		}

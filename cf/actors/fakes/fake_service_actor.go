@@ -11,9 +11,9 @@ type FakeServiceActor struct {
 	FilterBrokersStub        func(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error)
 	filterBrokersMutex       sync.RWMutex
 	filterBrokersArgsForCall []struct {
-		brokerFlag  string
-		serviceFlag string
-		orgFlag     string
+		arg1 string
+		arg2 string
+		arg3 string
 	}
 	filterBrokersReturns struct {
 		result1 []models.ServiceBroker
@@ -28,18 +28,27 @@ type FakeServiceActor struct {
 		result1 models.ServiceOffering
 		result2 error
 	}
+	AttachOrgsToPlansStub        func([]models.ServicePlanFields) ([]models.ServicePlanFields, error)
+	attachOrgsToPlansMutex       sync.RWMutex
+	attachOrgsToPlansArgsForCall []struct {
+		arg1 []models.ServicePlanFields
+	}
+	attachOrgsToPlansReturns struct {
+		result1 []models.ServicePlanFields
+		result2 error
+	}
 }
 
-func (fake *FakeServiceActor) FilterBrokers(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error) {
+func (fake *FakeServiceActor) FilterBrokers(arg1 string, arg2 string, arg3 string) ([]models.ServiceBroker, error) {
 	fake.filterBrokersMutex.Lock()
 	defer fake.filterBrokersMutex.Unlock()
 	fake.filterBrokersArgsForCall = append(fake.filterBrokersArgsForCall, struct {
-		brokerFlag  string
-		serviceFlag string
-		orgFlag     string
-	}{brokerFlag, serviceFlag, orgFlag})
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
 	if fake.FilterBrokersStub != nil {
-		return fake.FilterBrokersStub(brokerFlag, serviceFlag, orgFlag)
+		return fake.FilterBrokersStub(arg1, arg2, arg3)
 	} else {
 		return fake.filterBrokersReturns.result1, fake.filterBrokersReturns.result2
 	}
@@ -54,7 +63,7 @@ func (fake *FakeServiceActor) FilterBrokersCallCount() int {
 func (fake *FakeServiceActor) FilterBrokersArgsForCall(i int) (string, string, string) {
 	fake.filterBrokersMutex.RLock()
 	defer fake.filterBrokersMutex.RUnlock()
-	return fake.filterBrokersArgsForCall[i].brokerFlag, fake.filterBrokersArgsForCall[i].serviceFlag, fake.filterBrokersArgsForCall[i].orgFlag
+	return fake.filterBrokersArgsForCall[i].arg1, fake.filterBrokersArgsForCall[i].arg2, fake.filterBrokersArgsForCall[i].arg3
 }
 
 func (fake *FakeServiceActor) FilterBrokersReturns(result1 []models.ServiceBroker, result2 error) {
@@ -92,6 +101,38 @@ func (fake *FakeServiceActor) AttachPlansToServiceArgsForCall(i int) models.Serv
 func (fake *FakeServiceActor) AttachPlansToServiceReturns(result1 models.ServiceOffering, result2 error) {
 	fake.attachPlansToServiceReturns = struct {
 		result1 models.ServiceOffering
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceActor) AttachOrgsToPlans(arg1 []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
+	fake.attachOrgsToPlansMutex.Lock()
+	defer fake.attachOrgsToPlansMutex.Unlock()
+	fake.attachOrgsToPlansArgsForCall = append(fake.attachOrgsToPlansArgsForCall, struct {
+		arg1 []models.ServicePlanFields
+	}{arg1})
+	if fake.AttachOrgsToPlansStub != nil {
+		return fake.AttachOrgsToPlansStub(arg1)
+	} else {
+		return fake.attachOrgsToPlansReturns.result1, fake.attachOrgsToPlansReturns.result2
+	}
+}
+
+func (fake *FakeServiceActor) AttachOrgsToPlansCallCount() int {
+	fake.attachOrgsToPlansMutex.RLock()
+	defer fake.attachOrgsToPlansMutex.RUnlock()
+	return len(fake.attachOrgsToPlansArgsForCall)
+}
+
+func (fake *FakeServiceActor) AttachOrgsToPlansArgsForCall(i int) []models.ServicePlanFields {
+	fake.attachOrgsToPlansMutex.RLock()
+	defer fake.attachOrgsToPlansMutex.RUnlock()
+	return fake.attachOrgsToPlansArgsForCall[i].arg1
+}
+
+func (fake *FakeServiceActor) AttachOrgsToPlansReturns(result1 []models.ServicePlanFields, result2 error) {
+	fake.attachOrgsToPlansReturns = struct {
+		result1 []models.ServicePlanFields
 		result2 error
 	}{result1, result2}
 }
