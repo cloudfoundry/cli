@@ -57,6 +57,12 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 				return
 			}
 			presentFiles, err = repo.copyUploadableFiles(sourceDir, uploadDir)
+			if err != nil {
+				return
+			}
+
+			// copy cfignore if present
+			fileutils.CopyPathToPath(filepath.Join(sourceDir, ".cfignore"), filepath.Join(uploadDir, ".cfignore"))
 		})
 
 		if err != nil {
