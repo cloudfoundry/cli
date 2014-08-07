@@ -8,24 +8,6 @@ import (
 )
 
 type FakeServiceBuilder struct {
-	AttachOrgsToPlansStub        func([]models.ServicePlanFields) ([]models.ServicePlanFields, error)
-	attachOrgsToPlansMutex       sync.RWMutex
-	attachOrgsToPlansArgsForCall []struct {
-		arg1 []models.ServicePlanFields
-	}
-	attachOrgsToPlansReturns struct {
-		result1 []models.ServicePlanFields
-		result2 error
-	}
-	AttachPlansToServiceStub        func(models.ServiceOffering) (models.ServiceOffering, error)
-	attachPlansToServiceMutex       sync.RWMutex
-	attachPlansToServiceArgsForCall []struct {
-		arg1 models.ServiceOffering
-	}
-	attachPlansToServiceReturns struct {
-		result1 models.ServiceOffering
-		result2 error
-	}
 	GetServiceByNameStub        func(string) ([]models.ServiceOffering, error)
 	getServiceByNameMutex       sync.RWMutex
 	getServiceByNameArgsForCall []struct {
@@ -63,70 +45,6 @@ type FakeServiceBuilder struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}
-}
-
-func (fake *FakeServiceBuilder) AttachOrgsToPlans(arg1 []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
-	fake.attachOrgsToPlansMutex.Lock()
-	defer fake.attachOrgsToPlansMutex.Unlock()
-	fake.attachOrgsToPlansArgsForCall = append(fake.attachOrgsToPlansArgsForCall, struct {
-		arg1 []models.ServicePlanFields
-	}{arg1})
-	if fake.AttachOrgsToPlansStub != nil {
-		return fake.AttachOrgsToPlansStub(arg1)
-	} else {
-		return fake.attachOrgsToPlansReturns.result1, fake.attachOrgsToPlansReturns.result2
-	}
-}
-
-func (fake *FakeServiceBuilder) AttachOrgsToPlansCallCount() int {
-	fake.attachOrgsToPlansMutex.RLock()
-	defer fake.attachOrgsToPlansMutex.RUnlock()
-	return len(fake.attachOrgsToPlansArgsForCall)
-}
-
-func (fake *FakeServiceBuilder) AttachOrgsToPlansArgsForCall(i int) []models.ServicePlanFields {
-	fake.attachOrgsToPlansMutex.RLock()
-	defer fake.attachOrgsToPlansMutex.RUnlock()
-	return fake.attachOrgsToPlansArgsForCall[i].arg1
-}
-
-func (fake *FakeServiceBuilder) AttachOrgsToPlansReturns(result1 []models.ServicePlanFields, result2 error) {
-	fake.attachOrgsToPlansReturns = struct {
-		result1 []models.ServicePlanFields
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeServiceBuilder) AttachPlansToService(arg1 models.ServiceOffering) (models.ServiceOffering, error) {
-	fake.attachPlansToServiceMutex.Lock()
-	defer fake.attachPlansToServiceMutex.Unlock()
-	fake.attachPlansToServiceArgsForCall = append(fake.attachPlansToServiceArgsForCall, struct {
-		arg1 models.ServiceOffering
-	}{arg1})
-	if fake.AttachPlansToServiceStub != nil {
-		return fake.AttachPlansToServiceStub(arg1)
-	} else {
-		return fake.attachPlansToServiceReturns.result1, fake.attachPlansToServiceReturns.result2
-	}
-}
-
-func (fake *FakeServiceBuilder) AttachPlansToServiceCallCount() int {
-	fake.attachPlansToServiceMutex.RLock()
-	defer fake.attachPlansToServiceMutex.RUnlock()
-	return len(fake.attachPlansToServiceArgsForCall)
-}
-
-func (fake *FakeServiceBuilder) AttachPlansToServiceArgsForCall(i int) models.ServiceOffering {
-	fake.attachPlansToServiceMutex.RLock()
-	defer fake.attachPlansToServiceMutex.RUnlock()
-	return fake.attachPlansToServiceArgsForCall[i].arg1
-}
-
-func (fake *FakeServiceBuilder) AttachPlansToServiceReturns(result1 models.ServiceOffering, result2 error) {
-	fake.attachPlansToServiceReturns = struct {
-		result1 models.ServiceOffering
-		result2 error
-	}{result1, result2}
 }
 
 func (fake *FakeServiceBuilder) GetServiceByName(arg1 string) ([]models.ServiceOffering, error) {
