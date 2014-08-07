@@ -2,6 +2,7 @@ package api
 
 import (
 	"crypto/tls"
+	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
@@ -65,7 +66,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
-	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, nil)
+	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 
 	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
 	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
