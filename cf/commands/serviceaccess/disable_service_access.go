@@ -67,7 +67,7 @@ func (cmd *DisableServiceAccess) DisableServiceForAll(serviceName string) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Disabling access to all plans of service %s for all orgs as %s...", serviceName, cmd.config.Username())
+	cmd.ui.Say("Disabling access to all plans of service %s for all orgs as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
 }
 
 func (cmd *DisableServiceAccess) DisablePlanAndOrgForService(serviceName string, planName string, orgName string) {
@@ -77,11 +77,12 @@ func (cmd *DisableServiceAccess) DisablePlanAndOrgForService(serviceName string,
 	}
 
 	if planOriginalAccess == actors.None {
-		cmd.ui.Say("This plan is already inaccessible for all orgs")
+		cmd.ui.Say("The plan %s of service %s is already accessible for all orgs and no action has been taken at this time.", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName))
 	} else if planOriginalAccess == actors.Limited {
-		cmd.ui.Say("Disabling access to plan %s of service %s for org %s as %s...", planName, serviceName, orgName, cmd.config.Username())
+		cmd.ui.Say("Disabling access to plan %s of service %s for org %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username()))
+
 	} else {
-		cmd.ui.Say("This plan is already accessible for all orgs")
+		cmd.ui.Say("The plan %s of service %s is already inaccessible for org %s", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName))
 	}
 	return
 }
@@ -93,9 +94,9 @@ func (cmd *DisableServiceAccess) DisableSinglePlanForService(serviceName string,
 	}
 
 	if planOriginalAccess == actors.None {
-		cmd.ui.Say("This plan is already inaccessible for all orgs")
+		cmd.ui.Say("The plan %s of service %s is already inaccessible for all orgs", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName))
 	} else {
-		cmd.ui.Say("Disabling access of plan %s for service %s as %s...", planName, serviceName, cmd.config.Username())
+		cmd.ui.Say("Disabling access of plan %s for service %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
 	}
 	return
 }
