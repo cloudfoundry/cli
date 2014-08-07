@@ -2,6 +2,8 @@ package command_factory
 
 import (
 	"errors"
+
+	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
@@ -191,11 +193,15 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["set-space-role"] = spaceRoleSetter
 	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, config, spaceRoleSetter, repoLocator.GetSpaceRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetUserRepository())
 
-	serviceBuilder := service_builder.NewBuilder(
-		repoLocator.GetServiceRepository(),
+	planBuilder := plan_builder.NewBuilder(
 		repoLocator.GetServicePlanRepository(),
 		repoLocator.GetServicePlanVisibilityRepository(),
 		repoLocator.GetOrganizationRepository(),
+	)
+
+	serviceBuilder := service_builder.NewBuilder(
+		repoLocator.GetServiceRepository(),
+		planBuilder,
 	)
 
 	brokerBuilder := broker_builder.NewBuilder(
