@@ -8,6 +8,15 @@ import (
 )
 
 type FakeServicePlanVisibilityRepository struct {
+	CreateStub        func(string, string) error
+	createMutex       sync.RWMutex
+	createArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	createReturns struct {
+		result1 error
+	}
 	ListStub        func() ([]models.ServicePlanVisibilityFields, error)
 	listMutex       sync.RWMutex
 	listArgsForCall []struct{}
@@ -23,6 +32,39 @@ type FakeServicePlanVisibilityRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
+}
+
+func (fake *FakeServicePlanVisibilityRepository) Create(arg1 string, arg2 string) error {
+	fake.createMutex.Lock()
+	defer fake.createMutex.Unlock()
+	fake.createArgsForCall = append(fake.createArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	if fake.CreateStub != nil {
+		return fake.CreateStub(arg1, arg2)
+	} else {
+		return fake.createReturns.result1
+	}
+}
+
+func (fake *FakeServicePlanVisibilityRepository) CreateCallCount() int {
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	return len(fake.createArgsForCall)
+}
+
+func (fake *FakeServicePlanVisibilityRepository) CreateArgsForCall(i int) (string, string) {
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	return fake.createArgsForCall[i].arg1, fake.createArgsForCall[i].arg2
+}
+
+func (fake *FakeServicePlanVisibilityRepository) CreateReturns(result1 error) {
+	fake.CreateStub = nil
+	fake.createReturns = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeServicePlanVisibilityRepository) List() ([]models.ServicePlanVisibilityFields, error) {

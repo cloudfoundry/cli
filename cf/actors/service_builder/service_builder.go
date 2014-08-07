@@ -6,6 +6,8 @@ import (
 )
 
 type ServiceBuilder interface {
+	AttachOrgsToPlans([]models.ServicePlanFields) ([]models.ServicePlanFields, error)
+
 	AttachPlansToService(models.ServiceOffering) (models.ServiceOffering, error)
 
 	GetServiceByName(string) ([]models.ServiceOffering, error)
@@ -37,7 +39,7 @@ func (builder Builder) AttachPlansToService(service models.ServiceOffering) (mod
 		return models.ServiceOffering{}, err
 	}
 
-	service.Plans, err = builder.attachOrgsToPlans(plans)
+	service.Plans, err = builder.AttachOrgsToPlans(plans)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
@@ -111,7 +113,7 @@ func (builder Builder) GetServicesVisibleToOrg(orgName string) ([]models.Service
 	return services, nil
 }
 
-func (builder Builder) attachOrgsToPlans(plans []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
+func (builder Builder) AttachOrgsToPlans(plans []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
 	visMap, err := builder.buildPlanToOrgsVisibilityMap()
 	if err != nil {
 		return nil, err
