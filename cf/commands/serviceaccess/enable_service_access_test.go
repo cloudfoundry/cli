@@ -104,7 +104,7 @@ var _ = Describe("enable-service-access command", func() {
 
 					Expect(runCommand([]string{"-p", "public-service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"The plan", "of service", "is already accessible for all orgs"},
+						[]string{"The plan is already accessible for all orgs"},
 						[]string{"OK"},
 					))
 				})
@@ -135,7 +135,7 @@ var _ = Describe("enable-service-access command", func() {
 
 					Expect(runCommand([]string{"-p", "public-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"The plan", "of service", "is already accessible for the org"},
+						[]string{"The plan is already accessible for this org"},
 						[]string{"OK"},
 					))
 				})
@@ -146,6 +146,36 @@ var _ = Describe("enable-service-access command", func() {
 					Expect(runCommand([]string{"-p", "private-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Enabling access to plan private-service-plan of service service for org my-org as"},
+						[]string{"OK"},
+					))
+				})
+			})
+			Context("the user provides an org", func() {
+				It("fails if the org does not exist", func() {
+					actor.UpdateOrgForServiceReturns(false, errors.New("could not find org"))
+
+					Expect(runCommand([]string{"-o", "not-findable-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"could not find org"},
+					))
+				})
+
+				It("tells the user if the service's plans are already accessible", func() {
+					actor.UpdateOrgForServiceReturns(true, nil)
+
+					Expect(runCommand([]string{"-o", "my-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"All plans of the service are already accessible for the org"},
+						[]string{"OK"},
+					))
+				})
+
+				It("tells the user the service's plans are being updated if it is not accessible", func() {
+					actor.UpdateOrgForServiceReturns(false, nil)
+
+					Expect(runCommand([]string{"-o", "my-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Enabling access to all plans of service service for the org my-org as"},
 						[]string{"OK"},
 					))
 				})

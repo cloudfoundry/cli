@@ -12,6 +12,7 @@ import (
 
 type ServicePlanActor interface {
 	UpdateAllPlansForService(string, bool) (bool, error)
+	UpdateOrgForService(string, string, bool) (bool, error)
 	UpdateSinglePlanForService(string, string, bool) (Access, error)
 	UpdatePlanAndOrgForService(string, string, string, bool) (Access, error)
 }
@@ -67,6 +68,36 @@ func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string, set
 		}
 		// If any plan is Limited we know that we have to change the visibility.
 		planAlreadySet := ((planAccess == All) == setPlanVisibility) && planAccess != Limited
+		allPlansWereSet = allPlansWereSet && planAlreadySet
+	}
+	return allPlansWereSet, nil
+}
+
+func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName string, setPlanVisibility bool) (bool, error) {
+	services, err := actor.serviceBuilder.GetServiceByName(serviceName)
+	if err != nil {
+		return false, err
+	}
+	service := services[0]
+
+	org, err := actor.orgRepo.FindByName(orgName)
+	if err != nil {
+		return false, err
+	}
+
+	allPlansWereSet := true
+	for _, plan := range service.Plans {
+		visibilityExists := actor.checkPlanForOrgVisibility(plan, org.Name)
+		if plan.Public {
+			continue
+		} else if !visibilityExists {
+			err = actor.servicePlanVisibilityRepo.Create(plan.Guid, org.Guid)
+			if err != nil {
+				return false, err
+			}
+		}
+		planAccess := actor.findPlanAccess(plan)
+		planAlreadySet := ((planAccess == All) == setPlanVisibility) || visibilityExists
 		allPlansWereSet = allPlansWereSet && planAlreadySet
 	}
 	return allPlansWereSet, nil

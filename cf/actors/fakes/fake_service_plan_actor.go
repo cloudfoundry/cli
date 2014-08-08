@@ -17,6 +17,17 @@ type FakeServicePlanActor struct {
 		result1 bool
 		result2 error
 	}
+	UpdateOrgForServiceStub        func(string, string, bool) (bool, error)
+	updateOrgForServiceMutex       sync.RWMutex
+	updateOrgForServiceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 bool
+	}
+	updateOrgForServiceReturns struct {
+		result1 bool
+		result2 error
+	}
 	UpdateSinglePlanForServiceStub        func(string, string, bool) (Access, error)
 	updateSinglePlanForServiceMutex       sync.RWMutex
 	updateSinglePlanForServiceArgsForCall []struct {
@@ -70,6 +81,40 @@ func (fake *FakeServicePlanActor) UpdateAllPlansForServiceArgsForCall(i int) (st
 
 func (fake *FakeServicePlanActor) UpdateAllPlansForServiceReturns(result1 bool, result2 error) {
 	fake.updateAllPlansForServiceReturns = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServicePlanActor) UpdateOrgForService(arg1 string, arg2 string, arg3 bool) (bool, error) {
+	fake.updateOrgForServiceMutex.Lock()
+	defer fake.updateOrgForServiceMutex.Unlock()
+	fake.updateOrgForServiceArgsForCall = append(fake.updateOrgForServiceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 bool
+	}{arg1, arg2, arg3})
+	if fake.UpdateOrgForServiceStub != nil {
+		return fake.UpdateOrgForServiceStub(arg1, arg2, arg3)
+	} else {
+		return fake.updateOrgForServiceReturns.result1, fake.updateOrgForServiceReturns.result2
+	}
+}
+
+func (fake *FakeServicePlanActor) UpdateOrgForServiceCallCount() int {
+	fake.updateOrgForServiceMutex.RLock()
+	defer fake.updateOrgForServiceMutex.RUnlock()
+	return len(fake.updateOrgForServiceArgsForCall)
+}
+
+func (fake *FakeServicePlanActor) UpdateOrgForServiceArgsForCall(i int) (string, string, bool) {
+	fake.updateOrgForServiceMutex.RLock()
+	defer fake.updateOrgForServiceMutex.RUnlock()
+	return fake.updateOrgForServiceArgsForCall[i].arg1, fake.updateOrgForServiceArgsForCall[i].arg2, fake.updateOrgForServiceArgsForCall[i].arg3
+}
+
+func (fake *FakeServicePlanActor) UpdateOrgForServiceReturns(result1 bool, result2 error) {
+	fake.updateOrgForServiceReturns = struct {
 		result1 bool
 		result2 error
 	}{result1, result2}

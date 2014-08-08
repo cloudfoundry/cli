@@ -50,38 +50,65 @@ func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 	orgName := c.String("o")
 
 	if planName != "" && orgName != "" {
-		planOriginalAccess, err := cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-		}
-
-		if planOriginalAccess == actors.All {
-			cmd.ui.Say("The plan %s of service %s is already accessible for the org %s", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName))
-		} else {
-			cmd.ui.Say("Enabling access to plan %s of service %s for org %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username()))
-		}
+		cmd.enablePlanAndOrgForService(serviceName, planName, orgName)
 	} else if planName != "" {
-		planOriginalAccess, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-		}
-
-		if planOriginalAccess == actors.All {
-			cmd.ui.Say("The plan %s of service %s is already accessible for all orgs", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName))
-		} else {
-			cmd.ui.Say("Enabling access of plan %s for service %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
-		}
+		cmd.enablePlanForService(serviceName, planName)
+	} else if orgName != "" {
+		cmd.enableAllPlansForSingleOrgForService(serviceName, orgName)
 	} else {
-		allPlansInServicePublic, err := cmd.actor.UpdateAllPlansForService(serviceName, true)
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-		}
-
-		if allPlansInServicePublic {
-			cmd.ui.Say("All plans of the service %s are already accessible for all orgs", terminal.EntityNameColor(serviceName))
-		} else {
-			cmd.ui.Say("Enabling access to all plans of service %s for all orgs as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
-		}
+		cmd.enableAllPlansForService(serviceName)
 	}
 	cmd.ui.Say("OK")
+}
+
+func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, planName string, orgName string) {
+	planOriginalAccess, err := cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	if planOriginalAccess == actors.All {
+		cmd.ui.Say("The plan is already accessible for this org")
+	} else {
+		cmd.ui.Say("Enabling access to plan %s of service %s for org %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username()))
+	}
+}
+
+func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planName string) {
+	planOriginalAccess, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	if planOriginalAccess == actors.All {
+		cmd.ui.Say("The plan is already accessible for all orgs")
+	} else {
+		cmd.ui.Say("Enabling access of plan %s for service %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
+	}
+}
+
+func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) {
+	allPlansInServicePublic, err := cmd.actor.UpdateAllPlansForService(serviceName, true)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	if allPlansInServicePublic {
+		cmd.ui.Say("All plans of the service are already accessible for all orgs")
+	} else {
+		cmd.ui.Say("Enabling access to all plans of service %s for all orgs as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
+	}
+}
+
+func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName string, orgName string) {
+	allPlansWereSet, err := cmd.actor.UpdateOrgForService(serviceName, orgName, true)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	if allPlansWereSet {
+		cmd.ui.Say("All plans of the service are already accessible for the org")
+	} else {
+		cmd.ui.Say("Enabling access to all plans of service %s for the org %s as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username()))
+	}
 }

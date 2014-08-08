@@ -28,9 +28,10 @@ var _ = Describe("Service Plans", func() {
 		privateServicePlan models.ServicePlanFields
 		limitedServicePlan models.ServicePlanFields
 
-		publicService  models.ServiceOffering
-		mixedService   models.ServiceOffering
-		privateService models.ServiceOffering
+		publicService           models.ServiceOffering
+		mixedService            models.ServiceOffering
+		privateService          models.ServiceOffering
+		publicAndLimitedService models.ServiceOffering
 
 		org1 models.Organization
 		org2 models.Organization
@@ -128,6 +129,17 @@ var _ = Describe("Service Plans", func() {
 			Plans: []models.ServicePlanFields{
 				privateServicePlan,
 				privateServicePlan,
+			},
+		}
+		publicAndLimitedService = models.ServiceOffering{
+			ServiceOfferingFields: models.ServiceOfferingFields{
+				Label: "my-public-and-limited-service",
+				Guid:  "my-public-and-limited-service-guid",
+			},
+			Plans: []models.ServicePlanFields{
+				publicServicePlan,
+				publicServicePlan,
+				limitedServicePlan,
 			},
 		}
 	})
@@ -257,6 +269,81 @@ var _ = Describe("Service Plans", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(servicePlanRepo.UpdateCallCount()).To(Equal(0))
+			})
+		})
+	})
+
+	Describe(".UpdateOrgForService", func() {
+		BeforeEach(func() {
+			serviceRepo.FindServiceOfferingByLabelServiceOffering = mixedService
+
+			servicePlanVisibilityRepo.ListReturns(
+				[]models.ServicePlanVisibilityFields{limitedServicePlanVisibilityFields}, nil)
+
+			servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
+				"my-mixed-service-guid": {
+					publicServicePlan,
+					privateServicePlan,
+					limitedServicePlan,
+				},
+			}
+			orgRepo.FindByNameOrganization = org1
+		})
+
+		It("Returns an error if the service cannot be found", func() {
+			serviceRepo.FindServiceOfferingByLabelApiResponse = errors.New("service was not found")
+
+			_, err := actor.UpdateOrgForService("not-a-service", "org-1", true)
+			Expect(err.Error()).To(Equal("service was not found"))
+		})
+
+		Context("when giving access to all plans for a single org", func() {
+			It("creates a service plan visibility for all private plans", func() {
+				_, err := actor.UpdateOrgForService("my-mixed-service", "org-1", true)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(servicePlanVisibilityRepo.CreateCallCount()).To(Equal(1))
+
+				planGuid, orgGuid := servicePlanVisibilityRepo.CreateArgsForCall(0)
+				Expect(planGuid).To(Equal("private-service-plan-guid"))
+				Expect(orgGuid).To(Equal("org-1-guid"))
+			})
+
+			It("Returns true if all the plans were public", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = publicService
+				servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
+					"my-public-service-guid": {
+						publicServicePlan,
+						publicServicePlan,
+					},
+				}
+
+				servicesOriginallyPublic, err := actor.UpdateOrgForService("my-public-service", "org-1", true)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(servicesOriginallyPublic).To(BeTrue())
+			})
+
+			It("Returns false if any of the plans were not public", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = mixedService
+				servicesOriginallyPublic, err := actor.UpdateOrgForService("my-mixed-service", "org-1", true)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(servicesOriginallyPublic).To(BeFalse())
+			})
+
+			It("Does not try to update service plans if they are all already public or the org already has access", func() {
+				serviceRepo.FindServiceOfferingByLabelServiceOffering = publicAndLimitedService
+				servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
+					"my-public-and-limited-service-guid": {
+						publicServicePlan,
+						publicServicePlan,
+						limitedServicePlan,
+					},
+				}
+
+				allPlansWereSet, err := actor.UpdateOrgForService("my-public-and-limited-service", "org-1", true)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(servicePlanVisibilityRepo.CreateCallCount()).To(Equal(0))
+				Expect(allPlansWereSet).To(BeTrue())
 			})
 		})
 	})
