@@ -55,18 +55,18 @@ var _ = Describe("disable-service-access command", func() {
 
 		Context("when the named service exists", func() {
 
-			PIt("tells the user if all plans were already private", func() {
-				actor.UpdateAllPlansForServiceReturns(false, nil)
+			It("tells the user if all plans were already private", func() {
+				actor.UpdateAllPlansForServiceReturns(true, nil)
 
 				Expect(runCommand([]string{"service"})).To(BeTrue())
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"All plans", "for service", "are already private"},
+					[]string{"All plans of the service are already inaccessible for all orgs"},
 					[]string{"OK"},
 				))
 			})
 
 			It("tells the user the plans are being updated if they weren't all already private", func() {
-				actor.UpdateAllPlansForServiceReturns(true, nil)
+				actor.UpdateAllPlansForServiceReturns(false, nil)
 
 				Expect(runCommand([]string{"service"})).To(BeTrue())
 				Expect(ui.Outputs).To(ContainSubstrings(

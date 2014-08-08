@@ -59,15 +59,17 @@ func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string, set
 	}
 	service.Plans = plans
 
-	allPlansWerePublic := true
+	allPlansWereSet := true
 	for _, plan := range service.Plans {
 		planAccess, err := actor.updateSinglePlan(service, plan.Name, setPlanVisibility)
 		if err != nil {
 			return false, err
 		}
-		allPlansWerePublic = allPlansWerePublic && (planAccess == All)
+		// If any plan is Limited we know that we have to change the visibility.
+		planAlreadySet := ((planAccess == All) == setPlanVisibility) && planAccess != Limited
+		allPlansWereSet = allPlansWereSet && planAlreadySet
 	}
-	return allPlansWerePublic, nil
+	return allPlansWereSet, nil
 }
 
 func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName, orgName string, setPlanVisibility bool) (Access, error) {
