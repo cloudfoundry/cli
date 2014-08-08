@@ -11,6 +11,11 @@ type PlanBuilder interface {
 	GetPlansVisibleToOrg(string) ([]models.ServicePlanFields, error)
 }
 
+var (
+	OrgToPlansVisibilityMap *map[string][]string
+	PlanToOrgsVisibilityMap *map[string][]string
+)
+
 type Builder struct {
 	servicePlanRepo           api.ServicePlanRepository
 	servicePlanVisibilityRepo api.ServicePlanVisibilityRepository
@@ -61,6 +66,7 @@ func (builder Builder) GetPlansVisibleToOrg(orgName string) ([]models.ServicePla
 	}
 
 	orgToPlansVisMap := builder.buildOrgToPlansVisibilityMap(planToOrgsVisMap)
+
 	filterOrgPlans := orgToPlansVisMap[orgName]
 
 	for _, plan := range allPlans {
@@ -85,34 +91,40 @@ func (builder Builder) containsGuid(guidSlice []string, guid string) bool {
 }
 
 func (builder Builder) buildPlanToOrgsVisibilityMap() (map[string][]string, error) {
-	//WE PROBABLY HAVE A TERRIBLE PERFORMANCE PROBLEM HERE
-	//WE SHOULD MEMOIZE THESE MAPS
-	orgLookup := make(map[string]string)
-	builder.orgRepo.ListOrgs(func(org models.Organization) bool {
-		orgLookup[org.Guid] = org.Name
-		return true
-	})
+	// Since this map doesn't ever change, we memoize it for performance
+	if PlanToOrgsVisibilityMap == nil {
+		orgLookup := make(map[string]string)
+		builder.orgRepo.ListOrgs(func(org models.Organization) bool {
+			orgLookup[org.Guid] = org.Name
+			return true
+		})
 
-	visibilities, err := builder.servicePlanVisibilityRepo.List()
-	if err != nil {
-		return nil, err
+		visibilities, err := builder.servicePlanVisibilityRepo.List()
+		if err != nil {
+			return nil, err
+		}
+
+		visMap := make(map[string][]string)
+		for _, vis := range visibilities {
+			visMap[vis.ServicePlanGuid] = append(visMap[vis.ServicePlanGuid], orgLookup[vis.OrganizationGuid])
+		}
+		PlanToOrgsVisibilityMap = &visMap
 	}
 
-	visMap := make(map[string][]string)
-	for _, vis := range visibilities {
-		visMap[vis.ServicePlanGuid] = append(visMap[vis.ServicePlanGuid], orgLookup[vis.OrganizationGuid])
-	}
-
-	return visMap, nil
+	return *PlanToOrgsVisibilityMap, nil
 }
 
 func (builder Builder) buildOrgToPlansVisibilityMap(planToOrgsMap map[string][]string) map[string][]string {
-	visMap := make(map[string][]string)
-	for planGuid, orgNames := range planToOrgsMap {
-		for _, orgName := range orgNames {
-			visMap[orgName] = append(visMap[orgName], planGuid)
+	// Since this map doesn't ever change, we memoize it for performance
+	if OrgToPlansVisibilityMap == nil {
+		visMap := make(map[string][]string)
+		for planGuid, orgNames := range planToOrgsMap {
+			for _, orgName := range orgNames {
+				visMap[orgName] = append(visMap[orgName], planGuid)
+			}
 		}
+		OrgToPlansVisibilityMap = &visMap
 	}
 
-	return visMap
+	return *OrgToPlansVisibilityMap
 }
