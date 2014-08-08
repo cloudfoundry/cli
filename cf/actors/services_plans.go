@@ -26,7 +26,6 @@ const (
 )
 
 type ServicePlanHandler struct {
-	serviceRepo               api.ServiceRepository
 	servicePlanRepo           api.ServicePlanRepository
 	servicePlanVisibilityRepo api.ServicePlanVisibilityRepository
 	orgRepo                   api.OrganizationRepository
@@ -34,11 +33,8 @@ type ServicePlanHandler struct {
 	planBuilder               plan_builder.PlanBuilder
 }
 
-func NewServicePlanHandler(service api.ServiceRepository, plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org api.OrganizationRepository) ServicePlanHandler {
-	planBuilder := plan_builder.NewBuilder(plan, vis, org)
-	serviceBuilder := service_builder.NewBuilder(service, planBuilder)
+func NewServicePlanHandler(plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org api.OrganizationRepository, planBuilder plan_builder.PlanBuilder, serviceBuilder service_builder.ServiceBuilder) ServicePlanHandler {
 	return ServicePlanHandler{
-		serviceRepo:               service,
 		servicePlanRepo:           plan,
 		servicePlanVisibilityRepo: vis,
 		orgRepo:                   org,
@@ -48,16 +44,10 @@ func NewServicePlanHandler(service api.ServiceRepository, plan api.ServicePlanRe
 }
 
 func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string, setPlanVisibility bool) (bool, error) {
-	service, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
+	service, err := actor.serviceBuilder.GetServiceByName(serviceName)
 	if err != nil {
 		return false, err
 	}
-
-	plans, err := actor.planBuilder.GetPlansForService(service.Guid)
-	if err != nil {
-		return false, err
-	}
-	service.Plans = plans
 
 	allPlansWereSet := true
 	for _, plan := range service.Plans {
@@ -73,7 +63,7 @@ func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string, set
 }
 
 func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName, orgName string, setPlanVisibility bool) (Access, error) {
-	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
+	service, err := actor.serviceBuilder.GetServiceByName(serviceName)
 	if err != nil {
 		return Error, err
 	}
@@ -83,17 +73,12 @@ func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName
 		return Error, err
 	}
 
-	servicePlans, err := actor.planBuilder.GetPlansForService(serviceOffering.Guid)
-	if err != nil {
-		return Error, err
-	}
-
 	found := false
 	var servicePlan models.ServicePlanFields
-	for i, val := range servicePlans {
+	for i, val := range service.Plans {
 		if val.Name == planName {
 			found = true
-			servicePlan = servicePlans[i]
+			servicePlan = service.Plans[i]
 		}
 	}
 	if !found {
@@ -125,10 +110,9 @@ func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, p
 	if err != nil {
 		return Error, err
 	}
-	return actor.updateSinglePlan(serviceOffering[0], planName, setPlanVisibility)
+	return actor.updateSinglePlan(serviceOffering, planName, setPlanVisibility)
 }
 
-// Do we even need this function?
 func (actor ServicePlanHandler) updateSinglePlan(serviceOffering models.ServiceOffering, planName string, setPlanVisibility bool) (Access, error) {
 	var planToUpdate *models.ServicePlanFields
 

@@ -67,7 +67,7 @@ var _ = Describe("Services", func() {
 
 		Context("when the -b flag is passed", func() {
 			It("returns a single broker contained in a slice with all dependencies populated", func() {
-				returnedBroker := []models.ServiceBroker{serviceBroker1}
+				returnedBroker := serviceBroker1
 				brokerBuilder.GetBrokerWithAllServicesReturns(returnedBroker, nil)
 
 				brokers, err := actor.FilterBrokers("my-service-broker1", "", "")
@@ -80,7 +80,7 @@ var _ = Describe("Services", func() {
 		Context("when the -e flag is passed", func() {
 			It("returns a single broker containing a single service", func() {
 				serviceBroker1.Services = []models.ServiceOffering{service1}
-				returnedBroker := []models.ServiceBroker{serviceBroker1}
+				returnedBroker := serviceBroker1
 				brokerBuilder.GetBrokerWithSpecifiedServiceReturns(returnedBroker, nil)
 
 				brokers, err := actor.FilterBrokers("", "my-service1", "")
@@ -123,8 +123,8 @@ var _ = Describe("Services", func() {
 		Context("when the -b AND the -e flags are passed", func() {
 			It("returns the intersection set", func() {
 				serviceBroker1.Services = []models.ServiceOffering{service1}
-				returnedBrokers := []models.ServiceBroker{serviceBroker1}
-				brokerBuilder.GetBrokerWithSpecifiedServiceReturns(returnedBrokers, nil)
+				returnedBroker := serviceBroker1
+				brokerBuilder.GetBrokerWithSpecifiedServiceReturns(returnedBroker, nil)
 
 				brokers, err := actor.FilterBrokers("my-service-broker1", "my-service1", "")
 				Expect(err).NotTo(HaveOccurred())
@@ -138,7 +138,7 @@ var _ = Describe("Services", func() {
 
 			Context("when the -b AND -e intersection is the empty set", func() {
 				It("returns an empty set", func() {
-					brokerBuilder.GetBrokerWithSpecifiedServiceReturns(nil, nil)
+					brokerBuilder.GetBrokerWithSpecifiedServiceReturns(models.ServiceBroker{}, nil)
 					brokers, err := actor.FilterBrokers("my-service-broker", "my-service2", "")
 
 					Expect(len(brokers)).To(Equal(0))
@@ -150,10 +150,10 @@ var _ = Describe("Services", func() {
 		Context("when the -b AND the -o flags are passed", func() {
 			It("returns the intersection set", func() {
 				serviceBroker1.Services = []models.ServiceOffering{service1}
-				returnedBrokers := []models.ServiceBroker{serviceBroker1}
+				returnedBroker := serviceBroker1
 
-				serviceBuilder.GetServiceVisibleToOrgReturns([]models.ServiceOffering{service1}, nil)
-				brokerBuilder.AttachSpecificBrokerToServicesReturns(returnedBrokers, nil)
+				serviceBuilder.GetServiceVisibleToOrgReturns(service1, nil)
+				brokerBuilder.AttachSpecificBrokerToServicesReturns(returnedBroker, nil)
 
 				brokers, err := actor.FilterBrokers("my-service-broker", "", "org1")
 				Expect(err).NotTo(HaveOccurred())
@@ -188,10 +188,10 @@ var _ = Describe("Services", func() {
 		Context("when the -b AND -e AND the -o flags are passed", func() {
 			It("returns the intersection set", func() {
 				serviceBroker1.Services = []models.ServiceOffering{service1}
-				returnedBrokers := []models.ServiceBroker{serviceBroker1}
+				returnedBroker := serviceBroker1
 
 				serviceBuilder.GetServicesVisibleToOrgReturns([]models.ServiceOffering{service1}, nil)
-				brokerBuilder.AttachSpecificBrokerToServicesReturns(returnedBrokers, nil)
+				brokerBuilder.AttachSpecificBrokerToServicesReturns(returnedBroker, nil)
 
 				brokers, err := actor.FilterBrokers("my-service-broker1", "my-service1", "org1")
 				Expect(err).NotTo(HaveOccurred())
