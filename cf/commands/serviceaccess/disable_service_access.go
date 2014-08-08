@@ -62,12 +62,16 @@ func (cmd *DisableServiceAccess) Run(c *cli.Context) {
 }
 
 func (cmd *DisableServiceAccess) DisableServiceForAll(serviceName string) {
-	_, err := cmd.actor.UpdateAllPlansForService(serviceName, false)
+	allPlansAlreadySet, err := cmd.actor.UpdateAllPlansForService(serviceName, false)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say("Disabling access to all plans of service %s for all orgs as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
+	if allPlansAlreadySet {
+		cmd.ui.Say("All plans of the service are already inaccessible for all orgs")
+	} else {
+		cmd.ui.Say("Disabling access to all plans of service %s for all orgs as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
+	}
 }
 
 func (cmd *DisableServiceAccess) DisablePlanAndOrgForService(serviceName string, planName string, orgName string) {
