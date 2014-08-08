@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/actors"
+	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -36,6 +37,9 @@ var _ = Describe("Service Plans", func() {
 	)
 
 	BeforeEach(func() {
+		plan_builder.OrgToPlansVisibilityMap = nil
+		plan_builder.PlanToOrgsVisibilityMap = nil
+
 		serviceRepo = &fakes.FakeServiceRepo{}
 		servicePlanRepo = &fakes.FakeServicePlanRepo{}
 		servicePlanVisibilityRepo = &fakes.FakeServicePlanVisibilityRepository{}
