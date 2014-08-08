@@ -7,10 +7,10 @@ import (
 )
 
 type ServiceBuilder interface {
-	GetServiceByName(string) ([]models.ServiceOffering, error)
+	GetServiceByName(string) (models.ServiceOffering, error)
 	GetServicesForBroker(string) ([]models.ServiceOffering, error)
 
-	GetServiceVisibleToOrg(string, string) ([]models.ServiceOffering, error)
+	GetServiceVisibleToOrg(string, string) (models.ServiceOffering, error)
 	GetServicesVisibleToOrg(string) ([]models.ServiceOffering, error)
 }
 
@@ -26,16 +26,16 @@ func NewBuilder(service api.ServiceRepository, planBuilder plan_builder.PlanBuil
 	}
 }
 
-func (builder Builder) GetServiceByName(serviceLabel string) ([]models.ServiceOffering, error) {
+func (builder Builder) GetServiceByName(serviceLabel string) (models.ServiceOffering, error) {
 	service, err := builder.serviceRepo.FindServiceOfferingByLabel(serviceLabel)
 	if err != nil {
-		return nil, err
+		return models.ServiceOffering{}, err
 	}
 	service, err = builder.attachPlansToService(service)
 	if err != nil {
-		return nil, err
+		return models.ServiceOffering{}, err
 	}
-	return []models.ServiceOffering{service}, nil
+	return service, nil
 }
 
 func (builder Builder) GetServicesForBroker(brokerGuid string) ([]models.ServiceOffering, error) {
@@ -52,14 +52,14 @@ func (builder Builder) GetServicesForBroker(brokerGuid string) ([]models.Service
 	return services, nil
 }
 
-func (builder Builder) GetServiceVisibleToOrg(serviceName string, orgName string) ([]models.ServiceOffering, error) {
+func (builder Builder) GetServiceVisibleToOrg(serviceName string, orgName string) (models.ServiceOffering, error) {
 	visiblePlans, err := builder.planBuilder.GetPlansVisibleToOrg(orgName)
 	if err != nil {
-		return nil, err
+		return models.ServiceOffering{}, err
 	}
 
 	if len(visiblePlans) == 0 {
-		return nil, nil
+		return models.ServiceOffering{}, nil
 	}
 
 	return builder.attachSpecificServiceToPlans(serviceName, visiblePlans)
@@ -117,10 +117,10 @@ func (builder Builder) attachServicesToPlans(plans []models.ServicePlanFields) (
 	return services, nil
 }
 
-func (builder Builder) attachSpecificServiceToPlans(serviceName string, plans []models.ServicePlanFields) ([]models.ServiceOffering, error) {
+func (builder Builder) attachSpecificServiceToPlans(serviceName string, plans []models.ServicePlanFields) (models.ServiceOffering, error) {
 	service, err := builder.serviceRepo.FindServiceOfferingByLabel(serviceName)
 	if err != nil {
-		return nil, err
+		return models.ServiceOffering{}, err
 	}
 
 	for _, plan := range plans {
@@ -129,5 +129,5 @@ func (builder Builder) attachSpecificServiceToPlans(serviceName string, plans []
 		}
 	}
 
-	return []models.ServiceOffering{service}, nil
+	return service, nil
 }

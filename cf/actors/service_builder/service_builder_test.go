@@ -36,6 +36,14 @@ var _ = Describe("Service Builder", func() {
 		serviceRepo.FindServiceOfferingByLabelName = "my-service1"
 		serviceRepo.FindServiceOfferingByLabelServiceOffering = service1
 
+		serviceRepo.GetServiceOfferingByGuidReturns = struct {
+			ServiceOffering models.ServiceOffering
+			Error           error
+		}{
+			service1,
+			nil,
+		}
+
 		serviceRepo.ListServicesFromBrokerReturns = map[string][]models.ServiceOffering{
 			"my-service-broker-guid1": []models.ServiceOffering{service1},
 		}
@@ -58,10 +66,9 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetServiceByName", func() {
 		It("returns the named service, populated with plans", func() {
-			services, err := serviceBuilder.GetServiceByName("my-cool-service")
+			service, err := serviceBuilder.GetServiceByName("my-cool-service")
 			Expect(err).NotTo(HaveOccurred())
 
-			service := services[0]
 			Expect(len(service.Plans)).To(Equal(2))
 			Expect(service.Plans[0].Name).To(Equal("service-plan1"))
 			Expect(service.Plans[1].Name).To(Equal("service-plan2"))
@@ -85,10 +92,9 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetServiceVisibleToOrg", func() {
 		It("Returns a service populated with plans visible to the provided org", func() {
-			services, err := serviceBuilder.GetServiceVisibleToOrg("my-service1", "org1")
+			service, err := serviceBuilder.GetServiceVisibleToOrg("my-service1", "org1")
 			Expect(err).NotTo(HaveOccurred())
 
-			service := services[0]
 			Expect(service.Label).To(Equal("my-service1"))
 			Expect(len(service.Plans)).To(Equal(2))
 			Expect(service.Plans[0].Name).To(Equal("service-plan1"))
@@ -98,17 +104,18 @@ var _ = Describe("Service Builder", func() {
 		Context("When no plans are visible to the provided org", func() {
 			It("Returns nil", func() {
 				planBuilder.GetPlansVisibleToOrgReturns(nil, nil)
-				services, err := serviceBuilder.GetServiceVisibleToOrg("my-service1", "org3")
+				service, err := serviceBuilder.GetServiceVisibleToOrg("my-service1", "org3")
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(services).To(BeNil())
+				Expect(service).To(Equal(models.ServiceOffering{}))
 			})
 		})
 	})
 
 	Describe(".GetServicesVisibleToOrg", func() {
 		It("Returns services with plans visible to the provided org", func() {
-			services, err := serviceBuilder.GetServiceVisibleToOrg("my-service1", "org1")
+			planBuilder.GetPlansVisibleToOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
+			services, err := serviceBuilder.GetServicesVisibleToOrg("org1")
 			Expect(err).NotTo(HaveOccurred())
 
 			service := services[0]
@@ -121,7 +128,7 @@ var _ = Describe("Service Builder", func() {
 		Context("When no plans are visible to the provided org", func() {
 			It("Returns nil", func() {
 				planBuilder.GetPlansVisibleToOrgReturns(nil, nil)
-				services, err := serviceBuilder.GetServiceVisibleToOrg("my-service1", "org3")
+				services, err := serviceBuilder.GetServicesVisibleToOrg("org3")
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(services).To(BeNil())
@@ -129,69 +136,3 @@ var _ = Describe("Service Builder", func() {
 		})
 	})
 })
-
-/*
-	publicServicePlanVisibilityFields = models.ServicePlanVisibilityFields{
-		Guid:            "public-service-plan-visibility-guid",
-		ServicePlanGuid: "public-service-plan-guid",
-	}
-
-	privateServicePlanVisibilityFields = models.ServicePlanVisibilityFields{
-		Guid:            "private-service-plan-visibility-guid",
-		ServicePlanGuid: "private-service-plan-guid",
-	}
-
-*/
-/*
-	brokerRepo.FindByNameServiceBroker = serviceBroker2
-
-	brokerRepo.ServiceBrokers = []models.ServiceBroker{
-		serviceBroker1,
-		serviceBroker2,
-	}
-
-	serviceRepo.ListServicesFromBrokerReturns = map[string][]models.ServiceOffering{
-		"my-service-broker-guid": {
-			{ServiceOfferingFields: models.ServiceOfferingFields{Guid: "a-guid", Label: "a-label"}},
-		},
-		"my-service-broker-guid2": {
-			{ServiceOfferingFields: models.ServiceOfferingFields{Guid: "service-guid", Label: "my-service"}},
-			{ServiceOfferingFields: models.ServiceOfferingFields{Guid: "service-guid2", Label: "my-service2"}},
-		},
-	}
-
-	service2 := models.ServiceOffering{ServiceOfferingFields: models.ServiceOfferingFields{
-		Label:      "my-service2",
-		Guid:       "service-guid2",
-		BrokerGuid: "my-service-broker-guid2"},
-	}
-
-	serviceRepo.FindServiceOfferingByLabelServiceOffering = service2
-
-	servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
-		"service-guid": {{Name: "service-plan", Guid: "service-plan-guid", ServiceOfferingGuid: "service-guid"},
-			{Name: "other-plan", Guid: "other-plan-guid", ServiceOfferingGuid: "service-guid", Public: true}},
-		"service-guid2": {{Name: "service-plan2", Guid: "service-plan2-guid", ServiceOfferingGuid: "service-guid2"}},
-	}
-
-	servicePlanVisibilityRepo.ListReturns([]models.ServicePlanVisibilityFields{
-		{ServicePlanGuid: "service-plan2-guid", OrganizationGuid: "org-guid"},
-		{ServicePlanGuid: "service-plan-guid", OrganizationGuid: "org-guid"},
-		{ServicePlanGuid: "service-plan-guid", OrganizationGuid: "org2-guid"},
-		{ServicePlanGuid: "service-plan2-guid", OrganizationGuid: "org2-guid"},
-		{ServicePlanGuid: "other-plan-guid", OrganizationGuid: "org-guid"},
-	}, nil)
-
-	org1 := models.Organization{}
-	org1.Name = "org1"
-	org1.Guid = "org-guid"
-
-	org2 := models.Organization{}
-	org2.Name = "org2"
-	org2.Guid = "org2-guid"
-
-	orgRepo.Organizations = []models.Organization{
-		org1,
-		org2,
-	}
-*/
