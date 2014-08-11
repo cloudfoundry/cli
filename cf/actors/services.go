@@ -44,21 +44,25 @@ func (actor ServiceHandler) checkForOrgExistence(orgName string) error {
 
 func (actor ServiceHandler) getServiceBrokers(brokerName string, serviceName string) ([]models.ServiceBroker, error) {
 	if serviceName != "" {
-		brokers, err := actor.brokerBuilder.GetBrokerWithSpecifiedService(serviceName)
+		broker, err := actor.brokerBuilder.GetBrokerWithSpecifiedService(serviceName)
 		if err != nil {
 			return nil, err
 		}
 
 		if brokerName != "" {
-			if brokers != nil && brokers[0].Name != brokerName {
+			if broker.Name != brokerName {
 				return nil, nil
 			}
 		}
-		return brokers, nil
+		return []models.ServiceBroker{broker}, nil
 	}
 
 	if brokerName != "" && serviceName == "" {
-		return actor.brokerBuilder.GetBrokerWithAllServices(brokerName)
+		broker, err := actor.brokerBuilder.GetBrokerWithAllServices(brokerName)
+		if err != nil {
+			return nil, err
+		}
+		return []models.ServiceBroker{broker}, nil
 	}
 
 	return actor.brokerBuilder.GetAllServiceBrokers()
@@ -66,19 +70,23 @@ func (actor ServiceHandler) getServiceBrokers(brokerName string, serviceName str
 
 func (actor ServiceHandler) buildBrokersVisibleFromOrg(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error) {
 	if serviceFlag != "" && brokerFlag != "" {
-		services, err := actor.serviceBuilder.GetServiceVisibleToOrg(serviceFlag, orgFlag)
+		service, err := actor.serviceBuilder.GetServiceVisibleToOrg(serviceFlag, orgFlag)
 		if err != nil {
 			return nil, err
 		}
-		return actor.brokerBuilder.AttachSpecificBrokerToServices(brokerFlag, services)
+		broker, err := actor.brokerBuilder.AttachSpecificBrokerToServices(brokerFlag, []models.ServiceOffering{service})
+		if err != nil {
+			return nil, err
+		}
+		return []models.ServiceBroker{broker}, nil
 	}
 
 	if serviceFlag != "" && brokerFlag == "" {
-		services, err := actor.serviceBuilder.GetServiceVisibleToOrg(serviceFlag, orgFlag)
+		service, err := actor.serviceBuilder.GetServiceVisibleToOrg(serviceFlag, orgFlag)
 		if err != nil {
 			return nil, err
 		}
-		return actor.brokerBuilder.AttachBrokersToServices(services)
+		return actor.brokerBuilder.AttachBrokersToServices([]models.ServiceOffering{service})
 	}
 
 	if serviceFlag == "" && brokerFlag != "" {
@@ -86,7 +94,11 @@ func (actor ServiceHandler) buildBrokersVisibleFromOrg(brokerFlag string, servic
 		if err != nil {
 			return nil, err
 		}
-		return actor.brokerBuilder.AttachSpecificBrokerToServices(brokerFlag, services)
+		broker, err := actor.brokerBuilder.AttachSpecificBrokerToServices(brokerFlag, services)
+		if err != nil {
+			return nil, err
+		}
+		return []models.ServiceBroker{broker}, nil
 	}
 
 	if serviceFlag == "" && brokerFlag == "" {

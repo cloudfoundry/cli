@@ -8,13 +8,13 @@ import (
 )
 
 type FakeServiceBuilder struct {
-	GetServiceByNameStub        func(string) ([]models.ServiceOffering, error)
+	GetServiceByNameStub        func(string) (models.ServiceOffering, error)
 	getServiceByNameMutex       sync.RWMutex
 	getServiceByNameArgsForCall []struct {
 		arg1 string
 	}
 	getServiceByNameReturns struct {
-		result1 []models.ServiceOffering
+		result1 models.ServiceOffering
 		result2 error
 	}
 	GetServicesForBrokerStub        func(string) ([]models.ServiceOffering, error)
@@ -26,14 +26,14 @@ type FakeServiceBuilder struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}
-	GetServiceVisibleToOrgStub        func(string, string) ([]models.ServiceOffering, error)
+	GetServiceVisibleToOrgStub        func(string, string) (models.ServiceOffering, error)
 	getServiceVisibleToOrgMutex       sync.RWMutex
 	getServiceVisibleToOrgArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getServiceVisibleToOrgReturns struct {
-		result1 []models.ServiceOffering
+		result1 models.ServiceOffering
 		result2 error
 	}
 	GetServicesVisibleToOrgStub        func(string) ([]models.ServiceOffering, error)
@@ -47,7 +47,7 @@ type FakeServiceBuilder struct {
 	}
 }
 
-func (fake *FakeServiceBuilder) GetServiceByName(arg1 string) ([]models.ServiceOffering, error) {
+func (fake *FakeServiceBuilder) GetServiceByName(arg1 string) (models.ServiceOffering, error) {
 	fake.getServiceByNameMutex.Lock()
 	defer fake.getServiceByNameMutex.Unlock()
 	fake.getServiceByNameArgsForCall = append(fake.getServiceByNameArgsForCall, struct {
@@ -72,9 +72,9 @@ func (fake *FakeServiceBuilder) GetServiceByNameArgsForCall(i int) string {
 	return fake.getServiceByNameArgsForCall[i].arg1
 }
 
-func (fake *FakeServiceBuilder) GetServiceByNameReturns(result1 []models.ServiceOffering, result2 error) {
+func (fake *FakeServiceBuilder) GetServiceByNameReturns(result1 models.ServiceOffering, result2 error) {
 	fake.getServiceByNameReturns = struct {
-		result1 []models.ServiceOffering
+		result1 models.ServiceOffering
 		result2 error
 	}{result1, result2}
 }
@@ -111,7 +111,7 @@ func (fake *FakeServiceBuilder) GetServicesForBrokerReturns(result1 []models.Ser
 	}{result1, result2}
 }
 
-func (fake *FakeServiceBuilder) GetServiceVisibleToOrg(arg1 string, arg2 string) ([]models.ServiceOffering, error) {
+func (fake *FakeServiceBuilder) GetServiceVisibleToOrg(arg1 string, arg2 string) (models.ServiceOffering, error) {
 	fake.getServiceVisibleToOrgMutex.Lock()
 	defer fake.getServiceVisibleToOrgMutex.Unlock()
 	fake.getServiceVisibleToOrgArgsForCall = append(fake.getServiceVisibleToOrgArgsForCall, struct {
@@ -137,9 +137,9 @@ func (fake *FakeServiceBuilder) GetServiceVisibleToOrgArgsForCall(i int) (string
 	return fake.getServiceVisibleToOrgArgsForCall[i].arg1, fake.getServiceVisibleToOrgArgsForCall[i].arg2
 }
 
-func (fake *FakeServiceBuilder) GetServiceVisibleToOrgReturns(result1 []models.ServiceOffering, result2 error) {
+func (fake *FakeServiceBuilder) GetServiceVisibleToOrgReturns(result1 models.ServiceOffering, result2 error) {
 	fake.getServiceVisibleToOrgReturns = struct {
-		result1 []models.ServiceOffering
+		result1 models.ServiceOffering
 		result2 error
 	}{result1, result2}
 }

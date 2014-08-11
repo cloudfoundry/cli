@@ -8,10 +8,10 @@ import (
 
 type BrokerBuilder interface {
 	AttachBrokersToServices([]models.ServiceOffering) ([]models.ServiceBroker, error)
-	AttachSpecificBrokerToServices(string, []models.ServiceOffering) ([]models.ServiceBroker, error)
+	AttachSpecificBrokerToServices(string, []models.ServiceOffering) (models.ServiceBroker, error)
 	GetAllServiceBrokers() ([]models.ServiceBroker, error)
-	GetBrokerWithAllServices(brokerName string) ([]models.ServiceBroker, error)
-	GetBrokerWithSpecifiedService(serviceName string) ([]models.ServiceBroker, error)
+	GetBrokerWithAllServices(brokerName string) (models.ServiceBroker, error)
+	GetBrokerWithSpecifiedService(serviceName string) (models.ServiceBroker, error)
 }
 
 type Builder struct {
@@ -55,10 +55,10 @@ func (builder Builder) AttachBrokersToServices(services []models.ServiceOffering
 	return brokers, nil
 }
 
-func (builder Builder) AttachSpecificBrokerToServices(brokerName string, services []models.ServiceOffering) ([]models.ServiceBroker, error) {
+func (builder Builder) AttachSpecificBrokerToServices(brokerName string, services []models.ServiceOffering) (models.ServiceBroker, error) {
 	broker, err := builder.brokerRepo.FindByName(brokerName)
 	if err != nil {
-		return nil, err
+		return models.ServiceBroker{}, err
 	}
 
 	for _, service := range services {
@@ -67,7 +67,7 @@ func (builder Builder) AttachSpecificBrokerToServices(brokerName string, service
 		}
 	}
 
-	return []models.ServiceBroker{broker}, nil
+	return broker, nil
 }
 
 func (builder Builder) GetAllServiceBrokers() ([]models.ServiceBroker, error) {
@@ -91,25 +91,28 @@ func (builder Builder) GetAllServiceBrokers() ([]models.ServiceBroker, error) {
 	return brokers, err
 }
 
-func (builder Builder) GetBrokerWithAllServices(brokerName string) ([]models.ServiceBroker, error) {
+func (builder Builder) GetBrokerWithAllServices(brokerName string) (models.ServiceBroker, error) {
 	broker, err := builder.brokerRepo.FindByName(brokerName)
 	if err != nil {
-		return nil, err
+		return models.ServiceBroker{}, err
 	}
 	services, err := builder.serviceBuilder.GetServicesForBroker(broker.Guid)
 	if err != nil {
-		return nil, err
+		return models.ServiceBroker{}, err
 	}
 	broker.Services = services
-	brokers := []models.ServiceBroker{broker}
 
-	return brokers, nil
+	return broker, nil
 }
 
-func (builder Builder) GetBrokerWithSpecifiedService(serviceName string) ([]models.ServiceBroker, error) {
+func (builder Builder) GetBrokerWithSpecifiedService(serviceName string) (models.ServiceBroker, error) {
 	service, err := builder.serviceBuilder.GetServiceByName(serviceName)
 	if err != nil {
-		return nil, err
+		return models.ServiceBroker{}, err
 	}
-	return builder.AttachBrokersToServices(service)
+	brokers, err := builder.AttachBrokersToServices([]models.ServiceOffering{service})
+	if err != nil || len(brokers) == 0 {
+		return models.ServiceBroker{}, err
+	}
+	return brokers[0], err
 }
