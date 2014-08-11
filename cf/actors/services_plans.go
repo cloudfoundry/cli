@@ -104,40 +104,40 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 }
 
 func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName, orgName string, setPlanVisibility bool) (Access, error) {
-	serviceOffering, err := actor.serviceRepo.FindServiceOfferingByLabel(serviceName)
+	services, err := actor.serviceBuilder.GetServiceByName(serviceName)
 	if err != nil {
 		return Error, err
 	}
+	service := services[0]
 
 	org, err := actor.orgRepo.FindByName(orgName)
 	if err != nil {
 		return Error, err
 	}
 
-	servicePlans, err := actor.planBuilder.GetPlansForService(serviceOffering.Guid)
-	if err != nil {
-		return Error, err
-	}
-
 	found := false
 	var servicePlan models.ServicePlanFields
-	for i, val := range servicePlans {
+	for i, val := range service.Plans {
 		if val.Name == planName {
 			found = true
-			servicePlan = servicePlans[i]
+			servicePlan = service.Plans[i]
 		}
 	}
 	if !found {
 		return Error, errors.New(fmt.Sprintf("Service plan %s not found", planName))
 	}
 
-	if !servicePlan.Public && setPlanVisibility {
+	if !servicePlan.Public && setPlanVisibility == true {
+		if servicePlan.OrgHasVisibility(orgName) {
+			return Limited, nil
+		}
+
 		// Enable service access
 		err = actor.servicePlanVisibilityRepo.Create(servicePlan.Guid, org.Guid)
 		if err != nil {
 			return Error, err
 		}
-	} else if !servicePlan.Public {
+	} else if !servicePlan.Public && setPlanVisibility == false {
 		// Disable service access
 		if actor.checkPlanForOrgVisibility(servicePlan, org.Name) {
 			err = actor.deleteServicePlanVisibility(servicePlan, org)

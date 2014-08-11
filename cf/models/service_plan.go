@@ -15,3 +15,15 @@ type ServicePlan struct {
 	ServicePlanFields
 	ServiceOffering ServiceOfferingFields
 }
+
+func (servicePlanFields ServicePlanFields) OrgHasVisibility(orgName string) bool {
+	if servicePlanFields.Public {
+		return true
+	}
+	for _, org := range servicePlanFields.OrgNames {
+		if org == orgName {
+			return true
+		}
+	}
+	return false
+}
