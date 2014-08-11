@@ -79,6 +79,10 @@ func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect fun
 		return err
 	}
 
+	if err != nil {
+		return err
+	}
+
 	repo.bufferMessages(logChan, onMessage)
 	return nil
 }
