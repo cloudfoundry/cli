@@ -118,6 +118,18 @@ var _ = Describe("loggregator logs repository", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeTokenRefresher.RefreshTokenCalled).To(BeTrue())
 			})
+
+			Context("when LoggregatorConsumer.UnauthorizedError occurs again", func() {
+				It("returns an error", func(done Done) {
+					fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+						return nil, loggregator_consumer.NewUnauthorizedError("All the errors")
+					}
+
+					err := logsRepo.TailLogsFor("app-guid", func() {}, func(*logmessage.LogMessage) {})
+					Expect(err).To(HaveOccurred())
+					close(done)
+				})
+			})
 		})
 
 		Context("when no error occurs", func() {
