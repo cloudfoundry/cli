@@ -19,14 +19,14 @@ type FakeBrokerBuilder struct {
 		result1 []models.ServiceBroker
 		result2 error
 	}
-	AttachSpecificBrokerToServicesStub        func(string, []models.ServiceOffering) ([]models.ServiceBroker, error)
+	AttachSpecificBrokerToServicesStub        func(string, []models.ServiceOffering) (models.ServiceBroker, error)
 	attachSpecificBrokerToServicesMutex       sync.RWMutex
 	attachSpecificBrokerToServicesArgsForCall []struct {
 		arg1 string
 		arg2 []models.ServiceOffering
 	}
 	attachSpecificBrokerToServicesReturns struct {
-		result1 []models.ServiceBroker
+		result1 models.ServiceBroker
 		result2 error
 	}
 	GetAllServiceBrokersStub        func() ([]models.ServiceBroker, error)
@@ -36,22 +36,22 @@ type FakeBrokerBuilder struct {
 		result1 []models.ServiceBroker
 		result2 error
 	}
-	GetBrokerWithAllServicesStub        func(brokerName string) ([]models.ServiceBroker, error)
+	GetBrokerWithAllServicesStub        func(brokerName string) (models.ServiceBroker, error)
 	getBrokerWithAllServicesMutex       sync.RWMutex
 	getBrokerWithAllServicesArgsForCall []struct {
 		brokerName string
 	}
 	getBrokerWithAllServicesReturns struct {
-		result1 []models.ServiceBroker
+		result1 models.ServiceBroker
 		result2 error
 	}
-	GetBrokerWithSpecifiedServiceStub        func(serviceName string) ([]models.ServiceBroker, error)
+	GetBrokerWithSpecifiedServiceStub        func(serviceName string) (models.ServiceBroker, error)
 	getBrokerWithSpecifiedServiceMutex       sync.RWMutex
 	getBrokerWithSpecifiedServiceArgsForCall []struct {
 		serviceName string
 	}
 	getBrokerWithSpecifiedServiceReturns struct {
-		result1 []models.ServiceBroker
+		result1 models.ServiceBroker
 		result2 error
 	}
 }
@@ -88,7 +88,7 @@ func (fake *FakeBrokerBuilder) AttachBrokersToServicesReturns(result1 []models.S
 	}{result1, result2}
 }
 
-func (fake *FakeBrokerBuilder) AttachSpecificBrokerToServices(arg1 string, arg2 []models.ServiceOffering) ([]models.ServiceBroker, error) {
+func (fake *FakeBrokerBuilder) AttachSpecificBrokerToServices(arg1 string, arg2 []models.ServiceOffering) (models.ServiceBroker, error) {
 	fake.attachSpecificBrokerToServicesMutex.Lock()
 	defer fake.attachSpecificBrokerToServicesMutex.Unlock()
 	fake.attachSpecificBrokerToServicesArgsForCall = append(fake.attachSpecificBrokerToServicesArgsForCall, struct {
@@ -114,9 +114,9 @@ func (fake *FakeBrokerBuilder) AttachSpecificBrokerToServicesArgsForCall(i int) 
 	return fake.attachSpecificBrokerToServicesArgsForCall[i].arg1, fake.attachSpecificBrokerToServicesArgsForCall[i].arg2
 }
 
-func (fake *FakeBrokerBuilder) AttachSpecificBrokerToServicesReturns(result1 []models.ServiceBroker, result2 error) {
+func (fake *FakeBrokerBuilder) AttachSpecificBrokerToServicesReturns(result1 models.ServiceBroker, result2 error) {
 	fake.attachSpecificBrokerToServicesReturns = struct {
-		result1 []models.ServiceBroker
+		result1 models.ServiceBroker
 		result2 error
 	}{result1, result2}
 }
@@ -145,7 +145,7 @@ func (fake *FakeBrokerBuilder) GetAllServiceBrokersReturns(result1 []models.Serv
 	}{result1, result2}
 }
 
-func (fake *FakeBrokerBuilder) GetBrokerWithAllServices(brokerName string) ([]models.ServiceBroker, error) {
+func (fake *FakeBrokerBuilder) GetBrokerWithAllServices(brokerName string) (models.ServiceBroker, error) {
 	fake.getBrokerWithAllServicesMutex.Lock()
 	defer fake.getBrokerWithAllServicesMutex.Unlock()
 	fake.getBrokerWithAllServicesArgsForCall = append(fake.getBrokerWithAllServicesArgsForCall, struct {
@@ -170,14 +170,14 @@ func (fake *FakeBrokerBuilder) GetBrokerWithAllServicesArgsForCall(i int) string
 	return fake.getBrokerWithAllServicesArgsForCall[i].brokerName
 }
 
-func (fake *FakeBrokerBuilder) GetBrokerWithAllServicesReturns(result1 []models.ServiceBroker, result2 error) {
+func (fake *FakeBrokerBuilder) GetBrokerWithAllServicesReturns(result1 models.ServiceBroker, result2 error) {
 	fake.getBrokerWithAllServicesReturns = struct {
-		result1 []models.ServiceBroker
+		result1 models.ServiceBroker
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedService(serviceName string) ([]models.ServiceBroker, error) {
+func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedService(serviceName string) (models.ServiceBroker, error) {
 	fake.getBrokerWithSpecifiedServiceMutex.Lock()
 	defer fake.getBrokerWithSpecifiedServiceMutex.Unlock()
 	fake.getBrokerWithSpecifiedServiceArgsForCall = append(fake.getBrokerWithSpecifiedServiceArgsForCall, struct {
@@ -202,9 +202,9 @@ func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedServiceArgsForCall(i int) s
 	return fake.getBrokerWithSpecifiedServiceArgsForCall[i].serviceName
 }
 
-func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedServiceReturns(result1 []models.ServiceBroker, result2 error) {
+func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedServiceReturns(result1 models.ServiceBroker, result2 error) {
 	fake.getBrokerWithSpecifiedServiceReturns = struct {
-		result1 []models.ServiceBroker
+		result1 models.ServiceBroker
 		result2 error
 	}{result1, result2}
 }

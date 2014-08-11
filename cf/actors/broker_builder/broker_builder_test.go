@@ -157,16 +157,15 @@ var _ = Describe("Broker Builder", func() {
 		It("attaches a single broker to only services that match", func() {
 			serviceBroker1.Services = models.ServiceOfferings{}
 			brokerRepo.FindByNameServiceBroker = serviceBroker1
-			brokers, err := brokerBuilder.AttachSpecificBrokerToServices("my-service-broker", services)
+			broker, err := brokerBuilder.AttachSpecificBrokerToServices("my-service-broker", services)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(len(brokers)).To(Equal(1))
-			Expect(brokers[0].Name).To(Equal("my-service-broker"))
-			Expect(brokers[0].Services[0].Label).To(Equal("my-public-service"))
-			Expect(len(brokers[0].Services[0].Plans)).To(Equal(2))
-			Expect(brokers[0].Services[1].Label).To(Equal("my-other-public-service"))
-			Expect(len(brokers[0].Services[0].Plans)).To(Equal(2))
-			Expect(len(brokers[0].Services)).To(Equal(2))
+			Expect(broker.Name).To(Equal("my-service-broker"))
+			Expect(broker.Services[0].Label).To(Equal("my-public-service"))
+			Expect(len(broker.Services[0].Plans)).To(Equal(2))
+			Expect(broker.Services[1].Label).To(Equal("my-other-public-service"))
+			Expect(len(broker.Services[0].Plans)).To(Equal(2))
+			Expect(len(broker.Services)).To(Equal(2))
 		})
 	})
 
@@ -202,40 +201,38 @@ var _ = Describe("Broker Builder", func() {
 	})
 
 	Describe(".GetBrokerWithAllServices", func() {
-		It("returns all service brokers populated with their services", func() {
+		It("returns a service broker populated with their services", func() {
 			brokerRepo.FindByNameServiceBroker = serviceBroker1
 			serviceBuilder.GetServicesForBrokerReturns(services, nil)
 
-			brokers, err := brokerBuilder.GetBrokerWithAllServices("my-service-broker")
+			broker, err := brokerBuilder.GetBrokerWithAllServices("my-service-broker")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(len(brokers)).To(Equal(1))
-			Expect(brokers[0].Name).To(Equal("my-service-broker"))
-			Expect(brokers[0].Services[0].Label).To(Equal("my-public-service"))
-			Expect(len(brokers[0].Services[0].Plans)).To(Equal(2))
-			Expect(brokers[0].Services[1].Label).To(Equal("my-other-public-service"))
-			Expect(len(brokers[0].Services[0].Plans)).To(Equal(2))
+			Expect(broker.Name).To(Equal("my-service-broker"))
+			Expect(broker.Services[0].Label).To(Equal("my-public-service"))
+			Expect(len(broker.Services[0].Plans)).To(Equal(2))
+			Expect(broker.Services[1].Label).To(Equal("my-other-public-service"))
+			Expect(len(broker.Services[0].Plans)).To(Equal(2))
 		})
 	})
 
 	Describe(".GetBrokerWithSpecifiedService", func() {
 		It("returns an error if a broker containeing the specific service cannot be found", func() {
-			serviceBuilder.GetServiceByNameReturns(nil, errors.New("Asplosions"))
+			serviceBuilder.GetServiceByNameReturns(models.ServiceOffering{}, errors.New("Asplosions"))
 			_, err := brokerBuilder.GetBrokerWithSpecifiedService("totally-not-a-service")
 
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns the service broker populated with the specific service", func() {
-			serviceBuilder.GetServiceByNameReturns([]models.ServiceOffering{service1}, nil)
+			serviceBuilder.GetServiceByNameReturns(service1, nil)
 			brokerRepo.FindByGuidServiceBroker = serviceBroker1
 
-			brokers, err := brokerBuilder.GetBrokerWithSpecifiedService("my-public-service")
+			broker, err := brokerBuilder.GetBrokerWithSpecifiedService("my-public-service")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(len(brokers)).To(Equal(1))
-			Expect(brokers[0].Name).To(Equal("my-service-broker"))
-			Expect(len(brokers[0].Services)).To(Equal(1))
-			Expect(brokers[0].Services[0].Label).To(Equal("my-public-service"))
-			Expect(len(brokers[0].Services[0].Plans)).To(Equal(2))
+			Expect(broker.Name).To(Equal("my-service-broker"))
+			Expect(len(broker.Services)).To(Equal(1))
+			Expect(broker.Services[0].Label).To(Equal("my-public-service"))
+			Expect(len(broker.Services[0].Plans)).To(Equal(2))
 		})
 	})
 })
