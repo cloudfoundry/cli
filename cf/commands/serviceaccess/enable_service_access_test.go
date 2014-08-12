@@ -150,6 +150,7 @@ var _ = Describe("enable-service-access command", func() {
 					))
 				})
 			})
+
 			Context("the user provides an org", func() {
 				It("fails if the org does not exist", func() {
 					actor.UpdateOrgForServiceReturns(false, errors.New("could not find org"))

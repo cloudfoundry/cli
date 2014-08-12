@@ -2,8 +2,10 @@
 package fakes
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/cf/api"
+
 	"github.com/cloudfoundry/cli/cf/models"
+
 	"sync"
 )
 
@@ -31,6 +33,15 @@ type FakeServicePlanVisibilityRepository struct {
 	}
 	deleteReturns struct {
 		result1 error
+	}
+	SearchStub        func(map[string]string) ([]models.ServicePlanVisibilityFields, error)
+	searchMutex       sync.RWMutex
+	searchArgsForCall []struct {
+		arg1 map[string]string
+	}
+	searchReturns struct {
+		result1 []models.ServicePlanVisibilityFields
+		result2 error
 	}
 }
 
@@ -61,7 +72,6 @@ func (fake *FakeServicePlanVisibilityRepository) CreateArgsForCall(i int) (strin
 }
 
 func (fake *FakeServicePlanVisibilityRepository) CreateReturns(result1 error) {
-	fake.CreateStub = nil
 	fake.createReturns = struct {
 		result1 error
 	}{result1}
@@ -85,7 +95,6 @@ func (fake *FakeServicePlanVisibilityRepository) ListCallCount() int {
 }
 
 func (fake *FakeServicePlanVisibilityRepository) ListReturns(result1 []models.ServicePlanVisibilityFields, result2 error) {
-	fake.ListStub = nil
 	fake.listReturns = struct {
 		result1 []models.ServicePlanVisibilityFields
 		result2 error
@@ -118,10 +127,41 @@ func (fake *FakeServicePlanVisibilityRepository) DeleteArgsForCall(i int) string
 }
 
 func (fake *FakeServicePlanVisibilityRepository) DeleteReturns(result1 error) {
-	fake.DeleteStub = nil
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ api.ServicePlanVisibilityRepository = new(FakeServicePlanVisibilityRepository)
+func (fake *FakeServicePlanVisibilityRepository) Search(arg1 map[string]string) ([]models.ServicePlanVisibilityFields, error) {
+	fake.searchMutex.Lock()
+	defer fake.searchMutex.Unlock()
+	fake.searchArgsForCall = append(fake.searchArgsForCall, struct {
+		arg1 map[string]string
+	}{arg1})
+	if fake.SearchStub != nil {
+		return fake.SearchStub(arg1)
+	} else {
+		return fake.searchReturns.result1, fake.searchReturns.result2
+	}
+}
+
+func (fake *FakeServicePlanVisibilityRepository) SearchCallCount() int {
+	fake.searchMutex.RLock()
+	defer fake.searchMutex.RUnlock()
+	return len(fake.searchArgsForCall)
+}
+
+func (fake *FakeServicePlanVisibilityRepository) SearchArgsForCall(i int) map[string]string {
+	fake.searchMutex.RLock()
+	defer fake.searchMutex.RUnlock()
+	return fake.searchArgsForCall[i].arg1
+}
+
+func (fake *FakeServicePlanVisibilityRepository) SearchReturns(result1 []models.ServicePlanVisibilityFields, result2 error) {
+	fake.searchReturns = struct {
+		result1 []models.ServicePlanVisibilityFields
+		result2 error
+	}{result1, result2}
+}
+
+var _ ServicePlanVisibilityRepository = new(FakeServicePlanVisibilityRepository)

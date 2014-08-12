@@ -3,10 +3,20 @@ package fakes
 
 import (
 	. "github.com/cloudfoundry/cli/cf/actors"
+
 	"sync"
 )
 
 type FakeServicePlanActor struct {
+	FindServiceAccessStub        func(string) (ServiceAccess, error)
+	findServiceAccessMutex       sync.RWMutex
+	findServiceAccessArgsForCall []struct {
+		arg1 string
+	}
+	findServiceAccessReturns struct {
+		result1 ServiceAccess
+		result2 error
+	}
 	UpdateAllPlansForServiceStub        func(string, bool) (bool, error)
 	updateAllPlansForServiceMutex       sync.RWMutex
 	updateAllPlansForServiceArgsForCall []struct {
@@ -28,7 +38,7 @@ type FakeServicePlanActor struct {
 		result1 bool
 		result2 error
 	}
-	UpdateSinglePlanForServiceStub        func(string, string, bool) (Access, error)
+	UpdateSinglePlanForServiceStub        func(string, string, bool) (PlanAccess, error)
 	updateSinglePlanForServiceMutex       sync.RWMutex
 	updateSinglePlanForServiceArgsForCall []struct {
 		arg1 string
@@ -36,10 +46,10 @@ type FakeServicePlanActor struct {
 		arg3 bool
 	}
 	updateSinglePlanForServiceReturns struct {
-		result1 Access
+		result1 PlanAccess
 		result2 error
 	}
-	UpdatePlanAndOrgForServiceStub        func(string, string, string, bool) (Access, error)
+	UpdatePlanAndOrgForServiceStub        func(string, string, string, bool) (PlanAccess, error)
 	updatePlanAndOrgForServiceMutex       sync.RWMutex
 	updatePlanAndOrgForServiceArgsForCall []struct {
 		arg1 string
@@ -48,9 +58,41 @@ type FakeServicePlanActor struct {
 		arg4 bool
 	}
 	updatePlanAndOrgForServiceReturns struct {
-		result1 Access
+		result1 PlanAccess
 		result2 error
 	}
+}
+
+func (fake *FakeServicePlanActor) FindServiceAccess(arg1 string) (ServiceAccess, error) {
+	fake.findServiceAccessMutex.Lock()
+	defer fake.findServiceAccessMutex.Unlock()
+	fake.findServiceAccessArgsForCall = append(fake.findServiceAccessArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.FindServiceAccessStub != nil {
+		return fake.FindServiceAccessStub(arg1)
+	} else {
+		return fake.findServiceAccessReturns.result1, fake.findServiceAccessReturns.result2
+	}
+}
+
+func (fake *FakeServicePlanActor) FindServiceAccessCallCount() int {
+	fake.findServiceAccessMutex.RLock()
+	defer fake.findServiceAccessMutex.RUnlock()
+	return len(fake.findServiceAccessArgsForCall)
+}
+
+func (fake *FakeServicePlanActor) FindServiceAccessArgsForCall(i int) string {
+	fake.findServiceAccessMutex.RLock()
+	defer fake.findServiceAccessMutex.RUnlock()
+	return fake.findServiceAccessArgsForCall[i].arg1
+}
+
+func (fake *FakeServicePlanActor) FindServiceAccessReturns(result1 ServiceAccess, result2 error) {
+	fake.findServiceAccessReturns = struct {
+		result1 ServiceAccess
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeServicePlanActor) UpdateAllPlansForService(arg1 string, arg2 bool) (bool, error) {
@@ -120,7 +162,7 @@ func (fake *FakeServicePlanActor) UpdateOrgForServiceReturns(result1 bool, resul
 	}{result1, result2}
 }
 
-func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string, arg3 bool) (Access, error) {
+func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string, arg3 bool) (PlanAccess, error) {
 	fake.updateSinglePlanForServiceMutex.Lock()
 	defer fake.updateSinglePlanForServiceMutex.Unlock()
 	fake.updateSinglePlanForServiceArgsForCall = append(fake.updateSinglePlanForServiceArgsForCall, struct {
@@ -147,14 +189,14 @@ func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceArgsForCall(i int) (
 	return fake.updateSinglePlanForServiceArgsForCall[i].arg1, fake.updateSinglePlanForServiceArgsForCall[i].arg2, fake.updateSinglePlanForServiceArgsForCall[i].arg3
 }
 
-func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturns(result1 Access, result2 error) {
+func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturns(result1 PlanAccess, result2 error) {
 	fake.updateSinglePlanForServiceReturns = struct {
-		result1 Access
+		result1 PlanAccess
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeServicePlanActor) UpdatePlanAndOrgForService(arg1 string, arg2 string, arg3 string, arg4 bool) (Access, error) {
+func (fake *FakeServicePlanActor) UpdatePlanAndOrgForService(arg1 string, arg2 string, arg3 string, arg4 bool) (PlanAccess, error) {
 	fake.updatePlanAndOrgForServiceMutex.Lock()
 	defer fake.updatePlanAndOrgForServiceMutex.Unlock()
 	fake.updatePlanAndOrgForServiceArgsForCall = append(fake.updatePlanAndOrgForServiceArgsForCall, struct {
@@ -182,9 +224,9 @@ func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceArgsForCall(i int) (
 	return fake.updatePlanAndOrgForServiceArgsForCall[i].arg1, fake.updatePlanAndOrgForServiceArgsForCall[i].arg2, fake.updatePlanAndOrgForServiceArgsForCall[i].arg3, fake.updatePlanAndOrgForServiceArgsForCall[i].arg4
 }
 
-func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceReturns(result1 Access, result2 error) {
+func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceReturns(result1 PlanAccess, result2 error) {
 	fake.updatePlanAndOrgForServiceReturns = struct {
-		result1 Access
+		result1 PlanAccess
 		result2 error
 	}{result1, result2}
 }

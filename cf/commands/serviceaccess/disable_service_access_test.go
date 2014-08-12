@@ -115,6 +115,48 @@ var _ = Describe("disable-service-access command", func() {
 				})
 			})
 
+			Context("the user provides an org", func() {
+				It("fails if the org does not exist", func() {
+					actor.UpdateOrgForServiceReturns(false, errors.New("could not find org"))
+
+					Expect(runCommand([]string{"-o", "not-findable-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"could not find org"},
+					))
+				})
+
+				It("tells the user if the service's plans are already inaccessible", func() {
+					actor.UpdateOrgForServiceReturns(true, nil)
+
+					Expect(runCommand([]string{"-o", "my-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"All plans of the service are already inaccessible for the org"},
+						[]string{"OK"},
+					))
+				})
+
+				It("tells the user the service's plans are being updated if they are accessible", func() {
+					actor.UpdateOrgForServiceReturns(false, nil)
+
+					Expect(runCommand([]string{"-o", "my-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Disabling access to all plans of service service for the org my-org as"},
+						[]string{"OK"},
+					))
+				})
+
+				It("tells the user if the service's plans are all public", func() {
+					actor.FindServiceAccessReturns(actors.AllPlansArePublic, nil)
+					actor.UpdateOrgForServiceReturns(true, nil)
+
+					Expect(runCommand([]string{"-o", "my-org", "service"})).To(BeTrue())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Plans are accessible for all orgs. Try removing access for all orgs, then enable access for select orgs."},
+						[]string{"OK"},
+					))
+				})
+			})
+
 			Context("the user provides a plan and org", func() {
 				It("fails if the org does not exist", func() {
 					actor.UpdatePlanAndOrgForServiceReturns(actors.All, errors.New("could not find org"))
