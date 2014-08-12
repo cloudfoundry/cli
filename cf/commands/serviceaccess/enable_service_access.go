@@ -8,6 +8,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type EnableServiceAccess struct {
@@ -35,11 +37,11 @@ func (cmd *EnableServiceAccess) GetRequirements(requirementsFactory requirements
 func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "enable-service-access",
-		Description: "Enable access to a service or service plan for one or all orgs",
+		Description: T("Enable access to a service or service plan for one or all orgs"),
 		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", "Enable access to a particular service plan"),
-			flag_helpers.NewStringFlag("o", "Enable access to a particular organization"),
+			flag_helpers.NewStringFlag("p", T("Enable access to a particular service plan")),
+			flag_helpers.NewStringFlag("o", T("Enable access to a particular organization")),
 		},
 	}
 }
@@ -68,9 +70,9 @@ func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, p
 	}
 
 	if planOriginalAccess == actors.All {
-		cmd.ui.Say("The plan is already accessible for this org")
+		cmd.ui.Say(T("The plan is already accessible for this org"))
 	} else {
-		cmd.ui.Say("Enabling access to plan %s of service %s for org %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username()))
+		cmd.ui.Say(T("Enabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...", map[string]interface{}{"PlanName": terminal.EntityNameColor(planName), "ServiceName": terminal.EntityNameColor(serviceName), "OrgName": terminal.EntityNameColor(orgName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
 	}
 }
 
@@ -81,9 +83,9 @@ func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planNam
 	}
 
 	if planOriginalAccess == actors.All {
-		cmd.ui.Say("The plan is already accessible for all orgs")
+		cmd.ui.Say(T("The plan is already accessible for all orgs"))
 	} else {
-		cmd.ui.Say("Enabling access of plan %s for service %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
+		cmd.ui.Say(T("Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...", map[string]interface{}{"PlanName": terminal.EntityNameColor(planName), "ServiceName": terminal.EntityNameColor(serviceName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
 	}
 }
 
@@ -94,9 +96,9 @@ func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) {
 	}
 
 	if allPlansInServicePublic {
-		cmd.ui.Say("All plans of the service are already accessible for all orgs")
+		cmd.ui.Say(T("All plans of the service are already accessible for all orgs"))
 	} else {
-		cmd.ui.Say("Enabling access to all plans of service %s for all orgs as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
+		cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for all orgs as {{.Username}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
 	}
 }
 
@@ -107,8 +109,8 @@ func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName
 	}
 
 	if allPlansWereSet {
-		cmd.ui.Say("All plans of the service are already accessible for the org")
+		cmd.ui.Say(T("All plans of the service are already accessible for the org"))
 	} else {
-		cmd.ui.Say("Enabling access to all plans of service %s for the org %s as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username()))
+		cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName), "OrgName": terminal.EntityNameColor(orgName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
 	}
 }
