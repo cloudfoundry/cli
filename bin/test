@@ -55,6 +55,9 @@
     go tool vet -all -shadow=true $file
   done
 
+  echo -e "\n Running gi18n checkup..."
+  bin/gi18n-checkup
+
   echo -e "\n Running build script to confirm everything compiles..."
   bin/build
 )
