@@ -71,10 +71,10 @@ func (repo CloudControllerServicePlanVisibilityRepository) Search(queryParams ma
 	//WE DO THE HORRIBLE BROKEN NAIVE THING HERE BECAUSE THE SERVICES API DOES NOT SUPPORT QUERY PARAMS
 	//AS OF 8/11/2014.  AS SOON AS IT DOES, THIS HACKY FILTERING SHOULD BE REMOVED.
 	for _, visibility := range visibilities {
-		if visibility.OrganizationGuid == queryParams["org_guid"] && visibility.ServicePlanGuid == queryParams["plan_guid"] {
+		if (visibility.OrganizationGuid == queryParams["org_guid"] || queryParams["org_guid"] == "") &&
+			visibility.ServicePlanGuid == queryParams["plan_guid"] {
 			filteredVisibilities = append(filteredVisibilities, visibility)
 		}
 	}
 	return filteredVisibilities, err
-
 }
