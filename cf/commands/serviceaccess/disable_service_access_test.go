@@ -151,7 +151,7 @@ var _ = Describe("disable-service-access command", func() {
 
 					Expect(runCommand([]string{"-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Plans are accessible for all orgs. Try removing access for all orgs, then enable access for select orgs."},
+						[]string{"No action taken.  You must disable access to all plans of service service for all orgs and then grant access for all orgs except the my-org org."},
 						[]string{"OK"},
 					))
 				})
@@ -187,12 +187,12 @@ var _ = Describe("disable-service-access command", func() {
 					))
 				})
 
-				PIt("tells the user the plan is accessible to all orgs if the plan is public", func() {
+				It("tells the user the plan is accessible to all orgs if the plan is public", func() {
 					actor.UpdatePlanAndOrgForServiceReturns(actors.All, nil)
 
 					Expect(runCommand([]string{"-p", "public-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Change to better return message."},
+						[]string{"No action taken.  You must disable access to the public-service-plan plan of service service for all orgs and then grant access for all orgs except the my-org org."},
 						[]string{"OK"},
 					))
 				})

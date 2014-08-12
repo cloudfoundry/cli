@@ -88,7 +88,12 @@ func (cmd *DisableServiceAccess) disablePlanAndOrgForService(serviceName string,
 		cmd.ui.Say(T("Disabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...", map[string]interface{}{"PlanName": terminal.EntityNameColor(planName), "ServiceName": terminal.EntityNameColor(serviceName), "OrgName": terminal.EntityNameColor(orgName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	} else {
-		cmd.ui.Say(T("The plan {{.PlanName}} of service {{.ServiceName}} is already inaccessible for org {{.OrgName}}", map[string]interface{}{"PlanName": terminal.EntityNameColor(planName), "ServiceName": terminal.EntityNameColor(serviceName), "OrgName": terminal.EntityNameColor(orgName)}))
+		cmd.ui.Say(T("No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
+			map[string]interface{}{
+				"PlanName":    terminal.EntityNameColor(planName),
+				"ServiceName": terminal.EntityNameColor(serviceName),
+				"OrgName":     terminal.EntityNameColor(orgName),
+			}))
 	}
 	return
 }
@@ -113,7 +118,11 @@ func (cmd *DisableServiceAccess) disablePlansForSingleOrgForService(serviceName 
 		cmd.ui.Failed(err.Error())
 	}
 	if serviceAccess == actors.AllPlansArePublic {
-		cmd.ui.Say(T("Plans are accessible for all orgs. Try removing access for all orgs, then enable access for select orgs."))
+		cmd.ui.Say(T("No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
+			map[string]interface{}{
+				"ServiceName": terminal.EntityNameColor(serviceName),
+				"OrgName":     terminal.EntityNameColor(orgName),
+			}))
 		return
 	}
 
