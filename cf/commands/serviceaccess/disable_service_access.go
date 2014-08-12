@@ -54,6 +54,8 @@ func (cmd *DisableServiceAccess) Run(c *cli.Context) {
 		cmd.DisablePlanAndOrgForService(serviceName, planName, orgName)
 	} else if planName != "" {
 		cmd.DisableSinglePlanForService(serviceName, planName)
+	} else if orgName != "" {
+		cmd.disablePlansForSingleOrgForService(serviceName, orgName)
 	} else {
 		cmd.DisableServiceForAll(serviceName)
 	}
@@ -103,4 +105,26 @@ func (cmd *DisableServiceAccess) DisableSinglePlanForService(serviceName string,
 		cmd.ui.Say("Disabling access of plan %s for service %s as %s...", terminal.EntityNameColor(planName), terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username()))
 	}
 	return
+}
+
+func (cmd *DisableServiceAccess) disablePlansForSingleOrgForService(serviceName string, orgName string) {
+	serviceAccess, err := cmd.actor.FindServiceAccess(serviceName)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+	if serviceAccess == actors.AllPlansArePublic {
+		cmd.ui.Say("Plans are accessible for all orgs. Try removing access for all orgs, then enable access for select orgs.")
+		return
+	}
+
+	allPlansWereSet, err := cmd.actor.UpdateOrgForService(serviceName, orgName, false)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	if allPlansWereSet {
+		cmd.ui.Say("All plans of the service are already inaccessible for the org")
+	} else {
+		cmd.ui.Say("Disabling access to all plans of service %s for the org %s as %s...", terminal.EntityNameColor(serviceName), terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username()))
+	}
 }

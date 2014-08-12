@@ -93,6 +93,20 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
+
+	Describe(".Search", func() {
+		It("finds the service plan visibilities that match the given query parameters", func() {
+			setupTestServer(firstPlanVisibilityRequest, secondPlanVisibilityRequest)
+
+			servicePlansVisibilitiesFields, err := repo.Search(map[string]string{"plan_guid": "service-plan-guid-1", "org_guid": "org-guid-1"})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(len(servicePlansVisibilitiesFields)).To(Equal(1))
+			Expect(servicePlansVisibilitiesFields[0].Guid).To(Equal("request-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].ServicePlanGuid).To(Equal("service-plan-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].OrganizationGuid).To(Equal("org-guid-1"))
+		})
+	})
 })
 
 var firstPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{

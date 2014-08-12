@@ -39,6 +39,8 @@ var _ = Describe("Service Plans", func() {
 
 		org1 models.Organization
 		org2 models.Organization
+
+		visibility1 models.ServicePlanVisibilityFields
 	)
 
 	BeforeEach(func() {
@@ -144,6 +146,12 @@ var _ = Describe("Service Plans", func() {
 				publicServicePlan,
 				limitedServicePlan,
 			},
+		}
+
+		visibility1 = models.ServicePlanVisibilityFields{
+			Guid:             "visibility-guid-1",
+			OrganizationGuid: "org-1-guid",
+			ServicePlanGuid:  "limited-service-plan-guid",
 		}
 	})
 
@@ -305,6 +313,37 @@ var _ = Describe("Service Plans", func() {
 				allPlansWereSet, err := actor.UpdateOrgForService("my-public-and-limited-service", "org-1", true)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(servicePlanVisibilityRepo.CreateCallCount()).To(Equal(0))
+				Expect(allPlansWereSet).To(BeTrue())
+			})
+		})
+
+		Context("when disabling access to all plans for a single org", func() {
+			It("deletes the associated visibilities for all limited plans", func() {
+				serviceBuilder.GetServiceByNameReturns(publicAndLimitedService, nil)
+				servicePlanVisibilityRepo.SearchReturns([]models.ServicePlanVisibilityFields{visibility1}, nil)
+				_, err := actor.UpdateOrgForService("my-public-and-limited-service", "org-1", false)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(1))
+
+				visibilityGuid := servicePlanVisibilityRepo.DeleteArgsForCall(0)
+				Expect(visibilityGuid).To(Equal("visibility-guid-1"))
+			})
+
+			It("Does not try to update service plans if they are all public", func() {
+				serviceBuilder.GetServiceByNameReturns(publicService, nil)
+
+				allPlansWereSet, err := actor.UpdateOrgForService("my-public-and-limited-service", "org-1", false)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(0))
+				Expect(allPlansWereSet).To(BeTrue())
+			})
+
+			It("Does not try to update service plans if the org already did not have visibility", func() {
+				serviceBuilder.GetServiceByNameReturns(privateService, nil)
+
+				allPlansWereSet, err := actor.UpdateOrgForService("my-private-service", "org-1", false)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(0))
 				Expect(allPlansWereSet).To(BeTrue())
 			})
 		})
