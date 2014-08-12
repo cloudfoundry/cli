@@ -19,7 +19,7 @@ end
 def run
   results = `gi18n -c checkup`.split("\n")
 
-  if results.length > 1
+  if results.length > 0 && results[0] != "OK"
     puts results
     exit(1)
   end
