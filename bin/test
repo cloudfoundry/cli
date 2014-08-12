@@ -55,11 +55,6 @@
     go tool vet -all -shadow=true $file
   done
 
-  echo -e "\n Running gi18n checkup..."
-  echo -e $PWD
-  go get github.com/maximilien/i18n4go/gi18n/
-  gi18n -c checkup
-
-  echo -e "\n\n Running build script to confirm everything compiles..."
+  echo -e "\n Running build script to confirm everything compiles..."
   bin/build
 )
