@@ -104,9 +104,8 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 				return false, err
 			}
 		}
-		planAccess := actor.findPlanAccess(plan)
-		planAlreadySet := ((planAccess == All) == setPlanVisibility) || visibilityExists
-		allPlansWereSet = allPlansWereSet && planAlreadySet
+		// We only get here once we have already updated a plan.
+		allPlansWereSet = false
 	}
 	return allPlansWereSet, nil
 }

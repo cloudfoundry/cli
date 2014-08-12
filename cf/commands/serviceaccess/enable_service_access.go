@@ -109,7 +109,7 @@ func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName
 	}
 
 	if allPlansWereSet {
-		cmd.ui.Say(T("All plans of the service are already accessible for the org"))
+		cmd.ui.Say(T("All plans of the service are already accessible for this org"))
 	} else {
 		cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName), "OrgName": terminal.EntityNameColor(orgName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
 	}

@@ -292,19 +292,18 @@ var _ = Describe("Service Plans", func() {
 				Expect(orgGuid).To(Equal("org-1-guid"))
 			})
 
-			It("Returns true if all the plans were public", func() {
+			It("Returns true if all the plans were already public", func() {
 				serviceBuilder.GetServiceByNameReturns(publicService, nil)
-
-				servicesOriginallyPublic, err := actor.UpdateOrgForService("my-public-service", "org-1", true)
+				allPlansSet, err := actor.UpdateOrgForService("my-public-service", "org-1", true)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(servicesOriginallyPublic).To(BeTrue())
+				Expect(allPlansSet).To(BeTrue())
 			})
 
 			It("Returns false if any of the plans were not public", func() {
-				serviceBuilder.GetServiceByNameReturns(mixedService, nil)
-				servicesOriginallyPublic, err := actor.UpdateOrgForService("my-mixed-service", "org-1", true)
+				serviceBuilder.GetServiceByNameReturns(privateService, nil)
+				allPlansSet, err := actor.UpdateOrgForService("my-private-service", "org-1", true)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(servicesOriginallyPublic).To(BeFalse())
+				Expect(allPlansSet).To(BeFalse())
 			})
 
 			It("Does not try to update service plans if they are all already public or the org already has access", func() {
@@ -321,10 +320,11 @@ var _ = Describe("Service Plans", func() {
 			It("deletes the associated visibilities for all limited plans", func() {
 				serviceBuilder.GetServiceByNameReturns(publicAndLimitedService, nil)
 				servicePlanVisibilityRepo.SearchReturns([]models.ServicePlanVisibilityFields{visibility1}, nil)
-				_, err := actor.UpdateOrgForService("my-public-and-limited-service", "org-1", false)
+				allPlansSet, err := actor.UpdateOrgForService("my-public-and-limited-service", "org-1", false)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(1))
 
+				Expect(allPlansSet).To(BeFalse())
 				visibilityGuid := servicePlanVisibilityRepo.DeleteArgsForCall(0)
 				Expect(visibilityGuid).To(Equal("visibility-guid-1"))
 			})

@@ -99,7 +99,7 @@ var _ = Describe("disable-service-access command", func() {
 
 					Expect(runCommand([]string{"-p", "private-service-plan", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"The plan", "of service", "is already inaccessible for all orgs"},
+						[]string{"The plan is already inaccessible for all orgs"},
 						[]string{"OK"},
 					))
 				})
@@ -130,7 +130,7 @@ var _ = Describe("disable-service-access command", func() {
 
 					Expect(runCommand([]string{"-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"All plans of the service are already inaccessible for the org"},
+						[]string{"All plans of the service are already inaccessible for this org"},
 						[]string{"OK"},
 					))
 				})
@@ -172,7 +172,7 @@ var _ = Describe("disable-service-access command", func() {
 
 					Expect(runCommand([]string{"-p", "private-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"The plan", "of service", "is already accessible for all orgs and no action has been taken at this time."},
+						[]string{"The plan is already inaccessible for this org"},
 						[]string{"OK"},
 					))
 				})
@@ -187,12 +187,12 @@ var _ = Describe("disable-service-access command", func() {
 					))
 				})
 
-				It("tells the user the plan is accessible to all orgs if the plan is public", func() {
+				PIt("tells the user the plan is accessible to all orgs if the plan is public", func() {
 					actor.UpdatePlanAndOrgForServiceReturns(actors.All, nil)
 
 					Expect(runCommand([]string{"-p", "public-service-plan", "-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"The plan", "of service", "is already inaccessible for org"},
+						[]string{"Change to better return message."},
 						[]string{"OK"},
 					))
 				})

@@ -166,7 +166,7 @@ var _ = Describe("enable-service-access command", func() {
 
 					Expect(runCommand([]string{"-o", "my-org", "service"})).To(BeTrue())
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"All plans of the service are already accessible for the org"},
+						[]string{"All plans of the service are already accessible for this org"},
 						[]string{"OK"},
 					))
 				})
