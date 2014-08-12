@@ -157,7 +157,7 @@ var _ = Describe("Service Plans", func() {
 
 	Describe(".UpdateAllPlansForService", func() {
 		BeforeEach(func() {
-			servicePlanVisibilityRepo.ListReturns(
+			servicePlanVisibilityRepo.SearchReturns(
 				[]models.ServicePlanVisibilityFields{privateServicePlanVisibilityFields}, nil)
 
 			servicePlanRepo.SearchReturns = map[string][]models.ServicePlanFields{
@@ -387,7 +387,7 @@ var _ = Describe("Service Plans", func() {
 
 		Context("when setting private service plan to public", func() {
 			BeforeEach(func() {
-				servicePlanVisibilityRepo.ListReturns(
+				servicePlanVisibilityRepo.SearchReturns(
 					[]models.ServicePlanVisibilityFields{privateServicePlanVisibilityFields}, nil)
 			})
 
@@ -423,7 +423,7 @@ var _ = Describe("Service Plans", func() {
 
 		Context("When setting public service plan to private", func() {
 			BeforeEach(func() {
-				servicePlanVisibilityRepo.ListReturns(
+				servicePlanVisibilityRepo.SearchReturns(
 					[]models.ServicePlanVisibilityFields{publicServicePlanVisibilityFields}, nil)
 			})
 
@@ -515,7 +515,7 @@ var _ = Describe("Service Plans", func() {
 
 				Context("with service plan visibilities", func() {
 					BeforeEach(func() {
-						servicePlanVisibilityRepo.ListReturns(
+						servicePlanVisibilityRepo.SearchReturns(
 							[]models.ServicePlanVisibilityFields{limitedServicePlanVisibilityFields}, nil)
 
 					})

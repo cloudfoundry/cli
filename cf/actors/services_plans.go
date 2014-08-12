@@ -78,7 +78,6 @@ func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string, set
 }
 
 func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName string, setPlanVisibility bool) (bool, error) {
-	var visibilities []models.ServicePlanVisibilityFields
 	var err error
 	var service models.ServiceOffering
 
@@ -94,29 +93,16 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 
 	allPlansWereSet := true
 	for _, plan := range service.Plans {
-		visibilityExists := actor.checkPlanForOrgVisibility(plan, org.Name)
-		if plan.Public {
-			continue
-		} else if visibilityExists && setPlanVisibility {
+		visibilityExists := plan.OrgHasVisibility(org.Name)
+		if plan.Public || visibilityExists == setPlanVisibility {
 			continue
 		} else if visibilityExists && !setPlanVisibility {
-			visibilities, err = actor.servicePlanVisibilityRepo.Search(map[string]string{"org_guid": org.Guid, "plan_guid": plan.Guid})
-			if err != nil {
-				return false, err
-			}
-			for _, visibility := range visibilities {
-				err = actor.servicePlanVisibilityRepo.Delete(visibility.Guid)
-				if err != nil {
-					return false, err
-				}
-			}
+			actor.deleteServicePlanVisibilities(map[string]string{"org_guid": org.Guid, "plan_guid": plan.Guid})
 		} else if !visibilityExists && setPlanVisibility {
 			err = actor.servicePlanVisibilityRepo.Create(plan.Guid, org.Guid)
 			if err != nil {
 				return false, err
 			}
-		} else if !visibilityExists && !setPlanVisibility {
-			continue
 		}
 		planAccess := actor.findPlanAccess(plan)
 		planAlreadySet := ((planAccess == All) == setPlanVisibility) || visibilityExists
@@ -148,7 +134,7 @@ func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName
 		return PlanAccessError, errors.New(fmt.Sprintf("Service plan %s not found", planName))
 	}
 
-	if !servicePlan.Public && setPlanVisibility == true {
+	if !servicePlan.Public && setPlanVisibility {
 		if servicePlan.OrgHasVisibility(orgName) {
 			return Limited, nil
 		}
@@ -158,10 +144,10 @@ func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName
 		if err != nil {
 			return PlanAccessError, err
 		}
-	} else if !servicePlan.Public && setPlanVisibility == false {
+	} else if !servicePlan.Public && !setPlanVisibility {
 		// Disable service access
-		if actor.checkPlanForOrgVisibility(servicePlan, org.Name) {
-			err = actor.deleteServicePlanVisibility(servicePlan, org)
+		if servicePlan.OrgHasVisibility(org.Name) {
+			err = actor.deleteServicePlanVisibilities(map[string]string{"org_guid": org.Guid, "plan_guid": servicePlan.Guid})
 			if err != nil {
 				return PlanAccessError, err
 			}
@@ -204,31 +190,28 @@ func (actor ServicePlanHandler) updateSinglePlan(serviceOffering models.ServiceO
 	return access, nil
 }
 
-func (actor ServicePlanHandler) deleteServicePlanVisibility(servicePlan models.ServicePlanFields, org models.Organization) error {
-	vis, err := actor.findServicePlanVisibility(servicePlan, org)
+func (actor ServicePlanHandler) deleteServicePlanVisibilities(queryParams map[string]string) error {
+	visibilities, err := actor.servicePlanVisibilityRepo.Search(queryParams)
 	if err != nil {
 		return err
+	}
+	for _, visibility := range visibilities {
+		err = actor.servicePlanVisibilityRepo.Delete(visibility.Guid)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = actor.servicePlanVisibilityRepo.Delete(vis.Guid)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
-func (actor ServicePlanHandler) checkPlanForOrgVisibility(servicePlan models.ServicePlanFields, orgName string) bool {
-	for _, org := range servicePlan.OrgNames {
-		if org == orgName {
-			return true
-		}
-	}
-	return false
-}
-
 func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string, servicePlan models.ServicePlanFields, setPlanVisibility bool) error {
-	//delete service_plan_visibility guids[] and public: true
-	err := actor.removeServicePlanVisibilities(servicePlan.Guid)
+	// We delete all service plan visibilities for the given Plan since the attribute public should function as a giant on/off
+	// switch for all orgs. Thus we need to clean up any visibilities laying around so that they don't carry over.
+	//
+	// Currently org_guid must be set to "" in order to get around the hacked servicePlanVisibilityRepo.Search function, when that
+	// changes make sure to change this as well.
+	err := actor.deleteServicePlanVisibilities(map[string]string{"org_guid": "", "plan_guid": servicePlan.Guid})
 	if err != nil {
 		return err
 	}
@@ -238,40 +221,6 @@ func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string
 	}
 
 	return actor.servicePlanRepo.Update(servicePlan, serviceGuid, setPlanVisibility)
-}
-
-func (actor ServicePlanHandler) removeServicePlanVisibilities(servicePlanGuid string) error {
-	planVisibilities, err := actor.servicePlanVisibilityRepo.List()
-	if err != nil {
-		return err
-	}
-
-	for _, planVisibility := range planVisibilities {
-		if planVisibility.ServicePlanGuid == servicePlanGuid {
-			err := actor.servicePlanVisibilityRepo.Delete(planVisibility.Guid)
-			if err != nil {
-				return err
-			}
-		}
-		//else we simply skip it
-	}
-
-	return nil
-}
-
-func (actor ServicePlanHandler) findServicePlanVisibility(servicePlan models.ServicePlanFields, org models.Organization) (models.ServicePlanVisibilityFields, error) {
-	visibilities, err := actor.servicePlanVisibilityRepo.List()
-	if err != nil {
-		return models.ServicePlanVisibilityFields{}, err
-	}
-
-	for _, vis := range visibilities {
-		if vis.ServicePlanGuid == servicePlan.Guid && vis.OrganizationGuid == org.Guid {
-			return vis, nil
-		}
-	}
-	// We should never get here since we call checkPlanForOrgVisibility first.
-	return models.ServicePlanVisibilityFields{}, nil
 }
 
 func (actor ServicePlanHandler) FindServiceAccess(serviceName string) (ServiceAccess, error) {
