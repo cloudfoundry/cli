@@ -2,8 +2,9 @@ package ui_helpers
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -29,6 +30,10 @@ func ColoredAppState(app models.ApplicationFields) string {
 
 func ColoredAppInstances(app models.ApplicationFields) string {
 	healthString := fmt.Sprintf("%d/%d", app.RunningInstances, app.InstanceCount)
+
+	if app.RunningInstances < 0 {
+		healthString = fmt.Sprintf("?/%d", app.InstanceCount)
+	}
 
 	if app.RunningInstances == 0 {
 		if strings.ToLower(app.State) == "stopped" {
