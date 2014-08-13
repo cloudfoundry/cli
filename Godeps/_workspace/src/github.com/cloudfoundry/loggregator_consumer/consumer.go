@@ -55,20 +55,40 @@ type LoggregatorConsumer interface {
 
 	// SetOnConnectCallback sets a callback function to be called with the websocket connection is established.
 	SetOnConnectCallback(func())
+
+	// SetDebugPrinter enables logging of the websocket handshake
+	SetDebugPrinter(DebugPrinter)
+}
+
+type DebugPrinter interface {
+	Print(title, dump string)
+}
+
+type nullDebugPrinter struct {
+}
+
+func (nullDebugPrinter) Print(title, body string) {
 }
 
 type consumer struct {
-	endpoint  string
-	tlsConfig *tls.Config
-	ws        *websocket.Conn
-	callback  func()
-	proxy     func(*http.Request) (*url.URL, error)
+	endpoint     string
+	tlsConfig    *tls.Config
+	ws           *websocket.Conn
+	callback     func()
+	proxy        func(*http.Request) (*url.URL, error)
+	debugPrinter DebugPrinter
 }
 
 /* New creates a new consumer to a loggregator endpoint.
  */
 func New(endpoint string, tlsConfig *tls.Config, proxy func(*http.Request) (*url.URL, error)) LoggregatorConsumer {
-	return &consumer{endpoint: endpoint, tlsConfig: tlsConfig, proxy: proxy}
+	return &consumer{endpoint: endpoint, tlsConfig: tlsConfig, proxy: proxy, debugPrinter: nullDebugPrinter{}}
+}
+
+/* SetDebugPrinter enables logging of the websocket handshake
+ */
+func (cnsmr *consumer) SetDebugPrinter(debugPrinter DebugPrinter) {
+	cnsmr.debugPrinter = debugPrinter
 }
 
 /*
@@ -298,11 +318,34 @@ func (cnsmr *consumer) listenForMessages(msgChan chan<- *logmessage.LogMessage) 
 	}
 }
 
+func headersString(header http.Header) string {
+	var result string
+	for name, values := range header {
+		result += name + ": " + strings.Join(values, ", ") + "\n"
+	}
+	return result
+}
+
 func (cnsmr *consumer) establishWebsocketConnection(path string, authToken string) (*websocket.Conn, error) {
 	header := http.Header{"Origin": []string{"http://localhost"}, "Authorization": []string{authToken}}
+
 	dialer := websocket.Dialer{NetDial: cnsmr.proxyDial, TLSClientConfig: cnsmr.tlsConfig}
 
-	ws, resp, err := dialer.Dial(cnsmr.endpoint+path, header)
+	url := cnsmr.endpoint + path
+
+	cnsmr.debugPrinter.Print("WEBSOCKET REQUEST:",
+		"GET " + path + " HTTP/1.1\n" +
+		"Host: " + cnsmr.endpoint + "\n" +
+		"Upgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Version: 13\nSec-WebSocket-Key: [HIDDEN]\n" +
+		headersString(header))
+
+	ws, resp, err := dialer.Dial(url, header)
+
+	if resp != nil {
+		cnsmr.debugPrinter.Print("WEBSOCKET RESPONSE:",
+			resp.Proto + " " + resp.Status + "\n" +
+			headersString(resp.Header))
+	}
 
 	if resp != nil && resp.StatusCode == http.StatusUnauthorized {
 		bodyData, _ := ioutil.ReadAll(resp.Body)

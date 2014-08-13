@@ -109,20 +109,52 @@ var _ = Describe("Loggregator Consumer", func() {
 		})
 	})
 
+	var startFakeTrafficController = func() {
+		fakeHandler = &FakeHandler{innerHandler: handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond)}
+		testServer = httptest.NewServer(fakeHandler)
+		endpoint = "ws://" + testServer.Listener.Addr().String()
+		appGuid = "app-guid"
+	}
+
+	Describe("Debug Printing", func() {
+		var debugPrinter *fakeDebugPrinter
+
+		BeforeEach(func() {
+			startFakeTrafficController()
+
+			debugPrinter = &fakeDebugPrinter{}
+			connection = consumer.New(endpoint, tlsSettings, consumerProxyFunc)
+			connection.SetDebugPrinter(debugPrinter)
+		})
+
+		It("includes websocket handshake", func() {
+			close(messagesToSend)
+			connection.Tail(appGuid, authToken)
+
+			Expect(debugPrinter.Messages[0].Body).To(ContainSubstring("Sec-WebSocket-Version: 13"))
+		})
+
+		It("does not include messages sent or received", func() {
+			messagesToSend <- marshalMessage(createMessage("hello", 0))
+
+			close(messagesToSend)
+			connection.Tail(appGuid, authToken)
+
+			Expect(debugPrinter.Messages[0].Body).ToNot(ContainSubstring("hello"))
+		})
+	})
+
 	Describe("Tail", func() {
 		perform := func() {
 			connection = consumer.New(endpoint, tlsSettings, consumerProxyFunc)
 			incomingChan, err = connection.Tail(appGuid, authToken)
 		}
 
-		Context("when there is no TLS Config or consumerProxyFunc setting", func() {
-			BeforeEach(func() {
-				fakeHandler = &FakeHandler{innerHandler: handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond)}
-				testServer = httptest.NewServer(fakeHandler)
-				endpoint = "ws://" + testServer.Listener.Addr().String()
-				appGuid = "app-guid"
-			})
+		BeforeEach(func() {
+			startFakeTrafficController()
+		})
 
+		Context("when there is no TLS Config or consumerProxyFunc setting", func() {
 			Context("when the connection can be established", func() {
 				It("receives messages on the incoming channel", func(done Done) {
 					messagesToSend <- marshalMessage(createMessage("hello", 0))
@@ -646,4 +678,17 @@ func (fh *FakeHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Set("Content-Length", fh.contentLen)
 	}
 	fh.innerHandler.ServeHTTP(rw, r)
+}
+
+type fakeDebugPrinter struct {
+	Messages []*fakeDebugPrinterMessage
+}
+
+type fakeDebugPrinterMessage struct {
+	Title, Body string
+}
+
+func (p *fakeDebugPrinter) Print(title, body string) {
+	message := &fakeDebugPrinterMessage{title, body}
+	p.Messages = append(p.Messages, message)
 }
