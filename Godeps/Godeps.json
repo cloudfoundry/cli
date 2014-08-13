@@ -29,7 +29,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
-			"Rev": "dc21be9b7619ac99357fa44c77295e465f0d1e89"
+			"Rev": "e1f8ed753935b356ad4f8a5348278a87eecf5a19"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",

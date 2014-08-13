@@ -1,6 +1,7 @@
 package loggregator_consumer_test
 
 import (
+	"bytes"
 	"crypto/tls"
 	"errors"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
@@ -9,12 +10,11 @@ import (
 	"github.com/elazarl/goproxy"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"time"
-	"log"
-	"bytes"
 )
 
 var _ = Describe("Loggregator Consumer behind a Proxy", func() {

@@ -15,6 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
 )
 
@@ -67,6 +68,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
 	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{})
 
 	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
 	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)

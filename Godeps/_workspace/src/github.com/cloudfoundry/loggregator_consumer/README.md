@@ -17,7 +17,7 @@ export CF_ACCESS_TOKEN="bearer eyJhbGciOiJSUzI1NiJ9.eyJqdGkiOiI3YmM2MzllOC0wZGM0
 ```
 * APP_GUID - You can get this value from running `$ CF_TRACE=true cf app dora` and then extracting the app guid from the request URL. Example:
 
-  ```
+```
 export APP_GUID=55fdb274-d6c9-4b8c-9b1f-9b7e7f3a346c
 ```
 
@@ -29,10 +29,3 @@ export PATH=$PATH:$GOPATH/bin
 go get github.com/cloudfoundry/loggregator_consumer/sample_consumer
 sample_consumer
 ```
-
-
-
-	
-
-
-

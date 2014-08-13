@@ -1,6 +1,7 @@
 package fakes
 
 import (
+	"github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
@@ -59,5 +60,9 @@ func (c *FakeLoggregatorConsumer) Tail(appGuid string, authToken string) (<-chan
 }
 
 func (c *FakeLoggregatorConsumer) WaitForClose() {
+	<-c.closeChan
+}
+
+func (c *FakeLoggregatorConsumer) SetDebugPrinter(debugPrinter loggregator_consumer.DebugPrinter) {
 	<-c.closeChan
 }
