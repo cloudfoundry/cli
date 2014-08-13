@@ -1,3 +1,21 @@
+## v6.4.0
+* Implement service-access command.
+* Implement enable-service-access command.
+* Implement disable-service-access command.
+* Merge pull request #237 from sykesm/hm-unknown-instances Use '?' instead of '-1' when running instances is unknown [#76461268]
+* Merge pull request #239 from johannespetzold/loggregator-debug-printer CF_TRACE option for cf logs
+* Stop using deprecated endpoints for domains. [#76723550]
+* Refresh auth token on all service-access commands. [#76831670]
+* Stop CLI from hanging when Loggregator keeps returning errors. [#76545800]
+* Merge pull request #234 from fraenkel/cfignoreIgnored Copy cfignore to upload directory to properly ignore files
+* Pass in ProxyFromEnvironment function to loggregator_consumer. [#75343416]
+* Merge pull request #227 from XenoPhex/master By Grabthar hammer, by the sons of Worvan, you shall be avenged. Also, sorting.
+* Add cli version to the "aww shucks" messsage. [#75131050]
+* Merge pull request #223 from fraenkel:connectTimeout Use a connect timeout whenever making connections
+* Merge pull request #225 from cloudfoundry/flush-log-messages Fix inter-woven output during start
+* Merge pull request #222 from fraenkel/closeBody Close the response body
+* Merge pull request #221 from jpalermo/master Fix base64 padding
+
 ## v6.3.2
 * Provides "pretty printed" output of config JSON. [#74664516]
 * Undo recursive copy of files [#75530934]
