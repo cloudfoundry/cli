@@ -2,6 +2,7 @@ package serviceaccess_test
 
 import (
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,16 +22,18 @@ var _ = Describe("service-access command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		serviceBroker1      models.ServiceBroker
 		serviceBroker2      models.ServiceBroker
+		tokenRefresher      *testapi.FakeAuthenticationRepository
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		actor = &testactor.FakeServiceActor{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		tokenRefresher = &testapi.FakeAuthenticationRepository{}
 	})
 
 	runCommand := func(args []string) bool {
-		cmd := NewServiceAccess(ui, testconfig.NewRepositoryWithDefaults(), actor)
+		cmd := NewServiceAccess(ui, testconfig.NewRepositoryWithDefaults(), actor, tokenRefresher)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -77,6 +80,11 @@ var _ = Describe("service-access command", func() {
 			},
 				nil,
 			)
+		})
+
+		It("refreshes the auth token", func() {
+			runCommand([]string{"service"})
+			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
 		})
 
 		It("prints all of the brokers", func() {

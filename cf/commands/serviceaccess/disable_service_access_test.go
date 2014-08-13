@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,6 +21,7 @@ var _ = Describe("disable-service-access command", func() {
 		ui                  *testterm.FakeUI
 		actor               *testactor.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
+		tokenRefresher      *testapi.FakeAuthenticationRepository
 	)
 
 	BeforeEach(func() {
@@ -28,10 +30,11 @@ var _ = Describe("disable-service-access command", func() {
 		}
 		actor = &testactor.FakeServicePlanActor{}
 		requirementsFactory = &testreq.FakeReqFactory{}
+		tokenRefresher = &testapi.FakeAuthenticationRepository{}
 	})
 
 	runCommand := func(args []string) bool {
-		cmd := NewDisableServiceAccess(ui, configuration.NewRepositoryWithDefaults(), actor)
+		cmd := NewDisableServiceAccess(ui, configuration.NewRepositoryWithDefaults(), actor, tokenRefresher)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -53,8 +56,12 @@ var _ = Describe("disable-service-access command", func() {
 			requirementsFactory.LoginSuccess = true
 		})
 
-		Context("when the named service exists", func() {
+		It("refreshes the auth token", func() {
+			runCommand([]string{"service"})
+			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
+		})
 
+		Context("when the named service exists", func() {
 			It("tells the user if all plans were already private", func() {
 				actor.UpdateAllPlansForServiceReturns(true, nil)
 

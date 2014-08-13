@@ -2,6 +2,7 @@ package serviceaccess
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -13,16 +14,18 @@ import (
 )
 
 type EnableServiceAccess struct {
-	ui     terminal.UI
-	config configuration.Reader
-	actor  actors.ServicePlanActor
+	ui             terminal.UI
+	config         configuration.Reader
+	actor          actors.ServicePlanActor
+	tokenRefresher authentication.TokenRefresher
 }
 
-func NewEnableServiceAccess(ui terminal.UI, config configuration.Reader, actor actors.ServicePlanActor) (cmd *EnableServiceAccess) {
+func NewEnableServiceAccess(ui terminal.UI, config configuration.Reader, actor actors.ServicePlanActor, tokenRefresher authentication.TokenRefresher) (cmd *EnableServiceAccess) {
 	return &EnableServiceAccess{
-		ui:     ui,
-		config: config,
-		actor:  actor,
+		ui:             ui,
+		config:         config,
+		actor:          actor,
+		tokenRefresher: tokenRefresher,
 	}
 }
 
@@ -47,6 +50,8 @@ func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd *EnableServiceAccess) Run(c *cli.Context) {
+	cmd.tokenRefresher.RefreshAuthToken()
+
 	serviceName := c.Args()[0]
 	planName := c.String("p")
 	orgName := c.String("o")
