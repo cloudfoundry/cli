@@ -15,11 +15,12 @@ limitations under the License.
 package candiedyaml
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"math"
 	"reflect"
 	"time"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Resolver", func() {
@@ -626,6 +627,50 @@ var _ = Describe("Resolver", func() {
 				})
 			})
 
+			Context("Binary tag", func() {
+				It("string", func() {
+					checkNulls(func() {
+						event.value = []byte("YWJjZGVmZw==")
+						event.tag = []byte("!binary")
+						aString := ""
+						v := reflect.ValueOf(&aString)
+
+						tag, err := resolve(event, v.Elem(), false)
+						Ω(err).ShouldNot(HaveOccurred())
+						Ω(tag).Should(Equal("!!str"))
+						Ω(aString).Should(Equal("abcdefg"))
+					})
+				})
+
+				It("[]byte", func() {
+					checkNulls(func() {
+						event.value = []byte("YWJjZGVmZw==")
+						event.tag = []byte("!binary")
+						bytes := []byte(nil)
+						v := reflect.ValueOf(&bytes)
+
+						tag, err := resolve(event, v.Elem(), false)
+						Ω(err).ShouldNot(HaveOccurred())
+						Ω(tag).Should(Equal("!!str"))
+						Ω(bytes).Should(Equal([]byte("abcdefg")))
+					})
+				})
+
+				It("returns a []byte when provided no hints", func() {
+					checkNulls(func() {
+						event.value = []byte("YWJjZGVmZw==")
+						event.tag = []byte("!binary")
+						var intf interface{}
+						v := reflect.ValueOf(&intf)
+
+						tag, err := resolve(event, v.Elem(), false)
+						Ω(err).ShouldNot(HaveOccurred())
+						Ω(tag).Should(Equal("!!str"))
+						Ω(intf).Should(Equal([]byte("abcdefg")))
+					})
+				})
+			})
+
 			It("fails to resolve a pointer", func() {
 				aString := ""
 				pString := &aString
@@ -635,7 +680,6 @@ var _ = Describe("Resolver", func() {
 				_, err := resolve(event, v.Elem(), false)
 				Ω(err).Should(HaveOccurred())
 			})
-
 		})
 
 		Context("Not an implicit event && no tag", func() {
