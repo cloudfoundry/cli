@@ -2,6 +2,7 @@ package serviceaccess
 
 import (
 	"fmt"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/actors"
@@ -16,16 +17,18 @@ import (
 )
 
 type ServiceAccess struct {
-	ui     terminal.UI
-	config configuration.Reader
-	actor  actors.ServiceActor
+	ui             terminal.UI
+	config         configuration.Reader
+	actor          actors.ServiceActor
+	tokenRefresher authentication.TokenRefresher
 }
 
-func NewServiceAccess(ui terminal.UI, config configuration.Reader, actor actors.ServiceActor) (cmd *ServiceAccess) {
+func NewServiceAccess(ui terminal.UI, config configuration.Reader, actor actors.ServiceActor, tokenRefresher authentication.TokenRefresher) (cmd *ServiceAccess) {
 	return &ServiceAccess{
-		ui:     ui,
-		config: config,
-		actor:  actor,
+		ui:             ui,
+		config:         config,
+		actor:          actor,
+		tokenRefresher: tokenRefresher,
 	}
 }
 
@@ -50,6 +53,8 @@ func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *ServiceAccess) Run(c *cli.Context) {
+	cmd.tokenRefresher.RefreshAuthToken()
+
 	brokers, err := cmd.actor.FilterBrokers(c.String("b"), c.String("e"), c.String("o"))
 	if err != nil {
 		cmd.ui.Failed(T("Failed fetching service brokers.\n{{.Error}}", map[string]interface{}{"Error": err}))

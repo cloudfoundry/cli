@@ -216,6 +216,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 			brokerBuilder,
 			serviceBuilder,
 		),
+		repoLocator.GetAuthenticationRepository(),
 	)
 	factory.cmdsByName["enable-service-access"] = serviceaccess.NewEnableServiceAccess(
 		ui, config,
@@ -225,7 +226,9 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 			repoLocator.GetOrganizationRepository(),
 			planBuilder,
 			serviceBuilder,
-		))
+		),
+		repoLocator.GetAuthenticationRepository(),
+	)
 	factory.cmdsByName["disable-service-access"] = serviceaccess.NewDisableServiceAccess(
 		ui, config,
 		actors.NewServicePlanHandler(
@@ -234,7 +237,9 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 			repoLocator.GetOrganizationRepository(),
 			planBuilder,
 			serviceBuilder,
-		))
+		),
+		repoLocator.GetAuthenticationRepository(),
+	)
 
 	return
 }

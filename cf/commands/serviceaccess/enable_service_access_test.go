@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -21,16 +22,18 @@ var _ = Describe("enable-service-access command", func() {
 		ui                  *testterm.FakeUI
 		actor               *testactor.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
+		tokenRefresher      *testapi.FakeAuthenticationRepository
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		actor = &testactor.FakeServicePlanActor{}
 		requirementsFactory = &testreq.FakeReqFactory{}
+		tokenRefresher = &testapi.FakeAuthenticationRepository{}
 	})
 
 	runCommand := func(args []string) bool {
-		cmd := NewEnableServiceAccess(ui, configuration.NewRepositoryWithDefaults(), actor)
+		cmd := NewEnableServiceAccess(ui, configuration.NewRepositoryWithDefaults(), actor, tokenRefresher)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -50,6 +53,11 @@ var _ = Describe("enable-service-access command", func() {
 	Describe("when logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+		})
+
+		It("Refreshes the auth token", func() {
+			runCommand([]string{"service"})
+			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
 		})
 
 		Context("when the named service exists", func() {
