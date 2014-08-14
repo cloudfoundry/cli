@@ -46,7 +46,7 @@
    },
    {
       "id": "List security groups in the staging set for applications",
-      "translation": "Listar grupos de segurança nos padrões de encenação",
+      "translation": "Exibir grupos de segurança nos padrões de encenação",
       "modified": false
    },
    {
@@ -96,7 +96,7 @@
    },
    {
       "id": "   OrgAuditor - Read-only access to org info and reports\n",
-      "translation": "   OrgAuditor - Acesso somente leitura à informações e relatórios da Org\n",
+      "translation": "   OrgAuditor - Acesso somente leitura à informações e relatórios da Organização\n",
       "modified": false
    },
    {
@@ -141,7 +141,7 @@
    },
    {
       "id": "Could not find any offerings with name {{.ServiceOfferingName}}",
-      "translation": "Não foi possível encontrar ofertas com o nome {{.ServiceOfferingName}}",
+      "translation": "Não foi possível encontrar ofertas de serviço com o nome {{.ServiceOfferingName}}",
       "modified": false
    },
    {
@@ -201,7 +201,7 @@
    },
    {
       "id": "Start an app",
-      "translation": "Iniciar um app",
+      "translation": "Iniciar um aplicativo",
       "modified": false
    },
    {
@@ -261,7 +261,7 @@
    },
    {
       "id": "   View allowable quotas with 'CF_NAME quotas'",
-      "translation": "   Ver cotas permitidas com o comando 'CF_NAME quotas'",
+      "translation": "   Mostrar cotas disponíveis com o comando 'CF_NAME quotas'",
       "modified": false
    },
    {
@@ -271,7 +271,7 @@
    },
    {
       "id": "Print the version",
-      "translation": "Mostrar versão",
+      "translation": "Exibir versão",
       "modified": false
    },
    {
@@ -296,7 +296,7 @@
    },
    {
       "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
-      "translation": "Não foi possível vincular serviço {{.ServiceName}}\nError: {{.Err}}",
+      "translation": "Não foi possível vincular ao serviço {{.ServiceName}}\nError: {{.Err}}",
       "modified": false
    },
    {
@@ -316,7 +316,7 @@
    },
    {
       "id": "Stop an app",
-      "translation": "Parar um app",
+      "translation": "Parar um aplicativo",
       "modified": false
    },
    {
@@ -346,7 +346,7 @@
    },
    {
       "id": "Set or view the targeted org or space",
-      "translation": "Definir ou ver organização e/ou espaço alvo",
+      "translation": "Definir ou exibir organização e/ou espaço alvo",
       "modified": false
    },
    {
@@ -411,7 +411,7 @@
    },
    {
       "id": "Dump recent logs instead of tailing",
-      "translation": "Mostrar apenas logs recentes ao invés de continuamente",
+      "translation": "Exibir apenas logs recentes ao invés de continuamente",
       "modified": false
    },
    {
@@ -441,7 +441,7 @@
    },
    {
       "id": "Show org info",
-      "translation": "Mostrar informações da organização",
+      "translation": "Exibir informações da organização",
       "modified": false
    },
    {
@@ -456,12 +456,12 @@
    },
    {
       "id": "Print out a list of files in a directory or the contents of a specific file",
-      "translation": "Mostrar lista de arquivos em um diretório ou conteúdo de um arquivo específico",
+      "translation": "Exibir lista de arquivos em um diretório ou conteúdo de um arquivo específico",
       "modified": false
    },
    {
       "id": "List all buildpacks",
-      "translation": "Listar todos os buildpacks",
+      "translation": "Exibir todos os buildpacks",
       "modified": false
    },
    {
@@ -481,7 +481,7 @@
    },
    {
       "id": "Paid service plans",
-      "translation": "Plano de serviços pagos",
+      "translation": "Planos de serviços pagos",
       "modified": false
    },
    {
@@ -501,7 +501,7 @@
    },
    {
       "id": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
-      "translation": "{{.QuotaName}} ({{.MemoryLimit}}M limite de memoria, {{.RoutesLimit}} rotas, {{.ServicesLimit}} serviços, serviços pagos {{.NonBasicServicesAllowed}})",
+      "translation": "{{.QuotaName}} ({{.MemoryLimit}}M limite de memória, {{.RoutesLimit}} rotas, {{.ServicesLimit}} serviços, serviços pagos {{.NonBasicServicesAllowed}})",
       "modified": false
    },
    {
@@ -516,7 +516,7 @@
    },
    {
       "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
-      "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
+      "translation": "CF_NAME create-user-provided-service INSTÂNCIA_DE_SERVIÇO [-p PARÂMETROS] [-l URL-DE-SERVIÇO-SYSLOG]\n\n   Forneça parâmetros como uma lista separadas com vírgula, para habilitar uso interativo do comando:\n CF_NAME create-user-provided-service INSTÂNCIA_DE_SERVIÇO -p \"parâmetro1, parâmetro2, parâmetro3\"\n\n   Forneça parâmetros em formato JSON para criar o serviço não interativamente:\n CF_NAME create-user-provided-service INSTÂNCIA_DE_SERVIÇO -p '{\"parâmetro1\":\"valor\",\"parâmetro2\":\"valor\"}'\n\nEXEMPLO:\n   CF_NAME create-user-provided-service oracle-db-mine-p \"host, porta, db, usuário, senha\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"usuário\":\"admin\",\"senha\":\"5enh4\"}'\n   CF_NAME create-user-provided-service meu-servico-syslog -l syslog://exemplo.com\n",
       "modified": false
    },
    {
@@ -581,7 +581,7 @@
    },
    {
       "id": "write default values to the config",
-      "translation": "gravar valores padrão para configuração",
+      "translation": "Gravar valores padrão para configuração",
       "modified": false
    },
    {
@@ -591,7 +591,7 @@
    },
    {
       "id": "Push a new app or sync changes to an existing app",
-      "translation": "Enviar um novo app ou sincronizar modificações à um app existente",
+      "translation": "Enviar um novo aplicativo ou sincronizar modificações à um já existente",
       "modified": false
    },
    {
@@ -631,7 +631,7 @@
    },
    {
       "id": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "Iniciar app sem tempo limite\n\nDICA: utilize '{{.Command}}' para maiores informações",
+      "translation": "Tempo de inicialização limite para aplicativo\n\nDICA: utilize '{{.Command}}' para maiores informações",
       "modified": false
    },
    {
@@ -671,7 +671,7 @@
    },
    {
       "id": "Executes a raw request, content-type set to application/json by default",
-      "translation": "Executa um pedido raw, o content-type é definido como application/json por padrão",
+      "translation": "Executar um pedido diretamente contra a API, o content-type é definido como application/json por padrão",
       "modified": false
    },
    {
@@ -696,12 +696,12 @@
    },
    {
       "id": "Rename an app",
-      "translation": "Renomear um app",
+      "translation": "Renomear um aplicativo",
       "modified": false
    },
    {
       "id": "Show all env variables for an app",
-      "translation": "Mostrar todas as variáveis de ambiente para um app",
+      "translation": "Exibir todas as variáveis de ambiente para um aplicativo",
       "modified": false
    },
    {
@@ -716,7 +716,7 @@
    },
    {
       "id": "Restart an app",
-      "translation": "Reinicializar um app",
+      "translation": "Reinicializar um aplicativo",
       "modified": false
    },
    {
@@ -736,7 +736,7 @@
    },
    {
       "id": "Restage an app",
-      "translation": "Re-encenar um app",
+      "translation": "Re-encenar um aplicativo",
       "modified": false
    },
    {
@@ -756,7 +756,7 @@
    },
    {
       "id": "Show service instance info",
-      "translation": "Mostrar informações da instância de serviço",
+      "translation": "Exibir informações da instância de serviço",
       "modified": false
    },
    {
@@ -771,7 +771,7 @@
    },
    {
       "id": "Please don't",
-      "translation": "Apenas não faça",
+      "translation": "Tente evitar",
       "modified": false
    },
    {
@@ -781,7 +781,7 @@
    },
    {
       "id": "Remove an org role from a user",
-      "translation": "Remover uma função da org de um usuário",
+      "translation": "Remover uma função da organização de um usuário",
       "modified": false
    },
    {
@@ -806,12 +806,12 @@
    },
    {
       "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
-      "translation": "Deseja realmente remover {{.ModelType}} {{.ModelName}} e tudo associado com isto?",
+      "translation": "Deseja realmente remover {{.ModelType}} {{.ModelName}} e tudo com o que estiver associado?",
       "modified": false
    },
    {
       "id": "App {{.AppName}} does not exist.",
-      "translation": "App {{.AppName}} não existe.",
+      "translation": "Aplicativo {{.AppName}} não existe.",
       "modified": false
    },
    {
@@ -836,7 +836,7 @@
    },
    {
       "id": "List all orgs",
-      "translation": "Listar todas as organizações",
+      "translation": "Exibir todas as organizações",
       "modified": false
    },
    {
@@ -851,12 +851,12 @@
    },
    {
       "id": "Set or view target api url",
-      "translation": "Definir ou ver URL da API",
+      "translation": "Definir ou exibir URL da API",
       "modified": false
    },
    {
       "id": "SERVICE ADMIN",
-      "translation": "ADMINISTRADOR DE SERVIÇOS",
+      "translation": "ADMINISTRAÇÃO DE SERVIÇOS",
       "modified": false
    },
    {
@@ -871,12 +871,12 @@
    },
    {
       "id": "App name is a required field",
-      "translation": "Nome do App é um campo obrigatório",
+      "translation": "Nome do aplicativo é um campo obrigatório",
       "modified": false
    },
    {
       "id": "Path of app directory or zip file",
-      "translation": "Caminho para o diretório do app ou arquivo zip",
+      "translation": "Caminho para o diretório do aplicativo ou arquivo zip",
       "modified": false
    },
    {
@@ -886,12 +886,12 @@
    },
    {
       "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
-      "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
+      "translation": "CF_NAME migrate-service-instances SERVIÇO_v1 PROVEDOR_v1 PLANO_v1 SERVIÇO_v2 PLANO_v2\n\n",
       "modified": false
    },
    {
       "id": "limited",
-      "translation": "limited",
+      "translation": "limitado",
       "modified": false
    },
    {
@@ -906,7 +906,7 @@
    },
    {
       "id": "Tail or show recent logs for an app",
-      "translation": "Mostrar logs recentes ou continuadamente para um app",
+      "translation": "Exibir logs recentes ou continuadamente para um aplicativo",
       "modified": false
    },
    {
@@ -951,7 +951,7 @@
    },
    {
       "id": "Binding {{.URL}} to {{.AppName}}...",
-      "translation": "Vinculando {{.URL}} para {{.AppName}}...",
+      "translation": "Vinculando {{.URL}} com {{.AppName}}...",
       "modified": false
    },
    {
@@ -981,7 +981,7 @@
    },
    {
       "id": "Invalid instance: {{.Instance}}\nInstance must be a positive integer",
-      "translation": "Invalid instance: {{.Instance}}\nInstance must be a positive integer",
+      "translation": "Instância inválida: {{.Instance}}\nO valor deverá ser um número inteiro positivo",
       "modified": false
    },
    {
@@ -1081,7 +1081,7 @@
    },
    {
       "id": "Create a security group",
-      "translation": "Crear um grupo de segurança",
+      "translation": "Criar um grupo de segurança",
       "modified": false
    },
    {
@@ -1106,7 +1106,7 @@
    },
    {
       "id": "List all service instances in the target space",
-      "translation": "Listas todas as instâncias de servicos no espaço alvo",
+      "translation": "Exibir todas as instâncias de servico no espaço alvo",
       "modified": false
    },
    {
@@ -1146,7 +1146,7 @@
    },
    {
       "id": "List security groups in the set of security groups for running applications",
-      "translation": "Listar grupos de segurança nos padões de execução",
+      "translation": "Exibir grupos de segurança nos padões de execução",
       "modified": false
    },
    {
@@ -1161,7 +1161,7 @@
    },
    {
       "id": "bound apps",
-      "translation": "apps vinculadas",
+      "translation": "aplicativos vinculados",
       "modified": false
    },
    {
@@ -1171,12 +1171,12 @@
    },
    {
       "id": "Remove a url route from an app",
-      "translation": "Remover uma rota URL de um app",
+      "translation": "Remover uma rota URL de um aplicativo",
       "modified": false
    },
    {
       "id": "Error performing request",
-      "translation": "Erro durante performação do pedido",
+      "translation": "Erro durante pedido",
       "modified": false
    },
    {
@@ -1201,7 +1201,7 @@
    },
    {
       "id": "Change or view the instance count, disk space limit, and memory limit for an app",
-      "translation": "Alterar ou exibir a quantidade de instâncias, limite no disco rígido, e limiti de memória para um app",
+      "translation": "Alterar ou exibir a quantidade de instâncias, limite no disco rígido, e limite de memória para um aplicativo",
       "modified": false
    },
    {
@@ -1236,7 +1236,7 @@
    },
    {
       "id": "Show a single security group",
-      "translation": "Mostrar um único grupo de segurança",
+      "translation": "Exibir um único grupo de segurança",
       "modified": false
    },
    {
@@ -1271,17 +1271,17 @@
    },
    {
       "id": "Display health and status for app",
-      "translation": "Mostrar status para app",
+      "translation": "Exibir status para um determinado aplicativo",
       "modified": false
    },
    {
       "id": "There are too many options to display, please type in the name.",
-      "translation": "Existem muitas opçoes para serem exibidas, por favor digite um nome.",
+      "translation": "Existem muitas opções a serem exibidas, por favor digite um nome.",
       "modified": false
    },
    {
       "id": "Binding security group {{.security_group}} to staging as {{.username}}",
-      "translation": "Vinculando grupo de segurança {{.security_group}} para padrões de encenação como {{.username}}",
+      "translation": "Vinculando grupo de segurança {{.security_group}} com padrões de encenação como {{.username}}",
       "modified": false
    },
    {
@@ -1306,7 +1306,7 @@
    },
    {
       "id": "Start timeout in seconds",
-      "translation": "Tempo limite de espera para inicialização",
+      "translation": "Tempo de espera limite para inicialização em segundos",
       "modified": false
    },
    {
@@ -1316,7 +1316,7 @@
    },
    {
       "id": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
-      "translation": "{{.ErrorDescription}}\nDICA: Utilize '{{.CFServicesCommand}}' para ver todos os serviços nesta org e espaço.",
+      "translation": "{{.ErrorDescription}}\nDICA: Utilize '{{.CFServicesCommand}}' para mostrar todos os serviços nesta org e espaço.",
       "modified": false
    },
    {
@@ -1336,7 +1336,7 @@
    },
    {
       "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-      "translation": "CF_NAME create-service-broker SERVICE_BROKER USUÁRIO SENHA URL",
+      "translation": "CF_NAME create-service-broker CORRETOR-DE-SERVIÇO USUÁRIO SENHA URL",
       "modified": false
    },
    {
@@ -1416,7 +1416,7 @@
    },
    {
       "id": "CF_NAME service SERVICE_INSTANCE",
-      "translation": "CF_NAME service SERVICE_INSTANCE",
+      "translation": "CF_NAME service INSTÂNCIA_DE_SERVIÇO",
       "modified": false
    },
    {
@@ -1431,7 +1431,7 @@
    },
    {
       "id": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
-      "translation": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
+      "translation": "CF_NAME rename-service NOME_DA_INSTÂNCIA_DE_SERVIÇO NOVO_NOME_DA_INSTÂNCIA_DE_SERVIÇO",
       "modified": false
    },
    {
@@ -1471,12 +1471,12 @@
    },
    {
       "id": "Show space info",
-      "translation": "Mostrar informações de espaço",
+      "translation": "Exibir informações de espaço",
       "modified": false
    },
    {
       "id": "{{.PropertyName}} must be a string value",
-      "translation": "{{.PropertyName}} deve ser uma string",
+      "translation": "{{.PropertyName}} deverá ser uma string",
       "modified": false
    },
    {
@@ -1566,7 +1566,7 @@
    },
    {
       "id": "Do not start an app after pushing",
-      "translation": "Não inicialize este app após envio",
+      "translation": "Não inicialize este aplicativo após envio",
       "modified": false
    },
    {
@@ -1646,7 +1646,7 @@
    },
    {
       "id": "Max wait time for app instance startup, in minutes",
-      "translation": "Tempo de espera máximo para inicialização do app, em minutos",
+      "translation": "Tempo de espera máximo para inicialização do aplicativo, em minutos",
       "modified": false
    },
    {
@@ -1671,7 +1671,7 @@
    },
    {
       "id": "Syslog Drain Url",
-      "translation": "Syslog Drain Url",
+      "translation": "URL para serviço Syslog",
       "modified": false
    },
    {
@@ -1686,7 +1686,7 @@
    },
    {
       "id": "Print API request diagnostics to stdout",
-      "translation": "Mostrar diagnósticos de pedidos API",
+      "translation": "Exibir diagnósticos de pedidos API",
       "modified": false
    },
    {
@@ -1771,7 +1771,7 @@
    },
    {
       "id": "No apps found",
-      "translation": "Nenhum app encontrado",
+      "translation": "Nenhum aplicativo encontrado",
       "modified": false
    },
    {
@@ -1951,7 +1951,7 @@
    },
    {
       "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "translation": "Listar todas as stacks (uma stack é um container pré-contruído, incluindo um sistema de arquivos e operacional, capaz de executar apps)",
+      "translation": "Exibir todas as stacks (uma stack é um container pré-contruído, incluindo um sistema de arquivos e operacional, capaz de executar apps)",
       "modified": false
    },
    {
@@ -1991,7 +1991,7 @@
    },
    {
       "id": "List domains in the target org",
-      "translation": "Listar domínios na organização alvo",
+      "translation": "Exibir domínios na organização alvo",
       "modified": false
    },
    {
@@ -2036,7 +2036,7 @@
    },
    {
       "id": "Cannot list marketplace services without a targeted space",
-      "translation": "Não é possível listar serviços disponíveis no mercado sem ter um espaço alvo definido",
+      "translation": "Não é possível exibir serviços disponíveis no mercado sem ter um espaço alvo definido",
       "modified": false
    },
    {
@@ -2066,12 +2066,12 @@
    },
    {
       "id": "No org or space targeted, use '{{.CFTargetCommand}}'",
-      "translation": "Organização ou espaço invalido, utilize '{{.CFTargetCommand}}'",
+      "translation": "Organização ou espaço inválido, utilize '{{.CFTargetCommand}}'",
       "modified": false
    },
    {
       "id": "Show help",
-      "translation": "Mostrar ajuda",
+      "translation": "Exibir ajuda",
       "modified": false
    },
    {
@@ -2081,7 +2081,7 @@
    },
    {
       "id": "List service auth tokens",
-      "translation": "Listar tokens de autenticação de serviços",
+      "translation": "Exibir tokens de autenticação de serviços",
       "modified": false
    },
    {
@@ -2131,7 +2131,7 @@
    },
    {
       "id": "List all apps in the target space",
-      "translation": "Listar todos os apps num determinado espaço",
+      "translation": "Exibir todos os aplicativos num determinado espaço",
       "modified": false
    },
    {
@@ -2206,7 +2206,7 @@
    },
    {
       "id": "Show org users by role",
-      "translation": "Mostrar usuários da org por função",
+      "translation": "Exibir usuários da org por função",
       "modified": false
    },
    {
@@ -2281,7 +2281,7 @@
    },
    {
       "id": "Show space users by role",
-      "translation": "mostrar usuários do espaço por função",
+      "translation": "Exibir usuários do espaço por função",
       "modified": false
    },
    {
@@ -2356,7 +2356,7 @@
    },
    {
       "id": "CF_NAME bind-service APP SERVICE_INSTANCE",
-      "translation": "CF_NAME bind-service APP SERVICE_INSTANCE",
+      "translation": "CF_NAME bind-service APP INSTÂNCIA_DE_SERVIÇO",
       "modified": false
    },
    {
@@ -2421,7 +2421,7 @@
    },
    {
       "id": "Show recent app events",
-      "translation": "Mostrar eventos recentes para app",
+      "translation": "Exibir eventos recentes para um determinado aplicativo",
       "modified": false
    },
    {
@@ -2546,7 +2546,7 @@
    },
    {
       "id": "List service brokers",
-      "translation": "Listar corretores de serviços",
+      "translation": "Exibir corretores de serviços",
       "modified": false
    },
    {
@@ -2561,7 +2561,7 @@
    },
    {
       "id": "Could not find app named '{{.AppName}}' in manifest",
-      "translation": "Não foi possível encontrar app com o nome '{{.AppName}}' no manifesto",
+      "translation": "Não foi possível encontrar aplicativo com o nome '{{.AppName}}' no manifesto",
       "modified": false
    },
    {
@@ -2651,7 +2651,7 @@
    },
    {
       "id": "List all routes in the current space",
-      "translation": "Listar todas as rotas disponíveis no espaço alvo",
+      "translation": "Exibir todas as rotas disponíveis no espaço alvo",
       "modified": false
    },
    {
@@ -2661,7 +2661,7 @@
    },
    {
       "id": "Service Instance is not user provided",
-      "translation": "Instância de serviço não foi fornecida pelo usuário",
+      "translation": "Instância de serviço não é fornecida pelo usuário",
       "modified": false
    },
    {
@@ -2686,7 +2686,7 @@
    },
    {
       "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
-      "translation": "Vinculando grupo de segurança {{.security_group}} para padrões de execução como {{.username}}",
+      "translation": "Vinculando grupo de segurança {{.security_group}} com padrões de execução como {{.username}}",
       "modified": false
    },
    {
@@ -2811,7 +2811,7 @@
    },
    {
       "id": "APPS",
-      "translation": "APPS",
+      "translation": "APLICATIVOS",
       "modified": false
    },
    {
@@ -2866,7 +2866,7 @@
    },
    {
       "id": "Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Obtendo serviços disponíveis no mercado na org {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}...",
+      "translation": "Obtendo serviços disponíveis no mercado para org {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}...",
       "modified": false
    },
    {
@@ -2891,7 +2891,7 @@
    },
    {
       "id": "Map the root domain to this app",
-      "translation": "Mapear o domínio raiz para este app",
+      "translation": "Mapear o domínio raiz para este aplicativo",
       "modified": false
    },
    {
@@ -3066,12 +3066,12 @@
    },
    {
       "id": "Invalid manifest. Expected a map",
-      "translation": "Arquivo de manifesto inválido. Deve ser um mapa",
+      "translation": "Arquivo de manifesto inválido. Deverá ser map",
       "modified": false
    },
    {
       "id": "List all spaces in an org",
-      "translation": "Listar todos os espaços em uma org",
+      "translation": "Exibir todos os espaços em uma org",
       "modified": false
    },
    {
@@ -3096,7 +3096,7 @@
    },
    {
       "id": "No events for app {{.AppName}}",
-      "translation": "Nenhum evento para app {{.AppName}}",
+      "translation": "Nenhum evento para aplicativo {{.AppName}}",
       "modified": false
    },
    {
@@ -3156,7 +3156,7 @@
    },
    {
       "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
-      "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
+      "translation": "CF_NAME curl PATH [-iv] [-X MÉTODO] [-H CABEÇALHO] [-d DATA] [--output ARQUIVO]",
       "modified": false
    },
    {
@@ -3166,7 +3166,7 @@
    },
    {
       "id": "USER ADMIN",
-      "translation": "ADMINISTRADOR DE USUÁRIOS",
+      "translation": "ADMINISTRAÇÃO DE USUÁRIOS",
       "modified": false
    },
    {
@@ -3186,12 +3186,12 @@
    },
    {
       "id": "Invalid instance: {{.Instance}}\nInstance must be less than {{.InstanceCount}}",
-      "translation": "Invalid instance: {{.Instance}}\nInstance must be less than {{.InstanceCount}}",
+      "translation": "Instância inválida: {{.Instance}}\nO valor deverá ser menor que {{.InstanceCount}}",
       "modified": false
    },
    {
       "id": "List available usage quotas",
-      "translation": "Listar cotas de utilização disponíveis",
+      "translation": "Exibir cotas de utilização disponíveis",
       "modified": false
    },
    {
@@ -3221,7 +3221,7 @@
    },
    {
       "id": "Bind a service instance to an app",
-      "translation": "Vincular uma instância de serviço a um app",
+      "translation": "Vincular instância de serviço a um aplicativo",
       "modified": false
    },
    {
@@ -3256,7 +3256,7 @@
    },
    {
       "id": "Service Broker {{.Name}} does not exist.",
-      "translation": "Corretor de serviço {{.Name}} não existe.",
+      "translation": "Corretor de serviços {{.Name}} não existe.",
       "modified": false
    },
    {
@@ -3286,12 +3286,12 @@
    },
    {
       "id": "BUILD TIME:",
-      "translation": "TEMPO DE CONSTRUÇÃO:",
+      "translation": "COMPILADO EM:",
       "modified": false
    },
    {
       "id": "List all users in the org",
-      "translation": "Listar todos os usuários na org",
+      "translation": "Exibir todos os usuários na org",
       "modified": false
    },
    {
@@ -3311,7 +3311,7 @@
    },
    {
       "id": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
-      "translation": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
+      "translation": "CF_NAME delete-service-broker CORRETOR_DE_SERVIÇOS [-f]",
       "modified": false
    },
    {
@@ -3346,7 +3346,7 @@
    },
    {
       "id": "Delete an app",
-      "translation": "Remover um app",
+      "translation": "Remover um aplicativo",
       "modified": false
    },
    {
@@ -3361,7 +3361,7 @@
    },
    {
       "id": "\nApp started\n",
-      "translation": "\nApp iniciado\n",
+      "translation": "\nAplicativo iniciado\n",
       "modified": false
    },
    {
@@ -3381,7 +3381,7 @@
    },
    {
       "id": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
-      "translation": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
+      "translation": "CF_NAME rename-service-broker NOME_DO_CORRETOR_DE_SERVIÇOS NOVO_NOME_DO_CORRETOR_DE_SERVIÇOS",
       "modified": false
    },
    {
@@ -3486,7 +3486,7 @@
    },
    {
       "id": "{{.PropertyName}} must be a string or null value",
-      "translation": "{{.PropertyName}} deve ser uma string ou valor nulo",
+      "translation": "{{.PropertyName}} deverá ser uma string ou valor nulo",
       "modified": false
    },
    {
@@ -3516,7 +3516,7 @@
    },
    {
       "id": "ORG ADMIN",
-      "translation": "ADMINISTRADOR DA ORG",
+      "translation": "ADMINISTRAÇÃO DA ORG",
       "modified": false
    },
    {
@@ -3556,7 +3556,7 @@
    },
    {
       "id": "Use '{{.Name}}' to view or set your target org and space",
-      "translation": "Utilize '{{.Name}}' para ver ou definir sua organização e espaco alvo",
+      "translation": "Utilize '{{.Name}}' para mostrar ou definir sua organização e espaco alvo",
       "modified": false
    },
    {
@@ -3601,7 +3601,7 @@
    },
    {
       "id": "Make a user-provided service instance available to cf apps",
-      "translation": "Fazer com que um serviço fornecido por usuário seja disponível para apps",
+      "translation": "Fazer com que um serviço fornecido pelo usuário esteja disponível para aplicativos",
       "modified": false
    },
    {
@@ -3636,7 +3636,7 @@
    },
    {
       "id": "Logging out...",
-      "translation": "Disconectando...",
+      "translation": "Desconectando...",
       "modified": false
    },
    {
@@ -3656,7 +3656,7 @@
    },
    {
       "id": "List available offerings in the marketplace",
-      "translation": "Listar ofertas disponíveis no mercado",
+      "translation": "Exibir ofertas disponíveis no mercado",
       "modified": false
    },
    {
@@ -3696,7 +3696,7 @@
    },
    {
       "id": "broker: {{.Name}}",
-      "translation": "broker: {{.Name}}",
+      "translation": "corretor: {{.Name}}",
       "modified": false
    },
    {
@@ -3756,7 +3756,7 @@
    },
    {
       "id": "List all security groups",
-      "translation": "Listar todos os grupos de segurança",
+      "translation": "Exibir todos os grupos de segurança",
       "modified": false
    },
    {
@@ -3766,7 +3766,7 @@
    },
    {
       "id": "Show quota info",
-      "translation": "Mostrar informações de cota",
+      "translation": "Exibir informações de cota",
       "modified": false
    },
    {
@@ -3806,7 +3806,7 @@
    },
    {
       "id": "Instance",
-      "translation": "Instance",
+      "translation": "Instância",
       "modified": false
    },
    {
@@ -3821,7 +3821,7 @@
    },
    {
       "id": "Log user out",
-      "translation": "Disconectar usuário",
+      "translation": "Desconectar usuário",
       "modified": false
    },
    {
