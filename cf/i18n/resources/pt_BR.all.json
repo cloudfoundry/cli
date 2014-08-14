@@ -1241,7 +1241,7 @@
    },
    {
       "id": "All plans of the service are already accessible for this org",
-      "translation": "All plans of the service are already accessible for the org",
+      "translation": "Todos os planos pertencentes à este serviço já está acessível para esta organização",
       "modified": true
    },
    {
@@ -1391,7 +1391,7 @@
    },
    {
       "id": "access for plans of a particular broker",
-      "translation": "settings for a specific service",
+      "translation": "configurações de planos específicas à um corretor",
       "modified": true
    },
    {
@@ -1656,7 +1656,7 @@
    },
    {
       "id": "All plans of the service are already inaccessible for this org",
-      "translation": "All plans of the service are already inaccessible for the org",
+      "translation": "Todos os planos pertencentes à este serviço já estão inacessíveis para esta organização",
       "modified": true
    },
    {
@@ -2231,7 +2231,7 @@
    },
    {
       "id": "The plan is already inaccessible for this org",
-      "translation": "The plan {{.PlanName}} of service {{.ServiceName}} is already inaccessible for all orgs",
+      "translation": "Este plano já está inacessível para esta organização",
       "modified": true
    },
    {
@@ -2541,7 +2541,7 @@
    },
    {
       "id": "Disable access to a particular service plan",
-      "translation": "Disable access to a particular service plan.",
+      "translation": "Desabilitar acesso a um plano de serviço em particular.",
       "modified": true
    },
    {
@@ -2751,7 +2751,7 @@
    },
    {
       "id": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-      "translation": "Plans are accessible for all orgs. Try removing access for all orgs, then enable access for select orgs.",
+      "translation": "Nenhuma ação efetuada. O acesso à todos os planos do serviço {{.ServiceName}} deverá ser removido e subsequentemente habilitado para todas as organizações com exceção da organização {{.OrgName}}.",
       "modified": true
    },
    {
@@ -3726,7 +3726,7 @@
    },
    {
       "id": "access for plans of a particular service offering",
-      "translation": "settings for a specific broker",
+      "translation": "configurações de planos específicas à uma oferta de serviço",
       "modified": true
    },
    {
@@ -3776,7 +3776,7 @@
    },
    {
       "id": "No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-      "translation": "The plan {{.PlaneName}} of service {{.ServiceName}} is already inaccessible for org {{.OrgName}}",
+      "translation": "Nenhuma ação efetuada. O acesso ao plano {{.PlaneName}} do serviço {{.ServiceName}} deverá ser removido e subsequentemente habilitado para todas as organizações com exceção da organização {{.OrgName}}.",
       "modified": true
    },
    {
@@ -3801,7 +3801,7 @@
    },
    {
       "id": "CF_NAME files APP [-i INSTANCE] [PATH]",
-      "translation": "CF_NAME files APP [CAMINHO]",
+      "translation": "CF_NAME files APP [-i INSTÂNCIA] [CAMINHO]",
       "modified": true
    },
    {
@@ -3841,7 +3841,7 @@
    },
    {
       "id": "The plan is already inaccessible for all orgs",
-      "translation": "The plan {{.PlanName}} of service {{.ServiceName}} is already accessible for all orgs and no action has been taken at this time.",
+      "translation": "O plano já está inacessível à todas as organizações",
       "modified": true
    },
    {
