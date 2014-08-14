@@ -436,7 +436,7 @@
    },
    {
       "id": "The plan is already accessible for all orgs",
-      "translation": "The plan is already accessible for all orgs",
+      "translation": "O plano já está acessível a todas as organizações",
       "modified": false
    },
    {
@@ -606,7 +606,7 @@
    },
    {
       "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
-      "translation": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
+      "translation": "Desabilitando acesso a plano {{.PlanName}} para serviço {{.ServiceName}} como {{.Username}}...",
       "modified": false
    },
    {
@@ -776,7 +776,7 @@
    },
    {
       "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
-      "translation": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
+      "translation": "Habilitando acesso a plano {{.PlanName}} para serviço {{.ServiceName}} como {{.Username}}...",
       "modified": false
    },
    {
@@ -796,7 +796,7 @@
    },
    {
       "id": "Disabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...",
-      "translation": "Disabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...",
+      "translation": "Desabilitando acesso a plano {{.PlanName}} do serviço {{.ServiceName}} para org {{.OrgName}} como {{.Username}}...",
       "modified": false
    },
    {
@@ -901,7 +901,7 @@
    },
    {
       "id": "Disabling access to all plans of service {{.ServiceName}} for all orgs as {{.UserName}}...",
-      "translation": "Disabling access to all plans of service {{.ServiceName}} for all orgs as {{.UserName}}...",
+      "translation": "Desabilitando acesso a todos os planos do serviço {{.ServiceName}} para todas as organizações como {{.UserName}}...",
       "modified": false
    },
    {
@@ -911,7 +911,7 @@
    },
    {
       "id": "Enable access to a service or service plan for one or all orgs",
-      "translation": "Enable access to a service or service plan for one or all orgs",
+      "translation": "Habilitar acesso a um serviço ou plano de serviço para uma ou todas as organizações",
       "modified": false
    },
    {
@@ -1226,7 +1226,7 @@
    },
    {
       "id": "The plan is already accessible for this org",
-      "translation": "The plan is already accessible for this org",
+      "translation": "O plano já está acessível a esta organização",
       "modified": false
    },
    {
@@ -1631,7 +1631,7 @@
    },
    {
       "id": "Enable access to a particular service plan",
-      "translation": "Enable access to a particular service plan",
+      "translation": "Habilitar acesso a um plano de serviço em particular",
       "modified": false
    },
    {
@@ -2301,7 +2301,7 @@
    },
    {
       "id": "Disable access to a service or service plan for one or all orgs",
-      "translation": "Disable access to a service or service plan for one or all orgs",
+      "translation": "Desabilitar acesso a um serviço ou plano de serviço para uma ou todas as organizações",
       "modified": false
    },
    {
@@ -2311,7 +2311,7 @@
    },
    {
       "id": "All plans of the service are already inaccessible for all orgs",
-      "translation": "All plans of the service are already inaccessible for all orgs",
+      "translation": "Todos os planos deste serviço já estão inacessíveis para todas as organizações",
       "modified": false
    },
    {
@@ -2606,7 +2606,7 @@
    },
    {
       "id": "plans accessible by a particular organization",
-      "translation": "plans accessible by a particular organization",
+      "translation": "planos acessíveis a uma organização em particular",
       "modified": false
    },
    {
@@ -2791,7 +2791,7 @@
    },
    {
       "id": "access",
-      "translation": "access",
+      "translation": "accesso",
       "modified": false
    },
    {
@@ -2826,7 +2826,7 @@
    },
    {
       "id": "Enabling access to all plans of service {{.ServiceName}} for all orgs as {{.Username}}...",
-      "translation": "Enabling access to all plans of service {{.ServiceName}} for all orgs as {{.Username}}...",
+      "translation": "Habilitando acesso a todos os planos do serviço {{.ServiceName}} para todas as organizações como {{.Username}}...",
       "modified": false
    },
    {
@@ -3226,7 +3226,7 @@
    },
    {
       "id": "Enable access to a particular organization",
-      "translation": "Enable access to a particular organization",
+      "translation": "Habilite acesso para uma organização em particular",
       "modified": false
    },
    {
@@ -3341,7 +3341,7 @@
    },
    {
       "id": "All plans of the service are already accessible for all orgs",
-      "translation": "All plans of the service are already accessible for all orgs",
+      "translation": "Todos os planos deste serviço já estão acessíveis a todas as organizações",
       "modified": false
    },
    {
@@ -3526,7 +3526,7 @@
    },
    {
       "id": "List service access settings",
-      "translation": "List service access settings",
+      "translation": "Exibir configurações de acesso de serviços",
       "modified": false
    },
    {
@@ -3571,7 +3571,7 @@
    },
    {
       "id": "Disabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...",
-      "translation": "Disabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...",
+      "translation": "Desabilitando acesso a todos os planos do serviço {{.ServiceName}} para a organização {{.OrgName}} como {{.Username}}...",
       "modified": false
    },
    {
