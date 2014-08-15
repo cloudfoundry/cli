@@ -60,6 +60,7 @@ var _ = Describe("quota", func() {
 						Guid:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
+						InstanceMemoryLimit:     5,
 						RoutesLimit:             2000,
 						ServicesLimit:           47,
 						NonBasicServicesAllowed: true,
@@ -72,7 +73,8 @@ var _ = Describe("quota", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
 						[]string{"OK"},
-						[]string{"Memory", "512M"},
+						[]string{"Total Memory", "512M"},
+						[]string{"Instance Memory", "5M"},
 						[]string{"Routes", "2000"},
 						[]string{"Services", "47"},
 						[]string{"Paid service plans", "allowed"},

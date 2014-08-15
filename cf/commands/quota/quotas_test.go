@@ -46,6 +46,7 @@ var _ = Describe("quotas command", func() {
 				models.QuotaFields{
 					Name:                    "quota-name",
 					MemoryLimit:             1024,
+					InstanceMemoryLimit:     512,
 					RoutesLimit:             111,
 					ServicesLimit:           222,
 					NonBasicServicesAllowed: true,
@@ -53,6 +54,7 @@ var _ = Describe("quotas command", func() {
 				models.QuotaFields{
 					Name:                    "quota-non-basic-not-allowed",
 					MemoryLimit:             434,
+					InstanceMemoryLimit:     3,
 					RoutesLimit:             1,
 					ServicesLimit:           2,
 					NonBasicServicesAllowed: false,
@@ -65,9 +67,9 @@ var _ = Describe("quotas command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting quotas as", "my-user"},
 				[]string{"OK"},
-				[]string{"name", "memory limit", "routes", "service instances", "paid service plans"},
-				[]string{"quota-name", "1G", "111", "222", "allowed"},
-				[]string{"quota-non-basic-not-allowed", "434M", "1", "2", "disallowed"},
+				[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans"},
+				[]string{"quota-name", "1G", "512M", "111", "222", "allowed"},
+				[]string{"quota-non-basic-not-allowed", "434M", "3M", "1", "2", "disallowed"},
 			))
 		})
 	})
