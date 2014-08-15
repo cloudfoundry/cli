@@ -1,4 +1,4 @@
-package api
+package quotas
 
 import (
 	"fmt"

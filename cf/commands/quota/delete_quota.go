@@ -1,7 +1,7 @@
 package quota
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -14,11 +14,11 @@ import (
 type DeleteQuota struct {
 	ui        terminal.UI
 	config    configuration.Reader
-	quotaRepo api.QuotaRepository
+	quotaRepo quotas.QuotaRepository
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewDeleteQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) (cmd *DeleteQuota) {
+func NewDeleteQuota(ui terminal.UI, config configuration.Reader, quotaRepo quotas.QuotaRepository) (cmd *DeleteQuota) {
 	return &DeleteQuota{
 		ui:        ui,
 		config:    config,

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
+	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
@@ -25,7 +26,7 @@ type RepositoryLocator struct {
 	curlRepo                        CurlRepository
 	endpointRepo                    RemoteEndpointRepository
 	organizationRepo                CloudControllerOrganizationRepository
-	quotaRepo                       CloudControllerQuotaRepository
+	quotaRepo                       quotas.CloudControllerQuotaRepository
 	spaceRepo                       spaces.CloudControllerSpaceRepository
 	appRepo                         CloudControllerApplicationRepository
 	appBitsRepo                     CloudControllerApplicationBitsRepository
@@ -85,7 +86,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = NewCloudControllerPasswordRepository(config, uaaGateway)
-	loc.quotaRepo = NewCloudControllerQuotaRepository(config, cloudControllerGateway)
+	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
 	loc.routeRepo = NewCloudControllerRouteRepository(config, cloudControllerGateway)
 	loc.stackRepo = NewCloudControllerStackRepository(config, cloudControllerGateway)
 	loc.serviceRepo = NewCloudControllerServiceRepository(config, cloudControllerGateway)
@@ -123,7 +124,7 @@ func (locator RepositoryLocator) GetOrganizationRepository() OrganizationReposit
 	return locator.organizationRepo
 }
 
-func (locator RepositoryLocator) GetQuotaRepository() QuotaRepository {
+func (locator RepositoryLocator) GetQuotaRepository() quotas.QuotaRepository {
 	return locator.quotaRepo
 }
 

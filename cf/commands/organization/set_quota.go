@@ -1,7 +1,7 @@
 package organization
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -13,11 +13,11 @@ import (
 type SetQuota struct {
 	ui        terminal.UI
 	config    configuration.Reader
-	quotaRepo api.QuotaRepository
+	quotaRepo quotas.QuotaRepository
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSetQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) (cmd *SetQuota) {
+func NewSetQuota(ui terminal.UI, config configuration.Reader, quotaRepo quotas.QuotaRepository) (cmd *SetQuota) {
 	cmd = new(SetQuota)
 	cmd.ui = ui
 	cmd.config = config
