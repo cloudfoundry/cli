@@ -29,9 +29,9 @@ func NewListSpaceQuotas(ui terminal.UI, config configuration.Reader, spaceQuotaR
 
 func (cmd *ListSpaceQuotas) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "quotas",
-		Description: T("List available usage quotas"),
-		Usage:       T("CF_NAME quotas"),
+		Name:        "space-quotas",
+		Description: T("List available space resource quotas"),
+		Usage:       T("CF_NAME space-quotas"),
 	}
 }
 
