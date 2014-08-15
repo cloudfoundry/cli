@@ -56,10 +56,9 @@ func (repo CloudControllerServicePlanVisibilityRepository) Delete(servicePlanGui
 
 func (repo CloudControllerServicePlanVisibilityRepository) Search(queryParams map[string]string) ([]models.ServicePlanVisibilityFields, error) {
 	var visibilities []models.ServicePlanVisibilityFields
-	var filteredVisibilities []models.ServicePlanVisibilityFields
 	err := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		"/v2/service_plan_visibilities", // This will eventually mix in query parameters
+		combineQueryParametersWithUri("/v2/service_plan_visibilities", queryParams),
 		resources.ServicePlanVisibilityResource{},
 		func(resource interface{}) bool {
 			if sp, ok := resource.(resources.ServicePlanVisibilityResource); ok {
@@ -67,14 +66,5 @@ func (repo CloudControllerServicePlanVisibilityRepository) Search(queryParams ma
 			}
 			return true
 		})
-
-	//WE DO THE HORRIBLE BROKEN NAIVE THING HERE BECAUSE THE SERVICES API DOES NOT SUPPORT QUERY PARAMS
-	//AS OF 8/11/2014.  AS SOON AS IT DOES, THIS HACKY FILTERING SHOULD BE REMOVED.
-	for _, visibility := range visibilities {
-		if (visibility.OrganizationGuid == queryParams["org_guid"] || queryParams["org_guid"] == "") &&
-			visibility.ServicePlanGuid == queryParams["plan_guid"] {
-			filteredVisibilities = append(filteredVisibilities, visibility)
-		}
-	}
-	return filteredVisibilities, err
+	return visibilities, err
 }

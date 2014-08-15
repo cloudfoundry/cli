@@ -96,9 +96,9 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 
 	Describe(".Search", func() {
 		It("finds the service plan visibilities that match the given query parameters", func() {
-			setupTestServer(firstPlanVisibilityRequest, secondPlanVisibilityRequest)
+			setupTestServer(searchPlanVisibilityRequest)
 
-			servicePlansVisibilitiesFields, err := repo.Search(map[string]string{"plan_guid": "service-plan-guid-1", "org_guid": "org-guid-1"})
+			servicePlansVisibilitiesFields, err := repo.Search(map[string]string{"service_plan_guid": "service-plan-guid-1", "organization_guid": "org-guid-1"})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(servicePlansVisibilitiesFields)).To(Equal(1))
@@ -149,6 +149,29 @@ var secondPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.
       "entity": {
         "service_plan_guid": "service-plan-guid-2",
         "organization_guid": "org-guid-2"
+      }
+    }
+  ]
+}`,
+	},
+})
+
+var searchPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/service_plan_visibilities?q=service_plan_guid%3Aservice-plan-guid-1%3Borganization_guid%3Aorg-guid-1",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+  "total_results": 1,
+  "total_pages": 1,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "request-guid-1"
+      },
+      "entity": {
+        "service_plan_guid": "service-plan-guid-1",
+        "organization_guid": "org-guid-1"
       }
     }
   ]

@@ -64,8 +64,8 @@ func combineQueryParametersWithUri(uri string, queryParams map[string]string) st
 
 	params := []string{}
 	for key, value := range queryParams {
-		params = append(params, fmt.Sprintf("q=%s", url.QueryEscape(key+":"+value)))
+		params = append(params, url.QueryEscape(key+":"+value))
 	}
 
-	return uri + "?" + strings.Join(params, "&")
+	return uri + "?q=" + strings.Join(params, "%3B")
 }
