@@ -66,7 +66,7 @@ var _ = Describe("create-quota command", func() {
 		Context("when the -m flag is provided", func() {
 			It("sets the memory limit", func() {
 				runCommand("-m", "50G", "erryday makin fitty jeez")
-				Expect(quotaRepo.CreateCalledWith.MemoryLimit).To(Equal(uint64(51200)))
+				Expect(quotaRepo.CreateCalledWith.MemoryLimit).To(Equal(int64(51200)))
 			})
 
 			It("alerts the user when parsing the memory limit fails", func() {

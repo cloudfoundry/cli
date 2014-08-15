@@ -89,8 +89,8 @@ func copyPathToPath(fromPath, toPath string) (err error) {
 	return err
 }
 
-func CountFiles(directory string) uint64 {
-	var count uint64
+func CountFiles(directory string) int64 {
+	var count int64
 	WalkAppFiles(directory, func(_, _ string) error {
 		count++
 		return nil

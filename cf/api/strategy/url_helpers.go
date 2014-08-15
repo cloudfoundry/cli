@@ -7,11 +7,11 @@ import (
 )
 
 type params struct {
-	resultsPerPage       uint64
+	resultsPerPage       int64
 	orderDirection       string
 	q                    map[string]string
 	recursive            bool
-	inlineRelationsDepth uint64
+	inlineRelationsDepth int64
 }
 
 func v2(segments ...string) string {
@@ -23,11 +23,11 @@ func buildURL(path string, params params) string {
 	query := url.Values{}
 
 	if params.inlineRelationsDepth != 0 {
-		query.Set("inline-relations-depth", strconv.FormatUint(params.inlineRelationsDepth, 10))
+		query.Set("inline-relations-depth", strconv.FormatInt(params.inlineRelationsDepth, 10))
 	}
 
 	if params.resultsPerPage != 0 {
-		query.Set("results-per-page", strconv.FormatUint(params.resultsPerPage, 10))
+		query.Set("results-per-page", strconv.FormatInt(params.resultsPerPage, 10))
 	}
 
 	if params.orderDirection != "" {

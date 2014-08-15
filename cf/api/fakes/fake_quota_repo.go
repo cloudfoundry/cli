@@ -26,7 +26,7 @@ type FakeQuotaRepository struct {
 
 	UpdateCalledWith struct {
 		Name                  string
-		MemoryLimit           uint64
+		MemoryLimit           int64
 		RoutesLimit           int
 		ServicesLimit         int
 		AllowPaidServicePlans bool
@@ -37,7 +37,7 @@ type FakeQuotaRepository struct {
 
 	CreateCalledWith struct {
 		Name                    string
-		MemoryLimit             uint64
+		MemoryLimit             int64
 		RoutesLimit             int
 		ServicesLimit           int
 		NonBasicServicesAllowed bool

@@ -47,10 +47,10 @@ type ApplicationFields struct {
 	Name             string
 	BuildpackUrl     string
 	Command          string
-	DiskQuota        uint64 // in Megabytes
+	DiskQuota        int64 // in Megabytes
 	EnvironmentVars  map[string]string
 	InstanceCount    int
-	Memory           uint64 // in Megabytes
+	Memory           int64 // in Megabytes
 	RunningInstances int
 	State            string
 	SpaceGuid        string
@@ -59,14 +59,14 @@ type ApplicationFields struct {
 type AppParams struct {
 	BuildpackUrl       *string
 	Command            *string
-	DiskQuota          *uint64
+	DiskQuota          *int64
 	Domain             *string
 	EnvironmentVars    *map[string]string
 	Guid               *string
 	HealthCheckTimeout *int
 	Host               *string
 	InstanceCount      *int
-	Memory             *uint64
+	Memory             *int64
 	Name               *string
 	NoRoute            bool
 	UseRandomHostname  bool

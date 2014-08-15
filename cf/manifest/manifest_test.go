@@ -32,7 +32,7 @@ var _ = Describe("Manifests", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(*apps[0].InstanceCount).To(Equal(3))
-		Expect(*apps[0].Memory).To(Equal(uint64(512)))
+		Expect(*apps[0].Memory).To(Equal(int64(512)))
 		Expect(apps[0].NoRoute).To(BeTrue())
 	})
 
@@ -48,7 +48,7 @@ var _ = Describe("Manifests", func() {
 
 			Expect(len(apps)).To(Equal(1))
 			Expect(*apps[0].InstanceCount).To(Equal(3))
-			Expect(*apps[0].Memory).To(Equal(uint64(512)))
+			Expect(*apps[0].Memory).To(Equal(int64(512)))
 		})
 	})
 
@@ -214,12 +214,12 @@ var _ = Describe("Manifests", func() {
 		Expect(len(apps)).To(Equal(1))
 
 		Expect(*apps[0].BuildpackUrl).To(Equal("my-buildpack"))
-		Expect(*apps[0].DiskQuota).To(Equal(uint64(512)))
+		Expect(*apps[0].DiskQuota).To(Equal(int64(512)))
 		Expect(*apps[0].Domain).To(Equal("my-domain"))
 		Expect(*apps[0].Host).To(Equal("my-hostname"))
 		Expect(*apps[0].Name).To(Equal("my-app-name"))
 		Expect(*apps[0].StackName).To(Equal("my-stack"))
-		Expect(*apps[0].Memory).To(Equal(uint64(256)))
+		Expect(*apps[0].Memory).To(Equal(int64(256)))
 		Expect(*apps[0].InstanceCount).To(Equal(1))
 		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
 		Expect(apps[0].NoRoute).To(BeTrue())

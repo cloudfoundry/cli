@@ -62,7 +62,7 @@ var _ = Describe("app Command", func() {
 			It("updates the memory limit", func() {
 				runCommand("-m", "15G", "quota-name")
 				Expect(quotaRepo.UpdateCalledWith.Name).To(Equal("quota-name"))
-				Expect(quotaRepo.UpdateCalledWith.MemoryLimit).To(Equal(uint64(15360)))
+				Expect(quotaRepo.UpdateCalledWith.MemoryLimit).To(Equal(int64(15360)))
 			})
 
 			It("fails with usage when the value cannot be parsed", func() {

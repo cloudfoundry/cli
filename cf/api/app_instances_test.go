@@ -37,10 +37,10 @@ var _ = Describe("AppInstancesRepo", func() {
 
 		instance0 := instances[0]
 		Expect(instance0.Since).To(Equal(time.Unix(1379522342, 0)))
-		Expect(instance0.DiskQuota).To(Equal(uint64(1073741824)))
-		Expect(instance0.DiskUsage).To(Equal(uint64(56037376)))
-		Expect(instance0.MemQuota).To(Equal(uint64(67108864)))
-		Expect(instance0.MemUsage).To(Equal(uint64(19218432)))
+		Expect(instance0.DiskQuota).To(Equal(int64(1073741824)))
+		Expect(instance0.DiskUsage).To(Equal(int64(56037376)))
+		Expect(instance0.MemQuota).To(Equal(int64(67108864)))
+		Expect(instance0.MemUsage).To(Equal(int64(19218432)))
 		Expect(instance0.CpuUsage).To(Equal(3.659571249238058e-05))
 	})
 })

@@ -41,8 +41,8 @@ type ApplicationEntity struct {
 	State              *string             `json:"state,omitempty"`
 	SpaceGuid          *string             `json:"space_guid,omitempty"`
 	Instances          *int                `json:"instances,omitempty"`
-	Memory             *uint64             `json:"memory,omitempty"`
-	DiskQuota          *uint64             `json:"disk_quota,omitempty"`
+	Memory             *int64              `json:"memory,omitempty"`
+	DiskQuota          *int64              `json:"disk_quota,omitempty"`
 	StackGuid          *string             `json:"stack_guid,omitempty"`
 	Stack              *StackResource      `json:"stack,omitempty"`
 	Routes             *[]AppRouteResource `json:"routes,omitempty"`

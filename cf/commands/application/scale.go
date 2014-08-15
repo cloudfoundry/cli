@@ -59,7 +59,7 @@ func (cmd *Scale) GetRequirements(requirementsFactory requirements.Factory, c *c
 	return
 }
 
-var bytesInAMegabyte uint64 = 1024 * 1024
+var bytesInAMegabyte int64 = 1024 * 1024
 
 func (cmd *Scale) Run(c *cli.Context) {
 	currentApp := cmd.appReq.GetApplication()

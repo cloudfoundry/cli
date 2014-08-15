@@ -27,7 +27,7 @@ const (
 )
 
 type ApplicationBitsRepository interface {
-	UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiErr error)
+	UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount int64)) (apiErr error)
 }
 
 type CloudControllerApplicationBitsRepository struct {
@@ -43,7 +43,7 @@ func NewCloudControllerApplicationBitsRepository(config configuration.Reader, ga
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, fileSizePrinter func(path string, zipSize, fileCount uint64)) (apiErr error) {
+func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, fileSizePrinter func(path string, zipSize, fileCount int64)) (apiErr error) {
 	fileutils.TempDir("apps", func(uploadDir string, err error) {
 		if err != nil {
 			apiErr = err
@@ -76,8 +76,8 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 				return
 			}
 
-			zipFileSize := uint64(0)
-			zipFileCount := uint64(0)
+			zipFileSize := int64(0)
+			zipFileCount := int64(0)
 
 			err = repo.zipper.Zip(uploadDir, zipFile)
 			switch err := err.(type) {
@@ -88,7 +88,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 					return
 				}
 
-				zipFileSize = uint64(stat.Size())
+				zipFileSize = int64(stat.Size())
 				zipFileCount = app_files.CountFiles(uploadDir)
 			case *errors.EmptyDirError:
 				zipFile = nil

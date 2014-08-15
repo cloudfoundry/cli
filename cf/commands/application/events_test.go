@@ -76,7 +76,7 @@ var _ = Describe("events command", func() {
 
 		Expect(eventsRepo.RecentEventsCallCount()).To(Equal(1))
 		appGuid, limit := eventsRepo.RecentEventsArgsForCall(0)
-		Expect(limit).To(Equal(uint64(50)))
+		Expect(limit).To(Equal(int64(50)))
 		Expect(appGuid).To(Equal("my-app-guid"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},

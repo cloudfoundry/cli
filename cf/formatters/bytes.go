@@ -18,7 +18,7 @@ const (
 	TERABYTE = 1024 * GIGABYTE
 )
 
-func ByteSize(bytes uint64) string {
+func ByteSize(bytes int64) string {
 	unit := ""
 	value := float32(bytes)
 
@@ -44,18 +44,18 @@ func ByteSize(bytes uint64) string {
 	return fmt.Sprintf("%s%s", stringValue, unit)
 }
 
-func ToMegabytes(s string) (uint64, error) {
+func ToMegabytes(s string) (int64, error) {
 	parts := bytesPattern.FindStringSubmatch(strings.TrimSpace(s))
 	if len(parts) < 3 {
 		return 0, invalidByteQuantityError
 	}
 
-	value, err := strconv.ParseUint(parts[1], 10, 0)
-	if err != nil || value < 1 {
+	value, err := strconv.ParseInt(parts[1], 10, 0)
+	if err != nil {
 		return 0, invalidByteQuantityError
 	}
 
-	var bytes uint64
+	var bytes int64
 	unit := strings.ToUpper(parts[2])
 	switch unit {
 	case "T":
@@ -74,5 +74,5 @@ func ToMegabytes(s string) (uint64, error) {
 var (
 	bytesPattern             *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
 	t                                       = i18n.Init()
-	invalidByteQuantityError                = errors.New(t("Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB"))
+	invalidByteQuantityError                = errors.New(t("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
 )

@@ -235,7 +235,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 	}
 }
 
-func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount uint64) {
+func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount int64) {
 	if fileCount > 0 {
 		cmd.ui.Say(T("Uploading app files from: {{.Path}}", map[string]interface{}{"Path": path}))
 		cmd.ui.Say(T("Uploading {{.ZipFileBytes}}, {{.FileCount}} files",

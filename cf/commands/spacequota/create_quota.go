@@ -37,7 +37,7 @@ func (cmd CreateSpaceQuota) Metadata() command_metadata.CommandMetadata {
 		Description: T("Define a new space resource quota"),
 		Usage:       T("CF_NAME create-space-quota QUOTA ORG [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G")),
+			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewStringFlag("m", T("Total amount of memory a space can have(e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewIntFlag("r", T("Total number of routes")),
 			flag_helpers.NewIntFlag("s", T("Total number of service instances")),

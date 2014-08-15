@@ -3,13 +3,13 @@ package strategy
 import "github.com/cloudfoundry/cli/cf/api/resources"
 
 type EventsEndpointStrategy interface {
-	EventsURL(appGuid string, limit uint64) string
+	EventsURL(appGuid string, limit int64) string
 	EventsResource() resources.EventResource
 }
 
 type eventsEndpointStrategy struct{}
 
-func (_ eventsEndpointStrategy) EventsURL(appGuid string, limit uint64) string {
+func (_ eventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
 	return buildURL(v2("apps", appGuid, "events"), params{
 		resultsPerPage: limit,
 	})
@@ -21,7 +21,7 @@ func (_ eventsEndpointStrategy) EventsResource() resources.EventResource {
 
 type globalEventsEndpointStrategy struct{}
 
-func (strategy globalEventsEndpointStrategy) EventsURL(appGuid string, limit uint64) string {
+func (strategy globalEventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
 	return buildURL(v2("events"), params{
 		resultsPerPage: limit,
 		orderDirection: "desc",

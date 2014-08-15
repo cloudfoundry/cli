@@ -27,8 +27,8 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 	var (
 		fixturesDir        string
 		reportedFilePath   string
-		reportedUploadSize uint64
-		reportedFileCount  uint64
+		reportedUploadSize int64
+		reportedFileCount  int64
 		reportedZipCount   int
 	)
 
@@ -52,7 +52,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		repo := NewCloudControllerApplicationBitsRepository(configRepo, gateway, zipper)
 
-		apiErr = repo.UploadApp("my-cool-app-guid", dir, func(path string, uploadSize, fileCount uint64) {
+		apiErr = repo.UploadApp("my-cool-app-guid", dir, func(path string, uploadSize, fileCount int64) {
 			reportedFilePath = path
 			reportedUploadSize = uploadSize
 			reportedFileCount = fileCount
@@ -69,9 +69,9 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(reportedFilePath).To(Equal(appPath))
-		Expect(reportedFileCount).To(Equal(uint64(len(expectedApplicationContent))))
+		Expect(reportedFileCount).To(Equal(int64(len(expectedApplicationContent))))
 		Expect(reportedZipCount).To(Equal(2))
-		Expect(reportedUploadSize).To(Equal(uint64(532)))
+		Expect(reportedUploadSize).To(Equal(int64(532)))
 	})
 
 	It("returns an error when the directory to upload does not exist", func() {
@@ -81,7 +81,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
-		apiErr := repo.UploadApp("app-guid", "/foo/bar", func(_ string, _, _ uint64) {})
+		apiErr := repo.UploadApp("app-guid", "/foo/bar", func(_ string, _, _ int64) {})
 		Expect(apiErr).To(HaveOccurred())
 		Expect(apiErr.Error()).To(ContainSubstring(filepath.Join("foo", "bar")))
 	})
@@ -106,8 +106,8 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(reportedFilePath).To(Equal(appPath))
-			Expect(reportedFileCount).To(Equal(uint64(len(expectedApplicationContent))))
-			Expect(reportedUploadSize).To(Equal(uint64(532)))
+			Expect(reportedFileCount).To(Equal(int64(len(expectedApplicationContent))))
+			Expect(reportedUploadSize).To(Equal(int64(532)))
 		})
 
 		It("returns a failure when uploading bits fails", func() {
@@ -177,8 +177,8 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 				)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(reportedFileCount).To(Equal(uint64(0)))
-				Expect(reportedUploadSize).To(Equal(uint64(0)))
+				Expect(reportedFileCount).To(Equal(int64(0)))
+				Expect(reportedUploadSize).To(Equal(int64(0)))
 				Expect(reportedZipCount).To(Equal(-1))
 				Expect(reportedFilePath).To(Equal(emptyDir))
 			})
@@ -203,8 +203,8 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 			)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(reportedFileCount).To(Equal(uint64(3)))
-			Expect(reportedUploadSize).To(Equal(uint64(354)))
+			Expect(reportedFileCount).To(Equal(int64(3)))
+			Expect(reportedUploadSize).To(Equal(int64(354)))
 			Expect(reportedZipCount).To(Equal(3))
 		})
 	})
