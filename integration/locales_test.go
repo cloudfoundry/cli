@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"os"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/i18n"
 
@@ -26,7 +27,7 @@ var _ = Describe("locales", func() {
 			os.Setenv("LANG", locale)
 			result := Cf("help")
 
-			Eventually(result).Should(Exit(0))
+			Eventually(result, 3*time.Second).Should(Exit(0))
 		}
 	})
 })
