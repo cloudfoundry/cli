@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	securitygroupspaces "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 
@@ -52,6 +53,7 @@ type RepositoryLocator struct {
 	stagingSecurityGroupRepo        staging.StagingSecurityGroupsRepo
 	runningSecurityGroupRepo        running.RunningSecurityGroupsRepo
 	securityGroupSpaceBinder        securitygroupspaces.SecurityGroupSpaceBinder
+	spaceQuotaRepo                  space_quotas.SpaceQuotaRepository
 }
 
 func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
@@ -101,6 +103,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.stagingSecurityGroupRepo = staging.NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.runningSecurityGroupRepo = running.NewRunningSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.securityGroupSpaceBinder = securitygroupspaces.NewSecurityGroupSpaceBinder(config, cloudControllerGateway)
+	loc.spaceQuotaRepo = space_quotas.NewCloudControllerSpaceQuotaRepository(config, cloudControllerGateway)
 	return
 }
 
@@ -230,4 +233,8 @@ func (locator RepositoryLocator) GetSecurityGroupSpaceBinder() securitygroupspac
 
 func (locator RepositoryLocator) GetServicePlanVisibilityRepository() ServicePlanVisibilityRepository {
 	return locator.servicePlanVisibilityRepo
+}
+
+func (locator RepositoryLocator) GetSpaceQuotaRepository() space_quotas.SpaceQuotaRepository {
+	return locator.spaceQuotaRepo
 }

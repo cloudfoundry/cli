@@ -25,6 +25,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
 	"github.com/cloudfoundry/cli/cf/commands/space"
+	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -240,6 +241,8 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 		),
 		repoLocator.GetAuthenticationRepository(),
 	)
+
+	factory.cmdsByName["create-space-quota"] = spacequota.NewCreateSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository(), repoLocator.GetOrganizationRepository())
 
 	return
 }
