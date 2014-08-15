@@ -79,10 +79,24 @@ func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, p
 
 func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker models.ServiceBroker) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.ApiEndpoint(), serviceBroker.Guid)
-	body := fmt.Sprintf(
-		`{"broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
-		serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
-	)
+
+	// Only send attributes that are non-zero value.
+	body := `{`
+	if serviceBroker.Url != "" {
+		body += fmt.Sprintf(`"broker_url": "%s",`, serviceBroker.Url)
+	}
+	if serviceBroker.Username != "" {
+		body += fmt.Sprintf(`"auth_username": "%s",`, serviceBroker.Username)
+	}
+	if serviceBroker.Password != "" {
+		body += fmt.Sprintf(`"auth_password": "%s",`, serviceBroker.Password)
+	}
+
+	if body[len(body)-1] == ',' {
+		body = body[:len(body)-1]
+	}
+	body += `}`
+
 	return repo.gateway.UpdateResource(path, strings.NewReader(body))
 }
 

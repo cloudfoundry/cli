@@ -240,6 +240,52 @@ var _ = Describe("Service Brokers Repo", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
+
+		It("only sends the non zero value attributes of the model", func() {
+			expectedReqBody := `{"broker_url":"http://update.example.com","auth_username":"update-username"}`
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/service_brokers/my-guid",
+				Matcher:  testnet.RequestBodyMatcher(expectedReqBody),
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			})
+
+			ts, handler, repo := createServiceBrokerRepo(req)
+			defer ts.Close()
+			serviceBroker := models.ServiceBroker{}
+			serviceBroker.Guid = "my-guid"
+			serviceBroker.Name = "foobroker"
+			serviceBroker.Url = "http://update.example.com"
+			serviceBroker.Username = "update-username"
+
+			apiErr := repo.Update(serviceBroker)
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("doesn't break with no attributes to be updated", func() {
+			expectedReqBody := `{}`
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/service_brokers/my-guid",
+				Matcher:  testnet.RequestBodyMatcher(expectedReqBody),
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			})
+
+			ts, handler, repo := createServiceBrokerRepo(req)
+			defer ts.Close()
+			serviceBroker := models.ServiceBroker{}
+			serviceBroker.Guid = "my-guid"
+			serviceBroker.Name = "foobroker"
+
+			apiErr := repo.Update(serviceBroker)
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
 	})
 
 	Describe("Rename", func() {
