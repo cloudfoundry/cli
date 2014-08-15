@@ -146,7 +146,7 @@ func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName
 	} else if !servicePlan.Public && !setPlanVisibility {
 		// Disable service access
 		if servicePlan.OrgHasVisibility(org.Name) {
-			err = actor.deleteServicePlanVisibilities(map[string]string{"org_guid": org.Guid, "plan_guid": servicePlan.Guid})
+			err = actor.deleteServicePlanVisibilities(map[string]string{"organization_guid": org.Guid, "service_plan_guid": servicePlan.Guid})
 			if err != nil {
 				return PlanAccessError, err
 			}
@@ -207,10 +207,7 @@ func (actor ServicePlanHandler) deleteServicePlanVisibilities(queryParams map[st
 func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string, servicePlan models.ServicePlanFields, setPlanVisibility bool) error {
 	// We delete all service plan visibilities for the given Plan since the attribute public should function as a giant on/off
 	// switch for all orgs. Thus we need to clean up any visibilities laying around so that they don't carry over.
-	//
-	// Currently org_guid must be set to "" in order to get around the hacked servicePlanVisibilityRepo.Search function, when that
-	// changes make sure to change this as well.
-	err := actor.deleteServicePlanVisibilities(map[string]string{"org_guid": "", "plan_guid": servicePlan.Guid})
+	err := actor.deleteServicePlanVisibilities(map[string]string{"plan_guid": servicePlan.Guid})
 	if err != nil {
 		return err
 	}
