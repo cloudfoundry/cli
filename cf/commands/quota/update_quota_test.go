@@ -63,6 +63,19 @@ var _ = Describe("app Command", func() {
 			quotaRepo.FindByNameReturns(quota, nil)
 		})
 
+		Context("when the -i flag is provided", func() {
+			It("updates the instance memory limit", func() {
+				runCommand("-i", "15G", "quota-name")
+				Expect(quotaRepo.UpdateArgsForCall(0).Name).To(Equal("quota-name"))
+				Expect(quotaRepo.UpdateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(15360)))
+			})
+
+			It("fails with usage when the value cannot be parsed", func() {
+				runCommand("-m", "blasé", "le-tired")
+				Expect(ui.FailedWithUsage).To(BeTrue())
+			})
+		})
+
 		Context("when the -m flag is provided", func() {
 			It("updates the memory limit", func() {
 				runCommand("-m", "15G", "quota-name")

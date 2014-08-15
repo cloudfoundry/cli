@@ -30,8 +30,9 @@ func (cmd *updateQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-quota",
 		Description: T("Update an existing resource quota"),
-		Usage:       T("CF_NAME update-quota QUOTA [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]"),
+		Usage:       T("CF_NAME update-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY][-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]"),
 		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewStringFlag("m", T("Total amount of memory (e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewStringFlag("n", T("New name")),
 			flag_helpers.NewIntFlag("r", T("Total number of routes")),
@@ -72,6 +73,16 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 
 	if disallowPaidServices {
 		quota.NonBasicServicesAllowed = false
+	}
+
+	if c.String("i") != "" {
+		memory, formatError := formatters.ToMegabytes(c.String("i"))
+
+		if formatError != nil {
+			cmd.ui.FailWithUsage(c)
+		}
+
+		quota.InstanceMemoryLimit = memory
 	}
 
 	if c.String("m") != "" {
