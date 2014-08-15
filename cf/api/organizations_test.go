@@ -128,7 +128,7 @@ var _ = Describe("Organization Repository", func() {
 			Expect(org.Name).To(Equal(existingOrg.Name))
 			Expect(org.Guid).To(Equal(existingOrg.Guid))
 			Expect(org.QuotaDefinition.Name).To(Equal("not-your-average-quota"))
-			Expect(org.QuotaDefinition.MemoryLimit).To(Equal(uint64(128)))
+			Expect(org.QuotaDefinition.MemoryLimit).To(Equal(int64(128)))
 			Expect(len(org.Spaces)).To(Equal(1))
 			Expect(org.Spaces[0].Name).To(Equal("Space1"))
 			Expect(org.Spaces[0].Guid).To(Equal("space1-guid"))

@@ -30,8 +30,8 @@ var _ = Describe("ApplicationsRepository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(app.Name).To(Equal("My App"))
 			Expect(app.Guid).To(Equal("app1-guid"))
-			Expect(app.Memory).To(Equal(uint64(128)))
-			Expect(app.DiskQuota).To(Equal(uint64(512)))
+			Expect(app.Memory).To(Equal(int64(128)))
+			Expect(app.DiskQuota).To(Equal(int64(512)))
 			Expect(app.InstanceCount).To(Equal(1))
 			Expect(app.EnvironmentVars).To(Equal(map[string]string{"foo": "bar", "baz": "boom"}))
 			Expect(app.Routes[0].Host).To(Equal("app1"))
@@ -362,8 +362,8 @@ func defaultAppParams() models.AppParams {
 	spaceGuid := "some-space-guid"
 	stackGuid := "some-stack-guid"
 	command := "some-command"
-	memory := uint64(2048)
-	diskQuota := uint64(512)
+	memory := int64(2048)
+	diskQuota := int64(512)
 	instanceCount := 3
 
 	return models.AppParams{

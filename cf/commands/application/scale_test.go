@@ -68,38 +68,6 @@ var _ = Describe("scale command", func() {
 		})
 	})
 
-	Describe("checking for bad flags", func() {
-		It("fails when non-positive value is given for memory limit", func() {
-			testcmd.RunCommand(cmd, []string{"-m", "0M", "my-app"}, requirementsFactory)
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"memory"},
-				[]string{"positive integer"},
-			))
-		})
-
-		It("fails when non-positive value is given for instances", func() {
-			testcmd.RunCommand(cmd, []string{"-i", "-15", "my-app"}, requirementsFactory)
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"Invalid instance count"},
-				[]string{"must be a positive integer"},
-			))
-		})
-
-		It("fails when non-positive value is given for disk quota", func() {
-			testcmd.RunCommand(cmd, []string{"-k", "-1G", "my-app"}, requirementsFactory)
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"disk quota"},
-				[]string{"positive integer"},
-			))
-		})
-	})
-
 	Describe("scaling an app", func() {
 		BeforeEach(func() {
 			app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
@@ -159,9 +127,9 @@ var _ = Describe("scale command", func() {
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"This will cause the app to restart", "Are you sure", "my-app"}))
 				Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
 				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-				Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
+				Expect(*appRepo.UpdateParams.Memory).To(Equal(int64(512)))
 				Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
-				Expect(*appRepo.UpdateParams.DiskQuota).To(Equal(uint64(2048)))
+				Expect(*appRepo.UpdateParams.DiskQuota).To(Equal(int64(2048)))
 			})
 
 			It("does not scale the memory and disk limits if they are not specified", func() {
@@ -179,7 +147,7 @@ var _ = Describe("scale command", func() {
 
 				Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
 				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-				Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
+				Expect(*appRepo.UpdateParams.Memory).To(Equal(int64(512)))
 				Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
 				Expect(appRepo.UpdateParams.InstanceCount).To(BeNil())
 			})

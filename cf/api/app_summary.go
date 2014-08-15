@@ -24,9 +24,9 @@ type ApplicationFromSummary struct {
 	Name             string
 	Routes           []RouteSummary
 	RunningInstances int `json:"running_instances"`
-	Memory           uint64
+	Memory           int64
 	Instances        int
-	DiskQuota        uint64 `json:"disk_quota"`
+	DiskQuota        int64 `json:"disk_quota"`
 	Urls             []string
 	State            string
 	SpaceGuid        string `json:"space_guid"`

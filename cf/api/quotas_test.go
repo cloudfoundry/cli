@@ -75,7 +75,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(len(quotas)).To(Equal(3))
 			Expect(quotas[0].Guid).To(Equal("my-quota-guid"))
 			Expect(quotas[0].Name).To(Equal("my-remote-quota"))
-			Expect(quotas[0].MemoryLimit).To(Equal(uint64(1024)))
+			Expect(quotas[0].MemoryLimit).To(Equal(int64(1024)))
 			Expect(quotas[0].RoutesLimit).To(Equal(123))
 			Expect(quotas[0].ServicesLimit).To(Equal(321))
 

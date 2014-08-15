@@ -207,7 +207,7 @@ func stringValOrDefault(yamlMap generic.Map, key string, errs *[]error) *string 
 	}
 }
 
-func bytesVal(yamlMap generic.Map, key string, errs *[]error) *uint64 {
+func bytesVal(yamlMap generic.Map, key string, errs *[]error) *int64 {
 	yamlVal := yamlMap.Get(key)
 	if yamlVal == nil {
 		return nil

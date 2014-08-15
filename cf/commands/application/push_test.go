@@ -1,6 +1,10 @@
 package application_test
 
 import (
+	"os"
+	"path/filepath"
+	"syscall"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -18,9 +22,6 @@ import (
 	"github.com/cloudfoundry/cli/words"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
-	"path/filepath"
-	"syscall"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
@@ -254,8 +255,8 @@ var _ = Describe("Push Command", func() {
 				Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
 				Expect(*appRepo.CreatedAppParams().Command).To(Equal("unicorn -c config/unicorn.rb -D"))
 				Expect(*appRepo.CreatedAppParams().InstanceCount).To(Equal(3))
-				Expect(*appRepo.CreatedAppParams().DiskQuota).To(Equal(uint64(4096)))
-				Expect(*appRepo.CreatedAppParams().Memory).To(Equal(uint64(2048)))
+				Expect(*appRepo.CreatedAppParams().DiskQuota).To(Equal(int64(4096)))
+				Expect(*appRepo.CreatedAppParams().Memory).To(Equal(int64(2048)))
 				Expect(*appRepo.CreatedAppParams().StackGuid).To(Equal("custom-linux-guid"))
 				Expect(*appRepo.CreatedAppParams().HealthCheckTimeout).To(Equal(1))
 				Expect(*appRepo.CreatedAppParams().BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
@@ -446,7 +447,7 @@ var _ = Describe("Push Command", func() {
 				))
 
 				Expect(*appRepo.CreatedAppParams().Name).To(Equal("manifest-app-name"))
-				Expect(*appRepo.CreatedAppParams().Memory).To(Equal(uint64(128)))
+				Expect(*appRepo.CreatedAppParams().Memory).To(Equal(int64(128)))
 				Expect(*appRepo.CreatedAppParams().InstanceCount).To(Equal(1))
 				Expect(*appRepo.CreatedAppParams().StackName).To(Equal("custom-stack"))
 				Expect(*appRepo.CreatedAppParams().BuildpackUrl).To(Equal("some-buildpack"))
@@ -661,7 +662,7 @@ var _ = Describe("Push Command", func() {
 			Expect(appRepo.UpdateAppGuid).To(Equal(existingApp.Guid))
 			Expect(*appRepo.UpdateParams.Command).To(Equal("different start command"))
 			Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(10))
-			Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(1024)))
+			Expect(*appRepo.UpdateParams.Memory).To(Equal(int64(1024)))
 			Expect(*appRepo.UpdateParams.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-different.git"))
 			Expect(*appRepo.UpdateParams.StackGuid).To(Equal("differentStack-guid"))
 		})
@@ -889,36 +890,6 @@ var _ = Describe("Push Command", func() {
 	})
 
 	Describe("checking for bad flags", func() {
-		It("fails when non-positive value is given for memory limit", func() {
-			callPush("-m", "0G", "my-new-app")
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"memory"},
-				[]string{"positive integer"},
-			))
-		})
-
-		It("fails when non-positive value is given for instances", func() {
-			callPush("-i", "0", "my-new-app")
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"instance count"},
-				[]string{"positive integer"},
-			))
-		})
-
-		It("fails when non-positive value is given for disk quota", func() {
-			callPush("-k", "-1G", "my-new-app")
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"disk quota"},
-				[]string{"positive integer"},
-			))
-		})
-
 		It("fails when a non-numeric start timeout is given", func() {
 			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 

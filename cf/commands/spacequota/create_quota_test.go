@@ -83,7 +83,7 @@ var _ = Describe("create-quota command", func() {
 		Context("when the -m flag is provided", func() {
 			It("sets the memory limit", func() {
 				runCommand("-m", "50G", "erryday makin fitty jeez", "my-org")
-				Expect(quotaRepo.CreateArgsForCall(0).MemoryLimit).To(Equal(uint64(51200)))
+				Expect(quotaRepo.CreateArgsForCall(0).MemoryLimit).To(Equal(int64(51200)))
 			})
 
 			It("alerts the user when parsing the memory limit fails", func() {
@@ -96,7 +96,7 @@ var _ = Describe("create-quota command", func() {
 		Context("when the -i flag is provided", func() {
 			It("sets the memory limit", func() {
 				runCommand("-i", "50G", "erryday makin fitty jeez", "my-org")
-				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(uint64(51200)))
+				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(51200)))
 			})
 
 			It("alerts the user when parsing the memory limit fails", func() {

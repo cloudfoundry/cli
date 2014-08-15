@@ -13,7 +13,7 @@ type FakeSpaceQuotaRepository struct {
 	FindAllStub        func() (quotas []models.SpaceQuota, apiErr error)
 	findAllMutex       sync.RWMutex
 	findAllArgsForCall []struct{}
-	findAllReturns struct {
+	findAllReturns     struct {
 		result1 []models.SpaceQuota
 		result2 error
 	}

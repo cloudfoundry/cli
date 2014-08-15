@@ -9,7 +9,7 @@ import (
 )
 
 type AppEventsRepository interface {
-	RecentEvents(appGuid string, limit uint64) ([]models.EventFields, error)
+	RecentEvents(appGuid string, limit int64) ([]models.EventFields, error)
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -26,8 +26,8 @@ func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway 
 	}
 }
 
-func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limit uint64) ([]models.EventFields, error) {
-	count := uint64(0)
+func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limit int64) ([]models.EventFields, error) {
+	count := int64(0)
 	events := make([]models.EventFields, 0, limit)
 	apiErr := repo.listEvents(appGuid, limit, func(eventField models.EventFields) bool {
 		count++
@@ -38,7 +38,7 @@ func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limi
 	return events, apiErr
 }
 
-func (repo CloudControllerAppEventsRepository) listEvents(appGuid string, limit uint64, cb func(models.EventFields) bool) error {
+func (repo CloudControllerAppEventsRepository) listEvents(appGuid string, limit int64, cb func(models.EventFields) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.strategy.EventsURL(appGuid, limit),
