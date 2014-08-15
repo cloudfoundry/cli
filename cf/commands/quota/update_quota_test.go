@@ -1,7 +1,7 @@
 package quota_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,13 +19,14 @@ var _ = Describe("app Command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		quotaRepo           *testapi.FakeQuotaRepository
+		quotaRepo           *fakes.FakeQuotaRepository
+		quota               models.QuotaFields
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		quotaRepo = &testapi.FakeQuotaRepository{}
+		quotaRepo = &fakes.FakeQuotaRepository{}
 	})
 
 	runCommand := func(args ...string) {
@@ -49,7 +50,7 @@ var _ = Describe("app Command", func() {
 
 	Describe("updating quota fields", func() {
 		BeforeEach(func() {
-			quotaRepo.FindByNameReturns.Quota = models.QuotaFields{
+			quota = models.QuotaFields{
 				Guid:          "quota-guid",
 				Name:          "quota-name",
 				MemoryLimit:   1024,
@@ -58,11 +59,15 @@ var _ = Describe("app Command", func() {
 			}
 		})
 
+		JustBeforeEach(func() {
+			quotaRepo.FindByNameReturns(quota, nil)
+		})
+
 		Context("when the -m flag is provided", func() {
 			It("updates the memory limit", func() {
 				runCommand("-m", "15G", "quota-name")
-				Expect(quotaRepo.UpdateCalledWith.Name).To(Equal("quota-name"))
-				Expect(quotaRepo.UpdateCalledWith.MemoryLimit).To(Equal(int64(15360)))
+				Expect(quotaRepo.UpdateArgsForCall(0).Name).To(Equal("quota-name"))
+				Expect(quotaRepo.UpdateArgsForCall(0).MemoryLimit).To(Equal(int64(15360)))
 			})
 
 			It("fails with usage when the value cannot be parsed", func() {
@@ -75,7 +80,7 @@ var _ = Describe("app Command", func() {
 			It("updates the quota name", func() {
 				runCommand("-n", "quota-new-name", "quota-name")
 
-				Expect(quotaRepo.UpdateCalledWith.Name).To(Equal("quota-new-name"))
+				Expect(quotaRepo.UpdateArgsForCall(0).Name).To(Equal("quota-new-name"))
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Updating quota", "quota-name", "as", "my-user"},
@@ -86,25 +91,22 @@ var _ = Describe("app Command", func() {
 
 		It("updates the total allowed services", func() {
 			runCommand("-s", "9000", "quota-name")
-			Expect(quotaRepo.UpdateCalledWith.ServicesLimit).To(Equal(9000))
+			Expect(quotaRepo.UpdateArgsForCall(0).ServicesLimit).To(Equal(9000))
 		})
 
 		It("updates the total allowed routes", func() {
 			runCommand("-r", "9001", "quota-name")
-			Expect(quotaRepo.UpdateCalledWith.RoutesLimit).To(Equal(9001))
+			Expect(quotaRepo.UpdateArgsForCall(0).RoutesLimit).To(Equal(9001))
 		})
 
 		Context("update paid service plans", func() {
-			It("changes to paid service plan when --allow flag is provided", func() {
-				runCommand("--allow-paid-service-plans", "quota-name")
-				Expect(quotaRepo.UpdateCalledWith.AllowPaidServicePlans).To(BeTrue())
+			BeforeEach(func() {
+				quota.NonBasicServicesAllowed = false
 			})
 
-			It("changes to non-paid service plan when --disallow flag is provided", func() {
-				quotaRepo.FindByNameReturns.Quota.NonBasicServicesAllowed = true // updating an existing quota
-
-				runCommand("--disallow-paid-service-plans", "quota-name")
-				Expect(quotaRepo.UpdateCalledWith.AllowPaidServicePlans).To(BeFalse())
+			It("changes to paid service plan when --allow flag is provided", func() {
+				runCommand("--allow-paid-service-plans", "quota-name")
+				Expect(quotaRepo.UpdateArgsForCall(0).NonBasicServicesAllowed).To(BeTrue())
 			})
 
 			It("shows an error when both --allow and --disallow flags are provided", func() {
@@ -115,24 +117,37 @@ var _ = Describe("app Command", func() {
 					[]string{"Both flags are not permitted"},
 				))
 			})
+
+			Context("when paid services are allowed", func() {
+				BeforeEach(func() {
+					quota.NonBasicServicesAllowed = true
+				})
+				It("changes to non-paid service plan when --disallow flag is provided", func() {
+					quotaRepo.FindByNameReturns(quota, nil) // updating an existing quota
+
+					runCommand("--disallow-paid-service-plans", "quota-name")
+					Expect(quotaRepo.UpdateArgsForCall(0).NonBasicServicesAllowed).To(BeFalse())
+				})
+			})
 		})
 	})
 
 	It("shows an error when updating fails", func() {
-		quotaRepo.UpdateReturns.Error = errors.New("I accidentally a quota")
+		quotaRepo.UpdateReturns(errors.New("I accidentally a quota"))
 		runCommand("-m", "1M", "dead-serious")
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("shows the user an error when finding the quota fails", func() {
-		quotaRepo.FindByNameReturns.Error = errors.New("i can't believe it's not quotas!")
+		quotaRepo.FindByNameReturns(models.QuotaFields{}, errors.New("i can't believe it's not quotas!"))
 
 		runCommand("-m", "50Somethings", "what-could-possibly-go-wrong?")
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("shows a message explaining the update", func() {
-		quotaRepo.FindByNameReturns.Quota.Name = "i-love-ui"
+		quota.Name = "i-love-ui"
+		quotaRepo.FindByNameReturns(quota, nil)
 
 		runCommand("-m", "50G", "i-love-ui")
 		Expect(ui.Outputs).To(ContainSubstrings(

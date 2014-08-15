@@ -1,7 +1,7 @@
 package quota
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -17,10 +17,10 @@ import (
 type CreateQuota struct {
 	ui        terminal.UI
 	config    configuration.Reader
-	quotaRepo api.QuotaRepository
+	quotaRepo quotas.QuotaRepository
 }
 
-func NewCreateQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) CreateQuota {
+func NewCreateQuota(ui terminal.UI, config configuration.Reader, quotaRepo quotas.QuotaRepository) CreateQuota {
 	return CreateQuota{
 		ui:        ui,
 		config:    config,
@@ -32,8 +32,9 @@ func (cmd CreateQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-quota",
 		Description: T("Define a new resource quota"),
-		Usage:       T("CF_NAME create-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
+		Usage:       T("CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
 		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewStringFlag("m", T("Total amount of memory (e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewIntFlag("r", T("Total number of routes")),
 			flag_helpers.NewIntFlag("s", T("Total number of service instances")),
@@ -72,6 +73,16 @@ func (cmd CreateQuota) Run(context *cli.Context) {
 		}
 
 		quota.MemoryLimit = parsedMemory
+	}
+
+	instanceMemoryLimit := context.String("i")
+	if instanceMemoryLimit != "" {
+		parsedMemory, errr := formatters.ToMegabytes(instanceMemoryLimit)
+		if errr != nil {
+			cmd.ui.Failed(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": errr}))
+		}
+
+		quota.InstanceMemoryLimit = parsedMemory
 	}
 
 	if context.IsSet("r") {

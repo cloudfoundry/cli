@@ -1,7 +1,7 @@
 package quota_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -18,13 +18,13 @@ import (
 var _ = Describe("quotas command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		quotaRepo           *testapi.FakeQuotaRepository
+		quotaRepo           *fakes.FakeQuotaRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		quotaRepo = &testapi.FakeQuotaRepository{}
+		quotaRepo = &fakes.FakeQuotaRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
@@ -42,7 +42,7 @@ var _ = Describe("quotas command", func() {
 
 	Context("when quotas exist", func() {
 		BeforeEach(func() {
-			quotaRepo.FindAllReturns.Quotas = []models.QuotaFields{
+			quotaRepo.FindAllReturns([]models.QuotaFields{
 				models.QuotaFields{
 					Name:                    "quota-name",
 					MemoryLimit:             1024,
@@ -57,7 +57,7 @@ var _ = Describe("quotas command", func() {
 					ServicesLimit:           2,
 					NonBasicServicesAllowed: false,
 				},
-			}
+			}, nil)
 		})
 
 		It("lists quotas", func() {
@@ -74,7 +74,7 @@ var _ = Describe("quotas command", func() {
 
 	Context("when an error occurs fetching quotas", func() {
 		BeforeEach(func() {
-			quotaRepo.FindAllReturns.Error = errors.New("I haz a borken!")
+			quotaRepo.FindAllReturns([]models.QuotaFields{}, errors.New("I haz a borken!"))
 		})
 
 		It("prints an error", func() {

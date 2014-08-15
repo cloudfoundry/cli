@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,13 +20,13 @@ var _ = Describe("quota", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		quotaRepo           *testapi.FakeQuotaRepository
+		quotaRepo           *fakes.FakeQuotaRepository
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		quotaRepo = &testapi.FakeQuotaRepository{}
+		quotaRepo = &fakes.FakeQuotaRepository{}
 	})
 
 	runCommand := func(args ...string) {
@@ -56,14 +56,14 @@ var _ = Describe("quota", func() {
 		Context("When providing a quota name", func() {
 			Context("that exists", func() {
 				BeforeEach(func() {
-					quotaRepo.FindByNameReturns.Quota = models.QuotaFields{
+					quotaRepo.FindByNameReturns(models.QuotaFields{
 						Guid:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						RoutesLimit:             2000,
 						ServicesLimit:           47,
 						NonBasicServicesAllowed: true,
-					}
+					}, nil)
 				})
 
 				It("shows you that quota", func() {
@@ -82,7 +82,7 @@ var _ = Describe("quota", func() {
 
 			Context("that doesn't exist", func() {
 				BeforeEach(func() {
-					quotaRepo.FindByNameReturns.Error = errors.New("oops i accidentally a quota")
+					quotaRepo.FindByNameReturns(models.QuotaFields{}, errors.New("oops i accidentally a quota"))
 				})
 
 				It("gives an error", func() {

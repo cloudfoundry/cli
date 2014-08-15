@@ -1,7 +1,7 @@
 package organization_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,7 +18,7 @@ var _ = Describe("set-quota command", func() {
 	var (
 		cmd                 *SetQuota
 		ui                  *testterm.FakeUI
-		quotaRepo           *testapi.FakeQuotaRepository
+		quotaRepo           *fakes.FakeQuotaRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
@@ -28,7 +28,7 @@ var _ = Describe("set-quota command", func() {
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
-		quotaRepo = &testapi.FakeQuotaRepository{}
+		quotaRepo = &fakes.FakeQuotaRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		cmd = NewSetQuota(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
 	})
@@ -64,7 +64,7 @@ var _ = Describe("set-quota command", func() {
 
 			quota := models.QuotaFields{Name: "my-quota", Guid: "my-quota-guid"}
 
-			quotaRepo.FindByNameReturns.Quota = quota
+			quotaRepo.FindByNameReturns(quota, nil)
 			requirementsFactory.Organization = org
 
 			runCommand("my-org", "my-quota")
@@ -74,9 +74,10 @@ var _ = Describe("set-quota command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(quotaRepo.FindByNameCalledWith.Name).To(Equal("my-quota"))
-			Expect(quotaRepo.AssignQuotaToOrgCalledWith.OrgGuid).To(Equal("my-org-guid"))
-			Expect(quotaRepo.AssignQuotaToOrgCalledWith.QuotaGuid).To(Equal("my-quota-guid"))
+			Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("my-quota"))
+			orgGuid, quotaGuid := quotaRepo.AssignQuotaToOrgArgsForCall(0)
+			Expect(orgGuid).To(Equal("my-org-guid"))
+			Expect(quotaGuid).To(Equal("my-quota-guid"))
 		})
 	})
 })
