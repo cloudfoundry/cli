@@ -117,13 +117,15 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk")})
+	table := terminal.NewTable(cmd.ui, []string{"", T("state"), T("since"), T("host"), T("handle id"), T("cpu"), T("memory"), T("disk")})
 
 	for index, instance := range instances {
 		table.Add(
 			fmt.Sprintf("#%d", index),
 			ui_helpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
+			fmt.Sprintf("%s", instance.Host),
+			fmt.Sprintf("%s", instance.HandleId),
 			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
 			fmt.Sprintf(T("{{.MemUsage}} of {{.MemQuota}}",
 				map[string]interface{}{
