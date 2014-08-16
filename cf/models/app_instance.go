@@ -19,4 +19,6 @@ type AppInstanceFields struct {
 	DiskUsage int64
 	MemQuota  int64
 	MemUsage  int64
+	Host      string
+	HandleId  string
 }
