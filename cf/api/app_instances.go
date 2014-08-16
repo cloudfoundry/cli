@@ -21,8 +21,10 @@ type StatsApiResponse map[string]InstanceStatsApiResponse
 
 type InstanceStatsApiResponse struct {
 	Stats struct {
-		DiskQuota int64 `json:"disk_quota"`
-		MemQuota  int64 `json:"mem_quota"`
+		DiskQuota int64  `json:"disk_quota"`
+		MemQuota  int64  `json:"mem_quota"`
+		Host      string `json:"host"` 
+		HandleId  string `json:"warden_handle"` 
 		Usage     struct {
 			Cpu  float64
 			Disk int64
@@ -92,6 +94,8 @@ func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid 
 		instance.DiskUsage = v.Stats.Usage.Disk
 		instance.MemQuota = v.Stats.MemQuota
 		instance.MemUsage = v.Stats.Usage.Mem
+		instance.Host     = v.Stats.Host
+		instance.HandleId = v.Stats.HandleId
 
 		updatedInst[index] = instance
 	}
