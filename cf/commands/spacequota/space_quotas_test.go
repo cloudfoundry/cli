@@ -50,7 +50,7 @@ var _ = Describe("quotas command", func() {
 					RoutesLimit:             111,
 					ServicesLimit:           222,
 					NonBasicServicesAllowed: true,
-					//					OrgGuid:                 "my-org",
+					OrgGuid:                 "my-org",
 				},
 				models.SpaceQuota{
 					Name:                    "quota-non-basic-not-allowed",
@@ -59,7 +59,7 @@ var _ = Describe("quotas command", func() {
 					RoutesLimit:             1,
 					ServicesLimit:           2,
 					NonBasicServicesAllowed: false,
-					//					OrgGuid:                 "your-org",
+					OrgGuid:                 "your-org",
 				},
 			}, nil)
 		})
@@ -69,7 +69,7 @@ var _ = Describe("quotas command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting space quotas as", "my-user"},
 				[]string{"OK"},
-				[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans"},
+				[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans", "organization"},
 				[]string{"quota-name", "1G", "512M", "111", "222", "allowed"},
 				[]string{"quota-non-basic-not-allowed", "434M", "3M", "1", "2", "disallowed"},
 			))
