@@ -2,6 +2,7 @@ package space_quotas
 
 import (
 	"fmt"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -13,6 +14,7 @@ import (
 type SpaceQuotaRepository interface {
 	FindAll() (quotas []models.SpaceQuota, apiErr error)
 	FindByName(name string) (quota models.SpaceQuota, apiErr error)
+	FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error)
 
 	AssignQuotaToOrg(orgGuid, quotaGuid string) error
 
@@ -34,19 +36,18 @@ func NewCloudControllerSpaceQuotaRepository(config configuration.Reader, gateway
 }
 
 func (repo CloudControllerSpaceQuotaRepository) findAllWithPath(path string) ([]models.SpaceQuota, error) {
-	// var quotas []models.SpaceQuota
-	// apiErr := repo.gateway.ListPaginatedResources(
-	// 	repo.config.ApiEndpoint(),
-	// 	path,
-	// 	resources.QuotaResource{},
-	// 	func(resource interface{}) bool {
-	// 		if qr, ok := resource.(resources.QuotaResource); ok {
-	// 			quotas = append(quotas, qr.ToFields())
-	// 		}
-	// 		return true
-	// 	})
-	// return quotas, apiErr
-	return nil, nil
+	var quotas []models.SpaceQuota
+	apiErr := repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		path,
+		resources.SpaceQuotaResource{},
+		func(resource interface{}) bool {
+			if qr, ok := resource.(resources.SpaceQuotaResource); ok {
+				quotas = append(quotas, qr.ToModel())
+			}
+			return true
+		})
+	return quotas, apiErr
 }
 
 func (repo CloudControllerSpaceQuotaRepository) FindAll() (quotas []models.SpaceQuota, apiErr error) {
@@ -67,6 +68,15 @@ func (repo CloudControllerSpaceQuotaRepository) FindByName(name string) (quota m
 
 	quota = quotas[0]
 	return
+}
+
+func (repo CloudControllerSpaceQuotaRepository) FindByOrg(guid string) ([]models.SpaceQuota, error) {
+	path := fmt.Sprintf("/v2/organizations/%s/space_quota_definitions", guid)
+	quotas, apiErr := repo.findAllWithPath(path)
+	if apiErr != nil {
+		return nil, apiErr
+	}
+	return quotas, nil
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Create(quota models.SpaceQuota) error {

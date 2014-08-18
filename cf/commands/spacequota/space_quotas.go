@@ -38,6 +38,7 @@ func (cmd *ListSpaceQuotas) Metadata() command_metadata.CommandMetadata {
 func (cmd *ListSpaceQuotas) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedOrgRequirement(),
 	}
 	return
 }
@@ -45,16 +46,17 @@ func (cmd *ListSpaceQuotas) GetRequirements(requirementsFactory requirements.Fac
 func (cmd *ListSpaceQuotas) Run(c *cli.Context) {
 	cmd.ui.Say(T("Getting space quotas as {{.Username}}...", map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	quotas, apiErr := cmd.spaceQuotaRepo.FindAll()
+	quotas, apiErr := cmd.spaceQuotaRepo.FindByOrg(cmd.config.OrganizationFields().Guid)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
+
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := terminal.NewTable(cmd.ui, []string{T("name"), T("total memory limit"), T("instance memory limit"), T("routes"), T("service instances"), T("paid service plans"), T("organization")})
+	table := terminal.NewTable(cmd.ui, []string{T("name"), T("total memory limit"), T("instance memory limit"), T("routes"), T("service instances"), T("paid service plans")})
 
 	for _, quota := range quotas {
 		table.Add(

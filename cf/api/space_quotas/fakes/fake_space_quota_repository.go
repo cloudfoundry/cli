@@ -26,6 +26,15 @@ type FakeSpaceQuotaRepository struct {
 		result1 models.SpaceQuota
 		result2 error
 	}
+	FindByOrgStub        func(guid string) (quota []models.SpaceQuota, apiErr error)
+	findByOrgMutex       sync.RWMutex
+	findByOrgArgsForCall []struct {
+		guid string
+	}
+	findByOrgReturns struct {
+		result1 []models.SpaceQuota
+		result2 error
+	}
 	AssignQuotaToOrgStub        func(orgGuid, quotaGuid string) error
 	assignQuotaToOrgMutex       sync.RWMutex
 	assignQuotaToOrgArgsForCall []struct {
@@ -113,6 +122,38 @@ func (fake *FakeSpaceQuotaRepository) FindByNameArgsForCall(i int) string {
 func (fake *FakeSpaceQuotaRepository) FindByNameReturns(result1 models.SpaceQuota, result2 error) {
 	fake.findByNameReturns = struct {
 		result1 models.SpaceQuota
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSpaceQuotaRepository) FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error) {
+	fake.findByOrgMutex.Lock()
+	defer fake.findByOrgMutex.Unlock()
+	fake.findByOrgArgsForCall = append(fake.findByOrgArgsForCall, struct {
+		guid string
+	}{guid})
+	if fake.FindByOrgStub != nil {
+		return fake.FindByOrgStub(guid)
+	} else {
+		return fake.findByOrgReturns.result1, fake.findByOrgReturns.result2
+	}
+}
+
+func (fake *FakeSpaceQuotaRepository) FindByOrgCallCount() int {
+	fake.findByOrgMutex.RLock()
+	defer fake.findByOrgMutex.RUnlock()
+	return len(fake.findByOrgArgsForCall)
+}
+
+func (fake *FakeSpaceQuotaRepository) FindByOrgArgsForCall(i int) string {
+	fake.findByOrgMutex.RLock()
+	defer fake.findByOrgMutex.RUnlock()
+	return fake.findByOrgArgsForCall[i].guid
+}
+
+func (fake *FakeSpaceQuotaRepository) FindByOrgReturns(result1 []models.SpaceQuota, result2 error) {
+	fake.findByOrgReturns = struct {
+		result1 []models.SpaceQuota
 		result2 error
 	}{result1, result2}
 }
