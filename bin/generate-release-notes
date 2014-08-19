@@ -32,24 +32,23 @@ VERSION=v$(cat VERSION)
 cat <<-NOTES
 CF version $VERSION
 ===================
-
 Installers
 ----------
-- [Debian 32 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-cli_i386.deb)
-- [Debian 64 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-cli_amd64.deb)
-- [Redhat 32 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-cli_i386.rpm)
-- [Redhat 64 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-cli_amd64.rpm)
-- [Mac OS X 64 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/installer-osx-amd64.pkg)
-- [Windows 32 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/installer-windows-386.zip)
-- [Windows 64 bit](https://s3.amazonaws.com/go-cli/releases/$VERSION/installer-windows-amd64.zip)
+- [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&version=$VERSION&source=github-rel)
+- [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&version=$VERSION&source=github-rel)
+- [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32&version=$VERSION&source=github-rel)
+- [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64&version=$VERSION&source=github-rel)
+- [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64&version=$VERSION&source=github-rel)
+- [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32&version=$VERSION&source=github-rel)
+- [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64&version=$VERSION&source=github-rel)
 
 Binaries
 --------
-- [Linux 32 bit binary]   (https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-linux-386.tgz)
-- [Linux 64 bit binary]   (https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-linux-amd64.tgz)
-- [Mac OS X 64 bit binary](https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-darwin-amd64.tgz)
-- [Windows 32 bit binary] (https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-windows-386.zip)
-- [Windows 64 bit binary] (https://s3.amazonaws.com/go-cli/releases/$VERSION/cf-windows-amd64.zip)
+- [Linux 32 bit binary]   (https://cli.run.pivotal.io/stable?release=linux32-binary&version=$VERSION&source=github-rel)
+- [Linux 64 bit binary]   (https://cli.run.pivotal.io/stable?release=linux64-binary&version=$VERSION&source=github-rel)
+- [Mac OS X 64 bit binary](https://cli.run.pivotal.io/stable?release=macosx64-binary&version=$VERSION&source=github-rel)
+- [Windows 32 bit binary] (https://cli.run.pivotal.io/stable?release=windows32-exe&version=$VERSION&source=github-rel)
+- [Windows 64 bit binary] (https://cli.run.pivotal.io/stable?release=windows64-exe&version=$VERSION&source=github-rel)
 
 Change Log
 ----------
