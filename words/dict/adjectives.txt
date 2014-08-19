@@ -1224,8 +1224,6 @@ anticeremonial
 anticeremonious
 antichloristic
 anticholinergic
-antichristian
-antichurch
 anticipant
 anticipatable
 anticipative
@@ -11069,8 +11067,6 @@ hollowhearted
 holmic
 holoblastic
 holocarpic
-holocaustal
-holocaustic
 holocrine
 holohedral
 holometabolous
@@ -31384,7 +31380,6 @@ unchoosable
 unchopped
 unchosen
 unchristened
-unchristian
 unchromatic
 unchromed
 unchronic
@@ -31406,7 +31401,6 @@ uncircularized
 uncirculated
 uncirculating
 uncirculative
-uncircumcised
 uncircumlocutory
 uncircumscribable
 uncircumscribed
