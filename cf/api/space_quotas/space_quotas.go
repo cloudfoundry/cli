@@ -2,13 +2,13 @@ package space_quotas
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type SpaceQuotaRepository interface {
@@ -55,19 +55,19 @@ func (repo CloudControllerSpaceQuotaRepository) FindAll() (quotas []models.Space
 }
 
 func (repo CloudControllerSpaceQuotaRepository) FindByName(name string) (quota models.SpaceQuota, apiErr error) {
-	path := fmt.Sprintf("/v2/quota_definitions?q=%s", url.QueryEscape("name:"+name))
-	quotas, apiErr := repo.findAllWithPath(path)
+	quotas, apiErr := repo.FindByOrg(repo.config.OrganizationFields().Guid)
 	if apiErr != nil {
 		return
 	}
 
-	if len(quotas) == 0 {
-		apiErr = errors.NewModelNotFoundError("Quota", name)
-		return
+	for _, quota := range quotas {
+		if quota.Name == name {
+			return quota, nil
+		}
 	}
 
-	quota = quotas[0]
-	return
+	apiErr = errors.NewModelNotFoundError("Space Quota", name)
+	return models.SpaceQuota{}, apiErr
 }
 
 func (repo CloudControllerSpaceQuotaRepository) FindByOrg(guid string) ([]models.SpaceQuota, error) {

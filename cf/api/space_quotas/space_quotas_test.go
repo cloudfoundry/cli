@@ -1,12 +1,13 @@
 package space_quotas_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"net/http"
 	"net/http/httptest"
 	"time"
 
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -41,9 +42,9 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		testServer.Close()
 	})
 
-	PDescribe("FindByName", func() {
+	Describe("FindByName", func() {
 		BeforeEach(func() {
-			setupTestServer(firstQuotaRequest, secondQuotaRequest)
+			setupTestServer(firstSpaceQuotaRequest, secondSpaceQuotaRequest)
 		})
 
 		It("Finds Quota definitions by name", func() {
@@ -51,14 +52,22 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
-			Expect(quota).To(Equal(models.QuotaFields{
+			Expect(quota).To(Equal(models.SpaceQuota{
 				Guid:                    "my-quota-guid",
 				Name:                    "my-remote-quota",
 				MemoryLimit:             1024,
 				RoutesLimit:             123,
 				ServicesLimit:           321,
 				NonBasicServicesAllowed: true,
+				OrgGuid:                 "my-org-guid",
 			}))
+		})
+
+		It("Returns an error if the quota cannot be found", func() {
+			_, err := repo.FindByName("totally-not-a-quota")
+
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 	})
 
@@ -86,7 +95,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 	Describe("FindByOrg", func() {
 		BeforeEach(func() {
-			setupTestServer(firstRequestByOrg, secondRequestByOrg)
+			setupTestServer(firstSpaceQuotaRequest, secondSpaceQuotaRequest)
 		})
 
 		It("finds all quota definitions by org guid", func() {
@@ -244,7 +253,7 @@ var secondQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestReque
 	},
 })
 
-var firstRequestByOrg = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstSpaceQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/organizations/my-org-guid/space_quota_definitions",
 	Response: testnet.TestResponse{
@@ -267,7 +276,7 @@ var firstRequestByOrg = testapi.NewCloudControllerTestRequest(testnet.TestReques
 	},
 })
 
-var secondRequestByOrg = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondSpaceQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/organizations/my-org-guid/space_quota_definitions?page=2",
 	Response: testnet.TestResponse{
