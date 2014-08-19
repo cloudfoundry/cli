@@ -2,6 +2,8 @@
 
 set -e
 
+export CF_RAISE_ERROR_ON_WARNINGS=true
+
 export GOPATH=~/go
 rm -rf $GOPATH/pkg/*
 
