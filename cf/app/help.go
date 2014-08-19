@@ -222,6 +222,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentCommand("create-space-quota"),
 					presentCommand("space-quotas"),
+					presentCommand("space-quota"),
 				},
 			},
 		}, {
