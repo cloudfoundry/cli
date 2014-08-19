@@ -207,7 +207,7 @@ func (actor ServicePlanHandler) deleteServicePlanVisibilities(queryParams map[st
 func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string, servicePlan models.ServicePlanFields, setPlanVisibility bool) error {
 	// We delete all service plan visibilities for the given Plan since the attribute public should function as a giant on/off
 	// switch for all orgs. Thus we need to clean up any visibilities laying around so that they don't carry over.
-	err := actor.deleteServicePlanVisibilities(map[string]string{"plan_guid": servicePlan.Guid})
+	err := actor.deleteServicePlanVisibilities(map[string]string{"service_plan_guid": servicePlan.Guid})
 	if err != nil {
 		return err
 	}
