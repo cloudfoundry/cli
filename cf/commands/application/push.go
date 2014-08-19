@@ -2,11 +2,11 @@ package application
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -82,7 +82,7 @@ func (cmd *Push) Metadata() command_metadata.CommandMetadata {
 			flag_helpers.NewStringFlag("k", T("Disk limit (e.g. 256M, 1024M, 1G)")),
 			flag_helpers.NewStringFlag("m", T("Memory limit (e.g. 256M, 1024M, 1G)")),
 			flag_helpers.NewStringFlag("n", T("Hostname (e.g. my-subdomain)")),
-			flag_helpers.NewStringFlag("p", T("Path of app directory or zip file")),
+			flag_helpers.NewStringFlag("p", T("Path to app directory or file")),
 			flag_helpers.NewStringFlag("s", T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")),
 			flag_helpers.NewStringFlag("t", T("Start timeout in seconds")),
 			cli.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")},
