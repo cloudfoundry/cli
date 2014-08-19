@@ -77,7 +77,9 @@ func main() {
 	}
 
 	gateways := gatewaySliceFromMap(deps.gateways)
-	net.NewWarningsCollector(deps.termUI, gateways...).PrintWarnings()
+
+	warningsCollector := net.NewWarningsCollector(deps.termUI, gateways...)
+	warningsCollector.PrintWarnings()
 }
 
 func gatewaySliceFromMap(gateway_map map[string]net.Gateway) []net.WarningProducer {
