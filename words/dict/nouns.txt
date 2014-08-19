@@ -3411,9 +3411,6 @@ aseity
 asemia
 asepsis
 asepticism
-asexualisation
-asexuality
-asexualization
 asgmt
 ash
 ashamedness
@@ -5585,8 +5582,6 @@ bisection
 bisector
 bisectrix
 bisellium
-bisexualism
-bisexuality
 bish
 bishop
 bishopbird
@@ -9564,10 +9559,6 @@ chocolate
 choctaw
 choice
 choiceness
-choir
-choirboy
-choirgirl
-choirmaster
 chokeberry
 chokebore
 chokecherry
@@ -9676,7 +9667,6 @@ chrismon
 chrisom
 christcross
 christener
-christening
 chroma
 chromate
 chromaticism
@@ -9781,16 +9771,6 @@ chupatti
 chuppah
 chuprassi
 churada
-church
-churchgoer
-churchgoing
-churchiness
-churchliness
-churchman
-churchmanship
-churchwarden
-churchwoman
-churchyard
 churinga
 churl
 churlishness
@@ -9831,10 +9811,6 @@ cicisbeism
 cicisbeo
 cider
 cierzo
-cig
-cigar
-cigarette
-cigarillo
 cilia
 ciliation
 cilice
@@ -9911,8 +9887,6 @@ circumambulation
 circumambulator
 circumbendibus
 circumcenter
-circumciser
-circumcision
 circumference
 circumferentor
 circumflex
@@ -11665,7 +11639,6 @@ contrabass
 contrabassist
 contrabassoon
 contrabassoonist
-contraception
 contractedness
 contractibility
 contractibleness
@@ -24967,7 +24940,6 @@ holly
 hollyhock
 holm
 holmium
-holocaust
 holoenzyme
 hologonidium
 hologram
@@ -27994,9 +27966,6 @@ interscene
 interschool
 intersection
 intersession
-intersex
-intersexualism
-intersexuality
 intersolubility
 interspersal
 interspersion
@@ -30567,9 +30536,6 @@ leucotaxine
 leucotome
 leucotomy
 leud
-leukaemia
-leukemia
-leukemid
 leukoblast
 leukocidin
 leukocyte
@@ -30614,7 +30580,6 @@ levity
 levoglucose
 levorotation
 levulose
-lewdness
 lewis
 lewisite
 lewisson
@@ -30667,11 +30632,7 @@ libertarian
 libertarianism
 liberticide
 libertinage
-libertine
-libertinism
 liberty
-libidinousness
-libido
 libra
 librarian
 librarianship
@@ -39125,12 +39086,6 @@ overlaudation
 overlavishness
 overlaxness
 overlearnedness
-overlewdness
-overliberality
-overliberalization
-overlicentiousness
-overlightness
-overliking
 overline
 overliterariness
 overliveliness
@@ -44196,15 +44151,6 @@ prickspur
 pride
 pridefulness
 prier
-priest
-priestcraft
-priestess
-priestfish
-priesthood
-priestliness
-prig
-priggery
-priggish
 primacy
 primage
 primaquine
@@ -49800,8 +49746,6 @@ sewing
 sexagenarian
 sexdecillion
 sexfoil
-sexiness
-sexlessness
 sextain
 sextant
 sextet
@@ -54253,7 +54197,6 @@ superserviceableness
 supersession
 supersevereness
 superseverity
-supersex
 supershipment
 supersimplicity
 supersincerity
