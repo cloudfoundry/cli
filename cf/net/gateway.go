@@ -24,7 +24,6 @@ const (
 	JOB_FINISHED             = "finished"
 	JOB_FAILED               = "failed"
 	DEFAULT_POLLING_THROTTLE = 5 * time.Second
-	ASYNC_REQUEST_TIMEOUT    = 10 * time.Minute
 )
 
 type JobResource struct {
@@ -77,9 +76,9 @@ func newGateway(errHandler apiErrorHandler, config configuration.Reader) (gatewa
 func (gateway *Gateway) AsyncTimeout() time.Duration {
 	if gateway.config.AsyncTimeout() > 0 {
 		return time.Duration(gateway.config.AsyncTimeout()) * time.Minute
-	} else {
-		return ASYNC_REQUEST_TIMEOUT
 	}
+
+	return 0
 }
 
 func (gateway *Gateway) SetTokenRefresher(auth tokenRefresher) {
@@ -311,7 +310,7 @@ func (gateway Gateway) Warnings() []string {
 func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Duration) (err error) {
 	startTime := gateway.Clock()
 	for true {
-		if gateway.Clock().Sub(startTime) > timeout {
+		if gateway.Clock().Sub(startTime) > timeout && timeout != 0 {
 			return errors.NewAsyncTimeoutError(jobUrl)
 		}
 		var request *Request

@@ -44,10 +44,6 @@ var _ = Describe("Gateway", func() {
 	})
 
 	Describe("async timeout", func() {
-		It("has an async timeout that defaults to a sane value", func() {
-			Expect(ccGateway.AsyncTimeout()).To(Equal(ASYNC_REQUEST_TIMEOUT))
-		})
-
 		Context("when the config has a positive async timeout", func() {
 			It("inherits the async timeout from the config", func() {
 				config.SetAsyncTimeout(9001)
