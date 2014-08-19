@@ -1,18 +1,20 @@
 package net_test
 
 import (
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/net"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
 )
 
 var _ = Describe("WarningsCollector", func() {
 	var (
 		ui                 *testterm.FakeUI
 		oldRaiseErrorValue string
+		warningsCollector  net.WarningsCollector
 	)
 
 	BeforeEach(func() {
@@ -28,22 +30,36 @@ var _ = Describe("WarningsCollector", func() {
 			os.Setenv("CF_RAISE_ERROR_ON_WARNINGS", oldRaiseErrorValue)
 		})
 
-		Context("when the RAISE_ERROR_ON_WARNINGS environment variable is set", func() {
+		Context("when the CF_RAISE_ERROR_ON_WARNINGS environment variable is set", func() {
 			BeforeEach(func() {
 				os.Setenv("CF_RAISE_ERROR_ON_WARNINGS", "true")
 			})
+			Context("when there are warnings", func() {
+				BeforeEach(func() {
+					warning_producer_one := testnet.NewWarningProducer([]string{"Hello", "Darling"})
+					warning_producer_two := testnet.NewWarningProducer([]string{"Goodbye", "Sweetie"})
+					warning_producer_three := testnet.NewWarningProducer(nil)
+					warningsCollector = net.NewWarningsCollector(ui, warning_producer_one, warning_producer_two, warning_producer_three)
+				})
 
-			It("panics with an error that contains all the warnings", func() {
-				warning_producer_one := testnet.NewWarningProducer([]string{"Hello", "Darling"})
-				warning_producer_two := testnet.NewWarningProducer([]string{"Goodbye", "Sweetie"})
-				warning_producer_three := testnet.NewWarningProducer(nil)
-				warnings_collector := net.NewWarningsCollector(ui, warning_producer_one, warning_producer_two, warning_producer_three)
+				It("panics with an error that contains all the warnings", func() {
+					Expect(warningsCollector.PrintWarnings).To(Panic())
+				})
+			})
 
-				Expect(warnings_collector.PrintWarnings).To(Panic())
+			Context("when there are no warnings", func() {
+				BeforeEach(func() {
+					warningsCollector = net.NewWarningsCollector(ui)
+				})
+
+				It("does not panic", func() {
+					Expect(warningsCollector.PrintWarnings).NotTo(Panic())
+				})
+
 			})
 		})
 
-		Context("when the RAISE_ERROR_ON_WARNINGS environment variable is not set", func() {
+		Context("when the CF_RAISE_ERROR_ON_WARNINGS environment variable is not set", func() {
 			BeforeEach(func() {
 				os.Setenv("CF_RAISE_ERROR_ON_WARNINGS", "")
 			})
@@ -52,9 +68,9 @@ var _ = Describe("WarningsCollector", func() {
 				warning_producer_one := testnet.NewWarningProducer([]string{"Hello", "Darling"})
 				warning_producer_two := testnet.NewWarningProducer([]string{"Goodbye", "Sweetie"})
 				warning_producer_three := testnet.NewWarningProducer(nil)
-				warnings_collector := net.NewWarningsCollector(ui, warning_producer_one, warning_producer_two, warning_producer_three)
+				warningsCollector := net.NewWarningsCollector(ui, warning_producer_one, warning_producer_two, warning_producer_three)
 
-				Expect(warnings_collector.PrintWarnings).NotTo(Panic())
+				Expect(warningsCollector.PrintWarnings).NotTo(Panic())
 			})
 		})
 	})
