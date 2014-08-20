@@ -35,7 +35,7 @@ func (cmd CreateSpaceQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-space-quota",
 		Description: T("Define a new space resource quota"),
-		Usage:       T("CF_NAME create-space-quota QUOTA ORG [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
+		Usage:       T("CF_NAME create-space-quota QUOTA [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewStringFlag("m", T("Total amount of memory a space can have(e.g. 1024M, 1G, 10G)")),
@@ -47,29 +47,25 @@ func (cmd CreateSpaceQuota) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd CreateSpaceQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 2 {
+	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
 
 	return []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedOrgRequirement(),
 	}, nil
 }
 
 func (cmd CreateSpaceQuota) Run(context *cli.Context) {
 	name := context.Args()[0]
-	orgName := context.Args()[1]
+	org := cmd.config.OrganizationFields()
 
 	cmd.ui.Say(T("Creating quota {{.QuotaName}} for org {{.OrgName}} as {{.Username}}...", map[string]interface{}{
 		"QuotaName": terminal.EntityNameColor(name),
-		"OrgName":   terminal.EntityNameColor(orgName),
+		"OrgName":   terminal.EntityNameColor(org.Name),
 		"Username":  terminal.EntityNameColor(cmd.config.Username()),
 	}))
-
-	org, err := cmd.orgRepo.FindByName(orgName)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-	}
 
 	quota := models.SpaceQuota{
 		Name:    name,
@@ -108,7 +104,7 @@ func (cmd CreateSpaceQuota) Run(context *cli.Context) {
 		quota.NonBasicServicesAllowed = true
 	}
 
-	err = cmd.quotaRepo.Create(quota)
+	err := cmd.quotaRepo.Create(quota)
 
 	httpErr, ok := err.(errors.HttpError)
 	if ok && httpErr.ErrorCode() == errors.QUOTA_EXISTS {

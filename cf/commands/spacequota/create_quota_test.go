@@ -42,21 +42,26 @@ var _ = Describe("create-quota command", func() {
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
-	Context("when the user is not logged in", func() {
-		BeforeEach(func() {
+	Context("requirements", func() {
+		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
+			runCommand("my-quota", "-m", "50G")
+
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 
-		It("fails requirements", func() {
-			runCommand("my-quota", "my-org", "-m", "50G")
+		It("requires the user to target an org", func() {
+			requirementsFactory.TargetedOrgSuccess = false
+			runCommand("my-quota", "-m", "50G")
 
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	Context("when requirements have been met", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedOrgSuccess = true
 		})
 
 		It("fails requirements when called without a quota name", func() {
@@ -64,13 +69,8 @@ var _ = Describe("create-quota command", func() {
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
-		It("fails requirements when called without an org name", func() {
+		It("creates a quota with a given name", func() {
 			runCommand("my-quota")
-			Expect(ui.FailedWithUsage).To(BeTrue())
-		})
-
-		It("creates a quota with a given name and org", func() {
-			runCommand("my-quota", "my-org")
 			Expect(quotaRepo.CreateArgsForCall(0).Name).To(Equal("my-quota"))
 			Expect(quotaRepo.CreateArgsForCall(0).OrgGuid).To(Equal("my-org-guid"))
 
@@ -82,12 +82,12 @@ var _ = Describe("create-quota command", func() {
 
 		Context("when the -m flag is provided", func() {
 			It("sets the memory limit", func() {
-				runCommand("-m", "50G", "erryday makin fitty jeez", "my-org")
+				runCommand("-m", "50G", "erryday makin fitty jeez")
 				Expect(quotaRepo.CreateArgsForCall(0).MemoryLimit).To(Equal(int64(51200)))
 			})
 
 			It("alerts the user when parsing the memory limit fails", func() {
-				runCommand("-m", "whoops", "wit mah hussle", "my-org")
+				runCommand("-m", "whoops", "wit mah hussle")
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
@@ -95,36 +95,36 @@ var _ = Describe("create-quota command", func() {
 
 		Context("when the -i flag is provided", func() {
 			It("sets the memory limit", func() {
-				runCommand("-i", "50G", "erryday makin fitty jeez", "my-org")
+				runCommand("-i", "50G", "erryday makin fitty jeez")
 				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(51200)))
 			})
 
 			It("alerts the user when parsing the memory limit fails", func() {
-				runCommand("-i", "whoops", "wit mah hussle", "my-org", "12")
+				runCommand("-i", "whoops", "wit mah hussle", "12")
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
 		It("sets the route limit", func() {
-			runCommand("-r", "12", "ecstatic", "my-org")
+			runCommand("-r", "12", "ecstatic")
 
 			Expect(quotaRepo.CreateArgsForCall(0).RoutesLimit).To(Equal(12))
 		})
 
 		It("sets the service instance limit", func() {
-			runCommand("-s", "42", "black star", "my-org")
+			runCommand("-s", "42", "black star")
 			Expect(quotaRepo.CreateArgsForCall(0).ServicesLimit).To(Equal(42))
 		})
 
 		It("defaults to not allowing paid service plans", func() {
-			runCommand("my-pro-bono-quota", "my-org")
+			runCommand("my-pro-bono-quota")
 			Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeFalse())
 		})
 
 		Context("when requesting to allow paid service plans", func() {
 			It("creates the quota with paid service plans allowed", func() {
-				runCommand("--allow-paid-service-plans", "my-for-profit-quota", "my-org")
+				runCommand("--allow-paid-service-plans", "my-for-profit-quota")
 				Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeTrue())
 			})
 		})
@@ -132,7 +132,7 @@ var _ = Describe("create-quota command", func() {
 		Context("when creating a quota returns an error", func() {
 			It("alerts the user when creating the quota fails", func() {
 				quotaRepo.CreateReturns(errors.New("WHOOP THERE IT IS"))
-				runCommand("my-quota", "my-org")
+				runCommand("my-quota")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating quota", "my-quota", "my-org"},
@@ -142,7 +142,7 @@ var _ = Describe("create-quota command", func() {
 
 			It("warns the user when quota already exists", func() {
 				quotaRepo.CreateReturns(errors.NewHttpError(400, "240002", "Quota Definition is taken: quota-sct"))
-				runCommand("Banana", "my-org")
+				runCommand("Banana")
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings(
 					[]string{"FAILED"},

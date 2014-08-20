@@ -45,7 +45,7 @@ var _ = Describe("quotas command", func() {
 		})
 	})
 
-	Context("when logged in", func() {
+	Context("when requirements have been met", func() {
 		JustBeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
