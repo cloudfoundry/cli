@@ -96,6 +96,6 @@ func (repo CloudControllerSpaceQuotaRepository) AssignQuotaToOrg(orgGuid, quotaG
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Delete(quotaGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/quota_definitions/%s", repo.config.ApiEndpoint(), quotaGuid)
+	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s", repo.config.ApiEndpoint(), quotaGuid)
 	return repo.gateway.DeleteResource(path)
 }
