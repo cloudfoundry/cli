@@ -85,7 +85,7 @@ func (repo CloudControllerSpaceQuotaRepository) Create(quota models.SpaceQuota) 
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Update(quota models.SpaceQuota) error {
-	path := fmt.Sprintf("%s/v2/quota_definitions/%s", repo.config.ApiEndpoint(), quota.Guid)
+	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s", repo.config.ApiEndpoint(), quota.Guid)
 	return repo.gateway.UpdateResourceFromStruct(path, quota)
 }
 
