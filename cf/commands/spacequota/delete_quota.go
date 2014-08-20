@@ -28,7 +28,7 @@ func NewDeleteSpaceQuota(ui terminal.UI, config configuration.Reader, spaceQuota
 func (cmd DeleteSpaceQuota) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-space-quota",
-		Description: T(" Delete a space quota definition and unassign the space quota from all spaces"),
+		Description: T("Delete a space quota definition and unassign the space quota from all spaces"),
 		Usage:       T("CF_NAME delete-space-quota SPACE-QUOTA-NAME"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "f", Usage: T("Force delete (do not prompt for confirmation)")},
