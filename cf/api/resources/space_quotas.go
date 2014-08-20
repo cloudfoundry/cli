@@ -18,6 +18,7 @@ func (resource SpaceQuotaResource) ToModel() models.SpaceQuota {
 		Guid:                    resource.Metadata.Guid,
 		Name:                    entity.Name,
 		MemoryLimit:             entity.MemoryLimit,
+		InstanceMemoryLimit:     entity.InstanceMemoryLimit,
 		RoutesLimit:             entity.RoutesLimit,
 		ServicesLimit:           entity.ServicesLimit,
 		NonBasicServicesAllowed: entity.NonBasicServicesAllowed,
