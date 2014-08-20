@@ -165,11 +165,11 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		})
 	})
 
-	PDescribe("Update", func() {
+	Describe("Update", func() {
 		It("updates an existing quota", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "PUT",
-				Path:   "/v2/quota_definitions/my-quota-guid",
+				Path:   "/v2/space_quota_definitions/my-quota-guid",
 				Matcher: testnet.RequestBodyMatcher(`{
 					"guid": "my-quota-guid",
 					"non_basic_services_allowed": false,
@@ -177,17 +177,20 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					"total_services": 1,
 					"total_routes": 12,
 					"memory_limit": 123,
+					"instance_memory_limit": 1234,
 					"organization_guid": "myorgguid"
 				}`),
 			}))
 
 			quota := models.SpaceQuota{
-				Guid:          "my-quota-guid",
-				Name:          "amazing-quota",
-				ServicesLimit: 1,
-				RoutesLimit:   12,
-				MemoryLimit:   123,
-				OrgGuid:       "myorgguid",
+				Guid: "my-quota-guid",
+				Name: "amazing-quota",
+				NonBasicServicesAllowed: false,
+				ServicesLimit:           1,
+				RoutesLimit:             12,
+				MemoryLimit:             123,
+				InstanceMemoryLimit:     1234,
+				OrgGuid:                 "myorgguid",
 			}
 
 			err := repo.Update(quota)
