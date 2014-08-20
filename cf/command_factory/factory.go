@@ -248,6 +248,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["space-quotas"] = spacequota.NewListSpaceQuotas(ui, config, repoLocator.GetSpaceQuotaRepository())
 	factory.cmdsByName["space-quota"] = spacequota.NewSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository())
 	factory.cmdsByName["update-space-quota"] = spacequota.NewUpdateSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository())
+	factory.cmdsByName["set-space-quota"] = spacequota.NewSetSpaceQuota(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetSpaceQuotaRepository())
 	return
 }
 
