@@ -12,4 +12,5 @@ type Space struct {
 	ServiceInstances []ServiceInstanceFields
 	Domains          []DomainFields
 	SecurityGroups   []SecurityGroupFields
+	SpaceQuotaGuid   string
 }

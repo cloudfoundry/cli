@@ -16,8 +16,8 @@ type SpaceQuotaRepository interface {
 	FindByName(name string) (quota models.SpaceQuota, apiErr error)
 	FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error)
 
-	AssignQuotaToOrg(orgGuid, quotaGuid string) error
-
+	AssignQuotaToOrg(orgGuid string, quotaGuid string) error
+	AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error
 	// CRUD ahoy
 	Create(quota models.SpaceQuota) error
 	Update(quota models.SpaceQuota) error
@@ -89,10 +89,15 @@ func (repo CloudControllerSpaceQuotaRepository) Update(quota models.SpaceQuota) 
 	return repo.gateway.UpdateResourceFromStruct(path, quota)
 }
 
-func (repo CloudControllerSpaceQuotaRepository) AssignQuotaToOrg(orgGuid, quotaGuid string) (apiErr error) {
+func (repo CloudControllerSpaceQuotaRepository) AssignQuotaToOrg(orgGuid string, quotaGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGuid)
 	return repo.gateway.UpdateResource(path, strings.NewReader(data))
+}
+
+func (repo CloudControllerSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error {
+	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s/spaces/%s", repo.config.ApiEndpoint(), quotaGuid, spaceGuid)
+	return repo.gateway.UpdateResource(path, strings.NewReader(""))
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Delete(quotaGuid string) (apiErr error) {

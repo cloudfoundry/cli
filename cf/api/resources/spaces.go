@@ -14,6 +14,7 @@ type SpaceEntity struct {
 	Domains          []DomainResource
 	ServiceInstances []ServiceInstanceResource `json:"service_instances"`
 	SecurityGroups   []SecurityGroupResource   `json:"security_groups"`
+	SpaceQuotaGuid   string                    `json:"space_quota_definition_guid"`
 }
 
 func (resource SpaceResource) ToFields() (fields models.SpaceFields) {
@@ -41,5 +42,6 @@ func (resource SpaceResource) ToModel() (space models.Space) {
 	}
 
 	space.Organization = resource.Entity.Organization.ToFields()
+	space.SpaceQuotaGuid = resource.Entity.SpaceQuotaGuid
 	return
 }

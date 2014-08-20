@@ -71,28 +71,6 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		})
 	})
 
-	PDescribe("FindAll", func() {
-		BeforeEach(func() {
-			setupTestServer(firstQuotaRequest, secondQuotaRequest)
-		})
-
-		It("finds all Quota definitions", func() {
-			quotas, err := repo.FindAll()
-
-			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
-			Expect(len(quotas)).To(Equal(3))
-			Expect(quotas[0].Guid).To(Equal("my-quota-guid"))
-			Expect(quotas[0].Name).To(Equal("my-remote-quota"))
-			Expect(quotas[0].MemoryLimit).To(Equal(int64(1024)))
-			Expect(quotas[0].RoutesLimit).To(Equal(123))
-			Expect(quotas[0].ServicesLimit).To(Equal(321))
-
-			Expect(quotas[1].Guid).To(Equal("my-quota-guid2"))
-			Expect(quotas[2].Guid).To(Equal("my-quota-guid3"))
-		})
-	})
-
 	Describe("FindByOrg", func() {
 		BeforeEach(func() {
 			setupTestServer(firstSpaceQuotaRequest, secondSpaceQuotaRequest)
@@ -118,18 +96,17 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		})
 	})
 
-	PDescribe("AssignQuotaToOrg", func() {
-		It("sets the quota for an organization", func() {
+	Describe("AssociateSpaceWithQuota", func() {
+		It("sets the quota for a space", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
-				Path:     "/v2/organizations/my-org-guid",
-				Matcher:  testnet.RequestBodyMatcher(`{"quota_definition_guid":"my-quota-guid"}`),
+				Path:     "/v2/space_quota_definitions/my-quota-guid/spaces/my-space-guid",
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
 			setupTestServer(req)
 
-			err := repo.AssignQuotaToOrg("my-org-guid", "my-quota-guid")
+			err := repo.AssociateSpaceWithQuota("my-space-guid", "my-quota-guid")
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
