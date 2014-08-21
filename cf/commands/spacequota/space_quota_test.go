@@ -64,7 +64,7 @@ var _ = Describe("quotas command", func() {
 					models.SpaceQuota{
 						Name:                    "quota-name",
 						MemoryLimit:             1024,
-						InstanceMemoryLimit:     512,
+						InstanceMemoryLimit:     -1,
 						RoutesLimit:             111,
 						ServicesLimit:           222,
 						NonBasicServicesAllowed: true,
@@ -78,7 +78,7 @@ var _ = Describe("quotas command", func() {
 					[]string{"Getting space quota quota-name info as", "my-user"},
 					[]string{"OK"},
 					[]string{"total memory limit", "1G"},
-					[]string{"instance memory limit", "512M"},
+					[]string{"instance memory limit", "-1 "},
 					[]string{"routes", "111"},
 					[]string{"service", "222"},
 					[]string{"non basic services", "allowed"},
