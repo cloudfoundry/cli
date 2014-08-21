@@ -99,8 +99,13 @@ var _ = Describe("create-quota command", func() {
 				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(51200)))
 			})
 
+			It("accepts -1 without units as an appropriate value", func() {
+				runCommand("-i", "-1", "wit mah hussle")
+				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
+			})
+
 			It("alerts the user when parsing the memory limit fails", func() {
-				runCommand("-i", "whoops", "wit mah hussle", "12")
+				runCommand("-i", "whoops", "yo", "12")
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
