@@ -57,12 +57,19 @@ func (cmd *ListSpaceQuotas) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	table := terminal.NewTable(cmd.ui, []string{T("name"), T("total memory limit"), T("instance memory limit"), T("routes"), T("service instances"), T("paid service plans")})
+	var megabytes string
 
 	for _, quota := range quotas {
+		if quota.InstanceMemoryLimit == -1 {
+			megabytes = "-1"
+		} else {
+			megabytes = formatters.ByteSize(quota.InstanceMemoryLimit * formatters.MEGABYTE)
+		}
+
 		table.Add(
 			quota.Name,
 			formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE),
-			formatters.ByteSize(quota.InstanceMemoryLimit*formatters.MEGABYTE),
+			megabytes,
 			fmt.Sprintf("%d", quota.RoutesLimit),
 			fmt.Sprintf("%d", quota.ServicesLimit),
 			formatters.Allowed(quota.NonBasicServicesAllowed),

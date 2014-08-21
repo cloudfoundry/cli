@@ -65,10 +65,16 @@ func (cmd *SpaceQuota) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
+	var megabytes string
 
 	table := terminal.NewTable(cmd.ui, []string{"", ""})
 	table.Add(T("total memory limit"), formatters.ByteSize(spaceQuota.MemoryLimit*formatters.MEGABYTE))
-	table.Add(T("instance memory limit"), formatters.ByteSize(spaceQuota.InstanceMemoryLimit*formatters.MEGABYTE))
+	if spaceQuota.InstanceMemoryLimit == -1 {
+		megabytes = "-1"
+	} else {
+		megabytes = formatters.ByteSize(spaceQuota.InstanceMemoryLimit * formatters.MEGABYTE)
+	}
+	table.Add(T("instance memory limit"), megabytes)
 	table.Add(T("routes"), fmt.Sprintf("%d", spaceQuota.RoutesLimit))
 	table.Add(T("services"), fmt.Sprintf("%d", spaceQuota.ServicesLimit))
 	table.Add(T("non basic services"), formatters.Allowed(spaceQuota.NonBasicServicesAllowed))
