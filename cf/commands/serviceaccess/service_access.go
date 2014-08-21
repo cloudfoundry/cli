@@ -2,10 +2,10 @@ package serviceaccess
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/actors"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -54,8 +54,46 @@ func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Facto
 
 func (cmd *ServiceAccess) Run(c *cli.Context) {
 	cmd.tokenRefresher.RefreshAuthToken()
+	brokerName := c.String("b")
+	serviceName := c.String("e")
+	orgName := c.String("o")
 
-	brokers, err := cmd.actor.FilterBrokers(c.String("b"), c.String("e"), c.String("o"))
+	if brokerName != "" && serviceName != "" && orgName != "" {
+		cmd.ui.Say(fmt.Sprintf("getting service access for broker %s and service %s and organization %s as %s...",
+			terminal.EntityNameColor(brokerName),
+			terminal.EntityNameColor(serviceName),
+			terminal.EntityNameColor(orgName),
+			terminal.EntityNameColor(cmd.config.Username())))
+	} else if serviceName != "" && orgName != "" {
+		cmd.ui.Say(fmt.Sprintf("getting service access for service %s and organization %s as %s...",
+			terminal.EntityNameColor(serviceName),
+			terminal.EntityNameColor(orgName),
+			terminal.EntityNameColor(cmd.config.Username())))
+	} else if brokerName != "" && orgName != "" {
+		cmd.ui.Say(fmt.Sprintf("getting service access for broker %s and organization %s as %s...",
+			terminal.EntityNameColor(brokerName),
+			terminal.EntityNameColor(orgName),
+			terminal.EntityNameColor(cmd.config.Username())))
+	} else if brokerName != "" && serviceName != "" {
+		cmd.ui.Say(fmt.Sprintf("getting service access for broker %s and service %s as %s...",
+			terminal.EntityNameColor(brokerName),
+			terminal.EntityNameColor(serviceName),
+			terminal.EntityNameColor(cmd.config.Username())))
+	} else if brokerName != "" {
+		cmd.ui.Say(fmt.Sprintf("getting service access for broker %s as %s...",
+			terminal.EntityNameColor(brokerName), terminal.EntityNameColor(cmd.config.Username())))
+	} else if serviceName != "" {
+		cmd.ui.Say(fmt.Sprintf("getting service access for service %s as %s...",
+			terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username())))
+	} else if orgName != "" {
+		cmd.ui.Say(fmt.Sprintf("getting service access for organization %s as %s...",
+			terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username())))
+	} else {
+		cmd.ui.Say(fmt.Sprintf("getting service access as %s...",
+			terminal.EntityNameColor(cmd.config.Username())))
+	}
+
+	brokers, err := cmd.actor.FilterBrokers(brokerName, serviceName, orgName)
 	if err != nil {
 		cmd.ui.Failed(T("Failed fetching service brokers.\n{{.Error}}", map[string]interface{}{"Error": err}))
 		return

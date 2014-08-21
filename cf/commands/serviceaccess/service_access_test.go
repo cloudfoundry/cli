@@ -32,7 +32,7 @@ var _ = Describe("service-access command", func() {
 		tokenRefresher = &testapi.FakeAuthenticationRepository{}
 	})
 
-	runCommand := func(args []string) bool {
+	runCommand := func(args ...string) bool {
 		cmd := NewServiceAccess(ui, testconfig.NewRepositoryWithDefaults(), actor, tokenRefresher)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
@@ -40,7 +40,7 @@ var _ = Describe("service-access command", func() {
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			Expect(runCommand(nil)).ToNot(HavePassedRequirements())
+			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 	})
 
@@ -83,23 +83,95 @@ var _ = Describe("service-access command", func() {
 		})
 
 		It("refreshes the auth token", func() {
-			runCommand([]string{"service"})
+			runCommand("service")
 			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
 		})
 
-		It("prints all of the brokers", func() {
-			runCommand(nil)
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"broker: brokername1"},
-				[]string{"service", "plan", "access", "orgs"},
-				[]string{"my-service-1", "beep", "all"},
-				[]string{"my-service-1", "burp", "none"},
-				[]string{"my-service-1", "boop", "limited", "fwip", "brzzt"},
-				[]string{"my-service-2", "petaloideous-noncelebration"},
-				[]string{"broker: brokername2"},
-				[]string{"service", "plan", "access", "orgs"},
-				[]string{"my-service-3"},
-			))
+		Context("When no flags are provided", func() {
+			It("tells the user it is obtaining the service access", func() {
+				runCommand()
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"getting service access as", "my-user"},
+				))
+			})
+
+			It("prints all of the brokers", func() {
+				runCommand()
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"broker: brokername1"},
+					[]string{"service", "plan", "access", "orgs"},
+					[]string{"my-service-1", "beep", "all"},
+					[]string{"my-service-1", "burp", "none"},
+					[]string{"my-service-1", "boop", "limited", "fwip", "brzzt"},
+					[]string{"my-service-2", "petaloideous-noncelebration"},
+					[]string{"broker: brokername2"},
+					[]string{"service", "plan", "access", "orgs"},
+					[]string{"my-service-3"},
+				))
+			})
+		})
+
+		Context("When the broker flag is provided", func() {
+			It("tells the user it is obtaining the services access for a particular broker", func() {
+				runCommand("-b", "brokername1")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"getting service access", "for broker brokername1 as", "my-user"},
+				))
+			})
+		})
+
+		Context("when the service flag is provided", func() {
+			It("tells the user it is obtaining the service access for a particular service", func() {
+				runCommand("-e", "my-service-1")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"getting service access", "for service my-service-1 as", "my-user"},
+				))
+			})
+		})
+
+		Context("when the org flag is provided", func() {
+			It("tells the user it is obtaining the service access for a particular org", func() {
+				runCommand("-o", "fwip")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"getting service access", "for organization fwip as", "my-user"},
+				))
+			})
+		})
+
+		Context("when the broker and service flag are both provided", func() {
+			It("tells the user it is obtaining the service access for a particular broker and service", func() {
+				runCommand("-b", "brokername1", "-e", "my-service-1")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"getting service access", "for broker brokername1", "and service my-service-1", "as", "my-user"},
+				))
+			})
+		})
+
+		Context("when the broker and org name are both provided", func() {
+			It("tells the user it is obtaining the service access for a particular broker and org", func() {
+				runCommand("-b", "brokername1", "-o", "fwip")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"getting service access", "for broker brokername1", "and organization fwip", "as", "my-user"},
+				))
+			})
+		})
+
+		Context("when the service and org name are both provided", func() {
+			It("tells the user it is obtaining the service access for a particular service and org", func() {
+				runCommand("-e", "my-service-1", "-o", "fwip")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"getting service access", "for service my-service-1", "and organization fwip", "as", "my-user"},
+				))
+			})
+		})
+
+		Context("when all flags are provided", func() {
+			It("tells the user it is filtering on all options", func() {
+				runCommand("-b", "brokername1", "-e", "my-service-1", "-o", "fwip")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"getting service access", "for broker brokername1", "and service my-service-1", "and organization fwip", "as", "my-user"},
+				))
+			})
 		})
 	})
 })
