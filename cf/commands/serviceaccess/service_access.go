@@ -59,38 +59,41 @@ func (cmd *ServiceAccess) Run(c *cli.Context) {
 	orgName := c.String("o")
 
 	if brokerName != "" && serviceName != "" && orgName != "" {
-		cmd.ui.Say(fmt.Sprintf("getting service access for broker %s and service %s and organization %s as %s...",
-			terminal.EntityNameColor(brokerName),
-			terminal.EntityNameColor(serviceName),
-			terminal.EntityNameColor(orgName),
-			terminal.EntityNameColor(cmd.config.Username())))
+		cmd.ui.Say(T("getting service access for broker {{.Broker}} and service {{.Service}} and organization {{.Organization}} as {{.Username}}...", map[string]interface{}{
+			"Broker":       terminal.EntityNameColor(brokerName),
+			"Service":      terminal.EntityNameColor(serviceName),
+			"Organization": terminal.EntityNameColor(orgName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username())}))
 	} else if serviceName != "" && orgName != "" {
-		cmd.ui.Say(fmt.Sprintf("getting service access for service %s and organization %s as %s...",
-			terminal.EntityNameColor(serviceName),
-			terminal.EntityNameColor(orgName),
-			terminal.EntityNameColor(cmd.config.Username())))
+		cmd.ui.Say(T("getting service access for service {{.Service}} and organization {{.Organization}} as {{.Username}}...", map[string]interface{}{
+			"Service":      terminal.EntityNameColor(serviceName),
+			"Organization": terminal.EntityNameColor(orgName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username())}))
 	} else if brokerName != "" && orgName != "" {
-		cmd.ui.Say(fmt.Sprintf("getting service access for broker %s and organization %s as %s...",
-			terminal.EntityNameColor(brokerName),
-			terminal.EntityNameColor(orgName),
-			terminal.EntityNameColor(cmd.config.Username())))
+		cmd.ui.Say(T("getting service access for broker {{.Broker}} and organization {{.Organization}} as {{.Username}}...", map[string]interface{}{
+			"Broker":       terminal.EntityNameColor(brokerName),
+			"Organization": terminal.EntityNameColor(orgName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username())}))
 	} else if brokerName != "" && serviceName != "" {
-		cmd.ui.Say(fmt.Sprintf("getting service access for broker %s and service %s as %s...",
-			terminal.EntityNameColor(brokerName),
-			terminal.EntityNameColor(serviceName),
-			terminal.EntityNameColor(cmd.config.Username())))
+		cmd.ui.Say(T("getting service access for broker {{.Broker}} and service {{.Service}} as {{.Username}}...", map[string]interface{}{
+			"Broker":   terminal.EntityNameColor(brokerName),
+			"Service":  terminal.EntityNameColor(serviceName),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 	} else if brokerName != "" {
-		cmd.ui.Say(fmt.Sprintf("getting service access for broker %s as %s...",
-			terminal.EntityNameColor(brokerName), terminal.EntityNameColor(cmd.config.Username())))
+		cmd.ui.Say(T("getting service access for broker {{.Broker}} as {{.Username}}...", map[string]interface{}{
+			"Broker":   terminal.EntityNameColor(brokerName),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 	} else if serviceName != "" {
-		cmd.ui.Say(fmt.Sprintf("getting service access for service %s as %s...",
-			terminal.EntityNameColor(serviceName), terminal.EntityNameColor(cmd.config.Username())))
+		cmd.ui.Say(T("getting service access for service {{.Service}} as {{.Username}}...", map[string]interface{}{
+			"Service":  terminal.EntityNameColor(serviceName),
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 	} else if orgName != "" {
-		cmd.ui.Say(fmt.Sprintf("getting service access for organization %s as %s...",
-			terminal.EntityNameColor(orgName), terminal.EntityNameColor(cmd.config.Username())))
+		cmd.ui.Say(T("getting service access for organization {{.Organization}} as {{.Username}}...", map[string]interface{}{
+			"Organization": terminal.EntityNameColor(orgName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username())}))
 	} else {
-		cmd.ui.Say(fmt.Sprintf("getting service access as %s...",
-			terminal.EntityNameColor(cmd.config.Username())))
+		cmd.ui.Say(T("getting service access as {{.Username}}...", map[string]interface{}{
+			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 	}
 
 	brokers, err := cmd.actor.FilterBrokers(brokerName, serviceName, orgName)
