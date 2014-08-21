@@ -6,6 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -34,6 +36,7 @@ var _ = Describe("WarningsCollector", func() {
 			BeforeEach(func() {
 				os.Setenv("CF_RAISE_ERROR_ON_WARNINGS", "true")
 			})
+
 			Context("when there are warnings", func() {
 				BeforeEach(func() {
 					warning_producer_one := testnet.NewWarningProducer([]string{"Hello", "Darling"})
@@ -71,6 +74,16 @@ var _ = Describe("WarningsCollector", func() {
 				warningsCollector := net.NewWarningsCollector(ui, warning_producer_one, warning_producer_two, warning_producer_three)
 
 				Expect(warningsCollector.PrintWarnings).NotTo(Panic())
+			})
+
+			It("does not print out duplicate warnings", func() {
+				warning_producer_one := testnet.NewWarningProducer([]string{"Hello Darling"})
+				warning_producer_two := testnet.NewWarningProducer([]string{"Hello Darling"})
+				warningsCollector := net.NewWarningsCollector(ui, warning_producer_one, warning_producer_two)
+
+				warningsCollector.PrintWarnings()
+				Expect(len(ui.Outputs)).To(Equal(1))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Hello Darling"}))
 			})
 		})
 	})
