@@ -12,12 +12,12 @@ import (
 )
 
 type SpaceQuotaRepository interface {
-	FindAll() (quotas []models.SpaceQuota, apiErr error)
 	FindByName(name string) (quota models.SpaceQuota, apiErr error)
 	FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error)
 
-	AssignQuotaToOrg(orgGuid string, quotaGuid string) error
 	AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error
+	UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error
+
 	// CRUD ahoy
 	Create(quota models.SpaceQuota) error
 	Update(quota models.SpaceQuota) error
@@ -48,10 +48,6 @@ func (repo CloudControllerSpaceQuotaRepository) findAllWithPath(path string) ([]
 			return true
 		})
 	return quotas, apiErr
-}
-
-func (repo CloudControllerSpaceQuotaRepository) FindAll() (quotas []models.SpaceQuota, apiErr error) {
-	return repo.findAllWithPath("/v2/quota_definitions")
 }
 
 func (repo CloudControllerSpaceQuotaRepository) FindByName(name string) (quota models.SpaceQuota, apiErr error) {
@@ -89,15 +85,14 @@ func (repo CloudControllerSpaceQuotaRepository) Update(quota models.SpaceQuota) 
 	return repo.gateway.UpdateResourceFromStruct(path, quota)
 }
 
-func (repo CloudControllerSpaceQuotaRepository) AssignQuotaToOrg(orgGuid string, quotaGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
-	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGuid)
-	return repo.gateway.UpdateResource(path, strings.NewReader(data))
-}
-
 func (repo CloudControllerSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error {
 	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s/spaces/%s", repo.config.ApiEndpoint(), quotaGuid, spaceGuid)
 	return repo.gateway.UpdateResource(path, strings.NewReader(""))
+}
+
+func (repo CloudControllerSpaceQuotaRepository) UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error {
+	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s/spaces/%s", repo.config.ApiEndpoint(), quotaGuid, spaceGuid)
+	return repo.gateway.DeleteResource(path)
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Delete(quotaGuid string) (apiErr error) {
