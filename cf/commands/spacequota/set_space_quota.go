@@ -1,8 +1,6 @@
 package spacequota
 
 import (
-	"fmt"
-
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -53,12 +51,11 @@ func (cmd SetSpaceQuota) Run(context *cli.Context) {
 	spaceName := context.Args()[0]
 	quotaName := context.Args()[1]
 
-	cmd.ui.Say(fmt.Sprintf("Assigning space quota %s to space %s as %s...", quotaName, spaceName, cmd.config.Username()))
-	//	cmd.ui.Say(T("Assigning space quota {{.QuotaName}} to space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-	//		"QuotaName": terminal.EntityNameColor(quotaName),
-	//		"SpaceName": terminal.EntityNameColor(spaceName),
-	//		"Username":  terminal.EntityNameColor(cmd.config.Username()),
-	//	}))
+	cmd.ui.Say(T("Assigning space quota {{.QuotaName}} to space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"QuotaName": terminal.EntityNameColor(quotaName),
+		"SpaceName": terminal.EntityNameColor(spaceName),
+		"Username":  terminal.EntityNameColor(cmd.config.Username()),
+	}))
 
 	space, err := cmd.spaceRepo.FindByName(spaceName)
 	if err != nil {
@@ -66,7 +63,7 @@ func (cmd SetSpaceQuota) Run(context *cli.Context) {
 	}
 
 	if space.SpaceQuotaGuid != "" {
-		cmd.ui.Failed("This space already has an assigned space quota.")
+		cmd.ui.Failed(T("This space already has an assigned space quota."))
 	}
 
 	quota, err := cmd.quotaRepo.FindByName(quotaName)
