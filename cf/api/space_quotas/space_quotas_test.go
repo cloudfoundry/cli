@@ -112,6 +112,21 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		})
 	})
 
+	Describe("UnassignQuotaFromSpace", func() {
+		It("deletes the association between the quota and the space", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "DELETE",
+				Path:     "/v2/space_quota_definitions/my-quota-guid/spaces/my-space-guid",
+				Response: testnet.TestResponse{Status: http.StatusNoContent},
+			})
+			setupTestServer(req)
+
+			err := repo.UnassignQuotaFromSpace("my-space-guid", "my-quota-guid")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+		})
+	})
+
 	Describe("Create", func() {
 		It("creates a new quota with the given name", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
