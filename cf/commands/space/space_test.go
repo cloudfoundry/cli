@@ -1,6 +1,8 @@
 package space_test
 
 import (
+	"errors"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,18 +20,19 @@ var _ = Describe("space command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
+		quotaRepo           *fakes.FakeSpaceQuotaRepository
 		configRepo          configuration.ReadWriter
 	)
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-
+		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
 	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewShowSpace(ui, configRepo), args, requirementsFactory)
+		testcmd.RunCommand(NewShowSpace(ui, configRepo, quotaRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -77,24 +80,58 @@ var _ = Describe("space command", func() {
 			space.Domains = domains
 			space.ServiceInstances = services
 			space.SecurityGroups = securityGroups
+			space.SpaceQuotaGuid = "runaway-guid"
+
+			quota := models.SpaceQuota{}
+			quota.Guid = "runaway-guid"
+			quota.Name = "runaway"
+			quota.MemoryLimit = 102400
+			quota.InstanceMemoryLimit = -1
+			quota.RoutesLimit = 111
+			quota.ServicesLimit = 222
+			quota.NonBasicServicesAllowed = false
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
 			requirementsFactory.Space = space
+
+			quotaRepo.FindByGuidReturns(quota, nil)
 		})
 
-		It("shows information about the given space", func() {
-			runCommand("whose-space-is-it-anyway")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
-				[]string{"OK"},
-				[]string{"whose-space-is-it-anyway"},
-				[]string{"Org", "my-org"},
-				[]string{"Apps", "app1"},
-				[]string{"Domains", "domain1"},
-				[]string{"Services", "service1"},
-				[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-			))
+		Context("when the space has a space quota", func() {
+			It("shows information about the given space", func() {
+				runCommand("whose-space-is-it-anyway")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+					[]string{"OK"},
+					[]string{"whose-space-is-it-anyway"},
+					[]string{"Org", "my-org"},
+					[]string{"Apps", "app1"},
+					[]string{"Domains", "domain1"},
+					[]string{"Services", "service1"},
+					[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+					[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed)"},
+				))
+			})
+		})
+
+		Context("when the space does not have a space quota", func() {
+			It("shows information without a space quota", func() {
+				space.SpaceQuotaGuid = ""
+				quotaRepo.FindByGuidReturns(models.SpaceQuota{}, errors.New("Space Quota not found"))
+				runCommand("whose-space-is-it-anyway")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+					[]string{"OK"},
+					[]string{"whose-space-is-it-anyway"},
+					[]string{"Org", "my-org"},
+					[]string{"Apps", "app1"},
+					[]string{"Domains", "domain1"},
+					[]string{"Services", "service1"},
+					[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+					[]string{"Space Quota"},
+				))
+			})
 		})
 	})
 })

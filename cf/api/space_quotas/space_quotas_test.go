@@ -96,6 +96,34 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		})
 	})
 
+	Describe("FindByGuid", func() {
+		BeforeEach(func() {
+			setupTestServer(firstSpaceQuotaRequest, secondSpaceQuotaRequest)
+		})
+
+		It("Finds Quota definitions by Guid", func() {
+			quota, err := repo.FindByGuid("my-quota-guid")
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(quota).To(Equal(models.SpaceQuota{
+				Guid:                    "my-quota-guid",
+				Name:                    "my-remote-quota",
+				MemoryLimit:             1024,
+				RoutesLimit:             123,
+				ServicesLimit:           321,
+				NonBasicServicesAllowed: true,
+				OrgGuid:                 "my-org-guid",
+			}))
+		})
+		It("Returns an error if the quota cannot be found", func() {
+			_, err := repo.FindByGuid("totally-not-a-quota-guid")
+
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err.(*errors.ModelNotFoundError)).NotTo(BeNil())
+		})
+	})
+
 	Describe("AssociateSpaceWithQuota", func() {
 		It("sets the quota for a space", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
