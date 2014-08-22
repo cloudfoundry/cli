@@ -14,6 +14,7 @@ import (
 type SpaceQuotaRepository interface {
 	FindByName(name string) (quota models.SpaceQuota, apiErr error)
 	FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error)
+	FindByGuid(guid string) (quota models.SpaceQuota, apiErr error)
 
 	AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error
 	UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error
@@ -73,6 +74,22 @@ func (repo CloudControllerSpaceQuotaRepository) FindByOrg(guid string) ([]models
 		return nil, apiErr
 	}
 	return quotas, nil
+}
+
+func (repo CloudControllerSpaceQuotaRepository) FindByGuid(guid string) (quota models.SpaceQuota, apiErr error) {
+	quotas, apiErr := repo.FindByOrg(repo.config.OrganizationFields().Guid)
+	if apiErr != nil {
+		return
+	}
+
+	for _, quota := range quotas {
+		if quota.Guid == guid {
+			return quota, nil
+		}
+	}
+
+	apiErr = errors.NewModelNotFoundError("Space Quota", guid)
+	return models.SpaceQuota{}, apiErr
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Create(quota models.SpaceQuota) error {

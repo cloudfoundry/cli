@@ -1,26 +1,32 @@
 package space
 
 import (
+	"fmt"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type ShowSpace struct {
-	ui       terminal.UI
-	config   configuration.Reader
-	spaceReq requirements.SpaceRequirement
+	ui        terminal.UI
+	config    configuration.Reader
+	spaceReq  requirements.SpaceRequirement
+	quotaRepo space_quotas.SpaceQuotaRepository
 }
 
-func NewShowSpace(ui terminal.UI, config configuration.Reader) (cmd *ShowSpace) {
+func NewShowSpace(ui terminal.UI, config configuration.Reader, quotaRepo space_quotas.SpaceQuotaRepository) (cmd *ShowSpace) {
 	cmd = new(ShowSpace)
 	cmd.ui = ui
 	cmd.config = config
+	cmd.quotaRepo = quotaRepo
 	return
 }
 
@@ -55,6 +61,8 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
+	quotaString := cmd.quotaString(space)
+
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 	cmd.ui.Say(terminal.EntityNameColor(space.Name) + ":")
@@ -86,5 +94,40 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 	}
 	table.Add("", T("Security Groups:"), strings.Join(securityGroups, ", "))
 
+	table.Add("", T("Space Quota:"))
+
 	table.Print()
+}
+
+func (cmd *ShowSpace) quotaString(space models.Space) string {
+	var instance_memory string
+
+	if space.SpaceQuotaGuid == "" {
+		return ""
+	}
+
+	quota, err := cmd.quotaRepo.FindByGuid(space.SpaceQuotaGuid)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+		return ""
+	}
+
+	if quota.InstanceMemoryLimit == -1 {
+		instance_memory = "-1"
+	} else {
+		instance_memory = formatters.ByteSize(quota.InstanceMemoryLimit * formatters.MEGABYTE)
+	}
+	memory := formatters.ByteSize(quota.MemoryLimit * formatters.MEGABYTE)
+
+	spaceQuota := fmt.Sprintf("%s (%s memory limit, %s instance memory limit, %d routes, %d services, paid services %s)", quota.Name, memory, instance_memory, quota.RoutesLimit, quota.ServicesLimit, formatters.Allowed(quota.NonBasicServicesAllowed))
+	//	spaceQuota := fmt.Sprintf(T("{{.QuotaName}} ({{.MemoryLimit}} memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
+	//		map[string]interface{}{
+	//			"QuotaName":               quota.Name,
+	//			"MemoryLimit":             memory,
+	//			"InstanceMemoryLimit":     instance_memory,
+	//			"RoutesLimit":             quota.RoutesLimit,
+	//			"ServicesLimit":           quota.ServicesLimit,
+	//			"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
+
+	return spaceQuota
 }
