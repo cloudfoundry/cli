@@ -1,7 +1,6 @@
 package space_test
 
 import (
-	"errors"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -117,9 +116,9 @@ var _ = Describe("space command", func() {
 
 		Context("when the space does not have a space quota", func() {
 			It("shows information without a space quota", func() {
-				space.SpaceQuotaGuid = ""
-				quotaRepo.FindByGuidReturns(models.SpaceQuota{}, errors.New("Space Quota not found"))
+				requirementsFactory.Space.SpaceQuotaGuid = ""
 				runCommand("whose-space-is-it-anyway")
+				Expect(quotaRepo.FindByGuidCallCount()).To(Equal(0))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
 					[]string{"OK"},

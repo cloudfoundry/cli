@@ -2,9 +2,10 @@ package space
 
 import (
 	"fmt"
+	"strings"
+
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
-	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -94,7 +95,7 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 	}
 	table.Add("", T("Security Groups:"), strings.Join(securityGroups, ", "))
 
-	table.Add("", T("Space Quota:"))
+	table.Add("", T("Space Quota:"), quotaString)
 
 	table.Print()
 }
