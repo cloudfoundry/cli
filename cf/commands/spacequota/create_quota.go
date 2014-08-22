@@ -61,7 +61,7 @@ func (cmd CreateSpaceQuota) Run(context *cli.Context) {
 	name := context.Args()[0]
 	org := cmd.config.OrganizationFields()
 
-	cmd.ui.Say(T("Creating quota {{.QuotaName}} for org {{.OrgName}} as {{.Username}}...", map[string]interface{}{
+	cmd.ui.Say(T("Creating space quota {{.QuotaName}} for org {{.OrgName}} as {{.Username}}...", map[string]interface{}{
 		"QuotaName": terminal.EntityNameColor(name),
 		"OrgName":   terminal.EntityNameColor(org.Name),
 		"Username":  terminal.EntityNameColor(cmd.config.Username()),

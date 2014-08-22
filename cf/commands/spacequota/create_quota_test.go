@@ -75,7 +75,7 @@ var _ = Describe("create-quota command", func() {
 			Expect(quotaRepo.CreateArgsForCall(0).OrgGuid).To(Equal("my-org-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating quota", "my-org", "my-quota", "my-user", "..."},
+				[]string{"Creating space quota", "my-org", "my-quota", "my-user", "..."},
 				[]string{"OK"},
 			))
 		})
@@ -140,7 +140,7 @@ var _ = Describe("create-quota command", func() {
 				runCommand("my-quota")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Creating quota", "my-quota", "my-org"},
+					[]string{"Creating space quota", "my-quota", "my-org"},
 					[]string{"FAILED"},
 				))
 			})
