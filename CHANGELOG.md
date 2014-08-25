@@ -1,3 +1,12 @@
+## v6.5.0
+* Implement Space Quota commands (create, update, delete, list, assignment)
+* Change cf space command to show information on the quota associated with the space. [#77389658]
+* Tweak help text for "push" [#76417956]
+* Remove default async timeout. [#76995182]
+* Change update-service-broker to take in optional flags. [#63480754]
+* Update plan visibility search to take advantage of API queries [#76753494]
+* Add instance memory to quota, quotas, and update-quota. [#76292608]
+
 ## v6.4.0
 * Implement service-access command.
 * Implement enable-service-access command.
