@@ -28,27 +28,28 @@ if [ "$2" = "--all" ]; then
 fi
 
 VERSION=v$(cat VERSION)
+URL_VERSION=$(cat VERSION)
 
 cat <<-NOTES
 CF version $VERSION
 ===================
 Installers
 ----------
-- [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&version=$VERSION&source=github-rel)
-- [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&version=$VERSION&source=github-rel)
-- [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32&version=$VERSION&source=github-rel)
-- [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64&version=$VERSION&source=github-rel)
-- [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64&version=$VERSION&source=github-rel)
-- [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32&version=$VERSION&source=github-rel)
-- [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64&version=$VERSION&source=github-rel)
+- [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&version=$URL_VERSION&source=github-rel)
+- [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&version=$URL_VERSION&source=github-rel)
+- [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32&version=$URL_VERSION&source=github-rel)
+- [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64&version=$URL_VERSION&source=github-rel)
+- [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64&version=$URL_VERSION&source=github-rel)
+- [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32&version=$URL_VERSION&source=github-rel)
+- [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64&version=$URL_VERSION&source=github-rel)
 
 Binaries
 --------
-- [Linux 32 bit binary]   (https://cli.run.pivotal.io/stable?release=linux32-binary&version=$VERSION&source=github-rel)
-- [Linux 64 bit binary]   (https://cli.run.pivotal.io/stable?release=linux64-binary&version=$VERSION&source=github-rel)
-- [Mac OS X 64 bit binary](https://cli.run.pivotal.io/stable?release=macosx64-binary&version=$VERSION&source=github-rel)
-- [Windows 32 bit binary] (https://cli.run.pivotal.io/stable?release=windows32-exe&version=$VERSION&source=github-rel)
-- [Windows 64 bit binary] (https://cli.run.pivotal.io/stable?release=windows64-exe&version=$VERSION&source=github-rel)
+- [Linux 32 bit binary]   (https://cli.run.pivotal.io/stable?release=linux32-binary&version=$URL_VERSION&source=github-rel)
+- [Linux 64 bit binary]   (https://cli.run.pivotal.io/stable?release=linux64-binary&version=$URL_VERSION&source=github-rel)
+- [Mac OS X 64 bit binary](https://cli.run.pivotal.io/stable?release=macosx64-binary&version=$URL_VERSION&source=github-rel)
+- [Windows 32 bit binary] (https://cli.run.pivotal.io/stable?release=windows32-exe&version=$URL_VERSION&source=github-rel)
+- [Windows 64 bit binary] (https://cli.run.pivotal.io/stable?release=windows64-exe&version=$URL_VERSION&source=github-rel)
 
 Change Log
 ----------
@@ -58,9 +59,9 @@ if [ -z $SHOW_ALL_COMMITS ]; then
   git --no-pager log \
     $PREVIOUS_VERSION..$VERSION \
     --grep "\[.*\d*\]" \
-    --pretty=format:'#### %s%n%b'
+    --pretty=format:'* %s%n%b'
 else
   git --no-pager log \
     $PREVIOUS_VERSION..$VERSION \
-    --pretty=format:'#### %s%n%b'
+    --pretty=format:'* %s%n%b'
 fi
