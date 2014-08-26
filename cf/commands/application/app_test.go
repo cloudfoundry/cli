@@ -100,8 +100,8 @@ var _ = Describe("app Command", func() {
 				[]string{"instances", "2/2"},
 				[]string{"usage", "256M x 2 instances"},
 				[]string{"urls", "my-app.example.com", "foo.example.com"},
-				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
-				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
+				[]string{"#1", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
+				[]string{"#2", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
 			))
 		})
 	})
@@ -191,8 +191,8 @@ var _ = Describe("app Command", func() {
 				[]string{"instances", "?/2"},
 				[]string{"usage", "256M x 2 instances"},
 				[]string{"urls", "my-app.example.com", "foo.example.com"},
-				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "500.0%", "1G of 2G", "3G of 4G"},
-				[]string{"#1", "running", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
+				[]string{"#1", "running", "2012-01-02 03:04:05 PM", "500.0%", "1G of 2G", "3G of 4G"},
+				[]string{"#2", "running", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
 			))
 		})
 	})
