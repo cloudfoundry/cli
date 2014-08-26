@@ -1,4 +1,4 @@
-package loggregator_consumer
+package noaa_errors
 
 type UnauthorizedError struct {
 	description string
