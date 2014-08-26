@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
+	"github.com/cloudfoundry/loggregator_consumer/noaa_errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
@@ -49,7 +50,7 @@ func (repo *LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmess
 
 	switch err.(type) {
 	case nil: // do nothing
-	case *consumer.UnauthorizedError:
+	case *noaa_errors.UnauthorizedError:
 		repo.tokenRefresher.RefreshAuthToken()
 		messages, err = repo.consumer.Recent(appGuid, repo.config.AccessToken())
 	default:
@@ -72,7 +73,7 @@ func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect fun
 	logChan, err := repo.consumer.Tail(appGuid, repo.config.AccessToken())
 	switch err.(type) {
 	case nil: // do nothing
-	case *consumer.UnauthorizedError:
+	case *noaa_errors.UnauthorizedError:
 		repo.tokenRefresher.RefreshAuthToken()
 		logChan, err = repo.consumer.Tail(appGuid, repo.config.AccessToken())
 	default:

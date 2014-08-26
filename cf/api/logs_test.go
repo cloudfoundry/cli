@@ -6,8 +6,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/loggregator_consumer"
+	"github.com/cloudfoundry/loggregator_consumer/noaa_errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/api"
@@ -37,10 +38,10 @@ var _ = Describe("loggregator logs repository", func() {
 	})
 
 	Describe("RecentLogsFor", func() {
-		Context("when a LoggregatorConsumer.UnauthorizedError occurs", func() {
+		Context("when a noaa_errors.UnauthorizedError occurs", func() {
 			BeforeEach(func() {
 				fakeConsumer.RecentReturns.Err = []error{
-					loggregator_consumer.NewUnauthorizedError("i'm sorry dave"),
+					noaa_errors.NewUnauthorizedError("i'm sorry dave"),
 					nil,
 				}
 			})
@@ -107,7 +108,7 @@ var _ = Describe("loggregator logs repository", func() {
 				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 					if !calledOnce {
 						calledOnce = true
-						return nil, loggregator_consumer.NewUnauthorizedError("i'm sorry dave")
+						return nil, noaa_errors.NewUnauthorizedError("i'm sorry dave")
 					} else {
 						close(done)
 						return nil, nil
@@ -122,7 +123,7 @@ var _ = Describe("loggregator logs repository", func() {
 			Context("when LoggregatorConsumer.UnauthorizedError occurs again", func() {
 				It("returns an error", func(done Done) {
 					fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
-						return nil, loggregator_consumer.NewUnauthorizedError("All the errors")
+						return nil, noaa_errors.NewUnauthorizedError("All the errors")
 					}
 
 					err := logsRepo.TailLogsFor("app-guid", func() {}, func(*logmessage.LogMessage) {})

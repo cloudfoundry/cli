@@ -17,11 +17,11 @@
 		},
 		{
 			"ImportPath": "code.google.com/p/gogoprotobuf/proto",
-			"Rev": "559fad465cf6fb43dbed4cea5f91e06f14c819e6"
+			"Rev": "6c980277330804e94257ac7ef70a3adbe1641059"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "64a15c83a0d6a2580cc3971d5f821e36f849a604"
+			"Rev": "6579ea507a2f30532e97c1de18b6907fc6262b43"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
@@ -29,15 +29,15 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
-			"Rev": "e1f8ed753935b356ad4f8a5348278a87eecf5a19"
+			"Rev": "395f869e12746b7233c9dd37041fee9f29482cf2"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
-			"Rev": "7e6ea917ad23aca9f77ddb29a1ead3224f0a4f20"
+			"Rev": "b8f5328b834053bf1f29afa2984265ff6867863e"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/signature",
-			"Rev": "7e6ea917ad23aca9f77ddb29a1ead3224f0a4f20"
+			"Rev": "b8f5328b834053bf1f29afa2984265ff6867863e"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
@@ -46,7 +46,7 @@
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "365b7a442dd6798d7982f6ece83aee286cc53c62"
+			"Rev": "4292df70df546334d4174bcd77271253c9b7835c"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
@@ -54,8 +54,8 @@
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.1.0-1-g32204a3",
-			"Rev": "32204a3eab0576cbea19f5ff8b27d3a928647ea6"
+			"Comment": "v1.1.0-3-gd79a7e7",
+			"Rev": "d79a7e77e6d3738a0e83e9f6564a1aa1dfcbfeaa"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
