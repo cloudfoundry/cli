@@ -121,7 +121,7 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 
 	for index, instance := range instances {
 		table.Add(
-			fmt.Sprintf("#%d", index),
+			fmt.Sprintf("#%d", index+1),
 			ui_helpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
 			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
