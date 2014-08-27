@@ -1,12 +1,13 @@
 package actors_test
 
 import (
-	"errors"
+	"github.com/cloudfoundry/cli/cf/errors"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	fake_plan_builder "github.com/cloudfoundry/cli/cf/actors/plan_builder/fakes"
 	fake_service_builder "github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
-	"github.com/cloudfoundry/cli/cf/api/fakes"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fake_orgs "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	. "github.com/onsi/ginkgo"
@@ -17,9 +18,9 @@ var _ = Describe("Service Plans", func() {
 	var (
 		actor actors.ServicePlanActor
 
-		servicePlanRepo           *fakes.FakeServicePlanRepo
-		servicePlanVisibilityRepo *fakes.FakeServicePlanVisibilityRepository
-		orgRepo                   *fakes.FakeOrgRepository
+		servicePlanRepo           *testapi.FakeServicePlanRepo
+		servicePlanVisibilityRepo *testapi.FakeServicePlanVisibilityRepository
+		orgRepo                   *fake_orgs.FakeOrganizationRepository
 
 		planBuilder    *fake_plan_builder.FakePlanBuilder
 		serviceBuilder *fake_service_builder.FakeServiceBuilder
@@ -44,9 +45,9 @@ var _ = Describe("Service Plans", func() {
 	)
 
 	BeforeEach(func() {
-		servicePlanRepo = &fakes.FakeServicePlanRepo{}
-		servicePlanVisibilityRepo = &fakes.FakeServicePlanVisibilityRepository{}
-		orgRepo = &fakes.FakeOrgRepository{}
+		servicePlanRepo = &testapi.FakeServicePlanRepo{}
+		servicePlanVisibilityRepo = &testapi.FakeServicePlanVisibilityRepository{}
+		orgRepo = &fake_orgs.FakeOrganizationRepository{}
 		planBuilder = &fake_plan_builder.FakePlanBuilder{}
 		serviceBuilder = &fake_service_builder.FakeServiceBuilder{}
 
@@ -60,10 +61,7 @@ var _ = Describe("Service Plans", func() {
 		org2.Name = "org-2"
 		org2.Guid = "org-2-guid"
 
-		orgRepo.Organizations = []models.Organization{
-			org1,
-			org2,
-		}
+		orgRepo.FindByNameReturns(org1, nil)
 
 		publicServicePlanVisibilityFields = models.ServicePlanVisibilityFields{
 			Guid:            "public-service-plan-visibility-guid",
@@ -270,7 +268,7 @@ var _ = Describe("Service Plans", func() {
 		BeforeEach(func() {
 			serviceBuilder.GetServiceByNameReturns(mixedService, nil)
 
-			orgRepo.FindByNameOrganization = org1
+			orgRepo.FindByNameReturns(org1, nil)
 		})
 
 		It("Returns an error if the service cannot be found", func() {
@@ -451,7 +449,7 @@ var _ = Describe("Service Plans", func() {
 
 	Describe(".UpdatePlanAndOrgForService", func() {
 		BeforeEach(func() {
-			orgRepo.FindByNameOrganization = org1
+			orgRepo.FindByNameReturns(org1, nil)
 		})
 
 		It("returns an error if the service cannot be found", func() {
@@ -462,7 +460,7 @@ var _ = Describe("Service Plans", func() {
 		})
 
 		It("returns an error if the org cannot be found", func() {
-			orgRepo.Organizations = []models.Organization{}
+			orgRepo.FindByNameReturns(models.Organization{}, errors.NewModelNotFoundError("organization", "not-an-org"))
 			_, err := actor.UpdatePlanAndOrgForService("a-real-service", "public-service-plan", "not-an-org", true)
 			Expect(err).To(HaveOccurred())
 		})
@@ -531,6 +529,7 @@ var _ = Describe("Service Plans", func() {
 
 					It("does not call delete if the specified service plan visibility does not exist", func() {
 						serviceBuilder.GetServiceByNameReturns(mixedService, nil)
+						orgRepo.FindByNameReturns(org2, nil)
 						originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "limited-service-plan", "org-2", false)
 
 						Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(0))
@@ -583,7 +582,7 @@ var _ = Describe("Service Plans", func() {
 				})
 				Context("when the org does not have access", func() {
 					It("creates the visibility", func() {
-						orgRepo.FindByNameOrganization = org2
+						orgRepo.FindByNameReturns(org2, nil)
 
 						originalAccessValue, err := actor.UpdatePlanAndOrgForService("my-mixed-service", "limited-service-plan", "org-2", true)
 

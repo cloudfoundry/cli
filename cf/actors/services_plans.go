@@ -3,6 +3,7 @@ package actors
 import (
 	"errors"
 	"fmt"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
@@ -43,12 +44,12 @@ const (
 type ServicePlanHandler struct {
 	servicePlanRepo           api.ServicePlanRepository
 	servicePlanVisibilityRepo api.ServicePlanVisibilityRepository
-	orgRepo                   api.OrganizationRepository
+	orgRepo                   organizations.OrganizationRepository
 	serviceBuilder            service_builder.ServiceBuilder
 	planBuilder               plan_builder.PlanBuilder
 }
 
-func NewServicePlanHandler(plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org api.OrganizationRepository, planBuilder plan_builder.PlanBuilder, serviceBuilder service_builder.ServiceBuilder) ServicePlanHandler {
+func NewServicePlanHandler(plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org organizations.OrganizationRepository, planBuilder plan_builder.PlanBuilder, serviceBuilder service_builder.ServiceBuilder) ServicePlanHandler {
 	return ServicePlanHandler{
 		servicePlanRepo:           plan,
 		servicePlanVisibilityRepo: vis,

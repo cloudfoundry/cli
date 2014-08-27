@@ -1,4 +1,4 @@
-package api
+package organizations
 
 import (
 	"fmt"

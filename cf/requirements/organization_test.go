@@ -24,7 +24,7 @@ var _ = Describe("OrganizationRequirement", func() {
 			org := models.Organization{}
 			org.Name = "my-org-name"
 			org.Guid = "my-org-guid"
-			orgRepo := &testapi.FakeOrgRepository{Organizations: []models.Organization{org}}
+			orgRepo := &testapi.FakeOrganizationRepository{Organizations: []models.Organization{org}}
 			orgReq := NewOrganizationRequirement("my-org-name", ui, orgRepo)
 
 			Expect(orgReq.Execute()).To(BeTrue())
@@ -34,7 +34,7 @@ var _ = Describe("OrganizationRequirement", func() {
 	})
 
 	It("fails when the org with the given name does not exist", func() {
-		orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
+		orgRepo := &testapi.FakeOrganizationRepository{FindByNameNotFound: true}
 
 		testassert.AssertPanic(testterm.QuietPanic, func() {
 			NewOrganizationRequirement("foo", ui, orgRepo).Execute()

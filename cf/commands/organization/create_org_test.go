@@ -19,14 +19,14 @@ var _ = Describe("create-org command", func() {
 		config              configuration.ReadWriter
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *testapi.FakeOrgRepository
+		orgRepo             *testapi.FakeOrganizationRepository
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		orgRepo = &testapi.FakeOrgRepository{}
+		orgRepo = &testapi.FakeOrganizationRepository{}
 	})
 
 	runCommand := func(args ...string) {

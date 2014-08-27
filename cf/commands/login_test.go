@@ -1,7 +1,10 @@
 package commands_test
 
 import (
+	"strconv"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fake_organizations "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -11,7 +14,6 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"strconv"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
@@ -23,7 +25,7 @@ var _ = Describe("Login Command", func() {
 		ui           *testterm.FakeUI
 		authRepo     *testapi.FakeAuthenticationRepository
 		endpointRepo *testapi.FakeEndpointRepo
-		orgRepo      *testapi.FakeOrgRepository
+		orgRepo      *fake_organizations.FakeOrganizationRepository
 		spaceRepo    *testapi.FakeSpaceRepository
 	)
 
@@ -42,10 +44,7 @@ var _ = Describe("Login Command", func() {
 		org.Name = "my-new-org"
 		org.Guid = "my-new-org-guid"
 
-		orgRepo = &testapi.FakeOrgRepository{
-			Organizations:          []models.Organization{org},
-			FindByNameOrganization: models.Organization{},
-		}
+		orgRepo = &fake_organizations.FakeOrganizationRepository{}
 
 		space := models.Space{}
 		space.Guid = "my-space-guid"
@@ -89,13 +88,13 @@ var _ = Describe("Login Command", func() {
 				space2.Guid = "some-space-guid"
 				space2.Name = "some-space"
 
-				orgRepo.Organizations = []models.Organization{org1, org2}
+				orgRepo.ListOrgsReturns([]models.Organization{org1, org2}, nil)
 				spaceRepo.Spaces = []models.Space{space1, space2}
 			})
 
 			It("lets the user select an org and space by number", func() {
+				orgRepo.FindByNameReturns(org2, nil)
 				OUT_OF_RANGE_CHOICE := "3"
-
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
@@ -117,7 +116,7 @@ var _ = Describe("Login Command", func() {
 
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
 
-				Expect(orgRepo.FindByNameName).To(Equal("my-new-org"))
+				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
@@ -125,6 +124,7 @@ var _ = Describe("Login Command", func() {
 
 			It("lets the user select an org and space by name", func() {
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-new-org", "my-space"}
+				orgRepo.FindByNameReturns(org2, nil)
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, Flags, nil)
@@ -145,7 +145,7 @@ var _ = Describe("Login Command", func() {
 
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
 
-				Expect(orgRepo.FindByNameName).To(Equal("my-new-org"))
+				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
@@ -195,15 +195,16 @@ var _ = Describe("Login Command", func() {
 
 		Describe("when there are too many orgs to show", func() {
 			BeforeEach(func() {
+				organizations := []models.Organization{}
 				for i := 0; i < 60; i++ {
 					id := strconv.Itoa(i)
 					org := models.Organization{}
 					org.Guid = "my-org-guid-" + id
 					org.Name = "my-org-" + id
-					orgRepo.Organizations = append(orgRepo.Organizations, org)
+					organizations = append(organizations, org)
 				}
-
-				orgRepo.FindByNameOrganization = orgRepo.Organizations[1]
+				orgRepo.ListOrgsReturns(organizations, nil)
+				orgRepo.FindByNameReturns(organizations[1], nil)
 
 				space1 := models.Space{}
 				space1.Guid = "my-space-guid"
@@ -223,7 +224,7 @@ var _ = Describe("Login Command", func() {
 				testcmd.RunCommand(l, Flags, nil)
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"my-org-2"}))
-				Expect(orgRepo.FindByNameName).To(Equal("my-org-1"))
+				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-org-1"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid-1"))
 			})
 		})
@@ -635,8 +636,12 @@ var _ = Describe("Login Command", func() {
 
 		Describe("and the login succeeds", func() {
 			BeforeEach(func() {
-				orgRepo.Organizations[0].Name = "new-org"
-				orgRepo.Organizations[0].Guid = "new-org-guid"
+				orgRepo.FindByNameReturns(models.Organization{
+					OrganizationFields: models.OrganizationFields{
+						Name: "new-org",
+						Guid: "new-org-guid",
+					},
+				}, nil)
 				spaceRepo.Spaces[0].Name = "new-space"
 				spaceRepo.Spaces[0].Guid = "new-space-guid"
 				authRepo.AccessToken = "new_access_token"

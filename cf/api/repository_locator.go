@@ -2,6 +2,7 @@ package api
 
 import (
 	"crypto/tls"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
@@ -25,7 +26,7 @@ type RepositoryLocator struct {
 	authRepo                        authentication.AuthenticationRepository
 	curlRepo                        CurlRepository
 	endpointRepo                    RemoteEndpointRepository
-	organizationRepo                CloudControllerOrganizationRepository
+	organizationRepo                organizations.CloudControllerOrganizationRepository
 	quotaRepo                       quotas.CloudControllerQuotaRepository
 	spaceRepo                       spaces.CloudControllerSpaceRepository
 	appRepo                         CloudControllerApplicationRepository
@@ -84,7 +85,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
-	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
+	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
 	loc.routeRepo = NewCloudControllerRouteRepository(config, cloudControllerGateway)
@@ -120,7 +121,7 @@ func (locator RepositoryLocator) GetEndpointRepository() EndpointRepository {
 	return locator.endpointRepo
 }
 
-func (locator RepositoryLocator) GetOrganizationRepository() OrganizationRepository {
+func (locator RepositoryLocator) GetOrganizationRepository() organizations.OrganizationRepository {
 	return locator.organizationRepo
 }
 

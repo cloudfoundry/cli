@@ -20,7 +20,7 @@ var _ = Describe("delete-org command", func() {
 		config              configuration.ReadWriter
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *testapi.FakeOrgRepository
+		orgRepo             *testapi.FakeOrganizationRepository
 	)
 
 	BeforeEach(func() {
@@ -33,7 +33,7 @@ var _ = Describe("delete-org command", func() {
 		org := models.Organization{}
 		org.Name = "org-to-delete"
 		org.Guid = "org-to-delete-guid"
-		orgRepo = &testapi.FakeOrgRepository{Organizations: []models.Organization{org}}
+		orgRepo = &testapi.FakeOrganizationRepository{Organizations: []models.Organization{org}}
 	})
 
 	runCommand := func(args ...string) {

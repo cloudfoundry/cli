@@ -1,7 +1,7 @@
 package organization
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -15,11 +15,11 @@ import (
 type DeleteOrg struct {
 	ui      terminal.UI
 	config  configuration.ReadWriter
-	orgRepo api.OrganizationRepository
+	orgRepo organizations.OrganizationRepository
 	orgReq  requirements.OrganizationRequirement
 }
 
-func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.OrganizationRepository) (cmd *DeleteOrg) {
+func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo organizations.OrganizationRepository) (cmd *DeleteOrg) {
 	cmd = new(DeleteOrg)
 	cmd.ui = ui
 	cmd.config = config

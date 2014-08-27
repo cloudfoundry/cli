@@ -18,7 +18,7 @@ import (
 var _ = Describe("org command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		orgRepo             *testapi.FakeOrgRepository
+		orgRepo             *testapi.FakeOrganizationRepository
 		configRepo          configuration.ReadWriter
 		requirementsFactory *testreq.FakeReqFactory
 	)
@@ -31,7 +31,7 @@ var _ = Describe("org command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		orgRepo = &testapi.FakeOrgRepository{}
+		orgRepo = &testapi.FakeOrganizationRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
