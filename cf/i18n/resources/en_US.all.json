@@ -895,8 +895,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME update-service-broker SERVICE_BROKER [-u USERNAME] [-p PASSWORD] [--url URL]",
-      "translation": "CF_NAME update-service-broker SERVICE_BROKER [-u USERNAME] [-p PASSWORD] [--url URL]",
+      "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+      "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
       "modified": false
    },
    {
@@ -3272,11 +3272,6 @@
    {
       "id": "UAA endpoint missing from config file",
       "translation": "UAA endpoint missing from config file",
-      "modified": false
-   },
-   {
-      "id": "URL",
-      "translation": "URL",
       "modified": false
    },
    {

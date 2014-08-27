@@ -895,9 +895,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME update-service-broker SERVICE_BROKER [-u USERNAME] [-p PASSWORD] [--url URL]",
+      "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
       "translation": "CF_NAME update-service-broker SERVICE_BROKER [-u USERNAME] [-p PASSWORD] [--url URL]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
@@ -3272,11 +3272,6 @@
    {
       "id": "UAA endpoint missing from config file",
       "translation": "Terminal UAA ausente em arquivo de configuração",
-      "modified": false
-   },
-   {
-      "id": "URL",
-      "translation": "URL",
       "modified": false
    },
    {
