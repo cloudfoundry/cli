@@ -36,7 +36,7 @@ var _ = Describe("update-service-broker command", func() {
 	}
 
 	Describe("requirements", func() {
-		It("fails with usage when invoked without exactly one args", func() {
+		It("fails with usage when invoked without exactly four args", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand("arg1", "arg2", "arg3")
@@ -55,14 +55,11 @@ var _ = Describe("update-service-broker command", func() {
 			broker := models.ServiceBroker{}
 			broker.Name = "my-found-broker"
 			broker.Guid = "my-found-broker-guid"
-			broker.Username = "old-user"
-			broker.Password = "old-password"
-			broker.Url = "old-url"
 			serviceBrokerRepo.FindByNameServiceBroker = broker
 		})
 
 		It("updates the service broker with the provided properties", func() {
-			runCommand("-u", "new-username", "--url", "new-url", "my-broker")
+			runCommand("my-broker", "new-username", "new-password", "new-url")
 
 			Expect(serviceBrokerRepo.FindByNameName).To(Equal("my-broker"))
 
@@ -74,24 +71,8 @@ var _ = Describe("update-service-broker command", func() {
 			expectedServiceBroker := models.ServiceBroker{}
 			expectedServiceBroker.Name = "my-found-broker"
 			expectedServiceBroker.Username = "new-username"
+			expectedServiceBroker.Password = "new-password"
 			expectedServiceBroker.Url = "new-url"
-			expectedServiceBroker.Guid = "my-found-broker-guid"
-
-			Expect(serviceBrokerRepo.UpdatedServiceBroker).To(Equal(expectedServiceBroker))
-		})
-
-		It("updates the broker without any flags", func() {
-			runCommand("my-broker")
-
-			Expect(serviceBrokerRepo.FindByNameName).To(Equal("my-broker"))
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Updating service broker", "my-found-broker", "my-user"},
-				[]string{"OK"},
-			))
-
-			expectedServiceBroker := models.ServiceBroker{}
-			expectedServiceBroker.Name = "my-found-broker"
 			expectedServiceBroker.Guid = "my-found-broker-guid"
 
 			Expect(serviceBrokerRepo.UpdatedServiceBroker).To(Equal(expectedServiceBroker))

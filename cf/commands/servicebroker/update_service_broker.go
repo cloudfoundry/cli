@@ -4,7 +4,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -28,17 +27,12 @@ func (cmd UpdateServiceBroker) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-service-broker",
 		Description: T("Update a service broker"),
-		Usage:       T("CF_NAME update-service-broker SERVICE_BROKER [-u USERNAME] [-p PASSWORD] [--url URL]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("u", T("Username")),
-			flag_helpers.NewStringFlag("p", T("Password")),
-			flag_helpers.NewStringFlag("url", T("URL")),
-		},
+		Usage:       T("CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"),
 	}
 }
 
 func (cmd UpdateServiceBroker) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
+	if len(c.Args()) != 4 {
 		cmd.ui.FailWithUsage(c)
 	}
 
@@ -59,10 +53,9 @@ func (cmd UpdateServiceBroker) Run(c *cli.Context) {
 			"Name":     terminal.EntityNameColor(serviceBroker.Name),
 			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	// We only want to update the passed in flags. The repo does not send a zero value.
-	serviceBroker.Username = c.String("u")
-	serviceBroker.Password = c.String("p")
-	serviceBroker.Url = c.String("url")
+	serviceBroker.Username = c.Args()[1]
+	serviceBroker.Password = c.Args()[2]
+	serviceBroker.Url = c.Args()[3]
 
 	apiErr = cmd.repo.Update(serviceBroker)
 
