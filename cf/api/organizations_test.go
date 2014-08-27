@@ -53,10 +53,7 @@ var _ = Describe("Organization Repository", func() {
 			defer testserver.Close()
 
 			orgs := []models.Organization{}
-			apiErr := repo.ListOrgs(func(o models.Organization) bool {
-				orgs = append(orgs, o)
-				return true
-			})
+			orgs, apiErr := repo.ListOrgs()
 
 			Expect(len(orgs)).To(Equal(3))
 			Expect(orgs[0].Guid).To(Equal("org1-guid"))
@@ -76,13 +73,8 @@ var _ = Describe("Organization Repository", func() {
 			testserver, handler, repo := createOrganizationRepo(emptyOrgsRequest)
 			defer testserver.Close()
 
-			wasCalled := false
-			apiErr := repo.ListOrgs(func(o models.Organization) bool {
-				wasCalled = true
-				return false
-			})
+			_, apiErr := repo.ListOrgs()
 
-			Expect(wasCalled).To(BeFalse())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(handler).To(HaveAllRequestsCalled())
 		})

@@ -12,7 +12,7 @@ import (
 )
 
 type OrganizationRepository interface {
-	ListOrgs(func(models.Organization) bool) (apiErr error)
+	ListOrgs() (orgs []models.Organization, apiErr error)
 	FindByName(name string) (org models.Organization, apiErr error)
 	Create(name string) (apiErr error)
 	Rename(orgGuid string, name string) (apiErr error)
@@ -30,14 +30,22 @@ func NewCloudControllerOrganizationRepository(config configuration.Reader, gatew
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) ListOrgs(cb func(models.Organization) bool) (apiErr error) {
-	return repo.gateway.ListPaginatedResources(
+func (repo CloudControllerOrganizationRepository) ListOrgs() ([]models.Organization, error) {
+	orgs := []models.Organization{}
+	err := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		"/v2/organizations",
 		resources.OrganizationResource{},
 		func(resource interface{}) bool {
-			return cb(resource.(resources.OrganizationResource).ToModel())
+			orgResource, ok := resource.(resources.OrganizationResource)
+			if ok {
+				orgs = append(orgs, orgResource.ToModel())
+				return true
+			} else {
+				return false
+			}
 		})
+	return orgs, err
 }
 
 func (repo CloudControllerOrganizationRepository) FindByName(name string) (org models.Organization, apiErr error) {

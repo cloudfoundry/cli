@@ -5,7 +5,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -47,11 +46,15 @@ func (cmd ListOrgs) Run(c *cli.Context) {
 	noOrgs := true
 	table := cmd.ui.Table([]string{T("name")})
 
-	apiErr := cmd.orgRepo.ListOrgs(func(org models.Organization) bool {
+	orgs, apiErr := cmd.orgRepo.ListOrgs()
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
+	}
+	for _, org := range orgs {
 		table.Add(org.Name)
 		noOrgs = false
-		return true
-	})
+	}
+
 	table.Print()
 
 	if apiErr != nil {
