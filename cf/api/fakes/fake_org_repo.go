@@ -22,13 +22,8 @@ type FakeOrgRepository struct {
 	DeletedOrganizationGuid string
 }
 
-func (repo FakeOrgRepository) ListOrgs(cb func(models.Organization) bool) (apiErr error) {
-	for _, org := range repo.Organizations {
-		if !cb(org) {
-			break
-		}
-	}
-	return
+func (repo FakeOrgRepository) ListOrgs() (orgs []models.Organization, apiErr error) {
+	return repo.Organizations, nil
 }
 
 func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization, apiErr error) {

@@ -94,10 +94,14 @@ func (builder Builder) buildPlanToOrgsVisibilityMap() (map[string][]string, erro
 	// Since this map doesn't ever change, we memoize it for performance
 	if PlanToOrgsVisibilityMap == nil {
 		orgLookup := make(map[string]string)
-		builder.orgRepo.ListOrgs(func(org models.Organization) bool {
+
+		orgs, err := builder.orgRepo.ListOrgs()
+		if err != nil {
+			return nil, err
+		}
+		for _, org := range orgs {
 			orgLookup[org.Guid] = org.Name
-			return true
-		})
+		}
 
 		visibilities, err := builder.servicePlanVisibilityRepo.List()
 		if err != nil {
