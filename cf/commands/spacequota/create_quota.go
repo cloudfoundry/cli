@@ -1,7 +1,7 @@
 package spacequota
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -19,10 +19,10 @@ type CreateSpaceQuota struct {
 	ui        terminal.UI
 	config    configuration.Reader
 	quotaRepo space_quotas.SpaceQuotaRepository
-	orgRepo   api.OrganizationRepository
+	orgRepo   organizations.OrganizationRepository
 }
 
-func NewCreateSpaceQuota(ui terminal.UI, config configuration.Reader, quotaRepo space_quotas.SpaceQuotaRepository, orgRepo api.OrganizationRepository) CreateSpaceQuota {
+func NewCreateSpaceQuota(ui terminal.UI, config configuration.Reader, quotaRepo space_quotas.SpaceQuotaRepository, orgRepo organizations.OrganizationRepository) CreateSpaceQuota {
 	return CreateSpaceQuota{
 		ui:        ui,
 		config:    config,

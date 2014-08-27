@@ -20,14 +20,14 @@ var _ = Describe("create-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		orgRepo             *testapi.FakeOrgRepository
+		orgRepo             *testapi.FakeOrganizationRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
-		orgRepo = &testapi.FakeOrgRepository{}
+		orgRepo = &testapi.FakeOrganizationRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		org := models.Organization{}

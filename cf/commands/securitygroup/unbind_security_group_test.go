@@ -25,7 +25,7 @@ var _ = Describe("unbind-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
-		orgRepo             *fakes.FakeOrgRepository
+		orgRepo             *fakes.FakeOrganizationRepository
 		spaceRepo           *fakes.FakeSpaceRepository
 		secBinder           *fakeBinder.FakeSecurityGroupSpaceBinder
 		requirementsFactory *testreq.FakeReqFactory
@@ -36,7 +36,7 @@ var _ = Describe("unbind-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
-		orgRepo = &fakes.FakeOrgRepository{}
+		orgRepo = &fakes.FakeOrganizationRepository{}
 		spaceRepo = &fakes.FakeSpaceRepository{}
 		secBinder = &fakeBinder.FakeSecurityGroupSpaceBinder{}
 		configRepo = testconfig.NewRepositoryWithDefaults()

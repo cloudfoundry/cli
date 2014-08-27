@@ -18,14 +18,14 @@ import (
 var _ = Describe("rename-org command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *testapi.FakeOrgRepository
+		orgRepo             *testapi.FakeOrganizationRepository
 		ui                  *testterm.FakeUI
 		configRepo          configuration.ReadWriter
 	)
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
-		orgRepo = &testapi.FakeOrgRepository{}
+		orgRepo = &testapi.FakeOrganizationRepository{}
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})

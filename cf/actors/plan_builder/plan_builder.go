@@ -2,6 +2,7 @@ package plan_builder
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -19,10 +20,10 @@ var (
 type Builder struct {
 	servicePlanRepo           api.ServicePlanRepository
 	servicePlanVisibilityRepo api.ServicePlanVisibilityRepository
-	orgRepo                   api.OrganizationRepository
+	orgRepo                   organizations.OrganizationRepository
 }
 
-func NewBuilder(plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org api.OrganizationRepository) Builder {
+func NewBuilder(plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org organizations.OrganizationRepository) Builder {
 	return Builder{
 		servicePlanRepo:           plan,
 		servicePlanVisibilityRepo: vis,

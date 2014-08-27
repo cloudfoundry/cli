@@ -1,7 +1,7 @@
 package securitygroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	sgbinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
@@ -17,12 +17,12 @@ type UnbindSecurityGroup struct {
 	ui                terminal.UI
 	configRepo        configuration.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
-	orgRepo           api.OrganizationRepository
+	orgRepo           organizations.OrganizationRepository
 	spaceRepo         spaces.SpaceRepository
 	secBinder         sgbinder.SecurityGroupSpaceBinder
 }
 
-func NewUnbindSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, orgRepo api.OrganizationRepository, spaceRepo spaces.SpaceRepository, secBinder sgbinder.SecurityGroupSpaceBinder) UnbindSecurityGroup {
+func NewUnbindSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, orgRepo organizations.OrganizationRepository, spaceRepo spaces.SpaceRepository, secBinder sgbinder.SecurityGroupSpaceBinder) UnbindSecurityGroup {
 	return UnbindSecurityGroup{
 		ui:                ui,
 		configRepo:        configRepo,

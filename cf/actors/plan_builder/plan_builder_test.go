@@ -3,6 +3,7 @@ package plan_builder_test
 import (
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/api/fakes"
+	testorg "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,7 +15,7 @@ var _ = Describe("Plan builder", func() {
 
 		planRepo       *fakes.FakeServicePlanRepo
 		visibilityRepo *fakes.FakeServicePlanVisibilityRepository
-		orgRepo        *fakes.FakeOrgRepository
+		orgRepo        *testorg.FakeOrganizationRepository
 
 		plan1 models.ServicePlanFields
 		plan2 models.ServicePlanFields
@@ -26,7 +27,7 @@ var _ = Describe("Plan builder", func() {
 	BeforeEach(func() {
 		planRepo = &fakes.FakeServicePlanRepo{}
 		visibilityRepo = &fakes.FakeServicePlanVisibilityRepository{}
-		orgRepo = &fakes.FakeOrgRepository{}
+		orgRepo = &testorg.FakeOrganizationRepository{}
 
 		builder = plan_builder.NewBuilder(planRepo, visibilityRepo, orgRepo)
 
@@ -51,11 +52,12 @@ var _ = Describe("Plan builder", func() {
 		org2 = models.Organization{}
 		org2.Name = "org2"
 		org2.Guid = "org2-guid"
-
-		orgRepo.Organizations = []models.Organization{
-			org1,
-			org2,
-		}
+		/**
+			orgRepo.Organizations = []models.Organization{
+				org1,
+				org2,
+			}
+		**/
 		visibilityRepo.ListReturns([]models.ServicePlanVisibilityFields{
 			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org1-guid"},
 			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org2-guid"},
@@ -64,6 +66,7 @@ var _ = Describe("Plan builder", func() {
 
 	Describe(".AttachOrgsToPlans", func() {
 		It("returns plans fully populated with the orgnames that have visibility", func() {
+			orgRepo.ListOrgsReturns([]models.Organization{org1, org2}, nil)
 			barePlans := []models.ServicePlanFields{plan1, plan2}
 
 			plans, err := builder.AttachOrgsToPlans(barePlans)

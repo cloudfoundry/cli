@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -24,7 +25,7 @@ type Login struct {
 	config        configuration.ReadWriter
 	authenticator authentication.AuthenticationRepository
 	endpointRepo  api.EndpointRepository
-	orgRepo       api.OrganizationRepository
+	orgRepo       organizations.OrganizationRepository
 	spaceRepo     spaces.SpaceRepository
 }
 
@@ -32,7 +33,7 @@ func NewLogin(ui terminal.UI,
 	config configuration.ReadWriter,
 	authenticator authentication.AuthenticationRepository,
 	endpointRepo api.EndpointRepository,
-	orgRepo api.OrganizationRepository,
+	orgRepo organizations.OrganizationRepository,
 	spaceRepo spaces.SpaceRepository) (cmd Login) {
 	return Login{
 		ui:            ui,

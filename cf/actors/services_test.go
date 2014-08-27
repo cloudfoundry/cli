@@ -4,7 +4,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	broker_builder "github.com/cloudfoundry/cli/cf/actors/broker_builder/fakes"
 	service_builder "github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
-	"github.com/cloudfoundry/cli/cf/api/fakes"
+	organization_fakes "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	. "github.com/onsi/ginkgo"
@@ -16,14 +17,14 @@ var _ = Describe("Services", func() {
 		actor          actors.ServiceActor
 		brokerBuilder  *broker_builder.FakeBrokerBuilder
 		serviceBuilder *service_builder.FakeServiceBuilder
-		orgRepo        *fakes.FakeOrgRepository
+		orgRepo        *organization_fakes.FakeOrganizationRepository
 		serviceBroker1 models.ServiceBroker
 		serviceBroker2 models.ServiceBroker
 		service1       models.ServiceOffering
 	)
 
 	BeforeEach(func() {
-		orgRepo = &fakes.FakeOrgRepository{}
+		orgRepo = &organization_fakes.FakeOrganizationRepository{}
 		brokerBuilder = &broker_builder.FakeBrokerBuilder{}
 		serviceBuilder = &service_builder.FakeServiceBuilder{}
 
@@ -45,11 +46,6 @@ var _ = Describe("Services", func() {
 		org2 := models.Organization{}
 		org2.Name = "org2"
 		org2.Guid = "org2-guid"
-
-		orgRepo.Organizations = []models.Organization{
-			org1,
-			org2,
-		}
 	})
 
 	Describe("FilterBrokers", func() {
@@ -95,7 +91,7 @@ var _ = Describe("Services", func() {
 
 		Context("when the -o flag is passed", func() {
 			It("returns an error if the org does not actually exist", func() {
-				orgRepo.Organizations = []models.Organization{}
+				orgRepo.FindByNameReturns(models.Organization{}, errors.NewModelNotFoundError("organization", "org-that-shall-not-be-found"))
 				_, err := actor.FilterBrokers("", "", "org-that-shall-not-be-found")
 
 				Expect(err).To(HaveOccurred())

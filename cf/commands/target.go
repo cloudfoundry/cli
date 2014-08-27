@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -17,13 +17,13 @@ import (
 type Target struct {
 	ui        terminal.UI
 	config    configuration.ReadWriter
-	orgRepo   api.OrganizationRepository
+	orgRepo   organizations.OrganizationRepository
 	spaceRepo spaces.SpaceRepository
 }
 
 func NewTarget(ui terminal.UI,
 	config configuration.ReadWriter,
-	orgRepo api.OrganizationRepository,
+	orgRepo organizations.OrganizationRepository,
 	spaceRepo spaces.SpaceRepository) (cmd Target) {
 
 	cmd.ui = ui

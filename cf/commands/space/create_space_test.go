@@ -25,7 +25,7 @@ var _ = Describe("create-space command", func() {
 		configOrg           models.OrganizationFields
 		configRepo          configuration.ReadWriter
 		spaceRepo           *testapi.FakeSpaceRepository
-		orgRepo             *testapi.FakeOrgRepository
+		orgRepo             *testapi.FakeOrganizationRepository
 		userRepo            *testapi.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
 	)
@@ -39,7 +39,7 @@ var _ = Describe("create-space command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		orgRepo = &testapi.FakeOrgRepository{}
+		orgRepo = &testapi.FakeOrganizationRepository{}
 		userRepo = &testapi.FakeUserRepository{}
 		spaceRoleSetter = user.NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
 

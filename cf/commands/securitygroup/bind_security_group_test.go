@@ -26,13 +26,13 @@ var _ = Describe("bind-security-group command", func() {
 		fakeSecurityGroupRepo *testapi.FakeSecurityGroupRepo
 		requirementsFactory   *testreq.FakeReqFactory
 		fakeSpaceRepo         *fakes.FakeSpaceRepository
-		fakeOrgRepo           *fakes.FakeOrgRepository
+		fakeOrgRepo           *fakes.FakeOrganizationRepository
 		fakeSpaceBinder       *zoidberg.FakeSecurityGroupSpaceBinder
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		fakeOrgRepo = &fakes.FakeOrgRepository{}
+		fakeOrgRepo = &fakes.FakeOrganizationRepository{}
 		fakeSpaceRepo = &fakes.FakeSpaceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		fakeSecurityGroupRepo = &testapi.FakeSecurityGroupRepo{}

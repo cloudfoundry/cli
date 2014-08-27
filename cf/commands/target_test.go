@@ -2,6 +2,7 @@ package commands_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,7 +19,7 @@ import (
 
 var _ = Describe("target command", func() {
 	var (
-		orgRepo             *testapi.FakeOrgRepository
+		orgRepo             *fake_org.FakeOrganizationRepository
 		spaceRepo           *testapi.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
 		config              configuration.ReadWriter
@@ -27,7 +28,7 @@ var _ = Describe("target command", func() {
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
-		orgRepo = new(testapi.FakeOrgRepository)
+		orgRepo = new(fake_org.FakeOrganizationRepository)
 		spaceRepo = new(testapi.FakeSpaceRepository)
 		requirementsFactory = new(testreq.FakeReqFactory)
 		config = testconfig.NewRepositoryWithDefaults()

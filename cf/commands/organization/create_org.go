@@ -2,7 +2,7 @@ package organization
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -15,10 +15,10 @@ import (
 type CreateOrg struct {
 	ui      terminal.UI
 	config  configuration.Reader
-	orgRepo api.OrganizationRepository
+	orgRepo organizations.OrganizationRepository
 }
 
-func NewCreateOrg(ui terminal.UI, config configuration.Reader, orgRepo api.OrganizationRepository) (cmd CreateOrg) {
+func NewCreateOrg(ui terminal.UI, config configuration.Reader, orgRepo organizations.OrganizationRepository) (cmd CreateOrg) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.orgRepo = orgRepo
