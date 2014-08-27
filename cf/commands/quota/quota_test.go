@@ -82,6 +82,34 @@ var _ = Describe("quota", func() {
 				})
 			})
 
+			Context("when instance memory limit is -1", func() {
+				BeforeEach(func() {
+					quotaRepo.FindByNameReturns(models.QuotaFields{
+						Guid:                    "my-quota-guid",
+						Name:                    "muh-muh-muh-my-qua-quota",
+						MemoryLimit:             512,
+						InstanceMemoryLimit:     -1,
+						RoutesLimit:             2000,
+						ServicesLimit:           47,
+						NonBasicServicesAllowed: true,
+					}, nil)
+				})
+
+				It("shows you that quota", func() {
+					runCommand("muh-muh-muh-my-qua-quota")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
+						[]string{"OK"},
+						[]string{"Total Memory", "512M"},
+						[]string{"Instance Memory", "-1 "},
+						[]string{"Routes", "2000"},
+						[]string{"Services", "47"},
+						[]string{"Paid service plans", "allowed"},
+					))
+				})
+			})
+
 			Context("that doesn't exist", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{}, errors.New("oops i accidentally a quota"))

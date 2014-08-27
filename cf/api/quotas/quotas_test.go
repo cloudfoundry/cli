@@ -55,6 +55,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				Guid:                    "my-quota-guid",
 				Name:                    "my-remote-quota",
 				MemoryLimit:             1024,
+				InstanceMemoryLimit:     -1,
 				RoutesLimit:             123,
 				ServicesLimit:           321,
 				NonBasicServicesAllowed: true,
@@ -187,6 +188,7 @@ var firstQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestReques
 			  "entity": {
 			  	"name": "my-remote-quota",
 			  	"memory_limit": 1024,
+          "instance_memory_limit": -1,
 			  	"total_routes": 123,
 			  	"total_services": 321,
 			  	"non_basic_services_allowed": true

@@ -56,9 +56,16 @@ func (cmd *showQuota) Run(context *cli.Context) {
 
 	cmd.ui.Ok()
 
+	var megabytes string
+	if quota.InstanceMemoryLimit == -1 {
+		megabytes = "-1"
+	} else {
+		megabytes = formatters.ByteSize(quota.InstanceMemoryLimit * formatters.MEGABYTE)
+	}
+
 	table := terminal.NewTable(cmd.ui, []string{"", ""})
 	table.Add(T("Total Memory"), formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE))
-	table.Add(T("Instance Memory"), formatters.ByteSize(quota.InstanceMemoryLimit*formatters.MEGABYTE))
+	table.Add(T("Instance Memory"), megabytes)
 	table.Add(T("Routes"), fmt.Sprintf("%d", quota.RoutesLimit))
 	table.Add(T("Services"), fmt.Sprintf("%d", quota.ServicesLimit))
 	table.Add(T("Paid service plans"), formatters.Allowed(quota.NonBasicServicesAllowed))
