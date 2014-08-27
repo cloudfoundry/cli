@@ -2285,6 +2285,11 @@
       "modified": false
    },
    {
+      "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.",
+      "translation": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.",
+      "modified": false
+   },
+   {
       "id": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G)",
       "translation": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G)",
       "modified": false
