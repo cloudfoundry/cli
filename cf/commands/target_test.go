@@ -1,6 +1,8 @@
 package commands_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
@@ -82,149 +84,143 @@ var _ = Describe("target command", func() {
 			Expect(config.SpaceFields()).To(Equal(models.SpaceFields{}))
 		}
 
-		It("it updates the organization in the config", func() {
-			org := models.Organization{}
-			org.Name = "my-organization"
-			org.Guid = "my-organization-guid"
+		Context("there are no errors", func() {
+			BeforeEach(func() {
+				org := models.Organization{}
+				org.Name = "my-organization"
+				org.Guid = "my-organization-guid"
 
-			orgRepo.Organizations = []models.Organization{org}
-			orgRepo.FindByNameOrganization = org
+				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
+				orgRepo.FindByNameReturns(org, nil)
+			})
 
-			callTarget([]string{"-o", "my-organization"})
+			It("it updates the organization in the config", func() {
+				callTarget([]string{"-o", "my-organization"})
 
-			Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
-			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
+				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 
-			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+			})
+
+			It("updates the space in the config", func() {
+				space := models.Space{}
+				space.Name = "my-space"
+				space.Guid = "my-space-guid"
+
+				spaceRepo.Spaces = []models.Space{space}
+				spaceRepo.FindByNameSpace = space
+
+				callTarget([]string{"-s", "my-space"})
+
+				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+				Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			})
+
+			It("updates both the organization and the space in the config", func() {
+				space := models.Space{}
+				space.Name = "my-space"
+				space.Guid = "my-space-guid"
+				spaceRepo.Spaces = []models.Space{space}
+
+				callTarget([]string{"-o", "my-organization", "-s", "my-space"})
+
+				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
+				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+
+				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+				Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+
+				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			})
+
+			It("only updates the organization in the config when the space can't be found", func() {
+				config.SetSpaceFields(models.SpaceFields{})
+
+				spaceRepo.FindByNameErr = true
+
+				callTarget([]string{"-o", "my-organization", "-s", "my-space"})
+
+				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
+				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+
+				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+				Expect(config.SpaceFields().Guid).To(Equal(""))
+
+				Expect(ui.ShowConfigurationCalled).To(BeFalse())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Unable to access space", "my-space"},
+				))
+			})
 		})
 
-		It("updates the space in the config", func() {
-			space := models.Space{}
-			space.Name = "my-space"
-			space.Guid = "my-space-guid"
+		Context("there are errors", func() {
+			It("fails when the user does not have access to the specified organization", func() {
+				orgRepo.FindByNameReturns(models.Organization{}, errors.New("Invalid access"))
 
-			spaceRepo.Spaces = []models.Space{space}
-			spaceRepo.FindByNameSpace = space
+				callTarget([]string{"-o", "my-organization"})
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				expectOrgToBeCleared()
+				expectSpaceToBeCleared()
+			})
 
-			callTarget([]string{"-s", "my-space"})
+			It("fails when the organization is not found", func() {
+				orgRepo.FindByNameReturns(models.Organization{}, errors.New("my-organization not found"))
 
-			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
-			Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
-			Expect(ui.ShowConfigurationCalled).To(BeTrue())
-		})
+				callTarget([]string{"-o", "my-organization"})
 
-		It("updates both the organization and the space in the config", func() {
-			org := models.Organization{}
-			org.Name = "my-organization"
-			org.Guid = "my-organization-guid"
-			orgRepo.Organizations = []models.Organization{org}
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"my-organization", "not found"},
+				))
 
-			space := models.Space{}
-			space.Name = "my-space"
-			space.Guid = "my-space-guid"
-			spaceRepo.Spaces = []models.Space{space}
+				expectOrgToBeCleared()
+				expectSpaceToBeCleared()
+			})
 
-			callTarget([]string{"-o", "my-organization", "-s", "my-space"})
+			It("fails to target a space if no organization is targeted", func() {
+				config.SetOrganizationFields(models.OrganizationFields{})
 
-			Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
-			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				callTarget([]string{"-s", "my-space"})
 
-			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
-			Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"An org must be targeted before targeting a space"},
+				))
 
-			Expect(ui.ShowConfigurationCalled).To(BeTrue())
-		})
+				expectSpaceToBeCleared()
+			})
 
-		It("only updates the organization in the config when the space can't be found", func() {
-			config.SetSpaceFields(models.SpaceFields{})
+			It("fails when the user doesn't have access to the space", func() {
+				spaceRepo.FindByNameErr = true
 
-			org := models.Organization{}
-			org.Name = "my-organization"
-			org.Guid = "my-organization-guid"
-			orgRepo.Organizations = []models.Organization{org}
+				callTarget([]string{"-s", "my-space"})
 
-			spaceRepo.FindByNameErr = true
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Unable to access space", "my-space"},
+				))
 
-			callTarget([]string{"-o", "my-organization", "-s", "my-space"})
+				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(ui.ShowConfigurationCalled).To(BeFalse())
 
-			Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
-			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.OrganizationFields().Guid).NotTo(BeEmpty())
+				expectSpaceToBeCleared()
+			})
 
-			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
-			Expect(config.SpaceFields().Guid).To(Equal(""))
+			It("fails when the space is not found", func() {
+				spaceRepo.FindByNameNotFound = true
 
-			Expect(ui.ShowConfigurationCalled).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"Unable to access space", "my-space"},
-			))
-		})
+				callTarget([]string{"-s", "my-space"})
 
-		It("fails when the user does not have access to the specified organization", func() {
-			orgs := []models.Organization{}
-			orgRepo.Organizations = orgs
-			orgRepo.FindByNameErr = true
-
-			callTarget([]string{"-o", "my-organization"})
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-			expectOrgToBeCleared()
-			expectSpaceToBeCleared()
-		})
-
-		It("fails when the organization is not found", func() {
-			orgRepo.FindByNameNotFound = true
-
-			callTarget([]string{"-o", "my-organization"})
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"my-organization", "not found"},
-			))
-
-			expectOrgToBeCleared()
-			expectSpaceToBeCleared()
-		})
-
-		It("fails to target a space if no organization is targeted", func() {
-			config.SetOrganizationFields(models.OrganizationFields{})
-
-			callTarget([]string{"-s", "my-space"})
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"An org must be targeted before targeting a space"},
-			))
-
-			expectSpaceToBeCleared()
-		})
-
-		It("fails when the user doesn't have access to the space", func() {
-			spaceRepo.FindByNameErr = true
-
-			callTarget([]string{"-s", "my-space"})
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"Unable to access space", "my-space"},
-			))
-
-			Expect(config.SpaceFields().Guid).To(Equal(""))
-			Expect(ui.ShowConfigurationCalled).To(BeFalse())
-
-			Expect(config.OrganizationFields().Guid).NotTo(BeEmpty())
-			expectSpaceToBeCleared()
-		})
-
-		It("fails when the space is not found", func() {
-			spaceRepo.FindByNameNotFound = true
-
-			callTarget([]string{"-s", "my-space"})
-
-			expectSpaceToBeCleared()
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"my-space", "not found"},
-			))
+				expectSpaceToBeCleared()
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"my-space", "not found"},
+				))
+			})
 		})
 	})
 })

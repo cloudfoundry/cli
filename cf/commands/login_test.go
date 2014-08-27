@@ -27,6 +27,8 @@ var _ = Describe("Login Command", func() {
 		endpointRepo *testapi.FakeEndpointRepo
 		orgRepo      *fake_organizations.FakeOrganizationRepository
 		spaceRepo    *testapi.FakeSpaceRepository
+
+		org models.Organization
 	)
 
 	BeforeEach(func() {
@@ -40,11 +42,12 @@ var _ = Describe("Login Command", func() {
 		}
 		endpointRepo = &testapi.FakeEndpointRepo{}
 
-		org := models.Organization{}
+		org = models.Organization{}
 		org.Name = "my-new-org"
 		org.Guid = "my-new-org-guid"
 
 		orgRepo = &fake_organizations.FakeOrganizationRepository{}
+		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 
 		space := models.Space{}
 		space.Guid = "my-space-guid"
@@ -154,6 +157,7 @@ var _ = Describe("Login Command", func() {
 			It("lets the user specify an org and space using flags", func() {
 				Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-new-org", "-s", "my-space"}
 
+				orgRepo.FindByNameReturns(org2, nil)
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, Flags, nil)
 
@@ -174,6 +178,7 @@ var _ = Describe("Login Command", func() {
 			})
 
 			It("doesn't ask the user for the API url if they have it in their config", func() {
+				orgRepo.FindByNameReturns(org, nil)
 				Config.SetApiEndpoint("http://api.example.com")
 
 				Flags = []string{"-o", "my-new-org", "-s", "my-space"}
@@ -592,7 +597,7 @@ var _ = Describe("Login Command", func() {
 		Describe("and the login fails to target an org", func() {
 			BeforeEach(func() {
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "nonexistentorg", "-s", "my-space"}
-
+				orgRepo.FindByNameReturns(models.Organization{}, errors.New("No org"))
 				Config.SetSSLDisabled(true)
 			})
 
@@ -613,6 +618,7 @@ var _ = Describe("Login Command", func() {
 		Describe("and the login fails to target a space", func() {
 			BeforeEach(func() {
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "my-new-org", "-s", "nonexistent"}
+				orgRepo.FindByNameReturns(org, nil)
 
 				Config.SetSSLDisabled(true)
 			})
