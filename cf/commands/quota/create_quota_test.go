@@ -87,6 +87,13 @@ var _ = Describe("create-quota command", func() {
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
+
+			Context("and the provided value is -1", func() {
+				It("sets the memory limit", func() {
+					runCommand("-i", "-1", "yo")
+					Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
+				})
+			})
 		})
 		It("sets the route limit", func() {
 			runCommand("-r", "12", "ecstatic")
