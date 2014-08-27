@@ -1,3 +1,6 @@
+## v6.5.1 
+* Revert changes to update-service-broker. This cause a breaking change by mistake.
+
 ## v6.5.0
 * Implement Space Quota commands (create, update, delete, list, assignment)
 * Change cf space command to show information on the quota associated with the space. [#77389658]
