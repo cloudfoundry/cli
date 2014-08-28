@@ -2,6 +2,7 @@ package feature_flags
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -11,6 +12,7 @@ import (
 type FeatureFlagRepository interface {
 	List() ([]models.FeatureFlag, error)
 	FindByName(string) (models.FeatureFlag, error)
+	Update(string, bool) error
 }
 
 type CloudControllerFeatureFlagRepository struct {
@@ -49,4 +51,11 @@ func (repo CloudControllerFeatureFlagRepository) FindByName(name string) (models
 	}
 
 	return flag, nil
+}
+
+func (repo CloudControllerFeatureFlagRepository) Update(flag string, set bool) error {
+	url := fmt.Sprintf("%s/v2/config/feature_flags/%s", repo.config.ApiEndpoint(), flag)
+	body := fmt.Sprintf(`{"enabled": %v}`, set)
+
+	return repo.gateway.UpdateResource(url, strings.NewReader(body))
 }

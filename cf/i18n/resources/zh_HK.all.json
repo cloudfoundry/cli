@@ -630,6 +630,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME enable-feature-flag FEATURE_NAME",
+      "translation": "CF_NAME enable-feature-flag FEATURE_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME env APP",
       "translation": "CF_NAME env APP",
       "modified": false
@@ -1522,6 +1527,11 @@
    {
       "id": "Enable the buildpack",
       "translation": "Enable the buildpack",
+      "modified": false
+   },
+   {
+      "id": "Enable the use of a feature so that users have access to and can use the feature.",
+      "translation": "Enable the use of a feature so that users have access to and can use the feature.",
       "modified": false
    },
    {
@@ -3037,6 +3047,11 @@
    {
       "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
       "translation": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Setting status of {{.FeatureFlag}} as {{.Username}}...",
+      "translation": "Setting status of {{.FeatureFlag}} as {{.Username}}...",
       "modified": false
    },
    {
