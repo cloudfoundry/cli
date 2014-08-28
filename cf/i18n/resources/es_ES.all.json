@@ -640,6 +640,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME feature-flag",
+      "translation": "CF_NAME feature-flag",
+      "modified": false
+   },
+   {
       "id": "CF_NAME feature-flags",
       "translation": "CF_NAME feature-flags",
       "modified": false
@@ -2850,6 +2855,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve an individual feature flag with status",
+      "translation": "Retrieve an individual feature flag with status",
+      "modified": false
+   },
+   {
       "id": "Retrieve list of feature flags with status of each flag-able feature",
       "translation": "Retrieve list of feature flags with status of each flag-able feature",
       "modified": false
@@ -2857,6 +2867,11 @@
    {
       "id": "Retrieving status of all flagged features as {{.Username}}...",
       "translation": "Retrieving status of all flagged features as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Retrieving status of {{.FeatureFlag}} as {{.Username}}...",
+      "translation": "Retrieving status of {{.FeatureFlag}} as {{.Username}}...",
       "modified": false
    },
    {
