@@ -24,6 +24,15 @@ type FakeFeatureFlagRepository struct {
 		result1 models.FeatureFlag
 		result2 error
 	}
+	UpdateStub        func(string, bool) error
+	updateMutex       sync.RWMutex
+	updateArgsForCall []struct {
+		arg1 string
+		arg2 bool
+	}
+	updateReturns struct {
+		result1 error
+	}
 }
 
 func (fake *FakeFeatureFlagRepository) List() ([]models.FeatureFlag, error) {
@@ -80,6 +89,38 @@ func (fake *FakeFeatureFlagRepository) FindByNameReturns(result1 models.FeatureF
 		result1 models.FeatureFlag
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeFeatureFlagRepository) Update(arg1 string, arg2 bool) error {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
+		arg1 string
+		arg2 bool
+	}{arg1, arg2})
+	if fake.UpdateStub != nil {
+		return fake.UpdateStub(arg1, arg2)
+	} else {
+		return fake.updateReturns.result1
+	}
+}
+
+func (fake *FakeFeatureFlagRepository) UpdateCallCount() int {
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	return len(fake.updateArgsForCall)
+}
+
+func (fake *FakeFeatureFlagRepository) UpdateArgsForCall(i int) (string, bool) {
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	return fake.updateArgsForCall[i].arg1, fake.updateArgsForCall[i].arg2
+}
+
+func (fake *FakeFeatureFlagRepository) UpdateReturns(result1 error) {
+	fake.updateReturns = struct {
+		result1 error
+	}{result1}
 }
 
 var _ FeatureFlagRepository = new(FakeFeatureFlagRepository)

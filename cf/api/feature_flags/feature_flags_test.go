@@ -77,7 +77,28 @@ var _ = Describe("Feature Flags Repository", func() {
 
 			Expect(featureFlagModel.Name).To(Equal("user_org_creation"))
 			Expect(featureFlagModel.Enabled).To(BeFalse())
+		})
+	})
 
+	Describe(".Update", func() {
+		BeforeEach(func() {
+			setupTestServer(featureFlagsUpdateRequest)
+		})
+
+		It("updates the given feature flag with the specified value", func() {
+			err := repo.Update("app_scaling", true)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		Context("when given a non-existent feature flag", func() {
+			BeforeEach(func() {
+				setupTestServer(featureFlagsUpdateErrorRequest)
+			})
+
+			It("returns an error", func() {
+				err := repo.Update("i_dont_exist", true)
+				Expect(err).To(HaveOccurred())
+			})
 		})
 	})
 })
@@ -133,5 +154,32 @@ var featureFlagRequest = testapi.NewCloudControllerTestRequest(testnet.TestReque
   "error_message": null,
   "url": "/v2/config/feature_flags/user_org_creation"
 }`,
+	},
+})
+
+var featureFlagsUpdateErrorRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "PUT",
+	Path:   "/v2/config/feature_flags/i_dont_exist",
+	Response: testnet.TestResponse{
+		Status: http.StatusNotFound,
+		Body: `{
+         "code": 330000,
+         "description": "The feature flag could not be found: i_dont_exist",
+         "error_code": "CF-FeatureFlagNotFound"
+         }`,
+	},
+})
+
+var featureFlagsUpdateRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "PUT",
+	Path:   "/v2/config/feature_flags/app_scaling",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{ 
+      "name": "app_scaling",
+      "enabled": true,
+      "error_message": null,
+      "url": "/v2/config/feature_flags/app_scaling"
+    }`,
 	},
 })

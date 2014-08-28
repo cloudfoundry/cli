@@ -280,6 +280,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentCommand("feature-flags"),
 					presentCommand("feature-flag"),
+					presentCommand("enable-feature-flag"),
 				},
 			},
 		}, {
