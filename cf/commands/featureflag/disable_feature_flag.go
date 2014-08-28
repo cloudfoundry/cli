@@ -10,32 +10,32 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type EnableFeatureFlag struct {
+type DisableFeatureFlag struct {
 	ui       terminal.UI
 	config   configuration.ReadWriter
 	flagRepo feature_flags.FeatureFlagRepository
 }
 
-func NewEnableFeatureFlag(
+func NewDisableFeatureFlag(
 	ui terminal.UI,
 	config configuration.ReadWriter,
-	flagRepo feature_flags.FeatureFlagRepository) (cmd EnableFeatureFlag) {
-	return EnableFeatureFlag{
+	flagRepo feature_flags.FeatureFlagRepository) (cmd DisableFeatureFlag) {
+	return DisableFeatureFlag{
 		ui:       ui,
 		config:   config,
 		flagRepo: flagRepo,
 	}
 }
 
-func (cmd EnableFeatureFlag) Metadata() command_metadata.CommandMetadata {
+func (cmd DisableFeatureFlag) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
-		Name:        "enable-feature-flag",
-		Description: T("Enable the use of a feature so that users have access to and can use the feature."),
-		Usage:       T("CF_NAME enable-feature-flag FEATURE_NAME"),
+		Name:        "disable-feature-flag",
+		Description: T("Disable the use of a feature so that users have access to and can use the feature."),
+		Usage:       T("CF_NAME disable-feature-flag FEATURE_NAME"),
 	}
 }
 
-func (cmd EnableFeatureFlag) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
+func (cmd DisableFeatureFlag) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
 	if len(context.Args()) != 1 {
 		cmd.ui.FailWithUsage(context)
 	}
@@ -46,14 +46,14 @@ func (cmd EnableFeatureFlag) GetRequirements(requirementsFactory requirements.Fa
 	return reqs, nil
 }
 
-func (cmd EnableFeatureFlag) Run(c *cli.Context) {
+func (cmd DisableFeatureFlag) Run(c *cli.Context) {
 	flag := c.Args()[0]
 
 	cmd.ui.Say(T("Setting status of {{.FeatureFlag}} as {{.Username}}...", map[string]interface{}{
 		"FeatureFlag": terminal.EntityNameColor(flag),
 		"Username":    terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr := cmd.flagRepo.Update(flag, true)
+	apiErr := cmd.flagRepo.Update(flag, false)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}
@@ -61,7 +61,7 @@ func (cmd EnableFeatureFlag) Run(c *cli.Context) {
 	cmd.ui.Say("")
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-	cmd.ui.Say(T("Feature {{.FeatureFlag}} Enabled.", map[string]interface{}{
+	cmd.ui.Say(T("Feature {{.FeatureFlag}} Disabled.", map[string]interface{}{
 		"FeatureFlag": terminal.EntityNameColor(flag)}))
 	return
 }
