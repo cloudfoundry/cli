@@ -1,4 +1,4 @@
-package feature_flag_test
+package feature_flags_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestFeatureFlag(t *testing.T) {
+func TestFeatureFlags(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "FeatureFlag Suite")
+	RunSpecs(t, "FeatureFlags Suite")
 }
