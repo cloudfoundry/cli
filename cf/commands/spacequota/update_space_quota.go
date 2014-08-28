@@ -32,7 +32,7 @@ func (cmd *UpdateSpaceQuota) Metadata() command_metadata.CommandMetadata {
 		Description: T("update an existing space quota"),
 		Usage:       T("CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G)")),
+			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.")),
 			flag_helpers.NewStringFlag("m", T("Total amount of memory a space can have(e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewStringFlag("n", T("New name")),
 			flag_helpers.NewIntFlag("r", T("Total number of routes")),
