@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	test_quota "github.com/cloudFoundry/cli/cf/api/quotas/fakes"
+	test_quota "github.com/cloudfoundry/cli/cf/api/quotas/fakes"
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
