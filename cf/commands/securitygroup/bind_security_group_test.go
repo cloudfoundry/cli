@@ -2,6 +2,7 @@ package securitygroup_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/fakes"
+	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	zoidberg "github.com/cloudfoundry/cli/cf/api/security_groups/spaces/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -26,13 +27,13 @@ var _ = Describe("bind-security-group command", func() {
 		fakeSecurityGroupRepo *testapi.FakeSecurityGroupRepo
 		requirementsFactory   *testreq.FakeReqFactory
 		fakeSpaceRepo         *fakes.FakeSpaceRepository
-		fakeOrgRepo           *fakes.FakeOrganizationRepository
+		fakeOrgRepo           *test_org.FakeOrganizationRepository
 		fakeSpaceBinder       *zoidberg.FakeSecurityGroupSpaceBinder
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		fakeOrgRepo = &fakes.FakeOrganizationRepository{}
+		fakeOrgRepo = &test_org.FakeOrganizationRepository{}
 		fakeSpaceRepo = &fakes.FakeSpaceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		fakeSecurityGroupRepo = &testapi.FakeSecurityGroupRepo{}
@@ -90,13 +91,13 @@ var _ = Describe("bind-security-group command", func() {
 
 		Context("when the org does not exist", func() {
 			BeforeEach(func() {
-				fakeOrgRepo.FindByNameNotFound = true
+				fakeOrgRepo.FindByNameReturns(models.Organization{}, errors.New("Org org not found"))
 			})
 
 			It("fails and tells the user", func() {
 				runCommand("sec group", "org", "space")
 
-				Expect(fakeOrgRepo.FindByNameName).To(Equal("org"))
+				Expect(fakeOrgRepo.FindByNameArgsForCall(0)).To(Equal("org"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Org", "org", "not found"},
@@ -109,7 +110,8 @@ var _ = Describe("bind-security-group command", func() {
 				org := models.Organization{}
 				org.Name = "org-name"
 				org.Guid = "org-guid"
-				fakeOrgRepo.Organizations = append(fakeOrgRepo.Organizations, org) // TODO: replace this with countfeiter
+				fakeOrgRepo.ListOrgsReturns([]models.Organization{org}, nil)
+				fakeOrgRepo.FindByNameReturns(org, nil)
 				fakeSpaceRepo.FindByNameInOrgError = errors.NewModelNotFoundError("Space", "space-name")
 			})
 
@@ -130,7 +132,7 @@ var _ = Describe("bind-security-group command", func() {
 				org := models.Organization{}
 				org.Name = "org-name"
 				org.Guid = "org-guid"
-				fakeOrgRepo.Organizations = append(fakeOrgRepo.Organizations, org) // TODO: replace this with countfeiter
+				fakeOrgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 
 				space := models.Space{}
 				space.Name = "space-name"

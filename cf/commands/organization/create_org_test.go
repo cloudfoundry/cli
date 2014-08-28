@@ -1,7 +1,9 @@
 package organization_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/errors"
+
+	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,14 +21,14 @@ var _ = Describe("create-org command", func() {
 		config              configuration.ReadWriter
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *testapi.FakeOrganizationRepository
+		orgRepo             *test_org.FakeOrganizationRepository
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		orgRepo = &testapi.FakeOrganizationRepository{}
+		orgRepo = &test_org.FakeOrganizationRepository{}
 	})
 
 	runCommand := func(args ...string) {
@@ -48,6 +50,7 @@ var _ = Describe("create-org command", func() {
 
 	Context("when logged in and provided the name of an org to create", func() {
 		BeforeEach(func() {
+			orgRepo.CreateReturns(nil)
 			requirementsFactory.LoginSuccess = true
 		})
 
@@ -58,11 +61,12 @@ var _ = Describe("create-org command", func() {
 				[]string{"Creating org", "my-org", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(orgRepo.CreateName).To(Equal("my-org"))
+			Expect(orgRepo.CreateArgsForCall(0)).To(Equal("my-org"))
 		})
 
 		It("fails and warns the user when the org already exists", func() {
-			orgRepo.CreateOrgExists = true
+			err := errors.NewHttpError(400, errors.ORG_EXISTS, "org already exists")
+			orgRepo.CreateReturns(err)
 			runCommand("my-org")
 
 			Expect(ui.Outputs).To(ContainSubstrings(

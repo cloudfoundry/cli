@@ -1,7 +1,9 @@
 package organization_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/errors"
+
+	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,7 +22,8 @@ var _ = Describe("delete-org command", func() {
 		config              configuration.ReadWriter
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *testapi.FakeOrganizationRepository
+		orgRepo             *test_org.FakeOrganizationRepository
+		org                 models.Organization
 	)
 
 	BeforeEach(func() {
@@ -30,10 +33,13 @@ var _ = Describe("delete-org command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		org := models.Organization{}
+		org = models.Organization{}
 		org.Name = "org-to-delete"
 		org.Guid = "org-to-delete-guid"
-		orgRepo = &testapi.FakeOrganizationRepository{Organizations: []models.Organization{org}}
+		orgRepo = &test_org.FakeOrganizationRepository{}
+
+		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
+		orgRepo.FindByNameReturns(org, nil)
 	})
 
 	runCommand := func(args ...string) {
@@ -59,7 +65,7 @@ var _ = Describe("delete-org command", func() {
 
 		Context("when deleting the currently targeted org", func() {
 			It("untargets the deleted org", func() {
-				config.SetOrganizationFields(orgRepo.Organizations[0].OrganizationFields)
+				config.SetOrganizationFields(org.OrganizationFields)
 				runCommand("org-to-delete")
 
 				Expect(config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
@@ -88,8 +94,8 @@ var _ = Describe("delete-org command", func() {
 					[]string{"Deleting", "org-to-delete"},
 					[]string{"OK"},
 				))
-				Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
-				Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
+
+				Expect(orgRepo.DeleteArgsForCall(0)).To(Equal("org-to-delete-guid"))
 			})
 
 			It("does not untarget the org and space", func() {
@@ -108,16 +114,16 @@ var _ = Describe("delete-org command", func() {
 				[]string{"Deleting", "org-to-delete"},
 				[]string{"OK"},
 			))
-			Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
-			Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
+
+			Expect(orgRepo.DeleteArgsForCall(0)).To(Equal("org-to-delete-guid"))
 		})
 
 		It("warns the user when the org does not exist", func() {
-			orgRepo.FindByNameNotFound = true
+			orgRepo.FindByNameReturns(models.Organization{}, errors.NewModelNotFoundError("Organization", "org org-to-delete does not exist"))
 
 			runCommand("org-to-delete")
 
-			Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
+			Expect(orgRepo.DeleteCallCount()).To(Equal(0))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Deleting", "org-to-delete"},
