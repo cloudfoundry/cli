@@ -1,7 +1,10 @@
 package space_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -25,7 +28,7 @@ var _ = Describe("create-space command", func() {
 		configOrg           models.OrganizationFields
 		configRepo          configuration.ReadWriter
 		spaceRepo           *testapi.FakeSpaceRepository
-		orgRepo             *testapi.FakeOrganizationRepository
+		orgRepo             *fake_org.FakeOrganizationRepository
 		userRepo            *testapi.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
 	)
@@ -39,7 +42,7 @@ var _ = Describe("create-space command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		orgRepo = &testapi.FakeOrganizationRepository{}
+		orgRepo = &fake_org.FakeOrganizationRepository{}
 		userRepo = &testapi.FakeUserRepository{}
 		spaceRoleSetter = user.NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
 
@@ -127,8 +130,12 @@ var _ = Describe("create-space command", func() {
 
 	Context("when the -o flag is provided", func() {
 		It("creates a space within that org", func() {
-			org := maker.NewOrg(maker.Overrides{"name": "other-org"})
-			orgRepo.Organizations = []models.Organization{org}
+			org := models.Organization{
+				OrganizationFields: models.OrganizationFields{
+					Name: "other-org",
+					Guid: "org-guid-1",
+				}}
+			orgRepo.FindByNameReturns(org, nil)
 
 			runCommand("-o", "other-org", "my-space")
 
@@ -148,7 +155,7 @@ var _ = Describe("create-space command", func() {
 		})
 
 		It("fails when the org provided does not exist", func() {
-			orgRepo.FindByNameNotFound = true
+			orgRepo.FindByNameReturns(models.Organization{}, errors.New("cool-organization does not exist"))
 			runCommand("-o", "cool-organization", "my-space")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -160,7 +167,7 @@ var _ = Describe("create-space command", func() {
 		})
 
 		It("fails when finding the org returns an error", func() {
-			orgRepo.FindByNameErr = true
+			orgRepo.FindByNameReturns(models.Organization{}, errors.New("cool-organization does not exist"))
 			runCommand("-o", "cool-organization", "my-space")
 
 			Expect(ui.Outputs).To(ContainSubstrings(

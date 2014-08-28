@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 
+	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	fakeBinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces/fakes"
 
@@ -25,7 +26,7 @@ var _ = Describe("unbind-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
-		orgRepo             *fakes.FakeOrganizationRepository
+		orgRepo             *fake_org.FakeOrganizationRepository
 		spaceRepo           *fakes.FakeSpaceRepository
 		secBinder           *fakeBinder.FakeSecurityGroupSpaceBinder
 		requirementsFactory *testreq.FakeReqFactory
@@ -36,7 +37,7 @@ var _ = Describe("unbind-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
-		orgRepo = &fakes.FakeOrganizationRepository{}
+		orgRepo = &fake_org.FakeOrganizationRepository{}
 		spaceRepo = &fakes.FakeSpaceRepository{}
 		secBinder = &fakeBinder.FakeSecurityGroupSpaceBinder{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -87,9 +88,12 @@ var _ = Describe("unbind-security-group command", func() {
 
 				securityGroupRepo.ReadReturns(securityGroup, nil)
 
-				orgRepo.Organizations = []models.Organization{
-					{OrganizationFields: models.OrganizationFields{Name: "my-org", Guid: "my-org-guid"}},
-				}
+				orgRepo.ListOrgsReturns([]models.Organization{{
+					OrganizationFields: models.OrganizationFields{
+						Name: "my-org",
+						Guid: "my-org-guid",
+					}},
+				}, nil)
 
 				spaceRepo.FindByNameInOrgSpace = models.Space{SpaceFields: models.SpaceFields{Name: "my-space", Guid: "my-space-guid"}}
 			})

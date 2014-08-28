@@ -1,7 +1,7 @@
 package organization_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("org command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		orgRepo             *testapi.FakeOrganizationRepository
+		orgRepo             *test_org.FakeOrganizationRepository
 		configRepo          configuration.ReadWriter
 		requirementsFactory *testreq.FakeReqFactory
 	)
@@ -31,7 +31,7 @@ var _ = Describe("org command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		orgRepo = &testapi.FakeOrganizationRepository{}
+		orgRepo = &test_org.FakeOrganizationRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
@@ -54,7 +54,7 @@ var _ = Describe("org command", func() {
 			org3 := models.Organization{}
 			org3.Name = "Organization-3"
 
-			orgRepo.Organizations = []models.Organization{org1, org2, org3}
+			orgRepo.ListOrgsReturns([]models.Organization{org1, org2, org3}, nil)
 		})
 
 		It("lists orgs", func() {
@@ -70,6 +70,7 @@ var _ = Describe("org command", func() {
 	})
 
 	It("tells the user when no orgs were found", func() {
+		orgRepo.ListOrgsReturns([]models.Organization{}, nil)
 		runCommand()
 
 		Expect(ui.Outputs).To(ContainSubstrings(

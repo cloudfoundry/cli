@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,21 +20,21 @@ var _ = Describe("create-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		orgRepo             *testapi.FakeOrganizationRepository
+		orgRepo             *test_org.FakeOrganizationRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
-		orgRepo = &testapi.FakeOrganizationRepository{}
+		orgRepo = &test_org.FakeOrganizationRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		org := models.Organization{}
 		org.Name = "my-org"
 		org.Guid = "my-org-guid"
-		orgRepo.Organizations = []models.Organization{org}
-		orgRepo.FindByNameName = org.Name
+		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
+		orgRepo.FindByNameReturns(org, nil)
 	})
 
 	runCommand := func(args ...string) {
