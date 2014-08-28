@@ -76,10 +76,18 @@ func (cmd *updateQuota) Run(c *cli.Context) {
 	}
 
 	if c.String("i") != "" {
-		memory, formatError := formatters.ToMegabytes(c.String("i"))
+		var memory int64
 
-		if formatError != nil {
-			cmd.ui.FailWithUsage(c)
+		if c.String("i") == "-1" {
+			memory = -1
+		} else {
+			var formatError error
+
+			memory, formatError = formatters.ToMegabytes(c.String("i"))
+
+			if formatError != nil {
+				cmd.ui.FailWithUsage(c)
+			}
 		}
 
 		quota.InstanceMemoryLimit = memory
