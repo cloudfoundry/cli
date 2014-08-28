@@ -630,6 +630,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME disable-feature-flag FEATURE_NAME",
+      "translation": "CF_NAME disable-feature-flag FEATURE_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME enable-feature-flag FEATURE_NAME",
       "translation": "CF_NAME enable-feature-flag FEATURE_NAME",
       "modified": false
@@ -1420,6 +1425,11 @@
       "modified": false
    },
    {
+      "id": "Disable the use of a feature so that users have access to and can use the feature.",
+      "translation": "Disable the use of a feature so that users have access to and can use the feature.",
+      "modified": false
+   },
+   {
       "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
       "translation": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
       "modified": false
@@ -1847,6 +1857,16 @@
    {
       "id": "Failed to start oauth request",
       "translation": "无法启动开放授权请求",
+      "modified": false
+   },
+   {
+      "id": "Feature {{.FeatureFlag}} Disabled.",
+      "translation": "Feature {{.FeatureFlag}} Disabled.",
+      "modified": false
+   },
+   {
+      "id": "Feature {{.FeatureFlag}} Enabled.",
+      "translation": "Feature {{.FeatureFlag}} Enabled.",
       "modified": false
    },
    {

@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("enable-feature-flag command", func() {
+var _ = Describe("disable-feature-flag command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
@@ -28,7 +28,7 @@ var _ = Describe("enable-feature-flag command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewEnableFeatureFlag(ui, testconfig.NewRepositoryWithDefaults(), flagRepo)
+		cmd := NewDisableFeatureFlag(ui, testconfig.NewRepositoryWithDefaults(), flagRepo)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -54,12 +54,12 @@ var _ = Describe("enable-feature-flag command", func() {
 
 			flag, set := flagRepo.UpdateArgsForCall(0)
 			Expect(flag).To(Equal("user_org_creation"))
-			Expect(set).To(BeTrue())
+			Expect(set).To(BeFalse())
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Setting status of user_org_creation as my-user..."},
 				[]string{"OK"},
-				[]string{"Feature user_org_creation Enabled."},
+				[]string{"Feature user_org_creation Disabled."},
 			))
 		})
 
