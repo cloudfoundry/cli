@@ -1,4 +1,4 @@
-package feature_flag_test
+package feature_flags_test
 
 import (
 	"net/http"
@@ -11,13 +11,13 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
-	. "github.com/cloudfoundry/cli/cf/api/feature_flag"
+	. "github.com/cloudfoundry/cli/cf/api/feature_flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Feature Flag Repository", func() {
+var _ = Describe("Feature Flags Repository", func() {
 	var (
 		testServer  *httptest.Server
 		testHandler *testnet.TestHandler
@@ -63,6 +63,23 @@ var _ = Describe("Feature Flag Repository", func() {
 			Expect(featureFlagModels[4].Enabled).To(BeTrue())
 		})
 	})
+
+	Describe(".FindByName", func() {
+		BeforeEach(func() {
+			setupTestServer(featureFlagRequest)
+		})
+
+		It("returns the requested", func() {
+			featureFlagModel, err := repo.FindByName("user_org_creation")
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+
+			Expect(featureFlagModel.Name).To(Equal("user_org_creation"))
+			Expect(featureFlagModel.Enabled).To(BeFalse())
+
+		})
+	})
 })
 
 var featureFlagsGetAllRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -102,5 +119,19 @@ var featureFlagsGetAllRequest = testapi.NewCloudControllerTestRequest(testnet.Te
       "url": "/v2/config/feature_flags/route_creation"
     }
 ]`,
+	},
+})
+
+var featureFlagRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/config/feature_flags/user_org_creation",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+  "name": "user_org_creation",
+  "enabled": false,
+  "error_message": null,
+  "url": "/v2/config/feature_flags/user_org_creation"
+}`,
 	},
 })

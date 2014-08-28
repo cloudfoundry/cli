@@ -1,4 +1,4 @@
-package feature_flag
+package feature_flags
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 
 type FeatureFlagRepository interface {
 	List() ([]models.FeatureFlag, error)
+	FindByName(string) (models.FeatureFlag, error)
 }
 
 type CloudControllerFeatureFlagRepository struct {
@@ -35,4 +36,17 @@ func (repo CloudControllerFeatureFlagRepository) List() ([]models.FeatureFlag, e
 	}
 
 	return flags, nil
+}
+
+func (repo CloudControllerFeatureFlagRepository) FindByName(name string) (models.FeatureFlag, error) {
+	flag := models.FeatureFlag{}
+	apiError := repo.gateway.GetResource(
+		fmt.Sprintf("%s/v2/config/feature_flags/%s", repo.config.ApiEndpoint(), name),
+		&flag)
+
+	if apiError != nil {
+		return models.FeatureFlag{}, apiError
+	}
+
+	return flag, nil
 }

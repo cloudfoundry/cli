@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("feature-flags command", func() {
+var _ = Describe("feature-flag command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
@@ -29,65 +29,47 @@ var _ = Describe("feature-flags command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewListFeatureFlags(ui, testconfig.NewRepositoryWithDefaults(), flagRepo)
+		cmd := NewShowFeatureFlag(ui, testconfig.NewRepositoryWithDefaults(), flagRepo)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
+			Expect(runCommand("foo")).ToNot(HavePassedRequirements())
+		})
+
+		It("requires the user to provide a feature flag", func() {
+			requirementsFactory.LoginSuccess = true
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 	})
 
 	Describe("when logged in", func() {
 		BeforeEach(func() {
-			flags := []models.FeatureFlag{
-				models.FeatureFlag{
-					Name:         "user_org_creation",
-					Enabled:      true,
-					ErrorMessage: "error",
-				},
-				models.FeatureFlag{
-					Name:    "private_domain_creation",
-					Enabled: false,
-				},
-				models.FeatureFlag{
-					Name:    "app_bits_upload",
-					Enabled: true,
-				},
-				models.FeatureFlag{
-					Name:    "app_scaling",
-					Enabled: true,
-				},
-				models.FeatureFlag{
-					Name:    "route_creation",
-					Enabled: false,
-				},
+			flag := models.FeatureFlag{
+				Name:    "route_creation",
+				Enabled: false,
 			}
-			flagRepo.ListReturns(flags, nil)
+			flagRepo.FindByNameReturns(flag, nil)
 		})
 
-		It("lists the state of all feature flags", func() {
-			runCommand()
+		It("lists the state of the specified feature flag", func() {
+			runCommand("route_creation")
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Retrieving status of all flagged features as my-user..."},
+				[]string{"Retrieving status of route_creation as my-user..."},
 				[]string{"Feature", "State"},
-				[]string{"user_org_creation", "enabled"},
-				[]string{"private_domain_creation", "disabled"},
-				[]string{"app_bits_upload", "enabled"},
-				[]string{"app_scaling", "enabled"},
 				[]string{"route_creation", "disabled"},
 			))
 		})
 
 		Context("when an error occurs", func() {
 			BeforeEach(func() {
-				flagRepo.ListReturns(nil, errors.New("An error occurred."))
+				flagRepo.FindByNameReturns(models.FeatureFlag{}, errors.New("An error occurred."))
 			})
 
 			It("fails with an error", func() {
-				runCommand()
+				runCommand("route_creation")
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"An error occurred."},
