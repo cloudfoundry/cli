@@ -2,7 +2,9 @@ package organization_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/models"
 
+	test_quota "github.com/cloudFoundry/cli/cf/api/quotas/fakes"
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,6 +24,7 @@ var _ = Describe("create-org command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		orgRepo             *test_org.FakeOrganizationRepository
+		quotaRepo           *test_quota.FakeQuotaRepository
 	)
 
 	BeforeEach(func() {
@@ -29,10 +32,11 @@ var _ = Describe("create-org command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		orgRepo = &test_org.FakeOrganizationRepository{}
+		quotaRepo = &test_quota.FakeQuotaRepository{}
 	})
 
 	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewCreateOrg(ui, config, orgRepo), args, requirementsFactory)
+		testcmd.RunCommand(NewCreateOrg(ui, config, orgRepo, quotaRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -61,7 +65,7 @@ var _ = Describe("create-org command", func() {
 				[]string{"Creating org", "my-org", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(orgRepo.CreateArgsForCall(0)).To(Equal("my-org"))
+			Expect(orgRepo.CreateArgsForCall(0).Name).To(Equal("my-org"))
 		})
 
 		It("fails and warns the user when the org already exists", func() {
@@ -74,6 +78,41 @@ var _ = Describe("create-org command", func() {
 				[]string{"OK"},
 				[]string{"my-org", "already exists"},
 			))
+		})
+
+		Context("when allowing a non-defualt quota", func() {
+			var (
+				quota models.QuotaFields
+			)
+
+			BeforeEach(func() {
+				quota = models.QuotaFields{
+					Name: "non-default-quota",
+					Guid: "non-default-quota-guid",
+				}
+			})
+
+			It("creates an org with a non-default quota", func() {
+				quotaRepo.FindByNameReturns(quota, nil)
+				runCommand("-q", "non-default-quota", "my-org")
+
+				Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("non-default-quota"))
+				Expect(orgRepo.CreateArgsForCall(0).QuotaDefinition.Guid).To(Equal("non-default-quota-guid"))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating org", "my-org"},
+					[]string{"OK"},
+				))
+			})
+
+			It("fails and warns the user when the quota cannot be found", func() {
+				quotaRepo.FindByNameReturns(models.QuotaFields{}, errors.New("Could not find quota"))
+				runCommand("-q", "non-default-quota", "my-org")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating org", "my-org"},
+					[]string{"Could not find quota"},
+				))
+			})
 		})
 	})
 })
