@@ -275,6 +275,13 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
+			Name: T("FEATURE FLAGS"),
+			CommandSubGroups: [][]cmdPresenter{
+				{
+					presentCommand("feature-flags"),
+				},
+			},
+		}, {
 			Name: T("ADVANCED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{

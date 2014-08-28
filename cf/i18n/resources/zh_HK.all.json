@@ -640,6 +640,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME feature-flags",
+      "translation": "CF_NAME feature-flags",
+      "modified": false
+   },
+   {
       "id": "CF_NAME files APP [-i INSTANCE] [PATH]",
       "translation": "CF_NAME files APP [PATH]",
       "modified": true
@@ -1765,6 +1770,11 @@
       "modified": false
    },
    {
+      "id": "FEATURE FLAGS",
+      "translation": "FEATURE FLAGS",
+      "modified": false
+   },
+   {
       "id": "Failed fetching buildpacks.\n{{.Error}}",
       "translation": "Failed fetching buildpacks.\n{{.Error}}",
       "modified": false
@@ -1822,6 +1832,11 @@
    {
       "id": "Failed to start oauth request",
       "translation": "Failed to start oauth request",
+      "modified": false
+   },
+   {
+      "id": "Features",
+      "translation": "Features",
       "modified": false
    },
    {
@@ -2830,6 +2845,16 @@
       "modified": false
    },
    {
+      "id": "Retrieve list of feature flags with status of each flag-able feature",
+      "translation": "Retrieve list of feature flags with status of each flag-able feature",
+      "modified": false
+   },
+   {
+      "id": "Retrieving status of all flagged features as {{.Username}}...",
+      "translation": "Retrieving status of all flagged features as {{.Username}}...",
+      "modified": false
+   },
+   {
       "id": "Route {{.URL}} already exists",
       "translation": "Route {{.URL}} already exists",
       "modified": false
@@ -3117,6 +3142,11 @@
    {
       "id": "Startup command, set to null to reset to default start command",
       "translation": "Startup command, set to null to reset to default start command",
+      "modified": false
+   },
+   {
+      "id": "State",
+      "translation": "State",
       "modified": false
    },
    {

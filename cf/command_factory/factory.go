@@ -16,6 +16,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/commands/buildpack"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
+	"github.com/cloudfoundry/cli/cf/commands/featureflag"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/route"
@@ -250,6 +251,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["update-space-quota"] = spacequota.NewUpdateSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository())
 	factory.cmdsByName["set-space-quota"] = spacequota.NewSetSpaceQuota(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetSpaceQuotaRepository())
 	factory.cmdsByName["unset-space-quota"] = spacequota.NewUnsetSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository(), repoLocator.GetSpaceRepository())
+	factory.cmdsByName["feature-flags"] = featureflag.NewListFeatureFlags(ui, config, repoLocator.GetFeatureFlagRepository())
 
 	return
 }
