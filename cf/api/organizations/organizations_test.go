@@ -161,19 +161,48 @@ var _ = Describe("Organization Repository", func() {
 		})
 	})
 
-	Describe("creating organizations", func() {
+	Describe(".Create", func() {
 		It("creates the org", func() {
+			org := models.Organization{
+				OrganizationFields: models.OrganizationFields{
+					Name: "my-org",
+				}}
+
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/organizations",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org"}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org", "quota_definition_guid":""}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
 			testserver, handler, repo := createOrganizationRepo(req)
 			defer testserver.Close()
 
-			apiErr := repo.Create("my-org")
+			apiErr := repo.Create(org)
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("creates the org with the provided quota", func() {
+			org := models.Organization{
+				OrganizationFields: models.OrganizationFields{
+					Name: "my-org",
+					QuotaDefinition: models.QuotaFields{
+						Guid: "my-quota-guid",
+					},
+				}}
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/organizations",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org", "quota_definition_guid":"my-quota-guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			})
+
+			testserver, handler, repo := createOrganizationRepo(req)
+			defer testserver.Close()
+
+			apiErr := repo.Create(org)
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})

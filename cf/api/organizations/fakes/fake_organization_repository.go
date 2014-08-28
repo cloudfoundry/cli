@@ -2,10 +2,8 @@
 package fakes
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api/organizations"
-
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/models"
-
 	"sync"
 )
 
@@ -26,10 +24,10 @@ type FakeOrganizationRepository struct {
 		result1 models.Organization
 		result2 error
 	}
-	CreateStub        func(name string) (apiErr error)
+	CreateStub        func(org models.Organization) (apiErr error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
-		name string
+		org models.Organization
 	}
 	createReturns struct {
 		result1 error
@@ -71,6 +69,7 @@ func (fake *FakeOrganizationRepository) ListOrgsCallCount() int {
 }
 
 func (fake *FakeOrganizationRepository) ListOrgsReturns(result1 []models.Organization, result2 error) {
+	fake.ListOrgsStub = nil
 	fake.listOrgsReturns = struct {
 		result1 []models.Organization
 		result2 error
@@ -103,20 +102,21 @@ func (fake *FakeOrganizationRepository) FindByNameArgsForCall(i int) string {
 }
 
 func (fake *FakeOrganizationRepository) FindByNameReturns(result1 models.Organization, result2 error) {
+	fake.FindByNameStub = nil
 	fake.findByNameReturns = struct {
 		result1 models.Organization
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeOrganizationRepository) Create(name string) (apiErr error) {
+func (fake *FakeOrganizationRepository) Create(org models.Organization) (apiErr error) {
 	fake.createMutex.Lock()
 	defer fake.createMutex.Unlock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		name string
-	}{name})
+		org models.Organization
+	}{org})
 	if fake.CreateStub != nil {
-		return fake.CreateStub(name)
+		return fake.CreateStub(org)
 	} else {
 		return fake.createReturns.result1
 	}
@@ -128,13 +128,14 @@ func (fake *FakeOrganizationRepository) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeOrganizationRepository) CreateArgsForCall(i int) string {
+func (fake *FakeOrganizationRepository) CreateArgsForCall(i int) models.Organization {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].name
+	return fake.createArgsForCall[i].org
 }
 
 func (fake *FakeOrganizationRepository) CreateReturns(result1 error) {
+	fake.CreateStub = nil
 	fake.createReturns = struct {
 		result1 error
 	}{result1}
@@ -167,6 +168,7 @@ func (fake *FakeOrganizationRepository) RenameArgsForCall(i int) (string, string
 }
 
 func (fake *FakeOrganizationRepository) RenameReturns(result1 error) {
+	fake.RenameStub = nil
 	fake.renameReturns = struct {
 		result1 error
 	}{result1}
@@ -198,9 +200,10 @@ func (fake *FakeOrganizationRepository) DeleteArgsForCall(i int) string {
 }
 
 func (fake *FakeOrganizationRepository) DeleteReturns(result1 error) {
+	fake.DeleteStub = nil
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ OrganizationRepository = new(FakeOrganizationRepository)
+var _ organizations.OrganizationRepository = new(FakeOrganizationRepository)

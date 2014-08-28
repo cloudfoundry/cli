@@ -2,19 +2,20 @@ package organizations
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type OrganizationRepository interface {
 	ListOrgs() (orgs []models.Organization, apiErr error)
 	FindByName(name string) (org models.Organization, apiErr error)
-	Create(name string) (apiErr error)
+	Create(org models.Organization) (apiErr error)
 	Rename(orgGuid string, name string) (apiErr error)
 	Delete(orgGuid string) (apiErr error)
 }
@@ -67,9 +68,9 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Create(name string) (apiErr error) {
+func (repo CloudControllerOrganizationRepository) Create(org models.Organization) (apiErr error) {
 	url := repo.config.ApiEndpoint() + "/v2/organizations"
-	data := fmt.Sprintf(`{"name":"%s"}`, name)
+	data := fmt.Sprintf(`{"name":"%s", "quota_definition_guid":"%s"}`, org.Name, org.QuotaDefinition.Guid)
 	return repo.gateway.CreateResource(url, strings.NewReader(data))
 }
 

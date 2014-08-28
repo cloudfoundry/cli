@@ -2665,6 +2665,11 @@
       "modified": false
    },
    {
+      "id": "Quota to assign to the newly created org (excluding this option results in assignment of default quota)",
+      "translation": "Quota to assign to the newly created org (excluding this option results in assignment of default quota)",
+      "modified": false
+   },
+   {
       "id": "Quota {{.QuotaName}} does not exist",
       "translation": "La cuota {{.QuotaName}} no existe",
       "modified": false
