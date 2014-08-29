@@ -84,7 +84,7 @@ func (cmd *Push) Metadata() command_metadata.CommandMetadata {
 			flag_helpers.NewStringFlag("n", T("Hostname (e.g. my-subdomain)")),
 			flag_helpers.NewStringFlag("p", T("Path to app directory or file")),
 			flag_helpers.NewStringFlag("s", T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")),
-			flag_helpers.NewStringFlag("t", T("Start timeout in seconds")),
+			flag_helpers.NewStringFlag("t", T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")),
 			cli.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")},
 			cli.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")},
 			cli.BoolFlag{Name: "no-route", Usage: T("Do not map a route to this app")},
