@@ -1,11 +1,12 @@
 package configuration_test
 
 import (
+	"regexp"
+
 	. "github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"regexp"
 )
 
 var exampleJSON = `
@@ -36,7 +37,8 @@ var exampleJSON = `
 	"SSLDisabled": true,
 	"AsyncTimeout": 1000,
 	"Trace": "path/to/some/file",
-	"ColorEnabled": "true"
+	"ColorEnabled": "true",
+	"Locale": "fr_FR"
 }`
 
 var exampleConfig = &Data{
@@ -59,6 +61,7 @@ var exampleConfig = &Data{
 	Trace:        "path/to/some/file",
 	AsyncTimeout: 1000,
 	ColorEnabled: "true",
+	Locale:       "fr_FR",
 }
 
 var _ = Describe("V3 Config files", func() {

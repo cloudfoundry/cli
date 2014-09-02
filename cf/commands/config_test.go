@@ -8,6 +8,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/commands"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -78,6 +79,34 @@ var _ = Describe("config command", func() {
 		It("fails with usage when a non-bool value is provided", func() {
 			runCommand("--color", "plaid")
 			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
+	})
+
+	Context("--locale flag", func() {
+		It("stores the locale value when --locale [locale] is provided", func() {
+			runCommand("--locale", "zh_CN")
+			Expect(configRepo.Locale()).Should(Equal("zh_CN"))
+		})
+
+		It("informs the user of known locales if an unknown locale is provided", func() {
+			runCommand("--locale", "foo_BAR")
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"known locales are"},
+				[]string{"en_US"},
+				[]string{"fr_FR"},
+			))
+		})
+
+		Context("when the locale is already set", func() {
+			BeforeEach(func() {
+				configRepo.SetLocale("fr_FR")
+				Expect(configRepo.Locale()).Should(Equal("fr_FR"))
+			})
+
+			It("clears the locale when the '--locale clear' flag is provided", func() {
+				runCommand("--locale", "CLEAR")
+				Expect(configRepo.Locale()).Should(Equal(""))
+			})
 		})
 	})
 })

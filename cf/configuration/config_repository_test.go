@@ -79,6 +79,9 @@ var _ = Describe("Configuration Repository", func() {
 
 		config.SetSSLDisabled(false)
 		Expect(config.IsSSLDisabled()).To(BeFalse())
+
+		config.SetLocale("en_US")
+		Expect(config.Locale()).To(Equal("en_US"))
 	})
 
 	Describe("HasAPIEndpoint", func() {

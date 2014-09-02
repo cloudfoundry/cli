@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/command_runner"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/panic_printer"
@@ -20,6 +21,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/codegangsta/cli"
 )
+
+var deps = setupDependencies()
 
 type cliDependencies struct {
 	termUI         terminal.UI
@@ -42,6 +45,8 @@ func setupDependencies() (deps *cliDependencies) {
 		}
 	})
 
+	i18n.T = i18n.Init(deps.configRepo)
+
 	terminal.UserAskedForColors = deps.configRepo.ColorEnabled()
 	terminal.InitColorSupport()
 
@@ -63,8 +68,6 @@ func setupDependencies() (deps *cliDependencies) {
 
 func main() {
 	defer handlePanics()
-
-	deps := setupDependencies()
 	defer deps.configRepo.Close()
 
 	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator)

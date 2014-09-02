@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
 	"time"
 
@@ -10,42 +9,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/command_runner"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/i18n"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/codegangsta/cli"
-)
-
-var (
-	t               = i18n.Init()
-	appHelpTemplate = `{{.Title "` + t("NAME:") + `"}}
-   {{.Name}} - {{.Usage}}
-
-{{.Title "` + t("USAGE:") + `"}}
-   ` + t("[environment variables]") + ` {{.Name}} ` + t("[global options] command [arguments...] [command options]") + `
-
-{{.Title "` + t("VERSION:") + `"}}
-   {{.Version}}
-
-{{.Title "` + t("BUILD TIME:") + `"}}
-   {{.Compiled}}
-   {{range .Commands}}
-{{.SubTitle .Name}}{{range .CommandSubGroups}}
-{{range .}}   {{.Name}} {{.Description}}
-{{end}}{{end}}{{end}}
-{{.Title "` + t("ENVIRONMENT VARIABLES") + `"}}
-   CF_COLOR=false                     ` + t("Do not colorize output") + `
-   CF_HOME=path/to/dir/               ` + t("Override path to default config directory") + `
-   CF_STAGING_TIMEOUT=15              ` + t("Max wait time for buildpack staging, in minutes") + `
-   CF_STARTUP_TIMEOUT=5               ` + t("Max wait time for app instance startup, in minutes") + `
-   CF_TRACE=true                      ` + t("Print API request diagnostics to stdout") + `
-   CF_TRACE=path/to/trace.log         ` + t("Append API request diagnostics to a log file") + `
-   HTTP_PROXY=proxy.example.com:8080  ` + t("Enable HTTP proxying for API requests") + `
-
-{{.Title "` + t("GLOBAL OPTIONS") + `"}}
-   --version, -v                      ` + t("Print the version") + `
-   --help, -h                         ` + t("Show help") + `
-`
 )
 
 const UnknownCommand = "cf: '%s' is not a registered command. See 'cf help'"
@@ -61,18 +28,18 @@ func NewApp(cmdRunner command_runner.Runner, metadatas ...command_metadata.Comma
 			if len(args) > 0 {
 				cli.ShowCommandHelp(c, args[0])
 			} else {
-				showAppHelp(appHelpTemplate, c.App)
+				showAppHelp(appHelpTemplate(), c.App)
 			}
 		},
 	}
 
-	cli.AppHelpTemplate = appHelpTemplate
+	cli.AppHelpTemplate = appHelpTemplate()
 	cli.HelpPrinter = ShowHelp
 
 	trace.Logger.Printf("\n%s\n%s\n\n", terminal.HeaderColor(T("VERSION:")), cf.Version)
 
 	app = cli.NewApp()
-	app.Usage = cf.Usage
+	app.Usage = Usage()
 	app.Version = cf.Version + "-" + cf.BuiltOnDate
 	app.Action = helpCommand.Action
 	app.CommandNotFound = func(c *cli.Context, command string) {
@@ -114,4 +81,39 @@ func getCommand(metadata command_metadata.CommandMetadata, runner command_runner
 		Flags:           metadata.Flags,
 		SkipFlagParsing: metadata.SkipFlagParsing,
 	}
+}
+
+func Usage() string {
+	return T("A command line tool to interact with Cloud Foundry")
+}
+
+func appHelpTemplate() string {
+	return `{{.Title "` + T("NAME:") + `"}}
+   {{.Name}} - {{.Usage}}
+
+{{.Title "` + T("USAGE:") + `"}}
+   ` + T("[environment variables]") + ` {{.Name}} ` + T("[global options] command [arguments...] [command options]") + `
+
+{{.Title "` + T("VERSION:") + `"}}
+   {{.Version}}
+
+{{.Title "` + T("BUILD TIME:") + `"}}
+   {{.Compiled}}
+   {{range .Commands}}
+{{.SubTitle .Name}}{{range .CommandSubGroups}}
+{{range .}}   {{.Name}} {{.Description}}
+{{end}}{{end}}{{end}}
+{{.Title "` + T("ENVIRONMENT VARIABLES") + `"}}
+   CF_COLOR=false                     ` + T("Do not colorize output") + `
+   CF_HOME=path/to/dir/               ` + T("Override path to default config directory") + `
+   CF_STAGING_TIMEOUT=15              ` + T("Max wait time for buildpack staging, in minutes") + `
+   CF_STARTUP_TIMEOUT=5               ` + T("Max wait time for app instance startup, in minutes") + `
+   CF_TRACE=true                      ` + T("Print API request diagnostics to stdout") + `
+   CF_TRACE=path/to/trace.log         ` + T("Append API request diagnostics to a log file") + `
+   HTTP_PROXY=proxy.example.com:8080  ` + T("Enable HTTP proxying for API requests") + `
+
+{{.Title "` + T("GLOBAL OPTIONS") + `"}}
+   --version, -v                      ` + T("Print the version") + `
+   --help, -h                         ` + T("Show help") + `
+`
 }
