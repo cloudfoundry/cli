@@ -74,6 +74,19 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 			}))
 		})
 	})
+
+	Describe("SetStaging", func() {
+		BeforeEach(func() {
+			setupTestServer(setStagingRequest)
+		})
+
+		It("sets the environment variables in the staging group", func() {
+			err := repo.SetStaging(`{"abc": "one-two-three", "def": 456}`)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+		})
+	})
 })
 
 var listRunningRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -97,4 +110,12 @@ var listStagingRequest = testapi.NewCloudControllerTestRequest(testnet.TestReque
   "do-re-mi": "fa-sol-la-ti"
 }`,
 	},
+})
+var setStagingRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "PUT",
+	Path:   "/v2/config/environment_variable_groups/staging",
+	Matcher: testnet.RequestBodyMatcher(`{
+					"abc": "one-two-three",
+					"def": 456
+				}`),
 })

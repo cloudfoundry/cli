@@ -4,6 +4,7 @@ package fakes
 import (
 	. "github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
 	"github.com/cloudfoundry/cli/cf/models"
+
 	"sync"
 )
 
@@ -21,6 +22,14 @@ type FakeEnvironmentVariableGroupsRepository struct {
 	listStagingReturns     struct {
 		result1 []models.EnvironmentVariable
 		result2 error
+	}
+	SetStagingStub        func(string) error
+	setStagingMutex       sync.RWMutex
+	setStagingArgsForCall []struct {
+		arg1 string
+	}
+	setStagingReturns struct {
+		result1 error
 	}
 }
 
@@ -70,6 +79,37 @@ func (fake *FakeEnvironmentVariableGroupsRepository) ListStagingReturns(result1 
 		result1 []models.EnvironmentVariable
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeEnvironmentVariableGroupsRepository) SetStaging(arg1 string) error {
+	fake.setStagingMutex.Lock()
+	defer fake.setStagingMutex.Unlock()
+	fake.setStagingArgsForCall = append(fake.setStagingArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.SetStagingStub != nil {
+		return fake.SetStagingStub(arg1)
+	} else {
+		return fake.setStagingReturns.result1
+	}
+}
+
+func (fake *FakeEnvironmentVariableGroupsRepository) SetStagingCallCount() int {
+	fake.setStagingMutex.RLock()
+	defer fake.setStagingMutex.RUnlock()
+	return len(fake.setStagingArgsForCall)
+}
+
+func (fake *FakeEnvironmentVariableGroupsRepository) SetStagingArgsForCall(i int) string {
+	fake.setStagingMutex.RLock()
+	defer fake.setStagingMutex.RUnlock()
+	return fake.setStagingArgsForCall[i].arg1
+}
+
+func (fake *FakeEnvironmentVariableGroupsRepository) SetStagingReturns(result1 error) {
+	fake.setStagingReturns = struct {
+		result1 error
+	}{result1}
 }
 
 var _ EnvironmentVariableGroupsRepository = new(FakeEnvironmentVariableGroupsRepository)

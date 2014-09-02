@@ -1,6 +1,7 @@
 package errors
 
 const (
+	PARSE_ERROR                 = "1001"
 	INVALID_RELATION            = "1002"
 	BAD_QUERY_PARAM             = "10005"
 	USER_EXISTS                 = "20002"
