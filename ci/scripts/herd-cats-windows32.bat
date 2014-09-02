@@ -16,7 +16,7 @@ SET PATH=%PATH%;%CATSPATH%;C:\Program Files\cURL\bin
 
 cd %CATSPATH%
 git pull
-git checkout CLI-non-backwards-compatible
+git checkout master
 SET CONFIG=%CATSPATH%\config.json
 
 SET LOCAL_GOPATH=%CATSPATH%\Godeps\_workspace
