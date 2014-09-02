@@ -57,11 +57,39 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 			}))
 		})
 	})
+
+	Describe("ListStaging", func() {
+		BeforeEach(func() {
+			setupTestServer(listStagingRequest)
+		})
+
+		It("lists the environment variables in the staging group", func() {
+			envVars, err := repo.ListStaging()
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(envVars).To(Equal([]models.EnvironmentVariable{
+				models.EnvironmentVariable{Name: "abc", Value: "123"},
+				models.EnvironmentVariable{Name: "do-re-mi", Value: "fa-sol-la-ti"},
+			}))
+		})
+	})
 })
 
 var listRunningRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/config/environment_variable_groups/running",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+  "abc": 123,
+  "do-re-mi": "fa-sol-la-ti"
+}`,
+	},
+})
+var listStagingRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/config/environment_variable_groups/staging",
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `{
