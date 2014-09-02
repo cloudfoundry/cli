@@ -83,8 +83,8 @@ var _ = Describe("start command", func() {
 		ui = new(testterm.FakeUI)
 
 		cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
-		cmd.StagingTimeout = 50 * time.Millisecond
-		cmd.StartupTimeout = 100 * time.Millisecond
+		cmd.StagingTimeout = 100 * time.Millisecond
+		cmd.StartupTimeout = 200 * time.Millisecond
 		cmd.PingerThrottle = 50 * time.Millisecond
 
 		testcmd.RunCommand(cmd, args, requirementsFactory)
