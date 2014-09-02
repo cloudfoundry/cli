@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("disable-feature-flag command", func() {
+var _ = Describe("running-environment-variable-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		requirementsFactory          *testreq.FakeReqFactory
