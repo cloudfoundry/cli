@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -20,6 +21,7 @@ type configJsonV3 struct {
 	AsyncTimeout          uint
 	Trace                 string
 	ColorEnabled          string // need to be able to express true, false and undefined
+	Locale                string
 }
 
 func JsonMarshalV3(config *Data) (output []byte, err error) {
@@ -38,6 +40,7 @@ func JsonMarshalV3(config *Data) (output []byte, err error) {
 		Trace:                 config.Trace,
 		AsyncTimeout:          config.AsyncTimeout,
 		ColorEnabled:          config.ColorEnabled,
+		Locale:                config.Locale,
 	}, "", "  ")
 }
 
@@ -66,6 +69,7 @@ func JsonUnmarshalV3(input []byte, config *Data) (err error) {
 	config.AsyncTimeout = configJson.AsyncTimeout
 	config.Trace = configJson.Trace
 	config.ColorEnabled = configJson.ColorEnabled
+	config.Locale = configJson.Locale
 
 	return
 }

@@ -53,6 +53,8 @@ type Reader interface {
 	Trace() string
 
 	ColorEnabled() string
+
+	Locale() string
 }
 
 type ReadWriter interface {
@@ -71,6 +73,7 @@ type ReadWriter interface {
 	SetAsyncTimeout(uint)
 	SetTrace(string)
 	SetColorEnabled(string)
+	SetLocale(string)
 }
 
 type Repository interface {
@@ -261,6 +264,13 @@ func (c *configRepository) ColorEnabled() (enabled string) {
 	return
 }
 
+func (c *configRepository) Locale() (locale string) {
+	c.read(func() {
+		locale = c.data.Locale
+	})
+	return
+}
+
 // SETTERS
 
 func (c *configRepository) ClearSession() {
@@ -347,5 +357,11 @@ func (c *configRepository) SetTrace(value string) {
 func (c *configRepository) SetColorEnabled(enabled string) {
 	c.write(func() {
 		c.data.ColorEnabled = enabled
+	})
+}
+
+func (c *configRepository) SetLocale(locale string) {
+	c.write(func() {
+		c.data.Locale = locale
 	})
 }

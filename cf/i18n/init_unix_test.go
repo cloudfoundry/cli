@@ -6,119 +6,188 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/i18n"
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("i18n.Init() function", func() {
-	var oldResourcesPath string
+	var (
+		oldResourcesPath string
+		configRepo       configuration.ReadWriter
+
+		T go_i18n.TranslateFunc
+	)
 
 	BeforeEach(func() {
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		oldResourcesPath = i18n.GetResourcesPath()
 		i18n.Resources_path = filepath.Join("cf", "i18n", "test_fixtures")
 	})
 
-	AfterEach(func() {
-		i18n.Resources_path = oldResourcesPath
-		os.Setenv("LC_ALL", "")
-		os.Setenv("LANG", "en_US.UTF-8")
+	JustBeforeEach(func() {
+		T = i18n.Init(configRepo)
 	})
 
-	Context("loads correct locale", func() {
-		It("defaults to en_US when LC_ALL and LANG not set", func() {
-			os.Setenv("LC_ALL", "")
-			os.Setenv("LANG", "")
+	Describe("When a user has a locale configuration set", func() {
+		It("panics when the translation files cannot be loaded", func() {
+			i18n.Resources_path = filepath.Join("should", "not", "be_valid")
+			configRepo.SetLocale("en_us")
 
-			T := i18n.Init()
-
-			translation := T("Hello world!")
-			Ω("Hello world!").Should(Equal(translation))
+			init := func() { i18n.Init(configRepo) }
+			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
 		})
 
-		Context("when there is no territory set", func() {
+		It("Panics if the locale is not valid", func() {
+			configRepo.SetLocale("abc_def")
+
+			init := func() { i18n.Init(configRepo) }
+			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
+		})
+
+		Context("when the locale is set to french", func() {
 			BeforeEach(func() {
-				os.Setenv("LANG", "en")
+				configRepo.SetLocale("fr_FR")
 			})
 
-			It("still loads the english translation", func() {
-				T := i18n.Init()
-
-				translation := T("Hello world!")
-				Ω("Hello world!").Should(Equal(translation))
+			It("translates into french correctly", func() {
+				translation := T("No buildpacks found")
+				Ω(translation).Should(Equal("Pas buildpacks trouvés"))
 			})
 		})
 
-		Context("when the desired language is not supported", func() {
-			It("defaults to en_US when langauge is not supported", func() {
-				os.Setenv("LC_ALL", "zz_FF.UTF-8")
-				T := i18n.Init()
+		Context("creates a valid T function", func() {
+			BeforeEach(func() {
+				configRepo.SetLocale("en_US")
+			})
+
+			It("returns a usable T function for simple strings", func() {
+				Ω(T).ShouldNot(BeNil())
 
 				translation := T("Hello world!")
 				Ω("Hello world!").Should(Equal(translation))
-
-				translation = T("No buildpacks found")
-				Ω("No buildpacks found").Should(Equal(translation))
 			})
 
-			Context("because we don't have the territory", func() {
-				It("defaults to same language in supported territory", func() {
-					os.Setenv("LC_ALL", "fr_CA.UTF-8")
-					T := i18n.Init()
+			It("returns a usable T function for complex strings (interpolated)", func() {
+				Ω(T).ShouldNot(BeNil())
 
+				translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo.com", "Username": "Anand"})
+				Ω("Deleting domain foo.com as Anand...").Should(Equal(translation))
+			})
+		})
+	})
+
+	Describe("When the user does not have a locale configuration set", func() {
+		AfterEach(func() {
+			i18n.Resources_path = oldResourcesPath
+			os.Setenv("LC_ALL", "")
+			os.Setenv("LANG", "en_US.UTF-8")
+		})
+
+		It("panics when the translation files cannot be loaded", func() {
+			os.Setenv("LANG", "en")
+			i18n.Resources_path = filepath.Join("should", "not", "be_valid")
+
+			init := func() { i18n.Init(configRepo) }
+			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
+		})
+
+		Context("loads correct locale", func() {
+			It("defaults to en_US when LC_ALL and LANG not set", func() {
+				os.Setenv("LC_ALL", "")
+				os.Setenv("LANG", "")
+
+				translation := T("Hello world!")
+				Ω("Hello world!").Should(Equal(translation))
+			})
+
+			Context("when there is no territory set", func() {
+				BeforeEach(func() {
+					os.Setenv("LANG", "en")
+				})
+
+				It("still loads the english translation", func() {
+					translation := T("Hello world!")
+					Ω("Hello world!").Should(Equal(translation))
+				})
+			})
+
+			Context("when the desired language is not supported", func() {
+				BeforeEach(func() {
+					os.Setenv("LC_ALL", "zz_FF.UTF-8")
+				})
+
+				It("defaults to en_US when langauge is not supported", func() {
+					translation := T("Hello world!")
+					Ω("Hello world!").Should(Equal(translation))
+
+					translation = T("No buildpacks found")
+					Ω("No buildpacks found").Should(Equal(translation))
+				})
+
+				Context("because we don't have the territory", func() {
+					BeforeEach(func() {
+						os.Setenv("LC_ALL", "fr_CA.UTF-8")
+					})
+
+					It("defaults to same language in supported territory", func() {
+						translation := T("No buildpacks found")
+						Ω("Pas buildpacks trouvés").Should(Equal(translation))
+					})
+				})
+			})
+
+			Context("translates correctly", func() {
+				BeforeEach(func() {
+					os.Setenv("LC_ALL", "fr_FR.UTF-8")
+				})
+
+				It("T function should return translation if string key exists", func() {
 					translation := T("No buildpacks found")
 					Ω("Pas buildpacks trouvés").Should(Equal(translation))
 				})
 			})
 		})
 
-		Context("when not even the english translation can be loaded", func() {
+		Context("creates a valid T function", func() {
 			BeforeEach(func() {
-				i18n.Resources_path = filepath.Join("should", "not", "be_valid")
+				os.Setenv("LC_ALL", "en_US.UTF-8")
 			})
 
-			It("panics", func() {
-				os.Setenv("LC_ALL", "zz_FF.utf-8")
+			It("returns a usable T function for simple strings", func() {
+				Ω(T).ShouldNot(BeNil())
 
-				init := func() { i18n.Init() }
-				Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
+				translation := T("Hello world!")
+				Ω("Hello world!").Should(Equal(translation))
+			})
+
+			It("returns a usable T function for complex strings (interpolated)", func() {
+				Ω(T).ShouldNot(BeNil())
+
+				translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo.com", "Username": "Anand"})
+				Ω("Deleting domain foo.com as Anand...").Should(Equal(translation))
 			})
 		})
 	})
 
-	Context("creates a valid T function", func() {
+	Describe("when the config is set to a non-english language and the LANG environamnt variable is en_US", func() {
 		BeforeEach(func() {
-			os.Setenv("LC_ALL", "en_US.UTF-8")
+			configRepo.SetLocale("fr_FR")
+			os.Setenv("LANG", "en_US")
 		})
 
-		It("returns a usable T function for simple strings", func() {
-			T := i18n.Init()
-			Ω(T).ShouldNot(BeNil())
-
-			translation := T("Hello world!")
-			Ω("Hello world!").Should(Equal(translation))
+		AfterEach(func() {
+			i18n.Resources_path = oldResourcesPath
+			os.Setenv("LANG", "en_US.UTF-8")
 		})
 
-		It("returns a usable T function for complex strings (interpolated)", func() {
-			T := i18n.Init()
-			Ω(T).ShouldNot(BeNil())
-
-			translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo.com", "Username": "Anand"})
-			Ω("Deleting domain foo.com as Anand...").Should(Equal(translation))
-		})
-	})
-
-	Context("translates correctly", func() {
-		BeforeEach(func() {
-			os.Setenv("LC_ALL", "fr_FR.UTF-8")
-		})
-
-		It("T function should return translation if string key exists", func() {
-			T := i18n.Init()
-
+		It("ignores the english LANG enviornmant variable", func() {
 			translation := T("No buildpacks found")
-			Ω("Pas buildpacks trouvés").Should(Equal(translation))
+			Ω(translation).Should(Equal("Pas buildpacks trouvés"))
 		})
 	})
 })

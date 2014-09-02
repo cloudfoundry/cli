@@ -31,6 +31,7 @@ type Data struct {
 	AsyncTimeout          uint
 	Trace                 string
 	ColorEnabled          string
+	Locale                string
 }
 
 func NewData() (data *Data) {

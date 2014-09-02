@@ -2,16 +2,13 @@ package trace
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io"
 	"log"
 	"os"
 	"regexp"
-)
 
-var (
-	PRIVATE_DATA_PLACEHOLDER = T("[PRIVATE DATA HIDDEN]")
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
 const CF_TRACE = "CF_TRACE"
@@ -79,13 +76,13 @@ func newFileLogger(path string) Printer {
 func Sanitize(input string) (sanitized string) {
 	var sanitizeJson = func(propertyName string, json string) string {
 		regex := regexp.MustCompile(fmt.Sprintf(`"%s":\s*"[^"]*"`, propertyName))
-		return regex.ReplaceAllString(json, fmt.Sprintf(`"%s":"%s"`, propertyName, PRIVATE_DATA_PLACEHOLDER))
+		return regex.ReplaceAllString(json, fmt.Sprintf(`"%s":"%s"`, propertyName, PRIVATE_DATA_PLACEHOLDER()))
 	}
 
 	re := regexp.MustCompile(`(?m)^Authorization: .*`)
-	sanitized = re.ReplaceAllString(input, "Authorization: "+PRIVATE_DATA_PLACEHOLDER)
+	sanitized = re.ReplaceAllString(input, "Authorization: "+PRIVATE_DATA_PLACEHOLDER())
 	re = regexp.MustCompile(`password=[^&]*&`)
-	sanitized = re.ReplaceAllString(sanitized, "password="+PRIVATE_DATA_PLACEHOLDER+"&")
+	sanitized = re.ReplaceAllString(sanitized, "password="+PRIVATE_DATA_PLACEHOLDER()+"&")
 
 	sanitized = sanitizeJson("access_token", sanitized)
 	sanitized = sanitizeJson("refresh_token", sanitized)
@@ -94,4 +91,8 @@ func Sanitize(input string) (sanitized string) {
 	sanitized = sanitizeJson("oldPassword", sanitized)
 
 	return
+}
+
+func PRIVATE_DATA_PLACEHOLDER() string {
+	return T("[PRIVATE DATA HIDDEN]")
 }

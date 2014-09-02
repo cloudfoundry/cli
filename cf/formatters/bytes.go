@@ -47,12 +47,12 @@ func ByteSize(bytes int64) string {
 func ToMegabytes(s string) (int64, error) {
 	parts := bytesPattern.FindStringSubmatch(strings.TrimSpace(s))
 	if len(parts) < 3 {
-		return 0, invalidByteQuantityError
+		return 0, invalidByteQuantityError()
 	}
 
 	value, err := strconv.ParseInt(parts[1], 10, 0)
 	if err != nil {
-		return 0, invalidByteQuantityError
+		return 0, invalidByteQuantityError()
 	}
 
 	var bytes int64
@@ -72,7 +72,9 @@ func ToMegabytes(s string) (int64, error) {
 }
 
 var (
-	bytesPattern             *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
-	t                                       = i18n.Init()
-	invalidByteQuantityError                = errors.New(t("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+	bytesPattern *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
 )
+
+func invalidByteQuantityError() error {
+	return errors.New(i18n.T("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+}
