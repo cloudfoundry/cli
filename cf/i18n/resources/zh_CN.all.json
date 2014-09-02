@@ -815,6 +815,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME set-staging-environment-variable-group",
+      "translation": "CF_NAME set-staging-environment-variable-group",
+      "modified": false
+   },
+   {
       "id": "CF_NAME space SPACE",
       "translation": "CF_NAME space 空间",
       "modified": false
@@ -2620,6 +2625,11 @@
       "modified": false
    },
    {
+      "id": "Pass parameters as JSON to create a staging environment variable group",
+      "translation": "Pass parameters as JSON to create a staging environment variable group",
+      "modified": false
+   },
+   {
       "id": "Password",
       "translation": "密码",
       "modified": false
@@ -3112,6 +3122,11 @@
    {
       "id": "Setting status of {{.FeatureFlag}} as {{.Username}}...",
       "translation": "Setting status of {{.FeatureFlag}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Setting the contents of the staging environment variable group as {{.Username}}...",
+      "translation": "Setting the contents of the staging environment variable group as {{.Username}}...",
       "modified": false
    },
    {
