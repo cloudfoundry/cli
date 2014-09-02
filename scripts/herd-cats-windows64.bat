@@ -15,8 +15,8 @@ bitsadmin.exe /transfer "DownloadStableCLI" https://s3.amazonaws.com/go-cli/buil
 SET PATH=%PATH%;%CATSPATH%;C:\Program Files\cURL\bin
 
 cd %CATSPATH%
-git pull
 git checkout master
+git pull
 SET CONFIG=%CATSPATH%\config.json
 
 SET LOCAL_GOPATH=%CATSPATH%\Godeps\_workspace
