@@ -845,6 +845,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME staging-environment-variable-group",
+      "translation": "CF_NAME staging-environment-variable-group",
+      "modified": false
+   },
+   {
       "id": "CF_NAME start APP",
       "translation": "CF_NAME start APP",
       "modified": false
@@ -2915,6 +2920,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve the contents of the staging environment variable group",
+      "translation": "Retrieve the contents of the staging environment variable group",
+      "modified": false
+   },
+   {
       "id": "Retrieving status of all flagged features as {{.Username}}...",
       "translation": "Retrieving status of all flagged features as {{.Username}}...",
       "modified": false
@@ -2927,6 +2937,11 @@
    {
       "id": "Retrieving the contents of the running environment variable group as {{.Username}}...",
       "translation": "Retrieving the contents of the running environment variable group as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
+      "translation": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
       "modified": false
    },
    {

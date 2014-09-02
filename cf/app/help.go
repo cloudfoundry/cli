@@ -279,6 +279,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentCommand("running-environment-variable-group"),
+					presentCommand("staging-environment-variable-group"),
 				},
 			},
 		},
