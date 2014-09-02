@@ -2345,6 +2345,11 @@
       "modified": false
    },
    {
+      "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
+      "translation": "Tiempo de espera en segundos",
+      "modified": true
+   },
+   {
       "id": "Memory limit (e.g. 256M, 1024M, 1G)",
       "translation": "Limite de memoria (ej. 256M, 1024M, 1G)",
       "modified": false
@@ -3172,11 +3177,6 @@
    {
       "id": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
       "translation": "Tiempo de espera para comienzo de app\n\nTIP: usar '{{.Command}}' para mas informacion",
-      "modified": false
-   },
-   {
-      "id": "Start timeout in seconds",
-      "translation": "Tiempo de espera en segundos",
       "modified": false
    },
    {
