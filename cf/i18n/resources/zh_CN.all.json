@@ -315,6 +315,11 @@
       "modified": false
    },
    {
+      "id": "Assigned Value",
+      "translation": "Assigned Value",
+      "modified": false
+   },
+   {
       "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
       "translation": "分配角色:{{.Role}}在组织{{.TargetOrg}}或空间{{.TargetSpace}}中分配权限给用户{{.TargetUser}} (作为用户{{.CurrentUser}}) ...",
       "modified": false
@@ -758,6 +763,11 @@
       "id": "CF_NAME restart APP",
       "translation": "CF_NAME restart 应用程序名",
       "modified": false
+   },
+   {
+      "id": "CF_NAME running-environment-variable-group",
+      "translation": "cf running-environment-variable-group",
+      "modified": true
    },
    {
       "id": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
@@ -1492,6 +1502,11 @@
    {
       "id": "Dump recent logs instead of tailing",
       "translation": "生成最近的日志文件，而非读取日志内容",
+      "modified": false
+   },
+   {
+      "id": "ENVIRONMENT VARIABLE GROUPS",
+      "translation": "ENVIRONMENT VARIABLE GROUPS",
       "modified": false
    },
    {
@@ -2895,6 +2910,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve the contents of the running environment variable group",
+      "translation": "Retrieve the contents of the running environment variable group",
+      "modified": false
+   },
+   {
       "id": "Retrieving status of all flagged features as {{.Username}}...",
       "translation": "Retrieving status of all flagged features as {{.Username}}...",
       "modified": false
@@ -2902,6 +2922,11 @@
    {
       "id": "Retrieving status of {{.FeatureFlag}} as {{.Username}}...",
       "translation": "Retrieving status of {{.FeatureFlag}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Retrieving the contents of the running environment variable group as {{.Username}}...",
+      "translation": "Retrieving the contents of the running environment variable group as {{.Username}}...",
       "modified": false
    },
    {
@@ -3587,6 +3612,11 @@
    {
       "id": "VERSION:",
       "translation": "版本:",
+      "modified": false
+   },
+   {
+      "id": "Variable Name",
+      "translation": "Variable Name",
       "modified": false
    },
    {

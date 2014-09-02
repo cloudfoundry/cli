@@ -2,8 +2,10 @@ package api
 
 import (
 	"crypto/tls"
-	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"net/http"
+
+	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
+	"github.com/cloudfoundry/cli/cf/api/organizations"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
@@ -58,6 +60,7 @@ type RepositoryLocator struct {
 	securityGroupSpaceBinder        securitygroupspaces.SecurityGroupSpaceBinder
 	spaceQuotaRepo                  space_quotas.SpaceQuotaRepository
 	featureFlagRepo                 feature_flags.FeatureFlagRepository
+	environmentVariableGroupRepo    environment_variable_groups.EnvironmentVariableGroupsRepository
 }
 
 func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
@@ -109,6 +112,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.securityGroupSpaceBinder = securitygroupspaces.NewSecurityGroupSpaceBinder(config, cloudControllerGateway)
 	loc.spaceQuotaRepo = space_quotas.NewCloudControllerSpaceQuotaRepository(config, cloudControllerGateway)
 	loc.featureFlagRepo = feature_flags.NewCloudControllerFeatureFlagRepository(config, cloudControllerGateway)
+	loc.environmentVariableGroupRepo = environment_variable_groups.NewCloudControllerEnvironmentVariableGroupsRepository(config, cloudControllerGateway)
 	return
 }
 
@@ -246,4 +250,8 @@ func (locator RepositoryLocator) GetSpaceQuotaRepository() space_quotas.SpaceQuo
 
 func (locator RepositoryLocator) GetFeatureFlagRepository() feature_flags.FeatureFlagRepository {
 	return locator.featureFlagRepo
+}
+
+func (locator RepositoryLocator) GetEnvironmentVariableGroupsRepository() environment_variable_groups.EnvironmentVariableGroupsRepository {
+	return locator.environmentVariableGroupRepo
 }
