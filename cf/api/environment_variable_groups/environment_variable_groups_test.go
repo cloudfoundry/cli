@@ -87,6 +87,19 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 			Expect(testHandler).To(HaveAllRequestsCalled())
 		})
 	})
+
+	Describe("SetRunning", func() {
+		BeforeEach(func() {
+			setupTestServer(setRunningRequest)
+		})
+
+		It("sets the environment variables in the running group", func() {
+			err := repo.SetRunning(`{"abc": "one-two-three", "def": 456}`)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+		})
+	})
 })
 
 var listRunningRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -100,6 +113,7 @@ var listRunningRequest = testapi.NewCloudControllerTestRequest(testnet.TestReque
 }`,
 	},
 })
+
 var listStagingRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/config/environment_variable_groups/staging",
@@ -111,9 +125,19 @@ var listStagingRequest = testapi.NewCloudControllerTestRequest(testnet.TestReque
 }`,
 	},
 })
+
 var setStagingRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "PUT",
 	Path:   "/v2/config/environment_variable_groups/staging",
+	Matcher: testnet.RequestBodyMatcher(`{
+					"abc": "one-two-three",
+					"def": 456
+				}`),
+})
+
+var setRunningRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "PUT",
+	Path:   "/v2/config/environment_variable_groups/running",
 	Matcher: testnet.RequestBodyMatcher(`{
 					"abc": "one-two-three",
 					"def": 456

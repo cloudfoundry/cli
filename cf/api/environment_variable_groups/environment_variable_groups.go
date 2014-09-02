@@ -14,6 +14,7 @@ type EnvironmentVariableGroupsRepository interface {
 	ListRunning() (variables []models.EnvironmentVariable, apiErr error)
 	ListStaging() (variables []models.EnvironmentVariable, apiErr error)
 	SetStaging(string) error
+	SetRunning(string) error
 }
 
 type CloudControllerEnvironmentVariableGroupsRepository struct {
@@ -62,6 +63,11 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) ListStaging() (va
 func (repo CloudControllerEnvironmentVariableGroupsRepository) SetStaging(staging_vars string) error {
 	path := fmt.Sprintf("%s/v2/config/environment_variable_groups/staging", repo.config.ApiEndpoint())
 	return repo.gateway.UpdateResource(path, strings.NewReader(staging_vars))
+}
+
+func (repo CloudControllerEnvironmentVariableGroupsRepository) SetRunning(running_vars string) error {
+	path := fmt.Sprintf("%s/v2/config/environment_variable_groups/running", repo.config.ApiEndpoint())
+	return repo.gateway.UpdateResource(path, strings.NewReader(running_vars))
 }
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) marshalToEnvironmentVariables(raw_response interface{}) ([]models.EnvironmentVariable, error) {

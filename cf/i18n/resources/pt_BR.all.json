@@ -5,6 +5,16 @@
       "modified": false
    },
    {
+      "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
+      "translation": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
+      "modified": false
+   },
+   {
+      "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
+      "translation": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
+      "modified": false
+   },
+   {
       "id": "\nApp started\n",
       "translation": "\nAplicativo iniciado\n",
       "modified": false
@@ -802,6 +812,11 @@
    {
       "id": "CF_NAME set-quota ORG QUOTA\n\n",
       "translation": "CF_NAME set-quota ORG COTA\n\n",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME set-running-environment-variable-group",
+      "translation": "CF_NAME set-running-environment-variable-group",
       "modified": false
    },
    {
@@ -2625,6 +2640,11 @@
       "modified": false
    },
    {
+      "id": "Pass parameters as JSON to create a running environment variable group",
+      "translation": "Pass parameters as JSON to create a running environment variable group",
+      "modified": false
+   },
+   {
       "id": "Pass parameters as JSON to create a staging environment variable group",
       "translation": "Pass parameters as JSON to create a staging environment variable group",
       "modified": false
@@ -3122,6 +3142,11 @@
    {
       "id": "Setting status of {{.FeatureFlag}} as {{.Username}}...",
       "translation": "Setting status of {{.FeatureFlag}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Setting the contents of the running environment variable group as {{.Username}}...",
+      "translation": "Setting the contents of the running environment variable group as {{.Username}}...",
       "modified": false
    },
    {
