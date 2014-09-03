@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/i18n"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 const (
@@ -76,5 +76,5 @@ var (
 )
 
 func invalidByteQuantityError() error {
-	return errors.New(i18n.T("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+	return errors.New(T("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
 }

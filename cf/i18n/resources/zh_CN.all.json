@@ -490,9 +490,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false]",
+      "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false] [--locale (LOCALE | CLEAR)]",
       "translation": "CF_NAME config [--async-timeout 超时_以分钟为单位] [--trace true | false | 文件访问路径] [--color true | false]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
@@ -1757,11 +1757,6 @@
    {
       "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
       "translation": "上传buildpack {{.Name}},\n错误：{{.Error}}",
-      "modified": false
-   },
-   {
-      "id": "Error writing to manifest file:{{.FilePath}}\n{{.Err}}",
-      "translation": "写入清单文件错误: {{.FilePath}}\n错误: {{.Err}}",
       "modified": false
    },
    {
