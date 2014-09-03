@@ -3,7 +3,7 @@ set -ex
 
 export PATH=$PATH:$HOME/gopath/bin
 export GOPATH=$(godep path):$(pwd):$GOPATH
-export GOMAXPROCS=2
+export GOMAXPROCS=1
 
 ruby bin/gi18n-checkup
 ginkgo -r cf --randomizeAllSpecs --randomizeSuites --failOnPending --trace
