@@ -40,7 +40,7 @@ var _ = Describe("i18n.Init() function", func() {
 			})
 
 			It("returns a usable T function for complex strings (interpolated)", func() {
-				T = i18n.Init(configRepo)
+				T := i18n.Init(configRepo)
 				Ω(T).ShouldNot(BeNil())
 
 				translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo.com", "Username": "Anand"})
@@ -61,7 +61,7 @@ var _ = Describe("i18n.Init() function", func() {
 			})
 
 			It("returns a usable T function for simple strings", func() {
-				T = i18n.Init(configRepo)
+				T := i18n.Init(configRepo)
 				Ω(T).ShouldNot(BeNil())
 
 				translation := T("Change user password")
@@ -69,7 +69,7 @@ var _ = Describe("i18n.Init() function", func() {
 			})
 
 			It("returns a usable T function for complex strings (interpolated)", func() {
-				T = i18n.Init(configRepo)
+				T := i18n.Init(configRepo)
 				Ω(T).ShouldNot(BeNil())
 
 				translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo", "Username": "Anand"})
