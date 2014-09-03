@@ -171,7 +171,7 @@ var _ = Describe("Organization Repository", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/organizations",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org", "quota_definition_guid":""}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org"}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
