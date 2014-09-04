@@ -26,4 +26,4 @@ SET GOPATH=%LOCAL_GOPATH%;%GOPATH%
 SET PATH=%LOCAL_GOPATH%\bin;%PATH%
 
 go install -v github.com/onsi/ginkgo/ginkgo
-ginkgo -r -slowSpecThreshold=120 -skipPackage=diego -skip="transparently proxies both reserved characters and unsafe characters|go makes the app reachable via its bound route|SSO|takes effect after a restart, not requiring a push|doesn't die when printing 32MB|exercises basic loggregator"
+ginkgo -r -slowSpecThreshold=120 -skipPackage=diego -skip="Can mount a fuse endpoint|transparently proxies both reserved characters and unsafe characters|go makes the app reachable via its bound route|SSO|takes effect after a restart, not requiring a push|doesn't die when printing 32MB|exercises basic loggregator"
