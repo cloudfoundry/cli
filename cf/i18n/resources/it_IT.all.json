@@ -815,8 +815,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME set-running-environment-variable-group",
-      "translation": "CF_NAME set-running-environment-variable-group",
+      "id": "CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
+      "translation": "CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
       "modified": false
    },
    {
@@ -830,8 +830,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME set-staging-environment-variable-group",
-      "translation": "CF_NAME set-staging-environment-variable-group",
+      "id": "CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
+      "translation": "CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
       "modified": false
    },
    {
