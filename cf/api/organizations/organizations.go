@@ -70,7 +70,11 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 
 func (repo CloudControllerOrganizationRepository) Create(org models.Organization) (apiErr error) {
 	url := repo.config.ApiEndpoint() + "/v2/organizations"
-	data := fmt.Sprintf(`{"name":"%s", "quota_definition_guid":"%s"}`, org.Name, org.QuotaDefinition.Guid)
+	data := fmt.Sprintf(`{"name":"%s"`, org.Name)
+	if org.QuotaDefinition.Guid != "" {
+		data = data + fmt.Sprintf(`, "quota_definition_guid":"%s"`, org.QuotaDefinition.Guid)
+	}
+	data = data + "}"
 	return repo.gateway.CreateResource(url, strings.NewReader(data))
 }
 
