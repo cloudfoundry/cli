@@ -313,7 +313,7 @@ var secondSpaceQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.Test
 			{
 			  "metadata": { "guid": "my-quota-guid3" },
 			  "entity": { "name": "my-remote-quota3", "memory_limit": 1024, "organization_guid": "my-org-guid" }
-			}	
+			}
 		]}`,
 	},
 })

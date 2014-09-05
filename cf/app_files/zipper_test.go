@@ -20,6 +20,17 @@ func readFile(file *os.File) []byte {
 }
 
 var _ = Describe("Zipper", func() {
+	var filesInZip = []string{
+		"foo.txt",
+		"fooDir/",
+		"fooDir/bar/",
+		"lastDir/",
+		"subDir/",
+		"subDir/bar.txt",
+		"subDir/otherDir/",
+		"subDir/otherDir/file.txt",
+	}
+
 	It("zips directories", func() {
 		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 			workingDir, err := os.Getwd()
@@ -39,6 +50,13 @@ var _ = Describe("Zipper", func() {
 			reader, err := zip.NewReader(zipFile, fileStat.Size())
 			Expect(err).NotTo(HaveOccurred())
 
+			filenames := []string{}
+			for _, file := range reader.File {
+				filenames = append(filenames, file.Name)
+			}
+
+			Expect(filenames).To(Equal(filesInZip))
+
 			readFileInZip := func(index int) (string, string) {
 				buf := &bytes.Buffer{}
 				file := reader.File[index]
@@ -50,21 +68,7 @@ var _ = Describe("Zipper", func() {
 				return file.Name, string(buf.Bytes())
 			}
 
-			filenames := []string{}
-			for _, file := range reader.File {
-				filenames = append(filenames, file.Name)
-			}
-
-			Expect(filenames).To(Equal([]string{
-				"foo.txt",
-				"fooDir/",
-				"fooDir/bar/",
-				"lastDir/",
-				"subDir/",
-				"subDir/bar.txt",
-				"subDir/otherDir/",
-				"subDir/otherDir/file.txt",
-			}))
+			Expect(err).NotTo(HaveOccurred())
 
 			name, contents := readFileInZip(0)
 			Expect(name).To(Equal("foo.txt"))
@@ -110,6 +114,57 @@ var _ = Describe("Zipper", func() {
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("is empty"))
 			})
+		})
+	})
+
+	Describe(".Unzip", func() {
+		It("extracts the zip file", func() {
+			filez := []string{
+				"example-app/.cfignore",
+				"example-app/app.rb",
+				"example-app/config.ru",
+				"example-app/Gemfile",
+				"example-app/Gemfile.lock",
+				"example-app/ignore-me",
+				"example-app/manifest.yml",
+			}
+
+			dir, err := os.Getwd()
+			Expect(err).NotTo(HaveOccurred())
+			fileutils.TempDir("unzipped_app", func(tmpDir string, err error) {
+				zipper := ApplicationZipper{}
+
+				fixture := filepath.Join(dir, "../../fixtures/applications/example-app.zip")
+				err = zipper.Unzip(fixture, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+				for _, file := range filez {
+					_, err := os.Stat(filepath.Join(tmpDir, file))
+					Expect(os.IsNotExist(err)).To(BeFalse())
+				}
+			})
+		})
+	})
+
+	Describe(".GetZipSize", func() {
+		var zipper = ApplicationZipper{}
+
+		It("returns the size of the zip file", func() {
+			dir, err := os.Getwd()
+			Expect(err).NotTo(HaveOccurred())
+			zipFile := filepath.Join(dir, "../../fixtures/applications/example-app.zip")
+
+			file, err := os.Open(zipFile)
+			Expect(err).NotTo(HaveOccurred())
+
+			fileSize, err := zipper.GetZipSize(file)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fileSize).To(Equal(int64(1803)))
+		})
+
+		It("returns  an error if the zip file cannot be found", func() {
+			tmpFile, _ := os.Open("fooBar")
+			_, sizeErr := zipper.GetZipSize(tmpFile)
+			Expect(sizeErr).To(HaveOccurred())
 		})
 	})
 })

@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/broker_builder"
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/commands"
@@ -186,9 +187,11 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 		repoLocator.GetRouteRepository(),
 		repoLocator.GetStackRepository(),
 		repoLocator.GetServiceRepository(),
-		repoLocator.GetApplicationBitsRepository(),
 		repoLocator.GetAuthenticationRepository(),
-		words.NewWordGenerator())
+		words.NewWordGenerator(),
+		actors.NewPushActor(repoLocator.GetApplicationBitsRepository(), app_files.ApplicationZipper{}, app_files.ApplicationFiles{}),
+		app_files.ApplicationZipper{},
+		app_files.ApplicationFiles{})
 
 	factory.cmdsByName["scale"] = application.NewScale(ui, config, restart, repoLocator.GetApplicationRepository())
 
