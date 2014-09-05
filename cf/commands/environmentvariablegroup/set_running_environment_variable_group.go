@@ -29,7 +29,7 @@ func (cmd SetRunningEnvironmentVariableGroup) Metadata() command_metadata.Comman
 		Name:        "set-running-environment-variable-group",
 		Description: T("Pass parameters as JSON to create a running environment variable group"),
 		ShortName:   "srevg",
-		Usage:       T("CF_NAME set-running-environment-variable-group"),
+		Usage:       T(`CF_NAME set-running-environment-variable-group '{"name":"value","name":"value"}'`),
 	}
 }
 
