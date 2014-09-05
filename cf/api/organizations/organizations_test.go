@@ -162,7 +162,7 @@ var _ = Describe("Organization Repository", func() {
 	})
 
 	Describe(".Create", func() {
-		It("creates the org", func() {
+		It("creates the org and sends only the org name if the quota flag is not provided", func() {
 			org := models.Organization{
 				OrganizationFields: models.OrganizationFields{
 					Name: "my-org",
@@ -171,7 +171,7 @@ var _ = Describe("Organization Repository", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/organizations",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org", "quota_definition_guid":""}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org"}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
