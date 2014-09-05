@@ -1,3 +1,22 @@
+## v6.6.0
+* Modify set-running-environment-variable-group command usage to show example. [Finishes #77830856]
+* Modify set-staging-environment-variable-group usage to show example of JSON. [Finishes #77837402]
+* Add -i parameter for create-quota in usage. [Finishes #78111444]
+* Can set locale using `cf config --locale LOCALE` - can clear locale providing CLEAR as flag argument. [Finishes #74651616]
+* Implement set-running-environment-variable-group command. [Finishes #77830856]
+* Implement "set-staging-environment-variable-group" command. [Finishes #77837402]
+* Implement staging-environment-variable-group command. [Finishes #77829608]
+* Implement running-environment-variable-group command. [Finishes #76840940]
+* Make help for start timeouts on push more explicit. [Finishes #75071698]
+* Implement disable-feature-flag command. [Finishes #77676754]
+* Accept a bare -1 as instance memory on updating quotas. [#77765852]
+* Implement enable-feature-flag command. [Finishes #77665980]
+* Implement "feature-flag" command. Finishes #77222224]
+* Can create organization with specified quota. [Finishes #75915142]
+* Implement feature-flags command. [Finishes #77665936]
+* Correctly accept a -1 value for creating quotas. [Fixes #77765852]
+* Correctly display instance memory limit field for quotas. [Fixes #77765166]
+
 ## v6.5.1 
 * Revert changes to update-service-broker. This cause a breaking change by mistake.
 
