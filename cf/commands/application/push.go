@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/fileutils"
 	"os"
 	"regexp"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
+	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -37,16 +39,19 @@ type Push struct {
 	routeRepo     api.RouteRepository
 	serviceRepo   api.ServiceRepository
 	stackRepo     api.StackRepository
-	appBitsRepo   api.ApplicationBitsRepository
 	authRepo      authentication.AuthenticationRepository
 	wordGenerator words.WordGenerator
+	actor         actors.PushActor
+	zipper        app_files.Zipper
+	app_files     app_files.AppFiles
 }
 
 func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.ManifestRepository,
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
 	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
-	stackRepo api.StackRepository, serviceRepo api.ServiceRepository, appBitsRepo api.ApplicationBitsRepository,
-	authRepo authentication.AuthenticationRepository, wordGenerator words.WordGenerator) *Push {
+	stackRepo api.StackRepository, serviceRepo api.ServiceRepository,
+	authRepo authentication.AuthenticationRepository, wordGenerator words.WordGenerator,
+	actor actors.PushActor, zipper app_files.Zipper, app_files app_files.AppFiles) *Push {
 	return &Push{
 		ui:            ui,
 		config:        config,
@@ -59,9 +64,11 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 		routeRepo:     routeRepo,
 		serviceRepo:   serviceRepo,
 		stackRepo:     stackRepo,
-		appBitsRepo:   appBitsRepo,
 		authRepo:      authRepo,
 		wordGenerator: wordGenerator,
+		actor:         actor,
+		zipper:        zipper,
+		app_files:     app_files,
 	}
 }
 
@@ -126,7 +133,7 @@ func (cmd *Push) Run(c *cli.Context) {
 		cmd.ui.Say(T("Uploading {{.AppName}}...",
 			map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
 
-		apiErr := cmd.appBitsRepo.UploadApp(app.Guid, *appParams.Path, cmd.describeUploadOperation)
+		apiErr := cmd.uploadApp(app.Guid, *appParams.Path)
 		if apiErr != nil {
 			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
 				map[string]interface{}{"ApiErr": apiErr.Error()})))
@@ -232,18 +239,6 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 		}
 
 		cmd.ui.Ok()
-	}
-}
-
-func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount int64) {
-	if fileCount > 0 {
-		cmd.ui.Say(T("Uploading app files from: {{.Path}}", map[string]interface{}{"Path": path}))
-		cmd.ui.Say(T("Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
-			map[string]interface{}{
-				"ZipFileBytes": formatters.ByteSize(zipFileBytes),
-				"FileCount":    fileCount}))
-	} else {
-		cmd.ui.Warn(T("None of your application files have changed. Nothing will be uploaded."))
 	}
 }
 
@@ -540,4 +535,77 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 	}
 
 	return
+}
+
+func (cmd *Push) uploadApp(appGuid string, appDir string) (apiErr error) {
+	fileutils.TempDir("apps", func(uploadDir string, err error) {
+		if err != nil {
+			apiErr = err
+			return
+		}
+
+		presentFiles, err := cmd.actor.GatherFiles(appDir, uploadDir)
+		if err != nil {
+			apiErr = err
+			return
+		}
+
+		fileutils.TempFile("uploads", func(zipFile *os.File, err error) {
+			err = cmd.zipAppFiles(zipFile, appDir, uploadDir)
+			if err != nil {
+				apiErr = err
+				return
+			}
+
+			err = cmd.actor.UploadApp(appGuid, zipFile, presentFiles)
+			if err != nil {
+				apiErr = err
+				return
+			}
+		})
+		return
+	})
+	return
+}
+
+func (cmd *Push) zipAppFiles(zipFile *os.File, appDir string, uploadDir string) (zipErr error) {
+	zipErr = cmd.zipWithBetterErrors(uploadDir, zipFile)
+	if zipErr != nil {
+		return
+	}
+
+	zipFileSize, zipErr := cmd.zipper.GetZipSize(zipFile)
+	if zipErr != nil {
+		return
+	}
+
+	zipFileCount := cmd.app_files.CountFiles(uploadDir)
+
+	cmd.describeUploadOperation(appDir, zipFileSize, zipFileCount)
+	return
+}
+
+func (cmd *Push) zipWithBetterErrors(uploadDir string, zipFile *os.File) error {
+	zipError := cmd.zipper.Zip(uploadDir, zipFile)
+	switch err := zipError.(type) {
+	case nil:
+		return nil
+	case *errors.EmptyDirError:
+		zipFile = nil
+		return zipError
+	default:
+		return errors.NewWithError(T("Error zipping application"), err)
+	}
+}
+
+func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount int64) {
+	if fileCount > 0 {
+		cmd.ui.Say(T("Uploading app files from: {{.Path}}", map[string]interface{}{"Path": path}))
+		cmd.ui.Say(T("Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
+			map[string]interface{}{
+				"ZipFileBytes": formatters.ByteSize(zipFileBytes),
+				"FileCount":    fileCount}))
+	} else {
+		cmd.ui.Warn(T("None of your application files have changed. Nothing will be uploaded."))
+	}
 }

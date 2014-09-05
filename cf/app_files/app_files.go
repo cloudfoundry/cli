@@ -12,13 +12,22 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
-func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
+type AppFiles interface {
+	AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error)
+	CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err error)
+	CountFiles(directory string) int64
+	WalkAppFiles(dir string, onEachFile func(string, string) error) (err error)
+}
+
+type ApplicationFiles struct{}
+
+func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 	dir, err = filepath.Abs(dir)
 	if err != nil {
 		return
 	}
 
-	err = WalkAppFiles(dir, func(fileName string, fullPath string) (err error) {
+	err = appfiles.WalkAppFiles(dir, func(fileName string, fullPath string) (err error) {
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
 			return
@@ -47,7 +56,7 @@ func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 	return
 }
 
-func CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err error) {
+func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err error) {
 	if err != nil {
 		return
 	}
@@ -63,42 +72,16 @@ func CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err erro
 	return
 }
 
-func copyPathToPath(fromPath, toPath string) (err error) {
-	srcFileInfo, err := os.Stat(fromPath)
-	if err != nil {
-		return
-	}
-
-	if srcFileInfo.IsDir() {
-		err = os.MkdirAll(toPath, srcFileInfo.Mode())
-		if err != nil {
-			return
-		}
-	} else {
-		var dst *os.File
-		dst, err = fileutils.Create(toPath)
-		if err != nil {
-			return
-		}
-		defer dst.Close()
-
-		dst.Chmod(srcFileInfo.Mode())
-
-		err = fileutils.CopyPathToWriter(fromPath, dst)
-	}
-	return err
-}
-
-func CountFiles(directory string) int64 {
+func (appfiles ApplicationFiles) CountFiles(directory string) int64 {
 	var count int64
-	WalkAppFiles(directory, func(_, _ string) error {
+	appfiles.WalkAppFiles(directory, func(_, _ string) error {
 		count++
 		return nil
 	})
 	return count
 }
 
-func WalkAppFiles(dir string, onEachFile func(string, string) error) (err error) {
+func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string, string) error) (err error) {
 	cfIgnore := loadIgnoreFile(dir)
 	walkFunc := func(fullPath string, f os.FileInfo, inErr error) (err error) {
 		err = inErr
@@ -126,6 +109,32 @@ func WalkAppFiles(dir string, onEachFile func(string, string) error) (err error)
 
 	err = filepath.Walk(dir, walkFunc)
 	return
+}
+
+func copyPathToPath(fromPath, toPath string) (err error) {
+	srcFileInfo, err := os.Stat(fromPath)
+	if err != nil {
+		return
+	}
+
+	if srcFileInfo.IsDir() {
+		err = os.MkdirAll(toPath, srcFileInfo.Mode())
+		if err != nil {
+			return
+		}
+	} else {
+		var dst *os.File
+		dst, err = fileutils.Create(toPath)
+		if err != nil {
+			return
+		}
+		defer dst.Close()
+
+		dst.Chmod(srcFileInfo.Mode())
+
+		err = fileutils.CopyPathToWriter(fromPath, dst)
+	}
+	return err
 }
 
 func loadIgnoreFile(dir string) CfIgnore {

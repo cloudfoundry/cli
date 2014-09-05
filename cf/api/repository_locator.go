@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 
+	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
@@ -33,7 +34,7 @@ type RepositoryLocator struct {
 	quotaRepo                       quotas.CloudControllerQuotaRepository
 	spaceRepo                       spaces.CloudControllerSpaceRepository
 	appRepo                         CloudControllerApplicationRepository
-	appBitsRepo                     CloudControllerApplicationBitsRepository
+	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  CloudControllerAppSummaryRepository
 	appInstancesRepo                CloudControllerAppInstancesRepository
 	appEventsRepo                   CloudControllerAppEventsRepository
@@ -79,7 +80,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{})
 
-	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
+	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
@@ -144,7 +145,7 @@ func (locator RepositoryLocator) GetApplicationRepository() ApplicationRepositor
 	return locator.appRepo
 }
 
-func (locator RepositoryLocator) GetApplicationBitsRepository() ApplicationBitsRepository {
+func (locator RepositoryLocator) GetApplicationBitsRepository() application_bits.ApplicationBitsRepository {
 	return locator.appBitsRepo
 }
 
