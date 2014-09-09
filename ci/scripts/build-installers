@@ -12,7 +12,14 @@ echo "building windows-386 installer"
 (
     cd ${INSTALLERS_DIR}/windows
     cp ${OUT_DIR}/cf-windows-386.exe cf.exe
-    makensis install.nsi
+
+    sed -i -e "s/VERSION/${VERSION}/" ${ROOT_DIR}/ci/scripts/windows-installer.iss
+
+    # Change the Unix file path to a Windows file path for the Inno Setup script.
+    sed -i -e "s/CF_SOURCE/$(echo "z:$(pwd)/cf.exe" | sed 's,/,\\\\,g')/" ${ROOT_DIR}/ci/scripts/windows-installer.iss
+
+    iscc ${ROOT_DIR}/ci/scripts/windows-installer.iss
+    mv ${ROOT_DIR}/ci/scripts/Output/setup.exe cf_installer.exe
     zip ${ROOT_DIR}/release/installer-windows-386.zip cf_installer.exe
     rm cf_installer.exe cf.exe
 )
@@ -21,7 +28,8 @@ echo "building windows-amd64 installer"
 (
     cd ${INSTALLERS_DIR}/windows
     cp ${OUT_DIR}/cf-windows-amd64.exe cf.exe
-    makensis install.nsi
+    iscc ${ROOT_DIR}/ci/scripts/windows-installer.iss
+    mv ${ROOT_DIR}/ci/scripts/Output/setup.exe cf_installer.exe
     zip ${RELEASE_DIR}/installer-windows-amd64.zip cf_installer.exe
     rm cf_installer.exe cf.exe
 )
