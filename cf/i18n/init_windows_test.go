@@ -6,10 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/XenoPhex/jibber_jabber"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	"github.com/pivotal-cf-experimental/jibber_jabber"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
