@@ -83,8 +83,31 @@ var _ = Describe("quotas command", func() {
 					[]string{"OK"},
 					[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans"},
 					[]string{"quota-name", "1G", "512M", "111", "222", "allowed"},
-					[]string{"quota-non-basic-not-allowed", "434M", "-1 ", "1", "2", "disallowed"},
+					[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed"},
 				))
+			})
+			Context("when services are unlimited", func() {
+				BeforeEach(func() {
+					quotaRepo.FindByOrgReturns([]models.SpaceQuota{
+						models.SpaceQuota{
+							Name:                    "quota-non-basic-not-allowed",
+							MemoryLimit:             434,
+							InstanceMemoryLimit:     57,
+							RoutesLimit:             1,
+							ServicesLimit:           -1,
+							NonBasicServicesAllowed: false,
+							OrgGuid:                 "my-org-guid",
+						},
+					}, nil)
+				})
+				It("replaces -1 with unlimited", func() {
+					Expect(quotaRepo.FindByOrgArgsForCall(0)).To(Equal("my-org-guid"))
+					Expect(ui.Outputs).To(ContainSubstrings(
+
+						[]string{"quota-non-basic-not-allowed", "434M", "57M ", "1", "unlimited", "disallowed"},
+					))
+				})
+
 			})
 		})
 
