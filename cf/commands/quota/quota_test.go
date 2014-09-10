@@ -102,9 +102,37 @@ var _ = Describe("quota", func() {
 						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
 						[]string{"OK"},
 						[]string{"Total Memory", "512M"},
-						[]string{"Instance Memory", "-1 "},
+						[]string{"Instance Memory", "unlimited"},
 						[]string{"Routes", "2000"},
 						[]string{"Services", "47"},
+						[]string{"Paid service plans", "allowed"},
+					))
+				})
+			})
+
+			Context("when the services limit is -1", func() {
+				BeforeEach(func() {
+					quotaRepo.FindByNameReturns(models.QuotaFields{
+						Guid:                    "my-quota-guid",
+						Name:                    "muh-muh-muh-my-qua-quota",
+						MemoryLimit:             512,
+						InstanceMemoryLimit:     14,
+						RoutesLimit:             2000,
+						ServicesLimit:           -1,
+						NonBasicServicesAllowed: true,
+					}, nil)
+				})
+
+				It("shows you that quota", func() {
+					runCommand("muh-muh-muh-my-qua-quota")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
+						[]string{"OK"},
+						[]string{"Total Memory", "512M"},
+						[]string{"Instance Memory", "14M"},
+						[]string{"Routes", "2000"},
+						[]string{"Services", "unlimited"},
 						[]string{"Paid service plans", "allowed"},
 					))
 				})
