@@ -3,6 +3,7 @@ package quota
 import (
 	"fmt"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -59,9 +60,14 @@ func (cmd *ListQuotas) Run(c *cli.Context) {
 	var megabytes string
 	for _, quota := range quotas {
 		if quota.InstanceMemoryLimit == -1 {
-			megabytes = "-1"
+			megabytes = T("unlimited")
 		} else {
 			megabytes = formatters.ByteSize(quota.InstanceMemoryLimit * formatters.MEGABYTE)
+		}
+
+		servicesLimit := strconv.Itoa(quota.ServicesLimit)
+		if quota.ServicesLimit == -1 {
+			servicesLimit = T("unlimited")
 		}
 
 		table.Add(
@@ -69,7 +75,7 @@ func (cmd *ListQuotas) Run(c *cli.Context) {
 			formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE),
 			megabytes,
 			fmt.Sprintf("%d", quota.RoutesLimit),
-			fmt.Sprintf("%d", quota.ServicesLimit),
+			fmt.Sprintf(servicesLimit),
 			formatters.Allowed(quota.NonBasicServicesAllowed),
 		)
 	}
