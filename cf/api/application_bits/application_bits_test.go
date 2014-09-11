@@ -289,7 +289,7 @@ var defaultZipCheck = func(zipReader *zip.Reader) {
 
 	var expectedPermissionBits os.FileMode
 	if runtime.GOOS == "windows" {
-		expectedPermissionBits = 0666
+		expectedPermissionBits = 0000
 	} else {
 		expectedPermissionBits = 0755
 	}
