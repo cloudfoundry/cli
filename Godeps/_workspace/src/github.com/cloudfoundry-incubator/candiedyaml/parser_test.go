@@ -15,11 +15,12 @@ limitations under the License.
 package candiedyaml
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var parses = func(filename string) {
@@ -63,7 +64,10 @@ var parses = func(filename string) {
 
 var parseYamls = func(dirname string) {
 	fileInfos, err := ioutil.ReadDir(dirname)
-	Ω(err).To(BeNil())
+	if err != nil {
+		panic(err.Error())
+	}
+
 	for _, fileInfo := range fileInfos {
 		if !fileInfo.IsDir() {
 			parses(filepath.Join(dirname, fileInfo.Name()))

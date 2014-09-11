@@ -84,7 +84,7 @@ func BeClosed() types.GomegaMatcher {
 //
 //- If there is nothing on the channel `c` then Ω(c).Should(Receive()) will fail and Ω(c).ShouldNot(Receive()) will pass.
 //
-//- If the channel `c` is closed then *both* Ω(c).Should(Receive()) and Ω(c).ShouldNot(Receive()) will error.
+//- If the channel `c` is closed then Ω(c).Should(Receive()) will fail and Ω(c).ShouldNot(Receive()) will pass.
 //
 //- If there is something on the channel `c` ready to be read, then Ω(c).Should(Receive()) will pass and Ω(c).ShouldNot(Receive()) will fail.
 //
@@ -157,6 +157,26 @@ func MatchRegexp(regexp string, args ...interface{}) types.GomegaMatcher {
 func ContainSubstring(substr string, args ...interface{}) types.GomegaMatcher {
 	return &matchers.ContainSubstringMatcher{
 		Substr: substr,
+		Args:   args,
+	}
+}
+
+//HavePrefix succeeds if actual is a string or stringer that contains the
+//passed-in string as a prefix.  Optional arguments can be provided to construct
+//via fmt.Sprintf().
+func HavePrefix(prefix string, args ...interface{}) types.GomegaMatcher {
+	return &matchers.HavePrefixMatcher{
+		Prefix: prefix,
+		Args:   args,
+	}
+}
+
+//HaveSuffix succeeds if actual is a string or stringer that contains the
+//passed-in string as a suffix.  Optional arguments can be provided to construct
+//via fmt.Sprintf().
+func HaveSuffix(suffix string, args ...interface{}) types.GomegaMatcher {
+	return &matchers.HaveSuffixMatcher{
+		Suffix: suffix,
 		Args:   args,
 	}
 }

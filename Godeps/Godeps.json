@@ -7,8 +7,8 @@
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go.crypto/ssh/terminal",
-			"Comment": "null-218",
-			"Rev": "f3cebac2bd11c2bf03c15bfa4c66688ad02a0a40"
+			"Comment": "null-221",
+			"Rev": "6e881b5273dfffbadb6a76a61d3c39a71e3588d1"
 		},
 		{
 			"ImportPath": "code.google.com/p/go.net/websocket",
@@ -21,7 +21,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "6579ea507a2f30532e97c1de18b6907fc6262b43"
+			"Rev": "f1eaf927056e1b069eae3c47444f4b420b238277"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
@@ -33,38 +33,38 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
-			"Rev": "b8f5328b834053bf1f29afa2984265ff6867863e"
+			"Rev": "b252010e87446bf4d53c8da24440e2ab7d162346"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/signature",
-			"Rev": "b8f5328b834053bf1f29afa2984265ff6867863e"
+			"Rev": "b252010e87446bf4d53c8da24440e2ab7d162346"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "1.2.0-22-g687db20",
-			"Rev": "687db20fc379d1686465a28e9959707cd1acc990"
+			"Comment": "1.2.0-24-g7381bc4",
+			"Rev": "7381bc4e62942763475703c7edd405f1e42adf4f"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "4292df70df546334d4174bcd77271253c9b7835c"
+			"Rev": "a6f041ac33b84488bb44137d6866cd3c8706d792"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
-			"Rev": "bdaf3a82d0f3862d7894131c1d30a6f3eed5f9ba"
+			"Rev": "fdd9ce0eff0447ddec6b10625512f49a726418c1"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.1.0-3-gd79a7e7",
-			"Rev": "d79a7e77e6d3738a0e83e9f6564a1aa1dfcbfeaa"
+			"Comment": "v1.1.0-11-ge809316",
+			"Rev": "e8093161dcbdab0a59dfe56f3f8c867d243ac75f"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Comment": "v1.0",
-			"Rev": "a78ae492d53aad5a7a232d0d0462c14c400e3ee7"
+			"Comment": "v1.0-12-g3ca2515",
+			"Rev": "3ca2515afb00bc39bc77d27cdbce85a7caaf103e"
 		},
 		{
 			"ImportPath": "github.com/pivotal-cf-experimental/jibber_jabber",
-			"Rev": "4f063ae5c2cae7f3444c8b16af0f9f5e4323b31b"
+			"Rev": "fda28dabd83da1c20091644e3d196d29348c763d"
 		}
 	]
 }
