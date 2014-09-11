@@ -26,6 +26,11 @@ import (
 
 const GOMEGA_VERSION = "1.0"
 
+const nilFailHandlerPanic = `You are trying to make an assertion, but Gomega's fail handler is nil.
+If you're using Ginkgo then you probably forgot to put your assertion in an It().
+Alternatively, you may have forgotten to register a fail handler with RegisterFailHandler() or RegisterTestingT().
+`
+
 var globalFailHandler types.GomegaFailHandler
 
 var defaultEventuallyTimeout = time.Second
@@ -130,6 +135,9 @@ func Expect(actual interface{}, extra ...interface{}) GomegaAssertion {
 //error message to refer to the calling line in the test (as opposed to the line in the helper function)
 //set the first argument of `ExpectWithOffset` appropriately.
 func ExpectWithOffset(offset int, actual interface{}, extra ...interface{}) GomegaAssertion {
+	if globalFailHandler == nil {
+		panic(nilFailHandlerPanic)
+	}
 	return assertion.New(actual, globalFailHandler, offset, extra...)
 }
 
@@ -177,6 +185,9 @@ func Eventually(actual interface{}, intervals ...interface{}) GomegaAsyncAsserti
 //initial argument to indicate an offset in the call stack.  This is useful when building helper
 //functions that contain matchers.  To learn more, read about `ExpectWithOffset`.
 func EventuallyWithOffset(offset int, actual interface{}, intervals ...interface{}) GomegaAsyncAssertion {
+	if globalFailHandler == nil {
+		panic(nilFailHandlerPanic)
+	}
 	timeoutInterval := defaultEventuallyTimeout
 	pollingInterval := defaultEventuallyPollingInterval
 	if len(intervals) > 0 {
@@ -219,6 +230,9 @@ func Consistently(actual interface{}, intervals ...interface{}) GomegaAsyncAsser
 //initial argument to indicate an offset in the call stack.  This is useful when building helper
 //functions that contain matchers.  To learn more, read about `ExpectWithOffset`.
 func ConsistentlyWithOffset(offset int, actual interface{}, intervals ...interface{}) GomegaAsyncAssertion {
+	if globalFailHandler == nil {
+		panic(nilFailHandlerPanic)
+	}
 	timeoutInterval := defaultConsistentlyDuration
 	pollingInterval := defaultConsistentlyPollingInterval
 	if len(intervals) > 0 {

@@ -1,19 +1,19 @@
 {
 	"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-	"GoVersion": "go1.3",
+	"GoVersion": "go1.3.1",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.1.0-3-gd79a7e7",
-			"Rev": "d79a7e77e6d3738a0e83e9f6564a1aa1dfcbfeaa"
+			"Comment": "v1.1.0-11-ge809316",
+			"Rev": "e8093161dcbdab0a59dfe56f3f8c867d243ac75f"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Comment": "v1.0",
-			"Rev": "a78ae492d53aad5a7a232d0d0462c14c400e3ee7"
+			"Comment": "v1.0-4-gc9914be",
+			"Rev": "c9914bed6a0c5fd914a6d3ca57c59c5935a5cfd0"
 		}
 	]
 }

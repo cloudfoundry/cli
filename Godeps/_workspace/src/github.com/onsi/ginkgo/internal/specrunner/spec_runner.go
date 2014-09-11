@@ -109,7 +109,7 @@ func (runner *SpecRunner) runSpecs() bool {
 
 		if !spec.Skipped() && !spec.Pending() {
 			runner.runningSpec = spec
-			spec.Run()
+			spec.Run(runner.writer)
 			runner.runningSpec = nil
 			if spec.Failed() {
 				suiteFailed = true
@@ -144,8 +144,16 @@ func (runner *SpecRunner) registerForInterrupts() {
 	signal.Stop(c)
 	runner.markInterrupted()
 	go runner.registerForHardInterrupts()
+	runner.writer.DumpOutWithHeader(`
+Received interrupt.  Emitting contents of GinkgoWriter...
+---------------------------------------------------------
+`)
 	if runner.afterSuiteNode != nil {
-		fmt.Fprintln(os.Stderr, "\nReceived interrupt.  Running AfterSuite...\n^C again to terminate immediately")
+		fmt.Fprint(os.Stderr, `
+---------------------------------------------------------
+Received interrupt.  Running AfterSuite...
+^C again to terminate immediately
+`)
 		runner.runAfterSuite()
 	}
 	runner.reportSuiteDidEnd(false)
