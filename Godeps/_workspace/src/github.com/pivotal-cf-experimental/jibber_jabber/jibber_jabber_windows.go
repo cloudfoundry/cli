@@ -51,8 +51,8 @@ func getAllWindowsLocaleFrom(sysCall string) (string, error) {
 		return "", err
 	}
 
-	r, locale, dllError := proc.Call()
-	if r == 0 {
+	locale, _, dllError := proc.Call()
+	if locale == 0 {
 		return "", errors.New(COULD_NOT_DETECT_PACKAGE_ERROR_MESSAGE + ":\n" + dllError.Error())
 	}
 
