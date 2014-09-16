@@ -92,7 +92,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		one := 1
 		two := 2
-		Expect(buildpacks).To(Equal([]models.Buildpack{
+		Expect(buildpacks).To(ConsistOf([]models.Buildpack{
 			{
 				Guid:     "buildpack1-guid",
 				Name:     "Buildpack1",

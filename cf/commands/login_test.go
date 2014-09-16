@@ -281,7 +281,7 @@ var _ = Describe("Login Command", func() {
 
 			Context("when the user does not provide the --sso flag", func() {
 				It("prompts the user for 'password' prompt and any text type prompt", func() {
-					ui.Inputs = []string{"api.example.com", "the-account-number", "the-username", "the-password"}
+					ui.Inputs = []string{"api.example.com", "the-username", "the-account-number", "the-password"}
 
 					l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 					testcmd.RunCommand(l, Flags, nil)
@@ -326,7 +326,7 @@ var _ = Describe("Login Command", func() {
 
 			It("takes the password from the -p flag", func() {
 				Flags = []string{"-p", "the-password"}
-				ui.Inputs = []string{"api.example.com", "the-account-number", "the-username", "the-pin"}
+				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number", "the-pin"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, Flags, nil)
@@ -343,7 +343,7 @@ var _ = Describe("Login Command", func() {
 
 			It("tries 3 times for the password-type prompts", func() {
 				authRepo.AuthError = true
-				ui.Inputs = []string{"api.example.com", "the-account-number", "the-username",
+				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number",
 					"the-password-1", "the-password-2", "the-password-3"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
@@ -375,7 +375,7 @@ var _ = Describe("Login Command", func() {
 
 				Flags = []string{"-p", "the-password-1"}
 
-				ui.Inputs = []string{"api.example.com", "the-account-number", "the-username",
+				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number",
 					"the-password-2", "the-password-3"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)

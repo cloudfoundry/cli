@@ -158,6 +158,15 @@ func (cmd Login) authenticate(c *cli.Context) {
 	}
 	passwordKeys := []string{}
 	credentials := make(map[string]string)
+
+	if value, ok := prompts["username"]; ok {
+		if prompts["username"].Type == configuration.AuthPromptTypeText && usernameFlagValue != "" {
+			credentials["username"] = usernameFlagValue
+		} else {
+			credentials["username"] = cmd.ui.Ask("%s", value.DisplayName)
+		}
+	}
+
 	for key, prompt := range prompts {
 		if prompt.Type == configuration.AuthPromptTypePassword {
 			if key == "passcode" {
@@ -165,8 +174,8 @@ func (cmd Login) authenticate(c *cli.Context) {
 			}
 
 			passwordKeys = append(passwordKeys, key)
-		} else if key == "username" && usernameFlagValue != "" {
-			credentials[key] = usernameFlagValue
+		} else if key == "username" {
+			continue
 		} else {
 			credentials[key] = cmd.ui.Ask("%s", prompt.DisplayName)
 		}

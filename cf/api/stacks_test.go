@@ -150,7 +150,7 @@ var _ = Describe("StacksRepo", func() {
 
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
-			Expect(stacks).To(Equal([]models.Stack{
+			Expect(stacks).To(ConsistOf([]models.Stack{
 				{
 					Guid:        "stack-guid-1",
 					Name:        "lucid64",
