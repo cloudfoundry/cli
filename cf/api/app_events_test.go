@@ -52,7 +52,7 @@ var _ = Describe("App Events Repo", func() {
 			list, err := repo.RecentEvents("my-app-guid", 2)
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(list).To(Equal([]models.EventFields{
+			Expect(list).To(ConsistOf([]models.EventFields{
 				models.EventFields{
 					Guid:        "event-1-guid",
 					Name:        "audit.app.update",

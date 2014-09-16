@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"reflect"
+	//"reflect"
 	"strings"
 
 	"github.com/onsi/ginkgo"
@@ -37,12 +37,33 @@ func (h *TestHandler) AllRequestsCalled() bool {
 }
 
 func urlQueryContains(container, containee url.Values) bool {
-	for key, value := range containee {
-		actualValue, ok := container[key]
-		if !ok || !reflect.DeepEqual(actualValue, value) {
+	//Cloud Controller often uses "q" as a container for search queries, which may be semantically
+	//equivalent to CC but be actually different strings.
+
+	//Example: "foo:bar;baz:qux" is semantically the same as "baz:qux;foo:bar". CC doesn't care about order.
+
+	//Therefore, we crack apart "q" params on their seperator (a colon) and compare the resulting
+	//substrings.  Everything else is just a straight string comparison.
+	containerValues := strings.Split(container.Get("q"), ";")
+	containeeValues := strings.Split(containee.Get("q"), ";")
+
+	allValuesFound := make([]bool, len(containeeValues))
+
+	for index, expected := range containeeValues {
+		for _, actual := range containerValues {
+			if expected == actual {
+				allValuesFound[index] = true
+				break
+			}
+		}
+	}
+
+	for _, ok := range allValuesFound {
+		if !ok {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -71,6 +92,7 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(paths) > 1 {
 		actualValues, _ := url.ParseQuery(r.URL.RawQuery)
 		expectedValues, _ := url.ParseQuery(paths[1])
+
 		if !urlQueryContains(actualValues, expectedValues) {
 			h.logError("Query string does not match.\nExpected: %s\nActual:   %s", paths[1], r.URL.RawQuery)
 		}

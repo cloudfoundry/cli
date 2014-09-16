@@ -106,7 +106,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
-			Expect(defaults).To(Equal([]models.SecurityGroupFields{
+			Expect(defaults).To(ConsistOf([]models.SecurityGroupFields{
 				{
 					Name: "name-71",
 					Guid: "cd186158-b356-474d-9861-724f34f48502",

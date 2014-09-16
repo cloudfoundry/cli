@@ -51,7 +51,8 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
-			Expect(envVars).To(Equal([]models.EnvironmentVariable{
+
+			Expect(envVars).To(ConsistOf([]models.EnvironmentVariable{
 				models.EnvironmentVariable{Name: "abc", Value: "123"},
 				models.EnvironmentVariable{Name: "do-re-mi", Value: "fa-sol-la-ti"},
 			}))
@@ -68,7 +69,7 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
-			Expect(envVars).To(Equal([]models.EnvironmentVariable{
+			Expect(envVars).To(ConsistOf([]models.EnvironmentVariable{
 				models.EnvironmentVariable{Name: "abc", Value: "123"},
 				models.EnvironmentVariable{Name: "do-re-mi", Value: "fa-sol-la-ti"},
 			}))
