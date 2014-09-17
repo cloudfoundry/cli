@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	//"reflect"
 	"strings"
 
 	"github.com/onsi/ginkgo"
@@ -43,24 +42,27 @@ func urlQueryContains(container, containee url.Values) bool {
 	//Example: "foo:bar;baz:qux" is semantically the same as "baz:qux;foo:bar". CC doesn't care about order.
 
 	//Therefore, we crack apart "q" params on their seperator (a colon) and compare the resulting
-	//substrings.  Everything else is just a straight string comparison.
-	containerValues := strings.Split(container.Get("q"), ";")
-	containeeValues := strings.Split(containee.Get("q"), ";")
+	//substrings.  No other params seem to use semicolon separators AND are order-dependent, so we just
+	//run all params through the same process.
+	for key, _ := range containee {
 
-	allValuesFound := make([]bool, len(containeeValues))
+		containerValues := strings.Split(container.Get(key), ";")
+		containeeValues := strings.Split(containee.Get(key), ";")
 
-	for index, expected := range containeeValues {
-		for _, actual := range containerValues {
-			if expected == actual {
-				allValuesFound[index] = true
-				break
+		allValuesFound := make([]bool, len(containeeValues))
+
+		for index, expected := range containeeValues {
+			for _, actual := range containerValues {
+				if expected == actual {
+					allValuesFound[index] = true
+					break
+				}
 			}
 		}
-	}
-
-	for _, ok := range allValuesFound {
-		if !ok {
-			return false
+		for _, ok := range allValuesFound {
+			if !ok {
+				return false
+			}
 		}
 	}
 
