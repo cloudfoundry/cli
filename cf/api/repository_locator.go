@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 
+	"github.com/cloudfoundry/cli/cf/api/app_events"
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
@@ -37,7 +38,7 @@ type RepositoryLocator struct {
 	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  CloudControllerAppSummaryRepository
 	appInstancesRepo                CloudControllerAppInstancesRepository
-	appEventsRepo                   CloudControllerAppEventsRepository
+	appEventsRepo                   app_events.CloudControllerAppEventsRepository
 	appFilesRepo                    CloudControllerAppFilesRepository
 	domainRepo                      CloudControllerDomainRepository
 	routeRepo                       CloudControllerRouteRepository
@@ -81,7 +82,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{})
 
 	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
-	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
+	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
@@ -157,7 +158,7 @@ func (locator RepositoryLocator) GetAppInstancesRepository() AppInstancesReposit
 	return locator.appInstancesRepo
 }
 
-func (locator RepositoryLocator) GetAppEventsRepository() AppEventsRepository {
+func (locator RepositoryLocator) GetAppEventsRepository() app_events.AppEventsRepository {
 	return locator.appEventsRepo
 }
 
