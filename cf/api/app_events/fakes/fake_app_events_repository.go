@@ -2,6 +2,8 @@
 package fakes
 
 import (
+	. "github.com/cloudfoundry/cli/cf/api/app_events"
+
 	"github.com/cloudfoundry/cli/cf/models"
 	"sync"
 )
@@ -10,8 +12,8 @@ type FakeAppEventsRepository struct {
 	RecentEventsStub        func(appGuid string, limit int64) ([]models.EventFields, error)
 	recentEventsMutex       sync.RWMutex
 	recentEventsArgsForCall []struct {
-		arg1 string
-		arg2 int64
+		appGuid string
+		limit   int64
 	}
 	recentEventsReturns struct {
 		result1 []models.EventFields
@@ -19,15 +21,15 @@ type FakeAppEventsRepository struct {
 	}
 }
 
-func (fake *FakeAppEventsRepository) RecentEvents(arg1 string, arg2 int64) ([]models.EventFields, error) {
+func (fake *FakeAppEventsRepository) RecentEvents(appGuid string, limit int64) ([]models.EventFields, error) {
 	fake.recentEventsMutex.Lock()
 	defer fake.recentEventsMutex.Unlock()
 	fake.recentEventsArgsForCall = append(fake.recentEventsArgsForCall, struct {
-		arg1 string
-		arg2 int64
-	}{arg1, arg2})
+		appGuid string
+		limit   int64
+	}{appGuid, limit})
 	if fake.RecentEventsStub != nil {
-		return fake.RecentEventsStub(arg1, arg2)
+		return fake.RecentEventsStub(appGuid, limit)
 	} else {
 		return fake.recentEventsReturns.result1, fake.recentEventsReturns.result2
 	}
@@ -42,7 +44,7 @@ func (fake *FakeAppEventsRepository) RecentEventsCallCount() int {
 func (fake *FakeAppEventsRepository) RecentEventsArgsForCall(i int) (string, int64) {
 	fake.recentEventsMutex.RLock()
 	defer fake.recentEventsMutex.RUnlock()
-	return fake.recentEventsArgsForCall[i].arg1, fake.recentEventsArgsForCall[i].arg2
+	return fake.recentEventsArgsForCall[i].appGuid, fake.recentEventsArgsForCall[i].limit
 }
 
 func (fake *FakeAppEventsRepository) RecentEventsReturns(result1 []models.EventFields, result2 error) {
@@ -51,3 +53,5 @@ func (fake *FakeAppEventsRepository) RecentEventsReturns(result1 []models.EventF
 		result2 error
 	}{result1, result2}
 }
+
+var _ AppEventsRepository = new(FakeAppEventsRepository)
