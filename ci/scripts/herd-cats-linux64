@@ -19,7 +19,7 @@ export PATH=$PATH:$CATSPATH
 cd $CATSPATH
 export CONFIG=$CATSPATH/config.json
 git checkout aac443fbc138465486bc04580487bd237b1c7691
-git pull
+#git pull
 
 local_gopath=$CATSPATH/Godeps/_workspace
 
