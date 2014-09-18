@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 	"time"
@@ -74,15 +75,32 @@ func main() {
 	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
 
-	err := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...).Run(os.Args)
-	if err != nil {
-		os.Exit(1)
+	theApp := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
+	if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
+		err := theApp.Run(os.Args)
+		if err != nil {
+			os.Exit(1)
+		}
+		gateways := gatewaySliceFromMap(deps.gateways)
+
+		warningsCollector := net.NewWarningsCollector(deps.termUI, gateways...)
+		warningsCollector.PrintWarnings()
+	} else {
+		location := deps.configRepo.Plugins()[os.Args[1]]
+		if location != "" {
+			println("localtion: ", location)
+			cmd := exec.Command("go", "run", location)
+			cmd.Stdout = os.Stdout
+			err := cmd.Start()
+			if err != nil {
+				fmt.Println("Error running plugin command: ", err)
+				os.Exit(1)
+			}
+			cmd.Wait()
+		} else {
+			theApp.Run(os.Args)
+		}
 	}
-
-	gateways := gatewaySliceFromMap(deps.gateways)
-
-	warningsCollector := net.NewWarningsCollector(deps.termUI, gateways...)
-	warningsCollector.PrintWarnings()
 }
 
 func gatewaySliceFromMap(gateway_map map[string]net.Gateway) []net.WarningProducer {

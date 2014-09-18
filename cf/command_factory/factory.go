@@ -39,6 +39,7 @@ import (
 type Factory interface {
 	GetByCmdName(cmdName string) (cmd command.Command, err error)
 	CommandMetadatas() []command_metadata.CommandMetadata
+	CheckIfCoreCmdExists(cmdName string) bool
 }
 
 type concreteFactory struct {
@@ -273,6 +274,11 @@ func (f concreteFactory) GetByCmdName(cmdName string) (cmd command.Command, err 
 		err = errors.New(T("Command not found"))
 	}
 	return
+}
+
+func (f concreteFactory) CheckIfCoreCmdExists(cmdName string) bool {
+	_, found := f.cmdsByName[cmdName]
+	return found
 }
 
 func (factory concreteFactory) CommandMetadatas() (commands []command_metadata.CommandMetadata) {

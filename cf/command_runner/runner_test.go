@@ -22,6 +22,10 @@ func (f *TestCommandFactory) GetByCmdName(cmdName string) (cmd command.Command, 
 	return
 }
 
+func (f *TestCommandFactory) CheckIfCoreCmdExists(cmdName string) bool {
+	return true
+}
+
 func (fake *TestCommandFactory) CommandMetadatas() []command_metadata.CommandMetadata {
 	return []command_metadata.CommandMetadata{}
 }
