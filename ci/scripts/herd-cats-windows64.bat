@@ -15,7 +15,7 @@ bitsadmin.exe /transfer "DownloadStableCLI" https://s3.amazonaws.com/go-cli/buil
 SET PATH=%PATH%;%CATSPATH%;C:\Program Files\cURL\bin
 
 cd %CATSPATH%
-git checkout master
+git checkout aac443fbc138465486bc04580487bd237b1c7691
 git pull
 SET CONFIG=%CATSPATH%\config.json
 
