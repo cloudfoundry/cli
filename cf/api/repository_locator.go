@@ -20,6 +20,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 
+	api_app_files "github.com/cloudfoundry/cli/cf/api/app_files"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -39,7 +40,7 @@ type RepositoryLocator struct {
 	appSummaryRepo                  CloudControllerAppSummaryRepository
 	appInstancesRepo                CloudControllerAppInstancesRepository
 	appEventsRepo                   app_events.CloudControllerAppEventsRepository
-	appFilesRepo                    CloudControllerAppFilesRepository
+	appFilesRepo                    api_app_files.CloudControllerAppFilesRepository
 	domainRepo                      CloudControllerDomainRepository
 	routeRepo                       CloudControllerRouteRepository
 	stackRepo                       CloudControllerStackRepository
@@ -83,7 +84,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 
 	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
-	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
+	loc.appFilesRepo = api_app_files.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
 	loc.appInstancesRepo = NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
@@ -162,7 +163,7 @@ func (locator RepositoryLocator) GetAppEventsRepository() app_events.AppEventsRe
 	return locator.appEventsRepo
 }
 
-func (locator RepositoryLocator) GetAppFilesRepository() AppFilesRepository {
+func (locator RepositoryLocator) GetAppFilesRepository() api_app_files.AppFilesRepository {
 	return locator.appFilesRepo
 }
 
