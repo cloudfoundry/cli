@@ -1,4 +1,4 @@
-package api
+package app_files
 
 import (
 	"fmt"

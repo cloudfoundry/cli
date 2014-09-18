@@ -1,4 +1,4 @@
-package api_test
+package app_files_test
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
-	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/cf/api/app_files"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -1,7 +1,7 @@
 package application_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	testappfiles "github.com/cloudfoundry/cli/cf/api/app_files/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,13 +20,13 @@ var _ = Describe("files command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          configuration.ReadWriter
 		requirementsFactory *testreq.FakeReqFactory
-		appFilesRepo        *testapi.FakeAppFilesRepo
+		appFilesRepo        *testappfiles.FakeAppFilesRepository
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		appFilesRepo = &testapi.FakeAppFilesRepo{}
+		appFilesRepo = &testappfiles.FakeAppFilesRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
@@ -65,7 +65,7 @@ var _ = Describe("files command", func() {
 			requirementsFactory.Application = app
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
-			appFilesRepo.FileList = "file 1\nfile 2"
+			appFilesRepo.ListFilesReturns("file 1\nfile 2", nil)
 		})
 
 		It("it lists files in a directory", func() {
@@ -78,12 +78,13 @@ var _ = Describe("files command", func() {
 				[]string{"file 2"},
 			))
 
-			Expect(appFilesRepo.AppGuid).To(Equal("my-app-guid"))
-			Expect(appFilesRepo.Path).To(Equal("/foo"))
+			guid, _, path := appFilesRepo.ListFilesArgsForCall(0)
+			Expect(guid).To(Equal("my-app-guid"))
+			Expect(path).To(Equal("/foo"))
 		})
 
 		It("does not interpolate or interpret special format characters as though it should be a format string", func() {
-			appFilesRepo.FileList = "%s %d %i"
+			appFilesRepo.ListFilesReturns("%s %d %i", nil)
 			runCommand("my-app", "/foo")
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"%s %d %i"}))
