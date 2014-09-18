@@ -72,4 +72,28 @@ var _ = Describe("factory", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 	})
+	Describe("GetByCmdName", func() {
+		It("returns the cmd if it exists", func() {
+			cmd, err := factory.GetByCmdName("push")
+			Expect(cmd).ToNot(BeNil())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("returns an error if it does not exist", func() {
+			cmd, err := factory.GetByCmdName("FOOBARRRRR")
+			Expect(cmd).To(BeNil())
+			Expect(err).To(HaveOccurred())
+		})
+	})
+	Describe("CheckIfCoreCmdExists", func() {
+		It("returns true if the cmd exists", func() {
+			exists := factory.CheckIfCoreCmdExists("push")
+			Expect(exists).To(BeTrue())
+		})
+
+		It("returns an error if it does not exist", func() {
+			exists := factory.CheckIfCoreCmdExists("FOOOOBARRRR")
+			Expect(exists).To(BeFalse())
+		})
+	})
 })

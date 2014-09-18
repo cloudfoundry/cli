@@ -1,7 +1,9 @@
 package main_test
 
 import (
+	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -15,17 +17,51 @@ func TestIntegration(t *testing.T) {
 	RunSpecs(t, "CLI Integration")
 }
 
-var _ = Describe("exit codes", func() {
-	It("exits non-zero when an unknown command is invoked", func() {
-		result := Cf("some-command-that-should-never-actually-be-a-real-thing-i-can-use")
+var _ = Describe("main", func() {
+	Describe("exit codes", func() {
+		It("exits non-zero when an unknown command is invoked", func() {
+			result := Cf("some-command-that-should-never-actually-be-a-real-thing-i-can-use")
 
-		Eventually(result).Should(Say("not a registered command"))
-		Eventually(result).Should(Exit(1))
+			Eventually(result).Should(Say("not a registered command"))
+			Eventually(result).Should(Exit(1))
+		})
+
+		It("exits non-zero when known command is invoked with invalid option", func() {
+			result := Cf("push", "--crazy")
+			Eventually(result).Should(Exit(1))
+		})
 	})
 
-	It("exits non-zero when known command is invoked with invalid option", func() {
-		result := Cf("push", "--crazy")
-		Eventually(result).Should(Exit(1))
+	Describe("Plugins", func() {
+		var (
+			old_CF_HOME string
+		)
+
+		BeforeEach(func() {
+			old_CF_HOME = os.Getenv("CF_HOME")
+
+			dir, err := os.Getwd()
+			Expect(err).NotTo(HaveOccurred())
+
+			fullDir := filepath.Join(dir, "..", "fixtures", "config", "plugin-config")
+			err = os.Setenv("CF_HOME", fullDir)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			err := os.Setenv("CF_HOME", old_CF_HOME)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("Can call a executable from the Plugins configuration if it does not exist as a cf command", func() {
+			output := Cf("valid-plugin")
+			Eventually(output.Out).Should(Say("HaHaHaHa you called the push plugin"))
+		})
+
+		It("Calls core cf command if the plugin shares the same name", func() {
+			output := Cf("help")
+			Eventually(output.Out).ShouldNot(Say("HaHaHaHa you called the push plugin"))
+		})
 	})
 })
 

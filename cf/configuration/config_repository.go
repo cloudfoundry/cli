@@ -55,6 +55,8 @@ type Reader interface {
 	ColorEnabled() string
 
 	Locale() string
+
+	Plugins() map[string]string
 }
 
 type ReadWriter interface {
@@ -267,6 +269,13 @@ func (c *configRepository) ColorEnabled() (enabled string) {
 func (c *configRepository) Locale() (locale string) {
 	c.read(func() {
 		locale = c.data.Locale
+	})
+	return
+}
+
+func (c *configRepository) Plugins() (plugins map[string]string) {
+	c.read(func() {
+		plugins = c.data.Plugins
 	})
 	return
 }

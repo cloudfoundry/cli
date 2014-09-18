@@ -38,7 +38,11 @@ var exampleJSON = `
 	"AsyncTimeout": 1000,
 	"Trace": "path/to/some/file",
 	"ColorEnabled": "true",
-	"Locale": "fr_FR"
+	"Locale": "fr_FR",
+  "Plugins":{
+          "plugin-1":"/foo/bar",
+          "plugin-2":"/the/second/location"
+   }
 }`
 
 var exampleConfig = &Data{
@@ -62,6 +66,7 @@ var exampleConfig = &Data{
 	AsyncTimeout: 1000,
 	ColorEnabled: "true",
 	Locale:       "fr_FR",
+	Plugins:      map[string]string{"plugin-1": "/foo/bar", "plugin-2": "/the/second/location"},
 }
 
 var _ = Describe("V3 Config files", func() {

@@ -22,6 +22,7 @@ type configJsonV3 struct {
 	Trace                 string
 	ColorEnabled          string // need to be able to express true, false and undefined
 	Locale                string
+	Plugins               map[string]string
 }
 
 func JsonMarshalV3(config *Data) (output []byte, err error) {
@@ -41,6 +42,7 @@ func JsonMarshalV3(config *Data) (output []byte, err error) {
 		AsyncTimeout:          config.AsyncTimeout,
 		ColorEnabled:          config.ColorEnabled,
 		Locale:                config.Locale,
+		Plugins:               config.Plugins,
 	}, "", "  ")
 }
 
@@ -70,6 +72,7 @@ func JsonUnmarshalV3(input []byte, config *Data) (err error) {
 	config.Trace = configJson.Trace
 	config.ColorEnabled = configJson.ColorEnabled
 	config.Locale = configJson.Locale
+	config.Plugins = configJson.Plugins
 
 	return
 }
