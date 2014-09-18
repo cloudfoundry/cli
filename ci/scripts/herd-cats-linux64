@@ -1,16 +1,11 @@
 #!/usr/bin/env bash
 
-export CONFIG_DIR=`pwd`
-
 set -e
 
 export CF_RAISE_ERROR_ON_WARNINGS=true
 
 export GOPATH=~/go
 rm -rf $GOPATH/pkg/*
-
-rm -f config.json
-$(dirname $0)/create-cats-config
 
 go get -d github.com/cloudfoundry/cf-acceptance-tests/
 export CATSPATH=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
@@ -35,7 +30,4 @@ export PATH=$local_gopath/bin:$PATH
 
 go install -v github.com/onsi/ginkgo/ginkgo
 echo "CATS STRAPPED WITH GATS"
-rm -f *.json
-cp $CONFIG_DIR/config.json unix-cats.json
-export CONFIG=`pwd`/unix-cats.json
 ginkgo -r -slowSpecThreshold=120 -skipPackage=diego -skip="Can mount a fuse endpoint|transparently proxies both reserved characters and unsafe characters|go makes the app reachable via its bound route|SSO|takes effect after a restart, not requiring a push|doesn't die when printing 32MB"
