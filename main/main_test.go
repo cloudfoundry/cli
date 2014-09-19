@@ -53,9 +53,19 @@ var _ = Describe("main", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
+		It("can print help for all core commands by executing only the command `cf`", func() {
+			output := Cf()
+			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+		})
+
 		It("Can call a executable from the Plugins configuration if it does not exist as a cf command", func() {
 			output := Cf("valid-plugin")
 			Eventually(output.Out).Should(Say("HaHaHaHa you called the push plugin"))
+		})
+
+		It("informs user for any invalid commands", func() {
+			output := Cf("foo-bar")
+			Eventually(output.Out).Should(Say("no help topic for 'foo-bar'"))
 		})
 
 		It("Calls core cf command if the plugin shares the same name", func() {

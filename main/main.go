@@ -76,27 +76,15 @@ func main() {
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
 
 	theApp := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
-	if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
-		err := theApp.Run(os.Args)
-		if err != nil {
-			os.Exit(1)
-		}
-		gateways := gatewaySliceFromMap(deps.gateways)
-
-		warningsCollector := net.NewWarningsCollector(deps.termUI, gateways...)
-		warningsCollector.PrintWarnings()
+	//command `cf` without argument
+	if len(os.Args) == 1 {
+		theApp.Run(os.Args)
+	} else if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
+		callCoreCommand(os.Args[1:], theApp)
 	} else {
 		location := deps.configRepo.Plugins()[os.Args[1]]
 		if location != "" {
-			println("localtion: ", location)
-			cmd := exec.Command("go", "run", location)
-			cmd.Stdout = os.Stdout
-			err := cmd.Start()
-			if err != nil {
-				fmt.Println("Error running plugin command: ", err)
-				os.Exit(1)
-			}
-			cmd.Wait()
+			callPlugin(os.Args[1:], location)
 		} else {
 			theApp.Run(os.Args)
 		}
@@ -152,4 +140,26 @@ func generateBacktrace() string {
 	}
 	stackTrace := "\t" + strings.Replace(string(bytes), "\n", "\n\t", -1)
 	return stackTrace
+}
+
+func callCoreCommand(args []string, theApp *cli.App) {
+	err := theApp.Run(args)
+	if err != nil {
+		os.Exit(1)
+	}
+	gateways := gatewaySliceFromMap(deps.gateways)
+
+	warningsCollector := net.NewWarningsCollector(deps.termUI, gateways...)
+	warningsCollector.PrintWarnings()
+}
+
+func callPlugin(args []string, location string) {
+	cmd := exec.Command("go", "run", location)
+	cmd.Stdout = os.Stdout
+	err := cmd.Start()
+	if err != nil {
+		fmt.Println("Error running plugin command: ", err)
+		os.Exit(1)
+	}
+	cmd.Wait()
 }
