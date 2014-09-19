@@ -28,6 +28,6 @@
   "ColorEnabled": "",
   "Locale": "",
  "Plugins": {
-    "valid-plugin": "/Users/pivotal/go/src/github.com/cloudfoundry/cli/fixtures/plugins/push.go"
+    "valid-plugin": "../fixtures/plugins/push.go"
   } 
 }
