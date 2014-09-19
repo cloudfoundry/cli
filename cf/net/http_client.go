@@ -19,7 +19,7 @@ import (
 
 func newHttpClient(trustedCerts []tls.Certificate, disableSSL bool) *http.Client {
 	tr := &http.Transport{
-		Dial:            (&net.Dialer{Timeout: 5 * time.Second}).Dial,
+		Dial:            (&net.Dialer{Timeout: 10 * time.Second}).Dial,
 		TLSClientConfig: NewTLSConfig(trustedCerts, disableSSL),
 		Proxy:           http.ProxyFromEnvironment,
 	}
@@ -74,15 +74,13 @@ func WrapNetworkErrors(host string, err error) error {
 	}
 
 	if innerErr != nil {
-		switch typedErr := innerErr.(type) {
+		switch innerErr.(type) {
 		case x509.UnknownAuthorityError:
 			return errors.NewInvalidSSLCert(host, T("unknown authority"))
 		case x509.HostnameError:
 			return errors.NewInvalidSSLCert(host, T("not valid for the requested host"))
 		case x509.CertificateInvalidError:
 			return errors.NewInvalidSSLCert(host, "")
-		case *net.OpError:
-			return typedErr.Err
 		}
 	}
 

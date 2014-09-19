@@ -90,7 +90,8 @@ var _ = Describe("HTTP Client", func() {
 		It("provides a nice message for connection errors", func() {
 			underlyingErr := syscall.Errno(61)
 			err := WrapNetworkErrors("example.com", &url.Error{Err: &net.OpError{Err: underlyingErr}})
-			Expect(err).To(Equal(underlyingErr))
+			Expect(err.Error()).To(ContainSubstring("Error performing request"))
+			Expect(err.Error()).To(ContainSubstring("connection refused"))
 		})
 
 		It("wraps other errors in a generic error type", func() {
