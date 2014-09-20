@@ -1,19 +1,19 @@
 {
 	"ImportPath": "github.com/cloudfoundry/cli",
-	"GoVersion": "go1.3.1",
+	"GoVersion": "go1.2.2",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go.crypto/ssh/terminal",
-			"Comment": "null-221",
-			"Rev": "6e881b5273dfffbadb6a76a61d3c39a71e3588d1"
+			"Comment": "null-223",
+			"Rev": "31393df5baea9ed8d6778396e7f3896070ea5c04"
 		},
 		{
 			"ImportPath": "code.google.com/p/go.net/websocket",
-			"Comment": "null-144",
-			"Rev": "ad01a6fcc8a19d3a4478c836895ffe883bd2ceab"
+			"Comment": "null-145",
+			"Rev": "81cc697d50c43e5525cf90ae3fa1699a51e02324"
 		},
 		{
 			"ImportPath": "code.google.com/p/gogoprotobuf/proto",
@@ -21,7 +21,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "f1eaf927056e1b069eae3c47444f4b420b238277"
+			"Rev": "39fb5c673e898bc3343f306217f91f485c40a831"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
@@ -29,15 +29,15 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
-			"Rev": "395f869e12746b7233c9dd37041fee9f29482cf2"
+			"Rev": "a35b4068c1a008dce5b2a78460ff9828e61b164b"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
-			"Rev": "b252010e87446bf4d53c8da24440e2ab7d162346"
+			"Rev": "59e4fb600f6a950861ecf3de2f99c71b15cf83d9"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/signature",
-			"Rev": "b252010e87446bf4d53c8da24440e2ab7d162346"
+			"Rev": "59e4fb600f6a950861ecf3de2f99c71b15cf83d9"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
