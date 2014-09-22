@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -59,7 +60,7 @@ var _ = Describe("main", func() {
 		})
 
 		It("Can call a executable from the Plugins configuration if it does not exist as a cf command", func() {
-			output := Cf("valid-plugin")
+			output := Cf("valid-plugin").Wait(5 * time.Second)
 			Eventually(output.Out).Should(Say("HaHaHaHa you called the push plugin"))
 		})
 

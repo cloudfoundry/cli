@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/rpc"
 	"os"
 	"os/exec"
 	"runtime"
@@ -154,12 +155,30 @@ func callCoreCommand(args []string, theApp *cli.App) {
 }
 
 func callPlugin(args []string, location string) {
-	cmd := exec.Command("go", "run", location)
+	//go func() {
+	cmd := exec.Command(location)
 	cmd.Stdout = os.Stdout
 	err := cmd.Start()
 	if err != nil {
 		fmt.Println("Error running plugin command: ", err)
 		os.Exit(1)
 	}
+	//}()
+
+	time.Sleep(3 * time.Second)
+	//Call the plugin's Run function through rpc
+	client, err := rpc.Dial("tcp", "127.0.0.1:20001")
+	if err != nil {
+		os.Exit(1)
+	}
+
+	tmp := "abc"
+	err = client.Call("PushCommand.Run", []string{"stuff"}, &tmp)
+	if err != nil {
+		fmt.Println("error:", err)
+		os.Exit(1)
+	}
+
+	cmd.Process.Kill()
 	cmd.Wait()
 }
