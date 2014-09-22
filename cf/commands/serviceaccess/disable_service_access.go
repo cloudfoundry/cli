@@ -42,8 +42,8 @@ func (cmd *DisableServiceAccess) Metadata() command_metadata.CommandMetadata {
 		Description: T("Disable access to a service or service plan for one or all orgs"),
 		Usage:       "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Disable access to a particular service plan")),
-			flag_helpers.NewStringFlag("o", T("Disable access to a particular organization")),
+			flag_helpers.NewStringFlag("p", T("Disable access to a specified service plan")),
+			flag_helpers.NewStringFlag("o", T("Disable access for a specified organization")),
 		},
 	}
 }

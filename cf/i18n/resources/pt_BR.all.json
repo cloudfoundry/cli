@@ -1440,18 +1440,18 @@
       "modified": false
    },
    {
-      "id": "Disable access to a particular organization",
-      "translation": "Disable access to a service or service plan for one or all orgs.",
-      "modified": true
-   },
-   {
-      "id": "Disable access to a particular service plan",
-      "translation": "Desabilitar acesso a um plano de serviço em particular.",
-      "modified": true
+      "id": "Disable access for a specified organization",
+      "translation": "Disable access for a specified organization",
+      "modified": false
    },
    {
       "id": "Disable access to a service or service plan for one or all orgs",
       "translation": "Desabilitar acesso a um serviço ou plano de serviço para uma ou todas as organizações",
+      "modified": false
+   },
+   {
+      "id": "Disable access to a specified service plan",
+      "translation": "Disable access to a specified service plan",
       "modified": false
    },
    {
@@ -1555,18 +1555,18 @@
       "modified": false
    },
    {
-      "id": "Enable access to a particular organization",
-      "translation": "Habilite acesso para uma organização em particular",
-      "modified": false
-   },
-   {
-      "id": "Enable access to a particular service plan",
-      "translation": "Habilitar acesso a um plano de serviço em particular",
+      "id": "Enable access for a specified organization",
+      "translation": "Enable access for a specified organization",
       "modified": false
    },
    {
       "id": "Enable access to a service or service plan for one or all orgs",
       "translation": "Habilitar acesso a um serviço ou plano de serviço para uma ou todas as organizações",
+      "modified": false
+   },
+   {
+      "id": "Enable access to a specified service plan",
+      "translation": "Enable access to a specified service plan",
       "modified": false
    },
    {
