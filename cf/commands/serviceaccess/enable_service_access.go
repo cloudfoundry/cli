@@ -43,8 +43,8 @@ func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
 		Description: T("Enable access to a service or service plan for one or all orgs"),
 		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Enable access to a particular service plan")),
-			flag_helpers.NewStringFlag("o", T("Enable access to a particular organization")),
+			flag_helpers.NewStringFlag("p", T("Enable access to a specified service plan")),
+			flag_helpers.NewStringFlag("o", T("Enable access for a specified organization")),
 		},
 	}
 }

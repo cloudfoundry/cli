@@ -1440,18 +1440,18 @@
       "modified": false
    },
    {
-      "id": "Disable access to a particular organization",
-      "translation": "Disable access to a particular organization",
-      "modified": false
-   },
-   {
-      "id": "Disable access to a particular service plan",
-      "translation": "Disable access to a particular service plan",
+      "id": "Disable access for a specified organization",
+      "translation": "Disable access for a specified organization",
       "modified": false
    },
    {
       "id": "Disable access to a service or service plan for one or all orgs",
       "translation": "Disable access to a service or service plan for one or all orgs",
+      "modified": false
+   },
+   {
+      "id": "Disable access to a specified service plan",
+      "translation": "Disable access to a specified service plan",
       "modified": false
    },
    {
@@ -1555,18 +1555,18 @@
       "modified": false
    },
    {
-      "id": "Enable access to a particular organization",
-      "translation": "Enable access to a particular organization",
-      "modified": false
-   },
-   {
-      "id": "Enable access to a particular service plan",
-      "translation": "Enable access to a particular service plan",
+      "id": "Enable access for a specified organization",
+      "translation": "Enable access for a specified organization",
       "modified": false
    },
    {
       "id": "Enable access to a service or service plan for one or all orgs",
       "translation": "Enable access to a service or service plan for one or all orgs",
+      "modified": false
+   },
+   {
+      "id": "Enable access to a specified service plan",
+      "translation": "Enable access to a specified service plan",
       "modified": false
    },
    {
