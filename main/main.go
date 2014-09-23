@@ -80,7 +80,7 @@ func main() {
 	if len(os.Args) == 1 {
 		theApp.Run(os.Args)
 	} else if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
-		callCoreCommand(os.Args[1:], theApp)
+		callCoreCommand(os.Args[0:], theApp)
 	} else {
 		location := deps.configRepo.Plugins()[os.Args[1]]
 		if location != "" {
