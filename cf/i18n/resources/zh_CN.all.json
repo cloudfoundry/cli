@@ -1,5 +1,20 @@
 [
    {
+      "id": "\u0009domains:\u0009{{.Domains}}",
+      "translation": "  域: {{.Domains}}",
+      "modified": true
+   },
+   {
+      "id": "\u0009quota:\u0009{{.Quota}}",
+      "translation": "  配额:   {{.Quota}}",
+      "modified": true
+   },
+   {
+      "id": "\u0009spaces:\u0009{{.Spaces}}",
+      "translation": "  空间:  {{.Spaces}}",
+      "modified": true
+   },
+   {
       "id": "\n\nTIP:\n",
       "translation": "\n\n小贴士:\n",
       "modified": false
@@ -137,21 +152,6 @@
    {
       "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
       "translation": "   [-i 实例数] [-k 磁盘配额] [-m 内存配额] [-n 主机] [-p 应用本地包所在路径] [-s 栈深度] [-t 超时时间]\n",
-      "modified": false
-   },
-   {
-      "id": "  domains: {{.Domains}}",
-      "translation": "  域: {{.Domains}}",
-      "modified": false
-   },
-   {
-      "id": "  quota:   {{.Quota}}",
-      "translation": "  配额:   {{.Quota}}",
-      "modified": false
-   },
-   {
-      "id": "  spaces:  {{.Spaces}}",
-      "translation": "  空间:  {{.Spaces}}",
       "modified": false
    },
    {
