@@ -1,5 +1,20 @@
 [
    {
+      "id": "\u0009domains:\u0009{{.Domains}}",
+      "translation": "  domaines: {{.Domains}}",
+      "modified": true
+   },
+   {
+      "id": "\u0009quota:\u0009{{.Quota}}",
+      "translation": "  quota:   {{.Quota}}",
+      "modified": true
+   },
+   {
+      "id": "\u0009spaces:\u0009{{.Spaces}}",
+      "translation": "  espaces: {{.Spaces}}",
+      "modified": true
+   },
+   {
       "id": "\n\nTIP:\n",
       "translation": "\n\nTIP:\n",
       "modified": false
@@ -137,21 +152,6 @@
    {
       "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
       "translation": "   [-i NOMBRES_INSTANCES] [-k DISC] [-m MEMOIRE] [-n HÔTE] [-p PATH] [-s PILE] [-t TEMPS_EXPIRÉE]\n",
-      "modified": false
-   },
-   {
-      "id": "  domains: {{.Domains}}",
-      "translation": "  domaines: {{.Domains}}",
-      "modified": false
-   },
-   {
-      "id": "  quota:   {{.Quota}}",
-      "translation": "  quota:   {{.Quota}}",
-      "modified": false
-   },
-   {
-      "id": "  spaces:  {{.Spaces}}",
-      "translation": "  espaces: {{.Spaces}}",
       "modified": false
    },
    {
