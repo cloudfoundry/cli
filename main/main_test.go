@@ -65,7 +65,7 @@ var _ = Describe("main", func() {
 
 		It("informs user for any invalid commands", func() {
 			output := Cf("foo-bar")
-			Eventually(output.Out).Should(Say("no help topic for 'foo-bar'"))
+			Eventually(output.Out).Should(Say("'foo-bar' is not a registered command"))
 		})
 
 		It("Calls core cf command if the plugin shares the same name", func() {
