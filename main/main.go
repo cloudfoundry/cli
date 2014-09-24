@@ -83,10 +83,9 @@ func main() {
 	} else if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
 		callCoreCommand(os.Args[0:], theApp)
 	} else {
-		location := deps.configRepo.Plugins()[os.Args[1]]
-		if location != "" {
-			callPlugin(os.Args[1:], location)
-		} else {
+		// run each plugin and find the method/
+		// run method if exist
+		if !runPluginMethodIfExists(os.Args[1]) {
 			theApp.Run(os.Args)
 		}
 	}
@@ -154,7 +153,37 @@ func callCoreCommand(args []string, theApp *cli.App) {
 	warningsCollector.PrintWarnings()
 }
 
-func callPlugin(args []string, location string) {
+func runPluginMethodIfExists(cmdName string) bool {
+	plugins := deps.configRepo.Plugins()
+	var exists bool
+	for _, location := range plugins {
+		cmd := runPluginServer(location)
+		exists = runClientCmd("CmdExists", cmdName)
+		if exists {
+			runClientCmd("Run", cmdName)
+			stopPluginServer(cmd)
+			return true
+		}
+		stopPluginServer(cmd)
+	}
+	return false
+}
+
+func runClientCmd(cmd string, method string) bool {
+	client, err := rpc.Dial("tcp", "127.0.0.1:20001")
+	if err != nil {
+		os.Exit(1)
+	}
+
+	var reply bool
+	err = client.Call("CliPlugin."+cmd, method, &reply)
+	if err != nil {
+		fmt.Println("error:", err)
+		os.Exit(1)
+	}
+	return reply
+}
+func runPluginServer(location string) *exec.Cmd {
 	cmd := exec.Command(location)
 	cmd.Stdout = os.Stdout
 	err := cmd.Start()
@@ -163,20 +192,11 @@ func callPlugin(args []string, location string) {
 		os.Exit(1)
 	}
 
-	time.Sleep(3 * time.Second)
-	//Call the plugin's Run function through rpc
-	client, err := rpc.Dial("tcp", "127.0.0.1:20001")
-	if err != nil {
-		os.Exit(1)
-	}
+	time.Sleep(1 * time.Second)
+	return cmd
+}
 
-	tmp := "abc"
-	err = client.Call("PushCommand.Run", []string{"stuff"}, &tmp)
-	if err != nil {
-		fmt.Println("error:", err)
-		os.Exit(1)
-	}
-
-	cmd.Process.Kill()
-	cmd.Wait()
+func stopPluginServer(plugin *exec.Cmd) {
+	plugin.Process.Kill()
+	plugin.Wait()
 }
