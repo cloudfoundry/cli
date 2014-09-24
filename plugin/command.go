@@ -20,9 +20,7 @@ type Command interface {
 /**
 	This function is called by the plugin to setup their server. This allows us to call Run on the plugin
 **/
-func ServeCommand(cmd Command) {
-	fmt.Println("trying to listen")
-
+func ServeCommand(cmd Command, port string) {
 	//register command
 	rpc.Register(cmd)
 
@@ -31,8 +29,6 @@ func ServeCommand(cmd Command) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	fmt.Println("listining ding dong")
 
 	//listen for the run command
 	for {

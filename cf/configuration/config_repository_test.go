@@ -2,12 +2,13 @@ package configuration_test
 
 import (
 	"fmt"
+	"time"
+
 	. "github.com/cloudfoundry/cli/cf/configuration"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 var _ = Describe("Configuration Repository", func() {
@@ -82,6 +83,10 @@ var _ = Describe("Configuration Repository", func() {
 
 		config.SetLocale("en_US")
 		Expect(config.Locale()).To(Equal("en_US"))
+
+		config.SetPlugin("foo", "bar")
+		plugins := config.Plugins()
+		Expect(plugins["foo"]).To(Equal("bar"))
 	})
 
 	Describe("HasAPIEndpoint", func() {
