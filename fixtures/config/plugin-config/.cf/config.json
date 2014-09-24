@@ -28,7 +28,7 @@
   "ColorEnabled": "",
   "Locale": "",
  "Plugins": {
-    "valid-plugin": "../fixtures/plugins/push",
-    "help": "../fixtures/plugins/push"
+    "valid-plugin": "../fixtures/plugins/test",
+    "help": "../fixtures/plugins/test"
   } 
 }
