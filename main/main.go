@@ -155,7 +155,6 @@ func callCoreCommand(args []string, theApp *cli.App) {
 }
 
 func callPlugin(args []string, location string) {
-	//go func() {
 	cmd := exec.Command(location)
 	cmd.Stdout = os.Stdout
 	err := cmd.Start()
@@ -163,7 +162,6 @@ func callPlugin(args []string, location string) {
 		fmt.Println("Error running plugin command: ", err)
 		os.Exit(1)
 	}
-	//}()
 
 	time.Sleep(3 * time.Second)
 	//Call the plugin's Run function through rpc

@@ -680,6 +680,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME install-plugin PATH/TO/PLUGIN",
+      "translation": "CF_NAME install-plugin PATH/TO/PLUGIN",
+      "modified": false
+   },
+   {
       "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
       "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
       "modified": false
@@ -1037,6 +1042,16 @@
    {
       "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
       "translation": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
+      "modified": false
+   },
+   {
+      "id": "Could not copy plugin binary: \n{{.Error}}",
+      "translation": "Could not copy plugin binary: \n{{.Error}}",
+      "modified": false
+   },
+   {
+      "id": "Could not create the plugin directory: \n{{.Error}}",
+      "translation": "Could not create the plugin directory: \n{{.Error}}",
       "modified": false
    },
    {
@@ -2120,6 +2135,11 @@
       "modified": false
    },
    {
+      "id": "Installing plugin {{.PluginName}}...",
+      "translation": "Installing plugin {{.PluginName}}...",
+      "modified": false
+   },
+   {
       "id": "Instance",
       "translation": "Instance",
       "modified": false
@@ -2697,6 +2717,16 @@
    {
       "id": "Please log in again",
       "translation": "Please log in again",
+      "modified": false
+   },
+   {
+      "id": "Plugin name {{.PluginName}} is already taken",
+      "translation": "Plugin name {{.PluginName}} is already taken",
+      "modified": false
+   },
+   {
+      "id": "Plugin {{.PluginName}} successfully installed.",
+      "translation": "Plugin {{.PluginName}} successfully installed.",
       "modified": false
    },
    {
@@ -3345,6 +3375,11 @@
       "modified": false
    },
    {
+      "id": "The file {{.PluginName}} already exists under the plugin directory.\n",
+      "translation": "The file {{.PluginName}} already exists under the plugin directory.\n",
+      "modified": false
+   },
+   {
       "id": "The plan is already accessible for all orgs",
       "translation": "The plan is already accessible for all orgs",
       "modified": false
@@ -3512,6 +3547,11 @@
    {
       "id": "Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
       "translation": "Unbinding security group {{.security_group}} from {{.organization}}/{{.space}} as {{.username}}",
+      "modified": false
+   },
+   {
+      "id": "Unexpected error has occurred:\n{{.Error}}",
+      "translation": "Unexpected error has occurred:\n{{.Error}}",
       "modified": false
    },
    {
@@ -3912,6 +3952,16 @@
    {
       "id": "incorrect usage",
       "translation": "incorrect usage",
+      "modified": false
+   },
+   {
+      "id": "install-plugin",
+      "translation": "install-plugin",
+      "modified": false
+   },
+   {
+      "id": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
+      "translation": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
       "modified": false
    },
    {

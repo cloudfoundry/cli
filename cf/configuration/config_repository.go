@@ -1,8 +1,9 @@
 package configuration
 
 import (
-	"github.com/cloudfoundry/cli/cf/models"
 	"sync"
+
+	"github.com/cloudfoundry/cli/cf/models"
 )
 
 type configRepository struct {
@@ -76,6 +77,7 @@ type ReadWriter interface {
 	SetTrace(string)
 	SetColorEnabled(string)
 	SetLocale(string)
+	SetPlugin(string, string)
 }
 
 type Repository interface {
@@ -372,5 +374,15 @@ func (c *configRepository) SetColorEnabled(enabled string) {
 func (c *configRepository) SetLocale(locale string) {
 	c.write(func() {
 		c.data.Locale = locale
+	})
+}
+
+func (c *configRepository) SetPlugin(name string, location string) {
+	if c.data.Plugins == nil {
+		c.data.Plugins = make(map[string]string)
+	}
+
+	c.write(func() {
+		c.data.Plugins[name] = location
 	})
 }
