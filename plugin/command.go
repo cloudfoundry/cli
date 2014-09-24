@@ -20,7 +20,7 @@ type Command interface {
 /**
 	This function is called by the plugin to setup their server. This allows us to call Run on the plugin
 **/
-func ServeCommand(cmd Command, port string) {
+func ServeCommand(cmd Command) {
 	//register command
 	rpc.Register(cmd)
 
