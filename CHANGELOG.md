@@ -1,3 +1,53 @@
+##v6.6.1
+* Bump version to 6.6.1
+* fix argument in callCoreCommand()
+* Fix http_test.go to be OS independent [#79151902]
+* Update flag descriptions for enable/disable service access [#79151902]
+* show help when `cf` is input [#78233706]
+Signed-off-by: Daniel Lavine <dlavine@us.ibm.com>
+* Up tcp timeout to 10 seconds and log errors more effectively -Upping the timeout to deal with possible architecture issues, but
+this should not be increased any more than 10 seconds
+[#79151504]
+* User can specify go program as a plugin in config.json [#78233706]
+* Bump Goderps
+* Dont pull from a locked SHA
+* Lock CATS to a known good SHA (for now)
+* Brought app_files repo into alignment with our new patterns. [#74259334]
+* Revert "Update herd-cats-linux64 script to dynamically generate config" This reverts commit 7a74e5a3bfbb4e975eee4aedcc5a1471939070fc.
+* Update herd-cats-linux64 script to dynamically generate config
+* Move integration tests into main_test suite -Go 1.3 changes the way tests are built
+* Move app_events repo into its own package. [#74259334]
+* Upgrade to Go 1.3.1 - Go 1.3.x no longer orders maps, so we had to compensate in some of our
+  tests.
+- The fake server is a little smarter about "q" params now.
+[Finishes #73583562]
+
+* Bump Godeps for jibber-jabber. - Pull in Windows XP fix.
+
+[Finishes #78489056]
+
+* Remove -u option and clean up symlink in the build script.
+* Bump Goderps
+* Another attempt to fix unit tests on Windows
+* Attempt to fix unit tests on Windows
+* Change fake and refactor app_bits repo. - App bits repo is much more tightly scoped
+- The App Bits repo has a counterfeiter fake, and lives in its own
+  package
+- Some callbacks met their demise
+- We now have a push actor
+- Former responsibilities of the App Bits repo have been divided between
+  the App Bits repo, the push command, and the push actor.
+- All this should make the future implementation of an "upload bits"
+  command much easier/possible.
+[#74259334]
+* Change "-1" to "unlimited" in space-quotas. [#77830744]
+* Change '-1' to 'unlimited' in space-quota. [#77830744]
+* Display "unlimited" instead of "-1" in quota. [#77830744]
+* Display "unlimited" instead of "-1" in quotas. [#77830744]
+* Make Windows recognize PATH update and don't append on reinstall. [#78348074]
+* Chmod the Inno Setup script. [#78348074]
+* Change Windows installer build process to use Inno Setup. [#78348074]
+
 ## v6.6.0
 * Modify set-running-environment-variable-group command usage to show example. [Finishes #77830856]
 * Modify set-staging-environment-variable-group usage to show example of JSON. [Finishes #77837402]
