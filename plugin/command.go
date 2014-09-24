@@ -22,6 +22,7 @@ type RpcPlugin interface {
 	This function is called by the plugin to setup their server. This allows us to call Run on the plugin
 **/
 func ServeCommand(cmd RpcPlugin, port string) {
+	//register command
 	rpc.Register(cmd)
 
 	listener, err := net.Listen("tcp", ":"+port)
