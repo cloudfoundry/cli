@@ -13,14 +13,37 @@ import (
 	"github.com/cloudfoundry/cli/plugin"
 )
 
-type PushCommand struct{}
+type CliPlugin struct{}
 
-func (c *PushCommand) Run(args []string, cmds *string) error {
-	fmt.Println("HaHaHaHa you called the push plugin")
-
+func (c *CliPlugin) Run(args string, reply *bool) error {
+	if args == "push1" {
+		theFirstPush()
+	} else if args == "push2" {
+		theSecondPush()
+	}
 	return nil
 }
 
+func (c *CliPlugin) CmdExists(args string, exists *bool) error {
+	var reply bool
+	if args == "push1" || args == "push2" {
+		reply = true
+	} else {
+		reply = false
+
+	}
+	exists = &reply
+	return nil
+}
+
+func theSecondPush() {
+	fmt.Println("HaHaHaHa you called THE SECOND PUSH")
+}
+
+func theFirstPush() {
+	fmt.Println("HaHaHaHa you called THE FIRST PUSH")
+}
+
 func main() {
-	plugin.ServeCommand(new(PushCommand))
+	plugin.ServeCommand(new(CliPlugin), "20001")
 }

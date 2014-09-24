@@ -11,20 +11,20 @@ import (
 /**
 	Command interface needs to be implementd for a runnable sub-command of `cf`
 **/
-type Command interface {
+type RpcPlugin interface {
 	//run is passed in all the command line parameter arguments and
 	//an object containing all of the cli commands available to them
-	Run(args []string, cmds *string) error
+	Run(args string, reply *bool) error
+	CmdExists(args string, exists *bool) error
 }
 
 /**
 	This function is called by the plugin to setup their server. This allows us to call Run on the plugin
 **/
-func ServeCommand(cmd Command) {
-	//register command
+func ServeCommand(cmd RpcPlugin, port string) {
 	rpc.Register(cmd)
 
-	listener, err := net.Listen("tcp", ":20001")
+	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
