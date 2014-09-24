@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type configRepository struct {
+type ConfigRepository struct {
 	data      *Data
 	mutex     *sync.RWMutex
 	initOnce  *sync.Once
@@ -19,7 +19,7 @@ func NewRepositoryFromFilepath(filepath string, errorHandler func(error)) Reposi
 }
 
 func NewRepositoryFromPersistor(persistor Persistor, errorHandler func(error)) Repository {
-	c := new(configRepository)
+	c := new(ConfigRepository)
 	c.mutex = new(sync.RWMutex)
 	c.initOnce = new(sync.Once)
 	c.persistor = persistor
@@ -58,6 +58,8 @@ type Reader interface {
 	Locale() string
 
 	Plugins() map[string]string
+
+	UserHomePath() string
 }
 
 type ReadWriter interface {
@@ -87,7 +89,7 @@ type Repository interface {
 
 // ACCESS CONTROL
 
-func (c *configRepository) init() {
+func (c *ConfigRepository) init() {
 	c.initOnce.Do(func() {
 		var err error
 		c.data, err = c.persistor.Load()
@@ -97,7 +99,7 @@ func (c *configRepository) init() {
 	})
 }
 
-func (c *configRepository) read(cb func()) {
+func (c *ConfigRepository) read(cb func()) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	c.init()
@@ -105,7 +107,7 @@ func (c *configRepository) read(cb func()) {
 	cb()
 }
 
-func (c *configRepository) write(cb func()) {
+func (c *ConfigRepository) write(cb func()) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	c.init()
@@ -120,7 +122,7 @@ func (c *configRepository) write(cb func()) {
 
 // CLOSERS
 
-func (c *configRepository) Close() {
+func (c *ConfigRepository) Close() {
 	c.read(func() {
 		// perform a read to ensure write lock has been cleared
 	})
@@ -128,154 +130,158 @@ func (c *configRepository) Close() {
 
 // GETTERS
 
-func (c *configRepository) ApiVersion() (apiVersion string) {
+func (c *ConfigRepository) UserHomePath() string {
+	return userHomeDir()
+}
+
+func (c *ConfigRepository) ApiVersion() (apiVersion string) {
 	c.read(func() {
 		apiVersion = c.data.ApiVersion
 	})
 	return
 }
 
-func (c *configRepository) AuthenticationEndpoint() (authEndpoint string) {
+func (c *ConfigRepository) AuthenticationEndpoint() (authEndpoint string) {
 	c.read(func() {
 		authEndpoint = c.data.AuthorizationEndpoint
 	})
 	return
 }
 
-func (c *configRepository) LoggregatorEndpoint() (logEndpoint string) {
+func (c *ConfigRepository) LoggregatorEndpoint() (logEndpoint string) {
 	c.read(func() {
 		logEndpoint = c.data.LoggregatorEndPoint
 	})
 	return
 }
 
-func (c *configRepository) UaaEndpoint() (uaaEndpoint string) {
+func (c *ConfigRepository) UaaEndpoint() (uaaEndpoint string) {
 	c.read(func() {
 		uaaEndpoint = c.data.UaaEndpoint
 	})
 	return
 }
 
-func (c *configRepository) ApiEndpoint() (apiEndpoint string) {
+func (c *ConfigRepository) ApiEndpoint() (apiEndpoint string) {
 	c.read(func() {
 		apiEndpoint = c.data.Target
 	})
 	return
 }
 
-func (c *configRepository) HasAPIEndpoint() (hasEndpoint bool) {
+func (c *ConfigRepository) HasAPIEndpoint() (hasEndpoint bool) {
 	c.read(func() {
 		hasEndpoint = c.data.ApiVersion != "" && c.data.Target != ""
 	})
 	return
 }
 
-func (c *configRepository) AccessToken() (accessToken string) {
+func (c *ConfigRepository) AccessToken() (accessToken string) {
 	c.read(func() {
 		accessToken = c.data.AccessToken
 	})
 	return
 }
 
-func (c *configRepository) RefreshToken() (refreshToken string) {
+func (c *ConfigRepository) RefreshToken() (refreshToken string) {
 	c.read(func() {
 		refreshToken = c.data.RefreshToken
 	})
 	return
 }
 
-func (c *configRepository) OrganizationFields() (org models.OrganizationFields) {
+func (c *ConfigRepository) OrganizationFields() (org models.OrganizationFields) {
 	c.read(func() {
 		org = c.data.OrganizationFields
 	})
 	return
 }
 
-func (c *configRepository) SpaceFields() (space models.SpaceFields) {
+func (c *ConfigRepository) SpaceFields() (space models.SpaceFields) {
 	c.read(func() {
 		space = c.data.SpaceFields
 	})
 	return
 }
 
-func (c *configRepository) UserEmail() (email string) {
+func (c *ConfigRepository) UserEmail() (email string) {
 	c.read(func() {
 		email = NewTokenInfo(c.data.AccessToken).Email
 	})
 	return
 }
 
-func (c *configRepository) UserGuid() (guid string) {
+func (c *ConfigRepository) UserGuid() (guid string) {
 	c.read(func() {
 		guid = NewTokenInfo(c.data.AccessToken).UserGuid
 	})
 	return
 }
 
-func (c *configRepository) Username() (name string) {
+func (c *ConfigRepository) Username() (name string) {
 	c.read(func() {
 		name = NewTokenInfo(c.data.AccessToken).Username
 	})
 	return
 }
 
-func (c *configRepository) IsLoggedIn() (loggedIn bool) {
+func (c *ConfigRepository) IsLoggedIn() (loggedIn bool) {
 	c.read(func() {
 		loggedIn = c.data.AccessToken != ""
 	})
 	return
 }
 
-func (c *configRepository) HasOrganization() (hasOrg bool) {
+func (c *ConfigRepository) HasOrganization() (hasOrg bool) {
 	c.read(func() {
 		hasOrg = c.data.OrganizationFields.Guid != "" && c.data.OrganizationFields.Name != ""
 	})
 	return
 }
 
-func (c *configRepository) HasSpace() (hasSpace bool) {
+func (c *ConfigRepository) HasSpace() (hasSpace bool) {
 	c.read(func() {
 		hasSpace = c.data.SpaceFields.Guid != "" && c.data.SpaceFields.Name != ""
 	})
 	return
 }
 
-func (c *configRepository) IsSSLDisabled() (isSSLDisabled bool) {
+func (c *ConfigRepository) IsSSLDisabled() (isSSLDisabled bool) {
 	c.read(func() {
 		isSSLDisabled = c.data.SSLDisabled
 	})
 	return
 }
 
-func (c *configRepository) AsyncTimeout() (timeout uint) {
+func (c *ConfigRepository) AsyncTimeout() (timeout uint) {
 	c.read(func() {
 		timeout = c.data.AsyncTimeout
 	})
 	return
 }
 
-func (c *configRepository) Trace() (trace string) {
+func (c *ConfigRepository) Trace() (trace string) {
 	c.read(func() {
 		trace = c.data.Trace
 	})
 	return
 }
 
-func (c *configRepository) ColorEnabled() (enabled string) {
+func (c *ConfigRepository) ColorEnabled() (enabled string) {
 	c.read(func() {
 		enabled = c.data.ColorEnabled
 	})
 	return
 }
 
-func (c *configRepository) Locale() (locale string) {
+func (c *ConfigRepository) Locale() (locale string) {
 	c.read(func() {
 		locale = c.data.Locale
 	})
 	return
 }
 
-func (c *configRepository) Plugins() (plugins map[string]string) {
+func (c *ConfigRepository) Plugins() (plugins map[string]string) {
 	c.read(func() {
 		plugins = c.data.Plugins
 	})
@@ -284,7 +290,7 @@ func (c *configRepository) Plugins() (plugins map[string]string) {
 
 // SETTERS
 
-func (c *configRepository) ClearSession() {
+func (c *ConfigRepository) ClearSession() {
 	c.write(func() {
 		c.data.AccessToken = ""
 		c.data.RefreshToken = ""
@@ -293,91 +299,91 @@ func (c *configRepository) ClearSession() {
 	})
 }
 
-func (c *configRepository) SetApiEndpoint(endpoint string) {
+func (c *ConfigRepository) SetApiEndpoint(endpoint string) {
 	c.write(func() {
 		c.data.Target = endpoint
 	})
 }
 
-func (c *configRepository) SetApiVersion(version string) {
+func (c *ConfigRepository) SetApiVersion(version string) {
 	c.write(func() {
 		c.data.ApiVersion = version
 	})
 }
 
-func (c *configRepository) SetAuthenticationEndpoint(endpoint string) {
+func (c *ConfigRepository) SetAuthenticationEndpoint(endpoint string) {
 	c.write(func() {
 		c.data.AuthorizationEndpoint = endpoint
 	})
 }
 
-func (c *configRepository) SetLoggregatorEndpoint(endpoint string) {
+func (c *ConfigRepository) SetLoggregatorEndpoint(endpoint string) {
 	c.write(func() {
 		c.data.LoggregatorEndPoint = endpoint
 	})
 }
 
-func (c *configRepository) SetUaaEndpoint(uaaEndpoint string) {
+func (c *ConfigRepository) SetUaaEndpoint(uaaEndpoint string) {
 	c.write(func() {
 		c.data.UaaEndpoint = uaaEndpoint
 	})
 }
 
-func (c *configRepository) SetAccessToken(token string) {
+func (c *ConfigRepository) SetAccessToken(token string) {
 	c.write(func() {
 		c.data.AccessToken = token
 	})
 }
 
-func (c *configRepository) SetRefreshToken(token string) {
+func (c *ConfigRepository) SetRefreshToken(token string) {
 	c.write(func() {
 		c.data.RefreshToken = token
 	})
 }
 
-func (c *configRepository) SetOrganizationFields(org models.OrganizationFields) {
+func (c *ConfigRepository) SetOrganizationFields(org models.OrganizationFields) {
 	c.write(func() {
 		c.data.OrganizationFields = org
 	})
 }
 
-func (c *configRepository) SetSpaceFields(space models.SpaceFields) {
+func (c *ConfigRepository) SetSpaceFields(space models.SpaceFields) {
 	c.write(func() {
 		c.data.SpaceFields = space
 	})
 }
 
-func (c *configRepository) SetSSLDisabled(disabled bool) {
+func (c *ConfigRepository) SetSSLDisabled(disabled bool) {
 	c.write(func() {
 		c.data.SSLDisabled = disabled
 	})
 }
 
-func (c *configRepository) SetAsyncTimeout(timeout uint) {
+func (c *ConfigRepository) SetAsyncTimeout(timeout uint) {
 	c.write(func() {
 		c.data.AsyncTimeout = timeout
 	})
 }
 
-func (c *configRepository) SetTrace(value string) {
+func (c *ConfigRepository) SetTrace(value string) {
 	c.write(func() {
 		c.data.Trace = value
 	})
 }
 
-func (c *configRepository) SetColorEnabled(enabled string) {
+func (c *ConfigRepository) SetColorEnabled(enabled string) {
 	c.write(func() {
 		c.data.ColorEnabled = enabled
 	})
 }
 
-func (c *configRepository) SetLocale(locale string) {
+func (c *ConfigRepository) SetLocale(locale string) {
 	c.write(func() {
 		c.data.Locale = locale
 	})
 }
 
-func (c *configRepository) SetPlugin(name string, location string) {
+func (c *ConfigRepository) SetPlugin(name string, location string) {
 	if c.data.Plugins == nil {
 		c.data.Plugins = make(map[string]string)
 	}

@@ -55,7 +55,7 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginName}}...", map[string]interface{}{"PluginName": pluginName})))
 
-	homeDir := path.Join(configuration.UserHomePath(), ".cf", "plugin")
+	homeDir := path.Join(cmd.config.UserHomePath(), ".cf", "plugin")
 	err := os.MkdirAll(homeDir, 0700)
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not create the plugin directory: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))

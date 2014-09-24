@@ -19,10 +19,6 @@ func DefaultFilePath() string {
 	return filepath.Join(configDir, "config.json")
 }
 
-func UserHomePath() string {
-	return userHomeDir()
-}
-
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
 func userHomeDir() string {
