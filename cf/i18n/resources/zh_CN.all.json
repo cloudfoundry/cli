@@ -985,6 +985,11 @@
       "modified": false
    },
    {
+      "id": "Can provision instances of paid service plans (Default: disallowed)",
+      "translation": "Can provision instances of paid service plans (Default: disallowed)",
+      "modified": false
+   },
+   {
       "id": "Cannot list marketplace services without a targeted space",
       "translation": "在没有指定空间的情况下无法获取服务列表",
       "modified": false
@@ -2397,6 +2402,11 @@
    {
       "id": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.",
       "translation": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.",
+      "modified": false
+   },
+   {
+      "id": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)",
+      "translation": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)",
       "modified": false
    },
    {

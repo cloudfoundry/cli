@@ -37,11 +37,11 @@ func (cmd CreateSpaceQuota) Metadata() command_metadata.CommandMetadata {
 		Description: T("Define a new space resource quota"),
 		Usage:       T("CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.")),
+			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)")),
 			flag_helpers.NewStringFlag("m", T("Total amount of memory a space can have(e.g. 1024M, 1G, 10G)")),
 			flag_helpers.NewIntFlag("r", T("Total number of routes")),
 			flag_helpers.NewIntFlag("s", T("Total number of service instances")),
-			cli.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")},
+			cli.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans (Default: disallowed)")},
 		},
 	}
 }
