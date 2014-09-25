@@ -73,6 +73,8 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
+	os.Chmod(path.Join(homeDir, pluginName), 0700)
+
 	cmd.config.SetPlugin(pluginName, path.Join(homeDir, pluginName))
 
 	cmd.ui.Ok()

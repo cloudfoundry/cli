@@ -49,6 +49,7 @@ tags
 
 #Compiled Plugins
 fixtures/plugins/test
+fixtures/plugins/plugin2
 
 # NEVER commit the resources files!
 cf/resources/i18n_resources.go

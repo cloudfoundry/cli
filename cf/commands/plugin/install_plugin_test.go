@@ -115,6 +115,12 @@ var _ = Describe("Install", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
+		It("Chmods the plugin so it is executable", func() {
+			fileInfo, err := os.Stat(path.Join(pluginDir, pluginFile.Name()))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(int(fileInfo.Mode())).To(Equal(0700))
+		})
+
 		It("populate the configuration map with the plugin name and location", func() {
 			pluginName, pluginPath := config.SetPluginArgsForCall(0)
 			Expect(pluginName).To(Equal(pluginFile.Name()))
