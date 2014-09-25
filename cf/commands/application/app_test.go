@@ -1,6 +1,7 @@
 package application_test
 
 import (
+	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -23,14 +24,14 @@ var _ = Describe("app Command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          configuration.ReadWriter
 		appSummaryRepo      *testapi.FakeAppSummaryRepo
-		appInstancesRepo    *testapi.FakeAppInstancesRepo
+		appInstancesRepo    *testAppInstanaces.FakeAppInstancesRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
-		appInstancesRepo = &testapi.FakeAppInstancesRepo{}
+		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
@@ -85,7 +86,7 @@ var _ = Describe("app Command", func() {
 			instances := []models.AppInstanceFields{appInstance, appInstance2}
 
 			appSummaryRepo.GetSummarySummary = app
-			appInstancesRepo.GetInstancesResponses = [][]models.AppInstanceFields{instances}
+			appInstancesRepo.GetInstancesReturns(instances, nil)
 			requirementsFactory.Application = app
 		})
 
@@ -125,7 +126,7 @@ var _ = Describe("app Command", func() {
 			runCommand("my-app")
 
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
-			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
+			Expect(appInstancesRepo.GetInstancesArgsForCall(0)).To(Equal("my-app-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
@@ -141,7 +142,7 @@ var _ = Describe("app Command", func() {
 			runCommand("my-app")
 
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
-			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
+			Expect(appInstancesRepo.GetInstancesArgsForCall(0)).To(Equal("my-app-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
@@ -175,7 +176,7 @@ var _ = Describe("app Command", func() {
 			instances := []models.AppInstanceFields{appInstance, appInstance2}
 
 			appSummaryRepo.GetSummarySummary = app
-			appInstancesRepo.GetInstancesResponses = [][]models.AppInstanceFields{instances}
+			appInstancesRepo.GetInstancesReturns(instances, nil)
 			requirementsFactory.Application = app
 		})
 

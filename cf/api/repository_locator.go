@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 
 	"github.com/cloudfoundry/cli/cf/api/app_events"
+	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
@@ -38,7 +39,7 @@ type RepositoryLocator struct {
 	appRepo                         CloudControllerApplicationRepository
 	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  CloudControllerAppSummaryRepository
-	appInstancesRepo                CloudControllerAppInstancesRepository
+	appInstancesRepo                app_instances.CloudControllerAppInstancesRepository
 	appEventsRepo                   app_events.CloudControllerAppEventsRepository
 	appFilesRepo                    api_app_files.CloudControllerAppFilesRepository
 	domainRepo                      CloudControllerDomainRepository
@@ -87,7 +88,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.appFilesRepo = api_app_files.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
-	loc.appInstancesRepo = NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
+	loc.appInstancesRepo = app_instances.NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
@@ -155,7 +156,7 @@ func (locator RepositoryLocator) GetAppSummaryRepository() AppSummaryRepository 
 	return locator.appSummaryRepo
 }
 
-func (locator RepositoryLocator) GetAppInstancesRepository() AppInstancesRepository {
+func (locator RepositoryLocator) GetAppInstancesRepository() app_instances.AppInstancesRepository {
 	return locator.appInstancesRepo
 }
 

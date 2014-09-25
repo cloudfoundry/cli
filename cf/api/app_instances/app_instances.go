@@ -1,13 +1,14 @@
-package api
+package app_instances
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/net"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/net"
 )
 
 type InstancesApiResponse map[string]InstanceApiResponse
