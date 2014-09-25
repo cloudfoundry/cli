@@ -20,6 +20,30 @@ func TestIntegration(t *testing.T) {
 }
 
 var _ = Describe("main", func() {
+	var (
+		old_CF_HOME string
+	)
+
+	BeforeEach(func() {
+		old_CF_HOME = os.Getenv("CF_HOME")
+
+		dir, err := os.Getwd()
+		Expect(err).NotTo(HaveOccurred())
+
+		cmd := exec.Command("go", "build", "-o", path.Join(dir, "..", "fixtures", "plugins", "test"), path.Join(dir, "..", "fixtures", "plugins", "test.go"))
+		err = cmd.Run()
+		Expect(err).NotTo(HaveOccurred())
+
+		fullDir := filepath.Join(dir, "..", "fixtures", "config", "plugin-config")
+		err = os.Setenv("CF_HOME", fullDir)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	AfterEach(func() {
+		err := os.Setenv("CF_HOME", old_CF_HOME)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
 	Describe("exit codes", func() {
 		It("exits non-zero when an unknown command is invoked", func() {
 			result := Cf("some-command-that-should-never-actually-be-a-real-thing-i-can-use")
@@ -35,29 +59,6 @@ var _ = Describe("main", func() {
 	})
 
 	Describe("Plugins", func() {
-		var (
-			old_CF_HOME string
-		)
-
-		BeforeEach(func() {
-			old_CF_HOME = os.Getenv("CF_HOME")
-
-			dir, err := os.Getwd()
-			Expect(err).NotTo(HaveOccurred())
-
-			cmd := exec.Command("go", "build", "-a", "-o", path.Join(dir, "..", "fixtures", "plugins", "test"), path.Join(dir, "..", "fixtures", "plugins", "test.go"))
-			err = cmd.Run()
-			Expect(err).NotTo(HaveOccurred())
-
-			fullDir := filepath.Join(dir, "..", "fixtures", "config", "plugin-config")
-			err = os.Setenv("CF_HOME", fullDir)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			err := os.Setenv("CF_HOME", old_CF_HOME)
-			Expect(err).NotTo(HaveOccurred())
-		})
 
 		It("can print help for all core commands by executing only the command `cf`", func() {
 			output := Cf()
