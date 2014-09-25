@@ -192,7 +192,7 @@ func runPluginServer(location string) *exec.Cmd {
 		os.Exit(1)
 	}
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(300 * time.Millisecond)
 	return cmd
 }
 
