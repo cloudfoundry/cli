@@ -25,14 +25,11 @@ func (c *CliPlugin) Run(args string, reply *bool) error {
 }
 
 func (c *CliPlugin) CmdExists(args string, exists *bool) error {
-	var reply bool
 	if args == "push1" || args == "push2" {
-		reply = true
+		*exists = true
 	} else {
-		reply = false
-
+		*exists = false
 	}
-	exists = &reply
 	return nil
 }
 
