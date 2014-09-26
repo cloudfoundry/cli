@@ -18,6 +18,7 @@ func TestMain(t *testing.T) {
 
 	cmd := exec.Command("go", "build", "-o", path.Join(dir, "..", "fixtures", "plugins", "test"), path.Join(dir, "..", "fixtures", "plugins", "test.go"))
 	err = cmd.Run()
+	defer GinkgoRecover()
 	Expect(err).NotTo(HaveOccurred())
 
 	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "fixtures", "plugins", "plugin2"), path.Join(dir, "..", "fixtures", "plugins", "plugin2.go"))
