@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"runtime"
 
 	testconfig "github.com/cloudfoundry/cli/cf/configuration/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -115,11 +116,13 @@ var _ = Describe("Install", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		It("Chmods the plugin so it is executable", func() {
-			fileInfo, err := os.Stat(path.Join(pluginDir, pluginFile.Name()))
-			Expect(err).ToNot(HaveOccurred())
-			Expect(int(fileInfo.Mode())).To(Equal(0700))
-		})
+		if runtime.GOOS != "windows" {
+			It("Chmods the plugin so it is executable", func() {
+				fileInfo, err := os.Stat(path.Join(pluginDir, pluginFile.Name()))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(int(fileInfo.Mode())).To(Equal(0700))
+			})
+		}
 
 		It("populate the configuration map with the plugin name and location", func() {
 			pluginName, pluginPath := config.SetPluginArgsForCall(0)
