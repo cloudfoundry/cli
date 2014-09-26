@@ -390,11 +390,19 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 }
 
 func (gateway Gateway) doRequest(request *http.Request) (response *http.Response, err error) {
-	httpClient := newHttpClient(gateway.trustedCerts, gateway.config.IsSSLDisabled())
+	httpClient := NewHttpClient(gateway.trustedCerts, gateway.config.IsSSLDisabled())
 
 	dumpRequest(request)
 
-	response, err = httpClient.Do(request)
+	for i := 0; i < 3; i++ {
+		response, err = httpClient.Do(request)
+		if response == nil && err != nil {
+			continue
+		} else {
+			break
+		}
+	}
+
 	if err != nil {
 		return
 	}

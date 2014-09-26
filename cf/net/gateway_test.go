@@ -17,6 +17,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/net/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	. "github.com/onsi/ginkgo"
@@ -31,6 +32,8 @@ var _ = Describe("Gateway", func() {
 		authRepo    authentication.AuthenticationRepository
 		currentTime time.Time
 		clock       func() time.Time
+
+		client *fakes.FakeHttpClientInterface
 	)
 
 	BeforeEach(func() {
@@ -50,6 +53,43 @@ var _ = Describe("Gateway", func() {
 				ccGateway = NewCloudControllerGateway((config), time.Now)
 				Expect(ccGateway.AsyncTimeout()).To(Equal(9001 * time.Minute))
 			})
+		})
+	})
+
+	Describe("Connection errors", func() {
+		var oldNewHttpClient func(trustedCerts []tls.Certificate, disableSSL bool) HttpClientInterface
+
+		BeforeEach(func() {
+			client = &fakes.FakeHttpClientInterface{}
+
+			oldNewHttpClient = NewHttpClient
+			NewHttpClient = func(trustedCerts []tls.Certificate, disableSSL bool) HttpClientInterface {
+				return client
+			}
+		})
+
+		AfterEach(func() {
+			NewHttpClient = oldNewHttpClient
+		})
+
+		It("only retry when response body is nil and error occurred", func() {
+			client.DoReturns(&http.Response{Status: "internal error", StatusCode: 500}, errors.New("internal error"))
+			request, apiErr := ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+			Expect(apiErr).ToNot(HaveOccurred())
+
+			_, apiErr = ccGateway.PerformRequest(request)
+			Expect(client.DoCallCount()).To(Equal(1))
+			Expect(apiErr).To(HaveOccurred())
+		})
+
+		It("Retries 3 times if we cannot contact the server", func() {
+			client.DoReturns(nil, errors.New("Connection refused"))
+			request, apiErr := ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+			Expect(apiErr).ToNot(HaveOccurred())
+
+			_, apiErr = ccGateway.PerformRequest(request)
+			Expect(apiErr).To(HaveOccurred())
+			Expect(client.DoCallCount()).To(Equal(3))
 		})
 	})
 
