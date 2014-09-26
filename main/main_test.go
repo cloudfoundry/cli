@@ -36,7 +36,7 @@ var _ = Describe("main", func() {
 		It("exits non-zero when an unknown command is invoked", func() {
 			result := Cf("some-command-that-should-never-actually-be-a-real-thing-i-can-use")
 
-			Eventually(result).Should(Say("not a registered command"))
+			Eventually(result, 3*time.Second).Should(Say("not a registered command"))
 			Eventually(result).Should(Exit(1))
 		})
 
@@ -54,18 +54,18 @@ var _ = Describe("main", func() {
 		})
 
 		It("Can call a plugin command from the Plugins configuration if it does not exist as a cf command", func() {
-			output := Cf("push1").Wait(3 * time.Second)
-			Eventually(output.Out).Should(Say("HaHaHaHa you called THE FIRST PUSH"))
+			output := Cf("push1")
+			Eventually(output.Out, 3*time.Second).Should(Say("HaHaHaHa you called THE FIRST PUSH"))
 		})
 
 		It("Can call another plugin command when more than one plugin is installed", func() {
-			output := Cf("test1").Wait(3 * time.Second)
-			Eventually(output.Out).Should(Say("HaHaHaHa you called THE FIRST TEST"))
+			output := Cf("test1")
+			Eventually(output.Out, 3*time.Second).Should(Say("HaHaHaHa you called THE FIRST TEST"))
 		})
 
 		It("informs user for any invalid commands", func() {
 			output := Cf("foo-bar")
-			Eventually(output.Out).Should(Say("'foo-bar' is not a registered command"))
+			Eventually(output.Out, 3*time.Second).Should(Say("'foo-bar' is not a registered command"))
 		})
 
 		It("Calls core cf command if the plugin shares the same name", func() {
