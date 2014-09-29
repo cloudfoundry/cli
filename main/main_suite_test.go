@@ -3,7 +3,7 @@ package main_test
 import (
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,9 +16,10 @@ func TestMain(t *testing.T) {
 	dir, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
 
-	exPath := path.Join(dir, "..", "fixtures", "plugins", "test")
-	srcPath := path.Join(dir, "..", "fixtures", "plugins", "test.go")
+	exPath := filepath.Join(dir, "..", "fixtures", "plugins", "test")
+	srcPath := filepath.Join(dir, "..", "fixtures", "plugins", "test.go")
 	cmd := exec.Command("go", "build", "-o", exPath, srcPath)
+	println("Working dir: ", dir)
 	println("Executable Path: ", exPath)
 	println("SrcPath: ", srcPath)
 	err = cmd.Run()
@@ -27,7 +28,7 @@ func TestMain(t *testing.T) {
 	}
 	Expect(err).NotTo(HaveOccurred())
 
-	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "fixtures", "plugins", "plugin2"), path.Join(dir, "..", "fixtures", "plugins", "plugin2.go"))
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "fixtures", "plugins", "plugin2"), filepath.Join(dir, "..", "fixtures", "plugins", "plugin2.go"))
 	err = cmd.Run()
 	Expect(err).NotTo(HaveOccurred())
 
