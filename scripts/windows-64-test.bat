@@ -7,9 +7,7 @@ go-bindata -pkg resources -ignore ".go" -o cf/resources/i18n_resources.go cf/i18
 powershell -command set-executionpolicy remotesigned
 powershell .\bin\replace-sha.ps1
 
-$env:GOPATH = "%CD%\Godeps\_workspace;c:\Users\Administrator\go"
-Get-ChildItem Env:GOPATH
-
+SET GOPATH=%CD%\Godeps\_workspace;c:\Users\Administrator\go
 c:\Go\bin\go build -v -o cf-windows-amd64.exe ./main
 c:\Go\bin\go test -i ./cf/... ./generic/... ./testhelpers/... ./main/...
 c:\Go\bin\go test -cover -v ./cf/... ./generic/... ./testhelpers/... ./main/...
