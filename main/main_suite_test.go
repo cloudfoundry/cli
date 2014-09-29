@@ -16,7 +16,11 @@ func TestMain(t *testing.T) {
 	dir, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
 
-	cmd := exec.Command("go", "build", "-o", path.Join(dir, "..", "fixtures", "plugins", "test"), path.Join(dir, "..", "fixtures", "plugins", "test.go"))
+	exPath := path.Join(dir, "..", "fixtures", "plugins", "test")
+	srcPath := path.Join(dir, "..", "fixtures", "plugins", "test.go")
+	cmd := exec.Command("go", "build", "-o", exPath, srcPath)
+	println("Executable Path: ", exPath)
+	println("SrcPath: ", srcPath)
 	err = cmd.Run()
 	if err != nil {
 		println(err.Error())
