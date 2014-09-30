@@ -8,13 +8,13 @@ import "github.com/cloudfoundry/cli/plugin"
 
 type CliPlugin struct{}
 
-var commands = []string{}
+var commands = []plugin.Command{}
 
 func (c *CliPlugin) Run(args string, reply *bool) error {
 	return nil
 }
 
-func (c *CliPlugin) ListCmds(args string, cmdList *[]string) error {
+func (c *CliPlugin) ListCmds(args string, cmdList *[]plugin.Command) error {
 	*cmdList = commands
 	return nil
 }

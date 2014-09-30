@@ -14,7 +14,9 @@ import (
 func TestMain(t *testing.T) {
 	RegisterFailHandler(Fail)
 	dir, err := os.Getwd()
-	Expect(err).NotTo(HaveOccurred())
+	if err != nil {
+		panic(err)
+	}
 
 	//Named test binaries with .exe so they will work correctly on windows
 	//sad panda :(
@@ -24,7 +26,9 @@ func TestMain(t *testing.T) {
 
 	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "fixtures", "plugins", "plugin2.exe"), filepath.Join(dir, "..", "fixtures", "plugins", "plugin2.go"))
 	err = cmd.Run()
-	Expect(err).NotTo(HaveOccurred())
+	if err != nil {
+		panic(err)
+	}
 
 	RunSpecs(t, "Main Suite")
 }

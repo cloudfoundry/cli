@@ -15,7 +15,16 @@ import (
 
 type CliPlugin struct{}
 
-var commands = []string{"test_2_cmd1", "test_2_cmd2"}
+var commands = []plugin.Command{
+	{
+		Name:     "test_2_cmd1",
+		HelpText: "help text for test_2_cmd1",
+	},
+	{
+		Name:     "test_2_cmd2",
+		HelpText: "help text for test_2_cmd2",
+	},
+}
 
 func (c *CliPlugin) Run(args string, reply *bool) error {
 	if args == "test_2_cmd1" {
@@ -26,8 +35,8 @@ func (c *CliPlugin) Run(args string, reply *bool) error {
 	return nil
 }
 
-func (c *CliPlugin) ListCmds(args string, cmdList *[]string) error {
-	*cmdList = commands
+func (c *CliPlugin) ListCmds(args string, cmdlist *[]plugin.Command) error {
+	*cmdlist = commands
 	return nil
 }
 

@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"net/rpc"
 	"os"
-	"os/exec"
 	"runtime"
 	"strings"
 	"time"
@@ -21,6 +19,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
+	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/codegangsta/cli"
 )
 
@@ -85,7 +84,7 @@ func main() {
 	} else {
 		// run each plugin and find the method/
 		// run method if exist
-		if !runPluginMethodIfExists(os.Args[1]) {
+		if !rpc.RunMethodIfExists(os.Args[1], deps.configRepo.Plugins()) {
 			theApp.Run(os.Args)
 		}
 	}
@@ -153,6 +152,7 @@ func callCoreCommand(args []string, theApp *cli.App) {
 	warningsCollector.PrintWarnings()
 }
 
+/*
 func runPluginMethodIfExists(cmdName string) bool {
 	plugins := deps.configRepo.Plugins()
 	var exists bool
@@ -200,4 +200,4 @@ func runPluginServer(location string) *exec.Cmd {
 func stopPluginServer(plugin *exec.Cmd) {
 	plugin.Process.Kill()
 	plugin.Wait()
-}
+} */
