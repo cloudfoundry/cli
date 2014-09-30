@@ -267,6 +267,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["set-running-environment-variable-group"] = environmentvariablegroup.NewSetRunningEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config)
+	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, config)
 	return
 }
 

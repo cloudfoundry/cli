@@ -183,6 +183,7 @@ func runClientCmd(cmd string, method string) bool {
 	}
 	return reply
 }
+
 func runPluginServer(location string) *exec.Cmd {
 	cmd := exec.Command(location)
 	cmd.Stdout = os.Stdout

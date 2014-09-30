@@ -16,6 +16,9 @@ type RpcPlugin interface {
 	//an object containing all of the cli commands available to them
 	Run(args string, reply *bool) error
 	CmdExists(args string, exists *bool) error
+
+	//We only care about the return value.
+	ListCmds(empty string, cmdList *[]string) error
 }
 
 /**
@@ -40,4 +43,13 @@ func ServeCommand(cmd RpcPlugin, port string) {
 			go rpc.ServeConn(conn)
 		}
 	}
+}
+
+func CmdExists(cmd string, availableCmds []string) bool {
+	for _, availableCmd := range availableCmds {
+		if cmd == availableCmd {
+			return true
+		}
+	}
+	return false
 }

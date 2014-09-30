@@ -307,6 +307,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: "PLUGIN",
 			CommandSubGroups: [][]cmdPresenter{
 				{
+					presentCommand("plugins"),
 					presentCommand("install-plugin"),
 				},
 			},
