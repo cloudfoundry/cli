@@ -160,7 +160,7 @@ func findBuildpackPath(zipFiles []*zip.File) (parentPath string, foundBuildpack 
 	for _, file := range zipFiles {
 		if strings.HasSuffix(file.Name, needle) {
 			foundBuildpack = true
-			parentPath = filepath.Join(file.Name, "..", "..")
+			parentPath = path.Join(file.Name, "..", "..")
 			if parentPath == "." {
 				parentPath = ""
 			}

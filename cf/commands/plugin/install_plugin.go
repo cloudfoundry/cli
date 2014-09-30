@@ -3,7 +3,7 @@ package plugin
 import (
 	"fmt"
 	"os"
-	"path/filepath"
+	"path"
 
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -45,7 +45,7 @@ func (cmd *PluginInstall) GetRequirements(_ requirements.Factory, c *cli.Context
 func (cmd *PluginInstall) Run(c *cli.Context) {
 	pluginPath := c.Args()[0]
 
-	_, pluginName := filepath.Split(pluginPath)
+	_, pluginName := path.Split(pluginPath)
 
 	plugins := cmd.config.Plugins()
 
@@ -55,27 +55,27 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginName}}...", map[string]interface{}{"PluginName": pluginName})))
 
-	homeDir := filepath.Join(cmd.config.UserHomePath(), ".cf", "plugin")
+	homeDir := path.Join(cmd.config.UserHomePath(), ".cf", "plugin")
 	err := os.MkdirAll(homeDir, 0700)
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not create the plugin directory: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	_, err = os.Stat(filepath.Join(homeDir, pluginName))
+	_, err = os.Stat(path.Join(homeDir, pluginName))
 	if err == nil || os.IsExist(err) {
 		cmd.ui.Failed(fmt.Sprintf(T("The file {{.PluginName}} already exists under the plugin directory.\n", map[string]interface{}{"PluginName": pluginName})))
 	} else if !os.IsNotExist(err) {
 		cmd.ui.Failed(fmt.Sprintf(T("Unexpected error has occurred:\n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	err = fileutils.CopyFile(filepath.Join(homeDir, pluginName), pluginPath)
+	err = fileutils.CopyFile(path.Join(homeDir, pluginName), pluginPath)
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	os.Chmod(filepath.Join(homeDir, pluginName), 0700)
+	os.Chmod(path.Join(homeDir, pluginName), 0700)
 
-	cmd.config.SetPlugin(pluginName, filepath.Join(homeDir, pluginName))
+	cmd.config.SetPlugin(pluginName, path.Join(homeDir, pluginName))
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully installed.", map[string]interface{}{"PluginName": pluginName})))
