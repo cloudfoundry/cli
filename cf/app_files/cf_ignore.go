@@ -1,7 +1,7 @@
 package app_files
 
 import (
-	"path/filepath"
+	"path"
 	"strings"
 
 	"github.com/cloudfoundry/cli/glob"
@@ -28,7 +28,7 @@ func NewCfIgnore(text string) CfIgnore {
 			ignore = false
 		}
 
-		for _, p := range globsForPattern(filepath.Clean(line)) {
+		for _, p := range globsForPattern(path.Clean(line)) {
 			patterns = append(patterns, ignorePattern{ignore, p})
 		}
 	}
@@ -54,13 +54,13 @@ func (ignore cfIgnore) FileShouldBeIgnored(path string) bool {
 
 func globsForPattern(pattern string) (globs []glob.Glob) {
 	globs = append(globs, glob.MustCompileGlob(pattern))
-	globs = append(globs, glob.MustCompileGlob(filepath.Join(pattern, "*")))
-	globs = append(globs, glob.MustCompileGlob(filepath.Join(pattern, "**", "*")))
+	globs = append(globs, glob.MustCompileGlob(path.Join(pattern, "*")))
+	globs = append(globs, glob.MustCompileGlob(path.Join(pattern, "**", "*")))
 
 	if !strings.HasPrefix(pattern, "/") {
-		globs = append(globs, glob.MustCompileGlob(filepath.Join("**", pattern)))
-		globs = append(globs, glob.MustCompileGlob(filepath.Join("**", pattern, "*")))
-		globs = append(globs, glob.MustCompileGlob(filepath.Join("**", pattern, "**", "*")))
+		globs = append(globs, glob.MustCompileGlob(path.Join("**", pattern)))
+		globs = append(globs, glob.MustCompileGlob(path.Join("**", pattern, "*")))
+		globs = append(globs, glob.MustCompileGlob(path.Join("**", pattern, "**", "*")))
 	}
 
 	return
