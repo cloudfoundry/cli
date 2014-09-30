@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"fmt"
 	"net/rpc"
 	"os"
 	"os/exec"
@@ -10,79 +9,97 @@ import (
 	"github.com/cloudfoundry/cli/plugin"
 )
 
-func RunListCmd(location string) []plugin.Command {
-	cmd := runPluginServer(location)
-	rpcClient := dialClient()
+func RunListCmd(location string) ([]plugin.Command, error) {
+	cmd, err := runPluginServer(location)
+	if err != nil {
+		return []plugin.Command{}, err
+	}
+	defer stopPluginServer(cmd)
+
+	rpcClient, err := dialClient()
+	if err != nil {
+		return []plugin.Command{}, err
+	}
+
 	var cmdList []plugin.Command
-	err := rpcClient.Call("CliPlugin.ListCmds", "", &cmdList)
+	err = rpcClient.Call("CliPlugin.ListCmds", "", &cmdList)
 	if err != nil {
-		fmt.Println("error:", err)
-		os.Exit(1)
+		return []plugin.Command{}, err
 	}
-	stopPluginServer(cmd)
 
-	return cmdList
+	return cmdList, nil
 }
 
-func RunCommandExists(methodName string, location string) bool {
-	cmd := runPluginServer(location)
-	rpcClient := dialClient()
+func RunCommandExists(methodName string, location string) (bool, error) {
+	cmd, err := runPluginServer(location)
+	if err != nil {
+		return false, err
+	}
+	defer stopPluginServer(cmd)
+
+	rpcClient, err := dialClient()
+	if err != nil {
+		return false, err
+	}
+
 	var exist bool
-	err := rpcClient.Call("CliPlugin.CmdExists", methodName, &exist)
+	err = rpcClient.Call("CliPlugin.CmdExists", methodName, &exist)
 	if err != nil {
-		fmt.Println("error:", err)
-		os.Exit(1)
+		return false, err
 	}
-	stopPluginServer(cmd)
 
-	return exist
+	return exist, nil
 }
 
-func RunMethodIfExists(cmdName string, pluginList map[string]string) bool {
+func RunMethodIfExists(cmdName string, pluginList map[string]string) (bool, error) {
 	var exists bool
+
 	for _, location := range pluginList {
-		cmd := runPluginServer(location)
-		exists = runClientCmd("CmdExists", cmdName)
+		cmd, err := runPluginServer(location)
+		if err != nil {
+			continue
+		}
+
+		exists, _ = runClientCmd("CmdExists", cmdName)
+
 		if exists {
-			runClientCmd("Run", cmdName)
+			_, err = runClientCmd("Run", cmdName)
 			stopPluginServer(cmd)
-			return true
+			return true, err
 		}
 		stopPluginServer(cmd)
 	}
-	return false
+	return false, nil
 }
 
-func runClientCmd(cmd string, method string) bool {
-	client := dialClient()
+func runClientCmd(cmd string, method string) (bool, error) {
+	client, err := dialClient()
 	var reply bool
-	err := client.Call("CliPlugin."+cmd, method, &reply)
+	err = client.Call("CliPlugin."+cmd, method, &reply)
 	if err != nil {
-		fmt.Println("error:", err)
-		os.Exit(1)
+		return false, err
 	}
-	return reply
+	return reply, nil
 }
 
-func dialClient() *rpc.Client {
+func dialClient() (*rpc.Client, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:20001")
 	if err != nil {
-		os.Exit(1)
+		return nil, err
 	}
-	return client
+	return client, nil
 }
 
-func runPluginServer(location string) *exec.Cmd {
+func runPluginServer(location string) (*exec.Cmd, error) {
 	cmd := exec.Command(location)
 	cmd.Stdout = os.Stdout
 	err := cmd.Start()
 	if err != nil {
-		fmt.Println("Error running plugin command: ", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	time.Sleep(300 * time.Millisecond)
-	return cmd
+	return cmd, nil
 }
 
 func stopPluginServer(plugin *exec.Cmd) {
