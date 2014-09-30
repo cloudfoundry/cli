@@ -27,7 +27,7 @@ var _ = Describe("locales", func() {
 			os.Setenv("LANG", locale)
 			result := Cf("help")
 
-			Eventually(result, 3*time.Second).Should(Exit(0))
+			Eventually(result, 5*time.Second).Should(Exit(0))
 		}
 	})
 })

@@ -42,8 +42,8 @@ var _ = Describe("Plugins", func() {
 	It("fails if the plugin cannot be started", func() {
 		config.PluginsReturns(map[string]string{"test_245": "not/a/path/you/fool"})
 		runCommand()
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"FAILED"},
+		Expect(ui.Outputs).ToNot(ContainSubstrings(
+			[]string{"test_245"},
 		))
 	})
 
