@@ -8,6 +8,11 @@ import (
 	"os"
 )
 
+type Command struct {
+	Name     string
+	HelpText string
+}
+
 /**
 	Command interface needs to be implementd for a runnable sub-command of `cf`
 **/
@@ -18,7 +23,8 @@ type RpcPlugin interface {
 	CmdExists(args string, exists *bool) error
 
 	//We only care about the return value.
-	ListCmds(empty string, cmdList *[]string) error
+	//TODO: the first param could be used for obtaining help of a specific command.
+	ListCmds(empty string, cmdList *[]Command) error
 }
 
 /**
@@ -45,9 +51,9 @@ func ServeCommand(cmd RpcPlugin, port string) {
 	}
 }
 
-func CmdExists(cmd string, availableCmds []string) bool {
+func CmdExists(cmd string, availableCmds []Command) bool {
 	for _, availableCmd := range availableCmds {
-		if cmd == availableCmd {
+		if cmd == availableCmd.Name {
 			return true
 		}
 	}

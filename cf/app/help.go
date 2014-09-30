@@ -64,6 +64,24 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		return
 	}
 
+	/*	presentPluginCommand := func(commandName string) [][]cmdPresenter {
+		config := configuration.NewRepositoryFromFilepath(configuration.DefaultFilePath(), func(err error) {})
+
+		availablePlugins := config.Plugins()
+		for pluginName, pluginLocation := range availablePlugins {
+			cmd := runPluginServer(pluginLocation)
+
+			for _, cmd := range cmdList {
+				presenter.Name = cmd.Name
+				padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
+				presenter.Name = presenter.Name + padding
+				presenter.Description = cmd.HelpText
+			}
+		}
+
+		return nil
+	}*/
+
 	presenter.Name = app.Name
 	presenter.Flags = app.Flags
 	presenter.Usage = app.Usage
@@ -311,12 +329,22 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("install-plugin"),
 				},
 			},
+		}, {
+			Name:             "INSTALLED PLUGINS",
+			CommandSubGroups: [][]cmdPresenter{
+			//function to get plugin commands.
+			//return value is []cmdPresenter
+			},
 		},
 	}
+
 	return
 }
 
 func ShowHelp(helpTemplate string, thingToPrint interface{}) {
+
+	fmt.Println("CALLING SHOW HELP!!!!")
+
 	translatedTemplatedHelp := T(strings.Replace(helpTemplate, "{{", "[[", -1))
 	translatedTemplatedHelp = strings.Replace(translatedTemplatedHelp, "[[", "{{", -1)
 
