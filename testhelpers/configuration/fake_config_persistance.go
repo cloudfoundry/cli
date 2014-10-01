@@ -6,12 +6,12 @@ import (
 
 type FakePersistor struct {
 	LoadReturns struct {
-		Data *configuration.Data
+		Data configuration.DataInterface
 		Err  error
 	}
 
 	SaveArgs struct {
-		Data *configuration.Data
+		Data configuration.DataInterface
 	}
 	SaveReturns struct {
 		Err error
@@ -22,7 +22,7 @@ func NewFakePersistor() *FakePersistor {
 	return &FakePersistor{}
 }
 
-func (fp *FakePersistor) Load() (data *configuration.Data, err error) {
+func (fp *FakePersistor) Load() (data configuration.DataInterface, err error) {
 	if fp.LoadReturns.Data == nil {
 		fp.LoadReturns.Data = configuration.NewData()
 	}
@@ -35,7 +35,7 @@ func (fp *FakePersistor) Delete() {
 
 }
 
-func (fp *FakePersistor) Save(data *configuration.Data) (err error) {
+func (fp *FakePersistor) Save(data configuration.DataInterface) (err error) {
 	fp.SaveArgs.Data = data
 	err = fp.SaveReturns.Err
 	return

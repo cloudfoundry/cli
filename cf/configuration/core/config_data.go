@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -32,10 +34,28 @@ type Data struct {
 	Trace                 string
 	ColorEnabled          string
 	Locale                string
-	Plugins               map[string]string
 }
 
 func NewData() (data *Data) {
 	data = new(Data)
+	return
+}
+
+func (d *Data) JsonMarshalV3() (output []byte, err error) {
+	d.ConfigVersion = 3
+	return json.MarshalIndent(d, "", "  ")
+}
+
+func (d *Data) JsonUnmarshalV3(input []byte) (err error) {
+	err = json.Unmarshal(input, d)
+	if err != nil {
+		return
+	}
+
+	if d.ConfigVersion != 3 {
+		*d = Data{}
+		return
+	}
+
 	return
 }
