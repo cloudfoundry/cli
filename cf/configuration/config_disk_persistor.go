@@ -13,23 +13,33 @@ const (
 
 type Persistor interface {
 	Delete()
-	Load() (*Data, error)
-	Save(*Data) error
+	Load() (DataInterface, error)
+	Save(DataInterface) error
+}
+
+type DataInterface interface {
+	NewData() DataInterface
+	JsonMarshalV3() ([]byte, error)
+	JsonUnmarshalV3([]byte) error
 }
 
 type DiskPersistor struct {
+	data     DataInterface
 	filePath string
 }
 
-func NewDiskPersistor(path string) (dp DiskPersistor) {
-	return DiskPersistor{filePath: path}
+func NewDiskPersistor(path string, data DataInterface) (dp DiskPersistor) {
+	return DiskPersistor{
+		filePath: path,
+		data:     data,
+	}
 }
 
 func (dp DiskPersistor) Delete() {
 	os.Remove(dp.filePath)
 }
 
-func (dp DiskPersistor) Load() (data *Data, err error) {
+func (dp DiskPersistor) Load() (data DataInterface, err error) {
 	data, err = dp.read()
 	if err != nil {
 		err = dp.write(data)
@@ -37,12 +47,12 @@ func (dp DiskPersistor) Load() (data *Data, err error) {
 	return
 }
 
-func (dp DiskPersistor) Save(data *Data) (err error) {
+func (dp DiskPersistor) Save(data DataInterface) (err error) {
 	return dp.write(data)
 }
 
-func (dp DiskPersistor) read() (data *Data, err error) {
-	data = NewData()
+func (dp DiskPersistor) read() (data DataInterface, err error) {
+	data = dp.data.NewData()
 
 	err = os.MkdirAll(filepath.Dir(dp.filePath), dirPermissions)
 	if err != nil {
@@ -54,17 +64,16 @@ func (dp DiskPersistor) read() (data *Data, err error) {
 		return
 	}
 
-	err = JsonUnmarshalV3(jsonBytes, data)
+	err = data.JsonUnmarshalV3(jsonBytes)
 	return
 }
 
-func (dp DiskPersistor) write(data *Data) (err error) {
-	bytes, err := JsonMarshalV3(data)
+func (dp DiskPersistor) write(data DataInterface) (err error) {
+	bytes, err := data.JsonMarshalV3()
 	if err != nil {
 		return
 	}
 
 	err = ioutil.WriteFile(dp.filePath, bytes, filePermissions)
-
 	return
 }

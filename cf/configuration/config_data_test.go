@@ -15,7 +15,7 @@ var exampleJSON = `
 	"Target": "api.example.com",
 	"ApiVersion": "3",
 	"AuthorizationEndpoint": "auth.example.com",
-	"LoggregatorEndpoint": "logs.example.com",
+	"LoggregatorEndPoint": "logs.example.com",
 	"UaaEndpoint": "uaa.example.com",
 	"AccessToken": "the-access-token",
 	"RefreshToken": "the-refresh-token",
@@ -38,14 +38,10 @@ var exampleJSON = `
 	"AsyncTimeout": 1000,
 	"Trace": "path/to/some/file",
 	"ColorEnabled": "true",
-	"Locale": "fr_FR",
-  "Plugins":{
-          "plugin-1":"/foo/bar",
-          "plugin-2":"/the/second/location"
-   }
+	"Locale": "fr_FR"
 }`
 
-var exampleConfig = &Data{
+var exampleData = &Data{
 	Target:                "api.example.com",
 	ApiVersion:            "3",
 	AuthorizationEndpoint: "auth.example.com",
@@ -66,33 +62,32 @@ var exampleConfig = &Data{
 	AsyncTimeout: 1000,
 	ColorEnabled: "true",
 	Locale:       "fr_FR",
-	Plugins:      map[string]string{"plugin-1": "/foo/bar", "plugin-2": "/the/second/location"},
 }
 
 var _ = Describe("V3 Config files", func() {
 	Describe("serialization", func() {
 		It("creates a JSON string from the config object", func() {
-			jsonData, err := JsonMarshalV3(exampleConfig)
+			jsonData, err := exampleData.JsonMarshalV3()
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(stripWhitespace(string(jsonData))).To(Equal(stripWhitespace(exampleJSON)))
+			Expect(stripWhitespace(string(jsonData))).To(ContainSubstring(stripWhitespace(exampleJSON)))
 		})
 	})
 
 	Describe("parsing", func() {
 		It("returns an error when the JSON is invalid", func() {
 			configData := NewData()
-			err := JsonUnmarshalV3([]byte(`{ "not_valid": ### }`), configData)
+			err := configData.JsonUnmarshalV3([]byte(`{ "not_valid": ### }`))
 
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("creates a config object from valid JSON", func() {
 			configData := NewData()
-			err := JsonUnmarshalV3([]byte(exampleJSON), configData)
+			err := configData.JsonUnmarshalV3([]byte(exampleJSON))
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(configData).To(Equal(exampleConfig))
+			Expect(configData).To(Equal(exampleData))
 		})
 	})
 })

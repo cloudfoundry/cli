@@ -56,10 +56,6 @@ type Reader interface {
 	ColorEnabled() string
 
 	Locale() string
-
-	Plugins() map[string]string
-
-	UserHomePath() string
 }
 
 type ReadWriter interface {
@@ -79,7 +75,6 @@ type ReadWriter interface {
 	SetTrace(string)
 	SetColorEnabled(string)
 	SetLocale(string)
-	SetPlugin(string, string)
 }
 
 type Repository interface {
@@ -92,10 +87,12 @@ type Repository interface {
 func (c *ConfigRepository) init() {
 	c.initOnce.Do(func() {
 		var err error
-		c.data, err = c.persistor.Load()
+		data, err := c.persistor.Load()
 		if err != nil {
 			c.onError(err)
 		}
+
+		c.data = data.(*Data)
 	})
 }
 
@@ -129,10 +126,6 @@ func (c *ConfigRepository) Close() {
 }
 
 // GETTERS
-
-func (c *ConfigRepository) UserHomePath() string {
-	return userHomeDir()
-}
 
 func (c *ConfigRepository) ApiVersion() (apiVersion string) {
 	c.read(func() {
@@ -281,13 +274,6 @@ func (c *ConfigRepository) Locale() (locale string) {
 	return
 }
 
-func (c *ConfigRepository) Plugins() (plugins map[string]string) {
-	c.read(func() {
-		plugins = c.data.Plugins
-	})
-	return
-}
-
 // SETTERS
 
 func (c *ConfigRepository) ClearSession() {
@@ -380,15 +366,5 @@ func (c *ConfigRepository) SetColorEnabled(enabled string) {
 func (c *ConfigRepository) SetLocale(locale string) {
 	c.write(func() {
 		c.data.Locale = locale
-	})
-}
-
-func (c *ConfigRepository) SetPlugin(name string, location string) {
-	if c.data.Plugins == nil {
-		c.data.Plugins = make(map[string]string)
-	}
-
-	c.write(func() {
-		c.data.Plugins[name] = location
 	})
 }
