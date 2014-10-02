@@ -1,9 +1,9 @@
-package configuration_test
+package core_config_test
 
 import (
 	"regexp"
 
-	. "github.com/cloudfoundry/cli/cf/configuration"
+	. "github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

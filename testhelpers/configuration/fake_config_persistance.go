@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 )
 
 type FakePersistor struct {
@@ -22,9 +23,9 @@ func NewFakePersistor() *FakePersistor {
 	return &FakePersistor{}
 }
 
-func (fp *FakePersistor) Load() (data configuration.DataInterface, err error) {
+func (fp *FakePersistor) Load(data configuration.DataInterface) (err error) {
 	if fp.LoadReturns.Data == nil {
-		fp.LoadReturns.Data = configuration.NewData()
+		fp.LoadReturns.Data = core_config.NewData()
 	}
 	data = fp.LoadReturns.Data
 	err = fp.LoadReturns.Err

@@ -10,7 +10,7 @@ import (
 
 	"github.com/pivotal-cf-experimental/jibber_jabber"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	resources "github.com/cloudfoundry/cli/cf/resources"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 )
@@ -40,7 +40,7 @@ func GetResourcesPath() string {
 	return Resources_path
 }
 
-func Init(config configuration.ReadWriter) go_i18n.TranslateFunc {
+func Init(config core_config.ReadWriter) go_i18n.TranslateFunc {
 	var T go_i18n.TranslateFunc
 	var err error
 

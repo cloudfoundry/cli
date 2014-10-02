@@ -1,8 +1,9 @@
-package configuration
+package core_config
 
 import (
 	"sync"
 
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -10,21 +11,22 @@ type ConfigRepository struct {
 	data      *Data
 	mutex     *sync.RWMutex
 	initOnce  *sync.Once
-	persistor Persistor
+	persistor configuration.Persistor
 	onError   func(error)
 }
 
 func NewRepositoryFromFilepath(filepath string, errorHandler func(error)) Repository {
-	return NewRepositoryFromPersistor(NewDiskPersistor(filepath), errorHandler)
+	return NewRepositoryFromPersistor(configuration.NewDiskPersistor(filepath), errorHandler)
 }
 
-func NewRepositoryFromPersistor(persistor Persistor, errorHandler func(error)) Repository {
-	c := new(ConfigRepository)
-	c.mutex = new(sync.RWMutex)
-	c.initOnce = new(sync.Once)
-	c.persistor = persistor
-	c.onError = errorHandler
-	return c
+func NewRepositoryFromPersistor(persistor configuration.Persistor, errorHandler func(error)) Repository {
+	return &ConfigRepository{
+		data:      NewData(),
+		mutex:     new(sync.RWMutex),
+		initOnce:  new(sync.Once),
+		persistor: persistor,
+		onError:   errorHandler,
+	}
 }
 
 type Reader interface {
@@ -86,13 +88,10 @@ type Repository interface {
 
 func (c *ConfigRepository) init() {
 	c.initOnce.Do(func() {
-		var err error
-		data, err := c.persistor.Load()
+		err := c.persistor.Load(c.data)
 		if err != nil {
 			c.onError(err)
 		}
-
-		c.data = data.(*Data)
 	})
 }
 

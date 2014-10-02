@@ -2,14 +2,15 @@ package terminal
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"io"
 	"os"
 	"strings"
 	"time"
 
+	. "github.com/cloudfoundry/cli/cf/i18n"
+
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/codegangsta/cli"
 )
@@ -33,7 +34,7 @@ type UI interface {
 	Failed(message string, args ...interface{})
 	FailWithUsage(context *cli.Context)
 	PanicQuietly()
-	ShowConfiguration(configuration.Reader)
+	ShowConfiguration(core_config.Reader)
 	LoadingIndication()
 	Wait(duration time.Duration)
 	Table(headers []string) Table
@@ -144,7 +145,7 @@ func (c terminalUI) FailWithUsage(context *cli.Context) {
 	os.Exit(1)
 }
 
-func (ui terminalUI) ShowConfiguration(config configuration.Reader) {
+func (ui terminalUI) ShowConfiguration(config core_config.Reader) {
 	table := NewTable(ui, []string{"", ""})
 	if config.HasAPIEndpoint() {
 		table.Add(

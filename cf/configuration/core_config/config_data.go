@@ -1,4 +1,4 @@
-package configuration
+package core_config
 
 import (
 	"encoding/json"

@@ -64,23 +64,24 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		return
 	}
 
-	/*	presentPluginCommand := func(commandName string) [][]cmdPresenter {
-		config := configuration.NewRepositoryFromFilepath(configuration.DefaultFilePath(), func(err error) {})
+	/*
+		presentPluginCommand := func(commandName string) [][]cmdPresenter {
+			pluginConfig := newPluginConfig()
+			availablePlugins := pluginConfig.Plugins()
 
-		availablePlugins := config.Plugins()
-		for pluginName, pluginLocation := range availablePlugins {
-			cmd := runPluginServer(pluginLocation)
+			for pluginName, pluginLocation := range availablePlugins {
+				cmd := runPluginServer(pluginLocation)
 
-			for _, cmd := range cmdList {
-				presenter.Name = cmd.Name
-				padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
-				presenter.Name = presenter.Name + padding
-				presenter.Description = cmd.HelpText
+				for _, cmd := range cmdList {
+					presenter.Name = cmd.Name
+					padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
+					presenter.Name = presenter.Name + padding
+					presenter.Description = cmd.HelpText
+				}
 			}
-		}
 
-		return nil
-	}*/
+			return nil
+		}*/
 
 	presenter.Name = app.Name
 	presenter.Flags = app.Flags
