@@ -533,7 +533,7 @@ var _ = Describe("Login Command", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"SSL Cert", "https://bobs-burgers.com"},
-						[]string{"TIP", "--skip-ssl-validation"},
+						[]string{"TIP", "login", "--skip-ssl-validation"},
 					))
 				})
 

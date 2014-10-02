@@ -1,8 +1,9 @@
 package commands
 
 import (
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strconv"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
@@ -72,7 +73,7 @@ func (cmd Login) Run(c *cli.Context) {
 	cmd.config.ClearSession()
 
 	endpoint, skipSSL := cmd.decideEndpoint(c)
-	NewApi(cmd.ui, cmd.config, cmd.endpointRepo).setApiEndpoint(endpoint, skipSSL)
+	NewApi(cmd.ui, cmd.config, cmd.endpointRepo).setApiEndpoint(endpoint, skipSSL, cmd.Metadata().Name)
 
 	defer func() {
 		cmd.ui.Say("")

@@ -2,6 +2,8 @@ package commands
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -11,7 +13,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type Api struct {
@@ -59,14 +60,14 @@ func (cmd Api) Run(c *cli.Context) {
 
 	cmd.ui.Say(T("Setting api endpoint to {{.Endpoint}}...",
 		map[string]interface{}{"Endpoint": terminal.EntityNameColor(endpoint)}))
-	cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"))
+	cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.Metadata().Name)
 	cmd.ui.Ok()
 
 	cmd.ui.Say("")
 	cmd.ui.ShowConfiguration(cmd.config)
 }
 
-func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool) {
+func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
 	if strings.HasSuffix(endpoint, "/") {
 		endpoint = strings.TrimSuffix(endpoint, "/")
 	}
@@ -80,7 +81,7 @@ func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool) {
 
 		switch typedErr := err.(type) {
 		case *errors.InvalidSSLCert:
-			cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s api --skip-ssl-validation", cf.Name()))
+			cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s %s --skip-ssl-validation", cf.Name(), cmdName))
 			tipMessage := fmt.Sprintf(T("TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
 				map[string]interface{}{"ApiCommand": cfApiCommand}))
 			cmd.ui.Failed(T("Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",

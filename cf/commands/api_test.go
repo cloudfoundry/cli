@@ -145,7 +145,7 @@ var _ = Describe("api command", func() {
 				Expect(config.ApiEndpoint()).To(Equal(""))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Invalid SSL Cert", "https://example.com"},
-					[]string{"TIP"},
+					[]string{"TIP", "api"},
 				))
 			})
 		})
