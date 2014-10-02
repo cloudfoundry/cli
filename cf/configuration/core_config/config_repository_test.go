@@ -1,4 +1,4 @@
-package configuration_test
+package core_config_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	. "github.com/cloudfoundry/cli/cf/configuration"
+	. "github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/fileutils"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
@@ -136,45 +136,25 @@ var _ = Describe("Configuration Repository", func() {
 
 	It("has sane defaults when there is no config to read", func() {
 		withFakeHome(func(configPath string) {
-			repo := NewDiskPersistor(configPath)
-			configData, err := repo.Load()
-			Expect(err).NotTo(HaveOccurred())
+			config = NewRepositoryFromFilepath(configPath, func(err error) {
+				panic(err)
+			})
 
-			Expect(configData.Target).To(Equal(""))
-			Expect(configData.ApiVersion).To(Equal(""))
-			Expect(configData.AuthorizationEndpoint).To(Equal(""))
-			Expect(configData.AccessToken).To(Equal(""))
-		})
-	})
-
-	It("saves its config to disk and can read it back", func() {
-		withFakeHome(func(configPath string) {
-			repo := NewDiskPersistor(configPath)
-			configData, err := repo.Load()
-			Expect(err).NotTo(HaveOccurred())
-
-			configData.ApiVersion = "3.1.0"
-			configData.Target = "https://api.target.example.com"
-			configData.AuthorizationEndpoint = "https://login.target.example.com"
-			configData.AccessToken = "bearer my_access_token"
-
-			err = repo.Save(configData)
-			Expect(err).NotTo(HaveOccurred())
-
-			savedConfig, err := repo.Load()
-			Expect(err).NotTo(HaveOccurred())
-			Expect(savedConfig).To(Equal(configData))
+			Expect(config.ApiEndpoint()).To(Equal(""))
+			Expect(config.ApiVersion()).To(Equal(""))
+			Expect(config.AuthenticationEndpoint()).To(Equal(""))
+			Expect(config.AccessToken()).To(Equal(""))
 		})
 	})
 
 	Context("when the configuration version is older than the current version", func() {
 		It("returns a new empty config", func() {
 			withConfigFixture("outdated-config", func(configPath string) {
-				repo := NewDiskPersistor(configPath)
-				configData, err := repo.Load()
+				config = NewRepositoryFromFilepath(configPath, func(err error) {
+					panic(err)
+				})
 
-				Expect(err).NotTo(HaveOccurred())
-				Expect(configData.Target).To(Equal(""))
+				Expect(config.ApiEndpoint()).To(Equal(""))
 			})
 		})
 	})

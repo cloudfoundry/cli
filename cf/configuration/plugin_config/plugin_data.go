@@ -1,4 +1,4 @@
-package configuration
+package plugin_config
 
 import "encoding/json"
 
@@ -7,7 +7,9 @@ type PluginData struct {
 }
 
 func NewData() *PluginData {
-	return new(PluginData)
+	return &PluginData{
+		Plugins: make(map[string]string),
+	}
 }
 
 func (pd *PluginData) JsonMarshalV3() (output []byte, err error) {
