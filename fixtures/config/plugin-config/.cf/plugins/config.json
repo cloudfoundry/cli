@@ -1,7 +1,7 @@
 {
   "Plugins": {
-    "test_1": "../../../fixtures/config/plugin-config/.cf/plugins/test_1",
-    "test_2": "../../../fixtures/config/plugin-config/.cf/plugins/test_2",
-    "empty_plugin": "../../../fixtures/config/plugin-config/.cf/plugins/empty_plugin.go"
+    "test_1": "../../../fixtures/config/plugin-config/.cf/plugins/test_1.exe",
+    "test_2": "../../../fixtures/config/plugin-config/.cf/plugins/test_2.exe",
+    "empty_plugin": "../../../fixtures/config/plugin-config/.cf/plugins/empty_plugin.exe"
   }
 }
