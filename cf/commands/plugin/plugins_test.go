@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	. "github.com/cloudfoundry/cli/cf/commands/plugin"
-	testconfig "github.com/cloudfoundry/cli/cf/configuration/fakes"
+	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -17,30 +17,29 @@ import (
 var _ = Describe("Plugins", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              *testconfig.FakeRepository
 		requirementsFactory *testreq.FakeReqFactory
-
-		plugin1, plugin2, emptyPlugin string
 	)
 
 	BeforeEach(func() {
+
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		config = &testconfig.FakeRepository{}
 
-		plugin1 = filepath.Join("..", "..", "..", "fixtures", "plugins", "test_1")
-		plugin2 = filepath.Join("..", "..", "..", "fixtures", "plugins", "test_2")
-		emptyPlugin = filepath.Join("..", "..", "..", "fixtures", "plugins", "empty_plugin")
-
+		config_helpers.UserHomeDir = func() string {
+			return filepath.Join("..", "..", "..", "fixtures", "config", "plugin-config")
+		}
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPlugins(ui, config)
+		cmd := NewPlugins(ui)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails if the plugin cannot be started", func() {
-		config.PluginsReturns(map[string]string{"test_245": "not/a/path/you/fool"})
+		config_helpers.UserHomeDir = func() string {
+			return filepath.Join("..", "..", "..", "fixtures", "config", "bad-plugin-config")
+		}
+
 		runCommand()
 		Expect(ui.Outputs).ToNot(ContainSubstrings(
 			[]string{"test_245"},
@@ -48,7 +47,6 @@ var _ = Describe("Plugins", func() {
 	})
 
 	It("returns a list of available methods of a plugin", func() {
-		config.PluginsReturns(map[string]string{"test_1": plugin1})
 		runCommand()
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Listing Installed Plugins..."},
@@ -59,7 +57,6 @@ var _ = Describe("Plugins", func() {
 	})
 
 	It("does not list the plugin when it provides no available commands", func() {
-		config.PluginsReturns(map[string]string{"empty_plugin": emptyPlugin})
 		runCommand()
 		Expect(ui.Outputs).NotTo(ContainSubstrings(
 			[]string{"empty_plugin"},
@@ -67,10 +64,6 @@ var _ = Describe("Plugins", func() {
 	})
 
 	It("list multiple plugins and their associated commands", func() {
-		config.PluginsReturns(map[string]string{
-			"test_1": plugin1,
-			"test_2": plugin2,
-		})
 		runCommand()
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"test_1", "test_1_cmd1"},

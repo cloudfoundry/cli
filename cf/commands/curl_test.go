@@ -3,7 +3,7 @@ package commands_test
 import (
 	"bytes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/trace"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -190,7 +190,7 @@ var _ = Describe("curl command", func() {
 
 type curlDependencies struct {
 	ui                  *testterm.FakeUI
-	config              configuration.Reader
+	config              core_config.Reader
 	requirementsFactory *testreq.FakeReqFactory
 	curlRepo            *testapi.FakeCurlRepository
 }

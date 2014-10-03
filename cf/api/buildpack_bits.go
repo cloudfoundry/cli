@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -29,13 +29,13 @@ type BuildpackBitsRepository interface {
 }
 
 type CloudControllerBuildpackBitsRepository struct {
-	config       configuration.Reader
+	config       core_config.Reader
 	gateway      net.Gateway
 	zipper       app_files.Zipper
 	TrustedCerts []tls.Certificate
 }
 
-func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gateway net.Gateway, zipper app_files.Zipper) (repo CloudControllerBuildpackBitsRepository) {
+func NewCloudControllerBuildpackBitsRepository(config core_config.Reader, gateway net.Gateway, zipper app_files.Zipper) (repo CloudControllerBuildpackBitsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.zipper = zipper

@@ -3,7 +3,7 @@ package service_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("marketplace command", func() {
 	var ui *testterm.FakeUI
 	var requirementsFactory *testreq.FakeReqFactory
-	var config configuration.ReadWriter
+	var config core_config.ReadWriter
 	var serviceRepo *testapi.FakeServiceRepo
 	var fakeServiceOfferings []models.ServiceOffering
 

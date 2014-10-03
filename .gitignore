@@ -51,6 +51,9 @@ tags
 fixtures/plugins/test_1
 fixtures/plugins/test_2
 fixtures/plugins/empty_plugin
+fixtures/config/plugin-config/.cf/plugins/test_1
+fixtures/config/plugin-config/.cf/plugins/test_2
+fixtures/config/plugin-config/.cf/plugins/empty_plugin
 
 # NEVER commit the resources files!
 cf/resources/i18n_resources.go

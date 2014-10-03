@@ -9,7 +9,7 @@ import (
 	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -100,7 +100,7 @@ var _ = Describe("start command", func() {
 		}
 	})
 
-	callStart := func(args []string, config configuration.Reader, requirementsFactory *testreq.FakeReqFactory, displayApp ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
+	callStart := func(args []string, config core_config.Reader, requirementsFactory *testreq.FakeReqFactory, displayApp ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
 		ui = new(testterm.FakeUI)
 
 		cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)

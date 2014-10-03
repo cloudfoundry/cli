@@ -15,7 +15,7 @@ import (
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -35,7 +35,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 		file4       resources.AppFileResource
 		testHandler *testnet.TestHandler
 		testServer  *httptest.Server
-		configRepo  configuration.ReadWriter
+		configRepo  core_config.ReadWriter
 	)
 
 	BeforeEach(func() {

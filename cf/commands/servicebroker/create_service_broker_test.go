@@ -2,7 +2,7 @@ package servicebroker_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -18,7 +18,7 @@ var _ = Describe("create-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		serviceBrokerRepo   *testapi.FakeServiceBrokerRepo
 	)
 

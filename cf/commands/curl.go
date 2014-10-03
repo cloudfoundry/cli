@@ -12,7 +12,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -22,11 +22,11 @@ import (
 
 type Curl struct {
 	ui       terminal.UI
-	config   configuration.Reader
+	config   core_config.Reader
 	curlRepo api.CurlRepository
 }
 
-func NewCurl(ui terminal.UI, config configuration.Reader, curlRepo api.CurlRepository) (cmd *Curl) {
+func NewCurl(ui terminal.UI, config core_config.Reader, curlRepo api.CurlRepository) (cmd *Curl) {
 	cmd = new(Curl)
 	cmd.ui = ui
 	cmd.config = config

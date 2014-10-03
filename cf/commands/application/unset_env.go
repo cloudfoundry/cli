@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,12 +14,12 @@ import (
 
 type UnsetEnv struct {
 	ui      terminal.UI
-	config  configuration.Reader
+	config  core_config.Reader
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewUnsetEnv(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *UnsetEnv) {
+func NewUnsetEnv(ui terminal.UI, config core_config.Reader, appRepo api.ApplicationRepository) (cmd *UnsetEnv) {
 	cmd = new(UnsetEnv)
 	cmd.ui = ui
 	cmd.config = config

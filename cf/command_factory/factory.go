@@ -31,7 +31,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 	"github.com/cloudfoundry/cli/cf/commands/user"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/words"
@@ -47,7 +47,7 @@ type concreteFactory struct {
 	cmdsByName map[string]command.Command
 }
 
-func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator) (factory concreteFactory) {
+func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator) (factory concreteFactory) {
 	factory.cmdsByName = make(map[string]command.Command)
 
 	factory.cmdsByName["api"] = commands.NewApi(ui, config, repoLocator.GetEndpointRepository())
@@ -266,8 +266,8 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["set-staging-environment-variable-group"] = environmentvariablegroup.NewSetStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-running-environment-variable-group"] = environmentvariablegroup.NewSetRunningEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 
-	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config)
-	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, config)
+	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui)
+	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui)
 	return
 }
 

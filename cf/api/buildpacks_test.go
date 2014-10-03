@@ -6,7 +6,7 @@ import (
 	"time"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -23,7 +23,7 @@ var _ = Describe("Buildpacks repo", func() {
 	var (
 		ts      *httptest.Server
 		handler *testnet.TestHandler
-		config  configuration.ReadWriter
+		config  core_config.ReadWriter
 		repo    BuildpackRepository
 	)
 

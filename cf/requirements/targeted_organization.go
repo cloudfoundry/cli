@@ -3,7 +3,7 @@ package requirements
 import (
 	"fmt"
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -16,10 +16,10 @@ type TargetedOrgRequirement interface {
 
 type targetedOrgApiRequirement struct {
 	ui     terminal.UI
-	config configuration.Reader
+	config core_config.Reader
 }
 
-func NewTargetedOrgRequirement(ui terminal.UI, config configuration.Reader) TargetedOrgRequirement {
+func NewTargetedOrgRequirement(ui terminal.UI, config core_config.Reader) TargetedOrgRequirement {
 	return targetedOrgApiRequirement{ui, config}
 }
 

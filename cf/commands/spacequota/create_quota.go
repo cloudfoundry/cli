@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/formatters"
@@ -17,12 +17,12 @@ import (
 
 type CreateSpaceQuota struct {
 	ui        terminal.UI
-	config    configuration.Reader
+	config    core_config.Reader
 	quotaRepo space_quotas.SpaceQuotaRepository
 	orgRepo   organizations.OrganizationRepository
 }
 
-func NewCreateSpaceQuota(ui terminal.UI, config configuration.Reader, quotaRepo space_quotas.SpaceQuotaRepository, orgRepo organizations.OrganizationRepository) CreateSpaceQuota {
+func NewCreateSpaceQuota(ui terminal.UI, config core_config.Reader, quotaRepo space_quotas.SpaceQuotaRepository, orgRepo organizations.OrganizationRepository) CreateSpaceQuota {
 	return CreateSpaceQuota{
 		ui:        ui,
 		config:    config,

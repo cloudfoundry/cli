@@ -3,7 +3,7 @@ package application
 import (
 	"github.com/cloudfoundry/cli/cf/api/app_files"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,12 +13,12 @@ import (
 
 type Files struct {
 	ui           terminal.UI
-	config       configuration.Reader
+	config       core_config.Reader
 	appFilesRepo app_files.AppFilesRepository
 	appReq       requirements.ApplicationRequirement
 }
 
-func NewFiles(ui terminal.UI, config configuration.Reader, appFilesRepo app_files.AppFilesRepository) (cmd *Files) {
+func NewFiles(ui terminal.UI, config core_config.Reader, appFilesRepo app_files.AppFilesRepository) (cmd *Files) {
 	cmd = new(Files)
 	cmd.ui = ui
 	cmd.config = config

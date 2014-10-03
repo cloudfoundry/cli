@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -21,7 +21,7 @@ import (
 
 type ShowApp struct {
 	ui               terminal.UI
-	config           configuration.Reader
+	config           core_config.Reader
 	appSummaryRepo   api.AppSummaryRepository
 	appInstancesRepo app_instances.AppInstancesRepository
 	appReq           requirements.ApplicationRequirement
@@ -31,7 +31,7 @@ type ApplicationDisplayer interface {
 	ShowApp(app models.Application)
 }
 
-func NewShowApp(ui terminal.UI, config configuration.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo app_instances.AppInstancesRepository) (cmd *ShowApp) {
+func NewShowApp(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo app_instances.AppInstancesRepository) (cmd *ShowApp) {
 	cmd = new(ShowApp)
 	cmd.ui = ui
 	cmd.config = config

@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -17,12 +17,12 @@ import (
 
 type CreateOrg struct {
 	ui        terminal.UI
-	config    configuration.Reader
+	config    core_config.Reader
 	orgRepo   organizations.OrganizationRepository
 	quotaRepo quotas.QuotaRepository
 }
 
-func NewCreateOrg(ui terminal.UI, config configuration.Reader, orgRepo organizations.OrganizationRepository, quotaRepo quotas.QuotaRepository) (cmd CreateOrg) {
+func NewCreateOrg(ui terminal.UI, config core_config.Reader, orgRepo organizations.OrganizationRepository, quotaRepo quotas.QuotaRepository) (cmd CreateOrg) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.orgRepo = orgRepo

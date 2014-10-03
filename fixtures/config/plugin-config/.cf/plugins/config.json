@@ -1,6 +1,7 @@
 {
   "Plugins": {
-    "valid1": "../fixtures/plugins/test_1",
-    "valid2": "../fixtures/plugins/test_2"
-  } 
+    "test_1": "../../../fixtures/config/plugin-config/.cf/plugins/test_1",
+    "test_2": "../../../fixtures/config/plugin-config/.cf/plugins/test_2",
+    "empty_plugin": "../../../fixtures/config/plugin-config/.cf/plugins/empty_plugin.go"
+  }
 }

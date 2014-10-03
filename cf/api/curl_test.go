@@ -5,7 +5,7 @@ import (
 	"time"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -166,7 +166,7 @@ const expectedJSONResponse = `
 `
 
 type curlDependencies struct {
-	config  configuration.ReadWriter
+	config  core_config.ReadWriter
 	gateway net.Gateway
 }
 

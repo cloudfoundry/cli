@@ -2,7 +2,7 @@ package application_test
 
 import (
 	testappfiles "github.com/cloudfoundry/cli/cf/api/app_files/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("files command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		requirementsFactory *testreq.FakeReqFactory
 		appFilesRepo        *testappfiles.FakeAppFilesRepository
 	)

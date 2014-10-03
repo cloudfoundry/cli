@@ -3,7 +3,7 @@ package quota
 import (
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -14,11 +14,11 @@ import (
 
 type updateQuota struct {
 	ui        terminal.UI
-	config    configuration.Reader
+	config    core_config.Reader
 	quotaRepo quotas.QuotaRepository
 }
 
-func NewUpdateQuota(ui terminal.UI, config configuration.Reader, quotaRepo quotas.QuotaRepository) *updateQuota {
+func NewUpdateQuota(ui terminal.UI, config core_config.Reader, quotaRepo quotas.QuotaRepository) *updateQuota {
 	return &updateQuota{
 		ui:        ui,
 		config:    config,

@@ -3,7 +3,7 @@ package application_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,7 +20,7 @@ var _ = Describe("restage command", func() {
 		ui                  *testterm.FakeUI
 		app                 models.Application
 		appRepo             *testapi.FakeApplicationRepository
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		requirementsFactory *testreq.FakeReqFactory
 		stagingWatcher      *fakeStagingWatcher
 	)

@@ -3,7 +3,7 @@ package user_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/user"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -19,7 +19,7 @@ var _ = Describe("Create user command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
 		userRepo            *testapi.FakeUserRepository
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 	)
 
 	BeforeEach(func() {
@@ -27,7 +27,7 @@ var _ = Describe("Create user command", func() {
 		ui = new(testterm.FakeUI)
 		userRepo = &testapi.FakeUserRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		accessToken, _ := testconfig.EncodeAccessToken(configuration.TokenInfo{
+		accessToken, _ := testconfig.EncodeAccessToken(core_config.TokenInfo{
 			Username: "current-user",
 		})
 		configRepo.SetAccessToken(accessToken)

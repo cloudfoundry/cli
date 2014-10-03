@@ -22,6 +22,10 @@ func DefaultFilePath() string {
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
 var UserHomeDir = func() string {
+	if os.Getenv("CF_PLUGINS_DIR") != "" {
+		return os.Getenv("CF_PLUGINS_DIR")
+	}
+
 	if runtime.GOOS == "windows" {
 		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
 		if home == "" {

@@ -2,7 +2,7 @@ package commands_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -11,7 +11,7 @@ import (
 )
 
 var _ = Describe("logout command", func() {
-	var config configuration.Repository
+	var config core_config.Repository
 	BeforeEach(func() {
 		org := models.OrganizationFields{}
 		org.Name = "MyOrg"

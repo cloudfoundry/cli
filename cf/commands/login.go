@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -22,7 +22,7 @@ const maxChoices = 50
 
 type Login struct {
 	ui            terminal.UI
-	config        configuration.ReadWriter
+	config        core_config.ReadWriter
 	authenticator authentication.AuthenticationRepository
 	endpointRepo  api.EndpointRepository
 	orgRepo       organizations.OrganizationRepository
@@ -30,7 +30,7 @@ type Login struct {
 }
 
 func NewLogin(ui terminal.UI,
-	config configuration.ReadWriter,
+	config core_config.ReadWriter,
 	authenticator authentication.AuthenticationRepository,
 	endpointRepo api.EndpointRepository,
 	orgRepo organizations.OrganizationRepository,
@@ -160,7 +160,7 @@ func (cmd Login) authenticate(c *cli.Context) {
 	credentials := make(map[string]string)
 
 	if value, ok := prompts["username"]; ok {
-		if prompts["username"].Type == configuration.AuthPromptTypeText && usernameFlagValue != "" {
+		if prompts["username"].Type == core_config.AuthPromptTypeText && usernameFlagValue != "" {
 			credentials["username"] = usernameFlagValue
 		} else {
 			credentials["username"] = cmd.ui.Ask("%s", value.DisplayName)
@@ -168,7 +168,7 @@ func (cmd Login) authenticate(c *cli.Context) {
 	}
 
 	for key, prompt := range prompts {
-		if prompt.Type == configuration.AuthPromptTypePassword {
+		if prompt.Type == core_config.AuthPromptTypePassword {
 			if key == "passcode" {
 				continue
 			}

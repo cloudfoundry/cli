@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,14 +14,14 @@ import (
 
 type UnsetSpaceRole struct {
 	ui        terminal.UI
-	config    configuration.Reader
+	config    core_config.Reader
 	spaceRepo spaces.SpaceRepository
 	userRepo  api.UserRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewUnsetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo spaces.SpaceRepository, userRepo api.UserRepository) (cmd *UnsetSpaceRole) {
+func NewUnsetSpaceRole(ui terminal.UI, config core_config.Reader, spaceRepo spaces.SpaceRepository, userRepo api.UserRepository) (cmd *UnsetSpaceRole) {
 	cmd = new(UnsetSpaceRole)
 	cmd.ui = ui
 	cmd.config = config

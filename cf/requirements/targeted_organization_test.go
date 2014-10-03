@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
@@ -17,7 +17,7 @@ import (
 var _ = Describe("TargetedOrganizationRequirement", func() {
 	var (
 		ui     *testterm.FakeUI
-		config configuration.ReadWriter
+		config core_config.ReadWriter
 	)
 
 	BeforeEach(func() {

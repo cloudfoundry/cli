@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,12 +18,12 @@ import (
 
 type ServiceAccess struct {
 	ui             terminal.UI
-	config         configuration.Reader
+	config         core_config.Reader
 	actor          actors.ServiceActor
 	tokenRefresher authentication.TokenRefresher
 }
 
-func NewServiceAccess(ui terminal.UI, config configuration.Reader, actor actors.ServiceActor, tokenRefresher authentication.TokenRefresher) (cmd *ServiceAccess) {
+func NewServiceAccess(ui terminal.UI, config core_config.Reader, actor actors.ServiceActor, tokenRefresher authentication.TokenRefresher) (cmd *ServiceAccess) {
 	return &ServiceAccess{
 		ui:             ui,
 		config:         config,

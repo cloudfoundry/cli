@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -16,11 +16,11 @@ import (
 
 type ListApps struct {
 	ui             terminal.UI
-	config         configuration.Reader
+	config         core_config.Reader
 	appSummaryRepo api.AppSummaryRepository
 }
 
-func NewListApps(ui terminal.UI, config configuration.Reader, appSummaryRepo api.AppSummaryRepository) (cmd ListApps) {
+func NewListApps(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository) (cmd ListApps) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appSummaryRepo = appSummaryRepo

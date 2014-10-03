@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -14,11 +14,11 @@ import (
 
 type CreateService struct {
 	ui          terminal.UI
-	config      configuration.Reader
+	config      core_config.Reader
 	serviceRepo api.ServiceRepository
 }
 
-func NewCreateService(ui terminal.UI, config configuration.Reader, serviceRepo api.ServiceRepository) (cmd CreateService) {
+func NewCreateService(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository) (cmd CreateService) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceRepo = serviceRepo

@@ -3,17 +3,17 @@ package requirements
 import (
 	"fmt"
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type TargetedSpaceRequirement struct {
 	ui     terminal.UI
-	config configuration.Reader
+	config core_config.Reader
 }
 
-func NewTargetedSpaceRequirement(ui terminal.UI, config configuration.Reader) TargetedSpaceRequirement {
+func NewTargetedSpaceRequirement(ui terminal.UI, config core_config.Reader) TargetedSpaceRequirement {
 	return TargetedSpaceRequirement{ui, config}
 }
 

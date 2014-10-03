@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/net"
 	"regexp"
@@ -14,7 +14,7 @@ type EndpointRepository interface {
 }
 
 type RemoteEndpointRepository struct {
-	config  configuration.ReadWriter
+	config  core_config.ReadWriter
 	gateway net.Gateway
 }
 
@@ -24,7 +24,7 @@ type endpointResource struct {
 	LoggregatorEndpoint   string `json:"logging_endpoint"`
 }
 
-func NewEndpointRepository(config configuration.ReadWriter, gateway net.Gateway) (repo RemoteEndpointRepository) {
+func NewEndpointRepository(config core_config.ReadWriter, gateway net.Gateway) (repo RemoteEndpointRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

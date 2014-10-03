@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -15,11 +15,11 @@ import (
 
 type Env struct {
 	ui      terminal.UI
-	config  configuration.Reader
+	config  core_config.Reader
 	appRepo api.ApplicationRepository
 }
 
-func NewEnv(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *Env) {
+func NewEnv(ui terminal.UI, config core_config.Reader, appRepo api.ApplicationRepository) (cmd *Env) {
 	cmd = new(Env)
 	cmd.ui = ui
 	cmd.config = config

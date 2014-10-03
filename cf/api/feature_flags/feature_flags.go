@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -16,11 +16,11 @@ type FeatureFlagRepository interface {
 }
 
 type CloudControllerFeatureFlagRepository struct {
-	config  configuration.Reader
+	config  core_config.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerFeatureFlagRepository(config configuration.Reader, gateway net.Gateway) CloudControllerFeatureFlagRepository {
+func NewCloudControllerFeatureFlagRepository(config core_config.Reader, gateway net.Gateway) CloudControllerFeatureFlagRepository {
 	return CloudControllerFeatureFlagRepository{
 		config:  config,
 		gateway: gateway,

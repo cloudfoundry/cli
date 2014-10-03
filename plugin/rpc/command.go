@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/plugin"
 )
 
@@ -51,8 +52,10 @@ func RunCommandExists(methodName string, location string) (bool, error) {
 	return exist, nil
 }
 
-func RunMethodIfExists(cmdName string, pluginList map[string]string) (bool, error) {
+func RunMethodIfExists(cmdName string) (bool, error) {
 	var exists bool
+	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
+	pluginList := pluginsConfig.Plugins()
 
 	for _, location := range pluginList {
 		cmd, err := runPluginServer(location)

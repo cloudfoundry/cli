@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,12 +14,12 @@ import (
 
 type DisableServiceAccess struct {
 	ui             terminal.UI
-	config         configuration.Reader
+	config         core_config.Reader
 	actor          actors.ServicePlanActor
 	tokenRefresher authentication.TokenRefresher
 }
 
-func NewDisableServiceAccess(ui terminal.UI, config configuration.Reader, actor actors.ServicePlanActor, tokenRefresher authentication.TokenRefresher) (cmd *DisableServiceAccess) {
+func NewDisableServiceAccess(ui terminal.UI, config core_config.Reader, actor actors.ServicePlanActor, tokenRefresher authentication.TokenRefresher) (cmd *DisableServiceAccess) {
 	return &DisableServiceAccess{
 		ui:             ui,
 		config:         config,

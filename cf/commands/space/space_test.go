@@ -3,7 +3,7 @@ package space_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/space"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,7 +20,7 @@ var _ = Describe("space command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 	)
 
 	BeforeEach(func() {

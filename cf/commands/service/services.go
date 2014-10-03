@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -14,11 +14,11 @@ import (
 
 type ListServices struct {
 	ui                 terminal.UI
-	config             configuration.Reader
+	config             core_config.Reader
 	serviceSummaryRepo api.ServiceSummaryRepository
 }
 
-func NewListServices(ui terminal.UI, config configuration.Reader, serviceSummaryRepo api.ServiceSummaryRepository) (cmd ListServices) {
+func NewListServices(ui terminal.UI, config core_config.Reader, serviceSummaryRepo api.ServiceSummaryRepository) (cmd ListServices) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceSummaryRepo = serviceSummaryRepo

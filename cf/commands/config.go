@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,10 +14,10 @@ import (
 
 type ConfigCommands struct {
 	ui     terminal.UI
-	config configuration.ReadWriter
+	config core_config.ReadWriter
 }
 
-func NewConfig(ui terminal.UI, config configuration.ReadWriter) ConfigCommands {
+func NewConfig(ui terminal.UI, config core_config.ReadWriter) ConfigCommands {
 	return ConfigCommands{ui: ui, config: config}
 }
 

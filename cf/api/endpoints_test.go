@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	. "github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -56,7 +56,7 @@ func apiInfoEndpointWithoutLogURL(w http.ResponseWriter, r *http.Request) {
 
 var _ = Describe("Endpoints Repository", func() {
 	var (
-		config       configuration.ReadWriter
+		config       core_config.ReadWriter
 		gateway      net.Gateway
 		testServer   *httptest.Server
 		repo         EndpointRepository

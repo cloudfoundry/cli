@@ -3,6 +3,7 @@ package fileutils
 import (
 	"io"
 	"os"
+	"runtime"
 )
 
 func CopyFile(dst, src string) error {
@@ -25,6 +26,18 @@ func CopyFile(dst, src string) error {
 	err = out.Close()
 	if err != nil {
 		return err
+	}
+
+	fileInfo, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+
+	if runtime.GOOS != "windows" {
+		err = os.Chmod(dst, fileInfo.Mode())
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

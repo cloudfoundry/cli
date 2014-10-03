@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -139,7 +139,7 @@ var _ = Describe("UI", func() {
 	})
 
 	Context("when user is not logged in", func() {
-		var config configuration.Reader
+		var config core_config.Reader
 
 		BeforeEach(func() {
 			config = testconfig.NewRepository()
@@ -157,10 +157,10 @@ var _ = Describe("UI", func() {
 	})
 
 	Context("when an api endpoint is set and the user logged in", func() {
-		var config configuration.ReadWriter
+		var config core_config.ReadWriter
 
 		BeforeEach(func() {
-			accessToken := configuration.TokenInfo{
+			accessToken := core_config.TokenInfo{
 				UserGuid: "my-user-guid",
 				Username: "my-user",
 				Email:    "my-user-email",

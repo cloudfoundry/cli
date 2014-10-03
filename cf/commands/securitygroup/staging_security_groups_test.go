@@ -2,7 +2,7 @@ package securitygroup_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/command"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -21,7 +21,7 @@ import (
 var _ = Describe("staging-security-groups command", func() {
 	var (
 		ui                           *testterm.FakeUI
-		configRepo                   configuration.ReadWriter
+		configRepo                   core_config.ReadWriter
 		fakeStagingSecurityGroupRepo *testapi.FakeStagingSecurityGroupsRepo
 		cmd                          command.Command
 		requirementsFactory          *testreq.FakeReqFactory

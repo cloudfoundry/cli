@@ -3,7 +3,7 @@ package spaces
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -14,11 +14,11 @@ type SecurityGroupSpaceBinder interface {
 }
 
 type securityGroupSpaceBinder struct {
-	configRepo configuration.Reader
+	configRepo core_config.Reader
 	gateway    net.Gateway
 }
 
-func NewSecurityGroupSpaceBinder(configRepo configuration.Reader, gateway net.Gateway) (binder securityGroupSpaceBinder) {
+func NewSecurityGroupSpaceBinder(configRepo core_config.Reader, gateway net.Gateway) (binder securityGroupSpaceBinder) {
 	return securityGroupSpaceBinder{
 		configRepo: configRepo,
 		gateway:    gateway,

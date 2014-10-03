@@ -2,7 +2,7 @@ package net
 
 import (
 	"encoding/json"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"strconv"
 	"time"
@@ -24,7 +24,7 @@ func cloudControllerErrorHandler(statusCode int, body []byte) error {
 	}
 }
 
-func NewCloudControllerGateway(config configuration.Reader, clock func() time.Time) Gateway {
+func NewCloudControllerGateway(config core_config.Reader, clock func() time.Time) Gateway {
 	gateway := newGateway(cloudControllerErrorHandler, config)
 	gateway.Clock = clock
 	gateway.PollingEnabled = true

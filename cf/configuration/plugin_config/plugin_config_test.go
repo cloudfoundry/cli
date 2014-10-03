@@ -32,8 +32,8 @@ var _ = Describe("PluginConfig", func() {
 			})
 			plugins := pluginConfig.Plugins()
 
-			Expect(plugins["valid1"]).To(Equal("../fixtures/plugins/test_1"))
-			Expect(plugins["valid2"]).To(Equal("../fixtures/plugins/test_2"))
+			Expect(plugins["test_1"]).To(Equal("../../../fixtures/config/plugin-config/.cf/plugins/test_1"))
+			Expect(plugins["test_2"]).To(Equal("../../../fixtures/config/plugin-config/.cf/plugins/test_2"))
 		})
 	})
 

@@ -3,7 +3,7 @@ package servicebroker
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,11 +12,11 @@ import (
 
 type RenameServiceBroker struct {
 	ui     terminal.UI
-	config configuration.Reader
+	config core_config.Reader
 	repo   api.ServiceBrokerRepository
 }
 
-func NewRenameServiceBroker(ui terminal.UI, config configuration.Reader, repo api.ServiceBrokerRepository) (cmd RenameServiceBroker) {
+func NewRenameServiceBroker(ui terminal.UI, config core_config.Reader, repo api.ServiceBrokerRepository) (cmd RenameServiceBroker) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.repo = repo

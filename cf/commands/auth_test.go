@@ -3,7 +3,7 @@ package commands_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,7 +19,7 @@ var _ = Describe("auth command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		cmd                 Authenticate
-		config              configuration.ReadWriter
+		config              core_config.ReadWriter
 		repo                *testapi.FakeAuthenticationRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)

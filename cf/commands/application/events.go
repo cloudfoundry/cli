@@ -3,7 +3,7 @@ package application
 import (
 	"github.com/cloudfoundry/cli/cf/api/app_events"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,12 +12,12 @@ import (
 
 type Events struct {
 	ui         terminal.UI
-	config     configuration.Reader
+	config     core_config.Reader
 	appReq     requirements.ApplicationRequirement
 	eventsRepo app_events.AppEventsRepository
 }
 
-func NewEvents(ui terminal.UI, config configuration.Reader, eventsRepo app_events.AppEventsRepository) (cmd *Events) {
+func NewEvents(ui terminal.UI, config core_config.Reader, eventsRepo app_events.AppEventsRepository) (cmd *Events) {
 	cmd = new(Events)
 	cmd.ui = ui
 	cmd.config = config

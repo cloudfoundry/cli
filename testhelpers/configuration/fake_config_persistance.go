@@ -7,12 +7,12 @@ import (
 
 type FakePersistor struct {
 	LoadReturns struct {
-		Data configuration.DataInterface
+		Data *core_config.Data
 		Err  error
 	}
 
 	SaveArgs struct {
-		Data configuration.DataInterface
+		Data *core_config.Data
 	}
 	SaveReturns struct {
 		Err error
@@ -37,7 +37,7 @@ func (fp *FakePersistor) Delete() {
 }
 
 func (fp *FakePersistor) Save(data configuration.DataInterface) (err error) {
-	fp.SaveArgs.Data = data
+	fp.SaveArgs.Data = data.(*core_config.Data)
 	err = fp.SaveReturns.Err
 	return
 }

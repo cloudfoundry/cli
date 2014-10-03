@@ -1,7 +1,7 @@
 package organization_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -17,7 +17,7 @@ import (
 func callShowOrg(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
-	token := configuration.TokenInfo{Username: "my-user"}
+	token := core_config.TokenInfo{Username: "my-user"}
 
 	spaceFields := models.SpaceFields{}
 	spaceFields.Name = "my-space"
@@ -37,7 +37,7 @@ func callShowOrg(args []string, requirementsFactory *testreq.FakeReqFactory) (ui
 var _ = Describe("org command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		requirementsFactory *testreq.FakeReqFactory
 	)
 

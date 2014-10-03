@@ -2,7 +2,7 @@ package service_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("rename-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              configuration.ReadWriter
+		config              core_config.ReadWriter
 		serviceRepo         *testapi.FakeServiceRepo
 		requirementsFactory *testreq.FakeReqFactory
 	)

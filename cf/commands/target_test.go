@@ -6,7 +6,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,7 +24,7 @@ var _ = Describe("target command", func() {
 		orgRepo             *fake_org.FakeOrganizationRepository
 		spaceRepo           *testapi.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		config              configuration.ReadWriter
+		config              core_config.ReadWriter
 		ui                  *testterm.FakeUI
 	)
 

@@ -3,7 +3,7 @@ package commands_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -104,7 +104,7 @@ var _ = Describe("password command", func() {
 type passwordDeps struct {
 	ReqFactory *testreq.FakeReqFactory
 	PwdRepo    *testapi.FakePasswordRepo
-	Config     configuration.ReadWriter
+	Config     core_config.ReadWriter
 }
 
 func getPasswordDeps() passwordDeps {

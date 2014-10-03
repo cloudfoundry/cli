@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	term "github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
 )
@@ -139,7 +139,7 @@ func (ui *FakeUI) ClearOutputs() {
 	ui.Outputs = []string{}
 }
 
-func (ui *FakeUI) ShowConfiguration(config configuration.Reader) {
+func (ui *FakeUI) ShowConfiguration(config core_config.Reader) {
 	ui.ShowConfigurationCalled = true
 }
 

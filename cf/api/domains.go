@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -25,12 +25,12 @@ type DomainRepository interface {
 }
 
 type CloudControllerDomainRepository struct {
-	config   configuration.Reader
+	config   core_config.Reader
 	gateway  net.Gateway
 	strategy strategy.EndpointStrategy
 }
 
-func NewCloudControllerDomainRepository(config configuration.Reader, gateway net.Gateway, strategy strategy.EndpointStrategy) CloudControllerDomainRepository {
+func NewCloudControllerDomainRepository(config core_config.Reader, gateway net.Gateway, strategy strategy.EndpointStrategy) CloudControllerDomainRepository {
 	return CloudControllerDomainRepository{
 		config:   config,
 		gateway:  gateway,

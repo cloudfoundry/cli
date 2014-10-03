@@ -3,7 +3,7 @@ package api_test
 import (
 	"code.google.com/p/gogoprotobuf/proto"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/loggregator_consumer/noaa_errors"
@@ -20,7 +20,7 @@ var _ = Describe("loggregator logs repository", func() {
 	var (
 		fakeConsumer       *testapi.FakeLoggregatorConsumer
 		logsRepo           LogsRepository
-		configRepo         configuration.ReadWriter
+		configRepo         core_config.ReadWriter
 		fakeTokenRefresher *testapi.FakeAuthenticationRepository
 	)
 

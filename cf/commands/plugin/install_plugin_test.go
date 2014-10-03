@@ -4,9 +4,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 
-	testconfig "github.com/cloudfoundry/cli/cf/configuration/fakes"
+	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -21,7 +23,6 @@ import (
 var _ = Describe("Install", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              *testconfig.FakeRepository
 		requirementsFactory *testreq.FakeReqFactory
 
 		pluginFile *os.File
@@ -33,24 +34,38 @@ var _ = Describe("Install", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		config = &testconfig.FakeRepository{}
+
+		config_helpers.UserHomeDir = func() string {
+			return filepath.Join("..", "..", "..", "fixtures", "config", "plugin-config")
+		}
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPluginInstall(ui, config)
+		cmd := NewPluginInstall(ui)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	setupTempExecutable := func() {
 		var err error
-		homeDir, err = ioutil.TempDir(os.TempDir(), "plugin")
+
+		homeDir, err = ioutil.TempDir(os.TempDir(), "plugins")
 		Expect(err).ToNot(HaveOccurred())
-		pluginDir = path.Join(homeDir, ".cf", "plugin")
+
+		config_helpers.UserHomeDir = func() string {
+			return homeDir
+		}
+
+		pluginDir = path.Join(homeDir, ".cf", "plugins")
 
 		curDir, err = os.Getwd()
 		Expect(err).ToNot(HaveOccurred())
 		pluginFile, err = ioutil.TempFile("./", "test_plugin")
 		Expect(err).ToNot(HaveOccurred())
+
+		if runtime.GOOS != "windows" {
+			err = os.Chmod(path.Join(curDir, pluginFile.Name()), 0700)
+			Expect(err).ToNot(HaveOccurred())
+		}
 	}
 
 	Describe("requirements", func() {
@@ -61,11 +76,10 @@ var _ = Describe("Install", func() {
 
 	Describe("failures", func() {
 		It("if plugin name is already taken", func() {
-			config.PluginsReturns(map[string]string{"fake_plugin": "/going/to/nowhere/fake_plugin"})
-			runCommand("/going/to/nowhere/fake_plugin")
+			runCommand(filepath.Join("..", "..", "..", "fixtures", "plugins", "test_1"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Plugin name", "fake_plugin", "is already taken"},
+				[]string{"Plugin name", "test_1", "is already taken"},
 				[]string{"FAILED"},
 			))
 		})
@@ -75,7 +89,6 @@ var _ = Describe("Install", func() {
 				setupTempExecutable()
 				err := os.MkdirAll(pluginDir, 0700)
 				Expect(err).NotTo(HaveOccurred())
-				config.UserHomePathReturns(homeDir)
 			})
 
 			AfterEach(func() {
@@ -100,7 +113,6 @@ var _ = Describe("Install", func() {
 	Describe("success", func() {
 		BeforeEach(func() {
 			setupTempExecutable()
-			config.UserHomePathReturns(homeDir)
 			runCommand(path.Join(curDir, pluginFile.Name()))
 		})
 
@@ -109,7 +121,7 @@ var _ = Describe("Install", func() {
 			os.Remove(homeDir)
 		})
 
-		It("copies the plugin into directory ~/.cf/plugin/PLUGIN_NAME", func() {
+		It("copies the plugin into directory <FAKE_HOME_DIR>/.cf/plugins/PLUGIN_NAME", func() {
 			_, err := os.Stat(path.Join(curDir, pluginFile.Name()))
 			Expect(err).ToNot(HaveOccurred())
 			_, err = os.Stat(path.Join(pluginDir, pluginFile.Name()))
@@ -125,9 +137,10 @@ var _ = Describe("Install", func() {
 		}
 
 		It("populate the configuration map with the plugin name and location", func() {
-			pluginName, pluginPath := config.SetPluginArgsForCall(0)
-			Expect(pluginName).To(Equal(pluginFile.Name()))
-			Expect(pluginPath).To(Equal(path.Join(pluginDir, pluginFile.Name())))
+			pluginConfig := plugin_config.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
+			plugins := pluginConfig.Plugins()
+
+			Expect(plugins[pluginFile.Name()]).To(Equal(path.Join(pluginDir, pluginFile.Name())))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Installing plugin", pluginFile.Name()},
 				[]string{"OK"},

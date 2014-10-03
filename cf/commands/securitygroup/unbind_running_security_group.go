@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -15,12 +15,12 @@ import (
 
 type unbindFromRunningGroup struct {
 	ui                terminal.UI
-	configRepo        configuration.Reader
+	configRepo        core_config.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
 	runningGroupRepo  running.RunningSecurityGroupsRepo
 }
 
-func NewUnbindFromRunningGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo, runningGroupRepo running.RunningSecurityGroupsRepo) command.Command {
+func NewUnbindFromRunningGroup(ui terminal.UI, configRepo core_config.Reader, securityGroupRepo security_groups.SecurityGroupRepo, runningGroupRepo running.RunningSecurityGroupsRepo) command.Command {
 	return &unbindFromRunningGroup{
 		ui:                ui,
 		configRepo:        configRepo,

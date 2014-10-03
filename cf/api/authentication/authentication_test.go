@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -22,7 +22,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		gateway    net.Gateway
 		testServer *httptest.Server
 		handler    *testnet.TestHandler
-		config     configuration.ReadWriter
+		config     core_config.ReadWriter
 		auth       AuthenticationRepository
 	)
 
@@ -109,7 +109,7 @@ var _ = Describe("AuthenticationRepository", func() {
 	Describe("getting login info", func() {
 		var (
 			apiErr  error
-			prompts map[string]configuration.AuthPrompt
+			prompts map[string]core_config.AuthPrompt
 		)
 
 		JustBeforeEach(func() {
@@ -126,14 +126,14 @@ var _ = Describe("AuthenticationRepository", func() {
 			})
 
 			It("gets the login prompts", func() {
-				Expect(prompts).To(Equal(map[string]configuration.AuthPrompt{
-					"username": configuration.AuthPrompt{
+				Expect(prompts).To(Equal(map[string]core_config.AuthPrompt{
+					"username": core_config.AuthPrompt{
 						DisplayName: "Email",
-						Type:        configuration.AuthPromptTypeText,
+						Type:        core_config.AuthPromptTypeText,
 					},
-					"pin": configuration.AuthPrompt{
+					"pin": core_config.AuthPrompt{
 						DisplayName: "PIN Number",
-						Type:        configuration.AuthPromptTypePassword,
+						Type:        core_config.AuthPromptTypePassword,
 					},
 				}))
 			})

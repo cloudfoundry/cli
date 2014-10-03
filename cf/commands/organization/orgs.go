@@ -3,7 +3,7 @@ package organization
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,11 +12,11 @@ import (
 
 type ListOrgs struct {
 	ui      terminal.UI
-	config  configuration.Reader
+	config  core_config.Reader
 	orgRepo organizations.OrganizationRepository
 }
 
-func NewListOrgs(ui terminal.UI, config configuration.Reader, orgRepo organizations.OrganizationRepository) (cmd ListOrgs) {
+func NewListOrgs(ui terminal.UI, config core_config.Reader, orgRepo organizations.OrganizationRepository) (cmd ListOrgs) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.orgRepo = orgRepo

@@ -3,7 +3,7 @@ package serviceauthtoken_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
@@ -20,7 +20,7 @@ import (
 var _ = Describe("delete-service-auth-token command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		authTokenRepo       *testapi.FakeAuthTokenRepo
 		requirementsFactory *testreq.FakeReqFactory
 	)

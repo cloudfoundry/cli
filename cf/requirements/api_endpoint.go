@@ -3,17 +3,17 @@ package requirements
 import (
 	"fmt"
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type ApiEndpointRequirement struct {
 	ui     terminal.UI
-	config configuration.Reader
+	config core_config.Reader
 }
 
-func NewApiEndpointRequirement(ui terminal.UI, config configuration.Reader) ApiEndpointRequirement {
+func NewApiEndpointRequirement(ui terminal.UI, config core_config.Reader) ApiEndpointRequirement {
 	return ApiEndpointRequirement{ui, config}
 }
 
