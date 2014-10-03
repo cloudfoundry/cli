@@ -21,7 +21,7 @@ func NewPluginConfig(errorHandler func(error)) *PluginConfig {
 		data:      NewData(),
 		mutex:     new(sync.RWMutex),
 		initOnce:  new(sync.Once),
-		persistor: configuration.NewDiskPersistor(filepath.Join(config_helpers.UserHomeDir(), ".cf", "plugins", "config.json")),
+		persistor: configuration.NewDiskPersistor(filepath.Join(config_helpers.PluginRepoDir(), ".cf", "plugins", "config.json")),
 		onError:   errorHandler,
 	}
 }

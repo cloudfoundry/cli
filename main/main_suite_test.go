@@ -19,14 +19,14 @@ func TestMain(t *testing.T) {
 		panic(err)
 	}
 
-	cmd := exec.Command("go", "build", "-o", path.Join(dir, "..", "fixtures", "config", "main-plugin-test-config", ".cf", "plugins", "test_1.exe"), path.Join(dir, "..", "fixtures", "plugins", "test_1.go"))
+	cmd := exec.Command("go", "build", "-o", filepath.Join(dir, "..", "fixtures", "config", "main-plugin-test-config", ".cf", "plugins", "test_1.exe"), filepath.Join(dir, "..", "fixtures", "plugins", "test_1.go"))
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)
 	}
 	Expect(err).NotTo(HaveOccurred())
 
-	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "fixtures", "config", "main-plugin-test-config", ".cf", "plugins", "test_2.exe"), path.Join(dir, "..", "fixtures", "plugins", "test_2.go"))
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "fixtures", "config", "main-plugin-test-config", ".cf", "plugins", "test_2.exe"), filepath.Join(dir, "..", "fixtures", "plugins", "test_2.go"))
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)

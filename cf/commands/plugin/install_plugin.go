@@ -55,7 +55,7 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginName}}...", map[string]interface{}{"PluginName": pluginName})))
 
-	pluginsDir := filepath.Join(config_helpers.UserHomeDir(), ".cf", "plugins")
+	pluginsDir := filepath.Join(config_helpers.PluginRepoDir(), ".cf", "plugins")
 	pluginExecutable := filepath.Join(pluginsDir, pluginName)
 
 	_, err := os.Stat(pluginExecutable)
