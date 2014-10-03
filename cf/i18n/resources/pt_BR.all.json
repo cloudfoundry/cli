@@ -1055,11 +1055,6 @@
       "modified": false
    },
    {
-      "id": "Could not create the plugin directory: \n{{.Error}}",
-      "translation": "Could not create the plugin directory: \n{{.Error}}",
-      "modified": false
-   },
-   {
       "id": "Could not determine the current working directory!",
       "translation": "Não foi possível determinar o diretório de trabalho atual!",
       "modified": false
