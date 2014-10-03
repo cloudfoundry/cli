@@ -35,7 +35,7 @@ var _ = Describe("Install", func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		config_helpers.UserHomeDir = func() string {
+		config_helpers.PluginRepoDir = func() string {
 			return filepath.Join("..", "..", "..", "fixtures", "config", "plugin-config")
 		}
 	})
@@ -51,7 +51,7 @@ var _ = Describe("Install", func() {
 		homeDir, err = ioutil.TempDir(os.TempDir(), "plugins")
 		Expect(err).ToNot(HaveOccurred())
 
-		config_helpers.UserHomeDir = func() string {
+		config_helpers.PluginRepoDir = func() string {
 			return homeDir
 		}
 

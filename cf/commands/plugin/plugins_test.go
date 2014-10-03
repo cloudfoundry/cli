@@ -25,7 +25,7 @@ var _ = Describe("Plugins", func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		config_helpers.UserHomeDir = func() string {
+		config_helpers.PluginRepoDir = func() string {
 			return filepath.Join("..", "..", "..", "fixtures", "config", "plugin-config")
 		}
 	})
@@ -36,7 +36,7 @@ var _ = Describe("Plugins", func() {
 	}
 
 	It("fails if the plugin cannot be started", func() {
-		config_helpers.UserHomeDir = func() string {
+		config_helpers.PluginRepoDir = func() string {
 			return filepath.Join("..", "..", "..", "fixtures", "config", "bad-plugin-config")
 		}
 

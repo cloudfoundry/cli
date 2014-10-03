@@ -13,7 +13,7 @@ func DefaultFilePath() string {
 		cfHome := os.Getenv("CF_HOME")
 		configDir = filepath.Join(cfHome, ".cf")
 	} else {
-		configDir = filepath.Join(UserHomeDir(), ".cf")
+		configDir = filepath.Join(userHomeDir(), ".cf")
 	}
 
 	return filepath.Join(configDir, "config.json")
@@ -21,10 +21,7 @@ func DefaultFilePath() string {
 
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
-var UserHomeDir = func() string {
-	if os.Getenv("CF_PLUGINS_DIR") != "" {
-		return os.Getenv("CF_PLUGINS_DIR")
-	}
+var userHomeDir = func() string {
 
 	if runtime.GOOS == "windows" {
 		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
@@ -35,4 +32,12 @@ var UserHomeDir = func() string {
 	}
 
 	return os.Getenv("HOME")
+}
+
+var PluginRepoDir = func() string {
+	if os.Getenv("CF_PLUGINS_DIR") != "" {
+		return os.Getenv("CF_PLUGINS_DIR")
+	}
+
+	return userHomeDir()
 }

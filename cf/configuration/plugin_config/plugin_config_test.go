@@ -19,7 +19,7 @@ var _ = Describe("PluginConfig", func() {
 			curDir, err := os.Getwd()
 			Expect(err).ToNot(HaveOccurred())
 
-			config_helpers.UserHomeDir = func() string {
+			config_helpers.PluginRepoDir = func() string {
 				return filepath.Join(curDir, "..", "..", "..", "fixtures", "config", "plugin-config")
 			}
 		})
@@ -39,7 +39,7 @@ var _ = Describe("PluginConfig", func() {
 
 	Describe("Writing configuration data", func() {
 		BeforeEach(func() {
-			config_helpers.UserHomeDir = func() string { return os.TempDir() }
+			config_helpers.PluginRepoDir = func() string { return os.TempDir() }
 		})
 
 		AfterEach(func() {
