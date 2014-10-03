@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,12 +18,12 @@ import (
 
 type Logs struct {
 	ui       terminal.UI
-	config   configuration.Reader
+	config   core_config.Reader
 	logsRepo api.LogsRepository
 	appReq   requirements.ApplicationRequirement
 }
 
-func NewLogs(ui terminal.UI, config configuration.Reader, logsRepo api.LogsRepository) (cmd *Logs) {
+func NewLogs(ui terminal.UI, config core_config.Reader, logsRepo api.LogsRepository) (cmd *Logs) {
 	cmd = new(Logs)
 	cmd.ui = ui
 	cmd.config = config

@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -16,11 +16,11 @@ import (
 
 type CreateUserProvidedService struct {
 	ui                              terminal.UI
-	config                          configuration.Reader
+	config                          core_config.Reader
 	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
 }
 
-func NewCreateUserProvidedService(ui terminal.UI, config configuration.Reader, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd CreateUserProvidedService) {
+func NewCreateUserProvidedService(ui terminal.UI, config core_config.Reader, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd CreateUserProvidedService) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo

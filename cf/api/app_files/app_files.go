@@ -3,7 +3,7 @@ package app_files
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
@@ -12,11 +12,11 @@ type AppFilesRepository interface {
 }
 
 type CloudControllerAppFilesRepository struct {
-	config  configuration.Reader
+	config  core_config.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerAppFilesRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerAppFilesRepository) {
+func NewCloudControllerAppFilesRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerAppFilesRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

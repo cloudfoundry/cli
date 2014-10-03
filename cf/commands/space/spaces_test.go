@@ -3,7 +3,7 @@ package space_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -16,7 +16,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func callSpaces(args []string, requirementsFactory *testreq.FakeReqFactory, config configuration.Reader, spaceRepo spaces.SpaceRepository) (ui *testterm.FakeUI) {
+func callSpaces(args []string, requirementsFactory *testreq.FakeReqFactory, config core_config.Reader, spaceRepo spaces.SpaceRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	cmd := NewListSpaces(ui, config, spaceRepo)
 	testcmd.RunCommand(cmd, args, requirementsFactory)
@@ -27,7 +27,7 @@ var _ = Describe("spaces command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		spaceRepo           *testapi.FakeSpaceRepository
 	)
 

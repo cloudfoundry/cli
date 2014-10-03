@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("i18n.Init() function", func() {
 	var (
 		oldResourcesPath string
-		configRepo       configuration.ReadWriter
+		configRepo       core_config.ReadWriter
 
 		T go_i18n.TranslateFunc
 	)

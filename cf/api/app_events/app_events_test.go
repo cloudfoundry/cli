@@ -3,7 +3,7 @@ package app_events_test
 import (
 	. "github.com/cloudfoundry/cli/cf/api/app_events"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,7 +20,7 @@ var _ = Describe("App Events Repo", func() {
 	var (
 		server  *httptest.Server
 		handler *testnet.TestHandler
-		config  configuration.ReadWriter
+		config  core_config.ReadWriter
 		repo    AppEventsRepository
 	)
 

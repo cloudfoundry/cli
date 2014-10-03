@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -16,13 +16,13 @@ import (
 
 type Target struct {
 	ui        terminal.UI
-	config    configuration.ReadWriter
+	config    core_config.ReadWriter
 	orgRepo   organizations.OrganizationRepository
 	spaceRepo spaces.SpaceRepository
 }
 
 func NewTarget(ui terminal.UI,
-	config configuration.ReadWriter,
+	config core_config.ReadWriter,
 	orgRepo organizations.OrganizationRepository,
 	spaceRepo spaces.SpaceRepository) (cmd Target) {
 

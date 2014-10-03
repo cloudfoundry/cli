@@ -2,7 +2,7 @@
 package fakes
 
 import (
-	. "github.com/cloudfoundry/cli/cf/configuration"
+	. "github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	"sync"

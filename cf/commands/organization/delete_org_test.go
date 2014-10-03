@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,7 +19,7 @@ import (
 
 var _ = Describe("delete-org command", func() {
 	var (
-		config              configuration.ReadWriter
+		config              core_config.ReadWriter
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		orgRepo             *test_org.FakeOrganizationRepository

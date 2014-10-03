@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -16,11 +16,11 @@ import (
 
 type ShowOrg struct {
 	ui     terminal.UI
-	config configuration.Reader
+	config core_config.Reader
 	orgReq requirements.OrganizationRequirement
 }
 
-func NewShowOrg(ui terminal.UI, config configuration.Reader) (cmd *ShowOrg) {
+func NewShowOrg(ui terminal.UI, config core_config.Reader) (cmd *ShowOrg) {
 	cmd = new(ShowOrg)
 	cmd.ui = ui
 	cmd.config = config

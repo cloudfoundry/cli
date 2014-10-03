@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	"strings"
@@ -87,11 +87,11 @@ type AppSummaryRepository interface {
 }
 
 type CloudControllerAppSummaryRepository struct {
-	config  configuration.Reader
+	config  core_config.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerAppSummaryRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerAppSummaryRepository) {
+func NewCloudControllerAppSummaryRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerAppSummaryRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/plugin/rpc"
@@ -10,14 +10,12 @@ import (
 )
 
 type Plugins struct {
-	ui     terminal.UI
-	config configuration.ReadWriter
+	ui terminal.UI
 }
 
-func NewPlugins(ui terminal.UI, config configuration.ReadWriter) *Plugins {
+func NewPlugins(ui terminal.UI) *Plugins {
 	return &Plugins{
-		ui:     ui,
-		config: config,
+		ui: ui,
 	}
 }
 
@@ -35,7 +33,9 @@ func (cmd *Plugins) GetRequirements(_ requirements.Factory, _ *cli.Context) (req
 
 func (cmd *Plugins) Run(c *cli.Context) {
 	cmd.ui.Say("Listing Installed Plugins...")
-	plugins := cmd.config.Plugins()
+
+	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { cmd.ui.Failed(err.Error()) })
+	plugins := pluginsConfig.Plugins()
 
 	table := terminal.NewTable(cmd.ui, []string{"Plugin name", "Command name"})
 

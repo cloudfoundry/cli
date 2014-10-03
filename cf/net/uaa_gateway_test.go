@@ -2,7 +2,7 @@ package net_test
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,7 +20,7 @@ var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) 
 
 var _ = Describe("UAA Gateway", func() {
 	var gateway Gateway
-	var config configuration.Reader
+	var config core_config.Reader
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()

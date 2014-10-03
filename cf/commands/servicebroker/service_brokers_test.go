@@ -3,7 +3,7 @@ package servicebroker_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/servicebroker"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -27,7 +27,7 @@ func callListServiceBrokers(args []string, serviceBrokerRepo *testapi.FakeServic
 var _ = Describe("service-brokers command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              configuration.Repository
+		config              core_config.Repository
 		cmd                 ListServiceBrokers
 		repo                *testapi.FakeServiceBrokerRepo
 		requirementsFactory *testreq.FakeReqFactory

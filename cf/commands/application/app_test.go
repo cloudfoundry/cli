@@ -4,7 +4,7 @@ import (
 	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,7 +22,7 @@ import (
 var _ = Describe("app Command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		appSummaryRepo      *testapi.FakeAppSummaryRepo
 		appInstancesRepo    *testAppInstanaces.FakeAppInstancesRepository
 		requirementsFactory *testreq.FakeReqFactory

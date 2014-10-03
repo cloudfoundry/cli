@@ -1,0 +1,6 @@
+{
+	"Plugins": {
+		"test_245": "../no/executable/found",
+		"anotherThing":"something"
+		}
+}

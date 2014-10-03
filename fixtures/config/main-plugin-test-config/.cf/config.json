@@ -1,0 +1,30 @@
+{
+  "ConfigVersion": 3,
+  "Target": "",
+  "ApiVersion": "",
+  "AuthorizationEndpoint": "",
+  "LoggregatorEndPoint": "",
+  "UaaEndpoint": "",
+  "AccessToken": "",
+  "RefreshToken": "",
+  "OrganizationFields": {
+    "Guid": "",
+    "Name": "",
+    "QuotaDefinition": {
+      "name": "",
+      "memory_limit": 0,
+      "total_routes": 0,
+      "total_services": 0,
+      "non_basic_services_allowed": false
+    }
+  },
+  "SpaceFields": {
+    "Guid": "",
+    "Name": ""
+  },
+  "SSLDisabled": false,
+  "AsyncTimeout": 0,
+  "Trace": "",
+  "ColorEnabled": "",
+  "Locale": ""
+}

@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -11,10 +11,10 @@ import (
 
 type Logout struct {
 	ui     terminal.UI
-	config configuration.ReadWriter
+	config core_config.ReadWriter
 }
 
-func NewLogout(ui terminal.UI, config configuration.ReadWriter) (cmd Logout) {
+func NewLogout(ui terminal.UI, config core_config.ReadWriter) (cmd Logout) {
 	cmd.ui = ui
 	cmd.config = config
 	return

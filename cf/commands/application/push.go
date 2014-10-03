@@ -15,7 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/formatters"
@@ -29,7 +29,7 @@ import (
 
 type Push struct {
 	ui            terminal.UI
-	config        configuration.Reader
+	config        core_config.Reader
 	manifestRepo  manifest.ManifestRepository
 	appStarter    ApplicationStarter
 	appStopper    ApplicationStopper
@@ -46,7 +46,7 @@ type Push struct {
 	app_files     app_files.AppFiles
 }
 
-func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.ManifestRepository,
+func NewPush(ui terminal.UI, config core_config.Reader, manifestRepo manifest.ManifestRepository,
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
 	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
 	stackRepo api.StackRepository, serviceRepo api.ServiceRepository,

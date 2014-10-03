@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -18,11 +18,11 @@ type EnvironmentVariableGroupsRepository interface {
 }
 
 type CloudControllerEnvironmentVariableGroupsRepository struct {
-	config  configuration.Reader
+	config  core_config.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerEnvironmentVariableGroupsRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerEnvironmentVariableGroupsRepository) {
+func NewCloudControllerEnvironmentVariableGroupsRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerEnvironmentVariableGroupsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

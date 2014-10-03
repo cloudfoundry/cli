@@ -4,7 +4,7 @@ import (
 	"errors"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	cferrors "github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -180,7 +180,7 @@ var _ = Describe("purge-service command", func() {
 
 type commandDependencies struct {
 	ui                  *testterm.FakeUI
-	config              configuration.ReadWriter
+	config              core_config.ReadWriter
 	serviceRepo         *testapi.FakeServiceRepo
 	requirementsFactory *testreq.FakeReqFactory
 }

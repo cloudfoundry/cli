@@ -14,21 +14,22 @@ import (
 
 var _ = Describe("main", func() {
 	var (
-		old_CF_HOME string
+		old_PLUGINS_DIR string
 	)
 
 	BeforeEach(func() {
-		old_CF_HOME = os.Getenv("CF_HOME")
+		old_PLUGINS_DIR = os.Getenv("CF_PLUGINS_DIR")
 
 		dir, err := os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
-		fullDir := filepath.Join(dir, "..", "fixtures", "config", "plugin-config")
-		err = os.Setenv("CF_HOME", fullDir)
+
+		fullDir := filepath.Join(dir, "..", "fixtures", "config", "main-plugin-test-config")
+		err = os.Setenv("CF_PLUGINS_DIR", fullDir)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		err := os.Setenv("CF_HOME", old_CF_HOME)
+		err := os.Setenv("CF_PLUGINS_DIR", old_PLUGINS_DIR)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

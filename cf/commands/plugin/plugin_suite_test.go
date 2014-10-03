@@ -26,21 +26,21 @@ func TestPlugin(t *testing.T) {
 	}
 	Expect(err).NotTo(HaveOccurred())
 
-	cmd := exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.go"))
+	cmd := exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "test_1"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.go"))
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)
 	}
 	Expect(err).NotTo(HaveOccurred())
 
-	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.go"))
+	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "test_2"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.go"))
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)
 	}
 	Expect(err).NotTo(HaveOccurred())
 
-	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "plugins", "empty_plugin"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "empty_plugin.go"))
+	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "empty_plugin"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "empty_plugin.go"))
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)

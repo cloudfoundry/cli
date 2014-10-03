@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -33,7 +33,7 @@ var _ = Describe("Push Command", func() {
 	var (
 		cmd                 *Push
 		ui                  *testterm.FakeUI
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		manifestRepo        *testmanifest.FakeManifestRepository
 		starter             *testcmd.FakeAppStarter
 		stopper             *testcmd.FakeAppStopper

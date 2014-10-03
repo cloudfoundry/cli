@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregator_consumer/noaa_errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
@@ -21,7 +21,7 @@ type LogsRepository interface {
 
 type LoggregatorLogsRepository struct {
 	consumer       consumer.LoggregatorConsumer
-	config         configuration.Reader
+	config         core_config.Reader
 	TrustedCerts   []tls.Certificate
 	tokenRefresher authentication.TokenRefresher
 	messageQueue   *SortedMessageQueue
@@ -31,7 +31,7 @@ type LoggregatorLogsRepository struct {
 
 var BufferTime time.Duration = 5 * time.Second
 
-func NewLoggregatorLogsRepository(config configuration.Reader, consumer consumer.LoggregatorConsumer, refresher authentication.TokenRefresher) LogsRepository {
+func NewLoggregatorLogsRepository(config core_config.Reader, consumer consumer.LoggregatorConsumer, refresher authentication.TokenRefresher) LogsRepository {
 	return &LoggregatorLogsRepository{
 		config:         config,
 		consumer:       consumer,

@@ -1,19 +1,19 @@
 package fakes
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 )
 
 type FakeAuthenticationRepository struct {
-	Config           configuration.ReadWriter
+	Config           core_config.ReadWriter
 	AuthenticateArgs struct {
 		Credentials []map[string]string
 	}
 	GetLoginPromptsWasCalled bool
 	GetLoginPromptsReturns   struct {
 		Error   error
-		Prompts map[string]configuration.AuthPrompt
+		Prompts map[string]core_config.AuthPrompt
 	}
 
 	AuthError          bool
@@ -46,7 +46,7 @@ func (auth *FakeAuthenticationRepository) RefreshAuthToken() (string, error) {
 	return "", auth.RefreshTokenError
 }
 
-func (auth *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]configuration.AuthPrompt, apiErr error) {
+func (auth *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]core_config.AuthPrompt, apiErr error) {
 	auth.GetLoginPromptsWasCalled = true
 	prompts = auth.GetLoginPromptsReturns.Prompts
 	apiErr = auth.GetLoginPromptsReturns.Error

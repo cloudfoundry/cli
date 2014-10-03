@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -16,11 +16,11 @@ import (
 
 type showQuota struct {
 	ui        terminal.UI
-	config    configuration.Reader
+	config    core_config.Reader
 	quotaRepo quotas.QuotaRepository
 }
 
-func NewShowQuota(ui terminal.UI, config configuration.Reader, quotaRepo quotas.QuotaRepository) *showQuota {
+func NewShowQuota(ui terminal.UI, config core_config.Reader, quotaRepo quotas.QuotaRepository) *showQuota {
 	return &showQuota{
 		ui:        ui,
 		config:    config,

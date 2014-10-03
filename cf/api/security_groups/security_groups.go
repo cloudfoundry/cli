@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -21,10 +21,10 @@ type SecurityGroupRepo interface {
 
 type cloudControllerSecurityGroupRepo struct {
 	gateway net.Gateway
-	config  configuration.Reader
+	config  core_config.Reader
 }
 
-func NewSecurityGroupRepo(config configuration.Reader, gateway net.Gateway) SecurityGroupRepo {
+func NewSecurityGroupRepo(config core_config.Reader, gateway net.Gateway) SecurityGroupRepo {
 	return cloudControllerSecurityGroupRepo{
 		config:  config,
 		gateway: gateway,

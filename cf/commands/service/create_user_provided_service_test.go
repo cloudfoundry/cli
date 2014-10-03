@@ -3,7 +3,7 @@ package service_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -17,7 +17,7 @@ import (
 var _ = Describe("create-user-provided-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              configuration.ReadWriter
+		config              core_config.ReadWriter
 		repo                *testapi.FakeUserProvidedServiceInstanceRepo
 		requirementsFactory *testreq.FakeReqFactory
 		cmd                 CreateUserProvidedService

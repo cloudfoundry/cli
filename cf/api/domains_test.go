@@ -7,7 +7,7 @@ import (
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -25,7 +25,7 @@ var _ = Describe("DomainRepository", func() {
 		ts      *httptest.Server
 		handler *testnet.TestHandler
 		repo    DomainRepository
-		config  configuration.ReadWriter
+		config  core_config.ReadWriter
 	)
 
 	BeforeEach(func() {

@@ -3,7 +3,7 @@ package serviceauthtoken
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,11 +12,11 @@ import (
 
 type ListServiceAuthTokens struct {
 	ui            terminal.UI
-	config        configuration.Reader
+	config        core_config.Reader
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewListServiceAuthTokens(ui terminal.UI, config configuration.Reader, authTokenRepo api.ServiceAuthTokenRepository) (cmd ListServiceAuthTokens) {
+func NewListServiceAuthTokens(ui terminal.UI, config core_config.Reader, authTokenRepo api.ServiceAuthTokenRepository) (cmd ListServiceAuthTokens) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo

@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/json"
@@ -16,10 +16,10 @@ import (
 type UpdateSecurityGroup struct {
 	ui                terminal.UI
 	securityGroupRepo security_groups.SecurityGroupRepo
-	configRepo        configuration.Reader
+	configRepo        core_config.Reader
 }
 
-func NewUpdateSecurityGroup(ui terminal.UI, configRepo configuration.Reader, securityGroupRepo security_groups.SecurityGroupRepo) UpdateSecurityGroup {
+func NewUpdateSecurityGroup(ui terminal.UI, configRepo core_config.Reader, securityGroupRepo security_groups.SecurityGroupRepo) UpdateSecurityGroup {
 	return UpdateSecurityGroup{
 		ui:                ui,
 		configRepo:        configRepo,

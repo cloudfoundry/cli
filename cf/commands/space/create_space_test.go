@@ -6,7 +6,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/commands/user"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -26,7 +26,7 @@ var _ = Describe("create-space command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		configSpace         models.SpaceFields
 		configOrg           models.OrganizationFields
-		configRepo          configuration.ReadWriter
+		configRepo          core_config.ReadWriter
 		spaceRepo           *testapi.FakeSpaceRepository
 		orgRepo             *fake_org.FakeOrganizationRepository
 		userRepo            *testapi.FakeUserRepository

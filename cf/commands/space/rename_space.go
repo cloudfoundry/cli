@@ -3,7 +3,7 @@ package space
 import (
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,12 +12,12 @@ import (
 
 type RenameSpace struct {
 	ui        terminal.UI
-	config    configuration.ReadWriter
+	config    core_config.ReadWriter
 	spaceRepo spaces.SpaceRepository
 	spaceReq  requirements.SpaceRequirement
 }
 
-func NewRenameSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo spaces.SpaceRepository) (cmd *RenameSpace) {
+func NewRenameSpace(ui terminal.UI, config core_config.ReadWriter, spaceRepo spaces.SpaceRepository) (cmd *RenameSpace) {
 	cmd = new(RenameSpace)
 	cmd.ui = ui
 	cmd.config = config

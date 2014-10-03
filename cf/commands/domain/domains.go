@@ -3,7 +3,7 @@ package domain
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,12 +13,12 @@ import (
 
 type ListDomains struct {
 	ui         terminal.UI
-	config     configuration.Reader
+	config     core_config.Reader
 	orgReq     requirements.TargetedOrgRequirement
 	domainRepo api.DomainRepository
 }
 
-func NewListDomains(ui terminal.UI, config configuration.Reader, domainRepo api.DomainRepository) (cmd *ListDomains) {
+func NewListDomains(ui terminal.UI, config core_config.Reader, domainRepo api.DomainRepository) (cmd *ListDomains) {
 	cmd = new(ListDomains)
 	cmd.ui = ui
 	cmd.config = config

@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -16,10 +16,10 @@ import (
 type ListRoutes struct {
 	ui        terminal.UI
 	routeRepo api.RouteRepository
-	config    configuration.Reader
+	config    core_config.Reader
 }
 
-func NewListRoutes(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd ListRoutes) {
+func NewListRoutes(ui terminal.UI, config core_config.Reader, routeRepo api.RouteRepository) (cmd ListRoutes) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.routeRepo = routeRepo

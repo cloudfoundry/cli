@@ -3,7 +3,7 @@ package application
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -14,12 +14,12 @@ import (
 
 type Restage struct {
 	ui                terminal.UI
-	config            configuration.Reader
+	config            core_config.Reader
 	appRepo           api.ApplicationRepository
 	appStagingWatcher ApplicationStagingWatcher
 }
 
-func NewRestage(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository, stagingWatcher ApplicationStagingWatcher) *Restage {
+func NewRestage(ui terminal.UI, config core_config.Reader, appRepo api.ApplicationRepository, stagingWatcher ApplicationStagingWatcher) *Restage {
 	cmd := new(Restage)
 	cmd.ui = ui
 	cmd.config = config

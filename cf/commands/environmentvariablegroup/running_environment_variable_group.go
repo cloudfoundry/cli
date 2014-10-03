@@ -3,7 +3,7 @@ package environmentvariablegroup
 import (
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,11 +12,11 @@ import (
 
 type RunningEnvironmentVariableGroup struct {
 	ui                           terminal.UI
-	config                       configuration.ReadWriter
+	config                       core_config.ReadWriter
 	environmentVariableGroupRepo environment_variable_groups.EnvironmentVariableGroupsRepository
 }
 
-func NewRunningEnvironmentVariableGroup(ui terminal.UI, config configuration.ReadWriter, environmentVariableGroupRepo environment_variable_groups.EnvironmentVariableGroupsRepository) (cmd RunningEnvironmentVariableGroup) {
+func NewRunningEnvironmentVariableGroup(ui terminal.UI, config core_config.ReadWriter, environmentVariableGroupRepo environment_variable_groups.EnvironmentVariableGroupsRepository) (cmd RunningEnvironmentVariableGroup) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.environmentVariableGroupRepo = environmentVariableGroupRepo

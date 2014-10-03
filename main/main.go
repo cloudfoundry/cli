@@ -11,7 +11,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/command_runner"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -27,7 +28,7 @@ var deps = setupDependencies()
 
 type cliDependencies struct {
 	termUI         terminal.UI
-	configRepo     configuration.Repository
+	configRepo     core_config.Repository
 	manifestRepo   manifest.ManifestRepository
 	apiRepoLocator api.RepositoryLocator
 	gateways       map[string]net.Gateway
@@ -40,7 +41,7 @@ func setupDependencies() (deps *cliDependencies) {
 
 	deps.manifestRepo = manifest.NewManifestDiskRepository()
 
-	deps.configRepo = configuration.NewRepositoryFromFilepath(configuration.DefaultFilePath(), func(err error) {
+	deps.configRepo = core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), func(err error) {
 		if err != nil {
 			deps.termUI.Failed(fmt.Sprintf("Config error: %s", err))
 		}
@@ -84,7 +85,7 @@ func main() {
 	} else {
 		// run each plugin and find the method/
 		// run method if exist
-		ran, _ := rpc.RunMethodIfExists(os.Args[1], deps.configRepo.Plugins())
+		ran, _ := rpc.RunMethodIfExists(os.Args[1])
 		if !ran {
 			theApp.Run(os.Args)
 		}

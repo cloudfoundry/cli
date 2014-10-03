@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,13 +13,13 @@ import (
 
 type UnmapRoute struct {
 	ui        terminal.UI
-	config    configuration.Reader
+	config    core_config.Reader
 	routeRepo api.RouteRepository
 	appReq    requirements.ApplicationRequirement
 	domainReq requirements.DomainRequirement
 }
 
-func NewUnmapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd *UnmapRoute) {
+func NewUnmapRoute(ui terminal.UI, config core_config.Reader, routeRepo api.RouteRepository) (cmd *UnmapRoute) {
 	cmd = new(UnmapRoute)
 	cmd.ui = ui
 	cmd.config = config

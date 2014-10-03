@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -23,11 +23,11 @@ type ServiceBrokerRepository interface {
 }
 
 type CloudControllerServiceBrokerRepository struct {
-	config  configuration.Reader
+	config  core_config.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServiceBrokerRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerServiceBrokerRepository) {
+func NewCloudControllerServiceBrokerRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerServiceBrokerRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

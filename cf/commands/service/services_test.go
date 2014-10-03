@@ -3,7 +3,7 @@ package service_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("services", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          configuration.Repository
+		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 	)
 

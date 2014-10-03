@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -16,11 +16,11 @@ import (
 
 type MigrateServiceInstances struct {
 	ui          terminal.UI
-	configRepo  configuration.Reader
+	configRepo  core_config.Reader
 	serviceRepo api.ServiceRepository
 }
 
-func NewMigrateServiceInstances(ui terminal.UI, configRepo configuration.Reader, serviceRepo api.ServiceRepository) (cmd *MigrateServiceInstances) {
+func NewMigrateServiceInstances(ui terminal.UI, configRepo core_config.Reader, serviceRepo api.ServiceRepository) (cmd *MigrateServiceInstances) {
 	cmd = new(MigrateServiceInstances)
 	cmd.ui = ui
 	cmd.configRepo = configRepo

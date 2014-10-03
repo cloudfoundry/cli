@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -76,7 +76,7 @@ func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 	cmd.ui.Ok()
 }
 
-func NewPurgeServiceOffering(ui terminal.UI, config configuration.Reader, serviceRepo api.ServiceRepository) (cmd PurgeServiceOffering) {
+func NewPurgeServiceOffering(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository) (cmd PurgeServiceOffering) {
 	cmd.ui = ui
 	cmd.serviceRepo = serviceRepo
 	return

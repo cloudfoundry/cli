@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -58,12 +58,12 @@ type Gateway struct {
 	PollingEnabled  bool
 	PollingThrottle time.Duration
 	trustedCerts    []tls.Certificate
-	config          configuration.Reader
+	config          core_config.Reader
 	warnings        *[]string
 	Clock           func() time.Time
 }
 
-func newGateway(errHandler apiErrorHandler, config configuration.Reader) (gateway Gateway) {
+func newGateway(errHandler apiErrorHandler, config core_config.Reader) (gateway Gateway) {
 	gateway.errHandler = errHandler
 	gateway.config = config
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE

@@ -5,7 +5,7 @@ import (
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	zoidberg "github.com/cloudfoundry/cli/cf/api/security_groups/spaces/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,7 +23,7 @@ var _ = Describe("bind-security-group command", func() {
 	var (
 		ui                    *testterm.FakeUI
 		cmd                   BindSecurityGroup
-		configRepo            configuration.ReadWriter
+		configRepo            core_config.ReadWriter
 		fakeSecurityGroupRepo *testapi.FakeSecurityGroupRepo
 		requirementsFactory   *testreq.FakeReqFactory
 		fakeSpaceRepo         *fakes.FakeSpaceRepository

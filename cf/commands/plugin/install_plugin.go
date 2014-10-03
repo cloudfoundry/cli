@@ -3,10 +3,11 @@ package plugin
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -15,14 +16,12 @@ import (
 )
 
 type PluginInstall struct {
-	ui     terminal.UI
-	config configuration.ReadWriter
+	ui terminal.UI
 }
 
-func NewPluginInstall(ui terminal.UI, config configuration.ReadWriter) *PluginInstall {
+func NewPluginInstall(ui terminal.UI) *PluginInstall {
 	return &PluginInstall{
-		ui:     ui,
-		config: config,
+		ui: ui,
 	}
 }
 
@@ -45,9 +44,10 @@ func (cmd *PluginInstall) GetRequirements(_ requirements.Factory, c *cli.Context
 func (cmd *PluginInstall) Run(c *cli.Context) {
 	pluginPath := c.Args()[0]
 
-	_, pluginName := path.Split(pluginPath)
+	_, pluginName := filepath.Split(pluginPath)
 
-	plugins := cmd.config.Plugins()
+	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { cmd.ui.Failed(err.Error()) })
+	plugins := pluginsConfig.Plugins()
 
 	if _, ok := plugins[pluginName]; ok {
 		cmd.ui.Failed(fmt.Sprintf(T("Plugin name {{.PluginName}} is already taken", map[string]interface{}{"PluginName": pluginName})))
@@ -55,27 +55,22 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginName}}...", map[string]interface{}{"PluginName": pluginName})))
 
-	homeDir := path.Join(cmd.config.UserHomePath(), ".cf", "plugin")
-	err := os.MkdirAll(homeDir, 0700)
-	if err != nil {
-		cmd.ui.Failed(fmt.Sprintf(T("Could not create the plugin directory: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
-	}
+	pluginsDir := filepath.Join(config_helpers.UserHomeDir(), ".cf", "plugins")
+	pluginExecutable := filepath.Join(pluginsDir, pluginName)
 
-	_, err = os.Stat(path.Join(homeDir, pluginName))
+	_, err := os.Stat(pluginExecutable)
 	if err == nil || os.IsExist(err) {
 		cmd.ui.Failed(fmt.Sprintf(T("The file {{.PluginName}} already exists under the plugin directory.\n", map[string]interface{}{"PluginName": pluginName})))
 	} else if !os.IsNotExist(err) {
 		cmd.ui.Failed(fmt.Sprintf(T("Unexpected error has occurred:\n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	err = fileutils.CopyFile(path.Join(homeDir, pluginName), pluginPath)
+	err = fileutils.CopyFile(pluginExecutable, pluginPath)
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	os.Chmod(path.Join(homeDir, pluginName), 0700)
-
-	cmd.config.SetPlugin(pluginName, path.Join(homeDir, pluginName))
+	pluginsConfig.SetPlugin(pluginName, pluginExecutable)
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully installed.", map[string]interface{}{"PluginName": pluginName})))

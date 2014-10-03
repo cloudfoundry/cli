@@ -6,7 +6,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_organizations "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,7 +21,7 @@ import (
 var _ = Describe("Login Command", func() {
 	var (
 		Flags        []string
-		Config       configuration.ReadWriter
+		Config       core_config.ReadWriter
 		ui           *testterm.FakeUI
 		authRepo     *testapi.FakeAuthenticationRepository
 		endpointRepo *testapi.FakeEndpointRepo
@@ -57,14 +57,14 @@ var _ = Describe("Login Command", func() {
 			Spaces: []models.Space{space},
 		}
 
-		authRepo.GetLoginPromptsReturns.Prompts = map[string]configuration.AuthPrompt{
-			"username": configuration.AuthPrompt{
+		authRepo.GetLoginPromptsReturns.Prompts = map[string]core_config.AuthPrompt{
+			"username": core_config.AuthPrompt{
 				DisplayName: "Username",
-				Type:        configuration.AuthPromptTypeText,
+				Type:        core_config.AuthPromptTypeText,
 			},
-			"password": configuration.AuthPrompt{
+			"password": core_config.AuthPrompt{
 				DisplayName: "Password",
-				Type:        configuration.AuthPromptTypePassword,
+				Type:        core_config.AuthPromptTypePassword,
 			},
 		}
 	})
@@ -259,22 +259,22 @@ var _ = Describe("Login Command", func() {
 
 		Describe("login prompts", func() {
 			BeforeEach(func() {
-				authRepo.GetLoginPromptsReturns.Prompts = map[string]configuration.AuthPrompt{
-					"account_number": configuration.AuthPrompt{
+				authRepo.GetLoginPromptsReturns.Prompts = map[string]core_config.AuthPrompt{
+					"account_number": core_config.AuthPrompt{
 						DisplayName: "Account Number",
-						Type:        configuration.AuthPromptTypeText,
+						Type:        core_config.AuthPromptTypeText,
 					},
-					"username": configuration.AuthPrompt{
+					"username": core_config.AuthPrompt{
 						DisplayName: "Username",
-						Type:        configuration.AuthPromptTypeText,
+						Type:        core_config.AuthPromptTypeText,
 					},
-					"passcode": configuration.AuthPrompt{
+					"passcode": core_config.AuthPrompt{
 						DisplayName: "It's a passcode, what you want it to be???",
-						Type:        configuration.AuthPromptTypePassword,
+						Type:        core_config.AuthPromptTypePassword,
 					},
-					"password": configuration.AuthPrompt{
+					"password": core_config.AuthPrompt{
 						DisplayName: "Your Password",
-						Type:        configuration.AuthPromptTypePassword,
+						Type:        core_config.AuthPromptTypePassword,
 					},
 				}
 			})

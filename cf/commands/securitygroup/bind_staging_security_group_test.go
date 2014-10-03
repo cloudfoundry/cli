@@ -5,7 +5,7 @@ import (
 
 	fakeStaging "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/fakes"
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,7 +21,7 @@ import (
 var _ = Describe("bind-staging-security-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
-		configRepo                   configuration.ReadWriter
+		configRepo                   core_config.ReadWriter
 		requirementsFactory          *testreq.FakeReqFactory
 		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroupRepo
 		fakeStagingSecurityGroupRepo *fakeStaging.FakeStagingSecurityGroupsRepo

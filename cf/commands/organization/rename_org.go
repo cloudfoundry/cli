@@ -3,7 +3,7 @@ package organization
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,12 +12,12 @@ import (
 
 type RenameOrg struct {
 	ui      terminal.UI
-	config  configuration.ReadWriter
+	config  core_config.ReadWriter
 	orgRepo organizations.OrganizationRepository
 	orgReq  requirements.OrganizationRequirement
 }
 
-func NewRenameOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo organizations.OrganizationRepository) (cmd *RenameOrg) {
+func NewRenameOrg(ui terminal.UI, config core_config.ReadWriter, orgRepo organizations.OrganizationRepository) (cmd *RenameOrg) {
 	cmd = new(RenameOrg)
 	cmd.ui = ui
 	cmd.config = config

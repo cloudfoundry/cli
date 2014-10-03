@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,12 +13,12 @@ import (
 
 type UnsetSpaceQuota struct {
 	ui        terminal.UI
-	config    configuration.Reader
+	config    core_config.Reader
 	quotaRepo space_quotas.SpaceQuotaRepository
 	spaceRepo spaces.SpaceRepository
 }
 
-func NewUnsetSpaceQuota(ui terminal.UI, config configuration.Reader, quotaRepo space_quotas.SpaceQuotaRepository, spaceRepo spaces.SpaceRepository) UnsetSpaceQuota {
+func NewUnsetSpaceQuota(ui terminal.UI, config core_config.Reader, quotaRepo space_quotas.SpaceQuotaRepository, spaceRepo spaces.SpaceRepository) UnsetSpaceQuota {
 	return UnsetSpaceQuota{
 		ui:        ui,
 		config:    config,

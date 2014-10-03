@@ -3,7 +3,7 @@ package spacequota
 import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -14,11 +14,11 @@ import (
 
 type DeleteSpaceQuota struct {
 	ui             terminal.UI
-	config         configuration.Reader
+	config         core_config.Reader
 	spaceQuotaRepo space_quotas.SpaceQuotaRepository
 }
 
-func NewDeleteSpaceQuota(ui terminal.UI, config configuration.Reader, spaceQuotaRepo space_quotas.SpaceQuotaRepository) DeleteSpaceQuota {
+func NewDeleteSpaceQuota(ui terminal.UI, config core_config.Reader, spaceQuotaRepo space_quotas.SpaceQuotaRepository) DeleteSpaceQuota {
 	return DeleteSpaceQuota{
 		ui:             ui,
 		config:         config,

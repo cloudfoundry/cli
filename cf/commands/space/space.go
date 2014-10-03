@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -18,12 +18,12 @@ import (
 
 type ShowSpace struct {
 	ui        terminal.UI
-	config    configuration.Reader
+	config    core_config.Reader
 	spaceReq  requirements.SpaceRequirement
 	quotaRepo space_quotas.SpaceQuotaRepository
 }
 
-func NewShowSpace(ui terminal.UI, config configuration.Reader, quotaRepo space_quotas.SpaceQuotaRepository) (cmd *ShowSpace) {
+func NewShowSpace(ui terminal.UI, config core_config.Reader, quotaRepo space_quotas.SpaceQuotaRepository) (cmd *ShowSpace) {
 	cmd = new(ShowSpace)
 	cmd.ui = ui
 	cmd.config = config

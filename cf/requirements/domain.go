@@ -2,7 +2,7 @@ package requirements
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
@@ -15,12 +15,12 @@ type DomainRequirement interface {
 type domainApiRequirement struct {
 	name       string
 	ui         terminal.UI
-	config     configuration.Reader
+	config     core_config.Reader
 	domainRepo api.DomainRepository
 	domain     models.DomainFields
 }
 
-func NewDomainRequirement(name string, ui terminal.UI, config configuration.Reader, domainRepo api.DomainRepository) (req *domainApiRequirement) {
+func NewDomainRequirement(name string, ui terminal.UI, config core_config.Reader, domainRepo api.DomainRepository) (req *domainApiRequirement) {
 	req = new(domainApiRequirement)
 	req.name = name
 	req.ui = ui

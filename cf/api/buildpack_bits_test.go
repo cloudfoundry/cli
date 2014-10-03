@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -29,7 +29,7 @@ import (
 var _ = Describe("BuildpackBitsRepository", func() {
 	var (
 		buildpacksDir     string
-		configRepo        configuration.Repository
+		configRepo        core_config.Repository
 		repo              CloudControllerBuildpackBitsRepository
 		buildpack         models.Buildpack
 		testServer        *httptest.Server
