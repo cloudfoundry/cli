@@ -21,7 +21,6 @@ var _ = Describe("Plugins", func() {
 	)
 
 	BeforeEach(func() {
-
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 

@@ -1,10 +1,9 @@
 package plugin_test
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -22,30 +21,26 @@ func TestPlugin(t *testing.T) {
 
 	dir, err := os.Getwd()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
-	Expect(err).NotTo(HaveOccurred())
 
-	cmd := exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "test_1"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.go"))
+	cmd := exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "test_1.exe"), filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.go"))
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
-	Expect(err).NotTo(HaveOccurred())
 
-	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "test_2"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.go"))
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "test_2.exe"), filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.go"))
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
-	Expect(err).NotTo(HaveOccurred())
 
-	cmd = exec.Command("go", "build", "-o", path.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "empty_plugin"), path.Join(dir, "..", "..", "..", "fixtures", "plugins", "empty_plugin.go"))
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "empty_plugin.exe"), filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "empty_plugin.go"))
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
-	Expect(err).NotTo(HaveOccurred())
 
 	RunSpecs(t, "Plugin Suite")
 }
