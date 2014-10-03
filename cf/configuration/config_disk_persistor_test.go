@@ -34,6 +34,7 @@ var _ = Describe("DiskPersistor", func() {
 
 	Describe(".Delete", func() {
 		It("Deletes the correct file", func() {
+			tmpFile.Close()
 			diskPersistor.Delete()
 
 			file, err := os.Stat(tmpFile.Name())
