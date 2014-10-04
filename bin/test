@@ -15,11 +15,9 @@
 
   bin/generate-language-resources
 
+  go get github.com/tools/godep
+
   GODEP=$(which godep)
-  if [[ -z $GODEP ]] ; then
-    echo "godep is not installed. Run 'go get github.com/tools/godep'"
-    exit 1
-  fi
 
   echo -e "\n Cleaning build artifacts..."
 
