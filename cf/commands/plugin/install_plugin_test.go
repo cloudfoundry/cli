@@ -3,7 +3,6 @@ package plugin_test
 import (
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 
@@ -55,7 +54,7 @@ var _ = Describe("Install", func() {
 			return homeDir
 		}
 
-		pluginDir = path.Join(homeDir, ".cf", "plugins")
+		pluginDir = filepath.Join(homeDir, ".cf", "plugins")
 
 		curDir, err = os.Getwd()
 		Expect(err).ToNot(HaveOccurred())
@@ -63,7 +62,7 @@ var _ = Describe("Install", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		if runtime.GOOS != "windows" {
-			err = os.Chmod(path.Join(curDir, pluginFile.Name()), 0700)
+			err = os.Chmod(filepath.Join(curDir, pluginFile.Name()), 0700)
 			Expect(err).ToNot(HaveOccurred())
 		}
 	}
@@ -92,15 +91,15 @@ var _ = Describe("Install", func() {
 			})
 
 			AfterEach(func() {
-				os.Remove(path.Join(curDir, pluginFile.Name()))
+				os.Remove(filepath.Join(curDir, pluginFile.Name()))
 				os.Remove(homeDir)
 			})
 
 			It("if a file with the plugin name already exists under ~/.cf/plugin/", func() {
-				err := fileutils.CopyFile(path.Join(pluginDir, pluginFile.Name()), path.Join(curDir, pluginFile.Name()))
+				err := fileutils.CopyFile(filepath.Join(pluginDir, pluginFile.Name()), filepath.Join(curDir, pluginFile.Name()))
 				Expect(err).NotTo(HaveOccurred())
 
-				runCommand(path.Join(curDir, pluginFile.Name()))
+				runCommand(filepath.Join(curDir, pluginFile.Name()))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Installing plugin"},
 					[]string{"The file", pluginFile.Name(), "already exists"},
@@ -113,24 +112,24 @@ var _ = Describe("Install", func() {
 	Describe("success", func() {
 		BeforeEach(func() {
 			setupTempExecutable()
-			runCommand(path.Join(curDir, pluginFile.Name()))
+			runCommand(filepath.Join(curDir, pluginFile.Name()))
 		})
 
 		AfterEach(func() {
-			os.Remove(path.Join(curDir, pluginFile.Name()))
+			os.Remove(filepath.Join(curDir, pluginFile.Name()))
 			os.Remove(homeDir)
 		})
 
 		It("copies the plugin into directory <FAKE_HOME_DIR>/.cf/plugins/PLUGIN_NAME", func() {
-			_, err := os.Stat(path.Join(curDir, pluginFile.Name()))
+			_, err := os.Stat(filepath.Join(curDir, pluginFile.Name()))
 			Expect(err).ToNot(HaveOccurred())
-			_, err = os.Stat(path.Join(pluginDir, pluginFile.Name()))
+			_, err = os.Stat(filepath.Join(pluginDir, pluginFile.Name()))
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		if runtime.GOOS != "windows" {
 			It("Chmods the plugin so it is executable", func() {
-				fileInfo, err := os.Stat(path.Join(pluginDir, pluginFile.Name()))
+				fileInfo, err := os.Stat(filepath.Join(pluginDir, pluginFile.Name()))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(int(fileInfo.Mode())).To(Equal(0700))
 			})
@@ -140,7 +139,7 @@ var _ = Describe("Install", func() {
 			pluginConfig := plugin_config.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
 			plugins := pluginConfig.Plugins()
 
-			Expect(plugins[pluginFile.Name()]).To(Equal(path.Join(pluginDir, pluginFile.Name())))
+			Expect(plugins[pluginFile.Name()]).To(Equal(filepath.Join(pluginDir, pluginFile.Name())))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Installing plugin", pluginFile.Name()},
 				[]string{"OK"},
