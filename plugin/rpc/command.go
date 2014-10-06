@@ -11,13 +11,14 @@ import (
 )
 
 func RunListCmd(location string) ([]plugin.Command, error) {
-	cmd, err := runPluginServer(location)
+	port := "20001"
+	cmd, err := runPluginServer(location, port)
 	if err != nil {
 		return []plugin.Command{}, err
 	}
 	defer stopPluginServer(cmd)
 
-	rpcClient, err := dialClient()
+	rpcClient, err := dialClient(port)
 	if err != nil {
 		return []plugin.Command{}, err
 	}
@@ -32,13 +33,14 @@ func RunListCmd(location string) ([]plugin.Command, error) {
 }
 
 func RunCommandExists(methodName string, location string) (bool, error) {
-	cmd, err := runPluginServer(location)
+	port := "20001"
+	cmd, err := runPluginServer(location, port)
 	if err != nil {
 		return false, err
 	}
 	defer stopPluginServer(cmd)
 
-	rpcClient, err := dialClient()
+	rpcClient, err := dialClient(port)
 	if err != nil {
 		return false, err
 	}
@@ -56,17 +58,17 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 	var exists bool
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
-
+	port := "20001"
 	for _, location := range pluginList {
-		cmd, err := runPluginServer(location)
+		cmd, err := runPluginServer(location, port)
 		if err != nil {
 			continue
 		}
 
-		exists, _ = runClientCmd("CmdExists", cmdName)
+		exists, _ = runClientCmd("CmdExists", cmdName, port)
 
 		if exists {
-			_, err = runClientCmd("Run", cmdName)
+			_, err = runClientCmd("Run", cmdName, port)
 			stopPluginServer(cmd)
 			return true, err
 		}
@@ -76,18 +78,18 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 }
 
 func GetAllPluginCommands() []plugin.Command {
-	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
-	pluginList := pluginsConfig.Plugins()
-
 	var combinedCmdList, cmdList []plugin.Command
 
+	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
+	pluginList := pluginsConfig.Plugins()
+	port := "20001"
 	for _, location := range pluginList {
-		cmd, err := runPluginServer(location)
+		cmd, err := runPluginServer(location, port)
 		if err != nil {
 			continue
 		}
 
-		cmdList, err = getPluginCmds()
+		cmdList, err = getPluginCmds(port)
 
 		if err == nil {
 			combinedCmdList = append(combinedCmdList, cmdList...)
@@ -97,8 +99,8 @@ func GetAllPluginCommands() []plugin.Command {
 	return combinedCmdList
 }
 
-func runClientCmd(cmd string, method string) (bool, error) {
-	client, err := dialClient()
+func runClientCmd(cmd string, method string, port string) (bool, error) {
+	client, err := dialClient(port)
 	var reply bool
 	err = client.Call("CliPlugin."+cmd, method, &reply)
 	if err != nil {
@@ -107,8 +109,8 @@ func runClientCmd(cmd string, method string) (bool, error) {
 	return reply, nil
 }
 
-func getPluginCmds() ([]plugin.Command, error) {
-	client, err := dialClient()
+func getPluginCmds(port string) ([]plugin.Command, error) {
+	client, err := dialClient(port)
 	var cmds []plugin.Command
 	err = client.Call("CliPlugin.ListCmds", "", &cmds)
 	if err != nil {
@@ -117,16 +119,16 @@ func getPluginCmds() ([]plugin.Command, error) {
 	return cmds, nil
 }
 
-func dialClient() (*rpc.Client, error) {
-	client, err := rpc.Dial("tcp", "127.0.0.1:20001")
+func dialClient(port string) (*rpc.Client, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+port)
 	if err != nil {
 		return nil, err
 	}
 	return client, nil
 }
 
-func runPluginServer(location string) (*exec.Cmd, error) {
-	cmd := exec.Command(location)
+func runPluginServer(location string, port string) (*exec.Cmd, error) {
+	cmd := exec.Command(location, port)
 	cmd.Stdout = os.Stdout
 	err := cmd.Start()
 	if err != nil {
