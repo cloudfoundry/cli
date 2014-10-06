@@ -1,12 +1,14 @@
 package app_test
 
 import (
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
+	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -34,6 +36,31 @@ var _ = Describe("Help", func() {
 			Expect(commandInOutput(metadata.Name, output)).To(BeTrue(), metadata.Name+" not in help")
 		}
 	})
+
+	It("shows help for all installed plugin's commands", func() {
+		config_helpers.PluginRepoDir = func() string {
+			return filepath.Join("..", "..", "fixtures", "config", "help-plugin-test-config")
+		}
+
+		commandFactory := createCommandFactory()
+
+		dummyTemplate := `
+{{range .Commands}}{{range .CommandSubGroups}}{{range .}}
+{{.Name}}
+{{end}}{{end}}{{end}}
+`
+		output := io_helpers.CaptureOutput(func() {
+			app.ShowHelp(dummyTemplate, createApp(commandFactory))
+		})
+
+		Expect(commandInOutput("test_1_cmd1", output)).To(BeTrue(), "plugin command: test_1_cmd1 not in help")
+		Expect(commandInOutput("test_1_cmd2", output)).To(BeTrue(), "plugin command: test_1_cmd2 not in help")
+		Expect(commandInOutput("help", output)).To(BeTrue(), "plugin command: test_1_help not in help")
+		Expect(commandInOutput("test_2_cmd1", output)).To(BeTrue(), "plugin command: test_2_cmd1 not in help")
+		Expect(commandInOutput("test_2_cmd2", output)).To(BeTrue(), "plugin command: test_2_cmd2 not in help")
+
+	})
+
 })
 
 func createCommandFactory() command_factory.Factory {
