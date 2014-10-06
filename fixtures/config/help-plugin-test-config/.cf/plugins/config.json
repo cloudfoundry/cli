@@ -1,0 +1,6 @@
+{
+  "Plugins": {
+    "test_1": "../../fixtures/config/help-plugin-test-config/.cf/plugins/test_1.exe",
+    "test_2": "../../fixtures/config/help-plugin-test-config/.cf/plugins/test_2.exe"
+  }
+}
