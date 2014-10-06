@@ -1,8 +1,6 @@
-package app_test
+package rpc_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -13,10 +11,7 @@ import (
 	"testing"
 )
 
-func TestApp(t *testing.T) {
-	config := configuration.NewRepositoryWithDefaults()
-	i18n.T = i18n.Init(config)
-
+func TestRpc(t *testing.T) {
 	RegisterFailHandler(Fail)
 
 	dir, err := os.Getwd()
@@ -36,5 +31,5 @@ func TestApp(t *testing.T) {
 		panic(err)
 	}
 
-	RunSpecs(t, "App Suite")
+	RunSpecs(t, "Rpc Suite")
 }
