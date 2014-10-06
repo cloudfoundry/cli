@@ -10,7 +10,6 @@ import (
 	"unicode/utf8"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/plugin/rpc"
 
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -65,20 +64,24 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		return
 	}
 
-	presentPluginCommands := func() []cmdPresenter {
-		pluginCmdList := rpc.GetAllPluginCommands()
-		var presenters []cmdPresenter
-		var pluginPresenter cmdPresenter
-		for _, cmd := range pluginCmdList {
-			pluginPresenter.Name = cmd.Name
-			padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(pluginPresenter.Name))
-			pluginPresenter.Name = pluginPresenter.Name + padding
-			pluginPresenter.Description = cmd.HelpText
-			presenters = append(presenters, pluginPresenter)
+	/*
+		presentPluginCommand := func(commandName string) [][]cmdPresenter {
+			pluginConfig := newPluginConfig()
+			availablePlugins := pluginConfig.Plugins()
 
-		}
-		return presenters
-	}
+			for pluginName, pluginLocation := range availablePlugins {
+				cmd := runPluginServer(pluginLocation)
+
+				for _, cmd := range cmdList {
+					presenter.Name = cmd.Name
+					padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
+					presenter.Name = presenter.Name + padding
+					presenter.Description = cmd.HelpText
+				}
+			}
+
+			return nil
+		}*/
 
 	presenter.Name = app.Name
 	presenter.Flags = app.Flags
@@ -328,9 +331,10 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "INSTALLED PLUGINS",
+			Name:             "INSTALLED PLUGINS",
 			CommandSubGroups: [][]cmdPresenter{
-				presentPluginCommands(),
+			//function to get plugin commands.
+			//return value is []cmdPresenter
 			},
 		},
 	}
@@ -339,6 +343,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 }
 
 func ShowHelp(helpTemplate string, thingToPrint interface{}) {
+
+	fmt.Println("CALLING SHOW HELP!!!!")
+
 	translatedTemplatedHelp := T(strings.Replace(helpTemplate, "{{", "[[", -1))
 	translatedTemplatedHelp = strings.Replace(translatedTemplatedHelp, "[[", "{{", -1)
 

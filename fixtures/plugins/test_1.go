@@ -26,7 +26,7 @@ var commands = []plugin.Command{
 	},
 	{
 		Name:     "help",
-		HelpText: "help text for test_1_help",
+		HelpText: "this is not help",
 	},
 }
 

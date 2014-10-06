@@ -75,28 +75,6 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 	return false, nil
 }
 
-func GetAllPluginCommands() []plugin.Command {
-	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
-	pluginList := pluginsConfig.Plugins()
-
-	var combinedCmdList, cmdList []plugin.Command
-
-	for _, location := range pluginList {
-		cmd, err := runPluginServer(location)
-		if err != nil {
-			continue
-		}
-
-		cmdList, err = getPluginCmds()
-
-		if err == nil {
-			combinedCmdList = append(combinedCmdList, cmdList...)
-		}
-		stopPluginServer(cmd)
-	}
-	return combinedCmdList
-}
-
 func runClientCmd(cmd string, method string) (bool, error) {
 	client, err := dialClient()
 	var reply bool
@@ -105,16 +83,6 @@ func runClientCmd(cmd string, method string) (bool, error) {
 		return false, err
 	}
 	return reply, nil
-}
-
-func getPluginCmds() ([]plugin.Command, error) {
-	client, err := dialClient()
-	var cmds []plugin.Command
-	err = client.Call("CliPlugin.ListCmds", "", &cmds)
-	if err != nil {
-		return nil, err
-	}
-	return cmds, nil
 }
 
 func dialClient() (*rpc.Client, error) {
