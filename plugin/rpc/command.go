@@ -1,9 +1,11 @@
 package rpc
 
 import (
+	"net"
 	"net/rpc"
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
@@ -11,7 +13,7 @@ import (
 )
 
 func RunListCmd(location string) ([]plugin.Command, error) {
-	port := "20001"
+	port := obtainPort()
 	cmd, err := runPluginServer(location, port)
 	if err != nil {
 		return []plugin.Command{}, err
@@ -33,7 +35,7 @@ func RunListCmd(location string) ([]plugin.Command, error) {
 }
 
 func RunCommandExists(methodName string, location string) (bool, error) {
-	port := "20001"
+	port := obtainPort()
 	cmd, err := runPluginServer(location, port)
 	if err != nil {
 		return false, err
@@ -58,7 +60,7 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 	var exists bool
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
-	port := "20001"
+	port := obtainPort()
 	for _, location := range pluginList {
 		cmd, err := runPluginServer(location, port)
 		if err != nil {
@@ -82,7 +84,7 @@ func GetAllPluginCommands() []plugin.Command {
 
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
-	port := "20001"
+	port := obtainPort()
 	for _, location := range pluginList {
 		cmd, err := runPluginServer(location, port)
 		if err != nil {
@@ -142,4 +144,12 @@ func runPluginServer(location string, port string) (*exec.Cmd, error) {
 func stopPluginServer(plugin *exec.Cmd) {
 	plugin.Process.Kill()
 	plugin.Wait()
+}
+
+func obtainPort() string {
+	//assign 0 to port to get a random open port
+	l, _ := net.Listen("tcp", "127.0.0.1:0")
+	port := strconv.Itoa(l.Addr().(*net.TCPAddr).Port)
+	l.Close()
+	return port
 }
