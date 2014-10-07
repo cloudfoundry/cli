@@ -78,7 +78,7 @@ func main() {
 
 	theApp := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
 	//command `cf` without argument
-	if len(os.Args) == 1 {
+	if len(os.Args) == 1 || os.Args[1] == "help" {
 		theApp.Run(os.Args)
 	} else if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
 		callCoreCommand(os.Args[0:], theApp)
