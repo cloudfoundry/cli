@@ -4,7 +4,11 @@
 
 package main
 
-import "github.com/cloudfoundry/cli/plugin"
+import (
+	"os"
+
+	"github.com/cloudfoundry/cli/plugin"
+)
 
 type CliPlugin struct{}
 
@@ -25,5 +29,6 @@ func (c *CliPlugin) CmdExists(args string, exists *bool) error {
 }
 
 func main() {
-	plugin.ServeCommand(new(CliPlugin), "20001")
+	port := os.Args[1]
+	plugin.ServeCommand(new(CliPlugin), port)
 }
