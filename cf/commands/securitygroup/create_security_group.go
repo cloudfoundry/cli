@@ -1,8 +1,9 @@
 package securitygroup
 
 import (
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -30,7 +31,18 @@ func NewCreateSecurityGroup(ui terminal.UI, configRepo core_config.Reader, secur
 
 func (cmd CreateSecurityGroup) Metadata() command_metadata.CommandMetadata {
 	primaryUsage := T("CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE")
-	secondaryUsage := T("   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.")
+	secondaryUsage := T(`   The provided path can be an absolute or relative path to a file.  The file should have
+   a single array with JSON objects inside describing the rules.  The JSON Base Object is 
+   omitted and only the square brackets and associated child object are required in the file.  
+
+   Valid json file example:
+   [
+     {
+       "protocol": "tcp",
+       "destination": "10.244.1.18",
+       "ports": "3306"
+     }
+   ]`)
 
 	return command_metadata.CommandMetadata{
 		Name:        "create-security-group",
