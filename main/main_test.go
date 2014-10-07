@@ -70,7 +70,7 @@ var _ = Describe("main", func() {
 
 		It("Calls core cf command if the plugin shares the same name", func() {
 			output := Cf("help")
-			Eventually(output.Out).ShouldNot(Say("You called help in test_1"))
+			Consistently(output.Out, 1).ShouldNot(Say("You called help in test_1"))
 		})
 	})
 })
