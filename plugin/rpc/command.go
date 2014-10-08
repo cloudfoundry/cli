@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"fmt"
 	"net"
 	"net/rpc"
 	"os"
@@ -129,15 +130,34 @@ func dialClient(port string) (*rpc.Client, error) {
 	return client, nil
 }
 
-func runPluginServer(location string, port string) (*exec.Cmd, error) {
-	cmd := exec.Command(location, port)
-	cmd.Stdout = os.Stdout
-	err := cmd.Start()
+func runPluginServer(location string, pluginPort string) (*exec.Cmd, error) {
+	//wait for plugin to respond it is active
+	address, err := net.ResolveTCPAddr("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, err
 	}
 
-	time.Sleep(300 * time.Millisecond)
+	listener, err := net.ListenTCP("tcp", address)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	cmd := exec.Command(location, pluginPort, strconv.Itoa(listener.Addr().(*net.TCPAddr).Port))
+	cmd.Stdout = os.Stdout
+	err = cmd.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	listener.SetDeadline(time.Now().Add(1 * time.Second))
+	_, err = listener.Accept()
+	listener.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
 	return cmd, nil
 }
 
