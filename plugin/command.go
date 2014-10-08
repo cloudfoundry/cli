@@ -30,11 +30,11 @@ type RpcPlugin interface {
 /**
 	This function is called by the plugin to setup their server. This allows us to call Run on the plugin
 **/
-func ServeCommand(cmd RpcPlugin, port string) {
+func ServeCommand(cmd RpcPlugin) {
 	//register command
 	rpc.Register(cmd)
 
-	listener, err := net.Listen("tcp", ":"+port)
+	listener, err := net.Listen("tcp", ":"+os.Args[1])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

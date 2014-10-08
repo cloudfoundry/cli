@@ -9,7 +9,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/cloudfoundry/cli/plugin"
 )
@@ -65,6 +64,5 @@ func theHelpCmd() {
 }
 
 func main() {
-	port := os.Args[1]
-	plugin.ServeCommand(new(CliPlugin), port)
+	plugin.ServeCommand(new(CliPlugin))
 }
