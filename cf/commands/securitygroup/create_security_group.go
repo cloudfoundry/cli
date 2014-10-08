@@ -65,7 +65,16 @@ func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	pathToJSONFile := context.Args()[1]
 	rules, err := json.ParseJSON(pathToJSONFile)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		cmd.ui.Failed(T(`Incorrect json format: file: {{.JSONFile}}
+		
+Valid json file example:
+[
+  {
+    "protocol": "tcp",
+    "destination": "10.244.1.18",
+    "ports": "3306"
+  }
+]`, map[string]interface{}{"JSONFile": pathToJSONFile}))
 	}
 
 	cmd.ui.Say(T("Creating security group {{.security_group}} as {{.username}}",
