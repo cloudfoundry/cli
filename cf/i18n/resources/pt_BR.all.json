@@ -2405,14 +2405,9 @@
       "modified": false
    },
    {
-      "id": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.",
-      "translation": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.",
-      "modified": false
-   },
-   {
-      "id": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)",
+      "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)",
       "translation": "Maximum amount of memory an application instance can have(e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
@@ -3460,9 +3455,9 @@
       "modified": false
    },
    {
-      "id": "Total amount of memory a space can have(e.g. 1024M, 1G, 10G)",
+      "id": "Total amount of memory a space can have (e.g. 1024M, 1G, 10G)",
       "translation": "Total amount of memory a space can have(e.g. 1024M, 1G, 10G)",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Total number of routes",
