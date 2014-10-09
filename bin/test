@@ -15,6 +15,9 @@
 
   bin/generate-language-resources
 
+  echo -e "\n Running gi18n checkup..."
+  bin/gi18n-checkup
+
   go get github.com/tools/godep
 
   GODEP=$(which godep)
