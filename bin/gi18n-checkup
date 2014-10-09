@@ -15,6 +15,7 @@ fi
 OUTPUT=`gi18n -c checkup`
 
 if [ "$OUTPUT" != "OK" ]; then
+  echo "Error:"
   echo "$OUTPUT"
   exit 1
 fi
