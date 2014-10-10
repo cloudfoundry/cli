@@ -2,12 +2,13 @@ package application
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/fileutils"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/fileutils"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -23,7 +24,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/words"
+	"github.com/cloudfoundry/cli/words/generator"
 	"github.com/codegangsta/cli"
 )
 
@@ -40,7 +41,7 @@ type Push struct {
 	serviceRepo   api.ServiceRepository
 	stackRepo     api.StackRepository
 	authRepo      authentication.AuthenticationRepository
-	wordGenerator words.WordGenerator
+	wordGenerator generator.WordGenerator
 	actor         actors.PushActor
 	zipper        app_files.Zipper
 	app_files     app_files.AppFiles
@@ -50,7 +51,7 @@ func NewPush(ui terminal.UI, config core_config.Reader, manifestRepo manifest.Ma
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
 	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
 	stackRepo api.StackRepository, serviceRepo api.ServiceRepository,
-	authRepo authentication.AuthenticationRepository, wordGenerator words.WordGenerator,
+	authRepo authentication.AuthenticationRepository, wordGenerator generator.WordGenerator,
 	actor actors.PushActor, zipper app_files.Zipper, app_files app_files.AppFiles) *Push {
 	return &Push{
 		ui:            ui,

@@ -2,17 +2,18 @@ package manifest
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
+	. "github.com/cloudfoundry/cli/cf/i18n"
+
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/generic"
-	"github.com/cloudfoundry/cli/words"
+	"github.com/cloudfoundry/cli/words/generator"
 )
 
 type Manifest struct {
@@ -25,7 +26,7 @@ func NewEmptyManifest() (m *Manifest) {
 }
 
 func (m Manifest) Applications() (apps []models.AppParams, err error) {
-	rawData, errs := expandProperties(m.Data, words.NewWordGenerator())
+	rawData, errs := expandProperties(m.Data, generator.NewWordGenerator())
 	if len(errs) > 0 {
 		err = errors.NewWithSlice(errs)
 		return
@@ -80,7 +81,7 @@ func (m Manifest) getAppMaps(data generic.Map) (apps []generic.Map, errs []error
 
 var propertyRegex = regexp.MustCompile(`\${[\w-]+}`)
 
-func expandProperties(input interface{}, babbler words.WordGenerator) (output interface{}, errs []error) {
+func expandProperties(input interface{}, babbler generator.WordGenerator) (output interface{}, errs []error) {
 	switch input := input.(type) {
 	case string:
 		match := propertyRegex.FindStringSubmatch(input)

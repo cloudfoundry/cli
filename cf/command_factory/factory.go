@@ -34,7 +34,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/words"
+	"github.com/cloudfoundry/cli/words/generator"
 )
 
 type Factory interface {
@@ -190,7 +190,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		repoLocator.GetStackRepository(),
 		repoLocator.GetServiceRepository(),
 		repoLocator.GetAuthenticationRepository(),
-		words.NewWordGenerator(),
+		generator.NewWordGenerator(),
 		actors.NewPushActor(repoLocator.GetApplicationBitsRepository(), app_files.ApplicationZipper{}, app_files.ApplicationFiles{}),
 		app_files.ApplicationZipper{},
 		app_files.ApplicationFiles{})

@@ -1,9 +1,11 @@
-package words
+package generator
 
 import (
 	"math/rand"
 	"strings"
 	"time"
+
+	. "github.com/cloudfoundry/cli/words"
 )
 
 type WordGenerator interface {
