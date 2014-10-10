@@ -1,12 +1,13 @@
 package manifest_test
 
 import (
+	"runtime"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"runtime"
-	"strings"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )

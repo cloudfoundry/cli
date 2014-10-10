@@ -21,8 +21,7 @@ import (
 	testmanifest "github.com/cloudfoundry/cli/testhelpers/manifest"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	testwords "github.com/cloudfoundry/cli/testhelpers/words"
-	"github.com/cloudfoundry/cli/words"
+	testwords "github.com/cloudfoundry/cli/words/generator/fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -43,7 +42,7 @@ var _ = Describe("Push Command", func() {
 		routeRepo           *testapi.FakeRouteRepository
 		stackRepo           *testapi.FakeStackRepository
 		serviceRepo         *testapi.FakeServiceRepo
-		wordGenerator       words.WordGenerator
+		wordGenerator       *testwords.FakeWordGenerator
 		requirementsFactory *testreq.FakeReqFactory
 		authRepo            *testapi.FakeAuthenticationRepository
 		actor               *fakeactors.FakePushActor
@@ -66,7 +65,8 @@ var _ = Describe("Push Command", func() {
 		stackRepo = &testapi.FakeStackRepository{}
 		serviceRepo = &testapi.FakeServiceRepo{}
 		authRepo = &testapi.FakeAuthenticationRepository{}
-		wordGenerator = testwords.NewFakeWordGenerator("laughing-cow")
+		wordGenerator = new(testwords.FakeWordGenerator)
+		wordGenerator.BabbleReturns("laughing-cow")
 
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
