@@ -1,6 +1,7 @@
 package rpc_test
 
 import (
+	"github.com/cloudfoundry/cli/plugin/rpc"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -10,6 +11,8 @@ import (
 
 	"testing"
 )
+
+var rpcService *rpc.CliRpcService
 
 func TestRpc(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -33,3 +36,9 @@ func TestRpc(t *testing.T) {
 
 	RunSpecs(t, "Rpc Suite")
 }
+
+var _ = BeforeSuite(func() {
+	var err error
+	rpcService, err = rpc.NewRpcService()
+	Expect(err).ToNot(HaveOccurred())
+})
