@@ -2145,8 +2145,8 @@
       "modified": false
    },
    {
-      "id": "Installing plugin {{.PluginName}}...",
-      "translation": "Installing plugin {{.PluginName}}...",
+      "id": "Installing plugin {{.PluginPath}}...",
+      "translation": "Installing plugin {{.PluginPath}}...",
       "modified": false
    },
    {
@@ -3385,8 +3385,8 @@
       "modified": false
    },
    {
-      "id": "The file {{.PluginName}} already exists under the plugin directory.\n",
-      "translation": "The file {{.PluginName}} already exists under the plugin directory.\n",
+      "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
+      "translation": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
       "modified": false
    },
    {
