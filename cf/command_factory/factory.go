@@ -32,6 +32,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/words/generator"
@@ -266,7 +267,8 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["set-staging-environment-variable-group"] = environmentvariablegroup.NewSetStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-running-environment-variable-group"] = environmentvariablegroup.NewSetRunningEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 
-	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui)
+	pluginConfig := plugin_config.NewPluginConfig(func(err error) { ui.Failed(err.Error()) })
+	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, pluginConfig)
 	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui)
 	return
 }
