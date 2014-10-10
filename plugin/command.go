@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/rpc"
 	"os"
+	"reflect"
 	"time"
 )
 
@@ -28,11 +29,19 @@ type RpcPlugin interface {
 }
 
 /**
-	This function is called by the plugin to setup their server. This allows us to call Run on the plugin
+	* This function is called by the plugin to setup their server. This allows us to call Run on the plugin
+	* os.Args[1] port plugin rpc will be listening on
+	* os.Args[2] port CF_CLI rpc server is running on
+	* os.Args[3] **OPTIONAL**
+		* install-plugin - used to fetch the command name
 **/
 func ServeCommand(cmd RpcPlugin) {
 	//register command
-	rpc.Register(cmd)
+	err := rpc.Register(cmd)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	listener, err := net.Listen("tcp", ":"+os.Args[1])
 	if err != nil {
@@ -40,19 +49,34 @@ func ServeCommand(cmd RpcPlugin) {
 		os.Exit(1)
 	}
 
-	//call back to cf saying we have been setup
-	for i := 0; i < 5; i++ {
-		conn, err := net.Dial("tcp", "127.0.0.1:"+os.Args[2])
-		defer conn.Close()
-		if err != nil {
-			time.Sleep(200 * time.Millisecond)
-		} else {
-			break
+	pingCLI()
+
+	//Send CLI the plugin command name.
+	if len(os.Args) == 4 {
+		if os.Args[3] == "install-plugin" {
+			pluginName := reflect.TypeOf(cmd).Elem().Name()
+			fmt.Println("reflecting: ", reflect.TypeOf(cmd).Elem().Name())
+			client, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[2])
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			var success bool
+			fmt.Println("In ServeCommand,name: ", pluginName)
+			err = client.Call("CliRpcCmd.SetName", pluginName, &success)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			if !success {
+				//fmt.Println(fmt.Sprintf("There was an error registering the plugin name: %s", pluginName))
+				os.Exit(1)
+			}
+
+			os.Exit(0)
 		}
-	}
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
 	}
 
 	//listen for the run command
@@ -72,4 +96,23 @@ func CmdExists(cmd string, availableCmds []Command) bool {
 		}
 	}
 	return false
+}
+
+func pingCLI() {
+	//call back to cf saying we have been setup
+	var connErr error
+	var conn net.Conn
+	for i := 0; i < 5; i++ {
+		conn, connErr = net.Dial("tcp", "127.0.0.1:"+os.Args[2])
+		if connErr != nil {
+			time.Sleep(200 * time.Millisecond)
+		} else {
+			conn.Close()
+			break
+		}
+	}
+	if connErr != nil {
+		fmt.Println(connErr)
+		os.Exit(1)
+	}
 }
