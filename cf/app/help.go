@@ -66,7 +66,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 	}
 
 	presentPluginCommands := func() []cmdPresenter {
-		pluginCmdList := rpc.GetAllPluginCommands()
+		pluginCmdList, _ := rpc.GetAllPluginCommands()
 		var presenters []cmdPresenter
 		var pluginPresenter cmdPresenter
 		for _, cmd := range pluginCmdList {

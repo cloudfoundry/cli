@@ -13,17 +13,10 @@ import (
 	"github.com/cloudfoundry/cli/plugin"
 )
 
-func RunListCmd(location string) ([]plugin.Command, error) {
+func RunListCmd(pluginName, location, cliServicePort string) ([]plugin.Command, error) {
 	port := obtainPort()
 
-	service, err := startCliServer()
-	if err != nil {
-		return []plugin.Command{}, err
-	}
-
-	defer service.Stop()
-
-	cmd, err := runPlugin(location, port, service.Port())
+	cmd, err := runPlugin(location, port, cliServicePort)
 	if err != nil {
 		return []plugin.Command{}, err
 	}
@@ -35,7 +28,7 @@ func RunListCmd(location string) ([]plugin.Command, error) {
 	}
 
 	var cmdList []plugin.Command
-	err = rpcClient.Call("CliPlugin.ListCmds", "", &cmdList)
+	err = rpcClient.Call(pluginName+".ListCmds", "", &cmdList)
 	if err != nil {
 		return []plugin.Command{}, err
 	}
@@ -86,16 +79,16 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 
 	defer service.Stop()
 
-	for _, location := range pluginList {
+	for pluginName, location := range pluginList {
 		cmd, err := runPlugin(location, port, service.Port())
 		if err != nil {
 			continue
 		}
 
-		exists, _ = runClientCmd("CmdExists", cmdName, port)
+		exists, _ = runClientCmd(pluginName+".CmdExists", cmdName, port)
 
 		if exists {
-			_, err = runClientCmd("Run", cmdName, port)
+			_, err = runClientCmd(pluginName+".Run", cmdName, port)
 			stopPlugin(cmd)
 			return true, err
 		}
@@ -118,13 +111,13 @@ func GetAllPluginCommands() ([]plugin.Command, error) {
 	defer service.Stop()
 
 	port := obtainPort()
-	for _, location := range pluginList {
+	for pluginName, location := range pluginList {
 		cmd, err := runPlugin(location, port, service.Port()) //both started
 		if err != nil {
 			continue
 		}
 
-		cmdList, err = getPluginCmds(port)
+		cmdList, err = getPluginCmds(pluginName, port)
 
 		if err == nil {
 			combinedCmdList = append(combinedCmdList, cmdList...)
@@ -137,21 +130,21 @@ func GetAllPluginCommands() ([]plugin.Command, error) {
 func runClientCmd(cmd string, method string, port string) (bool, error) {
 	client, err := dialClient(port)
 	var reply bool
-	err = client.Call("CliPlugin."+cmd, method, &reply)
+	err = client.Call(cmd, method, &reply)
 	if err != nil {
 		return false, err
 	}
 	return reply, nil
 }
 
-func getPluginCmds(port string) ([]plugin.Command, error) {
+func getPluginCmds(pluginName, port string) ([]plugin.Command, error) {
 	client, err := dialClient(port)
 	if err != nil {
 		fmt.Println("error dailing to plugin: ", err)
 		return []plugin.Command{}, err
 	}
 	var cmds []plugin.Command
-	err = client.Call("CliPlugin.ListCmds", "", &cmds)
+	err = client.Call(pluginName+".ListCmds", "", &cmds)
 	if err != nil {
 		return nil, err
 	}

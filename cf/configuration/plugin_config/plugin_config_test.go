@@ -13,7 +13,6 @@ import (
 )
 
 var _ = Describe("PluginConfig", func() {
-
 	Describe("Reading configuration data", func() {
 		BeforeEach(func() {
 			curDir, err := os.Getwd()

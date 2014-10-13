@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"net/rpc"
 	"path/filepath"
 	"strings"
 	"time"
@@ -20,6 +21,10 @@ import (
 )
 
 var _ = Describe("Help", func() {
+	BeforeEach(func() {
+		rpc.DefaultServer = rpc.NewServer()
+	})
+
 	It("shows help for all commands", func() {
 		commandFactory := createCommandFactory()
 
