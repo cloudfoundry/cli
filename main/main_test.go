@@ -49,7 +49,7 @@ var _ = Describe("main", func() {
 
 	Describe("Plugins", func() {
 		It("can print help for all core commands by executing only the command `cf`", func() {
-			output := Cf()
+			output := Cf().Wait(3 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 		})
 
