@@ -36,9 +36,3 @@ func TestRpc(t *testing.T) {
 
 	RunSpecs(t, "Rpc Suite")
 }
-
-var _ = BeforeSuite(func() {
-	var err error
-	rpcService, err = rpc.NewRpcService()
-	Expect(err).ToNot(HaveOccurred())
-})

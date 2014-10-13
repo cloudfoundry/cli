@@ -12,14 +12,22 @@ import (
 
 var _ = Describe("Server", func() {
 	var (
-		err    error
-		client *rpc.Client
+		err        error
+		client     *rpc.Client
+		rpcService *CliRpcService
 	)
 
 	AfterEach(func() {
 		if client != nil {
 			client.Close()
 		}
+	})
+
+	BeforeEach(func() {
+		rpc.DefaultServer = rpc.NewServer()
+
+		rpcService, err = NewRpcService()
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	Describe(".NewRpcService", func() {
