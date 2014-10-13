@@ -57,9 +57,18 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 
 	cmd.ensurePluginDoesNotExist(pluginExecutable, pluginExecutableName)
 
-	rpcService := rpc.NewRpcService()
+	rpcService, err := rpc.NewRpcService()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	err = rpcService.Start()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+	defer rpcService.Stop()
+
 	runPluginBinary(pluginPath, rpcService.Port())
-	rpcService.Stop()
 
 	pluginName := rpcService.RpcCmd.ReturnData.(string)
 	if pluginName == "" {
@@ -70,7 +79,7 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 		cmd.ui.Failed(fmt.Sprintf(T("Plugin name {{.PluginName}} is already taken", map[string]interface{}{"PluginName": pluginName})))
 	}
 
-	err := fileutils.CopyFile(pluginExecutable, pluginPath)
+	err = fileutils.CopyFile(pluginExecutable, pluginPath)
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}

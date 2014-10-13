@@ -42,5 +42,11 @@ func TestPlugin(t *testing.T) {
 		panic(err)
 	}
 
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "empty_plugin.exe"), filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "empty_plugin.go"))
+	err = cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+
 	RunSpecs(t, "Plugin Suite")
 }

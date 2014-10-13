@@ -55,7 +55,7 @@ func ServeCommand(cmd RpcPlugin) {
 	if len(os.Args) == 4 {
 		if os.Args[3] == "install-plugin" {
 			pluginName := reflect.TypeOf(cmd).Elem().Name()
-			fmt.Println("reflecting: ", reflect.TypeOf(cmd).Elem().Name())
+			fmt.Println("reflecting: ", reflect.Indirect(reflect.ValueOf(cmd)).Type().Name())
 			client, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[2])
 			if err != nil {
 				fmt.Println(err)

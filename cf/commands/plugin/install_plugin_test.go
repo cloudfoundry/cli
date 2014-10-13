@@ -2,6 +2,7 @@ package plugin_test
 
 import (
 	"io/ioutil"
+	"net/rpc"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -17,17 +18,16 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Install", func() {
+var _ = Describe("Install", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              *testconfig.FakePluginConfiguration
 
-		pluginFile      *os.File
-		old_PLUGINS_DIR string
-		homeDir         string
-		pluginDir       string
-		curDir          string
+		pluginFile *os.File
+		homeDir    string
+		pluginDir  string
+		curDir     string
 
 		test_1 string
 		test_2 string
@@ -44,29 +44,14 @@ var _ = FDescribe("Install", func() {
 		}
 		test_1 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.exe")
 		test_2 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.exe")
-	})
 
-	AfterEach(func() {
-		err := os.Setenv("CF_PLUGINS_DIR", old_PLUGINS_DIR)
-		Expect(err).NotTo(HaveOccurred())
-	})
-
-	runCommand := func(args ...string) bool {
-		cmd := NewPluginInstall(ui, config)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
-	}
-
-	setupTempExecutable := func() {
-		var err error
+		rpc.DefaultServer = rpc.NewServer()
 
 		homeDir, err = ioutil.TempDir(os.TempDir(), "plugins")
 		Expect(err).ToNot(HaveOccurred())
 
-		old_PLUGINS_DIR = os.Getenv("CF_PLUGINS_DIR")
-		err = os.Setenv("CF_PLUGINS_DIR", homeDir)
-		Expect(err).NotTo(HaveOccurred())
-
 		pluginDir = filepath.Join(homeDir, ".cf", "plugins")
+		config.GetPluginPathReturns(pluginDir)
 
 		curDir, err = os.Getwd()
 		Expect(err).ToNot(HaveOccurred())
@@ -77,6 +62,16 @@ var _ = FDescribe("Install", func() {
 			err = os.Chmod(test_1, 0700)
 			Expect(err).ToNot(HaveOccurred())
 		}
+	})
+
+	AfterEach(func() {
+		os.Remove(filepath.Join(curDir, pluginFile.Name()))
+		os.Remove(homeDir)
+	})
+
+	runCommand := func(args ...string) bool {
+		cmd := NewPluginInstall(ui, config)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -87,25 +82,19 @@ var _ = FDescribe("Install", func() {
 
 	Describe("failures", func() {
 		It("if plugin name is already taken", func() {
-			config.PluginsReturns(map[string]string{"CliPlugin": "do/not/care"})
+			config.PluginsReturns(map[string]string{"Test1": "do/not/care"})
 			runCommand(test_1)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Plugin name", "CliPlugin", "is already taken"},
+				[]string{"Plugin name", "Test1", "is already taken"},
 				[]string{"FAILED"},
 			))
 		})
 
 		Context("io", func() {
 			BeforeEach(func() {
-				setupTempExecutable()
 				err := os.MkdirAll(pluginDir, 0700)
 				Expect(err).NotTo(HaveOccurred())
-			})
-
-			AfterEach(func() {
-				os.Remove(filepath.Join(curDir, pluginFile.Name()))
-				os.Remove(homeDir)
 			})
 
 			It("if a file with the plugin name already exists under ~/.cf/plugin/", func() {
@@ -128,19 +117,12 @@ var _ = FDescribe("Install", func() {
 		)
 
 		BeforeEach(func() {
-			setupTempExecutable()
-
 			err := os.MkdirAll(pluginDir, 0700)
 			Expect(err).ToNot(HaveOccurred())
 
 			sourceBinaryPath = filepath.Join("..", "..", "..", "fixtures", "plugins", "test_1.exe")
 			config.GetPluginPathReturns(pluginDir)
 			runCommand(sourceBinaryPath)
-		})
-
-		AfterEach(func() {
-			os.Remove(filepath.Join(curDir, pluginFile.Name()))
-			os.Remove(homeDir)
 		})
 
 		It("copies the plugin into directory <FAKE_HOME_DIR>/.cf/plugins/PLUGIN_FILE_NAME", func() {
@@ -161,12 +143,12 @@ var _ = FDescribe("Install", func() {
 		It("populate the configuration map with the plugin name and location", func() {
 			pluginName, pluginExecutable := config.SetPluginArgsForCall(0)
 
-			Expect(pluginName).To(Equal("CliPlugin"))
+			Expect(pluginName).To(Equal("Test1"))
 			Expect(pluginExecutable).To(Equal(filepath.Join(pluginDir, "test_1.exe")))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Installing plugin", sourceBinaryPath},
 				[]string{"OK"},
-				[]string{"Plugin", "CliPlugin", "successfully installed"},
+				[]string{"Plugin", "Test1", "successfully installed"},
 			))
 		})
 

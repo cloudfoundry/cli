@@ -12,7 +12,6 @@ import (
 
 var _ = Describe("Command", func() {
 	var (
-		noRpcPluginPath string
 		validPluginPath string
 		OLD_PLUGINS_DIR string
 	)
@@ -36,7 +35,7 @@ var _ = Describe("Command", func() {
 	})
 
 	Describe(".ServeCommand", func() {
-		XIt("prints a warning if a plugin does not implement the rpc interface", func() {
+		It("prints a warning if a plugin does not implement the rpc interface", func() {
 			//This would seem like a valid test, but the plugin itself will not compile
 		})
 

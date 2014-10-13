@@ -13,7 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/plugin"
 )
 
-type CliPlugin struct{}
+type Test2 struct{}
 
 var commands = []plugin.Command{
 	{
@@ -26,7 +26,7 @@ var commands = []plugin.Command{
 	},
 }
 
-func (c *CliPlugin) Run(args string, reply *bool) error {
+func (c *Test2) Run(args string, reply *bool) error {
 	if args == "test_2_cmd1" {
 		theFirstCmd()
 	} else if args == "test_2_cmd2" {
@@ -35,12 +35,12 @@ func (c *CliPlugin) Run(args string, reply *bool) error {
 	return nil
 }
 
-func (c *CliPlugin) ListCmds(args string, cmdlist *[]plugin.Command) error {
+func (c *Test2) ListCmds(args string, cmdlist *[]plugin.Command) error {
 	*cmdlist = commands
 	return nil
 }
 
-func (c *CliPlugin) CmdExists(args string, exists *bool) error {
+func (c *Test2) CmdExists(args string, exists *bool) error {
 	*exists = plugin.CmdExists(args, commands)
 	return nil
 }
@@ -54,5 +54,5 @@ func theSecondCmd() {
 }
 
 func main() {
-	plugin.ServeCommand(new(CliPlugin))
+	plugin.ServeCommand(new(Test2))
 }

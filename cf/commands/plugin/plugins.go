@@ -10,12 +10,14 @@ import (
 )
 
 type Plugins struct {
-	ui terminal.UI
+	ui     terminal.UI
+	config plugin_config.PluginConfiguration
 }
 
-func NewPlugins(ui terminal.UI) *Plugins {
+func NewPlugins(ui terminal.UI, config plugin_config.PluginConfiguration) *Plugins {
 	return &Plugins{
-		ui: ui,
+		ui:     ui,
+		config: config,
 	}
 }
 
@@ -34,13 +36,23 @@ func (cmd *Plugins) GetRequirements(_ requirements.Factory, _ *cli.Context) (req
 func (cmd *Plugins) Run(c *cli.Context) {
 	cmd.ui.Say("Listing Installed Plugins...")
 
-	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { cmd.ui.Failed(err.Error()) })
-	plugins := pluginsConfig.Plugins()
+	plugins := cmd.config.Plugins()
 
 	table := terminal.NewTable(cmd.ui, []string{"Plugin name", "Command name"})
 
+	service, err := rpc.NewRpcService()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	err = service.Start()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+	defer service.Stop()
+
 	for pluginName, location := range plugins {
-		cmdList, _ := rpc.RunListCmd(location)
+		cmdList, _ := rpc.RunListCmd(pluginName, location, service.Port())
 
 		for _, command := range cmdList {
 			table.Add(pluginName, command.Name)

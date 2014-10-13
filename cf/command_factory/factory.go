@@ -269,7 +269,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 
 	pluginConfig := plugin_config.NewPluginConfig(func(err error) { ui.Failed(err.Error()) })
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, pluginConfig)
-	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui)
+	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, pluginConfig)
 	return
 }
 
