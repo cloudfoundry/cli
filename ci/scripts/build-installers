@@ -6,7 +6,7 @@ ROOT_DIR=$(pwd)
 OUT_DIR=${ROOT_DIR}/out
 RELEASE_DIR=${ROOT_DIR}/release
 INSTALLERS_DIR=${ROOT_DIR}/installers
-VERSION=$(${OUT_DIR}/cf-linux-amd64 -v | cut -d' ' -f 3 | cut -d'-' -f 1)
+VERSION=$(${OUT_DIR}/cf-linux-386 -v | cut -d' ' -f 3 | cut -d'-' -f 1)
 
 echo "building windows-386 installer"
 (
