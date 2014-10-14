@@ -35,7 +35,7 @@ var _ = Describe("Uninstall", func() {
 		fakePluginRepoDir, err = ioutil.TempDir(os.TempDir(), "plugins")
 		Expect(err).ToNot(HaveOccurred())
 
-		fixtureDir := filepath.Join("..", "..", "..", "fixtures", "config", "plugin-config", ".cf", "plugins")
+		fixtureDir := filepath.Join("..", "..", "..", "fixtures", "plugins")
 
 		pluginDir = filepath.Join(fakePluginRepoDir, ".cf", "plugins")
 		err = os.MkdirAll(pluginDir, 0700)
