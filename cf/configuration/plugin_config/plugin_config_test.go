@@ -57,4 +57,43 @@ var _ = Describe("PluginConfig", func() {
 			Expect(plugins["foo"]).To(Equal("bar"))
 		})
 	})
+
+	Describe("Removing configuration data", func() {
+
+		var (
+			pluginConfig *PluginConfig
+		)
+
+		BeforeEach(func() {
+			config_helpers.PluginRepoDir = func() string { return os.TempDir() }
+			pluginConfig = NewPluginConfig(func(err error) {
+				if err != nil {
+					panic(fmt.Sprintf("Config error: %s", err))
+				}
+			})
+		})
+
+		AfterEach(func() {
+			os.Remove(filepath.Join(os.TempDir()))
+		})
+
+		It("removes plugin location and executable information", func() {
+			pluginConfig.SetPlugin("foo", "bar")
+
+			plugins := pluginConfig.Plugins()
+			Expect(plugins).To(HaveKey("foo"))
+
+			pluginConfig.RemovePlugin("foo")
+
+			plugins = pluginConfig.Plugins()
+			Expect(plugins).NotTo(HaveKey("foo"))
+		})
+
+		It("handles when the config is not yet initialized", func() {
+			pluginConfig.RemovePlugin("foo")
+
+			plugins := pluginConfig.Plugins()
+			Expect(plugins).NotTo(HaveKey("foo"))
+		})
+	})
 })

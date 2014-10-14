@@ -35,7 +35,7 @@ var expectedCommandNames = []string{
 	"set-space-role", "create-shared-domain", "space", "space-users", "spaces", "stacks", "start", "stop",
 	"target", "unbind-service", "unmap-route", "unset-env", "unset-org-role", "unset-space-role",
 	"update-buildpack", "update-service-broker", "update-service-auth-token", "update-user-provided-service",
-	"quotas", "create-quota", "delete-quota", "quota", "set-quota",
+	"quotas", "create-quota", "delete-quota", "quota", "set-quota", "install-plugin", "plugins", "uninstall-plugin",
 }
 
 var _ = Describe("App", func() {

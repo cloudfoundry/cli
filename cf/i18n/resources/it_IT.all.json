@@ -915,6 +915,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME uninstall-plugin PLUGIN-NAME",
+      "translation": "CF_NAME uninstall-plugin PLUGIN-NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
       "translation": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
       "modified": false
@@ -2655,6 +2660,11 @@
       "modified": false
    },
    {
+      "id": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
+      "translation": "uninstall-plugin PLUGIN-NAME  - Uninstall the plugin defined in command argument",
+      "modified": true
+   },
+   {
       "id": "Paid service plans",
       "translation": "Paid service plans",
       "modified": false
@@ -2730,6 +2740,11 @@
       "modified": false
    },
    {
+      "id": "Plugin name {{.PluginName}} does not exist",
+      "translation": "Plugin name {{.PluginName}} does not exist",
+      "modified": true
+   },
+   {
       "id": "Plugin name {{.PluginName}} is already taken",
       "translation": "Plugin name {{.PluginName}} is already taken",
       "modified": false
@@ -2738,6 +2753,11 @@
       "id": "Plugin {{.PluginName}} successfully installed.",
       "translation": "Plugin {{.PluginName}} successfully installed.",
       "modified": false
+   },
+   {
+      "id": "Plugin {{.PluginName}} successfully uninstalled.",
+      "translation": "Plugin name {{.PluginName}} successfully uninstalled",
+      "modified": true
    },
    {
       "id": "Print API request diagnostics to stdout",
@@ -3570,6 +3590,11 @@
       "modified": false
    },
    {
+      "id": "Uninstalling plugin {{.PluginName}}...",
+      "translation": "Uninstalling plugin {{.PluginName}}...",
+      "modified": false
+   },
+   {
       "id": "Unlock the buildpack",
       "translation": "Unlock the buildpack",
       "modified": false
@@ -4208,6 +4233,11 @@
       "id": "total memory limit",
       "translation": "memory limit",
       "modified": true
+   },
+   {
+      "id": "uninstall-plugin",
+      "translation": "uninstall-plugin",
+      "modified": false
    },
    {
       "id": "unknown authority",
