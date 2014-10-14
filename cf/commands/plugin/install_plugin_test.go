@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/cloudfoundry/cli/cf/command"
+	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
 	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -24,6 +26,7 @@ var _ = Describe("Install", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		config              *testconfig.FakePluginConfiguration
 
+		coreCmds   map[string]command.Command
 		pluginFile *os.File
 		homeDir    string
 		pluginDir  string
@@ -37,6 +40,7 @@ var _ = Describe("Install", func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		config = &testconfig.FakePluginConfiguration{}
+		coreCmds = make(map[string]command.Command)
 
 		dir, err := os.Getwd()
 		if err != nil {
@@ -70,7 +74,7 @@ var _ = Describe("Install", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPluginInstall(ui, config)
+		cmd := NewPluginInstall(ui, config, coreCmds)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -81,6 +85,30 @@ var _ = Describe("Install", func() {
 	})
 
 	Describe("failures", func() {
+		FIt("if a plugin's command shares the same name as a core command", func() {
+			coreCmds["help"] = &testCommand.FakeCommand{}
+
+			x, err := os.Stat(test_1)
+			println("name file: ", x.Name())
+			Ω(err).ToNot(HaveOccurred())
+
+			runCommand(test_1)
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Plugin 'test_1.exe' cannot be installed from", test_1, "at this time because the command 'cf help' already exists."},
+				[]string{"FAILED"},
+			))
+		})
+
+		It("plugin binary argument is a bad file path", func() {
+			runCommand("path/to/not/a/thing.exe")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Binary file 'path/to/not/a/thing.exe' not found"},
+				[]string{"FAILED"},
+			))
+		})
+
 		It("if plugin name is already taken", func() {
 			config.PluginsReturns(map[string]string{"Test1": "do/not/care"})
 			runCommand(test_1)

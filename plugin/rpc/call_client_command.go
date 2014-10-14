@@ -97,22 +97,15 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 	return false, nil
 }
 
-func GetAllPluginCommands() ([]plugin.Command, error) {
+func GetAllPluginCommands(cliServicePort string) ([]plugin.Command, error) {
 	var combinedCmdList, cmdList []plugin.Command
 
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
 
-	service, err := startCliServer()
-	if err != nil {
-		return []plugin.Command{}, err
-	}
-
-	defer service.Stop()
-
 	port := obtainPort()
 	for pluginName, location := range pluginList {
-		cmd, err := runPlugin(location, port, service.Port()) //both started
+		cmd, err := runPlugin(location, port, cliServicePort) //both started
 		if err != nil {
 			continue
 		}
