@@ -2,6 +2,7 @@
 ChangesEnvironment=yes
 AppName=Cloud Foundry CLI
 AppVersion=VERSION
+AppVerName=VERSION
 DefaultDirName={pf}\CloudFoundry
 
 [Registry]
