@@ -325,6 +325,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentCommand("plugins"),
 					presentCommand("install-plugin"),
+					presentCommand("uninstall-plugin"),
 				},
 			},
 		}, {

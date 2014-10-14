@@ -55,8 +55,15 @@ func (c *PluginConfig) SetPlugin(name, location string) {
 	})
 }
 
+func (c *PluginConfig) RemovePlugin(name string) {
+	c.write(func() {
+		delete(c.data.Plugins, name)
+	})
+}
+
 /* Functions that handel locking */
 func (c *PluginConfig) init() {
+	//only read from disk if it was never read
 	c.initOnce.Do(func() {
 		err := c.persistor.Load(c.data)
 		if err != nil {

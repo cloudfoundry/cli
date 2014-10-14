@@ -915,6 +915,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME uninstall-plugin PLUGIN-NAME",
+      "translation": "CF_NAME uninstall-plugin PLUGIN-NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
       "translation": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
       "modified": false
@@ -2655,6 +2660,11 @@
       "modified": false
    },
    {
+      "id": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
+      "translation": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
+      "modified": false
+   },
+   {
       "id": "Paid service plans",
       "translation": "Paid service plans",
       "modified": false
@@ -2730,6 +2740,11 @@
       "modified": false
    },
    {
+      "id": "Plugin name {{.PluginName}} does not exist",
+      "translation": "Plugin name {{.PluginName}} does not exist",
+      "modified": false
+   },
+   {
       "id": "Plugin name {{.PluginName}} is already taken",
       "translation": "Plugin name {{.PluginName}} is already taken",
       "modified": false
@@ -2737,6 +2752,11 @@
    {
       "id": "Plugin {{.PluginName}} successfully installed.",
       "translation": "Plugin {{.PluginName}} successfully installed.",
+      "modified": false
+   },
+   {
+      "id": "Plugin {{.PluginName}} successfully uninstalled.",
+      "translation": "Plugin {{.PluginName}} successfully uninstalled.",
       "modified": false
    },
    {
@@ -3570,6 +3590,11 @@
       "modified": false
    },
    {
+      "id": "Uninstalling plugin {{.PluginName}}...",
+      "translation": "Uninstalling plugin {{.PluginName}}...",
+      "modified": false
+   },
+   {
       "id": "Unlock the buildpack",
       "translation": "Unlock the buildpack",
       "modified": false
@@ -4207,6 +4232,11 @@
    {
       "id": "total memory limit",
       "translation": "total memory limit",
+      "modified": false
+   },
+   {
+      "id": "uninstall-plugin",
+      "translation": "uninstall-plugin",
       "modified": false
    },
    {
