@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -19,14 +20,16 @@ import (
 )
 
 type PluginInstall struct {
-	ui     terminal.UI
-	config plugin_config.PluginConfiguration
+	ui       terminal.UI
+	config   plugin_config.PluginConfiguration
+	coreCmds map[string]command.Command
 }
 
-func NewPluginInstall(ui terminal.UI, config plugin_config.PluginConfiguration) *PluginInstall {
+func NewPluginInstall(ui terminal.UI, config plugin_config.PluginConfiguration, coreCmds map[string]command.Command) *PluginInstall {
 	return &PluginInstall{
-		ui:     ui,
-		config: config,
+		ui:       ui,
+		config:   config,
+		coreCmds: coreCmds,
 	}
 }
 
@@ -48,9 +51,12 @@ func (cmd *PluginInstall) GetRequirements(_ requirements.Factory, c *cli.Context
 
 func (cmd *PluginInstall) Run(c *cli.Context) {
 	pluginPath := c.Args()[0]
-	_, pluginExecutableName := filepath.Split(pluginPath)
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginPath})))
+
+	cmd.ensurePluginBinaryExists(pluginPath)
+
+	_, pluginExecutableName := filepath.Split(pluginPath)
 
 	plugins := cmd.config.Plugins()
 	pluginExecutable := filepath.Join(cmd.config.GetPluginPath(), pluginExecutableName)
@@ -69,6 +75,21 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 	defer rpcService.Stop()
 
 	runPluginBinary(pluginPath, rpcService.Port())
+	pluginCmds, err := rpc.GetAllPluginCommands(rpcService.Port())
+	if err != nil {
+		cmd.ui.Failed(fmt.Sprintf("Error getting command list from plugin %s: %s", pluginPath, err.Error()))
+	}
+
+	for k, _ := range cmd.coreCmds {
+		println(k)
+	}
+
+	for k, pluginCmd := range pluginCmds {
+		println(k, " . ", pluginCmd.Name)
+		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists {
+			cmd.ui.Failed(fmt.Sprintf("Plugin '%s' cannot be installed from '%s' at this time because the command 'cf %s' already exists.", pluginExecutable, pluginPath, pluginCmd))
+		}
+	}
 
 	pluginName := rpcService.RpcCmd.ReturnData.(string)
 	if pluginName == "" {
@@ -98,6 +119,13 @@ func (cmd *PluginInstall) ensurePluginDoesNotExist(pluginExecutable, pluginExecu
 			})))
 	} else if !os.IsNotExist(err) {
 		cmd.ui.Failed(fmt.Sprintf(T("Unexpected error has occurred:\n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
+	}
+}
+
+func (cmd *PluginInstall) ensurePluginBinaryExists(pluginPath string) {
+	_, err := os.Stat(pluginPath)
+	if err != nil && os.IsNotExist(err) {
+		cmd.ui.Failed(fmt.Sprintf("Binary file '%s' not found", pluginPath))
 	}
 }
 

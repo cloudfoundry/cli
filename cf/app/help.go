@@ -65,8 +65,19 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		return
 	}
 
+	rpcService, err := rpc.NewRpcService()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	err = rpcService.Start()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rpcService.Stop()
+
 	presentPluginCommands := func() []cmdPresenter {
-		pluginCmdList, _ := rpc.GetAllPluginCommands()
+		pluginCmdList, _ := rpc.GetAllPluginCommands(rpcService.Port())
 		var presenters []cmdPresenter
 		var pluginPresenter cmdPresenter
 		for _, cmd := range pluginCmdList {
