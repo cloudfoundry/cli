@@ -730,6 +730,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME plugins",
+      "translation": "CF_NAME plugins",
+      "modified": false
+   },
+   {
       "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]",
       "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]",
       "modified": false
@@ -1037,6 +1042,11 @@
    {
       "id": "Changing password...",
       "translation": "Cambiando clave...",
+      "modified": false
+   },
+   {
+      "id": "Command name",
+      "translation": "Command name",
       "modified": false
    },
    {
@@ -2355,6 +2365,11 @@
       "modified": false
    },
    {
+      "id": "Listing Installed Plugins...",
+      "translation": "Listing Installed Plugins...",
+      "modified": false
+   },
+   {
       "id": "Lock the buildpack",
       "translation": "Bloquea el buildpack",
       "modified": false
@@ -2737,6 +2752,11 @@
    {
       "id": "Please log in again",
       "translation": "Por favor iniciar sesión nuevamente",
+      "modified": false
+   },
+   {
+      "id": "Plugin name",
+      "translation": "Plugin name",
       "modified": false
    },
    {
@@ -3990,11 +4010,6 @@
       "modified": false
    },
    {
-      "id": "install-plugin",
-      "translation": "install-plugin",
-      "modified": false
-   },
-   {
       "id": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
       "translation": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
       "modified": false
@@ -4042,6 +4057,11 @@
    {
       "id": "limited",
       "translation": "limited",
+      "modified": false
+   },
+   {
+      "id": "list all available plugin commands",
+      "translation": "list all available plugin commands",
       "modified": false
    },
    {
@@ -4233,11 +4253,6 @@
       "id": "total memory limit",
       "translation": "limite de memoria",
       "modified": true
-   },
-   {
-      "id": "uninstall-plugin",
-      "translation": "uninstall-plugin",
-      "modified": false
    },
    {
       "id": "unknown authority",
