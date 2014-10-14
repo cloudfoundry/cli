@@ -2676,7 +2676,7 @@
    },
    {
       "id": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
-      "translation": "uninstall-plugin PLUGIN-NAME  - Uninstall the plugin defined in command argument",
+      "translation": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
       "modified": true
    },
    {
