@@ -3,6 +3,7 @@ package plugin
 import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/plugin/rpc"
@@ -24,8 +25,8 @@ func NewPlugins(ui terminal.UI, config plugin_config.PluginConfiguration) *Plugi
 func (cmd *Plugins) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "plugins",
-		Description: "list all available plugin commands",
-		Usage:       "CF_NAME plugins",
+		Description: T("list all available plugin commands"),
+		Usage:       T("CF_NAME plugins"),
 	}
 }
 
@@ -34,11 +35,11 @@ func (cmd *Plugins) GetRequirements(_ requirements.Factory, _ *cli.Context) (req
 }
 
 func (cmd *Plugins) Run(c *cli.Context) {
-	cmd.ui.Say("Listing Installed Plugins...")
+	cmd.ui.Say(T("Listing Installed Plugins..."))
 
 	plugins := cmd.config.Plugins()
 
-	table := terminal.NewTable(cmd.ui, []string{"Plugin name", "Command name"})
+	table := terminal.NewTable(cmd.ui, []string{T("Plugin name"), T("Command name")})
 
 	service, err := rpc.NewRpcService()
 	if err != nil {
