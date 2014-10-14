@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -e
+
+mkdir -p out release
+(
+  cd out
+
+  for BIN in cf-[ld]*; do
+    cp ${BIN} cf
+    tar cvzf ../release/${BIN}.tgz cf
+    rm cf
+  done
+
+  for BIN in cf-windows*; do
+    cp ${BIN} cf.exe
+    zip ../release/${BIN%exe}zip cf.exe
+    rm cf.exe
+  done
+)
