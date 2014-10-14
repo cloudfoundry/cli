@@ -96,7 +96,7 @@ echo "building OS X installer"
     ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
     mkbom -i bom_list Bom
     mv Bom Payload com.cloudfoundry.cli.pkg
-    xar -c --compression none -f installer-osx-amd64.pkg com.cloudfoundry.cli.pkg Distribution
+    tar -cvf installer-osx-amd64.pkg com.cloudfoundry.cli.pkg Distribution --no-auto-compress
     mv installer-osx-amd64.pkg ${RELEASE_DIR}/
     rm -rf cf-cli Payload Bom bom_list
 )
