@@ -13,12 +13,14 @@ import (
 )
 
 type PluginUninstall struct {
-	ui terminal.UI
+	ui     terminal.UI
+	config plugin_config.PluginConfiguration
 }
 
-func NewPluginUninstall(ui terminal.UI) *PluginUninstall {
+func NewPluginUninstall(ui terminal.UI, config plugin_config.PluginConfiguration) *PluginUninstall {
 	return &PluginUninstall{
-		ui: ui,
+		ui:     ui,
+		config: config,
 	}
 }
 
@@ -45,11 +47,7 @@ func (cmd *PluginUninstall) Run(c *cli.Context) {
 
 	cmd.ui.Say(fmt.Sprintf(T("Uninstalling plugin {{.PluginName}}...", pluginNameMap)))
 
-	pluginsConfig := plugin_config.NewPluginConfig(func(err error) {
-		cmd.ui.Failed(err.Error())
-	})
-
-	plugins := pluginsConfig.Plugins()
+	plugins := cmd.config.Plugins()
 
 	if _, ok := plugins[pluginName]; !ok {
 		cmd.ui.Failed(fmt.Sprintf(T("Plugin name {{.PluginName}} does not exist", pluginNameMap)))
@@ -58,7 +56,7 @@ func (cmd *PluginUninstall) Run(c *cli.Context) {
 	pluginPath := plugins[pluginName]
 	os.Remove(pluginPath)
 
-	pluginsConfig.RemovePlugin(pluginName)
+	cmd.config.RemovePlugin(pluginName)
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully uninstalled.", pluginNameMap)))

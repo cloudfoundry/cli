@@ -58,7 +58,7 @@ var _ = Describe("Uninstall", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPluginUninstall(ui)
+		cmd := NewPluginUninstall(ui, pluginConfig)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -77,11 +77,6 @@ var _ = Describe("Uninstall", func() {
 				[]string{"FAILED"},
 				[]string{"Plugin name", "garbage", "does not exist"},
 			))
-		})
-		Describe("when the plugin config errors", func() {
-			It("invokes cmd.ui.Failure", func() {
-
-			})
 		})
 	})
 
@@ -104,7 +99,6 @@ var _ = Describe("Uninstall", func() {
 
 			runCommand("test_1.exe")
 
-			pluginConfig = plugin_config.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
 			plugins = pluginConfig.Plugins()
 			Expect(plugins).NotTo(HaveKey("test_1.exe"))
 		})

@@ -2,9 +2,8 @@
 package fakes
 
 import (
+	. "github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"sync"
-
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 )
 
 type FakePluginConfiguration struct {
@@ -26,12 +25,17 @@ type FakePluginConfiguration struct {
 	getPluginPathReturns     struct {
 		result1 string
 	}
+	RemovePluginStub        func(string)
+	removePluginMutex       sync.RWMutex
+	removePluginArgsForCall []struct {
+		arg1 string
+	}
 }
 
 func (fake *FakePluginConfiguration) Plugins() map[string]string {
 	fake.pluginsMutex.Lock()
+	defer fake.pluginsMutex.Unlock()
 	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct{}{})
-	fake.pluginsMutex.Unlock()
 	if fake.PluginsStub != nil {
 		return fake.PluginsStub()
 	} else {
@@ -46,7 +50,6 @@ func (fake *FakePluginConfiguration) PluginsCallCount() int {
 }
 
 func (fake *FakePluginConfiguration) PluginsReturns(result1 map[string]string) {
-	fake.PluginsStub = nil
 	fake.pluginsReturns = struct {
 		result1 map[string]string
 	}{result1}
@@ -54,11 +57,11 @@ func (fake *FakePluginConfiguration) PluginsReturns(result1 map[string]string) {
 
 func (fake *FakePluginConfiguration) SetPlugin(arg1 string, arg2 string) {
 	fake.setPluginMutex.Lock()
+	defer fake.setPluginMutex.Unlock()
 	fake.setPluginArgsForCall = append(fake.setPluginArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	fake.setPluginMutex.Unlock()
 	if fake.SetPluginStub != nil {
 		fake.SetPluginStub(arg1, arg2)
 	}
@@ -78,8 +81,8 @@ func (fake *FakePluginConfiguration) SetPluginArgsForCall(i int) (string, string
 
 func (fake *FakePluginConfiguration) GetPluginPath() string {
 	fake.getPluginPathMutex.Lock()
+	defer fake.getPluginPathMutex.Unlock()
 	fake.getPluginPathArgsForCall = append(fake.getPluginPathArgsForCall, struct{}{})
-	fake.getPluginPathMutex.Unlock()
 	if fake.GetPluginPathStub != nil {
 		return fake.GetPluginPathStub()
 	} else {
@@ -94,10 +97,32 @@ func (fake *FakePluginConfiguration) GetPluginPathCallCount() int {
 }
 
 func (fake *FakePluginConfiguration) GetPluginPathReturns(result1 string) {
-	fake.GetPluginPathStub = nil
 	fake.getPluginPathReturns = struct {
 		result1 string
 	}{result1}
 }
 
-var _ plugin_config.PluginConfiguration = new(FakePluginConfiguration)
+func (fake *FakePluginConfiguration) RemovePlugin(arg1 string) {
+	fake.removePluginMutex.Lock()
+	defer fake.removePluginMutex.Unlock()
+	fake.removePluginArgsForCall = append(fake.removePluginArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.RemovePluginStub != nil {
+		fake.RemovePluginStub(arg1)
+	}
+}
+
+func (fake *FakePluginConfiguration) RemovePluginCallCount() int {
+	fake.removePluginMutex.RLock()
+	defer fake.removePluginMutex.RUnlock()
+	return len(fake.removePluginArgsForCall)
+}
+
+func (fake *FakePluginConfiguration) RemovePluginArgsForCall(i int) string {
+	fake.removePluginMutex.RLock()
+	defer fake.removePluginMutex.RUnlock()
+	return fake.removePluginArgsForCall[i].arg1
+}
+
+var _ PluginConfiguration = new(FakePluginConfiguration)

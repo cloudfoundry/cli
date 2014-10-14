@@ -12,6 +12,7 @@ type PluginConfiguration interface {
 	Plugins() map[string]string
 	SetPlugin(string, string)
 	GetPluginPath() string
+	RemovePlugin(string)
 }
 
 type PluginConfig struct {
