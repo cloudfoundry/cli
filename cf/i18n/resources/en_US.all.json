@@ -2160,6 +2160,11 @@
       "modified": false
    },
    {
+      "id": "Install the plugin defined in command argument",
+      "translation": "Install the plugin defined in command argument",
+      "modified": false
+   },
+   {
       "id": "Installing plugin {{.PluginPath}}...",
       "translation": "Installing plugin {{.PluginPath}}...",
       "modified": false
@@ -2672,16 +2677,6 @@
    {
       "id": "Override path to default config directory",
       "translation": "Override path to default config directory",
-      "modified": false
-   },
-   {
-      "id": "PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
-      "translation": "PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
-      "modified": false
-   },
-   {
-      "id": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
-      "translation": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
       "modified": false
    },
    {
@@ -3617,6 +3612,11 @@
    {
       "id": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
       "translation": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
+      "modified": false
+   },
+   {
+      "id": "Uninstall the plugin defined in command argument",
+      "translation": "Uninstall the plugin defined in command argument",
       "modified": false
    },
    {
