@@ -3380,6 +3380,11 @@
       "modified": false
    },
    {
+      "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
+      "translation": "TIP: Changes will not apply to existing running applications until they are restarted.",
+      "modified": false
+   },
+   {
       "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
       "translation": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
       "modified": false

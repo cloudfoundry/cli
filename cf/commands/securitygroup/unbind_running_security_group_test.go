@@ -71,6 +71,7 @@ var _ = Describe("unbind-running-security-group command", func() {
 			It("unbinds the group from the running group set", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Unbinding", "security group", "a-security-group-name", "my-user"},
+					[]string{"TIP: Changes will not apply to existing running applications until they are restarted."},
 					[]string{"OK"},
 				))
 

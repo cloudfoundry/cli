@@ -69,6 +69,7 @@ var _ = Describe("bind-running-security-group command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Binding", "security-group-name", "as", "my-user"},
 				[]string{"OK"},
+				[]string{"TIP: Changes will not apply to existing running applications until they are restarted."},
 			))
 		})
 

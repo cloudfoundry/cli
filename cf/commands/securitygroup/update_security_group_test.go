@@ -90,6 +90,7 @@ var _ = Describe("update-security-group command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Updating security group", "my-group-name", "my-user"},
 					[]string{"OK"},
+					[]string{"TIP: Changes will not apply to existing running applications until they are restarted."},
 				))
 			})
 
