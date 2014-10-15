@@ -1,6 +1,8 @@
 package securitygroup
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/command"
@@ -30,10 +32,12 @@ func NewUnbindFromStagingGroup(ui terminal.UI, configRepo core_config.Reader, se
 }
 
 func (cmd *unbindFromStagingGroup) Metadata() command_metadata.CommandMetadata {
+	primaryUsage := T("CF_NAME unbind-staging-security-group SECURITY_GROUP")
+	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
 	return command_metadata.CommandMetadata{
 		Name:        "unbind-staging-security-group",
 		Description: T("Unbind a security group from the set of security groups for staging applications"),
-		Usage:       T("CF_NAME unbind-staging-security-group SECURITY_GROUP"),
+		Usage:       strings.Join([]string{primaryUsage, tipUsage}, "\n\n"),
 	}
 }
 
@@ -77,4 +81,6 @@ func (cmd *unbindFromStagingGroup) Run(context *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("\n\n")
+	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
 }

@@ -1,6 +1,8 @@
 package securitygroup
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	sgbinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
@@ -41,10 +43,12 @@ func NewBindSecurityGroup(
 }
 
 func (cmd BindSecurityGroup) Metadata() command_metadata.CommandMetadata {
+	primaryUsage := T("CF_NAME bind-security-group SECURITY_GROUP ORG SPACE")
+	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
 	return command_metadata.CommandMetadata{
 		Name:        "bind-security-group",
 		Description: T("Bind a security group to a space"),
-		Usage:       T("CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"),
+		Usage:       strings.Join([]string{primaryUsage, tipUsage}, "\n\n"),
 	}
 }
 
@@ -94,4 +98,6 @@ func (cmd BindSecurityGroup) Run(context *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("\n\n")
+	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
 }

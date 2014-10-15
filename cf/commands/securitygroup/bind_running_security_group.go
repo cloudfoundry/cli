@@ -1,6 +1,8 @@
 package securitygroup
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/command"
@@ -29,10 +31,12 @@ func NewBindToRunningGroup(ui terminal.UI, configRepo core_config.Reader, securi
 }
 
 func (cmd *bindToRunningGroup) Metadata() command_metadata.CommandMetadata {
+	primaryUsage := T("CF_NAME bind-running-security-group SECURITY_GROUP")
+	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
 	return command_metadata.CommandMetadata{
 		Name:        "bind-running-security-group",
 		Description: T("Bind a security group to the list of security groups to be used for running applications"),
-		Usage:       T("CF_NAME bind-running-security-group SECURITY_GROUP"),
+		Usage:       strings.Join([]string{primaryUsage, tipUsage}, "\n\n"),
 	}
 }
 
@@ -66,4 +70,6 @@ func (cmd *bindToRunningGroup) Run(context *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("\n\n")
+	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
 }
