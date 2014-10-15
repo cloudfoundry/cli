@@ -27,7 +27,7 @@ func NewPluginUninstall(ui terminal.UI, config plugin_config.PluginConfiguration
 func (cmd *PluginUninstall) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "uninstall-plugin",
-		Description: T("PLUGIN-NAME - Uninstall the plugin defined in command argument"),
+		Description: T("Uninstall the plugin defined in command argument"),
 		Usage:       T("CF_NAME uninstall-plugin PLUGIN-NAME"),
 	}
 }

@@ -2160,6 +2160,11 @@
       "modified": false
    },
    {
+      "id": "Install the plugin defined in command argument",
+      "translation": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
+      "modified": true
+   },
+   {
       "id": "Installing plugin {{.PluginPath}}...",
       "translation": "Installing plugin {{.PluginPath}}...",
       "modified": false
@@ -2673,16 +2678,6 @@
       "id": "Override path to default config directory",
       "translation": "修改cf配置文件config.json的路径（该路径默认为～/.cf）",
       "modified": false
-   },
-   {
-      "id": "PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
-      "translation": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
-      "modified": true
-   },
-   {
-      "id": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
-      "translation": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
-      "modified": true
    },
    {
       "id": "Paid service plans",
@@ -3618,6 +3613,11 @@
       "id": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
       "translation": "非法{{.PropertyName}}值:\n错误: {{.Error}}",
       "modified": false
+   },
+   {
+      "id": "Uninstall the plugin defined in command argument",
+      "translation": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
+      "modified": true
    },
    {
       "id": "Uninstalling plugin {{.PluginName}}...",
