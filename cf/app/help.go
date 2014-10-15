@@ -10,7 +10,7 @@ import (
 	"unicode/utf8"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/plugin/rpc"
+	// "github.com/cloudfoundry/cli/plugin/rpc"
 
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -65,32 +65,32 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		return
 	}
 
-	rpcService, err := rpc.NewRpcService()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	err = rpcService.Start()
-	if err != nil {
-		panic(err.Error())
-	}
-	defer rpcService.Stop()
-
-	presentPluginCommands := func() []cmdPresenter {
-		pluginCmdList, _ := rpc.GetAllPluginCommands(rpcService.Port())
-		var presenters []cmdPresenter
-		var pluginPresenter cmdPresenter
-		for _, cmd := range pluginCmdList {
-			pluginPresenter.Name = cmd.Name
-			padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(pluginPresenter.Name))
-			pluginPresenter.Name = pluginPresenter.Name + padding
-			pluginPresenter.Description = cmd.HelpText
-			presenters = append(presenters, pluginPresenter)
-
+	/*	rpcService, err := rpc.NewRpcService()
+		if err != nil {
+			panic(err.Error())
 		}
-		return presenters
-	}
 
+		err = rpcService.Start()
+		if err != nil {
+			panic(err.Error())
+		}
+		defer rpcService.Stop()
+
+		presentPluginCommands := func() []cmdPresenter {
+			pluginCmdList, _ := rpc.GetAllPluginCommands(rpcService.Port())
+			var presenters []cmdPresenter
+			var pluginPresenter cmdPresenter
+			for _, cmd := range pluginCmdList {
+				pluginPresenter.Name = cmd.Name
+				padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(pluginPresenter.Name))
+				pluginPresenter.Name = pluginPresenter.Name + padding
+				pluginPresenter.Description = cmd.HelpText
+				presenters = append(presenters, pluginPresenter)
+
+			}
+			return presenters
+		}
+	*/
 	presenter.Name = app.Name
 	presenter.Flags = app.Flags
 	presenter.Usage = app.Usage
@@ -340,9 +340,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: "INSTALLED PLUGINS",
+			Name:             "INSTALLED PLUGINS",
 			CommandSubGroups: [][]cmdPresenter{
-				presentPluginCommands(),
+			// presentPluginCommands(),
 			},
 		},
 	}

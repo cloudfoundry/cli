@@ -5,6 +5,7 @@ import (
 	"net/rpc"
 	"time"
 
+	"github.com/cloudfoundry/cli/plugin"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -77,7 +78,11 @@ var _ = Describe("Server", func() {
 		})
 	})
 
-	Describe(".SetName", func() {
+	Describe(".SetPluginMetadata", func() {
+		var (
+			metadata plugin.PluginMetadata
+		)
+
 		BeforeEach(func() {
 			err := rpcService.Start()
 			Expect(err).ToNot(HaveOccurred())
@@ -86,6 +91,14 @@ var _ = Describe("Server", func() {
 
 			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
+
+			metadata = plugin.PluginMetadata{
+				Name: "foo",
+				Commands: []plugin.Command{
+					{Name: "cmd_1", HelpText: "cm 1 help text"},
+					{Name: "cmd_2", HelpText: "cmd 2 help text"},
+				},
+			}
 		})
 
 		AfterEach(func() {
@@ -97,11 +110,11 @@ var _ = Describe("Server", func() {
 
 		It("set the rpc command's Return Data", func() {
 			var success bool
-			err = client.Call("CliRpcCmd.SetName", "Hello Tokyo", &success)
+			err = client.Call("CliRpcCmd.SetPluginMetadata", metadata, &success)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(success).To(BeTrue())
-			Expect(rpcService.RpcCmd.ReturnData.(string)).To(Equal("Hello Tokyo"))
+			Expect(rpcService.RpcCmd.ReturnData.(plugin.PluginMetadata)).To(Equal(metadata))
 		})
 	})
 })

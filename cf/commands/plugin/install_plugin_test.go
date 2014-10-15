@@ -85,7 +85,7 @@ var _ = Describe("Install", func() {
 	})
 
 	Describe("failures", func() {
-		FIt("if a plugin's command shares the same name as a core command", func() {
+		It("if a plugin's command shares the same name as a core command", func() {
 			coreCmds["help"] = &testCommand.FakeCommand{}
 
 			x, err := os.Stat(test_1)
@@ -95,7 +95,7 @@ var _ = Describe("Install", func() {
 			runCommand(test_1)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Plugin 'test_1.exe' cannot be installed from", test_1, "at this time because the command 'cf help' already exists."},
+				[]string{"Plugin", "test_1.exe", "cannot be installed from", test_1, "at this time because the command 'cf help' already exists."},
 				[]string{"FAILED"},
 			))
 		})

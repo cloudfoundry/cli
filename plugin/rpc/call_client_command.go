@@ -97,29 +97,6 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 	return false, nil
 }
 
-func GetAllPluginCommands(cliServicePort string) ([]plugin.Command, error) {
-	var combinedCmdList, cmdList []plugin.Command
-
-	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
-	pluginList := pluginsConfig.Plugins()
-
-	port := obtainPort()
-	for pluginName, location := range pluginList {
-		cmd, err := runPlugin(location, port, cliServicePort) //both started
-		if err != nil {
-			continue
-		}
-
-		cmdList, err = getPluginCmds(pluginName, port)
-
-		if err == nil {
-			combinedCmdList = append(combinedCmdList, cmdList...)
-		}
-		stopPlugin(cmd)
-	}
-	return combinedCmdList, nil
-}
-
 func runClientCmd(cmd string, method string, port string) (bool, error) {
 	client, err := dialClient(port)
 	var reply bool
