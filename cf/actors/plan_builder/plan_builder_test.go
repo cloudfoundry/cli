@@ -28,7 +28,6 @@ var _ = Describe("Plan builder", func() {
 		planRepo = &fakes.FakeServicePlanRepo{}
 		visibilityRepo = &fakes.FakeServicePlanVisibilityRepository{}
 		orgRepo = &testorg.FakeOrganizationRepository{}
-
 		builder = plan_builder.NewBuilder(planRepo, visibilityRepo, orgRepo)
 
 		plan1 = models.ServicePlanFields{
@@ -62,11 +61,11 @@ var _ = Describe("Plan builder", func() {
 			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org1-guid"},
 			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org2-guid"},
 		}, nil)
+		orgRepo.ListOrgsReturns([]models.Organization{org1, org2}, nil)
 	})
 
 	Describe(".AttachOrgsToPlans", func() {
 		It("returns plans fully populated with the orgnames that have visibility", func() {
-			orgRepo.ListOrgsReturns([]models.Organization{org1, org2}, nil)
 			barePlans := []models.ServicePlanFields{plan1, plan2}
 
 			plans, err := builder.AttachOrgsToPlans(barePlans)
@@ -90,7 +89,6 @@ var _ = Describe("Plan builder", func() {
 
 	Describe(".GetPlansVisibleToOrg", func() {
 		It("returns all the plans visible to the named org", func() {
-
 			plans, err := builder.GetPlansVisibleToOrg("org1")
 			Expect(err).ToNot(HaveOccurred())
 
