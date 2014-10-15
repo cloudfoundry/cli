@@ -9,10 +9,15 @@ import (
 )
 
 type PluginConfiguration interface {
-	Plugins() map[string]string
+	Plugins() map[string]PluginMetadata
 	SetPlugin(string, string)
 	GetPluginPath() string
 	RemovePlugin(string)
+}
+
+type PluginMetadata struct {
+	Location string
+	Commands []string
 }
 
 type PluginConfig struct {

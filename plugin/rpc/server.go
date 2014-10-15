@@ -5,6 +5,8 @@ import (
 	"net"
 	"net/rpc"
 	"strconv"
+
+	"github.com/cloudfoundry/cli/plugin"
 )
 
 type CliRpcService struct {
@@ -33,8 +35,8 @@ func NewRpcService() (*CliRpcService, error) {
 	return rpcService, nil
 }
 
-func (cmd *CliRpcCmd) SetName(pluginName string, retVal *bool) error {
-	cmd.ReturnData = interface{}(pluginName)
+func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
+	cmd.ReturnData = interface{}(pluginMetadata)
 	*retVal = true
 	return nil
 }

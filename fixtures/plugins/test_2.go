@@ -40,6 +40,10 @@ func (c *Test2) ListCmds(args string, cmdlist *[]plugin.Command) error {
 	return nil
 }
 
+func (c *Test2) GetCommands() []plugin.Command {
+	return commands
+}
+
 func (c *Test2) CmdExists(args string, exists *bool) error {
 	*exists = plugin.CmdExists(args, commands)
 	return nil
@@ -54,5 +58,5 @@ func theSecondCmd() {
 }
 
 func main() {
-	plugin.ServeCommand(new(Test2))
+	plugin.Start(new(Test2))
 }

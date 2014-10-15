@@ -15,6 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/fileutils"
+	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/codegangsta/cli"
 )
@@ -54,7 +55,7 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginPath})))
 
-	cmd.ensurePluginBinaryExists(pluginPath)
+	cmd.validateCandidatePluginPath(pluginPath)
 
 	_, pluginExecutableName := filepath.Split(pluginPath)
 
@@ -74,30 +75,26 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 	}
 	defer rpcService.Stop()
 
-	runPluginBinary(pluginPath, rpcService.Port())
-	pluginCmds, err := rpc.GetAllPluginCommands(rpcService.Port())
-	if err != nil {
-		cmd.ui.Failed(fmt.Sprintf("Error getting command list from plugin %s: %s", pluginPath, err.Error()))
-	}
+	cmd.runPluginBinary(pluginPath, rpcService.Port())
 
-	for k, _ := range cmd.coreCmds {
-		println(k)
-	}
-
-	for k, pluginCmd := range pluginCmds {
-		println(k, " . ", pluginCmd.Name)
-		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists {
-			cmd.ui.Failed(fmt.Sprintf("Plugin '%s' cannot be installed from '%s' at this time because the command 'cf %s' already exists.", pluginExecutable, pluginPath, pluginCmd))
-		}
-	}
-
-	pluginName := rpcService.RpcCmd.ReturnData.(string)
-	if pluginName == "" {
+	pluginMetadata := rpcService.RpcCmd.ReturnData.(plugin.PluginMetadata)
+	if pluginMetadata.Name == "" {
 		cmd.ui.Failed(fmt.Sprintf("Unable to obtain plugin name for executable %s", pluginPath))
 	}
 
-	if _, ok := plugins[pluginName]; ok {
-		cmd.ui.Failed(fmt.Sprintf(T("Plugin name {{.PluginName}} is already taken", map[string]interface{}{"PluginName": pluginName})))
+	if _, ok := plugins[pluginMetadata.Name]; ok {
+		cmd.ui.Failed(fmt.Sprintf(T("Plugin name {{.PluginName}} is already taken", map[string]interface{}{"PluginName": pluginMetadata.Name})))
+	}
+
+	if pluginMetadata.Commands == nil {
+		cmd.ui.Failed(fmt.Sprintf("Error getting command list from plugin %s", pluginPath))
+	}
+
+	for k, pluginCmd := range pluginMetadata.Commands {
+		println(k, " . ", pluginCmd.Name)
+		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists {
+			cmd.ui.Failed(fmt.Sprintf("Plugin '%s' cannot be installed from '%s' at this time because the command 'cf %s' already exists.", pluginExecutable, pluginPath, pluginCmd.Name))
+		}
 	}
 
 	err = fileutils.CopyFile(pluginExecutable, pluginPath)
@@ -105,9 +102,9 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	cmd.config.SetPlugin(pluginName, pluginExecutable)
+	cmd.config.SetPlugin(pluginMetadata.Name, pluginExecutable)
 	cmd.ui.Ok()
-	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully installed.", map[string]interface{}{"PluginName": pluginName})))
+	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name})))
 }
 
 func (cmd *PluginInstall) ensurePluginDoesNotExist(pluginExecutable, pluginExecutableName string) {
@@ -122,21 +119,20 @@ func (cmd *PluginInstall) ensurePluginDoesNotExist(pluginExecutable, pluginExecu
 	}
 }
 
-func (cmd *PluginInstall) ensurePluginBinaryExists(pluginPath string) {
+func (cmd *PluginInstall) validateCandidatePluginPath(pluginPath string) {
 	_, err := os.Stat(pluginPath)
 	if err != nil && os.IsNotExist(err) {
 		cmd.ui.Failed(fmt.Sprintf("Binary file '%s' not found", pluginPath))
 	}
 }
 
-func runPluginBinary(location string, servicePort string) error {
-	cmd := exec.Command(location, obtainPort(), servicePort, "install-plugin")
-	err := cmd.Run()
+func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
+	pluginInvocation := exec.Command(location, obtainPort(), servicePort, "install-plugin")
+
+	err := pluginInvocation.Run()
 	if err != nil {
-		panic(err.Error())
+		cmd.ui.Failed(err.Error())
 	}
-	cmd.Wait()
-	return err
 }
 
 func obtainPort() string {

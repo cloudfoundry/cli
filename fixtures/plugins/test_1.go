@@ -13,7 +13,9 @@ import (
 	"github.com/cloudfoundry/cli/plugin"
 )
 
-type Test1 struct{}
+type Test1 struct {
+	stringForTest1 string
+}
 
 var commands = []plugin.Command{
 	{
@@ -46,6 +48,10 @@ func (c *Test1) ListCmds(args string, cmdList *[]plugin.Command) error {
 	return nil
 }
 
+func (c *Test1) GetCommands() []plugin.Command {
+	return commands
+}
+
 func (c *Test1) CmdExists(args string, exists *bool) error {
 	*exists = plugin.CmdExists(args, commands)
 	return nil
@@ -64,5 +70,5 @@ func theHelpCmd() {
 }
 
 func main() {
-	plugin.ServeCommand(new(Test1))
+	plugin.Start(new(Test1))
 }

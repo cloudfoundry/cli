@@ -20,6 +20,10 @@ func (c *EmptyPlugin) CmdExists(args string, exists *bool) error {
 	return nil
 }
 
+func (c *EmptyPlugin) GetCommands() []plugin.Command {
+	return commands
+}
+
 func main() {
-	plugin.ServeCommand(new(EmptyPlugin))
+	plugin.Start(new(EmptyPlugin))
 }

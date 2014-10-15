@@ -14,6 +14,11 @@ type Command struct {
 	HelpText string
 }
 
+type PluginMetadata struct {
+	Name     string
+	Commands []Command
+}
+
 /**
 	Command interface needs to be implementd for a runnable sub-command of `cf`
 **/
@@ -23,9 +28,7 @@ type RpcPlugin interface {
 	Run(args string, reply *bool) error
 	CmdExists(args string, exists *bool) error
 
-	//We only care about the return value.
-	//TODO: the first param could be used for obtaining help of a specific command.
-	ListCmds(empty string, cmdList *[]Command) error
+	GetCommands() []Command
 }
 
 /**
@@ -35,7 +38,8 @@ type RpcPlugin interface {
 	* os.Args[3] **OPTIONAL**
 		* install-plugin - used to fetch the command name
 **/
-func ServeCommand(cmd RpcPlugin) {
+func Start(cmd RpcPlugin) {
+	println("STARTING PLUGIN")
 	//register command
 	err := rpc.Register(cmd)
 	if err != nil {
@@ -63,15 +67,17 @@ func ServeCommand(cmd RpcPlugin) {
 			}
 
 			var success bool
-			fmt.Println("In ServeCommand,name: ", pluginName)
-			err = client.Call("CliRpcCmd.SetName", pluginName, &success)
+			pluginMetadata := PluginMetadata{
+				Name:     pluginName,
+				Commands: cmd.GetCommands(),
+			}
+			err = client.Call("CliRpcCmd.SetPluginMetadata", pluginMetadata, &success)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
 
 			if !success {
-				//fmt.Println(fmt.Sprintf("There was an error registering the plugin name: %s", pluginName))
 				os.Exit(1)
 			}
 
