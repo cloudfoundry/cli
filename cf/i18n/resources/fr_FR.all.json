@@ -2675,6 +2675,11 @@
       "modified": false
    },
    {
+      "id": "PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
+      "translation": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
+      "modified": true
+   },
+   {
       "id": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
       "translation": "PLUGIN-NAME - Uninstall the plugin defined in command argument",
       "modified": true
@@ -4012,11 +4017,6 @@
    {
       "id": "incorrect usage",
       "translation": "utilisation incorrecte",
-      "modified": false
-   },
-   {
-      "id": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
-      "translation": "install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument",
       "modified": false
    },
    {

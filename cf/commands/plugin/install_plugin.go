@@ -33,7 +33,7 @@ func NewPluginInstall(ui terminal.UI, config plugin_config.PluginConfiguration) 
 func (cmd *PluginInstall) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "install-plugin",
-		Description: T("install-plugin PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument"),
+		Description: T("PATH/TO/PLUGIN-NAME  - Install the plugin defined in command argument"),
 		Usage:       T("CF_NAME install-plugin PATH/TO/PLUGIN"),
 	}
 }
