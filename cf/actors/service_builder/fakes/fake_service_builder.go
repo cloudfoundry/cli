@@ -17,6 +17,16 @@ type FakeServiceBuilder struct {
 		result1 models.ServiceOffering
 		result2 error
 	}
+	GetServiceByNameForOrgStub        func(string, string) (models.ServiceOffering, error)
+	getServiceByNameForOrgMutex       sync.RWMutex
+	getServiceByNameForOrgArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getServiceByNameForOrgReturns struct {
+		result1 models.ServiceOffering
+		result2 error
+	}
 	GetServicesForBrokerStub        func(string) ([]models.ServiceOffering, error)
 	getServicesForBrokerMutex       sync.RWMutex
 	getServicesForBrokerArgsForCall []struct {
@@ -74,6 +84,39 @@ func (fake *FakeServiceBuilder) GetServiceByNameArgsForCall(i int) string {
 
 func (fake *FakeServiceBuilder) GetServiceByNameReturns(result1 models.ServiceOffering, result2 error) {
 	fake.getServiceByNameReturns = struct {
+		result1 models.ServiceOffering
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameForOrg(arg1 string, arg2 string) (models.ServiceOffering, error) {
+	fake.getServiceByNameForOrgMutex.Lock()
+	defer fake.getServiceByNameForOrgMutex.Unlock()
+	fake.getServiceByNameForOrgArgsForCall = append(fake.getServiceByNameForOrgArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	if fake.GetServiceByNameForOrgStub != nil {
+		return fake.GetServiceByNameForOrgStub(arg1, arg2)
+	} else {
+		return fake.getServiceByNameForOrgReturns.result1, fake.getServiceByNameForOrgReturns.result2
+	}
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameForOrgCallCount() int {
+	fake.getServiceByNameForOrgMutex.RLock()
+	defer fake.getServiceByNameForOrgMutex.RUnlock()
+	return len(fake.getServiceByNameForOrgArgsForCall)
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameForOrgArgsForCall(i int) (string, string) {
+	fake.getServiceByNameForOrgMutex.RLock()
+	defer fake.getServiceByNameForOrgMutex.RUnlock()
+	return fake.getServiceByNameForOrgArgsForCall[i].arg1, fake.getServiceByNameForOrgArgsForCall[i].arg2
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameForOrgReturns(result1 models.ServiceOffering, result2 error) {
+	fake.getServiceByNameForOrgReturns = struct {
 		result1 models.ServiceOffering
 		result2 error
 	}{result1, result2}

@@ -3,6 +3,7 @@ package actors
 import (
 	"errors"
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
@@ -82,7 +83,7 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 	var err error
 	var service models.ServiceOffering
 
-	service, err = actor.serviceBuilder.GetServiceByName(serviceName)
+	service, err = actor.serviceBuilder.GetServiceByNameForOrg(serviceName, orgName)
 	if err != nil {
 		return false, err
 	}
@@ -112,7 +113,7 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 }
 
 func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName, orgName string, setPlanVisibility bool) (PlanAccess, error) {
-	service, err := actor.serviceBuilder.GetServiceByName(serviceName)
+	service, err := actor.serviceBuilder.GetServiceByNameForOrg(serviceName, orgName)
 	if err != nil {
 		return PlanAccessError, err
 	}

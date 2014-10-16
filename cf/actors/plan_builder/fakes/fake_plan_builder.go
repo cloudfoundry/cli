@@ -17,6 +17,26 @@ type FakePlanBuilder struct {
 		result1 []models.ServicePlanFields
 		result2 error
 	}
+	AttachOrgToPlansStub        func([]models.ServicePlanFields, string) ([]models.ServicePlanFields, error)
+	attachOrgToPlansMutex       sync.RWMutex
+	attachOrgToPlansArgsForCall []struct {
+		arg1 []models.ServicePlanFields
+		arg2 string
+	}
+	attachOrgToPlansReturns struct {
+		result1 []models.ServicePlanFields
+		result2 error
+	}
+	GetPlansForServiceForOrgStub        func(string, string) ([]models.ServicePlanFields, error)
+	getPlansForServiceForOrgMutex       sync.RWMutex
+	getPlansForServiceForOrgArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getPlansForServiceForOrgReturns struct {
+		result1 []models.ServicePlanFields
+		result2 error
+	}
 	GetPlansForServiceStub        func(string) ([]models.ServicePlanFields, error)
 	getPlansForServiceMutex       sync.RWMutex
 	getPlansForServiceArgsForCall []struct {
@@ -64,6 +84,72 @@ func (fake *FakePlanBuilder) AttachOrgsToPlansArgsForCall(i int) []models.Servic
 
 func (fake *FakePlanBuilder) AttachOrgsToPlansReturns(result1 []models.ServicePlanFields, result2 error) {
 	fake.attachOrgsToPlansReturns = struct {
+		result1 []models.ServicePlanFields
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePlanBuilder) AttachOrgToPlans(arg1 []models.ServicePlanFields, arg2 string) ([]models.ServicePlanFields, error) {
+	fake.attachOrgToPlansMutex.Lock()
+	defer fake.attachOrgToPlansMutex.Unlock()
+	fake.attachOrgToPlansArgsForCall = append(fake.attachOrgToPlansArgsForCall, struct {
+		arg1 []models.ServicePlanFields
+		arg2 string
+	}{arg1, arg2})
+	if fake.AttachOrgToPlansStub != nil {
+		return fake.AttachOrgToPlansStub(arg1, arg2)
+	} else {
+		return fake.attachOrgToPlansReturns.result1, fake.attachOrgToPlansReturns.result2
+	}
+}
+
+func (fake *FakePlanBuilder) AttachOrgToPlansCallCount() int {
+	fake.attachOrgToPlansMutex.RLock()
+	defer fake.attachOrgToPlansMutex.RUnlock()
+	return len(fake.attachOrgToPlansArgsForCall)
+}
+
+func (fake *FakePlanBuilder) AttachOrgToPlansArgsForCall(i int) ([]models.ServicePlanFields, string) {
+	fake.attachOrgToPlansMutex.RLock()
+	defer fake.attachOrgToPlansMutex.RUnlock()
+	return fake.attachOrgToPlansArgsForCall[i].arg1, fake.attachOrgToPlansArgsForCall[i].arg2
+}
+
+func (fake *FakePlanBuilder) AttachOrgToPlansReturns(result1 []models.ServicePlanFields, result2 error) {
+	fake.attachOrgToPlansReturns = struct {
+		result1 []models.ServicePlanFields
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePlanBuilder) GetPlansForServiceForOrg(arg1 string, arg2 string) ([]models.ServicePlanFields, error) {
+	fake.getPlansForServiceForOrgMutex.Lock()
+	defer fake.getPlansForServiceForOrgMutex.Unlock()
+	fake.getPlansForServiceForOrgArgsForCall = append(fake.getPlansForServiceForOrgArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	if fake.GetPlansForServiceForOrgStub != nil {
+		return fake.GetPlansForServiceForOrgStub(arg1, arg2)
+	} else {
+		return fake.getPlansForServiceForOrgReturns.result1, fake.getPlansForServiceForOrgReturns.result2
+	}
+}
+
+func (fake *FakePlanBuilder) GetPlansForServiceForOrgCallCount() int {
+	fake.getPlansForServiceForOrgMutex.RLock()
+	defer fake.getPlansForServiceForOrgMutex.RUnlock()
+	return len(fake.getPlansForServiceForOrgArgsForCall)
+}
+
+func (fake *FakePlanBuilder) GetPlansForServiceForOrgArgsForCall(i int) (string, string) {
+	fake.getPlansForServiceForOrgMutex.RLock()
+	defer fake.getPlansForServiceForOrgMutex.RUnlock()
+	return fake.getPlansForServiceForOrgArgsForCall[i].arg1, fake.getPlansForServiceForOrgArgsForCall[i].arg2
+}
+
+func (fake *FakePlanBuilder) GetPlansForServiceForOrgReturns(result1 []models.ServicePlanFields, result2 error) {
+	fake.getPlansForServiceForOrgReturns = struct {
 		result1 []models.ServicePlanFields
 		result2 error
 	}{result1, result2}
