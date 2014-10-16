@@ -1,7 +1,6 @@
 package app_test
 
 import (
-	"net/rpc"
 	"path/filepath"
 	"strings"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,10 +21,6 @@ import (
 )
 
 var _ = Describe("Help", func() {
-	BeforeEach(func() {
-		rpc.DefaultServer = rpc.NewServer()
-	})
-
 	It("shows help for all commands", func() {
 		commandFactory := createCommandFactory()
 
@@ -58,11 +54,10 @@ var _ = Describe("Help", func() {
 			app.ShowHelp(dummyTemplate, createApp(commandFactory))
 		})
 
-		Expect(commandInOutput("test_1_cmd1", output)).To(BeTrue(), "plugin command: test_1_cmd1 not in help")
-		Expect(commandInOutput("test_1_cmd2", output)).To(BeTrue(), "plugin command: test_1_cmd2 not in help")
-		Expect(commandInOutput("help", output)).To(BeTrue(), "plugin command: test_1_help not in help")
-		Expect(commandInOutput("test_2_cmd1", output)).To(BeTrue(), "plugin command: test_2_cmd1 not in help")
-		Expect(commandInOutput("test_2_cmd2", output)).To(BeTrue(), "plugin command: test_2_cmd2 not in help")
+		Expect(commandInOutput("test1_cmd1", output)).To(BeTrue(), "plugin command: test1_cmd1 not in help")
+		Expect(commandInOutput("test1_cmd2", output)).To(BeTrue(), "plugin command: test1_cmd2 not in help")
+		Expect(commandInOutput("test2_cmd1", output)).To(BeTrue(), "plugin command: test2_cmd1 not in help")
+		Expect(commandInOutput("test2_cmd2", output)).To(BeTrue(), "plugin command: test2_cmd2 not in help")
 
 	})
 
@@ -71,6 +66,8 @@ var _ = Describe("Help", func() {
 func createCommandFactory() command_factory.Factory {
 	fakeUI := &testterm.FakeUI{}
 	configRepo := testconfig.NewRepository()
+	pluginConfig := &testPluginConfig.FakePluginConfiguration{}
+
 	manifestRepo := manifest.NewManifestDiskRepository()
 	apiRepoLocator := api.NewRepositoryLocator(configRepo, map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(configRepo),
@@ -78,7 +75,7 @@ func createCommandFactory() command_factory.Factory {
 		"uaa":              net.NewUAAGateway(configRepo),
 	})
 
-	return command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator)
+	return command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig)
 }
 
 func createApp(commandFactory command_factory.Factory) *cli.App {

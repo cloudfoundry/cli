@@ -24,7 +24,19 @@ func TestPlugin(t *testing.T) {
 		panic(err)
 	}
 
-	cmd := exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.exe"), filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.go"))
+	cmd := exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.exe"), filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.go"))
+	err = cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push.exe"), filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push.go"))
+	err = cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.exe"), filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.go"))
 	err = cmd.Run()
 	if err != nil {
 		panic(err)

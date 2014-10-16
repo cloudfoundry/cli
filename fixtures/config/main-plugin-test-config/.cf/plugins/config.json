@@ -1,6 +1,33 @@
 {
   "Plugins": {
-    "Test1": "../fixtures/config/main-plugin-test-config/.cf/plugins/test_1.exe",
-    "Test2": "../fixtures/config/main-plugin-test-config/.cf/plugins/test_2.exe"
+    "Test1":{
+      "Location":"../fixtures/config/main-plugin-test-config/.cf/plugins/test_1.exe",
+      "Commands":[
+        {"Name":"test_1_cmd1","HelpText":"help text for test1 cmd1"},
+        {"Name":"test_1_cmd2","HelpText":"help text for test1 cmd2"}
+      ]
+    },
+    "Test2":{
+      "Location":"../fixtures/config/main-plugin-test-config/.cf/plugins/test_2.exe",
+      "Commands":[
+        {"Name":"test_2_cmd1","HelpText":"help text for test2 cmd1"},
+        {"Name":"test_2_cmd2","HelpText":"help text for test2 cmd2"}
+      ]
+    },
+    "TestWithPush":{
+      "Location":"../fixtures/config/main-plugin-test-config/.cf/plugins/test_with_push.exe",
+      "Commands":[
+        {"Name":"push","HelpText":"push text for test_with_push"}
+      ]
+    },
+    "TestWithHelp":{
+      "Location":"../fixtures/config/main-plugin-test-config/.cf/plugins/test_with_help.exe",
+      "Commands":[
+        {"Name":"help","HelpText":"help text for test_with_help"}
+      ]
+    }
+
   }
 }
+
+

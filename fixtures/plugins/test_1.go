@@ -17,43 +17,35 @@ type Test1 struct {
 	stringForTest1 string
 }
 
-var commands = []plugin.Command{
-	{
-		Name:     "test_1_cmd1",
-		HelpText: "help text for test_1_cmd1",
-	},
-	{
-		Name:     "test_1_cmd2",
-		HelpText: "help text for test_1_cmd2",
-	},
-	{
-		Name:     "help",
-		HelpText: "help text for test_1_help",
-	},
-}
-
 func (c *Test1) Run(args string, reply *bool) error {
 	if args == "test_1_cmd1" {
 		theFirstCmd()
 	} else if args == "test_1_cmd2" {
 		theSecondCmd()
-	} else if args == "help" {
-		theHelpCmd()
 	}
 	return nil
 }
 
 func (c *Test1) ListCmds(args string, cmdList *[]plugin.Command) error {
-	*cmdList = commands
+	*cmdList = c.GetCommands()
 	return nil
 }
 
 func (c *Test1) GetCommands() []plugin.Command {
-	return commands
+	return []plugin.Command{
+		{
+			Name:     "test_1_cmd1",
+			HelpText: "help text for test_1_cmd1",
+		},
+		{
+			Name:     "test_1_cmd2",
+			HelpText: "help text for test_1_cmd2",
+		},
+	}
 }
 
 func (c *Test1) CmdExists(args string, exists *bool) error {
-	*exists = plugin.CmdExists(args, commands)
+	*exists = plugin.CmdExists(args, c.GetCommands())
 	return nil
 }
 
@@ -63,10 +55,6 @@ func theFirstCmd() {
 
 func theSecondCmd() {
 	fmt.Println("You called cmd2 in test_1")
-}
-
-func theHelpCmd() {
-	fmt.Println("You called help in test_1")
 }
 
 func main() {

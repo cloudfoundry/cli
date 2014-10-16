@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
+	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -26,13 +27,14 @@ var _ = Describe("factory", func() {
 		fakeUI := &testterm.FakeUI{}
 		config := testconfig.NewRepository()
 		manifestRepo := manifest.NewManifestDiskRepository()
+		pluginConfig := &testPluginConfig.FakePluginConfiguration{}
 		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
 			"auth":             net.NewUAAGateway(config),
 			"cloud-controller": net.NewCloudControllerGateway(config, time.Now),
 			"uaa":              net.NewUAAGateway(config),
 		})
 
-		factory = NewFactory(fakeUI, config, manifestRepo, repoLocator)
+		factory = NewFactory(fakeUI, config, manifestRepo, repoLocator, pluginConfig)
 	})
 
 	It("provides the metadata for its commands", func() {

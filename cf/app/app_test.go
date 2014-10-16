@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_factory"
+	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/trace"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -47,6 +48,7 @@ var _ = Describe("App", func() {
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}
 		config := testconfig.NewRepository()
+		pluginConfig := &testPluginConfig.FakePluginConfiguration{}
 		manifestRepo := &testmanifest.FakeManifestRepository{}
 
 		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
@@ -55,7 +57,7 @@ var _ = Describe("App", func() {
 			"uaa":              net.NewUAAGateway(config),
 		})
 
-		cmdFactory := command_factory.NewFactory(ui, config, manifestRepo, repoLocator)
+		cmdFactory := command_factory.NewFactory(ui, config, manifestRepo, repoLocator, pluginConfig)
 		cmdRunner = &FakeRunner{cmdFactory: cmdFactory}
 		app = NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
 	})

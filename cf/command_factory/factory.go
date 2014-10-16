@@ -48,7 +48,7 @@ type concreteFactory struct {
 	cmdsByName map[string]command.Command
 }
 
-func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator) (factory concreteFactory) {
+func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator, pluginConfig plugin_config.PluginConfiguration) (factory concreteFactory) {
 	factory.cmdsByName = make(map[string]command.Command)
 
 	factory.cmdsByName["api"] = commands.NewApi(ui, config, repoLocator.GetEndpointRepository())
@@ -266,9 +266,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["staging-environment-variable-group"] = environmentvariablegroup.NewStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-staging-environment-variable-group"] = environmentvariablegroup.NewSetStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-running-environment-variable-group"] = environmentvariablegroup.NewSetRunningEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
-
-
-	pluginConfig := plugin_config.NewPluginConfig(func(err error) { ui.Failed(err.Error()) })
 
 	factory.cmdsByName["uninstall-plugin"] = plugin.NewPluginUninstall(ui, pluginConfig)
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, pluginConfig, factory.cmdsByName)

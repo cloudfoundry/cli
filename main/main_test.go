@@ -68,9 +68,14 @@ var _ = Describe("main", func() {
 			Eventually(output.Out, 3*time.Second).Should(Say("'foo-bar' is not a registered command"))
 		})
 
-		It("Calls core cf command if the plugin shares the same name", func() {
+		It("Calls help if the plugin shares the same name", func() {
 			output := Cf("help")
-			Consistently(output.Out, 1).ShouldNot(Say("You called help in test_1"))
+			Consistently(output.Out, 1).ShouldNot(Say("You called help in test_with_help"))
+		})
+
+		It("Calls the core push command if the plugin shares the same name", func() {
+			output := Cf("push")
+			Consistently(output.Out, 1).ShouldNot(Say("You called push in test_with_push"))
 		})
 	})
 })

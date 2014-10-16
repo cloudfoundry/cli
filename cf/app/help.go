@@ -9,9 +9,8 @@ import (
 	"text/template"
 	"unicode/utf8"
 
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	// "github.com/cloudfoundry/cli/plugin/rpc"
-
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
 )
@@ -65,32 +64,28 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		return
 	}
 
-	/*	rpcService, err := rpc.NewRpcService()
-		if err != nil {
-			panic(err.Error())
-		}
+	presentPluginCommands := func() []cmdPresenter {
+		pluginConfig := plugin_config.NewPluginConfig(func(err error) {
+			//fail silently when running help?
+		})
 
-		err = rpcService.Start()
-		if err != nil {
-			panic(err.Error())
-		}
-		defer rpcService.Stop()
+		plugins := pluginConfig.Plugins()
+		fmt.Println("plugins :", plugins)
+		var presenters []cmdPresenter
+		var pluginPresenter cmdPresenter
 
-		presentPluginCommands := func() []cmdPresenter {
-			pluginCmdList, _ := rpc.GetAllPluginCommands(rpcService.Port())
-			var presenters []cmdPresenter
-			var pluginPresenter cmdPresenter
-			for _, cmd := range pluginCmdList {
+		for _, pluginMetadata := range plugins {
+			for _, cmd := range pluginMetadata.Commands {
 				pluginPresenter.Name = cmd.Name
 				padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(pluginPresenter.Name))
 				pluginPresenter.Name = pluginPresenter.Name + padding
 				pluginPresenter.Description = cmd.HelpText
 				presenters = append(presenters, pluginPresenter)
-
 			}
-			return presenters
 		}
-	*/
+
+		return presenters
+	}
 	presenter.Name = app.Name
 	presenter.Flags = app.Flags
 	presenter.Usage = app.Usage
@@ -340,9 +335,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name:             "INSTALLED PLUGINS",
+			Name: "INSTALLED PLUGINS",
 			CommandSubGroups: [][]cmdPresenter{
-			// presentPluginCommands(),
+				presentPluginCommands(),
 			},
 		},
 	}

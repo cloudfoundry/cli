@@ -27,9 +27,4 @@
   "Trace": "",
   "ColorEnabled": "",
   "Locale": "",
- "Plugins": {
-    "valid1": "../fixtures/plugins/test.exe",
-    "valid2": "../fixtures/plugins/plugin2.exe",
-    "help": "../fixtures/plugins/test.exe"
-  } 
 }
