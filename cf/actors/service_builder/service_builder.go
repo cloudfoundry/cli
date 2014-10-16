@@ -8,6 +8,7 @@ import (
 
 type ServiceBuilder interface {
 	GetServiceByName(string) (models.ServiceOffering, error)
+	GetServiceByNameForOrg(string, string) (models.ServiceOffering, error)
 	GetServicesForBroker(string) ([]models.ServiceOffering, error)
 
 	GetServiceVisibleToOrg(string, string) (models.ServiceOffering, error)
@@ -24,6 +25,18 @@ func NewBuilder(service api.ServiceRepository, planBuilder plan_builder.PlanBuil
 		serviceRepo: service,
 		planBuilder: planBuilder,
 	}
+}
+
+func (builder Builder) GetServiceByNameForOrg(serviceLabel, orgName string) (models.ServiceOffering, error) {
+	service, err := builder.serviceRepo.FindServiceOfferingByLabel(serviceLabel)
+	if err != nil {
+		return models.ServiceOffering{}, err
+	}
+	service, err = builder.attachPlansToServiceForOrg(service, orgName)
+	if err != nil {
+		return models.ServiceOffering{}, err
+	}
+	return service, nil
 }
 
 func (builder Builder) GetServiceByName(serviceLabel string) (models.ServiceOffering, error) {
@@ -76,6 +89,16 @@ func (builder Builder) GetServicesVisibleToOrg(orgName string) ([]models.Service
 	}
 
 	return builder.attachServicesToPlans(visiblePlans)
+}
+
+func (builder Builder) attachPlansToServiceForOrg(service models.ServiceOffering, orgName string) (models.ServiceOffering, error) {
+	plans, err := builder.planBuilder.GetPlansForServiceForOrg(service.Guid, orgName)
+	if err != nil {
+		return models.ServiceOffering{}, err
+	}
+
+	service.Plans = plans
+	return service, nil
 }
 
 func (builder Builder) attachPlansToService(service models.ServiceOffering) (models.ServiceOffering, error) {

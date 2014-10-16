@@ -63,12 +63,30 @@ var _ = Describe("Service Builder", func() {
 		}
 		planBuilder.GetPlansVisibleToOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
 		planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{plan1, plan2}, nil)
+		planBuilder.GetPlansForServiceForOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
 	})
 
 	Describe(".GetServiceByName", func() {
 		It("returns the named service, populated with plans", func() {
 			service, err := serviceBuilder.GetServiceByName("my-cool-service")
 			Expect(err).NotTo(HaveOccurred())
+
+			Expect(len(service.Plans)).To(Equal(2))
+			Expect(service.Plans[0].Name).To(Equal("service-plan1"))
+			Expect(service.Plans[1].Name).To(Equal("service-plan2"))
+			Expect(service.Plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
+		})
+	})
+
+	Describe(".GetServiceByNameForOrg", func() {
+		It("returns the named service, populated with plans", func() {
+			service, err := serviceBuilder.GetServiceByNameForOrg("my-cool-service", "org1")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(planBuilder.GetPlansForServiceForOrgCallCount()).To(Equal(1))
+			servName, orgName := planBuilder.GetPlansForServiceForOrgArgsForCall(0)
+			Expect(servName).To(Equal("service-guid1"))
+			Expect(orgName).To(Equal("org1"))
 
 			Expect(len(service.Plans)).To(Equal(2))
 			Expect(service.Plans[0].Name).To(Equal("service-plan1"))
