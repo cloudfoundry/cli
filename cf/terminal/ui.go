@@ -125,12 +125,22 @@ const QuietPanic = "This shouldn't print anything"
 
 func (c terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
-	c.Say(FailureColor(T("FAILED")))
-	c.Say(message)
 
-	trace.Logger.Print(T("FAILED"))
-	trace.Logger.Print(message)
-	c.PanicQuietly()
+	if T == nil {
+		c.Say(FailureColor("FAILED"))
+		c.Say(message)
+
+		trace.Logger.Print("FAILED")
+		trace.Logger.Print(message)
+		c.PanicQuietly()
+	} else {
+		c.Say(FailureColor(T("FAILED")))
+		c.Say(message)
+
+		trace.Logger.Print(T("FAILED"))
+		trace.Logger.Print(message)
+		c.PanicQuietly()
+	}
 }
 
 func (c terminalUI) PanicQuietly() {

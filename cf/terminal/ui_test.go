@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -262,6 +263,19 @@ var _ = Describe("UI", func() {
 					NewUI(os.Stdin).Failed("uh oh")
 				})
 			})
+		})
+
+		It("does not use 'T' func to translate when it is not initialized", func() {
+			t := i18n.T
+			i18n.T = nil
+
+			io_helpers.CaptureOutput(func() {
+				testassert.AssertPanic(QuietPanic, func() {
+					NewUI(os.Stdin).Failed("uh oh")
+				})
+			})
+
+			i18n.T = t
 		})
 	})
 })
