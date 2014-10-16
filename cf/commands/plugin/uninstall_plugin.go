@@ -53,8 +53,8 @@ func (cmd *PluginUninstall) Run(c *cli.Context) {
 		cmd.ui.Failed(fmt.Sprintf(T("Plugin name {{.PluginName}} does not exist", pluginNameMap)))
 	}
 
-	pluginPath := plugins[pluginName]
-	os.Remove(pluginPath)
+	pluginMetadata := plugins[pluginName]
+	os.Remove(pluginMetadata.Location)
 
 	cmd.config.RemovePlugin(pluginName)
 

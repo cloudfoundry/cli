@@ -7,19 +7,53 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	. "github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/plugin"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("PluginConfig", func() {
+	var (
+		metadata  PluginMetadata
+		commands1 []plugin.Command
+		commands2 []plugin.Command
+	)
+
+	BeforeEach(func() {
+		commands1 = []plugin.Command{
+			{
+				Name:     "test1_cmd1",
+				HelpText: "help text for test1 cmd1",
+			},
+			{
+				Name:     "test1_cmd2",
+				HelpText: "help text for test1 cmd2",
+			},
+		}
+
+		commands2 = []plugin.Command{
+			{
+				Name:     "test2_cmd1",
+				HelpText: "help text for test2 cmd1",
+			},
+			{
+				Name:     "test2_cmd2",
+				HelpText: "help text for test2 cmd2",
+			},
+		}
+
+		metadata = PluginMetadata{
+			Location: "../../../fixtures/config/plugin-config/.cf/plugins/test_1.exe",
+			Commands: commands1,
+		}
+	})
+
 	Describe("Reading configuration data", func() {
 		BeforeEach(func() {
-			curDir, err := os.Getwd()
-			Expect(err).ToNot(HaveOccurred())
 
 			config_helpers.PluginRepoDir = func() string {
-				return filepath.Join(curDir, "..", "..", "..", "fixtures", "config", "plugin-config")
+				return filepath.Join("..", "..", "..", "fixtures", "config", "plugin-config")
 			}
 		})
 
@@ -31,8 +65,10 @@ var _ = Describe("PluginConfig", func() {
 			})
 			plugins := pluginConfig.Plugins()
 
-			Expect(plugins["test_1"]).To(Equal("../../../fixtures/config/plugin-config/.cf/plugins/test_1.exe"))
-			Expect(plugins["test_2"]).To(Equal("../../../fixtures/config/plugin-config/.cf/plugins/test_2.exe"))
+			Expect(plugins["Test1"].Location).To(Equal("../../../fixtures/config/plugin-config/.cf/plugins/test_1.exe"))
+			Expect(plugins["Test1"].Commands).To(Equal(commands1))
+			Expect(plugins["Test2"].Location).To(Equal("../../../fixtures/config/plugin-config/.cf/plugins/test_2.exe"))
+			Expect(plugins["Test2"].Commands).To(Equal(commands2))
 		})
 	})
 
@@ -52,14 +88,13 @@ var _ = Describe("PluginConfig", func() {
 				}
 			})
 
-			pluginConfig.SetPlugin("foo", "bar")
+			pluginConfig.SetPlugin("foo", metadata)
 			plugins := pluginConfig.Plugins()
-			Expect(plugins["foo"]).To(Equal("bar"))
+			Expect(plugins["foo"].Commands).To(Equal(commands1))
 		})
 	})
 
 	Describe("Removing configuration data", func() {
-
 		var (
 			pluginConfig *PluginConfig
 		)
@@ -78,7 +113,7 @@ var _ = Describe("PluginConfig", func() {
 		})
 
 		It("removes plugin location and executable information", func() {
-			pluginConfig.SetPlugin("foo", "bar")
+			pluginConfig.SetPlugin("foo", metadata)
 
 			plugins := pluginConfig.Plugins()
 			Expect(plugins).To(HaveKey("foo"))
