@@ -33,8 +33,10 @@ var _ = Describe("Install", func() {
 		pluginDir  string
 		curDir     string
 
-		test_1 string
-		test_2 string
+		test_1         string
+		test_2         string
+		test_with_help string
+		test_with_push string
 	)
 
 	BeforeEach(func() {
@@ -49,6 +51,8 @@ var _ = Describe("Install", func() {
 		}
 		test_1 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.exe")
 		test_2 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.exe")
+		test_with_help = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.exe")
+		test_with_push = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push.exe")
 
 		rpc.DefaultServer = rpc.NewServer()
 
@@ -86,14 +90,27 @@ var _ = Describe("Install", func() {
 	})
 
 	Describe("failures", func() {
-		It("if a plugin's command shares the same name as a core command", func() {
-			coreCmds["help"] = &testCommand.FakeCommand{}
-			runCommand(test_1)
+		Context("when the plugin contains a 'help' command", func() {
+			It("fails", func() {
+				runCommand(test_with_help)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Plugin", "test_1.exe", "cannot be installed from", test_1, "at this time because the command 'cf help' already exists."},
-				[]string{"FAILED"},
-			))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Plugin 'TestWithHelp' cannot be installed from", test_with_help, "at this time because the command 'cf help' already exists."},
+					[]string{"FAILED"},
+				))
+			})
+		})
+
+		Context("when the plugin contains a core command", func() {
+			It("fails", func() {
+				coreCmds["push"] = &testCommand.FakeCommand{}
+				runCommand(test_with_push)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Plugin 'TestWithPush' cannot be installed from", test_with_push, "at this time because the command 'cf push' already exists."},
+					[]string{"FAILED"},
+				))
+			})
 		})
 
 		It("plugin binary argument is a bad file path", func() {

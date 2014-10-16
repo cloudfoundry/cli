@@ -15,17 +15,6 @@ import (
 
 type Test2 struct{}
 
-var commands = []plugin.Command{
-	{
-		Name:     "test_2_cmd1",
-		HelpText: "help text for test_2_cmd1",
-	},
-	{
-		Name:     "test_2_cmd2",
-		HelpText: "help text for test_2_cmd2",
-	},
-}
-
 func (c *Test2) Run(args string, reply *bool) error {
 	if args == "test_2_cmd1" {
 		theFirstCmd()
@@ -36,16 +25,25 @@ func (c *Test2) Run(args string, reply *bool) error {
 }
 
 func (c *Test2) ListCmds(args string, cmdlist *[]plugin.Command) error {
-	*cmdlist = commands
+	*cmdlist = c.GetCommands()
 	return nil
 }
 
 func (c *Test2) GetCommands() []plugin.Command {
-	return commands
+	return []plugin.Command{
+		{
+			Name:     "test_2_cmd1",
+			HelpText: "help text for test_2_cmd1",
+		},
+		{
+			Name:     "test_2_cmd2",
+			HelpText: "help text for test_2_cmd2",
+		},
+	}
 }
 
 func (c *Test2) CmdExists(args string, exists *bool) error {
-	*exists = plugin.CmdExists(args, commands)
+	*exists = plugin.CmdExists(args, c.GetCommands())
 	return nil
 }
 

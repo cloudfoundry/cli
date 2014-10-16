@@ -4,24 +4,22 @@ import "github.com/cloudfoundry/cli/plugin"
 
 type EmptyPlugin struct{}
 
-var commands = []plugin.Command{}
-
 func (c *EmptyPlugin) Run(args string, reply *bool) error {
 	return nil
 }
 
 func (c *EmptyPlugin) ListCmds(args string, cmdList *[]plugin.Command) error {
-	*cmdList = commands
+	*cmdList = c.GetCommands()
 	return nil
 }
 
 func (c *EmptyPlugin) CmdExists(args string, exists *bool) error {
-	*exists = plugin.CmdExists(args, commands)
+	*exists = plugin.CmdExists(args, c.GetCommands())
 	return nil
 }
 
 func (c *EmptyPlugin) GetCommands() []plugin.Command {
-	return commands
+	return []plugin.Command{}
 }
 
 func main() {

@@ -11,7 +11,7 @@ type FakePluginConfiguration struct {
 	PluginsStub        func() map[string]plugin_config.PluginMetadata
 	pluginsMutex       sync.RWMutex
 	pluginsArgsForCall []struct{}
-	pluginsReturns struct {
+	pluginsReturns     struct {
 		result1 map[string]plugin_config.PluginMetadata
 	}
 	SetPluginStub        func(string, plugin_config.PluginMetadata)
@@ -23,7 +23,7 @@ type FakePluginConfiguration struct {
 	GetPluginPathStub        func() string
 	getPluginPathMutex       sync.RWMutex
 	getPluginPathArgsForCall []struct{}
-	getPluginPathReturns struct {
+	getPluginPathReturns     struct {
 		result1 string
 	}
 	RemovePluginStub        func(string)

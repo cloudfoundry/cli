@@ -13,6 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_runner"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -29,6 +30,7 @@ var deps = setupDependencies()
 type cliDependencies struct {
 	termUI         terminal.UI
 	configRepo     core_config.Repository
+	pluginConfig   plugin_config.PluginConfiguration
 	manifestRepo   manifest.ManifestRepository
 	apiRepoLocator api.RepositoryLocator
 	gateways       map[string]net.Gateway
@@ -41,11 +43,13 @@ func setupDependencies() (deps *cliDependencies) {
 
 	deps.manifestRepo = manifest.NewManifestDiskRepository()
 
-	deps.configRepo = core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), func(err error) {
+	errorHandler := func(err error) {
 		if err != nil {
 			deps.termUI.Failed(fmt.Sprintf("Config error: %s", err))
 		}
-	})
+	}
+	deps.configRepo = core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler)
+	deps.pluginConfig = plugin_config.NewPluginConfig(errorHandler)
 
 	i18n.T = i18n.Init(deps.configRepo)
 
@@ -72,7 +76,7 @@ func main() {
 	defer handlePanics()
 	defer deps.configRepo.Close()
 
-	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator)
+	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator, deps.pluginConfig)
 	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
 

@@ -31,6 +31,18 @@ func TestMain(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "fixtures", "config", "main-plugin-test-config", ".cf", "plugins", "test_with_push.exe"), filepath.Join(dir, "..", "fixtures", "plugins", "test_with_push.go"))
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "fixtures", "config", "main-plugin-test-config", ".cf", "plugins", "test_with_help.exe"), filepath.Join(dir, "..", "fixtures", "plugins", "test_with_help.go"))
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
 	Expect(err).NotTo(HaveOccurred())
 
 	RunSpecs(t, "Main Suite")
