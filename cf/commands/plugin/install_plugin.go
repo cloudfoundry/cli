@@ -60,13 +60,17 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 	_, pluginExecutableName := filepath.Split(pluginPath)
 
 	plugins := cmd.config.Plugins()
-	pluginExecutable := filepath.Join(cmd.config.GetPluginPath(), pluginExecutableName)
+	pluginLocation := filepath.Join(cmd.config.GetPluginPath(), pluginExecutableName)
 
-	cmd.ensurePluginDoesNotExist(pluginExecutable, pluginExecutableName)
+	cmd.ensurePluginDoesNotExist(pluginLocation, pluginExecutableName)
 
 	rpcService, err := rpc.NewRpcService()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
+	}
+
+	for key, _ := range cmd.coreCmds {
+		fmt.Println(key)
 	}
 
 	err = rpcService.Start()
@@ -90,25 +94,29 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 		cmd.ui.Failed(fmt.Sprintf("Error getting command list from plugin %s", pluginPath))
 	}
 
-	for k, pluginCmd := range pluginMetadata.Commands {
-		println(k, " . ", pluginCmd.Name)
+	for _, pluginCmd := range pluginMetadata.Commands {
 		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists {
-			cmd.ui.Failed(fmt.Sprintf("Plugin '%s' cannot be installed from '%s' at this time because the command 'cf %s' already exists.", pluginExecutable, pluginPath, pluginCmd.Name))
+			cmd.ui.Failed(fmt.Sprintf("Plugin '%s' cannot be installed from '%s' at this time because the command 'cf %s' already exists.", pluginLocation, pluginPath, pluginCmd.Name))
 		}
 	}
 
-	err = fileutils.CopyFile(pluginExecutable, pluginPath)
+	err = fileutils.CopyFile(pluginLocation, pluginPath)
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	cmd.config.SetPlugin(pluginMetadata.Name, pluginExecutable)
+	configMetadata := plugin_config.PluginMetadata{
+		Location: pluginLocation,
+		Commands: pluginMetadata.Commands,
+	}
+
+	cmd.config.SetPlugin(pluginMetadata.Name, configMetadata)
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name})))
 }
 
-func (cmd *PluginInstall) ensurePluginDoesNotExist(pluginExecutable, pluginExecutableName string) {
-	_, err := os.Stat(pluginExecutable)
+func (cmd *PluginInstall) ensurePluginDoesNotExist(pluginLocation, pluginExecutableName string) {
+	_, err := os.Stat(pluginLocation)
 	if err == nil || os.IsExist(err) {
 		cmd.ui.Failed(fmt.Sprintf(T("The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
 			map[string]interface{}{

@@ -49,8 +49,8 @@ var _ = Describe("Uninstall", func() {
 		}
 
 		pluginConfig = plugin_config.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
-		pluginConfig.SetPlugin("test_1.exe", filepath.Join(pluginDir, "test_1.exe"))
-		pluginConfig.SetPlugin("test_2.exe", filepath.Join(pluginDir, "test_2.exe"))
+		pluginConfig.SetPlugin("test_1.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_1.exe")})
+		pluginConfig.SetPlugin("test_2.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_2.exe")})
 	})
 
 	AfterEach(func() {

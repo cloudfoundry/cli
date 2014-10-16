@@ -52,10 +52,8 @@ func (cmd *Plugins) Run(c *cli.Context) {
 	}
 	defer service.Stop()
 
-	for pluginName, location := range plugins {
-		cmdList, _ := rpc.RunListCmd(pluginName, location, service.Port())
-
-		for _, command := range cmdList {
+	for pluginName, metadata := range plugins {
+		for _, command := range metadata.Commands {
 			table.Add(pluginName, command.Name)
 		}
 	}

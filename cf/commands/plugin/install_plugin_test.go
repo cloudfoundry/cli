@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command"
 	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -87,11 +88,6 @@ var _ = Describe("Install", func() {
 	Describe("failures", func() {
 		It("if a plugin's command shares the same name as a core command", func() {
 			coreCmds["help"] = &testCommand.FakeCommand{}
-
-			x, err := os.Stat(test_1)
-			println("name file: ", x.Name())
-			Ω(err).ToNot(HaveOccurred())
-
 			runCommand(test_1)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -110,7 +106,7 @@ var _ = Describe("Install", func() {
 		})
 
 		It("if plugin name is already taken", func() {
-			config.PluginsReturns(map[string]string{"Test1": "do/not/care"})
+			config.PluginsReturns(map[string]plugin_config.PluginMetadata{"Test1": plugin_config.PluginMetadata{}})
 			runCommand(test_1)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -126,7 +122,7 @@ var _ = Describe("Install", func() {
 			})
 
 			It("if a file with the plugin name already exists under ~/.cf/plugin/", func() {
-				config.PluginsReturns(map[string]string{"useless": "do/not/care"})
+				config.PluginsReturns(map[string]plugin_config.PluginMetadata{"useless": plugin_config.PluginMetadata{}})
 				config.GetPluginPathReturns(curDir)
 
 				runCommand(filepath.Join(curDir, pluginFile.Name()))
@@ -168,17 +164,20 @@ var _ = Describe("Install", func() {
 			})
 		}
 
-		It("populate the configuration map with the plugin name and location", func() {
-			pluginName, pluginExecutable := config.SetPluginArgsForCall(0)
+		It("populate the configuration with plugin metadata", func() {
+			pluginName, pluginMetadata := config.SetPluginArgsForCall(0)
 
 			Expect(pluginName).To(Equal("Test1"))
-			Expect(pluginExecutable).To(Equal(filepath.Join(pluginDir, "test_1.exe")))
+			Expect(pluginMetadata.Location).To(Equal(filepath.Join(pluginDir, "test_1.exe")))
+			Expect(pluginMetadata.Commands[0].Name).To(Equal("test_1_cmd1"))
+			Expect(pluginMetadata.Commands[0].HelpText).To(Equal("help text for test_1_cmd1"))
+			Expect(pluginMetadata.Commands[1].Name).To(Equal("test_1_cmd2"))
+			Expect(pluginMetadata.Commands[1].HelpText).To(Equal("help text for test_1_cmd2"))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Installing plugin", sourceBinaryPath},
 				[]string{"OK"},
 				[]string{"Plugin", "Test1", "successfully installed"},
 			))
 		})
-
 	})
 })

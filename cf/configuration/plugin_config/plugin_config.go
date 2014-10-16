@@ -10,14 +10,9 @@ import (
 
 type PluginConfiguration interface {
 	Plugins() map[string]PluginMetadata
-	SetPlugin(string, string)
+	SetPlugin(string, PluginMetadata)
 	GetPluginPath() string
 	RemovePlugin(string)
-}
-
-type PluginMetadata struct {
-	Location string
-	Commands []string
 }
 
 type PluginConfig struct {
@@ -46,18 +41,18 @@ func (c *PluginConfig) GetPluginPath() string {
 	return c.pluginPath
 }
 
-func (c *PluginConfig) Plugins() map[string]string {
+func (c *PluginConfig) Plugins() map[string]PluginMetadata {
 	c.read()
 	return c.data.Plugins
 }
 
 /* setter methods */
-func (c *PluginConfig) SetPlugin(name, location string) {
+func (c *PluginConfig) SetPlugin(name string, metadata PluginMetadata) {
 	if c.data.Plugins == nil {
-		c.data.Plugins = make(map[string]string)
+		c.data.Plugins = make(map[string]PluginMetadata)
 	}
 	c.write(func() {
-		c.data.Plugins[name] = location
+		c.data.Plugins[name] = metadata
 	})
 }
 

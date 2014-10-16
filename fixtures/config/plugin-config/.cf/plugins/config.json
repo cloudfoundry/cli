@@ -1,7 +1,18 @@
 {
   "Plugins": {
-    "test_1": "../../../fixtures/config/plugin-config/.cf/plugins/test_1.exe",
-    "test_2": "../../../fixtures/config/plugin-config/.cf/plugins/test_2.exe",
-    "empty_plugin": "../../../fixtures/config/plugin-config/.cf/plugins/empty_plugin.exe"
+    "Test1":{
+      "Location":"../../../fixtures/config/plugin-config/.cf/plugins/test_1.exe",
+      "Commands":[
+        {"Name":"test1_cmd1","HelpText":"help text for test1 cmd1"},
+        {"Name":"test1_cmd2","HelpText":"help text for test1 cmd2"}
+      ]
+    },
+    "Test2":{
+      "Location":"../../../fixtures/config/plugin-config/.cf/plugins/test_2.exe",
+      "Commands":[
+        {"Name":"test2_cmd1","HelpText":"help text for test2 cmd1"},
+        {"Name":"test2_cmd2","HelpText":"help text for test2 cmd2"}
+      ]
+    }
   }
 }

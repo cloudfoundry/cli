@@ -1,14 +1,23 @@
 package plugin_config
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/cloudfoundry/cli/plugin"
+)
 
 type PluginData struct {
-	Plugins map[string]string
+	Plugins map[string]PluginMetadata
+}
+
+type PluginMetadata struct {
+	Location string
+	Commands []plugin.Command
 }
 
 func NewData() *PluginData {
 	return &PluginData{
-		Plugins: make(map[string]string),
+		Plugins: make(map[string]PluginMetadata),
 	}
 }
 

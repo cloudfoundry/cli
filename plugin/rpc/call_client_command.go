@@ -79,8 +79,8 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 
 	defer service.Stop()
 
-	for pluginName, location := range pluginList {
-		cmd, err := runPlugin(location, port, service.Port())
+	for pluginName, metadata := range pluginList {
+		cmd, err := runPlugin(metadata.Location, port, service.Port())
 		if err != nil {
 			continue
 		}
