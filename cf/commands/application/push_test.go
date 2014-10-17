@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	fakeactors "github.com/cloudfoundry/cli/cf/actors/fakes"
+	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
@@ -37,7 +38,7 @@ var _ = Describe("Push Command", func() {
 		starter             *testcmd.FakeAppStarter
 		stopper             *testcmd.FakeAppStopper
 		serviceBinder       *testcmd.FakeAppBinder
-		appRepo             *testapi.FakeApplicationRepository
+		appRepo             *testApplication.FakeApplicationRepository
 		domainRepo          *testapi.FakeDomainRepository
 		routeRepo           *testapi.FakeRouteRepository
 		stackRepo           *testapi.FakeStackRepository
@@ -55,7 +56,7 @@ var _ = Describe("Push Command", func() {
 		starter = &testcmd.FakeAppStarter{}
 		stopper = &testcmd.FakeAppStopper{}
 		serviceBinder = &testcmd.FakeAppBinder{}
-		appRepo = &testapi.FakeApplicationRepository{}
+		appRepo = &testApplication.FakeApplicationRepository{}
 
 		domainRepo = &testapi.FakeDomainRepository{}
 		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})

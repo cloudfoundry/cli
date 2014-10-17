@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/app_events"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
+	applications "github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
@@ -36,7 +37,7 @@ type RepositoryLocator struct {
 	organizationRepo                organizations.CloudControllerOrganizationRepository
 	quotaRepo                       quotas.CloudControllerQuotaRepository
 	spaceRepo                       spaces.CloudControllerSpaceRepository
-	appRepo                         CloudControllerApplicationRepository
+	appRepo                         applications.CloudControllerApplicationRepository
 	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  CloudControllerAppSummaryRepository
 	appInstancesRepo                app_instances.CloudControllerAppInstancesRepository
@@ -86,7 +87,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = api_app_files.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
-	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
+	loc.appRepo = applications.NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
 	loc.appInstancesRepo = app_instances.NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
@@ -144,7 +145,7 @@ func (locator RepositoryLocator) GetSpaceRepository() spaces.SpaceRepository {
 	return locator.spaceRepo
 }
 
-func (locator RepositoryLocator) GetApplicationRepository() ApplicationRepository {
+func (locator RepositoryLocator) GetApplicationRepository() applications.ApplicationRepository {
 	return locator.appRepo
 }
 

@@ -1,10 +1,12 @@
 package application
 
 import (
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	"encoding/json"
 	"sort"
 
-	"github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/cf/i18n"
+
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -16,10 +18,10 @@ import (
 type Env struct {
 	ui      terminal.UI
 	config  core_config.Reader
-	appRepo api.ApplicationRepository
+	appRepo applications.ApplicationRepository
 }
 
-func NewEnv(ui terminal.UI, config core_config.Reader, appRepo api.ApplicationRepository) (cmd *Env) {
+func NewEnv(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) (cmd *Env) {
 	cmd = new(Env)
 	cmd.ui = ui
 	cmd.config = config
@@ -57,7 +59,7 @@ func (cmd *Env) Run(c *cli.Context) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	envVars, vcapServices, err := cmd.appRepo.ReadEnv(app.Guid)
+	env, err := cmd.appRepo.ReadEnv(app.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -65,12 +67,27 @@ func (cmd *Env) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	cmd.displaySystemProvidedEnvironment(vcapServices)
+	cmd.displaySystemProvidedEnvironment(env.System)
 	cmd.ui.Say("")
-	cmd.displayUserProvidedEnvironment(envVars)
+	cmd.displayUserProvidedEnvironment(env.Environment)
+	cmd.ui.Say("")
+	cmd.displayRunningEnvironment(env.Running)
+	cmd.ui.Say("")
+	cmd.displayStagingEnvironment(env.Staging)
+	cmd.ui.Say("")
 }
 
-func (cmd *Env) displaySystemProvidedEnvironment(vcapServices string) {
+func (cmd *Env) displaySystemProvidedEnvironment(env map[string]interface{}) {
+	var vcapServices string
+	servicesAsMap, ok := env["VCAP_SERVICES"].(map[string]interface{})
+	if ok && len(servicesAsMap) > 0 {
+		jsonBytes, err := json.MarshalIndent(env, "", " ")
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+		vcapServices = string(jsonBytes)
+	}
+
 	if len(vcapServices) == 0 {
 		cmd.ui.Say(T("No system-provided env variables have been set"))
 		return
@@ -92,6 +109,42 @@ func (cmd *Env) displayUserProvidedEnvironment(envVars map[string]string) {
 	sort.Strings(keys)
 
 	cmd.ui.Say(T("User-Provided:"))
+	for _, key := range keys {
+		cmd.ui.Say("%s: %s", key, terminal.EntityNameColor(envVars[key]))
+	}
+}
+
+func (cmd *Env) displayRunningEnvironment(envVars map[string]string) {
+	if len(envVars) == 0 {
+		cmd.ui.Say(T("No running env variables have been set"))
+		return
+	}
+
+	keys := make([]string, 0, len(envVars))
+	for key, _ := range envVars {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	cmd.ui.Say(T("Running Environment Variable Groups:"))
+	for _, key := range keys {
+		cmd.ui.Say("%s: %s", key, terminal.EntityNameColor(envVars[key]))
+	}
+}
+
+func (cmd *Env) displayStagingEnvironment(envVars map[string]string) {
+	if len(envVars) == 0 {
+		cmd.ui.Say(T("No staging env variables have been set"))
+		return
+	}
+
+	keys := make([]string, 0, len(envVars))
+	for key, _ := range envVars {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	cmd.ui.Say(T("Staging Environment Variable Groups:"))
 	for _, key := range keys {
 		cmd.ui.Say("%s: %s", key, terminal.EntityNameColor(envVars[key]))
 	}

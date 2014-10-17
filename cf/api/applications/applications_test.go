@@ -1,9 +1,9 @@
-package api_test
+package applications_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"time"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
@@ -13,7 +13,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
-	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/cf/api/applications"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -94,12 +94,11 @@ var _ = Describe("ApplicationsRepository", func() {
 	Describe("reading environment for an app", func() {
 		Context("when the response can be parsed as json", func() {
 			var (
-				testServer   *httptest.Server
-				userEnv      map[string]string
-				vcapServices string
-				err          error
-				handler      *testnet.TestHandler
-				repo         ApplicationRepository
+				testServer *httptest.Server
+				userEnv    *models.Environment
+				err        error
+				handler    *testnet.TestHandler
+				repo       ApplicationRepository
 			)
 
 			AfterEach(func() {
@@ -116,34 +115,44 @@ var _ = Describe("ApplicationsRepository", func() {
 							Status: http.StatusOK,
 							Body: `
 {
-   "system_env_json": {
-      "VCAP_SERVICES": {
-        "system_hash": {
-          "system_key": "system_value"
-        }
-      }
+	 "staging_env_json": {
+     "STAGING_ENV": "staging_value"
+   },
+   "running_env_json": {
+     "RUNNING_ENV": "running_value"
    },
    "environment_json": {
-      "key": "value"
+     "key": "value"
+   },
+   "system_env_json": {
+     "VCAP_SERVICES": {
+				"system_hash": {
+          "system_key": "system_value"
+        }
+     }
    }
 }
 `,
 						}})
 
 					testServer, handler, repo = createAppRepo([]testnet.TestRequest{appEnvRequest})
-					userEnv, vcapServices, err = repo.ReadEnv("some-cool-app-guid")
+					userEnv, err = repo.ReadEnv("some-cool-app-guid")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(handler).To(HaveAllRequestsCalled())
 				})
 
-				It("returns the user environment and vcap services", func() {
-					Expect(userEnv["key"]).To(Equal("value"))
-					Expect(strings.Split(vcapServices, "\n")).To(ContainSubstrings(
-						[]string{"system_hash", ":", "{"},
-						[]string{"system_key", ":", "system_value"},
-						[]string{"}"},
-					))
+				It("returns the user environment, vcap services, running/staging env variables", func() {
+					Expect(userEnv.Environment["key"]).To(Equal("value"))
+					Expect(userEnv.Running["RUNNING_ENV"]).To(Equal("running_value"))
+					Expect(userEnv.Staging["STAGING_ENV"]).To(Equal("staging_value"))
+
+					vcapServices := userEnv.System["VCAP_SERVICES"]
+					data, err := json.Marshal(vcapServices)
+
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(data)).To(ContainSubstring("\"system_key\":\"system_value\""))
 				})
+
 			})
 
 			Context("when there are no environment variables", func() {
@@ -157,14 +166,14 @@ var _ = Describe("ApplicationsRepository", func() {
 						}})
 
 					testServer, handler, repo = createAppRepo([]testnet.TestRequest{emptyEnvRequest})
-					userEnv, vcapServices, err = repo.ReadEnv("some-cool-app-guid")
+					userEnv, err = repo.ReadEnv("some-cool-app-guid")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(handler).To(HaveAllRequestsCalled())
 				})
 
 				It("returns an empty string", func() {
-					Expect(userEnv["key"]).To(BeEmpty())
-					Expect(vcapServices).To(BeEmpty())
+					Expect(userEnv.Environment["key"]).To(BeEmpty())
+					Expect(len(userEnv.System["VCAP_SERVICES"].(map[string]interface{}))).To(Equal(0))
 				})
 			})
 		})

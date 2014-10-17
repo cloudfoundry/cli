@@ -1,7 +1,7 @@
 package application_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,7 +20,7 @@ var _ = Describe("env command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *testapi.FakeApplicationRepository
+		appRepo             *testApplication.FakeApplicationRepository
 		configRepo          core_config.ReadWriter
 		requirementsFactory *testreq.FakeReqFactory
 	)
@@ -30,7 +30,7 @@ var _ = Describe("env command", func() {
 
 		app = models.Application{}
 		app.Name = "my-app"
-		appRepo = &testapi.FakeApplicationRepository{}
+		appRepo = &testApplication.FakeApplicationRepository{}
 		appRepo.ReadReturns.App = app
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -74,21 +74,23 @@ var _ = Describe("env command", func() {
 			app.Guid = "the-app-guid"
 
 			appRepo.ReadReturns.App = app
-			appRepo.ReadEnvReturns.UserEnv = map[string]string{
-				"my-key":    "my-value",
-				"my-key2":   "my-value2",
-				"first-key": "Zer0",
-			}
-			appRepo.ReadEnvReturns.VcapServices = `{
-  "VCAP_SERVICES": {
-    "pump-yer-brakes": "drive-slow"
-  }
-}`
+			appRepo.ReadEnvReturns(&models.Environment{
+				Environment: map[string]string{
+					"my-key":    "my-value",
+					"my-key2":   "my-value2",
+					"first-key": "Zer0",
+				},
+				System: map[string]interface{}{
+					"VCAP_SERVICES": map[string]interface{}{
+						"pump-yer-brakes": "drive-slow",
+					},
+				},
+			}, nil)
 		})
 
 		It("lists those environment variables, in sorted order for provided services", func() {
 			runCommand("my-app")
-			Expect(appRepo.ReadEnvArgs.AppGuid).To(Equal("the-app-guid"))
+			Expect(appRepo.ReadEnvArgsForCall(0)).To(Equal("the-app-guid"))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
@@ -106,6 +108,7 @@ var _ = Describe("env command", func() {
 
 	Context("when the app has no user-defined environment variables", func() {
 		It("shows an empty message", func() {
+			appRepo.ReadEnvReturns(&models.Environment{}, nil)
 			runCommand("my-app")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -117,16 +120,56 @@ var _ = Describe("env command", func() {
 		})
 	})
 
-	Context("when the app has no system-provided environment variables", func() {
-		It("does not show the system provided services hash", func() {
+	Context("when the app has no environment variables", func() {
+		It("informs the user that each group is empty", func() {
+			appRepo.ReadEnvReturns(&models.Environment{}, nil)
+
 			runCommand("my-app")
-			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"System-Provided"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"No system-provided env variables have been set"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"No user-defined env variables have been set"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"No running env variables have been set"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"No staging env variables have been set"}))
+		})
+	})
+
+	Context("when the app has at least one running and staging environment variable", func() {
+		BeforeEach(func() {
+			app = models.Application{}
+			app.Name = "my-app"
+			app.Guid = "the-app-guid"
+
+			appRepo.ReadReturns.App = app
+			appRepo.ReadEnvReturns(&models.Environment{
+				Running: map[string]string{
+					"running-key-1": "running-value-1",
+					"running-key-2": "running-value-2",
+				},
+				Staging: map[string]string{
+					"staging-key-1": "staging-value-1",
+					"staging-key-2": "staging-value-2",
+				},
+			}, nil)
+		})
+
+		It("lists the environment variables", func() {
+			runCommand("my-app")
+			Expect(appRepo.ReadEnvArgsForCall(0)).To(Equal("the-app-guid"))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+				[]string{"Running Environment Variable Groups:"},
+				[]string{"running-key-1", ":", "running-value-1"},
+				[]string{"running-key-2", ":", "running-value-2"},
+				[]string{"Staging Environment Variable Groups:"},
+				[]string{"staging-key-1", ":", "staging-value-1"},
+				[]string{"staging-key-2", ":", "staging-value-2"},
+			))
 		})
 	})
 
 	Context("when reading the environment variables returns an error", func() {
 		It("tells you about that error", func() {
-			appRepo.ReadEnvReturns.Error = errors.New("BOO YOU CANT DO THAT; GO HOME; you're drunk")
+			appRepo.ReadEnvReturns(nil, errors.New("BOO YOU CANT DO THAT; GO HOME; you're drunk"))
 			runCommand("whatever")
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"you're drunk"}))
 		})

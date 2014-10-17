@@ -1,11 +1,12 @@
-package api
+package applications
 
 import (
 	"encoding/json"
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"net/url"
 	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -19,7 +20,7 @@ type ApplicationRepository interface {
 	Read(name string) (app models.Application, apiErr error)
 	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error)
 	Delete(appGuid string) (apiErr error)
-	ReadEnv(guid string) (userEnv map[string]string, vcapServices string, err error)
+	ReadEnv(guid string) (*models.Environment, error)
 	CreateRestageRequest(guid string) (apiErr error)
 }
 
@@ -100,33 +101,20 @@ func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiErr 
 	return repo.gateway.DeleteResource(path)
 }
 
-type systemEnvResource struct {
-	System      map[string]interface{} `json:"system_env_json,omitempty"`
-	Environment map[string]string      `json:"environment_json,omitempty"`
-}
-
-func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (map[string]string, string, error) {
+func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (*models.Environment, error) {
 	var (
-		err          error
-		jsonBytes    []byte
-		vcapServices string
+		err error
 	)
 
 	path := fmt.Sprintf("%s/v2/apps/%s/env", repo.config.ApiEndpoint(), guid)
-	appResource := new(systemEnvResource)
+	appResource := models.NewEnvironment()
 
 	err = repo.gateway.GetResource(path, appResource)
 	if err != nil {
-		return nil, "", err
+		return &models.Environment{}, err
 	}
 
-	servicesAsMap, ok := appResource.System["VCAP_SERVICES"].(map[string]interface{})
-	if ok && len(servicesAsMap) > 0 {
-		jsonBytes, err = json.MarshalIndent(appResource.System, "", "  ")
-		vcapServices = string(jsonBytes)
-	}
-
-	return appResource.Environment, vcapServices, err
+	return appResource, err
 }
 
 func (repo CloudControllerApplicationRepository) CreateRestageRequest(guid string) error {

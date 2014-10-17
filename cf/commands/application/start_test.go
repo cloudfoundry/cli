@@ -7,6 +7,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications"
+	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -100,7 +102,7 @@ var _ = Describe("start command", func() {
 		}
 	})
 
-	callStart := func(args []string, config core_config.Reader, requirementsFactory *testreq.FakeReqFactory, displayApp ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
+	callStart := func(args []string, config core_config.Reader, requirementsFactory *testreq.FakeReqFactory, displayApp ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
 		ui = new(testterm.FakeUI)
 
 		cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
@@ -112,9 +114,9 @@ var _ = Describe("start command", func() {
 		return
 	}
 
-	startAppWithInstancesAndErrors := func(displayApp ApplicationDisplayer, app models.Application, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testAppInstanaces.FakeAppInstancesRepository) {
+	startAppWithInstancesAndErrors := func(displayApp ApplicationDisplayer, app models.Application, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, appRepo *testApplication.FakeApplicationRepository, appInstancesRepo *testAppInstanaces.FakeAppInstancesRepository) {
 		configRepo := testconfig.NewRepositoryWithDefaults()
-		appRepo = &testapi.FakeApplicationRepository{
+		appRepo = &testApplication.FakeApplicationRepository{
 			UpdateAppResult: app,
 		}
 		appRepo.ReadReturns.App = app
@@ -135,14 +137,14 @@ var _ = Describe("start command", func() {
 
 	It("fails requirements when not logged in", func() {
 		requirementsFactory.LoginSuccess = false
-		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testAppInstanaces.FakeAppInstancesRepository{}, &testapi.FakeLogsRepository{})
+		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testApplication.FakeApplicationRepository{}, &testAppInstanaces.FakeAppInstancesRepository{}, &testapi.FakeLogsRepository{})
 		testcmd.RunCommand(cmd, []string{"some-app-name"}, requirementsFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
 	Describe("timeouts", func() {
 		It("has sane default timeout values", func() {
-			cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testAppInstanaces.FakeAppInstancesRepository{}, &testapi.FakeLogsRepository{})
+			cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testApplication.FakeApplicationRepository{}, &testAppInstanaces.FakeAppInstancesRepository{}, &testapi.FakeLogsRepository{})
 			Expect(cmd.StagingTimeout).To(Equal(15 * time.Minute))
 			Expect(cmd.StartupTimeout).To(Equal(5 * time.Minute))
 		})
@@ -157,7 +159,7 @@ var _ = Describe("start command", func() {
 
 			os.Setenv("CF_STAGING_TIMEOUT", "6")
 			os.Setenv("CF_STARTUP_TIMEOUT", "3")
-			cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testAppInstanaces.FakeAppInstancesRepository{}, &testapi.FakeLogsRepository{})
+			cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testApplication.FakeApplicationRepository{}, &testAppInstanaces.FakeAppInstancesRepository{}, &testapi.FakeLogsRepository{})
 			Expect(cmd.StagingTimeout).To(Equal(6 * time.Minute))
 			Expect(cmd.StartupTimeout).To(Equal(3 * time.Minute))
 		})
@@ -172,7 +174,7 @@ var _ = Describe("start command", func() {
 				app = defaultAppForStart
 
 				instances := []models.AppInstanceFields{models.AppInstanceFields{}}
-				appRepo := &testapi.FakeApplicationRepository{
+				appRepo := &testApplication.FakeApplicationRepository{
 					UpdateAppResult: app,
 				}
 				appRepo.ReadReturns.App = app
@@ -211,7 +213,7 @@ var _ = Describe("start command", func() {
 		It("fails with usage when provided with no args", func() {
 			config := testconfig.NewRepository()
 			displayApp := &testcmd.FakeAppDisplayer{}
-			appRepo := &testapi.FakeApplicationRepository{}
+			appRepo := &testApplication.FakeApplicationRepository{}
 			appInstancesRepo := &testAppInstanaces.FakeAppInstancesRepository{}
 			logRepo := &testapi.FakeLogsRepository{}
 
@@ -238,7 +240,7 @@ var _ = Describe("start command", func() {
 		It("only displays staging logs when an app is starting", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			requirementsFactory.Application = defaultAppForStart
-			appRepo := &testapi.FakeApplicationRepository{
+			appRepo := &testApplication.FakeApplicationRepository{
 				UpdateAppResult: defaultAppForStart,
 			}
 			appRepo.ReadReturns.App = defaultAppForStart
@@ -396,7 +398,7 @@ var _ = Describe("start command", func() {
 			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
-			appRepo := &testapi.FakeApplicationRepository{UpdateErr: true}
+			appRepo := &testApplication.FakeApplicationRepository{UpdateErr: true}
 			appRepo.ReadReturns.App = app
 			appInstancesRepo := &testAppInstanaces.FakeAppInstancesRepository{}
 			args := []string{"my-app"}
@@ -418,7 +420,7 @@ var _ = Describe("start command", func() {
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.State = "started"
-			appRepo := &testapi.FakeApplicationRepository{}
+			appRepo := &testApplication.FakeApplicationRepository{}
 			appRepo.ReadReturns.App = app
 			appInstancesRepo := &testAppInstanaces.FakeAppInstancesRepository{}
 
@@ -436,7 +438,7 @@ var _ = Describe("start command", func() {
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			displayApp := &testcmd.FakeAppDisplayer{}
 
-			appRepo := &testapi.FakeApplicationRepository{}
+			appRepo := &testApplication.FakeApplicationRepository{}
 			appRepo.ReadReturns.App = defaultAppForStart
 			appInstancesRepo := &testAppInstanaces.FakeAppInstancesRepository{}
 

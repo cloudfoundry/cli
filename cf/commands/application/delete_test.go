@@ -1,6 +1,7 @@
 package application_test
 
 import (
+	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -22,7 +23,7 @@ var _ = Describe("delete app command", func() {
 		ui                  *testterm.FakeUI
 		app                 models.Application
 		configRepo          core_config.ReadWriter
-		appRepo             *testapi.FakeApplicationRepository
+		appRepo             *testApplication.FakeApplicationRepository
 		routeRepo           *testapi.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)
@@ -33,7 +34,7 @@ var _ = Describe("delete app command", func() {
 		app.Guid = "app-to-delete-guid"
 
 		ui = &testterm.FakeUI{}
-		appRepo = &testapi.FakeApplicationRepository{}
+		appRepo = &testApplication.FakeApplicationRepository{}
 		routeRepo = &testapi.FakeRouteRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 

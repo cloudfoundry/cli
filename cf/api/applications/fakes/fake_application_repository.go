@@ -1,7 +1,10 @@
 package fakes
 
 import (
-	"github.com/cloudfoundry/cli/cf/errors"
+	"errors"
+	"sync"
+
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -25,20 +28,56 @@ type FakeApplicationRepository struct {
 
 	DeletedAppGuid string
 
-	ReadEnvArgs struct {
-		AppGuid string
-	}
-
-	ReadEnvReturns struct {
-		UserEnv      map[string]string
-		VcapServices string
-		Error        error
-	}
-
 	CreateRestageRequestArgs struct {
 		AppGuid string
 	}
+
+	ReadEnvStub        func(guid string) (*models.Environment, error)
+	readEnvMutex       sync.RWMutex
+	readEnvArgsForCall []struct {
+		guid string
+	}
+	readEnvReturns struct {
+		result1 *models.Environment
+		result2 error
+	}
 }
+
+//counterfeiter section
+func (fake *FakeApplicationRepository) ReadEnv(guid string) (*models.Environment, error) {
+	fake.readEnvMutex.Lock()
+	fake.readEnvArgsForCall = append(fake.readEnvArgsForCall, struct {
+		guid string
+	}{guid})
+	fake.readEnvMutex.Unlock()
+	if fake.ReadEnvStub != nil {
+		return fake.ReadEnvStub(guid)
+	} else {
+		return fake.readEnvReturns.result1, fake.readEnvReturns.result2
+	}
+}
+
+func (fake *FakeApplicationRepository) ReadEnvCallCount() int {
+	fake.readEnvMutex.RLock()
+	defer fake.readEnvMutex.RUnlock()
+	return len(fake.readEnvArgsForCall)
+}
+
+func (fake *FakeApplicationRepository) ReadEnvArgsForCall(i int) string {
+	fake.readEnvMutex.RLock()
+	defer fake.readEnvMutex.RUnlock()
+	return fake.readEnvArgsForCall[i].guid
+}
+
+func (fake *FakeApplicationRepository) ReadEnvReturns(result1 *models.Environment, result2 error) {
+	fake.ReadEnvStub = nil
+	fake.readEnvReturns = struct {
+		result1 *models.Environment
+		result2 error
+	}{result1, result2}
+}
+
+//End counterfeiter section
 
 func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiErr error) {
 	repo.ReadArgs.Name = name
@@ -104,13 +143,9 @@ func (repo *FakeApplicationRepository) Delete(appGuid string) (apiErr error) {
 	return
 }
 
-func (repo *FakeApplicationRepository) ReadEnv(appGuid string) (map[string]string, string, error) {
-	repo.ReadEnvArgs.AppGuid = appGuid
-
-	return repo.ReadEnvReturns.UserEnv, repo.ReadEnvReturns.VcapServices, repo.ReadEnvReturns.Error
-}
-
 func (repo *FakeApplicationRepository) CreateRestageRequest(guid string) (apiErr error) {
 	repo.CreateRestageRequestArgs.AppGuid = guid
 	return nil
 }
+
+var _ applications.ApplicationRepository = new(FakeApplicationRepository)
