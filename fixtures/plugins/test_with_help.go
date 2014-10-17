@@ -33,11 +33,6 @@ func (c *TestWithHelp) GetCommands() []plugin.Command {
 	}
 }
 
-func (c *TestWithHelp) CmdExists(args string, exists *bool) error {
-	*exists = plugin.CmdExists(args, c.GetCommands())
-	return nil
-}
-
 func theHelpCmd() {
 	fmt.Println("You called help in test_with_help")
 }

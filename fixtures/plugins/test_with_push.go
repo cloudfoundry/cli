@@ -33,11 +33,6 @@ func (c *TestWithPush) GetCommands() []plugin.Command {
 	}
 }
 
-func (c *TestWithPush) CmdExists(args string, exists *bool) error {
-	*exists = plugin.CmdExists(args, c.GetCommands())
-	return nil
-}
-
 func thePushCmd() {
 	fmt.Println("You called push in test_with_push")
 }

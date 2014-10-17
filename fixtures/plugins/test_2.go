@@ -37,11 +37,6 @@ func (c *Test2) GetCommands() []plugin.Command {
 	}
 }
 
-func (c *Test2) CmdExists(args string, exists *bool) error {
-	*exists = plugin.CmdExists(args, c.GetCommands())
-	return nil
-}
-
 func theFirstCmd() {
 	fmt.Println("You called cmd1 in test_2")
 }

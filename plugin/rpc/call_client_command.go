@@ -11,36 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 )
 
-func RunCommandExists(methodName string, location string) (bool, error) {
-	port := obtainPort()
-
-	service, err := startCliServer()
-	if err != nil {
-		return false, err
-	}
-
-	defer service.Stop()
-
-	cmd, err := runPlugin(location, port, service.Port())
-	if err != nil {
-		return false, err
-	}
-	defer stopPlugin(cmd)
-
-	rpcClient, err := dialClient(port)
-	if err != nil {
-		return false, err
-	}
-
-	var exist bool
-	err = rpcClient.Call("CliPlugin.CmdExists", methodName, &exist)
-	if err != nil {
-		return false, err
-	}
-
-	return exist, nil
-}
-
 func RunMethodIfExists(cmdName string) (bool, error) {
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()

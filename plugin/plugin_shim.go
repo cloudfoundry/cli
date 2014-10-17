@@ -26,8 +26,6 @@ type RpcPlugin interface {
 	//run is passed in all the command line parameter arguments and
 	//an object containing all of the cli commands available to them
 	Run(args string, reply *bool) error
-	CmdExists(args string, exists *bool) error
-
 	GetCommands() []Command
 }
 
@@ -93,15 +91,6 @@ func Start(cmd RpcPlugin) {
 			go rpc.ServeConn(conn)
 		}
 	}
-}
-
-func CmdExists(cmd string, availableCmds []Command) bool {
-	for _, availableCmd := range availableCmds {
-		if cmd == availableCmd.Name {
-			return true
-		}
-	}
-	return false
 }
 
 func pingCLI() {
