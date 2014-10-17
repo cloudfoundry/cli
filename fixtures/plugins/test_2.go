@@ -24,11 +24,6 @@ func (c *Test2) Run(args string, reply *bool) error {
 	return nil
 }
 
-func (c *Test2) ListCmds(args string, cmdlist *[]plugin.Command) error {
-	*cmdlist = c.GetCommands()
-	return nil
-}
-
 func (c *Test2) GetCommands() []plugin.Command {
 	return []plugin.Command{
 		{

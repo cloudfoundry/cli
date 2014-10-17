@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"fmt"
 	"net"
 	"net/rpc"
 	"os"
@@ -10,31 +9,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/plugin"
 )
-
-func RunListCmd(pluginName, location, cliServicePort string) ([]plugin.Command, error) {
-	port := obtainPort()
-
-	cmd, err := runPlugin(location, port, cliServicePort)
-	if err != nil {
-		return []plugin.Command{}, err
-	}
-	defer stopPlugin(cmd)
-
-	rpcClient, err := dialClient(port)
-	if err != nil {
-		return []plugin.Command{}, err
-	}
-
-	var cmdList []plugin.Command
-	err = rpcClient.Call(pluginName+".ListCmds", "", &cmdList)
-	if err != nil {
-		return []plugin.Command{}, err
-	}
-
-	return cmdList, nil
-}
 
 func RunCommandExists(methodName string, location string) (bool, error) {
 	port := obtainPort()
@@ -105,20 +80,6 @@ func runClientCmd(cmd string, method string, port string) (bool, error) {
 		return false, err
 	}
 	return reply, nil
-}
-
-func getPluginCmds(pluginName, port string) ([]plugin.Command, error) {
-	client, err := dialClient(port)
-	if err != nil {
-		fmt.Println("error dailing to plugin: ", err)
-		return []plugin.Command{}, err
-	}
-	var cmds []plugin.Command
-	err = client.Call(pluginName+".ListCmds", "", &cmds)
-	if err != nil {
-		return nil, err
-	}
-	return cmds, nil
 }
 
 func dialClient(port string) (*rpc.Client, error) {
