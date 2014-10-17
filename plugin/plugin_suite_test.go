@@ -18,7 +18,7 @@ func TestPlugin(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	cmd := exec.Command("go", "build", "-o", filepath.Join(dir, "..", "fixtures", "config", "plugin-config", ".cf", "plugins", "test_1.exe"), filepath.Join(dir, "..", "fixtures", "plugins", "test_1.go"))
+	cmd := exec.Command("go", "build", "-o", filepath.Join(dir, "..", "fixtures", "plugins", "test_1.exe"), filepath.Join(dir, "..", "fixtures", "plugins", "test_1.go"))
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)

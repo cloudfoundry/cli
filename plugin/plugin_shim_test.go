@@ -22,11 +22,11 @@ var _ = Describe("Command", func() {
 		dir, err := os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
 
-		fullDir := filepath.Join(dir, "..", "fixtures", "config", "plugin-config")
+		fullDir := filepath.Join(dir, "..", "fixtures", "config", "main-plugin-test-config")
 		err = os.Setenv("CF_PLUGINS_DIR", fullDir)
 		Expect(err).NotTo(HaveOccurred())
 
-		validPluginPath = filepath.Join(fullDir, ".cf", "plugins", "test_1.exe")
+		validPluginPath = filepath.Join(dir, "..", "fixtures", "plugins", "test_1.exe")
 	})
 
 	AfterEach(func() {
@@ -35,7 +35,7 @@ var _ = Describe("Command", func() {
 	})
 
 	Describe(".ServeCommand", func() {
-		It("prints a warning if a plugin does not implement the rpc interface", func() {
+		XIt("prints a warning if a plugin does not implement the rpc interface", func() {
 			//This would seem like a valid test, but the plugin itself will not compile
 		})
 

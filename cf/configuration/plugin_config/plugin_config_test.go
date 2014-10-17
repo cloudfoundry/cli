@@ -23,28 +23,28 @@ var _ = Describe("PluginConfig", func() {
 	BeforeEach(func() {
 		commands1 = []plugin.Command{
 			{
-				Name:     "test1_cmd1",
+				Name:     "test_1_cmd1",
 				HelpText: "help text for test1 cmd1",
 			},
 			{
-				Name:     "test1_cmd2",
+				Name:     "test_1_cmd2",
 				HelpText: "help text for test1 cmd2",
 			},
 		}
 
 		commands2 = []plugin.Command{
 			{
-				Name:     "test2_cmd1",
+				Name:     "test_2_cmd1",
 				HelpText: "help text for test2 cmd1",
 			},
 			{
-				Name:     "test2_cmd2",
+				Name:     "test_2_cmd2",
 				HelpText: "help text for test2 cmd2",
 			},
 		}
 
 		metadata = PluginMetadata{
-			Location: "../../../fixtures/config/plugin-config/.cf/plugins/test_1.exe",
+			Location: "../../../fixtures/plugins/test_1.exe",
 			Commands: commands1,
 		}
 	})
@@ -65,9 +65,9 @@ var _ = Describe("PluginConfig", func() {
 			})
 			plugins := pluginConfig.Plugins()
 
-			Expect(plugins["Test1"].Location).To(Equal("../../../fixtures/config/plugin-config/.cf/plugins/test_1.exe"))
+			Expect(plugins["Test1"].Location).To(Equal("../../../fixtures/plugins/test_1.exe"))
 			Expect(plugins["Test1"].Commands).To(Equal(commands1))
-			Expect(plugins["Test2"].Location).To(Equal("../../../fixtures/config/plugin-config/.cf/plugins/test_2.exe"))
+			Expect(plugins["Test2"].Location).To(Equal("../../../fixtures/plugins/test_2.exe"))
 			Expect(plugins["Test2"].Commands).To(Equal(commands2))
 		})
 	})
