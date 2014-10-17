@@ -1,3 +1,80 @@
+##v6.6.2
+* Bump version to 6.6.2
+* Update usage text for install/uninstall-plugin [finishes #80770062][finishes #80701742]
+* Move test setup into beforeEach of plan_builder_test
+* Fix install_plugin usage text [finshes #80701742]
+* security group commands show tip about changes requiring restart [Finishes #75375696]
+* Remove unused scripts (moved for gocd) [#78508732]
+* update correct fixture path in test code
+* update transaltions for uninstall plugin description text
+* stop translating commands, add missed translated strings
+* Tar exectutables before uploading artifacts from gocd
+* Update build-and-release-gocd tooling
+* Potential fix for windows gocd timeout. 
+* Fix for flakey tests in rpc package.
+* Use 32 bit binary to get version when building installers
+* Revert "Get version from 32bit binary, since the agent is 32bit" This reverts commit 8f7ff830b48f0926215adb60e8512e023e942ba5.
+* Implemented plugins advertising their own name. - Name space with plugin name instead of binary name.
+- Expose plugins directory as part of plugin configuration object
+- Cli and plugins ping each other for availability. If the ping fails,
+  they will stop the servers after 1 second. [Finishes #79964866]
+* Refacto plugin/rpc to setup bidirectional communication [#79964866]
+* Refactor install plugin to use counterfeiter fake. [#79964866]
+* Plugin pings cf when it is ready to accept commands. - removes sleep from cf. [#79964866]
+* refactor ServeCommand calls
+* Change fake_word_generator to a counterfeiter fake [#74259334]
+* add gi18n-checkup to bin/test [Finishes #80173376]
+* Improve spacing for help output in create/update-space-quota [finishes #80052722]
+* Add scripts for build-and-release for gocd
+* Sync words.go with the word list [#80335818]
+* Update error text on invalid json format. [Finishes #77391788]
+* Improve help text for create-security-group command [Finishes #77391788]
+* help will run as a core command instead of calling plugin commands [Finishes #78234942]
+* plugin server runs on randomly chosen port
+* consolodate plugin port configuration
+* cf help includes plugin commands
+* attempt to fix install paths for windows
+* fix windows test failures by naming binaries with .exe extension
+* close test file before deleting
+* Fix error message for login w/ -a when ssl-cert invalid [#69644266]
+* Finished refactor of configuration repository. [#78234942]
+* Refactor plugin commands into rpc package -Also increase locales_test timeout
+-Add empty_plugin executable to gitignore [#78234942]
+* Refactoring plugins to include common code for rpc model. - plugins/rpc contains everything main used to contain.
+- new interface for listing commands through rpc.
+* Implement 'plugins' to list all installed plugin methods and the executable they belong to. [Finishes #78235118]
+* go get godep before tests
+* Revert "Use filepath instead of path where possible" This reverts commit 49beccf7726887211cfb05a20f6bbc175ec5847e.
+- Failed on CI
+* Use filepath instead of path where possible -Path does not always work well with windows [#79748230]
+* Append .exe to config.json for plugin-config
+* Name test binaries w/ .exe so windows WORKS
+* Use filepath instead of path in main_suite_test -Add more debugging as well
+* Add debugging statements to building plugin in main_suite_test
+* Revert "Update GOPATH var in windows bat scripts" This reverts commit d311d8d4e71db7f8aad7d39d2ab0e1e26394aac2.
+* Update GOPATH var in windows bat scripts
+* Add debugging info to the main test
+* Add ginkgo defer to allow us to see error message -This is when the main_suite_test fails before running
+the main_test
+* Skip checking filemode for instal-plugin on windows
+* Retry request on tcp connection error. [Finishes #79151504]
+* Added tests for the package main on windows during ci
+* Added defaults for create-space-quota's help [Finishes #77394232]
+* Improve testing with plugins and fix install-plugin bug -Chmod plugin binary after copying to the CF_HOME directory
+-Test that all plugins work when multiple are successfully installed [finishes #78399080] [finishes #79487120]
+* Refactor app instances to use a counterfeiter fake
+* Fix tests relating to plugins and polution caused by them -Reduce sleep time when waiting for plugin to start
+-Have main_test use plugin config the whole time in case of
+invalid config in the home directory (the real home dir) [finishes #79305568]
+* Wip commit for plugins with multiple commands
+* Wip commit for plugins with multiple commands
+* Add missing fixtures plugin command file.
+* Compile test plugin every run. -This gives us a cross-platform test suite.
+-Refactoring stuff out of main will make the test suite faster..
+* Update changelog
+* First pass at rpc model - have hardcoded port 20001
+- sleep for 3 seconds waiting for rpc server [Finishes #78397654]
+
 ##v6.6.1
 * Bump version to 6.6.1
 * fix argument in callCoreCommand()
