@@ -3,11 +3,10 @@ package app_test
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
+	"github.com/cloudfoundry/cli/testhelpers/plugin_builder"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"os"
-	"os/exec"
 	"path/filepath"
 
 	"testing"
@@ -18,23 +17,7 @@ func TestApp(t *testing.T) {
 	i18n.T = i18n.Init(config)
 
 	RegisterFailHandler(Fail)
-
-	dir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-
-	cmd := exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "fixtures", "plugins", "test_1.exe"), filepath.Join(dir, "..", "..", "fixtures", "plugins", "test_1.go"))
-	err = cmd.Run()
-	if err != nil {
-		panic(err)
-	}
-
-	cmd = exec.Command("go", "build", "-o", filepath.Join(dir, "..", "..", "fixtures", "plugins", "test_2.exe"), filepath.Join(dir, "..", "..", "fixtures", "plugins", "test_2.go"))
-	err = cmd.Run()
-	if err != nil {
-		panic(err)
-	}
-
+	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "fixtures", "plugins"), "test_1")
+	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "fixtures", "plugins"), "test_2")
 	RunSpecs(t, "App Suite")
 }

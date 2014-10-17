@@ -24,6 +24,10 @@
 
   echo -e "\n Cleaning build artifacts..."
 
+  # Clean up old plugin binaries used in test
+
+  rm fixtures/plugins/*.exe
+
   # Clean up old .a files in GOPATH
   # It seems like `go clean` should do this but ... not so much
   if [[ -d $GOPATH/pkg ]] ; then
