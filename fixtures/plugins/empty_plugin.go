@@ -8,11 +8,6 @@ func (c *EmptyPlugin) Run(args string, reply *bool) error {
 	return nil
 }
 
-func (c *EmptyPlugin) CmdExists(args string, exists *bool) error {
-	*exists = plugin.CmdExists(args, c.GetCommands())
-	return nil
-}
-
 func (c *EmptyPlugin) GetCommands() []plugin.Command {
 	return []plugin.Command{}
 }
