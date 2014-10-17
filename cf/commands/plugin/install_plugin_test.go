@@ -153,17 +153,11 @@ var _ = Describe("Install", func() {
 	})
 
 	Describe("success", func() {
-		var (
-			sourceBinaryPath string
-		)
-
 		BeforeEach(func() {
 			err := os.MkdirAll(pluginDir, 0700)
 			Expect(err).ToNot(HaveOccurred())
-
-			sourceBinaryPath = filepath.Join("..", "..", "..", "fixtures", "plugins", "test_1.exe")
 			config.GetPluginPathReturns(pluginDir)
-			runCommand(sourceBinaryPath)
+			runCommand(test_1)
 		})
 
 		It("copies the plugin into directory <FAKE_HOME_DIR>/.cf/plugins/PLUGIN_FILE_NAME", func() {
@@ -191,7 +185,7 @@ var _ = Describe("Install", func() {
 			Expect(pluginMetadata.Commands[1].Name).To(Equal("test_1_cmd2"))
 			Expect(pluginMetadata.Commands[1].HelpText).To(Equal("help text for test_1_cmd2"))
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Installing plugin", sourceBinaryPath},
+				[]string{"Installing plugin", test_1},
 				[]string{"OK"},
 				[]string{"Plugin", "Test1", "successfully installed"},
 			))
