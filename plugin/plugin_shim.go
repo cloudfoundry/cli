@@ -34,7 +34,7 @@ type RpcPlugin interface {
 	* os.Args[1] port plugin rpc will be listening on
 	* os.Args[2] port CF_CLI rpc server is running on
 	* os.Args[3] **OPTIONAL**
-		* install-plugin - used to fetch the command name
+		* SendMetadata - used to fetch the plugin metadata
 **/
 func Start(cmd RpcPlugin) {
 	println("STARTING PLUGIN")
@@ -55,7 +55,7 @@ func Start(cmd RpcPlugin) {
 
 	//Send CLI the plugin command name.
 	if len(os.Args) == 4 {
-		if os.Args[3] == "install-plugin" {
+		if os.Args[3] == "SendMetadata" {
 			pluginName := reflect.TypeOf(cmd).Elem().Name()
 			fmt.Println("reflecting: ", reflect.Indirect(reflect.ValueOf(cmd)).Type().Name())
 			client, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[2])
