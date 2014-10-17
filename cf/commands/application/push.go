@@ -12,6 +12,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -35,7 +36,7 @@ type Push struct {
 	appStarter    ApplicationStarter
 	appStopper    ApplicationStopper
 	serviceBinder service.ServiceBinder
-	appRepo       api.ApplicationRepository
+	appRepo       applications.ApplicationRepository
 	domainRepo    api.DomainRepository
 	routeRepo     api.RouteRepository
 	serviceRepo   api.ServiceRepository
@@ -49,7 +50,7 @@ type Push struct {
 
 func NewPush(ui terminal.UI, config core_config.Reader, manifestRepo manifest.ManifestRepository,
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
-	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
+	appRepo applications.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
 	stackRepo api.StackRepository, serviceRepo api.ServiceRepository,
 	authRepo authentication.AuthenticationRepository, wordGenerator generator.WordGenerator,
 	actor actors.PushActor, zipper app_files.Zipper, app_files app_files.AppFiles) *Push {

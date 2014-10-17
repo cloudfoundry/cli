@@ -2545,6 +2545,11 @@
       "modified": false
    },
    {
+      "id": "No running env variables have been set",
+      "translation": "No running env variables have been set",
+      "modified": false
+   },
+   {
       "id": "No running security groups set",
       "translation": "No running security groups set",
       "modified": false
@@ -2587,6 +2592,11 @@
    {
       "id": "No spaces found",
       "translation": "No spaces found",
+      "modified": false
+   },
+   {
+      "id": "No staging env variables have been set",
+      "translation": "No staging env variables have been set",
       "modified": false
    },
    {
@@ -3065,6 +3075,11 @@
       "modified": false
    },
    {
+      "id": "Running Environment Variable Groups:",
+      "translation": "Running Environment Variable Groups:",
+      "modified": false
+   },
+   {
       "id": "SECURITY GROUP",
       "translation": "SECURITY GROUP",
       "modified": false
@@ -3322,6 +3337,11 @@
    {
       "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
       "translation": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "modified": false
+   },
+   {
+      "id": "Staging Environment Variable Groups:",
+      "translation": "Staging Environment Variable Groups:",
       "modified": false
    },
    {

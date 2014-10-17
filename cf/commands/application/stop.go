@@ -2,9 +2,10 @@ package application
 
 import (
 	"errors"
+
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,11 +21,11 @@ type ApplicationStopper interface {
 type Stop struct {
 	ui      terminal.UI
 	config  core_config.Reader
-	appRepo api.ApplicationRepository
+	appRepo applications.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewStop(ui terminal.UI, config core_config.Reader, appRepo api.ApplicationRepository) (cmd *Stop) {
+func NewStop(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) (cmd *Stop) {
 	cmd = new(Stop)
 	cmd.ui = ui
 	cmd.config = config

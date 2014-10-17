@@ -1,7 +1,7 @@
 package requirements
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
@@ -14,11 +14,11 @@ type ApplicationRequirement interface {
 type applicationApiRequirement struct {
 	name        string
 	ui          terminal.UI
-	appRepo     api.ApplicationRepository
+	appRepo     applications.ApplicationRepository
 	application models.Application
 }
 
-func NewApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRepository) (req *applicationApiRequirement) {
+func NewApplicationRequirement(name string, ui terminal.UI, aR applications.ApplicationRepository) (req *applicationApiRequirement) {
 	req = new(applicationApiRequirement)
 	req.name = name
 	req.ui = ui

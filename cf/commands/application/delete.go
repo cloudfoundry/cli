@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -14,12 +15,12 @@ import (
 type DeleteApp struct {
 	ui        terminal.UI
 	config    core_config.Reader
-	appRepo   api.ApplicationRepository
+	appRepo   applications.ApplicationRepository
 	routeRepo api.RouteRepository
 	appReq    requirements.ApplicationRequirement
 }
 
-func NewDeleteApp(ui terminal.UI, config core_config.Reader, appRepo api.ApplicationRepository, routeRepo api.RouteRepository) (cmd *DeleteApp) {
+func NewDeleteApp(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository, routeRepo api.RouteRepository) (cmd *DeleteApp) {
 	cmd = new(DeleteApp)
 	cmd.ui = ui
 	cmd.config = config

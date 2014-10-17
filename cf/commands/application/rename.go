@@ -1,7 +1,7 @@
 package application
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -14,11 +14,11 @@ import (
 type RenameApp struct {
 	ui      terminal.UI
 	config  core_config.Reader
-	appRepo api.ApplicationRepository
+	appRepo applications.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewRenameApp(ui terminal.UI, config core_config.Reader, appRepo api.ApplicationRepository) (cmd *RenameApp) {
+func NewRenameApp(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) (cmd *RenameApp) {
 	cmd = new(RenameApp)
 	cmd.ui = ui
 	cmd.config = config

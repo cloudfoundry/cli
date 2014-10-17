@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -15,11 +15,11 @@ import (
 type SetEnv struct {
 	ui      terminal.UI
 	config  core_config.Reader
-	appRepo api.ApplicationRepository
+	appRepo applications.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewSetEnv(ui terminal.UI, config core_config.Reader, appRepo api.ApplicationRepository) *SetEnv {
+func NewSetEnv(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) *SetEnv {
 	return &SetEnv{
 		ui:      ui,
 		config:  config,

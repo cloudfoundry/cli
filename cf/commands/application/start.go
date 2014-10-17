@@ -13,6 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -36,7 +37,7 @@ type Start struct {
 	config           core_config.Reader
 	appDisplayer     ApplicationDisplayer
 	appReq           requirements.ApplicationRequirement
-	appRepo          api.ApplicationRepository
+	appRepo          applications.ApplicationRepository
 	appInstancesRepo app_instances.AppInstancesRepository
 	logRepo          api.LogsRepository
 
@@ -54,7 +55,7 @@ type ApplicationStagingWatcher interface {
 	ApplicationWatchStaging(app models.Application, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config

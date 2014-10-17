@@ -1,7 +1,7 @@
 package application_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,7 +19,7 @@ var _ = Describe("scale command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
 		restarter           *testcmd.FakeAppRestarter
-		appRepo             *testapi.FakeApplicationRepository
+		appRepo             *testApplication.FakeApplicationRepository
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		cmd                 *Scale
@@ -28,7 +28,7 @@ var _ = Describe("scale command", func() {
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		restarter = &testcmd.FakeAppRestarter{}
-		appRepo = &testapi.FakeApplicationRepository{}
+		appRepo = &testApplication.FakeApplicationRepository{}
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		cmd = NewScale(ui, configRepo, restarter, appRepo)

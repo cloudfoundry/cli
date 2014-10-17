@@ -69,7 +69,6 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 }
 
 func (cmd *ShowApp) ShowApp(app models.Application) {
-
 	cmd.ui.Say(T("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"AppName":   terminal.EntityNameColor(app.Name),
