@@ -144,7 +144,7 @@ func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSou
 }
 
 func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
-	pluginInvocation := exec.Command(location, obtainPort(), servicePort, "install-plugin")
+	pluginInvocation := exec.Command(location, obtainPort(), servicePort, "SendMetadata")
 
 	err := pluginInvocation.Run()
 	if err != nil {
