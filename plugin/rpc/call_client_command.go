@@ -42,7 +42,6 @@ func RunCommandExists(methodName string, location string) (bool, error) {
 }
 
 func RunMethodIfExists(cmdName string) (bool, error) {
-	var exists bool
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
 	port := obtainPort()
@@ -55,19 +54,18 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 	defer service.Stop()
 
 	for pluginName, metadata := range pluginList {
-		cmd, err := runPlugin(metadata.Location, port, service.Port())
-		if err != nil {
-			continue
-		}
+		for _, command := range metadata.Commands {
+			if command.Name == cmdName {
+				cmd, err := runPlugin(metadata.Location, port, service.Port())
+				if err != nil {
+					continue
+				}
 
-		exists, _ = runClientCmd(pluginName+".CmdExists", cmdName, port)
-
-		if exists {
-			_, err = runClientCmd(pluginName+".Run", cmdName, port)
-			stopPlugin(cmd)
-			return true, err
+				_, err = runClientCmd(pluginName+".Run", cmdName, port)
+				stopPlugin(cmd)
+				return true, err
+			}
 		}
-		stopPlugin(cmd)
 	}
 	return false, nil
 }
