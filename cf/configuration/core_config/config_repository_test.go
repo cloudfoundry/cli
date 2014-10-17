@@ -172,5 +172,5 @@ func withFakeHome(callback func(dirPath string)) {
 func withConfigFixture(name string, callback func(dirPath string)) {
 	cwd, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
-	callback(filepath.Join(cwd, "../../fixtures/config", name, ".cf", "config.json"))
+	callback(filepath.Join(cwd, "..", "..", "..", "fixtures", "config", name, ".cf", "config.json"))
 }
