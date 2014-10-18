@@ -43,6 +43,9 @@ func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]st
 
 func (auth *FakeAuthenticationRepository) RefreshAuthToken() (string, error) {
 	auth.RefreshTokenCalled = true
+	if auth.RefreshTokenError == nil {
+		return auth.RefreshToken, nil
+	}
 	return "", auth.RefreshTokenError
 }
 
