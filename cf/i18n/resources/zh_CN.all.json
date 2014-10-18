@@ -715,6 +715,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME oauth-token",
+      "translation": "CF_NAME oauth-token",
+      "modified": false
+   },
+   {
       "id": "CF_NAME org ORG",
       "translation": "CF_NAME org 组织",
       "modified": false
@@ -1975,6 +1980,11 @@
       "modified": false
    },
    {
+      "id": "Getting OAuth token...",
+      "translation": "Getting OAuth token...",
+      "modified": false
+   },
+   {
       "id": "Getting all services from marketplace...",
       "translation": "从服务市场获取所有服务...",
       "modified": false
@@ -3022,6 +3032,11 @@
    {
       "id": "Retrieve an individual feature flag with status",
       "translation": "Retrieve an individual feature flag with status",
+      "modified": false
+   },
+   {
+      "id": "Retrieve and display the OAuth token for the current session",
+      "translation": "Retrieve and display the OAuth token for the current session",
       "modified": false
    },
    {

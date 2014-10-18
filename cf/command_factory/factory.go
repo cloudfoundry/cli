@@ -85,6 +85,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["logout"] = commands.NewLogout(ui, config)
 	factory.cmdsByName["logs"] = application.NewLogs(ui, config, repoLocator.GetLogsRepository())
 	factory.cmdsByName["marketplace"] = service.NewMarketplaceServices(ui, config, repoLocator.GetServiceRepository())
+	factory.cmdsByName["oauth-token"] = commands.NewOAuthToken(ui, config, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["org"] = organization.NewShowOrg(ui, config)
 	factory.cmdsByName["org-users"] = user.NewOrgUsers(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, config, repoLocator.GetOrganizationRepository())
