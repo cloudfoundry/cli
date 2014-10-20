@@ -89,7 +89,7 @@ func main() {
 	} else {
 		// run each plugin and find the method/
 		// run method if exist
-		ran, _ := rpc.RunMethodIfExists(os.Args[1])
+		ran, _ := rpc.RunMethodIfExists(os.Args[1:])
 		if !ran {
 			theApp.Run(os.Args)
 		}

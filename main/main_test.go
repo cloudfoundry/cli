@@ -77,6 +77,16 @@ var _ = Describe("main", func() {
 			output := Cf("push")
 			Consistently(output.Out, 1).ShouldNot(Say("You called push in test_with_push"))
 		})
+
+		It("Passes all arguments to a plugin", func() {
+			output := Cf("my-say", "foo").Wait(3 * time.Second)
+			Eventually(output.Out).Should(Say("foo"))
+		})
+
+		It("Passes all arguments and flags to a plugin", func() {
+			output := Cf("my-say", "foo", "--loud").Wait(3 * time.Second)
+			Eventually(output.Out).Should(Say("FOO"))
+		})
 	})
 })
 

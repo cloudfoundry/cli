@@ -25,6 +25,12 @@
       "Commands":[
         {"Name":"help","HelpText":"help text for test_with_help"}
       ]
+    },
+    "MySay":{
+      "Location":"../fixtures/plugins/my_say.exe",
+      "Commands":[
+        {"Name":"my-say","HelpText":"Help text for saying stuff"}
+      ]
     }
 
   }

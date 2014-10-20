@@ -17,8 +17,8 @@ type TestWithPush struct {
 	stringForTestWithPush string
 }
 
-func (c *TestWithPush) Run(args string, reply *bool) error {
-	if args == "push" {
+func (c *TestWithPush) Run(args []string, reply *bool) error {
+	if args[0] == "push" {
 		thePushCmd()
 	}
 	return nil

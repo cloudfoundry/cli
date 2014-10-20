@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 )
 
-func RunMethodIfExists(cmdName string) (bool, error) {
+func RunMethodIfExists(args []string) (bool, error) {
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
 	port := obtainPort()
@@ -25,13 +25,14 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 
 	for pluginName, metadata := range pluginList {
 		for _, command := range metadata.Commands {
-			if command.Name == cmdName {
+			if command.Name == args[0] {
+
 				cmd, err := runPlugin(metadata.Location, port, service.Port())
 				if err != nil {
 					continue
 				}
 
-				_, err = runClientCmd(pluginName+".Run", cmdName, port)
+				_, err = runClientCmd(pluginName+".Run", port, args)
 				stopPlugin(cmd)
 				return true, err
 			}
@@ -40,10 +41,10 @@ func RunMethodIfExists(cmdName string) (bool, error) {
 	return false, nil
 }
 
-func runClientCmd(cmd string, method string, port string) (bool, error) {
+func runClientCmd(cmd string, port string, args []string) (bool, error) {
 	client, err := dialClient(port)
 	var reply bool
-	err = client.Call(cmd, method, &reply)
+	err = client.Call(cmd, args, &reply)
 	if err != nil {
 		return false, err
 	}
