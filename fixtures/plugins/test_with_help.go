@@ -17,8 +17,8 @@ type TestWithHelp struct {
 	stringForTestWithHelp string
 }
 
-func (c *TestWithHelp) Run(args string, reply *bool) error {
-	if args == "help" {
+func (c *TestWithHelp) Run(args []string, reply *bool) error {
+	if args[0] == "help" {
 		theHelpCmd()
 	}
 	return nil

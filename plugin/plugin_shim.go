@@ -25,7 +25,7 @@ type PluginMetadata struct {
 type RpcPlugin interface {
 	//run is passed in all the command line parameter arguments and
 	//an object containing all of the cli commands available to them
-	Run(args string, reply *bool) error
+	Run(args []string, reply *bool) error
 	GetCommands() []Command
 }
 

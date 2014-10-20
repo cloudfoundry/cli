@@ -17,10 +17,10 @@ type Test1 struct {
 	stringForTest1 string
 }
 
-func (c *Test1) Run(args string, reply *bool) error {
-	if args == "test_1_cmd1" {
+func (c *Test1) Run(args []string, reply *bool) error {
+	if args[0] == "test_1_cmd1" {
 		theFirstCmd()
-	} else if args == "test_1_cmd2" {
+	} else if args[0] == "test_1_cmd2" {
 		theSecondCmd()
 	}
 	return nil

@@ -15,10 +15,10 @@ import (
 
 type Test2 struct{}
 
-func (c *Test2) Run(args string, reply *bool) error {
-	if args == "test_2_cmd1" {
+func (c *Test2) Run(args []string, reply *bool) error {
+	if args[0] == "test_2_cmd1" {
 		theFirstCmd()
-	} else if args == "test_2_cmd2" {
+	} else if args[0] == "test_2_cmd2" {
 		theSecondCmd()
 	}
 	return nil
