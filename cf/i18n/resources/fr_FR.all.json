@@ -385,6 +385,11 @@
       "modified": false
    },
    {
+      "id": "Binary file '{{.BinaryFile}}' not found",
+      "translation": "Binary file '{{.BinaryFile}}' not found",
+      "modified": false
+   },
+   {
       "id": "Bind a security group to a space",
       "translation": "Bind a security group to a space",
       "modified": false
@@ -1047,6 +1052,11 @@
    {
       "id": "Changing password...",
       "translation": "Changement de mot de passe ...",
+      "modified": false
+   },
+   {
+      "id": "Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+      "translation": "Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
       "modified": false
    },
    {
@@ -1732,6 +1742,11 @@
    {
       "id": "Error finding space {{.SpaceName}}\n{{.Err}}",
       "translation": "espace de constatation d'erreur {{.SpaceName}}\n{{.Err}}",
+      "modified": false
+   },
+   {
+      "id": "Error getting command list from plugin {{.FilePath}}",
+      "translation": "Error getting command list from plugin {{.FilePath}}",
       "modified": false
    },
    {
@@ -3590,6 +3605,11 @@
       "modified": false
    },
    {
+      "id": "Unable to obtain plugin name for executable {{.Executable}}",
+      "translation": "Unable to obtain plugin name for executable {{.Executable}}",
+      "modified": false
+   },
+   {
       "id": "Unassign a quota from a space",
       "translation": "Unassign a quota from a space",
       "modified": false
@@ -3867,6 +3887,11 @@
    {
       "id": "[global options] command [arguments...] [command options]",
       "translation": "[options globales] commande [arguments...] [options de commande]",
+      "modified": false
+   },
+   {
+      "id": "`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+      "translation": "`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
       "modified": false
    },
    {

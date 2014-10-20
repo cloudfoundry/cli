@@ -88,7 +88,7 @@ func (cmd *PluginInstall) ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(
 func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata plugin.PluginMetadata, pluginDestinationFilepath string, pluginSourceFilepath string) {
 	plugins := cmd.config.Plugins()
 	if pluginMetadata.Name == "" {
-		cmd.ui.Failed(fmt.Sprintf("Unable to obtain plugin name for executable %s", pluginSourceFilepath))
+		cmd.ui.Failed(fmt.Sprintf(T("Unable to obtain plugin name for executable {{.Executable}}", map[string]interface{}{"Executable": pluginSourceFilepath})))
 	}
 
 	if _, ok := plugins[pluginMetadata.Name]; ok {
@@ -96,12 +96,22 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata plugi
 	}
 
 	if pluginMetadata.Commands == nil {
-		cmd.ui.Failed(fmt.Sprintf("Error getting command list from plugin %s", pluginSourceFilepath))
+		cmd.ui.Failed(fmt.Sprintf(T("Error getting command list from plugin {{.FilePath}}", map[string]interface{}{"FilePath": pluginSourceFilepath})))
 	}
 
 	for _, pluginCmd := range pluginMetadata.Commands {
 		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists || pluginCmd.Name == "help" {
-			cmd.ui.Failed(fmt.Sprintf("Plugin '%s' cannot be installed from '%s' at this time because the command 'cf %s' already exists.", pluginMetadata.Name, pluginSourceFilepath, pluginCmd.Name))
+			cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+				map[string]interface{}{"Command": pluginCmd.Name})))
+		}
+
+		for installedPluginName, installedPlugin := range plugins {
+			for _, installedPluginCmd := range installedPlugin.Commands {
+				if installedPluginCmd.Name == pluginCmd.Name {
+					cmd.ui.Failed(fmt.Sprintf(T("`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+						map[string]interface{}{"Command": pluginCmd.Name, "PluginName": installedPluginName})))
+				}
+			}
 		}
 	}
 }
@@ -139,7 +149,7 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) {
 	_, err := os.Stat(pluginSourceFilepath)
 	if err != nil && os.IsNotExist(err) {
-		cmd.ui.Failed(fmt.Sprintf("Binary file '%s' not found", pluginSourceFilepath))
+		cmd.ui.Failed(fmt.Sprintf(T("Binary file '{{.BinaryFile}}' not found", map[string]interface{}{"BinaryFile": pluginSourceFilepath})))
 	}
 }
 
