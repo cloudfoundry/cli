@@ -11,6 +11,7 @@ import (
 	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
+	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -95,7 +96,7 @@ var _ = Describe("Install", func() {
 				runCommand(test_with_help)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Plugin 'TestWithHelp' cannot be installed from", test_with_help, "at this time because the command 'cf help' already exists."},
+					[]string{"Command `help` in the plugin being installed is a native CF command.  Rename the `help` command in the plugin being installed in order to enable its installation and use."},
 					[]string{"FAILED"},
 				))
 			})
@@ -107,7 +108,31 @@ var _ = Describe("Install", func() {
 				runCommand(test_with_push)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Plugin 'TestWithPush' cannot be installed from", test_with_push, "at this time because the command 'cf push' already exists."},
+					[]string{"Command `push` in the plugin being installed is a native CF command.  Rename the `push` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"FAILED"},
+				))
+			})
+		})
+
+		Context("when the plugin contains a command that another installed plugin contains", func() {
+			BeforeEach(func() {
+				pluginsMap := make(map[string]plugin_config.PluginMetadata)
+				pluginsMap["Test1Collision"] = plugin_config.PluginMetadata{
+					Location: "location/to/config.exe",
+					Commands: []plugin.Command{
+						{
+							Name:     "test_1_cmd1",
+							HelpText: "Hi!",
+						},
+					},
+				}
+				config.PluginsReturns(pluginsMap)
+			})
+			It("fails", func() {
+				runCommand(test_1)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"`test_1_cmd1` is a command in plugin 'Test1Collision'.  You could try uninstalling plugin 'Test1Collision' and then install this plugin in order to invoke the `test_1_cmd1` command.  However, you should first fully understand the impact of uninstalling the existing 'Test1Collision' plugin."},
 					[]string{"FAILED"},
 				))
 			})
