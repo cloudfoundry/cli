@@ -32,21 +32,21 @@ func (cmd CreateUserProvidedService) Metadata() command_metadata.CommandMetadata
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",
 		Description: T("Make a user-provided service instance available to cf apps"),
-		Usage: T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]
+		Usage: T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]
 
-   Pass comma separated parameter names to enable interactive mode:
+   Pass comma separated credential parameter names to enable interactive mode:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
 
-   Pass parameters as JSON to create a service non-interactively:
+   Pass credential parameters as JSON to create a service non-interactively:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"name":"value","name":"value"}'
 
 EXAMPLE:
-   CF_NAME create-user-provided-service oracle-db-mine -p "host, port, dbname, username, password"
+   CF_NAME create-user-provided-service oracle-db-mine -p "username, password"
    CF_NAME create-user-provided-service oracle-db-mine -p '{"username":"admin","password":"pa55woRD"}'
    CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
 `),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Parameters")),
+			flag_helpers.NewStringFlag("p", T("Credentials")),
 			flag_helpers.NewStringFlag("l", T("Syslog Drain Url")),
 		},
 	}

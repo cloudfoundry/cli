@@ -570,9 +570,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
-      "translation": "CF_NAME create-user-provided-service INSTANCE_DE_SERVICE [-p Paramètres] [-l SYSLOG-VINDAGE-URL]\n\n   Passez les noms de paramètres, séparées par des virgules, pour activer le mode interactif:\n   CF_NAME create-user-provided-service INSTANCE_DE_SERVICE -p \"virgules, séparées, nom, de, paramètres\"\n\n fourni service INSTANCE_DE_SERVICE -p '{virgules, séparés, paramètres , les noms}' \n\n   Paramètres passer comme JSON pour créer un service non interactif:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"nom\": \"valeur\", \"nom\": \"valeur\"}'\n\nExemple: CF_NAME create-user-provided-service oracle-db-mines -p 'hôte, port, nom_de_base_de_donnés, nom_utilisateur, mot_de_passe'\n   CF_NAME create-user-provided-service oracle-db-mines -p '{\"username\" : \"admin\", \"password\" : \"Pa55word\"}'\n\n CF_NAME create-user-provided-service service-drain-service -l syslog://example.com\n",
-      "modified": false
+      "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
+      "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
+      "modified": true
    },
    {
       "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
@@ -1292,6 +1292,11 @@
    {
       "id": "Creating user {{.TargetUser}} as {{.CurrentUser}}...",
       "translation": "Création d'utilisateur {{.TargetUser}} comme {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Credentials",
+      "translation": "Credentials",
       "modified": false
    },
    {
