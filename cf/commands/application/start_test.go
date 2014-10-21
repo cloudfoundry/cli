@@ -197,7 +197,6 @@ var _ = Describe("start command", func() {
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},
-					[]string{"OK"},
 					[]string{"FAILED"},
 					[]string{"Error staging app"},
 				))
@@ -323,7 +322,6 @@ var _ = Describe("start command", func() {
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"my-app"},
-				[]string{"OK"},
 				[]string{"FAILED"},
 				[]string{"Error staging app"},
 			))
@@ -351,7 +349,6 @@ var _ = Describe("start command", func() {
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},
-					[]string{"OK"},
 					[]string{"0 of 2 instances running", "1 starting", "1 failing"},
 					[]string{"FAILED"},
 					[]string{"Start unsuccessful"},
@@ -385,7 +382,6 @@ var _ = Describe("start command", func() {
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Starting", "my-app"},
-				[]string{"OK"},
 				[]string{"FAILED"},
 				[]string{"Start app timeout"},
 			))

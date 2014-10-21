@@ -152,8 +152,6 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, start func(app
 		return
 	}
 
-	cmd.ui.Ok()
-
 	cmd.waitForInstancesToStage(updatedApp)
 	stopLoggingChan <- true
 	<-doneLoggingChan
@@ -162,6 +160,8 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, start func(app
 
 	cmd.waitForOneRunningInstance(updatedApp)
 	cmd.ui.Say(terminal.HeaderColor(T("\nApp started\n")))
+	cmd.ui.Say("")
+	cmd.ui.Ok()
 
 	cmd.appDisplayer.ShowApp(updatedApp)
 	return
