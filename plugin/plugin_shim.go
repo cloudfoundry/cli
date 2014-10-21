@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/rpc"
@@ -8,6 +9,8 @@ import (
 	"reflect"
 	"time"
 )
+
+var CliServicePort string
 
 type Command struct {
 	Name     string
@@ -37,7 +40,6 @@ type RpcPlugin interface {
 		* SendMetadata - used to fetch the plugin metadata
 **/
 func Start(cmd RpcPlugin) {
-	println("STARTING PLUGIN")
 	//register command
 	err := rpc.Register(cmd)
 	if err != nil {
@@ -57,7 +59,6 @@ func Start(cmd RpcPlugin) {
 	if len(os.Args) == 4 {
 		if os.Args[3] == "SendMetadata" {
 			pluginName := reflect.TypeOf(cmd).Elem().Name()
-			fmt.Println("reflecting: ", reflect.Indirect(reflect.ValueOf(cmd)).Type().Name())
 			client, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[2])
 			if err != nil {
 				fmt.Println(err)
@@ -93,12 +94,30 @@ func Start(cmd RpcPlugin) {
 	}
 }
 
+func CliCommand(args ...string) error {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+CliServicePort)
+	if err != nil {
+		return err
+	}
+
+	var success bool
+	err = client.Call("CliRpcCmd.CallCoreCommand", args, &success)
+	if err != nil {
+		return err
+	} else if !success {
+		return errors.New("Error executing cli core command")
+	}
+
+	return nil
+}
+
 func pingCLI() {
 	//call back to cf saying we have been setup
 	var connErr error
 	var conn net.Conn
 	for i := 0; i < 5; i++ {
-		conn, connErr = net.Dial("tcp", "127.0.0.1:"+os.Args[2])
+		CliServicePort = os.Args[2]
+		conn, connErr = net.Dial("tcp", "127.0.0.1:"+CliServicePort)
 		if connErr != nil {
 			time.Sleep(200 * time.Millisecond)
 		} else {

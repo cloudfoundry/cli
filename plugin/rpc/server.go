@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/plugin"
+	"github.com/codegangsta/cli"
 )
 
 type CliRpcService struct {
@@ -17,13 +18,15 @@ type CliRpcService struct {
 }
 
 type CliRpcCmd struct {
-	ReturnData interface{}
+	ReturnData        interface{}
+	coreCommandRunner *cli.App
 }
 
-func NewRpcService() (*CliRpcService, error) {
+func NewRpcService(commandRunner *cli.App) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
-			ReturnData: new(interface{}),
+			ReturnData:        new(interface{}),
+			coreCommandRunner: commandRunner,
 		},
 	}
 
@@ -33,12 +36,6 @@ func NewRpcService() (*CliRpcService, error) {
 	}
 
 	return rpcService, nil
-}
-
-func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
-	cmd.ReturnData = interface{}(pluginMetadata)
-	*retVal = true
-	return nil
 }
 
 func (cli *CliRpcService) Stop() {
@@ -77,4 +74,27 @@ func (cli *CliRpcService) Start() error {
 	}()
 
 	return nil
+}
+
+func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
+	defer recoverFromCore()
+
+	err := cmd.coreCommandRunner.Run(append([]string{"cf"}, args...))
+	if err != nil {
+		*retVal = false
+		return err
+	}
+
+	*retVal = true
+	return nil
+}
+
+func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
+	cmd.ReturnData = interface{}(pluginMetadata)
+	*retVal = true
+	return nil
+}
+
+func recoverFromCore() {
+	recover()
 }

@@ -31,8 +31,13 @@
       "Commands":[
         {"Name":"my-say","HelpText":"Help text for saying stuff"}
       ]
+    },
+    "CoreCmd":{
+      "Location":"../fixtures/plugins/call_core_cmd.exe",
+      "Commands":[
+        {"Name":"awesomeness","HelpText":"the most awesomeness command you have ever seen"}
+      ]
     }
-
   }
 }
 
