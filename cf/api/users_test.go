@@ -321,11 +321,6 @@ var _ = Describe("User Repository", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
-
-		PContext("when the user is not found on UAA", func() {
-			It("does something", func() {
-			})
-		})
 	})
 
 	Describe("assigning users organization roles", func() {

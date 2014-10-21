@@ -87,6 +87,11 @@ var _ = Describe("main", func() {
 			output := Cf("my-say", "foo", "--loud").Wait(3 * time.Second)
 			Eventually(output.Out).Should(Say("FOO"))
 		})
+
+		It("Calls a plugin that calls core commands", func() {
+			output := Cf("awesomeness").Wait(3 * time.Second)
+			Eventually(output.Out).Should(Say("my-say")) //look for another plugin
+		})
 	})
 })
 

@@ -1,9 +1,11 @@
 package plugin_test
 
 import (
-	"os"
+	"net"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,30 +14,20 @@ import (
 
 var _ = Describe("Command", func() {
 	var (
-		validPluginPath string
-		OLD_PLUGINS_DIR string
+		err             error
+		validPluginPath = filepath.Join("..", "fixtures", "plugins", "test_1.exe")
 	)
 
-	BeforeEach(func() {
-		OLD_PLUGINS_DIR = os.Getenv("CF_PLUGINS_DIR")
+	obtainPort := func() string {
+		//assign 0 to port to get a random open port
+		l, _ := net.Listen("tcp", "127.0.0.1:0")
+		port := strconv.Itoa(l.Addr().(*net.TCPAddr).Port)
+		l.Close()
+		return port
+	}
 
-		dir, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-
-		fullDir := filepath.Join(dir, "..", "fixtures", "config", "main-plugin-test-config")
-		err = os.Setenv("CF_PLUGINS_DIR", fullDir)
-		Expect(err).NotTo(HaveOccurred())
-
-		validPluginPath = filepath.Join(dir, "..", "fixtures", "plugins", "test_1.exe")
-	})
-
-	AfterEach(func() {
-		err := os.Setenv("CF_PLUGINS_DIR", OLD_PLUGINS_DIR)
-		Expect(err).NotTo(HaveOccurred())
-	})
-
-	Describe(".ServeCommand", func() {
-		XIt("prints a warning if a plugin does not implement the rpc interface", func() {
+	Describe(".Start", func() {
+		It("prints a warning if a plugin does not implement the rpc interface", func() {
 			//This would seem like a valid test, but the plugin itself will not compile
 		})
 
@@ -44,6 +36,60 @@ var _ = Describe("Command", func() {
 			session, err := Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 			Expect(err).ToNot(HaveOccurred())
 			Eventually(session, 2).Should(Exit(1))
+		})
+
+		Describe("able to ping cli rpc server", func() {
+			var (
+				args       []string
+				listener   net.Listener
+				pluginPort string
+				cliPort    string
+			)
+
+			BeforeEach(func() {
+				pluginPort = obtainPort()
+				cliPort = obtainPort()
+
+				args = append(args, pluginPort)
+				args = append(args, cliPort)
+
+				listener, err = net.Listen("tcp", ":"+cliPort)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				err = listener.Close()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("sets up a listener", func() {
+				_, err := Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+
+				var connErr error
+				var conn net.Conn
+				for i := 0; i < 5; i++ {
+					conn, connErr = net.Dial("tcp", "127.0.0.1:"+pluginPort)
+					if connErr != nil {
+						time.Sleep(200 * time.Millisecond)
+					} else {
+						conn.Close()
+						break
+					}
+				}
+				Expect(connErr).ToNot(HaveOccurred())
+			})
+
+			Context("when called to install by `cf install-plugin`", func() {
+				It("exits 1 when we cannot dial the cli rpc server", func() {
+					args = append(args, "SendMetadata")
+
+					session, err := Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
+					Expect(err).ToNot(HaveOccurred())
+
+					Eventually(session, 2).Should(Exit(1))
+				})
+			})
 		})
 	})
 })
