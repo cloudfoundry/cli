@@ -6,7 +6,6 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/codegangsta/cli"
 )
 
@@ -40,17 +39,6 @@ func (cmd *Plugins) Run(c *cli.Context) {
 	plugins := cmd.config.Plugins()
 
 	table := terminal.NewTable(cmd.ui, []string{T("Plugin name"), T("Command name")})
-
-	service, err := rpc.NewRpcService()
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-	}
-
-	err = service.Start()
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-	}
-	defer service.Stop()
 
 	for pluginName, metadata := range plugins {
 		for _, command := range metadata.Commands {
