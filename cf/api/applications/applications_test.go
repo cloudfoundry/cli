@@ -116,13 +116,19 @@ var _ = Describe("ApplicationsRepository", func() {
 							Body: `
 {
 	 "staging_env_json": {
-     "STAGING_ENV": "staging_value"
+     "STAGING_ENV": "staging_value",
+		 "staging": true,
+		 "number": 42
    },
    "running_env_json": {
-     "RUNNING_ENV": "running_value"
+     "RUNNING_ENV": "running_value",
+		 "running": false,
+		 "number": 37
    },
    "environment_json": {
-     "key": "value"
+     "key": "value",
+		 "number": 123,
+		 "bool": true
    },
    "system_env_json": {
      "VCAP_SERVICES": {
@@ -143,8 +149,14 @@ var _ = Describe("ApplicationsRepository", func() {
 
 				It("returns the user environment, vcap services, running/staging env variables", func() {
 					Expect(userEnv.Environment["key"]).To(Equal("value"))
+					Expect(userEnv.Environment["number"]).To(Equal(float64(123)))
+					Expect(userEnv.Environment["bool"]).To(BeTrue())
 					Expect(userEnv.Running["RUNNING_ENV"]).To(Equal("running_value"))
+					Expect(userEnv.Running["running"]).To(BeFalse())
+					Expect(userEnv.Running["number"]).To(Equal(float64(37)))
 					Expect(userEnv.Staging["STAGING_ENV"]).To(Equal("staging_value"))
+					Expect(userEnv.Staging["staging"]).To(BeTrue())
+					Expect(userEnv.Staging["number"]).To(Equal(float64(42)))
 
 					vcapServices := userEnv.System["VCAP_SERVICES"]
 					data, err := json.Marshal(vcapServices)
@@ -172,7 +184,7 @@ var _ = Describe("ApplicationsRepository", func() {
 				})
 
 				It("returns an empty string", func() {
-					Expect(userEnv.Environment["key"]).To(BeEmpty())
+					Expect(len(userEnv.Environment)).To(Equal(0))
 					Expect(len(userEnv.System["VCAP_SERVICES"].(map[string]interface{}))).To(Equal(0))
 				})
 			})

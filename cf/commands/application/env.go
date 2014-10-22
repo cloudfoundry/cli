@@ -96,7 +96,7 @@ func (cmd *Env) displaySystemProvidedEnvironment(env map[string]interface{}) {
 	cmd.ui.Say(vcapServices)
 }
 
-func (cmd *Env) displayUserProvidedEnvironment(envVars map[string]string) {
+func (cmd *Env) displayUserProvidedEnvironment(envVars map[string]interface{}) {
 	if len(envVars) == 0 {
 		cmd.ui.Say(T("No user-defined env variables have been set"))
 		return
@@ -110,11 +110,11 @@ func (cmd *Env) displayUserProvidedEnvironment(envVars map[string]string) {
 
 	cmd.ui.Say(terminal.EntityNameColor(T("User-Provided:")))
 	for _, key := range keys {
-		cmd.ui.Say("%s: %s", key, envVars[key])
+		cmd.ui.Say("%s: %v", key, envVars[key])
 	}
 }
 
-func (cmd *Env) displayRunningEnvironment(envVars map[string]string) {
+func (cmd *Env) displayRunningEnvironment(envVars map[string]interface{}) {
 	if len(envVars) == 0 {
 		cmd.ui.Say(T("No running env variables have been set"))
 		return
@@ -128,11 +128,11 @@ func (cmd *Env) displayRunningEnvironment(envVars map[string]string) {
 
 	cmd.ui.Say(terminal.EntityNameColor(T("Running Environment Variable Groups:")))
 	for _, key := range keys {
-		cmd.ui.Say("%s: %s", key, envVars[key])
+		cmd.ui.Say("%s: %v", key, envVars[key])
 	}
 }
 
-func (cmd *Env) displayStagingEnvironment(envVars map[string]string) {
+func (cmd *Env) displayStagingEnvironment(envVars map[string]interface{}) {
 	if len(envVars) == 0 {
 		cmd.ui.Say(T("No staging env variables have been set"))
 		return
@@ -146,6 +146,6 @@ func (cmd *Env) displayStagingEnvironment(envVars map[string]string) {
 
 	cmd.ui.Say(terminal.EntityNameColor(T("Staging Environment Variable Groups:")))
 	for _, key := range keys {
-		cmd.ui.Say("%s: %s", key, envVars[key])
+		cmd.ui.Say("%s: %v", key, envVars[key])
 	}
 }
