@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -61,6 +62,7 @@ type Gateway struct {
 	config          core_config.Reader
 	warnings        *[]string
 	Clock           func() time.Time
+	transport       *http.Transport
 }
 
 func newGateway(errHandler apiErrorHandler, config core_config.Reader) (gateway Gateway) {
@@ -69,6 +71,7 @@ func newGateway(errHandler apiErrorHandler, config core_config.Reader) (gateway 
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
 	gateway.warnings = &[]string{}
 	gateway.Clock = time.Now
+	makeHttpTransport(&gateway)
 
 	return
 }
@@ -390,7 +393,7 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 }
 
 func (gateway Gateway) doRequest(request *http.Request) (response *http.Response, err error) {
-	httpClient := NewHttpClient(gateway.trustedCerts, gateway.config.IsSSLDisabled())
+	httpClient := NewHttpClient(gateway.transport)
 
 	dumpRequest(request)
 
@@ -419,6 +422,15 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 	return
 }
 
+func makeHttpTransport(gateway *Gateway) {
+	gateway.transport = &http.Transport{
+		Dial:            (&net.Dialer{Timeout: 5 * time.Second}).Dial,
+		TLSClientConfig: NewTLSConfig(gateway.trustedCerts, gateway.config.IsSSLDisabled()),
+		Proxy:           http.ProxyFromEnvironment,
+	}
+}
+
 func (gateway *Gateway) SetTrustedCerts(certificates []tls.Certificate) {
 	gateway.trustedCerts = certificates
+	makeHttpTransport(gateway)
 }
