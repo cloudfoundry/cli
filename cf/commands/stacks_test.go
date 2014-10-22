@@ -1,7 +1,7 @@
 package commands_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	testapi "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -48,7 +48,7 @@ var _ = Describe("stacks command", func() {
 			Description: "Stack 2 Description",
 		}
 
-		repo.FindAllStacks = []models.Stack{stack1, stack2}
+		repo.FindAllReturns([]models.Stack{stack1, stack2}, nil)
 		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
