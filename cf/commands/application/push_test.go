@@ -9,6 +9,7 @@ import (
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
+	testStacks "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -41,7 +42,7 @@ var _ = Describe("Push Command", func() {
 		appRepo             *testApplication.FakeApplicationRepository
 		domainRepo          *testapi.FakeDomainRepository
 		routeRepo           *testapi.FakeRouteRepository
-		stackRepo           *testapi.FakeStackRepository
+		stackRepo           *testStacks.FakeStackRepository
 		serviceRepo         *testapi.FakeServiceRepo
 		wordGenerator       *testwords.FakeWordGenerator
 		requirementsFactory *testreq.FakeReqFactory
@@ -63,7 +64,7 @@ var _ = Describe("Push Command", func() {
 		domainRepo.ListDomainsForOrgDomains = []models.DomainFields{sharedDomain}
 
 		routeRepo = &testapi.FakeRouteRepository{}
-		stackRepo = &testapi.FakeStackRepository{}
+		stackRepo = &testStacks.FakeStackRepository{}
 		serviceRepo = &testapi.FakeServiceRepo{}
 		authRepo = &testapi.FakeAuthenticationRepository{}
 		wordGenerator = new(testwords.FakeWordGenerator)
@@ -237,10 +238,10 @@ var _ = Describe("Push Command", func() {
 					Name: "bar.cf-app.com",
 					Guid: "bar-domain-guid",
 				}
-				stackRepo.FindByNameStack = models.Stack{
+				stackRepo.FindByNameReturns(models.Stack{
 					Name: "customLinux",
 					Guid: "custom-linux-guid",
-				}
+				}, nil)
 
 				callPush(
 					"-c", "unicorn -c config/unicorn.rb -D",
@@ -268,7 +269,7 @@ var _ = Describe("Push Command", func() {
 					[]string{"OK"},
 				))
 
-				Expect(stackRepo.FindByNameName).To(Equal("customLinux"))
+				Expect(stackRepo.FindByNameArgsForCall(0)).To(Equal("customLinux"))
 
 				Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
 				Expect(*appRepo.CreatedAppParams().Command).To(Equal("unicorn -c config/unicorn.rb -D"))
@@ -669,10 +670,10 @@ var _ = Describe("Push Command", func() {
 			appRepo.ReadReturns.App = existingApp
 			appRepo.UpdateAppResult = existingApp
 
-			stackRepo.FindByNameStack = models.Stack{
+			stackRepo.FindByNameReturns(models.Stack{
 				Name: "differentStack",
 				Guid: "differentStack-guid",
-			}
+			}, nil)
 
 			callPush(
 				"-c", "different start command",

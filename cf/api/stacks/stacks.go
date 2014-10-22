@@ -1,13 +1,14 @@
-package api
+package stacks
 
 import (
 	"fmt"
+	"net/url"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
 )
 
 type StackRepository interface {

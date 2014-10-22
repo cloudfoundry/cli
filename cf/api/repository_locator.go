@@ -20,6 +20,7 @@ import (
 	securitygroupspaces "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
+	stacks "github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 
 	api_app_files "github.com/cloudfoundry/cli/cf/api/app_files"
@@ -45,7 +46,7 @@ type RepositoryLocator struct {
 	appFilesRepo                    api_app_files.CloudControllerAppFilesRepository
 	domainRepo                      CloudControllerDomainRepository
 	routeRepo                       CloudControllerRouteRepository
-	stackRepo                       CloudControllerStackRepository
+	stackRepo                       stacks.CloudControllerStackRepository
 	serviceRepo                     CloudControllerServiceRepository
 	serviceBindingRepo              CloudControllerServiceBindingRepository
 	serviceSummaryRepo              CloudControllerServiceSummaryRepository
@@ -99,7 +100,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.passwordRepo = NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
 	loc.routeRepo = NewCloudControllerRouteRepository(config, cloudControllerGateway)
-	loc.stackRepo = NewCloudControllerStackRepository(config, cloudControllerGateway)
+	loc.stackRepo = stacks.NewCloudControllerStackRepository(config, cloudControllerGateway)
 	loc.serviceRepo = NewCloudControllerServiceRepository(config, cloudControllerGateway)
 	loc.serviceBindingRepo = NewCloudControllerServiceBindingRepository(config, cloudControllerGateway)
 	loc.serviceBrokerRepo = NewCloudControllerServiceBrokerRepository(config, cloudControllerGateway)
@@ -177,7 +178,7 @@ func (locator RepositoryLocator) GetRouteRepository() RouteRepository {
 	return locator.routeRepo
 }
 
-func (locator RepositoryLocator) GetStackRepository() StackRepository {
+func (locator RepositoryLocator) GetStackRepository() stacks.StackRepository {
 	return locator.stackRepo
 }
 
