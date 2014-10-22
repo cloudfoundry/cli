@@ -142,6 +142,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("service"),
 				}, {
 					presentCommand("create-service"),
+					presentCommand("update-service"),
 					presentCommand("delete-service"),
 					presentCommand("rename-service"),
 				}, {

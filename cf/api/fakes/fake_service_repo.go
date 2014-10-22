@@ -44,6 +44,13 @@ type FakeServiceRepo struct {
 		Error error
 	}
 
+	UpdateServiceInstanceArgs struct {
+		InstanceGuid string
+		PlanGuid     string
+	}
+
+	UpdateServiceInstanceReturnsErr bool
+
 	FindInstanceByNameName            string
 	FindInstanceByNameServiceInstance models.ServiceInstance
 	FindInstanceByNameErr             bool
@@ -138,6 +145,18 @@ func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (apiEr
 	repo.CreateServiceInstanceArgs.PlanGuid = planGuid
 
 	return repo.CreateServiceInstanceReturns.Error
+}
+
+func (repo *FakeServiceRepo) UpdateServiceInstance(instanceGuid, planGuid string) (apiErr error) {
+
+	if repo.UpdateServiceInstanceReturnsErr {
+		apiErr = errors.New("Error updating service instance")
+	} else {
+		repo.UpdateServiceInstanceArgs.InstanceGuid = instanceGuid
+		repo.UpdateServiceInstanceArgs.PlanGuid = planGuid
+	}
+
+	return
 }
 
 func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error) {

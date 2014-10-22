@@ -252,6 +252,36 @@ var _ = Describe("Services Repo", func() {
 		})
 	})
 
+	Describe("UpdateServiceInstance", func() {
+		It("makes the right request", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/service_instances/instance-guid",
+				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			}))
+
+			err := repo.UpdateServiceInstance("instance-guid", "plan-guid")
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		Context("When the instance or plan is not found", func() {
+			It("fails", func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/service_instances/instance-guid",
+					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid"}`),
+					Response: testnet.TestResponse{Status: http.StatusNotFound},
+				}))
+
+				err := repo.UpdateServiceInstance("instance-guid", "plan-guid")
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
 	Describe("finding service instances by name", func() {
 		It("returns the service instance", func() {
 			setupTestServer(findServiceInstanceReq, serviceOfferingReq)
