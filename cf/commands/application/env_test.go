@@ -75,10 +75,11 @@ var _ = Describe("env command", func() {
 
 			appRepo.ReadReturns.App = app
 			appRepo.ReadEnvReturns(&models.Environment{
-				Environment: map[string]string{
-					"my-key":    "my-value",
-					"my-key2":   "my-value2",
-					"first-key": "Zer0",
+				Environment: map[string]interface{}{
+					"my-key":     "my-value",
+					"my-key2":    "my-value2",
+					"first-key":  0,
+					"first-bool": false,
 				},
 				System: map[string]interface{}{
 					"VCAP_SERVICES": map[string]interface{}{
@@ -99,7 +100,8 @@ var _ = Describe("env command", func() {
 				[]string{"pump-yer-brakes", ":", "drive-slow"},
 				[]string{"}"},
 				[]string{"User-Provided:"},
-				[]string{"first-key", "Zer0"},
+				[]string{"first-bool", "false"},
+				[]string{"first-key", "0"},
 				[]string{"my-key", "my-value"},
 				[]string{"my-key2", "my-value2"},
 			))
@@ -140,13 +142,17 @@ var _ = Describe("env command", func() {
 
 			appRepo.ReadReturns.App = app
 			appRepo.ReadEnvReturns(&models.Environment{
-				Running: map[string]string{
+				Running: map[string]interface{}{
 					"running-key-1": "running-value-1",
 					"running-key-2": "running-value-2",
+					"running":       true,
+					"number":        37,
 				},
-				Staging: map[string]string{
+				Staging: map[string]interface{}{
 					"staging-key-1": "staging-value-1",
 					"staging-key-2": "staging-value-2",
+					"staging":       false,
+					"number":        42,
 				},
 			}, nil)
 		})
@@ -160,9 +166,13 @@ var _ = Describe("env command", func() {
 				[]string{"Running Environment Variable Groups:"},
 				[]string{"running-key-1", ":", "running-value-1"},
 				[]string{"running-key-2", ":", "running-value-2"},
+				[]string{"running", ":", "true"},
+				[]string{"number", ":", "37"},
 				[]string{"Staging Environment Variable Groups:"},
 				[]string{"staging-key-1", ":", "staging-value-1"},
 				[]string{"staging-key-2", ":", "staging-value-2"},
+				[]string{"staging", ":", "false"},
+				[]string{"number", ":", "42"},
 			))
 		})
 	})
