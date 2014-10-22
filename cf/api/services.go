@@ -22,6 +22,7 @@ type ServiceRepository interface {
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
 	CreateServiceInstance(name, planGuid string) (apiErr error)
+	UpdateServiceInstance(instanceGuid, planGuid string) (apiErr error)
 	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
 	DeleteService(instance models.ServiceInstance) (apiErr error)
 	FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error)
@@ -147,6 +148,15 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 			return errors.NewModelAlreadyExistsError("Service", name)
 		}
 	}
+
+	return
+}
+
+func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string) (err error) {
+	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.ApiEndpoint(), instanceGuid)
+	data := fmt.Sprintf(`{"service_plan_guid":"%s"}`, planGuid)
+
+	err = repo.gateway.UpdateResource(path, strings.NewReader(data))
 
 	return
 }

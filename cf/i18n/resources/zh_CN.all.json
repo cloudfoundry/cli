@@ -975,6 +975,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME update-service SERVICE [-p NEW_PLAN]",
+      "translation": "CF_NAME update-service SERVICE [-p NEW_PLAN]",
+      "modified": false
+   },
+   {
       "id": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
       "translation": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
       "modified": false
@@ -1042,6 +1047,11 @@
    {
       "id": "Change or view the instance count, disk space limit, and memory limit for an app",
       "translation": "更改或查看应用程序的实例个数，磁盘空间配额和内存配额",
+      "modified": false
+   },
+   {
+      "id": "Change service plan for a service instance",
+      "translation": "Change service plan for a service instance",
       "modified": false
    },
    {
@@ -2530,6 +2540,11 @@
       "modified": false
    },
    {
+      "id": "No changes were made",
+      "translation": "No changes were made",
+      "modified": false
+   },
+   {
       "id": "No domains found",
       "translation": "No domains found",
       "modified": false
@@ -2762,6 +2777,11 @@
    {
       "id": "Path to manifest",
       "translation": "部署描述文件的路径",
+      "modified": false
+   },
+   {
+      "id": "Plan does not exist for the {{.ServiceName}} service",
+      "translation": "Plan does not exist for the {{.ServiceName}} service",
       "modified": false
    },
    {
@@ -3710,6 +3730,11 @@
       "modified": false
    },
    {
+      "id": "Update a service instance",
+      "translation": "Update a service instance",
+      "modified": false
+   },
+   {
       "id": "Update an existing resource quota",
       "translation": "Update an existing resource quota",
       "modified": false
@@ -3747,6 +3772,11 @@
    {
       "id": "Updating service broker {{.Name}} as {{.Username}}...",
       "translation": "Updating service broker {{.Name}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Updating service instance {{.ServiceName}} as {{.UserName}}...",
+      "translation": "Updating service instance {{.ServiceName}} as {{.UserName}}...",
       "modified": false
    },
    {
