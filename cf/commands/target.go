@@ -54,6 +54,7 @@ func (cmd Target) GetRequirements(requirementsFactory requirements.Factory, c *c
 		return
 	}
 
+	reqs = append(reqs, requirementsFactory.NewApiEndpointRequirement())
 	if c.String("o") != "" || c.String("s") != "" {
 		reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	}

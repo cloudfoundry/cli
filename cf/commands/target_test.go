@@ -34,6 +34,7 @@ var _ = Describe("target command", func() {
 		spaceRepo = new(testapi.FakeSpaceRepository)
 		requirementsFactory = new(testreq.FakeReqFactory)
 		config = testconfig.NewRepositoryWithDefaults()
+		requirementsFactory.ApiEndpointSuccess = true
 	})
 
 	var callTarget = func(args []string) {
@@ -44,6 +45,17 @@ var _ = Describe("target command", func() {
 	It("fails with usage when called with an argument but no flags", func() {
 		callTarget([]string{"some-argument"})
 		Expect(ui.FailedWithUsage).To(BeTrue())
+	})
+
+	Describe("when there is no api endpoint set", func() {
+		BeforeEach(func() {
+			requirementsFactory.ApiEndpointSuccess = false
+		})
+
+		It("fails requirements", func() {
+			callTarget([]string{})
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
 
 	Describe("when the user is not logged in", func() {

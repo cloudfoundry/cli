@@ -157,6 +157,7 @@ func (c terminalUI) FailWithUsage(context *cli.Context) {
 
 func (ui terminalUI) ShowConfiguration(config core_config.Reader) {
 	table := NewTable(ui, []string{"", ""})
+
 	if config.HasAPIEndpoint() {
 		table.Add(
 			T("API endpoint:"),

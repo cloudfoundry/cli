@@ -2510,9 +2510,9 @@
       "modified": false
    },
    {
-      "id": "No API endpoint targeted. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
+      "id": "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
       "translation": "Aucun API endpoint ciblé. Utiliser '{{.LoginTip}}' ou '{{.APITip}}' pour ciblé un endpoint.",
-      "modified": false
+      "modified": true
    },
    {
       "id": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
