@@ -115,7 +115,7 @@ func (cmd *DisableServiceAccess) disableSinglePlanForService(serviceName string,
 
 func (cmd *DisableServiceAccess) disablePlansForSingleOrgForService(serviceName string, orgName string) {
 	cmd.ui.Say(T("Disabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName), "OrgName": terminal.EntityNameColor(orgName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
-	serviceAccess, err := cmd.actor.FindServiceAccess(serviceName)
+	serviceAccess, err := cmd.actor.FindServiceAccess(serviceName, orgName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

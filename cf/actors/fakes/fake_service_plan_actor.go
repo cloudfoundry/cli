@@ -2,19 +2,19 @@
 package fakes
 
 import (
-	. "github.com/cloudfoundry/cli/cf/actors"
-
+	"github.com/cloudfoundry/cli/cf/actors"
 	"sync"
 )
 
 type FakeServicePlanActor struct {
-	FindServiceAccessStub        func(string) (ServiceAccess, error)
+	FindServiceAccessStub        func(string, string) (actors.ServiceAccess, error)
 	findServiceAccessMutex       sync.RWMutex
 	findServiceAccessArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
 	findServiceAccessReturns struct {
-		result1 ServiceAccess
+		result1 actors.ServiceAccess
 		result2 error
 	}
 	UpdateAllPlansForServiceStub        func(string, bool) (bool, error)
@@ -38,7 +38,7 @@ type FakeServicePlanActor struct {
 		result1 bool
 		result2 error
 	}
-	UpdateSinglePlanForServiceStub        func(string, string, bool) (PlanAccess, error)
+	UpdateSinglePlanForServiceStub        func(string, string, bool) (actors.PlanAccess, error)
 	updateSinglePlanForServiceMutex       sync.RWMutex
 	updateSinglePlanForServiceArgsForCall []struct {
 		arg1 string
@@ -46,10 +46,10 @@ type FakeServicePlanActor struct {
 		arg3 bool
 	}
 	updateSinglePlanForServiceReturns struct {
-		result1 PlanAccess
+		result1 actors.PlanAccess
 		result2 error
 	}
-	UpdatePlanAndOrgForServiceStub        func(string, string, string, bool) (PlanAccess, error)
+	UpdatePlanAndOrgForServiceStub        func(string, string, string, bool) (actors.PlanAccess, error)
 	updatePlanAndOrgForServiceMutex       sync.RWMutex
 	updatePlanAndOrgForServiceArgsForCall []struct {
 		arg1 string
@@ -58,19 +58,20 @@ type FakeServicePlanActor struct {
 		arg4 bool
 	}
 	updatePlanAndOrgForServiceReturns struct {
-		result1 PlanAccess
+		result1 actors.PlanAccess
 		result2 error
 	}
 }
 
-func (fake *FakeServicePlanActor) FindServiceAccess(arg1 string) (ServiceAccess, error) {
+func (fake *FakeServicePlanActor) FindServiceAccess(arg1 string, arg2 string) (actors.ServiceAccess, error) {
 	fake.findServiceAccessMutex.Lock()
 	defer fake.findServiceAccessMutex.Unlock()
 	fake.findServiceAccessArgsForCall = append(fake.findServiceAccessArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 string
+	}{arg1, arg2})
 	if fake.FindServiceAccessStub != nil {
-		return fake.FindServiceAccessStub(arg1)
+		return fake.FindServiceAccessStub(arg1, arg2)
 	} else {
 		return fake.findServiceAccessReturns.result1, fake.findServiceAccessReturns.result2
 	}
@@ -82,15 +83,16 @@ func (fake *FakeServicePlanActor) FindServiceAccessCallCount() int {
 	return len(fake.findServiceAccessArgsForCall)
 }
 
-func (fake *FakeServicePlanActor) FindServiceAccessArgsForCall(i int) string {
+func (fake *FakeServicePlanActor) FindServiceAccessArgsForCall(i int) (string, string) {
 	fake.findServiceAccessMutex.RLock()
 	defer fake.findServiceAccessMutex.RUnlock()
-	return fake.findServiceAccessArgsForCall[i].arg1
+	return fake.findServiceAccessArgsForCall[i].arg1, fake.findServiceAccessArgsForCall[i].arg2
 }
 
-func (fake *FakeServicePlanActor) FindServiceAccessReturns(result1 ServiceAccess, result2 error) {
+func (fake *FakeServicePlanActor) FindServiceAccessReturns(result1 actors.ServiceAccess, result2 error) {
+	fake.FindServiceAccessStub = nil
 	fake.findServiceAccessReturns = struct {
-		result1 ServiceAccess
+		result1 actors.ServiceAccess
 		result2 error
 	}{result1, result2}
 }
@@ -122,6 +124,7 @@ func (fake *FakeServicePlanActor) UpdateAllPlansForServiceArgsForCall(i int) (st
 }
 
 func (fake *FakeServicePlanActor) UpdateAllPlansForServiceReturns(result1 bool, result2 error) {
+	fake.UpdateAllPlansForServiceStub = nil
 	fake.updateAllPlansForServiceReturns = struct {
 		result1 bool
 		result2 error
@@ -156,13 +159,14 @@ func (fake *FakeServicePlanActor) UpdateOrgForServiceArgsForCall(i int) (string,
 }
 
 func (fake *FakeServicePlanActor) UpdateOrgForServiceReturns(result1 bool, result2 error) {
+	fake.UpdateOrgForServiceStub = nil
 	fake.updateOrgForServiceReturns = struct {
 		result1 bool
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string, arg3 bool) (PlanAccess, error) {
+func (fake *FakeServicePlanActor) UpdateSinglePlanForService(arg1 string, arg2 string, arg3 bool) (actors.PlanAccess, error) {
 	fake.updateSinglePlanForServiceMutex.Lock()
 	defer fake.updateSinglePlanForServiceMutex.Unlock()
 	fake.updateSinglePlanForServiceArgsForCall = append(fake.updateSinglePlanForServiceArgsForCall, struct {
@@ -189,14 +193,15 @@ func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceArgsForCall(i int) (
 	return fake.updateSinglePlanForServiceArgsForCall[i].arg1, fake.updateSinglePlanForServiceArgsForCall[i].arg2, fake.updateSinglePlanForServiceArgsForCall[i].arg3
 }
 
-func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturns(result1 PlanAccess, result2 error) {
+func (fake *FakeServicePlanActor) UpdateSinglePlanForServiceReturns(result1 actors.PlanAccess, result2 error) {
+	fake.UpdateSinglePlanForServiceStub = nil
 	fake.updateSinglePlanForServiceReturns = struct {
-		result1 PlanAccess
+		result1 actors.PlanAccess
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeServicePlanActor) UpdatePlanAndOrgForService(arg1 string, arg2 string, arg3 string, arg4 bool) (PlanAccess, error) {
+func (fake *FakeServicePlanActor) UpdatePlanAndOrgForService(arg1 string, arg2 string, arg3 string, arg4 bool) (actors.PlanAccess, error) {
 	fake.updatePlanAndOrgForServiceMutex.Lock()
 	defer fake.updatePlanAndOrgForServiceMutex.Unlock()
 	fake.updatePlanAndOrgForServiceArgsForCall = append(fake.updatePlanAndOrgForServiceArgsForCall, struct {
@@ -224,11 +229,12 @@ func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceArgsForCall(i int) (
 	return fake.updatePlanAndOrgForServiceArgsForCall[i].arg1, fake.updatePlanAndOrgForServiceArgsForCall[i].arg2, fake.updatePlanAndOrgForServiceArgsForCall[i].arg3, fake.updatePlanAndOrgForServiceArgsForCall[i].arg4
 }
 
-func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceReturns(result1 PlanAccess, result2 error) {
+func (fake *FakeServicePlanActor) UpdatePlanAndOrgForServiceReturns(result1 actors.PlanAccess, result2 error) {
+	fake.UpdatePlanAndOrgForServiceStub = nil
 	fake.updatePlanAndOrgForServiceReturns = struct {
-		result1 PlanAccess
+		result1 actors.PlanAccess
 		result2 error
 	}{result1, result2}
 }
 
-var _ ServicePlanActor = new(FakeServicePlanActor)
+var _ actors.ServicePlanActor = new(FakeServicePlanActor)

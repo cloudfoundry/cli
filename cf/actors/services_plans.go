@@ -13,7 +13,7 @@ import (
 )
 
 type ServicePlanActor interface {
-	FindServiceAccess(string) (ServiceAccess, error)
+	FindServiceAccess(string, string) (ServiceAccess, error)
 	UpdateAllPlansForService(string, bool) (bool, error)
 	UpdateOrgForService(string, string, bool) (bool, error)
 	UpdateSinglePlanForService(string, string, bool) (PlanAccess, error)
@@ -221,8 +221,8 @@ func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string
 	return actor.servicePlanRepo.Update(servicePlan, serviceGuid, setPlanVisibility)
 }
 
-func (actor ServicePlanHandler) FindServiceAccess(serviceName string) (ServiceAccess, error) {
-	service, err := actor.serviceBuilder.GetServiceByName(serviceName)
+func (actor ServicePlanHandler) FindServiceAccess(serviceName string, orgName string) (ServiceAccess, error) {
+	service, err := actor.serviceBuilder.GetServiceByNameForOrg(serviceName, orgName)
 	if err != nil {
 		return ServiceAccessError, err
 	}
