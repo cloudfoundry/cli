@@ -2510,8 +2510,8 @@
       "modified": false
    },
    {
-      "id": "No API endpoint targeted. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
-      "translation": "No API endpoint targeted. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
+      "id": "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
+      "translation": "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
       "modified": false
    },
    {
