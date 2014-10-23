@@ -13,6 +13,7 @@ import (
 	applications "github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/password"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
@@ -51,7 +52,7 @@ type RepositoryLocator struct {
 	serviceBindingRepo              CloudControllerServiceBindingRepository
 	serviceSummaryRepo              CloudControllerServiceSummaryRepository
 	userRepo                        CloudControllerUserRepository
-	passwordRepo                    CloudControllerPasswordRepository
+	passwordRepo                    password.CloudControllerPasswordRepository
 	logsRepo                        LogsRepository
 	authTokenRepo                   CloudControllerServiceAuthTokenRepository
 	serviceBrokerRepo               CloudControllerServiceBrokerRepository
@@ -97,7 +98,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
-	loc.passwordRepo = NewCloudControllerPasswordRepository(config, uaaGateway)
+	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
 	loc.routeRepo = NewCloudControllerRouteRepository(config, cloudControllerGateway)
 	loc.stackRepo = stacks.NewCloudControllerStackRepository(config, cloudControllerGateway)
@@ -198,7 +199,7 @@ func (locator RepositoryLocator) GetUserRepository() UserRepository {
 	return locator.userRepo
 }
 
-func (locator RepositoryLocator) GetPasswordRepository() PasswordRepository {
+func (locator RepositoryLocator) GetPasswordRepository() password.PasswordRepository {
 	return locator.passwordRepo
 }
 
