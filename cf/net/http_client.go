@@ -1,7 +1,9 @@
 package net
 
 import (
+	"crypto/tls"
 	"crypto/x509"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -19,7 +21,13 @@ type HttpClientInterface interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 }
 
-var NewHttpClient = func(tr *http.Transport) HttpClientInterface {
+var NewHttpClient = func(trustedCerts []tls.Certificate, disableSSL bool) HttpClientInterface {
+	tr := &http.Transport{
+		Dial:            (&net.Dialer{Timeout: 5 * time.Second}).Dial,
+		TLSClientConfig: NewTLSConfig(trustedCerts, disableSSL),
+		Proxy:           http.ProxyFromEnvironment,
+	}
+
 	return &http.Client{
 		Transport:     tr,
 		CheckRedirect: PrepareRedirect,

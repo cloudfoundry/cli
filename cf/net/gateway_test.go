@@ -57,13 +57,13 @@ var _ = Describe("Gateway", func() {
 	})
 
 	Describe("Connection errors", func() {
-		var oldNewHttpClient func(tr *http.Transport) HttpClientInterface
+		var oldNewHttpClient func(trustedCerts []tls.Certificate, disableSSL bool) HttpClientInterface
 
 		BeforeEach(func() {
 			client = &fakes.FakeHttpClientInterface{}
 
 			oldNewHttpClient = NewHttpClient
-			NewHttpClient = func(tr *http.Transport) HttpClientInterface {
+			NewHttpClient = func(trustedCerts []tls.Certificate, disableSSL bool) HttpClientInterface {
 				return client
 			}
 		})
@@ -475,7 +475,6 @@ var _ = Describe("Gateway", func() {
 			BeforeEach(func() {
 				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
 				config.SetSSLDisabled(true)
-				ccGateway = NewCloudControllerGateway(config, clock)
 			})
 
 			It("succeeds", func() {
