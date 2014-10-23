@@ -86,6 +86,13 @@ var _ = Describe("env command", func() {
 						"pump-yer-brakes": "drive-slow",
 					},
 				},
+				Application: map[string]interface{}{
+					"VCAP_APPLICATION": map[string]interface{}{
+						"dis-be-an-app-field": "wit-an-app-value",
+						"app-key-1":           0,
+						"app-key-2":           false,
+					},
+				},
 			}, nil)
 		})
 
@@ -104,6 +111,22 @@ var _ = Describe("env command", func() {
 				[]string{"first-key", "0"},
 				[]string{"my-key", "my-value"},
 				[]string{"my-key2", "my-value2"},
+			))
+		})
+		It("displays the application env info under the System env column", func() {
+			runCommand("my-app")
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+				[]string{"System-Provided:"},
+				[]string{"VCAP_SERVICES", ":", "{"},
+				[]string{"pump-yer-brakes", ":", "drive-slow"},
+				[]string{"}"},
+				[]string{"VCAP_APPLICATION", ":", "{"},
+				[]string{"dis-be-an-app-field", ":", "wit-an-app-value"},
+				[]string{"app-key-1", ":", "0"},
+				[]string{"app-key-2", ":", "false"},
+				[]string{"}"},
 			))
 		})
 	})
