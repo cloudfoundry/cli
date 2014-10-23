@@ -1,4 +1,4 @@
-package api_test
+package password_test
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
-	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/cf/api/password"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
