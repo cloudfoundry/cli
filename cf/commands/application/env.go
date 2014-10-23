@@ -67,7 +67,7 @@ func (cmd *Env) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	cmd.displaySystemProvidedEnvironment(env.System)
+	cmd.displaySystemiAndAppProvidedEnvironment(env.System, env.Application)
 	cmd.ui.Say("")
 	cmd.displayUserProvidedEnvironment(env.Environment)
 	cmd.ui.Say("")
@@ -77,8 +77,10 @@ func (cmd *Env) Run(c *cli.Context) {
 	cmd.ui.Say("")
 }
 
-func (cmd *Env) displaySystemProvidedEnvironment(env map[string]interface{}) {
+func (cmd *Env) displaySystemiAndAppProvidedEnvironment(env map[string]interface{}, app map[string]interface{}) {
 	var vcapServices string
+	var vcapApplication string
+
 	servicesAsMap, ok := env["VCAP_SERVICES"].(map[string]interface{})
 	if ok && len(servicesAsMap) > 0 {
 		jsonBytes, err := json.MarshalIndent(env, "", " ")
@@ -88,12 +90,25 @@ func (cmd *Env) displaySystemProvidedEnvironment(env map[string]interface{}) {
 		vcapServices = string(jsonBytes)
 	}
 
-	if len(vcapServices) == 0 {
+	applicationAsMap, ok := app["VCAP_APPLICATION"].(map[string]interface{})
+	if ok && len(applicationAsMap) > 0 {
+		jsonBytes, err := json.MarshalIndent(app, "", " ")
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+		vcapApplication = string(jsonBytes)
+	}
+
+	if len(vcapServices) == 0 && len(vcapApplication) == 0 {
 		cmd.ui.Say(T("No system-provided env variables have been set"))
 		return
 	}
+
 	cmd.ui.Say(terminal.EntityNameColor(T("System-Provided:")))
+
 	cmd.ui.Say(vcapServices)
+	cmd.ui.Say("")
+	cmd.ui.Say(vcapApplication)
 }
 
 func (cmd *Env) displayUserProvidedEnvironment(envVars map[string]interface{}) {
