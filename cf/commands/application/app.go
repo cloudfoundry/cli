@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
@@ -111,7 +112,8 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 		urls = append(urls, route.URL())
 	}
 
-	cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("urls:")), strings.Join(urls, ", "))
+	cmd.ui.Say("%s %s", terminal.HeaderColor(T("urls:")), strings.Join(urls, ", "))
+	cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("package uploaded:")), formatTime(application.PackageUpdatedAt))
 
 	if appIsStopped {
 		cmd.ui.Say(T("There are no running instances of this app."))
@@ -138,4 +140,9 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	}
 
 	table.Print()
+}
+
+func formatTime(timeString string) string {
+	theTime, _ := time.Parse("2006-01-02T15:04:05+00:00", timeString)
+	return theTime.Format("Mon Jan 2 15:04:05 MST 2006")
 }

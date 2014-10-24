@@ -2,10 +2,11 @@ package api
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"strings"
 )
 
 type ApplicationSummaries struct {
@@ -30,6 +31,7 @@ type ApplicationFromSummary struct {
 	Urls             []string
 	State            string
 	SpaceGuid        string `json:"space_guid"`
+	PackageUpdatedAt string `json:"package_updated_at"`
 }
 
 func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields) {
@@ -42,6 +44,7 @@ func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields)
 	app.RunningInstances = resource.RunningInstances
 	app.Memory = resource.Memory
 	app.SpaceGuid = resource.SpaceGuid
+	app.PackageUpdatedAt = resource.PackageUpdatedAt
 
 	return
 }

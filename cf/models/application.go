@@ -54,6 +54,7 @@ type ApplicationFields struct {
 	RunningInstances int
 	State            string
 	SpaceGuid        string
+	PackageUpdatedAt string
 }
 
 type AppParams struct {
