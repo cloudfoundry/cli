@@ -99,6 +99,7 @@ var _ = Describe("App", func() {
 
 			mergedOutput := strings.Join(output, "\n")
 			Expect(mergedOutput).To(ContainSubstring("CF_TRACE=true"), "CF_TRACE=true not in help")
+			Expect(mergedOutput).To(ContainSubstring("CF_PLUGIN_HOME=path/to/dir/"))
 
 			for _, name := range expectedCommandNames {
 				Expect(mergedOutput).To(ContainSubstring(name), name+" not in help")
