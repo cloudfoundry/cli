@@ -36,10 +36,14 @@ type cliDependencies struct {
 	gateways       map[string]net.Gateway
 }
 
+var (
+	tee = terminal.NewTeePrinter()
+)
+
 func setupDependencies() (deps *cliDependencies) {
 	deps = new(cliDependencies)
 
-	deps.termUI = terminal.NewUI(os.Stdin)
+	deps.termUI = terminal.NewUI(os.Stdin, tee)
 
 	deps.manifestRepo = manifest.NewManifestDiskRepository()
 
@@ -122,7 +126,7 @@ OPTIONS:
 }
 
 func handlePanics() {
-	panic_printer.UI = terminal.NewUI(os.Stdin)
+	panic_printer.UI = terminal.NewUI(os.Stdin, terminal.NewTeePrinter())
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()

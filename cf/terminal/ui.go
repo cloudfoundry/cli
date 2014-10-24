@@ -41,14 +41,18 @@ type UI interface {
 }
 
 type terminalUI struct {
-	stdin io.Reader
+	stdin   io.Reader
+	printer Printer
 }
 
-func NewUI(r io.Reader) UI {
-	return terminalUI{stdin: r}
+func NewUI(r io.Reader, printer Printer) UI {
+	return &terminalUI{
+		stdin:   r,
+		printer: printer,
+	}
 }
 
-func (c terminalUI) PrintPaginator(rows []string, err error) {
+func (c *terminalUI) PrintPaginator(rows []string, err error) {
 	if err != nil {
 		c.Failed(err.Error())
 		return
@@ -59,23 +63,21 @@ func (c terminalUI) PrintPaginator(rows []string, err error) {
 	}
 }
 
-func (c terminalUI) Say(message string, args ...interface{}) {
+func (c *terminalUI) Say(message string, args ...interface{}) {
 	if len(args) == 0 {
-		fmt.Printf("%s\n", message)
+		c.printer.Printf("%s\n", message)
 	} else {
-		fmt.Printf(message+"\n", args...)
+		c.printer.Printf(message+"\n", args...)
 	}
-
-	return
 }
 
-func (c terminalUI) Warn(message string, args ...interface{}) {
+func (c *terminalUI) Warn(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 	c.Say(WarningColor(message))
 	return
 }
 
-func (c terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
+func (c *terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
 	return c.confirmDelete(T("Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
 		map[string]interface{}{
 			"ModelType": modelType,
@@ -83,7 +85,7 @@ func (c terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) b
 		}))
 }
 
-func (c terminalUI) ConfirmDelete(modelType, modelName string) bool {
+func (c *terminalUI) ConfirmDelete(modelType, modelName string) bool {
 	return c.confirmDelete(T("Really delete the {{.ModelType}} {{.ModelName}}?",
 		map[string]interface{}{
 			"ModelType": modelType,
@@ -91,7 +93,7 @@ func (c terminalUI) ConfirmDelete(modelType, modelName string) bool {
 		}))
 }
 
-func (c terminalUI) confirmDelete(message string) bool {
+func (c *terminalUI) confirmDelete(message string) bool {
 	result := c.Confirm(message)
 
 	if !result {
@@ -101,7 +103,7 @@ func (c terminalUI) confirmDelete(message string) bool {
 	return result
 }
 
-func (c terminalUI) Confirm(message string, args ...interface{}) bool {
+func (c *terminalUI) Confirm(message string, args ...interface{}) bool {
 	response := c.Ask(message, args...)
 	switch strings.ToLower(response) {
 	case "y", T("yes"):
@@ -110,20 +112,20 @@ func (c terminalUI) Confirm(message string, args ...interface{}) bool {
 	return false
 }
 
-func (c terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
-	fmt.Println("")
-	fmt.Printf(prompt+PromptColor(">")+" ", args...)
+func (c *terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
+	c.printer.Println("")
+	c.printer.Println(fmt.Sprintf(prompt+PromptColor(">")+" ", args...))
 	fmt.Fscanln(c.stdin, &answer)
 	return
 }
 
-func (c terminalUI) Ok() {
+func (c *terminalUI) Ok() {
 	c.Say(SuccessColor(T("OK")))
 }
 
 const QuietPanic = "This shouldn't print anything"
 
-func (c terminalUI) Failed(message string, args ...interface{}) {
+func (c *terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 
 	if T == nil {
@@ -143,11 +145,11 @@ func (c terminalUI) Failed(message string, args ...interface{}) {
 	}
 }
 
-func (c terminalUI) PanicQuietly() {
+func (c *terminalUI) PanicQuietly() {
 	panic(QuietPanic)
 }
 
-func (c terminalUI) FailWithUsage(context *cli.Context) {
+func (c *terminalUI) FailWithUsage(context *cli.Context) {
 	c.Say(FailureColor(T("FAILED")))
 	c.Say(T("Incorrect Usage.\n"))
 	cli.ShowCommandHelp(context, context.Command.Name)
@@ -155,7 +157,7 @@ func (c terminalUI) FailWithUsage(context *cli.Context) {
 	os.Exit(1)
 }
 
-func (ui terminalUI) ShowConfiguration(config core_config.Reader) {
+func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
 	table := NewTable(ui, []string{"", ""})
 
 	if config.HasAPIEndpoint() {
@@ -222,14 +224,14 @@ func (ui terminalUI) ShowConfiguration(config core_config.Reader) {
 	table.Print()
 }
 
-func (c terminalUI) LoadingIndication() {
-	fmt.Print(".")
+func (c *terminalUI) LoadingIndication() {
+	c.printer.Print(".")
 }
 
-func (c terminalUI) Wait(duration time.Duration) {
+func (c *terminalUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
 }
 
-func (ui terminalUI) Table(headers []string) Table {
+func (ui *terminalUI) Table(headers []string) Table {
 	return NewTable(ui, headers)
 }
