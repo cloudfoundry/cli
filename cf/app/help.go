@@ -70,7 +70,6 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		})
 
 		plugins := pluginConfig.Plugins()
-		fmt.Println("plugins :", plugins)
 		var presenters []cmdPresenter
 		var pluginPresenter cmdPresenter
 

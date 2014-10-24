@@ -82,7 +82,7 @@ func main() {
 
 	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator, deps.pluginConfig)
 	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
-	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
+	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, deps.termUI)
 
 	theApp := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
 	//command `cf` without argument

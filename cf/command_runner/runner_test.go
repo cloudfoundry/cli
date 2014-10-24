@@ -74,7 +74,7 @@ var _ = Describe("Requirements runner", func() {
 		}
 
 		cmdFactory := &TestCommandFactory{Cmd: &cmd}
-		runner := NewRunner(cmdFactory, nil)
+		runner := NewRunner(cmdFactory, nil, nil)
 
 		ctxt := testcmd.NewContext("login", []string{})
 		err := runner.RunCmdByName("some-cmd", ctxt)
