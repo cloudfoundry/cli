@@ -63,7 +63,7 @@ func findCommand(cmdName string) (cmd cli.Command) {
 
 	cmdFactory := command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig)
 	requirementsFactory := &testreq.FakeReqFactory{}
-	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory)
+	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, fakeUI)
 	myApp := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
 
 	for _, cmd := range myApp.Commands {
