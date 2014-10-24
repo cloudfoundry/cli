@@ -6,7 +6,9 @@ import (
 )
 
 func NewTLSConfig(trustedCerts []tls.Certificate, disableSSL bool) (TLSConfig *tls.Config) {
-	TLSConfig = &tls.Config{}
+	TLSConfig = &tls.Config{
+		MinVersion: tls.VersionTLS10,
+	}
 
 	if len(trustedCerts) > 0 {
 		certPool := x509.NewCertPool()
