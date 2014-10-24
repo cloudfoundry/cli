@@ -2090,6 +2090,46 @@
       "modified": false
    },
    {
+      "id": "Getting service access as {{.Username}}...",
+      "translation": "getting service access as {{.Username}}...",
+      "modified": true
+   },
+   {
+      "id": "Getting service access for broker {{.Broker}} and organization {{.Organization}} as {{.Username}}...",
+      "translation": "getting service access for broker {{.Broker}} and organization {{.Organization}} as {{.Username}}...",
+      "modified": true
+   },
+   {
+      "id": "Getting service access for broker {{.Broker}} and service {{.Service}} and organization {{.Organization}} as {{.Username}}...",
+      "translation": "getting service access for broker {{.Broker}} and service {{.Service}} and organization {{.Organization}} as {{.Username}}...",
+      "modified": true
+   },
+   {
+      "id": "Getting service access for broker {{.Broker}} and service {{.Service}} as {{.Username}}...",
+      "translation": "getting service access for broker {{.Broker}} and service {{.Service}} as {{.Username}}...",
+      "modified": true
+   },
+   {
+      "id": "Getting service access for broker {{.Broker}} as {{.Username}}...",
+      "translation": "getting service access for broker {{.Broker}} as {{.Username}}...",
+      "modified": true
+   },
+   {
+      "id": "Getting service access for organization {{.Organization}} as {{.Username}}...",
+      "translation": "getting service access for organization {{.Organization}} as {{.Username}}...",
+      "modified": true
+   },
+   {
+      "id": "Getting service access for service {{.Service}} and organization {{.Organization}} as {{.Username}}...",
+      "translation": "getting service access for service {{.Service}} and organization {{.Organization}} as {{.Username}}...",
+      "modified": true
+   },
+   {
+      "id": "Getting service access for service {{.Service}} as {{.Username}}...",
+      "translation": "getting service access for service {{.Service}} as {{.Username}}...",
+      "modified": true
+   },
+   {
       "id": "Getting service auth tokens as {{.CurrentUser}}...",
       "translation": "Obtendo tokens de autenticação de serviços como {{.CurrentUser}}...",
       "modified": false
@@ -4062,46 +4102,6 @@
    {
       "id": "filename",
       "translation": "nome de arquivo",
-      "modified": false
-   },
-   {
-      "id": "getting service access as {{.Username}}...",
-      "translation": "getting service access as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "getting service access for broker {{.Broker}} and organization {{.Organization}} as {{.Username}}...",
-      "translation": "getting service access for broker {{.Broker}} and organization {{.Organization}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "getting service access for broker {{.Broker}} and service {{.Service}} and organization {{.Organization}} as {{.Username}}...",
-      "translation": "getting service access for broker {{.Broker}} and service {{.Service}} and organization {{.Organization}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "getting service access for broker {{.Broker}} and service {{.Service}} as {{.Username}}...",
-      "translation": "getting service access for broker {{.Broker}} and service {{.Service}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "getting service access for broker {{.Broker}} as {{.Username}}...",
-      "translation": "getting service access for broker {{.Broker}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "getting service access for organization {{.Organization}} as {{.Username}}...",
-      "translation": "getting service access for organization {{.Organization}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "getting service access for service {{.Service}} and organization {{.Organization}} as {{.Username}}...",
-      "translation": "getting service access for service {{.Service}} and organization {{.Organization}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "getting service access for service {{.Service}} as {{.Username}}...",
-      "translation": "getting service access for service {{.Service}} as {{.Username}}...",
       "modified": false
    },
    {
