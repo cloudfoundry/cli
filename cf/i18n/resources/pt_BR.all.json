@@ -2780,6 +2780,16 @@
       "modified": false
    },
    {
+      "id": "PLUGIN",
+      "translation": "PLUGIN",
+      "modified": false
+   },
+   {
+      "id": "PLUGIN COMMANDS",
+      "translation": "PLUGIN COMMANDS",
+      "modified": false
+   },
+   {
       "id": "Paid service plans",
       "translation": "Planos de serviços pagos",
       "modified": false
