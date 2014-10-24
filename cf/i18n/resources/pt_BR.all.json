@@ -2775,6 +2775,11 @@
       "modified": false
    },
    {
+      "id": "Override path to default plugin config directory",
+      "translation": "Override path to default plugin config directory",
+      "modified": false
+   },
+   {
       "id": "Paid service plans",
       "translation": "Planos de serviços pagos",
       "modified": false
