@@ -94,21 +94,28 @@ func Start(cmd RpcPlugin) {
 	}
 }
 
-func CliCommand(args ...string) error {
+func CliCommand(args ...string) ([]string, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+CliServicePort)
 	if err != nil {
-		return err
+		return []string{}, err
 	}
 
 	var success bool
 	err = client.Call("CliRpcCmd.CallCoreCommand", args, &success)
+
+	var cmdOutput []string
+	outputErr := client.Call("CliRpcCmd.GetOutputAndReset", success, &cmdOutput)
+
 	if err != nil {
-		return err
+		return cmdOutput, err
 	} else if !success {
-		return errors.New("Error executing cli core command")
+		return cmdOutput, errors.New("Error executing cli core command")
 	}
 
-	return nil
+	if outputErr != nil {
+		return cmdOutput, errors.New("something completely unexpected happened")
+	}
+	return cmdOutput, nil
 }
 
 func pingCLI() {

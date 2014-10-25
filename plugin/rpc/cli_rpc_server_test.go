@@ -31,19 +31,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil)
+			rpcService, err = NewRpcService(nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := NewRpcService(nil)
+			_, err := NewRpcService(nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil)
+			rpcService, err = NewRpcService(nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -65,7 +65,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil)
+			rpcService, err = NewRpcService(nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -93,7 +93,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil)
+			rpcService, err = NewRpcService(nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -130,6 +130,37 @@ var _ = Describe("Server", func() {
 		})
 	})
 
+	Describe(".GetOutputAndReset", func() {
+		Context("success", func() {
+			BeforeEach(func() {
+				outputCapture := FakeOutputCapture{}
+				rpcService, err = NewRpcService(nil, outputCapture)
+				Expect(err).ToNot(HaveOccurred())
+
+				err := rpcService.Start()
+				Expect(err).ToNot(HaveOccurred())
+
+				pingCli(rpcService.Port())
+			})
+
+			AfterEach(func() {
+				rpcService.Stop()
+
+				//give time for server to stop
+				time.Sleep(50 * time.Millisecond)
+			})
+
+			It("should return the logs from the output capture", func() {
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+				Expect(err).ToNot(HaveOccurred())
+				var output []string
+				client.Call("CliRpcCmd.GetOutputAndReset", nil, &output)
+
+				Expect(output).To(Equal([]string{"hi from command"}))
+			})
+		})
+	})
+
 	Describe(".CallCoreCommand", func() {
 		Context("success", func() {
 			BeforeEach(func() {
@@ -146,7 +177,9 @@ var _ = Describe("Server", func() {
 					},
 				}
 
-				rpcService, err = NewRpcService(app)
+				outputCapture := FakeOutputCapture{}
+
+				rpcService, err = NewRpcService(app, outputCapture)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -188,8 +221,8 @@ var _ = Describe("Server", func() {
 						},
 					},
 				}
-
-				rpcService, err = NewRpcService(app)
+				outputCapture := FakeOutputCapture{}
+				rpcService, err = NewRpcService(app, outputCapture)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -224,4 +257,10 @@ func pingCli(port string) {
 		}
 	}
 	Expect(connErr).ToNot(HaveOccurred())
+}
+
+type FakeOutputCapture struct{}
+
+func (o FakeOutputCapture) GetOutputAndReset() []string {
+	return []string{"hi from command"}
 }

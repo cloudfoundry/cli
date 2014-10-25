@@ -131,7 +131,7 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata plugin.PluginMetadata, pl
 }
 
 func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) plugin.PluginMetadata {
-	rpcService, err := rpc.NewRpcService(nil)
+	rpcService, err := rpc.NewRpcService(nil, nil)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

@@ -47,12 +47,12 @@ var _ = Describe("main", func() {
 		})
 	})
 
-	Describe("Plugins", func() {
-		It("can print help for all core commands by executing only the command `cf`", func() {
-			output := Cf().Wait(3 * time.Second)
-			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
-		})
+	It("can print help for all core commands by executing only the command `cf`", func() {
+		output := Cf().Wait(3 * time.Second)
+		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+	})
 
+	Describe("Plugins", func() {
 		It("Can call a plugin command from the Plugins configuration if it does not exist as a cf command", func() {
 			output := Cf("test_1_cmd1").Wait(3 * time.Second)
 			Eventually(output.Out).Should(Say("You called cmd1 in test_1"))
@@ -91,6 +91,11 @@ var _ = Describe("main", func() {
 		It("Calls a plugin that calls core commands", func() {
 			output := Cf("awesomeness").Wait(3 * time.Second)
 			Eventually(output.Out).Should(Say("my-say")) //look for another plugin
+		})
+
+		It("Sends stdoutput to the plugin to echo", func() {
+			output := Cf("core-command", "plugins").Wait(3 * time.Second)
+			Eventually(output.Out.Contents).Should(MatchRegexp("Command output from the plugin(.*\\W)*awesomeness(.*\\W)*FIN"))
 		})
 	})
 })
