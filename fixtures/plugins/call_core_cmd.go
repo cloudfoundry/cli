@@ -8,10 +8,36 @@ import (
 
 type CoreCmd struct{}
 
+func (c *CoreCmd) GetCommands() []plugin.Command {
+	return []plugin.Command{
+		{
+			Name:     "awesomeness",
+			HelpText: "the most awesomeness command you have ever seen",
+		},
+		{
+			Name:     "core-command",
+			HelpText: "command to call core command. It passes all text through to command",
+		},
+	}
+}
+
+func main() {
+	plugin.Start(new(CoreCmd))
+}
+
 func (c *CoreCmd) Run(args []string, reply *bool) error {
-	if len(args) == 1 {
+	if args[0] == "core-command" {
+		output, err := plugin.CliCommand(args[1:]...)
+		if err != nil {
+			fmt.Println("Error from CliCommand: ", err)
+		}
+		fmt.Println("")
+		fmt.Println("---------- Command output from the plugin ----------")
+		fmt.Println(output)
+		fmt.Println("----------              FIN               -----------")
+	} else if args[0] == "awesomeness" {
 		plugin.CliCommand("plugins")
-	} else if len(args) == 2 && args[1] == "easter_egg" {
+	} else if len(args) == 2 && args[0] == "awesomeness" && args[1] == "easter_egg" {
 		fmt.Println(`
 ZZZZ$Z$$$ZZ$$$$$77$777777777777777777777I77II7I?III?IIII???????+++????????++++++=++++++++++++++++++=++======+======+++++
 ZZZZZZZZ$$ZZ$77777777777III777777I7777IIIIIIIII??IIIIII???????++++???????++++++++++++?????++++++++++========+===~+=+++++
@@ -110,17 +136,4 @@ NMNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMD888OOZZZZZ$$ZZZZ$$ZZ8NNOZ$$$$DDDDDNDOODDDDD
 	}
 
 	return nil
-}
-
-func (c *CoreCmd) GetCommands() []plugin.Command {
-	return []plugin.Command{
-		{
-			Name:     "awesomeness",
-			HelpText: "the most awesomeness command you have ever seen",
-		},
-	}
-}
-
-func main() {
-	plugin.Start(new(CoreCmd))
 }

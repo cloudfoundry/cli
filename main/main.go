@@ -34,16 +34,15 @@ type cliDependencies struct {
 	manifestRepo   manifest.ManifestRepository
 	apiRepoLocator api.RepositoryLocator
 	gateways       map[string]net.Gateway
+	teePrinter     *terminal.TeePrinter
 }
-
-var (
-	tee = terminal.NewTeePrinter()
-)
 
 func setupDependencies() (deps *cliDependencies) {
 	deps = new(cliDependencies)
 
-	deps.termUI = terminal.NewUI(os.Stdin, tee)
+	deps.teePrinter = terminal.NewTeePrinter()
+
+	deps.termUI = terminal.NewUI(os.Stdin, deps.teePrinter)
 
 	deps.manifestRepo = manifest.NewManifestDiskRepository()
 
@@ -77,7 +76,7 @@ func setupDependencies() (deps *cliDependencies) {
 }
 
 func main() {
-	defer handlePanics()
+	defer handlePanics(deps.teePrinter)
 	defer deps.configRepo.Close()
 
 	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator, deps.pluginConfig)
@@ -93,7 +92,7 @@ func main() {
 	} else {
 		// run each plugin and find the method/
 		// run method if exist
-		ran, _ := rpc.RunMethodIfExists(theApp, os.Args[1:])
+		ran, _ := rpc.RunMethodIfExists(theApp, os.Args[1:], deps.teePrinter)
 		if !ran {
 			theApp.Run(os.Args)
 		}
@@ -125,8 +124,8 @@ OPTIONS:
 
 }
 
-func handlePanics() {
-	panic_printer.UI = terminal.NewUI(os.Stdin, terminal.NewTeePrinter())
+func handlePanics(printer terminal.Printer) {
+	panic_printer.UI = terminal.NewUI(os.Stdin, printer)
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()

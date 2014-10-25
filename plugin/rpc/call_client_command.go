@@ -9,15 +9,16 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
-func RunMethodIfExists(coreCommandRunner *cli.App, args []string) (bool, error) {
+func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture terminal.OutputCapture) (bool, error) {
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
 	port := obtainPort()
 
-	service, err := startCliServer(coreCommandRunner)
+	service, err := startCliServer(coreCommandRunner, outputCapture)
 	if err != nil {
 		return false, err
 	}
@@ -61,8 +62,8 @@ func dialClient(port string) (*rpc.Client, error) {
 	return client, nil
 }
 
-func startCliServer(coreCommandRunner *cli.App) (*CliRpcService, error) {
-	service, err := NewRpcService(coreCommandRunner)
+func startCliServer(coreCommandRunner *cli.App, outputCapture terminal.OutputCapture) (*CliRpcService, error) {
+	service, err := NewRpcService(coreCommandRunner, outputCapture)
 	if err != nil {
 		return nil, err
 	}

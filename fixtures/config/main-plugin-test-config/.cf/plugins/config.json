@@ -35,7 +35,8 @@
     "CoreCmd":{
       "Location":"../fixtures/plugins/call_core_cmd.exe",
       "Commands":[
-        {"Name":"awesomeness","HelpText":"the most awesomeness command you have ever seen"}
+        {"Name":"awesomeness","HelpText":"the most awesomeness command you have ever seen"},
+        {"Name":"core-command","HelpText":"runs core commands and dumps the output from the cli process"}
       ]
     }
   }

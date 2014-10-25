@@ -10,6 +10,10 @@ type Printer interface {
 	Println(a ...interface{}) (n int, err error)
 }
 
+type OutputCapture interface {
+	GetOutputAndReset() []string
+}
+
 type TeePrinter struct {
 	output []string
 }

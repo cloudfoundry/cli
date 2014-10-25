@@ -1,13 +1,14 @@
 package rpc
 
 import (
+	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/plugin"
+	"github.com/codegangsta/cli"
+
 	"fmt"
 	"net"
 	"net/rpc"
 	"strconv"
-
-	"github.com/cloudfoundry/cli/plugin"
-	"github.com/codegangsta/cli"
 )
 
 type CliRpcService struct {
@@ -20,13 +21,15 @@ type CliRpcService struct {
 type CliRpcCmd struct {
 	ReturnData        interface{}
 	coreCommandRunner *cli.App
+	outputCapture     terminal.OutputCapture
 }
 
-func NewRpcService(commandRunner *cli.App) (*CliRpcService, error) {
+func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
 			ReturnData:        new(interface{}),
 			coreCommandRunner: commandRunner,
+			outputCapture:     outputCapture,
 		},
 	}
 
@@ -76,9 +79,16 @@ func (cli *CliRpcService) Start() error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
-	defer recoverFromCore()
+func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
+	cmd.ReturnData = interface{}(pluginMetadata)
+	*retVal = true
+	return nil
+}
 
+func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
+	defer func() {
+		recover()
+	}()
 	err := cmd.coreCommandRunner.Run(append([]string{"cf"}, args...))
 	if err != nil {
 		*retVal = false
@@ -89,12 +99,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
-	cmd.ReturnData = interface{}(pluginMetadata)
-	*retVal = true
+func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
+	*retVal = cmd.outputCapture.GetOutputAndReset()
 	return nil
-}
-
-func recoverFromCore() {
-	recover()
 }
