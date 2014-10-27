@@ -7,6 +7,7 @@ import (
 
 	"github.com/cloudfoundry/cli/plugin"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
+	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -154,7 +155,7 @@ var _ = Describe("Server", func() {
 				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 				Expect(err).ToNot(HaveOccurred())
 				var output []string
-				client.Call("CliRpcCmd.GetOutputAndReset", nil, &output)
+				client.Call("CliRpcCmd.GetOutputAndReset", false, &output)
 
 				Expect(output).To(Equal([]string{"hi from command"}))
 			})
@@ -229,6 +230,31 @@ var _ = Describe("Server", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				pingCli(rpcService.Port())
+			})
+
+			It("returns false in success if the command cannot be found", func() {
+				io_helpers.CaptureOutput(func() {
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var success bool
+					err = client.Call("CliRpcCmd.CallCoreCommand", []string{"not_a_cmd"}, &success)
+					Expect(success).To(BeFalse())
+					Expect(err).ToNot(HaveOccurred())
+				})
+			})
+
+			It("returns an error if a command cannot parse provided flags", func() {
+				io_helpers.CaptureOutput(func() {
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var success bool
+					err = client.Call("CliRpcCmd.CallCoreCommand", []string{"test_cmd", "-invalid_flag"}, &success)
+
+					Expect(err).To(HaveOccurred())
+					Expect(success).To(BeFalse())
+				})
 			})
 
 			It("recovers from a panic from any core command", func() {

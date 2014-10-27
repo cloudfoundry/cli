@@ -35,21 +35,6 @@ var _ = Describe("TeePrinter", func() {
 
 	})
 
-	Describe("GetOutputAndReset", func() {
-		BeforeEach(func() {
-			output = io_helpers.CaptureOutput(func() {
-				printer = NewTeePrinter()
-				printer.Print("Hello")
-				printer.Print("Mom!")
-			})
-		})
-
-		It("should clear the slice after access", func() {
-			printer.GetOutputAndReset()
-			Expect(printer.GetOutputAndReset()).To(BeEmpty())
-		})
-	})
-
 	Describe(".Printf", func() {
 		BeforeEach(func() {
 			output = io_helpers.CaptureOutput(func() {
@@ -81,6 +66,21 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should save the output to the slice", func() {
 			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello everybody"))
+		})
+	})
+
+	Describe(".GetOutputAndReset", func() {
+		BeforeEach(func() {
+			output = io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.Print("Hello")
+				printer.Print("Mom!")
+			})
+		})
+
+		It("should clear the slice after access", func() {
+			printer.GetOutputAndReset()
+			Expect(printer.GetOutputAndReset()).To(BeEmpty())
 		})
 	})
 })

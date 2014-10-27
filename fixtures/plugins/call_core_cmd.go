@@ -29,11 +29,13 @@ func (c *CoreCmd) Run(args []string, reply *bool) error {
 	if args[0] == "core-command" {
 		output, err := plugin.CliCommand(args[1:]...)
 		if err != nil {
-			fmt.Println("Error from CliCommand: ", err)
+			fmt.Println("PLUGIN ERROR: Error from CliCommand: ", err)
 		}
 		fmt.Println("")
 		fmt.Println("---------- Command output from the plugin ----------")
-		fmt.Println(output)
+		for index, val := range output {
+			fmt.Print("#", index, " value: ", val)
+		}
 		fmt.Println("----------              FIN               -----------")
 	} else if args[0] == "awesomeness" {
 		plugin.CliCommand("plugins")
