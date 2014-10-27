@@ -1,6 +1,8 @@
 package serviceaccess_test
 
 import (
+	"errors"
+
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -85,6 +87,18 @@ var _ = Describe("service-access command", func() {
 		It("refreshes the auth token", func() {
 			runCommand("service")
 			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
+		})
+
+		Context("when refreshing the auth token fails", func() {
+			It("fails and returns the error", func() {
+				tokenRefresher.RefreshTokenError = errors.New("Refreshing went wrong")
+				runCommand()
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Refreshing went wrong"},
+					[]string{"FAILED"},
+				))
+			})
 		})
 
 		Context("When no flags are provided", func() {

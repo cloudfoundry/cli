@@ -174,6 +174,14 @@ var _ = Describe("AuthenticationRepository", func() {
 			refreshedToken, apiErr = auth.RefreshAuthToken()
 		})
 
+		Context("when the refresh token has expired", func() {
+			BeforeEach(func() {
+				setupTestServer(refreshTokenExpiredRequestError)
+			})
+			It("the returns the reauthentication error message", func() {
+				Expect(apiErr.Error()).To(Equal("Authentication has expired.  Please log back in to re-authenticate.\n\nTIP: Use `cf login -a <endpoint> -u <user> -o <org> -s <space>` to log back in and re-authenticate."))
+			})
+		})
 		Context("when there is a UAA error", func() {
 			BeforeEach(func() {
 				setupTestServer(errorLoginRequest)
@@ -228,6 +236,18 @@ var unsuccessfulLoginRequest = testnet.TestRequest{
 	Response: testnet.TestResponse{
 		Status: http.StatusUnauthorized,
 	},
+}
+var refreshTokenExpiredRequestError = testnet.TestRequest{
+	Method: "POST",
+	Path:   "/oauth/token",
+	Response: testnet.TestResponse{
+		Status: http.StatusUnauthorized,
+		Body: `
+{
+	"error": "invalid_token",
+	"error_description": "Invalid auth token: Invalid refresh token (expired): eyJhbGckjsdfdf"
+}
+`},
 }
 
 var errorLoginRequest = testnet.TestRequest{

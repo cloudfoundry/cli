@@ -179,6 +179,9 @@ var _ = Describe("Push Command", func() {
 				It("it displays an error", func() {
 					callPush("of-bel-air")
 
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Error refreshing auth token"},
+					))
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"accidentally the UAA"},

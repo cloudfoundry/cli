@@ -120,7 +120,7 @@ func (cmd *Push) Run(c *cli.Context) {
 	appSet := cmd.findAndValidateAppsToPush(c)
 	_, apiErr := cmd.authRepo.RefreshAuthToken()
 	if apiErr != nil {
-		cmd.ui.Failed(fmt.Sprintf("Error refreshing auth token.\n%s", apiErr.Error()))
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

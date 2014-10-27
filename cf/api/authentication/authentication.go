@@ -3,9 +3,10 @@ package authentication
 import (
 	"encoding/base64"
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"net/url"
 	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -128,6 +129,8 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	case nil:
 	case errors.HttpError:
 		return err
+	case *errors.InvalidTokenError:
+		return errors.New(T("Authentication has expired.  Please log back in to re-authenticate.\n\nTIP: Use `cf login -a <endpoint> -u <user> -o <org> -s <space>` to log back in and re-authenticate."))
 	default:
 		return errors.NewWithError(T("auth request failed"), err)
 	}

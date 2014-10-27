@@ -49,7 +49,10 @@ func (cmd *DisableServiceAccess) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd *DisableServiceAccess) Run(c *cli.Context) {
-	cmd.tokenRefresher.RefreshAuthToken()
+	_, err := cmd.tokenRefresher.RefreshAuthToken()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 
 	serviceName := c.Args()[0]
 	planName := c.String("p")
