@@ -321,8 +321,11 @@ var _ = Describe("Service Plans", func() {
 				allPlansSet, err := actor.UpdateOrgForService("my-public-and-limited-service", "org-1", false)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(servicePlanVisibilityRepo.DeleteCallCount()).To(Equal(1))
-
 				Expect(allPlansSet).To(BeFalse())
+
+				services := servicePlanVisibilityRepo.SearchArgsForCall(0)
+				Expect(services["organization_guid"]).To(Equal("org-1-guid"))
+
 				visibilityGuid := servicePlanVisibilityRepo.DeleteArgsForCall(0)
 				Expect(visibilityGuid).To(Equal("visibility-guid-1"))
 			})
