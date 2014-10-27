@@ -53,7 +53,11 @@ func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *ServiceAccess) Run(c *cli.Context) {
-	cmd.tokenRefresher.RefreshAuthToken()
+	_, err := cmd.tokenRefresher.RefreshAuthToken()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
 	brokerName := c.String("b")
 	serviceName := c.String("e")
 	orgName := c.String("o")

@@ -60,6 +60,18 @@ var _ = Describe("enable-service-access command", func() {
 			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
 		})
 
+		Context("when refreshing the auth token fails", func() {
+			It("fails and returns the error", func() {
+				tokenRefresher.RefreshTokenError = errors.New("Refreshing went wrong")
+				runCommand([]string{"service"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Refreshing went wrong"},
+					[]string{"FAILED"},
+				))
+			})
+		})
+
 		Context("when the named service exists", func() {
 			It("returns OK when ran successfully", func() {
 				Expect(runCommand([]string{"service"})).To(BeTrue())

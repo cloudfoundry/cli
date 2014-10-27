@@ -61,6 +61,18 @@ var _ = Describe("disable-service-access command", func() {
 			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
 		})
 
+		Context("when refreshing the auth token fails", func() {
+			It("fails and returns the error", func() {
+				tokenRefresher.RefreshTokenError = errors.New("Refreshing went wrong")
+				runCommand([]string{"service"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Refreshing went wrong"},
+					[]string{"FAILED"},
+				))
+			})
+		})
+
 		Context("when the named service exists", func() {
 			It("tells the user if all plans were already private", func() {
 				actor.UpdateAllPlansForServiceReturns(true, nil)
