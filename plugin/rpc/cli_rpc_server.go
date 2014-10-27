@@ -89,7 +89,9 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	defer func() {
 		recover()
 	}()
+
 	err := cmd.coreCommandRunner.Run(append([]string{"cf"}, args...))
+
 	if err != nil {
 		*retVal = false
 		return err
