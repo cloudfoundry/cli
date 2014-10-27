@@ -71,7 +71,6 @@ func newGateway(errHandler apiErrorHandler, config core_config.Reader) (gateway 
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
 	gateway.warnings = &[]string{}
 	gateway.Clock = time.Now
-	makeHttpTransport(&gateway)
 
 	return
 }
@@ -393,6 +392,10 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 }
 
 func (gateway Gateway) doRequest(request *http.Request) (response *http.Response, err error) {
+	if gateway.transport == nil {
+		makeHttpTransport(&gateway)
+	}
+
 	httpClient := NewHttpClient(gateway.transport)
 
 	dumpRequest(request)

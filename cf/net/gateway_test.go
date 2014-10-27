@@ -475,7 +475,6 @@ var _ = Describe("Gateway", func() {
 			BeforeEach(func() {
 				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
 				config.SetSSLDisabled(true)
-				ccGateway = NewCloudControllerGateway(config, clock)
 			})
 
 			It("succeeds", func() {
