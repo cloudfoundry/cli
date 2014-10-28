@@ -35,8 +35,8 @@ var userHomeDir = func() string {
 }
 
 var PluginRepoDir = func() string {
-	if os.Getenv("CF_PLUGINS_DIR") != "" {
-		return os.Getenv("CF_PLUGINS_DIR")
+	if os.Getenv("CF_PLUGIN_HOME") != "" {
+		return os.Getenv("CF_PLUGIN_HOME")
 	}
 
 	return userHomeDir()
