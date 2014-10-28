@@ -295,8 +295,18 @@ func (f concreteFactory) GetByCmdName(cmdName string) (cmd command.Command, err 
 }
 
 func (f concreteFactory) CheckIfCoreCmdExists(cmdName string) bool {
-	_, found := f.cmdsByName[cmdName]
-	return found
+	if _, exists := f.cmdsByName[cmdName]; exists {
+		return true
+	}
+
+	for _, singleCmd := range f.cmdsByName {
+		metaData := singleCmd.Metadata()
+		if metaData.ShortName == cmdName {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (factory concreteFactory) CommandMetadatas() (commands []command_metadata.CommandMetadata) {

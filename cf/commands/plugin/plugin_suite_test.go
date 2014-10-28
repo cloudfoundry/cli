@@ -20,6 +20,7 @@ func TestPlugin(t *testing.T) {
 
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_help")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_push")
+	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_push_short_name")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_1")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_2")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "empty_plugin")

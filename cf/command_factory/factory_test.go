@@ -93,6 +93,11 @@ var _ = Describe("factory", func() {
 			Expect(exists).To(BeTrue())
 		})
 
+		It("retruns true if the cmd short name exists", func() {
+			exists := factory.CheckIfCoreCmdExists("p")
+			Expect(exists).To(BeTrue())
+		})
+
 		It("returns an error if it does not exist", func() {
 			exists := factory.CheckIfCoreCmdExists("FOOOOBARRRR")
 			Expect(exists).To(BeFalse())

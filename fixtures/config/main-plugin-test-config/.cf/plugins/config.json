@@ -20,6 +20,12 @@
         {"Name":"push","HelpText":"push text for test_with_push"}
       ]
     },
+    "TestWithPushShortName":{
+      "Location":"../fixtures/plugins/test_with_push_short_name.exe",
+      "Commands":[
+        {"Name":"p","HelpText":"plugin short name p"}
+      ]
+    },
     "TestWithHelp":{
       "Location":"../fixtures/plugins/test_with_help.exe",
       "Commands":[

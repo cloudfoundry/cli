@@ -99,8 +99,10 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata plugi
 		cmd.ui.Failed(fmt.Sprintf(T("Error getting command list from plugin {{.FilePath}}", map[string]interface{}{"FilePath": pluginSourceFilepath})))
 	}
 
+	shortNames := cmd.getShortNames()
+
 	for _, pluginCmd := range pluginMetadata.Commands {
-		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists || pluginCmd.Name == "help" {
+		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists || shortNames[pluginCmd.Name] || pluginCmd.Name == "help" {
 			cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Name})))
 		}
@@ -151,6 +153,17 @@ func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSou
 	if err != nil && os.IsNotExist(err) {
 		cmd.ui.Failed(fmt.Sprintf(T("Binary file '{{.BinaryFile}}' not found", map[string]interface{}{"BinaryFile": pluginSourceFilepath})))
 	}
+}
+
+func (cmd *PluginInstall) getShortNames() map[string]bool {
+	shortNames := make(map[string]bool)
+	for _, singleCmd := range cmd.coreCmds {
+		metaData := singleCmd.Metadata()
+		if metaData.ShortName != "" {
+			shortNames[metaData.ShortName] = true
+		}
+	}
+	return shortNames
 }
 
 func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {

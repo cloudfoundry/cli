@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command"
 	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
+	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/plugin"
@@ -34,10 +35,11 @@ var _ = Describe("Install", func() {
 		pluginDir  string
 		curDir     string
 
-		test_1         string
-		test_2         string
-		test_with_help string
-		test_with_push string
+		test_1                    string
+		test_2                    string
+		test_with_help            string
+		test_with_push            string
+		test_with_push_short_name string
 	)
 
 	BeforeEach(func() {
@@ -54,6 +56,7 @@ var _ = Describe("Install", func() {
 		test_2 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.exe")
 		test_with_help = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.exe")
 		test_with_push = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push.exe")
+		test_with_push_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push_short_name.exe")
 
 		rpc.DefaultServer = rpc.NewServer()
 
@@ -103,12 +106,27 @@ var _ = Describe("Install", func() {
 		})
 
 		Context("when the plugin contains a core command", func() {
-			It("fails", func() {
+			It("fails if is shares a command name", func() {
 				coreCmds["push"] = &testCommand.FakeCommand{}
 				runCommand(test_with_push)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Command `push` in the plugin being installed is a native CF command.  Rename the `push` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"FAILED"},
+				))
+			})
+
+			It("fails if it shares a command short name", func() {
+				push := &testCommand.FakeCommand{}
+				push.MetadataReturns(command_metadata.CommandMetadata{
+					ShortName: "p",
+				})
+
+				coreCmds["push"] = push
+				runCommand(test_with_push_short_name)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Command `p` in the plugin being installed is a native CF command.  Rename the `p` command in the plugin being installed in order to enable its installation and use."},
 					[]string{"FAILED"},
 				))
 			})
@@ -128,6 +146,7 @@ var _ = Describe("Install", func() {
 				}
 				config.PluginsReturns(pluginsMap)
 			})
+
 			It("fails", func() {
 				runCommand(test_1)
 
