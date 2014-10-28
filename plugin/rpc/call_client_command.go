@@ -79,6 +79,7 @@ func startCliServer(coreCommandRunner *cli.App, outputCapture terminal.OutputCap
 func runPlugin(location string, pluginPort string, servicePort string) (*exec.Cmd, error) {
 	cmd := exec.Command(location, pluginPort, servicePort)
 	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
 	err := cmd.Start()
 	if err != nil {
 		return nil, err
