@@ -57,13 +57,13 @@ var _ = Describe("Gateway", func() {
 	})
 
 	Describe("Connection errors", func() {
-		var oldNewHttpClient func(trustedCerts []tls.Certificate, disableSSL bool) HttpClientInterface
+		var oldNewHttpClient func(tr *http.Transport) HttpClientInterface
 
 		BeforeEach(func() {
 			client = &fakes.FakeHttpClientInterface{}
 
 			oldNewHttpClient = NewHttpClient
-			NewHttpClient = func(trustedCerts []tls.Certificate, disableSSL bool) HttpClientInterface {
+			NewHttpClient = func(tr *http.Transport) HttpClientInterface {
 				return client
 			}
 		})
