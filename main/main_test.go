@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"bufio"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -102,6 +103,12 @@ var _ = Describe("main", func() {
 			output := Cf("core-command", "plugins").Wait(3 * time.Second)
 			Eventually(output.Out.Contents).Should(MatchRegexp("Command output from the plugin(.*\\W)*awesomeness(.*\\W)*FIN"))
 		})
+
+		It("Can call a plugin that requires stdin (interactive)", func() {
+			session := CfWithIo("input", "silly\n").Wait(5 * time.Second)
+
+			Eventually(session.Out).Should(Say("silly"))
+		})
 	})
 })
 
@@ -110,6 +117,24 @@ func Cf(args ...string) *Session {
 	Expect(err).NotTo(HaveOccurred())
 
 	session, err := Start(exec.Command(path, args...), GinkgoWriter, GinkgoWriter)
+	Expect(err).NotTo(HaveOccurred())
+
+	return session
+}
+func CfWithIo(command string, args string) *Session {
+	path, err := Build("github.com/cloudfoundry/cli/main")
+	Expect(err).NotTo(HaveOccurred())
+
+	cmd := exec.Command(path, command)
+
+	stdin, err := cmd.StdinPipe()
+	Expect(err).ToNot(HaveOccurred())
+
+	buffer := bufio.NewWriter(stdin)
+	buffer.WriteString(args)
+	buffer.Flush()
+
+	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 
 	return session

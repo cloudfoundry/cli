@@ -38,6 +38,12 @@
         {"Name":"my-say","HelpText":"Help text for saying stuff"}
       ]
     },
+    "Input":{
+      "Location":"../fixtures/plugins/input.exe",
+      "Commands":[
+        {"Name":"input","HelpText":"help text for input"}
+      ]
+    },
     "CoreCmd":{
       "Location":"../fixtures/plugins/call_core_cmd.exe",
       "Commands":[
