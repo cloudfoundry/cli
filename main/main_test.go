@@ -78,6 +78,11 @@ var _ = Describe("main", func() {
 			Consistently(output.Out, 1).ShouldNot(Say("You called push in test_with_push"))
 		})
 
+		It("Calls the core short name if a plugin shares the same name", func() {
+			output := Cf("p")
+			Consistently(output.Out, 1).ShouldNot(Say("You called p within the plugin"))
+		})
+
 		It("Passes all arguments to a plugin", func() {
 			output := Cf("my-say", "foo").Wait(3 * time.Second)
 			Eventually(output.Out).Should(Say("foo"))
