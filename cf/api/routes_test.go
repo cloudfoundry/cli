@@ -163,6 +163,70 @@ var _ = Describe("route repository", func() {
 
 	})
 
+	Describe("Check routes", func() {
+		It("checks if a route exists", func() {
+			ts, handler = testnet.NewServer([]testnet.TestRequest{
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     "/v2/routes/reserved/domain/domain-guid/host/my-host",
+					Response: testnet.TestResponse{Status: http.StatusNoContent},
+				}),
+			})
+			configRepo.SetApiEndpoint(ts.URL)
+
+			domain := models.DomainFields{}
+			domain.Guid = "domain-guid"
+
+			found, apiErr := repo.CheckIfExists("my-host", domain)
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(found).To(BeTrue())
+		})
+		Context("when the route is not found", func() {
+			It("does not return the error", func() {
+				ts, handler = testnet.NewServer([]testnet.TestRequest{
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "GET",
+						Path:     "/v2/routes/reserved/domain/domain-guid/host/my-host",
+						Response: testnet.TestResponse{Status: http.StatusNotFound},
+					}),
+				})
+				configRepo.SetApiEndpoint(ts.URL)
+
+				domain := models.DomainFields{}
+				domain.Guid = "domain-guid"
+
+				found, apiErr := repo.CheckIfExists("my-host", domain)
+
+				Expect(handler).To(HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(found).To(BeFalse())
+			})
+		})
+		Context("when there is a random httpError", func() {
+			It("returns false and the error", func() {
+				ts, handler = testnet.NewServer([]testnet.TestRequest{
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "GET",
+						Path:     "/v2/routes/reserved/domain/domain-guid/host/my-host",
+						Response: testnet.TestResponse{Status: http.StatusForbidden},
+					}),
+				})
+				configRepo.SetApiEndpoint(ts.URL)
+
+				domain := models.DomainFields{}
+				domain.Guid = "domain-guid"
+
+				found, apiErr := repo.CheckIfExists("my-host", domain)
+
+				Expect(handler).To(HaveAllRequestsCalled())
+				Expect(apiErr).To(HaveOccurred())
+				Expect(found).To(BeFalse())
+			})
+		})
+	})
+
 	Describe("Bind routes", func() {
 		It("binds routes", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{

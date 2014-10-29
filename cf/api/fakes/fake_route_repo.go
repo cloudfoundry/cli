@@ -26,6 +26,9 @@ type FakeRouteRepository struct {
 	CreateInSpaceCreatedRoute models.Route
 	CreateInSpaceErr          bool
 
+	CheckIfExistsFound bool
+	CheckIfExistsError error
+
 	BindErr        error
 	BoundRouteGuid string
 	BoundAppGuid   string
@@ -76,6 +79,18 @@ func (repo *FakeRouteRepository) Create(host string, domain models.DomainFields)
 	return
 }
 
+func (repo *FakeRouteRepository) CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error) {
+	if repo.CheckIfExistsFound {
+		found = true
+	} else {
+		found = false
+	}
+
+	if repo.CheckIfExistsError != nil {
+		apiErr = repo.CheckIfExistsError
+	}
+	return
+}
 func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
 	repo.CreateInSpaceHost = host
 	repo.CreateInSpaceDomainGuid = domainGuid

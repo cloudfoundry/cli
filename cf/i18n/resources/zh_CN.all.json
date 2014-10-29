@@ -505,6 +505,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME check-route HOST DOMAIN",
+      "translation": "CF_NAME check-route HOST DOMAIN",
+      "modified": false
+   },
+   {
       "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false] [--locale (LOCALE | CLEAR)]",
       "translation": "CF_NAME config [--async-timeout 超时_以分钟为单位] [--trace true | false | 文件访问路径] [--color true | false]",
       "modified": true
@@ -1067,6 +1072,11 @@
    {
       "id": "Changing password...",
       "translation": "正在更改密码...",
+      "modified": false
+   },
+   {
+      "id": "Checking for route...",
+      "translation": "Checking for route...",
       "modified": false
    },
    {
@@ -2840,6 +2850,11 @@
       "modified": false
    },
    {
+      "id": "Perform a simple check to determine whether a route currently exists or not.",
+      "translation": "Perform a simple check to determine whether a route currently exists or not.",
+      "modified": false
+   },
+   {
       "id": "Plan does not exist for the {{.ServiceName}} service",
       "translation": "Plan does not exist for the {{.ServiceName}} service",
       "modified": false
@@ -3172,6 +3187,16 @@
    {
       "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
       "translation": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Route {{.HostName}}.{{.DomainName}} does exist",
+      "translation": "Route {{.HostName}}.{{.DomainName}} does exist",
+      "modified": false
+   },
+   {
+      "id": "Route {{.HostName}}.{{.DomainName}} does not exist",
+      "translation": "Route {{.HostName}}.{{.DomainName}} does not exist",
       "modified": false
    },
    {
