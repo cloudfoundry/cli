@@ -32,6 +32,17 @@ type FakeApplicationRepository struct {
 		AppGuid string
 	}
 
+	ReadFromSpaceStub        func(name string, spaceGuid string) (app models.Application, apiErr error)
+	readFromSpaceMutex       sync.RWMutex
+	readFromSpaceArgsForCall []struct {
+		name      string
+		spaceGuid string
+	}
+	readFromSpaceReturns struct {
+		result1 models.Application
+		result2 error
+	}
+
 	ReadEnvStub        func(guid string) (*models.Environment, error)
 	readEnvMutex       sync.RWMutex
 	readEnvArgsForCall []struct {
@@ -44,6 +55,38 @@ type FakeApplicationRepository struct {
 }
 
 //counterfeiter section
+func (fake *FakeApplicationRepository) ReadFromSpace(name string, spaceGuid string) (app models.Application, apiErr error) {
+	fake.readFromSpaceMutex.Lock()
+	defer fake.readFromSpaceMutex.Unlock()
+	fake.readFromSpaceArgsForCall = append(fake.readFromSpaceArgsForCall, struct {
+		name      string
+		spaceGuid string
+	}{name, spaceGuid})
+	if fake.ReadFromSpaceStub != nil {
+		return fake.ReadFromSpaceStub(name, spaceGuid)
+	} else {
+		return fake.readFromSpaceReturns.result1, fake.readFromSpaceReturns.result2
+	}
+}
+
+func (fake *FakeApplicationRepository) ReadFromSpaceCallCount() int {
+	fake.readFromSpaceMutex.RLock()
+	defer fake.readFromSpaceMutex.RUnlock()
+	return len(fake.readFromSpaceArgsForCall)
+}
+
+func (fake *FakeApplicationRepository) ReadFromSpaceArgsForCall(i int) (string, string) {
+	fake.readFromSpaceMutex.RLock()
+	defer fake.readFromSpaceMutex.RUnlock()
+	return fake.readFromSpaceArgsForCall[i].name, fake.readFromSpaceArgsForCall[i].spaceGuid
+}
+
+func (fake *FakeApplicationRepository) ReadFromSpaceReturns(result1 models.Application, result2 error) {
+	fake.readFromSpaceReturns = struct {
+		result1 models.Application
+		result2 error
+	}{result1, result2}
+}
 func (fake *FakeApplicationRepository) ReadEnv(guid string) (*models.Environment, error) {
 	fake.readEnvMutex.Lock()
 	fake.readEnvArgsForCall = append(fake.readEnvArgsForCall, struct {

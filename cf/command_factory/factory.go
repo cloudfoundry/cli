@@ -284,6 +284,15 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["uninstall-plugin"] = plugin.NewPluginUninstall(ui, pluginConfig)
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, pluginConfig, factory.cmdsByName)
 	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, pluginConfig)
+	factory.cmdsByName["copy-source"] = application.NewCopySource(
+		ui,
+		config,
+		repoLocator.GetAuthenticationRepository(),
+		repoLocator.GetApplicationRepository(),
+		repoLocator.GetOrganizationRepository(),
+		repoLocator.GetSpaceRepository(),
+		repoLocator.GetCopyApplicationSourceRepository(),
+	)
 	return
 }
 

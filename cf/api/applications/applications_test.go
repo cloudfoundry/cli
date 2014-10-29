@@ -52,6 +52,23 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 	})
 
+	Describe(".ReadFromSpace", func() {
+		It("returns an application using the given space guid", func() {
+			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/spaces/another-space-guid/apps?q=name%3AMy+App&inline-relations-depth=1",
+				Response: singleAppResponse,
+			})
+			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
+			defer ts.Close()
+			app, err := repo.ReadFromSpace("My App", "another-space-guid")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(app.Name).To(Equal("My App"))
+		})
+	})
+
 	Describe("creating applications", func() {
 		It("makes the right request", func() {
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{createApplicationRequest})

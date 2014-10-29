@@ -70,6 +70,11 @@
       "modified": false
    },
    {
+      "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
+      "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
+      "modified": false
+   },
+   {
       "id": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n",
       "translation": "   CF_NAME login (omitir nombre de usuario y clave para loguearse interactivamente -- CF_NAME preguntará por ambas)\n",
       "modified": false
@@ -1102,6 +1107,11 @@
    {
       "id": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
       "translation": "Conectando, tailing logs para la app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}...\n",
+      "modified": false
+   },
+   {
+      "id": "Copy an app\n",
+      "translation": "Copy an app\n",
       "modified": false
    },
    {
@@ -2495,6 +2505,11 @@
       "modified": false
    },
    {
+      "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
+      "translation": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
+      "modified": false
+   },
+   {
       "id": "Make a user-provided service instance available to cf apps",
       "translation": "Hace que un servicio provisto por el usuario este disponible en las apps de cf",
       "modified": false
@@ -2760,6 +2775,11 @@
       "modified": false
    },
    {
+      "id": "Org that contains the target application",
+      "translation": "Org that contains the target application",
+      "modified": false
+   },
+   {
       "id": "Org {{.OrgName}} already exists",
       "translation": "La org {{.OrgName}} todavia existe",
       "modified": false
@@ -2792,6 +2812,11 @@
    {
       "id": "Override path to default plugin config directory",
       "translation": "Override path to default plugin config directory",
+      "modified": false
+   },
+   {
+      "id": "Override restart of the application in target environment after copy-source completes",
+      "translation": "Override restart of the application in target environment after copy-source completes",
       "modified": false
    },
    {
@@ -3462,6 +3487,11 @@
    {
       "id": "Space Quota:",
       "translation": "Space Quota:",
+      "modified": false
+   },
+   {
+      "id": "Space that contains the target application",
+      "translation": "Space that contains the target application",
       "modified": false
    },
    {

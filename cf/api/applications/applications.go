@@ -18,6 +18,7 @@ import (
 type ApplicationRepository interface {
 	Create(params models.AppParams) (createdApp models.Application, apiErr error)
 	Read(name string) (app models.Application, apiErr error)
+	ReadFromSpace(name string, spaceGuid string) (app models.Application, apiErr error)
 	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error)
 	Delete(appGuid string) (apiErr error)
 	ReadEnv(guid string) (*models.Environment, error)
@@ -54,7 +55,11 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 }
 
 func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiErr error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid, url.QueryEscape("name:"+name))
+	return repo.ReadFromSpace(name, repo.config.SpaceFields().Guid)
+}
+
+func (repo CloudControllerApplicationRepository) ReadFromSpace(name string, spaceGuid string) (app models.Application, apiErr error) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.ApiEndpoint(), spaceGuid, url.QueryEscape("name:"+name))
 	appResources := new(resources.PaginatedApplicationResources)
 	apiErr = repo.gateway.GetResource(path, appResources)
 	if apiErr != nil {

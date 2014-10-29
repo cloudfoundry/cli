@@ -8,10 +8,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 
 	"github.com/cloudfoundry/cli/cf/api/app_events"
+	api_app_files "github.com/cloudfoundry/cli/cf/api/app_files"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	applications "github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
+	"github.com/cloudfoundry/cli/cf/api/copy_application_source"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/api/password"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
@@ -23,8 +25,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	stacks "github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
-
-	api_app_files "github.com/cloudfoundry/cli/cf/api/app_files"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -68,6 +68,7 @@ type RepositoryLocator struct {
 	spaceQuotaRepo                  space_quotas.SpaceQuotaRepository
 	featureFlagRepo                 feature_flags.FeatureFlagRepository
 	environmentVariableGroupRepo    environment_variable_groups.EnvironmentVariableGroupsRepository
+	copyAppSourceRepo               copy_application_source.CopyApplicationSourceRepository
 }
 
 func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
@@ -120,6 +121,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.spaceQuotaRepo = space_quotas.NewCloudControllerSpaceQuotaRepository(config, cloudControllerGateway)
 	loc.featureFlagRepo = feature_flags.NewCloudControllerFeatureFlagRepository(config, cloudControllerGateway)
 	loc.environmentVariableGroupRepo = environment_variable_groups.NewCloudControllerEnvironmentVariableGroupsRepository(config, cloudControllerGateway)
+	loc.copyAppSourceRepo = copy_application_source.NewCloudControllerCopyApplicationSourceRepository(config, cloudControllerGateway)
 	return
 }
 
@@ -261,4 +263,8 @@ func (locator RepositoryLocator) GetFeatureFlagRepository() feature_flags.Featur
 
 func (locator RepositoryLocator) GetEnvironmentVariableGroupsRepository() environment_variable_groups.EnvironmentVariableGroupsRepository {
 	return locator.environmentVariableGroupRepo
+}
+
+func (locator RepositoryLocator) GetCopyApplicationSourceRepository() copy_application_source.CopyApplicationSourceRepository {
+	return locator.copyAppSourceRepo
 }
