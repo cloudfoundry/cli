@@ -2711,7 +2711,7 @@
    },
    {
       "id": "Not logged in. Use '{{.CFLoginCommand}}' to log in.",
-      "translation": "Pas connecté. Utiliser '{{.CFLoginCommand}}' pour vous connecté.",
+      "translation": "Pas connecté. Utiliser '{{.CFLoginCommand}}' pour vous connecter.",
       "modified": false
    },
    {
