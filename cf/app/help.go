@@ -193,6 +193,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentCommand("routes"),
 					presentCommand("create-route"),
+					presentCommand("check-route"),
 					presentCommand("map-route"),
 					presentCommand("unmap-route"),
 					presentCommand("delete-route"),

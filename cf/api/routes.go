@@ -2,19 +2,21 @@ package api
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error)
 	Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error)
+	CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error)
 	CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
 	Unbind(routeGuid, appGuid string) (apiErr error)
@@ -63,6 +65,22 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host string, doma
 
 func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error) {
 	return repo.CreateInSpace(host, domain.Guid, repo.config.SpaceFields().Guid)
+}
+
+func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error) {
+	var raw_response interface{}
+	apiErr = repo.gateway.GetResource(fmt.Sprintf("%s/v2/routes/reserved/domain/%s/host/%s", repo.config.ApiEndpoint(), domain.Guid, host), &raw_response)
+
+	switch apiErr.(type) {
+	case nil:
+		found = true
+	case *errors.HttpNotFoundError:
+		found = false
+		apiErr = nil
+	default:
+		return
+	}
+	return
 }
 
 func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
