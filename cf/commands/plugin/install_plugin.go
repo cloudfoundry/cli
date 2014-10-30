@@ -2,11 +2,9 @@ package plugin
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -167,18 +165,10 @@ func (cmd *PluginInstall) getShortNames() map[string]bool {
 }
 
 func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
-	pluginInvocation := exec.Command(location, obtainPort(), servicePort, "SendMetadata")
+	pluginInvocation := exec.Command(location, servicePort, "SendMetadata")
 
 	err := pluginInvocation.Run()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
-}
-
-func obtainPort() string {
-	//assign 0 to port to get a random open port
-	l, _ := net.Listen("tcp", "127.0.0.1:0")
-	port := strconv.Itoa(l.Addr().(*net.TCPAddr).Port)
-	l.Close()
-	return port
 }

@@ -34,9 +34,8 @@ type RpcPlugin interface {
 
 /**
 	* This function is called by the plugin to setup their server. This allows us to call Run on the plugin
-	* os.Args[1] port plugin rpc will be listening on
-	* os.Args[2] port CF_CLI rpc server is running on
-	* os.Args[3] **OPTIONAL**
+	* os.Args[1] port CF_CLI rpc server is running on
+	* os.Args[2] **OPTIONAL**
 		* SendMetadata - used to fetch the plugin metadata
 **/
 func Start(cmd RpcPlugin) {
@@ -45,17 +44,17 @@ func Start(cmd RpcPlugin) {
 		sendPluginMetadataToCliServer(cmd)
 	} else {
 		var thing bool
-		cmd.Run(os.Args[3:], &thing)
+		cmd.Run(os.Args[2:], &thing)
 	}
 }
 
 func isMetadataRequest() bool {
-	return len(os.Args) == 4 && os.Args[3] == "SendMetadata"
+	return len(os.Args) == 3 && os.Args[2] == "SendMetadata"
 }
 
 func sendPluginMetadataToCliServer(cmd RpcPlugin) {
 	pluginName := reflect.TypeOf(cmd).Elem().Name()
-	cliServerConn, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[2])
+	cliServerConn, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[1])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -110,7 +109,7 @@ func pingCLI() {
 	var connErr error
 	var conn net.Conn
 	for i := 0; i < 5; i++ {
-		CliServicePort = os.Args[2]
+		CliServicePort = os.Args[1]
 		conn, connErr = net.Dial("tcp", "127.0.0.1:"+CliServicePort)
 		if connErr != nil {
 			time.Sleep(200 * time.Millisecond)

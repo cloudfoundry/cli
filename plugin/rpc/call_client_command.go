@@ -24,7 +24,7 @@ func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture 
 				}
 
 				defer cliServer.Stop()
-				pluginArgs := append([]string{"empty arg", cliServer.Port()}, args...)
+				pluginArgs := append([]string{cliServer.Port()}, args...)
 				cmd := exec.Command(metadata.Location, pluginArgs...)
 				cmd.Stdout = os.Stdout
 				cmd.Stdin = os.Stdin
@@ -63,18 +63,6 @@ func startCliServer(coreCommandRunner *cli.App, outputCapture terminal.OutputCap
 	}
 
 	return cliServer, nil
-}
-
-func runPlugin(location string, pluginPort string, servicePort string) (*exec.Cmd, error) {
-	cmd := exec.Command(location, pluginPort, servicePort)
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	err := cmd.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	return cmd, nil
 }
 
 func stopPlugin(plugin *exec.Cmd) {
