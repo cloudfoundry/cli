@@ -1,8 +1,9 @@
 package organization
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
@@ -10,8 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
-	"text/tabwriter"
 )
 
 type ShowOrg struct {
@@ -56,7 +55,9 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 			"OrgName":  terminal.EntityNameColor(org.Name),
 			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s:", terminal.EntityNameColor(org.Name))
+	cmd.ui.Say("")
+
+	table := terminal.NewTable(cmd.ui, []string{terminal.EntityNameColor(org.Name) + ":", "", ""})
 
 	domains := []string{}
 	for _, domain := range org.Domains {
@@ -76,15 +77,10 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 			"RoutesLimit":             quota.RoutesLimit,
 			"ServicesLimit":           quota.ServicesLimit,
 			"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
-	writer := new(tabwriter.Writer)
-	output := new(bytes.Buffer)
 
-	writer.Init(output, 0, 4, 2, ' ', 0)
+	table.Add("", T("domains:"), terminal.EntityNameColor(strings.Join(domains, ", ")))
+	table.Add("", T("quota:"), terminal.EntityNameColor(orgQuota))
+	table.Add("", T("spaces:"), terminal.EntityNameColor(strings.Join(spaces, ", ")))
 
-	fmt.Fprintln(writer, T("\tdomains:\t{{.Domains}}", map[string]interface{}{"Domains": terminal.EntityNameColor(strings.Join(domains, ", "))}))
-	fmt.Fprintln(writer, T("\tquota:\t{{.Quota}}", map[string]interface{}{"Quota": terminal.EntityNameColor(orgQuota)}))
-	fmt.Fprintln(writer, T("\tspaces:\t{{.Spaces}}", map[string]interface{}{"Spaces": terminal.EntityNameColor(strings.Join(spaces, ", "))}))
-
-	writer.Flush()
-	cmd.ui.Say(output.String())
+	table.Print()
 }
