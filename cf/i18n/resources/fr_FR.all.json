@@ -1115,6 +1115,21 @@
       "modified": false
    },
    {
+      "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in organization {{.Org}} and space {{.Space}}",
+      "translation": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in organization {{.Org}} and space {{.Space}}",
+      "modified": false
+   },
+   {
+      "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space",
+      "translation": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space",
+      "modified": false
+   },
+   {
+      "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space {{.Space}}",
+      "translation": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space {{.Space}}",
+      "modified": false
+   },
+   {
       "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
       "translation": "Impossible de lier au service {{.ServiceName}}\nErreur: {{.Err}}",
       "modified": false
@@ -1152,6 +1167,11 @@
    {
       "id": "Could not find service {{.ServiceName}} to bind to {{.AppName}}",
       "translation": "Impossible de trouver le service {{.ServiceName}} de se lier à {{.AppName}}",
+      "modified": false
+   },
+   {
+      "id": "Could not find space {{.Space}} in organization {{.Org}}",
+      "translation": "Could not find space {{.Space}} in organization {{.Org}}",
       "modified": false
    },
    {
@@ -2740,6 +2760,11 @@
       "modified": false
    },
    {
+      "id": "Note: this may take some time",
+      "translation": "Note: this may take some time",
+      "modified": false
+   },
+   {
       "id": "Number of instances",
       "translation": "Nombre d'instances",
       "modified": false
@@ -2912,6 +2937,11 @@
    {
       "id": "Please log in again",
       "translation": "S'il vous plaît, connecter à nouveau",
+      "modified": false
+   },
+   {
+      "id": "Please provide the space within the organization containing the target application",
+      "translation": "Please provide the space within the organization containing the target application",
       "modified": false
    },
    {

@@ -292,6 +292,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		repoLocator.GetOrganizationRepository(),
 		repoLocator.GetSpaceRepository(),
 		repoLocator.GetCopyApplicationSourceRepository(),
+		restart, //note this is built up above.
 	)
 	return
 }
