@@ -47,41 +47,17 @@ func Start(cmd RpcPlugin) {
 		os.Exit(1)
 	}
 
+	pingCLI()
+
+	if isMetadataRequest() {
+		sendPluginMetadataToCliServer(cmd)
+		return
+	}
+
 	listener, err := net.Listen("tcp", ":"+os.Args[1])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	}
-
-	pingCLI()
-
-	//Send CLI the plugin command name.
-	if len(os.Args) == 4 {
-		if os.Args[3] == "SendMetadata" {
-			pluginName := reflect.TypeOf(cmd).Elem().Name()
-			client, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[2])
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-
-			var success bool
-			pluginMetadata := PluginMetadata{
-				Name:     pluginName,
-				Commands: cmd.GetCommands(),
-			}
-			err = client.Call("CliRpcCmd.SetPluginMetadata", pluginMetadata, &success)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-
-			if !success {
-				os.Exit(1)
-			}
-
-			os.Exit(0)
-		}
 	}
 
 	//listen for the run command
@@ -92,6 +68,37 @@ func Start(cmd RpcPlugin) {
 			go rpc.ServeConn(conn)
 		}
 	}
+}
+
+func isMetadataRequest() bool {
+	return len(os.Args) == 4 && os.Args[3] == "SendMetadata"
+}
+
+func sendPluginMetadataToCliServer(cmd RpcPlugin) {
+	pluginName := reflect.TypeOf(cmd).Elem().Name()
+	cliServerConn, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[2])
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	var success bool
+	pluginMetadata := PluginMetadata{
+		Name:     pluginName,
+		Commands: cmd.GetCommands(),
+	}
+	err = cliServerConn.Call("CliRpcCmd.SetPluginMetadata", pluginMetadata, &success)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	if !success {
+		os.Exit(1)
+	}
+
+	os.Exit(0)
+
 }
 
 func CliCommand(args ...string) ([]string, error) {

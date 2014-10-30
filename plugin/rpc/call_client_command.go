@@ -16,27 +16,26 @@ import (
 func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture terminal.OutputCapture) (bool, error) {
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
-	port := obtainPort()
-
-	service, err := startCliServer(coreCommandRunner, outputCapture)
-	if err != nil {
-		return false, err
-	}
-
-	defer service.Stop()
 
 	for pluginName, metadata := range pluginList {
 		for _, command := range metadata.Commands {
 			if command.Name == args[0] {
+				cliServer, err := startCliServer(coreCommandRunner, outputCapture)
+				if err != nil {
+					return false, err
+				}
 
-				cmd, err := runPlugin(metadata.Location, port, service.Port())
+				defer cliServer.Stop()
+
+				pluginPort := obtainPort()
+				pluginProcess, err := runPlugin(metadata.Location, pluginPort, cliServer.Port())
 				if err != nil {
 					continue
 				}
 
-				defer stopPlugin(cmd)
+				defer stopPlugin(pluginProcess)
 
-				_, err = runClientCmd(pluginName+".Run", port, args)
+				_, err = runClientCmd(pluginName, pluginPort, args)
 				return true, err
 			}
 		}
@@ -44,17 +43,17 @@ func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture 
 	return false, nil
 }
 
-func runClientCmd(cmd string, port string, args []string) (bool, error) {
-	client, err := dialClient(port)
+func runClientCmd(pluginName string, pluginPort string, args []string) (bool, error) {
+	client, err := dialServer(pluginPort)
 	var reply bool
-	err = client.Call(cmd, args, &reply)
+	err = client.Call(pluginName+".Run", args, &reply)
 	if err != nil {
 		return false, err
 	}
 	return reply, nil
 }
 
-func dialClient(port string) (*rpc.Client, error) {
+func dialServer(port string) (*rpc.Client, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+port)
 	if err != nil {
 		return nil, err
@@ -63,17 +62,17 @@ func dialClient(port string) (*rpc.Client, error) {
 }
 
 func startCliServer(coreCommandRunner *cli.App, outputCapture terminal.OutputCapture) (*CliRpcService, error) {
-	service, err := NewRpcService(coreCommandRunner, outputCapture)
+	cliServer, err := NewRpcService(coreCommandRunner, outputCapture)
 	if err != nil {
 		return nil, err
 	}
 
-	err = service.Start()
+	err = cliServer.Start()
 	if err != nil {
 		return nil, err
 	}
 
-	return service, nil
+	return cliServer, nil
 }
 
 func runPlugin(location string, pluginPort string, servicePort string) (*exec.Cmd, error) {
@@ -85,7 +84,7 @@ func runPlugin(location string, pluginPort string, servicePort string) (*exec.Cm
 		return nil, err
 	}
 
-	err = pingPlugin(pluginPort)
+	err = waitForPluginToRespondToRpc(pluginPort)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +105,7 @@ func obtainPort() string {
 	return port
 }
 
-func pingPlugin(port string) error {
+func waitForPluginToRespondToRpc(port string) error {
 	var err error
 	var conn net.Conn
 	for i := 0; i < 5; i++ {
