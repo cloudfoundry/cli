@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -56,6 +57,13 @@ func (cmd *UpdateService) GetRequirements(requirementsFactory requirements.Facto
 
 func (cmd *UpdateService) Run(c *cli.Context) {
 	serviceInstanceName := c.Args()[0]
+
+	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+		return
+	}
+
 	planName := c.String("p")
 
 	if planName != "" {
@@ -65,7 +73,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 				"UserName":    terminal.EntityNameColor(cmd.config.Username()),
 			}))
 
-		err := cmd.updateServiceWithPlan(serviceInstanceName, planName)
+		err := cmd.updateServiceWithPlan(serviceInstance, planName)
 		switch err.(type) {
 		case nil:
 			cmd.ui.Ok()
@@ -78,12 +86,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *UpdateService) updateServiceWithPlan(serviceInstanceName, planName string) (err error) {
-	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
-	if err != nil {
-		return
-	}
-
+func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceInstance, planName string) (err error) {
 	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.Guid, cmd.config.OrganizationFields().Name)
 	if err != nil {
 		return
