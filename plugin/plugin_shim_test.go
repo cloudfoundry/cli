@@ -80,7 +80,7 @@ var _ = Describe("Command", func() {
 				Expect(connErr).ToNot(HaveOccurred())
 			})
 
-			Context("when called to install by `cf install-plugin`", func() {
+			Context("when called to SendMetadata by `cf install-plugin`", func() {
 				It("exits 1 when we cannot dial the cli rpc server", func() {
 					args = append(args, "SendMetadata")
 
