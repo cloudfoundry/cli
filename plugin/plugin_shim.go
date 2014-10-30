@@ -40,33 +40,12 @@ type RpcPlugin interface {
 		* SendMetadata - used to fetch the plugin metadata
 **/
 func Start(cmd RpcPlugin) {
-	//register command
-	err := rpc.Register(cmd)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
 	pingCLI()
-
 	if isMetadataRequest() {
 		sendPluginMetadataToCliServer(cmd)
-		return
-	}
-
-	listener, err := net.Listen("tcp", ":"+os.Args[1])
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	//listen for the run command
-	for {
-		if conn, err := listener.Accept(); err != nil {
-			fmt.Println("accept error: " + err.Error())
-		} else {
-			go rpc.ServeConn(conn)
-		}
+	} else {
+		var thing bool
+		cmd.Run(os.Args[3:], &thing)
 	}
 }
 
@@ -83,6 +62,7 @@ func sendPluginMetadataToCliServer(cmd RpcPlugin) {
 	}
 
 	var success bool
+
 	pluginMetadata := PluginMetadata{
 		Name:     pluginName,
 		Commands: cmd.GetCommands(),
