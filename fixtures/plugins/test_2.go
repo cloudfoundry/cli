@@ -37,6 +37,10 @@ func (c *Test2) GetCommands() []plugin.Command {
 	}
 }
 
+func (c *Test2) GetName() string {
+	return "Test2"
+}
+
 func theFirstCmd() {
 	fmt.Println("You called cmd1 in test_2")
 }

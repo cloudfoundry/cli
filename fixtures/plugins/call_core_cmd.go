@@ -21,6 +21,10 @@ func (c *CoreCmd) GetCommands() []plugin.Command {
 	}
 }
 
+func (c *CoreCmd) GetName() string {
+	return "CoreCmd"
+}
+
 func main() {
 	plugin.Start(new(CoreCmd))
 }

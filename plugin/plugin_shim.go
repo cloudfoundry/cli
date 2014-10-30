@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/rpc"
 	"os"
-	"reflect"
 	"time"
 )
 
@@ -30,6 +29,7 @@ type RpcPlugin interface {
 	//an object containing all of the cli commands available to them
 	Run(args []string, reply *bool) error
 	GetCommands() []Command
+	GetName() string
 }
 
 /**
@@ -53,7 +53,6 @@ func isMetadataRequest() bool {
 }
 
 func sendPluginMetadataToCliServer(cmd RpcPlugin) {
-	pluginName := reflect.TypeOf(cmd).Elem().Name()
 	cliServerConn, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[1])
 	if err != nil {
 		fmt.Println(err)
@@ -63,9 +62,10 @@ func sendPluginMetadataToCliServer(cmd RpcPlugin) {
 	var success bool
 
 	pluginMetadata := PluginMetadata{
-		Name:     pluginName,
+		Name:     cmd.GetName(),
 		Commands: cmd.GetCommands(),
 	}
+
 	err = cliServerConn.Call("CliRpcCmd.SetPluginMetadata", pluginMetadata, &success)
 	if err != nil {
 		fmt.Println(err)

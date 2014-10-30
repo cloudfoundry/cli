@@ -12,6 +12,10 @@ func (c *EmptyPlugin) GetCommands() []plugin.Command {
 	return []plugin.Command{}
 }
 
+func (c *EmptyPlugin) GetName() string {
+	return "EmptyPlugin"
+}
+
 func main() {
 	plugin.Start(new(EmptyPlugin))
 }

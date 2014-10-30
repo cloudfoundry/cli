@@ -33,6 +33,10 @@ func (c *MySay) Run(args []string, reply *bool) error {
 	return nil
 }
 
+func (c *MySay) GetName() string {
+	return "MySay"
+}
+
 func (c *MySay) GetCommands() []plugin.Command {
 	return []plugin.Command{
 		{

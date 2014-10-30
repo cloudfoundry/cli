@@ -27,6 +27,10 @@ func (c *Input) Run(args []string, reply *bool) error {
 	return nil
 }
 
+func (c *Input) GetName() string {
+	return "Input"
+}
+
 func (c *Input) GetCommands() []plugin.Command {
 	return []plugin.Command{
 		{
