@@ -4166,7 +4166,7 @@
    },
    {
       "id": "domains:",
-      "translation": "domains:", 
+      "translation": "domains:",
       "modified": false
    },
    {
@@ -4422,6 +4422,11 @@
    {
       "id": "space",
       "translation": "space",
+      "modified": false
+   },
+   {
+      "id": "space quotas:",
+      "translation": "space quotas:",
       "modified": false
    },
    {

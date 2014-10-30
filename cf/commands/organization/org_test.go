@@ -81,6 +81,10 @@ var _ = Describe("org command", func() {
 			org.QuotaDefinition = models.NewQuotaFields("cantina-quota", 512, 2, 5, true)
 			org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 			org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
+			org.SpaceQuotas = []models.SpaceQuota{
+				{Name: "space-quota-1"},
+				{Name: "space-quota-2"},
+			}
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.Organization = org
@@ -94,9 +98,10 @@ var _ = Describe("org command", func() {
 				[]string{"Getting info for org", "my-org", "my-user"},
 				[]string{"OK"},
 				[]string{"my-org"},
-				[]string{"  domains:", "cfapps.io", "cf-app.com"},
-				[]string{"  quota: ", "cantina-quota", "512M", "2 routes", "5 services", "paid services allowed"},
-				[]string{"  spaces:", "development", "staging"},
+				[]string{"domains:", "cfapps.io", "cf-app.com"},
+				[]string{"quota: ", "cantina-quota", "512M", "2 routes", "5 services", "paid services allowed"},
+				[]string{"spaces:", "development", "staging"},
+				[]string{"space quotas:", "space-quota-1", "space-quota-2"},
 			))
 		})
 	})

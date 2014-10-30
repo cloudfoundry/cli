@@ -69,6 +69,11 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 		spaces = append(spaces, space.Name)
 	}
 
+	spaceQuotas := []string{}
+	for _, spaceQuota := range org.SpaceQuotas {
+		spaceQuotas = append(spaceQuotas, spaceQuota.Name)
+	}
+
 	quota := org.QuotaDefinition
 	orgQuota := fmt.Sprintf(T("{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
 		map[string]interface{}{
@@ -81,6 +86,7 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 	table.Add("", T("domains:"), terminal.EntityNameColor(strings.Join(domains, ", ")))
 	table.Add("", T("quota:"), terminal.EntityNameColor(orgQuota))
 	table.Add("", T("spaces:"), terminal.EntityNameColor(strings.Join(spaces, ", ")))
+	table.Add("", T("space quotas:"), terminal.EntityNameColor(strings.Join(spaceQuotas, ", ")))
 
 	table.Print()
 }
