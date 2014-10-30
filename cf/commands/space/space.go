@@ -66,9 +66,7 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-	cmd.ui.Say(terminal.EntityNameColor(space.Name) + ":")
-
-	table := terminal.NewTable(cmd.ui, []string{"", "", ""})
+	table := terminal.NewTable(cmd.ui, []string{terminal.EntityNameColor(space.Name), "", ""})
 	table.Add("", T("Org:"), terminal.EntityNameColor(space.Organization.Name))
 
 	apps := []string{}
