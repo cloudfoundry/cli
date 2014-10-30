@@ -8,6 +8,7 @@ type OrganizationFields struct {
 
 type Organization struct {
 	OrganizationFields
-	Spaces  []SpaceFields
-	Domains []DomainFields
+	Spaces      []SpaceFields
+	Domains     []DomainFields
+	SpaceQuotas []SpaceQuota
 }

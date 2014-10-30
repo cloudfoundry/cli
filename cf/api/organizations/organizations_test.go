@@ -102,6 +102,10 @@ var _ = Describe("Organization Repository", func() {
 		"domains": [{
 		  "metadata": { "guid": "domain1-guid" },
 		  "entity": { "name": "cfapps.io" }
+		}],
+		"space_quota_definitions":[{
+			"metadata": {"guid": "space-quota1-guid"},
+			"entity": {"name": "space-quota1"}
 		}]
 	  }
 	}]}`},
@@ -127,6 +131,9 @@ var _ = Describe("Organization Repository", func() {
 			Expect(len(org.Domains)).To(Equal(1))
 			Expect(org.Domains[0].Name).To(Equal("cfapps.io"))
 			Expect(org.Domains[0].Guid).To(Equal("domain1-guid"))
+			Expect(len(org.SpaceQuotas)).To(Equal(1))
+			Expect(org.SpaceQuotas[0].Name).To(Equal("space-quota1"))
+			Expect(org.SpaceQuotas[0].Guid).To(Equal("space-quota1-guid"))
 		})
 
 		It("returns a ModelNotFoundError when the org cannot be found", func() {

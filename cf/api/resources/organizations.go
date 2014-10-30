@@ -12,6 +12,7 @@ type OrganizationEntity struct {
 	QuotaDefinition QuotaResource `json:"quota_definition"`
 	Spaces          []SpaceResource
 	Domains         []DomainResource
+	SpaceQuotas     []SpaceQuotaResource `json:"space_quota_definitions"`
 }
 
 func (resource OrganizationResource) ToFields() (fields models.OrganizationFields) {
@@ -37,5 +38,10 @@ func (resource OrganizationResource) ToModel() (org models.Organization) {
 	}
 	org.Domains = domains
 
+	spaceQuotas := []models.SpaceQuota{}
+	for _, sq := range resource.Entity.SpaceQuotas {
+		spaceQuotas = append(spaceQuotas, sq.ToModel())
+	}
+	org.SpaceQuotas = spaceQuotas
 	return
 }
