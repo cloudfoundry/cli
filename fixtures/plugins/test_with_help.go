@@ -33,6 +33,10 @@ func (c *TestWithHelp) GetCommands() []plugin.Command {
 	}
 }
 
+func (c *TestWithHelp) GetName() string {
+	return "TestWithHelp"
+}
+
 func theHelpCmd() {
 	fmt.Println("You called help in test_with_help")
 }

@@ -33,6 +33,10 @@ func (c *TestWithPushShortName) GetCommands() []plugin.Command {
 	}
 }
 
+func (c *TestWithPushShortName) GetName() string {
+	return "TestWithPushShortName"
+}
+
 func thePushCmd() {
 	fmt.Println("You called p within the plugin")
 }

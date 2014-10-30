@@ -33,6 +33,10 @@ func (c *TestWithPush) GetCommands() []plugin.Command {
 	}
 }
 
+func (c *TestWithPush) GetName() string {
+	return "TestWithPush"
+}
+
 func thePushCmd() {
 	fmt.Println("You called push in test_with_push")
 }
