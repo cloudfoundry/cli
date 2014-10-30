@@ -1,20 +1,5 @@
 [
    {
-      "id": "\u0009domains:\u0009{{.Domains}}",
-      "translation": "  dominios: {{.Domains}}",
-      "modified": true
-   },
-   {
-      "id": "\u0009quota:\u0009{{.Quota}}",
-      "translation": "  quotas:   {{.Quota}}",
-      "modified": true
-   },
-   {
-      "id": "\u0009spaces:\u0009{{.Spaces}}",
-      "translation": "  spaces:  {{.Spaces}}",
-      "modified": true
-   },
-   {
       "id": "\n\nTIP:\n",
       "translation": "\n\nTIP:\n",
       "modified": false
@@ -4180,6 +4165,11 @@
       "modified": false
    },
    {
+      "id": "domains:",
+      "translation": "dominios:",
+      "modified": false
+   },
+   {
       "id": "down",
       "translation": "caida",
       "modified": false
@@ -4360,6 +4350,11 @@
       "modified": false
    },
    {
+      "id": "quota:",
+      "translation": "quotas:",
+      "modified": true
+   },
+   {
       "id": "requested state",
       "translation": "Estado solicitado",
       "modified": false
@@ -4427,6 +4422,11 @@
    {
       "id": "space",
       "translation": "space",
+      "modified": false
+   },
+   {
+      "id": "spaces:",
+      "translation": "spaces:",
       "modified": false
    },
    {
