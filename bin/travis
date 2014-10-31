@@ -5,5 +5,5 @@ export PATH=$PATH:$HOME/gopath/bin
 export GOPATH=$(godep path):$(pwd):$GOPATH
 export GOMAXPROCS=4
 
-ruby bin/gi18n-checkup
+bin/gi18n-checkup
 ginkgo -r cf --randomizeAllSpecs --randomizeSuites --failOnPending --trace
