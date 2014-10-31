@@ -59,7 +59,7 @@ var _ = Describe("Server", func() {
 			//give time for server to stop
 			time.Sleep(50 * time.Millisecond)
 
-			client, err = rpc.Dial("tcp", ":"+rpcService.Port())
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).To(HaveOccurred())
 		})
 	})
@@ -83,7 +83,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("Start an Rpc server for communication", func() {
-			client, err = rpc.Dial("tcp", ":"+rpcService.Port())
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -102,7 +102,7 @@ var _ = Describe("Server", func() {
 
 			pingCli(rpcService.Port())
 
-			client, err = rpc.Dial("tcp", ":"+rpcService.Port())
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
 
 			metadata = plugin.PluginMetadata{
@@ -152,7 +152,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("should return the logs from the output capture", func() {
-				client, err = rpc.Dial("tcp", ":"+rpcService.Port())
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 				Expect(err).ToNot(HaveOccurred())
 				var output []string
 				client.Call("CliRpcCmd.GetOutputAndReset", false, &output)
@@ -197,7 +197,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("calls the code gangsta cli App command", func() {
-				client, err = rpc.Dial("tcp", ":"+rpcService.Port())
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 				Expect(err).ToNot(HaveOccurred())
 
 				var success bool
@@ -234,7 +234,7 @@ var _ = Describe("Server", func() {
 
 			It("returns false in success if the command cannot be found", func() {
 				io_helpers.CaptureOutput(func() {
-					client, err = rpc.Dial("tcp", ":"+rpcService.Port())
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
 					var success bool
@@ -246,7 +246,7 @@ var _ = Describe("Server", func() {
 
 			It("returns an error if a command cannot parse provided flags", func() {
 				io_helpers.CaptureOutput(func() {
-					client, err = rpc.Dial("tcp", ":"+rpcService.Port())
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
 					var success bool
@@ -258,7 +258,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("recovers from a panic from any core command", func() {
-				client, err = rpc.Dial("tcp", ":"+rpcService.Port())
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 				Expect(err).ToNot(HaveOccurred())
 
 				var success bool
@@ -274,7 +274,7 @@ func pingCli(port string) {
 	var connErr error
 	var conn net.Conn
 	for i := 0; i < 5; i++ {
-		conn, connErr = net.Dial("tcp", ":"+port)
+		conn, connErr = net.Dial("tcp", "127.0.0.1:"+port)
 		if connErr != nil {
 			time.Sleep(200 * time.Millisecond)
 		} else {
