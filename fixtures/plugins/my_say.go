@@ -15,7 +15,6 @@ import (
 )
 
 type MySay struct {
-	stringForMySay string
 }
 
 func (c *MySay) Run(args []string) {

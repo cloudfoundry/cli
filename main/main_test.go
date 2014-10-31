@@ -106,8 +106,17 @@ var _ = Describe("main", func() {
 
 		It("Can call a plugin that requires stdin (interactive)", func() {
 			session := CfWithIo("input", "silly\n").Wait(5 * time.Second)
-
 			Eventually(session.Out).Should(Say("silly"))
+		})
+
+		It("exits 1 when a plugin panics", func() {
+			session := Cf("panic").Wait(5 * time.Second)
+			Eventually(session).Should(Exit(1))
+		})
+
+		It("exits 1 when a plugin exits 1", func() {
+			session := Cf("exit1").Wait(5 * time.Second)
+			Eventually(session).Should(Exit(1))
 		})
 	})
 })

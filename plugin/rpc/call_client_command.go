@@ -12,7 +12,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture terminal.OutputCapture) (bool, error) {
+func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture terminal.OutputCapture) bool {
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
 	for _, metadata := range pluginList {
@@ -20,7 +20,7 @@ func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture 
 			if command.Name == args[0] {
 				cliServer, err := startCliServer(coreCommandRunner, outputCapture)
 				if err != nil {
-					return false, err
+					os.Exit(1)
 				}
 
 				defer cliServer.Stop()
@@ -29,18 +29,16 @@ func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture 
 				cmd.Stdout = os.Stdout
 				cmd.Stdin = os.Stdin
 
+				defer stopPlugin(cmd)
 				err = cmd.Run()
 				if err != nil {
-					return false, err
+					os.Exit(1)
 				}
-
-				defer stopPlugin(cmd)
-
-				return true, err
+				return true
 			}
 		}
 	}
-	return false, nil
+	return false
 }
 
 func dialServer(port string) (*rpc.Client, error) {
