@@ -24,21 +24,20 @@ func (c *Panics) Run(args []string) {
 	}
 }
 
-func (c *Panics) GetCommands() []plugin.Command {
-	return []plugin.Command{
-		{
-			Name:     "panic",
-			HelpText: "omg panic",
-		},
-		{
-			Name:     "exit1",
-			HelpText: "omg exit1",
+func (c *Panics) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "Panics",
+		Commands: []plugin.Command{
+			{
+				Name:     "panic",
+				HelpText: "omg panic",
+			},
+			{
+				Name:     "exit1",
+				HelpText: "omg exit1",
+			},
 		},
 	}
-}
-
-func (c *Panics) GetName() string {
-	return "Panics"
 }
 
 func main() {

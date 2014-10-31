@@ -83,7 +83,7 @@ func (cmd *PluginInstall) ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(
 	}
 }
 
-func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata plugin.PluginMetadata, pluginDestinationFilepath string, pluginSourceFilepath string) {
+func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath string, pluginSourceFilepath string) {
 	plugins := cmd.config.Plugins()
 	if pluginMetadata.Name == "" {
 		cmd.ui.Failed(fmt.Sprintf(T("Unable to obtain plugin name for executable {{.Executable}}", map[string]interface{}{"Executable": pluginSourceFilepath})))
@@ -116,7 +116,7 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata plugi
 	}
 }
 
-func (cmd *PluginInstall) installPlugin(pluginMetadata plugin.PluginMetadata, pluginDestinationFilepath, pluginSourceFilepath string) {
+func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath, pluginSourceFilepath string) {
 	err := fileutils.CopyFile(pluginDestinationFilepath, pluginSourceFilepath)
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
@@ -130,7 +130,7 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata plugin.PluginMetadata, pl
 	cmd.config.SetPlugin(pluginMetadata.Name, configMetadata)
 }
 
-func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) plugin.PluginMetadata {
+func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) *plugin.PluginMetadata {
 	rpcService, err := rpc.NewRpcService(nil, nil)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -143,7 +143,7 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 	defer rpcService.Stop()
 
 	cmd.runPluginBinary(pluginSourceFilepath, rpcService.Port())
-	return rpcService.RpcCmd.ReturnData.(plugin.PluginMetadata)
+	return rpcService.RpcCmd.PluginMetadata
 }
 
 func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) {

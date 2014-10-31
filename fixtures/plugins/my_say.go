@@ -27,15 +27,14 @@ func (c *MySay) Run(args []string) {
 	}
 }
 
-func (c *MySay) GetName() string {
-	return "MySay"
-}
-
-func (c *MySay) GetCommands() []plugin.Command {
-	return []plugin.Command{
-		{
-			Name:     "my-say",
-			HelpText: "Plugin to say things from the cli",
+func (c *MySay) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "MySay",
+		Commands: []plugin.Command{
+			{
+				Name:     "my-say",
+				HelpText: "Plugin to say things from the cli",
+			},
 		},
 	}
 }

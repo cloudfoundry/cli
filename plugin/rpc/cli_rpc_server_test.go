@@ -90,7 +90,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".SetPluginMetadata", func() {
 		var (
-			metadata plugin.PluginMetadata
+			metadata *plugin.PluginMetadata
 		)
 
 		BeforeEach(func() {
@@ -105,7 +105,7 @@ var _ = Describe("Server", func() {
 			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
 
-			metadata = plugin.PluginMetadata{
+			metadata = &plugin.PluginMetadata{
 				Name: "foo",
 				Commands: []plugin.Command{
 					{Name: "cmd_1", HelpText: "cm 1 help text"},
@@ -127,7 +127,7 @@ var _ = Describe("Server", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(success).To(BeTrue())
-			Expect(rpcService.RpcCmd.ReturnData.(plugin.PluginMetadata)).To(Equal(metadata))
+			Expect(rpcService.RpcCmd.PluginMetadata).To(Equal(metadata))
 		})
 	})
 

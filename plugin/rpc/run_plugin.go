@@ -1,11 +1,8 @@
 package rpc
 
 import (
-	"net"
-	"net/rpc"
 	"os"
 	"os/exec"
-	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -41,14 +38,6 @@ func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture 
 	return false
 }
 
-func dialServer(port string) (*rpc.Client, error) {
-	client, err := rpc.Dial("tcp", "127.0.0.1:"+port)
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
-}
-
 func startCliServer(coreCommandRunner *cli.App, outputCapture terminal.OutputCapture) (*CliRpcService, error) {
 	cliServer, err := NewRpcService(coreCommandRunner, outputCapture)
 	if err != nil {
@@ -66,12 +55,4 @@ func startCliServer(coreCommandRunner *cli.App, outputCapture terminal.OutputCap
 func stopPlugin(plugin *exec.Cmd) {
 	plugin.Process.Kill()
 	plugin.Wait()
-}
-
-func obtainPort() string {
-	//assign 0 to port to get a random open port
-	l, _ := net.Listen("tcp", "127.0.0.1:0")
-	port := strconv.Itoa(l.Addr().(*net.TCPAddr).Port)
-	l.Close()
-	return port
 }

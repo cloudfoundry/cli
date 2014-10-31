@@ -19,7 +19,7 @@ type CliRpcService struct {
 }
 
 type CliRpcCmd struct {
-	ReturnData        interface{}
+	PluginMetadata    *plugin.PluginMetadata
 	coreCommandRunner *cli.App
 	outputCapture     terminal.OutputCapture
 }
@@ -27,7 +27,7 @@ type CliRpcCmd struct {
 func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
-			ReturnData:        new(interface{}),
+			PluginMetadata:    &plugin.PluginMetadata{},
 			coreCommandRunner: commandRunner,
 			outputCapture:     outputCapture,
 		},
@@ -80,7 +80,7 @@ func (cli *CliRpcService) Start() error {
 }
 
 func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
-	cmd.ReturnData = interface{}(pluginMetadata)
+	cmd.PluginMetadata = &pluginMetadata
 	*retVal = true
 	return nil
 }

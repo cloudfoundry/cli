@@ -22,17 +22,16 @@ func (c *TestWithPushShortName) Run(args []string) {
 	}
 }
 
-func (c *TestWithPushShortName) GetCommands() []plugin.Command {
-	return []plugin.Command{
-		{
-			Name:     "p",
-			HelpText: "plugin short name p",
+func (c *TestWithPushShortName) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "TestWithPushShortName",
+		Commands: []plugin.Command{
+			{
+				Name:     "p",
+				HelpText: "plugin short name p",
+			},
 		},
 	}
-}
-
-func (c *TestWithPushShortName) GetName() string {
-	return "TestWithPushShortName"
 }
 
 func thePushCmd() {

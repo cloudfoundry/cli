@@ -25,15 +25,14 @@ func (c *Input) Run(args []string) {
 	}
 }
 
-func (c *Input) GetName() string {
-	return "Input"
-}
-
-func (c *Input) GetCommands() []plugin.Command {
-	return []plugin.Command{
-		{
-			Name:     "input",
-			HelpText: "help text for input",
+func (c *Input) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "Input",
+		Commands: []plugin.Command{
+			{
+				Name:     "input",
+				HelpText: "help text for input",
+			},
 		},
 	}
 }
