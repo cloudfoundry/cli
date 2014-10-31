@@ -1095,11 +1095,6 @@
       "modified": false
    },
    {
-      "id": "Copy an app\n",
-      "translation": "Copy an app\n",
-      "modified": false
-   },
-   {
       "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in organization {{.Org}} and space {{.Space}}",
       "translation": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in organization {{.Org}} and space {{.Space}}",
       "modified": false

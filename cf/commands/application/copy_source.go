@@ -56,7 +56,7 @@ func (cmd *CopySource) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "copy-source",
 		Description: T("Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application."),
-		Usage:       T("Copy an app\n") + T("   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n"),
+		Usage:       T("   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n"),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("o", T("Org that contains the target application")),
 			flag_helpers.NewStringFlag("s", T("Space that contains the target application")),
