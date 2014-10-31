@@ -18,19 +18,14 @@ type MySay struct {
 	stringForMySay string
 }
 
-func (c *MySay) Run(args []string, reply *bool) error {
+func (c *MySay) Run(args []string) {
 	if args[0] == "my-say" {
 		if len(args) == 3 && args[2] == "--loud" {
 			fmt.Println(strings.ToUpper(args[1]))
-
-			*reply = true
-			return nil
 		}
 
 		fmt.Println(args[1])
 	}
-	*reply = true
-	return nil
 }
 
 func (c *MySay) GetName() string {

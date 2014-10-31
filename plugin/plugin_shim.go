@@ -22,12 +22,10 @@ type PluginMetadata struct {
 }
 
 /**
-	Command interface needs to be implementd for a runnable sub-command of `cf`
+	Command interface needs to be implemented for a runnable plugin of `cf`
 **/
 type RpcPlugin interface {
-	//run is passed in all the command line parameter arguments and
-	//an object containing all of the cli commands available to them
-	Run(args []string, reply *bool) error
+	Run(args []string)
 	GetCommands() []Command
 	GetName() string
 }
@@ -43,8 +41,7 @@ func Start(cmd RpcPlugin) {
 	if isMetadataRequest() {
 		sendPluginMetadataToCliServer(cmd)
 	} else {
-		var thing bool
-		cmd.Run(os.Args[2:], &thing)
+		cmd.Run(os.Args[2:])
 	}
 }
 

@@ -17,11 +17,10 @@ type TestWithHelp struct {
 	stringForTestWithHelp string
 }
 
-func (c *TestWithHelp) Run(args []string, reply *bool) error {
+func (c *TestWithHelp) Run(args []string) {
 	if args[0] == "help" {
 		theHelpCmd()
 	}
-	return nil
 }
 
 func (c *TestWithHelp) GetCommands() []plugin.Command {

@@ -17,11 +17,10 @@ type TestWithPushShortName struct {
 	stringForTestWithPush string
 }
 
-func (c *TestWithPushShortName) Run(args []string, reply *bool) error {
+func (c *TestWithPushShortName) Run(args []string) {
 	if args[0] == "p" {
 		thePushCmd()
 	}
-	return nil
 }
 
 func (c *TestWithPushShortName) GetCommands() []plugin.Command {

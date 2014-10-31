@@ -17,14 +17,13 @@ type Input struct {
 	stringForInput string
 }
 
-func (c *Input) Run(args []string, reply *bool) error {
+func (c *Input) Run(args []string) {
 	if args[0] == "input" {
 		var Echo string
 		fmt.Scanf("%s", &Echo)
 
 		fmt.Println("THE WORD IS: ", Echo)
 	}
-	return nil
 }
 
 func (c *Input) GetName() string {

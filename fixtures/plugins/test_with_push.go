@@ -17,11 +17,10 @@ type TestWithPush struct {
 	stringForTestWithPush string
 }
 
-func (c *TestWithPush) Run(args []string, reply *bool) error {
+func (c *TestWithPush) Run(args []string) {
 	if args[0] == "push" {
 		thePushCmd()
 	}
-	return nil
 }
 
 func (c *TestWithPush) GetCommands() []plugin.Command {

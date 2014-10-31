@@ -15,13 +15,12 @@ import (
 
 type Test2 struct{}
 
-func (c *Test2) Run(args []string, reply *bool) error {
+func (c *Test2) Run(args []string) {
 	if args[0] == "test_2_cmd1" {
 		theFirstCmd()
 	} else if args[0] == "test_2_cmd2" {
 		theSecondCmd()
 	}
-	return nil
 }
 
 func (c *Test2) GetCommands() []plugin.Command {
