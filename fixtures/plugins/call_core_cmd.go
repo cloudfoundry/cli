@@ -8,21 +8,20 @@ import (
 
 type CoreCmd struct{}
 
-func (c *CoreCmd) GetCommands() []plugin.Command {
-	return []plugin.Command{
-		{
-			Name:     "awesomeness",
-			HelpText: "the most awesomeness command you have ever seen",
-		},
-		{
-			Name:     "core-command",
-			HelpText: "command to call core command. It passes all text through to command",
+func (c *CoreCmd) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "CoreCmd",
+		Commands: []plugin.Command{
+			{
+				Name:     "awesomeness",
+				HelpText: "the most awesomeness command you have ever seen",
+			},
+			{
+				Name:     "core-command",
+				HelpText: "command to call core command. It passes all text through to command",
+			},
 		},
 	}
-}
-
-func (c *CoreCmd) GetName() string {
-	return "CoreCmd"
 }
 
 func main() {

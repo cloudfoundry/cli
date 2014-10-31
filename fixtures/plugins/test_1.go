@@ -24,21 +24,20 @@ func (c *Test1) Run(args []string) {
 	}
 }
 
-func (c *Test1) GetCommands() []plugin.Command {
-	return []plugin.Command{
-		{
-			Name:     "test_1_cmd1",
-			HelpText: "help text for test_1_cmd1",
-		},
-		{
-			Name:     "test_1_cmd2",
-			HelpText: "help text for test_1_cmd2",
+func (c *Test1) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "Test1",
+		Commands: []plugin.Command{
+			{
+				Name:     "test_1_cmd1",
+				HelpText: "help text for test_1_cmd1",
+			},
+			{
+				Name:     "test_1_cmd2",
+				HelpText: "help text for test_1_cmd2",
+			},
 		},
 	}
-}
-
-func (c *Test1) GetName() string {
-	return "Test1"
 }
 
 func theFirstCmd() {

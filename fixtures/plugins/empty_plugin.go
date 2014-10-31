@@ -7,12 +7,11 @@ type EmptyPlugin struct{}
 func (c *EmptyPlugin) Run(args []string) {
 }
 
-func (c *EmptyPlugin) GetCommands() []plugin.Command {
-	return []plugin.Command{}
-}
-
-func (c *EmptyPlugin) GetName() string {
-	return "EmptyPlugin"
+func (c *EmptyPlugin) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name:     "EmptyPlugin",
+		Commands: []plugin.Command{},
+	}
 }
 
 func main() {

@@ -22,17 +22,16 @@ func (c *TestWithHelp) Run(args []string) {
 	}
 }
 
-func (c *TestWithHelp) GetCommands() []plugin.Command {
-	return []plugin.Command{
-		{
-			Name:     "help",
-			HelpText: "help text for test_with_help",
+func (c *TestWithHelp) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "TestWithHelp",
+		Commands: []plugin.Command{
+			{
+				Name:     "help",
+				HelpText: "help text for test_with_help",
+			},
 		},
 	}
-}
-
-func (c *TestWithHelp) GetName() string {
-	return "TestWithHelp"
 }
 
 func theHelpCmd() {

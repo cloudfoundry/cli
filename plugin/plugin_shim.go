@@ -11,32 +11,13 @@ import (
 
 var CliServicePort string
 
-type Command struct {
-	Name     string
-	HelpText string
-}
-
-type PluginMetadata struct {
-	Name     string
-	Commands []Command
-}
-
-/**
-	Command interface needs to be implemented for a runnable plugin of `cf`
-**/
-type RpcPlugin interface {
-	Run(args []string)
-	GetCommands() []Command
-	GetName() string
-}
-
 /**
 	* This function is called by the plugin to setup their server. This allows us to call Run on the plugin
 	* os.Args[1] port CF_CLI rpc server is running on
 	* os.Args[2] **OPTIONAL**
 		* SendMetadata - used to fetch the plugin metadata
 **/
-func Start(cmd RpcPlugin) {
+func Start(cmd Plugin) {
 	pingCLI()
 	if isMetadataRequest() {
 		sendPluginMetadataToCliServer(cmd)
@@ -49,7 +30,7 @@ func isMetadataRequest() bool {
 	return len(os.Args) == 3 && os.Args[2] == "SendMetadata"
 }
 
-func sendPluginMetadataToCliServer(cmd RpcPlugin) {
+func sendPluginMetadataToCliServer(cmd Plugin) {
 	cliServerConn, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[1])
 	if err != nil {
 		fmt.Println(err)
@@ -58,12 +39,7 @@ func sendPluginMetadataToCliServer(cmd RpcPlugin) {
 
 	var success bool
 
-	pluginMetadata := PluginMetadata{
-		Name:     cmd.GetName(),
-		Commands: cmd.GetCommands(),
-	}
-
-	err = cliServerConn.Call("CliRpcCmd.SetPluginMetadata", pluginMetadata, &success)
+	err = cliServerConn.Call("CliRpcCmd.SetPluginMetadata", cmd.GetMetadata(), &success)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
