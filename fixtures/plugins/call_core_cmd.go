@@ -29,7 +29,7 @@ func main() {
 	plugin.Start(new(CoreCmd))
 }
 
-func (c *CoreCmd) Run(args []string, reply *bool) error {
+func (c *CoreCmd) Run(args []string) {
 	if args[0] == "core-command" {
 		output, err := plugin.CliCommand(args[1:]...)
 		if err != nil {
@@ -140,6 +140,4 @@ NMMMMMMMMMMMMMMMMMMMMMMMMMMMMNMMMDDNDD88ZZZ$$$$$7$$$$77$ZZ$7III$8NDNNMN8ZO8O88NM
 NNNNMMMMMMMMMMMMMMMMMMMMMMNMMMMMMMMMMNN8ZZZZZ$$$$Z$$$$$ZODD8777$7$D88D8OZZO8DD8O88DND88DNNNNNNNMMMMMMMMMMMNMMNMNNNMMMNNN
 NMNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMD888OOZZZZZ$$ZZZZ$$ZZ8NNOZ$$$$DDDDDNDOODDDDDDDDDDD8DNNDNNNNNMMMMMMMMMMMMMNNNNNNNMMNN`)
 	}
-
-	return nil
 }

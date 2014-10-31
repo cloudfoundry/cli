@@ -17,13 +17,12 @@ type Test1 struct {
 	stringForTest1 string
 }
 
-func (c *Test1) Run(args []string, reply *bool) error {
+func (c *Test1) Run(args []string) {
 	if args[0] == "test_1_cmd1" {
 		theFirstCmd()
 	} else if args[0] == "test_1_cmd2" {
 		theSecondCmd()
 	}
-	return nil
 }
 
 func (c *Test1) GetCommands() []plugin.Command {
