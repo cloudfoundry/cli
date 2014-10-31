@@ -50,7 +50,7 @@ func isMetadataRequest() bool {
 }
 
 func sendPluginMetadataToCliServer(cmd RpcPlugin) {
-	cliServerConn, err := rpc.Dial("tcp", "127.0.0.1:"+os.Args[1])
+	cliServerConn, err := rpc.Dial("tcp", ":"+os.Args[1])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -78,7 +78,7 @@ func sendPluginMetadataToCliServer(cmd RpcPlugin) {
 }
 
 func CliCommand(args ...string) ([]string, error) {
-	client, err := rpc.Dial("tcp", "127.0.0.1:"+CliServicePort)
+	client, err := rpc.Dial("tcp", ":"+CliServicePort)
 	if err != nil {
 		return []string{}, err
 	}
@@ -107,7 +107,7 @@ func pingCLI() {
 	var conn net.Conn
 	for i := 0; i < 5; i++ {
 		CliServicePort = os.Args[1]
-		conn, connErr = net.Dial("tcp", "127.0.0.1:"+CliServicePort)
+		conn, connErr = net.Dial("tcp", ":"+CliServicePort)
 		if connErr != nil {
 			time.Sleep(200 * time.Millisecond)
 		} else {
