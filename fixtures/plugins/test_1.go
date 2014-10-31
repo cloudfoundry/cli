@@ -14,7 +14,6 @@ import (
 )
 
 type Test1 struct {
-	stringForTest1 string
 }
 
 func (c *Test1) Run(args []string) {

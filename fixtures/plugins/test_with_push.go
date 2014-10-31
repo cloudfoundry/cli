@@ -14,7 +14,6 @@ import (
 )
 
 type TestWithPush struct {
-	stringForTestWithPush string
 }
 
 func (c *TestWithPush) Run(args []string) {

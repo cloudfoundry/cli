@@ -14,7 +14,6 @@ import (
 )
 
 type TestWithHelp struct {
-	stringForTestWithHelp string
 }
 
 func (c *TestWithHelp) Run(args []string) {

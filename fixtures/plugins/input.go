@@ -14,7 +14,6 @@ import (
 )
 
 type Input struct {
-	stringForInput string
 }
 
 func (c *Input) Run(args []string) {
