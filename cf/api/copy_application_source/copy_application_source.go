@@ -27,5 +27,5 @@ func NewCloudControllerCopyApplicationSourceRepository(config core_config.Reader
 func (repo *CloudControllerApplicationSourceRepository) CopyApplication(sourceAppGuid, targetAppGuid string) error {
 	url := fmt.Sprintf("%s/v2/apps/%s/copy_bits", repo.config.ApiEndpoint(), targetAppGuid)
 	body := fmt.Sprintf(`{"source_app_guid":"%s"}`, sourceAppGuid)
-	return repo.gateway.CreateResource(url, strings.NewReader(body))
+	return repo.gateway.CreateResource(url, strings.NewReader(body), new(interface{}))
 }
