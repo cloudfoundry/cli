@@ -64,7 +64,7 @@ var _ = Describe("create-space command", func() {
 	})
 
 	Describe("Requirements", func() {
-		It("fails with usage when no arguments are passed", func() {
+		It("fails with usage when not provided exactly one argument", func() {
 			runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
