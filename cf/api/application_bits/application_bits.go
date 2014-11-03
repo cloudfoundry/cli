@@ -64,6 +64,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, 
 		}
 
 		var request *net.Request
+
 		request, apiErr = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken(), requestFile)
 		if apiErr != nil {
 			return
