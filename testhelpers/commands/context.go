@@ -56,9 +56,9 @@ func findCommand(cmdName string) (cmd cli.Command) {
 	pluginConfig := &testPluginConfig.FakePluginConfiguration{}
 	manifestRepo := manifest.NewManifestDiskRepository()
 	apiRepoLocator := api.NewRepositoryLocator(configRepo, map[string]net.Gateway{
-		"auth":             net.NewUAAGateway(configRepo),
-		"cloud-controller": net.NewCloudControllerGateway(configRepo, time.Now),
-		"uaa":              net.NewUAAGateway(configRepo),
+		"auth":             net.NewUAAGateway(configRepo, fakeUI),
+		"cloud-controller": net.NewCloudControllerGateway(configRepo, time.Now, fakeUI),
+		"uaa":              net.NewUAAGateway(configRepo, fakeUI),
 	})
 
 	cmdFactory := command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig)

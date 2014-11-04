@@ -66,9 +66,9 @@ func setupDependencies() (deps *cliDependencies) {
 	}
 
 	deps.gateways = map[string]net.Gateway{
-		"auth":             net.NewUAAGateway(deps.configRepo),
-		"cloud-controller": net.NewCloudControllerGateway(deps.configRepo, time.Now),
-		"uaa":              net.NewUAAGateway(deps.configRepo),
+		"auth":             net.NewUAAGateway(deps.configRepo, deps.termUI),
+		"cloud-controller": net.NewCloudControllerGateway(deps.configRepo, time.Now, deps.termUI),
+		"uaa":              net.NewUAAGateway(deps.configRepo, deps.termUI),
 	}
 	deps.apiRepoLocator = api.NewRepositoryLocator(deps.configRepo, deps.gateways)
 

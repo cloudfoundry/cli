@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -33,7 +34,7 @@ var _ = Describe("User Repository", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepositoryWithDefaults()
-		ccGateway := net.NewCloudControllerGateway((config), time.Now)
+		ccGateway := net.NewCloudControllerGateway((config), time.Now, testterm.FakeUI{})
 		uaaGateway := net.NewUAAGateway(config)
 		repo = NewCloudControllerUserRepository(config, uaaGateway, ccGateway)
 	})

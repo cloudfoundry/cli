@@ -70,9 +70,9 @@ func createCommandFactory() command_factory.Factory {
 
 	manifestRepo := manifest.NewManifestDiskRepository()
 	apiRepoLocator := api.NewRepositoryLocator(configRepo, map[string]net.Gateway{
-		"auth":             net.NewUAAGateway(configRepo),
+		"auth":             net.NewUAAGateway(configRepo, fakeUI),
 		"cloud-controller": net.NewCloudControllerGateway(configRepo, time.Now),
-		"uaa":              net.NewUAAGateway(configRepo),
+		"uaa":              net.NewUAAGateway(configRepo, fakeUI),
 	})
 
 	return command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig)

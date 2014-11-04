@@ -2,8 +2,10 @@ package net
 
 import (
 	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type uaaErrorResponse struct {
@@ -22,6 +24,6 @@ var uaaErrorHandler = func(statusCode int, body []byte) error {
 	}
 }
 
-func NewUAAGateway(config core_config.Reader) Gateway {
-	return newGateway(uaaErrorHandler, config)
+func NewUAAGateway(config core_config.Reader, ui terminal.UI) Gateway {
+	return newGateway(uaaErrorHandler, config, ui)
 }

@@ -2,10 +2,12 @@ package net
 
 import (
 	"encoding/json"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"strconv"
 	"time"
+
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type ccErrorResponse struct {
@@ -24,8 +26,8 @@ func cloudControllerErrorHandler(statusCode int, body []byte) error {
 	}
 }
 
-func NewCloudControllerGateway(config core_config.Reader, clock func() time.Time) Gateway {
-	gateway := newGateway(cloudControllerErrorHandler, config)
+func NewCloudControllerGateway(config core_config.Reader, clock func() time.Time, ui terminal.UI) Gateway {
+	gateway := newGateway(cloudControllerErrorHandler, config, ui)
 	gateway.Clock = clock
 	gateway.PollingEnabled = true
 	return gateway

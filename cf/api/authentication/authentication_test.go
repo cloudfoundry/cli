@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/authentication"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -28,7 +29,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
-		gateway = net.NewUAAGateway(config)
+		gateway = net.NewUAAGateway(config, testterm.FakeUI{})
 		auth = NewUAAAuthenticationRepository(gateway, config)
 	})
 

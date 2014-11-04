@@ -29,9 +29,9 @@ var _ = Describe("factory", func() {
 		manifestRepo := manifest.NewManifestDiskRepository()
 		pluginConfig := &testPluginConfig.FakePluginConfiguration{}
 		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
-			"auth":             net.NewUAAGateway(config),
+			"auth":             net.NewUAAGateway(config, fakeUI),
 			"cloud-controller": net.NewCloudControllerGateway(config, time.Now),
-			"uaa":              net.NewUAAGateway(config),
+			"uaa":              net.NewUAAGateway(config, fakeUI),
 		})
 
 		factory = NewFactory(fakeUI, config, manifestRepo, repoLocator, pluginConfig)
