@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -32,7 +33,7 @@ var _ = Describe("Cloud Controller Gateway", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
-		gateway = NewCloudControllerGateway(config, time.Now)
+		gateway = NewCloudControllerGateway(config, time.Now, &testterm.FakeUI{})
 	})
 
 	It("parses error responses", func() {

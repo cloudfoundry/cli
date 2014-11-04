@@ -20,6 +20,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -41,16 +42,16 @@ var _ = Describe("Gateway", func() {
 		clock = func() time.Time { return currentTime }
 		config = testconfig.NewRepository()
 
-		ccGateway = NewCloudControllerGateway(config, clock)
+		ccGateway = NewCloudControllerGateway(config, clock, &testterm.FakeUI{})
 		ccGateway.PollingThrottle = 3 * time.Millisecond
-		uaaGateway = NewUAAGateway(config)
+		uaaGateway = NewUAAGateway(config, &testterm.FakeUI{})
 	})
 
 	Describe("async timeout", func() {
 		Context("when the config has a positive async timeout", func() {
 			It("inherits the async timeout from the config", func() {
 				config.SetAsyncTimeout(9001)
-				ccGateway = NewCloudControllerGateway((config), time.Now)
+				ccGateway = NewCloudControllerGateway((config), time.Now, &testterm.FakeUI{})
 				Expect(ccGateway.AsyncTimeout()).To(Equal(9001 * time.Minute))
 			})
 		})
@@ -581,7 +582,7 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	config.SetAccessToken("bearer initial-access-token")
 	config.SetRefreshToken("initial-refresh-token")
 
-	authGateway := NewUAAGateway(config)
+	authGateway := NewUAAGateway(config, &testterm.FakeUI{})
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
 	authenticator := authentication.NewUAAAuthenticationRepository(authGateway, config)
