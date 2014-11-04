@@ -83,4 +83,45 @@ var _ = Describe("TeePrinter", func() {
 			Expect(printer.GetOutputAndReset()).To(BeEmpty())
 		})
 	})
+
+	Describe(".PauseOutput", func() {
+		BeforeEach(func() {
+			output = io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.PauseTerminalOutput()
+				printer.Print("Hello")
+				printer.Println("Mom!")
+				printer.Printf("Dad!")
+			})
+		})
+
+		It("should print no terminal output", func() {
+			Expect(output).To(Equal([]string{""}))
+		})
+
+		It("should still capture output", func() {
+			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello"))
+		})
+
+		Describe(".ResumeOutput", func() {
+			BeforeEach(func() {
+				printer.GetOutputAndReset()
+				output = io_helpers.CaptureOutput(func() {
+					printer.ResumeTerminalOutput()
+					printer.Print("Hello")
+					printer.Println("Mom!")
+					printer.Printf("Dad!")
+					printer.Println("Grandpa!")
+				})
+			})
+
+			It("should print all output", func() {
+				Expect(output[1]).To(Equal("Dad!Grandpa!"))
+			})
+
+			It("should print terminal output", func() {
+				Expect(printer.GetOutputAndReset()[3]).To(Equal("Grandpa!"))
+			})
+		})
+	})
 })
