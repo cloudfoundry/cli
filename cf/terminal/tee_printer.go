@@ -14,7 +14,13 @@ type OutputCapture interface {
 	GetOutputAndReset() []string
 }
 
+type TerminalOutputSwitch interface {
+	PauseTerminalOutput()
+	ResumeTerminalOutput()
+}
+
 type TeePrinter struct {
+	pause  bool
 	output []string
 }
 
@@ -33,17 +39,34 @@ func (t *TeePrinter) GetOutputAndReset() []string {
 func (t *TeePrinter) Print(values ...interface{}) (n int, err error) {
 	str := fmt.Sprint(values...)
 	t.output = append(t.output, str)
-	return fmt.Print(str)
+	if !t.pause {
+		return fmt.Print(str)
+	}
+	return
 }
 
 func (t *TeePrinter) Printf(format string, a ...interface{}) (n int, err error) {
 	str := fmt.Sprintf(format, a...)
 	t.output = append(t.output, str)
-	return fmt.Print(str)
+	if !t.pause {
+		return fmt.Print(str)
+	}
+	return
 }
 
 func (t *TeePrinter) Println(values ...interface{}) (n int, err error) {
 	str := fmt.Sprint(values...)
 	t.output = append(t.output, str)
-	return fmt.Println(str)
+	if !t.pause {
+		return fmt.Println(str)
+	}
+	return
+}
+
+func (t *TeePrinter) PauseTerminalOutput() {
+	t.pause = true
+}
+
+func (t *TeePrinter) ResumeTerminalOutput() {
+	t.pause = false
 }
