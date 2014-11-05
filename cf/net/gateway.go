@@ -191,10 +191,15 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.Re
 func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiErr error) {
 	progressReader := NewProgressReader(body, gateway.ui, 5*time.Second)
 
+	var err error
+	var request *http.Request
+
 	if body != nil {
 		progressReader.Seek(0, 0)
+		request, err = http.NewRequest(method, path, progressReader)
+	} else {
+		request, err = http.NewRequest(method, path, body)
 	}
-	request, err := http.NewRequest(method, path, progressReader)
 
 	if err != nil {
 		apiErr = errors.NewWithError(T("Error building request"), err)
@@ -220,9 +225,11 @@ func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Read
 			request.ContentLength = fileSize
 			progressReader.SetTotalSize(fileSize)
 		}
+		req = &Request{HttpReq: request, SeekableBody: progressReader}
+	} else {
+		req = &Request{HttpReq: request, SeekableBody: body}
 	}
 
-	req = &Request{HttpReq: request, SeekableBody: progressReader}
 	return
 }
 
