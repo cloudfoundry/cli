@@ -48,7 +48,7 @@ func (c *CliCmd) Run(cliConnection plugin.CliConnection, args []string) {
 	fmt.Println("")
 	fmt.Println("---------- Command output from the plugin ----------")
 	for index, val := range output {
-		fmt.Print("#", index, " value: ", val)
+		fmt.Println("#", index, " value: ", val)
 	}
 	fmt.Println("----------              FIN               -----------")
 }
