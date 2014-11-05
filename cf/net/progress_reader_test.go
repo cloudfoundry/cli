@@ -2,6 +2,7 @@ package net_test
 
 import (
 	"os"
+	"time"
 
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -31,19 +32,22 @@ var _ = Describe("ProgressReader", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		b = make([]byte, 1024)
-		progressReader = NewProgressReader(testFile, ui)
+		progressReader = NewProgressReader(testFile, ui, 1*time.Millisecond)
 		progressReader.SetTotalSize(fileStat.Size())
 	})
 
 	It("prints progress while content is being read", func() {
 		for {
+			time.Sleep(50 * time.Microsecond)
 			_, err := progressReader.Read(b)
 			if err != nil {
 				break
 			}
 		}
 
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"Done uploading"}))
+		Expect(ui.UncapturedOutput).To(ContainSubstrings([]string{"\r", "uploaded..."}))
+		Expect(ui.UncapturedOutput).To(ContainSubstrings([]string{"\r    "}))
+		Expect(ui.Outputs).To(ContainSubstrings([]string{"\rDone "}))
 	})
 
 	It("reads the correct number of bytes", func() {

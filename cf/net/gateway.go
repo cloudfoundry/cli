@@ -189,7 +189,7 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.Re
 }
 
 func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiErr error) {
-	progressReader := NewProgressReader(body, gateway.ui)
+	progressReader := NewProgressReader(body, gateway.ui, 5*time.Second)
 
 	if body != nil {
 		progressReader.Seek(0, 0)

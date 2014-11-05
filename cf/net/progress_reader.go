@@ -1,7 +1,6 @@
 package net
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"time"
@@ -11,17 +10,19 @@ import (
 )
 
 type ProgressReader struct {
-	ioReadSeeker io.ReadSeeker
-	bytesRead    int64
-	total        int64
-	quit         chan bool
-	ui           terminal.UI
+	ioReadSeeker   io.ReadSeeker
+	bytesRead      int64
+	total          int64
+	quit           chan bool
+	ui             terminal.UI
+	outputInterval time.Duration
 }
 
-func NewProgressReader(readSeeker io.ReadSeeker, ui terminal.UI) *ProgressReader {
+func NewProgressReader(readSeeker io.ReadSeeker, ui terminal.UI, outputInterval time.Duration) *ProgressReader {
 	return &ProgressReader{
-		ioReadSeeker: readSeeker,
-		ui:           ui,
+		ioReadSeeker:   readSeeker,
+		ui:             ui,
+		outputInterval: outputInterval,
 	}
 }
 
@@ -56,15 +57,18 @@ func (progressReader *ProgressReader) Seek(offset int64, whence int) (int64, err
 }
 
 func (progressReader *ProgressReader) printProgress(quit chan bool) {
-	timer := time.NewTicker(5 * time.Second)
+	timer := time.NewTicker(progressReader.outputInterval)
 
 	for {
 		select {
 		case <-quit:
+			//The spaces are there to ensure we overwrite the entire line
+			//before using the terminal printer to output Done Uploading
+			progressReader.ui.PrintCapturingNoOutput("\r                             ")
 			progressReader.ui.Say("\rDone uploading")
 			return
 		case <-timer.C:
-			fmt.Println("\r%s uploaded...", formatters.ByteSize(progressReader.bytesRead))
+			progressReader.ui.PrintCapturingNoOutput("\r%s uploaded...", formatters.ByteSize(progressReader.bytesRead))
 		}
 	}
 }

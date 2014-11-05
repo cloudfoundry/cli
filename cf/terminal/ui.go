@@ -24,6 +24,7 @@ func NotLoggedInText() string {
 type UI interface {
 	PrintPaginator(rows []string, err error)
 	Say(message string, args ...interface{})
+	PrintCapturingNoOutput(message string, args ...interface{})
 	Warn(message string, args ...interface{})
 	Ask(prompt string, args ...interface{}) (answer string)
 	AskForPassword(prompt string, args ...interface{}) (answer string)
@@ -60,6 +61,14 @@ func (c *terminalUI) PrintPaginator(rows []string, err error) {
 
 	for _, row := range rows {
 		c.Say(row)
+	}
+}
+
+func (c *terminalUI) PrintCapturingNoOutput(message string, args ...interface{}) {
+	if len(args) == 0 {
+		fmt.Printf("%s", message)
+	} else {
+		fmt.Printf(message, args...)
 	}
 }
 
