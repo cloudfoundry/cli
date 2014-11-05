@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/spaces"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -296,7 +297,7 @@ func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(reqs)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
 	repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 	return
 }

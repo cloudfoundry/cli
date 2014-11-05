@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/password"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -39,7 +40,7 @@ func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Serve
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetUaaEndpoint(passwordServer.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
 	repo = NewCloudControllerPasswordRepository(configRepo, gateway)
 	return
 }

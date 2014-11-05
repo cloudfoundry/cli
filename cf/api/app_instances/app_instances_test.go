@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/app_instances"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -95,7 +96,7 @@ func createAppInstancesRepo(requests []testnet.TestRequest) (ts *httptest.Server
 	space.Guid = "my-space-guid"
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
 	repo = NewCloudControllerAppInstancesRepository(configRepo, gateway)
 	return
 }

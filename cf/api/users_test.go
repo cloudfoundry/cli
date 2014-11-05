@@ -34,8 +34,8 @@ var _ = Describe("User Repository", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepositoryWithDefaults()
-		ccGateway := net.NewCloudControllerGateway((config), time.Now, testterm.FakeUI{})
-		uaaGateway := net.NewUAAGateway(config)
+		ccGateway := net.NewCloudControllerGateway((config), time.Now, &testterm.FakeUI{})
+		uaaGateway := net.NewUAAGateway(config, &testterm.FakeUI{})
 		repo = NewCloudControllerUserRepository(config, uaaGateway, ccGateway)
 	})
 

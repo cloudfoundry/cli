@@ -53,7 +53,7 @@ var _ = Describe("App", func() {
 
 		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
 			"auth":             net.NewUAAGateway(config, ui),
-			"cloud-controller": net.NewCloudControllerGateway(config, time.Now),
+			"cloud-controller": net.NewCloudControllerGateway(config, time.Now, &testterm.FakeUI{}),
 			"uaa":              net.NewUAAGateway(config, ui),
 		})
 

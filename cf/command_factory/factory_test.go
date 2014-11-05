@@ -30,7 +30,7 @@ var _ = Describe("factory", func() {
 		pluginConfig := &testPluginConfig.FakePluginConfiguration{}
 		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
 			"auth":             net.NewUAAGateway(config, fakeUI),
-			"cloud-controller": net.NewCloudControllerGateway(config, time.Now),
+			"cloud-controller": net.NewCloudControllerGateway(config, time.Now, fakeUI),
 			"uaa":              net.NewUAAGateway(config, fakeUI),
 		})
 
