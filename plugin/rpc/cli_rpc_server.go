@@ -98,7 +98,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		recover()
 	}()
 
-	err := cmd.coreCommandRunner.Run(append([]string{"cf"}, args...))
+	err := cmd.coreCommandRunner.Run(append([]string{"CF_NAME"}, args...))
 
 	if err != nil {
 		*retVal = false
