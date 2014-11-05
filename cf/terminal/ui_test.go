@@ -19,6 +19,22 @@ import (
 )
 
 var _ = Describe("UI", func() {
+
+	Describe("Printing message to stdout with PrintCapturingNoOutput", func() {
+		It("prints strings without using the TeePrinter", func() {
+			printer := NewTeePrinter()
+			io_helpers.SimulateStdin("", func(reader io.Reader) {
+				output := io_helpers.CaptureOutput(func() {
+					ui := NewUI(reader, printer)
+					ui.PrintCapturingNoOutput("Hello")
+				})
+
+				Expect("Hello").To(Equal(strings.Join(output, "")))
+				Expect(len(printer.GetOutputAndReset())).To(Equal(0))
+			})
+		})
+	})
+
 	Describe("Printing message to stdout with Say", func() {
 		It("prints strings", func() {
 			io_helpers.SimulateStdin("", func(reader io.Reader) {
