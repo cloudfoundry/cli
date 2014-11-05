@@ -3,18 +3,20 @@ package api_test
 import (
 	"crypto/tls"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"time"
+
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"time"
 )
 
 func validApiInfoEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +70,7 @@ var _ = Describe("Endpoints Repository", func() {
 		testServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			testServerFn(w, r)
 		}))
-		gateway = net.NewCloudControllerGateway((config), time.Now)
+		gateway = net.NewCloudControllerGateway((config), time.Now, &testterm.FakeUI{})
 		gateway.SetTrustedCerts(testServer.TLS.Certificates)
 		repo = NewEndpointRepository(config, gateway)
 	})

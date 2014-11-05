@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/organizations"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -256,7 +257,7 @@ func createOrganizationRepo(reqs ...testnet.TestRequest) (testserver *httptest.S
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(testserver.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
 	repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 	return
 }
