@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"reflect"
 	"runtime"
 	"strings"
 	"time"
@@ -100,22 +101,42 @@ var _ = Describe("Gateway", func() {
 			apiErr  error
 		)
 
-		BeforeEach(func() {
-			request, apiErr = ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
-			Expect(apiErr).NotTo(HaveOccurred())
+		Context("when the body is nil", func() {
+			BeforeEach(func() {
+				request, apiErr = ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+				Expect(apiErr).NotTo(HaveOccurred())
+			})
+
+			It("does not use a ProgressReader as the SeekableBody", func() {
+				Expect(reflect.TypeOf(request.SeekableBody)).To(BeNil())
+			})
+
+			It("sets the Authorization header", func() {
+				Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
+			})
+
+			It("sets the accept header to application/json", func() {
+				Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
+			})
+
+			It("sets the user agent header", func() {
+				Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
+			})
 		})
 
-		It("sets the Authorization header", func() {
-			Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
+		Context("when the body is not nil", func() {
+			BeforeEach(func() {
+				f, _ := os.Open("../fixtures/test.file")
+				request, apiErr = ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", f)
+				Expect(apiErr).NotTo(HaveOccurred())
+			})
+
+			It("Uses a ProgressReader as the SeekableBody", func() {
+				Expect(reflect.TypeOf(request.SeekableBody).String()).To(ContainSubstring("ProgressReader"))
+			})
+
 		})
 
-		It("sets the accept header to application/json", func() {
-			Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
-		})
-
-		It("sets the user agent header", func() {
-			Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
-		})
 	})
 
 	Describe("CRUD methods", func() {
