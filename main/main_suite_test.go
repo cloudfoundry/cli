@@ -24,7 +24,6 @@ func TestMain(t *testing.T) {
 
 	//compile plugin examples to ensure they're up to date
 	plugin_builder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "basic_plugin")
-	plugin_builder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "call_cli_cmd")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "echo")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "interactive")
 

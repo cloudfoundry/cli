@@ -18,7 +18,9 @@ type BasicPlugin struct{}
 *	plugin interface defined by the core CLI.
 *
 *	Run(....) is the entry point when the core CLI is invoking a command defined
-*	by a plugin. args[0] will be the name of the command, and will be followed by
+*	by a plugin. The first parameter, plugin.CliConnection, is a struct that can
+*	be used to invoke cli commands. The second paramter, args, is a slice of
+*	strings. args[0] will be the name of the command, and will be followed by
 *	any additional arguments a cli user typed in.
 *
 *	Any error handling should be handled with the plugin itself (this means printing

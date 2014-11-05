@@ -16,10 +16,13 @@
 ## Writing Your First Plugin
 
   To start writting a plugin for the CF CLI, a developer will need to implement
-  a predefined interface which can be found [here](github.com/cloudfoundry/cli/plugin/plugin.go)
+  a predefined `Plugin` interface which can be found [here](github.com/cloudfoundry/cli/plugin/plugin.go)
 
   The `Run(...)` method is used at the main entry point between the CLI
-  and a plugin.
+  and a plugin. The run method receives two arguments. The first argument is
+  a plugin.CliConnection. The plugin.CliConnection is a struct containing methods 
+  for invoking cf cli commands. The second argument to Run(..) is a slice 
+  containing the arguments passed from the `cf` process.
 
   The `GetMetadata()` function informs the CLI of a plugin name, the
   commands it implements and help text for each command to be displayed with
@@ -57,25 +60,27 @@
 
   `cf uninstall-plugin <plugin-name>`
 
-## Plugin Takes Command Line Parameters
+## Command Line Arguments
 
   Command line arguments are sent along to plugins via the `Run(...)` method.
 
   An example plugin that parses command line arguments and flags can be
   found [here](github.com/cloudfoundry/plugin_examples/echo.go).
 
-## Plugin Calls CLI Command
+## Calling CLI Commands
 
-  CLI commands can be invoked with `plugin.CliCommand([]args)` from
-  within a plugin's `Run(..)` method.
+  CLI commands can be invoked with `cliConnection.CliCommand([]args)` from
+  within a plugin's `Run(..)` method. The Run(..) method receives the 
+  cliConnection as the first argument to Run(..)
 
   The `plugin.CliCommand([]args)` returns the output printed by the command
   and an error. The output is returned as a slice of strings. The error
   will be present if the call to the cli command fails.
 
-  An example usage can be found [here](github.com/cloudfoundry/plugin_examples/call_cli_cmd.go)
+  An example usage can be found [here](github.com/cloudfoundry/plugin_examples/call_cli_cmd/main/call_cli_cmd.go)
 
-## Plugin Can be Interactive
+## Interactive Plugins
+
   Plugins have the ability to be interactive. During a call to `Run(...)` a
   plugin has access to stdin.
 
