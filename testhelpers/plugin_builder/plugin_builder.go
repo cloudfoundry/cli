@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 )
 
-func BuildTestBinary(relativePathToPluginFixturesDir, pluginFile string) {
+func BuildTestBinary(relativePathToPluginDir, pluginFileName string) {
 	dir, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
 
-	binaryDestination := filepath.Join(dir, relativePathToPluginFixturesDir, pluginFile+".exe")
-	pluginSourceFile := filepath.Join(dir, relativePathToPluginFixturesDir, pluginFile+".go")
+	binaryDestination := filepath.Join(dir, relativePathToPluginDir, pluginFileName+".exe")
+	pluginSourceFile := filepath.Join(dir, relativePathToPluginDir, pluginFileName+".go")
 
 	cmd := exec.Command("go", "build", "-o", binaryDestination, pluginSourceFile)
 	err = cmd.Run()
