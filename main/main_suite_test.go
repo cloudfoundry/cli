@@ -21,5 +21,12 @@ func TestMain(t *testing.T) {
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "call_core_cmd")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "input")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "panics")
+
+	//compile plugin examples to ensure they're up to date
+	plugin_builder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "basic_plugin")
+	plugin_builder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "call_cli_cmd")
+	plugin_builder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "echo")
+	plugin_builder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "interactive")
+
 	RunSpecs(t, "Main Suite")
 }

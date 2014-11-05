@@ -27,6 +27,7 @@
   # Clean up old plugin binaries used in test
 
   rm -f fixtures/plugins/*.exe
+  rm -f plugin_examples/*.exe
 
   # Clean up old .a files in GOPATH
   # It seems like `go clean` should do this but ... not so much
