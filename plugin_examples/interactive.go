@@ -14,7 +14,7 @@ import (
 
 type Interactive struct{}
 
-func (c *Interactive) Run(args []string) {
+func (c *Interactive) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "interactive" {
 		var Echo string
 		fmt.Printf("Enter word: ")

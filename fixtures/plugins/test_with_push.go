@@ -16,7 +16,7 @@ import (
 type TestWithPush struct {
 }
 
-func (c *TestWithPush) Run(args []string) {
+func (c *TestWithPush) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "push" {
 		thePushCmd()
 	}

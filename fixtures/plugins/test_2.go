@@ -15,7 +15,7 @@ import (
 
 type Test2 struct{}
 
-func (c *Test2) Run(args []string) {
+func (c *Test2) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "test_2_cmd1" {
 		theFirstCmd()
 	} else if args[0] == "test_2_cmd2" {

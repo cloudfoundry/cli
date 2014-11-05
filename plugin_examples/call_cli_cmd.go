@@ -29,13 +29,13 @@ func main() {
 	plugin.Start(new(CliCmd))
 }
 
-func (c *CliCmd) Run(args []string) {
+func (c *CliCmd) Run(cliConnection plugin.CliConnection, args []string) {
 	// Invoke the cf command passed as the set of arguments
 	// after the first argument.
 	//
 	// Calls to plugin.CliCommand([]string) must be done after the invocation
 	// of plugin.Start() to ensure the environment is bootstrapped.
-	output, err := plugin.CliCommand(args[1:]...)
+	output, err := cliConnection.CliCommand(args[1:]...)
 
 	// The call to plugin.CliCommand() returns an error if the cli command
 	// returns a non-zero return code or panics. The output written by the CLI
