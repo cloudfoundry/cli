@@ -84,11 +84,11 @@ var _ = Describe("TeePrinter", func() {
 		})
 	})
 
-	Describe(".PauseOutput", func() {
+	Describe("Pausing Output", func() {
 		BeforeEach(func() {
 			output = io_helpers.CaptureOutput(func() {
 				printer = NewTeePrinter()
-				printer.PauseTerminalOutput()
+				printer.DisableTerminalOutput(true)
 				printer.Print("Hello")
 				printer.Println("Mom!")
 				printer.Printf("Dad!")
@@ -107,7 +107,7 @@ var _ = Describe("TeePrinter", func() {
 			BeforeEach(func() {
 				printer.GetOutputAndReset()
 				output = io_helpers.CaptureOutput(func() {
-					printer.ResumeTerminalOutput()
+					printer.DisableTerminalOutput(false)
 					printer.Print("Hello")
 					printer.Println("Mom!")
 					printer.Printf("Dad!")
