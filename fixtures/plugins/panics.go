@@ -16,7 +16,7 @@ import (
 type Panics struct {
 }
 
-func (c *Panics) Run(args []string) {
+func (c *Panics) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "panic" {
 		panic("OMG")
 	} else if args[0] == "exit1" {

@@ -17,7 +17,7 @@ import (
 type MySay struct {
 }
 
-func (c *MySay) Run(args []string) {
+func (c *MySay) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "my-say" {
 		if len(args) == 3 && args[2] == "--loud" {
 			fmt.Println(strings.ToUpper(args[1]))

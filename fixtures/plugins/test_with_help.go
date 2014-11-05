@@ -16,7 +16,7 @@ import (
 type TestWithHelp struct {
 }
 
-func (c *TestWithHelp) Run(args []string) {
+func (c *TestWithHelp) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "help" {
 		theHelpCmd()
 	}

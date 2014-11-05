@@ -16,7 +16,7 @@ import (
 type Input struct {
 }
 
-func (c *Input) Run(args []string) {
+func (c *Input) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "input" {
 		var Echo string
 		fmt.Scanf("%s", &Echo)

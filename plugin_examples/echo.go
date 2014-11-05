@@ -24,8 +24,7 @@ func main() {
 	plugin.Start(new(PluginDemonstratingParams))
 }
 
-func (pluginDemo *PluginDemonstratingParams) Run(args []string) {
-
+func (pluginDemo *PluginDemonstratingParams) Run(cliConnection plugin.CliConnection, args []string) {
 	// Initialize flags
 	echoFlagSet := flag.NewFlagSet("echo", flag.ExitOnError)
 	help := echoFlagSet.Bool("help", false, "passed to display help text")

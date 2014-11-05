@@ -25,7 +25,7 @@ type BasicPlugin struct{}
 *	user facing errors). The CLI will exit 0 if the plugin exits 0 and will exit
 *	1 should the plugin exits nonzero.
  */
-func (c *BasicPlugin) Run(args []string) {
+func (c *BasicPlugin) Run(cliConnection plugin.CliConnection, args []string) {
 	// Ensure that we called the command basic-plugin-command
 	if args[0] == "basic-plugin-command" {
 		fmt.Println("Running the basic-plugin-command")

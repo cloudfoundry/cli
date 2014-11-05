@@ -41,21 +41,21 @@ func dumpOutput(output []string) {
 	fmt.Println("----------              FIN               -----------")
 }
 
-func (c *CoreCmd) Run(args []string) {
+func (c *CoreCmd) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "core-command" {
-		output, err := plugin.CliCommand(args[1:]...)
+		output, err := cliConnection.CliCommand(args[1:]...)
 		if err != nil {
 			fmt.Println("PLUGIN ERROR: Error from CliCommand: ", err)
 		}
 		dumpOutput(output)
 	} else if args[0] == "core-command-quiet" {
-		output, err := plugin.CliCommandWithoutTerminalOutput(args[1:]...)
+		output, err := cliConnection.CliCommandWithoutTerminalOutput(args[1:]...)
 		if err != nil {
 			fmt.Println("PLUGIN ERROR: Error from CliCommand: ", err)
 		}
 		dumpOutput(output)
 	} else if args[0] == "awesomeness" {
-		plugin.CliCommand("plugins")
+		cliConnection.CliCommand("plugins")
 	} else if len(args) == 2 && args[0] == "awesomeness" && args[1] == "easter_egg" {
 		fmt.Println(`
 ZZZZ$Z$$$ZZ$$$$$77$777777777777777777777I77II7I?III?IIII???????+++????????++++++=++++++++++++++++++=++======+======+++++

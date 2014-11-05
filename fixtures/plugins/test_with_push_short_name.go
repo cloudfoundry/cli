@@ -16,7 +16,7 @@ import (
 type TestWithPushShortName struct {
 }
 
-func (c *TestWithPushShortName) Run(args []string) {
+func (c *TestWithPushShortName) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "p" {
 		thePushCmd()
 	}
