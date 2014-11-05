@@ -104,6 +104,11 @@ var _ = Describe("main", func() {
 			Eventually(output.Out.Contents).Should(MatchRegexp("Command output from the plugin(.*\\W)*awesomeness(.*\\W)*FIN"))
 		})
 
+		It("Can call a core commmand from a plugin without terminal output", func() {
+			output := Cf("core-command-quiet", "plugins").Wait(3 * time.Second)
+			Eventually(output.Out.Contents).Should(MatchRegexp("^\n---------- Command output from the plugin"))
+		})
+
 		It("Can call a plugin that requires stdin (interactive)", func() {
 			session := CfWithIo("input", "silly\n").Wait(5 * time.Second)
 			Eventually(session.Out).Should(Say("silly"))

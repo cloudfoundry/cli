@@ -9,13 +9,13 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture terminal.OutputCapture) bool {
+func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) bool {
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
 	for _, metadata := range pluginList {
 		for _, command := range metadata.Commands {
 			if command.Name == args[0] {
-				cliServer, err := startCliServer(coreCommandRunner, outputCapture)
+				cliServer, err := startCliServer(coreCommandRunner, outputCapture, terminalOutputSwitch)
 				if err != nil {
 					os.Exit(1)
 				}
@@ -38,8 +38,8 @@ func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture 
 	return false
 }
 
-func startCliServer(coreCommandRunner *cli.App, outputCapture terminal.OutputCapture) (*CliRpcService, error) {
-	cliServer, err := NewRpcService(coreCommandRunner, outputCapture)
+func startCliServer(coreCommandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) (*CliRpcService, error) {
+	cliServer, err := NewRpcService(coreCommandRunner, outputCapture, terminalOutputSwitch)
 	if err != nil {
 		return nil, err
 	}

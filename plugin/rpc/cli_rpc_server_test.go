@@ -5,6 +5,7 @@ import (
 	"net/rpc"
 	"time"
 
+	"github.com/cloudfoundry/cli/cf/terminal/fakes"
 	"github.com/cloudfoundry/cli/plugin"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
@@ -32,19 +33,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil)
+			rpcService, err = NewRpcService(nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := NewRpcService(nil, nil)
+			_, err := NewRpcService(nil, nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil)
+			rpcService, err = NewRpcService(nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -66,7 +67,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil)
+			rpcService, err = NewRpcService(nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -94,7 +95,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil)
+			rpcService, err = NewRpcService(nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -134,8 +135,9 @@ var _ = Describe("Server", func() {
 	Describe(".GetOutputAndReset", func() {
 		Context("success", func() {
 			BeforeEach(func() {
-				outputCapture := FakeOutputCapture{}
-				rpcService, err = NewRpcService(nil, outputCapture)
+				outputCapture := &fakes.FakeOutputCapture{}
+				outputCapture.GetOutputAndResetReturns([]string{"hi from command"})
+				rpcService, err = NewRpcService(nil, outputCapture, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -162,6 +164,34 @@ var _ = Describe("Server", func() {
 		})
 	})
 
+	Describe("disabling terminal output", func() {
+		var terminalOutputSwitch *fakes.FakeTerminalOutputSwitch
+
+		BeforeEach(func() {
+			terminalOutputSwitch = &fakes.FakeTerminalOutputSwitch{}
+			rpcService, err = NewRpcService(nil, nil, terminalOutputSwitch)
+			Expect(err).ToNot(HaveOccurred())
+
+			err := rpcService.Start()
+			Expect(err).ToNot(HaveOccurred())
+
+			pingCli(rpcService.Port())
+		})
+
+		It("should disable the terminal output switch", func() {
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
+
+			var success bool
+			err = client.Call("CliRpcCmd.DisableTerminalOutput", true, &success)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(success).To(BeTrue())
+			Expect(terminalOutputSwitch.DisableTerminalOutputCallCount()).To(Equal(1))
+			Expect(terminalOutputSwitch.DisableTerminalOutputArgsForCall(0)).To(Equal(true))
+		})
+	})
+
 	Describe(".CallCoreCommand", func() {
 		Context("success", func() {
 			BeforeEach(func() {
@@ -178,9 +208,9 @@ var _ = Describe("Server", func() {
 					},
 				}
 
-				outputCapture := FakeOutputCapture{}
+				outputCapture := &fakes.FakeOutputCapture{}
 
-				rpcService, err = NewRpcService(app, outputCapture)
+				rpcService, err = NewRpcService(app, outputCapture, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -222,8 +252,8 @@ var _ = Describe("Server", func() {
 						},
 					},
 				}
-				outputCapture := FakeOutputCapture{}
-				rpcService, err = NewRpcService(app, outputCapture)
+				outputCapture := &fakes.FakeOutputCapture{}
+				rpcService, err = NewRpcService(app, outputCapture, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -283,10 +313,4 @@ func pingCli(port string) {
 		}
 	}
 	Expect(connErr).ToNot(HaveOccurred())
-}
-
-type FakeOutputCapture struct{}
-
-func (o FakeOutputCapture) GetOutputAndReset() []string {
-	return []string{"hi from command"}
 }

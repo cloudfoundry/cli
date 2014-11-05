@@ -19,17 +19,19 @@ type CliRpcService struct {
 }
 
 type CliRpcCmd struct {
-	PluginMetadata    *plugin.PluginMetadata
-	coreCommandRunner *cli.App
-	outputCapture     terminal.OutputCapture
+	PluginMetadata       *plugin.PluginMetadata
+	coreCommandRunner    *cli.App
+	outputCapture        terminal.OutputCapture
+	terminalOutputSwitch terminal.TerminalOutputSwitch
 }
 
-func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture) (*CliRpcService, error) {
+func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
-			PluginMetadata:    &plugin.PluginMetadata{},
-			coreCommandRunner: commandRunner,
-			outputCapture:     outputCapture,
+			PluginMetadata:       &plugin.PluginMetadata{},
+			coreCommandRunner:    commandRunner,
+			outputCapture:        outputCapture,
+			terminalOutputSwitch: terminalOutputSwitch,
 		},
 	}
 
@@ -81,6 +83,12 @@ func (cli *CliRpcService) Start() error {
 
 func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
 	cmd.PluginMetadata = &pluginMetadata
+	*retVal = true
+	return nil
+}
+
+func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
+	cmd.terminalOutputSwitch.DisableTerminalOutput(disable)
 	*retVal = true
 	return nil
 }

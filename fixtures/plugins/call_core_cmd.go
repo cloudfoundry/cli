@@ -20,6 +20,10 @@ func (c *CoreCmd) GetMetadata() plugin.PluginMetadata {
 				Name:     "core-command",
 				HelpText: "command to call core command. It passes all text through to command",
 			},
+			{
+				Name:     "core-command-quiet",
+				HelpText: "command to call core command, disabling output to the terminal. It passes all text through to command",
+			},
 		},
 	}
 }
@@ -28,18 +32,28 @@ func main() {
 	plugin.Start(new(CoreCmd))
 }
 
+func dumpOutput(output []string) {
+	fmt.Println("")
+	fmt.Println("---------- Command output from the plugin ----------")
+	for index, val := range output {
+		fmt.Print("#", index, " value: ", val)
+	}
+	fmt.Println("----------              FIN               -----------")
+}
+
 func (c *CoreCmd) Run(args []string) {
 	if args[0] == "core-command" {
 		output, err := plugin.CliCommand(args[1:]...)
 		if err != nil {
 			fmt.Println("PLUGIN ERROR: Error from CliCommand: ", err)
 		}
-		fmt.Println("")
-		fmt.Println("---------- Command output from the plugin ----------")
-		for index, val := range output {
-			fmt.Print("#", index, " value: ", val)
+		dumpOutput(output)
+	} else if args[0] == "core-command-quiet" {
+		output, err := plugin.CliCommandWithoutTerminalOutput(args[1:]...)
+		if err != nil {
+			fmt.Println("PLUGIN ERROR: Error from CliCommand: ", err)
 		}
-		fmt.Println("----------              FIN               -----------")
+		dumpOutput(output)
 	} else if args[0] == "awesomeness" {
 		plugin.CliCommand("plugins")
 	} else if len(args) == 2 && args[0] == "awesomeness" && args[1] == "easter_egg" {

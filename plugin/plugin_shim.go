@@ -53,13 +53,23 @@ func sendPluginMetadataToCliServer(cmd Plugin) {
 
 }
 
+func CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
+	return callCoreCommand(true, args...)
+}
+
 func CliCommand(args ...string) ([]string, error) {
+	return callCoreCommand(false, args...)
+}
+
+func callCoreCommand(silently bool, args ...string) ([]string, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+CliServicePort)
 	if err != nil {
 		return []string{}, err
 	}
 
 	var success bool
+
+	client.Call("CliRpcCmd.DisableTerminalOutput", silently, &success)
 	err = client.Call("CliRpcCmd.CallCoreCommand", args, &success)
 
 	var cmdOutput []string
