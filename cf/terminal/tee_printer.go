@@ -37,7 +37,7 @@ func (t *TeePrinter) GetOutputAndReset() []string {
 
 func (t *TeePrinter) Print(values ...interface{}) (n int, err error) {
 	str := fmt.Sprint(values...)
-	t.output = append(t.output, str)
+	t.output = append(t.output, Decolorize(str))
 	if !t.disableTerminalOutput {
 		return fmt.Print(str)
 	}
@@ -46,7 +46,7 @@ func (t *TeePrinter) Print(values ...interface{}) (n int, err error) {
 
 func (t *TeePrinter) Printf(format string, a ...interface{}) (n int, err error) {
 	str := fmt.Sprintf(format, a...)
-	t.output = append(t.output, str)
+	t.output = append(t.output, Decolorize(str))
 	if !t.disableTerminalOutput {
 		return fmt.Print(str)
 	}
@@ -55,7 +55,7 @@ func (t *TeePrinter) Printf(format string, a ...interface{}) (n int, err error) 
 
 func (t *TeePrinter) Println(values ...interface{}) (n int, err error) {
 	str := fmt.Sprint(values...)
-	t.output = append(t.output, str)
+	t.output = append(t.output, Decolorize(str))
 	if !t.disableTerminalOutput {
 		return fmt.Println(str)
 	}
