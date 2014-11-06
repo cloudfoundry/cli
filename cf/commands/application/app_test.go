@@ -1,6 +1,8 @@
 package application_test
 
 import (
+	"time"
+
 	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
@@ -210,13 +212,14 @@ func makeAppWithRoute(appName string) models.Application {
 
 	route := models.RouteSummary{Host: "foo", Domain: domain}
 	secondRoute := models.RouteSummary{Host: appName, Domain: domain}
+	packgeUpdatedAt, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2012-10-24T19:54:00Z")
 
 	application.State = "started"
 	application.InstanceCount = 2
 	application.RunningInstances = 2
 	application.Memory = 256
 	application.Routes = []models.RouteSummary{route, secondRoute}
-	application.PackageUpdatedAt = "2012-10-24T19:54:00+00:00"
+	application.PackageUpdatedAt = packgeUpdatedAt
 
 	return application
 }

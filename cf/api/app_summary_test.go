@@ -62,7 +62,7 @@ var _ = Describe("AppSummaryRepository", func() {
 		Expect(app1.InstanceCount).To(Equal(1))
 		Expect(app1.RunningInstances).To(Equal(1))
 		Expect(app1.Memory).To(Equal(int64(128)))
-		Expect(app1.PackageUpdatedAt).To(Equal("2014-10-24T19:54:00+00:00"))
+		Expect(app1.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2014-10-24T19:54:00Z"))
 
 		app2 := apps[1]
 		Expect(app2.Name).To(Equal("app2"))
@@ -75,7 +75,7 @@ var _ = Describe("AppSummaryRepository", func() {
 		Expect(app2.InstanceCount).To(Equal(3))
 		Expect(app2.RunningInstances).To(Equal(1))
 		Expect(app2.Memory).To(Equal(int64(512)))
-		Expect(app2.PackageUpdatedAt).To(Equal("2012-10-24T19:54:00+00:00"))
+		Expect(app2.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2012-10-24T19:55:00Z"))
 	})
 })
 
@@ -131,7 +131,7 @@ const getAppSummariesResponseBody string = `
       "service_names":[
       	"my-service-instance"
       ],
-			"package_updated_at":"2012-10-24T19:54:00+00:00"
+			"package_updated_at":"2012-10-24T19:55:00+00:00"
     }
   ]
 }`

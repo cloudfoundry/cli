@@ -3,6 +3,7 @@ package models
 import (
 	"reflect"
 	"strings"
+	"time"
 )
 
 type Application struct {
@@ -54,7 +55,7 @@ type ApplicationFields struct {
 	RunningInstances int
 	State            string
 	SpaceGuid        string
-	PackageUpdatedAt string
+	PackageUpdatedAt time.Time
 }
 
 type AppParams struct {
