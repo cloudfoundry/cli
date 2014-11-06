@@ -69,8 +69,8 @@ func (cmd BindSecurityGroup) Run(context *cli.Context) {
 	cmd.ui.Say(T("Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
 		map[string]interface{}{
 			"security_group": securityGroupName,
-			"space":          orgName,
-			"organization":   spaceName,
+			"space":          spaceName,
+			"organization":   orgName,
 			"username":       cmd.configRepo.Username(),
 		}))
 
