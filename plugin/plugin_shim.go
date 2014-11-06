@@ -12,13 +12,13 @@ func Start(cmd Plugin) {
 	cliConnection := NewCliConnection(os.Args[1])
 
 	cliConnection.pingCLI()
-	if cliConnection.isMetadataRequest() {
+	if isMetadataRequest(os.Args) {
 		cliConnection.sendPluginMetadataToCliServer(cmd.GetMetadata())
 	} else {
 		cmd.Run(cliConnection, os.Args[2:])
 	}
 }
 
-func (plugingCliConnection *cliConnection) isMetadataRequest() bool {
-	return len(os.Args) == 3 && os.Args[2] == "SendMetadata"
+func isMetadataRequest(args []string) bool {
+	return len(args) == 3 && args[2] == "SendMetadata"
 }
