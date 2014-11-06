@@ -33,6 +33,15 @@ var _ = Describe("TeePrinter", func() {
 			Expect(outputs[1]).To(Equal("Mom!"))
 		})
 
+		It("should decolorize text", func() {
+			io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.Print("hi " + EntityNameColor("foo"))
+			})
+
+			output = printer.GetOutputAndReset()
+			Expect(output[0]).To(Equal("hi foo"))
+		})
 	})
 
 	Describe(".Printf", func() {
@@ -50,6 +59,16 @@ var _ = Describe("TeePrinter", func() {
 		It("should save the output to the slice", func() {
 			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello everybody"))
 		})
+
+		It("should decolorize text", func() {
+			io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.Printf("hi %s", EntityNameColor("foo"))
+			})
+
+			output = printer.GetOutputAndReset()
+			Expect(output[0]).To(Equal("hi foo"))
+		})
 	})
 
 	Describe(".Println", func() {
@@ -66,6 +85,16 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should save the output to the slice", func() {
 			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello everybody"))
+		})
+
+		It("should decolorize text", func() {
+			io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.Println("hi " + EntityNameColor("foo"))
+			})
+
+			output = printer.GetOutputAndReset()
+			Expect(output[0]).To(Equal("hi foo"))
 		})
 	})
 
