@@ -89,8 +89,8 @@ func (repo CloudControllerServiceRepository) GetAllServiceOfferings() (models.Se
 	return repo.getServiceOfferings("/v2/services?inline-relations-depth=1")
 }
 
-func (repo CloudControllerServiceRepository) getServiceOfferings(path string) (models.ServiceOfferings, error) {
-	var offerings models.ServiceOfferings
+func (repo CloudControllerServiceRepository) getServiceOfferings(path string) ([]models.ServiceOffering, error) {
+	var offerings []models.ServiceOffering
 	apiErr := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		path,

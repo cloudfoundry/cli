@@ -8,12 +8,36 @@ import (
 )
 
 type FakeServiceBuilder struct {
+	GetAllServicesStub        func() ([]models.ServiceOffering, error)
+	getAllServicesMutex       sync.RWMutex
+	getAllServicesArgsForCall []struct{}
+	getAllServicesReturns     struct {
+		result1 []models.ServiceOffering
+		result2 error
+	}
+	GetAllServicesWithPlansStub        func() ([]models.ServiceOffering, error)
+	getAllServicesWithPlansMutex       sync.RWMutex
+	getAllServicesWithPlansArgsForCall []struct{}
+	getAllServicesWithPlansReturns     struct {
+		result1 []models.ServiceOffering
+		result2 error
+	}
 	GetServiceByNameStub        func(string) (models.ServiceOffering, error)
 	getServiceByNameMutex       sync.RWMutex
 	getServiceByNameArgsForCall []struct {
 		arg1 string
 	}
 	getServiceByNameReturns struct {
+		result1 models.ServiceOffering
+		result2 error
+	}
+	GetServiceByNameForSpaceStub        func(string, string) (models.ServiceOffering, error)
+	getServiceByNameForSpaceMutex       sync.RWMutex
+	getServiceByNameForSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getServiceByNameForSpaceReturns struct {
 		result1 models.ServiceOffering
 		result2 error
 	}
@@ -36,6 +60,15 @@ type FakeServiceBuilder struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}
+	GetServicesForSpaceStub        func(string) ([]models.ServiceOffering, error)
+	getServicesForSpaceMutex       sync.RWMutex
+	getServicesForSpaceArgsForCall []struct {
+		arg1 string
+	}
+	getServicesForSpaceReturns struct {
+		result1 []models.ServiceOffering
+		result2 error
+	}
 	GetServiceVisibleToOrgStub        func(string, string) (models.ServiceOffering, error)
 	getServiceVisibleToOrgMutex       sync.RWMutex
 	getServiceVisibleToOrgArgsForCall []struct {
@@ -55,6 +88,54 @@ type FakeServiceBuilder struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}
+}
+
+func (fake *FakeServiceBuilder) GetAllServices() ([]models.ServiceOffering, error) {
+	fake.getAllServicesMutex.Lock()
+	defer fake.getAllServicesMutex.Unlock()
+	fake.getAllServicesArgsForCall = append(fake.getAllServicesArgsForCall, struct{}{})
+	if fake.GetAllServicesStub != nil {
+		return fake.GetAllServicesStub()
+	} else {
+		return fake.getAllServicesReturns.result1, fake.getAllServicesReturns.result2
+	}
+}
+
+func (fake *FakeServiceBuilder) GetAllServicesCallCount() int {
+	fake.getAllServicesMutex.RLock()
+	defer fake.getAllServicesMutex.RUnlock()
+	return len(fake.getAllServicesArgsForCall)
+}
+
+func (fake *FakeServiceBuilder) GetAllServicesReturns(result1 []models.ServiceOffering, result2 error) {
+	fake.getAllServicesReturns = struct {
+		result1 []models.ServiceOffering
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceBuilder) GetAllServicesWithPlans() ([]models.ServiceOffering, error) {
+	fake.getAllServicesWithPlansMutex.Lock()
+	defer fake.getAllServicesWithPlansMutex.Unlock()
+	fake.getAllServicesWithPlansArgsForCall = append(fake.getAllServicesWithPlansArgsForCall, struct{}{})
+	if fake.GetAllServicesWithPlansStub != nil {
+		return fake.GetAllServicesWithPlansStub()
+	} else {
+		return fake.getAllServicesWithPlansReturns.result1, fake.getAllServicesWithPlansReturns.result2
+	}
+}
+
+func (fake *FakeServiceBuilder) GetAllServicesWithPlansCallCount() int {
+	fake.getAllServicesWithPlansMutex.RLock()
+	defer fake.getAllServicesWithPlansMutex.RUnlock()
+	return len(fake.getAllServicesWithPlansArgsForCall)
+}
+
+func (fake *FakeServiceBuilder) GetAllServicesWithPlansReturns(result1 []models.ServiceOffering, result2 error) {
+	fake.getAllServicesWithPlansReturns = struct {
+		result1 []models.ServiceOffering
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeServiceBuilder) GetServiceByName(arg1 string) (models.ServiceOffering, error) {
@@ -84,6 +165,39 @@ func (fake *FakeServiceBuilder) GetServiceByNameArgsForCall(i int) string {
 
 func (fake *FakeServiceBuilder) GetServiceByNameReturns(result1 models.ServiceOffering, result2 error) {
 	fake.getServiceByNameReturns = struct {
+		result1 models.ServiceOffering
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameForSpace(arg1 string, arg2 string) (models.ServiceOffering, error) {
+	fake.getServiceByNameForSpaceMutex.Lock()
+	defer fake.getServiceByNameForSpaceMutex.Unlock()
+	fake.getServiceByNameForSpaceArgsForCall = append(fake.getServiceByNameForSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	if fake.GetServiceByNameForSpaceStub != nil {
+		return fake.GetServiceByNameForSpaceStub(arg1, arg2)
+	} else {
+		return fake.getServiceByNameForSpaceReturns.result1, fake.getServiceByNameForSpaceReturns.result2
+	}
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameForSpaceCallCount() int {
+	fake.getServiceByNameForSpaceMutex.RLock()
+	defer fake.getServiceByNameForSpaceMutex.RUnlock()
+	return len(fake.getServiceByNameForSpaceArgsForCall)
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameForSpaceArgsForCall(i int) (string, string) {
+	fake.getServiceByNameForSpaceMutex.RLock()
+	defer fake.getServiceByNameForSpaceMutex.RUnlock()
+	return fake.getServiceByNameForSpaceArgsForCall[i].arg1, fake.getServiceByNameForSpaceArgsForCall[i].arg2
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameForSpaceReturns(result1 models.ServiceOffering, result2 error) {
+	fake.getServiceByNameForSpaceReturns = struct {
 		result1 models.ServiceOffering
 		result2 error
 	}{result1, result2}
@@ -149,6 +263,38 @@ func (fake *FakeServiceBuilder) GetServicesForBrokerArgsForCall(i int) string {
 
 func (fake *FakeServiceBuilder) GetServicesForBrokerReturns(result1 []models.ServiceOffering, result2 error) {
 	fake.getServicesForBrokerReturns = struct {
+		result1 []models.ServiceOffering
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceBuilder) GetServicesForSpace(arg1 string) ([]models.ServiceOffering, error) {
+	fake.getServicesForSpaceMutex.Lock()
+	defer fake.getServicesForSpaceMutex.Unlock()
+	fake.getServicesForSpaceArgsForCall = append(fake.getServicesForSpaceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.GetServicesForSpaceStub != nil {
+		return fake.GetServicesForSpaceStub(arg1)
+	} else {
+		return fake.getServicesForSpaceReturns.result1, fake.getServicesForSpaceReturns.result2
+	}
+}
+
+func (fake *FakeServiceBuilder) GetServicesForSpaceCallCount() int {
+	fake.getServicesForSpaceMutex.RLock()
+	defer fake.getServicesForSpaceMutex.RUnlock()
+	return len(fake.getServicesForSpaceArgsForCall)
+}
+
+func (fake *FakeServiceBuilder) GetServicesForSpaceArgsForCall(i int) string {
+	fake.getServicesForSpaceMutex.RLock()
+	defer fake.getServicesForSpaceMutex.RUnlock()
+	return fake.getServicesForSpaceArgsForCall[i].arg1
+}
+
+func (fake *FakeServiceBuilder) GetServicesForSpaceReturns(result1 []models.ServiceOffering, result2 error) {
+	fake.getServicesForSpaceReturns = struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}{result1, result2}

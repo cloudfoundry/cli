@@ -10,6 +10,7 @@ type PlanBuilder interface {
 	AttachOrgsToPlans([]models.ServicePlanFields) ([]models.ServicePlanFields, error)
 	AttachOrgToPlans([]models.ServicePlanFields, string) ([]models.ServicePlanFields, error)
 	GetPlansForServiceForOrg(string, string) ([]models.ServicePlanFields, error)
+	GetPlansForServiceWithOrgs(string) ([]models.ServicePlanFields, error)
 	GetPlansForService(string) ([]models.ServicePlanFields, error)
 	GetPlansVisibleToOrg(string) ([]models.ServicePlanFields, error)
 }
@@ -73,6 +74,14 @@ func (builder Builder) GetPlansForServiceForOrg(serviceGuid string, orgName stri
 }
 
 func (builder Builder) GetPlansForService(serviceGuid string) ([]models.ServicePlanFields, error) {
+	plans, err := builder.servicePlanRepo.Search(map[string]string{"service_guid": serviceGuid})
+	if err != nil {
+		return nil, err
+	}
+	return plans, nil
+}
+
+func (builder Builder) GetPlansForServiceWithOrgs(serviceGuid string) ([]models.ServicePlanFields, error) {
 	plans, err := builder.servicePlanRepo.Search(map[string]string{"service_guid": serviceGuid})
 	if err != nil {
 		return nil, err

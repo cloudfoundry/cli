@@ -7,9 +7,15 @@ import (
 )
 
 type ServiceBuilder interface {
+	GetAllServices() ([]models.ServiceOffering, error)
+	GetAllServicesWithPlans() ([]models.ServiceOffering, error)
+
 	GetServiceByName(string) (models.ServiceOffering, error)
+	GetServiceByNameForSpace(string, string) (models.ServiceOffering, error)
 	GetServiceByNameForOrg(string, string) (models.ServiceOffering, error)
+
 	GetServicesForBroker(string) ([]models.ServiceOffering, error)
+	GetServicesForSpace(string) ([]models.ServiceOffering, error)
 
 	GetServiceVisibleToOrg(string, string) (models.ServiceOffering, error)
 	GetServicesVisibleToOrg(string) ([]models.ServiceOffering, error)
@@ -37,6 +43,45 @@ func (builder Builder) GetServiceByNameForOrg(serviceLabel, orgName string) (mod
 		return models.ServiceOffering{}, err
 	}
 	return service, nil
+}
+
+func (builder Builder) GetAllServices() ([]models.ServiceOffering, error) {
+	return builder.serviceRepo.GetAllServiceOfferings()
+}
+
+func (builder Builder) GetAllServicesWithPlans() ([]models.ServiceOffering, error) {
+	services, err := builder.GetAllServices()
+	if err != nil {
+		return []models.ServiceOffering{}, err
+	}
+
+	var plans []models.ServicePlanFields
+	for index, service := range services {
+		plans, err = builder.planBuilder.GetPlansForService(service.Guid)
+		if err != nil {
+			return []models.ServiceOffering{}, err
+		}
+		services[index].Plans = plans
+	}
+
+	return services, err
+}
+
+func (builder Builder) GetServicesForSpace(spaceGuid string) ([]models.ServiceOffering, error) {
+	return builder.serviceRepo.GetServiceOfferingsForSpace(spaceGuid)
+}
+
+func (builder Builder) GetServiceByNameForSpace(serviceLabel, spaceGuid string) (models.ServiceOffering, error) {
+	serviceOfferings, err := builder.serviceRepo.GetServiceOfferingsForSpace(spaceGuid)
+	if err != nil {
+		return models.ServiceOffering{}, err
+	}
+	for _, offering := range serviceOfferings {
+		if offering.Label == serviceLabel {
+			return offering, nil
+		}
+	}
+	return models.ServiceOffering{}, nil
 }
 
 func (builder Builder) GetServiceByName(serviceLabel string) (models.ServiceOffering, error) {
@@ -102,7 +147,7 @@ func (builder Builder) attachPlansToServiceForOrg(service models.ServiceOffering
 }
 
 func (builder Builder) attachPlansToService(service models.ServiceOffering) (models.ServiceOffering, error) {
-	plans, err := builder.planBuilder.GetPlansForService(service.Guid)
+	plans, err := builder.planBuilder.GetPlansForServiceWithOrgs(service.Guid)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
