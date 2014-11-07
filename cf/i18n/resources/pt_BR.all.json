@@ -1790,6 +1790,11 @@
       "modified": false
    },
    {
+      "id": "Error getting file info",
+      "translation": "Error getting file info",
+      "modified": false
+   },
+   {
       "id": "Error in requirement",
       "translation": "Erro no requerimento",
       "modified": false

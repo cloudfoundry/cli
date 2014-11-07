@@ -124,10 +124,10 @@ var _ = Describe("Gateway", func() {
 			})
 		})
 
-		Context("when the body is not nil", func() {
+		Context("when the body is a file", func() {
 			BeforeEach(func() {
-				f, _ := os.Open("../fixtures/test.file")
-				request, apiErr = ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", f)
+				f, _ := os.Open("../../fixtures/test.file")
+				request, apiErr = ccGateway.NewRequestForFile("PUT", "https://example.com/v2/apps", "BEARER my-access-token", f)
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 
@@ -325,7 +325,7 @@ var _ = Describe("Gateway", func() {
 			ccGateway.SetTokenRefresher(auth)
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
-			request, apiErr = ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), fileToUpload)
+			request, apiErr = ccGateway.NewRequestForFile("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), fileToUpload)
 		})
 
 		AfterEach(func() {
