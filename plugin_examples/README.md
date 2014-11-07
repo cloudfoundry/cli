@@ -1,87 +1,99 @@
 # Developing a Plugin
 
+This README discusses how to develop a cf CLI plugin.
+For user-focused documentation, see [Using the cf CLI](http://docs.cloudfoundry.org/devguide/installcf/use-cli-plugins.html).
+
+
 ## Development Requirements
 
   - Golang installed
-  - Tagged version of CLI release source code supporting plugins
+  - Tagged version of CLI release source code that supports plugins; cf CLI v.6.7.0 and above
 
 ## Architecture Overview
 
-  The CLI plugin architecture is built on an rpc model. This means that each plugin
-  is run as an independent executable and is invoked by the CLI. The CLI
-  handles starting, stopping, and cleaning up the plugin executable resources.
-  To write a plugin compatible with the CLI a developer only has to conform to
-  a simple interface defined [here](github.com/cloudfoundry/cli/plugin/plugin.go)
+  The cf CLI plugin architecture model follows the remote procedure call (RPC) model. 
+  The cf CLI invokes each plugin, runs it as an independent executable, and handles
+  all start, stop, and clean up tasks for plugin executable resources.
 
-## Writing Your First Plugin
+  Plugins that you develop for the cf CLI must conform to a predefined `Plugin` interface
+  that we discuss below.
 
-  To start writting a plugin for the CF CLI, a developer will need to implement
-  a predefined `Plugin` interface which can be found [here](github.com/cloudfoundry/cli/plugin/plugin.go)
+## Writing a Plugin
 
-  The `Run(...)` method is used at the main entry point between the CLI
-  and a plugin. The run method receives two arguments. The first argument is
-  a plugin.CliConnection. The plugin.CliConnection is a struct containing methods 
-  for invoking cf cli commands. The second argument to Run(..) is a slice 
-  containing the arguments passed from the `cf` process.
+  To write a plugin for the cf CLI, implement the 
+  [predefined plugin interface](github.com/cloudfoundry/cli/plugin/plugin.go).
 
-  The `GetMetadata()` function informs the CLI of a plugin name, the
-  commands it implements and help text for each command to be displayed with
-  `cf help`.
+  The interface uses a `Run(...)` method as the main entry point between the CLI
+  and a plugin. This method receives the following arguments:
 
-  Initializing a plugin is as easy as calling 
-  `plugin.Start(new(MyPluginStruct))`. The function `plugin.Start(...)`
-  requires a new reference to the struct implementing the defined interface.
-  The `plugin.Start(...)` method should be invoked in a plugin's `main()`
-  method.
+  - A struct `plugin.CliConnection` that containins methods for invoking cf cli commands
+  - A string array that contains the arguments passed from the `cf` process
 
-  A basic plugin example can be found [here](github.com/cloudfoundry/plugin_examples/basic_plugin.go)
+  The `GetMetadata()` function informs the CLI of the name of a plugin, the
+  commands it implements, and help text for each command that users can display
+  with `cf help`.
 
-  Plugins need to be compiled before installation. Information about
-  building a binary can be found [here](https://www.google.com/search?q=how%20to%20compile%20golang)
+  To initialize a plugin, call `plugin.Start(new(MyPluginStruct))` from within the main() method of
+  your plugin. The `plugin.Start(...)` function requires a new reference to the struct that implements the defined interface. 
+  
+  This repo contains a basic plugin example [here](github.com/cloudfoundry/plugin_examples/basic_plugin.go).
 
-## Installing Plugins
+### Using Command Line Arguments
 
-  A compiled plugin can be installed by invoking
+  The `Run(...)` method accepts the command line arguments and flags that you 
+  define for a plugin. 
+ 
+  See the [command line arguments example] (github.com/cloudfoundry/plugin_examples/echo.go)
+  included in this repo.
 
-  `cf install-plugin path/to/plugin-binary`
+### Calling CLI Commands
 
-## Listing Plugins
-
-  To see a list of installed plugins run
-
-  `cf plugins`
-
-  This shows a list of the commands that are avaiable from installed plugins,
-  along with each command's plugin name.
-
-## Uninstalling Plugins
-
-  A plugin is uninstalled by running the command
-
-  `cf uninstall-plugin <plugin-name>`
-
-## Command Line Arguments
-
-  Command line arguments are sent along to plugins via the `Run(...)` method.
-
-  An example plugin that parses command line arguments and flags can be
-  found [here](github.com/cloudfoundry/plugin_examples/echo.go).
-
-## Calling CLI Commands
-
-  CLI commands can be invoked with `cliConnection.CliCommand([]args)` from
-  within a plugin's `Run(..)` method. The Run(..) method receives the 
-  cliConnection as the first argument to Run(..)
+  You can invoke CLI commands with `cliConnection.CliCommand([]args)` from
+  within a plugin's `Run(...)` method. The `Run(...)` method receives the 
+  cliConnection as its first argument.
 
   The `plugin.CliCommand([]args)` returns the output printed by the command
   and an error. The output is returned as a slice of strings. The error
-  will be present if the call to the cli command fails.
+  will be present if the call to the CLI command fails.
 
-  An example usage can be found [here](github.com/cloudfoundry/plugin_examples/call_cli_cmd/main/call_cli_cmd.go)
+  See the [calling CLI commands example](github.com/cloudfoundry/plugin_examples/call_cli_cmd/main/call_cli_cmd.go)
+  included in this repo.
 
-## Interactive Plugins
+### Creating Interactive Plugins
 
-  Plugins have the ability to be interactive. During a call to `Run(...)` a
-  plugin has access to stdin.
+  Because a plugin has access to stdin during a call to the `Run(...)` method, you can create
+  interactive plugins. See the [interactive plugin example](github.com/cloudfoundry/plugin_examples/interactive.go)
+  included in this repo. 
 
-  An example usage can be found [here](github.com/cloudfoundry/plugin_examples/interactive.go)
+## Compiling Plugin Source Code
+
+  The cf CLI requires an executable file to install the plugin. You must compile the source code with
+  the `go build` command before distributing the plugin, or instruct your users to compile the plugin source code before
+  installing the plugin. For information about compiling Go source code, see [Compile
+  packages and dependencies](https://golang.org/cmd/go/).  
+
+## Using Plugins
+
+After you compile a plugin, use the following commands to install and manage the plugin.
+
+### Installing Plugins
+   
+  To install a plugin, run:
+ 
+  `cf install-plugin PATH_TO_PLUGIN_BINARY`
+
+### Listing Plugins
+
+   To display a list of installed plugins and the commands available from each plugin, run:
+
+   `cf plugins`
+
+### Uninstalling Plugins
+
+  To remove a plugin, run:
+
+  `cf uninstall-plugin PLUGIN_NAME`
+
+
+   
+
