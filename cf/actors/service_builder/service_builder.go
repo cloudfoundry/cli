@@ -10,7 +10,8 @@ type ServiceBuilder interface {
 	GetAllServices() ([]models.ServiceOffering, error)
 	GetAllServicesWithPlans() ([]models.ServiceOffering, error)
 
-	GetServiceByName(string) (models.ServiceOffering, error)
+	GetServiceByNameWithPlans(string) (models.ServiceOffering, error)
+	GetServiceByNameWithPlansWithOrgNames(string) (models.ServiceOffering, error)
 	GetServiceByNameForSpace(string, string) (models.ServiceOffering, error)
 	GetServiceByNameForOrg(string, string) (models.ServiceOffering, error)
 
@@ -84,7 +85,22 @@ func (builder Builder) GetServiceByNameForSpace(serviceLabel, spaceGuid string) 
 	return models.ServiceOffering{}, nil
 }
 
-func (builder Builder) GetServiceByName(serviceLabel string) (models.ServiceOffering, error) {
+func (builder Builder) GetServiceByNameWithPlans(serviceLabel string) (models.ServiceOffering, error) {
+	service, err := builder.serviceRepo.FindServiceOfferingByLabel(serviceLabel)
+	if err != nil {
+		return models.ServiceOffering{}, err
+	}
+
+	plans, err := builder.planBuilder.GetPlansForService(service.Guid)
+	if err != nil {
+		return models.ServiceOffering{}, err
+	}
+	service.Plans = plans
+
+	return service, nil
+}
+
+func (builder Builder) GetServiceByNameWithPlansWithOrgNames(serviceLabel string) (models.ServiceOffering, error) {
 	service, err := builder.serviceRepo.FindServiceOfferingByLabel(serviceLabel)
 	if err != nil {
 		return models.ServiceOffering{}, err

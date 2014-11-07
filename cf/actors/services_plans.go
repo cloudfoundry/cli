@@ -61,7 +61,7 @@ func NewServicePlanHandler(plan api.ServicePlanRepository, vis api.ServicePlanVi
 }
 
 func (actor ServicePlanHandler) UpdateAllPlansForService(serviceName string, setPlanVisibility bool) (bool, error) {
-	service, err := actor.serviceBuilder.GetServiceByName(serviceName)
+	service, err := actor.serviceBuilder.GetServiceByNameWithPlansWithOrgNames(serviceName)
 	if err != nil {
 		return false, err
 	}
@@ -160,7 +160,7 @@ func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName
 }
 
 func (actor ServicePlanHandler) UpdateSinglePlanForService(serviceName string, planName string, setPlanVisibility bool) (PlanAccess, error) {
-	serviceOffering, err := actor.serviceBuilder.GetServiceByName(serviceName)
+	serviceOffering, err := actor.serviceBuilder.GetServiceByNameWithPlansWithOrgNames(serviceName)
 	if err != nil {
 		return PlanAccessError, err
 	}

@@ -22,12 +22,21 @@ type FakeServiceBuilder struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}
-	GetServiceByNameStub        func(string) (models.ServiceOffering, error)
-	getServiceByNameMutex       sync.RWMutex
-	getServiceByNameArgsForCall []struct {
+	GetServiceByNameWithPlansStub        func(string) (models.ServiceOffering, error)
+	getServiceByNameWithPlansMutex       sync.RWMutex
+	getServiceByNameWithPlansArgsForCall []struct {
 		arg1 string
 	}
-	getServiceByNameReturns struct {
+	getServiceByNameWithPlansReturns struct {
+		result1 models.ServiceOffering
+		result2 error
+	}
+	GetServiceByNameWithPlansWithOrgNamesStub   func(string) (models.ServiceOffering, error)
+	getServiceByNameWithPlansAndOrgsMutex       sync.RWMutex
+	getServiceByNameWithPlansAndOrgsArgsForCall []struct {
+		arg1 string
+	}
+	getServiceByNameWithPlansAndOrgsReturns struct {
 		result1 models.ServiceOffering
 		result2 error
 	}
@@ -138,33 +147,65 @@ func (fake *FakeServiceBuilder) GetAllServicesWithPlansReturns(result1 []models.
 	}{result1, result2}
 }
 
-func (fake *FakeServiceBuilder) GetServiceByName(arg1 string) (models.ServiceOffering, error) {
-	fake.getServiceByNameMutex.Lock()
-	defer fake.getServiceByNameMutex.Unlock()
-	fake.getServiceByNameArgsForCall = append(fake.getServiceByNameArgsForCall, struct {
+func (fake *FakeServiceBuilder) GetServiceByNameWithPlans(arg1 string) (models.ServiceOffering, error) {
+	fake.getServiceByNameWithPlansMutex.Lock()
+	defer fake.getServiceByNameWithPlansMutex.Unlock()
+	fake.getServiceByNameWithPlansArgsForCall = append(fake.getServiceByNameWithPlansArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	if fake.GetServiceByNameStub != nil {
-		return fake.GetServiceByNameStub(arg1)
+	if fake.GetServiceByNameWithPlansStub != nil {
+		return fake.GetServiceByNameWithPlansStub(arg1)
 	} else {
-		return fake.getServiceByNameReturns.result1, fake.getServiceByNameReturns.result2
+		return fake.getServiceByNameWithPlansReturns.result1, fake.getServiceByNameWithPlansReturns.result2
 	}
 }
 
-func (fake *FakeServiceBuilder) GetServiceByNameCallCount() int {
-	fake.getServiceByNameMutex.RLock()
-	defer fake.getServiceByNameMutex.RUnlock()
-	return len(fake.getServiceByNameArgsForCall)
+func (fake *FakeServiceBuilder) GetServiceByNameWithPlansCallCount() int {
+	fake.getServiceByNameWithPlansMutex.RLock()
+	defer fake.getServiceByNameWithPlansMutex.RUnlock()
+	return len(fake.getServiceByNameWithPlansArgsForCall)
 }
 
-func (fake *FakeServiceBuilder) GetServiceByNameArgsForCall(i int) string {
-	fake.getServiceByNameMutex.RLock()
-	defer fake.getServiceByNameMutex.RUnlock()
-	return fake.getServiceByNameArgsForCall[i].arg1
+func (fake *FakeServiceBuilder) GetServiceByNameWithPlansArgsForCall(i int) string {
+	fake.getServiceByNameWithPlansMutex.RLock()
+	defer fake.getServiceByNameWithPlansMutex.RUnlock()
+	return fake.getServiceByNameWithPlansArgsForCall[i].arg1
 }
 
-func (fake *FakeServiceBuilder) GetServiceByNameReturns(result1 models.ServiceOffering, result2 error) {
-	fake.getServiceByNameReturns = struct {
+func (fake *FakeServiceBuilder) GetServiceByNameWithPlansReturns(result1 models.ServiceOffering, result2 error) {
+	fake.getServiceByNameWithPlansReturns = struct {
+		result1 models.ServiceOffering
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameWithPlansWithOrgNames(arg1 string) (models.ServiceOffering, error) {
+	fake.getServiceByNameWithPlansAndOrgsMutex.Lock()
+	defer fake.getServiceByNameWithPlansAndOrgsMutex.Unlock()
+	fake.getServiceByNameWithPlansAndOrgsArgsForCall = append(fake.getServiceByNameWithPlansAndOrgsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.GetServiceByNameWithPlansWithOrgNamesStub != nil {
+		return fake.GetServiceByNameWithPlansWithOrgNamesStub(arg1)
+	} else {
+		return fake.getServiceByNameWithPlansAndOrgsReturns.result1, fake.getServiceByNameWithPlansAndOrgsReturns.result2
+	}
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameWithPlansWithOrgNamesCallCount() int {
+	fake.getServiceByNameWithPlansAndOrgsMutex.RLock()
+	defer fake.getServiceByNameWithPlansAndOrgsMutex.RUnlock()
+	return len(fake.getServiceByNameWithPlansAndOrgsArgsForCall)
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameWithPlansWithOrgNamesArgsForCall(i int) string {
+	fake.getServiceByNameWithPlansAndOrgsMutex.RLock()
+	defer fake.getServiceByNameWithPlansAndOrgsMutex.RUnlock()
+	return fake.getServiceByNameWithPlansAndOrgsArgsForCall[i].arg1
+}
+
+func (fake *FakeServiceBuilder) GetServiceByNameWithPlansWithOrgNamesReturns(result1 models.ServiceOffering, result2 error) {
+	fake.getServiceByNameWithPlansAndOrgsReturns = struct {
 		result1 models.ServiceOffering
 		result2 error
 	}{result1, result2}
