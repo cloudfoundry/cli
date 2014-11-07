@@ -108,6 +108,19 @@ var _ = Describe("app Command", func() {
 				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
 			))
 		})
+
+		Describe("when the package updated at is nil", func() {
+			BeforeEach(func() {
+				appSummaryRepo.GetSummarySummary.PackageUpdatedAt = nil
+			})
+
+			It("should output whatever greg sez", func() {
+				runCommand("my-app")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"last uploaded", "unknown"},
+				))
+			})
+		})
 	})
 
 	Describe("when the app is not running", func() {
@@ -119,6 +132,8 @@ var _ = Describe("app Command", func() {
 			application.InstanceCount = 2
 			application.RunningInstances = 0
 			application.Memory = 256
+			now := time.Now()
+			application.PackageUpdatedAt = &now
 
 			appSummaryRepo.GetSummarySummary = application
 			requirementsFactory.Application = application
@@ -219,7 +234,7 @@ func makeAppWithRoute(appName string) models.Application {
 	application.RunningInstances = 2
 	application.Memory = 256
 	application.Routes = []models.RouteSummary{route, secondRoute}
-	application.PackageUpdatedAt = packgeUpdatedAt
+	application.PackageUpdatedAt = &packgeUpdatedAt
 
 	return application
 }

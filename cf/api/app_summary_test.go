@@ -50,7 +50,7 @@ var _ = Describe("AppSummaryRepository", func() {
 		Expect(handler).To(HaveAllRequestsCalled())
 
 		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(2).To(Equal(len(apps)))
+		Expect(3).To(Equal(len(apps)))
 
 		app1 := apps[0]
 		Expect(app1.Name).To(Equal("app1"))
@@ -76,6 +76,9 @@ var _ = Describe("AppSummaryRepository", func() {
 		Expect(app2.RunningInstances).To(Equal(1))
 		Expect(app2.Memory).To(Equal(int64(512)))
 		Expect(app2.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2012-10-24T19:55:00Z"))
+
+		nullUpdateAtApp := apps[2]
+		Expect(nullUpdateAtApp.PackageUpdatedAt).To(BeNil())
 	})
 })
 
@@ -132,6 +135,27 @@ const getAppSummariesResponseBody string = `
       	"my-service-instance"
       ],
 			"package_updated_at":"2012-10-24T19:55:00+00:00"
+    },{
+      "guid":"app-with-null-updated-at-guid",
+      "routes":[
+        {
+          "guid":"route-3-guid",
+          "host":"app3",
+          "domain":{
+            "guid":"domain-3-guid",
+            "name":"cfapps.io"
+          }
+        }
+      ],
+      "running_instances":1,
+      "name":"app-with-null-updated-at",
+      "memory":512,
+      "instances":3,
+      "state":"STARTED",
+      "service_names":[
+      	"my-service-instance"
+      ],
+			"package_updated_at":null
     }
   ]
 }`
