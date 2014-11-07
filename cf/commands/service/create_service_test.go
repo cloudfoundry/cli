@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -23,6 +24,7 @@ var _ = Describe("create-service command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		cmd                 CreateService
 		serviceRepo         *testapi.FakeServiceRepo
+		serviceBuilder      *fakes.FakeServiceBuilder
 
 		offering1 models.ServiceOffering
 		offering2 models.ServiceOffering
@@ -33,7 +35,8 @@ var _ = Describe("create-service command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		serviceRepo = &testapi.FakeServiceRepo{}
-		cmd = NewCreateService(ui, config, serviceRepo)
+		serviceBuilder = &fakes.FakeServiceBuilder{}
+		cmd = NewCreateService(ui, config, serviceRepo, serviceBuilder)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"
@@ -50,7 +53,7 @@ var _ = Describe("create-service command", func() {
 		offering2 = models.ServiceOffering{}
 		offering2.Label = "postgres"
 
-		serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering1, offering2}
+		serviceBuilder.GetServicesByNameForSpaceWithPlansReturns(models.ServiceOfferings{offering1, offering2}, nil)
 	})
 
 	var callCreateService = func(args []string) {

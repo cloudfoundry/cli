@@ -1130,11 +1130,6 @@
       "modified": false
    },
    {
-      "id": "Could not find any offerings with name {{.ServiceOfferingName}}",
-      "translation": "找不到名为{{.ServiceOfferingName}}的服务",
-      "modified": false
-   },
-   {
       "id": "Could not find app named '{{.AppName}}' in manifest",
       "translation": "无法在部署描述文件中找到名为'{{.AppName}}'的应用程序",
       "modified": false

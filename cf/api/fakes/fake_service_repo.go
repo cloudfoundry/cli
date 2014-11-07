@@ -32,7 +32,7 @@ type FakeServiceRepo struct {
 	}
 
 	FindServiceOfferingsForSpaceByLabelReturns struct {
-		ServiceOfferings []models.ServiceOffering
+		ServiceOfferings models.ServiceOfferings
 		Error            error
 	}
 
@@ -73,10 +73,10 @@ type FakeServiceRepo struct {
 	FindServiceOfferingByLabelAndProviderApiResponse     error
 	FindServiceOfferingByLabelAndProviderCalled          bool
 
-	FindServiceOfferingByLabelName            string
-	FindServiceOfferingByLabelServiceOffering models.ServiceOffering
-	FindServiceOfferingByLabelApiResponse     error
-	FindServiceOfferingByLabelCalled          bool
+	FindServiceOfferingsByLabelName             string
+	FindServiceOfferingsByLabelServiceOfferings models.ServiceOfferings
+	FindServiceOfferingsByLabelApiResponse      error
+	FindServiceOfferingsByLabelCalled           bool
 
 	ListServicesFromBrokerReturns map[string][]models.ServiceOffering
 	ListServicesFromBrokerErr     error
@@ -132,11 +132,11 @@ func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provide
 	return
 }
 
-func (repo *FakeServiceRepo) FindServiceOfferingByLabel(name string) (offering models.ServiceOffering, apiErr error) {
-	repo.FindServiceOfferingByLabelCalled = true
-	repo.FindServiceOfferingByLabelName = name
-	apiErr = repo.FindServiceOfferingByLabelApiResponse
-	offering = repo.FindServiceOfferingByLabelServiceOffering
+func (repo *FakeServiceRepo) FindServiceOfferingsByLabel(name string) (offerings models.ServiceOfferings, apiErr error) {
+	repo.FindServiceOfferingsByLabelCalled = true
+	repo.FindServiceOfferingsByLabelName = name
+	apiErr = repo.FindServiceOfferingsByLabelApiResponse
+	offerings = repo.FindServiceOfferingsByLabelServiceOfferings
 	return
 }
 

@@ -46,7 +46,7 @@ var _ = Describe("update-service command", func() {
 		},
 		}
 
-		serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering1}
+		//serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering1}
 	})
 
 	var callUpdateService = func(args []string) {
