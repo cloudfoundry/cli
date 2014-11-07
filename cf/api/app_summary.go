@@ -31,8 +31,8 @@ type ApplicationFromSummary struct {
 	DiskQuota        int64 `json:"disk_quota"`
 	Urls             []string
 	State            string
-	SpaceGuid        string    `json:"space_guid"`
-	PackageUpdatedAt time.Time `json:"package_updated_at"`
+	SpaceGuid        string     `json:"space_guid"`
+	PackageUpdatedAt *time.Time `json:"package_updated_at"`
 }
 
 func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields) {

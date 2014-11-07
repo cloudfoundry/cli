@@ -112,7 +112,13 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	}
 
 	cmd.ui.Say("%s %s", terminal.HeaderColor(T("urls:")), strings.Join(urls, ", "))
-	cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("last uploaded:")), application.PackageUpdatedAt.Format("Mon Jan 2 15:04:05 MST 2006"))
+	var lastUpdated string
+	if application.PackageUpdatedAt != nil {
+		lastUpdated = application.PackageUpdatedAt.Format("Mon Jan 2 15:04:05 MST 2006")
+	} else {
+		lastUpdated = "unknown"
+	}
+	cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("last uploaded:")), lastUpdated)
 
 	if appIsStopped {
 		cmd.ui.Say(T("There are no running instances of this app."))

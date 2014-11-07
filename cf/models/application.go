@@ -55,7 +55,7 @@ type ApplicationFields struct {
 	RunningInstances int
 	State            string
 	SpaceGuid        string
-	PackageUpdatedAt time.Time
+	PackageUpdatedAt *time.Time
 }
 
 type AppParams struct {
