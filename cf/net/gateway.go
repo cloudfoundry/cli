@@ -188,24 +188,7 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.Re
 	}
 }
 
-func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiErr error) {
-	progressReader := NewProgressReader(body, gateway.ui, 5*time.Second)
-
-	var err error
-	var request *http.Request
-
-	if body != nil {
-		progressReader.Seek(0, 0)
-		request, err = http.NewRequest(method, path, progressReader)
-	} else {
-		request, err = http.NewRequest(method, path, body)
-	}
-
-	if err != nil {
-		apiErr = errors.NewWithError(T("Error building request"), err)
-		return
-	}
-
+func (gateway Gateway) newRequest(request *http.Request, accessToken string, body io.ReadSeeker) (*Request, error) {
 	if accessToken != "" {
 		request.Header.Set("Authorization", accessToken)
 	}
@@ -213,24 +196,44 @@ func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Read
 	request.Header.Set("accept", "application/json")
 	request.Header.Set("content-type", "application/json")
 	request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
+	return &Request{HttpReq: request, SeekableBody: body}, nil
+}
 
-	if body != nil {
-		switch v := body.(type) {
-		case *os.File:
-			fileStats, err := v.Stat()
-			if err != nil {
-				break
-			}
-			fileSize := fileStats.Size()
-			request.ContentLength = fileSize
-			progressReader.SetTotalSize(fileSize)
-		}
-		req = &Request{HttpReq: request, SeekableBody: progressReader}
-	} else {
-		req = &Request{HttpReq: request, SeekableBody: body}
+func (gateway Gateway) NewRequestForFile(method, path, accessToken string, body *os.File) (req *Request, apiErr error) {
+	progressReader := NewProgressReader(body, gateway.ui, 5*time.Second)
+	progressReader.Seek(0, 0)
+	fileStats, err := body.Stat()
+
+	if err != nil {
+		apiErr = errors.NewWithError(T("Error getting file info"), err)
+		return
 	}
 
-	return
+	request, err := http.NewRequest(method, path, progressReader)
+	if err != nil {
+		apiErr = errors.NewWithError(T("Error building request"), err)
+		return
+	}
+
+	fileSize := fileStats.Size()
+	progressReader.SetTotalSize(fileSize)
+	request.ContentLength = fileSize
+
+	if err != nil {
+		apiErr = errors.NewWithError(T("Error building request"), err)
+		return
+	}
+
+	return gateway.newRequest(request, accessToken, progressReader)
+}
+
+func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiErr error) {
+	request, err := http.NewRequest(method, path, body)
+	if err != nil {
+		apiErr = errors.NewWithError(T("Error building request"), err)
+		return
+	}
+	return gateway.newRequest(request, accessToken, body)
 }
 
 func (gateway Gateway) PerformRequest(request *Request) (rawResponse *http.Response, apiErr error) {

@@ -243,7 +243,7 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 		}
 
 		var request *net.Request
-		request, apiErr = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken(), requestFile)
+		request, apiErr = repo.gateway.NewRequestForFile("PUT", url, repo.config.AccessToken(), requestFile)
 		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary())
 		request.HttpReq.Header.Set("Content-Type", contentType)
 		if apiErr != nil {
