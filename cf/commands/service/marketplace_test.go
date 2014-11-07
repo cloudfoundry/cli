@@ -75,14 +75,14 @@ var _ = Describe("marketplace command", func() {
 					Guid: "the-space-guid",
 					Name: "the-space-name",
 				})
-				serviceBuilder.GetServicesForSpaceReturns(fakeServiceOfferings, nil)
+				serviceBuilder.GetServicesForSpaceWithPlansReturns(fakeServiceOfferings, nil)
 			})
 
 			It("lists all of the service offerings for the space", func() {
 				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
 				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 
-				args := serviceBuilder.GetServicesForSpaceArgsForCall(0)
+				args := serviceBuilder.GetServicesForSpaceWithPlansArgsForCall(0)
 				Expect(args).To(Equal("the-space-guid"))
 
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -96,7 +96,7 @@ var _ = Describe("marketplace command", func() {
 
 			Context("when the user passes the -s flag", func() {
 				It("Displays the list of plans for each service with info", func() {
-					serviceBuilder.GetServiceByNameForSpaceReturns(service1, nil)
+					serviceBuilder.GetServiceByNameForSpaceWithPlansReturns(service1, nil)
 
 					cmd := NewMarketplaceServices(ui, config, serviceBuilder)
 					testcmd.RunCommand(cmd, []string{"-s", "aaa-my-service-offering"}, requirementsFactory)

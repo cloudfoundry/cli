@@ -10,11 +10,12 @@ type ServiceOfferingFields struct {
 	DocumentationUrl string
 }
 
-type ServiceOfferings []ServiceOffering
 type ServiceOffering struct {
 	ServiceOfferingFields
 	Plans []ServicePlanFields
 }
+
+type ServiceOfferings []ServiceOffering
 
 func (s ServiceOfferings) Len() int {
 	return len(s)

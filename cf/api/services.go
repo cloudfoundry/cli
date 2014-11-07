@@ -15,9 +15,11 @@ import (
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) error
 	GetServiceOfferingByGuid(serviceGuid string) (offering models.ServiceOffering, apiErr error)
-	FindServiceOfferingByLabel(name string) (offering models.ServiceOffering, apiErr error)
+	FindServiceOfferingsByLabel(name string) (offering models.ServiceOfferings, apiErr error)
 	FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiErr error)
+
 	FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offering models.ServiceOfferings, apiErr error)
+
 	GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr error)
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
@@ -49,9 +51,12 @@ func (repo CloudControllerServiceRepository) GetServiceOfferingByGuid(serviceGui
 	return models.ServiceOffering{ServiceOfferingFields: serviceOffering}, apiErr
 }
 
+func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (models.ServiceOfferings, error) {
+	return repo.getServiceOfferings(fmt.Sprintf("/v2/spaces/%s/services", spaceGuid))
+}
+
 func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offerings models.ServiceOfferings, err error) {
-	offerings, err = repo.getServiceOfferings(
-		fmt.Sprintf("/v2/spaces/%s/services?q=%s&inline-relations-depth=1", spaceGuid, url.QueryEscape("label:"+name)))
+	offerings, err = repo.getServiceOfferings(fmt.Sprintf("/v2/spaces/%s/services?q=%s", spaceGuid, url.QueryEscape("label:"+name)))
 
 	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.BAD_QUERY_PARAM {
 		offerings, err = repo.findServiceOfferingsByPaginating(spaceGuid, name)
@@ -80,13 +85,8 @@ func (repo CloudControllerServiceRepository) findServiceOfferingsByPaginating(sp
 	return matchingOffering, nil
 }
 
-func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (models.ServiceOfferings, error) {
-	return repo.getServiceOfferings(
-		fmt.Sprintf("/v2/spaces/%s/services?inline-relations-depth=1", spaceGuid))
-}
-
 func (repo CloudControllerServiceRepository) GetAllServiceOfferings() (models.ServiceOfferings, error) {
-	return repo.getServiceOfferings("/v2/services?inline-relations-depth=1")
+	return repo.getServiceOfferings("/v2/services")
 }
 
 func (repo CloudControllerServiceRepository) getServiceOfferings(path string) ([]models.ServiceOffering, error) {
@@ -184,18 +184,18 @@ func (repo CloudControllerServiceRepository) PurgeServiceOffering(offering model
 	return repo.gateway.DeleteResource(url)
 }
 
-func (repo CloudControllerServiceRepository) FindServiceOfferingByLabel(label string) (models.ServiceOffering, error) {
+func (repo CloudControllerServiceRepository) FindServiceOfferingsByLabel(label string) (models.ServiceOfferings, error) {
 	path := fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:"+label))
 	offerings, apiErr := repo.getServiceOfferings(path)
 
 	if apiErr != nil {
-		return models.ServiceOffering{}, apiErr
+		return models.ServiceOfferings{}, apiErr
 	} else if len(offerings) == 0 {
 		apiErr = errors.NewModelNotFoundError("Service offering", label)
-		return models.ServiceOffering{}, apiErr
+		return models.ServiceOfferings{}, apiErr
 	}
 
-	return offerings[0], apiErr
+	return offerings, apiErr
 }
 
 func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvider(label, provider string) (models.ServiceOffering, error) {

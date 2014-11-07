@@ -13,13 +13,14 @@ import (
 
 var _ = Describe("Service Builder", func() {
 	var (
-		planBuilder      *plan_builder_fakes.FakePlanBuilder
-		serviceBuilder   service_builder.ServiceBuilder
-		serviceRepo      *testapi.FakeServiceRepo
-		service1         models.ServiceOffering
-		serviceWithPlans models.ServiceOffering
-		plan1            models.ServicePlanFields
-		plan2            models.ServicePlanFields
+		planBuilder     *plan_builder_fakes.FakePlanBuilder
+		serviceBuilder  service_builder.ServiceBuilder
+		serviceRepo     *testapi.FakeServiceRepo
+		service1        models.ServiceOffering
+		v1Service       models.ServiceOffering
+		planWithoutOrgs models.ServicePlanFields
+		plan1           models.ServicePlanFields
+		plan2           models.ServicePlanFields
 	)
 
 	BeforeEach(func() {
@@ -35,8 +36,17 @@ var _ = Describe("Service Builder", func() {
 			},
 		}
 
-		serviceRepo.FindServiceOfferingByLabelName = "my-service1"
-		serviceRepo.FindServiceOfferingByLabelServiceOffering = service1
+		v1Service = models.ServiceOffering{
+			ServiceOfferingFields: models.ServiceOfferingFields{
+				Label:      "v1Service",
+				Guid:       "v1Service-guid",
+				BrokerGuid: "my-service-broker-guid1",
+				Provider:   "IAmV1",
+			},
+		}
+
+		serviceRepo.FindServiceOfferingsByLabelName = "my-service1"
+		serviceRepo.FindServiceOfferingsByLabelServiceOfferings = models.ServiceOfferings{service1, v1Service}
 
 		serviceRepo.GetServiceOfferingByGuidReturns = struct {
 			ServiceOffering models.ServiceOffering
@@ -63,6 +73,12 @@ var _ = Describe("Service Builder", func() {
 			ServiceOfferingGuid: "service-guid1",
 		}
 
+		planWithoutOrgs = models.ServicePlanFields{
+			Name:                "service-plan-without-orgs",
+			Guid:                "service-plan-without-orgs-guid",
+			ServiceOfferingGuid: "service-guid1",
+		}
+
 		planBuilder.GetPlansVisibleToOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
 		planBuilder.GetPlansForServiceWithOrgsReturns([]models.ServicePlanFields{plan1, plan2}, nil)
 		planBuilder.GetPlansForServiceForOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
@@ -79,11 +95,34 @@ var _ = Describe("Service Builder", func() {
 			}
 		})
 
-		It("returns the named service, populated with plans", func() {
+		It("returns the services for the space", func() {
 			services, err := serviceBuilder.GetServicesForSpace("spaceGuid")
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(services)).To(Equal(2))
+		})
+	})
+
+	Describe(".GetServicesForSpaceWithPlans", func() {
+		BeforeEach(func() {
+			serviceRepo.GetServiceOfferingsForSpaceReturns = struct {
+				ServiceOfferings []models.ServiceOffering
+				Error            error
+			}{
+				[]models.ServiceOffering{service1, service1},
+				nil,
+			}
+
+			planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{planWithoutOrgs}, nil)
+		})
+
+		It("returns the services for the space, populated with plans", func() {
+			services, err := serviceBuilder.GetServicesForSpaceWithPlans("spaceGuid")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(len(services)).To(Equal(2))
+			Expect(services[0].Plans[0]).To(Equal(planWithoutOrgs))
+			Expect(services[1].Plans[0]).To(Equal(planWithoutOrgs))
 		})
 	})
 
@@ -155,31 +194,149 @@ var _ = Describe("Service Builder", func() {
 		})
 	})
 
-	Describe(".GetServiceByNameForSapce", func() {
+	Describe(".GetServiceByNameForSpace", func() {
+		Context("mixed v2 and v1 services", func() {
+			BeforeEach(func() {
+				service2 := models.ServiceOffering{
+					ServiceOfferingFields: models.ServiceOfferingFields{
+						Label: "service",
+						Guid:  "service-guid-v2",
+					},
+				}
+
+				service1 := models.ServiceOffering{
+					ServiceOfferingFields: models.ServiceOfferingFields{
+						Label:    "service",
+						Guid:     "service-guid",
+						Provider: "a provider",
+					},
+				}
+
+				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
+					ServiceOfferings models.ServiceOfferings
+					Error            error
+				}{
+					models.ServiceOfferings{service1, service2},
+					nil,
+				}
+			})
+
+			It("returns the nv2 service", func() {
+				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGuid")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(len(service.Plans)).To(Equal(0))
+				Expect(service.Guid).To(Equal("service-guid-v2"))
+			})
+		})
+
+		Context("v2 services", func() {
+			BeforeEach(func() {
+				service := models.ServiceOffering{
+					ServiceOfferingFields: models.ServiceOfferingFields{
+						Label: "service",
+						Guid:  "service-guid",
+					},
+				}
+
+				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
+					ServiceOfferings models.ServiceOfferings
+					Error            error
+				}{
+					models.ServiceOfferings{service},
+					nil,
+				}
+			})
+
+			It("returns the named service", func() {
+				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGuid")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(len(service.Plans)).To(Equal(0))
+				Expect(service.Guid).To(Equal("service-guid"))
+			})
+		})
+
+		Context("v1 services", func() {
+			BeforeEach(func() {
+				service := models.ServiceOffering{
+					ServiceOfferingFields: models.ServiceOfferingFields{
+						Label:    "service",
+						Guid:     "service-guid",
+						Provider: "a provider",
+					},
+				}
+
+				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
+					ServiceOfferings models.ServiceOfferings
+					Error            error
+				}{
+					models.ServiceOfferings{service},
+					nil,
+				}
+			})
+
+			It("returns the an error", func() {
+				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGuid")
+				Expect(service).To(Equal(models.ServiceOffering{}))
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
+	Describe(".GetServiceByNameForSpaceWithPlans", func() {
 		BeforeEach(func() {
-			serviceWithPlans = models.ServiceOffering{
+			service := models.ServiceOffering{
 				ServiceOfferingFields: models.ServiceOfferingFields{
 					Label: "serviceWithPlans",
 				},
-				Plans: []models.ServicePlanFields{plan1, plan2},
 			}
 
-			serviceRepo.GetServiceOfferingsForSpaceReturns = struct {
-				ServiceOfferings []models.ServiceOffering
+			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
+				ServiceOfferings models.ServiceOfferings
 				Error            error
 			}{
-				[]models.ServiceOffering{serviceWithPlans},
+				models.ServiceOfferings{service},
 				nil,
 			}
+
+			planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{planWithoutOrgs}, nil)
 		})
-		It("returns the named service, populated with plans", func() {
-			service, err := serviceBuilder.GetServiceByNameForSpace("serviceWithPlans", "spaceGuid")
+
+		It("returns the named service", func() {
+			service, err := serviceBuilder.GetServiceByNameForSpaceWithPlans("serviceWithPlans", "spaceGuid")
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(len(service.Plans)).To(Equal(2))
-			Expect(service.Plans[0].Name).To(Equal("service-plan1"))
-			Expect(service.Plans[1].Name).To(Equal("service-plan2"))
-			Expect(service.Plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
+			Expect(len(service.Plans)).To(Equal(1))
+			Expect(service.Plans[0].Name).To(Equal("service-plan-without-orgs"))
+			Expect(service.Plans[0].OrgNames).To(BeNil())
+		})
+	})
+
+	Describe(".GetServicesByNameForSpaceWithPlans", func() {
+		BeforeEach(func() {
+			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
+				ServiceOfferings models.ServiceOfferings
+				Error            error
+			}{
+				models.ServiceOfferings{service1, v1Service},
+				nil,
+			}
+
+			planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{planWithoutOrgs}, nil)
+		})
+
+		It("returns the named service", func() {
+			services, err := serviceBuilder.GetServicesByNameForSpaceWithPlans("serviceWithPlans", "spaceGuid")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(len(services)).To(Equal(2))
+			Expect(services[0].Label).To(Equal("my-service1"))
+			Expect(services[0].Plans[0].Name).To(Equal("service-plan-without-orgs"))
+			Expect(services[0].Plans[0].OrgNames).To(BeNil())
+			Expect(services[1].Label).To(Equal("v1Service"))
+			Expect(services[1].Plans[0].Name).To(Equal("service-plan-without-orgs"))
+			Expect(services[1].Plans[0].OrgNames).To(BeNil())
 		})
 	})
 

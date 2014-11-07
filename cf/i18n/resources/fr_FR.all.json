@@ -1130,11 +1130,6 @@
       "modified": false
    },
    {
-      "id": "Could not find any offerings with name {{.ServiceOfferingName}}",
-      "translation": "Impossible de trouver des offres avec le nom {{.ServiceOfferingName}}",
-      "modified": false
-   },
-   {
       "id": "Could not find app named '{{.AppName}}' in manifest",
       "translation": "Impossible de trouver l'application nommée '{{.AppName}}' dans le manifeste",
       "modified": false

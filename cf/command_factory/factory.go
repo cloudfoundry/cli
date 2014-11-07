@@ -51,6 +51,22 @@ type concreteFactory struct {
 func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator, pluginConfig plugin_config.PluginConfiguration) (factory concreteFactory) {
 	factory.cmdsByName = make(map[string]command.Command)
 
+	planBuilder := plan_builder.NewBuilder(
+		repoLocator.GetServicePlanRepository(),
+		repoLocator.GetServicePlanVisibilityRepository(),
+		repoLocator.GetOrganizationRepository(),
+	)
+
+	serviceBuilder := service_builder.NewBuilder(
+		repoLocator.GetServiceRepository(),
+		planBuilder,
+	)
+
+	brokerBuilder := broker_builder.NewBuilder(
+		repoLocator.GetServiceBrokerRepository(),
+		serviceBuilder,
+	)
+
 	factory.cmdsByName["api"] = commands.NewApi(ui, config, repoLocator.GetEndpointRepository())
 	factory.cmdsByName["apps"] = application.NewListApps(ui, config, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["auth"] = commands.NewAuthenticate(ui, config, repoLocator.GetAuthenticationRepository())
@@ -59,7 +75,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["create-buildpack"] = buildpack.NewCreateBuildpack(ui, repoLocator.GetBuildpackRepository(), repoLocator.GetBuildpackBitsRepository())
 	factory.cmdsByName["create-domain"] = domain.NewCreateDomain(ui, config, repoLocator.GetDomainRepository())
 	factory.cmdsByName["create-org"] = organization.NewCreateOrg(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetQuotaRepository())
-	factory.cmdsByName["create-service"] = service.NewCreateService(ui, config, repoLocator.GetServiceRepository())
+	factory.cmdsByName["create-service"] = service.NewCreateService(ui, config, repoLocator.GetServiceRepository(), serviceBuilder)
 
 	factory.cmdsByName["update-service"] = service.NewUpdateService(
 		ui,
@@ -214,22 +230,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	spaceRoleSetter := user.NewSetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
 	factory.cmdsByName["set-space-role"] = spaceRoleSetter
 	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, config, spaceRoleSetter, repoLocator.GetSpaceRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetUserRepository())
-
-	planBuilder := plan_builder.NewBuilder(
-		repoLocator.GetServicePlanRepository(),
-		repoLocator.GetServicePlanVisibilityRepository(),
-		repoLocator.GetOrganizationRepository(),
-	)
-
-	serviceBuilder := service_builder.NewBuilder(
-		repoLocator.GetServiceRepository(),
-		planBuilder,
-	)
-
-	brokerBuilder := broker_builder.NewBuilder(
-		repoLocator.GetServiceBrokerRepository(),
-		serviceBuilder,
-	)
 
 	factory.cmdsByName["service-access"] = serviceaccess.NewServiceAccess(
 		ui, config,

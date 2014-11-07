@@ -48,101 +48,114 @@ func (cmd MarketplaceServices) GetRequirements(requirementsFactory requirements.
 }
 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
+	serviceName := c.String("s")
+
+	if serviceName != "" {
+		cmd.marketplaceByService(serviceName)
+	} else {
+		cmd.marketplace()
+	}
+}
+
+func (cmd MarketplaceServices) marketplaceByService(serviceName string) {
+	var (
+		serviceOffering models.ServiceOffering
+		apiErr          error
+	)
+
+	if cmd.config.HasSpace() {
+		cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}} as {{.CurrentUser}}...",
+			map[string]interface{}{
+				"ServiceName": terminal.EntityNameColor(serviceName),
+				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			}))
+		serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameForSpaceWithPlans(serviceName, cmd.config.SpaceFields().Guid)
+	} else if !cmd.config.IsLoggedIn() {
+		cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
+		serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameWithPlans(serviceName)
+	} else {
+		cmd.ui.Failed(T("Cannot list plan information for {{.ServiceName}} without a targeted space",
+			map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
+	}
+
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
+		return
+	}
+
+	cmd.ui.Ok()
+	cmd.ui.Say("")
+
+	if serviceOffering.Guid == "" {
+		cmd.ui.Say(T("Service offering not found"))
+		return
+	}
+
+	table := terminal.NewTable(cmd.ui, []string{T("service plan"), T("description"), T("free or paid")})
+	for _, plan := range serviceOffering.Plans {
+		var freeOrPaid string
+		if plan.Free {
+			freeOrPaid = "free"
+		} else {
+			freeOrPaid = "paid"
+		}
+		table.Add(plan.Name, plan.Description, freeOrPaid)
+	}
+
+	table.Print()
+}
+
+func (cmd MarketplaceServices) marketplace() {
 	var (
 		serviceOfferings models.ServiceOfferings
 		apiErr           error
 	)
 
-	serviceName := c.String("s")
-	if serviceName != "" {
-		var serviceOffering models.ServiceOffering
-		if cmd.config.HasSpace() {
-			cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}} as {{.CurrentUser}}...",
-				map[string]interface{}{
-					"ServiceName": terminal.EntityNameColor(serviceName),
-					"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
-				}))
-			serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameForSpace(serviceName, (cmd.config.SpaceFields().Guid))
-		} else if !cmd.config.IsLoggedIn() {
-			cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
-			serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameWithPlans(serviceName)
-		} else {
-			cmd.ui.Failed(T("Cannot list plan information for {{.ServiceName}} without a targeted space",
-				map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
-		}
-
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
-			return
-		}
-
-		cmd.ui.Ok()
-		cmd.ui.Say("")
-
-		if serviceOffering.Guid == "" {
-			cmd.ui.Say(T("Service offering not found"))
-			return
-		}
-
-		table := terminal.NewTable(cmd.ui, []string{T("service plan"), T("description"), T("free or paid")})
-		for _, plan := range serviceOffering.Plans {
-			var freeOrPaid string
-			if plan.Free {
-				freeOrPaid = "free"
-			} else {
-				freeOrPaid = "paid"
-			}
-			table.Add(plan.Name, plan.Description, freeOrPaid)
-		}
-
-		table.Print()
+	if cmd.config.HasSpace() {
+		cmd.ui.Say(T("Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+			map[string]interface{}{
+				"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			}))
+		serviceOfferings, apiErr = cmd.serviceBuilder.GetServicesForSpaceWithPlans(cmd.config.SpaceFields().Guid)
+	} else if !cmd.config.IsLoggedIn() {
+		cmd.ui.Say(T("Getting all services from marketplace..."))
+		serviceOfferings, apiErr = cmd.serviceBuilder.GetAllServicesWithPlans()
 	} else {
-		if cmd.config.HasSpace() {
-			cmd.ui.Say(T("Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-				map[string]interface{}{
-					"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-					"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-					"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
-				}))
-			serviceOfferings, apiErr = cmd.serviceBuilder.GetServicesForSpace(cmd.config.SpaceFields().Guid)
-		} else if !cmd.config.IsLoggedIn() {
-			cmd.ui.Say(T("Getting all services from marketplace..."))
-			serviceOfferings, apiErr = cmd.serviceBuilder.GetAllServicesWithPlans()
-		} else {
-			cmd.ui.Failed(T("Cannot list marketplace services without a targeted space"))
-		}
-
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
-			return
-		}
-
-		cmd.ui.Ok()
-		cmd.ui.Say("")
-
-		if len(serviceOfferings) == 0 {
-			cmd.ui.Say(T("No service offerings found"))
-			return
-		}
-
-		table := terminal.NewTable(cmd.ui, []string{T("service"), T("plans"), T("description")})
-
-		sort.Sort(serviceOfferings)
-		for _, offering := range serviceOfferings {
-			planNames := ""
-
-			for _, plan := range offering.Plans {
-				if plan.Name == "" {
-					continue
-				}
-				planNames = planNames + ", " + plan.Name
-			}
-
-			planNames = strings.TrimPrefix(planNames, ", ")
-
-			table.Add(offering.Label, planNames, offering.Description)
-		}
-
-		table.Print()
+		cmd.ui.Failed(T("Cannot list marketplace services without a targeted space"))
 	}
+
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
+		return
+	}
+
+	cmd.ui.Ok()
+	cmd.ui.Say("")
+
+	if len(serviceOfferings) == 0 {
+		cmd.ui.Say(T("No service offerings found"))
+		return
+	}
+
+	table := terminal.NewTable(cmd.ui, []string{T("service"), T("plans"), T("description")})
+
+	sort.Sort(serviceOfferings)
+	for _, offering := range serviceOfferings {
+		planNames := ""
+
+		for _, plan := range offering.Plans {
+			if plan.Name == "" {
+				continue
+			}
+			planNames += ", " + plan.Name
+		}
+
+		planNames = strings.TrimPrefix(planNames, ", ")
+
+		table.Add(offering.Label, planNames, offering.Description)
+	}
+
+	table.Print()
 }

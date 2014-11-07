@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -13,15 +14,17 @@ import (
 )
 
 type CreateService struct {
-	ui          terminal.UI
-	config      core_config.Reader
-	serviceRepo api.ServiceRepository
+	ui             terminal.UI
+	config         core_config.Reader
+	serviceRepo    api.ServiceRepository
+	serviceBuilder service_builder.ServiceBuilder
 }
 
-func NewCreateService(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository) (cmd CreateService) {
+func NewCreateService(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceBuilder service_builder.ServiceBuilder) (cmd CreateService) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceRepo = serviceRepo
+	cmd.serviceBuilder = serviceBuilder
 	return
 }
 
@@ -90,7 +93,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 }
 
 func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (models.ServicePlanFields, error) {
-	offerings, apiErr := cmd.serviceRepo.FindServiceOfferingsForSpaceByLabel(cmd.config.SpaceFields().Guid, serviceName)
+	offerings, apiErr := cmd.serviceBuilder.GetServicesByNameForSpaceWithPlans(serviceName, cmd.config.SpaceFields().Guid)
 	if apiErr != nil {
 		return models.ServicePlanFields{}, apiErr
 	}
@@ -102,21 +105,6 @@ func (cmd CreateService) CreateService(serviceName string, planName string, serv
 
 	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
 	return plan, apiErr
-}
-
-func findOfferings(offerings []models.ServiceOffering, name string) (matchingOfferings models.ServiceOfferings, err error) {
-	for _, offering := range offerings {
-		if name == offering.Label {
-			matchingOfferings = append(matchingOfferings, offering)
-		}
-	}
-
-	if len(matchingOfferings) == 0 {
-		err = errors.New(T("Could not find any offerings with name {{.ServiceOfferingName}}",
-			map[string]interface{}{"ServiceOfferingName": name},
-		))
-	}
-	return
 }
 
 func findPlanFromOfferings(offerings models.ServiceOfferings, name string) (plan models.ServicePlanFields, err error) {
