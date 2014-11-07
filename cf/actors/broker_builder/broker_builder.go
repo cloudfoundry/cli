@@ -106,7 +106,7 @@ func (builder Builder) GetBrokerWithAllServices(brokerName string) (models.Servi
 }
 
 func (builder Builder) GetBrokerWithSpecifiedService(serviceName string) (models.ServiceBroker, error) {
-	service, err := builder.serviceBuilder.GetServiceByName(serviceName)
+	service, err := builder.serviceBuilder.GetServiceByNameWithPlansWithOrgNames(serviceName)
 	if err != nil {
 		return models.ServiceBroker{}, err
 	}

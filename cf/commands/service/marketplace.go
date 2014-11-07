@@ -65,7 +65,7 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 			serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameForSpace(serviceName, (cmd.config.SpaceFields().Guid))
 		} else if !cmd.config.IsLoggedIn() {
 			cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
-			serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByName(serviceName)
+			serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameWithPlans(serviceName)
 		} else {
 			cmd.ui.Failed(T("Cannot list plan information for {{.ServiceName}} without a targeted space",
 				map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))

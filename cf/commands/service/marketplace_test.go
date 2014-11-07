@@ -177,7 +177,7 @@ var _ = Describe("marketplace command", func() {
 
 		Context("when the user passes the -s flag", func() {
 			It("Displays the list of plans for each service with info", func() {
-				serviceBuilder.GetAllServicesWithPlansReturns(fakeServiceOfferings, nil)
+				serviceBuilder.GetServiceByNameWithPlansReturns(service1, nil)
 				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
 				testcmd.RunCommand(cmd, []string{"-s", "aaa-my-service-offering"}, requirementsFactory)
 
