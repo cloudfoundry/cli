@@ -2,10 +2,9 @@
 package fakes
 
 import (
-	"sync"
-
 	. "github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/models"
+	"sync"
 )
 
 type FakePlanBuilder struct {
@@ -35,6 +34,15 @@ type FakePlanBuilder struct {
 		arg2 string
 	}
 	getPlansForServiceForOrgReturns struct {
+		result1 []models.ServicePlanFields
+		result2 error
+	}
+	GetPlansForServiceWithOrgsStub        func(string) ([]models.ServicePlanFields, error)
+	getPlansForServiceWithOrgsMutex       sync.RWMutex
+	getPlansForServiceWithOrgsArgsForCall []struct {
+		arg1 string
+	}
+	getPlansForServiceWithOrgsReturns struct {
 		result1 []models.ServicePlanFields
 		result2 error
 	}
@@ -151,6 +159,38 @@ func (fake *FakePlanBuilder) GetPlansForServiceForOrgArgsForCall(i int) (string,
 
 func (fake *FakePlanBuilder) GetPlansForServiceForOrgReturns(result1 []models.ServicePlanFields, result2 error) {
 	fake.getPlansForServiceForOrgReturns = struct {
+		result1 []models.ServicePlanFields
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePlanBuilder) GetPlansForServiceWithOrgs(arg1 string) ([]models.ServicePlanFields, error) {
+	fake.getPlansForServiceWithOrgsMutex.Lock()
+	defer fake.getPlansForServiceWithOrgsMutex.Unlock()
+	fake.getPlansForServiceWithOrgsArgsForCall = append(fake.getPlansForServiceWithOrgsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	if fake.GetPlansForServiceWithOrgsStub != nil {
+		return fake.GetPlansForServiceWithOrgsStub(arg1)
+	} else {
+		return fake.getPlansForServiceWithOrgsReturns.result1, fake.getPlansForServiceWithOrgsReturns.result2
+	}
+}
+
+func (fake *FakePlanBuilder) GetPlansForServiceWithOrgsCallCount() int {
+	fake.getPlansForServiceWithOrgsMutex.RLock()
+	defer fake.getPlansForServiceWithOrgsMutex.RUnlock()
+	return len(fake.getPlansForServiceWithOrgsArgsForCall)
+}
+
+func (fake *FakePlanBuilder) GetPlansForServiceWithOrgsArgsForCall(i int) string {
+	fake.getPlansForServiceWithOrgsMutex.RLock()
+	defer fake.getPlansForServiceWithOrgsMutex.RUnlock()
+	return fake.getPlansForServiceWithOrgsArgsForCall[i].arg1
+}
+
+func (fake *FakePlanBuilder) GetPlansForServiceWithOrgsReturns(result1 []models.ServicePlanFields, result2 error) {
+	fake.getPlansForServiceWithOrgsReturns = struct {
 		result1 []models.ServicePlanFields
 		result2 error
 	}{result1, result2}

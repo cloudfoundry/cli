@@ -51,12 +51,6 @@ var _ = Describe("Plan builder", func() {
 		org2 = models.Organization{}
 		org2.Name = "org2"
 		org2.Guid = "org2-guid"
-		/**
-			orgRepo.Organizations = []models.Organization{
-				org1,
-				org2,
-			}
-		**/
 		visibilityRepo.ListReturns([]models.ServicePlanVisibilityFields{
 			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org1-guid"},
 			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org2-guid"},
@@ -87,6 +81,18 @@ var _ = Describe("Plan builder", func() {
 		})
 	})
 
+	Describe(".GetPlansForServiceWithOrgs", func() {
+		It("returns all the plans for the service with the provided guid", func() {
+			plans, err := builder.GetPlansForServiceWithOrgs("service-guid1")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(len(plans)).To(Equal(2))
+			Expect(plans[0].Name).To(Equal("service-plan1"))
+			Expect(plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
+			Expect(plans[1].Name).To(Equal("service-plan2"))
+		})
+	})
+
 	Describe(".GetPlansForService", func() {
 		It("returns all the plans for the service with the provided guid", func() {
 			plans, err := builder.GetPlansForService("service-guid1")
@@ -94,7 +100,7 @@ var _ = Describe("Plan builder", func() {
 
 			Expect(len(plans)).To(Equal(2))
 			Expect(plans[0].Name).To(Equal("service-plan1"))
-			Expect(plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
+			Expect(plans[0].OrgNames).To(BeNil())
 			Expect(plans[1].Name).To(Equal("service-plan2"))
 		})
 	})

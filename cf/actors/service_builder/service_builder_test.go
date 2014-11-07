@@ -13,12 +13,13 @@ import (
 
 var _ = Describe("Service Builder", func() {
 	var (
-		planBuilder    *plan_builder_fakes.FakePlanBuilder
-		serviceBuilder service_builder.ServiceBuilder
-		serviceRepo    *testapi.FakeServiceRepo
-		service1       models.ServiceOffering
-		plan1          models.ServicePlanFields
-		plan2          models.ServicePlanFields
+		planBuilder      *plan_builder_fakes.FakePlanBuilder
+		serviceBuilder   service_builder.ServiceBuilder
+		serviceRepo      *testapi.FakeServiceRepo
+		service1         models.ServiceOffering
+		serviceWithPlans models.ServiceOffering
+		plan1            models.ServicePlanFields
+		plan2            models.ServicePlanFields
 	)
 
 	BeforeEach(func() {
@@ -62,13 +63,101 @@ var _ = Describe("Service Builder", func() {
 			ServiceOfferingGuid: "service-guid1",
 		}
 		planBuilder.GetPlansVisibleToOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
-		planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{plan1, plan2}, nil)
+		planBuilder.GetPlansForServiceWithOrgsReturns([]models.ServicePlanFields{plan1, plan2}, nil)
 		planBuilder.GetPlansForServiceForOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
+	})
+
+	Describe(".GetServicesForSpace", func() {
+		BeforeEach(func() {
+			serviceRepo.GetServiceOfferingsForSpaceReturns = struct {
+				ServiceOfferings []models.ServiceOffering
+				Error            error
+			}{
+				[]models.ServiceOffering{service1, service1},
+				nil,
+			}
+		})
+
+		It("returns the named service, populated with plans", func() {
+			services, err := serviceBuilder.GetServicesForSpace("spaceGuid")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(len(services)).To(Equal(2))
+		})
+	})
+
+	Describe(".GetAllServices", func() {
+		BeforeEach(func() {
+			serviceRepo.GetAllServiceOfferingsReturns = struct {
+				ServiceOfferings []models.ServiceOffering
+				Error            error
+			}{
+				[]models.ServiceOffering{service1, service1},
+				nil,
+			}
+		})
+
+		It("returns the named service, populated with plans", func() {
+			services, err := serviceBuilder.GetAllServices()
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(len(services)).To(Equal(2))
+		})
+	})
+
+	Describe(".GetAllServicesWithPlans", func() {
+		BeforeEach(func() {
+			serviceRepo.GetAllServiceOfferingsReturns = struct {
+				ServiceOfferings []models.ServiceOffering
+				Error            error
+			}{
+				[]models.ServiceOffering{service1, service1},
+				nil,
+			}
+
+			planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{plan1}, nil)
+		})
+
+		It("returns the named service, populated with plans", func() {
+			services, err := serviceBuilder.GetAllServicesWithPlans()
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(len(services)).To(Equal(2))
+			Expect(services[0].Plans[0]).To(Equal(plan1))
+		})
 	})
 
 	Describe(".GetServiceByName", func() {
 		It("returns the named service, populated with plans", func() {
-			service, err := serviceBuilder.GetServiceByName("my-cool-service")
+			service, err := serviceBuilder.GetServiceByName("my-service1")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(len(service.Plans)).To(Equal(2))
+			Expect(service.Plans[0].Name).To(Equal("service-plan1"))
+			Expect(service.Plans[1].Name).To(Equal("service-plan2"))
+			Expect(service.Plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
+		})
+	})
+
+	Describe(".GetServiceByNameForSapce", func() {
+		BeforeEach(func() {
+			serviceWithPlans = models.ServiceOffering{
+				ServiceOfferingFields: models.ServiceOfferingFields{
+					Label: "serviceWithPlans",
+				},
+				Plans: []models.ServicePlanFields{plan1, plan2},
+			}
+
+			serviceRepo.GetServiceOfferingsForSpaceReturns = struct {
+				ServiceOfferings []models.ServiceOffering
+				Error            error
+			}{
+				[]models.ServiceOffering{serviceWithPlans},
+				nil,
+			}
+		})
+		It("returns the named service, populated with plans", func() {
+			service, err := serviceBuilder.GetServiceByNameForSpace("serviceWithPlans", "spaceGuid")
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(service.Plans)).To(Equal(2))
@@ -80,7 +169,7 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetServiceByNameForOrg", func() {
 		It("returns the named service, populated with plans", func() {
-			service, err := serviceBuilder.GetServiceByNameForOrg("my-cool-service", "org1")
+			service, err := serviceBuilder.GetServiceByNameForOrg("my-service1", "org1")
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(planBuilder.GetPlansForServiceForOrgCallCount()).To(Equal(1))
