@@ -350,6 +350,11 @@
       "modified": false
    },
    {
+      "id": "Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
+      "translation": "Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
+      "modified": false
+   },
+   {
       "id": "Authenticate user non-interactively",
       "translation": "Autenticar usuário não interativamente",
       "modified": false

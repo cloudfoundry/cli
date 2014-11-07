@@ -66,11 +66,21 @@ func (cmd CreateService) Run(c *cli.Context) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err := cmd.CreateService(serviceName, planName, serviceInstanceName)
+	plan, err := cmd.CreateService(serviceName, planName, serviceInstanceName)
 
 	switch err.(type) {
 	case nil:
 		cmd.ui.Ok()
+		if !plan.Free {
+			cmd.ui.Say("")
+			cmd.ui.Say(T("Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
+				map[string]interface{}{
+					"PlanName":            terminal.EntityNameColor(plan.Name),
+					"ServiceName":         terminal.EntityNameColor(serviceName),
+					"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName),
+				}))
+			cmd.ui.Say("")
+		}
 	case *errors.ModelAlreadyExistsError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(err.Error())
@@ -79,17 +89,19 @@ func (cmd CreateService) Run(c *cli.Context) {
 	}
 }
 
-func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (apiErr error) {
+func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (models.ServicePlanFields, error) {
 	offerings, apiErr := cmd.serviceRepo.FindServiceOfferingsForSpaceByLabel(cmd.config.SpaceFields().Guid, serviceName)
 	if apiErr != nil {
-		return
-	}
-	plan, apiErr := findPlanFromOfferings(offerings, planName)
-	if apiErr != nil {
-		return
+		return models.ServicePlanFields{}, apiErr
 	}
 
-	return cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
+	plan, apiErr := findPlanFromOfferings(offerings, planName)
+	if apiErr != nil {
+		return plan, apiErr
+	}
+
+	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
+	return plan, apiErr
 }
 
 func findOfferings(offerings []models.ServiceOffering, name string) (matchingOfferings models.ServiceOfferings, err error) {
