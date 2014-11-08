@@ -1,6 +1,7 @@
 package net
 
 import (
+	_ "crypto/sha512"
 	"crypto/x509"
 	"net/http"
 	"net/http/httputil"
