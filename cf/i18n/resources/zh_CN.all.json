@@ -1095,18 +1095,8 @@
       "modified": false
    },
    {
-      "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in organization {{.Org}} and space {{.Space}}",
-      "translation": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in organization {{.Org}} and space {{.Space}}",
-      "modified": false
-   },
-   {
-      "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space",
-      "translation": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space",
-      "modified": false
-   },
-   {
-      "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space {{.Space}}",
-      "translation": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space {{.Space}}",
+      "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "modified": false
    },
    {

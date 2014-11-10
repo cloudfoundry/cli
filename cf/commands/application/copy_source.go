@@ -88,13 +88,6 @@ func (cmd *CopySource) Run(c *cli.Context) {
 		cmd.ui.Failed(T("Please provide the space within the organization containing the target application"))
 	}
 
-	copyStr := fmt.Sprintf(T("Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space",
-		map[string]interface{}{
-			"SourceApp": terminal.EntityNameColor(sourceAppName),
-			"TargetApp": terminal.EntityNameColor(targetAppName),
-		},
-	))
-
 	_, apiErr := cmd.authRepo.RefreshAuthToken()
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
@@ -105,33 +98,26 @@ func (cmd *CopySource) Run(c *cli.Context) {
 		cmd.ui.Failed(apiErr.Error())
 	}
 
-	spaceGuid := cmd.config.SpaceFields().Guid
-
+	var targetOrgName, targetSpaceName, spaceGuid, copyStr string
 	if targetOrg != "" && targetSpace != "" {
 		spaceGuid = cmd.findSpaceGuid(targetOrg, targetSpace)
-		copyStr = fmt.Sprintf(T("Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in organization {{.Org}} and space {{.Space}}",
-			map[string]interface{}{
-				"SourceApp": terminal.EntityNameColor(sourceAppName),
-				"TargetApp": terminal.EntityNameColor(targetAppName),
-				"Org":       terminal.EntityNameColor(targetOrg),
-				"Space":     terminal.EntityNameColor(targetSpace),
-			},
-		))
+		targetOrgName = targetOrg
+		targetSpaceName = targetSpace
 	} else if targetSpace != "" {
 		space, err := cmd.spaceRepo.FindByName(targetSpace)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
 		spaceGuid = space.Guid
-
-		copyStr = fmt.Sprintf(T("Copying source from app {{.SourceApp}} to target app {{.TargetApp}} within currently targeted organization and space {{.Space}}",
-			map[string]interface{}{
-				"SourceApp": terminal.EntityNameColor(sourceAppName),
-				"TargetApp": terminal.EntityNameColor(targetAppName),
-				"Space":     terminal.EntityNameColor(targetSpace),
-			},
-		))
+		targetOrgName = cmd.config.OrganizationFields().Name
+		targetSpaceName = targetSpace
+	} else {
+		spaceGuid = cmd.config.SpaceFields().Guid
+		targetOrgName = cmd.config.OrganizationFields().Name
+		targetSpaceName = cmd.config.SpaceFields().Name
 	}
+
+	copyStr = buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceName, cmd.config.Username())
 
 	targetApp, apiErr := cmd.appRepo.ReadFromSpace(targetAppName, spaceGuid)
 	if apiErr != nil {
@@ -179,4 +165,17 @@ func (cmd *CopySource) findSpaceGuid(targetOrg, targetSpace string) string {
 	}
 
 	return space.Guid
+}
+
+func buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceName, username string) string {
+	return fmt.Sprintf(T("Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"SourceApp": terminal.EntityNameColor(sourceAppName),
+			"TargetApp": terminal.EntityNameColor(targetAppName),
+			"OrgName":   terminal.EntityNameColor(targetOrgName),
+			"SpaceName": terminal.EntityNameColor(targetSpaceName),
+			"Username":  terminal.EntityNameColor(username),
+		},
+	))
+
 }
