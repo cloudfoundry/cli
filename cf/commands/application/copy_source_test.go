@@ -133,7 +133,7 @@ var _ = Describe("CopySource", func() {
 						Expect(appRestarter.AppToRestart).To(Equal(targetApp))
 
 						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Copying source from app", "source-app", "to target app", "target-app", "within currently targeted organization and space"},
+							[]string{"Copying source from app", "source-app", "to target app", "target-app", "in org my-org / space my-space as my-user..."},
 							[]string{"Note: this may take some time"},
 							[]string{"OK"},
 						))
@@ -180,7 +180,7 @@ var _ = Describe("CopySource", func() {
 						Expect(spaceGuid).To(Equal("model-space-guid"))
 
 						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Copying source from app", "source-app", "to target app", "target-app", "within currently targeted organization and space space-name"},
+							[]string{"Copying source from app", "source-app", "to target app", "target-app", "in org my-org / space space-name as my-user..."},
 							[]string{"Note: this may take some time"},
 							[]string{"OK"},
 						))
@@ -223,7 +223,7 @@ var _ = Describe("CopySource", func() {
 						Expect(appRestarter.AppToRestart).To(Equal(targetApp))
 
 						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Copying source from app source-app to target app target-app in organization org-name and space space-name"},
+							[]string{"Copying source from app source-app to target app target-app in org org-name / space space-name as my-user..."},
 							[]string{"Note: this may take some time"},
 							[]string{"OK"},
 						))
