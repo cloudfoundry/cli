@@ -6,8 +6,10 @@ import (
 
 type FakeAppDisplayer struct {
 	AppToDisplay models.Application
+	OrgName      string
+	SpaceName    string
 }
 
-func (displayer *FakeAppDisplayer) ShowApp(app models.Application) {
+func (displayer *FakeAppDisplayer) ShowApp(app models.Application, orgName, spaceName string) {
 	displayer.AppToDisplay = app
 }

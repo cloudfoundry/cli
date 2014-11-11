@@ -88,15 +88,21 @@ var _ = Describe("restage command", func() {
 		It("watches the staging output", func() {
 			runCommand("my-app")
 			Expect(stagingWatcher.watched).To(Equal(app))
+			Expect(stagingWatcher.orgName).To(Equal(configRepo.OrganizationFields().Name))
+			Expect(stagingWatcher.spaceName).To(Equal(configRepo.SpaceFields().Name))
 		})
 	})
 })
 
 type fakeStagingWatcher struct {
-	watched models.Application
+	watched   models.Application
+	orgName   string
+	spaceName string
 }
 
-func (f *fakeStagingWatcher) ApplicationWatchStaging(app models.Application, start func(models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
+func (f *fakeStagingWatcher) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
 	f.watched = app
+	f.orgName = orgName
+	f.spaceName = spaceName
 	return start(app)
 }

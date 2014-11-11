@@ -31,7 +31,7 @@ var _ = Describe("CopySource", func() {
 		copyAppSourceRepo   *testCopyApplication.FakeCopyApplicationSourceRepository
 		spaceRepo           *testapi.FakeSpaceRepository
 		orgRepo             *testorg.FakeOrganizationRepository
-		appRestarter        *testcmd.FakeAppRestarter
+		appRestarter        *testcmd.FakeApplicationRestarter
 	)
 
 	BeforeEach(func() {
@@ -42,7 +42,7 @@ var _ = Describe("CopySource", func() {
 		copyAppSourceRepo = &testCopyApplication.FakeCopyApplicationSourceRepository{}
 		spaceRepo = &testapi.FakeSpaceRepository{}
 		orgRepo = &testorg.FakeOrganizationRepository{}
-		appRestarter = &testcmd.FakeAppRestarter{}
+		appRestarter = &testcmd.FakeApplicationRestarter{}
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -130,7 +130,10 @@ var _ = Describe("CopySource", func() {
 						Expect(sourceAppGuid).To(Equal("source-app-guid"))
 						Expect(targetAppGuid).To(Equal("target-app-guid"))
 
-						Expect(appRestarter.AppToRestart).To(Equal(targetApp))
+						appArg, orgName, spaceName := appRestarter.ApplicationRestartArgsForCall(0)
+						Expect(appArg).To(Equal(targetApp))
+						Expect(orgName).To(Equal(config.OrganizationFields().Name))
+						Expect(spaceName).To(Equal(config.SpaceFields().Name))
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Copying source from app", "source-app", "to target app", "target-app", "in org my-org / space my-space as my-user..."},
@@ -220,7 +223,10 @@ var _ = Describe("CopySource", func() {
 						Expect(sourceAppGuid).To(Equal("source-app-guid"))
 						Expect(targetAppGuid).To(Equal("target-app-guid"))
 
-						Expect(appRestarter.AppToRestart).To(Equal(targetApp))
+						appArg, orgName, spaceName := appRestarter.ApplicationRestartArgsForCall(0)
+						Expect(appArg).To(Equal(targetApp))
+						Expect(orgName).To(Equal("org-name"))
+						Expect(spaceName).To(Equal("space-name"))
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Copying source from app source-app to target app target-app in org org-name / space space-name as my-user..."},
@@ -283,7 +289,7 @@ var _ = Describe("CopySource", func() {
 				Describe("when the --no-restart flag is passed", func() {
 					It("does not restart the target application", func() {
 						runCommand("--no-restart", "source-app", "target-app")
-						Expect(appRestarter.AppToRestart).To(Equal(models.Application{}))
+						Expect(appRestarter.ApplicationRestartCallCount()).To(Equal(0))
 					})
 				})
 			})

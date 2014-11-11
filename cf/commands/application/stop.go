@@ -15,7 +15,7 @@ import (
 )
 
 type ApplicationStopper interface {
-	ApplicationStop(app models.Application) (updatedApp models.Application, err error)
+	ApplicationStop(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
 
 type Stop struct {
@@ -54,7 +54,7 @@ func (cmd *Stop) GetRequirements(requirementsFactory requirements.Factory, c *cl
 	return
 }
 
-func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Application, err error) {
+func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName string) (updatedApp models.Application, err error) {
 	if app.State == "stopped" {
 		updatedApp = app
 		return
@@ -63,8 +63,8 @@ func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Appl
 	cmd.ui.Say(T("Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"AppName":     terminal.EntityNameColor(app.Name),
-			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"OrgName":     terminal.EntityNameColor(orgName),
+			"SpaceName":   terminal.EntityNameColor(spaceName),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 	state := "STOPPED"
@@ -84,6 +84,6 @@ func (cmd *Stop) Run(c *cli.Context) {
 	if app.State == "stopped" {
 		cmd.ui.Say(terminal.WarningColor(T("App ") + app.Name + T(" is already stopped")))
 	} else {
-		cmd.ApplicationStop(app)
+		cmd.ApplicationStop(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 	}
 }

@@ -143,7 +143,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	if shouldRestart {
-		cmd.restarter.ApplicationRestart(updatedApp)
+		cmd.restarter.ApplicationRestart(updatedApp, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 	}
 }
 
