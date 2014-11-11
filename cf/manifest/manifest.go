@@ -213,7 +213,8 @@ func bytesVal(yamlMap generic.Map, key string, errs *[]error) *int64 {
 	if yamlVal == nil {
 		return nil
 	}
-	value, err := formatters.ToMegabytes(yamlVal.(string))
+
+	value, err := formatters.ToMegabytes(coerceToString(yamlVal))
 	if err != nil {
 		*errs = append(*errs, errors.NewWithFmt(T("Unexpected value for {{.PropertyName}} :\n{{.Error}}",
 			map[string]interface{}{"PropertyName": key, "Error": err.Error()})))
@@ -248,6 +249,10 @@ func intVal(yamlMap generic.Map, key string, errs *[]error) *int {
 	}
 
 	return &intVal
+}
+
+func coerceToString(value interface{}) string {
+	return fmt.Sprintf("%s", value)
 }
 
 func boolVal(yamlMap generic.Map, key string, errs *[]error) bool {
