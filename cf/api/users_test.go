@@ -218,6 +218,22 @@ var _ = Describe("User Repository", func() {
 				Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
 			})
 		})
+
+		Context("when the user does not have permission", func() {
+			It("returns a AccessDeniedError", func() {
+				setupUAAServer(
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "GET",
+						Path:     "/Users?attributes=id,userName&filter=userName+Eq+%22my-user%22",
+						Response: testnet.TestResponse{Status: http.StatusForbidden, Body: `{"error":"access_denied","error_description":"Access is denied"}`},
+					}))
+
+				_, err := repo.FindByUsername("my-user")
+				Expect(uaaHandler).To(HaveAllRequestsCalled())
+				Expect(err).To(BeAssignableToTypeOf(&errors.AccessDeniedError{}))
+
+			})
+		})
 	})
 
 	Describe("creating users", func() {

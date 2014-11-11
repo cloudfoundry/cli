@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	neturl "net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/http"
-	neturl "net/url"
-	"strings"
 )
 
 var orgRoleToPathMap = map[string]string{
@@ -53,23 +54,29 @@ func NewCloudControllerUserRepository(config core_config.Reader, uaaGateway net.
 	return
 }
 
-func (repo CloudControllerUserRepository) FindByUsername(username string) (user models.UserFields, apiErr error) {
+func (repo CloudControllerUserRepository) FindByUsername(username string) (models.UserFields, error) {
 	uaaEndpoint, apiErr := repo.getAuthEndpoint()
+	var user models.UserFields
 	if apiErr != nil {
-		return
+		return user, apiErr
 	}
 
 	usernameFilter := neturl.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
 	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
-
 	users, apiErr := repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
-	if len(users) == 0 {
-		apiErr = errors.NewModelNotFoundError("User", username)
-		return
+
+	if apiErr != nil {
+		errType, ok := apiErr.(errors.HttpError)
+		if ok {
+			if errType.StatusCode() == 403 {
+				return user, errors.NewAccessDeniedError()
+			}
+		}
+	} else if len(users) == 0 {
+		return user, errors.NewModelNotFoundError("User", username)
 	}
 
-	user = users[0]
-	return
+	return users[0], apiErr
 }
 
 func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) (users []models.UserFields, apiErr error) {
@@ -215,7 +222,6 @@ func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb, userGuid, orgG
 	}
 
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s/%s", repo.config.ApiEndpoint(), orgGuid, rolePath, userGuid)
-
 	request, apiErr := repo.ccGateway.NewRequest(verb, path, repo.config.AccessToken(), nil)
 	if apiErr != nil {
 		return
