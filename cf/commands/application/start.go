@@ -48,11 +48,11 @@ type Start struct {
 
 type ApplicationStarter interface {
 	SetStartTimeoutInSeconds(timeout int)
-	ApplicationStart(app models.Application) (updatedApp models.Application, err error)
+	ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
 
 type ApplicationStagingWatcher interface {
-	ApplicationWatchStaging(app models.Application, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
+	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
 func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
@@ -112,21 +112,21 @@ func (cmd *Start) GetRequirements(requirementsFactory requirements.Factory, c *c
 }
 
 func (cmd *Start) Run(c *cli.Context) {
-	cmd.ApplicationStart(cmd.appReq.GetApplication())
+	cmd.ApplicationStart(cmd.appReq.GetApplication(), cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 }
 
-func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Application, err error) {
+func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName string) (updatedApp models.Application, err error) {
 	if app.State == "started" {
 		cmd.ui.Say(terminal.WarningColor(T("App ") + app.Name + T(" is already started")))
 		return
 	}
 
-	return cmd.ApplicationWatchStaging(app, func(app models.Application) (models.Application, error) {
+	return cmd.ApplicationWatchStaging(app, orgName, spaceName, func(app models.Application) (models.Application, error) {
 		cmd.ui.Say(T("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 			map[string]interface{}{
 				"AppName":     terminal.EntityNameColor(app.Name),
-				"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"OrgName":     terminal.EntityNameColor(orgName),
+				"SpaceName":   terminal.EntityNameColor(spaceName),
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 		state := "STARTED"
@@ -134,7 +134,7 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 	})
 }
 
-func (cmd *Start) ApplicationWatchStaging(app models.Application, start func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
+func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
 	stopLoggingChan := make(chan bool, 1)
 	loggingStartedChan := make(chan bool)
 	doneLoggingChan := make(chan bool)
@@ -163,7 +163,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, start func(app
 	cmd.ui.Say("")
 	cmd.ui.Ok()
 
-	cmd.appDisplayer.ShowApp(updatedApp)
+	cmd.appDisplayer.ShowApp(updatedApp, orgName, spaceName)
 	return
 }
 

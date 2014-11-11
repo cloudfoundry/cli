@@ -28,7 +28,7 @@ type ShowApp struct {
 }
 
 type ApplicationDisplayer interface {
-	ShowApp(app models.Application)
+	ShowApp(app models.Application, orgName string, spaceName string)
 }
 
 func NewShowApp(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo app_instances.AppInstancesRepository) (cmd *ShowApp) {
@@ -65,15 +65,15 @@ func (cmd *ShowApp) GetRequirements(requirementsFactory requirements.Factory, c 
 
 func (cmd *ShowApp) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-	cmd.ShowApp(app)
+	cmd.ShowApp(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 }
 
-func (cmd *ShowApp) ShowApp(app models.Application) {
+func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	cmd.ui.Say(T("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"AppName":   terminal.EntityNameColor(app.Name),
-			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"OrgName":   terminal.EntityNameColor(orgName),
+			"SpaceName": terminal.EntityNameColor(spaceName),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)

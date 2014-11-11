@@ -220,6 +220,28 @@ var _ = Describe("start command", func() {
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
+		It("uses uses proper org name and space name", func() {
+			config := testconfig.NewRepositoryWithDefaults()
+			displayApp := &testcmd.FakeAppDisplayer{}
+			appRepo := &testApplication.FakeApplicationRepository{}
+			appInstancesRepo := &testAppInstanaces.FakeAppInstancesRepository{}
+
+			appRepo.ReadReturns.App = defaultAppForStart
+			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
+			appInstancesRepo.GetInstancesStub = getInstance
+
+			cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
+			cmd.StagingTimeout = 100 * time.Millisecond
+			cmd.StartupTimeout = 200 * time.Millisecond
+			cmd.PingerThrottle = 50 * time.Millisecond
+			cmd.ApplicationStart(defaultAppForStart, "some-org", "some-space")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"my-app", "some-org", "some-space", "my-user"},
+				[]string{"OK"},
+			))
+		})
+
 		It("starts an app, when given the app's name", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)

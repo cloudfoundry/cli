@@ -134,7 +134,7 @@ func (cmd *CopySource) Run(c *cli.Context) {
 	}
 
 	if !c.Bool("no-restart") {
-		cmd.appRestart.ApplicationRestart(targetApp)
+		cmd.appRestart.ApplicationRestart(targetApp, targetOrgName, targetSpaceName)
 	}
 
 	cmd.ui.Ok()

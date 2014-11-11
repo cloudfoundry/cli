@@ -267,7 +267,7 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli.Context) {
 	if app.State != T("stopped") {
 		cmd.ui.Say("")
-		app, _ = cmd.appStopper.ApplicationStop(app)
+		app, _ = cmd.appStopper.ApplicationStop(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 	}
 
 	cmd.ui.Say("")
@@ -280,7 +280,7 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli
 		cmd.appStarter.SetStartTimeoutInSeconds(*params.HealthCheckTimeout)
 	}
 
-	cmd.appStarter.ApplicationStart(app)
+	cmd.appStarter.ApplicationStart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 }
 
 func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Application) {

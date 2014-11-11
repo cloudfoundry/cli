@@ -104,7 +104,7 @@ var _ = Describe("stop command", func() {
 
 				appRepo.UpdateAppResult = expectedStoppedApp
 				stopper := NewStop(ui, config, appRepo)
-				actualStoppedApp, err := stopper.ApplicationStop(app)
+				actualStoppedApp, err := stopper.ApplicationStop(app, config.OrganizationFields().Name, config.SpaceFields().Name)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(expectedStoppedApp).To(Equal(actualStoppedApp))
@@ -117,7 +117,7 @@ var _ = Describe("stop command", func() {
 
 				It("returns the app without updating it", func() {
 					stopper := NewStop(ui, config, appRepo)
-					updatedApp, err := stopper.ApplicationStop(app)
+					updatedApp, err := stopper.ApplicationStop(app, config.OrganizationFields().Name, config.SpaceFields().Name)
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(app).To(Equal(updatedApp))

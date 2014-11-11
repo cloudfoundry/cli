@@ -36,8 +36,8 @@ var _ = Describe("Push Command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          core_config.ReadWriter
 		manifestRepo        *testmanifest.FakeManifestRepository
-		starter             *testcmd.FakeAppStarter
-		stopper             *testcmd.FakeAppStopper
+		starter             *testcmd.FakeApplicationStarter
+		stopper             *testcmd.FakeApplicationStopper
 		serviceBinder       *testcmd.FakeAppBinder
 		appRepo             *testApplication.FakeApplicationRepository
 		domainRepo          *testapi.FakeDomainRepository
@@ -54,8 +54,8 @@ var _ = Describe("Push Command", func() {
 
 	BeforeEach(func() {
 		manifestRepo = &testmanifest.FakeManifestRepository{}
-		starter = &testcmd.FakeAppStarter{}
-		stopper = &testcmd.FakeAppStopper{}
+		starter = &testcmd.FakeApplicationStarter{}
+		stopper = &testcmd.FakeApplicationStopper{}
 		serviceBinder = &testcmd.FakeAppBinder{}
 		appRepo = &testApplication.FakeApplicationRepository{}
 
@@ -216,10 +216,14 @@ var _ = Describe("Push Command", func() {
 					[]string{"OK"},
 				))
 
-				Expect(stopper.AppToStop.Guid).To(Equal(""))
-				Expect(starter.AppToStart.Guid).To(Equal("my-new-app-guid"))
-				Expect(starter.AppToStart.Name).To(Equal("my-new-app"))
-				Expect(starter.Timeout).To(Equal(111))
+				Expect(stopper.ApplicationStopCallCount()).To(Equal(0))
+
+				app, orgName, spaceName := starter.ApplicationStartArgsForCall(0)
+				Expect(app.Guid).To(Equal(appGuid))
+				Expect(app.Name).To(Equal("my-new-app"))
+				Expect(orgName).To(Equal(configRepo.OrganizationFields().Name))
+				Expect(spaceName).To(Equal(configRepo.SpaceFields().Name))
+				Expect(starter.SetStartTimeoutInSecondsArgsForCall(0)).To(Equal(111))
 			})
 
 			It("strips special characters when creating a default route", func() {
@@ -294,7 +298,7 @@ var _ = Describe("Push Command", func() {
 				appGuid, _, _ := actor.UploadAppArgsForCall(0)
 				Expect(appGuid).To(Equal("my-new-app-guid"))
 
-				Expect(starter.AppToStart.Name).To(Equal(""))
+				Expect(starter.ApplicationStartCallCount()).To(Equal(0))
 			})
 
 			Context("when there is a shared domain", func() {
@@ -650,7 +654,12 @@ var _ = Describe("Push Command", func() {
 
 			callPush("existing-app")
 
-			Expect(stopper.AppToStop.Guid).To(Equal(existingApp.Guid))
+			app, orgName, spaceName := stopper.ApplicationStopArgsForCall(0)
+			Expect(app.Guid).To(Equal(existingApp.Guid))
+			Expect(app.Name).To(Equal("existing-app"))
+			Expect(orgName).To(Equal(configRepo.OrganizationFields().Name))
+			Expect(spaceName).To(Equal(configRepo.SpaceFields().Name))
+
 			appGuid, _, _ := actor.UploadAppArgsForCall(0)
 			Expect(appGuid).To(Equal(existingApp.Guid))
 		})
@@ -662,7 +671,7 @@ var _ = Describe("Push Command", func() {
 
 			callPush("existing-app")
 
-			Expect(stopper.AppToStop.Guid).To(Equal(""))
+			Expect(stopper.ApplicationStopCallCount()).To(Equal(0))
 		})
 
 		It("updates the app", func() {
