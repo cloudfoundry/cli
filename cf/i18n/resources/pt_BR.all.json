@@ -2380,6 +2380,11 @@
       "modified": false
    },
    {
+      "id": "Invalid value for '{{.PropertyName}}': {{.StringVal}}\n{{.Error}}",
+      "translation": "Valor para {{.PropertyName}} inesperado:\n{{.Error}}",
+      "modified": true
+   },
+   {
       "id": "JSON is invalid: {{.ErrorDescription}}",
       "translation": "JSON inválido: {{.ErrorDescription}}",
       "modified": false
@@ -3817,11 +3822,6 @@
    {
       "id": "Unexpected error has occurred:\n{{.Error}}",
       "translation": "Unexpected error has occurred:\n{{.Error}}",
-      "modified": false
-   },
-   {
-      "id": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
-      "translation": "Valor para {{.PropertyName}} inesperado:\n{{.Error}}",
       "modified": false
    },
    {

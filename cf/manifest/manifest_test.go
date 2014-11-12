@@ -66,7 +66,7 @@ var _ = Describe("Manifests", func() {
 
 		_, err := m.Applications()
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("memory"))
+		Expect(err.Error()).To(ContainSubstring("Invalid value for 'memory': 512"))
 	})
 
 	//candiedyaml returns an integer value when no unit is provided
@@ -83,7 +83,7 @@ var _ = Describe("Manifests", func() {
 
 		_, err := m.Applications()
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("memory"))
+		Expect(err.Error()).To(ContainSubstring("Invalid value for 'memory': 128"))
 	})
 
 	It("sets applications' health check timeouts", func() {
