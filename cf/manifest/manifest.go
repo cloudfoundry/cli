@@ -309,11 +309,11 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *[]error) *[]string {
 	return &stringSlice
 }
 
-func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]string {
+func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]interface{} {
 	key := "env"
 	switch envVars := yamlMap.Get(key).(type) {
 	case nil:
-		aMap := make(map[string]string, 0)
+		aMap := make(map[string]interface{}, 0)
 		return &aMap
 	case map[string]interface{}:
 		yamlMap.Set(key, generic.NewMap(yamlMap.Get(key)))
@@ -328,20 +328,20 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]string {
 			return nil
 		}
 
-		result := make(map[string]string, envVars.Count())
+		result := make(map[string]interface{}, envVars.Count())
 		generic.Each(envVars, func(key, value interface{}) {
-
-			switch value.(type) {
-			case string:
-				result[key.(string)] = value.(string)
-			case int64, int, int32:
-				result[key.(string)] = fmt.Sprintf("%d", value)
-			case float32, float64:
-				result[key.(string)] = fmt.Sprintf("%f", value)
-			default:
-				*errs = append(*errs, errors.NewWithFmt(T("Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
-					map[string]interface{}{"PropertyName": key, "PropertyType": value})))
-			}
+			result[key.(string)] = value
+			// switch value.(type) {
+			// case string:
+			// 	result[key.(string)] = value.(string)
+			// case int64, int, int32:
+			// 	result[key.(string)] = fmt.Sprintf("%d", value)
+			// case float32, float64:
+			// 	result[key.(string)] = fmt.Sprintf("%f", value)
+			// default:
+			// 	*errs = append(*errs, errors.NewWithFmt(T("Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
+			// 		map[string]interface{}{"PropertyName": key, "PropertyType": value})))
+			// }
 
 		})
 		return &result

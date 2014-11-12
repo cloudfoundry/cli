@@ -34,7 +34,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			Expect(app.Memory).To(Equal(int64(128)))
 			Expect(app.DiskQuota).To(Equal(int64(512)))
 			Expect(app.InstanceCount).To(Equal(1))
-			Expect(app.EnvironmentVars).To(Equal(map[string]string{"foo": "bar", "baz": "boom"}))
+			Expect(app.EnvironmentVars).To(Equal(map[string]interface{}{"foo": "bar", "baz": "boom"}))
 			Expect(app.Routes[0].Host).To(Equal("app1"))
 			Expect(app.Routes[0].Domain.Name).To(Equal("cfapps.io"))
 			Expect(app.Stack.Name).To(Equal("awesome-stacks-ahoy"))
@@ -265,7 +265,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
 			defer ts.Close()
 
-			envParams := map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
+			envParams := map[string]interface{}{"DATABASE_URL": "mysql://example.com/my-db"}
 			params := models.AppParams{EnvironmentVars: &envParams}
 
 			_, apiErr := repo.Update("app1-guid", params)
@@ -285,7 +285,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
 			defer ts.Close()
 
-			envParams := map[string]string{}
+			envParams := map[string]interface{}{}
 			params := models.AppParams{EnvironmentVars: &envParams}
 
 			_, apiErr := repo.Update("app1-guid", params)

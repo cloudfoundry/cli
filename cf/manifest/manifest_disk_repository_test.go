@@ -126,7 +126,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 
 		applications, err := m.Applications()
 		Expect(err).NotTo(HaveOccurred())
-		Expect(*applications[0].EnvironmentVars).To(Equal(map[string]string{
+		Expect(*applications[0].EnvironmentVars).To(Equal(map[string]interface{}{
 			"LD_LIBRARY_PATH": "/usr/lib/somewhere",
 		}))
 	})
@@ -139,7 +139,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(*applications[0].Name).To(Equal("base-app"))
 		Expect(*applications[0].ServicesToBind).To(Equal([]string{"base-service"}))
-		Expect(*applications[0].EnvironmentVars).To(Equal(map[string]string{
+		Expect(*applications[0].EnvironmentVars).To(Equal(map[string]interface{}{
 			"foo":                "bar",
 			"will-be-overridden": "my-value",
 		}))

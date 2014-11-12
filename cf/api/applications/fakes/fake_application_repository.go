@@ -144,7 +144,7 @@ func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultAp
 	resultApp.Guid = *params.Name + "-guid"
 	resultApp.Name = *params.Name
 	resultApp.State = "stopped"
-	resultApp.EnvironmentVars = map[string]string{}
+	resultApp.EnvironmentVars = map[string]interface{}{}
 
 	if params.SpaceGuid != nil {
 		resultApp.SpaceGuid = *params.SpaceGuid

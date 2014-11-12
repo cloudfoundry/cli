@@ -1900,11 +1900,6 @@
       "modified": false
    },
    {
-      "id": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
-      "translation": "Se esperaba variable de entorno {{.PropertyName}} que tenga un valor de cadena, pero fue un {{.PropertyType}}.",
-      "modified": false
-   },
-   {
       "id": "Expected {{.Name}} to be a set of key =\u003e value, but it was a {{.Type}}.",
       "translation": "Se espera {{.Name}} que sea un set de clave =\u003e valor, pero fue un {{.Type}}.",
       "modified": false

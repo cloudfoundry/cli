@@ -66,7 +66,7 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 	if len(app.EnvironmentVars) == 0 {
-		app.EnvironmentVars = map[string]string{}
+		app.EnvironmentVars = map[string]interface{}{}
 	}
 	envParams := app.EnvironmentVars
 	envParams[varName] = varValue

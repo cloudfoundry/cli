@@ -67,7 +67,7 @@ var _ = Describe("unset-env command", func() {
 
 	Context("when logged in, a space is targeted and provided enough args", func() {
 		BeforeEach(func() {
-			app.EnvironmentVars = map[string]string{"foo": "bar", "DATABASE_URL": "mysql://example.com/my-db"}
+			app.EnvironmentVars = map[string]interface{}{"foo": "bar", "DATABASE_URL": "mysql://example.com/my-db"}
 
 			requirementsFactory.Application = app
 			requirementsFactory.LoginSuccess = true
@@ -84,7 +84,7 @@ var _ = Describe("unset-env command", func() {
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-			Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
+			Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]interface{}{
 				"foo": "bar",
 			}))
 		})
