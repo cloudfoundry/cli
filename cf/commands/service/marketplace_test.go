@@ -21,7 +21,7 @@ var _ = Describe("marketplace command", func() {
 	var config core_config.ReadWriter
 	var serviceBuilder *testapi.FakeServiceBuilder
 	var fakeServiceOfferings []models.ServiceOffering
-	var service1 models.ServiceOffering
+	var serviceWithAPaidPlan models.ServiceOffering
 	var service2 models.ServiceOffering
 
 	BeforeEach(func() {
@@ -29,7 +29,7 @@ var _ = Describe("marketplace command", func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{ApiEndpointSuccess: true}
 
-		service1 = models.ServiceOffering{
+		serviceWithAPaidPlan = models.ServiceOffering{
 			Plans: []models.ServicePlanFields{
 				models.ServicePlanFields{Name: "service-plan-a", Description: "service-plan-a description", Free: true},
 				models.ServicePlanFields{Name: "service-plan-b", Description: "service-plan-b description", Free: false},
@@ -41,14 +41,14 @@ var _ = Describe("marketplace command", func() {
 			}}
 		service2 = models.ServiceOffering{
 			Plans: []models.ServicePlanFields{
-				models.ServicePlanFields{Name: "service-plan-c"},
-				models.ServicePlanFields{Name: "service-plan-d"}},
+				models.ServicePlanFields{Name: "service-plan-c", Free: true},
+				models.ServicePlanFields{Name: "service-plan-d", Free: true}},
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:       "aaa-my-service-offering",
 				Description: "service offering 2 description",
 			},
 		}
-		fakeServiceOfferings = []models.ServiceOffering{service1, service2}
+		fakeServiceOfferings = []models.ServiceOffering{serviceWithAPaidPlan, service2}
 	})
 
 	Describe("Requirements", func() {
@@ -89,14 +89,37 @@ var _ = Describe("marketplace command", func() {
 					[]string{"Getting services from marketplace in org", "my-org", "the-space-name", "my-user"},
 					[]string{"OK"},
 					[]string{"service", "plans", "description"},
-					[]string{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
-					[]string{"zzz-my-service-offering", "service offering 1 description", "service-plan-a", "service-plan-b"},
+					[]string{"aaa-my-service-offering", "service offering 2 description", "service-plan-c,", "service-plan-d"},
+					[]string{"zzz-my-service-offering", "service offering 1 description", "service-plan-a,", "service-plan-b*"},
+					[]string{"* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred."},
 				))
+			})
+
+			Context("when there are no paid plans", func() {
+				BeforeEach(func() {
+					serviceBuilder.GetServicesForSpaceWithPlansReturns([]models.ServiceOffering{service2}, nil)
+				})
+
+				It("lists the service offerings without displaying the paid message", func() {
+					cmd := NewMarketplaceServices(ui, config, serviceBuilder)
+					testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting services from marketplace in org", "my-org", "the-space-name", "my-user"},
+						[]string{"OK"},
+						[]string{"service", "plans", "description"},
+						[]string{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
+					))
+					Expect(ui.Outputs).NotTo(ContainSubstrings(
+						[]string{"* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred."},
+					))
+				})
+
 			})
 
 			Context("when the user passes the -s flag", func() {
 				It("Displays the list of plans for each service with info", func() {
-					serviceBuilder.GetServiceByNameForSpaceWithPlansReturns(service1, nil)
+					serviceBuilder.GetServiceByNameForSpaceWithPlansReturns(serviceWithAPaidPlan, nil)
 
 					cmd := NewMarketplaceServices(ui, config, serviceBuilder)
 					testcmd.RunCommand(cmd, []string{"-s", "aaa-my-service-offering"}, requirementsFactory)
@@ -177,7 +200,7 @@ var _ = Describe("marketplace command", func() {
 
 		Context("when the user passes the -s flag", func() {
 			It("Displays the list of plans for each service with info", func() {
-				serviceBuilder.GetServiceByNameWithPlansReturns(service1, nil)
+				serviceBuilder.GetServiceByNameWithPlansReturns(serviceWithAPaidPlan, nil)
 				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
 				testcmd.RunCommand(cmd, []string{"-s", "aaa-my-service-offering"}, requirementsFactory)
 
