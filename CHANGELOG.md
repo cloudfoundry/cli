@@ -1,3 +1,102 @@
+##v6.7.0
+* Display correct information about app in copy-source -Restart app.Start/Stop/Restart/WatchStaging by passing org and
+space name instead of assuming config contained correct information [finishes #81219748]
+
+* Change initial output for copy-source [finishes #82171880]
+
+* Add crypto/sha512 to import to solve unkown authority bug [Fixes #82254112]
+
+* Fixes bug where null json value caused panic [Fixes #82292538]
+
+* Merge pull request #290 from haydonryan/master Correcting status message
+
+* Correcting status message previously space was set to org and vice versa, correcting.
+
+* Fix french wording https://github.com/cloudfoundry/cli/pull/279 [finishes #81865644]
+
+* Update application.PackageUpdatedAt to marshal json as time.Time [#82138922]
+
+* Decolorize output for plugin to parse. [Finishes #82051672]
+
+* Fix issue when making requests without a body [#79025838]
+
+* move plugin cli invocations to a struct, which is passed into Run(...)
+
+* Testing interval output printing - add PrintCapturingNoOutput to ui object to avoid using stdout in net
+package tests
+- make sure we rewrite entire string during interval output printing by
+printing a long line of empty spaces [finish #79025838]
+
+* Progress inidicated during uploads (push and create/update buildpack) [Finishes #79025838]
+
+* Correcting status message previously space was set to org and vice versa, correcting.
+
+* Terminal output can be silenced when invoke cli command from a plugin [#81867022]
+
+* Add plugin_examples and README [finishes #78236438]
+
+* Remove errant text from copy-source help output [Finishes #81813144]
+
+* Exit 1 when a plugin exits nonzero or panics [#81633932]
+
+* plugins have names defined by method
+
+* `cf org` now displays space quotas. [Finishes #77390184]
+
+* Merge pull request #280 from cloudfoundry/missing-service-instance-error-message update-service shows an error if the instance is missing and no plan is ...
+
+* update-service shows an error if the instance is missing and no plan is provided
+
+* Add `cf check-route` command [finishes #78473792]
+
+* Plugins now have access to stdin (can be interactive) [finishes #81210182]
+
+* Cli checks command shortname during plugin install - Cli also checks short names for commands when determining execution.
+  Useful to prevent people from mucking with plugin configs by hand. [Finishes #80842550]
+
+* Merge branch 'thecadams-honor-keepalive'
+* Merge branch 'honor-keepalive' of github.com:thecadams/cli
+
+* Improve error message return when refresh token has expired [finishes #78130846]
+
+* Disable service access proprly queries for organization. [Finishes #80867298]
+
+* plugns receive output from core cli commands
+
+* Display most recent package uploaded time for cf app [finishes #78427862]
+
+* Add CF_PLUGIN_HOME to help text output [finishes #81147420]
+
+* Set MinVersion for ssl to TLS1, removing support for SSLV3 [#81218916]
+
+* Add VCAP_APPLICATION to cf env output [finishes #78533524]
+
+* Update `cf env` to grab booleans and integers. [Finishes #79059944]
+
+* Implement update_service command [#76633662]
+
+* Wait to output OK until app is started in start command
+
+* Update help text for create-user-provided-service [finishes: #75171038]
+
+* All arguments/flags are passed to plugin when plugin command invoked [finishes #78234552]
+
+* Provide error when install_plugin plugin collides with other plugin -Update error message for collision with core cli command [finishes #79400494]
+
+* Implement command `cf oauth-token` [Finishes #77587324]
+
+* Use cached plugin config data instead of rpcing the plugin
+
+* Cf help shows plugin info based on plugin_config [#78234404]
+
+* update plugin config to store data for each command
+* install handles conflicting commands
+* validate plugin binary upon install
+
+* Update `cf env APPNAME` to display running/staging env variables. - Refactor GetEnv api call to use counterfiter fake [Finishes #79059944]
+
+* cf exit gracefully when i18n.T() is not initialized for configurations [Finishes #80759488]
+
 ##v6.6.2
 * Bump version to 6.6.2
 * Update usage text for install/uninstall-plugin [finishes #80770062][finishes #80701742]
