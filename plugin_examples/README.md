@@ -48,8 +48,7 @@ You can invoke CLI commands with `cliConnection.CliCommand([]args)` from
  within a plugin's `Run(...)` method. The `Run(...)` method receives the 
 `cliConnection` as its first argument.
 
-The `plugin.CliCommand([]args)` returns the output printed by the command 
-and an error. The output is returned as a slice of strings. The error 
+The `cliConnection.CliCommand([]args)` returns the output printed by the command and an error. The output is returned as a slice of strings. The error 
 will be present if the call to the CLI command fails.
 
 See the [calling CLI commands example](github.com/cloudfoundry/plugin_examples/call_cli_cmd/main/call_cli_cmd.go) included in this repo.
