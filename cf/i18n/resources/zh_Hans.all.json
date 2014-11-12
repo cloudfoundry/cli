@@ -1900,11 +1900,6 @@
       "modified": false
    },
    {
-      "id": "Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
-      "translation": "环境变量{{.PropertyName}}应是字符串，不是{{.PropertyType}}",
-      "modified": false
-   },
-   {
       "id": "Expected {{.Name}} to be a set of key =\u003e value, but it was a {{.Type}}.",
       "translation": "预期令{{.Name}}为一组关键=\u003e 价值，但它是一{{.Type}}",
       "modified": false

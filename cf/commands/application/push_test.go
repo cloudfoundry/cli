@@ -485,7 +485,7 @@ var _ = Describe("Push Command", func() {
 				Expect(*appRepo.CreatedAppParams().Command).To(Equal("JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run"))
 				// Expect(actor.UploadedDir).To(Equal(filepath.Clean("some/path/from/manifest"))) TODO: Re-enable this once we develop a strategy
 
-				Expect(*appRepo.CreatedAppParams().EnvironmentVars).To(Equal(map[string]string{
+				Expect(*appRepo.CreatedAppParams().EnvironmentVars).To(Equal(map[string]interface{}{
 					"PATH": "/u/apps/my-app/bin",
 					"FOO":  "baz",
 				}))
@@ -607,7 +607,7 @@ var _ = Describe("Push Command", func() {
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
 			existingApp.Command = "unicorn -c config/unicorn.rb -D"
-			existingApp.EnvironmentVars = map[string]string{
+			existingApp.EnvironmentVars = map[string]interface{}{
 				"crazy": "pants",
 				"FOO":   "NotYoBaz",
 				"foo":   "manchu",

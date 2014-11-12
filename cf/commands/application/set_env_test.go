@@ -67,7 +67,7 @@ var _ = Describe("set-env command", func() {
 
 	Context("when logged in, a space is targeted and given enough args", func() {
 		BeforeEach(func() {
-			app.EnvironmentVars = map[string]string{"foo": "bar"}
+			app.EnvironmentVars = map[string]interface{}{"foo": "bar"}
 			requirementsFactory.Application = app
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
@@ -93,7 +93,7 @@ var _ = Describe("set-env command", func() {
 
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
-				Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
+				Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]interface{}{
 					"DATABASE_URL": "mysql://new-example.com/my-db",
 					"foo":          "bar",
 				}))
@@ -136,7 +136,7 @@ var _ = Describe("set-env command", func() {
 				[]string{"OK"},
 				[]string{"TIP"},
 			))
-			Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
+			Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]interface{}{
 				"MY_VAR": "--has-a-cool-value",
 				"foo":    "bar",
 			}))

@@ -49,7 +49,7 @@ type ApplicationFields struct {
 	BuildpackUrl     string
 	Command          string
 	DiskQuota        int64 // in Megabytes
-	EnvironmentVars  map[string]string
+	EnvironmentVars  map[string]interface{}
 	InstanceCount    int
 	Memory           int64 // in Megabytes
 	RunningInstances int
@@ -63,7 +63,7 @@ type AppParams struct {
 	Command            *string
 	DiskQuota          *int64
 	Domain             *string
-	EnvironmentVars    *map[string]string
+	EnvironmentVars    *map[string]interface{}
 	Guid               *string
 	HealthCheckTimeout *int
 	Host               *string
