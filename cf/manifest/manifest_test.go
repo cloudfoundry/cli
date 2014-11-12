@@ -86,23 +86,6 @@ var _ = Describe("Manifests", func() {
 		Expect(err.Error()).To(ContainSubstring("Invalid value for 'memory': 128"))
 	})
 
-	//candiedyaml returns an integer value when no unit is provided
-	It("returns an error when the memory limit is a non-string", func() {
-		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
-			"instances": "3",
-			"memory":    128,
-			"applications": []interface{}{
-				map[interface{}]interface{}{
-					"name": "bitcoin-miner",
-				},
-			},
-		}))
-
-		_, err := m.Applications()
-		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("memory"))
-	})
-
 	It("sets applications' health check timeouts", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
