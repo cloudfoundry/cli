@@ -170,6 +170,11 @@
       "modified": false
    },
    {
+      "id": "* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred.",
+      "translation": "* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred.",
+      "modified": false
+   },
+   {
       "id": "A command line tool to interact with Cloud Foundry",
       "translation": "Un outil de ligne de commande pour interagir avec Cloud Foundry",
       "modified": false
