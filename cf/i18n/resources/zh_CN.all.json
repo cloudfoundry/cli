@@ -2380,6 +2380,11 @@
       "modified": false
    },
    {
+      "id": "Invalid value for '{{.PropertyName}}': {{.StringVal}}\n{{.Error}}",
+      "translation": "非法{{.PropertyName}}值:\n错误: {{.Error}}",
+      "modified": true
+   },
+   {
       "id": "JSON is invalid: {{.ErrorDescription}}",
       "translation": "无效的JSON: {{.ErrorDescription}}",
       "modified": false
@@ -3817,11 +3822,6 @@
    {
       "id": "Unexpected error has occurred:\n{{.Error}}",
       "translation": "Unexpected error has occurred:\n{{.Error}}",
-      "modified": false
-   },
-   {
-      "id": "Unexpected value for {{.PropertyName}} :\n{{.Error}}",
-      "translation": "非法{{.PropertyName}}值:\n错误: {{.Error}}",
       "modified": false
    },
    {
