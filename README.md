@@ -55,6 +55,8 @@ $ brew tap pivotal/tap
 $ brew install cloudfoundry-cli
 ```
 
+**Releases:** Information about our releases can be found [here](https://github.com/cloudfoundry/cli/releases)
+
 Troubleshooting / FAQs
 ======================
 
