@@ -214,7 +214,8 @@ func bytesVal(yamlMap generic.Map, key string, errs *[]error) *int64 {
 		return nil
 	}
 
-	value, err := formatters.ToMegabytes(coerceToString(yamlVal))
+	stringVal := coerceToString(yamlVal)
+	value, err := formatters.ToMegabytes(stringVal)
 	if err != nil {
 		*errs = append(*errs, errors.NewWithFmt(T("Invalid value for '{{.PropertyName}}': {{.StringVal}}\n{{.Error}}",
 			map[string]interface{}{
