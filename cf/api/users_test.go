@@ -234,6 +234,21 @@ var _ = Describe("User Repository", func() {
 
 			})
 		})
+
+		Context("when the uaa endpoint request returns a non-403 error", func() {
+			It("returns the error", func() {
+				setupUAAServer(
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "GET",
+						Path:     "/Users?attributes=id,userName&filter=userName+Eq+%22my-user%22",
+						Response: testnet.TestResponse{Status: 500, Body: `server down!`},
+					}))
+
+				_, err := repo.FindByUsername("my-user")
+				Expect(uaaHandler).To(HaveAllRequestsCalled())
+				Expect(err).To(HaveOccurred())
+			})
+		})
 	})
 
 	Describe("creating users", func() {
