@@ -167,6 +167,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 			err = errors.NewModelAlreadyExistsError("user", username)
 			return
 		}
+		return
 	default:
 		return
 	}

@@ -14,9 +14,10 @@ type FakeUserRepository struct {
 	ListUsersSpaceGuid        string
 	ListUsersByRole           map[string][]models.UserFields
 
-	CreateUserUsername string
-	CreateUserPassword string
-	CreateUserExists   bool
+	CreateUserUsername         string
+	CreateUserPassword         string
+	CreateUserExists           bool
+	CreateUserReturnsHttpError bool
 
 	DeleteUserGuid string
 
@@ -63,6 +64,9 @@ func (repo *FakeUserRepository) Create(username, password string) (apiErr error)
 	repo.CreateUserUsername = username
 	repo.CreateUserPassword = password
 
+	if repo.CreateUserReturnsHttpError {
+		apiErr = errors.NewHttpError(403, "403", "Forbidden")
+	}
 	if repo.CreateUserExists {
 		apiErr = errors.NewModelAlreadyExistsError("User", username)
 	}

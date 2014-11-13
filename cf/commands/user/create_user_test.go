@@ -51,16 +51,30 @@ var _ = Describe("Create user command", func() {
 		Expect(userRepo.CreateUserUsername).To(Equal("my-user"))
 	})
 
-	It("prints a warning when the given user already exists", func() {
-		userRepo.CreateUserExists = true
+	Context("when creating the user returns an error", func() {
+		It("prints a warning when the given user already exists", func() {
+			userRepo.CreateUserExists = true
 
-		runCommand("my-user", "my-password")
+			runCommand("my-user", "my-password")
 
-		Expect(ui.WarnOutputs).To(ContainSubstrings(
-			[]string{"already exists"},
-		))
+			Expect(ui.WarnOutputs).To(ContainSubstrings(
+				[]string{"already exists"},
+			))
 
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		})
+		It("fails when any error other than alreadyExists is returned", func() {
+			userRepo.CreateUserReturnsHttpError = true
+
+			runCommand("my-user", "my-password")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Forbidden"},
+			))
+
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+
+		})
 	})
 
 	It("fails when no arguments are passed", func() {
