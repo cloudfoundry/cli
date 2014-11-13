@@ -288,6 +288,24 @@ var _ = Describe("User Repository", func() {
 			err := repo.Create("my-user", "my-password")
 			Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
 		})
+		It("Returns any http error", func() {
+			setupUAAServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "POST",
+					Path:   "/Users",
+					Response: testnet.TestResponse{
+						Status: http.StatusForbidden,
+						Body: `
+						{
+							"message":"Access Denied",
+							"error":"Forbidden"
+						}`,
+					},
+				}))
+
+			err := repo.Create("my-user", "my-password")
+			Expect(err.Error()).To(ContainSubstring("Forbidden"))
+		})
 	})
 
 	Describe("deleting users", func() {
