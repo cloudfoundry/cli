@@ -19,7 +19,7 @@ Plugins that you develop for the cf CLI must conform to a predefined plugin inte
 ## Writing a Plugin
 
 To write a plugin for the cf CLI, implement the 
-[predefined plugin interface](github.com/cloudfoundry/cli/plugin/plugin.go).
+[predefined plugin interface](https://github.com/cloudfoundry/cli/plugin/plugin.go).
 
 The interface uses a `Run(...)` method as the main entry point between the CLI 
 and a plugin. This method receives the following arguments:
@@ -33,14 +33,14 @@ with `cf help`.
 
   To initialize a plugin, call `plugin.Start(new(MyPluginStruct))` from within the `main()` method of your plugin. The `plugin.Start(...)` function requires a new reference to the struct that implements the defined interface. 
 
-This repo contains a basic plugin example [here](github.com/cloudfoundry/plugin_examples/basic_plugin.go).
+This repo contains a basic plugin example [here](https://github.com/cloudfoundry/plugin_examples/basic_plugin.go).
 
 ### Using Command Line Arguments
 
 The `Run(...)` method accepts the command line arguments and flags that you 
 define for a plugin. 
 
-  See the [command line arguments example] (github.com/cloudfoundry/plugin_examples/echo.go) included in this repo.
+  See the [command line arguments example] (https://github.com/cloudfoundry/plugin_examples/echo.go) included in this repo.
 
 ### Calling CLI Commands
 
@@ -51,11 +51,11 @@ You can invoke CLI commands with `cliConnection.CliCommand([]args)` from
 The `cliConnection.CliCommand([]args)` returns the output printed by the command and an error. The output is returned as a slice of strings. The error 
 will be present if the call to the CLI command fails.
 
-See the [calling CLI commands example](github.com/cloudfoundry/plugin_examples/call_cli_cmd/main/call_cli_cmd.go) included in this repo.
+See the [calling CLI commands example](https://github.com/cloudfoundry/plugin_examples/call_cli_cmd/main/call_cli_cmd.go) included in this repo.
 
 ### Creating Interactive Plugins
 
-Because a plugin has access to stdin during a call to the `Run(...)` method, you can create interactive plugins. See the [interactive plugin example](github.com/cloudfoundry/plugin_examples/interactive.go)
+Because a plugin has access to stdin during a call to the `Run(...)` method, you can create interactive plugins. See the [interactive plugin example](https://github.com/cloudfoundry/plugin_examples/interactive.go)
  included in this repo. 
 
 ## Compiling Plugin Source Code
