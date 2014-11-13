@@ -72,6 +72,7 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (model
 				return user, errors.NewAccessDeniedError()
 			}
 		}
+		return user, apiErr
 	} else if len(users) == 0 {
 		return user, errors.NewModelNotFoundError("User", username)
 	}
