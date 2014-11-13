@@ -1590,9 +1590,9 @@
       "modified": false
    },
    {
-      "id": "Do not map a route to this app",
+      "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
       "translation": "Do mapea ruta a esta app",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Do not start an app after pushing",

@@ -97,7 +97,7 @@ func (cmd *Push) Metadata() command_metadata.CommandMetadata {
 			flag_helpers.NewStringFlag("t", T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")),
 			cli.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")},
 			cli.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")},
-			cli.BoolFlag{Name: "no-route", Usage: T("Do not map a route to this app")},
+			cli.BoolFlag{Name: "no-route", Usage: T("Do not map a route to this app and remove routes from previous pushes of this app.")},
 			cli.BoolFlag{Name: "no-start", Usage: T("Do not start an app after pushing")},
 			cli.BoolFlag{Name: "random-route", Usage: T("Create a random route for this app")},
 		},
