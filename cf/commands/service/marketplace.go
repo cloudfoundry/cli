@@ -165,7 +165,7 @@ func (cmd MarketplaceServices) marketplace() {
 
 	table.Print()
 	if paidPlanExists {
-		cmd.ui.Say("")
-		cmd.ui.Say(T("* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred."))
+		cmd.ui.Say(T("\n* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred."))
 	}
+	cmd.ui.Say(T("\nTIP:  Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
 }

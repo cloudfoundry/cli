@@ -15,8 +15,18 @@
       "modified": false
    },
    {
+      "id": "\n* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred.",
+      "translation": "* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred.",
+      "modified": true
+   },
+   {
       "id": "\nApp started\n",
       "translation": "\nLa App empezo\n",
+      "modified": false
+   },
+   {
+      "id": "\nTIP:  Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service.",
+      "translation": "\nTIP:  Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service.",
       "modified": false
    },
    {
@@ -167,11 +177,6 @@
    {
       "id": " not found",
       "translation": " no encontrado",
-      "modified": false
-   },
-   {
-      "id": "* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred.",
-      "translation": "* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred.",
       "modified": false
    },
    {
