@@ -93,7 +93,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 }
 
 func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (models.ServicePlanFields, error) {
-	offerings, apiErr := cmd.serviceBuilder.GetServicesByNameForSpaceWithPlans(serviceName, cmd.config.SpaceFields().Guid)
+	offerings, apiErr := cmd.serviceBuilder.GetServicesByNameForSpaceWithPlans(cmd.config.SpaceFields().Guid, serviceName)
 	if apiErr != nil {
 		return models.ServicePlanFields{}, apiErr
 	}

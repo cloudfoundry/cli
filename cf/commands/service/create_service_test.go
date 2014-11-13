@@ -82,6 +82,9 @@ var _ = Describe("create-service command", func() {
 	It("successfully creates a service", func() {
 		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
+		spaceGuid, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
+		Expect(spaceGuid).To(Equal(config.SpaceFields().Guid))
+		Expect(serviceName).To(Equal("cleardb"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
 			[]string{"OK"},
