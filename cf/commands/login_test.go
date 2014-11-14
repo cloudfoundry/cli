@@ -257,6 +257,33 @@ var _ = Describe("Login Command", func() {
 			})
 		})
 
+		Describe("where there are no available orgs", func() {
+			BeforeEach(func() {
+				orgRepo.ListOrgsReturns([]models.Organization{}, nil)
+				spaceRepo.Spaces = []models.Space{}
+			})
+
+			It("does not as the user to select an org", func() {
+				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, Flags, nil)
+
+				Expect(Config.OrganizationFields().Guid).To(Equal(""))
+				Expect(Config.SpaceFields().Guid).To(Equal(""))
+				Expect(Config.AccessToken()).To(Equal("my_access_token"))
+				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+					{
+						"username": "user@example.com",
+						"password": "password",
+					},
+				}))
+				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			})
+		})
+
 		Describe("when there is only a single org and no spaces", func() {
 			BeforeEach(func() {
 				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)

@@ -225,15 +225,17 @@ func (cmd Login) setOrganization(c *cli.Context) (isOrgSet bool) {
 			}
 		}
 
-		if len(availableOrgs) == 1 {
+		if len(availableOrgs) == 0 {
+			return false
+		} else if len(availableOrgs) == 1 {
 			cmd.targetOrganization(availableOrgs[0])
 			return true
-		}
-
-		orgName = cmd.promptForOrgName(availableOrgs)
-		if orgName == "" {
-			cmd.ui.Say("")
-			return false
+		} else {
+			orgName = cmd.promptForOrgName(availableOrgs)
+			if orgName == "" {
+				cmd.ui.Say("")
+				return false
+			}
 		}
 	}
 
@@ -281,12 +283,12 @@ func (cmd Login) setSpace(c *cli.Context) {
 		} else if len(availableSpaces) == 1 {
 			cmd.targetSpace(availableSpaces[0])
 			return
-		}
-
-		spaceName = cmd.promptForSpaceName(availableSpaces)
-		if spaceName == "" {
-			cmd.ui.Say("")
-			return
+		} else {
+			spaceName = cmd.promptForSpaceName(availableSpaces)
+			if spaceName == "" {
+				cmd.ui.Say("")
+				return
+			}
 		}
 	}
 
