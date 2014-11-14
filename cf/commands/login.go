@@ -276,8 +276,9 @@ func (cmd Login) setSpace(c *cli.Context) {
 				map[string]interface{}{"Err": err.Error()}))
 		}
 
-		// Target only space if possible
-		if len(availableSpaces) == 1 {
+		if len(availableSpaces) == 0 {
+			return
+		} else if len(availableSpaces) == 1 {
 			cmd.targetSpace(availableSpaces[0])
 			return
 		}
