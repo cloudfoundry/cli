@@ -68,6 +68,22 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("Asking user for input", func() {
+		It("allows string with whitespaces", func() {
+			io_helpers.SimulateStdin("foo bar\n", func(reader io.Reader) {
+				ui := NewUI(reader, NewTeePrinter())
+				Expect(ui.Ask("?")).To(Equal("foo bar"))
+			})
+		})
+
+		It("returns empty string if an error occured while reading string", func() {
+			io_helpers.SimulateStdin("string without expected delimiter", func(reader io.Reader) {
+				ui := NewUI(reader, NewTeePrinter())
+				Expect(ui.Ask("?")).To(Equal(""))
+			})
+		})
+	})
+
 	Describe("Confirming user input", func() {
 		It("treats 'y' as an affirmative confirmation", func() {
 			io_helpers.SimulateStdin("y\n", func(reader io.Reader) {
