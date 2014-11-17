@@ -43,15 +43,14 @@ var _ = Describe("unbind-security-group command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUnbindSecurityGroup(ui, configRepo, securityGroupRepo, orgRepo, spaceRepo, secBinder)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("should fail if not logged in", func() {
-			runCommand("my-group")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-group")).To(BeFalse())
 		})
 
 		It("should fail with usage when not provided with any arguments", func() {

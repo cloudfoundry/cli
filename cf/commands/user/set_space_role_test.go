@@ -36,8 +36,8 @@ var _ = Describe("set-space-role command", func() {
 		userRepo = &testapi.FakeUserRepository{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo), args, requirementsFactory)
 	}
 
 	It("fails with usage when not provided exactly four args", func() {
@@ -52,16 +52,14 @@ var _ = Describe("set-space-role command", func() {
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
-			runCommand("username", "org", "space", "role")
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("username", "org", "space", "role")).To(BeFalse())
 		})
 
 		It("succeeds when logged in", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("username", "org", "space", "role")
+			passed := runCommand("username", "org", "space", "role")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(passed).To(BeTrue())
 			Expect(requirementsFactory.UserUsername).To(Equal("username"))
 			Expect(requirementsFactory.OrganizationName).To(Equal("org"))
 		})

@@ -47,14 +47,13 @@ var _ = Describe("org command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewShowOrg(ui, configRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewShowOrg(ui, configRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
-			runCommand("whoops")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("whoops")).To(BeFalse())
 		})
 
 		It("fails with usage when not provided exactly one arg", func() {

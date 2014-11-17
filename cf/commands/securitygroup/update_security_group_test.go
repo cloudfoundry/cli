@@ -34,15 +34,14 @@ var _ = Describe("update-security-group command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUpdateSecurityGroup(ui, configRepo, securityGroupRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
-			runCommand("the-security-group")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("the-security-group")).To(BeFalse())
 		})
 
 		It("fails with usage when a name is not provided", func() {

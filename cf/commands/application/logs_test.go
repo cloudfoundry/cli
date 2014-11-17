@@ -37,8 +37,8 @@ var _ = Describe("logs command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewLogs(ui, configRepo, logsRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewLogs(ui, configRepo, logsRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -50,8 +50,7 @@ var _ = Describe("logs command", func() {
 		})
 
 		It("fails requirements when not logged in", func() {
-			runCommand("my-app")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-app")).To(BeFalse())
 		})
 	})
 

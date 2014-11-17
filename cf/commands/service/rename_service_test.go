@@ -30,8 +30,8 @@ var _ = Describe("rename-service command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewRenameService(ui, config, serviceRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewRenameService(ui, config, serviceRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -42,15 +42,14 @@ var _ = Describe("rename-service command", func() {
 
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedSpaceSuccess = true
-			runCommand("banana", "fppants")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("banana", "fppants")).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("banana", "faaaaasdf")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("banana", "faaaaasdf")).To(BeFalse())
 		})
 	})
 

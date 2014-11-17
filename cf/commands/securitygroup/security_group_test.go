@@ -31,15 +31,14 @@ var _ = Describe("security-group command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewShowSecurityGroup(ui, configRepo, securityGroupRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("should fail if not logged in", func() {
-			runCommand("my-group")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-group")).To(BeFalse())
 		})
 
 		It("should fail with usage when not provided a single argument", func() {

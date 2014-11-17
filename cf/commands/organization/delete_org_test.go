@@ -42,15 +42,13 @@ var _ = Describe("delete-org command", func() {
 		orgRepo.FindByNameReturns(org, nil)
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails requirements when not logged in", func() {
-		runCommand("some-org-name")
-
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(runCommand("some-org-name")).To(BeFalse())
 	})
 
 	It("fails with usage if no arguments are given", func() {

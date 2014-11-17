@@ -33,24 +33,22 @@ var _ = Describe("list-apps command", func() {
 		}
 	})
 
-	runCommand := func() {
+	runCommand := func() bool {
 		cmd := NewListApps(ui, configRepo, appSummaryRepo)
-		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		return testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
 
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand()).To(BeFalse())
 		})
 
 		It("requires the user to have a space targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
 
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand()).To(BeFalse())
 		})
 	})
 

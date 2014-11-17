@@ -49,32 +49,28 @@ var _ = Describe("update-service command", func() {
 		//serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering1}
 	})
 
-	var callUpdateService = func(args []string) {
+	var callUpdateService = func(args []string) bool {
 		cmd := NewUpdateService(ui, config, serviceRepo, planBuilder)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("passes when logged in and a space is targeted", func() {
-			callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeTrue())
 		})
 
 		It("fails when there are 0 arguments", func() {
-			callUpdateService([]string{})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callUpdateService([]string{})).To(BeFalse())
 		})
 
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
-			callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeFalse())
 		})
 	})
 	Context("when no flags are passed", func() {

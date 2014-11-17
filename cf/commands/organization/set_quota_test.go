@@ -22,8 +22,8 @@ var _ = Describe("set-quota command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	BeforeEach(func() {
@@ -42,8 +42,7 @@ var _ = Describe("set-quota command", func() {
 	})
 
 	It("fails requirements when not logged in", func() {
-		runCommand("my-org", "my-quota")
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(runCommand("my-org", "my-quota")).To(BeFalse())
 	})
 
 	Context("when logged in", func() {
@@ -52,8 +51,8 @@ var _ = Describe("set-quota command", func() {
 		})
 
 		It("passes requirements when provided two args", func() {
-			runCommand("my-org", "my-quota")
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			passed := runCommand("my-org", "my-quota")
+			Expect(passed).To(BeTrue())
 			Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
 		})
 

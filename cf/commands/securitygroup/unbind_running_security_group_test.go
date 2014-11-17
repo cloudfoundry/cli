@@ -34,15 +34,14 @@ var _ = Describe("unbind-running-security-group command", func() {
 		fakeRunningSecurityGroupsRepo = &fakeRunningDefaults.FakeRunningSecurityGroupsRepo{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUnbindFromRunningGroup(ui, configRepo, fakeSecurityGroupRepo, fakeRunningSecurityGroupsRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
-			runCommand("name")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("name")).To(BeFalse())
 		})
 
 		It("fails with usage when a name is not provided", func() {

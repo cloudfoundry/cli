@@ -26,14 +26,13 @@ var _ = Describe("ListBuildpacks", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	RunCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := buildpack.NewListBuildpacks(ui, buildpackRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails requirements when login fails", func() {
-		RunCommand()
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(runCommand()).To(BeFalse())
 	})
 
 	Context("when logged in", func() {
@@ -54,7 +53,7 @@ var _ = Describe("ListBuildpacks", func() {
 				models.Buildpack{Name: "Buildpack-3", Position: &p3, Enabled: &t, Locked: &f},
 			}
 
-			RunCommand()
+			runCommand()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting buildpacks"},
@@ -66,7 +65,7 @@ var _ = Describe("ListBuildpacks", func() {
 		})
 
 		It("tells the user if no build packs exist", func() {
-			RunCommand()
+			runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting buildpacks"},
 				[]string{"No buildpacks found"},

@@ -29,9 +29,9 @@ var _ = Describe("delete-service-broker command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewDeleteServiceBroker(ui, configRepo, brokerRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -42,8 +42,8 @@ var _ = Describe("delete-service-broker command", func() {
 
 		It("fails requirements when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("-f", "my-broker")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("-f", "my-broker")).To(BeFalse())
 		})
 	})
 

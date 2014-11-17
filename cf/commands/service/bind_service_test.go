@@ -26,9 +26,8 @@ var _ = Describe("bind-service command", func() {
 
 	It("fails requirements when not logged in", func() {
 		cmd := NewBindService(&testterm.FakeUI{}, testconfig.NewRepository(), &testapi.FakeServiceBindingRepo{})
-		testcmd.RunCommand(cmd, []string{"service", "app"}, requirementsFactory)
 
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(testcmd.RunCommand(cmd, []string{"service", "app"}, requirementsFactory)).To(BeFalse())
 	})
 
 	Context("when logged in", func() {

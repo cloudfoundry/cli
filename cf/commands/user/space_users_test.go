@@ -32,22 +32,20 @@ var _ = Describe("space-users command", func() {
 		userRepo = &testapi.FakeUserRepository{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewSpaceUsers(ui, config, spaceRepo, userRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewSpaceUsers(ui, config, spaceRepo, userRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
-			runCommand("my-org", "my-space")
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-org", "my-space")).To(BeFalse())
 		})
 
 		It("succeeds when logged in", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("some-org", "whatever-space")
+			passed := runCommand("some-org", "whatever-space")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(passed).To(BeTrue())
 			Expect("some-org").To(Equal(requirementsFactory.OrganizationName))
 		})
 	})

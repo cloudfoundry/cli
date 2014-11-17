@@ -56,26 +56,23 @@ var _ = Describe("create-service command", func() {
 		serviceBuilder.GetServicesByNameForSpaceWithPlansReturns(models.ServiceOfferings{offering1, offering2}, nil)
 	})
 
-	var callCreateService = func(args []string) {
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+	var callCreateService = func(args []string) bool {
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("passes when logged in and a space is targeted", func() {
-			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeTrue())
 		})
 
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
-			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeFalse())
 		})
 	})
 

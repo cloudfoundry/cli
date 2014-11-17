@@ -33,10 +33,10 @@ var _ = Describe("delete-service command", func() {
 		}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		cmd := NewDeleteService(ui, configRepo, serviceRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when not logged in", func() {
@@ -45,8 +45,7 @@ var _ = Describe("delete-service command", func() {
 		})
 
 		It("does not pass requirements", func() {
-			runCommand("vestigial-service")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("vestigial-service")).To(BeFalse())
 		})
 	})
 

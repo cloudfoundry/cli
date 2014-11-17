@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -24,26 +25,26 @@ var _ = Describe("purge-service command", func() {
 			deps.requirementsFactory.LoginSuccess = false
 
 			cmd := NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo)
-			testcmd.RunCommand(
+			passed := testcmd.RunCommand(
 				cmd,
 				[]string{"-f", "whatever"},
 				deps.requirementsFactory,
 			)
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(passed).To(BeFalse())
 		})
 
 		It("fails when called without exactly one arg", func() {
 			deps := setupDependencies()
 			deps.requirementsFactory.LoginSuccess = true
 
-			testcmd.RunCommand(
+			passed := testcmd.RunCommand(
 				NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 				[]string{},
 				deps.requirementsFactory,
 			)
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(passed).To(BeFalse())
 			Expect(deps.ui.FailedWithUsage).To(BeTrue())
 		})
 	})

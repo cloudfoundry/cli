@@ -30,8 +30,8 @@ var _ = Describe("files command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewFiles(ui, configRepo, appFilesRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewFiles(ui, configRepo, appFilesRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -42,17 +42,16 @@ var _ = Describe("files command", func() {
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("my-app", "/foo")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-app", "/foo")).To(BeFalse())
 		})
 
 		It("fails with usage when not provided an app name", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
-			runCommand()
 
+			passed := runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(passed).To(BeFalse())
 		})
 	})
 

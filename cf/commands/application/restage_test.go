@@ -39,22 +39,21 @@ var _ = Describe("restage command", func() {
 		stagingWatcher = &fakeStagingWatcher{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewRestage(ui, configRepo, appRepo, stagingWatcher)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("Requirements", func() {
 		It("fails when the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("my-app")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-app")).To(BeFalse())
 		})
 
 		It("fails with usage when no arguments are given", func() {
-			runCommand()
+			passed := runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(passed).To(BeFalse())
 		})
 	})
 

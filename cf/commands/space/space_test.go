@@ -30,21 +30,21 @@ var _ = Describe("space command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewShowSpace(ui, configRepo, quotaRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewShowSpace(ui, configRepo, quotaRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedOrgSuccess = true
-			runCommand("some-space")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("some-space")).To(BeFalse())
 		})
 
 		It("fails when an org is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("some-space")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("some-space")).To(BeFalse())
 		})
 	})
 

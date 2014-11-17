@@ -30,15 +30,14 @@ var _ = Describe("unmap-route command", func() {
 		requirementsFactory = new(testreq.FakeReqFactory)
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUnmapRoute(ui, configRepo, routeRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when the user is not logged in", func() {
 		It("fails requirements", func() {
-			runCommand("my-app", "some-domain.com")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-app", "some-domain.com")).To(BeFalse())
 		})
 	})
 
@@ -69,20 +68,20 @@ var _ = Describe("unmap-route command", func() {
 					Guid:   "my-route-guid",
 					Host:   "foo",
 				}
-				runCommand("-n", "my-host", "my-app", "my-domain.com")
 			})
 
 			It("passes requirements", func() {
-				Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
+				Expect(runCommand("-n", "my-host", "my-app", "my-domain.com")).To(BeTrue())
 			})
 
 			It("reads the app and domain from its requirements", func() {
+				runCommand("-n", "my-host", "my-app", "my-domain.com")
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				Expect(requirementsFactory.DomainName).To(Equal("my-domain.com"))
 			})
 
 			It("unmaps the route", func() {
+				runCommand("-n", "my-host", "my-app", "my-domain.com")
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Removing route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
 					[]string{"OK"},

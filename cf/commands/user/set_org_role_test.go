@@ -39,14 +39,13 @@ var _ = Describe("set-org-role command", func() {
 		userRepo = &testapi.FakeUserRepository{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewSetOrgRole(ui, configRepo, userRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewSetOrgRole(ui, configRepo, userRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
-			runCommand("hey", "there", "jude")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("hey", "there", "jude")).To(BeFalse())
 		})
 
 		It("fails with usage when not provided exactly three args", func() {

@@ -29,22 +29,22 @@ var _ = Describe("app Command", func() {
 		quotaRepo = &fakes.FakeQuotaRepository{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUpdateQuota(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails if not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("cf-plays-dwarf-fortress")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("cf-plays-dwarf-fortress")).To(BeFalse())
 		})
 
 		It("fails with usage when no arguments are given", func() {
-			runCommand()
+			passed := runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(passed).To(BeFalse())
 		})
 	})
 

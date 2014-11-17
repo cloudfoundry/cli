@@ -34,8 +34,8 @@ var _ = Describe("set-env command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewSetEnv(ui, configRepo, appRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewSetEnv(ui, configRepo, appRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -43,16 +43,14 @@ var _ = Describe("set-env command", func() {
 			requirementsFactory.Application = app
 			requirementsFactory.TargetedSpaceSuccess = true
 
-			runCommand("hey", "gabba", "gabba")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("hey", "gabba", "gabba")).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.Application = app
 			requirementsFactory.LoginSuccess = true
 
-			runCommand("hey", "gabba", "gabba")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("hey", "gabba", "gabba")).To(BeFalse())
 		})
 
 		It("fails with usage when not provided with exactly three args", func() {

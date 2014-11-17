@@ -30,9 +30,9 @@ var _ = Describe("rename-org command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	var callRenameOrg = func(args []string) {
+	var callRenameOrg = func(args []string) bool {
 		cmd := organization.NewRenameOrg(ui, configRepo, orgRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails with usage when given less than two args", func() {
@@ -44,8 +44,7 @@ var _ = Describe("rename-org command", func() {
 	})
 
 	It("fails requirements when not logged in", func() {
-		callRenameOrg([]string{"my-org", "my-new-org"})
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(callRenameOrg([]string{"my-org", "my-new-org"})).To(BeFalse())
 	})
 
 	Context("when logged in and given an org to rename", func() {
@@ -58,8 +57,7 @@ var _ = Describe("rename-org command", func() {
 		})
 
 		It("passes requirements", func() {
-			callRenameOrg([]string{"the-old-org-name", "the-new-org-name"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(callRenameOrg([]string{"the-old-org-name", "the-new-org-name"})).To(BeTrue())
 		})
 
 		It("renames an organization", func() {

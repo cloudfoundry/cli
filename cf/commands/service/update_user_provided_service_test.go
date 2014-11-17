@@ -30,9 +30,9 @@ var _ = Describe("update-user-provided-service test", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUpdateUserProvidedService(ui, configRepo, serviceRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -43,8 +43,7 @@ var _ = Describe("update-user-provided-service test", func() {
 		})
 
 		It("fails when not logged in", func() {
-			runCommand("whoops")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("whoops")).To(BeFalse())
 		})
 	})
 

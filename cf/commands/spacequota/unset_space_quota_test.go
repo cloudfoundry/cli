@@ -30,9 +30,9 @@ var _ = Describe("unset-space-quota command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUnsetSpaceQuota(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo, spaceRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails with usage when provided too many or two few args", func() {
@@ -47,15 +47,13 @@ var _ = Describe("unset-space-quota command", func() {
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
 
-			runCommand("space", "quota")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("space", "quota")).To(BeFalse())
 		})
 
 		It("requires the user to target an org", func() {
 			requirementsFactory.TargetedOrgSuccess = false
 
-			runCommand("space", "quota")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("space", "quota")).To(BeFalse())
 		})
 	})
 

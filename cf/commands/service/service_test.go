@@ -23,8 +23,8 @@ var _ = Describe("service command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewShowService(ui), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewShowService(ui), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -38,16 +38,14 @@ var _ = Describe("service command", func() {
 
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedSpaceSuccess = true
-			runCommand("come-ON")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("come-ON")).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("okay-this-time-please??")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("okay-this-time-please??")).To(BeFalse())
 		})
 	})
 

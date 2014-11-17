@@ -37,9 +37,9 @@ var _ = Describe("target command", func() {
 		requirementsFactory.ApiEndpointSuccess = true
 	})
 
-	var callTarget = func(args []string) {
+	var callTarget = func(args []string) bool {
 		cmd := NewTarget(ui, config, orgRepo, spaceRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails with usage when called with an argument but no flags", func() {
@@ -53,8 +53,7 @@ var _ = Describe("target command", func() {
 		})
 
 		It("fails requirements", func() {
-			callTarget([]string{})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callTarget([]string{})).To(BeFalse())
 		})
 	})
 
@@ -64,8 +63,7 @@ var _ = Describe("target command", func() {
 		})
 
 		It("prints the target info when no org or space is specified", func() {
-			callTarget([]string{})
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(callTarget([]string{})).To(BeTrue())
 			Expect(ui.ShowConfigurationCalled).To(BeTrue())
 		})
 
@@ -75,11 +73,9 @@ var _ = Describe("target command", func() {
 		})
 
 		It("fails requirements when targeting a space or org", func() {
-			callTarget([]string{"-o", "some-crazy-org-im-not-in"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callTarget([]string{"-o", "some-crazy-org-im-not-in"})).To(BeFalse())
 
-			callTarget([]string{"-s", "i-love-space"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callTarget([]string{"-s", "i-love-space"})).To(BeFalse())
 		})
 	})
 

@@ -33,22 +33,21 @@ var _ = Describe("routes command", func() {
 		routeRepo = &testapi.FakeRouteRepository{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewListRoutes(ui, configRepo, routeRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand()).To(BeFalse())
 		})
 
 		It("fails when an org and space is not targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand()).To(BeFalse())
 		})
 	})
 

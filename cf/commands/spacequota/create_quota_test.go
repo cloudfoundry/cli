@@ -37,24 +37,22 @@ var _ = Describe("create-quota command", func() {
 		orgRepo.FindByNameReturns(org, nil)
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewCreateSpaceQuota(ui, configuration.NewRepositoryWithDefaults(), quotaRepo, orgRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("requirements", func() {
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("my-quota", "-m", "50G")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
 		})
 
 		It("requires the user to target an org", func() {
 			requirementsFactory.TargetedOrgSuccess = false
-			runCommand("my-quota", "-m", "50G")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
 		})
 	})
 

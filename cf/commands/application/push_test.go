@@ -92,34 +92,30 @@ var _ = Describe("Push Command", func() {
 			app_files)
 	})
 
-	callPush := func(args ...string) {
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+	callPush := func(args ...string) bool {
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("passes when logged in and a space is targeted", func() {
-			callPush()
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(callPush()).To(BeTrue())
 		})
 
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			callPush()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callPush()).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
-			callPush()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callPush()).To(BeFalse())
 		})
 
 		// yes, we're aware that the args here should probably be provided in a different order
 		// erg: app-name -p some/path some-extra-arg
 		// but the test infrastructure for parsing args and flags is sorely lacking
 		It("fails when provided too many args", func() {
-			callPush("-p", "path", "too-much", "app-name")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(callPush("-p", "path", "too-much", "app-name")).To(BeFalse())
 		})
 	})
 

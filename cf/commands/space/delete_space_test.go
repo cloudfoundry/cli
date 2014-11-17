@@ -25,10 +25,9 @@ var _ = Describe("delete-space command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewDeleteSpace(ui, config, spaceRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
-		return
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	BeforeEach(func() {
@@ -54,14 +53,14 @@ var _ = Describe("delete-space command", func() {
 		})
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("my-space")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
 		It("fails when not targeting a space", func() {
 			requirementsFactory.TargetedOrgSuccess = false
-			runCommand("my-space")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("my-space")).To(BeFalse())
 		})
 	})
 

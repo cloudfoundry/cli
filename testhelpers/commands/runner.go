@@ -14,8 +14,6 @@ const (
 	RunCommandResultRequirementsFailed = iota
 )
 
-var CommandDidPassRequirements bool
-
 func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
 	context := NewContext(cmd.Metadata().Name, args)
 
@@ -26,8 +24,6 @@ func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq
 			panic(errMsg)
 		}
 	}()
-
-	CommandDidPassRequirements = false
 
 	requirements, err := cmd.GetRequirements(requirementsFactory, context)
 	if err != nil {
@@ -42,7 +38,6 @@ func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq
 	}
 
 	passedRequirements = true
-	CommandDidPassRequirements = true
 	cmd.Run(context)
 
 	return

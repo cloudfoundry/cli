@@ -45,8 +45,7 @@ var _ = Describe("services", func() {
 			})
 
 			It("fails requirements", func() {
-				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
-				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+				Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
 			})
 		})
 
@@ -56,8 +55,7 @@ var _ = Describe("services", func() {
 			})
 
 			It("fails requirements", func() {
-				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
-				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+				Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
 			})
 		})
 	})

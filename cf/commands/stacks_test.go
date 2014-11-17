@@ -33,8 +33,8 @@ var _ = Describe("stacks command", func() {
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			testcmd.RunCommand(cmd, []string{}, requirementsFactory)
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
 		})
 	})
 

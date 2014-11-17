@@ -28,9 +28,9 @@ var _ = Describe("delete-quota command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewDeleteQuota(ui, configuration.NewRepositoryWithDefaults(), quotaRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when the user is not logged in", func() {
@@ -39,9 +39,7 @@ var _ = Describe("delete-quota command", func() {
 		})
 
 		It("fails requirements", func() {
-			runCommand("my-quota")
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-quota")).To(BeFalse())
 		})
 	})
 

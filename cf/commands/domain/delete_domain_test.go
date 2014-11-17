@@ -38,24 +38,22 @@ var _ = Describe("delete-domain command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd = NewDeleteDomain(ui, configRepo, domainRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("foo.com")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("foo.com")).To(BeFalse())
 		})
 
 		It("fails when the an org is not targetted", func() {
 			requirementsFactory.TargetedOrgSuccess = false
-			runCommand("foo.com")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("foo.com")).To(BeFalse())
 		})
 	})
 

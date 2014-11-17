@@ -33,10 +33,9 @@ var _ = Describe("Create user command", func() {
 		configRepo.SetAccessToken(accessToken)
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewCreateUser(ui, configRepo, userRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
-		return
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("creates a user", func() {
@@ -85,7 +84,6 @@ var _ = Describe("Create user command", func() {
 	It("fails when the user is not logged in", func() {
 		requirementsFactory.LoginSuccess = false
 
-		runCommand("my-user", "my-password")
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(runCommand("my-user", "my-password")).To(BeFalse())
 	})
 })

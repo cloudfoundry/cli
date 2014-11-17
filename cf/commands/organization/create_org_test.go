@@ -35,8 +35,8 @@ var _ = Describe("create-org command", func() {
 		quotaRepo = &test_quota.FakeQuotaRepository{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewCreateOrg(ui, config, orgRepo, quotaRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewCreateOrg(ui, config, orgRepo, quotaRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -47,8 +47,7 @@ var _ = Describe("create-org command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			runCommand("my-org")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-org")).To(BeFalse())
 		})
 	})
 

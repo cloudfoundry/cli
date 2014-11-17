@@ -2,6 +2,10 @@ package commands_test
 
 import (
 	"bytes"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -11,9 +15,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/gofileutils/fileutils"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 
 	. "github.com/cloudfoundry/cli/cf/commands"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -29,8 +30,7 @@ var _ = Describe("curl command", func() {
 	})
 
 	It("does not pass requirements when not logged in", func() {
-		runCurlWithInputs(deps, []string{"/foo"})
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(runCurlWithInputs(deps, []string{"/foo"})).To(BeFalse())
 	})
 
 	Context("when logged in", func() {
@@ -44,8 +44,7 @@ var _ = Describe("curl command", func() {
 		})
 
 		It("passes requirements", func() {
-			runCurlWithInputs(deps, []string{"/foo"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(runCurlWithInputs(deps, []string{"/foo"})).To(BeTrue())
 		})
 
 		It("makes a get request given an endpoint", func() {
@@ -203,7 +202,7 @@ func newCurlDependencies() (deps curlDependencies) {
 	return
 }
 
-func runCurlWithInputs(deps curlDependencies, args []string) {
+func runCurlWithInputs(deps curlDependencies, args []string) bool {
 	cmd := NewCurl(deps.ui, deps.config, deps.curlRepo)
-	testcmd.RunCommand(cmd, args, deps.requirementsFactory)
+	return testcmd.RunCommand(cmd, args, deps.requirementsFactory)
 }

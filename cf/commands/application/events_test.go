@@ -32,16 +32,16 @@ var _ = Describe("events command", func() {
 		ui = new(testterm.FakeUI)
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		cmd := NewEvents(ui, configRepo, eventsRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails with usage when called without an app name", func() {
-		runCommand()
+		passed := runCommand()
 		Expect(ui.FailedWithUsage).To(BeTrue())
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(passed).To(BeFalse())
 	})
 
 	It("lists events given an app name", func() {

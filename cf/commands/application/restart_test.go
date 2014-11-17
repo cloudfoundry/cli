@@ -35,8 +35,8 @@ var _ = Describe("restart command", func() {
 		app.Guid = "my-app-guid"
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewRestart(ui, config, starter, stopper), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewRestart(ui, config, starter, stopper), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -49,15 +49,15 @@ var _ = Describe("restart command", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.Application = app
 			requirementsFactory.TargetedSpaceSuccess = true
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand()).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.Application = app
 			requirementsFactory.LoginSuccess = true
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand()).To(BeFalse())
 		})
 	})
 

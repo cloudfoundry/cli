@@ -37,9 +37,9 @@ var _ = Describe("delete-quota command", func() {
 		orgRepo.FindByNameReturns(org, nil)
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewDeleteSpaceQuota(ui, configuration.NewRepositoryWithDefaults(), quotaRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when the user is not logged in", func() {
@@ -48,9 +48,7 @@ var _ = Describe("delete-quota command", func() {
 		})
 
 		It("fails requirements", func() {
-			runCommand("my-quota")
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-quota")).To(BeFalse())
 		})
 	})
 
@@ -66,7 +64,7 @@ var _ = Describe("delete-quota command", func() {
 
 		It("fails requirements when an org is not targeted", func() {
 			requirementsFactory.TargetedOrgSuccess = false
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand()).To(BeFalse())
 		})
 
 		Context("When the quota provided exists", func() {

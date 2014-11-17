@@ -38,21 +38,21 @@ var _ = Describe("spaces command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewListSpaces(ui, configRepo, spaceRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewListSpaces(ui, configRepo, spaceRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedOrgSuccess = true
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand()).To(BeFalse())
 		})
 
 		It("fails when an org is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand()).To(BeFalse())
 		})
 	})
 

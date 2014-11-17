@@ -27,9 +27,9 @@ var _ = Describe("delete-buildpack command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewDeleteBuildpack(ui, buildpackRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when the user is not logged in", func() {
@@ -38,9 +38,7 @@ var _ = Describe("delete-buildpack command", func() {
 		})
 
 		It("fails requirements", func() {
-			runCommand("-f", "my-buildpack")
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("-f", "my-buildpack")).To(BeFalse())
 		})
 	})
 

@@ -41,30 +41,29 @@ var _ = Describe("Updating buildpack command", func() {
 		bitsRepo = &testapi.FakeBuildpackBitsRepository{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUpdateBuildpack(ui, repo, bitsRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("is only successful on login and buildpack success", func() {
 		It("returns success when both are true", func() {
 			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-			runCommand("my-buildpack")
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+
+			Expect(runCommand("my-buildpack")).To(BeTrue())
 		})
 
 		It("returns failure when at least one is false", func() {
 			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
-			runCommand("my-buildpack", "-p", "buildpack.zip", "extraArg")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-buildpack", "-p", "buildpack.zip", "extraArg")).To(BeFalse())
 
 			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
-			runCommand("my-buildpack")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("my-buildpack")).To(BeFalse())
 
 			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, BuildpackSuccess: true}
-			runCommand("my-buildpack")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("my-buildpack")).To(BeFalse())
 		})
 	})
 

@@ -23,9 +23,9 @@ var _ = Describe("org command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
-	runCommand := func() {
+	runCommand := func() bool {
 		cmd := organization.NewListOrgs(ui, configRepo, orgRepo)
-		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		return testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 	}
 
 	BeforeEach(func() {
@@ -38,8 +38,8 @@ var _ = Describe("org command", func() {
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand()).To(BeFalse())
 		})
 	})
 
