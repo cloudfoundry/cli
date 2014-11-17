@@ -48,6 +48,7 @@ func (cmd *ServiceAccess) Metadata() command_metadata.CommandMetadata {
 func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewMinCCApiVersionRequirement(cmd.Metadata().Name, 2, 13, 0),
 	}
 	return
 }
