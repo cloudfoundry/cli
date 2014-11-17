@@ -37,6 +37,11 @@ type FakeReqFactory struct {
 	UserFields   models.UserFields
 
 	Buildpack models.Buildpack
+
+	MinCCApiVersionCommandName string
+	MinCCApiVersionMajor       int
+	MinCCApiVersionMinor       int
+	MinCCApiVersionPatch       int
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -88,6 +93,14 @@ func (f *FakeReqFactory) NewBuildpackRequirement(buildpack string) requirements.
 
 func (f *FakeReqFactory) NewApiEndpointRequirement() requirements.Requirement {
 	return FakeRequirement{f, f.ApiEndpointSuccess}
+}
+
+func (f *FakeReqFactory) NewMinCCApiVersionRequirement(commandName string, major, minor, patch int) requirements.Requirement {
+	f.MinCCApiVersionCommandName = commandName
+	f.MinCCApiVersionMajor = major
+	f.MinCCApiVersionMinor = minor
+	f.MinCCApiVersionPatch = patch
+	return FakeRequirement{f, true}
 }
 
 type FakeRequirement struct {

@@ -22,6 +22,7 @@ type Factory interface {
 	NewUserRequirement(username string) UserRequirement
 	NewBuildpackRequirement(buildpack string) BuildpackRequirement
 	NewApiEndpointRequirement() Requirement
+	NewMinCCApiVersionRequirement(commandName string, major, minor, patch int) Requirement
 }
 
 type apiRequirementFactory struct {
@@ -116,5 +117,16 @@ func (f apiRequirementFactory) NewApiEndpointRequirement() Requirement {
 	return NewApiEndpointRequirement(
 		f.ui,
 		f.config,
+	)
+}
+
+func (f apiRequirementFactory) NewMinCCApiVersionRequirement(commandName string, major, minor, patch int) Requirement {
+	return NewCCApiVersionRequirement(
+		f.ui,
+		f.config,
+		commandName,
+		major,
+		minor,
+		patch,
 	)
 }

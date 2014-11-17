@@ -1345,6 +1345,16 @@
       "modified": false
    },
    {
+      "id": "Current CF API version {{.ApiVersion}}",
+      "translation": "Current CF API version {{.ApiVersion}}",
+      "modified": false
+   },
+   {
+      "id": "Current CF CLI version {{.Version}}",
+      "translation": "Current CF CLI version {{.Version}}",
+      "modified": false
+   },
+   {
       "id": "Current Password",
       "translation": "Senha atual",
       "modified": false
@@ -3722,6 +3732,11 @@
    {
       "id": "Timeout for async HTTP requests",
       "translation": "Tempo de espera limite para pedidos de HTTP assíncronos",
+      "modified": false
+   },
+   {
+      "id": "To use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.MinApiVersionMajor}}.{{.MinApiVersionMinor}}.{{.MinApiVersionPatch}}",
+      "translation": "To use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.MinApiVersionMajor}}.{{.MinApiVersionMinor}}.{{.MinApiVersionPatch}}",
       "modified": false
    },
    {
