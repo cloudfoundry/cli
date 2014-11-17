@@ -58,8 +58,7 @@ var _ = Describe("marketplace command", func() {
 				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
 				requirementsFactory.ApiEndpointSuccess = false
 
-				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
-				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+				Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
 			})
 		})
 	})

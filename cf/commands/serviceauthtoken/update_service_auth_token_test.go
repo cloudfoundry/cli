@@ -30,8 +30,8 @@ var _ = Describe("update-service-auth-token command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewUpdateServiceAuthToken(ui, configRepo, authTokenRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewUpdateServiceAuthToken(ui, configRepo, authTokenRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -42,8 +42,7 @@ var _ = Describe("update-service-auth-token command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			runCommand("label", "provider", "token")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("label", "provider", "token")).To(BeFalse())
 		})
 	})
 

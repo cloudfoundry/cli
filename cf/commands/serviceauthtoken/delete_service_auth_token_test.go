@@ -32,9 +32,9 @@ var _ = Describe("delete-service-auth-token command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewDeleteServiceAuthToken(ui, configRepo, authTokenRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -45,8 +45,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand()
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand()).To(BeFalse())
 		})
 	})
 

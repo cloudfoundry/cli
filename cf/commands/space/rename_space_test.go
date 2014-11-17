@@ -30,24 +30,24 @@ var _ = Describe("rename-space command", func() {
 		spaceRepo = &testapi.FakeSpaceRepository{}
 	})
 
-	var callRenameSpace = func(args []string) {
+	var callRenameSpace = func(args []string) bool {
 		cmd := NewRenameSpace(ui, configRepo, spaceRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("when the user is not logged in", func() {
 		It("does not pass requirements", func() {
 			requirementsFactory.LoginSuccess = false
-			callRenameSpace([]string{"my-space", "my-new-space"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(callRenameSpace([]string{"my-space", "my-new-space"})).To(BeFalse())
 		})
 	})
 
 	Describe("when the user has not targeted an org", func() {
 		It("does not pass requirements", func() {
 			requirementsFactory.TargetedOrgSuccess = false
-			callRenameSpace([]string{"my-space", "my-new-space"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(callRenameSpace([]string{"my-space", "my-new-space"})).To(BeFalse())
 		})
 	})
 

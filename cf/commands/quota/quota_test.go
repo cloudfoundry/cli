@@ -29,15 +29,14 @@ var _ = Describe("quota", func() {
 		quotaRepo = &fakes.FakeQuotaRepository{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewShowQuota(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("When not logged in", func() {
 		It("fails requirements", func() {
-			runCommand("quota-name")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("quota-name")).To(BeFalse())
 		})
 	})
 

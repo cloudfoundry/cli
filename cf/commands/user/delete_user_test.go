@@ -37,16 +37,16 @@ var _ = Describe("delete-user command", func() {
 		configRepo.SetAccessToken(token)
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewDeleteUser(ui, configRepo, userRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("my-user")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("my-user")).To(BeFalse())
 		})
 
 		It("fails with usage when no arguments are given", func() {

@@ -33,36 +33,37 @@ var _ = Describe("check-route command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewCheckRoute(ui, config, routeRepo, domainRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewCheckRoute(ui, config, routeRepo, domainRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedOrgSuccess = true
-			runCommand("foobar.example.com", "bar.example.com")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("foobar.example.com", "bar.example.com")).To(BeFalse())
 		})
 
 		It("fails when no org is targeted", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("foobar.example.com", "bar.example.com")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("foobar.example.com", "bar.example.com")).To(BeFalse())
 		})
 
 		It("fails when the number of arguments is greater than two", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-			runCommand("foobar.example.com", "hello", "world")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			passed := runCommand("foobar.example.com", "hello", "world")
+
+			Expect(passed).To(BeFalse())
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
 		It("fails when the number of arguments is less than two", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-			runCommand("foobar.example.com")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			passed := runCommand("foobar.example.com")
+
+			Expect(passed).To(BeFalse())
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 	})

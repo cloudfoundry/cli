@@ -44,8 +44,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("fails if the user has not set an api endpoint", func() {
-			testcmd.RunCommand(cmd, []string{"username", "password"}, requirementsFactory)
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(testcmd.RunCommand(cmd, []string{"username", "password"}, requirementsFactory)).To(BeFalse())
 		})
 	})
 

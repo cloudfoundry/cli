@@ -29,14 +29,14 @@ var _ = Describe("rename-buildpack command", func() {
 		cmd = NewRenameBuildpack(ui, fakeRepo)
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails requirements when called without the current name and the new name to use", func() {
-		runCommand("my-buildpack-name")
+		passed := runCommand("my-buildpack-name")
 		Expect(ui.FailedWithUsage).To(BeTrue())
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(passed).To(BeFalse())
 	})
 
 	Context("when logged in", func() {

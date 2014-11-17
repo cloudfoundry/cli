@@ -30,21 +30,21 @@ var _ = Describe("create-route command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewCreateRoute(ui, config, routeRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewCreateRoute(ui, config, routeRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedOrgSuccess = true
-			runCommand("my-space", "example.com", "-n", "foo")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("my-space", "example.com", "-n", "foo")).To(BeFalse())
 		})
 
 		It("fails when an org is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("my-space", "example.com", "-n", "foo")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("my-space", "example.com", "-n", "foo")).To(BeFalse())
 		})
 
 		It("fails with usage when not provided two args", func() {

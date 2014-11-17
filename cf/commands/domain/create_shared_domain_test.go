@@ -27,20 +27,18 @@ var _ = Describe("Testing with ginkgo", func() {
 		configRepo = testconfig.NewRepositoryWithAccessToken(core_config.TokenInfo{Username: "my-user"})
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		ui = new(testterm.FakeUI)
 		cmd := NewCreateSharedDomain(ui, configRepo, domainRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
-		return
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("TestShareDomainRequirements", func() {
-		runCommand("example.com")
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		Expect(runCommand("example.com")).To(BeTrue())
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		runCommand("example.com")
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+		Expect(runCommand("example.com")).To(BeFalse())
 	})
 
 	It("TestShareDomainFailsWithUsage", func() {

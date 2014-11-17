@@ -37,24 +37,23 @@ var _ = Describe("env command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewEnv(ui, configRepo, appRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("Requirements", func() {
 		It("fails when the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("my-app")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-app")).To(BeFalse())
 		})
 	})
 
 	It("fails with usage when no app name is given", func() {
-		runCommand()
+		passed := runCommand()
 
 		Expect(ui.FailedWithUsage).To(BeTrue())
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(passed).To(BeFalse())
 	})
 
 	It("fails with usage when the app cannot be found", func() {

@@ -34,15 +34,14 @@ var _ = Describe("unbind-staging-security-group command", func() {
 		fakeStagingSecurityGroupsRepo = &fakeStagingDefaults.FakeStagingSecurityGroupsRepo{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUnbindFromStagingGroup(ui, configRepo, fakeSecurityGroupRepo, fakeStagingSecurityGroupsRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
-			runCommand("name")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("name")).To(BeFalse())
 		})
 
 		It("fails with usage when a name is not provided", func() {

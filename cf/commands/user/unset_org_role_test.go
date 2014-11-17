@@ -23,9 +23,9 @@ var _ = Describe("unset-org-role command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewUnsetOrgRole(ui, configRepo, userRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	BeforeEach(func() {
@@ -46,14 +46,14 @@ var _ = Describe("unset-org-role command", func() {
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			runCommand("username", "org", "role")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+			Expect(runCommand("username", "org", "role")).To(BeFalse())
 		})
 
 		It("succeeds when logged in", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("username", "org", "role")
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			passed := runCommand("username", "org", "role")
+			Expect(passed).To(BeTrue())
 
 			Expect(requirementsFactory.UserUsername).To(Equal("username"))
 			Expect(requirementsFactory.OrganizationName).To(Equal("org"))

@@ -30,8 +30,8 @@ var _ = Describe("org-users command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewOrgUsers(ui, configRepo, userRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewOrgUsers(ui, configRepo, userRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -43,8 +43,7 @@ var _ = Describe("org-users command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			runCommand("say-hello-to-my-little-org")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("say-hello-to-my-little-org")).To(BeFalse())
 		})
 	})
 

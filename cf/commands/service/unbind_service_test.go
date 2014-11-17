@@ -40,8 +40,7 @@ var _ = Describe("unbind-service command", func() {
 	Context("when not logged in", func() {
 		It("fails requirements when not logged in", func() {
 			cmd := NewUnbindService(&testterm.FakeUI{}, testconfig.NewRepository(), serviceBindingRepo)
-			testcmd.RunCommand(cmd, []string{"my-service", "my-app"}, requirementsFactory)
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(testcmd.RunCommand(cmd, []string{"my-service", "my-app"}, requirementsFactory)).To(BeFalse())
 		})
 	})
 

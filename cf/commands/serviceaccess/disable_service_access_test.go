@@ -40,8 +40,7 @@ var _ = Describe("disable-service-access command", func() {
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
-			runCommand([]string{"foo"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand([]string{"foo"})).To(BeFalse())
 		})
 
 		It("fails with usage when it does not recieve any arguments", func() {

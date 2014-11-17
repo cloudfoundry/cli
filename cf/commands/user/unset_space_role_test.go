@@ -18,7 +18,7 @@ var _ = Describe("unset-space-role command", func() {
 	It("fails with usage when not called with exactly four args", func() {
 		requirementsFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
 
-		ui := callUnsetSpaceRole([]string{"username", "org", "space"}, spaceRepo, userRepo, requirementsFactory)
+		ui, _ := callUnsetSpaceRole([]string{"username", "org", "space"}, spaceRepo, userRepo, requirementsFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
@@ -27,8 +27,8 @@ var _ = Describe("unset-space-role command", func() {
 		args := []string{"username", "org", "space", "role"}
 
 		requirementsFactory.LoginSuccess = false
-		callUnsetSpaceRole(args, spaceRepo, userRepo, requirementsFactory)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		_, passed := callUnsetSpaceRole(args, spaceRepo, userRepo, requirementsFactory)
+		Expect(passed).To(BeFalse())
 	})
 
 	It("unsets the user's space role", func() {
@@ -49,7 +49,7 @@ var _ = Describe("unset-space-role command", func() {
 
 		args := []string{"my-username", "my-org", "my-space", "SpaceManager"}
 
-		ui := callUnsetSpaceRole(args, spaceRepo, userRepo, requirementsFactory)
+		ui, _ := callUnsetSpaceRole(args, spaceRepo, userRepo, requirementsFactory)
 
 		Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
 		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("some-org-guid"))
@@ -71,10 +71,10 @@ func getUnsetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, space
 	return
 }
 
-func callUnsetSpaceRole(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
+func callUnsetSpaceRole(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, bool) {
+	ui := &testterm.FakeUI{}
 	config := testconfig.NewRepositoryWithDefaults()
 	cmd := NewUnsetSpaceRole(ui, config, spaceRepo, userRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
+	passed := testcmd.RunCommand(cmd, args, requirementsFactory)
+	return ui, passed
 }

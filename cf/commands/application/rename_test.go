@@ -30,8 +30,8 @@ var _ = Describe("Rename command", func() {
 		appRepo = &testApplication.FakeApplicationRepository{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewRenameApp(ui, configRepo, appRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewRenameApp(ui, configRepo, appRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -42,8 +42,7 @@ var _ = Describe("Rename command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			runCommand("my-app", "my-new-app")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-app", "my-new-app")).To(BeFalse())
 		})
 	})
 

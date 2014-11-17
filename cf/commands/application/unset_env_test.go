@@ -34,25 +34,23 @@ var _ = Describe("unset-env command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewUnsetEnv(ui, configRepo, appRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewUnsetEnv(ui, configRepo, appRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedSpaceSuccess = true
 			requirementsFactory.Application = app
-			runCommand("foo", "bar")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("foo", "bar")).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.Application = app
-			runCommand("foo", "bar")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("foo", "bar")).To(BeFalse())
 		})
 
 		It("fails with usage when not provided with exactly 2 args", func() {
@@ -60,8 +58,7 @@ var _ = Describe("unset-env command", func() {
 			requirementsFactory.TargetedSpaceSuccess = true
 			requirementsFactory.Application = app
 
-			runCommand("too", "many", "args")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("too", "many", "args")).To(BeFalse())
 		})
 	})
 

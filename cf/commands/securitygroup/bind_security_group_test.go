@@ -42,22 +42,19 @@ var _ = Describe("bind-security-group command", func() {
 		cmd = NewBindSecurityGroup(ui, configRepo, fakeSecurityGroupRepo, fakeSpaceRepo, fakeOrgRepo, fakeSpaceBinder)
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
-			runCommand("my-craaaaaazy-security-group", "my-org", "my-space")
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-craaaaaazy-security-group", "my-org", "my-space")).To(BeFalse())
 		})
 
 		It("succeeds when the user is logged in", func() {
 			requirementsFactory.LoginSuccess = true
-			runCommand("my-craaaaaazy-security-group", "my-org", "my-space")
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(runCommand("my-craaaaaazy-security-group", "my-org", "my-space")).To(BeTrue())
 		})
 
 		It("fails with usage when not provided the name of a security group, org, and space", func() {

@@ -42,14 +42,13 @@ var _ = Describe("delete app command", func() {
 		cmd = NewDeleteApp(ui, configRepo, appRepo, routeRepo)
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails requirements when not logged in", func() {
 		requirementsFactory.LoginSuccess = false
-		runCommand("-f", "delete-this-app-plz")
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(runCommand("-f", "delete-this-app-plz")).To(BeFalse())
 	})
 
 	Context("when logged in", func() {

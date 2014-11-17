@@ -31,10 +31,10 @@ var _ = Describe("delete-route command", func() {
 		}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		cmd := NewDeleteRoute(ui, configRepo, routeRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("when not logged in", func() {
@@ -43,8 +43,7 @@ var _ = Describe("delete-route command", func() {
 		})
 
 		It("does not pass requirements", func() {
-			runCommand("-n", "my-host", "example.com")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("-n", "my-host", "example.com")).To(BeFalse())
 		})
 	})
 

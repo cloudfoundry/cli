@@ -31,13 +31,12 @@ var _ = Describe("stop command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewStop(ui, config, appRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewStop(ui, config, appRepo), args, requirementsFactory)
 	}
 
 	It("fails requirements when not logged in", func() {
-		runCommand("some-app-name")
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(runCommand("some-app-name")).To(BeFalse())
 	})
 
 	Context("when logged in and an app exists", func() {

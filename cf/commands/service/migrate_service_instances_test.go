@@ -35,17 +35,14 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 
 	Describe("requirements", func() {
 		It("requires you to be logged in", func() {
-			testcmd.RunCommand(cmd, args, requirementsFactory)
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(testcmd.RunCommand(cmd, args, requirementsFactory)).To(BeFalse())
 		})
 
 		It("requires five arguments to run", func() {
 			requirementsFactory.LoginSuccess = true
 			args = []string{"one", "two", "three"}
-			testcmd.RunCommand(cmd, args, requirementsFactory)
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(testcmd.RunCommand(cmd, args, requirementsFactory)).To(BeFalse())
 		})
 
 		It("passes requirements if user is logged in and provided five args to run", func() {
@@ -53,9 +50,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 			args = []string{"one", "two", "three", "four", "five"}
 			ui.Inputs = append(ui.Inputs, "no")
 
-			testcmd.RunCommand(cmd, args, requirementsFactory)
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(testcmd.RunCommand(cmd, args, requirementsFactory)).To(BeTrue())
 		})
 	})
 

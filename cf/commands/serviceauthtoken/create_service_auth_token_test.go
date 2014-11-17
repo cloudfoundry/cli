@@ -30,9 +30,9 @@ var _ = Describe("create-service-auth-token command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewCreateServiceAuthToken(ui, configRepo, authTokenRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -44,9 +44,7 @@ var _ = Describe("create-service-auth-token command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			runCommand("just", "enough", "args")
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("just", "enough", "args")).To(BeFalse())
 		})
 	})
 

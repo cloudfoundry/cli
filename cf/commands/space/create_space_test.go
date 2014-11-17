@@ -33,9 +33,9 @@ var _ = Describe("create-space command", func() {
 		spaceRoleSetter     user.SpaceRoleSetter
 	)
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		cmd := NewCreateSpace(ui, configRepo, spaceRoleSetter, spaceRepo, orgRepo, userRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	BeforeEach(func() {
@@ -75,8 +75,7 @@ var _ = Describe("create-space command", func() {
 			})
 
 			It("fails requirements", func() {
-				runCommand("some-space")
-				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+				Expect(runCommand("some-space")).To(BeFalse())
 			})
 		})
 
@@ -86,8 +85,7 @@ var _ = Describe("create-space command", func() {
 			})
 
 			It("fails requirements", func() {
-				runCommand("what-is-space?")
-				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+				Expect(runCommand("what-is-space?")).To(BeFalse())
 			})
 		})
 	})

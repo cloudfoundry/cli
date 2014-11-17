@@ -30,11 +30,10 @@ var _ = Describe("create domain command", func() {
 		configRepo = testconfig.NewRepositoryWithAccessToken(core_config.TokenInfo{Username: "my-user"})
 	})
 
-	runCommand := func(args ...string) {
+	runCommand := func(args ...string) bool {
 		ui = new(testterm.FakeUI)
 		cmd := domain.NewCreateDomain(ui, configRepo, domainRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
-		return
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	It("fails with usage", func() {
@@ -50,16 +49,14 @@ var _ = Describe("create domain command", func() {
 
 	Context("checks login", func() {
 		It("passes when logged in", func() {
-			runCommand("my-org", "example.com")
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(runCommand("my-org", "example.com")).To(BeTrue())
 			Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
 		})
 
 		It("fails when not logged in", func() {
 			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 
-			runCommand("my-org", "example.com")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("my-org", "example.com")).To(BeFalse())
 		})
 	})
 

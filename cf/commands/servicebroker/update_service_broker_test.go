@@ -31,8 +31,8 @@ var _ = Describe("update-service-broker command", func() {
 		serviceBrokerRepo = &testapi.FakeServiceBrokerRepo{}
 	})
 
-	runCommand := func(args ...string) {
-		testcmd.RunCommand(NewUpdateServiceBroker(ui, configRepo, serviceBrokerRepo), args, requirementsFactory)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCommand(NewUpdateServiceBroker(ui, configRepo, serviceBrokerRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -44,8 +44,7 @@ var _ = Describe("update-service-broker command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			runCommand("heeeeeeey", "yooouuuuuuu", "guuuuuuuuys", "ヾ(＠*ー⌒ー*@)ノ")
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(runCommand("heeeeeeey", "yooouuuuuuu", "guuuuuuuuys", "ヾ(＠*ー⌒ー*@)ノ")).To(BeFalse())
 		})
 	})
 

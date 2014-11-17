@@ -43,30 +43,26 @@ var _ = Describe("scale command", func() {
 			requirementsFactory.LoginSuccess = false
 			requirementsFactory.TargetedSpaceSuccess = true
 
-			testcmd.RunCommand(cmd, args, requirementsFactory)
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(testcmd.RunCommand(cmd, args, requirementsFactory)).To(BeFalse())
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = false
 
-			testcmd.RunCommand(cmd, args, requirementsFactory)
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(testcmd.RunCommand(cmd, args, requirementsFactory)).To(BeFalse())
 		})
 
 		It("requires an app to be specified", func() {
-			testcmd.RunCommand(cmd, []string{"-m", "1G"}, requirementsFactory)
+			passed := testcmd.RunCommand(cmd, []string{"-m", "1G"}, requirementsFactory)
 
 			Expect(ui.FailedWithUsage).To(BeTrue())
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(passed).To(BeFalse())
 		})
 
 		It("does not require any flags", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
 
-			testcmd.RunCommand(cmd, []string{"my-app"}, requirementsFactory)
-
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(testcmd.RunCommand(cmd, []string{"my-app"}, requirementsFactory)).To(BeTrue())
 		})
 	})
 
