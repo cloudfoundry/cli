@@ -44,16 +44,6 @@ var _ = Describe("service-access command", func() {
 			requirementsFactory.LoginSuccess = false
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
-
-		Describe("cc api requirements", func() {
-			It("passes the command name and required version to the new requirement", func() {
-				runCommand()
-				Expect(requirementsFactory.MinCCApiVersionCommandName).To(Equal("service-access"))
-				Expect(requirementsFactory.MinCCApiVersionMajor).To(Equal(2))
-				Expect(requirementsFactory.MinCCApiVersionMinor).To(Equal(13))
-				Expect(requirementsFactory.MinCCApiVersionPatch).To(Equal(0))
-			})
-		})
 	})
 
 	Describe("when logged in", func() {
