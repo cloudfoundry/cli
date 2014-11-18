@@ -53,6 +53,25 @@ var _ = Describe("main", func() {
 		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 	})
 
+	Describe("Flag verification", func() {
+		It("informs user for any incorrect provided flags", func() {
+			result := Cf("push", "--no-hostname", "--bad-flag").Wait(3 * time.Second)
+			Eventually(result.Out).Should(Say("Unknown flag \"--bad-flag\""))
+			Eventually(result.Out).ShouldNot(Say("Unknown flag \"--no-hostname\""))
+		})
+
+		It("only checks flags with prefix '--'", func() {
+			result := Cf("push", "not-a-flag", "--invalid-flag")
+			Eventually(result.Out).Should(Say("Unknown flag \"--invalid-flag\""))
+			Eventually(result.Out).ShouldNot(Say("Unknown flag \"not-a-flag\""))
+		})
+
+		It("only checks flag for the provided command", func() {
+			result := Cf("push", "--no-hostname", "--skip-ssl-validation")
+			Eventually(result.Out).Should(Say("Unknown flag \"--skip-ssl-validation\""))
+		})
+	})
+
 	Describe("Plugins", func() {
 		It("Can call a plugin command from the Plugins configuration if it does not exist as a cf command", func() {
 			output := Cf("test_1_cmd1").Wait(3 * time.Second)

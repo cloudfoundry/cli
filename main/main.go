@@ -83,7 +83,36 @@ func main() {
 	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, deps.termUI)
 
-	theApp := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
+	var badFlags string
+	metaDatas := cmdFactory.CommandMetadatas()
+
+	if len(os.Args) > 1 {
+		var flags []string
+		for _, cmd := range metaDatas {
+			if os.Args[1] == cmd.Name || os.Args[1] == cmd.ShortName {
+				for _, flag := range cmd.Flags {
+					switch t := flag.(type) {
+					default:
+					case cli.IntFlag:
+						flags = append(flags, t.Name)
+					case cli.StringFlag:
+						flags = append(flags, t.Name)
+					case cli.BoolFlag:
+						flags = append(flags, t.Name)
+					}
+				}
+			}
+		}
+
+		badFlags = matchArgAndFlags(flags, os.Args[2:])
+		if badFlags != "" {
+			badFlags = badFlags + "\n\n"
+		}
+	}
+
+	injectTemplate(badFlags)
+
+	theApp := app.NewApp(cmdRunner, metaDatas...)
 	//command `cf` without argument
 	if len(os.Args) == 1 || os.Args[1] == "help" {
 		theApp.Run(os.Args)
@@ -107,8 +136,8 @@ func gatewaySliceFromMap(gateway_map map[string]net.Gateway) []net.WarningProduc
 	return gateways
 }
 
-func init() {
-	cli.CommandHelpTemplate = `NAME:
+func injectTemplate(badFlags string) {
+	cli.CommandHelpTemplate = fmt.Sprintf(`%sNAME:
    {{.Name}} - {{.Description}}
 {{with .ShortName}}
 ALIAS:
@@ -120,8 +149,7 @@ USAGE:
 OPTIONS:
 {{range .}}   {{.}}
 {{end}}{{else}}
-{{end}}`
-
+{{end}}`, badFlags)
 }
 
 func handlePanics(printer terminal.Printer) {
@@ -159,4 +187,27 @@ func callCoreCommand(args []string, theApp *cli.App) {
 
 	warningsCollector := net.NewWarningsCollector(deps.termUI, gateways...)
 	warningsCollector.PrintWarnings()
+}
+
+func matchArgAndFlags(flags []string, args []string) string {
+	var badFlag string
+
+Loop:
+	for _, arg := range args {
+		if strings.HasPrefix(arg, "--") {
+			arg = strings.TrimLeft(arg, "--")
+			for _, flag := range flags {
+				if flag == arg {
+					continue Loop
+				}
+			}
+			if badFlag == "" {
+				badFlag = fmt.Sprintf("Unknown flag \"--%s\"", arg)
+			} else {
+				badFlag = strings.Replace(badFlag, "Unknown flag", "Unknown flags:", 1)
+				badFlag = badFlag + fmt.Sprintf(", \"--%s\"", arg)
+			}
+		}
+	}
+	return badFlag
 }
