@@ -93,6 +93,7 @@ Forking the repository for development
 1. Install [godep](https://github.com/tools/godep)
 1. Get the cli source code: `go get github.com/cloudfoundry/cli`
   * (Ignore any warnings about "no buildable Go source files")
+1. Run `godep restore` (note: this will modify the dependencies in your $GOPATH)
 1. Fork the repository
 1. Add your fork as a remote: `cd $GOPATH/src/github.com/cloudfoundry/cli && git remote add your_name https://github.com/your_name/cli`
 
