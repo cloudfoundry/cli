@@ -25,6 +25,11 @@
       "modified": false
    },
    {
+      "id": "\nRoute to be unmapped is not currently mapped to the application.",
+      "translation": "\nRoute to be unmapped is not currently mapped to the application.",
+      "modified": false
+   },
+   {
       "id": "\nTIP:  Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service.",
       "translation": "\nTIP:  Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service.",
       "modified": false

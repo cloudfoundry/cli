@@ -74,11 +74,21 @@ func (cmd *UnmapRoute) Run(c *cli.Context) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr = cmd.routeRepo.Unbind(route.Guid, app.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	var routeFound bool
+	for _, appRoute := range app.Routes {
+		if appRoute.Guid == route.Guid {
+			routeFound = true
+			apiErr = cmd.routeRepo.Unbind(route.Guid, app.Guid)
+			if apiErr != nil {
+				cmd.ui.Failed(apiErr.Error())
+				return
+			}
+		}
+	}
+	cmd.ui.Ok()
+
+	if !routeFound {
+		cmd.ui.Warn(T("\nRoute to be unmapped is not currently mapped to the application."))
 	}
 
-	cmd.ui.Ok()
 }
