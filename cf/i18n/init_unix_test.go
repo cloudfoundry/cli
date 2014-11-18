@@ -151,6 +151,39 @@ var _ = Describe("i18n.Init() function", func() {
 					Ω("Pas buildpacks trouvés").Should(Equal(translation))
 				})
 			})
+
+			Context("matches zh_CN to simplified Chinese", func() {
+				BeforeEach(func() {
+					os.Setenv("LC_ALL", "zh_CN.UTF-8")
+				})
+
+				It("matches to zh_Hans", func() {
+					translation := T("No buildpacks found")
+					Ω("buildpack未找到").Should(Equal(translation))
+				})
+			})
+
+			Context("matches zh_TW locale to traditional Chinese", func() {
+				BeforeEach(func() {
+					os.Setenv("LC_ALL", "zh_TW.UTF-8")
+				})
+
+				It("matches to zh_Hant", func() {
+					translation := T("No buildpacks found")
+					Ω("(Hant)No buildpacks found").Should(Equal(translation))
+				})
+			})
+
+			Context("matches zh_HK locale to traditional Chinese", func() {
+				BeforeEach(func() {
+					os.Setenv("LC_ALL", "zh_HK.UTF-8")
+				})
+
+				It("matches to zh_Hant", func() {
+					translation := T("No buildpacks found")
+					Ω("(Hant)No buildpacks found").Should(Equal(translation))
+				})
+			})
 		})
 
 		Context("creates a valid T function", func() {
