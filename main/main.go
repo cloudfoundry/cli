@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/i18n"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/panic_printer"
@@ -54,7 +54,7 @@ func setupDependencies() (deps *cliDependencies) {
 	deps.configRepo = core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler)
 	deps.pluginConfig = plugin_config.NewPluginConfig(errorHandler)
 
-	i18n.T = i18n.Init(deps.configRepo)
+	T = Init(deps.configRepo)
 
 	terminal.UserAskedForColors = deps.configRepo.ColorEnabled()
 	terminal.InitColorSupport()
@@ -202,9 +202,9 @@ Loop:
 				}
 			}
 			if badFlag == "" {
-				badFlag = fmt.Sprintf("Unknown flag \"--%s\"", arg)
+				badFlag = fmt.Sprintf("%s \"--%s\"", T("Unknown flag"), arg)
 			} else {
-				badFlag = strings.Replace(badFlag, "Unknown flag", "Unknown flags:", 1)
+				badFlag = strings.Replace(badFlag, T("Unknown flag"), T("Unknown flags:"), 1)
 				badFlag = badFlag + fmt.Sprintf(", \"--%s\"", arg)
 			}
 		}

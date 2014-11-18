@@ -3880,6 +3880,16 @@
       "modified": false
    },
    {
+      "id": "Unknown flag",
+      "translation": "Unknown flag",
+      "modified": false
+   },
+   {
+      "id": "Unknown flags:",
+      "translation": "Unknown flags:",
+      "modified": false
+   },
+   {
       "id": "Unlock the buildpack",
       "translation": "Unlock the buildpack",
       "modified": false
