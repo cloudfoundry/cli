@@ -51,6 +51,10 @@ func (cmd *PluginInstall) GetRequirements(_ requirements.Factory, c *cli.Context
 func (cmd *PluginInstall) Run(c *cli.Context) {
 	pluginSourceFilepath := c.Args()[0]
 
+	if filepath.Dir(pluginSourceFilepath) == "." {
+		pluginSourceFilepath = "./" + filepath.Clean(pluginSourceFilepath)
+	}
+
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
 
 	cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath)
