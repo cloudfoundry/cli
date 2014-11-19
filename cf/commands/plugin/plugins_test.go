@@ -36,22 +36,15 @@ var _ = Describe("Plugins", func() {
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
-	It("fails if the plugin cannot be started", func() {
-		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
-			"test_245":     plugin_config.PluginMetadata{},
-			"anotherThing": plugin_config.PluginMetadata{},
-		})
-
-		runCommand()
-		Expect(ui.Outputs).ToNot(ContainSubstrings(
-			[]string{"test_245"},
-			[]string{"anotherThing"},
-		))
-	})
-
 	It("returns a list of available methods of a plugin", func() {
 		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
-			"Test1": plugin_config.PluginMetadata{Location: "../../../fixtures/plugins/test_1.exe", Commands: []plugin.Command{{Name: "test_1_cmd1"}, {Name: "test_1_cmd2"}}},
+			"Test1": plugin_config.PluginMetadata{
+				Location: "path/to/plugin",
+				Commands: []plugin.Command{
+					{Name: "test_1_cmd1", HelpText: "help text for test_1_cmd1"},
+					{Name: "test_1_cmd2", HelpText: "help text for test_1_cmd2"},
+				},
+			},
 		})
 
 		runCommand()
@@ -59,8 +52,9 @@ var _ = Describe("Plugins", func() {
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Listing Installed Plugins..."},
 			[]string{"OK"},
-			[]string{"Test1", "test_1_cmd1"},
-			[]string{"Test1", "test_1_cmd2"},
+			[]string{"Plugin Name", "Command Name", "Command Help"},
+			[]string{"Test1", "test_1_cmd1", "help text for test_1_cmd1"},
+			[]string{"Test1", "test_1_cmd2", "help text for test_1_cmd2"},
 		))
 	})
 
@@ -77,14 +71,14 @@ var _ = Describe("Plugins", func() {
 
 	It("list multiple plugins and their associated commands", func() {
 		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
-			"Test1": plugin_config.PluginMetadata{Location: "../../../fixtures/plugins/test_1.exe", Commands: []plugin.Command{{Name: "test_1_cmd1"}}},
-			"Test2": plugin_config.PluginMetadata{Location: "../../../fixtures/plugins/test_2.exe", Commands: []plugin.Command{{Name: "test_2_cmd1"}}},
+			"Test1": plugin_config.PluginMetadata{Location: "path/to/plugin1", Commands: []plugin.Command{{Name: "test_1_cmd1", HelpText: "help text for test_1_cmd1"}}},
+			"Test2": plugin_config.PluginMetadata{Location: "path/to/plugin2", Commands: []plugin.Command{{Name: "test_2_cmd1", HelpText: "help text for test_2_cmd1"}}},
 		})
 
 		runCommand()
 		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Test1", "test_1_cmd1"},
-			[]string{"Test2", "test_2_cmd1"},
+			[]string{"Test1", "test_1_cmd1", "help text for test_1_cmd1"},
+			[]string{"Test2", "test_2_cmd1", "help text for test_2_cmd1"},
 		))
 	})
 })

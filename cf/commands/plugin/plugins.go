@@ -38,11 +38,11 @@ func (cmd *Plugins) Run(c *cli.Context) {
 
 	plugins := cmd.config.Plugins()
 
-	table := terminal.NewTable(cmd.ui, []string{T("Plugin name"), T("Command name")})
+	table := terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Command Name"), T("Command Help")})
 
 	for pluginName, metadata := range plugins {
 		for _, command := range metadata.Commands {
-			table.Add(pluginName, command.Name)
+			table.Add(pluginName, command.Name, command.HelpText)
 		}
 	}
 
