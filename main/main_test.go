@@ -79,8 +79,8 @@ var _ = Describe("main", func() {
 		})
 
 		It("outputs all unknown flags in single sentence", func() {
-			result := Cf("push", "--bad-flag1", "--bad-flag2")
-			Eventually(result.Out).Should(Say("Unknown flags: \"--bad-flag1\", \"--bad-flag2\""))
+			result := Cf("push", "--bad-flag1", "--bad-flag2", "--bad-flag3")
+			Eventually(result.Out).Should(Say("Unknown flags: \"--bad-flag1\", \"--bad-flag2\", \"--bad-flag3\""))
 		})
 
 		It("only checks input flags against flags from the provided command", func() {
