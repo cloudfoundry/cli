@@ -56,36 +56,44 @@ var _ = Describe("main", func() {
 	Describe("Flag verification", func() {
 		It("informs user for any incorrect provided flags", func() {
 			result := Cf("push", "--no-hostname", "--bad-flag")
-			Eventually(result.Out).Should(Say("Unknown flag \"--bad-flag\""))
-			Eventually(result.Out).ShouldNot(Say("Unknown flag \"--no-hostname\""))
+			Eventually(result.Out).Should(Say("\"--bad-flag\""))
+			Consistently(result.Out).ShouldNot(Say("\"--no-hostname\""))
 		})
 
 		It("checks flags with prefix '--'", func() {
 			result := Cf("push", "not-a-flag", "--invalid-flag")
 			Eventually(result.Out).Should(Say("Unknown flag \"--invalid-flag\""))
-			Eventually(result.Out).ShouldNot(Say("Unknown flag \"not-a-flag\""))
+			Consistently(result.Out).ShouldNot(Say("Unknown flag \"not-a-flag\""))
 		})
 
 		It("checks flags with prefix '-'", func() {
 			result := Cf("push", "not-a-flag", "-invalid-flag")
-			Eventually(result.Out).Should(Say("Unknown flag \"-invalid-flag\""))
-			Eventually(result.Out).ShouldNot(Say("Unknown flag \"not-a-flag\""))
+			Eventually(result.Out).Should(Say("\"-invalid-flag\""))
+			Consistently(result.Out).ShouldNot(Say("\"not-a-flag\""))
 		})
 
 		It("checks flags but ignores the value after '=' ", func() {
 			result := Cf("push", "-p=./", "-invalid-flag=blarg")
-			Eventually(result.Out).Should(Say("Unknown flag \"-invalid-flag\""))
-			Eventually(result.Out).ShouldNot(Say("Unknown flag \"-p\""))
+			Eventually(result.Out).Should(Say("\"-invalid-flag\""))
+			Consistently(result.Out).ShouldNot(Say("Unknown flag \"-p\""))
 		})
 
 		It("outputs all unknown flags in single sentence", func() {
 			result := Cf("push", "--bad-flag1", "--bad-flag2", "--bad-flag3")
-			Eventually(result.Out).Should(Say("Unknown flags: \"--bad-flag1\", \"--bad-flag2\", \"--bad-flag3\""))
+			Eventually(result.Out).Should(Say("\"--bad-flag1\", \"--bad-flag2\", \"--bad-flag3\""))
 		})
 
 		It("only checks input flags against flags from the provided command", func() {
 			result := Cf("push", "--no-hostname", "--skip-ssl-validation")
-			Eventually(result.Out).Should(Say("Unknown flag \"--skip-ssl-validation\""))
+			Eventually(result.Out).Should(Say("\"--skip-ssl-validation\""))
+		})
+
+		It("accepts -h and --h flags for all commands", func() {
+			result := Cf("push", "-h")
+			Consistently(result.Out).ShouldNot(Say("Unknown flag \"-h\""))
+
+			result = Cf("target", "--h")
+			Consistently(result.Out).ShouldNot(Say("Unknown flag \"--h\""))
 		})
 	})
 

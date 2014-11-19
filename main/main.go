@@ -210,6 +210,10 @@ Loop:
 		//only take flag name, ignore value after '='
 		arg = strings.Split(arg, "=")[0]
 
+		if arg == "--h" || arg == "-h" {
+			continue Loop
+		}
+
 		if strings.HasPrefix(arg, "--") {
 			prefix = "--"
 		} else if strings.HasPrefix(arg, "-") {
