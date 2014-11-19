@@ -201,7 +201,7 @@ func getCommandFlags(args []string, metaDatas []command_metadata.CommandMetadata
 
 func matchArgAndFlags(flags []string, args []string) string {
 	var badFlag, prefix string
-	var multipleErr bool
+	multipleFlagErr := false
 
 Loop:
 	for _, arg := range args {
@@ -223,16 +223,17 @@ Loop:
 					continue Loop
 				}
 			}
+
 			if badFlag == "" {
 				badFlag = fmt.Sprintf("\"%s%s\"", prefix, arg)
 			} else {
-				multipleErr = true
+				multipleFlagErr = true
 				badFlag = badFlag + fmt.Sprintf(", \"%s%s\"", prefix, arg)
 			}
 		}
 	}
 
-	if multipleErr && badFlag != "" {
+	if multipleFlagErr && badFlag != "" {
 		badFlag = fmt.Sprintf("%s %s", T("Unknown flags:"), badFlag)
 	} else if badFlag != "" {
 		badFlag = fmt.Sprintf("%s %s", T("Unknown flag"), badFlag)
