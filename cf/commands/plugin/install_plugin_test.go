@@ -37,6 +37,7 @@ var _ = Describe("Install", func() {
 
 		test_1                    string
 		test_2                    string
+		test_curDir               string
 		test_with_help            string
 		test_with_push            string
 		test_with_push_short_name string
@@ -54,6 +55,7 @@ var _ = Describe("Install", func() {
 		}
 		test_1 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_1.exe")
 		test_2 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.exe")
+		test_curDir = filepath.Join("test_1.exe")
 		test_with_help = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.exe")
 		test_with_push = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push.exe")
 		test_with_push_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push_short_name.exe")
@@ -201,10 +203,26 @@ var _ = Describe("Install", func() {
 			err := os.MkdirAll(pluginDir, 0700)
 			Expect(err).ToNot(HaveOccurred())
 			config.GetPluginPathReturns(pluginDir)
-			runCommand(test_1)
+		})
+
+		It("finds plugin in the current directory without having to specify `./`", func() {
+			curDir, err := os.Getwd()
+			Expect(err).ToNot(HaveOccurred())
+
+			err = os.Chdir("../../../fixtures/plugins")
+			Expect(err).ToNot(HaveOccurred())
+
+			runCommand(test_curDir)
+			_, err = os.Stat(filepath.Join(pluginDir, "test_1.exe"))
+			Expect(err).ToNot(HaveOccurred())
+
+			err = os.Chdir(curDir)
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("copies the plugin into directory <FAKE_HOME_DIR>/.cf/plugins/PLUGIN_FILE_NAME", func() {
+			runCommand(test_1)
+
 			_, err := os.Stat(test_1)
 			Expect(err).ToNot(HaveOccurred())
 			_, err = os.Stat(filepath.Join(pluginDir, "test_1.exe"))
@@ -213,6 +231,8 @@ var _ = Describe("Install", func() {
 
 		if runtime.GOOS != "windows" {
 			It("Chmods the plugin so it is executable", func() {
+				runCommand(test_1)
+
 				fileInfo, err := os.Stat(filepath.Join(pluginDir, "test_1.exe"))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(int(fileInfo.Mode())).To(Equal(0700))
@@ -220,6 +240,8 @@ var _ = Describe("Install", func() {
 		}
 
 		It("populate the configuration with plugin metadata", func() {
+			runCommand(test_1)
+
 			pluginName, pluginMetadata := config.SetPluginArgsForCall(0)
 
 			Expect(pluginName).To(Equal("Test1"))
