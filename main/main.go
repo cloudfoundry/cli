@@ -10,10 +10,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
+	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/command_runner"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -87,30 +89,16 @@ func main() {
 	metaDatas := cmdFactory.CommandMetadatas()
 
 	if len(os.Args) > 1 {
-		var flags []string
-		for _, cmd := range metaDatas {
-			if os.Args[1] == cmd.Name || os.Args[1] == cmd.ShortName {
-				for _, flag := range cmd.Flags {
-					switch t := flag.(type) {
-					default:
-					case cli.IntFlag:
-						flags = append(flags, t.Name)
-					case cli.StringFlag:
-						flags = append(flags, t.Name)
-					case cli.BoolFlag:
-						flags = append(flags, t.Name)
-					}
-				}
-			}
-		}
+		flags := getCommandFlags(os.Args, metaDatas)
 
 		badFlags = matchArgAndFlags(flags, os.Args[2:])
+
 		if badFlags != "" {
 			badFlags = badFlags + "\n\n"
 		}
 	}
 
-	injectTemplate(badFlags)
+	injectHelpTemplate(badFlags)
 
 	theApp := app.NewApp(cmdRunner, metaDatas...)
 	//command `cf` without argument
@@ -136,7 +124,7 @@ func gatewaySliceFromMap(gateway_map map[string]net.Gateway) []net.WarningProduc
 	return gateways
 }
 
-func injectTemplate(badFlags string) {
+func injectHelpTemplate(badFlags string) {
 	cli.CommandHelpTemplate = fmt.Sprintf(`%sNAME:
    {{.Name}} - {{.Description}}
 {{with .ShortName}}
@@ -189,25 +177,66 @@ func callCoreCommand(args []string, theApp *cli.App) {
 	warningsCollector.PrintWarnings()
 }
 
+func getCommandFlags(args []string, metaDatas []command_metadata.CommandMetadata) []string {
+	var flags []string
+	for _, cmd := range metaDatas {
+		if args[1] == cmd.Name || args[1] == cmd.ShortName {
+			for _, flag := range cmd.Flags {
+				switch t := flag.(type) {
+				default:
+				case flag_helpers.StringSliceFlagWithNoDefault:
+					flags = append(flags, t.Name)
+				case flag_helpers.IntFlagWithNoDefault:
+					flags = append(flags, t.Name)
+				case flag_helpers.StringFlagWithNoDefault:
+					flags = append(flags, t.Name)
+				case cli.BoolFlag:
+					flags = append(flags, t.Name)
+				}
+			}
+		}
+	}
+	return flags
+}
+
 func matchArgAndFlags(flags []string, args []string) string {
-	var badFlag string
+	var badFlag, prefix string
+	var multipleErr bool
 
 Loop:
 	for _, arg := range args {
+		prefix = ""
+
+		//only take flag name, ignore value after '='
+		arg = strings.Split(arg, "=")[0]
+
 		if strings.HasPrefix(arg, "--") {
-			arg = strings.TrimLeft(arg, "--")
+			prefix = "--"
+		} else if strings.HasPrefix(arg, "-") {
+			prefix = "-"
+		}
+		arg = strings.TrimLeft(arg, prefix)
+
+		if prefix != "" {
 			for _, flag := range flags {
 				if flag == arg {
 					continue Loop
 				}
 			}
 			if badFlag == "" {
-				badFlag = fmt.Sprintf("%s \"--%s\"", T("Unknown flag"), arg)
+				badFlag = fmt.Sprintf("\"%s%s\"", prefix, arg)
 			} else {
-				badFlag = strings.Replace(badFlag, T("Unknown flag"), T("Unknown flags:"), 1)
-				badFlag = badFlag + fmt.Sprintf(", \"--%s\"", arg)
+				multipleErr = true
+				badFlag = badFlag + fmt.Sprintf(", \"%s%s\"", prefix, arg)
 			}
 		}
 	}
+
+	if multipleErr && badFlag != "" {
+		badFlag = fmt.Sprintf("%s %s", T("Unknown flags:"), badFlag)
+	} else if badFlag != "" {
+		badFlag = fmt.Sprintf("%s %s", T("Unknown flag"), badFlag)
+	}
+
 	return badFlag
 }

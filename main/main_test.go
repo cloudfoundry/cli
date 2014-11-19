@@ -55,18 +55,35 @@ var _ = Describe("main", func() {
 
 	Describe("Flag verification", func() {
 		It("informs user for any incorrect provided flags", func() {
-			result := Cf("push", "--no-hostname", "--bad-flag").Wait(3 * time.Second)
+			result := Cf("push", "--no-hostname", "--bad-flag")
 			Eventually(result.Out).Should(Say("Unknown flag \"--bad-flag\""))
 			Eventually(result.Out).ShouldNot(Say("Unknown flag \"--no-hostname\""))
 		})
 
-		It("only checks flags with prefix '--'", func() {
+		It("checks flags with prefix '--'", func() {
 			result := Cf("push", "not-a-flag", "--invalid-flag")
 			Eventually(result.Out).Should(Say("Unknown flag \"--invalid-flag\""))
 			Eventually(result.Out).ShouldNot(Say("Unknown flag \"not-a-flag\""))
 		})
 
-		It("only checks flag for the provided command", func() {
+		It("checks flags with prefix '-'", func() {
+			result := Cf("push", "not-a-flag", "-invalid-flag")
+			Eventually(result.Out).Should(Say("Unknown flag \"-invalid-flag\""))
+			Eventually(result.Out).ShouldNot(Say("Unknown flag \"not-a-flag\""))
+		})
+
+		It("checks flags but ignores the value after '=' ", func() {
+			result := Cf("push", "-p=./", "-invalid-flag=blarg")
+			Eventually(result.Out).Should(Say("Unknown flag \"-invalid-flag\""))
+			Eventually(result.Out).ShouldNot(Say("Unknown flag \"-p\""))
+		})
+
+		It("outputs all unknown flags in single sentence", func() {
+			result := Cf("push", "--bad-flag1", "--bad-flag2")
+			Eventually(result.Out).Should(Say("Unknown flags: \"--bad-flag1\", \"--bad-flag2\""))
+		})
+
+		It("only checks input flags against flags from the provided command", func() {
 			result := Cf("push", "--no-hostname", "--skip-ssl-validation")
 			Eventually(result.Out).Should(Say("Unknown flag \"--skip-ssl-validation\""))
 		})
