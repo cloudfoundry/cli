@@ -3225,6 +3225,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.",
+      "translation": "Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.",
+      "modified": false
+   },
+   {
       "id": "Retrieve list of feature flags with status of each flag-able feature",
       "translation": "Retrieve list of feature flags with status of each flag-able feature",
       "modified": false
