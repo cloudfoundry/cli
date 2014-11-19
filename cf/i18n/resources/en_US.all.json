@@ -1095,13 +1095,18 @@
       "modified": false
    },
    {
-      "id": "Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
-      "translation": "Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+      "id": "Command Help",
+      "translation": "Command Help",
       "modified": false
    },
    {
-      "id": "Command name",
-      "translation": "Command name",
+      "id": "Command Name",
+      "translation": "Command Name",
+      "modified": false
+   },
+   {
+      "id": "Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+      "translation": "Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
       "modified": false
    },
    {
@@ -2960,8 +2965,8 @@
       "modified": false
    },
    {
-      "id": "Plugin name",
-      "translation": "Plugin name",
+      "id": "Plugin Name",
+      "translation": "Plugin Name",
       "modified": false
    },
    {
