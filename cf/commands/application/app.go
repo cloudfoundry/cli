@@ -45,6 +45,9 @@ func (cmd *ShowApp) Metadata() command_metadata.CommandMetadata {
 		Name:        "app",
 		Description: T("Display health and status for app"),
 		Usage:       T("CF_NAME app APP"),
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.")},
+		},
 	}
 }
 
@@ -65,7 +68,12 @@ func (cmd *ShowApp) GetRequirements(requirementsFactory requirements.Factory, c 
 
 func (cmd *ShowApp) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-	cmd.ShowApp(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+
+	if c.Bool("guid") {
+		cmd.ui.Say(app.Guid)
+	} else {
+		cmd.ShowApp(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+	}
 }
 
 func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {

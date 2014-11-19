@@ -213,6 +213,26 @@ var _ = Describe("app Command", func() {
 			))
 		})
 	})
+
+	Describe("when the user passes the --guid flag", func() {
+		var app models.Application
+		BeforeEach(func() {
+			app = makeAppWithRoute("my-app")
+
+			requirementsFactory.Application = app
+		})
+
+		It("displays guid for the requested app", func() {
+			runCommand("--guid", "my-app")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{app.Guid},
+			))
+			Expect(ui.Outputs).ToNot(ContainSubstrings(
+				[]string{"Showing health and status", "my-app"},
+			))
+		})
+	})
 })
 
 func makeAppWithRoute(appName string) models.Application {
