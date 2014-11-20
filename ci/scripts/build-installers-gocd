@@ -8,6 +8,13 @@ RELEASE_DIR=${ROOT_DIR}/release
 INSTALLERS_DIR=${ROOT_DIR}/installers
 VERSION=$(${OUT_DIR}/cf-linux-386 -v | cut -d' ' -f 3 | cut -d'-' -f 1)
 
+
+# Instructions for installing iscc:
+# https://katastrophos.net/andre/blog/2009/03/16/setting-up-the-inno-setup-compiler-on-debian/
+#
+# forward X11 ports when installing 'Inno Setup' on the linux vm where the gocd agent runs 
+#   $ ssh -X -i id_rsa.pem ubuntu@x.x.x.x' 
+
 echo "building windows-386 installer"
 (
     cd ${INSTALLERS_DIR}/windows
