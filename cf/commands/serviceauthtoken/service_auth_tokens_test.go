@@ -49,6 +49,11 @@ var _ = Describe("service-auth-tokens command", func() {
 		It("fails when not logged in", func() {
 			Expect(runCommand()).To(BeFalse())
 		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
 	Context("when logged in and some service auth tokens exist", func() {

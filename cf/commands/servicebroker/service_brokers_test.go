@@ -46,6 +46,11 @@ var _ = Describe("service-brokers command", func() {
 			requirementsFactory.LoginSuccess = false
 			Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
 		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			Expect(testcmd.RunCommand(cmd, []string{"blahblah"}, requirementsFactory)).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
 	It("lists service brokers", func() {

@@ -33,6 +33,9 @@ func (cmd RunningEnvironmentVariableGroup) Metadata() command_metadata.CommandMe
 }
 
 func (cmd RunningEnvironmentVariableGroup) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
+	if len(c.Args()) != 0 {
+		cmd.ui.FailWithUsage(c)
+	}
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}

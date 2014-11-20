@@ -31,6 +31,12 @@ var _ = Describe("ListBuildpacks", func() {
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
+	It("should fail with usage when provided any arguments", func() {
+		requirementsFactory.LoginSuccess = true
+		Expect(runCommand("blahblah")).To(BeFalse())
+		Expect(ui.FailedWithUsage).To(BeTrue())
+	})
+
 	It("fails requirements when login fails", func() {
 		Expect(runCommand()).To(BeFalse())
 	})

@@ -56,10 +56,10 @@ var _ = Describe("update-service command", func() {
 
 	Describe("requirements", func() {
 		It("passes when logged in and a space is targeted", func() {
-			Expect(callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeTrue())
+			Expect(callUpdateService([]string{"cleardb"})).To(BeTrue())
 		})
 
-		It("fails when there are 0 arguments", func() {
+		It("fails with usage when not provided exactly one arg", func() {
 			Expect(callUpdateService([]string{})).To(BeFalse())
 		})
 

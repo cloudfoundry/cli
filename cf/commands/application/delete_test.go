@@ -56,7 +56,7 @@ var _ = Describe("delete app command", func() {
 			requirementsFactory.LoginSuccess = true
 		})
 
-		It("provides the user usage text when no app name is given", func() {
+		It("fails with usage when not provided exactly one arg", func() {
 			runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})

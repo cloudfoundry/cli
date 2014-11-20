@@ -57,7 +57,7 @@ var _ = Describe("app Command", func() {
 			Expect(runCommand("cf-plays-dwarf-fortress")).To(BeFalse())
 		})
 
-		It("fails with usage when no arguments are given", func() {
+		It("fails with usage when not provided exactly one arg", func() {
 			passed := runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
 			Expect(passed).To(BeFalse())

@@ -49,6 +49,12 @@ var _ = Describe("routes command", func() {
 
 			Expect(runCommand()).To(BeFalse())
 		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = true
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
 	Context("when there are routes", func() {

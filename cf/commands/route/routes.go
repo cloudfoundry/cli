@@ -36,6 +36,9 @@ func (cmd ListRoutes) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd ListRoutes) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
+	if len(c.Args()) != 0 {
+		cmd.ui.FailWithUsage(c)
+	}
 	return []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),

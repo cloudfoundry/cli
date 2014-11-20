@@ -58,6 +58,12 @@ var _ = Describe("services", func() {
 				Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
 			})
 		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = true
+			Expect(testcmd.RunCommand(cmd, []string{"blahblah"}, requirementsFactory)).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
 	It("lists available services", func() {

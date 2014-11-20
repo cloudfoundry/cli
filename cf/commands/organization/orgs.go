@@ -33,6 +33,10 @@ func (cmd ListOrgs) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd ListOrgs) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) != 0 {
+		cmd.ui.FailWithUsage(c)
+	}
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}

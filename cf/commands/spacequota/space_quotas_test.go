@@ -28,9 +28,9 @@ var _ = Describe("quotas command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
-	runCommand := func() bool {
+	runCommand := func(args ...string) bool {
 		cmd := NewListSpaceQuotas(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
-		return testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -42,6 +42,12 @@ var _ = Describe("quotas command", func() {
 		It("requires the user to target an org", func() {
 			requirementsFactory.TargetedOrgSuccess = false
 			Expect(runCommand()).ToNot(HavePassedRequirements())
+		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedOrgSuccess = true
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 	})
 
