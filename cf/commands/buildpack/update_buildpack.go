@@ -30,7 +30,7 @@ func (cmd *UpdateBuildpack) Metadata() command_metadata.CommandMetadata {
 		Name:        "update-buildpack",
 		Description: T("Update a buildpack"),
 		Usage: T("CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]") +
-			T("\n\nTIP:\n") + T("   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest."),
+			T("\n\nTIP:\n") + T("   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."),
 		Flags: []cli.Flag{
 			flag_helpers.NewIntFlag("i", T("Buildpack position among other buildpacks")),
 			flag_helpers.NewStringFlag("p", T("Path to directory or zip file")),
