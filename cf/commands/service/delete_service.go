@@ -39,16 +39,9 @@ func (cmd *DeleteService) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd *DeleteService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	var serviceName string
-
-	if len(c.Args()) == 1 {
-		serviceName = c.Args()[0]
-	}
-
-	if serviceName == "" {
+	if len(c.Args()) != 1 {
 		cmd.ui.FailWithUsage(c)
 	}
-
 	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return
 }

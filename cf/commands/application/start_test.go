@@ -209,7 +209,7 @@ var _ = Describe("start command", func() {
 			requirementsFactory.LoginSuccess = true
 		})
 
-		It("fails with usage when provided with no args", func() {
+		It("fails with usage when not provided exactly one arg", func() {
 			config := testconfig.NewRepository()
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appRepo := &testApplication.FakeApplicationRepository{}

@@ -29,7 +29,10 @@ func (cmd *Plugins) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *Plugins) GetRequirements(_ requirements.Factory, _ *cli.Context) (req []requirements.Requirement, err error) {
+func (cmd *Plugins) GetRequirements(_ requirements.Factory, c *cli.Context) (req []requirements.Requirement, err error) {
+	if len(c.Args()) != 0 {
+		cmd.ui.FailWithUsage(c)
+	}
 	return
 }
 

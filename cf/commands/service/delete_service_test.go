@@ -54,7 +54,7 @@ var _ = Describe("delete-service command", func() {
 			requirementsFactory.LoginSuccess = true
 		})
 
-		It("fails with usage when no service name is given", func() {
+		It("fails with usage when not provided exactly one arg", func() {
 			runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})

@@ -32,6 +32,9 @@ func (cmd ListBuildpacks) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd ListBuildpacks) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) != 0 {
+		cmd.ui.FailWithUsage(c)
+	}
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}

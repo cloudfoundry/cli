@@ -40,7 +40,7 @@ var _ = Describe("restart command", func() {
 	}
 
 	Describe("requirements", func() {
-		It("fails with usage when an app name is not given", func() {
+		It("fails with usage when not provided exactly one arg", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())

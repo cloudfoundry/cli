@@ -35,7 +35,10 @@ func (cmd ListFeatureFlags) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd ListFeatureFlags) GetRequirements(requirementsFactory requirements.Factory, _ *cli.Context) ([]requirements.Requirement, error) {
+func (cmd ListFeatureFlags) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
+	if len(c.Args()) != 0 {
+		cmd.ui.FailWithUsage(c)
+	}
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}

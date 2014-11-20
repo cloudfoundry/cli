@@ -54,6 +54,11 @@ var _ = Describe("spaces command", func() {
 
 			Expect(runCommand()).To(BeFalse())
 		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
 	Context("when logged in and an org is targeted", func() {
