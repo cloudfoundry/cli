@@ -78,6 +78,14 @@ var _ = Describe("create-quota command", func() {
 			))
 		})
 
+		Context("when the -i flag is not provided", func() {
+			It("sets the instance memory limit to unlimiited", func() {
+				runCommand("my-quota")
+
+				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
+			})
+		})
+
 		Context("when the -m flag is provided", func() {
 			It("sets the memory limit", func() {
 				runCommand("-m", "50G", "erryday makin fitty jeez")

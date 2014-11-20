@@ -76,16 +76,14 @@ func (cmd CreateQuota) Run(context *cli.Context) {
 	}
 
 	instanceMemoryLimit := context.String("i")
-	if instanceMemoryLimit != "" {
-		if instanceMemoryLimit == "-1" {
-			quota.InstanceMemoryLimit = -1
-		} else {
-			parsedMemory, errr := formatters.ToMegabytes(instanceMemoryLimit)
-			if errr != nil {
-				cmd.ui.Failed(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": errr}))
-			}
-			quota.InstanceMemoryLimit = parsedMemory
+	if instanceMemoryLimit == "-1" || instanceMemoryLimit == "" {
+		quota.InstanceMemoryLimit = -1
+	} else {
+		parsedMemory, errr := formatters.ToMegabytes(instanceMemoryLimit)
+		if errr != nil {
+			cmd.ui.Failed(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": errr}))
 		}
+		quota.InstanceMemoryLimit = parsedMemory
 	}
 
 	if context.IsSet("r") {
