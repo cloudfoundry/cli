@@ -120,9 +120,9 @@
       "modified": false
    },
    {
-      "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is an integer, sets priority, and is sorted from lowest to highest.",
+      "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.",
       "translation": "   路径应该是一个zip文件，一个URL到一个zip文件，或本地目录。位置是一个整数，设置优先级，并进行排序，从最低到最高",
-      "modified": false
+      "modified": true
    },
    {
       "id": "   Push multiple apps with a manifest:\n",
