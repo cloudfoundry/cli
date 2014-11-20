@@ -13,8 +13,8 @@ func NewSpaceQuota(name string, memory int64, routes int, services int, nonbasic
 type SpaceQuota struct {
 	Guid                    string `json:"guid,omitempty"`
 	Name                    string `json:"name"`
-	MemoryLimit             int64  `json:"memory_limit"`                    // in Megabytes
-	InstanceMemoryLimit     int64  `json:"instance_memory_limit,omitempty"` // in Megabytes
+	MemoryLimit             int64  `json:"memory_limit"`          // in Megabytes
+	InstanceMemoryLimit     int64  `json:"instance_memory_limit"` // in Megabytes
 	RoutesLimit             int    `json:"total_routes"`
 	ServicesLimit           int    `json:"total_services"`
 	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`

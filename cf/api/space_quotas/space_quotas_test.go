@@ -167,6 +167,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					"total_services": 1,
 					"total_routes": 12,
 					"memory_limit": 123,
+					"instance_memory_limit": 0,
 					"organization_guid": "my-org-guid"
 				}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},

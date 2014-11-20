@@ -25,6 +25,7 @@ var exampleJSON = `
 		"QuotaDefinition": {
 			"name":"",
 			"memory_limit":0,
+			"instance_memory_limit":0,
 			"total_routes":0,
 			"total_services":0,
 			"non_basic_services_allowed": false
