@@ -113,7 +113,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					"non_basic_services_allowed": false,
 					"total_services": 1,
 					"total_routes": 12,
-					"memory_limit": 123
+					"memory_limit": 123,
+					"instance_memory_limit": 0
 				}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
@@ -142,7 +143,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					"name": "amazing-quota",
 					"total_services": 1,
 					"total_routes": 12,
-					"memory_limit": 123
+					"memory_limit": 123,
+					"instance_memory_limit": 0
 				}`),
 			}))
 
