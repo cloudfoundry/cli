@@ -83,21 +83,18 @@ func (cmd CreateSpaceQuota) Run(context *cli.Context) {
 	}
 
 	instanceMemoryLimit := context.String("i")
-	if instanceMemoryLimit != "" {
-		var parsedMemory int64
-		var err error
-
-		if instanceMemoryLimit == "-1" {
-			parsedMemory = -1
-		} else {
-			parsedMemory, err = formatters.ToMegabytes(instanceMemoryLimit)
-			if err != nil {
-				cmd.ui.Failed(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": err}))
-			}
+	var parsedMemory int64
+	var err error
+	if instanceMemoryLimit == "-1" || instanceMemoryLimit == "" {
+		parsedMemory = -1
+	} else {
+		parsedMemory, err = formatters.ToMegabytes(instanceMemoryLimit)
+		if err != nil {
+			cmd.ui.Failed(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": err}))
 		}
-
-		quota.InstanceMemoryLimit = parsedMemory
 	}
+
+	quota.InstanceMemoryLimit = parsedMemory
 
 	if context.IsSet("r") {
 		quota.RoutesLimit = context.Int("r")
@@ -111,7 +108,7 @@ func (cmd CreateSpaceQuota) Run(context *cli.Context) {
 		quota.NonBasicServicesAllowed = true
 	}
 
-	err := cmd.quotaRepo.Create(quota)
+	err = cmd.quotaRepo.Create(quota)
 
 	httpErr, ok := err.(errors.HttpError)
 	if ok && httpErr.ErrorCode() == errors.QUOTA_EXISTS {
