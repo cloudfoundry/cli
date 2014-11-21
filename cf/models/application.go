@@ -44,18 +44,19 @@ func (model Application) ToParams() (params AppParams) {
 }
 
 type ApplicationFields struct {
-	Guid             string
-	Name             string
-	BuildpackUrl     string
-	Command          string
-	DiskQuota        int64 // in Megabytes
-	EnvironmentVars  map[string]interface{}
-	InstanceCount    int
-	Memory           int64 // in Megabytes
-	RunningInstances int
-	State            string
-	SpaceGuid        string
-	PackageUpdatedAt *time.Time
+	Guid                 string
+	Name                 string
+	BuildpackUrl         string
+	Command              string
+	DetectedStartCommand string
+	DiskQuota            int64 // in Megabytes
+	EnvironmentVars      map[string]interface{}
+	InstanceCount        int
+	Memory               int64 // in Megabytes
+	RunningInstances     int
+	State                string
+	SpaceGuid            string
+	PackageUpdatedAt     *time.Time
 }
 
 type AppParams struct {

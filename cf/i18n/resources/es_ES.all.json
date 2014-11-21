@@ -25,6 +25,11 @@
       "modified": false
    },
    {
+      "id": "\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
+      "translation": "\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
+      "modified": false
+   },
+   {
       "id": "\nRoute to be unmapped is not currently mapped to the application.",
       "translation": "\nRoute to be unmapped is not currently mapped to the application.",
       "modified": false
