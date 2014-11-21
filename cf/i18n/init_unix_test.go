@@ -8,6 +8,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 
@@ -19,6 +20,7 @@ var _ = Describe("i18n.Init() function", func() {
 	var (
 		oldResourcesPath string
 		configRepo       core_config.ReadWriter
+		detector         detection.Detector
 
 		T go_i18n.TranslateFunc
 	)
@@ -27,10 +29,11 @@ var _ = Describe("i18n.Init() function", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		oldResourcesPath = i18n.GetResourcesPath()
 		i18n.Resources_path = filepath.Join("cf", "i18n", "test_fixtures")
+		detector = &detection.JibberJabberDetector{}
 	})
 
 	JustBeforeEach(func() {
-		T = i18n.Init(configRepo)
+		T = i18n.Init(configRepo, detector)
 	})
 
 	Describe("When a user has a locale configuration set", func() {
@@ -38,14 +41,14 @@ var _ = Describe("i18n.Init() function", func() {
 			i18n.Resources_path = filepath.Join("should", "not", "be_valid")
 			configRepo.SetLocale("en_us")
 
-			init := func() { i18n.Init(configRepo) }
+			init := func() { i18n.Init(configRepo, detector) }
 			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
 		})
 
 		It("Panics if the locale is not valid", func() {
 			configRepo.SetLocale("abc_def")
 
-			init := func() { i18n.Init(configRepo) }
+			init := func() { i18n.Init(configRepo, detector) }
 			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
 		})
 
@@ -92,7 +95,7 @@ var _ = Describe("i18n.Init() function", func() {
 			os.Setenv("LANG", "en")
 			i18n.Resources_path = filepath.Join("should", "not", "be_valid")
 
-			init := func() { i18n.Init(configRepo) }
+			init := func() { i18n.Init(configRepo, detector) }
 			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
 		})
 

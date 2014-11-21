@@ -8,9 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pivotal-cf-experimental/jibber_jabber"
-
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	resources "github.com/cloudfoundry/cli/cf/resources"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 )
@@ -40,20 +39,19 @@ func GetResourcesPath() string {
 	return Resources_path
 }
 
-func Init(config core_config.ReadWriter) go_i18n.TranslateFunc {
+func Init(config core_config.ReadWriter, detector detection.Detector) go_i18n.TranslateFunc {
 	var T go_i18n.TranslateFunc
 	var err error
 
 	locale := config.Locale()
 	if locale != "" {
-		pieces := strings.Split(locale, "_")
-		err = loadFromAsset(locale, pieces[1])
+		err = loadFromAsset(locale)
 		if err == nil {
 			T, err = go_i18n.Tfunc(config.Locale(), DEFAULT_LOCALE)
 		}
 	} else {
 		var userLocale string
-		userLocale, err = initWithUserLocale()
+		userLocale, err = initWithUserLocale(detector)
 		if err != nil {
 			userLocale = mustLoadDefaultLocale()
 		}
@@ -68,13 +66,13 @@ func Init(config core_config.ReadWriter) go_i18n.TranslateFunc {
 	return T
 }
 
-func initWithUserLocale() (string, error) {
-	userLocale, err := jibber_jabber.DetectIETF()
+func initWithUserLocale(detector detection.Detector) (string, error) {
+	userLocale, err := detector.DetectIETF()
 	if err != nil {
 		userLocale = DEFAULT_LOCALE
 	}
 
-	language, err := jibber_jabber.DetectLanguage()
+	language, err := detector.DetectLanguage()
 	if err != nil {
 		language = DEFAULT_LANGUAGE
 	}
@@ -85,7 +83,7 @@ func initWithUserLocale() (string, error) {
 		language = "zh"
 	}
 
-	err = loadFromAsset(userLocale, language)
+	err = loadFromAsset(userLocale)
 	if err != nil {
 		locale := SUPPORTED_LOCALES[language]
 		if locale == "" {
@@ -93,7 +91,7 @@ func initWithUserLocale() (string, error) {
 		} else {
 			userLocale = locale
 		}
-		err = loadFromAsset(userLocale, language)
+		err = loadFromAsset(userLocale)
 	}
 
 	return userLocale, err
@@ -102,7 +100,7 @@ func initWithUserLocale() (string, error) {
 func mustLoadDefaultLocale() string {
 	userLocale := DEFAULT_LOCALE
 
-	err := loadFromAsset(DEFAULT_LOCALE, DEFAULT_LANGUAGE)
+	err := loadFromAsset(DEFAULT_LOCALE)
 	if err != nil {
 		panic("Could not load en_US language files. God save the queen. " + err.Error())
 	}
@@ -110,7 +108,7 @@ func mustLoadDefaultLocale() string {
 	return userLocale
 }
 
-func loadFromAsset(locale, language string) error {
+func loadFromAsset(locale string) error {
 	assetName := locale + ".all.json"
 	assetKey := filepath.Join(GetResourcesPath(), assetName)
 

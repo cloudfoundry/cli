@@ -3,13 +3,12 @@
 package i18n_test
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/i18n/detection/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/pivotal-cf-experimental/jibber_jabber"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,11 +17,13 @@ import (
 var _ = Describe("i18n.Init() function", func() {
 	var (
 		configRepo core_config.ReadWriter
+		detector   *fakes.FakeDetector
 	)
 
 	BeforeEach(func() {
 		i18n.Resources_path = filepath.Join("cf", "i18n", "test_fixtures")
 		configRepo = testconfig.NewRepositoryWithDefaults()
+		detector = &fakes.FakeDetector{}
 	})
 
 	Describe("When a user has a locale configuration set", func() {
@@ -32,7 +33,7 @@ var _ = Describe("i18n.Init() function", func() {
 			})
 
 			It("returns a usable T function for simple strings", func() {
-				T := i18n.Init(configRepo)
+				T := i18n.Init(configRepo, detector)
 				Ω(T).ShouldNot(BeNil())
 
 				translation := T("Hello world!")
@@ -40,7 +41,7 @@ var _ = Describe("i18n.Init() function", func() {
 			})
 
 			It("returns a usable T function for complex strings (interpolated)", func() {
-				T := i18n.Init(configRepo)
+				T := i18n.Init(configRepo, detector)
 				Ω(T).ShouldNot(BeNil())
 
 				translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo.com", "Username": "Anand"})
@@ -51,15 +52,12 @@ var _ = Describe("i18n.Init() function", func() {
 
 	Describe("When a user does not have a locale configuration set", func() {
 		BeforeEach(func() {
-			os.Setenv("LC_ALL", "en_US.UTF-8")
-
-			//All these tests require the system language to be English
-			Ω(jibber_jabber.DetectIETF()).Should(Equal("en-US"))
+			detector.DetectIETFReturns("en-US", nil)
 		})
 
 		Context("creates a valid T function", func() {
 			It("returns a usable T function for simple strings", func() {
-				T := i18n.Init(configRepo)
+				T := i18n.Init(configRepo, detector)
 				Ω(T).ShouldNot(BeNil())
 
 				translation := T("Change user password")
@@ -67,7 +65,7 @@ var _ = Describe("i18n.Init() function", func() {
 			})
 
 			It("returns a usable T function for complex strings (interpolated)", func() {
-				T := i18n.Init(configRepo)
+				T := i18n.Init(configRepo, detector)
 				Ω(T).ShouldNot(BeNil())
 
 				translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo", "Username": "Anand"})
@@ -79,8 +77,8 @@ var _ = Describe("i18n.Init() function", func() {
 
 	Describe("When locale is HK/TW", func() {
 		It("matches zh_CN to zh_Hans", func() {
-			os.Setenv("LC_ALL", "zh_CN.UTF-8")
-			T := i18n.Init(configRepo)
+			detector.DetectIETFReturns("zh-CN.UTF-8", nil)
+			T := i18n.Init(configRepo, detector)
 			Ω(T).ShouldNot(BeNil())
 
 			translation := T("No buildpacks found")
@@ -88,8 +86,8 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		It("matches zh_TW to zh_Hant", func() {
-			os.Setenv("LC_ALL", "zh_TW.UTF-8")
-			T := i18n.Init(configRepo)
+			detector.DetectIETFReturns("zh-TW.UTF-8", nil)
+			T := i18n.Init(configRepo, detector)
 			Ω(T).ShouldNot(BeNil())
 
 			translation := T("No buildpacks found")
@@ -97,8 +95,8 @@ var _ = Describe("i18n.Init() function", func() {
 		})
 
 		It("matches zh_HK to zh_Hant", func() {
-			os.Setenv("LC_ALL", "zh_HK.UTF-8")
-			T := i18n.Init(configRepo)
+			detector.DetectIETFReturns("zh-HK.UTF-8", nil)
+			T := i18n.Init(configRepo, detector)
 			Ω(T).ShouldNot(BeNil())
 
 			translation := T("No buildpacks found")
