@@ -36,11 +36,10 @@ func (repo securityGroupSpaceBinder) BindSpace(securityGroupGuid string, spaceGu
 }
 
 func (repo securityGroupSpaceBinder) UnbindSpace(securityGroupGuid string, spaceGuid string) error {
-	url := fmt.Sprintf("%s/v2/security_groups/%s/spaces/%s",
-		repo.configRepo.ApiEndpoint(),
+	url := fmt.Sprintf("/v2/security_groups/%s/spaces/%s",
 		securityGroupGuid,
 		spaceGuid,
 	)
 
-	return repo.gateway.DeleteResource(url)
+	return repo.gateway.DeleteResource(repo.configRepo.ApiEndpoint(), url)
 }

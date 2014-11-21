@@ -195,13 +195,13 @@ var _ = Describe("Gateway", func() {
 				})
 
 				It("deletes a resource", func() {
-					err := ccGateway.DeleteResource(apiServer.URL + "/v2/foobars/SOME_GUID")
+					err := ccGateway.DeleteResource(apiServer.URL, "/v2/foobars/SOME_GUID")
 					Expect(err).ToNot(HaveOccurred())
 				})
 
 				Context("when the request would take longer than the async timeout", func() {
 					It("returns an error", func() {
-						apiErr := ccGateway.DeleteResource(apiServer.URL + "/v2/foobars/TIMEOUT")
+						apiErr := ccGateway.DeleteResource(apiServer.URL, "/v2/foobars/TIMEOUT")
 						Expect(apiErr).To(HaveOccurred())
 						Expect(apiErr).To(BeAssignableToTypeOf(errors.NewAsyncTimeoutError("http://some.url")))
 					})
@@ -269,7 +269,7 @@ var _ = Describe("Gateway", func() {
 			}()
 
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 500*time.Millisecond)
+			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.ApiEndpoint(), request, new(struct{}), 500*time.Millisecond)
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
@@ -280,7 +280,7 @@ var _ = Describe("Gateway", func() {
 			}()
 
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 500*time.Millisecond)
+			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.ApiEndpoint(), request, new(struct{}), 500*time.Millisecond)
 			Expect(apiErr.Error()).To(ContainSubstring("he's dead, Jim"))
 		})
 
@@ -290,7 +290,7 @@ var _ = Describe("Gateway", func() {
 				statusChannel <- "OHNOES"
 			}()
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 10*time.Millisecond)
+			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.ApiEndpoint(), request, new(struct{}), 10*time.Millisecond)
 			Expect(apiErr).To(HaveOccurred())
 			Expect(apiErr).To(BeAssignableToTypeOf(errors.NewAsyncTimeoutError("http://some.url")))
 		})

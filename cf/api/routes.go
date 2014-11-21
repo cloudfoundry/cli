@@ -103,11 +103,11 @@ func (repo CloudControllerRouteRepository) Bind(routeGuid, appGuid string) (apiE
 }
 
 func (repo CloudControllerRouteRepository) Unbind(routeGuid, appGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.ApiEndpoint(), appGuid, routeGuid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/apps/%s/routes/%s", appGuid, routeGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 
 func (repo CloudControllerRouteRepository) Delete(routeGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/routes/%s", repo.config.ApiEndpoint(), routeGuid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/routes/%s", routeGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }

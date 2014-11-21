@@ -108,11 +108,11 @@ func (repo CloudControllerSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGui
 }
 
 func (repo CloudControllerSpaceQuotaRepository) UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error {
-	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s/spaces/%s", repo.config.ApiEndpoint(), quotaGuid, spaceGuid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/space_quota_definitions/%s/spaces/%s", quotaGuid, spaceGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Delete(quotaGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s", repo.config.ApiEndpoint(), quotaGuid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/space_quota_definitions/%s", quotaGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }

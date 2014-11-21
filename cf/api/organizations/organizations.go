@@ -85,6 +85,6 @@ func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name st
 }
 
 func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiErr error) {
-	url := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.ApiEndpoint(), orgGuid)
-	return repo.gateway.DeleteResource(url)
+	url := fmt.Sprintf("/v2/organizations/%s?recursive=true", orgGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
 }

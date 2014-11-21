@@ -99,6 +99,6 @@ func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, 
 }
 
 func (repo cloudControllerSecurityGroupRepo) Delete(securityGroupGuid string) error {
-	path := fmt.Sprintf("%s/v2/security_groups/%s", repo.config.ApiEndpoint(), securityGroupGuid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/security_groups/%s", securityGroupGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }

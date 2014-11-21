@@ -39,6 +39,6 @@ func (repo *DefaultSecurityGroupsRepoBase) List(path string) ([]models.SecurityG
 }
 
 func (repo *DefaultSecurityGroupsRepoBase) Delete(groupGuid string, path string) error {
-	updatedPath := fmt.Sprintf("%s%s/%s", repo.ConfigRepo.ApiEndpoint(), path, groupGuid)
-	return repo.Gateway.DeleteResource(updatedPath)
+	updatedPath := fmt.Sprintf("%s/%s", path, groupGuid)
+	return repo.Gateway.DeleteResource(repo.ConfigRepo.ApiEndpoint(), updatedPath)
 }

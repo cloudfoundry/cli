@@ -119,19 +119,19 @@ func (gateway Gateway) UpdateResourceFromStruct(url string, resource interface{}
 }
 
 func (gateway Gateway) CreateResource(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("POST", url, body, false, resource...)
+	return gateway.createUpdateOrDeleteResource("POST", "", url, body, false, resource...)
 }
 
 func (gateway Gateway) UpdateResource(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("PUT", url, body, false, resource...)
+	return gateway.createUpdateOrDeleteResource("PUT", "", url, body, false, resource...)
 }
 
 func (gateway Gateway) UpdateResourceSync(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("PUT", url, body, true, resource...)
+	return gateway.createUpdateOrDeleteResource("PUT", "", url, body, true, resource...)
 }
 
-func (gateway Gateway) DeleteResource(url string) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("DELETE", url, nil, false, &AsyncResource{})
+func (gateway Gateway) DeleteResource(endpoint, apiUrl string) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiUrl, nil, false, &AsyncResource{})
 }
 
 func (gateway Gateway) ListPaginatedResources(target string,
@@ -163,13 +163,13 @@ func (gateway Gateway) ListPaginatedResources(target string,
 	return
 }
 
-func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.ReadSeeker, sync bool, optionalResource ...interface{}) (apiErr error) {
+func (gateway Gateway) createUpdateOrDeleteResource(verb, endpoint, apiUrl string, body io.ReadSeeker, sync bool, optionalResource ...interface{}) (apiErr error) {
 	var resource interface{}
 	if len(optionalResource) > 0 {
 		resource = optionalResource[0]
 	}
 
-	request, apiErr := gateway.NewRequest(verb, url, gateway.config.AccessToken(), body)
+	request, apiErr := gateway.NewRequest(verb, endpoint+apiUrl, gateway.config.AccessToken(), body)
 	if apiErr != nil {
 		return
 	}
@@ -180,12 +180,13 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.Re
 	}
 
 	if gateway.PollingEnabled && !sync {
-		_, apiErr = gateway.PerformPollingRequestForJSONResponse(request, resource, gateway.AsyncTimeout())
+		_, apiErr = gateway.PerformPollingRequestForJSONResponse(endpoint, request, resource, gateway.AsyncTimeout())
 		return
 	} else {
 		_, apiErr = gateway.PerformRequestForJSONResponse(request, resource)
 		return
 	}
+
 }
 
 func (gateway Gateway) newRequest(request *http.Request, accessToken string, body io.ReadSeeker) (*Request, error) {
@@ -199,7 +200,7 @@ func (gateway Gateway) newRequest(request *http.Request, accessToken string, bod
 	return &Request{HttpReq: request, SeekableBody: body}, nil
 }
 
-func (gateway Gateway) NewRequestForFile(method, path, accessToken string, body *os.File) (req *Request, apiErr error) {
+func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, body *os.File) (req *Request, apiErr error) {
 	progressReader := NewProgressReader(body, gateway.ui, 5*time.Second)
 	progressReader.Seek(0, 0)
 	fileStats, err := body.Stat()
@@ -209,7 +210,7 @@ func (gateway Gateway) NewRequestForFile(method, path, accessToken string, body 
 		return
 	}
 
-	request, err := http.NewRequest(method, path, progressReader)
+	request, err := http.NewRequest(method, fullUrl, progressReader)
 	if err != nil {
 		apiErr = errors.NewWithError(T("Error building request"), err)
 		return
@@ -279,7 +280,7 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 	return
 }
 
-func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, response interface{}, timeout time.Duration) (headers http.Header, apiErr error) {
+func (gateway Gateway) PerformPollingRequestForJSONResponse(endpoint string, request *Request, response interface{}, timeout time.Duration) (headers http.Header, apiErr error) {
 	query := request.HttpReq.URL.Query()
 	query.Add("async", "true")
 	request.HttpReq.URL.RawQuery = query.Encode()
@@ -316,8 +317,8 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 		return
 	}
 
-	jobUrl = fmt.Sprintf("%s://%s%s", request.HttpReq.URL.Scheme, request.HttpReq.URL.Host, asyncResource.Metadata.URL)
-	apiErr = gateway.waitForJob(jobUrl, request.HttpReq.Header.Get("Authorization"), timeout)
+	// jobUrl = fmt.Sprintf("%s%s", request.HttpReq.URL.Scheme, request.HttpReq.URL.Host, asyncResource.Metadata.URL)
+	apiErr = gateway.waitForJob(endpoint+jobUrl, request.HttpReq.Header.Get("Authorization"), timeout)
 
 	return
 }

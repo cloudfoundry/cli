@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
 )
 
 type BuildpackRepository interface {
@@ -80,8 +81,8 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 }
 
 func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpackGuid)
-	apiErr = repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpackGuid)
+	apiErr = repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 	return
 }
 

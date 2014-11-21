@@ -2,13 +2,14 @@ package quotas
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type QuotaRepository interface {
@@ -86,6 +87,6 @@ func (repo CloudControllerQuotaRepository) AssignQuotaToOrg(orgGuid, quotaGuid s
 }
 
 func (repo CloudControllerQuotaRepository) Delete(quotaGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/quota_definitions/%s", repo.config.ApiEndpoint(), quotaGuid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/quota_definitions/%s", quotaGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }

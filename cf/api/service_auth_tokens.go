@@ -2,13 +2,14 @@ package api
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"net/url"
-	"strings"
 )
 
 type ServiceAuthTokenRepository interface {
@@ -73,8 +74,8 @@ func (repo CloudControllerServiceAuthTokenRepository) Create(authToken models.Se
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Delete(authToken models.ServiceAuthTokenFields) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.ApiEndpoint(), authToken.Guid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/service_auth_tokens/%s", authToken.Guid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Update(authToken models.ServiceAuthTokenFields) (apiErr error) {

@@ -102,8 +102,8 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppP
 }
 
 func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.ApiEndpoint(), appGuid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/apps/%s?recursive=true", appGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 
 func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (*models.Environment, error) {
