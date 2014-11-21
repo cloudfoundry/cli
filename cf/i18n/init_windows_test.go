@@ -76,5 +76,32 @@ var _ = Describe("i18n.Init() function", func() {
 				Ω("Deleting domain foo as Anand...").Should(Equal(translation))
 			})
 		})
+
+		It("matches zh_CN to zh_Hans", func() {
+			os.Setenv("LC_ALL", "zh_CN.UTF-8")
+			T := i18n.Init(configRepo)
+			Ω(T).ShouldNot(BeNil())
+
+			translation := T("No buildpacks found")
+			Ω("buildpack未找到").Should(Equal(translation))
+		})
+
+		It("matches zh_TW to zh_Hant", func() {
+			os.Setenv("LC_ALL", "zh_TW.UTF-8")
+			T := i18n.Init(configRepo)
+			Ω(T).ShouldNot(BeNil())
+
+			translation := T("No buildpacks found")
+			Ω("(Hant)No buildpacks found").Should(Equal(translation))
+		})
+
+		It("matches zh_HK to zh_Hant", func() {
+			os.Setenv("LC_ALL", "zh_HK.UTF-8")
+			T := i18n.Init(configRepo)
+			Ω(T).ShouldNot(BeNil())
+
+			translation := T("No buildpacks found")
+			Ω("(Hant)No buildpacks found").Should(Equal(translation))
+		})
 	})
 })

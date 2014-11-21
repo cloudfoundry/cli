@@ -80,6 +80,10 @@ func initWithUserLocale() (string, error) {
 	}
 
 	userLocale = strings.Replace(userLocale, "-", "_", 1)
+	if strings.HasPrefix(userLocale, "zh_TW") || strings.HasPrefix(userLocale, "zh_HK") {
+		userLocale = "zh_Hant"
+		language = "zh"
+	}
 
 	err = loadFromAsset(userLocale, language)
 	if err != nil {
