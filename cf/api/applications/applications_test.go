@@ -250,6 +250,8 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(updatedApp.Command).To(Equal("some-command"))
+			Expect(updatedApp.DetectedStartCommand).To(Equal("detected command"))
 			Expect(updatedApp.Name).To(Equal("my-cool-app"))
 			Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
 		})
@@ -423,7 +425,9 @@ var updateApplicationResponse = `
         "guid": "my-cool-app-guid"
     },
     "entity": {
-        "name": "my-cool-app"
+        "name": "my-cool-app",
+				"command": "some-command",
+				"detected_start_command": "detected command"
     }
 }`
 

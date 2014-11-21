@@ -163,6 +163,19 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	cmd.ui.Say("")
 	cmd.ui.Ok()
 
+	var appStartCommand string
+	if app.Command == "" {
+		appStartCommand = app.DetectedStartCommand
+	} else {
+		appStartCommand = app.Command
+	}
+
+	cmd.ui.Say(T("\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
+		map[string]interface{}{
+			"AppName": terminal.EntityNameColor(app.Name),
+			"Command": appStartCommand,
+		}))
+
 	cmd.appDisplayer.ShowApp(updatedApp, orgName, spaceName)
 	return
 }

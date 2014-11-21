@@ -258,6 +258,28 @@ var _ = Describe("start command", func() {
 			Expect(displayApp.AppToDisplay).To(Equal(defaultAppForStart))
 		})
 
+		It("displays the command start command instead of the detected start command when set", func() {
+			defaultAppForStart.Command = "command start command"
+			defaultAppForStart.DetectedStartCommand = "detected start command"
+			displayApp := &testcmd.FakeAppDisplayer{}
+			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"App my-app was started using this command `command start command`"},
+			))
+		})
+
+		It("displays the detected start command when no other command is set", func() {
+			defaultAppForStart.DetectedStartCommand = "detected start command"
+			defaultAppForStart.Command = ""
+			displayApp := &testcmd.FakeAppDisplayer{}
+			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"App my-app was started using this command `detected start command`"},
+			))
+		})
+
 		It("only displays staging logs when an app is starting", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			requirementsFactory.Application = defaultAppForStart
