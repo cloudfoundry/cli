@@ -700,8 +700,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME feature-flag",
-      "translation": "CF_NAME feature-flag",
+      "id": "CF_NAME feature-flag FEATURE_NAME",
+      "translation": "CF_NAME feature-flag FEATURE_NAME",
       "modified": false
    },
    {
