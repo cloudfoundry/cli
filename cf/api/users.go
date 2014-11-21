@@ -186,9 +186,9 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 }
 
 func (repo CloudControllerUserRepository) Delete(userGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/users/%s", repo.config.ApiEndpoint(), userGuid)
+	path := fmt.Sprintf("/v2/users/%s", userGuid)
 
-	apiErr = repo.ccGateway.DeleteResource(path)
+	apiErr = repo.ccGateway.DeleteResource(repo.config.ApiEndpoint(), path)
 
 	if httpErr, ok := apiErr.(errors.HttpError); ok && httpErr.ErrorCode() != errors.USER_NOT_FOUND {
 		return
@@ -198,8 +198,8 @@ func (repo CloudControllerUserRepository) Delete(userGuid string) (apiErr error)
 		return
 	}
 
-	path = fmt.Sprintf("%s/Users/%s", uaaEndpoint, userGuid)
-	return repo.uaaGateway.DeleteResource(path)
+	path = fmt.Sprintf("/Users/%s", userGuid)
+	return repo.uaaGateway.DeleteResource(uaaEndpoint, path)
 }
 
 func (repo CloudControllerUserRepository) SetOrgRole(userGuid string, orgGuid string, role string) (apiErr error) {
@@ -247,6 +247,7 @@ func (repo CloudControllerUserRepository) SetSpaceRole(userGuid, spaceGuid, orgG
 		return
 	}
 
+	rolePath = repo.config.ApiEndpoint() + rolePath
 	return repo.ccGateway.UpdateResource(rolePath, nil)
 }
 
@@ -255,10 +256,12 @@ func (repo CloudControllerUserRepository) UnsetSpaceRole(userGuid, spaceGuid, ro
 	if apiErr != nil {
 		return
 	}
-	return repo.ccGateway.DeleteResource(rolePath)
+	return repo.ccGateway.DeleteResource(repo.config.ApiEndpoint(), rolePath)
 }
 
-func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, role string) (fullPath string, apiErr error) {
+func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, role string) (string, error) {
+	var apiErr error
+
 	rolePath, found := spaceRoleToPathMap[role]
 
 	if !found {
@@ -266,8 +269,8 @@ func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, ro
 			map[string]interface{}{"Role": role}))
 	}
 
-	fullPath = fmt.Sprintf("%s/v2/spaces/%s/%s/%s", repo.config.ApiEndpoint(), spaceGuid, rolePath, userGuid)
-	return
+	apiPath := fmt.Sprintf("/v2/spaces/%s/%s/%s", spaceGuid, rolePath, userGuid)
+	return apiPath, apiErr
 }
 
 func (repo CloudControllerUserRepository) addOrgUserRole(userGuid, orgGuid string) (apiErr error) {

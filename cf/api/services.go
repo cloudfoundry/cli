@@ -175,13 +175,13 @@ func (repo CloudControllerServiceRepository) DeleteService(instance models.Servi
 	if len(instance.ServiceBindings) > 0 {
 		return errors.New("Cannot delete service instance, apps are still bound to it")
 	}
-	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.ApiEndpoint(), instance.Guid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/service_instances/%s", instance.Guid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 
 func (repo CloudControllerServiceRepository) PurgeServiceOffering(offering models.ServiceOffering) error {
-	url := fmt.Sprintf("%s/v2/services/%s?purge=true", repo.config.ApiEndpoint(), offering.Guid)
-	return repo.gateway.DeleteResource(url)
+	url := fmt.Sprintf("/v2/services/%s?purge=true", offering.Guid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
 }
 
 func (repo CloudControllerServiceRepository) FindServiceOfferingsByLabel(label string) (models.ServiceOfferings, error) {

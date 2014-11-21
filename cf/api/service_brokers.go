@@ -93,6 +93,6 @@ func (repo CloudControllerServiceBrokerRepository) Rename(guid, name string) (ap
 }
 
 func (repo CloudControllerServiceBrokerRepository) Delete(guid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.ApiEndpoint(), guid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/service_brokers/%s", guid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }

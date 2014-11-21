@@ -139,12 +139,14 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 
 func (repo CloudControllerDomainRepository) Delete(domainGuid string) error {
 	return repo.gateway.DeleteResource(
-		repo.config.ApiEndpoint() + repo.strategy.DeleteDomainURL(domainGuid))
+		repo.config.ApiEndpoint(),
+		repo.strategy.DeleteDomainURL(domainGuid))
 }
 
 func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) error {
 	return repo.gateway.DeleteResource(
-		repo.config.ApiEndpoint() + repo.strategy.DeleteSharedDomainURL(domainGuid))
+		repo.config.ApiEndpoint(),
+		repo.strategy.DeleteSharedDomainURL(domainGuid))
 }
 
 func (repo CloudControllerDomainRepository) FirstOrDefault(orgGuid string, name *string) (domain models.DomainFields, error error) {

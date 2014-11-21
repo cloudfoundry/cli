@@ -2,10 +2,11 @@ package api
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"strings"
 )
 
 type ServiceBindingRepository interface {
@@ -38,7 +39,7 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance models.Servi
 
 	for _, binding := range instance.ServiceBindings {
 		if binding.AppGuid == appGuid {
-			path = repo.config.ApiEndpoint() + binding.Url
+			path = binding.Url
 			break
 		}
 	}
@@ -49,6 +50,6 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance models.Servi
 		found = true
 	}
 
-	apiErr = repo.gateway.DeleteResource(path)
+	apiErr = repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 	return
 }

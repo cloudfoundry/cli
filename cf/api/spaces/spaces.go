@@ -84,6 +84,6 @@ func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (ap
 }
 
 func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.ApiEndpoint(), spaceGuid)
-	return repo.gateway.DeleteResource(path)
+	path := fmt.Sprintf("/v2/spaces/%s?recursive=true", spaceGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
