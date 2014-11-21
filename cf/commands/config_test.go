@@ -84,8 +84,8 @@ var _ = Describe("config command", func() {
 
 	Context("--locale flag", func() {
 		It("stores the locale value when --locale [locale] is provided", func() {
-			runCommand("--locale", "zh_CN")
-			Expect(configRepo.Locale()).Should(Equal("zh_CN"))
+			runCommand("--locale", "zh_Hans")
+			Expect(configRepo.Locale()).Should(Equal("zh_Hans"))
 		})
 
 		It("informs the user of known locales if an unknown locale is provided", func() {
