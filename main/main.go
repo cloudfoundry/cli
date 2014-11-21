@@ -17,6 +17,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/panic_printer"
@@ -37,6 +38,7 @@ type cliDependencies struct {
 	apiRepoLocator api.RepositoryLocator
 	gateways       map[string]net.Gateway
 	teePrinter     *terminal.TeePrinter
+	detector       detection.Detector
 }
 
 func setupDependencies() (deps *cliDependencies) {
@@ -55,8 +57,9 @@ func setupDependencies() (deps *cliDependencies) {
 	}
 	deps.configRepo = core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler)
 	deps.pluginConfig = plugin_config.NewPluginConfig(errorHandler)
+	deps.detector = &detection.JibberJabberDetector{}
 
-	T = Init(deps.configRepo)
+	T = Init(deps.configRepo, deps.detector)
 
 	terminal.UserAskedForColors = deps.configRepo.ColorEnabled()
 	terminal.InitColorSupport()
