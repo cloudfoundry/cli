@@ -1,0 +1,22 @@
+[
+   {
+      "id": "Deletes a security group",
+      "translation": "(Hant)Deletes a security group",
+      "modified": false
+   },
+   {
+      "id": "No buildpacks found",
+      "translation": "(Hant)No buildpacks found",
+      "modified": false
+   },
+   {
+      "id": "Change user password",
+      "translation": "(Hant)Change user password",
+      "modified": false
+   },
+   {
+      "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
+      "translation": "(Hant)Deleting domain {{.DomainName}} as {{.Username}}...",
+      "modified": false
+   }
+]
