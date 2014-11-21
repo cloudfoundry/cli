@@ -3,6 +3,7 @@ package fakes
 
 import (
 	"sync"
+
 	. "github.com/cloudfoundry/cli/cf/i18n/detection"
 )
 
@@ -10,14 +11,14 @@ type FakeDetector struct {
 	DetectIETFStub        func() (string, error)
 	detectIETFMutex       sync.RWMutex
 	detectIETFArgsForCall []struct{}
-	detectIETFReturns struct {
+	detectIETFReturns     struct {
 		result1 string
 		result2 error
 	}
 	DetectLanguageStub        func() (string, error)
 	detectLanguageMutex       sync.RWMutex
 	detectLanguageArgsForCall []struct{}
-	detectLanguageReturns struct {
+	detectLanguageReturns     struct {
 		result1 string
 		result2 error
 	}

@@ -78,6 +78,7 @@ var _ = Describe("i18n.Init() function", func() {
 	Describe("When locale is HK/TW", func() {
 		It("matches zh_CN to zh_Hans", func() {
 			detector.DetectIETFReturns("zh-CN.UTF-8", nil)
+			detector.DetectLanguageReturns("zh", nil)
 			T := i18n.Init(configRepo, detector)
 			Ω(T).ShouldNot(BeNil())
 
