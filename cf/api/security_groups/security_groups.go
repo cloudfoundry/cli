@@ -32,12 +32,12 @@ func NewSecurityGroupRepo(config core_config.Reader, gateway net.Gateway) Securi
 }
 
 func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[string]interface{}) error {
-	path := fmt.Sprintf("%s/v2/security_groups", repo.config.ApiEndpoint())
+	path := "/v2/security_groups"
 	params := models.SecurityGroupParams{
 		Name:  name,
 		Rules: rules,
 	}
-	return repo.gateway.CreateResourceFromStruct(path, params)
+	return repo.gateway.CreateResourceFromStruct(repo.config.ApiEndpoint(), path, params)
 }
 
 func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityGroup, error) {

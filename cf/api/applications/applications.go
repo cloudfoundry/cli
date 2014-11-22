@@ -43,9 +43,8 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/apps", repo.config.ApiEndpoint())
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.CreateResource(path, strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/apps", strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
@@ -123,6 +122,6 @@ func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (*models.E
 }
 
 func (repo CloudControllerApplicationRepository) CreateRestageRequest(guid string) error {
-	path := fmt.Sprintf("%s/v2/apps/%s/restage", repo.config.ApiEndpoint(), guid)
-	return repo.gateway.CreateResource(path, strings.NewReader(""), nil)
+	path := fmt.Sprintf("/v2/apps/%s/restage", guid)
+	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(""), nil)
 }

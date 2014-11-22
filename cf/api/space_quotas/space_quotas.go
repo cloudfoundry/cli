@@ -93,8 +93,8 @@ func (repo CloudControllerSpaceQuotaRepository) FindByGuid(guid string) (quota m
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Create(quota models.SpaceQuota) error {
-	path := fmt.Sprintf("%s/v2/space_quota_definitions", repo.config.ApiEndpoint())
-	return repo.gateway.CreateResourceFromStruct(path, quota)
+	path := "/v2/space_quota_definitions"
+	return repo.gateway.CreateResourceFromStruct(repo.config.ApiEndpoint(), path, quota)
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Update(quota models.SpaceQuota) error {

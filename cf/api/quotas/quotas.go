@@ -71,8 +71,7 @@ func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models
 }
 
 func (repo CloudControllerQuotaRepository) Create(quota models.QuotaFields) error {
-	path := fmt.Sprintf("%s/v2/quota_definitions", repo.config.ApiEndpoint())
-	return repo.gateway.CreateResourceFromStruct(path, quota)
+	return repo.gateway.CreateResourceFromStruct(repo.config.ApiEndpoint(), "/v2/quota_definitions", quota)
 }
 
 func (repo CloudControllerQuotaRepository) Update(quota models.QuotaFields) error {

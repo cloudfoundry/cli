@@ -133,13 +133,13 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 }
 
 func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (err error) {
-	path := fmt.Sprintf("%s/v2/service_instances", repo.config.ApiEndpoint())
+	path := "/v2/service_instances"
 	data := fmt.Sprintf(
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s", "async": true}`,
 		name, planGuid, repo.config.SpaceFields().Guid,
 	)
 
-	err = repo.gateway.CreateResource(path, strings.NewReader(data))
+	err = repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data))
 
 	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SERVICE_INSTANCE_NAME_TAKEN {
 		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)

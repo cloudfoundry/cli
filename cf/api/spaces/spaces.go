@@ -66,10 +66,10 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 }
 
 func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr error) {
-	path := fmt.Sprintf("%s/v2/spaces?inline-relations-depth=1", repo.config.ApiEndpoint())
+	path := "/v2/spaces?inline-relations-depth=1"
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
 	resource := new(resources.SpaceResource)
-	apiErr = repo.gateway.CreateResource(path, strings.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}
