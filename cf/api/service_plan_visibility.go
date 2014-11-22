@@ -30,9 +30,9 @@ func NewCloudControllerServicePlanVisibilityRepository(config core_config.Reader
 }
 
 func (repo CloudControllerServicePlanVisibilityRepository) Create(serviceGuid, orgGuid string) error {
-	url := repo.config.ApiEndpoint() + "/v2/service_plan_visibilities"
+	url := "/v2/service_plan_visibilities"
 	data := fmt.Sprintf(`{"service_plan_guid":"%s", "organization_guid":"%s"}`, serviceGuid, orgGuid)
-	return repo.gateway.CreateResource(url, strings.NewReader(data))
+	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), url, strings.NewReader(data))
 }
 
 func (repo CloudControllerServicePlanVisibilityRepository) List() (visibilities []models.ServicePlanVisibilityFields, err error) {

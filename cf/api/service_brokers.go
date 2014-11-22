@@ -70,11 +70,11 @@ func (repo CloudControllerServiceBrokerRepository) FindByGuid(guid string) (serv
 }
 
 func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, password string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/service_brokers", repo.config.ApiEndpoint())
+	path := "/v2/service_brokers"
 	body := fmt.Sprintf(
 		`{"name":"%s","broker_url":"%s","auth_username":"%s","auth_password":"%s"}`, name, url, username, password,
 	)
-	return repo.gateway.CreateResource(path, strings.NewReader(body))
+	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker models.ServiceBroker) (apiErr error) {

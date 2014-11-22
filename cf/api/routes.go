@@ -84,11 +84,10 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 }
 
 func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
-	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.ApiEndpoint())
 	data := fmt.Sprintf(`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`, host, domainGuid, spaceGuid)
 
 	resource := new(resources.RouteResource)
-	apiErr = repo.gateway.CreateResource(path, strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/routes?inline-relations-depth=1", strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}

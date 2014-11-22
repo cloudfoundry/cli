@@ -108,7 +108,8 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 
 	resource := new(resources.DomainResource)
 	err = repo.gateway.CreateResource(
-		repo.config.ApiEndpoint()+repo.strategy.PrivateDomainsURL(),
+		repo.config.ApiEndpoint(),
+		repo.strategy.PrivateDomainsURL(),
 		strings.NewReader(string(data)),
 		resource)
 
@@ -131,7 +132,8 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 	}
 
 	apiErr = repo.gateway.CreateResource(
-		repo.config.ApiEndpoint()+repo.strategy.SharedDomainsURL(),
+		repo.config.ApiEndpoint(),
+		repo.strategy.SharedDomainsURL(),
 		strings.NewReader(string(data)))
 
 	return

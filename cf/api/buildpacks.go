@@ -62,7 +62,6 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 }
 
 func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
-	path := repo.config.ApiEndpoint() + buildpacks_path
 	entity := resources.BuildpackEntity{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	body, err := json.Marshal(entity)
 	if err != nil {
@@ -71,7 +70,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.CreateResource(path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), buildpacks_path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}

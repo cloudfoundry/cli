@@ -28,7 +28,7 @@ func NewCCUserProvidedServiceInstanceRepository(config core_config.Reader, gatew
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]interface{}) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
+	path := "/v2/user_provided_service_instances"
 
 	type RequestBody struct {
 		Name           string                 `json:"name"`
@@ -49,7 +49,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 		return
 	}
 
-	return repo.gateway.CreateResource(path, bytes.NewReader(jsonBytes))
+	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {

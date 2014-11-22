@@ -152,7 +152,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 		return
 	}
 
-	path := fmt.Sprintf("%s/Users", uaaEndpoint)
+	path := "/Users"
 	body, err := json.Marshal(resources.NewUAAUserResource(username, password))
 
 	if err != nil {
@@ -160,7 +160,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 	}
 
 	createUserResponse := &resources.UAAUserFields{}
-	err = repo.uaaGateway.CreateResource(path, bytes.NewReader(body), createUserResponse)
+	err = repo.uaaGateway.CreateResource(uaaEndpoint, path, bytes.NewReader(body), createUserResponse)
 	switch httpErr := err.(type) {
 	case nil:
 	case errors.HttpError:
@@ -173,7 +173,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 		return
 	}
 
-	path = fmt.Sprintf("%s/v2/users", repo.config.ApiEndpoint())
+	path = "/v2/users"
 	body, err = json.Marshal(resources.Metadata{
 		Guid: createUserResponse.Id,
 	})
@@ -182,7 +182,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 		return
 	}
 
-	return repo.ccGateway.CreateResource(path, bytes.NewReader(body))
+	return repo.ccGateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(body))
 }
 
 func (repo CloudControllerUserRepository) Delete(userGuid string) (apiErr error) {

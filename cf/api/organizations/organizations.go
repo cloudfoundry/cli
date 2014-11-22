@@ -69,13 +69,12 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 }
 
 func (repo CloudControllerOrganizationRepository) Create(org models.Organization) (apiErr error) {
-	url := repo.config.ApiEndpoint() + "/v2/organizations"
 	data := fmt.Sprintf(`{"name":"%s"`, org.Name)
 	if org.QuotaDefinition.Guid != "" {
 		data = data + fmt.Sprintf(`, "quota_definition_guid":"%s"`, org.QuotaDefinition.Guid)
 	}
 	data = data + "}"
-	return repo.gateway.CreateResource(url, strings.NewReader(data))
+	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/organizations", strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name string) (apiErr error) {
