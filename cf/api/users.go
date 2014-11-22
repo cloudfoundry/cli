@@ -247,8 +247,7 @@ func (repo CloudControllerUserRepository) SetSpaceRole(userGuid, spaceGuid, orgG
 		return
 	}
 
-	rolePath = repo.config.ApiEndpoint() + rolePath
-	return repo.ccGateway.UpdateResource(rolePath, nil)
+	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), rolePath, nil)
 }
 
 func (repo CloudControllerUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string) (apiErr error) {
@@ -274,8 +273,8 @@ func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, ro
 }
 
 func (repo CloudControllerUserRepository) addOrgUserRole(userGuid, orgGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/organizations/%s/users/%s", repo.config.ApiEndpoint(), orgGuid, userGuid)
-	return repo.ccGateway.UpdateResource(path, nil)
+	path := fmt.Sprintf("/v2/organizations/%s/users/%s", orgGuid, userGuid)
+	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), path, nil)
 }
 
 func (repo CloudControllerUserRepository) getAuthEndpoint() (string, error) {

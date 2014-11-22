@@ -79,9 +79,9 @@ func (repo CloudControllerOrganizationRepository) Create(org models.Organization
 }
 
 func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name string) (apiErr error) {
-	url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
+	url := fmt.Sprintf("/v2/organizations/%s", orgGuid)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	return repo.gateway.UpdateResource(url, strings.NewReader(data))
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiErr error) {

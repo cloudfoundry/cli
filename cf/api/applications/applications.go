@@ -83,9 +83,9 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params m
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.ApiEndpoint(), appGuid)
+	path := fmt.Sprintf("/v2/apps/%s?inline-relations-depth=1", appGuid)
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.UpdateResource(path, strings.NewReader(data), resource)
+	apiErr = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}

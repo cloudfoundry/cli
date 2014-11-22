@@ -153,22 +153,22 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 }
 
 func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string) (err error) {
-	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.ApiEndpoint(), instanceGuid)
+	path := fmt.Sprintf("/v2/service_instances/%s", instanceGuid)
 	data := fmt.Sprintf(`{"service_plan_guid":"%s"}`, planGuid)
 
-	err = repo.gateway.UpdateResource(path, strings.NewReader(data))
+	err = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data))
 
 	return
 }
 
 func (repo CloudControllerServiceRepository) RenameService(instance models.ServiceInstance, newName string) (apiErr error) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
-	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.ApiEndpoint(), instance.Guid)
+	path := fmt.Sprintf("/v2/service_instances/%s", instance.Guid)
 
 	if instance.IsUserProvided() {
-		path = fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.ApiEndpoint(), instance.Guid)
+		path = fmt.Sprintf("/v2/user_provided_service_instances/%s", instance.Guid)
 	}
-	return repo.gateway.UpdateResource(path, strings.NewReader(body))
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceRepository) DeleteService(instance models.ServiceInstance) (apiErr error) {
@@ -251,11 +251,11 @@ func (repo CloudControllerServiceRepository) ListServicesFromBroker(brokerGuid s
 }
 
 func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiErr error) {
-	path := fmt.Sprintf("%s/v2/service_plans/%s/service_instances", repo.config.ApiEndpoint(), v1PlanGuid)
+	path := fmt.Sprintf("/v2/service_plans/%s/service_instances", v1PlanGuid)
 	body := strings.NewReader(fmt.Sprintf(`{"service_plan_guid":"%s"}`, v2PlanGuid))
 	response := new(resources.ServiceMigrateV1ToV2Response)
 
-	apiErr = repo.gateway.UpdateResource(path, body, response)
+	apiErr = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, body, response)
 	if apiErr != nil {
 		return
 	}

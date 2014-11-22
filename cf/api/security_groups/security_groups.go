@@ -70,8 +70,8 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 }
 
 func (repo cloudControllerSecurityGroupRepo) Update(guid string, rules []map[string]interface{}) error {
-	url := fmt.Sprintf("%s/v2/security_groups/%s", repo.config.ApiEndpoint(), guid)
-	return repo.gateway.UpdateResourceFromStruct(url, models.SecurityGroupParams{Rules: rules})
+	url := fmt.Sprintf("/v2/security_groups/%s", guid)
+	return repo.gateway.UpdateResourceFromStruct(repo.config.ApiEndpoint(), url, models.SecurityGroupParams{Rules: rules})
 }
 
 func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, error) {
