@@ -53,7 +53,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.ApiEndpoint(), serviceInstanceFields.Guid)
+	path := fmt.Sprintf("/v2/user_provided_service_instances/%s", serviceInstanceFields.Guid)
 
 	type RequestBody struct {
 		Credentials    map[string]interface{} `json:"credentials,omitempty"`
@@ -67,5 +67,5 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 		return
 	}
 
-	return repo.gateway.UpdateResource(path, bytes.NewReader(jsonBytes))
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 }

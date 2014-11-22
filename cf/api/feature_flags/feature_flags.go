@@ -54,8 +54,8 @@ func (repo CloudControllerFeatureFlagRepository) FindByName(name string) (models
 }
 
 func (repo CloudControllerFeatureFlagRepository) Update(flag string, set bool) error {
-	url := fmt.Sprintf("%s/v2/config/feature_flags/%s", repo.config.ApiEndpoint(), flag)
+	url := fmt.Sprintf("/v2/config/feature_flags/%s", flag)
 	body := fmt.Sprintf(`{"enabled": %v}`, set)
 
-	return repo.gateway.UpdateResource(url, strings.NewReader(body))
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, strings.NewReader(body))
 }

@@ -87,7 +87,7 @@ func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (api
 }
 
 func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
-	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpack.Guid)
+	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpack.Guid)
 
 	entity := resources.BuildpackEntity{
 		Name:     buildpack.Name,
@@ -105,7 +105,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.UpdateResource(path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}

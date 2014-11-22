@@ -91,7 +91,8 @@ func (repo CloudControllerApplicationBitsRepository) GetApplicationFiles(appFile
 
 	presentFiles := []resources.AppFileResource{}
 	apiErr := repo.gateway.UpdateResourceSync(
-		repo.config.ApiEndpoint()+"/v2/resource_match",
+		repo.config.ApiEndpoint(),
+		"/v2/resource_match",
 		bytes.NewReader(allAppFilesJson),
 		&presentFiles)
 

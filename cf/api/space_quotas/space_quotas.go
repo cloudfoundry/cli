@@ -98,13 +98,13 @@ func (repo CloudControllerSpaceQuotaRepository) Create(quota models.SpaceQuota) 
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Update(quota models.SpaceQuota) error {
-	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s", repo.config.ApiEndpoint(), quota.Guid)
-	return repo.gateway.UpdateResourceFromStruct(path, quota)
+	path := fmt.Sprintf("/v2/space_quota_definitions/%s", quota.Guid)
+	return repo.gateway.UpdateResourceFromStruct(repo.config.ApiEndpoint(), path, quota)
 }
 
 func (repo CloudControllerSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error {
-	path := fmt.Sprintf("%s/v2/space_quota_definitions/%s/spaces/%s", repo.config.ApiEndpoint(), quotaGuid, spaceGuid)
-	return repo.gateway.UpdateResource(path, strings.NewReader(""))
+	path := fmt.Sprintf("/v2/space_quota_definitions/%s/spaces/%s", quotaGuid, spaceGuid)
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(""))
 }
 
 func (repo CloudControllerSpaceQuotaRepository) UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error {

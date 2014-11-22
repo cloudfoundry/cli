@@ -78,9 +78,9 @@ func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (
 }
 
 func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.ApiEndpoint(), spaceGuid)
+	path := fmt.Sprintf("/v2/spaces/%s", spaceGuid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
-	return repo.gateway.UpdateResource(path, strings.NewReader(body))
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
 func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiErr error) {

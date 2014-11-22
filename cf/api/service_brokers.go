@@ -78,18 +78,18 @@ func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, p
 }
 
 func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker models.ServiceBroker) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.ApiEndpoint(), serviceBroker.Guid)
+	path := fmt.Sprintf("/v2/service_brokers/%s", serviceBroker.Guid)
 	body := fmt.Sprintf(
 		`{"broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
 		serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
 	)
-	return repo.gateway.UpdateResource(path, strings.NewReader(body))
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceBrokerRepository) Rename(guid, name string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.ApiEndpoint(), guid)
+	path := fmt.Sprintf("/v2/service_brokers/%s", guid)
 	body := fmt.Sprintf(`{"name":"%s"}`, name)
-	return repo.gateway.UpdateResource(path, strings.NewReader(body))
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceBrokerRepository) Delete(guid string) (apiErr error) {

@@ -39,8 +39,8 @@ func (repo CloudControllerServicePlanRepository) Update(servicePlan models.Servi
 		serviceGuid,
 	)
 
-	url := fmt.Sprintf("%s/v2/service_plans/%s", repo.config.ApiEndpoint(), servicePlan.Guid)
-	return repo.gateway.UpdateResource(url, strings.NewReader(body))
+	url := fmt.Sprintf("/v2/service_plans/%s", servicePlan.Guid)
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, strings.NewReader(body))
 }
 
 func (repo CloudControllerServicePlanRepository) Search(queryParams map[string]string) (plans []models.ServicePlanFields, err error) {

@@ -15,8 +15,8 @@ type DefaultSecurityGroupsRepoBase struct {
 }
 
 func (repo *DefaultSecurityGroupsRepoBase) Bind(groupGuid string, path string) error {
-	updatedPath := fmt.Sprintf("%s%s/%s", repo.ConfigRepo.ApiEndpoint(), path, groupGuid)
-	return repo.Gateway.UpdateResourceFromStruct(updatedPath, "")
+	updatedPath := fmt.Sprintf("%s/%s", path, groupGuid)
+	return repo.Gateway.UpdateResourceFromStruct(repo.ConfigRepo.ApiEndpoint(), updatedPath, "")
 }
 
 func (repo *DefaultSecurityGroupsRepoBase) List(path string) ([]models.SecurityGroupFields, error) {

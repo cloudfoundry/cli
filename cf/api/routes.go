@@ -98,8 +98,8 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, space
 }
 
 func (repo CloudControllerRouteRepository) Bind(routeGuid, appGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.ApiEndpoint(), appGuid, routeGuid)
-	return repo.gateway.UpdateResource(path, nil)
+	path := fmt.Sprintf("/v2/apps/%s/routes/%s", appGuid, routeGuid)
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, nil)
 }
 
 func (repo CloudControllerRouteRepository) Unbind(routeGuid, appGuid string) (apiErr error) {

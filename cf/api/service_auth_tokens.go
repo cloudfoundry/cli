@@ -80,6 +80,6 @@ func (repo CloudControllerServiceAuthTokenRepository) Delete(authToken models.Se
 
 func (repo CloudControllerServiceAuthTokenRepository) Update(authToken models.ServiceAuthTokenFields) (apiErr error) {
 	body := fmt.Sprintf(`{"token":"%s"}`, authToken.Token)
-	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.ApiEndpoint(), authToken.Guid)
-	return repo.gateway.UpdateResource(path, strings.NewReader(body))
+	path := fmt.Sprintf("/v2/service_auth_tokens/%s", authToken.Guid)
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }

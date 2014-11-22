@@ -76,14 +76,14 @@ func (repo CloudControllerQuotaRepository) Create(quota models.QuotaFields) erro
 }
 
 func (repo CloudControllerQuotaRepository) Update(quota models.QuotaFields) error {
-	path := fmt.Sprintf("%s/v2/quota_definitions/%s", repo.config.ApiEndpoint(), quota.Guid)
-	return repo.gateway.UpdateResourceFromStruct(path, quota)
+	path := fmt.Sprintf("/v2/quota_definitions/%s", quota.Guid)
+	return repo.gateway.UpdateResourceFromStruct(repo.config.ApiEndpoint(), path, quota)
 }
 
 func (repo CloudControllerQuotaRepository) AssignQuotaToOrg(orgGuid, quotaGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
+	path := fmt.Sprintf("/v2/organizations/%s", orgGuid)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGuid)
-	return repo.gateway.UpdateResource(path, strings.NewReader(data))
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data))
 }
 
 func (repo CloudControllerQuotaRepository) Delete(quotaGuid string) (apiErr error) {
