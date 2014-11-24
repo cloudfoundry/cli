@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -124,8 +125,13 @@ func (c *terminalUI) Confirm(message string, args ...interface{}) bool {
 func (c *terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	c.printer.Println("")
 	c.printer.Printf(prompt+PromptColor(">")+" ", args...)
-	fmt.Fscanln(c.stdin, &answer)
-	return
+
+	rd := bufio.NewReader(c.stdin)
+	line, err := rd.ReadString('\n')
+	if err == nil {
+		return strings.TrimSpace(line)
+	}
+	return ""
 }
 
 func (c *terminalUI) Ok() {
