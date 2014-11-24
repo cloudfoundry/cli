@@ -8,6 +8,9 @@ type Printer interface {
 	Print(a ...interface{}) (n int, err error)
 	Printf(format string, a ...interface{}) (n int, err error)
 	Println(a ...interface{}) (n int, err error)
+	ForcePrint(a ...interface{}) (n int, err error)
+	ForcePrintf(format string, a ...interface{}) (n int, err error)
+	ForcePrintln(a ...interface{}) (n int, err error)
 }
 
 type OutputCapture interface {
@@ -60,6 +63,24 @@ func (t *TeePrinter) Println(values ...interface{}) (n int, err error) {
 		return fmt.Println(str)
 	}
 	return
+}
+
+func (t *TeePrinter) ForcePrint(values ...interface{}) (n int, err error) {
+	str := fmt.Sprint(values...)
+	t.output = append(t.output, Decolorize(str))
+	return fmt.Print(str)
+}
+
+func (t *TeePrinter) ForcePrintf(format string, a ...interface{}) (n int, err error) {
+	str := fmt.Sprintf(format, a...)
+	t.output = append(t.output, Decolorize(str))
+	return fmt.Print(str)
+}
+
+func (t *TeePrinter) ForcePrintln(values ...interface{}) (n int, err error) {
+	str := fmt.Sprint(values...)
+	t.output = append(t.output, Decolorize(str))
+	return fmt.Println(str)
 }
 
 func (t *TeePrinter) DisableTerminalOutput(disable bool) {

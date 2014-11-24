@@ -70,17 +70,33 @@ var _ = Describe("UI", func() {
 
 	Describe("Asking user for input", func() {
 		It("allows string with whitespaces", func() {
-			io_helpers.SimulateStdin("foo bar\n", func(reader io.Reader) {
-				ui := NewUI(reader, NewTeePrinter())
-				Expect(ui.Ask("?")).To(Equal("foo bar"))
+			io_helpers.CaptureOutput(func() {
+				io_helpers.SimulateStdin("foo bar\n", func(reader io.Reader) {
+					ui := NewUI(reader, NewTeePrinter())
+					Expect(ui.Ask("?")).To(Equal("foo bar"))
+				})
 			})
 		})
 
 		It("returns empty string if an error occured while reading string", func() {
-			io_helpers.SimulateStdin("string without expected delimiter", func(reader io.Reader) {
-				ui := NewUI(reader, NewTeePrinter())
-				Expect(ui.Ask("?")).To(Equal(""))
+			io_helpers.CaptureOutput(func() {
+				io_helpers.SimulateStdin("string without expected delimiter", func(reader io.Reader) {
+					ui := NewUI(reader, NewTeePrinter())
+					Expect(ui.Ask("?")).To(Equal(""))
+				})
 			})
+		})
+
+		It("always outputs the prompt, even when output is disabled", func() {
+			output := io_helpers.CaptureOutput(func() {
+				io_helpers.SimulateStdin("things are great\n", func(reader io.Reader) {
+					printer := NewTeePrinter()
+					printer.DisableTerminalOutput(true)
+					ui := NewUI(reader, printer)
+					ui.Ask("You like things?")
+				})
+			})
+			Expect(strings.Join(output, "")).To(ContainSubstring("You like things?"))
 		})
 	})
 
