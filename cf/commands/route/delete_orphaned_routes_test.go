@@ -27,6 +27,12 @@ var _ = Describe("delete-orphaned-routes command", func() {
 		_, passed := callDeleteOrphanedRoutes("y", []string{}, reqFactory, routeRepo)
 		Expect(passed).To(BeFalse())
 	})
+	It("should fail with usage when provided any arguments", func() {
+		reqFactory.LoginSuccess = true
+		ui, passed := callDeleteOrphanedRoutes("y", []string{"blahblah"}, reqFactory, routeRepo)
+		Expect(passed).To(BeFalse())
+		Expect(ui.FailedWithUsage).To(BeTrue())
+	})
 
 	Context("when logged in successfully", func() {
 

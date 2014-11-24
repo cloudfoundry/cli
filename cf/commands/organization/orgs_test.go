@@ -23,9 +23,9 @@ var _ = Describe("org command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
-	runCommand := func() bool {
+	runCommand := func(args ...string) bool {
 		cmd := organization.NewListOrgs(ui, configRepo, orgRepo)
-		return testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	BeforeEach(func() {
@@ -41,6 +41,12 @@ var _ = Describe("org command", func() {
 
 			Expect(runCommand()).To(BeFalse())
 		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
+
 	})
 
 	Context("when there are orgs to be listed", func() {

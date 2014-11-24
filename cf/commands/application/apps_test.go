@@ -33,9 +33,9 @@ var _ = Describe("list-apps command", func() {
 		}
 	})
 
-	runCommand := func() bool {
+	runCommand := func(args ...string) bool {
 		cmd := NewListApps(ui, configRepo, appSummaryRepo)
-		return testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -49,6 +49,12 @@ var _ = Describe("list-apps command", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
 
 			Expect(runCommand()).To(BeFalse())
+		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = true
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 	})
 

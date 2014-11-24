@@ -43,7 +43,7 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd *UpdateService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) < 1 {
+	if len(c.Args()) != 1 {
 		cmd.ui.FailWithUsage(c)
 	}
 

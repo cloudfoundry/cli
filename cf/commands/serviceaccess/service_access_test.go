@@ -44,6 +44,11 @@ var _ = Describe("service-access command", func() {
 			requirementsFactory.LoginSuccess = false
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 	})
 
 	Describe("when logged in", func() {
@@ -85,7 +90,7 @@ var _ = Describe("service-access command", func() {
 		})
 
 		It("refreshes the auth token", func() {
-			runCommand("service")
+			runCommand()
 			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
 		})
 

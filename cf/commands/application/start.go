@@ -101,7 +101,7 @@ func (cmd *Start) Metadata() command_metadata.CommandMetadata {
 }
 
 func (cmd *Start) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) == 0 {
+	if len(c.Args()) != 1 {
 		cmd.ui.FailWithUsage(c)
 	}
 
