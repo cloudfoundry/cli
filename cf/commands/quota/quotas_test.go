@@ -28,15 +28,20 @@ var _ = Describe("quotas command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
-	runCommand := func() bool {
+	runCommand := func(args ...string) bool {
 		cmd := NewListQuotas(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
-		return testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
 			Expect(runCommand()).ToNot(HavePassedRequirements())
+		})
+		It("should fail with usage when provided any arguments", func() {
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 	})
 

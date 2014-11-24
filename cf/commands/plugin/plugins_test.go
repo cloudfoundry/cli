@@ -35,6 +35,11 @@ var _ = Describe("Plugins", func() {
 		cmd := NewPlugins(ui, config)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
+	It("should fail with usage when provided any arguments", func() {
+		requirementsFactory.LoginSuccess = true
+		Expect(runCommand("blahblah")).To(BeFalse())
+		Expect(ui.FailedWithUsage).To(BeTrue())
+	})
 
 	It("returns a list of available methods of a plugin", func() {
 		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
