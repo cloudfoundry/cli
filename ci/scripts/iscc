@@ -15,7 +15,7 @@ INNO_BIN="Inno Setup 5/ISCC.exe"
 command -v wine >/dev/null 2>&1 || { echo >&2 "I require wine but it's not installed. Aborting."; echo; exit 1; }
 
 # Get inno setup path
-INNO_PATH="/home/pivotal/.wine/dosdevices/c:/Program Files/${INNO_BIN}"
+INNO_PATH="${WINE_DIR}/.wine/dosdevices/c:/Program Files/${INNO_BIN}"
 echo $INNO_PATH
 
 # Translate unix script path to windows path
