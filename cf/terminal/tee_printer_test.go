@@ -98,6 +98,60 @@ var _ = Describe("TeePrinter", func() {
 		})
 	})
 
+	Describe(".ForcePrintf", func() {
+		BeforeEach(func() {
+			output = io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.ForcePrintf("Hello %s", "everybody")
+			})
+		})
+
+		It("should delegate to fmt.Printf", func() {
+			Expect(output[0]).To(Equal("Hello everybody"))
+		})
+
+		It("should save the output to the slice", func() {
+			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello everybody"))
+		})
+
+		It("should decolorize text", func() {
+			io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.Printf("hi %s", EntityNameColor("foo"))
+			})
+
+			output = printer.GetOutputAndReset()
+			Expect(output[0]).To(Equal("hi foo"))
+		})
+	})
+
+	Describe(".ForcePrintln", func() {
+		BeforeEach(func() {
+			output = io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.ForcePrintln("Hello ", "everybody")
+			})
+		})
+
+		It("should delegate to fmt.Printf", func() {
+			Expect(output[0]).To(Equal("Hello everybody"))
+		})
+
+		It("should save the output to the slice", func() {
+			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello everybody"))
+		})
+
+		It("should decolorize text", func() {
+			io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter()
+				printer.Println("hi " + EntityNameColor("foo"))
+			})
+
+			output = printer.GetOutputAndReset()
+			Expect(output[0]).To(Equal("hi foo"))
+		})
+	})
+
 	Describe(".GetOutputAndReset", func() {
 		BeforeEach(func() {
 			output = io_helpers.CaptureOutput(func() {
@@ -121,15 +175,18 @@ var _ = Describe("TeePrinter", func() {
 				printer.Print("Hello")
 				printer.Println("Mom!")
 				printer.Printf("Dad!")
+				printer.ForcePrint("Forced Hello")
+				printer.ForcePrintln("Forced Mom")
+				printer.ForcePrintf("Forced Dad")
 			})
 		})
 
-		It("should print no terminal output", func() {
-			Expect(output).To(Equal([]string{""}))
+		It("should print only forced terminal output", func() {
+			Expect(output).To(Equal([]string{"Forced HelloForced Mom", "Forced Dad"}))
 		})
 
-		It("should still capture output", func() {
-			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello"))
+		It("should still capture all output", func() {
+			Expect(printer.GetOutputAndReset()).To(Equal([]string{"Hello", "Mom!", "Dad!", "Forced Hello", "Forced Mom", "Forced Dad"}))
 		})
 
 		Describe(".ResumeOutput", func() {
@@ -141,15 +198,18 @@ var _ = Describe("TeePrinter", func() {
 					printer.Println("Mom!")
 					printer.Printf("Dad!")
 					printer.Println("Grandpa!")
+					printer.ForcePrint("ForcePrint")
+					printer.ForcePrintln("ForcePrintln")
+					printer.ForcePrintf("ForcePrintf")
 				})
 			})
 
 			It("should print all output", func() {
-				Expect(output[1]).To(Equal("Dad!Grandpa!"))
+				Expect(output).To(Equal([]string{"HelloMom!", "Dad!Grandpa!", "ForcePrintForcePrintln", "ForcePrintf"}))
 			})
 
-			It("should print terminal output", func() {
-				Expect(printer.GetOutputAndReset()[3]).To(Equal("Grandpa!"))
+			It("should capture all output", func() {
+				Expect(printer.GetOutputAndReset()).To(Equal([]string{"Hello", "Mom!", "Dad!", "Grandpa!", "ForcePrint", "ForcePrintln", "ForcePrintf"}))
 			})
 		})
 	})

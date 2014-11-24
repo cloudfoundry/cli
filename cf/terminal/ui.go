@@ -123,8 +123,8 @@ func (c *terminalUI) Confirm(message string, args ...interface{}) bool {
 }
 
 func (c *terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
-	c.printer.Println("")
-	c.printer.Printf(prompt+PromptColor(">")+" ", args...)
+	fmt.Println("")
+	fmt.Printf(prompt+PromptColor(">")+" ", args...)
 
 	rd := bufio.NewReader(c.stdin)
 	line, err := rd.ReadString('\n')
