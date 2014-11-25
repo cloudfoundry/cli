@@ -580,7 +580,7 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-space SPACE [-o ORG]",
+      "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE_QUOTA]",
       "translation": "CF_NAME create-space ESPAÇO [-o ORG]",
       "modified": false
    },
@@ -2852,6 +2852,11 @@
    {
       "id": "Organization",
       "translation": "Organização",
+      "modified": false
+   },
+   {
+      "id": "Space-Quota to assign to the newly created space. Excluding this option results in assignment of default quota",
+      "translation": "Space-Quota to assign to the newly created space. Excluding this option results in assignment of default quota",
       "modified": false
    },
    {
