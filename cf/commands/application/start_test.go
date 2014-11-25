@@ -262,8 +262,9 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.Command = "command start command"
 			defaultAppForStart.DetectedStartCommand = "detected start command"
 			displayApp := &testcmd.FakeAppDisplayer{}
-			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
 
+			Expect(appRepo.ReadCalls).To(Equal(1))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"App my-app was started using this command `command start command`"},
 			))
@@ -273,8 +274,9 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.DetectedStartCommand = "detected start command"
 			defaultAppForStart.Command = ""
 			displayApp := &testcmd.FakeAppDisplayer{}
-			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
 
+			Expect(appRepo.ReadCalls).To(Equal(1))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"App my-app was started using this command `detected start command`"},
 			))

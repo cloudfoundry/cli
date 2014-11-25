@@ -163,20 +163,27 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	cmd.ui.Say("")
 	cmd.ui.Ok()
 
+	//detectedstartcommand on first push is not present until starting completes
+	startedApp, apiErr := cmd.appRepo.Read(updatedApp.Name)
+	if err != nil {
+		cmd.ui.Failed(apiErr.Error())
+		return
+	}
+
 	var appStartCommand string
 	if app.Command == "" {
-		appStartCommand = app.DetectedStartCommand
+		appStartCommand = startedApp.DetectedStartCommand
 	} else {
-		appStartCommand = app.Command
+		appStartCommand = startedApp.Command
 	}
 
 	cmd.ui.Say(T("\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
 		map[string]interface{}{
-			"AppName": terminal.EntityNameColor(app.Name),
+			"AppName": terminal.EntityNameColor(startedApp.Name),
 			"Command": appStartCommand,
 		}))
 
-	cmd.appDisplayer.ShowApp(updatedApp, orgName, spaceName)
+	cmd.appDisplayer.ShowApp(startedApp, orgName, spaceName)
 	return
 }
 

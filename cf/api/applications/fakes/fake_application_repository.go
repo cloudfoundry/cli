@@ -11,7 +11,8 @@ import (
 type FakeApplicationRepository struct {
 	FindAllApps []models.Application
 
-	ReadArgs struct {
+	ReadCalls int
+	ReadArgs  struct {
 		Name string
 	}
 	ReadReturns struct {
@@ -123,6 +124,7 @@ func (fake *FakeApplicationRepository) ReadEnvReturns(result1 *models.Environmen
 //End counterfeiter section
 
 func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiErr error) {
+	repo.ReadCalls++
 	repo.ReadArgs.Name = name
 	return repo.ReadReturns.App, repo.ReadReturns.Error
 }
