@@ -31,7 +31,7 @@ func (cmd SecurityGroups) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "security-groups",
 		Description: T("List all security groups"),
-		Usage:       "CF_NAME security-group",
+		Usage:       "CF_NAME security-groups",
 	}
 }
 
