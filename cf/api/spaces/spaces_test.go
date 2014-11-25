@@ -127,7 +127,7 @@ var _ = Describe("Space Repository", func() {
 		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/spaces",
-			Matcher: testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"my-org-guid"}`),
+			Matcher: testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"my-org-guid","space_quota_definition_guid":"my-space-quota-guid"}`),
 			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 			{
 				"metadata": {
@@ -142,7 +142,7 @@ var _ = Describe("Space Repository", func() {
 		ts, handler, repo := createSpacesRepo(request)
 		defer ts.Close()
 
-		space, apiErr := repo.Create("space-name", "my-org-guid")
+		space, apiErr := repo.Create("space-name", "my-org-guid", "my-space-quota-guid")
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(space.Guid).To(Equal("space-guid"))

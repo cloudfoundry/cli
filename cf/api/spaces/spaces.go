@@ -16,7 +16,7 @@ type SpaceRepository interface {
 	ListSpaces(func(models.Space) bool) error
 	FindByName(name string) (space models.Space, apiErr error)
 	FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr error)
-	Create(name string, orgGuid string) (space models.Space, apiErr error)
+	Create(name string, orgGuid string, spaceQuotaGuid string) (space models.Space, apiErr error)
 	Rename(spaceGuid, newName string) (apiErr error)
 	Delete(spaceGuid string) (apiErr error)
 }
@@ -65,9 +65,13 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr error) {
+func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string, spaceQuotaGuid string) (space models.Space, apiErr error) {
 	path := "/v2/spaces?inline-relations-depth=1"
-	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
+	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"`, name, orgGuid)
+	if spaceQuotaGuid != "" {
+		body = body + fmt.Sprintf(`,"space_quota_definition_guid":"%s"`, spaceQuotaGuid)
+	}
+	body = body + "}"
 	resource := new(resources.SpaceResource)
 	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body), resource)
 	if apiErr != nil {
