@@ -5,6 +5,7 @@ import (
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -31,10 +32,11 @@ var _ = Describe("create-space command", func() {
 		orgRepo             *fake_org.FakeOrganizationRepository
 		userRepo            *testapi.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
+		spaceQuotaRepo      *fakes.FakeSpaceQuotaRepository
 	)
 
 	runCommand := func(args ...string) bool {
-		cmd := NewCreateSpace(ui, configRepo, spaceRoleSetter, spaceRepo, orgRepo, userRepo)
+		cmd := NewCreateSpace(ui, configRepo, spaceRoleSetter, spaceRepo, orgRepo, userRepo, spaceQuotaRepo)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -45,6 +47,7 @@ var _ = Describe("create-space command", func() {
 		orgRepo = &fake_org.FakeOrganizationRepository{}
 		userRepo = &testapi.FakeUserRepository{}
 		spaceRoleSetter = user.NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
+		spaceQuotaRepo = &fakes.FakeSpaceQuotaRepository{}
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		configOrg = models.OrganizationFields{
@@ -174,6 +177,33 @@ var _ = Describe("create-space command", func() {
 			))
 
 			Expect(spaceRepo.CreateSpaceName).To(Equal(""))
+		})
+	})
+
+	Context("when the -q flag is provided", func() {
+		It("assigns the space-quota specified to the space", func() {
+			spaceQuota := models.SpaceQuota{
+				Name: "my-space-quota",
+				Guid: "my-space-quota-guid",
+			}
+			spaceQuotaRepo.FindByNameReturns(spaceQuota, nil)
+			runCommand("-q", "my-space-quota", "my-space")
+
+			Expect(spaceQuotaRepo.FindByNameArgsForCall(0)).To(Equal(spaceQuota.Name))
+			Expect(spaceRepo.CreateSpaceSpaceQuotaGuid).To(Equal(spaceQuota.Guid))
+
+		})
+
+		Context("when the space-quota provided does not exist", func() {
+			It("fails", func() {
+				spaceQuotaRepo.FindByNameReturns(models.SpaceQuota{}, errors.New("Error"))
+				runCommand("-q", "my-space-quota", "my-space")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Error"},
+				))
+			})
 		})
 	})
 })

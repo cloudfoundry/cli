@@ -229,7 +229,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 
 	spaceRoleSetter := user.NewSetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
 	factory.cmdsByName["set-space-role"] = spaceRoleSetter
-	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, config, spaceRoleSetter, repoLocator.GetSpaceRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetUserRepository())
+	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, config, spaceRoleSetter, repoLocator.GetSpaceRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetUserRepository(), repoLocator.GetSpaceQuotaRepository())
 
 	factory.cmdsByName["service-access"] = serviceaccess.NewServiceAccess(
 		ui, config,

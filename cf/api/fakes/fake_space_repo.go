@@ -22,10 +22,11 @@ type FakeSpaceRepository struct {
 
 	SummarySpace models.Space
 
-	CreateSpaceName    string
-	CreateSpaceOrgGuid string
-	CreateSpaceExists  bool
-	CreateSpaceSpace   models.Space
+	CreateSpaceName           string
+	CreateSpaceOrgGuid        string
+	CreateSpaceSpaceQuotaGuid string
+	CreateSpaceExists         bool
+	CreateSpaceSpace          models.Space
 
 	RenameSpaceGuid string
 	RenameNewName   string
@@ -82,13 +83,14 @@ func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiErr error)
 	return
 }
 
-func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr error) {
+func (repo *FakeSpaceRepository) Create(name, orgGuid, spaceQuotaGuid string) (space models.Space, apiErr error) {
 	if repo.CreateSpaceExists {
 		apiErr = errors.NewHttpError(400, errors.SPACE_EXISTS, "Space already exists")
 		return
 	}
 	repo.CreateSpaceName = name
 	repo.CreateSpaceOrgGuid = orgGuid
+	repo.CreateSpaceSpaceQuotaGuid = spaceQuotaGuid
 	space = repo.CreateSpaceSpace
 	return
 }
