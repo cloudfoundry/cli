@@ -37,7 +37,7 @@ func BuildRunCommand() *Command {
 }
 
 type SpecRunner struct {
-	commandFlags     *RunAndWatchCommandFlags
+	commandFlags     *RunWatchAndBuildCommandFlags
 	notifier         *Notifier
 	interruptHandler *InterruptHandler
 	suiteRunner      *SuiteRunner
@@ -47,13 +47,19 @@ func (r *SpecRunner) RunSpecs(args []string, additionalArgs []string) {
 	r.commandFlags.computeNodes()
 	r.notifier.VerifyNotificationsAreAvailable()
 
-	suites, skippedPackages := findSuites(args, r.commandFlags.Recurse, r.commandFlags.SkipPackage)
+	suites, skippedPackages := findSuites(args, r.commandFlags.Recurse, r.commandFlags.SkipPackage, true)
 	if len(skippedPackages) > 0 {
 		fmt.Println("Will skip:")
 		for _, skippedPackage := range skippedPackages {
 			fmt.Println("  " + skippedPackage)
 		}
 	}
+
+	if len(skippedPackages) > 0 && len(suites) == 0 {
+		fmt.Println("All tests skipped!  Exiting...")
+		os.Exit(0)
+	}
+
 	if len(suites) == 0 {
 		complainAndQuit("Found no test suites")
 	}
@@ -74,7 +80,7 @@ func (r *SpecRunner) RunSpecs(args []string, additionalArgs []string) {
 		for {
 			r.UpdateSeed()
 			randomizedRunners := r.randomizeOrder(runners)
-			runResult, numSuites = r.suiteRunner.RunSuites(randomizedRunners, r.commandFlags.KeepGoing, nil)
+			runResult, numSuites = r.suiteRunner.RunSuites(randomizedRunners, r.commandFlags.NumCompilers, r.commandFlags.KeepGoing, nil)
 			iteration++
 
 			if r.interruptHandler.WasInterrupted() {
@@ -90,7 +96,7 @@ func (r *SpecRunner) RunSpecs(args []string, additionalArgs []string) {
 		}
 	} else {
 		randomizedRunners := r.randomizeOrder(runners)
-		runResult, numSuites = r.suiteRunner.RunSuites(randomizedRunners, r.commandFlags.KeepGoing, nil)
+		runResult, numSuites = r.suiteRunner.RunSuites(randomizedRunners, r.commandFlags.NumCompilers, r.commandFlags.KeepGoing, nil)
 	}
 
 	for _, runner := range runners {
