@@ -1,4 +1,4 @@
-// +build freebsd openbsd netbsd darwin linux
+// +build freebsd openbsd netbsd dragonfly darwin linux
 
 package remote
 
@@ -28,17 +28,17 @@ func (interceptor *outputInterceptor) StartInterceptingOutput() error {
 
 	var err error
 
-	interceptor.redirectFile, err = ioutil.TempFile("", "ginkgo")
+	interceptor.redirectFile, err = ioutil.TempFile("", "ginkgo-output")
 	if err != nil {
 		return err
 	}
 
-	interceptor.stdoutPlaceholder, err = ioutil.TempFile("", "ginkgo")
+	interceptor.stdoutPlaceholder, err = ioutil.TempFile("", "ginkgo-output")
 	if err != nil {
 		return err
 	}
 
-	interceptor.stderrPlaceholder, err = ioutil.TempFile("", "ginkgo")
+	interceptor.stderrPlaceholder, err = ioutil.TempFile("", "ginkgo-output")
 	if err != nil {
 		return err
 	}
