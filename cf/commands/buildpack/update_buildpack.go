@@ -32,12 +32,12 @@ func (cmd *UpdateBuildpack) Metadata() command_metadata.CommandMetadata {
 		Usage: T("CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]") +
 			T("\n\nTIP:\n") + T("   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."),
 		Flags: []cli.Flag{
-			flag_helpers.NewIntFlag("i", T("Buildpack position among other buildpacks")),
+			flag_helpers.NewIntFlag("i", T("The order in which the buildpacks are checked during buildpack auto-detection")),
 			flag_helpers.NewStringFlag("p", T("Path to directory or zip file")),
-			cli.BoolFlag{Name: "enable", Usage: T("Enable the buildpack")},
-			cli.BoolFlag{Name: "disable", Usage: T("Disable the buildpack")},
-			cli.BoolFlag{Name: "lock", Usage: T("Lock the buildpack")},
-			cli.BoolFlag{Name: "unlock", Usage: T("Unlock the buildpack")},
+			cli.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")},
+			cli.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")},
+			cli.BoolFlag{Name: "lock", Usage: T("Lock the buildpack to prevent updates")},
+			cli.BoolFlag{Name: "unlock", Usage: T("Unlock the buildpack to enable updates")},
 		},
 	}
 }

@@ -460,11 +460,6 @@
       "modified": false
    },
    {
-      "id": "Buildpack position among other buildpacks",
-      "translation": "Buildpack position among other buildpacks",
-      "modified": false
-   },
-   {
       "id": "Buildpack {{.BuildpackName}} already exists",
       "translation": "Buildpack {{.BuildpackName}} already exists",
       "modified": false
@@ -1575,8 +1570,8 @@
       "modified": false
    },
    {
-      "id": "Disable the buildpack",
-      "translation": "Disable the buildpack",
+      "id": "Disable the buildpack from being used for staging",
+      "translation": "Disable the buildpack from being used for staging",
       "modified": false
    },
    {
@@ -1695,8 +1690,8 @@
       "modified": false
    },
    {
-      "id": "Enable the buildpack",
-      "translation": "Enable the buildpack",
+      "id": "Enable the buildpack to be used for staging",
+      "translation": "Enable the buildpack to be used for staging",
       "modified": false
    },
    {
@@ -2525,8 +2520,8 @@
       "modified": false
    },
    {
-      "id": "Lock the buildpack",
-      "translation": "Lock the buildpack",
+      "id": "Lock the buildpack to prevent updates",
+      "translation": "Lock the buildpack to prevent updates",
       "modified": false
    },
    {
@@ -3705,6 +3700,11 @@
       "modified": false
    },
    {
+      "id": "The order in which the buildpacks are checked during buildpack auto-detection",
+      "translation": "The order in which the buildpacks are checked during buildpack auto-detection",
+      "modified": false
+   },
+   {
       "id": "The plan is already accessible for all orgs",
       "translation": "The plan is already accessible for all orgs",
       "modified": false
@@ -3910,8 +3910,8 @@
       "modified": false
    },
    {
-      "id": "Unlock the buildpack",
-      "translation": "Unlock the buildpack",
+      "id": "Unlock the buildpack to enable updates",
+      "translation": "Unlock the buildpack to enable updates",
       "modified": false
    },
    {
