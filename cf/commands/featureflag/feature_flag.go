@@ -31,7 +31,7 @@ func (cmd ShowFeatureFlag) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "feature-flag",
 		Description: T("Retrieve an individual feature flag with status"),
-		Usage:       T("CF_NAME feature-flag"),
+		Usage:       T("CF_NAME feature-flag FEATURE_NAME"),
 	}
 }
 
