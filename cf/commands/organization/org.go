@@ -82,10 +82,11 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 		}
 
 		quota := org.QuotaDefinition
-		orgQuota := fmt.Sprintf(T("{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
+		orgQuota := fmt.Sprintf(T("{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
 			map[string]interface{}{
 				"QuotaName":               quota.Name,
 				"MemoryLimit":             quota.MemoryLimit,
+				"InstanceMemoryLimit":     formatters.InstanceMemoryLimit(quota.InstanceMemoryLimit),
 				"RoutesLimit":             quota.RoutesLimit,
 				"ServicesLimit":           quota.ServicesLimit,
 				"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
