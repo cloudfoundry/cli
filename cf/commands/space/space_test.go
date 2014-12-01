@@ -74,6 +74,7 @@ var _ = Describe("space command", func() {
 
 			space := models.Space{}
 			space.Name = "whose-space-is-it-anyway"
+			space.Guid = "whose-space-is-it-anyway-guid"
 			space.Organization = org
 			space.Applications = apps
 			space.Domains = domains
@@ -95,6 +96,20 @@ var _ = Describe("space command", func() {
 			requirementsFactory.Space = space
 
 			quotaRepo.FindByGuidReturns(quota, nil)
+		})
+
+		Context("when the guid flag is passed", func() {
+			It("shows only the space guid", func() {
+				runCommand("--guid", "whose-space-is-it-anyway")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"whose-space-is-it-anyway-guid"},
+				))
+
+				Expect(ui.Outputs).ToNot(ContainSubstrings(
+					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+				))
+			})
 		})
 
 		Context("when the space has a space quota", func() {
