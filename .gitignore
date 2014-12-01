@@ -47,6 +47,9 @@ tags
 
 *.coverprofile
 
+#config craeted by bin/test
+fixtures/.cf
+
 #Compiled Plugins
 fixtures/plugins/test_1
 fixtures/plugins/test_2
