@@ -103,7 +103,7 @@ func appHelpTemplate() string {
 {{.SubTitle .Name}}{{range .CommandSubGroups}}
 {{range .}}   {{.Name}} {{.Description}}
 {{end}}{{end}}{{end}}
-{{.Title "` + T("ENVIRONMENT VARIABLES") + `"}}
+{{.Title "` + T("ENVIRONMENT VARIABLES:") + `"}}
    CF_COLOR=false                     ` + T("Do not colorize output") + `
    CF_HOME=path/to/dir/               ` + T("Override path to default config directory") + `
    CF_PLUGIN_HOME=path/to/dir/        ` + T("Override path to default plugin config directory") + `
@@ -113,7 +113,7 @@ func appHelpTemplate() string {
    CF_TRACE=path/to/trace.log         ` + T("Append API request diagnostics to a log file") + `
    HTTP_PROXY=proxy.example.com:8080  ` + T("Enable HTTP proxying for API requests") + `
 
-{{.Title "` + T("GLOBAL OPTIONS") + `"}}
+{{.Title "` + T("GLOBAL OPTIONS:") + `"}}
    --version, -v                      ` + T("Print the version") + `
    --help, -h                         ` + T("Show help") + `
 `

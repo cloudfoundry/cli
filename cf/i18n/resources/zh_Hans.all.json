@@ -1650,9 +1650,9 @@
       "modified": false
    },
    {
-      "id": "ENVIRONMENT VARIABLES",
-      "translation": "环境变量",
-      "modified": false
+      "id": "ENVIRONMENT VARIABLES:",
+      "translation": "环境变量:",
+      "modified": true
    },
    {
       "id": "EXAMPLE:\n",
@@ -2055,9 +2055,9 @@
       "modified": false
    },
    {
-      "id": "GLOBAL OPTIONS",
-      "translation": "全局选项",
-      "modified": false
+      "id": "GLOBAL OPTIONS:",
+      "translation": "全局选项:",
+      "modified": true
    },
    {
       "id": "Getting OAuth token...",
