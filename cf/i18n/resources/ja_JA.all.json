@@ -1650,9 +1650,9 @@
       "modified": false
    },
    {
-      "id": "ENVIRONMENT VARIABLES",
-      "translation": "ENVIRONMENT VARIABLES",
-      "modified": false
+      "id": "ENVIRONMENT VARIABLES:",
+      "translation": "ENVIRONMENT VARIABLES:",
+      "modified": true
    },
    {
       "id": "EXAMPLE:\n",
@@ -2055,9 +2055,9 @@
       "modified": false
    },
    {
-      "id": "GLOBAL OPTIONS",
-      "translation": "GLOBAL OPTIONS",
-      "modified": false
+      "id": "GLOBAL OPTIONS:",
+      "translation": "GLOBAL OPTIONS:",
+      "modified": true
    },
    {
       "id": "Getting OAuth token...",
