@@ -36,6 +36,9 @@ func (cmd *ShowSpace) Metadata() command_metadata.CommandMetadata {
 		Name:        "space",
 		Description: T("Show space info"),
 		Usage:       T("CF_NAME space SPACE"),
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given space's guid.  All other output for the space is suppressed.")},
+		},
 	}
 }
 
@@ -55,47 +58,52 @@ func (cmd *ShowSpace) GetRequirements(requirementsFactory requirements.Factory, 
 
 func (cmd *ShowSpace) Run(c *cli.Context) {
 	space := cmd.spaceReq.GetSpace()
-	cmd.ui.Say(T("Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
-		map[string]interface{}{
-			"TargetSpace": terminal.EntityNameColor(space.Name),
-			"OrgName":     terminal.EntityNameColor(space.Organization.Name),
-			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
-		}))
 
-	quotaString := cmd.quotaString(space)
+	if c.Bool("guid") {
+		cmd.ui.Say(space.Guid)
+	} else {
+		cmd.ui.Say(T("Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
+			map[string]interface{}{
+				"TargetSpace": terminal.EntityNameColor(space.Name),
+				"OrgName":     terminal.EntityNameColor(space.Organization.Name),
+				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			}))
 
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-	table := terminal.NewTable(cmd.ui, []string{terminal.EntityNameColor(space.Name), "", ""})
-	table.Add("", T("Org:"), terminal.EntityNameColor(space.Organization.Name))
+		quotaString := cmd.quotaString(space)
 
-	apps := []string{}
-	for _, app := range space.Applications {
-		apps = append(apps, terminal.EntityNameColor(app.Name))
+		cmd.ui.Ok()
+		cmd.ui.Say("")
+		table := terminal.NewTable(cmd.ui, []string{terminal.EntityNameColor(space.Name), "", ""})
+		table.Add("", T("Org:"), terminal.EntityNameColor(space.Organization.Name))
+
+		apps := []string{}
+		for _, app := range space.Applications {
+			apps = append(apps, terminal.EntityNameColor(app.Name))
+		}
+		table.Add("", T("Apps:"), strings.Join(apps, ", "))
+
+		domains := []string{}
+		for _, domain := range space.Domains {
+			domains = append(domains, terminal.EntityNameColor(domain.Name))
+		}
+		table.Add("", T("Domains:"), strings.Join(domains, ", "))
+
+		services := []string{}
+		for _, service := range space.ServiceInstances {
+			services = append(services, terminal.EntityNameColor(service.Name))
+		}
+		table.Add("", T("Services:"), strings.Join(services, ", "))
+
+		securityGroups := []string{}
+		for _, group := range space.SecurityGroups {
+			securityGroups = append(securityGroups, terminal.EntityNameColor(group.Name))
+		}
+		table.Add("", T("Security Groups:"), strings.Join(securityGroups, ", "))
+
+		table.Add("", T("Space Quota:"), quotaString)
+
+		table.Print()
 	}
-	table.Add("", T("Apps:"), strings.Join(apps, ", "))
-
-	domains := []string{}
-	for _, domain := range space.Domains {
-		domains = append(domains, terminal.EntityNameColor(domain.Name))
-	}
-	table.Add("", T("Domains:"), strings.Join(domains, ", "))
-
-	services := []string{}
-	for _, service := range space.ServiceInstances {
-		services = append(services, terminal.EntityNameColor(service.Name))
-	}
-	table.Add("", T("Services:"), strings.Join(services, ", "))
-
-	securityGroups := []string{}
-	for _, group := range space.SecurityGroups {
-		securityGroups = append(securityGroups, terminal.EntityNameColor(group.Name))
-	}
-	table.Add("", T("Security Groups:"), strings.Join(securityGroups, ", "))
-
-	table.Add("", T("Space Quota:"), quotaString)
-
-	table.Print()
 }
 
 func (cmd *ShowSpace) quotaString(space models.Space) string {
