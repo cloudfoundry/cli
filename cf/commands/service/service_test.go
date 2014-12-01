@@ -80,6 +80,20 @@ var _ = Describe("service command", func() {
 				))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 			})
+
+			Context("when the guid flag is provided", func() {
+				It("shows only the service guid", func() {
+					runCommand("--guid", "service1")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"service1-guid"},
+					))
+
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Service instance:", "service1"},
+					))
+				})
+			})
 		})
 
 		Context("when th e service is user provided", func() {
