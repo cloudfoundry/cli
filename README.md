@@ -60,6 +60,10 @@ $ brew install cloudfoundry-cli
 Troubleshooting / FAQs
 ======================
 
+Known Issues
+------------
+* .cfignore used in `cf push` must be in UTF8 encoding for CLI to interpret correctly.
+
 Linux
 -----
 * "bash: .cf: No such file or directory". Ensure that you're using the correct binary or installer for your architecture. See http://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
