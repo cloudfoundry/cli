@@ -4695,9 +4695,9 @@
       "modified": false
    },
    {
-      "id": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
+      "id": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
       "translation": "{{.QuotaName}} ({{.MemoryLimit}}M limite de memória, {{.RoutesLimit}} rotas, {{.ServicesLimit}} serviços, serviços pagos {{.NonBasicServicesAllowed}})",
-      "modified": false
+      "modified": true
    },
    {
       "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
