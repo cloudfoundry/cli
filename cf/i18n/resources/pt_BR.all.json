@@ -3240,6 +3240,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve and display the given org's guid.  All other output for the org is suppressed.",
+      "translation": "Retrieve and display the given org's guid.  All other output for the org is suppressed.",
+      "modified": false
+   },
+   {
       "id": "Retrieve and display the given service's guid.  All other output for the service is suppressed.",
       "translation": "Retrieve and display the given service's guid.  All other output for the service is suppressed.",
       "modified": false

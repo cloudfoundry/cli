@@ -103,5 +103,19 @@ var _ = Describe("org command", func() {
 				[]string{"space quotas:", "space-quota-1", "space-quota-2"},
 			))
 		})
+
+		Context("when the guid flag is provided", func() {
+			It("shows only the org guid", func() {
+				runCommand("--guid", "my-org")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"my-org-guid"},
+				))
+
+				Expect(ui.Outputs).ToNot(ContainSubstrings(
+					[]string{"Getting info for org", "my-org", "my-user"},
+				))
+			})
+		})
 	})
 })
