@@ -246,8 +246,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("SPACE ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("space-quota"),
 					presentCommand("space-quotas"),
+					presentCommand("space-quota"),
 					presentCommand("create-space-quota"),
 					presentCommand("update-space-quota"),
 					presentCommand("delete-space-quota"),
