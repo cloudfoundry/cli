@@ -23,5 +23,6 @@ type PluginMetadata struct {
 
 type Command struct {
 	Name     string
+	Alias    string
 	HelpText string
 }

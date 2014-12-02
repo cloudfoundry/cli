@@ -14,7 +14,7 @@ func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture 
 	pluginList := pluginsConfig.Plugins()
 	for _, metadata := range pluginList {
 		for _, command := range metadata.Commands {
-			if command.Name == args[0] {
+			if command.Name == args[0] || command.Alias == args[0] {
 				cliServer, err := startCliServer(coreCommandRunner, outputCapture, terminalOutputSwitch)
 				if err != nil {
 					os.Exit(1)

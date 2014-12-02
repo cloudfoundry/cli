@@ -103,6 +103,11 @@ var _ = Describe("main", func() {
 			Eventually(output.Out).Should(Say("You called cmd1 in test_1"))
 		})
 
+		It("Can call a plugin command via alias if it does not exist as a cf command", func() {
+			output := Cf("test_1_cmd1_alias").Wait(3 * time.Second)
+			Eventually(output.Out).Should(Say("You called cmd1 in test_1"))
+		})
+
 		It("Can call another plugin command when more than one plugin is installed", func() {
 			output := Cf("test_2_cmd1").Wait(3 * time.Second)
 			Eventually(output.Out).Should(Say("You called cmd1 in test_2"))
