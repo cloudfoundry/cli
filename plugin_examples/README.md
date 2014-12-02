@@ -58,6 +58,10 @@ See the [calling CLI commands example](https://github.com/cloudfoundry/cli/blob/
 Because a plugin has access to stdin during a call to the `Run(...)` method, you can create interactive plugins. See the [interactive plugin example](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/interactive.go)
  included in this repo. 
 
+### Creating Plugins with multiple commands
+
+A single plugin binary can have more than one command, and each command can have it's own help text defined. For an example of multi-comamnd plugins, see the [multiple commands example](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/multiple_commands.go)
+
 ## Compiling Plugin Source Code
 
 The cf CLI requires an executable file to install the plugin. You must compile the source code with the `go build` command before distributing the plugin, or instruct your users to compile the plugin source code before 
