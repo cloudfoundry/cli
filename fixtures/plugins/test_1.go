@@ -30,6 +30,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 		Commands: []plugin.Command{
 			{
 				Name:     "test_1_cmd1",
+				Alias:    "test_1_cmd1_alias",
 				HelpText: "help text for test_1_cmd1",
 			},
 			{

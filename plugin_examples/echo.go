@@ -61,6 +61,7 @@ func (pluginDemo *PluginDemonstratingParams) GetMetadata() plugin.PluginMetadata
 		Commands: []plugin.Command{
 			{
 				Name:     "echo",
+				Alias:    "repeat",
 				HelpText: "Echo text passed into the command. To obtain more information use --help",
 			},
 		},
