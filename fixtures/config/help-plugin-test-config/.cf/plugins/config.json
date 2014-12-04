@@ -3,7 +3,7 @@
     "Test1":{
       "Location":"../../fixtures/plugins/test_1.exe",
       "Commands":[
-        {"Name":"test1_cmd1","HelpText":"help text for test1 cmd1"},
+        {"Name":"test1_cmd1","Alias":"test1_cmd1_alias","HelpText":"help text for test1 cmd1"},
         {"Name":"test1_cmd2","HelpText":"help text for test1 cmd2"}
       ]
     },
