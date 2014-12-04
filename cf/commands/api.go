@@ -35,6 +35,7 @@ func (cmd Api) Metadata() command_metadata.CommandMetadata {
 		Usage:       T("CF_NAME api [URL]"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")},
+			cli.BoolFlag{Name: "unset", Usage: T("Remove all api endpoint targeting")},
 		},
 	}
 }
@@ -44,7 +45,14 @@ func (cmd Api) GetRequirements(_ requirements.Factory, _ *cli.Context) (reqs []r
 }
 
 func (cmd Api) Run(c *cli.Context) {
-	if len(c.Args()) == 0 {
+	if c.Bool("unset") {
+		cmd.ui.Say(T("Unsetting api endpoint..."))
+		cmd.config.SetApiEndpoint("")
+
+		cmd.ui.Ok()
+		cmd.ui.Say(T("\nNo api endpoint set."))
+
+	} else if len(c.Args()) == 0 {
 		if cmd.config.ApiEndpoint() == "" {
 			cmd.ui.Say(fmt.Sprintf(T("No api endpoint set. Use '{{.Name}}' to set an endpoint",
 				map[string]interface{}{"Name": terminal.CommandColor(cf.Name() + " api")})))
@@ -53,18 +61,17 @@ func (cmd Api) Run(c *cli.Context) {
 				map[string]interface{}{"ApiEndpoint": terminal.EntityNameColor(cmd.config.ApiEndpoint()),
 					"ApiVersion": terminal.EntityNameColor(cmd.config.ApiVersion())}))
 		}
-		return
+	} else {
+		endpoint := c.Args()[0]
+
+		cmd.ui.Say(T("Setting api endpoint to {{.Endpoint}}...",
+			map[string]interface{}{"Endpoint": terminal.EntityNameColor(endpoint)}))
+		cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.Metadata().Name)
+		cmd.ui.Ok()
+
+		cmd.ui.Say("")
+		cmd.ui.ShowConfiguration(cmd.config)
 	}
-
-	endpoint := c.Args()[0]
-
-	cmd.ui.Say(T("Setting api endpoint to {{.Endpoint}}...",
-		map[string]interface{}{"Endpoint": terminal.EntityNameColor(endpoint)}))
-	cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.Metadata().Name)
-	cmd.ui.Ok()
-
-	cmd.ui.Say("")
-	cmd.ui.ShowConfiguration(cmd.config)
 }
 
 func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
