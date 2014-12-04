@@ -63,7 +63,7 @@ var _ = Describe("Plugins", func() {
 		))
 	})
 
-	FIt("lists the name of the command and it's alias", func() {
+	It("lists the name of the command and it's alias", func() {
 		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
 			"Test1": plugin_config.PluginMetadata{
 				Location: "path/to/plugin",
