@@ -104,20 +104,36 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 	shortNames := cmd.getShortNames()
 
 	for _, pluginCmd := range pluginMetadata.Commands {
+		//check for command conflicting core commands
 		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists || shortNames[pluginCmd.Name] || pluginCmd.Name == "help" {
 			cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Name})))
 		}
 
+		//check for alias conflicting core alias
+		if _, exists := cmd.coreCmds[pluginCmd.Alias]; exists || shortNames[pluginCmd.Alias] || pluginCmd.Alias == "help" {
+			cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+				map[string]interface{}{"Command": pluginCmd.Alias})))
+		}
+
 		for installedPluginName, installedPlugin := range plugins {
 			for _, installedPluginCmd := range installedPlugin.Commands {
-				if installedPluginCmd.Name == pluginCmd.Name {
+
+				//check for command conflicting other plugin commands/alias
+				if installedPluginCmd.Name == pluginCmd.Name || installedPluginCmd.Alias == pluginCmd.Name {
 					cmd.ui.Failed(fmt.Sprintf(T("`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
 						map[string]interface{}{"Command": pluginCmd.Name, "PluginName": installedPluginName})))
+				}
+
+				//check for alias conflicting other plugin commands/alias
+				if installedPluginCmd.Name == pluginCmd.Alias || installedPluginCmd.Alias == pluginCmd.Alias {
+					cmd.ui.Failed(fmt.Sprintf(T("`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+						map[string]interface{}{"Command": pluginCmd.Alias, "PluginName": installedPluginName})))
 				}
 			}
 		}
 	}
+
 }
 
 func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath, pluginSourceFilepath string) {
