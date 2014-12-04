@@ -25,6 +25,7 @@ func TestPlugin(t *testing.T) {
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_1")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_2")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "empty_plugin")
+	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "alias_conflicts")
 
 	RunSpecs(t, "Plugin Suite")
 }

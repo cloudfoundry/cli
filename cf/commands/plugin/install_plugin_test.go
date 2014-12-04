@@ -41,6 +41,7 @@ var _ = Describe("Install", func() {
 		test_with_help            string
 		test_with_push            string
 		test_with_push_short_name string
+		aliasConflicts            string
 	)
 
 	BeforeEach(func() {
@@ -59,6 +60,7 @@ var _ = Describe("Install", func() {
 		test_with_help = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.exe")
 		test_with_push = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push.exe")
 		test_with_push_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push_short_name.exe")
+		aliasConflicts = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "alias_conflicts.exe")
 
 		rpc.DefaultServer = rpc.NewServer()
 
@@ -107,7 +109,7 @@ var _ = Describe("Install", func() {
 			})
 		})
 
-		Context("when the plugin contains a core command", func() {
+		Context("when the plugin's command conflicts with a core command", func() {
 			It("fails if is shares a command name", func() {
 				coreCmds["push"] = &testCommand.FakeCommand{}
 				runCommand(test_with_push)
@@ -134,8 +136,80 @@ var _ = Describe("Install", func() {
 			})
 		})
 
-		Context("when the plugin contains a command that another installed plugin contains", func() {
-			BeforeEach(func() {
+		Context("when the plugin's alias conflicts with a core command", func() {
+			It("fails if is shares a command name", func() {
+				coreCmds["conflict-cmd"] = &testCommand.FakeCommand{}
+				runCommand(aliasConflicts)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Command `conflict-cmd` in the plugin being installed is a native CF command.  Rename the `conflict-cmd` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"FAILED"},
+				))
+			})
+
+			It("fails if it shares a command short name", func() {
+				push := &testCommand.FakeCommand{}
+				push.MetadataReturns(command_metadata.CommandMetadata{
+					ShortName: "conflict-alias",
+				})
+
+				coreCmds["push"] = push
+				runCommand(aliasConflicts)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Command `conflict-alias` in the plugin being installed is a native CF command.  Rename the `conflict-alias` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"FAILED"},
+				))
+			})
+		})
+
+		Context("when the plugin's alias conflicts with other installed plugin", func() {
+			It("fails if it shares a command name", func() {
+				pluginsMap := make(map[string]plugin_config.PluginMetadata)
+				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+					Location: "location/to/config.exe",
+					Commands: []plugin.Command{
+						{
+							Name:     "conflict-alias",
+							HelpText: "Hi!",
+						},
+					},
+				}
+				config.PluginsReturns(pluginsMap)
+
+				runCommand(aliasConflicts)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"`conflict-alias` is a command in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-alias` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
+					[]string{"FAILED"},
+				))
+			})
+
+			It("fails if it shares a command alias", func() {
+				pluginsMap := make(map[string]plugin_config.PluginMetadata)
+				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+					Location: "location/to/alias.exe",
+					Commands: []plugin.Command{
+						{
+							Name:     "non-conflict-cmd",
+							Alias:    "conflict-alias",
+							HelpText: "Hi!",
+						},
+					},
+				}
+				config.PluginsReturns(pluginsMap)
+
+				runCommand(aliasConflicts)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"`conflict-alias` is a command in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-alias` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
+					[]string{"FAILED"},
+				))
+			})
+		})
+
+		Context("when the plugin's command conflicts with other installed plugin", func() {
+			It("fails if it shares a command name", func() {
 				pluginsMap := make(map[string]plugin_config.PluginMetadata)
 				pluginsMap["Test1Collision"] = plugin_config.PluginMetadata{
 					Location: "location/to/config.exe",
@@ -147,13 +221,33 @@ var _ = Describe("Install", func() {
 					},
 				}
 				config.PluginsReturns(pluginsMap)
-			})
 
-			It("fails", func() {
 				runCommand(test_1)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"`test_1_cmd1` is a command in plugin 'Test1Collision'.  You could try uninstalling plugin 'Test1Collision' and then install this plugin in order to invoke the `test_1_cmd1` command.  However, you should first fully understand the impact of uninstalling the existing 'Test1Collision' plugin."},
+					[]string{"FAILED"},
+				))
+			})
+
+			It("fails if it shares a command alias", func() {
+				pluginsMap := make(map[string]plugin_config.PluginMetadata)
+				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+					Location: "location/to/alias.exe",
+					Commands: []plugin.Command{
+						{
+							Name:     "non-conflict-cmd",
+							Alias:    "conflict-cmd",
+							HelpText: "Hi!",
+						},
+					},
+				}
+				config.PluginsReturns(pluginsMap)
+
+				runCommand(aliasConflicts)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"`conflict-cmd` is a command in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-cmd` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
 					[]string{"FAILED"},
 				))
 			})
