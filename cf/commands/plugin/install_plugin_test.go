@@ -103,7 +103,7 @@ var _ = Describe("Install", func() {
 				runCommand(test_with_help)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Command `help` in the plugin being installed is a native CF command.  Rename the `help` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"Command `help` in the plugin being installed is a native CF command/alias.  Rename the `help` command in the plugin being installed in order to enable its installation and use."},
 					[]string{"FAILED"},
 				))
 			})
@@ -115,7 +115,7 @@ var _ = Describe("Install", func() {
 				runCommand(test_with_push)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Command `push` in the plugin being installed is a native CF command.  Rename the `push` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"Command `push` in the plugin being installed is a native CF command/alias.  Rename the `push` command in the plugin being installed in order to enable its installation and use."},
 					[]string{"FAILED"},
 				))
 			})
@@ -130,19 +130,19 @@ var _ = Describe("Install", func() {
 				runCommand(test_with_push_short_name)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Command `p` in the plugin being installed is a native CF command.  Rename the `p` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"Command `p` in the plugin being installed is a native CF command/alias.  Rename the `p` command in the plugin being installed in order to enable its installation and use."},
 					[]string{"FAILED"},
 				))
 			})
 		})
 
-		Context("when the plugin's alias conflicts with a core command", func() {
+		Context("when the plugin's alias conflicts with a core command/alias", func() {
 			It("fails if is shares a command name", func() {
-				coreCmds["conflict-cmd"] = &testCommand.FakeCommand{}
+				coreCmds["conflict-alias"] = &testCommand.FakeCommand{}
 				runCommand(aliasConflicts)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Command `conflict-cmd` in the plugin being installed is a native CF command.  Rename the `conflict-cmd` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"Alias `conflict-alias` in the plugin being installed is a native CF command/alias.  Rename the `conflict-alias` command in the plugin being installed in order to enable its installation and use."},
 					[]string{"FAILED"},
 				))
 			})
@@ -157,7 +157,7 @@ var _ = Describe("Install", func() {
 				runCommand(aliasConflicts)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Command `conflict-alias` in the plugin being installed is a native CF command.  Rename the `conflict-alias` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"Alias `conflict-alias` in the plugin being installed is a native CF command/alias.  Rename the `conflict-alias` command in the plugin being installed in order to enable its installation and use."},
 					[]string{"FAILED"},
 				))
 			})
@@ -180,7 +180,7 @@ var _ = Describe("Install", func() {
 				runCommand(aliasConflicts)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"`conflict-alias` is a command in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-alias` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
+					[]string{"Alias `conflict-alias` is a command/alias in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-alias` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
 					[]string{"FAILED"},
 				))
 			})
@@ -202,7 +202,7 @@ var _ = Describe("Install", func() {
 				runCommand(aliasConflicts)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"`conflict-alias` is a command in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-alias` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
+					[]string{"Alias `conflict-alias` is a command/alias in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-alias` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
 					[]string{"FAILED"},
 				))
 			})
@@ -225,7 +225,7 @@ var _ = Describe("Install", func() {
 				runCommand(test_1)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"`test_1_cmd1` is a command in plugin 'Test1Collision'.  You could try uninstalling plugin 'Test1Collision' and then install this plugin in order to invoke the `test_1_cmd1` command.  However, you should first fully understand the impact of uninstalling the existing 'Test1Collision' plugin."},
+					[]string{"Command `test_1_cmd1` is a command/alias in plugin 'Test1Collision'.  You could try uninstalling plugin 'Test1Collision' and then install this plugin in order to invoke the `test_1_cmd1` command.  However, you should first fully understand the impact of uninstalling the existing 'Test1Collision' plugin."},
 					[]string{"FAILED"},
 				))
 			})
@@ -247,7 +247,7 @@ var _ = Describe("Install", func() {
 				runCommand(aliasConflicts)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"`conflict-cmd` is a command in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-cmd` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
+					[]string{"Command `conflict-cmd` is a command/alias in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-cmd` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
 					[]string{"FAILED"},
 				))
 			})
