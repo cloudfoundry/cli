@@ -1,7 +1,3 @@
-/**
-* This test plugin has an alias conlicts with the core command alias 'p'
-**/
-
 package main
 
 import (
