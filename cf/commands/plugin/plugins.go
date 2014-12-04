@@ -45,7 +45,11 @@ func (cmd *Plugins) Run(c *cli.Context) {
 
 	for pluginName, metadata := range plugins {
 		for _, command := range metadata.Commands {
-			table.Add(pluginName, command.Name, command.HelpText)
+			if command.Alias == "" {
+				table.Add(pluginName, command.Name, command.HelpText)
+			} else {
+				table.Add(pluginName, command.Name+", "+command.Alias, command.HelpText)
+			}
 		}
 	}
 

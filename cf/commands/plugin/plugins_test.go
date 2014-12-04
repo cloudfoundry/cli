@@ -63,6 +63,25 @@ var _ = Describe("Plugins", func() {
 		))
 	})
 
+	FIt("lists the name of the command and it's alias", func() {
+		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
+			"Test1": plugin_config.PluginMetadata{
+				Location: "path/to/plugin",
+				Commands: []plugin.Command{
+					{Name: "test_1_cmd1", Alias: "test_1_cmd1_alias", HelpText: "help text for test_1_cmd1"},
+					{Name: "test_1_cmd2", Alias: "test_1_cmd2_alias", HelpText: "help text for test_1_cmd2"},
+				},
+			},
+		})
+
+		runCommand()
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Test1", "test_1_cmd1", ", test_1_cmd1_alias", "help text for test_1_cmd1"},
+			[]string{"Test1", "test_1_cmd2", ", test_1_cmd2_alias", "help text for test_1_cmd2"},
+		))
+	})
+
 	It("does not list the plugin when it provides no available commands", func() {
 		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
 			"EmptyPlugin": plugin_config.PluginMetadata{Location: "../../../fixtures/plugins/empty_plugin.exe"},
