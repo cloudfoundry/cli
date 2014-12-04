@@ -30,6 +30,11 @@
       "modified": false
    },
    {
+      "id": "\nNo api endpoint set.",
+      "translation": "\nNo api endpoint set.",
+      "modified": false
+   },
+   {
       "id": "\nRoute to be unmapped is not currently mapped to the application.",
       "translation": "\nRoute to be unmapped is not currently mapped to the application.",
       "modified": false
@@ -3125,6 +3130,11 @@
       "modified": false
    },
    {
+      "id": "Remove all api endpoint targeting",
+      "translation": "Remove all api endpoint targeting",
+      "modified": false
+   },
+   {
       "id": "Remove an env variable",
       "translation": "Remueve una variable de entorno",
       "modified": false
@@ -3938,6 +3948,11 @@
       "id": "Unlock the buildpack to enable updates",
       "translation": "Desbloquea el buildpack",
       "modified": true
+   },
+   {
+      "id": "Unsetting api endpoint...",
+      "translation": "Unsetting api endpoint...",
+      "modified": false
    },
    {
       "id": "Update a buildpack",
