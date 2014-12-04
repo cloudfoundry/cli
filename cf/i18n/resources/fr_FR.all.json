@@ -255,6 +255,16 @@
       "modified": false
    },
    {
+      "id": "Alias `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+      "translation": "Alias `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+      "modified": false
+   },
+   {
+      "id": "Alias `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+      "translation": "`Alias {{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+      "modified": true
+   },
+   {
       "id": "All plans of the service are already accessible for all orgs",
       "translation": "All plans of the service are already accessible for all orgs",
       "modified": false
@@ -1105,9 +1115,14 @@
       "modified": true
    },
    {
-      "id": "Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+      "id": "Command `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
       "translation": "Command `{{.Command}}` in the plugin being installed is a native CF command.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
-      "modified": false
+      "modified": true
+   },
+   {
+      "id": "Command `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+      "translation": "`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+      "modified": true
    },
    {
       "id": "Command not found",
@@ -4137,11 +4152,6 @@
    {
       "id": "[global options] command [arguments...] [command options]",
       "translation": "[options globales] commande [arguments...] [options de commande]",
-      "modified": false
-   },
-   {
-      "id": "`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
-      "translation": "`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
       "modified": false
    },
    {
