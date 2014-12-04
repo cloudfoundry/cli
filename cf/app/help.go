@@ -75,7 +75,13 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 
 		for _, pluginMetadata := range plugins {
 			for _, cmd := range pluginMetadata.Commands {
-				pluginPresenter.Name = cmd.Name
+
+				if cmd.Alias == "" {
+					pluginPresenter.Name = cmd.Name
+				} else {
+					pluginPresenter.Name = cmd.Name + ", " + cmd.Alias
+				}
+
 				padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(pluginPresenter.Name))
 				pluginPresenter.Name = pluginPresenter.Name + padding
 				pluginPresenter.Description = cmd.HelpText
