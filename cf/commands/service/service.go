@@ -73,6 +73,10 @@ func (cmd *ShowService) Run(c *cli.Context) {
 				map[string]interface{}{
 					"URL": terminal.EntityNameColor(serviceInstance.ServiceOffering.DocumentationUrl),
 				}))
+			cmd.ui.Say(T("Dashboard: {{.URL}}",
+				map[string]interface{}{
+					"URL": terminal.EntityNameColor(serviceInstance.DashboardUrl),
+				}))
 		}
 	}
 }
