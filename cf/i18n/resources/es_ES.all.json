@@ -1410,6 +1410,11 @@
       "modified": false
    },
    {
+      "id": "Dashboard: {{.URL}}",
+      "translation": "Dashboard: {{.URL}}",
+      "modified": false
+   },
+   {
       "id": "Define a new resource quota",
       "translation": "Define un nuevo recurso de cuota",
       "modified": false

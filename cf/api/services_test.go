@@ -294,6 +294,7 @@ var _ = Describe("Services Repo", func() {
 
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
+			Expect(instance.DashboardUrl).To(Equal("my-dashboard-url"))
 			Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
 			Expect(instance.ServiceOffering.DocumentationUrl).To(Equal("http://info.example.com"))
 			Expect(instance.ServiceOffering.Description).To(Equal("MySQL database"))
@@ -1216,6 +1217,7 @@ var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestR
           },
           "entity": {
             "name": "my-service",
+						"dashboard_url":"my-dashboard-url",
             "service_bindings": [
               {
                 "metadata": {

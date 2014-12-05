@@ -6,6 +6,7 @@ type ServiceInstanceFields struct {
 	SysLogDrainUrl   string
 	ApplicationNames []string
 	Params           map[string]interface{}
+	DashboardUrl     string
 }
 
 type ServiceInstance struct {
