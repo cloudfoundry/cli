@@ -835,6 +835,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME restart-app-instance APP INDEX",
+      "translation": "CF_NAME restart-app-instance APP INDEX",
+      "modified": false
+   },
+   {
       "id": "CF_NAME running-environment-variable-group",
       "translation": "cf running-environment-variable-group",
       "modified": true
@@ -2345,6 +2350,11 @@
       "modified": false
    },
    {
+      "id": "Instance must be a non-negative integer",
+      "translation": "Instance must be a non-negative integer",
+      "modified": false
+   },
+   {
       "id": "Invalid JSON response from server",
       "translation": "Serveur JSON réponse invalide",
       "modified": false
@@ -3250,6 +3260,11 @@
       "modified": false
    },
    {
+      "id": "Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
+      "translation": "Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
+      "modified": false
+   },
+   {
       "id": "Retrieve an individual feature flag with status",
       "translation": "Retrieve an individual feature flag with status",
       "modified": false
@@ -3732,6 +3747,11 @@
    {
       "id": "Targeted space {{.SpaceName}}\n",
       "translation": "Espace ciblé {{.SpaceName}}\n",
+      "modified": false
+   },
+   {
+      "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
+      "translation": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
       "modified": false
    },
    {

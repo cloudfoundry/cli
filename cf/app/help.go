@@ -126,6 +126,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("stop"),
 					presentCommand("restart"),
 					presentCommand("restage"),
+					presentCommand("restart-app-instance"),
 				}, {
 					presentCommand("events"),
 					presentCommand("files"),

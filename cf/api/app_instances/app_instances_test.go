@@ -19,30 +19,59 @@ import (
 )
 
 var _ = Describe("AppInstancesRepo", func() {
-	It("returns instances of the app, given a guid", func() {
-		ts, handler, repo := createAppInstancesRepo([]testnet.TestRequest{
-			appInstancesRequest,
-			appStatsRequest,
+	Describe("Getting the instances for an application", func() {
+		It("returns instances of the app, given a guid", func() {
+			ts, handler, repo := createAppInstancesRepo([]testnet.TestRequest{
+				appInstancesRequest,
+				appStatsRequest,
+			})
+			defer ts.Close()
+			appGuid := "my-cool-app-guid"
+
+			instances, err := repo.GetInstances(appGuid)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+
+			Expect(len(instances)).To(Equal(2))
+
+			Expect(instances[0].State).To(Equal(models.InstanceRunning))
+			Expect(instances[1].State).To(Equal(models.InstanceStarting))
+
+			instance0 := instances[0]
+			Expect(instance0.Since).To(Equal(time.Unix(1379522342, 0)))
+			Expect(instance0.DiskQuota).To(Equal(int64(1073741824)))
+			Expect(instance0.DiskUsage).To(Equal(int64(56037376)))
+			Expect(instance0.MemQuota).To(Equal(int64(67108864)))
+			Expect(instance0.MemUsage).To(Equal(int64(19218432)))
+			Expect(instance0.CpuUsage).To(Equal(3.659571249238058e-05))
 		})
-		defer ts.Close()
-		appGuid := "my-cool-app-guid"
+	})
 
-		instances, err := repo.GetInstances(appGuid)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(handler).To(HaveAllRequestsCalled())
+	Describe("Deleting an instance for an application", func() {
+		It("returns no error if the response is successful", func() {
+			ts, handler, repo := createAppInstancesRepo([]testnet.TestRequest{
+				deleteInstanceRequest,
+			})
+			defer ts.Close()
+			appGuid := "my-cool-app-guid"
 
-		Expect(len(instances)).To(Equal(2))
+			err := repo.DeleteInstance(appGuid, 0)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+		})
 
-		Expect(instances[0].State).To(Equal(models.InstanceRunning))
-		Expect(instances[1].State).To(Equal(models.InstanceStarting))
+		It("returns the error if the response is unsuccessful", func() {
+			ts, handler, repo := createAppInstancesRepo([]testnet.TestRequest{
+				deleteInstanceFromUnkownApp,
+			})
+			defer ts.Close()
+			appGuid := "some-wrong-app-guid"
 
-		instance0 := instances[0]
-		Expect(instance0.Since).To(Equal(time.Unix(1379522342, 0)))
-		Expect(instance0.DiskQuota).To(Equal(int64(1073741824)))
-		Expect(instance0.DiskUsage).To(Equal(int64(56037376)))
-		Expect(instance0.MemQuota).To(Equal(int64(67108864)))
-		Expect(instance0.MemUsage).To(Equal(int64(19218432)))
-		Expect(instance0.CpuUsage).To(Equal(3.659571249238058e-05))
+			err := repo.DeleteInstance(appGuid, 0)
+			Expect(err).To(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+
+		})
 	})
 })
 
@@ -89,6 +118,18 @@ var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequ
     "since": 1379522342.6783738
   }
 }`}})
+
+var deleteInstanceRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:   "DELETE",
+	Path:     "/v2/apps/my-cool-app-guid/instances/0",
+	Response: testnet.TestResponse{Status: http.StatusNoContent, Body: `{}`},
+})
+
+var deleteInstanceFromUnkownApp = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:   "DELETE",
+	Path:     "/v2/apps/some-wrong-app-guid/instances/0",
+	Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{}`},
+})
 
 func createAppInstancesRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
 	ts, handler = testnet.NewServer(requests)
