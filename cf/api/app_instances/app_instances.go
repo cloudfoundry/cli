@@ -34,6 +34,7 @@ type InstanceStatsApiResponse struct {
 
 type AppInstancesRepository interface {
 	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr error)
+	DeleteInstance(appGuid string, instance int) error
 }
 
 type CloudControllerAppInstancesRepository struct {
@@ -70,6 +71,14 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 	}
 
 	return repo.updateInstancesWithStats(appGuid, instances)
+}
+
+func (repo CloudControllerAppInstancesRepository) DeleteInstance(appGuid string, instance int) error {
+	err := repo.gateway.DeleteResource(repo.config.ApiEndpoint(), fmt.Sprintf("/v2/apps/%s/instances/%d", appGuid, instance))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiErr error) {
