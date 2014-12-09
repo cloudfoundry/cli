@@ -350,5 +350,10 @@ var _ = Describe("Install", func() {
 				[]string{"Plugin", "Test1", "successfully installed"},
 			))
 		})
+
+		It("installs multiple plugins with no aliases", func() {
+			Expect(runCommand(test_1)).To(Equal(true))
+			Expect(runCommand(test_2)).To(Equal(true))
+		})
 	})
 })
