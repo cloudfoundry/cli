@@ -253,13 +253,30 @@ var _ = Describe("Install", func() {
 			})
 		})
 
-		It("plugin binary argument is a bad file path", func() {
-			runCommand("path/to/not/a/thing.exe")
+		Context("Locating binary file", func() {
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Binary file 'path/to/not/a/thing.exe' not found"},
-				[]string{"FAILED"},
-			))
+			Context("first tries to locate binary file at local path", func() {
+				It("will not try downloading from internet if file is found locally", func() {
+					runCommand("./install_plugin.go")
+
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Attempting to download binary file from internet"},
+					))
+				})
+			})
+
+			Context("tries to download binary from net if file is not found locally", func() {
+				It("informs users when binary is not downloadable from net", func() {
+					runCommand("path/to/not/a/thing.exe")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Download attempt failed"},
+						[]string{"Unable to install"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+
 		})
 
 		It("if plugin name is already taken", func() {
