@@ -43,7 +43,6 @@ func (d *downloader) DownloadFile(url string) (int64, string, error) {
 	r, err := c.Get(url)
 
 	if err != nil {
-		fmt.Printf("Error while downloading %q: %v", url, err)
 		return 0, "", err
 	}
 	defer r.Body.Close()

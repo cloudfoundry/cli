@@ -57,6 +57,8 @@ var _ = Describe("Downloader", func() {
 					w.Header().Set("Content-Disposition", "attachment;filename=header.zip")
 					fmt.Fprintln(w, "abc123")
 				}))
+
+				downloader = NewDownloader("./")
 			})
 
 			AfterEach(func() {
@@ -90,6 +92,8 @@ var _ = Describe("Downloader", func() {
 						fmt.Fprintln(w, "abc123")
 					}
 				}))
+
+				downloader = NewDownloader("./")
 			})
 
 			AfterEach(func() {
@@ -100,6 +104,8 @@ var _ = Describe("Downloader", func() {
 			})
 
 			It("follows redirects and download file", func() {
+				downloader = NewDownloader("./")
+
 				_, _, err := downloader.DownloadFile(ts.URL)
 				Ω(err).ToNot(HaveOccurred())
 
@@ -108,6 +114,18 @@ var _ = Describe("Downloader", func() {
 			})
 
 		})
+
+		Context("When URL is invalid", func() {
+			It("returns an error message", func() {
+				downloader = NewDownloader("./")
+
+				_, name, err := downloader.DownloadFile("http://going.nowwhere/abc.zip")
+
+				Ω(err).To(HaveOccurred())
+				Ω(name).To(Equal(""))
+			})
+		})
+
 	})
 
 	Describe("RemoveFile", func() {
