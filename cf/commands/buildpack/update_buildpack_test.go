@@ -1,6 +1,8 @@
 package buildpack_test
 
 import (
+	"strings"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -116,8 +118,7 @@ var _ = Describe("Updating buildpack command", func() {
 		Context("buildpack path", func() {
 			It("uploads buildpack when passed", func() {
 				runCommand("-p", "buildpack.zip", "my-buildpack")
-
-				Expect(bitsRepo.UploadBuildpackPath).To(Equal("buildpack.zip"))
+				Expect(strings.HasSuffix(bitsRepo.UploadBuildpackPath, "buildpack.zip")).To(Equal(true))
 
 				successfulUpdate(ui, "my-buildpack")
 			})

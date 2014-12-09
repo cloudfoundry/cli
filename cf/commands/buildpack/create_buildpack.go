@@ -1,6 +1,7 @@
 package buildpack
 
 import (
+	"path/filepath"
 	"strconv"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -75,7 +76,11 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 
 	cmd.ui.Say(T("Uploading buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
 
-	dir := c.Args()[1]
+	dir, err := filepath.Abs(c.Args()[1])
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+		return
+	}
 
 	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
 	if err != nil {
