@@ -420,11 +420,6 @@
       "modified": false
    },
    {
-      "id": "Binary file '{{.BinaryFile}}' not found",
-      "translation": "Binary file '{{.BinaryFile}}' not found",
-      "modified": false
-   },
-   {
       "id": "Bind a security group to a space",
       "translation": "Bind a security group to a space",
       "modified": false
@@ -1670,6 +1665,11 @@
       "modified": false
    },
    {
+      "id": "Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from local/internet.",
+      "translation": "Download attempt failed: {{.Error}}\nUnable to install, plugin is not available from local/internet.",
+      "modified": true
+   },
+   {
       "id": "Dump recent logs instead of tailing",
       "translation": "生成最近的日志文件，而非读取日志内容",
       "modified": false
@@ -2057,6 +2057,11 @@
    {
       "id": "Features",
       "translation": "Features",
+      "modified": false
+   },
+   {
+      "id": "File not found locally, attempting to download binary file from internet ...",
+      "translation": "File not found locally, attempting to download binary file from internet ...",
       "modified": false
    },
    {
@@ -3032,6 +3037,11 @@
    {
       "id": "Print the version",
       "translation": "打印版本号",
+      "modified": false
+   },
+   {
+      "id": "Problem removing downloaded binary in temp directory: ",
+      "translation": "Problem removing downloaded binary in temp directory: ",
       "modified": false
    },
    {
@@ -4257,6 +4267,11 @@
    {
       "id": "broker: {{.Name}}",
       "translation": "broker: {{.Name}}",
+      "modified": false
+   },
+   {
+      "id": "bytes downloaded",
+      "translation": "bytes downloaded",
       "modified": false
    },
    {

@@ -49,6 +49,8 @@ func (cmd *PluginInstall) GetRequirements(_ requirements.Factory, c *cli.Context
 }
 
 func (cmd *PluginInstall) Run(c *cli.Context) {
+	var downloader fileutils.Downloader
+
 	pluginSourceFilepath := c.Args()[0]
 
 	if filepath.Dir(pluginSourceFilepath) == "." {
@@ -57,7 +59,11 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
 
-	cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath)
+	if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
+		cmd.ui.Say("")
+		cmd.ui.Say(T("File not found locally, attempting to download binary file from internet ..."))
+		pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
+	}
 
 	_, pluginExecutableName := filepath.Split(pluginSourceFilepath)
 
@@ -70,6 +76,13 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 	cmd.ensurePluginIsSafeForInstallation(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
 
 	cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
+
+	if downloader != nil {
+		err := downloader.RemoveFile()
+		if err != nil {
+			cmd.ui.Say(T("Problem removing downloaded binary in temp directory: ") + err.Error())
+		}
+	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name})))
@@ -166,11 +179,30 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 	return rpcService.RpcCmd.PluginMetadata
 }
 
-func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) {
+func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
 	_, err := os.Stat(pluginSourceFilepath)
 	if err != nil && os.IsNotExist(err) {
-		cmd.ui.Failed(fmt.Sprintf(T("Binary file '{{.BinaryFile}}' not found", map[string]interface{}{"BinaryFile": pluginSourceFilepath})))
+		return false
 	}
+	return true
+}
+
+func (cmd *PluginInstall) tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath string, downloader fileutils.Downloader) string {
+
+	savePath := os.TempDir()
+	downloader = fileutils.NewDownloader(savePath)
+	size, filename, err := downloader.DownloadFile(pluginSourceFilepath)
+
+	if err != nil {
+		cmd.ui.Failed(fmt.Sprintf(T("Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from local/internet.", map[string]interface{}{"Error": err.Error()})))
+	}
+
+	cmd.ui.Say(fmt.Sprintf("%d "+T("bytes downloaded")+"...", size))
+
+	executablePath := filepath.Join(savePath, filename)
+	os.Chmod(executablePath, 0700)
+
+	return executablePath
 }
 
 func (cmd *PluginInstall) getShortNames() map[string]bool {
