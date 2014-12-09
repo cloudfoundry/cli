@@ -1,6 +1,8 @@
 package buildpack_test
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -45,7 +47,7 @@ var _ = Describe("create-buildpack command", func() {
 
 		Expect(repo.CreateBuildpack.Enabled).To(BeNil())
 		Expect(ui.FailedWithUsage).To(BeFalse())
-
+		Expect(strings.HasSuffix(bitsRepo.UploadBuildpackPath, "my.war")).To(Equal(true))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},
 			[]string{"OK"},

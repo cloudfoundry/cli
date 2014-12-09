@@ -1,6 +1,8 @@
 package buildpack
 
 import (
+	"path/filepath"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -98,7 +100,17 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 		return
 	}
 
-	dir := c.String("p")
+	path := c.String("p")
+	var dir string
+	var err error
+	if path != "" {
+		dir, err = filepath.Abs(path)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+			return
+		}
+	}
+
 	if dir != "" && (lock || unlock) {
 		cmd.ui.Failed(T("Cannot specify buildpack bits and lock/unlock."))
 	}
