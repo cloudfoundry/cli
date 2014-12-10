@@ -1,3 +1,115 @@
+##v6.8.0
+* Allows plugin to be installed from an Url [#80043644]
+* Allows mutliple plugins with blank aliases. [#84241752]
+* Remove commented line in update_service_test 
+* test fix and additional coverage [#80043644]
+* Exit non-zero in build-and-release-gocd if sub-script fails
+* New utils for download single file from url 
+* create-buildpack and update-buildpack now allow relative paths. [#80043644]
+* Update ginkgo
+* Add `cf restart_app_instance` command [#78049908]
+* Add dashboard-url to `cf service` output [#68396596]
+* Add unset flag to `cf api` -Allows user to unset the api endpoint [#82979408]
+* `cf plugins` shows command alias [finishes #83892154]
+* plugin alias shows in `cf help` [finishes #83892240]
+* improve error text for plugin alias conflict errors. [#83717740]
+* `cf install-plugin` cross-checks for command/alias conflicts [#83717740]
+* Fixed plugin test fixture; Made aliases work with multi-command plugins 
+* Added aliases for plugins. [#82051186]
+* README update for multi-command plugin example [#83690584]
+* code example for plugin with multiple commands [#83690584]
+* improve text in help [#82913246]
+* correct display order in space admin help section [#83437508]
+* `cf org` displays all information in quota [#83363414]
+* improve help text for command `uups` [#83233266]
+* Add guid flag to `cf org` [#83435546]
+* Add guid flag to `cf space` [#83435684]
+* Add guid flag to `cf service` [#83435846]
+* Update README.md 
+* fake out cf config for testing [#82871316]
+* Merge branch 'hw-issue-20' of github.com:HuaweiTech/cli into HuaweiTech-hw-issue-20 
+* Merge branch 'hw-issue-21' of github.com:HuaweiTech/cli into HuaweiTech-hw-issue-21 
+* Update buildpack flag descriptions [#83069682]
+* Allow users to specify a space-quota when creating a space [#82311654]
+* Update travis golang version to reflect the version we compile on
+* Attempt to fix travis build with ginkgo flag [#82012788]
+* Update ginkgo 
+* Show detected_start_command on first push [#79325064]
+* Merge pull request #287 from HuaweiTech/hw-issue-2 Extraneous arguments now cause commands to fail with usage.
+* Prompt is always shown to user, even when the plugin has invoked the cli command with output suppressed. [#82770766]
+* Update jibber_jabber - Adds support for zh-TW and has fix that moves zh-CK to zh-HK [#83146574]
+* Merge pull request #299 from uzzz/master Fix ui.Ask to return strings with spaces from stdin
+* Changed iscc to use environment variable for finding WINE.
+* Replace hard coded path to restore the build and release script.
+* Fix ui.Ask to return strings with spaces from stdin [#78596198] 
+* Fix windows init_i18n test -Also fix compilation issues related to injection of jibber_jabber
+* Inject jibberjabber so it can be tested Attempt to fix windws Hant/Hans init tests
+* Revert "Revert "fix failing HK/TW Windows 32 unit test"" 
+* Revert "Revert "Match traditional Chinese dialects to zh_Hant"" 
+* Revert "Revert "Moved chinese translations to more generic locale tags"" 
+* polling respects api target host while performing http 'Create' request [#77846300]
+* polling respects api target host while performing http 'Update' request [#77846300]
+* polling respects api target host while performing http 'Delete' request [#77846300]
+* When starting an app the start command is displayed to the user [#79325064]
+* Use '$HOME' env var instead of hard coded path 
+* Use iscc in scripts directory when building installers
+* Add comments to build-installers-gocd script for installation of 'Inno Setup 5'
+* Add iscc file for creating windows installer
+* Fix quota creation to default to unlimited instance memory [#82914568]
+* Allow users to set quotas and space-quotas instance memory to 0 [#82914568]
+* Fix the args validation in commands 
+* Update help text for `cf update-buildpack` and `cf create-buildpack` [#82828946]
+* Update README.md 
+* Add command help text to `cf plugins` [#82777012]
+* `-h` and `--h` should not report as invalid flags [#69038672]
+* Add `--guid` flag to `cf app` - Allow users to get the guid of an application with a guid flag [#76459212]
+* find plugins in the current directory without having to specify `./` [#82776732]
+* Fix the usage info in cf feature-flag command 
+* var renaming for readability 
+* handles both "-" & "--" prefix for flag checking - ignores flag value after `=` [#69038672]
+* T() up new texts for translation - dot-import i18n
+* informs user about incorrect flags 
+* Improve messaging `cf unmap-route` output [#82187142]
+* Removing api requirement for `cf service-access` [#77468074]
+* Revert "Moved chinese translations to more generic locale tags"
+* Revert "Match traditional Chinese dialects to zh_Hant"
+* Revert "fix failing HK/TW Windows 32 unit test"
+* Fix the Usage info in cf security-groups command 
+* fix failing HK/TW Windows 32 unit test 
+* tip text for update-buildpack [#82910350]
+* Merge pull request #297 from jberkhahn/default_english Match traditional Chinese dialects to zh_Hant
+* Match traditional Chinese dialects to zh_Hant 
+* update readme add step for running godep restore to ensure appropriate go dependencies are present
+* Remove 'CommandDidPassRequirements' global test var [#70595398]
+* 'service-access' command requires cc api version 2.13.0 
+* Do not prompt the user for org when none are available during login [#78057906]
+* Do not prompt the user for a space during login when the user has no available spaces [#78057906]
+* Handle non 403 error when accessing the uaa endpoint 
+* Add tip to `cf m` about the -s flag [#82673112]
+* Update push --no-route help text to be more accurate [#64863370]
+* Improve error handling for create-user [#80042984]
+* Handle non string env var variables. 
+* Moved chinese translations to more generic locale tags 
+* Fix issue with create-service
+* Update README.md 
+* Update README.md 
+* Merge pull request #293 from jennjblack/edits edit cf CLI dev guide README
+* edit cli README.md 
+* Update README.md Add Releases info to Download section of the README [#78473546]
+* Show whether a service is paid in `cf m` [#76373558]
+* Add script to improve release cutting process [#79626744]
+* edit cli/plugin_examples README.md 
+* Remove inline-relations-depth calls from service_builder calls [#81535612]
+* `cf m -s service-name` works when unauthenticated [#81535612]
+* Begin adding -s flag to `cf m` [#81535612]
+* Update output for bad memory or disk quota in manifest [#79727218]
+* Handle manifest memory and disk values that are numeric and have no memory unit [#79727218]
+* Update output for bad memory or disk quota in manifest [#79727218]
+* Handle manifest memory and disk values that are numeric and have no memory unit [#79727218]
+* Improve 'cf unset-org-role' error message on Access Denied (code 403) [#77158010]
+* User is warned when creating a service that incurs cost 
+* edit cf CLI dev guide README 
+
 ##v6.7.0
 * Display correct information about app in copy-source -Restart app.Start/Stop/Restart/WatchStaging by passing org and
 space name instead of assuming config contained correct information [finishes #81219748]
@@ -180,7 +292,6 @@ invalid config in the home directory (the real home dir) [finishes #79305568]
 * Fix http_test.go to be OS independent [#79151902]
 * Update flag descriptions for enable/disable service access [#79151902]
 * show help when `cf` is input [#78233706]
-Signed-off-by: Daniel Lavine <dlavine@us.ibm.com>
 * Up tcp timeout to 10 seconds and log errors more effectively -Upping the timeout to deal with possible architecture issues, but
 this should not be increased any more than 10 seconds
 [#79151504]
