@@ -331,19 +331,8 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]interface{
 		result := make(map[string]interface{}, envVars.Count())
 		generic.Each(envVars, func(key, value interface{}) {
 			result[key.(string)] = value
-			// switch value.(type) {
-			// case string:
-			// 	result[key.(string)] = value.(string)
-			// case int64, int, int32:
-			// 	result[key.(string)] = fmt.Sprintf("%d", value)
-			// case float32, float64:
-			// 	result[key.(string)] = fmt.Sprintf("%f", value)
-			// default:
-			// 	*errs = append(*errs, errors.NewWithFmt(T("Expected environment variable {{.PropertyName}} to have a string value, but it was a {{.PropertyType}}.",
-			// 		map[string]interface{}{"PropertyName": key, "PropertyType": value})))
-			// }
-
 		})
+
 		return &result
 	default:
 		*errs = append(*errs, errors.NewWithFmt(T("Expected {{.Name}} to be a set of key => value, but it was a {{.Type}}.",
