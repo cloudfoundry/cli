@@ -8,8 +8,9 @@ import (
 
 type Application struct {
 	ApplicationFields
-	Stack  *Stack
-	Routes []RouteSummary
+	Stack    *Stack
+	Routes   []RouteSummary
+	Services []ServicePlanSummary
 }
 
 func (model Application) HasRoute(route Route) bool {

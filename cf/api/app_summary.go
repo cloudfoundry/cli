@@ -25,6 +25,7 @@ type ApplicationFromSummary struct {
 	Guid             string
 	Name             string
 	Routes           []RouteSummary
+	Services         []ServicePlanSummary
 	RunningInstances int `json:"running_instances"`
 	Memory           int64
 	Instances        int
@@ -58,6 +59,13 @@ func (resource ApplicationFromSummary) ToModel() (app models.Application) {
 	}
 	app.Routes = routes
 
+	services := []models.ServicePlanSummary{}
+	for _, service := range resource.Services {
+		services = append(services, service.ToModel())
+	}
+	app.Routes = routes
+	app.Services = services
+
 	return
 }
 
@@ -76,6 +84,12 @@ func (resource RouteSummary) ToModel() (route models.RouteSummary) {
 	route.Guid = resource.Guid
 	route.Host = resource.Host
 	route.Domain = domain
+	return
+}
+
+func (resource ServicePlanSummary) ToModel() (route models.ServicePlanSummary) {
+	route.Guid = resource.Guid
+	route.Name = resource.Name
 	return
 }
 
