@@ -16,6 +16,11 @@ type ServicePlan struct {
 	ServiceOffering ServiceOfferingFields
 }
 
+type ServicePlanSummary struct {
+	Guid string
+	Name string
+}
+
 func (servicePlanFields ServicePlanFields) OrgHasVisibility(orgName string) bool {
 	if servicePlanFields.Public {
 		return true
