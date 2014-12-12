@@ -11,12 +11,17 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("generate_manifest", func() {
+type outputs struct {
+	contents []string
+	cursor   int
+}
 
+var _ = Describe("generate_manifest", func() {
 	var (
 		m   AppManifest
 		err error
 	)
+
 	BeforeEach(func() {
 		_, err = os.Stat("./output.yml")
 		Ω(err).To(HaveOccurred())
@@ -51,17 +56,20 @@ var _ = Describe("generate_manifest", func() {
 		m.Memory("app2", 64)
 		m.Save()
 
-		contents := getYamlContent("./output.yml")
+		//outputs.ContainSubstring assert orders
+		cmdOutput := &outputs{
+			contents: getYamlContent("./output.yml"),
+			cursor:   0,
+		}
 
-		Ω(contents[2]).To(Equal("- name: app1"))
-		Ω(contents[3]).To(Equal("  memory: 128M"))
+		Ω(cmdOutput.ContainsSubstring("- name: app1")).To(BeTrue())
+		Ω(cmdOutput.ContainsSubstring("  memory: 128M")).To(BeTrue())
 
-		Ω(contents[4]).To(Equal("- name: app2"))
-		Ω(contents[5]).To(Equal("  memory: 64M"))
+		Ω(cmdOutput.ContainsSubstring("- name: app2")).To(BeTrue())
+		Ω(cmdOutput.ContainsSubstring("  memory: 64M")).To(BeTrue())
 	})
 
-	It("uses '-' to signal the first item of fields that support multiple entries", func() {
-
+	It("prefixes each service with '-'", func() {
 		m.Service("app1", "service1")
 		m.Service("app1", "service2")
 		m.Service("app1", "service3")
@@ -69,10 +77,12 @@ var _ = Describe("generate_manifest", func() {
 
 		contents := getYamlContent("./output.yml")
 
-		Ω(contents[3]).To(Equal("  services:"))
-		Ω(contents[4]).To(Equal("  - service1"))
-		Ω(contents[5]).To(Equal("  - service2"))
-		Ω(contents[6]).To(Equal("  - service3"))
+		Ω(contents).To(ContainSubstrings(
+			[]string{"  services:"},
+			[]string{"- service1"},
+			[]string{"- service2"},
+			[]string{"- service3"},
+		))
 	})
 
 	It("generates a manifest containing all the attributes", func() {
@@ -82,19 +92,21 @@ var _ = Describe("generate_manifest", func() {
 		m.HealthCheckTimeout("app1", 100)
 		m.Instances("app1", 3)
 		m.Domain("app1", "foo", "blahblahblah.com")
+		err := m.Save()
+		Ω(err).NotTo(HaveOccurred())
 
 		Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
-			[]string{"  name: app1",
-				"  memory: 128M",
-				"  services:",
-				"  - service1",
-				"  env:",
-				"    foo: boo",
-				"  timeout: 100",
-				"  instances: 3",
-				"  host: foo",
-				"  domain: blahblahblah.com",
-			}))
+			[]string{"- name: app1"},
+			[]string{"  memory: 128M"},
+			[]string{"  services:"},
+			[]string{"  - service1"},
+			[]string{"  env:"},
+			[]string{"    foo:boo"},
+			[]string{"  timeout: 100"},
+			[]string{"  instances: 3"},
+			[]string{"  host: foo"},
+			[]string{"  domain: blahblahblah.com"},
+		))
 	})
 
 })
@@ -104,4 +116,14 @@ func getYamlContent(path string) []string {
 	Ω(err).ToNot(HaveOccurred())
 
 	return strings.Split(string(b), "\n")
+}
+
+func (o *outputs) ContainsSubstring(str string) bool {
+	for i := o.cursor; i < len(o.contents)-1; i++ {
+		if strings.Contains(o.contents[i], str) {
+			o.cursor = i
+			return true
+		}
+	}
+	return false
 }

@@ -137,7 +137,7 @@ func (m *appManifest) Save() error {
 				return err
 			}
 		} else {
-			if _, err := f.Write([]byte(fmt.Sprintf("  no-rote: true\n"))); err != nil {
+			if _, err := f.Write([]byte(fmt.Sprintf("  no-route: true\n"))); err != nil {
 				return err
 			}
 		}

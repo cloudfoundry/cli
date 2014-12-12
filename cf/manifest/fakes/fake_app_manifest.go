@@ -50,7 +50,7 @@ type FakeAppManifest struct {
 	GetContentsStub        func() []models.Application
 	getContentsMutex       sync.RWMutex
 	getContentsArgsForCall []struct{}
-	getContentsReturns struct {
+	getContentsReturns     struct {
 		result1 []models.Application
 	}
 	FileSavePathStub        func(string)
@@ -61,13 +61,13 @@ type FakeAppManifest struct {
 	GetFileSavePathStub        func() string
 	getFileSavePathMutex       sync.RWMutex
 	getFileSavePathArgsForCall []struct{}
-	getFileSavePathReturns struct {
+	getFileSavePathReturns     struct {
 		result1 string
 	}
 	SaveStub        func() error
 	saveMutex       sync.RWMutex
 	saveArgsForCall []struct{}
-	saveReturns struct {
+	saveReturns     struct {
 		result1 error
 	}
 }
