@@ -31,6 +31,7 @@ type ApplicationFromSummary struct {
 	Instances        int
 	DiskQuota        int64 `json:"disk_quota"`
 	Urls             []string
+	EnvironmentVars  map[string]interface{} `json:"environment_json,omitempty"`
 	State            string
 	SpaceGuid        string     `json:"space_guid"`
 	PackageUpdatedAt *time.Time `json:"package_updated_at"`
@@ -63,6 +64,8 @@ func (resource ApplicationFromSummary) ToModel() (app models.Application) {
 	for _, service := range resource.Services {
 		services = append(services, service.ToModel())
 	}
+
+	app.EnvironmentVars = resource.EnvironmentVars
 	app.Routes = routes
 	app.Services = services
 
