@@ -55,6 +55,7 @@ type ApplicationFields struct {
 	InstanceCount        int
 	Memory               int64 // in Megabytes
 	RunningInstances     int
+	HealthCheckTimeout   int
 	State                string
 	SpaceGuid            string
 	PackageUpdatedAt     *time.Time
