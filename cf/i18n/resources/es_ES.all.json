@@ -535,6 +535,11 @@
       "modified": true
    },
    {
+      "id": "CF_NAME create-app-manifest [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
+      "translation": "CF_NAME create-app-manifest [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
+      "modified": false
+   },
+   {
       "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
       "translation": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
       "modified": false
@@ -1280,8 +1285,18 @@
       "modified": false
    },
    {
+      "id": "Create an app manifest for an app that has been pushed successfully.",
+      "translation": "Create an app manifest for an app that has been pushed successfully.",
+      "modified": false
+   },
+   {
       "id": "Create an org",
       "translation": "Crea una org",
+      "modified": false
+   },
+   {
+      "id": "Creating an app manifest from current settings of app ",
+      "translation": "Creating an app manifest from current settings of app ",
       "modified": false
    },
    {
@@ -1760,6 +1775,11 @@
       "modified": false
    },
    {
+      "id": "Error creating manifest file: ",
+      "translation": "Error creating manifest file: ",
+      "modified": false
+   },
+   {
       "id": "Error creating request:\n{{.Err}}",
       "translation": "Error creando solicitud:\n{{.Err}}",
       "modified": false
@@ -1837,6 +1857,11 @@
    {
       "id": "Error finding space {{.SpaceName}}\n{{.Err}}",
       "translation": "Error encontrando space {{.SpaceName}}\n{{.Err}}",
+      "modified": false
+   },
+   {
+      "id": "Error getting application summary: ",
+      "translation": "Error getting application summary: ",
       "modified": false
    },
    {
@@ -2592,6 +2617,11 @@
    {
       "id": "Make a user-provided service instance available to cf apps",
       "translation": "Hace que un servicio provisto por el usuario este disponible en las apps de cf",
+      "modified": false
+   },
+   {
+      "id": "Manifest file created successfully at ",
+      "translation": "Manifest file created successfully at ",
       "modified": false
    },
    {
@@ -3642,6 +3672,11 @@
    {
       "id": "Space:",
       "translation": "Space:",
+      "modified": false
+   },
+   {
+      "id": "Specify a path for file creation.  If path not specified, file is create in root directory of the application source code.",
+      "translation": "Specify a path for file creation.  If path not specified, file is create in root directory of the application source code.",
       "modified": false
    },
    {
