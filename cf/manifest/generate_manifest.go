@@ -16,7 +16,6 @@ type AppManifest interface {
 	Domain(string, string, string)
 	GetContents() []models.Application
 	FileSavePath(string)
-	GetFileSavePath() string
 	Save() error
 }
 
@@ -31,10 +30,6 @@ func NewGenerator() AppManifest {
 
 func (m *appManifest) FileSavePath(savePath string) {
 	m.savePath = savePath
-}
-
-func (m *appManifest) GetFileSavePath() string {
-	return m.savePath
 }
 
 func (m *appManifest) Memory(appName string, memory int64) {

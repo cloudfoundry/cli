@@ -58,12 +58,6 @@ type FakeAppManifest struct {
 	fileSavePathArgsForCall []struct {
 		arg1 string
 	}
-	GetFileSavePathStub        func() string
-	getFileSavePathMutex       sync.RWMutex
-	getFileSavePathArgsForCall []struct{}
-	getFileSavePathReturns     struct {
-		result1 string
-	}
 	SaveStub        func() error
 	saveMutex       sync.RWMutex
 	saveArgsForCall []struct{}
@@ -263,30 +257,6 @@ func (fake *FakeAppManifest) FileSavePathArgsForCall(i int) string {
 	fake.fileSavePathMutex.RLock()
 	defer fake.fileSavePathMutex.RUnlock()
 	return fake.fileSavePathArgsForCall[i].arg1
-}
-
-func (fake *FakeAppManifest) GetFileSavePath() string {
-	fake.getFileSavePathMutex.Lock()
-	defer fake.getFileSavePathMutex.Unlock()
-	fake.getFileSavePathArgsForCall = append(fake.getFileSavePathArgsForCall, struct{}{})
-	if fake.GetFileSavePathStub != nil {
-		return fake.GetFileSavePathStub()
-	} else {
-		return fake.getFileSavePathReturns.result1
-	}
-}
-
-func (fake *FakeAppManifest) GetFileSavePathCallCount() int {
-	fake.getFileSavePathMutex.RLock()
-	defer fake.getFileSavePathMutex.RUnlock()
-	return len(fake.getFileSavePathArgsForCall)
-}
-
-func (fake *FakeAppManifest) GetFileSavePathReturns(result1 string) {
-	fake.GetFileSavePathStub = nil
-	fake.getFileSavePathReturns = struct {
-		result1 string
-	}{result1}
 }
 
 func (fake *FakeAppManifest) Save() error {
