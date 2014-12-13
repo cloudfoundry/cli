@@ -139,6 +139,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("stacks"),
 				}, {
 					presentCommand("copy-source"),
+				}, {
+					presentCommand("create-app-manifest"),
 				},
 			},
 		}, {
