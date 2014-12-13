@@ -96,7 +96,7 @@ func (m *appManifest) Save() error {
 	}
 	defer f.Close()
 
-	_, err = f.Write([]byte("---\napplications\n"))
+	_, err = f.Write([]byte("---\napplications:\n"))
 
 	for _, app := range m.contents {
 		if _, err := f.Write([]byte("- name: " + app.Name + "\n")); err != nil {
@@ -198,7 +198,7 @@ func writeEnvironmentVarToFile(f *os.File, envVars map[string]interface{}) error
 		return err
 	}
 	for k, v := range envVars {
-		_, err = f.Write([]byte(fmt.Sprintf("    %s:%s\n", k, v)))
+		_, err = f.Write([]byte(fmt.Sprintf("    %s: %s\n", k, v)))
 		if err != nil {
 			return err
 		}

@@ -48,7 +48,7 @@ var _ = Describe("generate_manifest", func() {
 		contents := getYamlContent("./output.yml")
 
 		Ω(contents[0]).To(Equal("---"))
-		Ω(contents[1]).To(Equal("applications"))
+		Ω(contents[1]).To(Equal("applications:"))
 	})
 
 	It("creates entry under the given app name", func() {
@@ -101,7 +101,7 @@ var _ = Describe("generate_manifest", func() {
 			[]string{"  services:"},
 			[]string{"  - service1"},
 			[]string{"  env:"},
-			[]string{"    foo:boo"},
+			[]string{"    foo: boo"},
 			[]string{"  timeout: 100"},
 			[]string{"  instances: 3"},
 			[]string{"  host: foo"},
