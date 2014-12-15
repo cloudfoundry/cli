@@ -91,48 +91,48 @@ func (m *appManifest) Save() error {
 	}
 	defer f.Close()
 
-	_, err = f.Write([]byte("---\napplications:\n"))
+	_, err = fmt.Fprintln(f, "---\napplications:")
 
 	for _, app := range m.contents {
-		if _, err := f.Write([]byte("- name: " + app.Name + "\n")); err != nil {
+		if _, err := fmt.Fprintf(f, "- name: %s\n", app.Name); err != nil {
 			return err
 		}
 
-		if _, err := f.Write([]byte(fmt.Sprintf("  memory: %dM\n", app.Memory))); err != nil {
+		if _, err := fmt.Fprintf(f, "  memory: %dM\n", app.Memory); err != nil {
 			return err
 		}
 
-		if _, err := f.Write([]byte(fmt.Sprintf("  instances: %d\n", app.InstanceCount))); err != nil {
+		if _, err := fmt.Fprintf(f, "  instances: %d\n", app.InstanceCount); err != nil {
 			return err
 		}
 
 		if app.BuildpackUrl != "" {
-			if _, err := f.Write([]byte(fmt.Sprintf("  buildpack: %s\n", app.BuildpackUrl))); err != nil {
+			if _, err := fmt.Fprintf(f, "  buildpack: %s\n", app.BuildpackUrl); err != nil {
 				return err
 			}
 		}
 
 		if app.HealthCheckTimeout > 0 {
-			if _, err := f.Write([]byte(fmt.Sprintf("  timeout: %d\n", app.HealthCheckTimeout))); err != nil {
+			if _, err := fmt.Fprintf(f, "  timeout: %d\n", app.HealthCheckTimeout); err != nil {
 				return err
 			}
 		}
 
 		if app.Command != "" {
-			if _, err := f.Write([]byte(fmt.Sprintf("  command: %s\n", app.Command))); err != nil {
+			if _, err := fmt.Fprintf(f, "  command: %s\n", app.Command); err != nil {
 				return err
 			}
 		}
 
 		if len(app.Routes) > 0 {
-			if _, err := f.Write([]byte(fmt.Sprintf("  host: %s\n", app.Routes[0].Host))); err != nil {
+			if _, err := fmt.Fprintf(f, "  host: %s\n", app.Routes[0].Host); err != nil {
 				return err
 			}
-			if _, err := f.Write([]byte(fmt.Sprintf("  domain: %s\n", app.Routes[0].Domain.Name))); err != nil {
+			if _, err := fmt.Fprintf(f, "  domain: %s\n", app.Routes[0].Domain.Name); err != nil {
 				return err
 			}
 		} else {
-			if _, err := f.Write([]byte(fmt.Sprintf("  no-route: true\n"))); err != nil {
+			if _, err := fmt.Fprintf(f, "  no-route: true\n"); err != nil {
 				return err
 			}
 		}
@@ -173,12 +173,12 @@ func (m *appManifest) addApplication(name string) {
 }
 
 func writeServicesToFile(f *os.File, entries []models.ServicePlanSummary) error {
-	_, err := f.Write([]byte(fmt.Sprintf("  services:\n")))
+	_, err := fmt.Fprintln(f, "  services:")
 	if err != nil {
 		return err
 	}
 	for _, service := range entries {
-		_, err = f.Write([]byte(fmt.Sprintf("  - %s\n", service.Name)))
+		_, err = fmt.Fprintf(f, "  - %s\n", service.Name)
 		if err != nil {
 			return err
 		}
@@ -188,12 +188,12 @@ func writeServicesToFile(f *os.File, entries []models.ServicePlanSummary) error 
 }
 
 func writeEnvironmentVarToFile(f *os.File, envVars map[string]interface{}) error {
-	_, err := f.Write([]byte(fmt.Sprintf("  env:\n")))
+	_, err := fmt.Fprintln(f, "  env:")
 	if err != nil {
 		return err
 	}
 	for k, v := range envVars {
-		_, err = f.Write([]byte(fmt.Sprintf("    %s: %s\n", k, v)))
+		_, err = fmt.Fprintf(f, "    %s: %s\n", k, v)
 		if err != nil {
 			return err
 		}
