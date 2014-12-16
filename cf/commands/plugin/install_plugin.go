@@ -36,7 +36,12 @@ func (cmd *PluginInstall) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "install-plugin",
 		Description: T("Install the plugin defined in command argument"),
-		Usage:       T("CF_NAME install-plugin PATH/TO/PLUGIN"),
+		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN
+
+EXAMPLE:
+   cf install-plugin https://github.com/cf-experimental/plugin-foobar
+   cf install-plugin ~/Downloads/plugin-foobar
+`),
 	}
 }
 
