@@ -725,9 +725,9 @@
       "modified": true
    },
    {
-      "id": "CF_NAME install-plugin PATH/TO/PLUGIN",
+      "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n",
       "translation": "CF_NAME install-plugin PATH/TO/PLUGIN",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
