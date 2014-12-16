@@ -109,6 +109,21 @@ var _ = Describe("main", func() {
 				Eventually(result.Out).ShouldNot(Say("\"--bad_flag2\""))
 			})
 		})
+
+		Context("When a negative integer is preceeded by a valid flag", func() {
+			It("skips validation for negative integer flag values", func() {
+				result := Cf("update-space-quota", "-i", "-10")
+				Eventually(result.Out).ShouldNot(Say("\"-10\""))
+			})
+		})
+
+		Context("When a negative integer is preceeded by a invalid flag", func() {
+			It("validates the negative integer as a flag", func() {
+				result := Cf("update-space-quota", "-badflag", "-10")
+				Eventually(result.Out).Should(Say("\"-badflag\""))
+				Eventually(result.Out).Should(Say("\"-10\""))
+			})
+		})
 	})
 
 	Describe("Plugins", func() {
