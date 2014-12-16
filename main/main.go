@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -207,12 +208,13 @@ func getCommandFlags(args []string, metaDatas []command_metadata.CommandMetadata
 }
 
 func matchArgAndFlags(flags []string, args []string) string {
-	var badFlag, prefix string
+	var badFlag string
+	var lastPassed bool
 	multipleFlagErr := false
 
 Loop:
 	for _, arg := range args {
-		prefix = ""
+		prefix := ""
 
 		//only take flag name, ignore value after '='
 		arg = strings.Split(arg, "=")[0]
@@ -228,9 +230,18 @@ Loop:
 		}
 		arg = strings.TrimLeft(arg, prefix)
 
+		//skip verification for negative integers, e.g. -i -10
+		if lastPassed {
+			lastPassed = false
+			if _, err := strconv.ParseInt(arg, 10, 32); err == nil {
+				continue Loop
+			}
+		}
+
 		if prefix != "" {
 			for _, flag := range flags {
 				if flag == arg {
+					lastPassed = true
 					continue Loop
 				}
 			}
