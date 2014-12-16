@@ -92,9 +92,11 @@ func main() {
 	metaDatas := cmdFactory.CommandMetadatas()
 
 	if len(os.Args) > 1 {
-		flags := getCommandFlags(os.Args, metaDatas)
+		flags, totalArgs := getCommandFlags(os.Args, metaDatas)
 
-		badFlags = matchArgAndFlags(flags, os.Args[2:])
+		if args2skip := totalArgs + 2; len(os.Args) >= args2skip {
+			badFlags = matchArgAndFlags(flags, os.Args[args2skip:])
+		}
 
 		if badFlags != "" {
 			badFlags = badFlags + "\n\n"
@@ -180,10 +182,12 @@ func callCoreCommand(args []string, theApp *cli.App) {
 	warningsCollector.PrintWarnings()
 }
 
-func getCommandFlags(args []string, metaDatas []command_metadata.CommandMetadata) []string {
+func getCommandFlags(args []string, metaDatas []command_metadata.CommandMetadata) ([]string, int) {
 	var flags []string
+	var totalArgs int
 	for _, cmd := range metaDatas {
 		if args[1] == cmd.Name || args[1] == cmd.ShortName {
+			totalArgs = cmd.TotalArgs
 			for _, flag := range cmd.Flags {
 				switch t := flag.(type) {
 				default:
@@ -199,7 +203,7 @@ func getCommandFlags(args []string, metaDatas []command_metadata.CommandMetadata
 			}
 		}
 	}
-	return flags
+	return flags, totalArgs
 }
 
 func matchArgAndFlags(flags []string, args []string) string {

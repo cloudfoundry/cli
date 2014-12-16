@@ -9,4 +9,5 @@ type CommandMetadata struct {
 	Description     string
 	Flags           []cli.Flag
 	SkipFlagParsing bool
+	TotalArgs       int //Optional: number of arguments to skip for flag verification
 }
