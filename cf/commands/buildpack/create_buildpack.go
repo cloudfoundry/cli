@@ -39,6 +39,7 @@ func (cmd CreateBuildpack) Metadata() command_metadata.CommandMetadata {
 			cli.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")},
 			cli.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")},
 		},
+		TotalArgs: 3,
 	}
 }
 
