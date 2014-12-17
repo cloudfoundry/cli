@@ -10,6 +10,7 @@ import (
 type AppManifest interface {
 	Memory(string, int64)
 	Service(string, string)
+	StartupCommand(string, string)
 	EnvironmentVars(string, string, string)
 	HealthCheckTimeout(string, int)
 	Instances(string, int)
@@ -35,6 +36,11 @@ func (m *appManifest) FileSavePath(savePath string) {
 func (m *appManifest) Memory(appName string, memory int64) {
 	i := m.findOrCreateApplication(appName)
 	m.contents[i].Memory = memory
+}
+
+func (m *appManifest) StartupCommand(appName string, cmd string) {
+	i := m.findOrCreateApplication(appName)
+	m.contents[i].Command = cmd
 }
 
 func (m *appManifest) BuildpackUrl(appName string, url string) {
