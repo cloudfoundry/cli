@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"sort"
+
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
@@ -41,9 +43,9 @@ func (cmd *CreateAppManifest) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-app-manifest",
 		Description: T("Create an app manifest for an app that has been pushed successfully."),
-		Usage:       T("CF_NAME create-app-manifest [-p /path/to/<app-name>-manifest.yml ]"),
+		Usage:       T("CF_NAME create-app-manifest APP [-p /path/to/<app-name>-manifest.yml ]"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Specify a path for file creation.  If path not specified, file is create in root directory of the application source code.")),
+			flag_helpers.NewStringFlag("p", T("Specify a path for file creation. If path not specified, manifest file is created in current working directory.")),
 		},
 	}
 }
@@ -104,8 +106,9 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 	}
 
 	if len(app.EnvironmentVars) > 0 {
-		for k, v := range app.EnvironmentVars {
-			cmd.manifest.EnvironmentVars(app.Name, k, v.(string))
+		sorted := sortEnvVar(app.EnvironmentVars)
+		for _, envVarKey := range sorted {
+			cmd.manifest.EnvironmentVars(app.Name, envVarKey, app.EnvironmentVars[envVarKey].(string))
 		}
 	}
 
@@ -123,4 +126,14 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 	cmd.ui.Say("")
 
 	return nil
+}
+
+func sortEnvVar(vars map[string]interface{}) []string {
+	var varsAry []string
+	for k, _ := range vars {
+		varsAry = append(varsAry, k)
+	}
+	sort.Strings(varsAry)
+
+	return varsAry
 }
