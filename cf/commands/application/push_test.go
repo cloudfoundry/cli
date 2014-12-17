@@ -371,7 +371,7 @@ var _ = Describe("Push Command", func() {
 				BeforeEach(func() {
 					manifest := singleAppManifest()
 					manifestApp = manifest.Data.Get("applications").([]interface{})[0].(generic.Map)
-					manifestApp.Delete("hosts")
+					manifestApp.Delete("host")
 					manifestRepo.ReadManifestReturns.Manifest = manifest
 				})
 
@@ -1043,7 +1043,7 @@ func existingAppManifest() *manifest.Manifest {
 					"name":      "manifest-app-name",
 					"memory":    "128MB",
 					"instances": 1,
-					"hosts":     []interface{}{"new-manifest-host"},
+					"host":      "new-manifest-host",
 					"domain":    "example.com",
 					"stack":     "custom-stack",
 					"timeout":   360,
@@ -1095,7 +1095,7 @@ func singleAppManifest() *manifest.Manifest {
 					"name":      "manifest-app-name",
 					"memory":    "128MB",
 					"instances": 1,
-					"hosts":     []interface{}{"manifest-host"},
+					"host":      "manifest-host",
 					"domain":    "manifest-example.com",
 					"stack":     "custom-stack",
 					"timeout":   360,
