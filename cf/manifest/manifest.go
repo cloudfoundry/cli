@@ -137,6 +137,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 	appParams.Domain = stringVal(yamlMap, "domain", &errs)
 	appParams.Host = stringVal(yamlMap, "host", &errs)
+	appParams.Hosts = sliceOrEmptyVal(yamlMap, "hosts", &errs)
 	appParams.Name = stringVal(yamlMap, "name", &errs)
 	appParams.Path = stringVal(yamlMap, "path", &errs)
 	appParams.StackName = stringVal(yamlMap, "stack", &errs)
