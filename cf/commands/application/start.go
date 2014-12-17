@@ -152,11 +152,15 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 		return
 	}
 
-	cmd.waitForInstancesToStage(updatedApp)
+	isStaged := cmd.waitForInstancesToStage(updatedApp)
 	stopLoggingChan <- true
 	<-doneLoggingChan
 
 	cmd.ui.Say("")
+
+	if !isStaged {
+		cmd.ui.Failed(fmt.Sprintf("%s failed to stage within %f minutes", app.Name, cmd.StagingTimeout.Minutes()))
+	}
 
 	cmd.waitForOneRunningInstance(updatedApp)
 	cmd.ui.Say(terminal.HeaderColor(T("\nApp started\n")))
@@ -226,7 +230,7 @@ func isStagingError(err error) bool {
 	return ok && httpError.ErrorCode() == errors.APP_NOT_STAGED
 }
 
-func (cmd Start) waitForInstancesToStage(app models.Application) {
+func (cmd Start) waitForInstancesToStage(app models.Application) bool {
 	stagingStartTime := time.Now()
 	_, err := cmd.appInstancesRepo.GetInstances(app.Guid)
 
@@ -243,7 +247,11 @@ func (cmd Start) waitForInstancesToStage(app models.Application) {
 				"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))}))
 	}
 
-	return
+	if time.Since(stagingStartTime) >= cmd.StagingTimeout {
+		return false
+	}
+
+	return true
 }
 
 func (cmd Start) waitForOneRunningInstance(app models.Application) {
