@@ -355,7 +355,7 @@ var _ = Describe("start command", func() {
 				[]string{"Before close"},
 				[]string{"After close 1"},
 				[]string{"After close 2"},
-				[]string{"0 of 2 instances running", "2 starting"},
+				[]string{"my-app failed to stage within", "minutes"},
 			))
 		})
 
@@ -429,7 +429,7 @@ var _ = Describe("start command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Starting", "my-app"},
 				[]string{"FAILED"},
-				[]string{"Start app timeout"},
+				[]string{"my-app failed to stage within", "minutes"},
 			))
 			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"instances running"}))
 		})
