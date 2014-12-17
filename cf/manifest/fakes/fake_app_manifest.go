@@ -21,6 +21,12 @@ type FakeAppManifest struct {
 		arg1 string
 		arg2 string
 	}
+	StartupCommandStub        func(string, string)
+	startupCommandMutex       sync.RWMutex
+	startupCommandArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
 	EnvironmentVarsStub        func(string, string, string)
 	environmentVarsMutex       sync.RWMutex
 	environmentVarsArgsForCall []struct {
@@ -50,7 +56,7 @@ type FakeAppManifest struct {
 	GetContentsStub        func() []models.Application
 	getContentsMutex       sync.RWMutex
 	getContentsArgsForCall []struct{}
-	getContentsReturns     struct {
+	getContentsReturns struct {
 		result1 []models.Application
 	}
 	FileSavePathStub        func(string)
@@ -61,7 +67,7 @@ type FakeAppManifest struct {
 	SaveStub        func() error
 	saveMutex       sync.RWMutex
 	saveArgsForCall []struct{}
-	saveReturns     struct {
+	saveReturns struct {
 		result1 error
 	}
 }
@@ -112,6 +118,30 @@ func (fake *FakeAppManifest) ServiceArgsForCall(i int) (string, string) {
 	fake.serviceMutex.RLock()
 	defer fake.serviceMutex.RUnlock()
 	return fake.serviceArgsForCall[i].arg1, fake.serviceArgsForCall[i].arg2
+}
+
+func (fake *FakeAppManifest) StartupCommand(arg1 string, arg2 string) {
+	fake.startupCommandMutex.Lock()
+	defer fake.startupCommandMutex.Unlock()
+	fake.startupCommandArgsForCall = append(fake.startupCommandArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	if fake.StartupCommandStub != nil {
+		fake.StartupCommandStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeAppManifest) StartupCommandCallCount() int {
+	fake.startupCommandMutex.RLock()
+	defer fake.startupCommandMutex.RUnlock()
+	return len(fake.startupCommandArgsForCall)
+}
+
+func (fake *FakeAppManifest) StartupCommandArgsForCall(i int) (string, string) {
+	fake.startupCommandMutex.RLock()
+	defer fake.startupCommandMutex.RUnlock()
+	return fake.startupCommandArgsForCall[i].arg1, fake.startupCommandArgsForCall[i].arg2
 }
 
 func (fake *FakeAppManifest) EnvironmentVars(arg1 string, arg2 string, arg3 string) {

@@ -87,6 +87,7 @@ var _ = Describe("generate_manifest", func() {
 
 	It("generates a manifest containing all the attributes", func() {
 		m.Memory("app1", 128)
+		m.StartupCommand("app1", "run main.go")
 		m.Service("app1", "service1")
 		m.EnvironmentVars("app1", "foo", "boo")
 		m.HealthCheckTimeout("app1", 100)
@@ -98,6 +99,7 @@ var _ = Describe("generate_manifest", func() {
 		Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
 			[]string{"- name: app1"},
 			[]string{"  memory: 128M"},
+			[]string{"  command: run main.go"},
 			[]string{"  services:"},
 			[]string{"  - service1"},
 			[]string{"  env:"},
