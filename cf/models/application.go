@@ -70,6 +70,7 @@ type AppParams struct {
 	Guid               *string
 	HealthCheckTimeout *int
 	Host               *string
+	Hosts              *[]string
 	InstanceCount      *int
 	Memory             *int64
 	Name               *string
@@ -105,8 +106,8 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.HealthCheckTimeout != nil {
 		app.HealthCheckTimeout = other.HealthCheckTimeout
 	}
-	if other.Host != nil {
-		app.Host = other.Host
+	if other.Hosts != nil {
+		app.Hosts = other.Hosts
 	}
 	if other.InstanceCount != nil {
 		app.InstanceCount = other.InstanceCount
@@ -145,4 +146,8 @@ func (app *AppParams) Merge(other *AppParams) {
 
 func (app *AppParams) IsEmpty() bool {
 	return reflect.DeepEqual(*app, AppParams{})
+}
+
+func (app *AppParams) IsHostEmpty() bool {
+	return app.Hosts == nil || len(*app.Hosts) == 0
 }
