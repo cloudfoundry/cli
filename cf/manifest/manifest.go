@@ -136,8 +136,13 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	appParams.BuildpackUrl = stringValOrDefault(yamlMap, "buildpack", &errs)
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 	appParams.Domain = stringVal(yamlMap, "domain", &errs)
-	appParams.Host = stringVal(yamlMap, "host", &errs)
-	appParams.Hosts = sliceOrEmptyVal(yamlMap, "hosts", &errs)
+
+	hostsArr := *sliceOrEmptyVal(yamlMap, "hosts", &errs)
+	if host := stringVal(yamlMap, "host", &errs); host != nil {
+		hostsArr = append(hostsArr, *host)
+	}
+	appParams.Hosts = &hostsArr
+
 	appParams.Name = stringVal(yamlMap, "name", &errs)
 	appParams.Path = stringVal(yamlMap, "path", &errs)
 	appParams.StackName = stringVal(yamlMap, "stack", &errs)

@@ -69,7 +69,6 @@ type AppParams struct {
 	EnvironmentVars    *map[string]interface{}
 	Guid               *string
 	HealthCheckTimeout *int
-	Host               *string
 	Hosts              *[]string
 	InstanceCount      *int
 	Memory             *int64
