@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -108,7 +109,18 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 	if len(app.EnvironmentVars) > 0 {
 		sorted := sortEnvVar(app.EnvironmentVars)
 		for _, envVarKey := range sorted {
-			cmd.manifest.EnvironmentVars(app.Name, envVarKey, app.EnvironmentVars[envVarKey].(string))
+			switch app.EnvironmentVars[envVarKey].(type) {
+			default:
+				cmd.ui.Failed(T("Failed to create manifest, unable to parse environment variable: ") + envVarKey)
+			case float64:
+				//json.Unmarshal turn all numbers to float64
+				value := int(app.EnvironmentVars[envVarKey].(float64))
+				cmd.manifest.EnvironmentVars(app.Name, envVarKey, fmt.Sprintf("%d", value))
+			case bool:
+				cmd.manifest.EnvironmentVars(app.Name, envVarKey, fmt.Sprintf("%t", app.EnvironmentVars[envVarKey].(bool)))
+			case string:
+				cmd.manifest.EnvironmentVars(app.Name, envVarKey, "\""+app.EnvironmentVars[envVarKey].(string)+"\"")
+			}
 		}
 	}
 

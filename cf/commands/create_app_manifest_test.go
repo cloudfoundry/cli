@@ -133,6 +133,27 @@ var _ = Describe("create-app-manifest Command", func() {
 			})
 		})
 
+		Context("Env Vars can be in different types (string, float64, bool)", func() {
+			BeforeEach(func() {
+				app := makeAppWithMultipleEnvVars("my-app")
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+			})
+
+			It("calls manifest EnvironmentVars() aphlhabetically", func() {
+				runCommand("my-app")
+				Ω(fakeManifest.EnvironmentVarsCallCount()).To(Equal(4))
+				_, _, v := fakeManifest.EnvironmentVarsArgsForCall(0)
+				Ω(v).To(Equal("\"abc\""))
+				_, _, v = fakeManifest.EnvironmentVarsArgsForCall(1)
+				Ω(v).To(Equal("10"))
+				_, _, v = fakeManifest.EnvironmentVarsArgsForCall(2)
+				Ω(v).To(Equal("true"))
+				_, _, v = fakeManifest.EnvironmentVarsArgsForCall(3)
+				Ω(v).To(Equal("false"))
+			})
+		})
+
 		Context("app without Services, Routes, Environment Vars", func() {
 			BeforeEach(func() {
 				app := makeAppWithoutOptions("my-app")
@@ -229,10 +250,10 @@ func makeAppWithMultipleEnvVars(appName string) models.Application {
 	application.PackageUpdatedAt = &packgeUpdatedAt
 
 	envMap := make(map[string]interface{})
-	envMap["foo"] = "value1"
-	envMap["abc"] = "value2"
-	envMap["xyz"] = "value3"
-	envMap["bar"] = "value4"
+	envMap["foo"] = bool(true)
+	envMap["abc"] = "abc"
+	envMap["xyz"] = bool(false)
+	envMap["bar"] = float64(10)
 	application.EnvironmentVars = envMap
 
 	return application

@@ -535,9 +535,9 @@
       "modified": true
    },
    {
-      "id": "CF_NAME create-app-manifest [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
+      "id": "CF_NAME create-app-manifest APP [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
       "translation": "CF_NAME create-app-manifest [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
@@ -2057,6 +2057,11 @@
    {
       "id": "Failed to create json for resource_match request",
       "translation": "Failed to create json for resource_match request",
+      "modified": false
+   },
+   {
+      "id": "Failed to create manifest, unable to parse environment variable: ",
+      "translation": "Failed to create manifest, unable to parse environment variable: ",
       "modified": false
    },
    {
@@ -3675,9 +3680,9 @@
       "modified": false
    },
    {
-      "id": "Specify a path for file creation.  If path not specified, file is create in root directory of the application source code.",
+      "id": "Specify a path for file creation. If path not specified, manifest file is created in current working directory.",
       "translation": "Specify a path for file creation.  If path not specified, file is create in root directory of the application source code.",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
