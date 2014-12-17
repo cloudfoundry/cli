@@ -154,17 +154,29 @@ func (cmd *Push) Run(c *cli.Context) {
 
 func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Application, appParams models.AppParams, noHostName bool) {
 	defaultRouteAcceptable := len(app.Routes) == 0
-	routeDefined := appParams.Domain != nil || appParams.Host != nil || noHostName
-
-	domain := cmd.findDomain(appParams.Domain)
-	hostname := cmd.hostnameForApp(appParams.Host, appParams.UseRandomHostname, app.Name, noHostName)
+	routeDefined := appParams.Domain != nil || !appParams.IsHostEmpty() || noHostName
 
 	if appParams.NoRoute {
 		cmd.removeRoutes(app, routeActor)
-	} else if routeDefined || defaultRouteAcceptable {
-		route := routeActor.FindOrCreateRoute(hostname, domain)
-		routeActor.BindRoute(app, route)
+		return
 	}
+
+	if routeDefined || defaultRouteAcceptable {
+		if appParams.IsHostEmpty() {
+			cmd.createAndBindRoute(nil, appParams, routeActor, app, noHostName)
+		} else {
+			for _, host := range *(appParams.Hosts) {
+				cmd.createAndBindRoute(&host, appParams, routeActor, app, noHostName)
+			}
+		}
+	}
+}
+
+func (cmd *Push) createAndBindRoute(host *string, appParams models.AppParams, routeActor actors.RouteActor, app models.Application, noHostName bool) {
+	domain := cmd.findDomain(appParams.Domain)
+	hostname := cmd.hostnameForApp(host, appParams.UseRandomHostname, app.Name, noHostName)
+	route := routeActor.FindOrCreateRoute(hostname, domain)
+	routeActor.BindRoute(app, route)
 }
 
 func (cmd *Push) removeRoutes(app models.Application, routeActor actors.RouteActor) {
@@ -466,7 +478,7 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 
 	if c.String("n") != "" {
 		hostname := c.String("n")
-		appParams.Host = &hostname
+		appParams.Hosts = &[]string{hostname}
 	}
 
 	if c.String("b") != "" {

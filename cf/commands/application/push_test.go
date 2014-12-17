@@ -371,7 +371,7 @@ var _ = Describe("Push Command", func() {
 				BeforeEach(func() {
 					manifest := singleAppManifest()
 					manifestApp = manifest.Data.Get("applications").([]interface{})[0].(generic.Map)
-					manifestApp.Delete("host")
+					manifestApp.Delete("hosts")
 					manifestRepo.ReadManifestReturns.Manifest = manifest
 				})
 
@@ -485,6 +485,27 @@ var _ = Describe("Push Command", func() {
 					"PATH": "/u/apps/my-app/bin",
 					"FOO":  "baz",
 				}))
+			})
+
+			It("pushes an app with multiple routes when multiple hosts are provided", func() {
+				domainRepo.FindByNameInOrgDomain = models.DomainFields{
+					Name: "manifest-example.com",
+					Guid: "bar-domain-guid",
+				}
+
+				manifestRepo.ReadManifestReturns.Manifest = multipleHostManifest()
+
+				callPush()
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route", "manifest-host-1.manifest-example.com"},
+					[]string{"OK"},
+					[]string{"Binding", "manifest-host-1.manifest-example.com"},
+					[]string{"Creating route", "manifest-host-2.manifest-example.com"},
+					[]string{"OK"},
+					[]string{"Binding", "manifest-host-2.manifest-example.com"},
+					[]string{"manifest-app-name"},
+				))
 			})
 
 			It("fails when parsing the manifest has errors", func() {
@@ -1022,8 +1043,34 @@ func existingAppManifest() *manifest.Manifest {
 					"name":      "manifest-app-name",
 					"memory":    "128MB",
 					"instances": 1,
-					"host":      "new-manifest-host",
+					"hosts":     []interface{}{"new-manifest-host"},
 					"domain":    "example.com",
+					"stack":     "custom-stack",
+					"timeout":   360,
+					"buildpack": "some-buildpack",
+					"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
+					"path":      filepath.Clean("some/path/from/manifest"),
+					"env": generic.NewMap(map[interface{}]interface{}{
+						"FOO":  "baz",
+						"PATH": "/u/apps/my-app/bin",
+					}),
+				}),
+			},
+		}),
+	}
+}
+
+func multipleHostManifest() *manifest.Manifest {
+	return &manifest.Manifest{
+		Path: "manifest.yml",
+		Data: generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				generic.NewMap(map[interface{}]interface{}{
+					"name":      "manifest-app-name",
+					"memory":    "128MB",
+					"instances": 1,
+					"hosts":     []interface{}{"manifest-host-1", "manifest-host-2"},
+					"domain":    "manifest-example.com",
 					"stack":     "custom-stack",
 					"timeout":   360,
 					"buildpack": "some-buildpack",
@@ -1048,7 +1095,7 @@ func singleAppManifest() *manifest.Manifest {
 					"name":      "manifest-app-name",
 					"memory":    "128MB",
 					"instances": 1,
-					"host":      "manifest-host",
+					"hosts":     []interface{}{"manifest-host"},
 					"domain":    "manifest-example.com",
 					"stack":     "custom-stack",
 					"timeout":   360,
