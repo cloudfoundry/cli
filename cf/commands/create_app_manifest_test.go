@@ -112,6 +112,27 @@ var _ = Describe("create-app-manifest Command", func() {
 			})
 		})
 
+		Context("Env Vars will be written in aplhabetical order", func() {
+			BeforeEach(func() {
+				app := makeAppWithMultipleEnvVars("my-app")
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+			})
+
+			It("calls manifest EnvironmentVars() aphlhabetically", func() {
+				runCommand("my-app")
+				Ω(fakeManifest.EnvironmentVarsCallCount()).To(Equal(4))
+				_, k, _ := fakeManifest.EnvironmentVarsArgsForCall(0)
+				Ω(k).To(Equal("abc"))
+				_, k, _ = fakeManifest.EnvironmentVarsArgsForCall(1)
+				Ω(k).To(Equal("bar"))
+				_, k, _ = fakeManifest.EnvironmentVarsArgsForCall(2)
+				Ω(k).To(Equal("foo"))
+				_, k, _ = fakeManifest.EnvironmentVarsArgsForCall(3)
+				Ω(k).To(Equal("xyz"))
+			})
+		})
+
 		Context("app without Services, Routes, Environment Vars", func() {
 			BeforeEach(func() {
 				app := makeAppWithoutOptions("my-app")
@@ -179,6 +200,7 @@ func makeAppWithOptions(appName string) models.Application {
 
 	return application
 }
+
 func makeAppWithoutOptions(appName string) models.Application {
 	application := models.Application{}
 	application.Name = appName
@@ -190,6 +212,28 @@ func makeAppWithoutOptions(appName string) models.Application {
 	application.RunningInstances = 2
 	application.Memory = 256
 	application.PackageUpdatedAt = &packgeUpdatedAt
+
+	return application
+}
+
+func makeAppWithMultipleEnvVars(appName string) models.Application {
+	application := models.Application{}
+	application.Name = appName
+	application.Guid = "app-guid"
+	packgeUpdatedAt, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2012-10-24T19:54:00Z")
+
+	application.State = "started"
+	application.InstanceCount = 2
+	application.RunningInstances = 2
+	application.Memory = 256
+	application.PackageUpdatedAt = &packgeUpdatedAt
+
+	envMap := make(map[string]interface{})
+	envMap["foo"] = "value1"
+	envMap["abc"] = "value2"
+	envMap["xyz"] = "value3"
+	envMap["bar"] = "value4"
+	application.EnvironmentVars = envMap
 
 	return application
 }
