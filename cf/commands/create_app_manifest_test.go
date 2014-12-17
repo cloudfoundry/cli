@@ -108,6 +108,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				Ω(fakeManifest.InstancesCallCount()).To(Equal(1))
 				Ω(fakeManifest.DomainCallCount()).To(Equal(1))
 				Ω(fakeManifest.ServiceCallCount()).To(Equal(1))
+				Ω(fakeManifest.StartupCommandCallCount()).To(Equal(1))
 			})
 		})
 
@@ -150,6 +151,7 @@ func makeAppWithOptions(appName string) models.Application {
 	application := models.Application{}
 	application.Name = appName
 	application.Guid = "app-guid"
+	application.Command = "run main.go"
 
 	domain := models.DomainFields{}
 	domain.Name = "example.com"

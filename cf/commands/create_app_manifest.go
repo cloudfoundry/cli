@@ -89,6 +89,10 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 	cmd.manifest.Memory(app.Name, app.Memory)
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
 
+	if app.Command != "" {
+		cmd.manifest.StartupCommand(app.Name, app.Command)
+	}
+
 	if len(app.Services) > 0 {
 		for _, service := range app.Services {
 			cmd.manifest.Service(app.Name, service.Name)
