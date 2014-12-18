@@ -94,5 +94,10 @@ func (cmd *Files) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-	cmd.ui.Say("%s", list)
+
+	if list == "" {
+		cmd.ui.Say("No files found")
+	} else {
+		cmd.ui.Say("%s", list)
+	}
 }

@@ -112,5 +112,23 @@ var _ = Describe("files command", func() {
 
 		})
 
+		Context("when there is no file to be listed", func() {
+			BeforeEach(func() {
+				appFilesRepo.ListFilesReturns("", nil)
+			})
+
+			It("informs user that the directory is empty", func() {
+				runCommand("my-app", "/foo")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{""},
+					[]string{"No files found"},
+				))
+			})
+
+		})
+
 	})
 })
