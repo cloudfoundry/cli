@@ -94,4 +94,11 @@ var _ = Describe("delete-space command", func() {
 
 		Expect(config.HasSpace()).To(Equal(false))
 	})
+
+	It("clears the space from the config, when deleting the space currently targeted even if space name is case insensitive", func() {
+		config.SetSpaceFields(space.SpaceFields)
+		runCommand("-f", "Space-To-Delete")
+
+		Expect(config.HasSpace()).To(Equal(false))
+	})
 })
