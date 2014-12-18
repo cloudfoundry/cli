@@ -7,7 +7,7 @@
 * New utils for download single file from url 
 * create-buildpack and update-buildpack now allow relative paths. [#80043644]
 * Update ginkgo
-* Add `cf restart_app_instance` command [#78049908]
+* Add `cf restart-app-instance` command [#78049908]
 * Add dashboard-url to `cf service` output [#68396596]
 * Add unset flag to `cf api` -Allows user to unset the api endpoint [#82979408]
 * `cf plugins` shows command alias [finishes #83892154]
