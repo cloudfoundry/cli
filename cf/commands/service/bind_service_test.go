@@ -78,6 +78,24 @@ var _ = Describe("bind-service command", func() {
 			))
 		})
 
+		It("warns the user when the error is non HttpError ", func() {
+			app := models.Application{}
+			app.Name = "my-app1"
+			app.Guid = "my-app1-guid1"
+			serviceInstance := models.ServiceInstance{}
+			serviceInstance.Name = "my-service1"
+			serviceInstance.Guid = "my-service1-guid1"
+			requirementsFactory.Application = app
+			requirementsFactory.ServiceInstance = serviceInstance
+			serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateNonHttpErrCode: "1001"}
+			ui := callBindService([]string{"my-app1", "my-service1"}, requirementsFactory, serviceBindingRepo)
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
+				[]string{"FAILED"},
+				[]string{"1001"},
+			))
+		})
+
 		It("fails with usage when called without a service instance and app", func() {
 			serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
 
