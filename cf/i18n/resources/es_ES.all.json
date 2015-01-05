@@ -1410,9 +1410,9 @@
       "modified": false
    },
    {
-      "id": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)",
+      "id": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch) ",
       "translation": "buildpack personalizado por nombre (ej. my-buildpack) o por GIT URL (ej. https://github.com/heroku/heroku-buildpack-play.git)",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Custom headers to include in the request, flag can be specified multiple times",
