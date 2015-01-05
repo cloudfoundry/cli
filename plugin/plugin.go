@@ -16,8 +16,15 @@ type CliConnection interface {
 	CliCommand(args ...string) ([]string, error)
 }
 
+type VersionType struct {
+	Major int
+	Minor int
+	Build int
+}
+
 type PluginMetadata struct {
 	Name     string
+	Version  VersionType
 	Commands []Command
 }
 
