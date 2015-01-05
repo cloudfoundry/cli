@@ -13,11 +13,16 @@ type FakeServiceBindingRepo struct {
 	DeleteServiceInstance models.ServiceInstance
 	DeleteApplicationGuid string
 	DeleteBindingNotFound bool
+	CreateNonHttpErrCode  string
 }
 
 func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string) (apiErr error) {
 	repo.CreateServiceInstanceGuid = instanceGuid
 	repo.CreateApplicationGuid = appGuid
+	if repo.CreateNonHttpErrCode != "" {
+		apiErr = errors.New(repo.CreateNonHttpErrCode)
+		return
+	}
 
 	if repo.CreateErrorCode != "" {
 		apiErr = errors.NewHttpError(400, repo.CreateErrorCode, "Error binding service")
