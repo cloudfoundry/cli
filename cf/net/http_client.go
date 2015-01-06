@@ -33,10 +33,19 @@ func PrepareRedirect(req *http.Request, via []*http.Request) error {
 	}
 
 	prevReq := via[len(via)-1]
-	req.Header.Set("Authorization", prevReq.Header.Get("Authorization"))
+	copyHeaders(prevReq, req)
 	dumpRequest(req)
 
 	return nil
+}
+
+func copyHeaders(from *http.Request, to *http.Request) {
+	for key, values := range from.Header {
+		// do not copy POST-specific headers
+		if key != "Content-Type" && key != "Content-Length" {
+			to.Header.Set(key, strings.Join(values, ","))
+		}
+	}
 }
 
 func dumpRequest(req *http.Request) {
