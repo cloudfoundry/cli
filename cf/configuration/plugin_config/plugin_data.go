@@ -12,6 +12,7 @@ type PluginData struct {
 
 type PluginMetadata struct {
 	Location string
+	Version  plugin.VersionType
 	Commands []plugin.Command
 }
 

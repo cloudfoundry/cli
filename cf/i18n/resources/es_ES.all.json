@@ -3050,13 +3050,13 @@
       "modified": false
    },
    {
-      "id": "Plugin {{.PluginName}} successfully installed.",
-      "translation": "Plugin {{.PluginName}} successfully installed.",
-      "modified": false
-   },
-   {
       "id": "Plugin {{.PluginName}} successfully uninstalled.",
       "translation": "Plugin name {{.PluginName}} successfully uninstalled",
+      "modified": true
+   },
+   {
+      "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
+      "translation": "Plugin {{.PluginName}} successfully installed.",
       "modified": true
    },
    {
