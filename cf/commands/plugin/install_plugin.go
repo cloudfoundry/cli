@@ -90,7 +90,7 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name})))
+	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} v{{.Version}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name, "Version": fmt.Sprintf("%d.%d.%d", pluginMetadata.Version.Major, pluginMetadata.Version.Minor, pluginMetadata.Version.Build)})))
 }
 
 func (cmd *PluginInstall) ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName string) {
@@ -162,6 +162,7 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, p
 
 	configMetadata := plugin_config.PluginMetadata{
 		Location: pluginDestinationFilepath,
+		Version:  pluginMetadata.Version,
 		Commands: pluginMetadata.Commands,
 	}
 
@@ -181,6 +182,7 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 	defer rpcService.Stop()
 
 	cmd.runPluginBinary(pluginSourceFilepath, rpcService.Port())
+
 	return rpcService.RpcCmd.PluginMetadata
 }
 
