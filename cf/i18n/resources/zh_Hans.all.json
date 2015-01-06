@@ -4190,6 +4190,11 @@
       "modified": false
    },
    {
+      "id": "Version",
+      "translation": "Version",
+      "modified": false
+   },
+   {
       "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
       "translation": "警告:\n   强烈建议不要在命令行参数里指定密码，\n   以防他人读取或通过命令历史记录查找到密码\n\n",
       "modified": false
