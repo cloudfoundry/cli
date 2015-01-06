@@ -26,8 +26,12 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 
 func (c *Test1) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
-		Name:    "Test1",
-		Version: plugin.VersionType{1, 1, 1},
+		Name: "Test1",
+		Version: plugin.VersionType{
+			Major: 1,
+			Minor: 1,
+			Build: 1,
+		},
 		Commands: []plugin.Command{
 			{
 				Name:     "test_1_cmd1",

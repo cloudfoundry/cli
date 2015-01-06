@@ -63,10 +63,11 @@ var _ = Describe("Plugins", func() {
 		))
 	})
 
-	It("lists the name of the command and it's alias", func() {
+	It("lists the name of the command, it's alias and version", func() {
 		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
 			"Test1": plugin_config.PluginMetadata{
 				Location: "path/to/plugin",
+				Version:  plugin.VersionType{Major: 1, Minor: 2, Build: 3},
 				Commands: []plugin.Command{
 					{Name: "test_1_cmd1", Alias: "test_1_cmd1_alias", HelpText: "help text for test_1_cmd1"},
 					{Name: "test_1_cmd2", Alias: "test_1_cmd2_alias", HelpText: "help text for test_1_cmd2"},
@@ -77,8 +78,25 @@ var _ = Describe("Plugins", func() {
 		runCommand()
 
 		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Test1", "test_1_cmd1", ", test_1_cmd1_alias", "help text for test_1_cmd1"},
-			[]string{"Test1", "test_1_cmd2", ", test_1_cmd2_alias", "help text for test_1_cmd2"},
+			[]string{"Test1", "test_1_cmd1", "1.2.3", ", test_1_cmd1_alias", "help text for test_1_cmd1"},
+			[]string{"Test1", "test_1_cmd2", "1.2.3", ", test_1_cmd2_alias", "help text for test_1_cmd2"},
+		))
+	})
+
+	It("lists 'N/A' as version when plugin does not provide a version", func() {
+		config.PluginsReturns(map[string]plugin_config.PluginMetadata{
+			"Test1": plugin_config.PluginMetadata{
+				Location: "path/to/plugin",
+				Commands: []plugin.Command{
+					{Name: "test_1_cmd1", Alias: "test_1_cmd1_alias", HelpText: "help text for test_1_cmd1"},
+				},
+			},
+		})
+
+		runCommand()
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Test1", "test_1_cmd1", "N/A", ", test_1_cmd1_alias", "help text for test_1_cmd1"},
 		))
 	})
 

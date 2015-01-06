@@ -1,6 +1,8 @@
 package plugin
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -37,18 +39,26 @@ func (cmd *Plugins) GetRequirements(_ requirements.Factory, c *cli.Context) (req
 }
 
 func (cmd *Plugins) Run(c *cli.Context) {
+	var version string
+
 	cmd.ui.Say(T("Listing Installed Plugins..."))
 
 	plugins := cmd.config.Plugins()
 
-	table := terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Command Name"), T("Command Help")})
+	table := terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
 
 	for pluginName, metadata := range plugins {
+		if metadata.Version.Major == 0 && metadata.Version.Minor == 0 && metadata.Version.Build == 0 {
+			version = "N/A"
+		} else {
+			version = fmt.Sprintf("%d.%d.%d", metadata.Version.Major, metadata.Version.Minor, metadata.Version.Build)
+		}
+
 		for _, command := range metadata.Commands {
 			if command.Alias == "" {
-				table.Add(pluginName, command.Name, command.HelpText)
+				table.Add(pluginName, version, command.Name, command.HelpText)
 			} else {
-				table.Add(pluginName, command.Name+", "+command.Alias, command.HelpText)
+				table.Add(pluginName, version, command.Name+", "+command.Alias, command.HelpText)
 			}
 		}
 	}
