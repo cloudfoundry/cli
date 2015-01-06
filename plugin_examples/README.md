@@ -27,7 +27,7 @@ and a plugin. This method receives the following arguments:
   - A struct `plugin.CliConnection` that contains methods for invoking cf CLI commands
   - A string array that contains the arguments passed from the `cf` process
 
-The `GetMetadata()` function informs the CLI of the name of a plugin, the 
+The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), the 
 commands it implements, and help text for each command that users can display 
 with `cf help`.
 
