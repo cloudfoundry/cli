@@ -29,6 +29,11 @@ func (c *Interactive) Run(cliConnection plugin.CliConnection, args []string) {
 func (c *Interactive) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
 		Name: "Interactive",
+		Version: plugin.VersionType{
+			Major: 2,
+			Minor: 1,
+			Build: 0,
+		},
 		Commands: []plugin.Command{
 			{
 				Name:     "interactive",

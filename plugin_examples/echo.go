@@ -58,6 +58,11 @@ func (pluginDemo *PluginDemonstratingParams) Run(cliConnection plugin.CliConnect
 func (pluginDemo *PluginDemonstratingParams) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
 		Name: "EchoDemo",
+		Version: plugin.VersionType{
+			Major: 0,
+			Minor: 1,
+			Build: 3,
+		},
 		Commands: []plugin.Command{
 			{
 				Name:     "echo",

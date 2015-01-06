@@ -16,6 +16,11 @@ type CliCmd struct{}
 func (c *CliCmd) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
 		Name: "CliCmd",
+		Version: plugin.VersionType{
+			Major: 1,
+			Minor: 1,
+			Build: 0,
+		},
 		Commands: []plugin.Command{
 			{
 				Name:     "cli-command",
