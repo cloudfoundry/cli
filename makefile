@@ -65,7 +65,7 @@ install-dev-tools:
 	@echo Installing development tools into $(GODEPS)
 	go get github.com/onsi/ginkgo/ginkgo
 	go get github.com/onsi/gomega
-	go get code.google.com/p/go.tools/cmd/vet
+	go get golang.org/x/tools/cmd/vet
 	go get github.com/jteeuwen/go-bindata/...
 
 .PHONY: all help clean generate-language-resource fmt format test ginkgo vet build install-dev-tools
