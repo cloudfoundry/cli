@@ -89,10 +89,11 @@ var _ = Describe("Broker Builder", func() {
 			},
 		}
 
-		services = models.ServiceOfferings{
-			service1,
-			service2,
-		}
+		services = models.ServiceOfferings(
+			[]models.ServiceOffering{
+				service1,
+				service2,
+			})
 
 		brokerRepo.FindByGuidServiceBroker = serviceBroker1
 	})
@@ -121,11 +122,12 @@ var _ = Describe("Broker Builder", func() {
 					privateServicePlan,
 				},
 			}
-			services = models.ServiceOfferings{
-				service1,
-				service2,
-				brokerlessService,
-			}
+			services = models.ServiceOfferings(
+				[]models.ServiceOffering{
+					service1,
+					service2,
+					brokerlessService,
+				})
 
 			brokers, err := brokerBuilder.AttachBrokersToServices(services)
 			Expect(err).NotTo(HaveOccurred())
