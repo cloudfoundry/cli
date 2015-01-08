@@ -16,7 +16,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -93,10 +92,12 @@ func main() {
 
 	var badFlags string
 	metaDatas := cmdFactory.CommandMetadatas()
+	//return only metadata for current command
 	metaDatas = mergePluginMetaData(metaDatas, pluginList)
 
 	if len(os.Args) > 1 {
-		flags, totalArgs := getCommandFlags(os.Args, metaDatas)
+		flags := cmdFactory.GetCommandFlags(os.Args[1])
+		totalArgs, _ := cmdFactory.GetCommandTotalArgs(os.Args[1])
 
 		if args2skip := totalArgs + 2; len(os.Args) >= args2skip {
 			badFlags = matchArgAndFlags(flags, os.Args[args2skip:])
@@ -185,30 +186,6 @@ func callCoreCommand(args []string, theApp *cli.App) {
 
 	warningsCollector := net.NewWarningsCollector(deps.termUI, gateways...)
 	warningsCollector.PrintWarnings()
-}
-
-func getCommandFlags(args []string, metaDatas []command_metadata.CommandMetadata) ([]string, int) {
-	var flags []string
-	var totalArgs int
-	for _, cmd := range metaDatas {
-		if args[1] == cmd.Name || args[1] == cmd.ShortName {
-			totalArgs = cmd.TotalArgs
-			for _, flag := range cmd.Flags {
-				switch t := flag.(type) {
-				default:
-				case flag_helpers.StringSliceFlagWithNoDefault:
-					flags = append(flags, t.Name)
-				case flag_helpers.IntFlagWithNoDefault:
-					flags = append(flags, t.Name)
-				case flag_helpers.StringFlagWithNoDefault:
-					flags = append(flags, t.Name)
-				case cli.BoolFlag:
-					flags = append(flags, t.Name)
-				}
-			}
-		}
-	}
-	return flags, totalArgs
 }
 
 func matchArgAndFlags(flags []string, args []string) string {

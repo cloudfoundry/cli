@@ -93,6 +93,7 @@ var _ = Describe("factory", func() {
 			Expect(err).To(HaveOccurred())
 		})
 	})
+
 	Describe("CheckIfCoreCmdExists", func() {
 		It("returns true if the cmd exists", func() {
 			exists := factory.CheckIfCoreCmdExists("push")
@@ -109,4 +110,35 @@ var _ = Describe("factory", func() {
 			Expect(exists).To(BeFalse())
 		})
 	})
+
+	Describe("GetCommandFlags", func() {
+		It("returns a list of flags for the command", func() {
+			flags := factory.GetCommandFlags("push")
+			Expect(contains(flags, "b")).To(Equal(true))
+			Expect(contains(flags, "c")).To(Equal(true))
+			Expect(contains(flags, "no-hostname")).To(Equal(true))
+		})
+	})
+
+	Describe("GetCommandTotalArgs", func() {
+		It("returns the total number of argument required by the command ", func() {
+			totalArgs, err := factory.GetCommandTotalArgs("create-buildpack")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(totalArgs).To(Equal(3))
+		})
+
+		It("returns an error if command does not exist", func() {
+			_, err := factory.GetCommandTotalArgs("not-a-command")
+			Expect(err).To(HaveOccurred())
+		})
+	})
 })
+
+func contains(ary []string, item string) bool {
+	for _, v := range ary {
+		if v == item {
+			return true
+		}
+	}
+	return false
+}
