@@ -93,6 +93,7 @@ func main() {
 
 	var badFlags string
 	metaDatas := cmdFactory.CommandMetadatas()
+	metaDatas = mergePluginMetaData(metaDatas, pluginList)
 
 	if len(os.Args) > 1 {
 		flags, totalArgs := getCommandFlags(os.Args, metaDatas)
@@ -266,3 +267,27 @@ Loop:
 
 	return badFlag
 }
+
+func mergePluginMetaData(coreMetas []command_metadata.CommandMetadata, pluginMetas map[string]plugin_config.PluginMetadata) []command_metadata.CommandMetadata {
+	for _, meta := range pluginMetas {
+		for _, cmd := range meta.Commands {
+			tmpMeta := command_metadata.CommandMetadata{}
+			if cmd.UsageDetails.Usage == "" {
+				tmpMeta.Usage = "N/A"
+			} else {
+				tmpMeta.Usage = cmd.UsageDetails.Usage
+			}
+			tmpMeta.Name = cmd.Name
+			tmpMeta.ShortName = cmd.Alias
+			tmpMeta.Description = cmd.HelpText
+
+			for k, v := range cmd.UsageDetails.Options {
+				tmpMeta.Flags = append(tmpMeta.Flags, cli.BoolFlag{Name: k, Usage: v})
+			}
+			coreMetas = append(coreMetas, tmpMeta)
+		}
+	}
+
+	return coreMetas
+}
+

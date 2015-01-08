@@ -152,6 +152,15 @@ var _ = Describe("main", func() {
 			Consistently(output.Out, 1).ShouldNot(Say("You called help in test_with_help"))
 		})
 
+		It("Can call help for a plugin command", func() {
+			output := Cf("help", "test_1_cmd1").Wait(3 * time.Second)
+			Eventually(output.Out).ShouldNot(Say("You called cmd1 in test_1"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE:"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("cf test_1_cmd1 [-a] [-b] [--no-ouput]"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS:"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("----no-output	example option with no use"))
+		})
+
 		It("Calls the core push command if the plugin shares the same name", func() {
 			output := Cf("push")
 			Consistently(output.Out, 1).ShouldNot(Say("You called push in test_with_push"))
