@@ -3,7 +3,19 @@
     "Test1":{
       "Location":"../fixtures/plugins/test_1.exe",
       "Commands":[
-        {"Name":"test_1_cmd1","Alias":"test_1_cmd1_alias","HelpText":"help text for test1 cmd1"},
+        {
+          "Name":"test_1_cmd1",
+          "Alias":"test_1_cmd1_alias",
+          "HelpText":"help text for test1 cmd1",
+          "UsageDetails": {
+            "Usage": "Test plugin command\n    cf test_1_cmd1 [-a] [-b] [--no-ouput]",
+            "Options": {
+              "--no-output": "example option with no use",
+              "-a": "flag to do nothing",
+              "-b": "another flag to do nothing"
+            }
+          }
+        },
         {"Name":"test_1_cmd2","Alias":"","HelpText":"help text for test1 cmd2"}
       ]
     },
