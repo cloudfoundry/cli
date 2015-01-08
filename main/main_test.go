@@ -161,6 +161,13 @@ var _ = Describe("main", func() {
 			Eventually(output.Out.Contents).Should(ContainSubstring("----no-output	example option with no use"))
 		})
 
+		It("shows help with a '-h' or '--help' flag in plugin command", func() {
+			output := Cf("test_1_cmd1", "-h").Wait(3 * time.Second)
+			Eventually(output.Out).ShouldNot(Say("You called cmd1 in test_1"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE:"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS:"))
+		})
+
 		It("Calls the core push command if the plugin shares the same name", func() {
 			output := Cf("push")
 			Consistently(output.Out, 1).ShouldNot(Say("You called push in test_with_push"))

@@ -111,7 +111,7 @@ func main() {
 
 	theApp := app.NewApp(cmdRunner, metaDatas...)
 	//command `cf` without argument
-	if len(os.Args) == 1 || os.Args[1] == "help" {
+	if len(os.Args) == 1 || os.Args[1] == "help" || requestHelp(os.Args[2:]) {
 		theApp.Run(os.Args)
 	} else if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
 		callCoreCommand(os.Args[0:], theApp)
@@ -291,3 +291,12 @@ func mergePluginMetaData(coreMetas []command_metadata.CommandMetadata, pluginMet
 	return coreMetas
 }
 
+func requestHelp(args []string) bool {
+	for _, v := range args {
+		if v == "-h" || v == "--help" {
+			return true
+		}
+	}
+
+	return false
+}
