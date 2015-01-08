@@ -88,6 +88,8 @@ func main() {
 	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator, deps.pluginConfig)
 	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, deps.termUI)
+	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
+	pluginList := pluginsConfig.Plugins()
 
 	var badFlags string
 	metaDatas := cmdFactory.CommandMetadatas()
@@ -115,7 +117,8 @@ func main() {
 	} else {
 		// run each plugin and find the method/
 		// run method if exist
-		ran := rpc.RunMethodIfExists(theApp, os.Args[1:], deps.teePrinter, deps.teePrinter)
+
+		ran := rpc.RunMethodIfExists(theApp, os.Args[1:], deps.teePrinter, deps.teePrinter, pluginList)
 		if !ran {
 			theApp.Run(os.Args)
 		}

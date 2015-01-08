@@ -9,9 +9,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) bool {
-	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
-	pluginList := pluginsConfig.Plugins()
+func RunMethodIfExists(coreCommandRunner *cli.App, args []string, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, pluginList map[string]plugin_config.PluginMetadata) bool {
 	for _, metadata := range pluginList {
 		for _, command := range metadata.Commands {
 			if command.Name == args[0] || command.Alias == args[0] {
