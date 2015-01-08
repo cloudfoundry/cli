@@ -28,8 +28,14 @@ type PluginMetadata struct {
 	Commands []Command
 }
 
+type Usage struct {
+	Usage   string
+	Options map[string]string
+}
+
 type Command struct {
-	Name     string
-	Alias    string
-	HelpText string
+	Name         string
+	Alias        string
+	HelpText     string
+	UsageDetails Usage //Detail usage to be displayed in `cf help <cmd>`
 }
