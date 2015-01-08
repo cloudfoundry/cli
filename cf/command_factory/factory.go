@@ -5,7 +5,9 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/codegangsta/cli"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/broker_builder"
@@ -42,6 +44,8 @@ type Factory interface {
 	GetByCmdName(cmdName string) (cmd command.Command, err error)
 	CommandMetadatas() []command_metadata.CommandMetadata
 	CheckIfCoreCmdExists(cmdName string) bool
+	GetCommandFlags(string) []string
+	GetCommandTotalArgs(string) (int, error)
 }
 
 type concreteFactory struct {
@@ -334,4 +338,37 @@ func (factory concreteFactory) CommandMetadatas() (commands []command_metadata.C
 		commands = append(commands, command.Metadata())
 	}
 	return
+}
+
+func (f concreteFactory) GetCommandFlags(command string) []string {
+	cmd, err := f.GetByCmdName(command)
+	if err != nil {
+		return []string{}
+	}
+
+	var flags []string
+	for _, flag := range cmd.Metadata().Flags {
+		switch t := flag.(type) {
+		default:
+		case flag_helpers.StringSliceFlagWithNoDefault:
+			flags = append(flags, t.Name)
+		case flag_helpers.IntFlagWithNoDefault:
+			flags = append(flags, t.Name)
+		case flag_helpers.StringFlagWithNoDefault:
+			flags = append(flags, t.Name)
+		case cli.BoolFlag:
+			flags = append(flags, t.Name)
+		}
+	}
+
+	return flags
+}
+
+func (f concreteFactory) GetCommandTotalArgs(command string) (int, error) {
+	cmd, err := f.GetByCmdName(command)
+	if err != nil {
+		return 0, err
+	}
+
+	return cmd.Metadata().TotalArgs, nil
 }
