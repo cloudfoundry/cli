@@ -81,6 +81,12 @@ var _ = Describe("factory", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
+		It("can find commands by short name", func() {
+			cmd, err := factory.GetByCmdName("p")
+			Expect(cmd).ToNot(BeNil())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
 		It("returns an error if it does not exist", func() {
 			cmd, err := factory.GetByCmdName("FOOBARRRRR")
 			Expect(cmd).To(BeNil())

@@ -303,6 +303,12 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 func (f concreteFactory) GetByCmdName(cmdName string) (cmd command.Command, err error) {
 	cmd, found := f.cmdsByName[cmdName]
 	if !found {
+		for _, c := range f.cmdsByName {
+			if c.Metadata().ShortName == cmdName {
+				return c, nil
+			}
+		}
+
 		err = errors.New(T("Command not found"))
 	}
 	return
