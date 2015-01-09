@@ -14,16 +14,21 @@ For user-focused documentation, see [Using the cf CLI](http://docs.cloudfoundry.
 The cf CLI plugin architecture model follows the remote procedure call (RPC) model.
 The cf CLI invokes each plugin, runs it as an independent executable, and handles all start, stop, and clean up tasks for plugin executable resources.
 
-Here is an illustration of the workflow when a plugin command is invoked.
+Here is an illustration of the workflow when a plugin command is being invoked.
 
 1: CLI launches 2 processes, the rpc server and the independent plugin executable
 <p align="center">
 <img src="https://raw.githubusercontent.com/cloudfoundry/cli/master/plugin_examples/images/rpc_flow1.png" alt="workflow 1" width="400px">
 </p>
 
-2: Plugin establishes a connection with the RPC server, the connection is used to invoke core cli commands.
+2: Plugin establishes a connection to the RPC server, the connection is used to invoke core cli commands.
 <p align="center">
 <img src="https://raw.githubusercontent.com/cloudfoundry/cli/master/plugin_examples/images/rpc_flow2.png" alt="workflow 1" width="400px">
+</p>
+
+3: When a plugin invokes a cli command, it talks to the rpc server, and the rpc server interacts with cf cli to perform the command. The result is passed back to the plugin through the rpc server.
+<p align="center">
+<img src="https://raw.githubusercontent.com/cloudfoundry/cli/master/plugin_examples/images/rpc_flow3.png" alt="workflow 1" width="400px">
 </p>
 
 - Plugins that you develop for the cf CLI must conform to a predefined plugin interface that we discuss below.
