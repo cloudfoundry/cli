@@ -50,7 +50,10 @@ with `cf help`.
 
   To initialize a plugin, call `plugin.Start(new(MyPluginStruct))` from within the `main()` method of your plugin. The `plugin.Start(...)` function requires a new reference to the struct that implements the defined interface. 
 
-This repo contains a basic plugin example [here](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/basic_plugin.go).
+This repo contains a basic plugin example [here](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/basic_plugin.go).<br>
+To see more examples, go [here](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/).
+
+If you wish to employ TDD in your plugin development, [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples/call_cli_cmd/main) is an example of a plugin that calls core cli command with the use of `FakeCliConnection` for testing.
 
 ### Using Command Line Arguments
 
