@@ -22,6 +22,14 @@ func (f *TestCommandFactory) GetByCmdName(cmdName string) (cmd command.Command, 
 	return
 }
 
+func (f *TestCommandFactory) GetCommandFlags(cmdName string) []string {
+	return []string{}
+}
+
+func (f *TestCommandFactory) GetCommandTotalArgs(cmdName string) (int, error) {
+	return 0, nil
+}
+
 func (f *TestCommandFactory) CheckIfCoreCmdExists(cmdName string) bool {
 	return true
 }
