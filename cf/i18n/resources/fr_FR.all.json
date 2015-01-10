@@ -15,7 +15,7 @@
       "modified": false
    },
    {
-      "id": "\n* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred.",
+      "id": "\n* These service plans have an associated cost. Creating a service instance will incur this cost.",
       "translation": "* Les services annotés ont des coûts associés. Si une instance de ce type est créée, un coût sera associé.",
       "modified": true
    },
