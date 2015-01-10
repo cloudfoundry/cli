@@ -97,7 +97,7 @@ var _ = Describe("marketplace command", func() {
 					[]string{"service", "plans", "description"},
 					[]string{"aaa-my-service-offering", "service offering 2 description", "service-plan-c,", "service-plan-d"},
 					[]string{"zzz-my-service-offering", "service offering 1 description", "service-plan-a,", "service-plan-b*"},
-					[]string{"* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred."},
+					[]string{"* These service plans have an associated cost. Creating a service instance will incur this cost."},
 					[]string{"TIP:  Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."},
 				))
 			})
