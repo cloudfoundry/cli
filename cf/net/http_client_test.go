@@ -16,10 +16,11 @@ import (
 var _ = Describe("HTTP Client", func() {
 
 	Describe("PrepareRedirect", func() {
-		It("transfers authorization headers", func() {
+		It("transfers original headers", func() {
 			originalReq, err := http.NewRequest("GET", "/foo", nil)
 			Expect(err).NotTo(HaveOccurred())
 			originalReq.Header.Set("Authorization", "my-auth-token")
+			originalReq.Header.Set("Accept", "application/json")
 
 			redirectReq, err := http.NewRequest("GET", "/bar", nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -30,6 +31,25 @@ var _ = Describe("HTTP Client", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(redirectReq.Header.Get("Authorization")).To(Equal("my-auth-token"))
+			Expect(redirectReq.Header.Get("Accept")).To(Equal("application/json"))
+		})
+
+		It("does not transfer POST-specific headers", func() {
+			originalReq, err := http.NewRequest("POST", "/foo", nil)
+			Expect(err).NotTo(HaveOccurred())
+			originalReq.Header.Set("Content-Type", "application/json")
+			originalReq.Header.Set("Content-Length", "100")
+
+			redirectReq, err := http.NewRequest("GET", "/bar", nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			via := []*http.Request{originalReq}
+
+			err = PrepareRedirect(redirectReq, via)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(redirectReq.Header.Get("Content-Type")).To(Equal(""))
+			Expect(redirectReq.Header.Get("Content-Length")).To(Equal(""))
 		})
 
 		It("fails after one redirect", func() {
