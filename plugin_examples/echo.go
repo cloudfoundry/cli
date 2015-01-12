@@ -1,9 +1,8 @@
 /**
 * This is an example plugin where we use both arguments and flags. The plugin
 * will echo all arguments passed to it. The flag -uppercase will upcase the
-* arguments passed to the command. The help flag will print the usage text for
-* this command and exit, ignoring any other arguments passed.
- */
+* arguments passed to the command.
+**/
 package main
 
 import (
@@ -16,7 +15,6 @@ import (
 )
 
 type PluginDemonstratingParams struct {
-	help      *bool
 	uppercase *bool
 }
 
@@ -27,7 +25,6 @@ func main() {
 func (pluginDemo *PluginDemonstratingParams) Run(cliConnection plugin.CliConnection, args []string) {
 	// Initialize flags
 	echoFlagSet := flag.NewFlagSet("echo", flag.ExitOnError)
-	help := echoFlagSet.Bool("help", false, "passed to display help text")
 	uppercase := echoFlagSet.Bool("uppercase", false, "displayes all provided text in uppercase")
 
 	// Parse starting from [1] because the [0]th element is the
@@ -36,11 +33,6 @@ func (pluginDemo *PluginDemonstratingParams) Run(cliConnection plugin.CliConnect
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	}
-
-	if *help {
-		printHelp()
-		os.Exit(0)
 	}
 
 	var itemToEcho string
@@ -61,27 +53,20 @@ func (pluginDemo *PluginDemonstratingParams) GetMetadata() plugin.PluginMetadata
 		Version: plugin.VersionType{
 			Major: 0,
 			Minor: 1,
-			Build: 3,
+			Build: 4,
 		},
 		Commands: []plugin.Command{
 			{
 				Name:     "echo",
 				Alias:    "repeat",
 				HelpText: "Echo text passed into the command. To obtain more information use --help",
+				UsageDetails: plugin.Usage{
+					Usage: "echo - print input arguments to screen\n   cf echo [-uppercase] text",
+					Options: map[string]string{
+						"uppercase": "If this param is passed, which ever word is passed to echo will be all capitals.",
+					},
+				},
 			},
 		},
 	}
-}
-
-func printHelp() {
-	fmt.Println(`
-cf echo [-uppercase] text 
-
-OPTIONAL PARAMS:
--help: used to display this additional output.
--uppercase: If this param is passed, which ever word is passed to echo will be all capitals.
-
-REQUIRED PARAMS:
-text: text to echo 
-		`)
 }

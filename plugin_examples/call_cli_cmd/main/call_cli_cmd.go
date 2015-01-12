@@ -25,6 +25,9 @@ func (c *CliCmd) GetMetadata() plugin.PluginMetadata {
 			{
 				Name:     "cli-command",
 				HelpText: "Command to call cli command. It passes all arguments through to the command",
+				UsageDetails: plugin.Usage{
+					Usage: "cli-command\n   cf cli-command CORE-COMMAND",
+				},
 			},
 		},
 	}
