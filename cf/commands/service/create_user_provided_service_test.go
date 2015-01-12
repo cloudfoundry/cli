@@ -27,13 +27,17 @@ var _ = Describe("create-user-provided-service command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		repo = &testapi.FakeUserProvidedServiceInstanceRepo{}
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		cmd = NewCreateUserProvidedService(ui, config, repo)
 	})
 
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
+			Expect(testcmd.RunCommand(cmd, []string{"my-service"}, requirementsFactory)).To(BeFalse())
+		})
+		It("fails when a space is not targeted", func() {
+			requirementsFactory.TargetedSpaceSuccess = false
 			Expect(testcmd.RunCommand(cmd, []string{"my-service"}, requirementsFactory)).To(BeFalse())
 		})
 	})
