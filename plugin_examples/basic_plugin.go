@@ -60,6 +60,12 @@ func (c *BasicPlugin) GetMetadata() plugin.PluginMetadata {
 			plugin.Command{
 				Name:     "basic-plugin-command",
 				HelpText: "Basic plugin command's help text",
+
+				// UsageDetails is optional
+				// It is used to show help of usage of each command
+				UsageDetails: plugin.Usage{
+					Usage: "basic-plugin-command\n   cf basic-plugin-command",
+				},
 			},
 		},
 	}

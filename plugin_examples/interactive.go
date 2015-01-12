@@ -38,6 +38,9 @@ func (c *Interactive) GetMetadata() plugin.PluginMetadata {
 			{
 				Name:     "interactive",
 				HelpText: "help text for interactive",
+				UsageDetails: plugin.Usage{
+					Usage: "interactive - prompt for input and echo to screen\n   cf interactive",
+				},
 			},
 		},
 	}

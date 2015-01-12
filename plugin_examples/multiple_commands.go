@@ -15,6 +15,9 @@ func (c *MultiCmd) GetMetadata() plugin.PluginMetadata {
 			{
 				Name:     "command-1",
 				HelpText: "Help text for command-1",
+				UsageDetails: plugin.Usage{
+					Usage: "command-1 - no real functionality\n   cf command-1",
+				},
 			},
 			{
 				Name:     "command-2",
