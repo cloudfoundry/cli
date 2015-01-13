@@ -53,7 +53,7 @@ var _ = Describe("create-service command", func() {
 		offering2 = models.ServiceOffering{}
 		offering2.Label = "postgres"
 
-		serviceBuilder.GetServicesByNameForSpaceWithPlansReturns(models.ServiceOfferings{offering1, offering2}, nil)
+		serviceBuilder.GetServicesByNameForSpaceWithPlansReturns(models.ServiceOfferings([]models.ServiceOffering{offering1, offering2}), nil)
 	})
 
 	var callCreateService = func(args []string) bool {
