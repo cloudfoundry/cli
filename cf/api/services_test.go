@@ -193,10 +193,10 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	Describe("creating a service instance", func() {
-		It("makes the right request", func() {
+		It("makes the right request with the async flag", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
-				Path:     "/v2/service_instances",
+				Path:     "/v2/service_instances?accept_unavailable=true",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			}))
@@ -211,7 +211,7 @@ var _ = Describe("Services Repo", func() {
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
-						Path:    "/v2/service_instances",
+						Path:    "/v2/service_instances?accept_unavailable=true",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
 						Response: testnet.TestResponse{
 							Status: http.StatusBadRequest,
@@ -233,7 +233,7 @@ var _ = Describe("Services Repo", func() {
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
-						Path:    "/v2/service_instances",
+						Path:    "/v2/service_instances?accept_unavailable=true",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
 						Response: testnet.TestResponse{
 							Status: http.StatusBadRequest,
