@@ -124,6 +124,10 @@ func LogStderrColor(message string) string {
 	return Colorize(message, red)
 }
 
+func LogHealthHeaderColor(message string) string {
+	return Colorize(message, grey)
+}
+
 func LogAppHeaderColor(message string) string {
 	return ColorizeBold(message, yellow)
 }
