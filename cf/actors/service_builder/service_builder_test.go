@@ -46,7 +46,7 @@ var _ = Describe("Service Builder", func() {
 		}
 
 		serviceRepo.FindServiceOfferingsByLabelName = "my-service1"
-		serviceRepo.FindServiceOfferingsByLabelServiceOfferings = models.ServiceOfferings{service1, v1Service}
+		serviceRepo.FindServiceOfferingsByLabelServiceOfferings = models.ServiceOfferings([]models.ServiceOffering{service1, v1Service})
 
 		serviceRepo.GetServiceOfferingByGuidReturns = struct {
 			ServiceOffering models.ServiceOffering
@@ -216,7 +216,8 @@ var _ = Describe("Service Builder", func() {
 					ServiceOfferings models.ServiceOfferings
 					Error            error
 				}{
-					models.ServiceOfferings{service1, service2},
+					models.ServiceOfferings([]models.ServiceOffering{
+						service1, service2}),
 					nil,
 				}
 			})
@@ -243,7 +244,8 @@ var _ = Describe("Service Builder", func() {
 					ServiceOfferings models.ServiceOfferings
 					Error            error
 				}{
-					models.ServiceOfferings{service},
+					models.ServiceOfferings([]models.ServiceOffering{
+						service}),
 					nil,
 				}
 			})
@@ -271,7 +273,8 @@ var _ = Describe("Service Builder", func() {
 					ServiceOfferings models.ServiceOfferings
 					Error            error
 				}{
-					models.ServiceOfferings{service},
+					models.ServiceOfferings([]models.ServiceOffering{
+						service}),
 					nil,
 				}
 			})
@@ -296,7 +299,7 @@ var _ = Describe("Service Builder", func() {
 				ServiceOfferings models.ServiceOfferings
 				Error            error
 			}{
-				models.ServiceOfferings{service},
+				models.ServiceOfferings([]models.ServiceOffering{service}),
 				nil,
 			}
 
@@ -319,7 +322,7 @@ var _ = Describe("Service Builder", func() {
 				ServiceOfferings models.ServiceOfferings
 				Error            error
 			}{
-				models.ServiceOfferings{service1, v1Service},
+				models.ServiceOfferings([]models.ServiceOffering{service1, v1Service}),
 				nil,
 			}
 
