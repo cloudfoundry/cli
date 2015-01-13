@@ -133,7 +133,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 }
 
 func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (err error) {
-	path := "/v2/service_instances"
+	path := "/v2/service_instances?accept_unavailable=true"
 	data := fmt.Sprintf(
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s", "async": true}`,
 		name, planGuid, repo.config.SpaceFields().Guid,
