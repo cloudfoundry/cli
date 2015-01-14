@@ -4878,5 +4878,20 @@
       "id": "(operation)",
       "translation": "(operation)",
       "modified": false
+   },
+   {
+      "id": "Message: {{.Message}}",
+      "translation": "Message: {{.Message}}",
+      "modified": false
+   },
+   {
+      "id": "Status: {{.Status}}",
+      "translation": "Status: {{.Status}}",
+      "modified": false
+   },
+   {
+      "id": "Operation: {{.State}} ({{.Progress}})",
+      "translation": "Operation: {{.State}} ({{.Progress}})",
+      "modified": false
    }
 ]

@@ -63,6 +63,8 @@ var _ = Describe("service command", func() {
 				serviceInstance := models.ServiceInstance{}
 				serviceInstance.Name = "service1"
 				serviceInstance.Guid = "service1-guid"
+				serviceInstance.State = "creating"
+				serviceInstance.StateDescription = "creating resource - step 1"
 				serviceInstance.ServicePlan = plan
 				serviceInstance.ServiceOffering = offering
 				serviceInstance.DashboardUrl = "some-url"
@@ -79,6 +81,9 @@ var _ = Describe("service command", func() {
 					[]string{"Description: ", "the-description"},
 					[]string{"Documentation url: ", "http://documentation.url"},
 					[]string{"Dashboard: ", "some-url"},
+					[]string{"Status: ", "unavailable"},
+					[]string{"Operation: ", "creating (in progress)"},
+					[]string{"Message: ", "creating resource - step 1"},
 				))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 			})
