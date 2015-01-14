@@ -1,3 +1,7 @@
+# Changes in v6.8.0
+- Plugin commands can now have aliases
+- Help text for plugins now listed in 'cf plugins'
+
 # Developing a Plugin
 
 This README discusses how to develop a cf CLI plugin.
