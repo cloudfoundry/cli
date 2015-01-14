@@ -78,8 +78,8 @@ func (cmd ListServices) Run(c *cli.Context) {
 
 		if instance.IsUserProvided() {
 			serviceColumn = T("user-provided")
-			serviceStatus = T("NA")
-			serviceOperation = T("(NA)")
+			serviceStatus = ""
+			serviceOperation = ""
 		} else {
 			serviceColumn = instance.ServiceOffering.Label
 			serviceStatus = T("unavailable")
