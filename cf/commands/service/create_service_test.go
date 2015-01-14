@@ -1,16 +1,22 @@
 package service_test
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/generic"
+
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
+	. "github.com/cloudfoundry/cli/cf/commands/service"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -88,6 +94,49 @@ var _ = Describe("create-service command", func() {
 		))
 		Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
 		Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
+	})
+
+	Context("when service creation is asynchronous", func() {
+		var serviceInstance models.ServiceInstance
+
+		BeforeEach(func() {
+			serviceInstance = models.ServiceInstance{
+				ServiceInstanceFields: models.ServiceInstanceFields{
+					Name:             "my-cleardb-service",
+					State:            "creating",
+					StateDescription: "fake service instance description",
+				},
+			}
+			serviceRepo.FindInstanceByNameMap = generic.NewMap()
+			serviceRepo.FindInstanceByNameMap.Set("my-cleardb-service", serviceInstance)
+		})
+
+		It("successfully starts async service creation", func() {
+			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
+
+			spaceGuid, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
+			Expect(spaceGuid).To(Equal(config.SpaceFields().Guid))
+			Expect(serviceName).To(Equal("cleardb"))
+
+			creatingServiceMessage := fmt.Sprintf("Instance status is unavailable (creating). Check status using cf services or cf service %s.", serviceInstance.ServiceInstanceFields.Name)
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
+				[]string{creatingServiceMessage},
+			))
+			Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
+			Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
+		})
+
+		It("fails when service instance could is created but cannot be found", func() {
+			serviceRepo.FindInstanceByNameErr = true
+			callCreateService([]string{"cleardb", "spark", "fake-service-instance-name"})
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Creating service fake-service-instance-name in org my-org / space my-space as my-user..."},
+				[]string{"FAILED"},
+				[]string{"Error finding instance"}))
+		})
 	})
 
 	Describe("warning the user about paid services", func() {

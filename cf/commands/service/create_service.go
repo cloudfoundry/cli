@@ -73,7 +73,11 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	switch err.(type) {
 	case nil:
-		cmd.ui.Ok()
+		err := cmd.printSuccessMessage(serviceInstanceName)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+
 		if !plan.Free {
 			cmd.ui.Say("")
 			cmd.ui.Say(T("Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
@@ -105,6 +109,22 @@ func (cmd CreateService) CreateService(serviceName string, planName string, serv
 
 	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
 	return plan, apiErr
+}
+
+func (cmd CreateService) printSuccessMessage(serviceInstanceName string) error {
+	instance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
+	if apiErr != nil {
+		return apiErr
+	}
+
+	if instance.ServiceInstanceFields.State == "creating" {
+		cmd.ui.Say(T("Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
+			map[string]interface{}{"ServiceInstanceName": serviceInstanceName}))
+	} else {
+		cmd.ui.Ok()
+	}
+
+	return nil
 }
 
 func findPlanFromOfferings(offerings models.ServiceOfferings, name string) (plan models.ServicePlanFields, err error) {
