@@ -4858,5 +4858,25 @@
       "id": "Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
       "translation": "Le status de l'instance est (créant). Trouver le status courant en utilisant cf services ou cf service {{.ServiceInstanceName}}.",
       "modified": false
+   },
+   {
+      "id": "NA",
+      "translation": "NA",
+      "modified": false
+   },
+   {
+      "id": "(NA)",
+      "translation": "(NA)",
+      "modified": false
+   },
+   {
+      "id": "unavailable",
+      "translation": "indisponible",
+      "modified": false
+   },
+   {
+      "id": "(operation)",
+      "translation": "(opération)",
+      "modified": false
    }
 ]
