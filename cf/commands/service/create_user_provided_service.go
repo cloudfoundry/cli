@@ -57,7 +57,10 @@ func (cmd CreateUserProvidedService) GetRequirements(requirementsFactory require
 		cmd.ui.FailWithUsage(c)
 	}
 
-	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
+	reqs = []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
+	}
 	return
 }
 
