@@ -1,6 +1,8 @@
 # Changes in v6.8.0
 - Plugin commands can now have aliases
 - Help text for plugins now listed in 'cf plugins'
+ 
+[Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md)
 
 # Developing a Plugin
 
