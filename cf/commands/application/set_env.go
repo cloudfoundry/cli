@@ -32,7 +32,7 @@ func (cmd *SetEnv) Metadata() command_metadata.CommandMetadata {
 		Name:            "set-env",
 		ShortName:       "se",
 		Description:     T("Set an env variable for an app"),
-		Usage:           T("CF_NAME set-env APP NAME VALUE"),
+		Usage:           T("CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"),
 		SkipFlagParsing: true,
 	}
 }

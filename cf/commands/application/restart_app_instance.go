@@ -31,7 +31,7 @@ func (cmd *RestartAppInstance) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "restart-app-instance",
 		Description: T("Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"),
-		Usage:       T("CF_NAME restart-app-instance APP INDEX"),
+		Usage:       T("CF_NAME restart-app-instance APP_NAME INDEX"),
 	}
 }
 

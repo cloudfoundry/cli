@@ -33,7 +33,7 @@ func (cmd *MapRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "map-route",
 		Description: T("Add a url route to an app"),
-		Usage:       T("CF_NAME map-route APP DOMAIN [-n HOSTNAME]"),
+		Usage:       T("CF_NAME map-route APP_NAME DOMAIN [-n HOSTNAME]"),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("n", T("Hostname")),
 		},

@@ -44,7 +44,7 @@ func (cmd *ShowApp) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "app",
 		Description: T("Display health and status for app"),
-		Usage:       T("CF_NAME app APP"),
+		Usage:       T("CF_NAME app APP_NAME"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.")},
 		},

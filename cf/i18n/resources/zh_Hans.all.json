@@ -110,9 +110,9 @@
       "modified": false
    },
    {
-      "id": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
+      "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
       "translation": "   CF_NAME push 应用程序[-b 包名] [-c 命令] [-d 域名] [-f 部署描述文件路径]\n",
-      "modified": false
+      "modified": true
    },
    {
       "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
@@ -490,9 +490,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME app APP",
+      "id": "CF_NAME app APP_NAME",
       "translation": "CF_NAME app 应用程序名",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME auth USERNAME PASSWORD\n\n",
@@ -510,9 +510,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME bind-service APP SERVICE_INSTANCE",
+      "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE",
       "translation": "CF_NAME bind-service 应用程序 服务实例",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
@@ -615,9 +615,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME delete APP [-f -r]",
+      "id": "CF_NAME delete APP_NAME [-f -r]",
       "translation": "CF_NAME delete 应用程序名 [-f -r]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME delete-buildpack BUILDPACK [-f]",
@@ -700,14 +700,14 @@
       "modified": false
    },
    {
-      "id": "CF_NAME env APP",
+      "id": "CF_NAME env APP_NAME",
       "translation": "CF_NAME env 应用程序名",
-      "modified": false
+      "modified": true
    },
    {
-      "id": "CF_NAME events APP",
+      "id": "CF_NAME events APP_NAME",
       "translation": "CF_NAME events 应用程序名",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME feature-flag FEATURE_NAME",
@@ -720,7 +720,7 @@
       "modified": false
    },
    {
-      "id": "CF_NAME files APP [-i INSTANCE] [PATH]",
+      "id": "CF_NAME files APP_NAME [-i INSTANCE] [PATH]",
       "translation": "CF_NAME files 应用程序名 [路径]",
       "modified": true
    },
@@ -740,14 +740,14 @@
       "modified": false
    },
    {
-      "id": "CF_NAME logs APP",
+      "id": "CF_NAME logs APP_NAME",
       "translation": "CF_NAME logs 应用程序名",
-      "modified": false
+      "modified": true
    },
    {
-      "id": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME map-route APP_NAME DOMAIN [-n HOSTNAME]",
       "translation": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
@@ -825,19 +825,19 @@
       "modified": false
    },
    {
-      "id": "CF_NAME restage APP",
+      "id": "CF_NAME restage APP_NAME",
       "translation": "CF_NAME restage 应用程序名",
-      "modified": false
+      "modified": true
    },
    {
-      "id": "CF_NAME restart APP",
+      "id": "CF_NAME restart APP_NAME",
       "translation": "CF_NAME restart 应用程序名",
-      "modified": false
+      "modified": true
    },
    {
-      "id": "CF_NAME restart-app-instance APP INDEX",
+      "id": "CF_NAME restart-app-instance APP_NAME INDEX",
       "translation": "CF_NAME restart-app-instance APP INDEX",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME running-environment-variable-group",
@@ -845,9 +845,9 @@
       "modified": true
    },
    {
-      "id": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+      "id": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
       "translation": "CF_NAME scale 应用程序 [-i 实例数] [-k 磁盘] [-m 内存] [-f]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME security-group SECURITY_GROUP",
@@ -865,9 +865,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME set-env APP NAME VALUE",
+      "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
       "translation": "CF_NAME set-env 应用程序名 环境名 值",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
@@ -935,14 +935,14 @@
       "modified": false
    },
    {
-      "id": "CF_NAME start APP",
+      "id": "CF_NAME start APP_NAME",
       "translation": "CF_NAME start 应用程序名",
-      "modified": false
+      "modified": true
    },
    {
-      "id": "CF_NAME stop APP",
+      "id": "CF_NAME stop APP_NAME",
       "translation": "CF_NAME stop 应用程序",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME target [-o ORG] [-s SPACE]",
@@ -960,9 +960,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME unbind-service APP SERVICE_INSTANCE",
+      "id": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE",
       "translation": "CF_NAME unbind-service 应用程序 服务实例",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
@@ -975,14 +975,14 @@
       "modified": false
    },
    {
-      "id": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME unmap-route APP_NAME DOMAIN [-n HOSTNAME]",
       "translation": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
-      "modified": false
+      "modified": true
    },
    {
-      "id": "CF_NAME unset-env APP NAME",
+      "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
       "translation": "CF_NAME unset-env 应用程序 名称",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n",

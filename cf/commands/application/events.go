@@ -29,7 +29,7 @@ func (cmd *Events) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "events",
 		Description: T("Show recent app events"),
-		Usage:       T("CF_NAME events APP"),
+		Usage:       T("CF_NAME events APP_NAME"),
 	}
 }
 

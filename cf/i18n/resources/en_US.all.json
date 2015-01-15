@@ -110,8 +110,8 @@
       "modified": false
    },
    {
-      "id": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
-      "translation": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
+      "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
+      "translation": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
       "modified": false
    },
    {
@@ -490,8 +490,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME app APP",
-      "translation": "CF_NAME app APP",
+      "id": "CF_NAME app APP_NAME",
+      "translation": "CF_NAME app APP_NAME",
       "modified": false
    },
    {
@@ -510,8 +510,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME bind-service APP SERVICE_INSTANCE",
-      "translation": "CF_NAME bind-service APP SERVICE_INSTANCE",
+      "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE",
+      "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE",
       "modified": false
    },
    {
@@ -615,8 +615,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME delete APP [-f -r]",
-      "translation": "CF_NAME delete APP [-f -r]",
+      "id": "CF_NAME delete APP_NAME [-f -r]",
+      "translation": "CF_NAME delete APP_NAME [-f -r]",
       "modified": false
    },
    {
@@ -700,13 +700,13 @@
       "modified": false
    },
    {
-      "id": "CF_NAME env APP",
-      "translation": "CF_NAME env APP",
+      "id": "CF_NAME env APP_NAME",
+      "translation": "CF_NAME env APP_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME events APP",
-      "translation": "CF_NAME events APP",
+      "id": "CF_NAME events APP_NAME",
+      "translation": "CF_NAME events APP_NAME",
       "modified": false
    },
    {
@@ -720,8 +720,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME files APP [-i INSTANCE] [PATH]",
-      "translation": "CF_NAME files APP [-i INSTANCE] [PATH]",
+      "id": "CF_NAME files APP_NAME [-i INSTANCE] [PATH]",
+      "translation": "CF_NAME files APP_NAME [-i INSTANCE] [PATH]",
       "modified": false
    },
    {
@@ -740,13 +740,13 @@
       "modified": false
    },
    {
-      "id": "CF_NAME logs APP",
-      "translation": "CF_NAME logs APP",
+      "id": "CF_NAME logs APP_NAME",
+      "translation": "CF_NAME logs APP_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME map-route APP_NAME DOMAIN [-n HOSTNAME]",
+      "translation": "CF_NAME map-route APP_NAME DOMAIN [-n HOSTNAME]",
       "modified": false
    },
    {
@@ -825,18 +825,18 @@
       "modified": false
    },
    {
-      "id": "CF_NAME restage APP",
-      "translation": "CF_NAME restage APP",
+      "id": "CF_NAME restage APP_NAME",
+      "translation": "CF_NAME restage APP_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME restart APP",
-      "translation": "CF_NAME restart APP",
+      "id": "CF_NAME restart APP_NAME",
+      "translation": "CF_NAME restart APP_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME restart-app-instance APP INDEX",
-      "translation": "CF_NAME restart-app-instance APP INDEX",
+      "id": "CF_NAME restart-app-instance APP_NAME INDEX",
+      "translation": "CF_NAME restart-app-instance APP_NAME INDEX",
       "modified": false
    },
    {
@@ -845,8 +845,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
-      "translation": "CF_NAME scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+      "id": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+      "translation": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
       "modified": false
    },
    {
@@ -865,8 +865,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME set-env APP NAME VALUE",
-      "translation": "CF_NAME set-env APP NAME VALUE",
+      "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
+      "translation": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
       "modified": false
    },
    {
@@ -935,13 +935,13 @@
       "modified": false
    },
    {
-      "id": "CF_NAME start APP",
-      "translation": "CF_NAME start APP",
+      "id": "CF_NAME start APP_NAME",
+      "translation": "CF_NAME start APP_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME stop APP",
-      "translation": "CF_NAME stop APP",
+      "id": "CF_NAME stop APP_NAME",
+      "translation": "CF_NAME stop APP_NAME",
       "modified": false
    },
    {
@@ -960,8 +960,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME unbind-service APP SERVICE_INSTANCE",
-      "translation": "CF_NAME unbind-service APP SERVICE_INSTANCE",
+      "id": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE",
+      "translation": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE",
       "modified": false
    },
    {
@@ -975,13 +975,13 @@
       "modified": false
    },
    {
-      "id": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME unmap-route APP_NAME DOMAIN [-n HOSTNAME]",
+      "translation": "CF_NAME unmap-route APP_NAME DOMAIN [-n HOSTNAME]",
       "modified": false
    },
    {
-      "id": "CF_NAME unset-env APP NAME",
-      "translation": "CF_NAME unset-env APP NAME",
+      "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
+      "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
       "modified": false
    },
    {

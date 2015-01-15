@@ -96,7 +96,7 @@ func (cmd *Start) Metadata() command_metadata.CommandMetadata {
 		Name:        "start",
 		ShortName:   "st",
 		Description: T("Start an app"),
-		Usage:       T("CF_NAME start APP"),
+		Usage:       T("CF_NAME start APP_NAME"),
 	}
 }
 

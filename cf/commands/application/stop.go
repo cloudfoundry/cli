@@ -39,7 +39,7 @@ func (cmd *Stop) Metadata() command_metadata.CommandMetadata {
 		Name:        "stop",
 		ShortName:   "sp",
 		Description: T("Stop an app"),
-		Usage:       T("CF_NAME stop APP"),
+		Usage:       T("CF_NAME stop APP_NAME"),
 	}
 }
 

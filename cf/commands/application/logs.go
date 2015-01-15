@@ -2,6 +2,8 @@ package application
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -13,7 +15,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
-	"time"
 )
 
 type Logs struct {
@@ -35,7 +36,7 @@ func (cmd *Logs) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "logs",
 		Description: T("Tail or show recent logs for an app"),
-		Usage:       T("CF_NAME logs APP"),
+		Usage:       T("CF_NAME logs APP_NAME"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "recent", Usage: T("Dump recent logs instead of tailing")},
 		},
