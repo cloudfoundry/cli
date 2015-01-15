@@ -26,18 +26,13 @@ func ExtractLogHeader(msg *logmessage.LogMessage, loc *time.Location) (logHeader
 	timeFormat := "2006-01-02T15:04:05.00-0700"
 	timeString := t.In(loc).Format(timeFormat)
 
-	logHeader = fmt.Sprintf("%s [%s]", timeString, sourceName)
+	if sourceID == "" {
+		logHeader = fmt.Sprintf("%s [%s]", timeString, sourceName)
+	} else {
+		logHeader = fmt.Sprintf("%s [%s/%s]", timeString, sourceName, sourceID)
+	}
+
 	coloredLogHeader = terminal.LogSysHeaderColor(logHeader)
-
-	if sourceName == "HEALTH" && sourceID != "" { //Health sourceID only exists in diego
-		logHeader = fmt.Sprintf("%s [%s/%s]", timeString, sourceName, sourceID)
-		coloredLogHeader = terminal.LogHealthHeaderColor(logHeader)
-	}
-
-	if sourceName == "App" || sourceName == "APP" { //currently "App", diego eventually goes to "APP"
-		logHeader = fmt.Sprintf("%s [%s/%s]", timeString, sourceName, sourceID)
-		coloredLogHeader = terminal.LogAppHeaderColor(logHeader)
-	}
 
 	// Calculate padding
 	longestHeader := fmt.Sprintf("%s  [HEALTH/10] ", timeFormat)
