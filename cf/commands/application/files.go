@@ -31,7 +31,7 @@ func (cmd *Files) Metadata() command_metadata.CommandMetadata {
 		Name:        "files",
 		ShortName:   "f",
 		Description: T("Print out a list of files in a directory or the contents of a specific file"),
-		Usage:       T("CF_NAME files APP [-i INSTANCE] [PATH]"),
+		Usage:       T("CF_NAME files APP_NAME [-i INSTANCE] [PATH]"),
 		Flags: []cli.Flag{
 			flag_helpers.NewIntFlag("i", T("Instance")),
 		},

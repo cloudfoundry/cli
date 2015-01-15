@@ -31,7 +31,7 @@ func (cmd *UnmapRoute) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "unmap-route",
 		Description: T("Remove a url route from an app"),
-		Usage:       T("CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]"),
+		Usage:       T("CF_NAME unmap-route APP_NAME DOMAIN [-n HOSTNAME]"),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("n", T("Hostname")),
 		},

@@ -38,7 +38,7 @@ func (cmd *BindService) Metadata() command_metadata.CommandMetadata {
 		Name:        "bind-service",
 		ShortName:   "bs",
 		Description: T("Bind a service instance to an app"),
-		Usage:       T("CF_NAME bind-service APP SERVICE_INSTANCE"),
+		Usage:       T("CF_NAME bind-service APP_NAME SERVICE_INSTANCE"),
 	}
 }
 

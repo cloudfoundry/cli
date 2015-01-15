@@ -34,7 +34,7 @@ func (cmd *DeleteApp) Metadata() command_metadata.CommandMetadata {
 		Name:        "delete",
 		ShortName:   "d",
 		Description: T("Delete an app"),
-		Usage:       T("CF_NAME delete APP [-f -r]"),
+		Usage:       T("CF_NAME delete APP_NAME [-f -r]"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
 			cli.BoolFlag{Name: "r", Usage: T("Also delete any mapped routes")},
