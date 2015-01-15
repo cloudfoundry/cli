@@ -79,17 +79,25 @@ func (cmd *ShowService) Run(c *cli.Context) {
 				}))
 			cmd.ui.Say(T("Status: {{.Status}}",
 				map[string]interface{}{
-					"Status": terminal.EntityNameColor("unavailable"),
-				}))
-			cmd.ui.Say(T("Operation: {{.State}} ({{.Progress}})",
-				map[string]interface{}{
-					"State":    terminal.EntityNameColor(serviceInstance.State),
-					"Progress": terminal.EntityNameColor("in progress"),
+					"Status": ServiceInstanceStateToStatus(serviceInstance.State),
 				}))
 			cmd.ui.Say(T("Message: {{.Message}}",
 				map[string]interface{}{
 					"Message": terminal.EntityNameColor(serviceInstance.StateDescription),
 				}))
 		}
+	}
+}
+
+func ServiceInstanceStateToStatus(state string) string {
+	switch state {
+	case "creating":
+		return T("unavailable ({{.State}})", map[string]interface{}{"State": state})
+	case "failed":
+		return T("failed ({{.State}})", map[string]interface{}{"State": "creating"})
+	case "available":
+		return T("available")
+	default:
+		return ""
 	}
 }

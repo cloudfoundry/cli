@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -70,20 +69,18 @@ func (cmd ListServices) Run(c *cli.Context) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{T("name"), T("service"), T("plan"), T("bound apps"), T("status"), T("(operation)")})
+	table := terminal.NewTable(cmd.ui, []string{T("name"), T("service"), T("plan"), T("bound apps"), T("status")})
 
 	for _, instance := range serviceInstances {
 		var serviceColumn string
-		var serviceStatus, serviceOperation string
+		var serviceStatus string
 
 		if instance.IsUserProvided() {
 			serviceColumn = T("user-provided")
 			serviceStatus = ""
-			serviceOperation = ""
 		} else {
 			serviceColumn = instance.ServiceOffering.Label
-			serviceStatus = T("unavailable")
-			serviceOperation = fmt.Sprintf("(%s)", instance.State)
+			serviceStatus = ServiceInstanceStateToStatus(instance.State)
 		}
 
 		table.Add(
@@ -92,7 +89,6 @@ func (cmd ListServices) Run(c *cli.Context) {
 			instance.ServicePlan.Name,
 			strings.Join(instance.ApplicationNames, ", "),
 			serviceStatus,
-			serviceOperation,
 		)
 	}
 
