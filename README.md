@@ -120,6 +120,9 @@ Developing
 1. Make the test pass.
 1. Submit a pull request to the `master` branch.
 
+_*_ For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples)
+
+
 Contributing
 ============
 
