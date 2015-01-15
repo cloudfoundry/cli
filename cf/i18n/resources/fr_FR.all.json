@@ -4860,18 +4860,8 @@
       "modified": false
    },
    {
-      "id": "unavailable",
-      "translation": "indisponible",
-      "modified": false
-   },
-   {
-      "id": "(operation)",
-      "translation": "(opération)",
-      "modified": false
-   },
-   {
-      "id": "Message: {{.Message}}",
-      "translation": "Méssage: {{.Message}}",
+      "id": "unavailable ({{.State}})",
+      "translation": "unavailable ({{.State}})",
       "modified": false
    },
    {
@@ -4880,8 +4870,23 @@
       "modified": false
    },
    {
-      "id": "Operation: {{.State}} ({{.Progress}})",
-      "translation": "Operation: {{.State}} ({{.Progress}})",
+      "id": "failed ({{.State}})",
+      "translation": "failed ({{.State}})",
+      "modified": false
+   },
+   {
+      "id": "status",
+      "translation": "status",
+      "modified": false
+   },
+   {
+      "id": "Message: {{.Message}}",
+      "translation": "Méssage: {{.Message}}",
+      "modified": false
+   },
+   {
+      "id": "available",
+      "translation": "available",
       "modified": false
    }
 ]
