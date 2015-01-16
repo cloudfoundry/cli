@@ -49,6 +49,21 @@ var _ = Describe("delete-shared-domain command", func() {
 		})
 	})
 
+	Context("Checks whether the domain is owned or shared", func() {
+		BeforeEach(func() {
+			domainRepo.FindByNameInOrgDomain = models.DomainFields{
+				Name: "foo1.com",
+				Guid: "foo1-guid",
+			}
+		})
+		It("If domain is owned", func() {
+
+			runCommand("foo1.com")
+
+			Expect(domainRepo.DeleteSharedDomainGuid).To(Equal(""))
+		})
+	})
+
 	Context("when logged in and targeted an organiztion", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true

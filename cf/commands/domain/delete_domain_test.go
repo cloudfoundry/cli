@@ -57,6 +57,29 @@ var _ = Describe("delete-domain command", func() {
 		})
 	})
 
+	Context("Checks whether the domain is owned or shared", func() {
+		BeforeEach(func() {
+			domainRepo.FindByNameInOrgDomain = models.DomainFields{
+				Name:   "foo1.com",
+				Guid:   "foo1-guid",
+				Shared: true,
+			}
+		})
+		It("If domain is shared", func() {
+
+			runCommand("foo1.com")
+
+			Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"domain"},
+				[]string{"foo1.com"},
+				[]string{"is not a owned domain"},
+			))
+
+		})
+	})
+
 	Context("when the domain exists", func() {
 		BeforeEach(func() {
 			domainRepo.FindByNameInOrgDomain = models.DomainFields{

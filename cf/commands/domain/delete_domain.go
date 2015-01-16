@@ -59,6 +59,12 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil: //do nothing
+		if domain.Shared {
+			cmd.ui.Say(T("domain {{.DomainName}} is not a owned domain",
+				map[string]interface{}{
+					"DomainName": domainName}))
+			return
+		}
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(apiErr.Error())
