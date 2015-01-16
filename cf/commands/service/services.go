@@ -77,11 +77,10 @@ func (cmd ListServices) Run(c *cli.Context) {
 
 		if instance.IsUserProvided() {
 			serviceColumn = T("user-provided")
-			serviceStatus = ""
 		} else {
 			serviceColumn = instance.ServiceOffering.Label
-			serviceStatus = ServiceInstanceStateToStatus(instance.State)
 		}
+		serviceStatus = ServiceInstanceStateToStatus(instance.State, instance.IsUserProvided())
 
 		table.Add(
 			instance.Name,

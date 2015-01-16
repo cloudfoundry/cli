@@ -94,7 +94,7 @@ var _ = Describe("service command", func() {
 			})
 
 			Context("shows correct status information based on service instance state", func() {
-				It("shows status: `unavailable (creating)` when state: `creating`", func() {
+				It("shows status: `unavailable (creating)` when state is `creating`", func() {
 					createServiceInstanceWithState("creating")
 					runCommand("service1")
 
@@ -104,7 +104,7 @@ var _ = Describe("service command", func() {
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
 
-				It("shows status: `available` when state: `available`", func() {
+				It("shows status: `available` when state is `available`", func() {
 					createServiceInstanceWithState("available")
 					runCommand("service1")
 
@@ -114,7 +114,7 @@ var _ = Describe("service command", func() {
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
 
-				It("shows status: `failed (creating)` when state: `failed`", func() {
+				It("shows status: `failed (creating)` when state is `failed`", func() {
 					createServiceInstanceWithState("failed")
 					runCommand("service1")
 
@@ -124,12 +124,12 @@ var _ = Describe("service command", func() {
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
 
-				It("shows status: `` when state: ``", func() {
+				It("shows status: `available` when state is ``", func() {
 					createServiceInstanceWithState("")
 					runCommand("service1")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Status: ", ""},
+						[]string{"Status: ", "available"},
 					))
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
@@ -172,23 +172,36 @@ var _ = Describe("service command", func() {
 })
 
 var _ = Describe("ServiceInstanceStateToStatus", func() {
-	It("returns status: `unavailable (creating)` when state: `creating`", func() {
-		status := ServiceInstanceStateToStatus("creating")
-		Expect(status).To(Equal("unavailable (creating)"))
+	Context("when the service is not user provided", func() {
+		isUserProvided := false
+
+		It("returns status: `unavailable (creating)` when state: `creating`", func() {
+			status := ServiceInstanceStateToStatus("creating", isUserProvided)
+			Expect(status).To(Equal("unavailable (creating)"))
+		})
+
+		It("returns status: `available` when state: `available`", func() {
+			status := ServiceInstanceStateToStatus("available", isUserProvided)
+			Expect(status).To(Equal("available"))
+		})
+
+		It("returns status: `failed (creating)` when state: `failed`", func() {
+			status := ServiceInstanceStateToStatus("failed", isUserProvided)
+			Expect(status).To(Equal("failed (creating)"))
+		})
+
+		It("returns status: `available` when state: ``", func() {
+			status := ServiceInstanceStateToStatus("", isUserProvided)
+			Expect(status).To(Equal("available"))
+		})
 	})
 
-	It("returns status: `available` when state: `available`", func() {
-		status := ServiceInstanceStateToStatus("available")
-		Expect(status).To(Equal("available"))
-	})
+	Context("when the service is user provided", func() {
+		isUserProvided := true
 
-	It("returns status: `failed (creating)` when state: `failed`", func() {
-		status := ServiceInstanceStateToStatus("failed")
-		Expect(status).To(Equal("failed (creating)"))
-	})
-
-	It("returns status: `` when state: ``", func() {
-		status := ServiceInstanceStateToStatus("")
-		Expect(status).To(Equal(""))
+		It("returns status: `` when state: ``", func() {
+			status := ServiceInstanceStateToStatus("", isUserProvided)
+			Expect(status).To(Equal(""))
+		})
 	})
 })

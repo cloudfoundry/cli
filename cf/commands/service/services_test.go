@@ -91,16 +91,16 @@ var _ = Describe("services", func() {
 
 		serviceInstance2 := models.ServiceInstance{}
 		serviceInstance2.Name = "my-service-2"
-		serviceInstance2.State = "creating"
+		serviceInstance2.State = ""
 		serviceInstance2.StateDescription = "fake state description"
 		serviceInstance2.ServicePlan = plan2
 		serviceInstance2.ApplicationNames = []string{"cli1"}
 		serviceInstance2.ServiceOffering = offering
 
-		serviceInstance3 := models.ServiceInstance{}
-		serviceInstance3.Name = "my-service-provided-by-user"
+		userProvidedServiceInstance := models.ServiceInstance{}
+		userProvidedServiceInstance.Name = "my-service-provided-by-user"
 
-		serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, serviceInstance3}
+		serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, userProvidedServiceInstance}
 		serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
 			GetSummariesInCurrentSpaceInstances: serviceInstances,
 		}
@@ -113,8 +113,8 @@ var _ = Describe("services", func() {
 			[]string{"name", "service", "plan", "bound apps", "status"},
 			[]string{"OK"},
 			[]string{"my-service-1", "cleardb", "spark", "cli1, cli2", "unavailable (creating)"},
-			[]string{"my-service-2", "cleardb", "spark-2", "cli1", "unavailable (creating)"},
-			[]string{"my-service-provided-by-user", "user-provided", ""},
+			[]string{"my-service-2", "cleardb", "spark-2", "cli1", "available"},
+			[]string{"my-service-provided-by-user", "user-provided", "", "", ""},
 		))
 	})
 
