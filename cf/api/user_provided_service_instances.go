@@ -30,14 +30,7 @@ func NewCCUserProvidedServiceInstanceRepository(config core_config.Reader, gatew
 func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]interface{}) (apiErr error) {
 	path := "/v2/user_provided_service_instances"
 
-	type RequestBody struct {
-		Name           string                 `json:"name"`
-		Credentials    map[string]interface{} `json:"credentials"`
-		SpaceGuid      string                 `json:"space_guid"`
-		SysLogDrainUrl string                 `json:"syslog_drain_url"`
-	}
-
-	jsonBytes, err := json.Marshal(RequestBody{
+	jsonBytes, err := json.Marshal(models.UserProvidedService{
 		Name:           name,
 		Credentials:    params,
 		SpaceGuid:      repo.config.SpaceFields().Guid,
@@ -55,12 +48,10 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {
 	path := fmt.Sprintf("/v2/user_provided_service_instances/%s", serviceInstanceFields.Guid)
 
-	type RequestBody struct {
-		Credentials    map[string]interface{} `json:"credentials,omitempty"`
-		SysLogDrainUrl string                 `json:"syslog_drain_url,omitempty"`
+	reqBody := models.UserProvidedService{
+		Credentials:    serviceInstanceFields.Params,
+		SysLogDrainUrl: serviceInstanceFields.SysLogDrainUrl,
 	}
-
-	reqBody := RequestBody{serviceInstanceFields.Params, serviceInstanceFields.SysLogDrainUrl}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
 		apiErr = errors.NewWithError("Error parsing response", err)
