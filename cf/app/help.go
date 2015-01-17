@@ -161,6 +161,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				}, {
 					presentCommand("create-user-provided-service"),
 					presentCommand("update-user-provided-service"),
+					presentCommand("user-provided-services"),
 				},
 			},
 		}, {
