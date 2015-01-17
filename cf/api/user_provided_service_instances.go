@@ -14,6 +14,7 @@ import (
 type UserProvidedServiceInstanceRepository interface {
 	Create(name, drainUrl string, params map[string]interface{}) (apiErr error)
 	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error)
+	GetSummaries() (models.UserProvidedServiceSummary, error)
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
@@ -59,4 +60,17 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 	}
 
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
+}
+
+func (repo CCUserProvidedServiceInstanceRepository) GetSummaries() (models.UserProvidedServiceSummary, error) {
+	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
+
+	model := models.UserProvidedServiceSummary{}
+
+	apiErr := repo.gateway.GetResource(path, &model)
+	if apiErr != nil {
+		return models.UserProvidedServiceSummary{}, apiErr
+	}
+
+	return model, nil
 }
