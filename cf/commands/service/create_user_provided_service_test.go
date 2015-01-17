@@ -18,7 +18,7 @@ var _ = Describe("create-user-provided-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.ReadWriter
-		repo                *testapi.FakeUserProvidedServiceInstanceRepo
+		repo                *testapi.FakeUserProvidedServiceInstanceRepository
 		requirementsFactory *testreq.FakeReqFactory
 		cmd                 CreateUserProvidedService
 	)
@@ -26,7 +26,7 @@ var _ = Describe("create-user-provided-service command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		repo = &testapi.FakeUserProvidedServiceInstanceRepo{}
+		repo = &testapi.FakeUserProvidedServiceInstanceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		cmd = NewCreateUserProvidedService(ui, config, repo)
 	})
@@ -60,12 +60,13 @@ var _ = Describe("create-user-provided-service command", func() {
 			[]string{"baz"},
 		))
 
-		Expect(repo.CreateName).To(Equal("my-custom-service"))
-		Expect(repo.CreateParams).To(Equal(map[string]interface{}{
-			"foo": "foo value",
-			"bar": "bar value",
-			"baz": "baz value",
-		}))
+		Expect(repo.CreateCallCount()).To(Equal(1))
+		name, drainUrl, params := repo.CreateArgsForCall(0)
+		Expect(name).To(Equal("my-custom-service"))
+		Expect(drainUrl).To(Equal(""))
+		Expect(params["foo"]).To(Equal("foo value"))
+		Expect(params["bar"]).To(Equal("bar value"))
+		Expect(params["baz"]).To(Equal("baz value"))
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating user provided service", "my-custom-service", "my-org", "my-space", "my-user"},
@@ -77,9 +78,11 @@ var _ = Describe("create-user-provided-service command", func() {
 		args := []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": 4}`, "my-custom-service"}
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 
+		name, _, params := repo.CreateArgsForCall(0)
+		Expect(name).To(Equal("my-custom-service"))
+
 		Expect(ui.Prompts).To(BeEmpty())
-		Expect(repo.CreateName).To(Equal("my-custom-service"))
-		Expect(repo.CreateParams).To(Equal(map[string]interface{}{
+		Expect(params).To(Equal(map[string]interface{}{
 			"foo": "foo value",
 			"bar": "bar value",
 			"baz": float64(4),
@@ -95,7 +98,8 @@ var _ = Describe("create-user-provided-service command", func() {
 		args := []string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"}
 		testcmd.RunCommand(cmd, args, requirementsFactory)
 
-		Expect(repo.CreateDrainUrl).To(Equal("syslog://example.com"))
+		_, drainUrl, _ := repo.CreateArgsForCall(0)
+		Expect(drainUrl).To(Equal("syslog://example.com"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating user provided service"},
 			[]string{"OK"},

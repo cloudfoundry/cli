@@ -19,13 +19,13 @@ var _ = Describe("update-user-provided-service test", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.ReadWriter
-		serviceRepo         *testapi.FakeUserProvidedServiceInstanceRepo
+		serviceRepo         *testapi.FakeUserProvidedServiceInstanceRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		serviceRepo = &testapi.FakeUserProvidedServiceInstanceRepo{}
+		serviceRepo = &testapi.FakeUserProvidedServiceInstanceRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
@@ -78,9 +78,10 @@ var _ = Describe("update-user-provided-service test", func() {
 					[]string{"OK"},
 					[]string{"TIP"},
 				))
-				Expect(serviceRepo.UpdateServiceInstance.Name).To(Equal("service-name"))
-				Expect(serviceRepo.UpdateServiceInstance.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
-				Expect(serviceRepo.UpdateServiceInstance.SysLogDrainUrl).To(Equal("syslog://example.com"))
+
+				Expect(serviceRepo.UpdateArgsForCall(0).Name).To(Equal("service-name"))
+				Expect(serviceRepo.UpdateArgsForCall(0).Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+				Expect(serviceRepo.UpdateArgsForCall(0).SysLogDrainUrl).To(Equal("syslog://example.com"))
 			})
 		})
 
@@ -88,7 +89,8 @@ var _ = Describe("update-user-provided-service test", func() {
 			It("tells the user the JSON is invalid", func() {
 				runCommand("-p", `{"foo":"ba WHOOPS OH MY HOW DID THIS GET HERE???`, "service-name")
 
-				Expect(serviceRepo.UpdateServiceInstance).To(Equal(models.ServiceInstanceFields{}))
+				Expect(serviceRepo.UpdateCallCount()).To(Equal(0))
+
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"JSON is invalid"},
@@ -109,7 +111,8 @@ var _ = Describe("update-user-provided-service test", func() {
 			It("fails and tells the user what went wrong", func() {
 				runCommand("-p", `{"foo":"bar"}`, "service-name")
 
-				Expect(serviceRepo.UpdateServiceInstance).To(Equal(models.ServiceInstanceFields{}))
+				Expect(serviceRepo.UpdateCallCount()).To(Equal(0))
+
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Service Instance is not user provided"},
