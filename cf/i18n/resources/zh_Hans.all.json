@@ -2295,11 +2295,6 @@
       "modified": false
    },
    {
-      "id": "Getting user provided services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Getting user provided services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
       "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
       "translation": "用户{{.CurrentUser}}请求分配组织{{.TargetOrg}}/空间{{.TargetSpace}}中的用户",
       "modified": false
@@ -2537,11 +2532,6 @@
    {
       "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
       "translation": "列出所有stacks (stack是预先建立好的文件系统， 包含可以运行应用程序的操作系统)",
-      "modified": false
-   },
-   {
-      "id": "List all user provided service instances in the target space",
-      "translation": "List all user provided service instances in the target space",
       "modified": false
    },
    {
@@ -2848,11 +2838,6 @@
       "id": "No system-provided env variables have been set",
       "translation": "系统提供的环境变量未设置",
       "modified": false
-   },
-   {
-      "id": "No user provided services found",
-      "translation": "No user created services found",
-      "modified": true
    },
    {
       "id": "No user-defined env variables have been set",
@@ -4460,11 +4445,6 @@
       "modified": false
    },
    {
-      "id": "key",
-      "translation": "key",
-      "modified": false
-   },
-   {
       "id": "label",
       "translation": "label",
       "modified": false
@@ -4685,11 +4665,6 @@
       "modified": false
    },
    {
-      "id": "syslog drain",
-      "translation": "syslog drain",
-      "modified": false
-   },
-   {
       "id": "time",
       "translation": "时间",
       "modified": false
@@ -4742,11 +4717,6 @@
    {
       "id": "user-provided",
       "translation": "由用户提供的",
-      "modified": false
-   },
-   {
-      "id": "value",
-      "translation": "value",
       "modified": false
    },
    {
