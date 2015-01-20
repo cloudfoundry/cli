@@ -2295,11 +2295,6 @@
       "modified": false
    },
    {
-      "id": "Getting user provided services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "translation": "Getting user provided services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
       "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
       "translation": "Obteniendo usuarios en la org {{.TargetOrg}} / space {{.TargetSpace}} como {{.CurrentUser}}",
       "modified": false
@@ -2537,11 +2532,6 @@
    {
       "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
       "translation": "Lista todos los stacks(un stack es un sistema de archivos pre construid, Incluyendo un sistema operativo, que puede correr apps)",
-      "modified": false
-   },
-   {
-      "id": "List all user provided service instances in the target space",
-      "translation": "List all user provided service instances in the target space",
       "modified": false
    },
    {
@@ -2848,11 +2838,6 @@
       "id": "No system-provided env variables have been set",
       "translation": "Ninguna variable de entorno provista por el sistema ha sido establecida",
       "modified": false
-   },
-   {
-      "id": "No user provided services found",
-      "translation": "No user created services found",
-      "modified": true
    },
    {
       "id": "No user-defined env variables have been set",
@@ -4460,11 +4445,6 @@
       "modified": false
    },
    {
-      "id": "key",
-      "translation": "key",
-      "modified": false
-   },
-   {
       "id": "label",
       "translation": "label",
       "modified": false
@@ -4685,11 +4665,6 @@
       "modified": false
    },
    {
-      "id": "syslog drain",
-      "translation": "syslog drain",
-      "modified": false
-   },
-   {
       "id": "time",
       "translation": "tiempo",
       "modified": false
@@ -4742,11 +4717,6 @@
    {
       "id": "user-provided",
       "translation": "user-provided",
-      "modified": false
-   },
-   {
-      "id": "value",
-      "translation": "value",
       "modified": false
    },
    {

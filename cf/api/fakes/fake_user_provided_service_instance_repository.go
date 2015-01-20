@@ -2,9 +2,9 @@
 package fakes
 
 import (
+	"sync"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
-	"sync"
 )
 
 type FakeUserProvidedServiceInstanceRepository struct {
@@ -29,7 +29,7 @@ type FakeUserProvidedServiceInstanceRepository struct {
 	GetSummariesStub        func() (models.UserProvidedServiceSummary, error)
 	getSummariesMutex       sync.RWMutex
 	getSummariesArgsForCall []struct{}
-	getSummariesReturns     struct {
+	getSummariesReturns struct {
 		result1 models.UserProvidedServiceSummary
 		result2 error
 	}
