@@ -186,6 +186,19 @@ var _ = Describe("create-app-manifest Command", func() {
 			})
 		})
 
+		Context("when no -p flag is supplied", func() {
+			BeforeEach(func() {
+				app := makeAppWithoutOptions("my-app2")
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+			})
+
+			It("creates a manifest named <app-name>_manifest.yml", func() {
+				runCommand("my-app2")
+				Ω(fakeManifest.FileSavePathArgsForCall(0)).To(Equal("./my-app2_manifest.yml"))
+			})
+		})
+
 	})
 })
 

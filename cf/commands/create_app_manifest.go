@@ -78,7 +78,7 @@ func (cmd *CreateAppManifest) Run(c *cli.Context) {
 	cmd.ui.Say(T("Creating an app manifest from current settings of app ") + application.Name + " ...")
 	cmd.ui.Say("")
 
-	savePath := "./manifest_generated.yml"
+	savePath := "./" + application.Name + "_manifest.yml"
 
 	if c.String("p") != "" {
 		savePath = c.String("p")
