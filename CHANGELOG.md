@@ -1,3 +1,92 @@
+##v6.9.0 
+* Merge PR #333: CLI sends async request for service instance provisioning
+* Revert "new command user-provided-services" [#79188196]
+* cf service(s) emits 'available' for services that do have a state. [#86181724]
+* Renamed accept_unavailable to accepts_incomplete. [#86259450]
+* Fixed table and detail formatting for service instances. [#62068908]
+* changed NA to "" string for user provided service [#84252876]
+* changed $cf service to add Status|Operation|Message sections [#84252876]
+* added fixed status and (operation) for $cf services command [#84252876] 
+* added check for ServiceInstance.State in CreateService [#62068908]
+* Add State and StateDescription to service_instance [#62068908]
+* Adding accept_unavailable=true query param for create-service [#62068908]
+* new command user-provided-services [#79188196]
+* counterfeiter fake for user_provided_service [#79188196]
+* new GetSummaries() in api/user_provided_server.go [#79188196]
+* fix usage of test http server [#79188196]
+* new models: user-provided-service [#79188196]
+* Correct help text for `files` command [#85754150]
+* clarify comment for usage of TotalArgs
+* Improve cf <commands> usage instructions [#85818652]
+* Merge PR #328 from Fix cups attempts to create service when no space is targeted
+* append source index to all source [#85484012]
+* Update README.md add link to plugin development guide
+* Update README.md Added link to complete plugin change log.
+* Update Plugin CHANGELOG.md Changed CHANGELOG.md to complete list of all plugin feature changes.
+* Update Plugin CHANGELOG.md Added version 6.7.0 info.
+* Update Plugin README.md Added version 6.8.0 info.
+* Touch change log for example plugins.
+* includes [HEALTH/{index}] from diego log [#85484012]
+* Merge PR #322: Updating go vet location in install-dev-tools target.
+* Merge PR #323: Fixes go vet errors:
+* Usage help example for plugins [#85665592]
+* remove '-' in test_1 plugin help sample
+* Merge PR #321: Copy original request's headers when handling redirect
+* Fix attempts to create service even when no space is targeted Solution to the bug [#82753668]
+* improvement to marketplace cost messaging [#85571986]
+* Update plugin example readme 
+* Additional readme for plugin/rpc workflow 
+* addition diagram for plugin rpc workflow
+* Update README to detail plugin/cli interaction 
+* illustrative diagram for plugin example README 
+* update TestCommandFactory for new interface
+* main refactor, extract code into command_factory New func in command_factory
+* GetByCmdName() can finds by short name [#82051134]
+* enable plugin commands to allow '-h' and '--help' flags [#82051134]
+* merge plugin metas and core command metas to be used in codegangster [#82051134]
+* extract getting plugin metadata out of RunMethodIfExists() [#82051134]
+* Add usage to test plugins and set version numbers to be different [#82051134]
+* Plugin usage/option model, for use in help [#82051134]
+* Fixes go vet errors
+* Updating go vet location in install-dev-tools target
+* Update README in plugin example for versioning [#85484250]
+* plugin example to show versioning usage [#85484250]
+* Copy original request's headers when handling redirect (fixes #318 on github)
+* `cf plugins` shows plugin versions [#84630868]
+* write version to config when install plugin [#82911038]
+* Allow versioning in plugins [#82911038]
+* Merge PR #317: Fix the invalid memory address during bind service
+* document new buildpack specifiers feature [#75205334]
+* Merge PR #315: Improve french i18n
+* Fix the invalid memory address during bind service Solution to the bug [#79267756]
+* fixed spelling in changelog.md [#84867042]
+* Merge PR #309: Fix in clearing space fields of config data on cf space-delete
+* Better message when no files to be listed in directory [#63120324]
+* Allows both host and hosts in manifest [#72389932]
+* allows multiple hosts(routes) to be created when app is pushed [#72389932]
+* Add hosts field for manifests [#72389932]
+* Preserve user-provided vars type when generating manifest. [#78294704]
+* Sort Environment Vars in manifest alphabetically [#78294704]
+* Includes startup command in `create-app-manifest` [#78294704]
+* New Command field in generated manifest [#78294704]
+* Apps now timeout when they fail to stage insead of waiting for an instance to start [#83802536]
+* i18n for install-plugin help text
+* improve help text for install-plugin [#84601290]
+* skip validating negative integer when it is a value to another flag [#84317640]
+* skip flag verification for arguments, only verify flags [#84317640]
+* replace file.Write() with fmt.Fprintf() in generate_manifest.go 
+* remove unused func in generate_manifest.go 
+* fix generated mainfest formet from create-app-manifest [#78294704]
+* command create-app-manifest for generating manifest for pushed app [#78294704]
+* new func to assert manifest orders in test [#78294704]
+* new package for generating manifests [#78294704]
+* fake for generate_manifest.go [#78294704]
+* add health_check_timeout to Application model [#78294704]
+* populates EnvironmentVars when hitting app/summary endpoint [#78294704]
+* Add services to models.Application [#78294704]
+* remove unsed code in mainfest.go 
+* Fix in clearing space fields of config data on cf space-delete 
+
 ##v6.8.0
 * Allows plugin to be installed from an Url [#80043644]
 * Allows mutliple plugins with blank aliases. [#84241752]
