@@ -3,6 +3,8 @@ package models
 type ServiceInstanceFields struct {
 	Guid             string
 	Name             string
+	State            string
+	StateDescription string
 	SysLogDrainUrl   string
 	ApplicationNames []string
 	Params           map[string]interface{}
