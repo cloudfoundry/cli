@@ -4325,8 +4325,8 @@
       "modified": false
    },
    {
-      "id": "available",
-      "translation": "available",
+      "id": "create succeeded",
+      "translation": "create succeeded",
       "modified": false
    },
    {
@@ -4410,8 +4410,8 @@
       "modified": false
    },
    {
-      "id": "failed ({{.State}})",
-      "translation": "failed ({{.State}})",
+      "id": "create failed",
+      "translation": "create failed",
       "modified": false
    },
    {
