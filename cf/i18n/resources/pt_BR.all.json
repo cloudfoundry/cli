@@ -2390,6 +2390,11 @@
       "modified": false
    },
    {
+      "id": "Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
+      "translation": "Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
+      "modified": false
+   },
+   {
       "id": "Invalid JSON response from server",
       "translation": "Resposta JSON do servidor inválida",
       "modified": false
@@ -2630,6 +2635,11 @@
       "modified": false
    },
    {
+      "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
+      "translation": "Manifest file is not found in the current directory, please provide either an app name or manifest",
+      "modified": false
+   },
+   {
       "id": "Map the root domain to this app",
       "translation": "Mapear o domínio raiz para este aplicativo",
       "modified": false
@@ -2667,6 +2677,11 @@
    {
       "id": "Memory limit (e.g. 256M, 1024M, 1G)",
       "translation": "Limite de memória (e.g. 256M, 1024M, 1G)",
+      "modified": false
+   },
+   {
+      "id": "Message: {{.Message}}",
+      "translation": "Message: {{.Message}}",
       "modified": false
    },
    {
@@ -3725,6 +3740,11 @@
       "modified": false
    },
    {
+      "id": "Status: {{.Status}}",
+      "translation": "Status: {{.Status}}",
+      "modified": false
+   },
+   {
       "id": "Stop an app",
       "translation": "Parar um aplicativo",
       "modified": false
@@ -4305,6 +4325,11 @@
       "modified": false
    },
    {
+      "id": "available",
+      "translation": "available",
+      "modified": false
+   },
+   {
       "id": "bound apps",
       "translation": "aplicativos vinculados",
       "modified": false
@@ -4382,6 +4407,11 @@
    {
       "id": "event",
       "translation": "evento",
+      "modified": false
+   },
+   {
+      "id": "failed ({{.State}})",
+      "translation": "failed ({{.State}})",
       "modified": false
    },
    {
@@ -4675,6 +4705,11 @@
       "modified": false
    },
    {
+      "id": "unavailable ({{.State}})",
+      "translation": "unavailable ({{.State}})",
+      "modified": false
+   },
+   {
       "id": "unknown authority",
       "translation": "autoridade desconhecida",
       "modified": false
@@ -4822,41 +4857,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instâncias",
-      "modified": false
-   },
-   {
-      "id": "Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
-      "translation": "Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
-      "modified": false
-   },
-   {
-      "id": "unavailable ({{.State}})",
-      "translation": "unavailable ({{.State}})",
-      "modified": false
-   },
-   {
-      "id": "Status: {{.Status}}",
-      "translation": "Status: {{.Status}}",
-      "modified": false
-   },
-   {
-      "id": "failed ({{.State}})",
-      "translation": "failed ({{.State}})",
-      "modified": false
-   },
-   {
-      "id": "status",
-      "translation": "status",
-      "modified": false
-   },
-   {
-      "id": "Message: {{.Message}}",
-      "translation": "Message: {{.Message}}",
-      "modified": false
-   },
-   {
-      "id": "available",
-      "translation": "available",
       "modified": false
    }
 ]
