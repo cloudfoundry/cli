@@ -1029,7 +1029,7 @@ var _ = Describe("Push Command", func() {
 		callPush()
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"FAILED"},
-			[]string{"App name"},
+			[]string{"Manifest file is not found"},
 		))
 	})
 })
