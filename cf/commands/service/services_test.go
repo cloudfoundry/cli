@@ -113,7 +113,7 @@ var _ = Describe("services", func() {
 			[]string{"name", "service", "plan", "bound apps", "status"},
 			[]string{"OK"},
 			[]string{"my-service-1", "cleardb", "spark", "cli1, cli2", "unavailable (creating)"},
-			[]string{"my-service-2", "cleardb", "spark-2", "cli1", "available"},
+			[]string{"my-service-2", "cleardb", "spark-2", "cli1", "create succeeded"},
 			[]string{"my-service-provided-by-user", "user-provided", "", "", ""},
 		))
 	})
