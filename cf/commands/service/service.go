@@ -94,11 +94,11 @@ func ServiceInstanceStateToStatus(state string, isUserProvidedService bool) stri
 		return ""
 	}
 	switch state {
-	case "creating":
-		return T("unavailable ({{.State}})", map[string]interface{}{"State": state})
+	case "in progress":
+		return T("create in progress")
 	case "failed":
 		return T("create failed")
-	case "available", "":
+	case "succeeded", "":
 		return T("create succeeded")
 	default:
 		return ""

@@ -4705,8 +4705,8 @@
       "modified": false
    },
    {
-      "id": "unavailable ({{.State}})",
-      "translation": "unavailable ({{.State}})",
+      "id": "create in progress",
+      "translation": "create in progress",
       "modified": false
    },
    {

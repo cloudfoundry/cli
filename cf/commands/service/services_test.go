@@ -83,7 +83,7 @@ var _ = Describe("services", func() {
 
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "my-service-1"
-		serviceInstance.State = "creating"
+		serviceInstance.State = "in progress"
 		serviceInstance.StateDescription = "fake state description"
 		serviceInstance.ServicePlan = plan
 		serviceInstance.ApplicationNames = []string{"cli1", "cli2"}
@@ -112,7 +112,7 @@ var _ = Describe("services", func() {
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
 			[]string{"name", "service", "plan", "bound apps", "status"},
 			[]string{"OK"},
-			[]string{"my-service-1", "cleardb", "spark", "cli1, cli2", "unavailable (creating)"},
+			[]string{"my-service-1", "cleardb", "spark", "cli1, cli2", "create in progress"},
 			[]string{"my-service-2", "cleardb", "spark-2", "cli1", "create succeeded"},
 			[]string{"my-service-provided-by-user", "user-provided", "", "", ""},
 		))
