@@ -37,21 +37,23 @@ var _ = Describe("ServiceSummaryRepository", func() {
 				}
 			  ],
 			  "services": [
-				{
-				  "guid": "my-service-instance-guid",
-				  "name": "my-service-instance",
-				  "bound_app_count": 2,
-				  "service_plan": {
-					"guid": "service-plan-guid",
-					"name": "spark",
-					"service": {
-					  "guid": "service-offering-guid",
-					  "label": "cleardb",
-					  "provider": "cleardb-provider",
-					  "version": "n/a"
+					{
+					  "guid": "my-service-instance-guid",
+					  "name": "my-service-instance",
+					  "bound_app_count": 2,
+						"state": "in progress",
+						"state_description": "50% done",
+					  "service_plan": {
+							"guid": "service-plan-guid",
+							"name": "spark",
+							"service": {
+								"guid": "service-offering-guid",
+								"label": "cleardb",
+								"provider": "cleardb-provider",
+								"version": "n/a"
+							}
+					  }
 					}
-				  }
-				}
 			  ]
 			}`,
 		}
@@ -75,6 +77,8 @@ var _ = Describe("ServiceSummaryRepository", func() {
 
 		instance1 := serviceInstances[0]
 		Expect(instance1.Name).To(Equal("my-service-instance"))
+		Expect(instance1.State).To(Equal("in progress"))
+		Expect(instance1.StateDescription).To(Equal("50% done"))
 		Expect(instance1.ServicePlan.Name).To(Equal("spark"))
 		Expect(instance1.ServiceOffering.Label).To(Equal("cleardb"))
 		Expect(instance1.ServiceOffering.Label).To(Equal("cleardb"))

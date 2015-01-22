@@ -79,7 +79,7 @@ func (cmd *ShowService) Run(c *cli.Context) {
 				}))
 			cmd.ui.Say(T("Status: {{.Status}}",
 				map[string]interface{}{
-					"Status": ServiceInstanceStateToStatus(serviceInstance.State, serviceInstance.IsUserProvided()),
+					"Status": terminal.EntityNameColor(ServiceInstanceStateToStatus(serviceInstance.State, serviceInstance.IsUserProvided())),
 				}))
 			cmd.ui.Say(T("Message: {{.Message}}",
 				map[string]interface{}{
