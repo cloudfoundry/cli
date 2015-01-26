@@ -8,7 +8,7 @@ type UserResource struct {
 }
 
 type UserEntity struct {
-	Name  string
+	Name  string `json:"username,omitempty"`
 	Admin bool
 }
 
@@ -21,8 +21,9 @@ type UAAUserResources struct {
 
 func (resource UserResource) ToFields() models.UserFields {
 	return models.UserFields{
-		Guid:    resource.Metadata.Guid,
-		IsAdmin: resource.Entity.Admin,
+		Guid:     resource.Metadata.Guid,
+		IsAdmin:  resource.Entity.Admin,
+		Username: resource.Entity.Name,
 	}
 }
 
