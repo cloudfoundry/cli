@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -76,10 +77,16 @@ func (cmd *OrgUsers) Run(c *cli.Context) {
 		models.ORG_AUDITOR:     T("ORG AUDITOR"),
 	}
 
+	var users []models.UserFields
+	var apiErr error
 	for _, role := range roles {
 		displayName := orgRoleToDisplayName[role]
 
-		users, apiErr := cmd.userRepo.ListUsersInOrgForRole(org.Guid, role)
+		if cmd.config.IsMinApiVersion("2.21.0") {
+			users, apiErr = cmd.userRepo.ListUsersInOrgForRoleWithNoUAA(org.Guid, role)
+		} else {
+			users, apiErr = cmd.userRepo.ListUsersInOrgForRole(org.Guid, role)
+		}
 
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
