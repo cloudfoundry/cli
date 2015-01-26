@@ -110,5 +110,30 @@ var _ = Describe("org-users command", func() {
 				))
 			})
 		})
+
+		Context("when cc api verson is >= 2.21.0", func() {
+			BeforeEach(func() {
+				userRepo.ListUsersInOrgForRole_CallCount = 0
+				userRepo.ListUsersInOrgForRoleWithNoUAA_CallCount = 0
+			})
+
+			It("calls ListUsersInOrgForRoleWithNoUAA()", func() {
+				configRepo.SetApiVersion("2.22.0")
+				runCommand("the-org")
+
+				Expect(userRepo.ListUsersInOrgForRoleWithNoUAA_CallCount).To(BeNumerically(">=", 1))
+				Expect(userRepo.ListUsersInOrgForRole_CallCount).To(Equal(0))
+			})
+		})
+
+		Context("when cc api verson is < 2.21.0", func() {
+			It("calls ListUsersInOrgForRole()", func() {
+				configRepo.SetApiVersion("2.20.0")
+				runCommand("the-org")
+
+				Expect(userRepo.ListUsersInOrgForRoleWithNoUAA_CallCount).To(Equal(0))
+				Expect(userRepo.ListUsersInOrgForRole_CallCount).To(BeNumerically(">=", 1))
+			})
+		})
 	})
 })
