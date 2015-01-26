@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -29,6 +30,8 @@ func (resource ServiceInstancesSummaries) ToModels() (instances []models.Service
 
 		instance := models.ServiceInstance{}
 		instance.Name = instanceSummary.Name
+		instance.State = instanceSummary.State
+		instance.StateDescription = instanceSummary.StateDescription
 		instance.ApplicationNames = applicationNames
 		instance.ServicePlan = servicePlan
 		instance.ServiceOffering = serviceOffering
@@ -57,8 +60,10 @@ type ServiceInstanceSummaryApp struct {
 }
 
 type ServiceInstanceSummary struct {
-	Name        string
-	ServicePlan ServicePlanSummary `json:"service_plan"`
+	Name             string
+	State            string
+	StateDescription string             `json:"state_description"`
+	ServicePlan      ServicePlanSummary `json:"service_plan"`
 }
 
 type ServicePlanSummary struct {
