@@ -86,6 +86,8 @@ var _ = Describe("Configuration Repository", func() {
 
 		config.SetLocale("en_US")
 		Expect(config.Locale()).To(Equal("en_US"))
+
+		Expect(config.IsMinApiVersion("3.1")).To(Equal(false))
 	})
 
 	Describe("HasAPIEndpoint", func() {
