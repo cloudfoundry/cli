@@ -51,6 +51,7 @@ type Reader interface {
 	UserEmail() string
 	IsLoggedIn() bool
 	IsSSLDisabled() bool
+	IsMinApiVersion(string) bool
 
 	AsyncTimeout() uint
 	Trace() string
@@ -243,6 +244,14 @@ func (c *ConfigRepository) IsSSLDisabled() (isSSLDisabled bool) {
 		isSSLDisabled = c.data.SSLDisabled
 	})
 	return
+}
+
+func (c *ConfigRepository) IsMinApiVersion(v string) bool {
+	var apiVersion string
+	c.read(func() {
+		apiVersion = c.data.ApiVersion
+	})
+	return apiVersion >= v
 }
 
 func (c *ConfigRepository) AsyncTimeout() (timeout uint) {
