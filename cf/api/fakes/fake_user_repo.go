@@ -50,6 +50,11 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user models.Use
 	return
 }
 
+func (repo *FakeUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGuid string, roleName string) ([]models.UserFields, error) {
+	repo.ListUsersOrganizationGuid = orgGuid
+	return repo.ListUsersByRole[roleName], nil
+}
+
 func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersOrganizationGuid = orgGuid
 	return repo.ListUsersByRole[roleName], nil

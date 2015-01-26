@@ -32,6 +32,7 @@ var spaceRoleToPathMap = map[string]string{
 type UserRepository interface {
 	FindByUsername(username string) (user models.UserFields, apiErr error)
 	ListUsersInOrgForRole(orgGuid string, role string) ([]models.UserFields, error)
+	ListUsersInOrgForRoleWithNoUAA(orgGuid string, role string) ([]models.UserFields, error)
 	ListUsersInSpaceForRole(spaceGuid string, role string) ([]models.UserFields, error)
 	Create(username, password string) (apiErr error)
 	Delete(userGuid string) (apiErr error)
@@ -84,8 +85,29 @@ func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGuid string, 
 	return repo.listUsersWithPath(fmt.Sprintf("/v2/organizations/%s/%s", orgGuid, orgRoleToPathMap[roleName]))
 }
 
+func (repo CloudControllerUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGuid string, roleName string) (users []models.UserFields, apiErr error) {
+	return repo.listUsersWithPathWithNoUAA(fmt.Sprintf("/v2/organizations/%s/%s", orgGuid, orgRoleToPathMap[roleName]))
+}
+
 func (repo CloudControllerUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) (users []models.UserFields, apiErr error) {
 	return repo.listUsersWithPath(fmt.Sprintf("/v2/spaces/%s/%s", spaceGuid, spaceRoleToPathMap[roleName]))
+}
+
+func (repo CloudControllerUserRepository) listUsersWithPathWithNoUAA(path string) (users []models.UserFields, apiErr error) {
+	apiErr = repo.ccGateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		path,
+		resources.UserResource{},
+		func(resource interface{}) bool {
+			user := resource.(resources.UserResource).ToFields()
+			users = append(users, user)
+			return true
+		})
+	if apiErr != nil {
+		return
+	}
+
+	return
 }
 
 func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users []models.UserFields, apiErr error) {

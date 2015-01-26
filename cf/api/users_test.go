@@ -58,7 +58,7 @@ var _ = Describe("User Repository", func() {
 		config.SetUaaEndpoint(uaaServer.URL)
 	}
 
-	Describe("listing the users with a given role", func() {
+	Describe("listing the users with a given role using ListUsersInOrgForRole()", func() {
 		Context("when there are no users in the given org", func() {
 			It("lists the users in a org with a given role", func() {
 				ccReqs := []testnet.TestRequest{
@@ -176,6 +176,37 @@ var _ = Describe("User Repository", func() {
 			_, apiErr := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 			Expect(apiErr).To(HaveOccurred())
 		})
+	})
+
+	Describe("listing the users with a given role using ListUsersInOrgForRoleWithNoUAA()", func() {
+		Context("when there are users in the given org", func() {
+			It("lists the users in an organization with a given role without hitting UAA endpoint", func() {
+				ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/managers")
+
+				setupCCServer(ccReqs...)
+				setupUAAServer(uaaReqs...)
+
+				users, apiErr := repo.ListUsersInOrgForRoleWithNoUAA("my-org-guid", models.ORG_MANAGER)
+
+				Expect(ccHandler).To(HaveAllRequestsCalled())
+				Expect(uaaHandler).ToNot(HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+
+				Expect(len(users)).To(Equal(3))
+				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].Username).To(Equal(""))
+				Expect(users[0].Username).ToNot(Equal("Super user 1"))
+
+				Expect(users[1].Username).To(Equal("user 2 from cc"))
+				Expect(users[1].Guid).To(Equal("user-2-guid"))
+				Expect(users[1].Username).ToNot(Equal("Super user 2"))
+
+				Expect(users[2].Username).To(Equal("user 3 from cc"))
+				Expect(users[2].Guid).To(Equal("user-3-guid"))
+				Expect(users[2].Username).ToNot(Equal("Super user 3"))
+			})
+		})
+
 	})
 
 	Describe("FindByUsername", func() {
@@ -514,8 +545,8 @@ func createUsersByRoleEndpoints(rolePath string) (ccReqs []testnet.TestRequest, 
 				Body: `
 				{
 					"resources": [
-					 	{"metadata": {"guid": "user-2-guid"}, "entity": {}},
-					 	{"metadata": {"guid": "user-3-guid"}, "entity": {}}
+					{"metadata": {"guid": "user-2-guid"}, "entity": {"username":"user 2 from cc"}},
+					{"metadata": {"guid": "user-3-guid"}, "entity": {"username":"user 3 from cc"}}
 					]
 				}`}}),
 	}
