@@ -37,6 +37,9 @@ type FakeUserRepository struct {
 	UnsetSpaceRoleUserGuid  string
 	UnsetSpaceRoleSpaceGuid string
 	UnsetSpaceRoleRole      string
+
+	ListUsersInOrgForRoleWithNoUAA_CallCount int
+	ListUsersInOrgForRole_CallCount          int
 }
 
 func (repo *FakeUserRepository) FindByUsername(username string) (user models.UserFields, apiErr error) {
@@ -52,11 +55,13 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user models.Use
 
 func (repo *FakeUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersOrganizationGuid = orgGuid
+	repo.ListUsersInOrgForRoleWithNoUAA_CallCount++
 	return repo.ListUsersByRole[roleName], nil
 }
 
 func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersOrganizationGuid = orgGuid
+	repo.ListUsersInOrgForRole_CallCount++
 	return repo.ListUsersByRole[roleName], nil
 }
 
