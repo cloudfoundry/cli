@@ -112,6 +112,16 @@ var _ = Describe("space command", func() {
 			})
 		})
 
+		Context("when the security-group-rules flag is passed", func() {
+			It("it shows space information and security group rules", func() {
+				runCommand("--security-group-rules", "whose-space-is-it-anyway")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting rules for the security group"},
+				))
+			})
+		})
+
 		Context("when the space has a space quota", func() {
 			It("shows information about the given space", func() {
 				runCommand("whose-space-is-it-anyway")
