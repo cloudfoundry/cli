@@ -34,6 +34,7 @@ type UserRepository interface {
 	ListUsersInOrgForRole(orgGuid string, role string) ([]models.UserFields, error)
 	ListUsersInOrgForRoleWithNoUAA(orgGuid string, role string) ([]models.UserFields, error)
 	ListUsersInSpaceForRole(spaceGuid string, role string) ([]models.UserFields, error)
+	ListUsersInSpaceForRoleWithNoUAA(spaceGuid string, role string) ([]models.UserFields, error)
 	Create(username, password string) (apiErr error)
 	Delete(userGuid string) (apiErr error)
 	SetOrgRole(userGuid, orgGuid, role string) (apiErr error)
@@ -91,6 +92,10 @@ func (repo CloudControllerUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGuid
 
 func (repo CloudControllerUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) (users []models.UserFields, apiErr error) {
 	return repo.listUsersWithPath(fmt.Sprintf("/v2/spaces/%s/%s", spaceGuid, spaceRoleToPathMap[roleName]))
+}
+
+func (repo CloudControllerUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGuid string, roleName string) (users []models.UserFields, apiErr error) {
+	return repo.listUsersWithPathWithNoUAA(fmt.Sprintf("/v2/spaces/%s/%s", spaceGuid, spaceRoleToPathMap[roleName]))
 }
 
 func (repo CloudControllerUserRepository) listUsersWithPathWithNoUAA(path string) (users []models.UserFields, apiErr error) {
