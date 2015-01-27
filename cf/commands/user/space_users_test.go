@@ -102,5 +102,30 @@ var _ = Describe("space-users command", func() {
 				[]string{"user3"},
 			))
 		})
+
+		Context("when cc api verson is >= 2.21.0", func() {
+			BeforeEach(func() {
+				userRepo.ListUsersInSpaceForRole_CallCount = 0
+				userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount = 0
+			})
+
+			It("calls ListUsersInSpaceForRoleWithNoUAA()", func() {
+				config.SetApiVersion("2.22.0")
+				runCommand("my-org", "my-sapce")
+
+				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount).To(BeNumerically(">=", 1))
+				Expect(userRepo.ListUsersInSpaceForRole_CallCount).To(Equal(0))
+			})
+		})
+
+		Context("when cc api verson is < 2.21.0", func() {
+			It("calls ListUsersInSpaceForRole()", func() {
+				config.SetApiVersion("2.20.0")
+				runCommand("my-org", "my-space")
+
+				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount).To(Equal(0))
+				Expect(userRepo.ListUsersInSpaceForRole_CallCount).To(BeNumerically(">=", 1))
+			})
+		})
 	})
 })
