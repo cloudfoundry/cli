@@ -209,6 +209,37 @@ var _ = Describe("User Repository", func() {
 
 	})
 
+	Describe("listing the users with a given role using ListUsersInSpaceForRoleWithNoUAA()", func() {
+		Context("when there are users in the given space", func() {
+			It("lists the users in a space with a given role without hitting UAA endpoint", func() {
+				ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/spaces/my-space-guid/managers")
+
+				setupCCServer(ccReqs...)
+				setupUAAServer(uaaReqs...)
+
+				users, apiErr := repo.ListUsersInSpaceForRoleWithNoUAA("my-space-guid", models.SPACE_MANAGER)
+
+				Expect(ccHandler).To(HaveAllRequestsCalled())
+				Expect(uaaHandler).ToNot(HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+
+				Expect(len(users)).To(Equal(3))
+				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].Username).To(Equal(""))
+				Expect(users[0].Username).ToNot(Equal("Super user 1"))
+
+				Expect(users[1].Username).To(Equal("user 2 from cc"))
+				Expect(users[1].Guid).To(Equal("user-2-guid"))
+				Expect(users[1].Username).ToNot(Equal("Super user 2"))
+
+				Expect(users[2].Username).To(Equal("user 3 from cc"))
+				Expect(users[2].Guid).To(Equal("user-3-guid"))
+				Expect(users[2].Username).ToNot(Equal("Super user 3"))
+			})
+		})
+
+	})
+
 	Describe("FindByUsername", func() {
 		Context("when the user exists", func() {
 			It("finds the user", func() {
