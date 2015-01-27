@@ -73,10 +73,15 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 		models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
 	}
 
+	var users []models.UserFields
 	for _, role := range spaceRoles {
 		displayName := spaceRoleToDisplayName[role]
 
-		users, apiErr := cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role)
+		if cmd.config.IsMinApiVersion("2.21.0") {
+			users, apiErr = cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA(space.Guid, role)
+		} else {
+			users, apiErr = cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role)
+		}
 
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
