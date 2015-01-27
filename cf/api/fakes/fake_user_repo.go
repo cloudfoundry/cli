@@ -70,6 +70,11 @@ func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleNa
 	return repo.ListUsersByRole[roleName], nil
 }
 
+func (repo *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGuid string, roleName string) ([]models.UserFields, error) {
+	repo.ListUsersSpaceGuid = spaceGuid
+	return repo.ListUsersByRole[roleName], nil
+}
+
 func (repo *FakeUserRepository) Create(username, password string) (apiErr error) {
 	repo.CreateUserUsername = username
 	repo.CreateUserPassword = password
