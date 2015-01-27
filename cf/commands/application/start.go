@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -288,16 +289,19 @@ func (cmd Start) waitForOneRunningInstance(app models.Application) {
 }
 
 type instanceCount struct {
-	running  int
-	starting int
-	flapping int
-	down     int
-	crashed  int
-	total    int
+	running         int
+	starting        int
+	startingDetails map[string]struct{}
+	flapping        int
+	down            int
+	crashed         int
+	total           int
 }
 
 func (cmd Start) fetchInstanceCount(appGuid string) (instanceCount, error) {
-	count := instanceCount{}
+	count := instanceCount{
+		startingDetails: make(map[string]struct{}),
+	}
 
 	instances, apiErr := cmd.appInstancesRepo.GetInstances(appGuid)
 	if apiErr != nil {
@@ -312,6 +316,9 @@ func (cmd Start) fetchInstanceCount(appGuid string) (instanceCount, error) {
 			count.running++
 		case models.InstanceStarting:
 			count.starting++
+			if inst.Details != "" {
+				count.startingDetails[inst.Details] = struct{}{}
+			}
 		case models.InstanceFlapping:
 			count.flapping++
 		case models.InstanceDown:
@@ -329,8 +336,21 @@ func instancesDetails(count instanceCount) string {
 		map[string]interface{}{"RunningCount": count.running, "TotalCount": count.total}))}
 
 	if count.starting > 0 {
-		details = append(details, fmt.Sprintf(T("{{.StartingCount}} starting",
-			map[string]interface{}{"StartingCount": count.starting})))
+		if len(count.startingDetails) == 0 {
+			details = append(details, fmt.Sprintf(T("{{.StartingCount}} starting",
+				map[string]interface{}{"StartingCount": count.starting})))
+		} else {
+			info := []string{}
+			for d, _ := range count.startingDetails {
+				info = append(info, d)
+			}
+			sort.Strings(info)
+			details = append(details, fmt.Sprintf(T("{{.StartingCount}} starting ({{.Details}})",
+				map[string]interface{}{
+					"StartingCount": count.starting,
+					"Details":       strings.Join(info, ", "),
+				})))
+		}
 	}
 
 	if count.down > 0 {
