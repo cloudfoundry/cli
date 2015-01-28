@@ -39,7 +39,13 @@ var exampleJSON = `
 	"AsyncTimeout": 1000,
 	"Trace": "path/to/some/file",
 	"ColorEnabled": "true",
-	"Locale": "fr_FR"
+	"Locale": "fr_FR",
+	"PluginRepos": [
+		{
+			"Name": "repo1",
+			"Url": "http://repo.com"
+		}
+	]
 }`
 
 var exampleData = &Data{
@@ -63,6 +69,12 @@ var exampleData = &Data{
 	AsyncTimeout: 1000,
 	ColorEnabled: "true",
 	Locale:       "fr_FR",
+	PluginRepos: []models.PluginRepo{
+		models.PluginRepo{
+			Name: "repo1",
+			Url:  "http://repo.com",
+		},
+	},
 }
 
 var _ = Describe("V3 Config files", func() {
