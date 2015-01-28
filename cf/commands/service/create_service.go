@@ -36,7 +36,7 @@ func (cmd CreateService) Metadata() command_metadata.CommandMetadata {
 		Usage: T(`CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE
 
 EXAMPLE:
-   CF_NAME create-service cleardb spark clear-db-mine
+   CF_NAME create-service dbaas silver mydb
 
 TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`),
