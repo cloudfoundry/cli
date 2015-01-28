@@ -34,6 +34,7 @@ type Data struct {
 	Trace                 string
 	ColorEnabled          string
 	Locale                string
+	PluginRepos           []models.PluginRepo
 }
 
 func NewData() (data *Data) {
