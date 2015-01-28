@@ -38,7 +38,7 @@ func (cmd *UpdateUserProvidedService) Metadata() command_metadata.CommandMetadat
 		Usage: T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]'
 
 EXAMPLE:
-   CF_NAME update-user-provided-service oracle-db-mine -p '{"username":"admin","password":"pa55woRD"}'
+   CF_NAME update-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
    CF_NAME update-user-provided-service my-drain-service -l syslog://example.com`),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Credentials")),

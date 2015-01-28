@@ -2,8 +2,9 @@ package service
 
 import (
 	"encoding/json"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -41,8 +42,8 @@ func (cmd CreateUserProvidedService) Metadata() command_metadata.CommandMetadata
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"name":"value","name":"value"}'
 
 EXAMPLE:
-   CF_NAME create-user-provided-service oracle-db-mine -p "username, password"
-   CF_NAME create-user-provided-service oracle-db-mine -p '{"username":"admin","password":"pa55woRD"}'
+   CF_NAME create-user-provided-service my-db-mine -p "username, password"
+   CF_NAME create-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
    CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
 `),
 		Flags: []cli.Flag{
