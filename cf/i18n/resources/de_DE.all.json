@@ -175,6 +175,11 @@
       "modified": false
    },
    {
+      "id": " added as '",
+      "translation": " added as '",
+      "modified": false
+   },
+   {
       "id": " is already started",
       "translation": " is already started",
       "modified": false
@@ -190,8 +195,28 @@
       "modified": false
    },
    {
+      "id": " is not a valid url, please provide a url, e.g. http://your_repo.com",
+      "translation": " is not a valid url, please provide a url, e.g. http://your_repo.com",
+      "modified": false
+   },
+   {
+      "id": " is not responding. Please make sure it is a valid plugin repo.",
+      "translation": " is not responding. Please make sure it is a valid plugin repo.",
+      "modified": false
+   },
+   {
       "id": " not found",
       "translation": " not found",
+      "modified": false
+   },
+   {
+      "id": "\"Plugins\" object not found in the responded data.",
+      "translation": "\"Plugins\" object not found in the responded data.",
+      "modified": false
+   },
+   {
+      "id": ") already exists.",
+      "translation": ") already exists.",
       "modified": false
    },
    {
@@ -257,6 +282,11 @@
    {
       "id": "Acquiring staging security group as {{.username}}",
       "translation": "Acquiring staging security group as {{.username}}",
+      "modified": false
+   },
+   {
+      "id": "Add a new plugin repository",
+      "translation": "Add a new plugin repository",
       "modified": false
    },
    {
@@ -493,6 +523,11 @@
       "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
       "translation": "Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB",
       "modified": true
+   },
+   {
+      "id": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n",
+      "translation": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n",
+      "modified": false
    },
    {
       "id": "CF_NAME api [URL]",
@@ -1915,6 +1950,11 @@
       "modified": false
    },
    {
+      "id": "Error processing data from server: ",
+      "translation": "Error processing data from server: ",
+      "modified": false
+   },
+   {
       "id": "Error reading manifest file:\n{{.Err}}",
       "translation": "Error reading manifest file:\n{{.Err}}",
       "modified": false
@@ -1922,6 +1962,11 @@
    {
       "id": "Error reading response",
       "translation": "Error reading response",
+      "modified": false
+   },
+   {
+      "id": "Error reading response from server: ",
+      "translation": "Error reading response from server: ",
       "modified": false
    },
    {
@@ -3070,6 +3115,11 @@
       "modified": false
    },
    {
+      "id": "Plugin repo named \"{{.repoName}}\" already exists, please use another name.",
+      "translation": "Plugin repo named \"{{.repoName}}\" already exists, please use another name.",
+      "modified": false
+   },
+   {
       "id": "Plugin {{.PluginName}} successfully uninstalled.",
       "translation": "Plugin name {{.PluginName}} successfully uninstalled",
       "modified": true
@@ -3873,6 +3923,11 @@
       "id": "There are too many options to display, please type in the name.",
       "translation": "There are too many options to display, please type in the name.",
       "modified": false
+   },
+   {
+      "id": "There is an error performing request on '{{.repoUrl}}': ",
+      "translation": "There is an error performing request on '{{.repoUrl}}':",
+      "modified": true
    },
    {
       "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
