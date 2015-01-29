@@ -24,6 +24,10 @@
 			"Rev": "39fb5c673e898bc3343f306217f91f485c40a831"
 		},
 		{
+			"ImportPath": "github.com/cloudfoundry-incubator/cli-plugin-repo/models",
+			"Rev": "c7b8489070e27b42e1ca0626c566dfacd70e80cf"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
 			"Rev": "a4a0cae5ff8a342ba01fce700b9e41c6942c0e5e"
 		},
