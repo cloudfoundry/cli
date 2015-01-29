@@ -342,6 +342,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("ADD/REMOVE PLUGIN REPOSITORY"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
+					presentCommand("add-plugin-repo"),
 				},
 			},
 		}, {

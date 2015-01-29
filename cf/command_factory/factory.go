@@ -23,6 +23,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/featureflag"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/commands/plugin"
+	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
@@ -291,6 +292,9 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["uninstall-plugin"] = plugin.NewPluginUninstall(ui, pluginConfig)
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, pluginConfig, factory.cmdsByName)
 	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, pluginConfig)
+
+	factory.cmdsByName["add-plugin-repo"] = plugin_repo.NewAddPluginRepo(ui, config)
+
 	factory.cmdsByName["copy-source"] = application.NewCopySource(
 		ui,
 		config,
