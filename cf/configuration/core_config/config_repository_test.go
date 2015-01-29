@@ -7,6 +7,7 @@ import (
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/fileutils"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
@@ -86,6 +87,10 @@ var _ = Describe("Configuration Repository", func() {
 
 		config.SetLocale("en_US")
 		Expect(config.Locale()).To(Equal("en_US"))
+
+		config.SetPluginRepo(models.PluginRepo{Name: "repo", Url: "nowhere.com"})
+		Expect(config.PluginRepos()[0].Name).To(Equal("repo"))
+		Expect(config.PluginRepos()[0].Url).To(Equal("nowhere.com"))
 
 		Expect(config.IsMinApiVersion("3.1")).To(Equal(false))
 	})

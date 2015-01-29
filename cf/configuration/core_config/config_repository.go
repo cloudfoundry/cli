@@ -59,6 +59,8 @@ type Reader interface {
 	ColorEnabled() string
 
 	Locale() string
+
+	PluginRepos() []models.PluginRepo
 }
 
 type ReadWriter interface {
@@ -78,6 +80,7 @@ type ReadWriter interface {
 	SetTrace(string)
 	SetColorEnabled(string)
 	SetLocale(string)
+	SetPluginRepo(models.PluginRepo)
 }
 
 type Repository interface {
@@ -282,6 +285,13 @@ func (c *ConfigRepository) Locale() (locale string) {
 	return
 }
 
+func (c *ConfigRepository) PluginRepos() (repos []models.PluginRepo) {
+	c.read(func() {
+		repos = c.data.PluginRepos
+	})
+	return
+}
+
 // SETTERS
 
 func (c *ConfigRepository) ClearSession() {
@@ -374,5 +384,11 @@ func (c *ConfigRepository) SetColorEnabled(enabled string) {
 func (c *ConfigRepository) SetLocale(locale string) {
 	c.write(func() {
 		c.data.Locale = locale
+	})
+}
+
+func (c *ConfigRepository) SetPluginRepo(repo models.PluginRepo) {
+	c.write(func() {
+		c.data.PluginRepos = append(c.data.PluginRepos, repo)
 	})
 }
