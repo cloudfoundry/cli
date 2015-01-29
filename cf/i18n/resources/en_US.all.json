@@ -200,6 +200,16 @@
       "modified": false
    },
    {
+      "id": "ADD/REMOVE PLUGIN",
+      "translation": "ADD/REMOVE PLUGIN",
+      "modified": false
+   },
+   {
+      "id": "ADD/REMOVE PLUGIN REPOSITORY",
+      "translation": "ADD/REMOVE PLUGIN REPOSITORY",
+      "modified": false
+   },
+   {
       "id": "ADVANCED",
       "translation": "ADVANCED",
       "modified": false
@@ -2325,6 +2335,11 @@
       "modified": false
    },
    {
+      "id": "INSTALLED PLUGIN COMMANDS",
+      "translation": "INSTALLED PLUGIN COMMANDS",
+      "modified": false
+   },
+   {
       "id": "Ignore manifest file",
       "translation": "Ignore manifest file",
       "modified": false
@@ -2952,16 +2967,6 @@
    {
       "id": "Override restart of the application in target environment after copy-source completes",
       "translation": "Override restart of the application in target environment after copy-source completes",
-      "modified": false
-   },
-   {
-      "id": "PLUGIN",
-      "translation": "PLUGIN",
-      "modified": false
-   },
-   {
-      "id": "PLUGIN COMMANDS",
-      "translation": "PLUGIN COMMANDS",
       "modified": false
    },
    {
