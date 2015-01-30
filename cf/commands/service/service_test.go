@@ -63,12 +63,13 @@ var _ = Describe("service command", func() {
 				serviceInstance := models.ServiceInstance{}
 				serviceInstance.Name = "service1"
 				serviceInstance.Guid = "service1-guid"
-				serviceInstance.State = "in progress"
-				serviceInstance.StateDescription = "creating resource - step 1"
+				serviceInstance.LastOperation.Type = "create"
+				serviceInstance.LastOperation.State = "in progress"
+				serviceInstance.LastOperation.Description = "creating resource - step 1"
 				serviceInstance.ServicePlan = plan
 				serviceInstance.ServiceOffering = offering
 				serviceInstance.DashboardUrl = "some-url"
-				serviceInstance.State = state
+				serviceInstance.LastOperation.State = state
 				requirementsFactory.ServiceInstance = serviceInstance
 			}
 
@@ -172,27 +173,32 @@ var _ = Describe("service command", func() {
 })
 
 var _ = Describe("ServiceInstanceStateToStatus", func() {
+	var operationType string
 	Context("when the service is not user provided", func() {
 		isUserProvided := false
 
-		It("returns status: `create in progress` when state: `in progress`", func() {
-			status := ServiceInstanceStateToStatus("in progress", isUserProvided)
-			Expect(status).To(Equal("create in progress"))
-		})
+		Context("when operationType is `create`", func() {
+			BeforeEach(func() { operationType = "create" })
 
-		It("returns status: `create succeeded` when state: `succeeded`", func() {
-			status := ServiceInstanceStateToStatus("succeeded", isUserProvided)
-			Expect(status).To(Equal("create succeeded"))
-		})
+			It("returns status: `create in progress` when state: `in progress`", func() {
+				status := ServiceInstanceStateToStatus(operationType, "in progress", isUserProvided)
+				Expect(status).To(Equal("create in progress"))
+			})
 
-		It("returns status: `create failed` when state: `failed`", func() {
-			status := ServiceInstanceStateToStatus("failed", isUserProvided)
-			Expect(status).To(Equal("create failed"))
-		})
+			It("returns status: `create succeeded` when state: `succeeded`", func() {
+				status := ServiceInstanceStateToStatus(operationType, "succeeded", isUserProvided)
+				Expect(status).To(Equal("create succeeded"))
+			})
 
-		It("returns status: `create succeeded` when state: ``", func() {
-			status := ServiceInstanceStateToStatus("", isUserProvided)
-			Expect(status).To(Equal("create succeeded"))
+			It("returns status: `create failed` when state: `failed`", func() {
+				status := ServiceInstanceStateToStatus(operationType, "failed", isUserProvided)
+				Expect(status).To(Equal("create failed"))
+			})
+
+			It("returns status: `create succeeded` when state: ``", func() {
+				status := ServiceInstanceStateToStatus(operationType, "", isUserProvided)
+				Expect(status).To(Equal("create succeeded"))
+			})
 		})
 	})
 
@@ -200,7 +206,7 @@ var _ = Describe("ServiceInstanceStateToStatus", func() {
 		isUserProvided := true
 
 		It("returns status: `` when state: ``", func() {
-			status := ServiceInstanceStateToStatus("", isUserProvided)
+			status := ServiceInstanceStateToStatus(operationType, "", isUserProvided)
 			Expect(status).To(Equal(""))
 		})
 	})

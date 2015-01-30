@@ -1,10 +1,15 @@
 package models
 
+type LastOperationFields struct {
+	Type        string
+	State       string
+	Description string
+}
+
 type ServiceInstanceFields struct {
 	Guid             string
 	Name             string
-	State            string
-	StateDescription string
+	LastOperation    LastOperationFields
 	SysLogDrainUrl   string
 	ApplicationNames []string
 	Params           map[string]interface{}
