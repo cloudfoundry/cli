@@ -4520,6 +4520,11 @@
       "modified": false
    },
    {
+      "id": "{{.OperationType}} succeeded",
+      "translation": "{{.OperationType}} succeeded",
+      "modified": false
+   },
+   {
       "id": "bound apps",
       "translation": "bound apps",
       "modified": false
@@ -4622,6 +4627,11 @@
    {
       "id": "event",
       "translation": "event",
+      "modified": false
+   },
+   {
+      "id": "{{.OperationType}} failed",
+      "translation": "{{.OperationType}} failed",
       "modified": false
    },
    {
@@ -4927,6 +4937,11 @@
    {
       "id": "total memory limit",
       "translation": "total memory limit",
+      "modified": false
+   },
+   {
+      "id": "{{.OperationType}} in progress",
+      "translation": "{{.OperationType}} in progress",
       "modified": false
    },
    {

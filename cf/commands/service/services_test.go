@@ -83,16 +83,18 @@ var _ = Describe("services", func() {
 
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "my-service-1"
-		serviceInstance.State = "in progress"
-		serviceInstance.StateDescription = "fake state description"
+		serviceInstance.LastOperation.Type = "create"
+		serviceInstance.LastOperation.State = "in progress"
+		serviceInstance.LastOperation.Description = "fake state description"
 		serviceInstance.ServicePlan = plan
 		serviceInstance.ApplicationNames = []string{"cli1", "cli2"}
 		serviceInstance.ServiceOffering = offering
 
 		serviceInstance2 := models.ServiceInstance{}
 		serviceInstance2.Name = "my-service-2"
-		serviceInstance2.State = ""
-		serviceInstance2.StateDescription = "fake state description"
+		serviceInstance2.LastOperation.Type = "create"
+		serviceInstance2.LastOperation.State = ""
+		serviceInstance2.LastOperation.Description = "fake state description"
 		serviceInstance2.ServicePlan = plan2
 		serviceInstance2.ApplicationNames = []string{"cli1"}
 		serviceInstance2.ServiceOffering = offering

@@ -80,7 +80,7 @@ func (cmd ListServices) Run(c *cli.Context) {
 		} else {
 			serviceColumn = instance.ServiceOffering.Label
 		}
-		serviceStatus = ServiceInstanceStateToStatus(instance.State, instance.IsUserProvided())
+		serviceStatus = ServiceInstanceStateToStatus(instance.LastOperation.Type, instance.LastOperation.State, instance.IsUserProvided())
 
 		table.Add(
 			instance.Name,

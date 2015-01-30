@@ -102,9 +102,12 @@ var _ = Describe("create-service command", func() {
 		BeforeEach(func() {
 			serviceInstance = models.ServiceInstance{
 				ServiceInstanceFields: models.ServiceInstanceFields{
-					Name:             "my-cleardb-service",
-					State:            "creating",
-					StateDescription: "fake service instance description",
+					Name: "my-cleardb-service",
+					LastOperation: models.LastOperationFields{
+						Type:        "create",
+						State:       "in progress",
+						Description: "fake service instance description",
+					},
 				},
 			}
 			serviceRepo.FindInstanceByNameMap = generic.NewMap()
