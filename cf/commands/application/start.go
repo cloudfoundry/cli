@@ -277,7 +277,7 @@ func (cmd Start) waitForOneRunningInstance(app models.Application) {
 			return
 		}
 
-		if count.flapping > 0 {
+		if count.flapping > 0 || count.crashed > 0 {
 			cmd.ui.Failed(fmt.Sprintf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
 				map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))})))
 			return
@@ -292,6 +292,7 @@ type instanceCount struct {
 	starting int
 	flapping int
 	down     int
+	crashed  int
 	total    int
 }
 
@@ -315,6 +316,8 @@ func (cmd Start) fetchInstanceCount(appGuid string) (instanceCount, error) {
 			count.flapping++
 		case models.InstanceDown:
 			count.down++
+		case models.InstanceCrashed:
+			count.crashed++
 		}
 	}
 
@@ -338,6 +341,11 @@ func instancesDetails(count instanceCount) string {
 	if count.flapping > 0 {
 		details = append(details, fmt.Sprintf(T("{{.FlappingCount}} failing",
 			map[string]interface{}{"FlappingCount": count.flapping})))
+	}
+
+	if count.crashed > 0 {
+		details = append(details, fmt.Sprintf(T("{{.CrashedCount}} crashed",
+			map[string]interface{}{"CrashedCount": count.crashed})))
 	}
 
 	return strings.Join(details, ", ")

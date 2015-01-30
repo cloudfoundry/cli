@@ -220,7 +220,7 @@ var _ = Describe("start command", func() {
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
-		It("uses uses proper org name and space name", func() {
+		It("uses proper org name and space name", func() {
 			config := testconfig.NewRepositoryWithDefaults()
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appRepo := &testApplication.FakeApplicationRepository{}
@@ -396,6 +396,35 @@ var _ = Describe("start command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},
 					[]string{"0 of 2 instances running", "1 starting", "1 failing"},
+					[]string{"FAILED"},
+					[]string{"Start unsuccessful"},
+				))
+			})
+		})
+
+		Context("when an app instance is crashed", func() {
+			It("fails and alerts the user", func() {
+				displayApp := &testcmd.FakeAppDisplayer{}
+				appInstance := models.AppInstanceFields{}
+				appInstance.State = models.InstanceStarting
+				appInstance2 := models.AppInstanceFields{}
+				appInstance2.State = models.InstanceStarting
+				appInstance3 := models.AppInstanceFields{}
+				appInstance3.State = models.InstanceStarting
+				appInstance4 := models.AppInstanceFields{}
+				appInstance4.State = models.InstanceCrashed
+				defaultInstanceResponses = [][]models.AppInstanceFields{
+					[]models.AppInstanceFields{appInstance, appInstance2},
+					[]models.AppInstanceFields{appInstance3, appInstance4},
+				}
+
+				defaultInstanceErrorCodes = []string{"", ""}
+
+				ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"my-app"},
+					[]string{"0 of 2 instances running", "1 starting", "1 crashed"},
 					[]string{"FAILED"},
 					[]string{"Start unsuccessful"},
 				))

@@ -4405,6 +4405,11 @@
       "modified": false
    },
    {
+      "id": "crashed",
+      "translation": "crashed",
+      "modified": false
+   },
+   {
       "id": "crashing",
       "translation": "崩溃",
       "modified": false
@@ -4847,6 +4852,11 @@
    {
       "id": "{{.CountOfServices}} migrated.",
       "translation": "{{.CountOfServices}} 迁移.",
+      "modified": false
+   },
+   {
+      "id": "{{.CrashedCount}} crashed",
+      "translation": "{{.CrashedCount}} crashed",
       "modified": false
    },
    {

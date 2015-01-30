@@ -4405,6 +4405,11 @@
       "modified": false
    },
    {
+      "id": "crashed",
+      "translation": "crashed",
+      "modified": false
+   },
+   {
       "id": "crashing",
       "translation": "falhando",
       "modified": false
@@ -4847,6 +4852,11 @@
    {
       "id": "{{.CountOfServices}} migrated.",
       "translation": "{{.CountOfServices}} migrado.",
+      "modified": false
+   },
+   {
+      "id": "{{.CrashedCount}} crashed",
+      "translation": "{{.CrashedCount}} crashed",
       "modified": false
    },
    {
