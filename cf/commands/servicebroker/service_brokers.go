@@ -1,6 +1,8 @@
 package servicebroker
 
 import (
+	"sort"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -16,6 +18,13 @@ type ListServiceBrokers struct {
 	config core_config.Reader
 	repo   api.ServiceBrokerRepository
 }
+
+type serviceBrokerRow struct {
+	name string
+	url  string
+}
+
+type serviceBrokerTable []serviceBrokerRow
 
 func NewListServiceBrokers(ui terminal.UI, config core_config.Reader, repo api.ServiceBrokerRepository) (cmd ListServiceBrokers) {
 	cmd.ui = ui
@@ -41,6 +50,8 @@ func (cmd ListServiceBrokers) GetRequirements(requirementsFactory requirements.F
 }
 
 func (cmd ListServiceBrokers) Run(c *cli.Context) {
+	sbTable := serviceBrokerTable{}
+
 	cmd.ui.Say(T("Getting service brokers as {{.Username}}...\n",
 		map[string]interface{}{
 			"Username": terminal.EntityNameColor(cmd.config.Username()),
@@ -49,10 +60,20 @@ func (cmd ListServiceBrokers) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{T("name"), T("url")})
 	foundBrokers := false
 	apiErr := cmd.repo.ListServiceBrokers(func(serviceBroker models.ServiceBroker) bool {
-		table.Add(serviceBroker.Name, serviceBroker.Url)
+		sbTable = append(sbTable, serviceBrokerRow{
+			name: serviceBroker.Name,
+			url:  serviceBroker.Url,
+		})
 		foundBrokers = true
 		return true
 	})
+
+	sort.Sort(sbTable)
+
+	for _, sb := range sbTable {
+		table.Add(sb.name, sb.url)
+	}
+
 	table.Print()
 
 	if apiErr != nil {
@@ -64,3 +85,7 @@ func (cmd ListServiceBrokers) Run(c *cli.Context) {
 		cmd.ui.Say(T("No service brokers found"))
 	}
 }
+
+func (a serviceBrokerTable) Len() int           { return len(a) }
+func (a serviceBrokerTable) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a serviceBrokerTable) Less(i, j int) bool { return a[i].name < a[j].name }

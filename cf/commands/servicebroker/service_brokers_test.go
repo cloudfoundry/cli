@@ -79,6 +79,29 @@ var _ = Describe("service-brokers command", func() {
 		))
 	})
 
+	It("lists service brokers by alphabetical order", func() {
+		repo.ServiceBrokers = []models.ServiceBroker{models.ServiceBroker{
+			Name: "z-service-broker-to-list",
+			Guid: "z-service-broker-to-list-guid-a",
+			Url:  "http://service-a-url.com",
+		}, models.ServiceBroker{
+			Name: "a-service-broker-to-list",
+			Guid: "a-service-broker-to-list-guid-c",
+			Url:  "http://service-c-url.com",
+		}, models.ServiceBroker{
+			Name: "fun-service-broker-to-list",
+			Guid: "fun-service-broker-to-list-guid-b",
+			Url:  "http://service-b-url.com",
+		}, models.ServiceBroker{
+			Name: "123-service-broker-to-list",
+			Guid: "123-service-broker-to-list-guid-c",
+			Url:  "http://service-d-url.com",
+		}}
+
+		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		Expect(inAlphabeticalOrder(ui.Outputs, 3)).To(Equal(true))
+	})
+
 	It("says when no service brokers were found", func() {
 		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
 
@@ -98,3 +121,21 @@ var _ = Describe("service-brokers command", func() {
 		))
 	})
 })
+
+func inAlphabeticalOrder(actual []string, skipLine int) bool {
+	lastIndex := skipLine
+	index := skipLine + 1
+
+	if len(actual) <= skipLine+1 {
+		return true
+	}
+
+	for index < len(actual)-1 {
+		if actual[index] < actual[lastIndex] {
+			return false
+		}
+		index++
+		lastIndex++
+	}
+	return true
+}
