@@ -57,6 +57,8 @@ func ColoredInstanceState(instance models.AppInstanceFields) (colored string) {
 		colored = T("running")
 	case "stopped":
 		colored = terminal.StoppedColor(T("stopped"))
+	case "crashed":
+		colored = terminal.CrashedColor(T("crashed"))
 	case "flapping":
 		colored = terminal.CrashedColor(T("crashing"))
 	case "down":

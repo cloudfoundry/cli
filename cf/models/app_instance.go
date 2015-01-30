@@ -9,6 +9,7 @@ const (
 	InstanceRunning  InstanceState = "running"
 	InstanceFlapping InstanceState = "flapping"
 	InstanceDown     InstanceState = "down"
+	InstanceCrashed  InstanceState = "crashed"
 )
 
 type AppInstanceFields struct {
