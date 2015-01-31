@@ -69,7 +69,7 @@ func (cmd ListServices) Run(c *cli.Context) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{T("name"), T("service"), T("plan"), T("bound apps"), T("status")})
+	table := terminal.NewTable(cmd.ui, []string{T("name"), T("service"), T("plan"), T("bound apps"), T("last operation")})
 
 	for _, instance := range serviceInstances {
 		var serviceColumn string

@@ -112,7 +112,7 @@ var _ = Describe("services", func() {
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
-			[]string{"name", "service", "plan", "bound apps", "status"},
+			[]string{"name", "service", "plan", "bound apps", "last operation"},
 			[]string{"OK"},
 			[]string{"my-service-1", "cleardb", "spark", "cli1, cli2", "create in progress"},
 			[]string{"my-service-2", "cleardb", "spark-2", "cli1", "create succeeded"},
