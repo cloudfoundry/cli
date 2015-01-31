@@ -19,7 +19,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("PluginRepo", func() {
+var _ = Describe("add-plugin-repo", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.ReadWriter

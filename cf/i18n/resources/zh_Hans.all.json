@@ -870,6 +870,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins\n",
+      "translation": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins\n",
+      "modified": false
+   },
+   {
       "id": "CF_NAME restage APP_NAME",
       "translation": "CF_NAME restage 应用程序名",
       "modified": true
@@ -1965,6 +1970,11 @@
       "modified": false
    },
    {
+      "id": "Error reading response from",
+      "translation": "Error reading response from",
+      "modified": false
+   },
+   {
       "id": "Error reading response from server: ",
       "translation": "Error reading response from server: ",
       "modified": false
@@ -1972,6 +1982,11 @@
    {
       "id": "Error renaming buildpack {{.Name}}\n{{.Error}}",
       "translation": "重命名buildpack {{.Name}}\n错误：{{.Error}}",
+      "modified": false
+   },
+   {
+      "id": "Error requesting from",
+      "translation": "Error requesting from",
       "modified": false
    },
    {
@@ -2240,6 +2255,11 @@
       "modified": false
    },
    {
+      "id": "Getting plugins from all repositories ... ",
+      "translation": "Getting plugins from all repositories ... ",
+      "modified": false
+   },
+   {
       "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
       "translation": "Getting quota {{.QuotaName}} info as {{.Username}}...",
       "modified": false
@@ -2480,6 +2500,11 @@
       "modified": false
    },
    {
+      "id": "Invalid data from '{{.repoName}}' - plugin data does not exist",
+      "translation": "Invalid data from '{{.repoName}}' - plugin data does not exist",
+      "modified": false
+   },
+   {
       "id": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
       "translation": "无效的磁盘配额: {{.DiskQuota}}\n{{.ErrorDescription}}",
       "modified": false
@@ -2512,6 +2537,11 @@
    {
       "id": "Invalid instance: {{.Instance}}\nInstance must be less than {{.InstanceCount}}",
       "translation": "Invalid instance: {{.Instance}}\nInstance must be less than {{.InstanceCount}}",
+      "modified": false
+   },
+   {
+      "id": "Invalid json data from",
+      "translation": "Invalid json data from",
       "modified": false
    },
    {
@@ -2562,6 +2592,11 @@
    {
       "id": "List all apps in the target space",
       "translation": "列出目标空间中的所有应用程序",
+      "modified": false
+   },
+   {
+      "id": "List all available plugins in all added repositories",
+      "translation": "List all available plugins in all added repositories",
       "modified": false
    },
    {
@@ -2667,6 +2702,11 @@
    {
       "id": "Log user out",
       "translation": "用户退出",
+      "modified": false
+   },
+   {
+      "id": "Logged errors:",
+      "translation": "Logged errors:",
       "modified": false
    },
    {
@@ -3357,6 +3397,11 @@
    {
       "id": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
       "translation": "重命名空间:用户{{.CurrentUser}}在组织{{.OrgName}}中将{{.OldSpaceName}}重命名为{{.NewSpaceName}}...",
+      "modified": false
+   },
+   {
+      "id": "Repository: ",
+      "translation": "Repository: ",
       "modified": false
    },
    {
@@ -4655,6 +4700,11 @@
       "modified": true
    },
    {
+      "id": "repo-plugins",
+      "translation": "repo-plugins",
+      "modified": false
+   },
+   {
       "id": "requested state",
       "translation": "请求状态",
       "modified": false
@@ -4817,6 +4867,11 @@
    {
       "id": "user-provided",
       "translation": "由用户提供的",
+      "modified": false
+   },
+   {
+      "id": "version",
+      "translation": "version",
       "modified": false
    },
    {

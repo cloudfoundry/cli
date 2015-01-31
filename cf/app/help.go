@@ -343,6 +343,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentCommand("add-plugin-repo"),
+					presentCommand("repo-plugins"),
 				},
 			},
 		}, {
