@@ -3920,8 +3920,8 @@
       "modified": false
    },
    {
-      "id": "Status: {{.Status}}",
-      "translation": "Status: {{.Status}}",
+      "id": "State: {{.State}}",
+      "translation": "State: {{.State}}",
       "modified": false
    },
    {
@@ -4910,11 +4910,6 @@
       "modified": false
    },
    {
-      "id": "state",
-      "translation": "estado",
-      "modified": false
-   },
-   {
       "id": "status",
       "translation": "estado",
       "modified": false
@@ -5107,6 +5102,26 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instancias",
+      "modified": false
+   },
+   {
+      "id": "details",
+      "translation": "details",
+      "modified": false
+   },
+   {
+      "id": "Last Operation",
+      "translation": "Last Operation",
+      "modified": false
+   },
+   {
+      "id": "last operation",
+      "translation": "last operation",
+      "modified": false
+   },
+   {
+      "id": "state",
+      "translation": "estado",
       "modified": false
    }
 ]

@@ -77,9 +77,11 @@ func (cmd *ShowService) Run(c *cli.Context) {
 				map[string]interface{}{
 					"URL": terminal.EntityNameColor(serviceInstance.DashboardUrl),
 				}))
-			cmd.ui.Say(T("Status: {{.Status}}",
+			cmd.ui.Say("")
+			cmd.ui.Say(T("Last Operation"))
+			cmd.ui.Say(T("State: {{.State}}",
 				map[string]interface{}{
-					"Status": terminal.EntityNameColor(ServiceInstanceStateToStatus(serviceInstance.LastOperation.Type, serviceInstance.LastOperation.State, serviceInstance.IsUserProvided())),
+					"State": terminal.EntityNameColor(ServiceInstanceStateToStatus(serviceInstance.LastOperation.Type, serviceInstance.LastOperation.State, serviceInstance.IsUserProvided())),
 				}))
 			cmd.ui.Say(T("Message: {{.Message}}",
 				map[string]interface{}{

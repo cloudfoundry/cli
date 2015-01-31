@@ -88,7 +88,8 @@ var _ = Describe("service command", func() {
 					[]string{"Description: ", "the-description"},
 					[]string{"Documentation url: ", "http://documentation.url"},
 					[]string{"Dashboard: ", "some-url"},
-					[]string{"Status: ", "create in progress"},
+					[]string{"Last Operation"},
+					[]string{"State: ", "create in progress"},
 					[]string{"Message: ", "creating resource - step 1"},
 				))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
@@ -100,7 +101,7 @@ var _ = Describe("service command", func() {
 					runCommand("service1")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Status: ", "create in progress"},
+						[]string{"State: ", "create in progress"},
 					))
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
@@ -110,7 +111,7 @@ var _ = Describe("service command", func() {
 					runCommand("service1")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Status: ", "create succeeded"},
+						[]string{"State: ", "create succeeded"},
 					))
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
@@ -120,7 +121,7 @@ var _ = Describe("service command", func() {
 					runCommand("service1")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Status: ", "create failed"},
+						[]string{"State: ", "create failed"},
 					))
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
@@ -130,7 +131,7 @@ var _ = Describe("service command", func() {
 					runCommand("service1")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Status: ", "create succeeded"},
+						[]string{"State: ", "create succeeded"},
 					))
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
