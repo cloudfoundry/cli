@@ -180,6 +180,11 @@
       "modified": false
    },
    {
+      "id": " does not exist as a repo",
+      "translation": " does not exist as a repo",
+      "modified": false
+   },
+   {
       "id": " is already started",
       "translation": " Ya ha comenzado",
       "modified": false
@@ -207,6 +212,11 @@
    {
       "id": " not found",
       "translation": " no encontrado",
+      "modified": false
+   },
+   {
+      "id": " removed from list of repositories",
+      "translation": " removed from list of repositories",
       "modified": false
    },
    {
@@ -837,6 +847,11 @@
    {
       "id": "CF_NAME quotas",
       "translation": "CF_NAME cuotas",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME remove-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n",
+      "translation": "CF_NAME remove-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n",
       "modified": false
    },
    {
@@ -3287,6 +3302,11 @@
    {
       "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
       "translation": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
+      "modified": false
+   },
+   {
+      "id": "Remove a plugin repository",
+      "translation": "Remove a plugin repository",
       "modified": false
    },
    {

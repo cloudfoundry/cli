@@ -81,6 +81,7 @@ type ReadWriter interface {
 	SetColorEnabled(string)
 	SetLocale(string)
 	SetPluginRepo(models.PluginRepo)
+	UnSetPluginRepo(int)
 }
 
 type Repository interface {
@@ -390,5 +391,11 @@ func (c *ConfigRepository) SetLocale(locale string) {
 func (c *ConfigRepository) SetPluginRepo(repo models.PluginRepo) {
 	c.write(func() {
 		c.data.PluginRepos = append(c.data.PluginRepos, repo)
+	})
+}
+
+func (c *ConfigRepository) UnSetPluginRepo(index int) {
+	c.write(func() {
+		c.data.PluginRepos = append(c.data.PluginRepos[:index], c.data.PluginRepos[index+1:]...)
 	})
 }

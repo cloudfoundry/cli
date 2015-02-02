@@ -294,6 +294,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, pluginConfig)
 
 	factory.cmdsByName["add-plugin-repo"] = plugin_repo.NewAddPluginRepo(ui, config)
+	factory.cmdsByName["remove-plugin-repo"] = plugin_repo.NewRemovePluginRepo(ui, config)
 	factory.cmdsByName["repo-plugins"] = plugin_repo.NewRepoPlugins(ui, config)
 
 	factory.cmdsByName["copy-source"] = application.NewCopySource(
