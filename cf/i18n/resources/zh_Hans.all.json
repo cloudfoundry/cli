@@ -2275,6 +2275,11 @@
       "modified": false
    },
    {
+      "id": "Getting plugins from repositories '",
+      "translation": "Getting plugins from repositories '",
+      "modified": false
+   },
+   {
       "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
       "translation": "Getting quota {{.QuotaName}} info as {{.Username}}...",
       "modified": false
@@ -3417,6 +3422,11 @@
    {
       "id": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
       "translation": "重命名空间:用户{{.CurrentUser}}在组织{{.OrgName}}中将{{.OldSpaceName}}重命名为{{.NewSpaceName}}...",
+      "modified": false
+   },
+   {
+      "id": "Repo Name - List plugins from just this repository",
+      "translation": "Repo Name - List plugins from just this repository",
       "modified": false
    },
    {
