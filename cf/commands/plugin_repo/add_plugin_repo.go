@@ -98,7 +98,7 @@ func (cmd AddPluginRepo) Run(c *cli.Context) {
 func (cmd AddPluginRepo) checkIfRepoExists(repoName, repoUrl string) {
 	repos := cmd.config.PluginRepos()
 	for _, repo := range repos {
-		if repo.Name == repoName {
+		if strings.ToLower(repo.Name) == strings.ToLower(repoName) {
 			cmd.ui.Failed(T(`Plugin repo named "{{.repoName}}" already exists, please use another name.`, map[string]interface{}{"repoName": repoName}))
 		} else if repo.Url == repoUrl {
 			cmd.ui.Failed(repo.Url + ` (` + repo.Name + T(`) already exists.`))
