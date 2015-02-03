@@ -9,6 +9,8 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/flag_helpers"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -39,6 +41,9 @@ func (cmd RepoPlugins) Metadata() command_metadata.CommandMetadata {
 EXAMPLE:
    cf repo-plugins
 `),
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("r", T("Repo Name - List plugins from just this repository")),
+		},
 	}
 }
 
@@ -47,13 +52,26 @@ func (cmd RepoPlugins) GetRequirements(_ requirements.Factory, c *cli.Context) (
 }
 
 func (cmd RepoPlugins) Run(c *cli.Context) {
+	var repos []models.PluginRepo
+	repoName := c.String("r")
 	repoError := []string{}
 	var pluginList clipr.PluginsJson
 	repoPlugins := make(map[string][]clipr.Plugin)
 
-	repos := cmd.config.PluginRepos()
+	repos = cmd.config.PluginRepos()
 
-	cmd.ui.Say(T("Getting plugins from all repositories ... "))
+	if repoName == "" {
+		cmd.ui.Say(T("Getting plugins from all repositories ... "))
+	} else {
+		index := cmd.findRepoIndex(repoName)
+		if index != -1 {
+			cmd.ui.Say(T("Getting plugins from repositories '") + repoName + "' ...")
+			repos = []models.PluginRepo{repos[index]}
+		} else {
+			cmd.ui.Failed(repoName + T(" does not exist as an available plugin repo."+"\nTip: use `add-plugin-repo` command to add repos."))
+		}
+	}
+
 	cmd.ui.Say("")
 	for _, repo := range repos {
 		resp, err := http.Get(getListEndpoint(repo.Url))
@@ -115,4 +133,14 @@ func getListEndpoint(url string) string {
 		return url + "list"
 	}
 	return url + "/list"
+}
+
+func (cmd RepoPlugins) findRepoIndex(repoName string) int {
+	repos := cmd.config.PluginRepos()
+	for i, repo := range repos {
+		if strings.ToLower(repo.Name) == strings.ToLower(repoName) {
+			return i
+		}
+	}
+	return -1
 }

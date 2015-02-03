@@ -35,62 +35,122 @@ var _ = Describe("repo-plugins", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 
-	var callRepoPlugins = func() bool {
+	var callRepoPlugins = func(args ...string) bool {
 		cmd := NewRepoPlugins(ui, config)
-		return testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
-	Context("request data from repos", func() {
-		var (
-			testServer1CallCount int
-			testServer2CallCount int
-		)
+	Context("If repo name is provided by '-r'", func() {
+		Context("request data from named repos", func() {
+			var (
+				testServer1CallCount int
+				testServer2CallCount int
+			)
 
-		BeforeEach(func() {
-			testServer1CallCount = 0
-			h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				testServer1CallCount++
-				fmt.Fprintln(w, `{"plugins":[]}`)
-			})
-			testServer1 = httptest.NewServer(h1)
+			BeforeEach(func() {
+				testServer1CallCount = 0
+				h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					testServer1CallCount++
+					fmt.Fprintln(w, `{"plugins":[]}`)
+				})
+				testServer1 = httptest.NewServer(h1)
 
-			testServer2CallCount = 0
-			h2 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				testServer2CallCount++
-				fmt.Fprintln(w, `{"plugins":[]}`)
-			})
-			testServer2 = httptest.NewServer(h2)
+				testServer2CallCount = 0
+				h2 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					testServer2CallCount++
+					fmt.Fprintln(w, `{"plugins":[]}`)
+				})
+				testServer2 = httptest.NewServer(h2)
 
-			config.SetPluginRepo(models.PluginRepo{
-				Name: "repo1",
-				Url:  testServer1.URL,
+				config.SetPluginRepo(models.PluginRepo{
+					Name: "repo1",
+					Url:  testServer1.URL,
+				})
+
+				config.SetPluginRepo(models.PluginRepo{
+					Name: "repo2",
+					Url:  testServer2.URL,
+				})
 			})
 
-			config.SetPluginRepo(models.PluginRepo{
-				Name: "repo2",
-				Url:  testServer2.URL,
+			AfterEach(func() {
+				testServer1.Close()
+				testServer2.Close()
 			})
+
+			It("make query to just the repo named", func() {
+				callRepoPlugins("-r", "repo2")
+
+				Ω(testServer1CallCount).To(Equal(0))
+				Ω(testServer2CallCount).To(Equal(1))
+			})
+
+			It("informs user if requested repo is not found", func() {
+				callRepoPlugins("-r", "repo_not_there")
+
+				Ω(testServer1CallCount).To(Equal(0))
+				Ω(testServer2CallCount).To(Equal(0))
+				Ω(ui.Outputs).To(ContainSubstrings([]string{"repo_not_there", "does not exist as an available plugin repo"}))
+				Ω(ui.Outputs).To(ContainSubstrings([]string{"Tip: use `add-plugin-repo` command to add repos."}))
+			})
+
 		})
+	})
 
-		AfterEach(func() {
-			testServer1.Close()
-			testServer2.Close()
-		})
+	Context("If no repo name is provided", func() {
+		Context("request data from all repos", func() {
+			var (
+				testServer1CallCount int
+				testServer2CallCount int
+			)
 
-		It("make query to all repos listed in config.json", func() {
-			callRepoPlugins()
+			BeforeEach(func() {
+				testServer1CallCount = 0
+				h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					testServer1CallCount++
+					fmt.Fprintln(w, `{"plugins":[]}`)
+				})
+				testServer1 = httptest.NewServer(h1)
 
-			Ω(testServer1CallCount).To(Equal(1))
-			Ω(testServer2CallCount).To(Equal(1))
-		})
+				testServer2CallCount = 0
+				h2 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					testServer2CallCount++
+					fmt.Fprintln(w, `{"plugins":[]}`)
+				})
+				testServer2 = httptest.NewServer(h2)
 
-		It("lists each of the repos in config.json", func() {
-			callRepoPlugins()
+				config.SetPluginRepo(models.PluginRepo{
+					Name: "repo1",
+					Url:  testServer1.URL,
+				})
 
-			Ω(ui.Outputs).To(ContainSubstrings(
-				[]string{"repo1"},
-				[]string{"repo2"},
-			))
+				config.SetPluginRepo(models.PluginRepo{
+					Name: "repo2",
+					Url:  testServer2.URL,
+				})
+			})
+
+			AfterEach(func() {
+				testServer1.Close()
+				testServer2.Close()
+			})
+
+			It("make query to all repos listed in config.json", func() {
+				callRepoPlugins()
+
+				Ω(testServer1CallCount).To(Equal(1))
+				Ω(testServer2CallCount).To(Equal(1))
+			})
+
+			It("lists each of the repos in config.json", func() {
+				callRepoPlugins()
+
+				Ω(ui.Outputs).To(ContainSubstrings(
+					[]string{"repo1"},
+					[]string{"repo2"},
+				))
+			})
+
 		})
 
 	})
