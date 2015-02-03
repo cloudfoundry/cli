@@ -79,7 +79,7 @@ func (cmd *ShowService) Run(c *cli.Context) {
 				}))
 			cmd.ui.Say("")
 			cmd.ui.Say(T("Last Operation"))
-			cmd.ui.Say(T("State: {{.State}}",
+			cmd.ui.Say(T("Status: {{.State}}",
 				map[string]interface{}{
 					"State": terminal.EntityNameColor(ServiceInstanceStateToStatus(serviceInstance.LastOperation.Type, serviceInstance.LastOperation.State, serviceInstance.IsUserProvided())),
 				}))
