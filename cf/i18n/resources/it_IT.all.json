@@ -3920,8 +3920,8 @@
       "modified": false
    },
    {
-      "id": "State: {{.State}}",
-      "translation": "State: {{.State}}",
+      "id": "Status: {{.State}}",
+      "translation": "Status: {{.State}}",
       "modified": false
    },
    {
