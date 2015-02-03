@@ -431,6 +431,62 @@ var _ = Describe("start command", func() {
 			})
 		})
 
+		Context("when an app instance is starting", func() {
+			It("reports any additional details", func() {
+				displayApp := &testcmd.FakeAppDisplayer{}
+				appInstance := models.AppInstanceFields{
+					State: models.InstanceStarting,
+				}
+				appInstance2 := models.AppInstanceFields{
+					State: models.InstanceStarting,
+				}
+
+				appInstance3 := models.AppInstanceFields{
+					State: models.InstanceDown,
+				}
+				appInstance4 := models.AppInstanceFields{
+					State:   models.InstanceStarting,
+					Details: "no compatible cell",
+				}
+
+				appInstance5 := models.AppInstanceFields{
+					State:   models.InstanceStarting,
+					Details: "insufficient resources",
+				}
+				appInstance6 := models.AppInstanceFields{
+					State:   models.InstanceStarting,
+					Details: "no compatible cell",
+				}
+
+				appInstance7 := models.AppInstanceFields{
+					State: models.InstanceRunning,
+				}
+				appInstance8 := models.AppInstanceFields{
+					State: models.InstanceRunning,
+				}
+
+				defaultInstanceResponses = [][]models.AppInstanceFields{
+					[]models.AppInstanceFields{appInstance, appInstance2},
+					[]models.AppInstanceFields{appInstance3, appInstance4},
+					[]models.AppInstanceFields{appInstance5, appInstance6},
+					[]models.AppInstanceFields{appInstance7, appInstance8},
+				}
+
+				defaultInstanceErrorCodes = []string{"", ""}
+
+				ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"my-app"},
+					[]string{"0 of 2 instances running", "2 starting"},
+					[]string{"0 of 2 instances running", "1 starting (no compatible cell)", "1 down"},
+					[]string{"0 of 2 instances running", "2 starting (insufficient resources, no compatible cell)"},
+					[]string{"2 of 2 instances running"},
+					[]string{"App started"},
+				))
+			})
+		})
+
 		It("tells the user about the failure when waiting for the app to start times out", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appInstance := models.AppInstanceFields{}

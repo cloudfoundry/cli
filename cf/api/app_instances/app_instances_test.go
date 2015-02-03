@@ -36,6 +36,7 @@ var _ = Describe("AppInstancesRepo", func() {
 
 			Expect(instances[0].State).To(Equal(models.InstanceRunning))
 			Expect(instances[1].State).To(Equal(models.InstanceStarting))
+			Expect(instances[1].Details).To(Equal("insufficient resources"))
 
 			instance0 := instances[0]
 			Expect(instance0.Since).To(Equal(time.Unix(1379522342, 0)))
@@ -111,6 +112,7 @@ var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequ
 {
   "1": {
     "state": "STARTING",
+    "details": "insufficient resources",
     "since": 1379522342.6783738
   },
   "0": {

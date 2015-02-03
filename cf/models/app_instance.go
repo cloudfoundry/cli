@@ -14,6 +14,7 @@ const (
 
 type AppInstanceFields struct {
 	State     InstanceState
+	Details   string
 	Since     time.Time
 	CpuUsage  float64 // percentage
 	DiskQuota int64   // in bytes
