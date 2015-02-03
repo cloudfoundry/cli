@@ -5010,8 +5010,18 @@
       "modified": false
    },
    {
+      "id": "{{.StartingCount}} starting ({{.Details}})",
+      "translation": "{{.StartingCount}} starting ({{.Details}})",
+      "modified": false
+   },
+   {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instâncias",
+      "modified": false
+   },
+   {
+      "id": "details",
+      "translation": "details",
       "modified": false
    }
 ]

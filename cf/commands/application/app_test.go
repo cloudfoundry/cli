@@ -79,8 +79,9 @@ var _ = Describe("app Command", func() {
 			}
 
 			appInstance2 := models.AppInstanceFields{
-				State: models.InstanceDown,
-				Since: testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012"),
+				State:   models.InstanceDown,
+				Details: "failure",
+				Since:   testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012"),
 			}
 
 			instances := []models.AppInstanceFields{appInstance, appInstance2}
@@ -103,7 +104,7 @@ var _ = Describe("app Command", func() {
 				[]string{"urls", "my-app.example.com", "foo.example.com"},
 				[]string{"last uploaded", "Wed Oct 24 19:54:00 UTC 2012"},
 				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
-				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
+				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0", "failure"},
 			))
 		})
 

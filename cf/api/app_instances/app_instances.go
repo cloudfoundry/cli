@@ -14,8 +14,9 @@ import (
 type InstancesApiResponse map[string]InstanceApiResponse
 
 type InstanceApiResponse struct {
-	State string
-	Since float64
+	State   string
+	Since   float64
+	Details string
 }
 
 type StatsApiResponse map[string]InstanceStatsApiResponse
@@ -65,8 +66,9 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 		}
 
 		instances[index] = models.AppInstanceFields{
-			State: models.InstanceState(strings.ToLower(v.State)),
-			Since: time.Unix(int64(v.Since), 0),
+			State:   models.InstanceState(strings.ToLower(v.State)),
+			Details: v.Details,
+			Since:   time.Unix(int64(v.Since), 0),
 		}
 	}
 
