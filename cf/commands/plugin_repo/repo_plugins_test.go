@@ -1,20 +1,19 @@
 package plugin_repo_test
 
 import (
-	"fmt"
-	"net/http"
-	"net/http/httptest"
-
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	. "github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
+	fakes "github.com/cloudfoundry/cli/cf/actors/plugin_repo/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
+	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -25,243 +24,93 @@ var _ = Describe("repo-plugins", func() {
 		ui                  *testterm.FakeUI
 		config              core_config.ReadWriter
 		requirementsFactory *testreq.FakeReqFactory
-		testServer1         *httptest.Server
-		testServer2         *httptest.Server
+		fakePluginRepo      *fakes.FakePluginRepo
 	)
 
 	BeforeEach(func() {
+		fakePluginRepo = &fakes.FakePluginRepo{}
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		config = testconfig.NewRepositoryWithDefaults()
+
+		config.SetPluginRepo(models.PluginRepo{
+			Name: "repo1",
+			Url:  "",
+		})
+
+		config.SetPluginRepo(models.PluginRepo{
+			Name: "repo2",
+			Url:  "",
+		})
 	})
 
 	var callRepoPlugins = func(args ...string) bool {
-		cmd := NewRepoPlugins(ui, config)
+		cmd := NewRepoPlugins(ui, config, fakePluginRepo)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
 	Context("If repo name is provided by '-r'", func() {
-		Context("request data from named repos", func() {
-			var (
-				testServer1CallCount int
-				testServer2CallCount int
-			)
+		It("list plugins from just the named repo", func() {
+			callRepoPlugins("-r", "repo2")
 
-			BeforeEach(func() {
-				testServer1CallCount = 0
-				h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					testServer1CallCount++
-					fmt.Fprintln(w, `{"plugins":[]}`)
-				})
-				testServer1 = httptest.NewServer(h1)
+			Ω(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("repo2"))
+			Ω(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(1))
 
-				testServer2CallCount = 0
-				h2 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					testServer2CallCount++
-					fmt.Fprintln(w, `{"plugins":[]}`)
-				})
-				testServer2 = httptest.NewServer(h2)
-
-				config.SetPluginRepo(models.PluginRepo{
-					Name: "repo1",
-					Url:  testServer1.URL,
-				})
-
-				config.SetPluginRepo(models.PluginRepo{
-					Name: "repo2",
-					Url:  testServer2.URL,
-				})
-			})
-
-			AfterEach(func() {
-				testServer1.Close()
-				testServer2.Close()
-			})
-
-			It("make query to just the repo named", func() {
-				callRepoPlugins("-r", "repo2")
-
-				Ω(testServer1CallCount).To(Equal(0))
-				Ω(testServer2CallCount).To(Equal(1))
-			})
-
-			It("informs user if requested repo is not found", func() {
-				callRepoPlugins("-r", "repo_not_there")
-
-				Ω(testServer1CallCount).To(Equal(0))
-				Ω(testServer2CallCount).To(Equal(0))
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"repo_not_there", "does not exist as an available plugin repo"}))
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"Tip: use `add-plugin-repo` command to add repos."}))
-			})
-
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"Getting plugins from repository 'repo2'"}))
 		})
 	})
 
 	Context("If no repo name is provided", func() {
-		Context("request data from all repos", func() {
-			var (
-				testServer1CallCount int
-				testServer2CallCount int
-			)
+		It("list plugins from just the named repo", func() {
+			callRepoPlugins()
 
-			BeforeEach(func() {
-				testServer1CallCount = 0
-				h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					testServer1CallCount++
-					fmt.Fprintln(w, `{"plugins":[]}`)
-				})
-				testServer1 = httptest.NewServer(h1)
+			Ω(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("repo1"))
+			Ω(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(2))
+			Ω(fakePluginRepo.GetPluginsArgsForCall(0)[1].Name).To(Equal("repo2"))
 
-				testServer2CallCount = 0
-				h2 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					testServer2CallCount++
-					fmt.Fprintln(w, `{"plugins":[]}`)
-				})
-				testServer2 = httptest.NewServer(h2)
-
-				config.SetPluginRepo(models.PluginRepo{
-					Name: "repo1",
-					Url:  testServer1.URL,
-				})
-
-				config.SetPluginRepo(models.PluginRepo{
-					Name: "repo2",
-					Url:  testServer2.URL,
-				})
-			})
-
-			AfterEach(func() {
-				testServer1.Close()
-				testServer2.Close()
-			})
-
-			It("make query to all repos listed in config.json", func() {
-				callRepoPlugins()
-
-				Ω(testServer1CallCount).To(Equal(1))
-				Ω(testServer2CallCount).To(Equal(1))
-			})
-
-			It("lists each of the repos in config.json", func() {
-				callRepoPlugins()
-
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"repo1"},
-					[]string{"repo2"},
-				))
-			})
-
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"Getting plugins from all repositories"}))
 		})
-
 	})
 
-	Context("Getting data from repos", func() {
-		Context("When data is valid", func() {
-			BeforeEach(func() {
-				h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					fmt.Fprintln(w, `{"plugins":[
-						{
-							"name":"plugin1",
-							"description":"none",
-							"version":"4",
-							"binaries":[
-								{
-									"platform":"osx",
-									"url":"https://github.com/simonleung8/cli-plugin-echo/raw/master/bin/osx/echo",
-									"checksum":"2a087d5cddcfb057fbda91e611c33f46"
-								}
-							]
-						},
-						{
-							"name":"plugin2",
-							"binaries":[
-								{
-									"platform":"windows",
-									"url":"http://going.no.where",
-									"checksum":"abcdefg"
-								}
-							]
-						}]
-					}`)
-				})
-				testServer1 = httptest.NewServer(h1)
+	Context("when GetPlugins returns a list of plugin meta data", func() {
+		It("lists all plugin data", func() {
+			result := make(map[string][]clipr.Plugin)
+			result["repo1"] = []clipr.Plugin{
+				clipr.Plugin{
+					Name:        "plugin1",
+					Description: "none1",
+				},
+			}
+			result["repo2"] = []clipr.Plugin{
+				clipr.Plugin{
+					Name:        "plugin2",
+					Description: "none2",
+				},
+			}
+			fakePluginRepo.GetPluginsReturns(result, []string{})
 
-				config.SetPluginRepo(models.PluginRepo{
-					Name: "repo1",
-					Url:  testServer1.URL,
-				})
-			})
+			callRepoPlugins()
 
-			AfterEach(func() {
-				testServer1.Close()
-			})
-
-			It("lists the info for each plugin", func() {
-				callRepoPlugins()
-
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"repo1"},
-					[]string{"plugin1", "4", "none"},
-					[]string{"plugin2"},
-				))
-			})
-
+			Ω(ui.Outputs).ToNot(ContainSubstrings([]string{"Logged errors:"}))
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"repo1"}))
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"plugin1"}))
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"repo2"}))
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"plugin2"}))
 		})
+	})
 
-		Context("When data is invalid", func() {
-			Context("json is invalid", func() {
-				BeforeEach(func() {
-					h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						fmt.Fprintln(w, `"plugins":[]}`)
-					})
-					testServer1 = httptest.NewServer(h1)
-
-					config.SetPluginRepo(models.PluginRepo{
-						Name: "repo1",
-						Url:  testServer1.URL,
-					})
-				})
-
-				AfterEach(func() {
-					testServer1.Close()
-				})
-
-				It("informs user of invalid json", func() {
-					callRepoPlugins()
-
-					Ω(ui.Outputs).To(ContainSubstrings(
-						[]string{"Invalid json data"},
-					))
-				})
-
+	Context("If errors are reported back from GetPlugins()", func() {
+		It("informs user about the errors", func() {
+			fakePluginRepo.GetPluginsReturns(nil, []string{
+				"error from repo1",
+				"error from repo2",
 			})
 
-			Context("when data is valid json, but not valid plugin repo data", func() {
-				BeforeEach(func() {
-					h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						fmt.Fprintln(w, `{"bad_plugin_tag":[]}`)
-					})
-					testServer1 = httptest.NewServer(h1)
+			callRepoPlugins()
 
-					config.SetPluginRepo(models.PluginRepo{
-						Name: "repo1",
-						Url:  testServer1.URL,
-					})
-				})
-
-				AfterEach(func() {
-					testServer1.Close()
-				})
-
-				It("informs user of invalid repo data", func() {
-					callRepoPlugins()
-
-					Ω(ui.Outputs).To(ContainSubstrings(
-						[]string{"Invalid data", "plugin data does not exist"},
-					))
-				})
-
-			})
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"Logged errors:"}))
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"error from repo1"}))
+			Ω(ui.Outputs).To(ContainSubstrings([]string{"error from repo2"}))
 		})
 	})
 

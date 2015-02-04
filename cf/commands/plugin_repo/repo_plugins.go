@@ -1,12 +1,9 @@
 package plugin_repo
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -21,14 +18,16 @@ import (
 )
 
 type RepoPlugins struct {
-	ui     terminal.UI
-	config core_config.Reader
+	ui         terminal.UI
+	config     core_config.Reader
+	pluginRepo plugin_repo.PluginRepo
 }
 
-func NewRepoPlugins(ui terminal.UI, config core_config.Reader) RepoPlugins {
+func NewRepoPlugins(ui terminal.UI, config core_config.Reader, pluginRepo plugin_repo.PluginRepo) RepoPlugins {
 	return RepoPlugins{
-		ui:     ui,
-		config: config,
+		ui:         ui,
+		config:     config,
+		pluginRepo: pluginRepo,
 	}
 }
 
@@ -54,9 +53,6 @@ func (cmd RepoPlugins) GetRequirements(_ requirements.Factory, c *cli.Context) (
 func (cmd RepoPlugins) Run(c *cli.Context) {
 	var repos []models.PluginRepo
 	repoName := c.String("r")
-	repoError := []string{}
-	var pluginList clipr.PluginsJson
-	repoPlugins := make(map[string][]clipr.Plugin)
 
 	repos = cmd.config.PluginRepos()
 
@@ -65,7 +61,7 @@ func (cmd RepoPlugins) Run(c *cli.Context) {
 	} else {
 		index := cmd.findRepoIndex(repoName)
 		if index != -1 {
-			cmd.ui.Say(T("Getting plugins from repositories '") + repoName + "' ...")
+			cmd.ui.Say(T("Getting plugins from repository '") + repoName + "' ...")
 			repos = []models.PluginRepo{repos[index]}
 		} else {
 			cmd.ui.Failed(repoName + T(" does not exist as an available plugin repo."+"\nTip: use `add-plugin-repo` command to add repos."))
@@ -73,33 +69,8 @@ func (cmd RepoPlugins) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Say("")
-	for _, repo := range repos {
-		resp, err := http.Get(getListEndpoint(repo.Url))
-		if err != nil {
-			repoError = append(repoError, fmt.Sprintf(T("Error requesting from")+" '%s' - %s", repo.Name, err.Error()))
-			continue
-		} else {
-			defer resp.Body.Close()
 
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				repoError = append(repoError, fmt.Sprintf(T("Error reading response from")+" '%s' - %s ", repo.Name, err.Error()))
-				continue
-			}
-
-			pluginList = clipr.PluginsJson{Plugins: nil}
-			err = json.Unmarshal(body, &pluginList)
-			if err != nil {
-				repoError = append(repoError, fmt.Sprintf(T("Invalid json data from")+" '%s' - %s", repo.Name, err.Error()))
-				continue
-			} else if pluginList.Plugins == nil {
-				repoError = append(repoError, T("Invalid data from '{{.repoName}}' - plugin data does not exist", map[string]interface{}{"repoName": repo.Name}))
-				continue
-			}
-		}
-
-		repoPlugins[repo.Name] = pluginList.Plugins
-	}
+	repoPlugins, repoError := cmd.pluginRepo.GetPlugins(repos)
 
 	cmd.printTable(repoPlugins)
 

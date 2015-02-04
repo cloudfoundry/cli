@@ -2275,8 +2275,8 @@
       "modified": false
    },
    {
-      "id": "Getting plugins from repositories '",
-      "translation": "Getting plugins from repositories '",
+      "id": "Getting plugins from repository '",
+      "translation": "Getting plugins from repository '",
       "modified": false
    },
    {
@@ -4727,6 +4727,11 @@
    {
       "id": "quota:",
       "translation": "quota:",
+      "modified": false
+   },
+   {
+      "id": "repo name where the plugin binary is located",
+      "translation": "repo name where the plugin binary is located",
       "modified": false
    },
    {
