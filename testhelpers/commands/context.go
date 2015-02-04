@@ -37,8 +37,8 @@ func NewContext(cmdName string, args []string) *cli.Context {
 			}
 		}
 		if firstFlagIndex > 0 {
-			args := args[0:firstFlagIndex]
 			flags := args[firstFlagIndex:]
+			args := args[0:firstFlagIndex]
 			flagSet.Parse(append(flags, args...))
 		} else {
 			flagSet.Parse(args[0:])
