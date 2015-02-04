@@ -2275,9 +2275,9 @@
       "modified": false
    },
    {
-      "id": "Getting plugins from repositories '",
+      "id": "Getting plugins from repository '",
       "translation": "Getting plugins from repositories '",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
@@ -4728,6 +4728,11 @@
       "id": "quota:",
       "translation": "配额:",
       "modified": true
+   },
+   {
+      "id": "repo name where the plugin binary is located",
+      "translation": "repo name where the plugin binary is located",
+      "modified": false
    },
    {
       "id": "repo-plugins",

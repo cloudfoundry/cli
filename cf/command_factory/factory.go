@@ -3,6 +3,8 @@ package command_factory
 import (
 	"errors"
 
+	actor_plugin_repo "github.com/cloudfoundry/cli/cf/actors/plugin_repo"
+
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -295,7 +297,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 
 	factory.cmdsByName["add-plugin-repo"] = plugin_repo.NewAddPluginRepo(ui, config)
 	factory.cmdsByName["remove-plugin-repo"] = plugin_repo.NewRemovePluginRepo(ui, config)
-	factory.cmdsByName["repo-plugins"] = plugin_repo.NewRepoPlugins(ui, config)
+	factory.cmdsByName["repo-plugins"] = plugin_repo.NewRepoPlugins(ui, config, actor_plugin_repo.NewPluginRepo())
 
 	factory.cmdsByName["copy-source"] = application.NewCopySource(
 		ui,
