@@ -235,6 +235,9 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 }
 
 func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
+	r := strings.NewReplacer("https://", "", "http://", "", "ftp://", "", "ftps://", "")
+	pluginSourceFilepath = r.Replace(pluginSourceFilepath)
+
 	_, err := os.Stat(pluginSourceFilepath)
 	if err != nil && os.IsNotExist(err) {
 		return false
