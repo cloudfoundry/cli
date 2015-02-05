@@ -2,8 +2,8 @@
 package fakes
 
 import (
-	"sync"
 	"github.com/cloudfoundry-incubator/cli-plugin-repo/models"
+	"sync"
 )
 
 type FakePluginModel struct {
