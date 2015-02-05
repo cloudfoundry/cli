@@ -1,34 +1,47 @@
 package plugin
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
 
+	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/fileutils"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/codegangsta/cli"
+
+	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 )
 
 type PluginInstall struct {
-	ui       terminal.UI
-	config   plugin_config.PluginConfiguration
-	coreCmds map[string]command.Command
+	ui           terminal.UI
+	config       core_config.Reader
+	pluginConfig plugin_config.PluginConfiguration
+	coreCmds     map[string]command.Command
+	pluginRepo   plugin_repo.PluginRepo
 }
 
-func NewPluginInstall(ui terminal.UI, config plugin_config.PluginConfiguration, coreCmds map[string]command.Command) *PluginInstall {
+func NewPluginInstall(ui terminal.UI, config core_config.Reader, pluginConfig plugin_config.PluginConfiguration, coreCmds map[string]command.Command, pluginRepo plugin_repo.PluginRepo) *PluginInstall {
 	return &PluginInstall{
-		ui:       ui,
-		config:   config,
-		coreCmds: coreCmds,
+		ui:           ui,
+		config:       config,
+		pluginConfig: pluginConfig,
+		coreCmds:     coreCmds,
+		pluginRepo:   pluginRepo,
 	}
 }
 
@@ -36,12 +49,19 @@ func (cmd *PluginInstall) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "install-plugin",
 		Description: T("Install the plugin defined in command argument"),
-		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN
+		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]
+
+The command will download the plugin binary from repository if '-r' is provided
 
 EXAMPLE:
    cf install-plugin https://github.com/cf-experimental/plugin-foobar
    cf install-plugin ~/Downloads/plugin-foobar
+   cf install-plugin plugin-echo -r My-Repo 
 `),
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("r", T("repo name where the plugin binary is located")),
+		},
+		TotalArgs: 1,
 	}
 }
 
@@ -54,25 +74,55 @@ func (cmd *PluginInstall) GetRequirements(_ requirements.Factory, c *cli.Context
 }
 
 func (cmd *PluginInstall) Run(c *cli.Context) {
-	var downloader fileutils.Downloader
+	downloader := fileutils.NewDownloader(os.TempDir())
 
 	pluginSourceFilepath := c.Args()[0]
 
-	if filepath.Dir(pluginSourceFilepath) == "." {
-		pluginSourceFilepath = "./" + filepath.Clean(pluginSourceFilepath)
+	repoName := c.String("r")
+
+	if repoName != "" {
+		targetPluginName := strings.ToLower(c.Args()[0])
+
+		cmd.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": pluginSourceFilepath, "repoName": repoName}))
+
+		repoModel, err := cmd.getRepoFromConfig(repoName)
+		if err != nil {
+			cmd.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
+		}
+
+		pluginList, repoAry := cmd.pluginRepo.GetPlugins([]models.PluginRepo{repoModel})
+		if len(repoAry) != 0 {
+			cmd.ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
+		}
+
+		found := false
+		for _, plugin := range pluginList[repoName] {
+			if strings.ToLower(plugin.Name) == targetPluginName {
+				found = true
+				pluginSourceFilepath = cmd.downloadBinary(plugin, downloader)
+			}
+		}
+		if !found {
+			cmd.ui.Failed(pluginSourceFilepath + " is not available in repo '" + repoName + "'")
+		}
+	} else {
+		if filepath.Dir(pluginSourceFilepath) == "." {
+			pluginSourceFilepath = "./" + filepath.Clean(pluginSourceFilepath)
+		}
+
+		if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
+			cmd.ui.Say("")
+			cmd.ui.Say(T("File not found locally, attempting to download binary file from internet ..."))
+			pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
+		}
+
 	}
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
 
-	if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
-		cmd.ui.Say("")
-		cmd.ui.Say(T("File not found locally, attempting to download binary file from internet ..."))
-		pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
-	}
-
 	_, pluginExecutableName := filepath.Split(pluginSourceFilepath)
 
-	pluginDestinationFilepath := filepath.Join(cmd.config.GetPluginPath(), pluginExecutableName)
+	pluginDestinationFilepath := filepath.Join(cmd.pluginConfig.GetPluginPath(), pluginExecutableName)
 
 	cmd.ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName)
 
@@ -82,11 +132,9 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 
 	cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
 
-	if downloader != nil {
-		err := downloader.RemoveFile()
-		if err != nil {
-			cmd.ui.Say(T("Problem removing downloaded binary in temp directory: ") + err.Error())
-		}
+	err := downloader.RemoveFile()
+	if err != nil {
+		cmd.ui.Say(T("Problem removing downloaded binary in temp directory: ") + err.Error())
 	}
 
 	cmd.ui.Ok()
@@ -106,7 +154,7 @@ func (cmd *PluginInstall) ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(
 }
 
 func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath string, pluginSourceFilepath string) {
-	plugins := cmd.config.Plugins()
+	plugins := cmd.pluginConfig.Plugins()
 	if pluginMetadata.Name == "" {
 		cmd.ui.Failed(fmt.Sprintf(T("Unable to obtain plugin name for executable {{.Executable}}", map[string]interface{}{"Executable": pluginSourceFilepath})))
 	}
@@ -166,7 +214,7 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, p
 		Commands: pluginMetadata.Commands,
 	}
 
-	cmd.config.SetPlugin(pluginMetadata.Name, configMetadata)
+	cmd.pluginConfig.SetPlugin(pluginMetadata.Name, configMetadata)
 }
 
 func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) *plugin.PluginMetadata {
@@ -195,9 +243,6 @@ func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSou
 }
 
 func (cmd *PluginInstall) tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath string, downloader fileutils.Downloader) string {
-
-	savePath := os.TempDir()
-	downloader = fileutils.NewDownloader(savePath)
 	size, filename, err := downloader.DownloadFile(pluginSourceFilepath)
 
 	if err != nil {
@@ -206,7 +251,7 @@ func (cmd *PluginInstall) tryDownloadPluginBinaryfromGivenPath(pluginSourceFilep
 
 	cmd.ui.Say(fmt.Sprintf("%d "+T("bytes downloaded")+"...", size))
 
-	executablePath := filepath.Join(savePath, filename)
+	executablePath := filepath.Join(downloader.SavePath(), filename)
 	os.Chmod(executablePath, 0700)
 
 	return executablePath
@@ -230,4 +275,55 @@ func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
+}
+
+func (cmd *PluginInstall) getRepoFromConfig(repoName string) (models.PluginRepo, error) {
+	targetRepo := strings.ToLower(repoName)
+	list := cmd.config.PluginRepos()
+
+	for i, repo := range list {
+		if strings.ToLower(repo.Name) == targetRepo {
+			return list[i], nil
+		}
+	}
+
+	return models.PluginRepo{}, errors.New(repoName + T(" not found"))
+}
+
+func (cmd *PluginInstall) downloadBinary(plugin clipr.Plugin, downloader fileutils.Downloader) string {
+	arch := runtime.GOARCH
+
+	switch runtime.GOOS {
+	case "darwin":
+		return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "osx"), downloader)
+	case "linux":
+		if arch == "386" {
+			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux32"), downloader)
+		} else {
+			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux64"), downloader)
+		}
+	case "windows":
+		if arch == "386" {
+			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win32"), downloader)
+		} else {
+			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win64"), downloader)
+		}
+	default:
+		cmd.binaryNotAvailable()
+	}
+	return ""
+}
+
+func (cmd *PluginInstall) getBinaryUrl(plugin clipr.Plugin, os string) string {
+	for _, binary := range plugin.Binaries {
+		if binary.Platform == os {
+			return binary.Url
+		}
+	}
+	cmd.binaryNotAvailable()
+	return ""
+}
+
+func (cmd *PluginInstall) binaryNotAvailable() {
+	cmd.ui.Failed(T("Plugin requested has no binary available for your OS: ") + runtime.GOOS + ", " + runtime.GOARCH)
 }
