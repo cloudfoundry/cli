@@ -17,7 +17,8 @@ type Plugin struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Version     string    `json:"version"`
-	Date        time.Time `json:"date"`
+	Created     time.Time `json:"created"`
+	Updated     time.Time `json:"updated"`
 	Company     string    `json:"company"`
 	Author      string    `json:"author"`
 	Contact     string    `json:"contact"`
@@ -75,8 +76,10 @@ func (p *Plugins) extractPlugin(rawData interface{}) Plugin {
 			plugin.Homepage = optionalStringField(v)
 		case "company":
 			plugin.Company = optionalStringField(v)
-		case "date":
-			plugin.Date = v.(time.Time)
+		case "created":
+			plugin.Created = v.(time.Time)
+		case "updated":
+			plugin.Updated = v.(time.Time)
 		default:
 			p.logger.Write([]byte("unexpected field in plugins: " + k.(string) + "\n"))
 		}
