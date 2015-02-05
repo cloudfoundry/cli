@@ -12,16 +12,19 @@ import (
 type Downloader interface {
 	DownloadFile(string) (int64, string, error)
 	RemoveFile() error
+	SavePath() string
 }
 
 type downloader struct {
-	saveDir  string
-	filename string
+	saveDir    string
+	filename   string
+	downloaded bool
 }
 
 func NewDownloader(saveDir string) Downloader {
 	return &downloader{
-		saveDir: saveDir,
+		saveDir:    saveDir,
+		downloaded: false,
 	}
 }
 
@@ -65,6 +68,7 @@ func (d *downloader) DownloadFile(url string) (int64, string, error) {
 			return 0, "", err
 		}
 
+		d.downloaded = true
 		return size, d.filename, nil
 
 	} else {
@@ -73,6 +77,10 @@ func (d *downloader) DownloadFile(url string) (int64, string, error) {
 }
 
 func (d *downloader) RemoveFile() error {
+	if !d.downloaded {
+		return nil
+	}
+	d.downloaded = false
 	return os.Remove(filepath.Join(d.saveDir, d.filename))
 }
 
@@ -109,4 +117,8 @@ func get_filename_from_url(url string) string {
 	}
 
 	return token
+}
+
+func (d *downloader) SavePath() string {
+	return d.saveDir
 }
