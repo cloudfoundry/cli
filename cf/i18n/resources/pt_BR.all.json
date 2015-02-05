@@ -780,7 +780,7 @@
       "modified": true
    },
    {
-      "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n",
+      "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]\n\nThe command will download the plugin binary from repository if '-r' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
       "translation": "CF_NAME install-plugin PATH/TO/PLUGIN",
       "modified": true
    },
@@ -1940,6 +1940,11 @@
       "modified": false
    },
    {
+      "id": "Error getting plugin metadata from repo: ",
+      "translation": "Error getting plugin metadata from repo: ",
+      "modified": false
+   },
+   {
       "id": "Error in requirement",
       "translation": "Erro no requerimento",
       "modified": false
@@ -2740,6 +2745,11 @@
       "modified": false
    },
    {
+      "id": "Looking up '{{.filePath}}' from repository '{{.repoName}}'",
+      "translation": "Looking up '{{.filePath}}' from repository '{{.repoName}}'",
+      "modified": false
+   },
+   {
       "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
       "translation": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
       "modified": false
@@ -3177,6 +3187,11 @@
    {
       "id": "Plugin repo named \"{{.repoName}}\" already exists, please use another name.",
       "translation": "Plugin repo named \"{{.repoName}}\" already exists, please use another name.",
+      "modified": false
+   },
+   {
+      "id": "Plugin requested has no binary available for your OS: ",
+      "translation": "Plugin requested has no binary available for your OS: ",
       "modified": false
    },
    {
@@ -4022,6 +4037,11 @@
    {
       "id": "Timeout for async HTTP requests",
       "translation": "Tempo de espera limite para pedidos de HTTP assíncronos",
+      "modified": false
+   },
+   {
+      "id": "Tip: use 'add-plugin-repo' to register the repo",
+      "translation": "Tip: use 'add-plugin-repo' to register the repo",
       "modified": false
    },
    {

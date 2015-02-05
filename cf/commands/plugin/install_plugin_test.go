@@ -1,21 +1,30 @@
 package plugin_test
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"net/rpc"
 	"os"
 	"path/filepath"
 	"runtime"
 
+	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/fakes"
 	"github.com/cloudfoundry/cli/cf/command"
 	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
+	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
+	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
 	. "github.com/cloudfoundry/cli/cf/commands/plugin"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -27,7 +36,9 @@ var _ = Describe("Install", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              *testconfig.FakePluginConfiguration
+		config              core_config.ReadWriter
+		pluginConfig        *testPluginConfig.FakePluginConfiguration
+		fakePluginRepo      *fakes.FakePluginRepo
 
 		coreCmds   map[string]command.Command
 		pluginFile *os.File
@@ -47,7 +58,9 @@ var _ = Describe("Install", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		config = &testconfig.FakePluginConfiguration{}
+		pluginConfig = &testPluginConfig.FakePluginConfiguration{}
+		config = testconfig.NewRepositoryWithDefaults()
+		fakePluginRepo = &fakes.FakePluginRepo{}
 		coreCmds = make(map[string]command.Command)
 
 		dir, err := os.Getwd()
@@ -68,7 +81,7 @@ var _ = Describe("Install", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		pluginDir = filepath.Join(homeDir, ".cf", "plugins")
-		config.GetPluginPathReturns(pluginDir)
+		pluginConfig.GetPluginPathReturns(pluginDir)
 
 		curDir, err = os.Getwd()
 		Expect(err).ToNot(HaveOccurred())
@@ -87,7 +100,7 @@ var _ = Describe("Install", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPluginInstall(ui, config, coreCmds)
+		cmd := NewPluginInstall(ui, config, pluginConfig, coreCmds, fakePluginRepo)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -97,7 +110,146 @@ var _ = Describe("Install", func() {
 		})
 	})
 
-	Describe("failures", func() {
+	Describe("Locating binary file", func() {
+
+		Describe("install from plugin repository when '-r' provided", func() {
+			Context("gets metadata of the plugin from repo", func() {
+				Context("when repo is not found in config", func() {
+					It("informs user repo is not found", func() {
+						runCommand("plugin1", "-r", "repo1")
+						Ω(ui.Outputs).To(ContainSubstrings([]string{"Looking up 'plugin1' from repository 'repo1'"}))
+						Ω(ui.Outputs).To(ContainSubstrings([]string{"repo1 not found"}))
+					})
+				})
+
+				Context("when repo is found in config", func() {
+					Context("when repo endpoint returns an error", func() {
+						It("informs user about the error", func() {
+							config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+							fakePluginRepo.GetPluginsReturns(nil, []string{"repo error1"})
+							runCommand("plugin1", "-r", "repo1")
+
+							Ω(ui.Outputs).To(ContainSubstrings([]string{"Error getting plugin metadata from repo"}))
+							Ω(ui.Outputs).To(ContainSubstrings([]string{"repo error1"}))
+						})
+					})
+
+					Context("when plugin metadata is available and desired plugin is not found", func() {
+						It("informs user about the error", func() {
+							config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+							fakePluginRepo.GetPluginsReturns(nil, nil)
+							runCommand("plugin1", "-r", "repo1")
+
+							Ω(ui.Outputs).To(ContainSubstrings([]string{"plugin1 is not available in repo 'repo1'"}))
+						})
+					})
+				})
+			})
+
+			Context("downloads the binary for the machine's OS", func() {
+				It("informs user when binary is not available for OS", func() {
+					p := clipr.Plugin{
+						Name: "plugin1",
+					}
+					result := make(map[string][]clipr.Plugin)
+					result["repo1"] = []clipr.Plugin{p}
+
+					config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+					fakePluginRepo.GetPluginsReturns(result, nil)
+					runCommand("plugin1", "-r", "repo1")
+
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"Plugin requested has no binary available"}))
+				})
+
+				It("downloads and installs binary when it is available", func() {
+					h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						fmt.Fprintln(w, "hi")
+					})
+
+					testServer := httptest.NewServer(h)
+					defer testServer.Close()
+
+					p := clipr.Plugin{
+						Name: "plugin1",
+						Binaries: []clipr.Binary{
+							clipr.Binary{
+								Platform: "osx",
+								Url:      testServer.URL + "/test.exe",
+							},
+							clipr.Binary{
+								Platform: "win64",
+								Url:      testServer.URL + "/test.exe",
+							},
+							clipr.Binary{
+								Platform: "win32",
+								Url:      testServer.URL + "/test.exe",
+							},
+							clipr.Binary{
+								Platform: "linux32",
+								Url:      testServer.URL + "/test.exe",
+							},
+							clipr.Binary{
+								Platform: "linux64",
+								Url:      testServer.URL + "/test.exe",
+							},
+						},
+					}
+					result := make(map[string][]clipr.Plugin)
+					result["repo1"] = []clipr.Plugin{p}
+
+					config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+					fakePluginRepo.GetPluginsReturns(result, nil)
+					runCommand("plugin1", "-r", "repo1")
+
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"3 bytes downloaded..."}))
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
+				})
+			})
+		})
+
+		Describe("install from plugin repository with no '-r' provided", func() {
+			Context("first tries to locate binary file at local path", func() {
+				It("will not try downloading from internet if file is found locally", func() {
+					runCommand("./install_plugin.go")
+
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Attempting to download binary file from internet"},
+					))
+				})
+			})
+
+			Context("tries to download binary from net if file is not found locally", func() {
+				It("informs users when binary is not downloadable from net", func() {
+					runCommand("path/to/not/a/thing.exe")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Download attempt failed"},
+						[]string{"Unable to install"},
+						[]string{"FAILED"},
+					))
+				})
+
+				It("downloads and installs binary when it is available", func() {
+					h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						fmt.Fprintln(w, "hi")
+					})
+
+					testServer := httptest.NewServer(h)
+					defer testServer.Close()
+
+					runCommand(testServer.URL + "/testfile.exe")
+
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"3 bytes downloaded..."}))
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
+				})
+			})
+		})
+
+	})
+
+	Describe("install failures", func() {
 		Context("when the plugin contains a 'help' command", func() {
 			It("fails", func() {
 				runCommand(test_with_help)
@@ -175,7 +327,7 @@ var _ = Describe("Install", func() {
 						},
 					},
 				}
-				config.PluginsReturns(pluginsMap)
+				pluginConfig.PluginsReturns(pluginsMap)
 
 				runCommand(aliasConflicts)
 
@@ -197,7 +349,7 @@ var _ = Describe("Install", func() {
 						},
 					},
 				}
-				config.PluginsReturns(pluginsMap)
+				pluginConfig.PluginsReturns(pluginsMap)
 
 				runCommand(aliasConflicts)
 
@@ -220,7 +372,7 @@ var _ = Describe("Install", func() {
 						},
 					},
 				}
-				config.PluginsReturns(pluginsMap)
+				pluginConfig.PluginsReturns(pluginsMap)
 
 				runCommand(test_1)
 
@@ -242,7 +394,7 @@ var _ = Describe("Install", func() {
 						},
 					},
 				}
-				config.PluginsReturns(pluginsMap)
+				pluginConfig.PluginsReturns(pluginsMap)
 
 				runCommand(aliasConflicts)
 
@@ -253,34 +405,8 @@ var _ = Describe("Install", func() {
 			})
 		})
 
-		Context("Locating binary file", func() {
-
-			Context("first tries to locate binary file at local path", func() {
-				It("will not try downloading from internet if file is found locally", func() {
-					runCommand("./install_plugin.go")
-
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
-						[]string{"Attempting to download binary file from internet"},
-					))
-				})
-			})
-
-			Context("tries to download binary from net if file is not found locally", func() {
-				It("informs users when binary is not downloadable from net", func() {
-					runCommand("path/to/not/a/thing.exe")
-
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Download attempt failed"},
-						[]string{"Unable to install"},
-						[]string{"FAILED"},
-					))
-				})
-			})
-
-		})
-
 		It("if plugin name is already taken", func() {
-			config.PluginsReturns(map[string]plugin_config.PluginMetadata{"Test1": plugin_config.PluginMetadata{}})
+			pluginConfig.PluginsReturns(map[string]plugin_config.PluginMetadata{"Test1": plugin_config.PluginMetadata{}})
 			runCommand(test_1)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -296,8 +422,8 @@ var _ = Describe("Install", func() {
 			})
 
 			It("if a file with the plugin name already exists under ~/.cf/plugin/", func() {
-				config.PluginsReturns(map[string]plugin_config.PluginMetadata{"useless": plugin_config.PluginMetadata{}})
-				config.GetPluginPathReturns(curDir)
+				pluginConfig.PluginsReturns(map[string]plugin_config.PluginMetadata{"useless": plugin_config.PluginMetadata{}})
+				pluginConfig.GetPluginPathReturns(curDir)
 
 				runCommand(filepath.Join(curDir, pluginFile.Name()))
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -309,11 +435,11 @@ var _ = Describe("Install", func() {
 		})
 	})
 
-	Describe("success", func() {
+	Describe("install success", func() {
 		BeforeEach(func() {
 			err := os.MkdirAll(pluginDir, 0700)
 			Expect(err).ToNot(HaveOccurred())
-			config.GetPluginPathReturns(pluginDir)
+			pluginConfig.GetPluginPathReturns(pluginDir)
 		})
 
 		It("finds plugin in the current directory without having to specify `./`", func() {
@@ -353,7 +479,7 @@ var _ = Describe("Install", func() {
 		It("populate the configuration with plugin metadata", func() {
 			runCommand(test_1)
 
-			pluginName, pluginMetadata := config.SetPluginArgsForCall(0)
+			pluginName, pluginMetadata := pluginConfig.SetPluginArgsForCall(0)
 
 			Expect(pluginName).To(Equal("Test1"))
 			Expect(pluginMetadata.Location).To(Equal(filepath.Join(pluginDir, "test_1.exe")))
