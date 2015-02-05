@@ -110,8 +110,12 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 			pluginSourceFilepath = "./" + filepath.Clean(pluginSourceFilepath)
 		}
 
-		if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
-			cmd.ui.Say("")
+		cmd.ui.Say("")
+		if strings.HasPrefix(pluginSourceFilepath, "https://") || strings.HasPrefix(pluginSourceFilepath, "http://") ||
+			strings.HasPrefix(pluginSourceFilepath, "ftp://") || strings.HasPrefix(pluginSourceFilepath, "ftps://") {
+			cmd.ui.Say(T("Attempting to download binary file from internet address..."))
+			pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
+		} else if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
 			cmd.ui.Say(T("File not found locally, attempting to download binary file from internet ..."))
 			pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
 		}
@@ -235,9 +239,6 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 }
 
 func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
-	r := strings.NewReplacer("https://", "", "http://", "", "ftp://", "", "ftps://", "")
-	pluginSourceFilepath = r.Replace(pluginSourceFilepath)
-
 	_, err := os.Stat(pluginSourceFilepath)
 	if err != nil && os.IsNotExist(err) {
 		return false

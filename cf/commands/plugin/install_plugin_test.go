@@ -209,12 +209,25 @@ var _ = Describe("Install", func() {
 		})
 
 		Describe("install from plugin repository with no '-r' provided", func() {
-			Context("first tries to locate binary file at local path", func() {
+			Context("downloads file from internet if path prefix with 'http','ftp' etc...", func() {
+				It("will not try locate file locally", func() {
+					runCommand("http://127.0.0.1/plugin.exe")
+
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"File not found locally"},
+					))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"download binary file from internet address"},
+					))
+				})
+			})
+
+			Context("first tries to locate binary file at local path if path has no internet prefix", func() {
 				It("will not try downloading from internet if file is found locally", func() {
 					runCommand("./install_plugin.go")
 
 					Expect(ui.Outputs).ToNot(ContainSubstrings(
-						[]string{"Attempting to download binary file from internet"},
+						[]string{"download binary file from internet"},
 					))
 				})
 			})
