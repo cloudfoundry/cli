@@ -38,7 +38,7 @@ func (cmd RepoPlugins) Metadata() command_metadata.CommandMetadata {
 		Usage: T(`CF_NAME repo-plugins
 
 EXAMPLE:
-   cf repo-plugins
+   cf repo-plugins [-r REPO_NAME]
 `),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("r", T("Repo Name - List plugins from just this repository")),

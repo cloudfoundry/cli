@@ -885,9 +885,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins\n",
+      "id": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins [-r REPO_NAME]\n",
       "translation": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins\n",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME restage APP_NAME",
