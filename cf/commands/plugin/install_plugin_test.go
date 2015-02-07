@@ -143,6 +143,14 @@ var _ = Describe("Install", func() {
 							Ω(ui.Outputs).To(ContainSubstrings([]string{"plugin1 is not available in repo 'repo1'"}))
 						})
 					})
+
+					It("ignore cases in repo name", func() {
+						config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+						fakePluginRepo.GetPluginsReturns(nil, nil)
+						runCommand("plugin1", "-r", "REPO1")
+
+						Ω(ui.Outputs).NotTo(ContainSubstrings([]string{"REPO1 not found"}))
+					})
 				})
 			})
 

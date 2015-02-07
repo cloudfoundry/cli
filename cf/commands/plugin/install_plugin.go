@@ -96,7 +96,7 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 		}
 
 		found := false
-		for _, plugin := range pluginList[repoName] {
+		for _, plugin := range findRepoCaseInsensity(pluginList, repoName) {
 			if strings.ToLower(plugin.Name) == targetPluginName {
 				found = true
 				pluginSourceFilepath = cmd.downloadBinary(plugin, downloader)
@@ -330,4 +330,14 @@ func (cmd *PluginInstall) getBinaryUrl(plugin clipr.Plugin, os string) string {
 
 func (cmd *PluginInstall) binaryNotAvailable() {
 	cmd.ui.Failed(T("Plugin requested has no binary available for your OS: ") + runtime.GOOS + ", " + runtime.GOARCH)
+}
+
+func findRepoCaseInsensity(repoList map[string][]clipr.Plugin, repoName string) []clipr.Plugin {
+	target := strings.ToLower(repoName)
+	for k, repo := range repoList {
+		if strings.ToLower(k) == target {
+			return repo
+		}
+	}
+	return nil
 }
