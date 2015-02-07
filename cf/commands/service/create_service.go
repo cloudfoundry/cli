@@ -118,7 +118,9 @@ func (cmd CreateService) printSuccessMessage(serviceInstanceName string) error {
 	}
 
 	if instance.ServiceInstanceFields.LastOperation.State == "in progress" {
-		cmd.ui.Say(T("Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
+		cmd.ui.Ok()
+		cmd.ui.Say("")
+		cmd.ui.Say(T("Create in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.",
 			map[string]interface{}{"ServiceInstanceName": serviceInstanceName}))
 	} else {
 		cmd.ui.Ok()
