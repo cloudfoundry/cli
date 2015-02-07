@@ -20,8 +20,17 @@ func NewRepositoryFromFilepath(filepath string, errorHandler func(error)) Reposi
 }
 
 func NewRepositoryFromPersistor(persistor configuration.Persistor, errorHandler func(error)) Repository {
+	data := NewData()
+	if !persistor.Exists() {
+		//set default plugin repo
+		data.PluginRepos = append(data.PluginRepos, models.PluginRepo{
+			Name: "CF_Plugin_Repo",
+			Url:  "http://plugins.cloudfoundry.org",
+		})
+	}
+
 	return &ConfigRepository{
-		data:      NewData(),
+		data:      data,
 		mutex:     new(sync.RWMutex),
 		initOnce:  new(sync.Once),
 		persistor: persistor,
