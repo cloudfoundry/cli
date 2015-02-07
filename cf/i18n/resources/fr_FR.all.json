@@ -2525,8 +2525,8 @@
       "modified": false
    },
    {
-      "id": "Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
-      "translation": "Le status de l'instance est (créant). Trouver le status courant en utilisant cf services ou cf service {{.ServiceInstanceName}}.",
+      "id": "Create in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.",
+      "translation": "Création en progres. Utilizer 'cf services' ou 'cf service {{.ServiceInstanceName}}' pour vérifier le status courant.",
       "modified": false
    },
    {
