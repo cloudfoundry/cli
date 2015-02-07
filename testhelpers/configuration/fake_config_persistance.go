@@ -32,8 +32,10 @@ func (fp *FakePersistor) Load(data configuration.DataInterface) (err error) {
 	return
 }
 
-func (fp *FakePersistor) Delete() {
+func (fp *FakePersistor) Delete() {}
 
+func (fp *FakePersistor) Exists() bool {
+	return true
 }
 
 func (fp *FakePersistor) Save(data configuration.DataInterface) (err error) {

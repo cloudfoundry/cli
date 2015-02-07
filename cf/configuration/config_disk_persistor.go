@@ -13,6 +13,7 @@ const (
 
 type Persistor interface {
 	Delete()
+	Exists() bool
 	Load(DataInterface) error
 	Save(DataInterface) error
 }
@@ -30,6 +31,14 @@ func NewDiskPersistor(path string) (dp DiskPersistor) {
 	return DiskPersistor{
 		filePath: path,
 	}
+}
+
+func (dp DiskPersistor) Exists() bool {
+	_, err := os.Stat(dp.filePath)
+	if err != nil && !os.IsExist(err) {
+		return false
+	}
+	return true
 }
 
 func (dp DiskPersistor) Delete() {
