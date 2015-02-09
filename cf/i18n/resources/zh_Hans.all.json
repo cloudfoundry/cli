@@ -1215,6 +1215,16 @@
       "modified": false
    },
    {
+      "id": "Compute and show the sha1 value of the plugin binary file",
+      "translation": "Compute and show the sha1 value of the plugin binary file",
+      "modified": false
+   },
+   {
+      "id": "Computing sha1 for installed plugins, this may take a while ...",
+      "translation": "Computing sha1 for installed plugins, this may take a while ...",
+      "modified": false
+   },
+   {
       "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
       "translation": "已连接，用户{{.Username}}生成组织 {{.OrgName}} / 空间 {{.SpaceName}}下应用程序{{.AppName}} 的日志...\n",
       "modified": false
