@@ -344,7 +344,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentCommand("add-plugin-repo"),
 					presentCommand("remove-plugin-repo"),
-					presentCommand("list-plugin-repo"),
+					presentCommand("list-plugin-repos"),
 					presentCommand("repo-plugins"),
 				},
 			},

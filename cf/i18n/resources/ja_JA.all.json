@@ -790,9 +790,9 @@
       "modified": true
    },
    {
-      "id": "CF_NAME list-plugin-repo",
+      "id": "CF_NAME list-plugin-repos",
       "translation": "CF_NAME list-plugin-repo",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
