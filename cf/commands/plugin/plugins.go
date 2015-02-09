@@ -74,7 +74,8 @@ func (cmd *Plugins) Run(c *cli.Context) {
 			}
 
 			if c.Bool("checksum") {
-				sha1, err := utils.ComputeFileSha1(metadata.Location)
+				checksum := utils.NewSha1Checksum(metadata.Location)
+				sha1, err := checksum.ComputeFileSha1()
 				if err != nil {
 					args = append(args, "n/a")
 				} else {
