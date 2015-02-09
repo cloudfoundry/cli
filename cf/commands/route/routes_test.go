@@ -89,6 +89,43 @@ var _ = Describe("routes command", func() {
 		})
 	})
 
+	Context("when there are routes in different spaces", func() {
+		BeforeEach(func() {
+			space1 := models.SpaceFields{Name: "space-1"}
+			space2 := models.SpaceFields{Name: "space-2"}
+
+			domain := models.DomainFields{Name: "example.com"}
+			domain2 := models.DomainFields{Name: "cookieclicker.co"}
+
+			app1 := models.ApplicationFields{Name: "dora"}
+			app2 := models.ApplicationFields{Name: "bora"}
+
+			route := models.Route{}
+			route.Host = "hostname-1"
+			route.Domain = domain
+			route.Apps = []models.ApplicationFields{app1}
+			route.Space = space1
+
+			route2 := models.Route{}
+			route2.Host = "hostname-2"
+			route2.Domain = domain2
+			route2.Apps = []models.ApplicationFields{app1, app2}
+			route2.Space = space2
+			routeRepo.Routes = []models.Route{route, route2}
+		})
+
+		It("lists routes at orglevel", func() {
+			runCommand("--orglevel")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting routes", "my-user"},
+				[]string{"space", "host", "domain", "apps"},
+				[]string{"space-1", "hostname-1", "example.com", "dora"},
+				[]string{"space-2", "hostname-2", "cookieclicker.co", "dora", "bora"},
+			))
+		})
+
+	})
 	Context("when there are not routes", func() {
 		It("tells the user when no routes were found", func() {
 			runCommand()
