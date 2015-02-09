@@ -8,6 +8,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/utils"
 	"github.com/codegangsta/cli"
 )
 
@@ -28,6 +29,9 @@ func (cmd *Plugins) Metadata() command_metadata.CommandMetadata {
 		Name:        "plugins",
 		Description: T("list all available plugin commands"),
 		Usage:       T("CF_NAME plugins"),
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "checksum", Usage: T("Compute and show the sha1 value of the plugin binary file")},
+		},
 	}
 }
 
@@ -45,7 +49,13 @@ func (cmd *Plugins) Run(c *cli.Context) {
 
 	plugins := cmd.config.Plugins()
 
-	table := terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
+	var table terminal.Table
+	if c.Bool("checksum") {
+		cmd.ui.Say(T("Computing sha1 for installed plugins, this may take a while ..."))
+		table = terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Version"), T("Command Name"), "sha1", T("Command Help")})
+	} else {
+		table = terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
+	}
 
 	for pluginName, metadata := range plugins {
 		if metadata.Version.Major == 0 && metadata.Version.Minor == 0 && metadata.Version.Build == 0 {
@@ -55,11 +65,25 @@ func (cmd *Plugins) Run(c *cli.Context) {
 		}
 
 		for _, command := range metadata.Commands {
-			if command.Alias == "" {
-				table.Add(pluginName, version, command.Name, command.HelpText)
+			args := []string{pluginName, version}
+
+			if command.Alias != "" {
+				args = append(args, command.Name+", "+command.Alias)
 			} else {
-				table.Add(pluginName, version, command.Name+", "+command.Alias, command.HelpText)
+				args = append(args, command.Name)
 			}
+
+			if c.Bool("checksum") {
+				sha1, err := utils.ComputeFileSha1(metadata.Location)
+				if err != nil {
+					args = append(args, "n/a")
+				} else {
+					args = append(args, fmt.Sprintf("%x", sha1))
+				}
+			}
+
+			args = append(args, command.HelpText)
+			table.Add(args...)
 		}
 	}
 

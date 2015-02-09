@@ -35,6 +35,28 @@ var _ = Describe("Plugins", func() {
 		cmd := NewPlugins(ui, config)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
+
+	Context("If --checksum flag is provided", func() {
+		It("computes and prints the sha1 checksum of the binary", func() {
+			config.PluginsReturns(map[string]plugin_config.PluginMetadata{
+				"Test1": plugin_config.PluginMetadata{
+					Location: "../../../fixtures/plugins/test_1.exe",
+					Version:  plugin.VersionType{Major: 1, Minor: 2, Build: 3},
+					Commands: []plugin.Command{
+						{Name: "test_1_cmd1", HelpText: "help text for test_1_cmd1"},
+					},
+				},
+			})
+
+			runCommand("--checksum")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Plugin Name", "Version", "sha1"},
+				[]string{"Test1", "test_1_cmd1", "1.2.3", "test_1_cmd1", "025b882e665e3fee35653095812bcbd384efd56f"},
+			))
+		})
+	})
+
 	It("should fail with usage when provided any arguments", func() {
 		requirementsFactory.LoginSuccess = true
 		Expect(runCommand("blahblah")).To(BeFalse())
