@@ -56,6 +56,19 @@ func (repo *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr 
 	return
 }
 
+func (repo *FakeRouteRepository) ListAllRoutes(cb func(models.Route) bool) (apiErr error) {
+	if repo.ListErr {
+		return errors.New("WHOOPSIE")
+	}
+
+	for _, route := range repo.Routes {
+		if !cb(route) {
+			break
+		}
+	}
+	return
+}
+
 func (repo *FakeRouteRepository) FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error) {
 	repo.FindByHostAndDomainCalledWith.Host = host
 	repo.FindByHostAndDomainCalledWith.Domain = domain
