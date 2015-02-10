@@ -262,21 +262,9 @@ var _ = Describe("Install", func() {
 						[]string{"download binary file from internet address"},
 					))
 				})
-			})
 
-			Context("first tries to locate binary file at local path if path has no internet prefix", func() {
-				It("will not try downloading from internet if file is found locally", func() {
-					runCommand("./install_plugin.go")
-
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
-						[]string{"download binary file from internet"},
-					))
-				})
-			})
-
-			Context("tries to download binary from net if file is not found locally", func() {
 				It("informs users when binary is not downloadable from net", func() {
-					runCommand("path/to/not/a/thing.exe")
+					runCommand("http://path/to/not/a/thing.exe")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Download attempt failed"},
@@ -298,6 +286,27 @@ var _ = Describe("Install", func() {
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"3 bytes downloaded..."}))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
+				})
+			})
+
+			Context("tries to locate binary file at local path if path has no internet prefix", func() {
+				It("reports error if local file is not found at given path", func() {
+					runCommand("./install_plugin.go")
+
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"download binary file from internet"},
+					))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Installing plugin", "./install_plugin.go"},
+					))
+				})
+
+				It("installs the plugin from a local file if found", func() {
+					runCommand("./no/file/is/here.exe")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"File not found locally"},
+					))
 				})
 			})
 		})
