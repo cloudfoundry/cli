@@ -205,6 +205,11 @@
       "modified": false
    },
    {
+      "id": " is not available in repo '",
+      "translation": " is not available in repo '",
+      "modified": false
+   },
+   {
       "id": " is not responding. Please make sure it is a valid plugin repo.",
       "translation": " is not responding. Please make sure it is a valid plugin repo.",
       "modified": false
@@ -1768,6 +1773,11 @@
       "id": "Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from local/internet.",
       "translation": "Download attempt failed: {{.Error}}\nUnable to install, plugin is not available from local/internet.",
       "modified": true
+   },
+   {
+      "id": "Downloaded plugin binary's checksum does not match repo metadata",
+      "translation": "Downloaded plugin binary's checksum does not match repo metadata",
+      "modified": false
    },
    {
       "id": "Dump recent logs instead of tailing",

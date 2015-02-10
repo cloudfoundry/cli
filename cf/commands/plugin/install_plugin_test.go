@@ -23,6 +23,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	testChecksum "github.com/cloudfoundry/cli/utils/fakes"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
@@ -39,6 +40,7 @@ var _ = Describe("Install", func() {
 		config              core_config.ReadWriter
 		pluginConfig        *testPluginConfig.FakePluginConfiguration
 		fakePluginRepo      *fakes.FakePluginRepo
+		fakeChecksum        *testChecksum.FakeSha1Checksum
 
 		coreCmds   map[string]command.Command
 		pluginFile *os.File
@@ -61,6 +63,7 @@ var _ = Describe("Install", func() {
 		pluginConfig = &testPluginConfig.FakePluginConfiguration{}
 		config = testconfig.NewRepositoryWithDefaults()
 		fakePluginRepo = &fakes.FakePluginRepo{}
+		fakeChecksum = &testChecksum.FakeSha1Checksum{}
 		coreCmds = make(map[string]command.Command)
 
 		dir, err := os.Getwd()
@@ -100,7 +103,7 @@ var _ = Describe("Install", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPluginInstall(ui, config, pluginConfig, coreCmds, fakePluginRepo)
+		cmd := NewPluginInstall(ui, config, pluginConfig, coreCmds, fakePluginRepo, fakeChecksum)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -155,63 +158,94 @@ var _ = Describe("Install", func() {
 			})
 
 			Context("downloads the binary for the machine's OS", func() {
-				It("informs user when binary is not available for OS", func() {
-					p := clipr.Plugin{
-						Name: "plugin1",
-					}
-					result := make(map[string][]clipr.Plugin)
-					result["repo1"] = []clipr.Plugin{p}
+				Context("when binary is not available", func() {
+					It("informs user when binary is not available for OS", func() {
+						p := clipr.Plugin{
+							Name: "plugin1",
+						}
+						result := make(map[string][]clipr.Plugin)
+						result["repo1"] = []clipr.Plugin{p}
 
-					config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
-					fakePluginRepo.GetPluginsReturns(result, nil)
-					runCommand("plugin1", "-r", "repo1")
+						config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+						fakePluginRepo.GetPluginsReturns(result, nil)
+						runCommand("plugin1", "-r", "repo1")
 
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"Plugin requested has no binary available"}))
+						Ω(ui.Outputs).To(ContainSubstrings([]string{"Plugin requested has no binary available"}))
+					})
 				})
 
-				It("downloads and installs binary when it is available", func() {
-					h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						fmt.Fprintln(w, "hi")
+				Context("when binary is available", func() {
+					var (
+						testServer *httptest.Server
+					)
+
+					BeforeEach(func() {
+						h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							fmt.Fprintln(w, "abc")
+						})
+
+						testServer = httptest.NewServer(h)
+
+						fakeChecksum.CheckSha1Returns(true)
+
+						p := clipr.Plugin{
+							Name: "plugin1",
+							Binaries: []clipr.Binary{
+								clipr.Binary{
+									Platform: "osx",
+									Url:      testServer.URL + "/test.exe",
+								},
+								clipr.Binary{
+									Platform: "win64",
+									Url:      testServer.URL + "/test.exe",
+								},
+								clipr.Binary{
+									Platform: "win32",
+									Url:      testServer.URL + "/test.exe",
+								},
+								clipr.Binary{
+									Platform: "linux32",
+									Url:      testServer.URL + "/test.exe",
+								},
+								clipr.Binary{
+									Platform: "linux64",
+									Url:      testServer.URL + "/test.exe",
+								},
+							},
+						}
+						result := make(map[string][]clipr.Plugin)
+						result["repo1"] = []clipr.Plugin{p}
+
+						config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+						fakePluginRepo.GetPluginsReturns(result, nil)
 					})
 
-					testServer := httptest.NewServer(h)
-					defer testServer.Close()
+					AfterEach(func() {
+						testServer.Close()
+					})
 
-					p := clipr.Plugin{
-						Name: "plugin1",
-						Binaries: []clipr.Binary{
-							clipr.Binary{
-								Platform: "osx",
-								Url:      testServer.URL + "/test.exe",
-							},
-							clipr.Binary{
-								Platform: "win64",
-								Url:      testServer.URL + "/test.exe",
-							},
-							clipr.Binary{
-								Platform: "win32",
-								Url:      testServer.URL + "/test.exe",
-							},
-							clipr.Binary{
-								Platform: "linux32",
-								Url:      testServer.URL + "/test.exe",
-							},
-							clipr.Binary{
-								Platform: "linux64",
-								Url:      testServer.URL + "/test.exe",
-							},
-						},
-					}
-					result := make(map[string][]clipr.Plugin)
-					result["repo1"] = []clipr.Plugin{p}
+					It("performs sha1 checksum validation on the downloaded binary", func() {
+						runCommand("plugin1", "-r", "repo1")
+						Ω(fakeChecksum.CheckSha1CallCount()).To(Equal(1))
+					})
 
-					config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
-					fakePluginRepo.GetPluginsReturns(result, nil)
-					runCommand("plugin1", "-r", "repo1")
+					It("reports error downloaded file's sha1 does not match the sha1 in metadata", func() {
+						fakeChecksum.CheckSha1Returns(false)
 
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"3 bytes downloaded..."}))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
+						runCommand("plugin1", "-r", "repo1")
+						Ω(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"checksum does not match"},
+						))
+					})
+
+					It("downloads and installs binary when it is available and checksum matches", func() {
+						runCommand("plugin1", "-r", "repo1")
+
+						Ω(ui.Outputs).To(ContainSubstrings([]string{"4 bytes downloaded..."}))
+						Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+						Ω(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
+					})
 				})
 			})
 		})
