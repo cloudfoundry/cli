@@ -153,7 +153,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 }
 
 func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string) (err error) {
-	path := fmt.Sprintf("/v2/service_instances/%s", instanceGuid)
+	path := fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=true", instanceGuid)
 	data := fmt.Sprintf(`{"service_plan_guid":"%s"}`, planGuid)
 
 	err = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data))
@@ -163,7 +163,7 @@ func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid,
 
 func (repo CloudControllerServiceRepository) RenameService(instance models.ServiceInstance, newName string) (apiErr error) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
-	path := fmt.Sprintf("/v2/service_instances/%s", instance.Guid)
+	path := fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=true", instance.Guid)
 
 	if instance.IsUserProvided() {
 		path = fmt.Sprintf("/v2/user_provided_service_instances/%s", instance.Guid)
