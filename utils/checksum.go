@@ -18,12 +18,12 @@ type sha1Checksum struct {
 }
 
 func NewSha1Checksum(filepath string) Sha1Checksum {
-	return sha1Checksum{
+	return &sha1Checksum{
 		filepath: filepath,
 	}
 }
 
-func (c sha1Checksum) ComputeFileSha1() ([]byte, error) {
+func (c *sha1Checksum) ComputeFileSha1() ([]byte, error) {
 	hash := sha1.New()
 
 	f, err := os.Open(c.filepath)
@@ -39,7 +39,7 @@ func (c sha1Checksum) ComputeFileSha1() ([]byte, error) {
 	return hash.Sum(nil), nil
 }
 
-func (c sha1Checksum) CheckSha1(targetSha1 string) bool {
+func (c *sha1Checksum) CheckSha1(targetSha1 string) bool {
 	sha1, err := c.ComputeFileSha1()
 	if err != nil {
 		return false
@@ -51,6 +51,6 @@ func (c sha1Checksum) CheckSha1(targetSha1 string) bool {
 	return false
 }
 
-func (c sha1Checksum) SetFilePath(filepath string) {
+func (c *sha1Checksum) SetFilePath(filepath string) {
 	c.filepath = filepath
 }
