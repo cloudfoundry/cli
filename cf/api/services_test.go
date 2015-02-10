@@ -257,7 +257,7 @@ var _ = Describe("Services Repo", func() {
 		It("makes the right request", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
-				Path:     "/v2/service_instances/instance-guid",
+				Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
 				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid"}`),
 				Response: testnet.TestResponse{Status: http.StatusOK},
 			}))
@@ -271,7 +271,7 @@ var _ = Describe("Services Repo", func() {
 			It("fails", func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
-					Path:     "/v2/service_instances/instance-guid",
+					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid"}`),
 					Response: testnet.TestResponse{Status: http.StatusNotFound},
 				}))
@@ -420,7 +420,7 @@ var _ = Describe("Services Repo", func() {
 			BeforeEach(func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
-					Path:     "/v2/service_instances/my-service-instance-guid",
+					Path:     "/v2/service_instances/my-service-instance-guid?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
 					Response: testnet.TestResponse{Status: http.StatusCreated},
 				}))
