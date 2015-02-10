@@ -22,6 +22,7 @@ import (
 	"github.com/cloudfoundry/cli/fileutils"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/rpc"
+	"github.com/cloudfoundry/cli/utils"
 	"github.com/codegangsta/cli"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
@@ -33,15 +34,17 @@ type PluginInstall struct {
 	pluginConfig plugin_config.PluginConfiguration
 	coreCmds     map[string]command.Command
 	pluginRepo   plugin_repo.PluginRepo
+	checksum     utils.Sha1Checksum
 }
 
-func NewPluginInstall(ui terminal.UI, config core_config.Reader, pluginConfig plugin_config.PluginConfiguration, coreCmds map[string]command.Command, pluginRepo plugin_repo.PluginRepo) *PluginInstall {
+func NewPluginInstall(ui terminal.UI, config core_config.Reader, pluginConfig plugin_config.PluginConfiguration, coreCmds map[string]command.Command, pluginRepo plugin_repo.PluginRepo, checksum utils.Sha1Checksum) *PluginInstall {
 	return &PluginInstall{
 		ui:           ui,
 		config:       config,
 		pluginConfig: pluginConfig,
 		coreCmds:     coreCmds,
 		pluginRepo:   pluginRepo,
+		checksum:     checksum,
 	}
 }
 
@@ -76,6 +79,14 @@ func (cmd *PluginInstall) GetRequirements(_ requirements.Factory, c *cli.Context
 func (cmd *PluginInstall) Run(c *cli.Context) {
 	downloader := fileutils.NewDownloader(os.TempDir())
 
+	removeTmpFile := func() {
+		err := downloader.RemoveFile()
+		if err != nil {
+			cmd.ui.Say(T("Problem removing downloaded binary in temp directory: ") + err.Error())
+		}
+	}
+	defer removeTmpFile()
+
 	pluginSourceFilepath := c.Args()[0]
 
 	repoName := c.String("r")
@@ -96,14 +107,21 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 		}
 
 		found := false
+		sha1 := ""
 		for _, plugin := range findRepoCaseInsensity(pluginList, repoName) {
 			if strings.ToLower(plugin.Name) == targetPluginName {
 				found = true
-				pluginSourceFilepath = cmd.downloadBinary(plugin, downloader)
+				pluginSourceFilepath, sha1 = cmd.downloadBinary(plugin, downloader)
+
+				cmd.checksum.SetFilePath(pluginSourceFilepath)
+				if !cmd.checksum.CheckSha1(sha1) {
+					cmd.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
+				}
 			}
+
 		}
 		if !found {
-			cmd.ui.Failed(pluginSourceFilepath + " is not available in repo '" + repoName + "'")
+			cmd.ui.Failed(pluginSourceFilepath + T(" is not available in repo '") + repoName + "'")
 		}
 	} else {
 		if filepath.Dir(pluginSourceFilepath) == "." {
@@ -135,11 +153,6 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 	cmd.ensurePluginIsSafeForInstallation(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
 
 	cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
-
-	err := downloader.RemoveFile()
-	if err != nil {
-		cmd.ui.Say(T("Problem removing downloaded binary in temp directory: ") + err.Error())
-	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} v{{.Version}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name, "Version": fmt.Sprintf("%d.%d.%d", pluginMetadata.Version.Major, pluginMetadata.Version.Minor, pluginMetadata.Version.Build)})))
@@ -294,28 +307,28 @@ func (cmd *PluginInstall) getRepoFromConfig(repoName string) (models.PluginRepo,
 	return models.PluginRepo{}, errors.New(repoName + T(" not found"))
 }
 
-func (cmd *PluginInstall) downloadBinary(plugin clipr.Plugin, downloader fileutils.Downloader) string {
+func (cmd *PluginInstall) downloadBinary(plugin clipr.Plugin, downloader fileutils.Downloader) (string, string) {
 	arch := runtime.GOARCH
 
 	switch runtime.GOOS {
 	case "darwin":
-		return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "osx"), downloader)
+		return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "osx"), downloader), cmd.getBinaryChecksum(plugin, "osx")
 	case "linux":
 		if arch == "386" {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux32"), downloader)
+			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux32"), downloader), cmd.getBinaryChecksum(plugin, "linux32")
 		} else {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux64"), downloader)
+			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux64"), downloader), cmd.getBinaryChecksum(plugin, "linux64")
 		}
 	case "windows":
 		if arch == "386" {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win32"), downloader)
+			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win32"), downloader), cmd.getBinaryChecksum(plugin, "win32")
 		} else {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win64"), downloader)
+			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win64"), downloader), cmd.getBinaryChecksum(plugin, "win64")
 		}
 	default:
 		cmd.binaryNotAvailable()
 	}
-	return ""
+	return "", ""
 }
 
 func (cmd *PluginInstall) getBinaryUrl(plugin clipr.Plugin, os string) string {
@@ -325,6 +338,15 @@ func (cmd *PluginInstall) getBinaryUrl(plugin clipr.Plugin, os string) string {
 		}
 	}
 	cmd.binaryNotAvailable()
+	return ""
+}
+
+func (cmd *PluginInstall) getBinaryChecksum(plugin clipr.Plugin, os string) string {
+	for _, binary := range plugin.Binaries {
+		if binary.Platform == os {
+			return binary.Checksum
+		}
+	}
 	return ""
 }
 
