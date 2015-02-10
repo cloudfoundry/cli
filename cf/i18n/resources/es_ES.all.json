@@ -1770,7 +1770,7 @@
       "modified": false
    },
    {
-      "id": "Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from local/internet.",
+      "id": "Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from the given url.",
       "translation": "Download attempt failed: {{.Error}}\nUnable to install, plugin is not available from local/internet.",
       "modified": true
    },
@@ -2210,9 +2210,9 @@
       "modified": false
    },
    {
-      "id": "File not found locally, attempting to download binary file from internet ...",
+      "id": "File not found locally, make sure the file exists at given path ...",
       "translation": "File not found locally, attempting to download binary file from internet ...",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Force delete (do not prompt for confirmation)",

@@ -134,8 +134,7 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 			cmd.ui.Say(T("Attempting to download binary file from internet address..."))
 			pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
 		} else if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
-			cmd.ui.Say(T("File not found locally, attempting to download binary file from internet ..."))
-			pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
+			cmd.ui.Failed(T("File not found locally, make sure the file exists at given path ..."))
 		}
 
 	}
@@ -263,7 +262,7 @@ func (cmd *PluginInstall) tryDownloadPluginBinaryfromGivenPath(pluginSourceFilep
 	size, filename, err := downloader.DownloadFile(pluginSourceFilepath)
 
 	if err != nil {
-		cmd.ui.Failed(fmt.Sprintf(T("Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from local/internet.", map[string]interface{}{"Error": err.Error()})))
+		cmd.ui.Failed(fmt.Sprintf(T("Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from the given url.", map[string]interface{}{"Error": err.Error()})))
 	}
 
 	cmd.ui.Say(fmt.Sprintf("%d "+T("bytes downloaded")+"...", size))
