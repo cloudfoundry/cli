@@ -83,16 +83,18 @@ var _ = Describe("services", func() {
 
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "my-service-1"
-		serviceInstance.State = "in progress"
-		serviceInstance.StateDescription = "fake state description"
+		serviceInstance.LastOperation.Type = "create"
+		serviceInstance.LastOperation.State = "in progress"
+		serviceInstance.LastOperation.Description = "fake state description"
 		serviceInstance.ServicePlan = plan
 		serviceInstance.ApplicationNames = []string{"cli1", "cli2"}
 		serviceInstance.ServiceOffering = offering
 
 		serviceInstance2 := models.ServiceInstance{}
 		serviceInstance2.Name = "my-service-2"
-		serviceInstance2.State = ""
-		serviceInstance2.StateDescription = "fake state description"
+		serviceInstance2.LastOperation.Type = "create"
+		serviceInstance2.LastOperation.State = ""
+		serviceInstance2.LastOperation.Description = "fake state description"
 		serviceInstance2.ServicePlan = plan2
 		serviceInstance2.ApplicationNames = []string{"cli1"}
 		serviceInstance2.ServiceOffering = offering
@@ -110,7 +112,7 @@ var _ = Describe("services", func() {
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
-			[]string{"name", "service", "plan", "bound apps", "status"},
+			[]string{"name", "service", "plan", "bound apps", "last operation"},
 			[]string{"OK"},
 			[]string{"my-service-1", "cleardb", "spark", "cli1, cli2", "create in progress"},
 			[]string{"my-service-2", "cleardb", "spark-2", "cli1", "create succeeded"},
