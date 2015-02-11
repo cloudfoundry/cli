@@ -2525,8 +2525,8 @@
       "modified": false
    },
    {
-      "id": "Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
-      "translation": "Instance status is unavailable (creating). Check status using cf services or cf service {{.ServiceInstanceName}}.",
+      "id": "Create in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.",
+      "translation": "Create in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.",
       "modified": false
    },
    {
@@ -3920,8 +3920,8 @@
       "modified": false
    },
    {
-      "id": "Status: {{.Status}}",
-      "translation": "Status: {{.Status}}",
+      "id": "Status: {{.State}}",
+      "translation": "Status: {{.State}}",
       "modified": false
    },
    {
@@ -4520,6 +4520,11 @@
       "modified": false
    },
    {
+      "id": "{{.OperationType}} succeeded",
+      "translation": "{{.OperationType}} succeeded",
+      "modified": false
+   },
+   {
       "id": "bound apps",
       "translation": "bound apps",
       "modified": false
@@ -4547,21 +4552,6 @@
    {
       "id": "crashing",
       "translation": "crashing",
-      "modified": false
-   },
-   {
-      "id": "create failed",
-      "translation": "create failed",
-      "modified": false
-   },
-   {
-      "id": "create in progress",
-      "translation": "create in progress",
-      "modified": false
-   },
-   {
-      "id": "create succeeded",
-      "translation": "create succeeded",
       "modified": false
    },
    {
@@ -4622,6 +4612,11 @@
    {
       "id": "event",
       "translation": "event",
+      "modified": false
+   },
+   {
+      "id": "{{.OperationType}} failed",
+      "translation": "{{.OperationType}} failed",
       "modified": false
    },
    {
@@ -4900,11 +4895,6 @@
       "modified": false
    },
    {
-      "id": "state",
-      "translation": "state",
-      "modified": false
-   },
-   {
       "id": "status",
       "translation": "status",
       "modified": false
@@ -4928,6 +4918,11 @@
       "id": "total memory limit",
       "translation": "memory limit",
       "modified": true
+   },
+   {
+      "id": "{{.OperationType}} in progress",
+      "translation": "{{.OperationType}} in progress",
+      "modified": false
    },
    {
       "id": "unknown authority",
@@ -5092,6 +5087,26 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
+      "modified": false
+   },
+   {
+      "id": "details",
+      "translation": "details",
+      "modified": false
+   },
+   {
+      "id": "Last Operation",
+      "translation": "Last Operation",
+      "modified": false
+   },
+   {
+      "id": "last operation",
+      "translation": "last operation",
+      "modified": false
+   },
+   {
+      "id": "state",
+      "translation": "state",
       "modified": false
    }
 ]

@@ -102,9 +102,12 @@ var _ = Describe("create-service command", func() {
 		BeforeEach(func() {
 			serviceInstance = models.ServiceInstance{
 				ServiceInstanceFields: models.ServiceInstanceFields{
-					Name:             "my-cleardb-service",
-					State:            "creating",
-					StateDescription: "fake service instance description",
+					Name: "my-cleardb-service",
+					LastOperation: models.LastOperationFields{
+						Type:        "create",
+						State:       "in progress",
+						Description: "fake service instance description",
+					},
 				},
 			}
 			serviceRepo.FindInstanceByNameMap = generic.NewMap()
@@ -118,10 +121,11 @@ var _ = Describe("create-service command", func() {
 			Expect(spaceGuid).To(Equal(config.SpaceFields().Guid))
 			Expect(serviceName).To(Equal("cleardb"))
 
-			creatingServiceMessage := fmt.Sprintf("Instance status is unavailable (creating). Check status using cf services or cf service %s.", serviceInstance.ServiceInstanceFields.Name)
+			creatingServiceMessage := fmt.Sprintf("Create in progress. Use 'cf services' or 'cf service %s' to check operation status.", serviceInstance.ServiceInstanceFields.Name)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
 				[]string{creatingServiceMessage},
 			))
 			Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
