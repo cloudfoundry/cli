@@ -1,3 +1,67 @@
+##v6.10.0
+* rename default plugin repo
+* Update README.md 
+* Merge pull request #349 
+* Added accepts_incomplete parameter to update and rename service. [#86584082]
+* changed the async provisioning messages [#86668046]
+* Update service instance last operation state => status 
+* Formatting for services and service command matching new fashion [#86585678]
+* changes commands for last_operation 'fashion' * create-service
+* service
+* services
+* service-summary
+* utils object constructor returns a pointer 
+* `install-plugin` only tries downloading with internet prefixes 
+* validate sha1 when installing plugin from repo [#86072988]
+* utils for sha1 computing, comparing [#86072988]
+* Changed list-plugin-repo to list-plugin-repos [Finishes #87851674]
+* not asserting checksum in util test 
+* take out checksum in assertion [#87856234]
+* --checksum flag for command plugins [#87856234]
+* sha1 checksum utils [#87856234]
+* repo name case insensitive when installing plugins
+* Plugin Repo default - plugins.cloudfoundry.org
+* Godeps clipr
+* not locating plugin binary locally if path prefix with internet address
+* `list-plugin-repo` command [#86071226]
+* trim internet addr prefix before checking file existance [#86073134]
+* improve help text for command repo-plugins [finishes #86071226]
+* `install-plugin` can install from a repository [#86073134]
+* update file downloader [#86073134]
+* Extract list plugins from repo functions into actors [#86073134]
+* fix bug where args is overwritten itself before flags in testhelpers
+* Repo name comparisons in add-plugin-repo are case-insensitive. [#87467254]
+* Merge pull request #343 from fraenkel/instance_details
+* App instance may contain additional details [#86856252]
+* `repo-plugins` can list a plugins from a single repo with `-r` [#86071226]
+* Added remove-plugin-repo command to remove plugin repos. [#86141272]
+* new command `repo-plugins` - list plugins from all repos [#86071636]
+* `cf service-brokers` output sorted by name [#86663258]
+* remove commented code 
+* CLI knows about 'CRASHED' in addition to 'FLAPPING' [#87141282]
+* Godeps clipr 
+* new `add-plugin-repo` commnad [#86452004]
+* improved plugin topics for help [#86452004]
+* config Getter & Setter for PluginRepos [#86452004]
+* new PluginRepos field in config.json [#86452004]
+* Removed help references to specific companies. [#87059156]
+* non admin can see other users with `space-users` [#86963130]
+* update fakes for user_repo [#86963130]
+* new func to list space users w/o hitting UAA with api version >v2.21.0 [#86963130]
+* non-privileged users can list users with `org-users` [#82059018]
+* Add CallCount in fakes for testing [#82059018]
+* Add Api version comparing to config [#82059018]
+* new func to list org users w/o hitting UAA with api version >v2.21.0 [#82059018]
+* Merge pull request #339 from cloudfoundry/async Async Service Provisioning
+* Fixed bug where `cf services` would not parse the JSON [#62068908]
+* Changing expected state from CC to be: * `in progress` vs `creating`
+* `succeeded` vs `created` [#86578718]
+* Changes text to user for status to be: * create succeeded
+* create failed [#86578582]
+* Notify user manifest is not found on `cf push` [#86561070]
+* `create-app-manifest` now named the file <app-name>_manifest.yml [#86561764]
+* Update README.md 
+
 ##v6.9.0 
 * Merge PR #333: CLI sends async request for service instance provisioning
 * Revert "new command user-provided-services" [#79188196]
