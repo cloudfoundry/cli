@@ -2525,8 +2525,8 @@
       "modified": false
    },
    {
-      "id": "Create in progress. Use {{.ServicesCommand}} or {{.ServiceCommand}} to check operation status.",
-      "translation": "Create in progress. Use {{.ServicesCommand}} or {{.ServiceCommand}} to check operation status.",
+      "id": "{{.State}} in progress. Use {{.ServicesCommand}} or {{.ServiceCommand}} to check operation status.",
+      "translation": "{{.State}} in progress. Use {{.ServicesCommand}} or {{.ServiceCommand}} to check operation status.",
       "modified": false
    },
    {
