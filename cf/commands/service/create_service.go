@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -61,7 +62,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	planName := c.Args()[1]
 	serviceInstanceName := c.Args()[2]
 
-	cmd.ui.Say(T("Creating service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+	cmd.ui.Say(T("Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"ServiceName": terminal.EntityNameColor(serviceInstanceName),
 			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -120,8 +121,11 @@ func (cmd CreateService) printSuccessMessage(serviceInstanceName string) error {
 	if instance.ServiceInstanceFields.LastOperation.State == "in progress" {
 		cmd.ui.Ok()
 		cmd.ui.Say("")
-		cmd.ui.Say(T("Create in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.",
-			map[string]interface{}{"ServiceInstanceName": serviceInstanceName}))
+		cmd.ui.Say(T("Create in progress. Use {{.ServicesCommand}} or {{.ServiceCommand}} to check operation status.",
+			map[string]interface{}{
+				"ServicesCommand": terminal.EntityNameColor("cf services"),
+				"ServiceCommand":  terminal.EntityNameColor(fmt.Sprintf("cf service %s", serviceInstanceName)),
+			}))
 	} else {
 		cmd.ui.Ok()
 	}
