@@ -82,5 +82,8 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Ok()
+	apiErr = printSuccessMessageForServiceInstance(serviceName, cmd.serviceRepo, cmd.ui)
+	if apiErr != nil {
+		cmd.ui.Ok()
+	}
 }
