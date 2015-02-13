@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -74,7 +73,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	switch err.(type) {
 	case nil:
-		err := cmd.printSuccessMessage(serviceInstanceName)
+		err := printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
@@ -110,27 +109,6 @@ func (cmd CreateService) CreateService(serviceName string, planName string, serv
 
 	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
 	return plan, apiErr
-}
-
-func (cmd CreateService) printSuccessMessage(serviceInstanceName string) error {
-	instance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
-	if apiErr != nil {
-		return apiErr
-	}
-
-	if instance.ServiceInstanceFields.LastOperation.State == "in progress" {
-		cmd.ui.Ok()
-		cmd.ui.Say("")
-		cmd.ui.Say(T("Create in progress. Use {{.ServicesCommand}} or {{.ServiceCommand}} to check operation status.",
-			map[string]interface{}{
-				"ServicesCommand": terminal.EntityNameColor("cf services"),
-				"ServiceCommand":  terminal.EntityNameColor(fmt.Sprintf("cf service %s", serviceInstanceName)),
-			}))
-	} else {
-		cmd.ui.Ok()
-	}
-
-	return nil
 }
 
 func findPlanFromOfferings(offerings models.ServiceOfferings, name string) (plan models.ServicePlanFields, err error) {
