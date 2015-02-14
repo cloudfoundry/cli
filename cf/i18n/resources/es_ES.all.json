@@ -5108,5 +5108,35 @@
       "id": "state",
       "translation": "estado",
       "modified": false
+   },
+   {
+      "id": "Share a private domain with an org",
+      "translation": "Share a private domain with an org",
+      "modified": false
+   },
+   {
+      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
+      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME share-private-domain ORG DOMAIN",
+      "translation": "CF_NAME share-private-domain ORG DOMAIN",
+      "modified": false
+   },
+   {
+      "id": "Unshare a private domain with an org",
+      "translation": "Unshare a private domain with an org",
+      "modified": false
+   },
+   {
+      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
+      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
+      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
+      "modified": false
    }
 ]

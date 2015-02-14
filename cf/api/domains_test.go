@@ -88,7 +88,7 @@ var _ = Describe("DomainRepository", func() {
 		})
 	})
 
-	It("finds a domain by name", func() {
+	It("finds a shared domain by name", func() {
 		setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
@@ -103,12 +103,37 @@ var _ = Describe("DomainRepository", func() {
 				}`},
 		}))
 
-		domain, apiErr := repo.FindByName("domain2.cf-app.com")
+		domain, apiErr := repo.FindSharedByName("domain2.cf-app.com")
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
 		Expect(domain.Guid).To(Equal("domain2-guid"))
+		Expect(domain.Shared).To(BeTrue())
+	})
+
+	It("finds a private domain by name", func() {
+		setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method: "GET",
+			Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+			Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+				{
+					"resources": [
+						{
+						  "metadata": { "guid": "domain2-guid" },
+						  "entity": { "name": "domain2.cf-app.com", "owning_organization_guid": "some-guid" }
+						}
+					]
+				}`},
+		}))
+
+		domain, apiErr := repo.FindPrivateByName("domain2.cf-app.com")
+		Expect(handler).To(HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+
+		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
+		Expect(domain.Guid).To(Equal("domain2-guid"))
+		Expect(domain.Shared).To(BeFalse())
 	})
 
 	Describe("finding a domain by name in an org", func() {
