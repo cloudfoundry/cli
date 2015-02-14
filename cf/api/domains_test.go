@@ -66,6 +66,7 @@ var _ = Describe("DomainRepository", func() {
 			Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
 			Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
 			Expect(receivedDomains[2].Guid).To(Equal("domain3-guid"))
+			Expect(receivedDomains[2].Shared).To(BeFalse())
 			Expect(receivedDomains[3].Guid).To(Equal("shared-domain1-guid"))
 			Expect(receivedDomains[4].Guid).To(Equal("shared-domain2-guid"))
 			Expect(receivedDomains[5].Guid).To(Equal("shared-domain3-guid"))
@@ -551,7 +552,8 @@ var secondPagePrivateDomainsRequest = testapi.NewCloudControllerTestRequest(test
 		  },
 		  "entity": {
 			"name": "example.com",
-			"owning_organization_guid": "my-org-guid"
+			"owning_organization_guid": null,
+			"shared_organizations_url": "/v2/private_domains/domain3-guid/shared_organizations"
 		  }
 		}
 	]
