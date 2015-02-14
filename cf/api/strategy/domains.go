@@ -2,7 +2,8 @@ package strategy
 
 type DomainsEndpointStrategy interface {
 	OrgDomainURL(orgGuid, name string) string
-	DomainURL(name string) string
+	SharedDomainURL(name string) string
+	PrivateDomainURL(name string) string
 	OrgDomainsURL(orgGuid string) string
 	PrivateDomainsURL() string
 	SharedDomainsURL() string
@@ -13,7 +14,14 @@ type DomainsEndpointStrategy interface {
 
 type domainsEndpointStrategy struct{}
 
-func (s domainsEndpointStrategy) DomainURL(name string) string {
+func (s domainsEndpointStrategy) SharedDomainURL(name string) string {
+	return buildURL(v2("domains"), params{
+		inlineRelationsDepth: 1,
+		q:                    map[string]string{"name": name},
+	})
+}
+
+func (s domainsEndpointStrategy) PrivateDomainURL(name string) string {
 	return buildURL(v2("domains"), params{
 		inlineRelationsDepth: 1,
 		q:                    map[string]string{"name": name},
@@ -53,8 +61,14 @@ func (s domainsEndpointStrategy) DeleteSharedDomainURL(guid string) string {
 
 type separatedDomainsEndpointStrategy struct{}
 
-func (s separatedDomainsEndpointStrategy) DomainURL(name string) string {
+func (s separatedDomainsEndpointStrategy) SharedDomainURL(name string) string {
 	return buildURL(v2("shared_domains"), params{
+		q: map[string]string{"name": name},
+	})
+}
+
+func (s separatedDomainsEndpointStrategy) PrivateDomainURL(name string) string {
+	return buildURL(v2("private_domains"), params{
 		q: map[string]string{"name": name},
 	})
 }
