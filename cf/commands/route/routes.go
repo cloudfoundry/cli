@@ -30,8 +30,11 @@ func (cmd ListRoutes) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "routes",
 		ShortName:   "r",
-		Description: T("List all routes in the current space"),
+		Description: T("List all routes in the current space or the current organization"),
 		Usage:       "CF_NAME routes",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "orglevel", Usage: T("List all the routes for all spaces of current organization")},
+		},
 	}
 }
 
@@ -49,19 +52,38 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 	cmd.ui.Say(T("Getting routes as {{.Username}} ...\n",
 		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	table := cmd.ui.Table([]string{T("host"), T("domain"), T("apps")})
+	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("apps")})
 
 	noRoutes := true
-	apiErr := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
-		noRoutes = false
-		appNames := []string{}
-		for _, app := range route.Apps {
-			appNames = append(appNames, app.Name)
-		}
+	var apiErr error
+	flag := c.Bool("orglevel")
 
-		table.Add(route.Host, route.Domain.Name, strings.Join(appNames, ","))
-		return true
-	})
+	if flag {
+		apiErr = cmd.routeRepo.ListAllRoutes(func(route models.Route) bool {
+			noRoutes = false
+			appNames := []string{}
+			for _, app := range route.Apps {
+				appNames = append(appNames, app.Name)
+			}
+
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","))
+			return true
+		})
+
+	} else {
+
+		apiErr = cmd.routeRepo.ListRoutes(func(route models.Route) bool {
+			noRoutes = false
+			appNames := []string{}
+			for _, app := range route.Apps {
+				appNames = append(appNames, app.Name)
+			}
+
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","))
+			return true
+		})
+	}
+
 	table.Print()
 
 	if apiErr != nil {

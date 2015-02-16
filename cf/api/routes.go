@@ -14,6 +14,7 @@ import (
 
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
+	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
 	FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error)
 	Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error)
@@ -44,6 +45,15 @@ func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool
 		})
 }
 
+func (repo CloudControllerRouteRepository) ListAllRoutes(cb func(models.Route) bool) (apiErr error) {
+	return repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		fmt.Sprintf("/v2/routes?q=organization_guid:%s&inline-relations-depth=1", repo.config.OrganizationFields().Guid),
+		resources.RouteResource{},
+		func(resource interface{}) bool {
+			return cb(resource.(resources.RouteResource).ToModel())
+		})
+}
 func (repo CloudControllerRouteRepository) FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error) {
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
