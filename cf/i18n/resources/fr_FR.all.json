@@ -2665,8 +2665,13 @@
       "modified": false
    },
    {
-      "id": "List all routes in the current space",
-      "translation": "Lister toutes les routes dans l'espace actuel",
+      "id": "List all routes in the current space or the current organization",
+      "translation": "List all routes in the current space or the current organization",
+      "modified": false
+   },
+   {
+      "id": "List all the routes for all spaces of current organization",
+      "translation": "List all the routes for all spaces of current organization",
       "modified": false
    },
    {
