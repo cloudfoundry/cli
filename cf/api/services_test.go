@@ -381,7 +381,7 @@ var _ = Describe("Services Repo", func() {
 		It("it deletes the service when no apps are bound", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
-				Path:     "/v2/service_instances/my-service-instance-guid",
+				Path:     "/v2/service_instances/my-service-instance-guid?accepts_incomplete=true&async=true",
 				Response: testnet.TestResponse{Status: http.StatusOK},
 			}))
 
