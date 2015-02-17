@@ -68,7 +68,7 @@ func (cmd *EnableServiceAccess) Run(c *cli.Context) {
 	} else {
 		cmd.enableAllPlansForService(serviceName)
 	}
-	cmd.ui.Say("OK")
+	cmd.ui.Ok()
 }
 
 func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, planName string, orgName string) {
