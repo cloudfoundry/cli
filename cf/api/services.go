@@ -175,7 +175,7 @@ func (repo CloudControllerServiceRepository) DeleteService(instance models.Servi
 	if len(instance.ServiceBindings) > 0 {
 		return errors.New("Cannot delete service instance, apps are still bound to it")
 	}
-	path := fmt.Sprintf("/v2/service_instances/%s", instance.Guid)
+	path := fmt.Sprintf("/v2/service_instances/%s?%s", instance.Guid, "accepts_incomplete=true")
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 
