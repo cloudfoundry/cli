@@ -2,11 +2,12 @@ package app_files
 
 import (
 	"archive/zip"
-	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
 type Zipper interface {
@@ -65,6 +66,9 @@ func writeZipFile(dir string, targetFile *os.File) error {
 		}
 
 		zipFilePart, err := writer.CreateHeader(header)
+		if err != nil {
+			return err
+		}
 
 		if fileInfo.IsDir() {
 			return nil
