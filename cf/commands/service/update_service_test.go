@@ -72,6 +72,7 @@ var _ = Describe("update-service command", func() {
 			Expect(callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeFalse())
 		})
 	})
+
 	Context("when no flags are passed", func() {
 		Context("when there is an err finding the instance", func() {
 			It("returns an error", func() {
@@ -96,90 +97,186 @@ var _ = Describe("update-service command", func() {
 			})
 		})
 	})
-	Context("when the plan flag is passed", func() {
-		BeforeEach(func() {
-			serviceInstance := models.ServiceInstance{
-				ServiceInstanceFields: models.ServiceInstanceFields{
-					Name: "my-service-instance",
-					Guid: "my-service-instance-guid",
+
+	Context("when service creation is asynchronous", func() {
+		Context("when the plan flag is passed", func() {
+			BeforeEach(func() {
+				serviceInstance := models.ServiceInstance{
+					ServiceInstanceFields: models.ServiceInstanceFields{
+						Name: "my-service-instance",
+						Guid: "my-service-instance-guid",
+						LastOperation: models.LastOperationFields{
+							Type:        "update",
+							State:       "in progress",
+							Description: "fake service instance description",
+						},
+					},
+					ServiceOffering: models.ServiceOfferingFields{
+						Label: "murkydb",
+						Guid:  "murkydb-guid",
+					},
+				}
+
+				servicePlans := []models.ServicePlanFields{{
+					Name: "spark",
+					Guid: "murkydb-spark-guid",
+				}, {
+					Name: "flare",
+					Guid: "murkydb-flare-guid",
 				},
-				ServiceOffering: models.ServiceOfferingFields{
-					Label: "murkydb",
-					Guid:  "murkydb-guid",
-				},
-			}
+				}
+				serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
+				planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
 
-			servicePlans := []models.ServicePlanFields{{
-				Name: "spark",
-				Guid: "murkydb-spark-guid",
-			}, {
-				Name: "flare",
-				Guid: "murkydb-flare-guid",
-			},
-			}
-			serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
-			planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
-
-		})
-		It("successfully updates a service", func() {
-			callUpdateService([]string{"-p", "flare", "my-service-instance"})
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Updating service", "my-service", "as", "my-user", "..."},
-				[]string{"OK"},
-			))
-			Expect(serviceRepo.FindInstanceByNameName).To(Equal("my-service-instance"))
-			serviceGuid, orgName := planBuilder.GetPlansForServiceForOrgArgsForCall(0)
-			Expect(serviceGuid).To(Equal("murkydb-guid"))
-			Expect(orgName).To(Equal("my-org"))
-			Expect(serviceRepo.UpdateServiceInstanceArgs.InstanceGuid).To(Equal("my-service-instance-guid"))
-			Expect(serviceRepo.UpdateServiceInstanceArgs.PlanGuid).To(Equal("murkydb-flare-guid"))
-		})
-
-		Context("when there is an err finding the instance", func() {
-			It("returns an error", func() {
-				serviceRepo.FindInstanceByNameErr = true
-
-				callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error finding instance"},
-					[]string{"FAILED"},
-				))
 			})
-		})
-		Context("when there is an err finding service plans", func() {
-			It("returns an error", func() {
-				planBuilder.GetPlansForServiceForOrgReturns(nil, errors.New("Error fetching plans"))
-
-				callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error fetching plans"},
-					[]string{"FAILED"},
-				))
-			})
-		})
-		Context("when the plan specified does not exist in the service offering", func() {
-			It("returns an error", func() {
-				callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Plan does not exist for the murkydb service"},
-					[]string{"FAILED"},
-				))
-			})
-		})
-		Context("when there is an error updating the service instance", func() {
-			It("returns an error", func() {
-				serviceRepo.UpdateServiceInstanceReturnsErr = true
+			It("successfully updates a service", func() {
 				callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error updating service instance"},
-					[]string{"FAILED"},
+					[]string{"Updating service", "my-service", "as", "my-user", "..."},
+					[]string{"OK"},
+					[]string{"Update in progress. Use cf services or cf service my-service-instance to check operation status."},
 				))
+				Expect(serviceRepo.FindInstanceByNameName).To(Equal("my-service-instance"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.InstanceGuid).To(Equal("my-service-instance-guid"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.PlanGuid).To(Equal("murkydb-flare-guid"))
+			})
+
+			Context("when there is an err finding the instance", func() {
+				It("returns an error", func() {
+					serviceRepo.FindInstanceByNameErr = true
+
+					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error finding instance"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when there is an err finding service plans", func() {
+				It("returns an error", func() {
+					planBuilder.GetPlansForServiceForOrgReturns(nil, errors.New("Error fetching plans"))
+
+					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error fetching plans"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when the plan specified does not exist in the service offering", func() {
+				It("returns an error", func() {
+					callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Plan does not exist for the murkydb service"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when there is an error updating the service instance", func() {
+				It("returns an error", func() {
+					serviceRepo.UpdateServiceInstanceReturnsErr = true
+					callUpdateService([]string{"-p", "flare", "my-service-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error updating service instance"},
+						[]string{"FAILED"},
+					))
+				})
 			})
 		})
+	})
+
+	Context("when service creation is synchronous", func() {
+		Context("when the plan flag is passed", func() {
+			BeforeEach(func() {
+				serviceInstance := models.ServiceInstance{
+					ServiceInstanceFields: models.ServiceInstanceFields{
+						Name: "my-service-instance",
+						Guid: "my-service-instance-guid",
+					},
+					ServiceOffering: models.ServiceOfferingFields{
+						Label: "murkydb",
+						Guid:  "murkydb-guid",
+					},
+				}
+
+				servicePlans := []models.ServicePlanFields{{
+					Name: "spark",
+					Guid: "murkydb-spark-guid",
+				}, {
+					Name: "flare",
+					Guid: "murkydb-flare-guid",
+				},
+				}
+				serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
+				planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
+
+			})
+			It("successfully updates a service", func() {
+				callUpdateService([]string{"-p", "flare", "my-service-instance"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating service", "my-service", "as", "my-user", "..."},
+					[]string{"OK"},
+				))
+				Expect(serviceRepo.FindInstanceByNameName).To(Equal("my-service-instance"))
+				serviceGuid, orgName := planBuilder.GetPlansForServiceForOrgArgsForCall(0)
+				Expect(serviceGuid).To(Equal("murkydb-guid"))
+				Expect(orgName).To(Equal("my-org"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.InstanceGuid).To(Equal("my-service-instance-guid"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.PlanGuid).To(Equal("murkydb-flare-guid"))
+			})
+
+			Context("when there is an err finding the instance", func() {
+				It("returns an error", func() {
+					serviceRepo.FindInstanceByNameErr = true
+
+					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error finding instance"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when there is an err finding service plans", func() {
+				It("returns an error", func() {
+					planBuilder.GetPlansForServiceForOrgReturns(nil, errors.New("Error fetching plans"))
+
+					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error fetching plans"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when the plan specified does not exist in the service offering", func() {
+				It("returns an error", func() {
+					callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Plan does not exist for the murkydb service"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when there is an error updating the service instance", func() {
+				It("returns an error", func() {
+					serviceRepo.UpdateServiceInstanceReturnsErr = true
+					callUpdateService([]string{"-p", "flare", "my-service-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error updating service instance"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+		})
+
 	})
 })

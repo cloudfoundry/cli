@@ -61,7 +61,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	planName := c.Args()[1]
 	serviceInstanceName := c.Args()[2]
 
-	cmd.ui.Say(T("Creating service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+	cmd.ui.Say(T("Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"ServiceName": terminal.EntityNameColor(serviceInstanceName),
 			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -73,7 +73,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	switch err.(type) {
 	case nil:
-		err := cmd.printSuccessMessage(serviceInstanceName)
+		err := printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
@@ -109,24 +109,6 @@ func (cmd CreateService) CreateService(serviceName string, planName string, serv
 
 	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
 	return plan, apiErr
-}
-
-func (cmd CreateService) printSuccessMessage(serviceInstanceName string) error {
-	instance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
-	if apiErr != nil {
-		return apiErr
-	}
-
-	if instance.ServiceInstanceFields.LastOperation.State == "in progress" {
-		cmd.ui.Ok()
-		cmd.ui.Say("")
-		cmd.ui.Say(T("Create in progress. Use 'cf services' or 'cf service {{.ServiceInstanceName}}' to check operation status.",
-			map[string]interface{}{"ServiceInstanceName": serviceInstanceName}))
-	} else {
-		cmd.ui.Ok()
-	}
-
-	return nil
 }
 
 func findPlanFromOfferings(offerings models.ServiceOfferings, name string) (plan models.ServicePlanFields, err error) {
