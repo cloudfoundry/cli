@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -76,7 +78,10 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 		err := cmd.updateServiceWithPlan(serviceInstance, planName)
 		switch err.(type) {
 		case nil:
-			cmd.ui.Ok()
+			err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
 		default:
 			cmd.ui.Failed(err.Error())
 		}
@@ -102,4 +107,26 @@ func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceIn
 		map[string]interface{}{"ServiceName": serviceInstance.ServiceOffering.Label}))
 
 	return
+}
+
+func printSuccessMessageForServiceInstance(serviceInstanceName string, serviceRepo api.ServiceRepository, ui terminal.UI) error {
+	instance, apiErr := serviceRepo.FindInstanceByName(serviceInstanceName)
+	if apiErr != nil {
+		return apiErr
+	}
+
+	if instance.ServiceInstanceFields.LastOperation.State == "in progress" {
+		ui.Ok()
+		ui.Say("")
+		ui.Say(T("{{.State}} in progress. Use {{.ServicesCommand}} or {{.ServiceCommand}} to check operation status.",
+			map[string]interface{}{
+				"State":           strings.Title(instance.ServiceInstanceFields.LastOperation.Type),
+				"ServicesCommand": terminal.EntityNameColor("cf services"),
+				"ServiceCommand":  terminal.EntityNameColor(fmt.Sprintf("cf service %s", serviceInstanceName)),
+			}))
+	} else {
+		ui.Ok()
+	}
+
+	return nil
 }
