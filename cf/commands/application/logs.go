@@ -52,6 +52,7 @@ func (cmd *Logs) GetRequirements(requirementsFactory requirements.Factory, c *cl
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 

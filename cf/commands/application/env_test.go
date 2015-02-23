@@ -34,7 +34,7 @@ var _ = Describe("env command", func() {
 		appRepo.ReadReturns.App = app
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	})
 
 	runCommand := func(args ...string) bool {
@@ -45,6 +45,10 @@ var _ = Describe("env command", func() {
 	Describe("Requirements", func() {
 		It("fails when the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
+			Expect(runCommand("my-app")).To(BeFalse())
+		})
+		It("fails if a space is not targeted", func() {
+			requirementsFactory.TargetedSpaceSuccess = false
 			Expect(runCommand("my-app")).To(BeFalse())
 		})
 	})

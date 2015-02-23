@@ -47,7 +47,8 @@ func (cmd *DeleteApp) GetRequirements(requirementsFactory requirements.Factory, 
 		cmd.ui.FailWithUsage(c)
 	}
 
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement()}
 	return
 }
 

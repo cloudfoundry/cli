@@ -38,10 +38,16 @@ var _ = Describe("stop command", func() {
 	It("fails requirements when not logged in", func() {
 		Expect(runCommand("some-app-name")).To(BeFalse())
 	})
+	It("fails requirements when a space is not targeted", func() {
+		requirementsFactory.LoginSuccess = true
+		requirementsFactory.TargetedSpaceSuccess = false
+		Expect(runCommand("some-app-name")).To(BeFalse())
+	})
 
 	Context("when logged in and an app exists", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = true
 
 			app = models.Application{}
 			app.Name = "my-app"
