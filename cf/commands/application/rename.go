@@ -42,6 +42,7 @@ func (cmd *RenameApp) GetRequirements(requirementsFactory requirements.Factory, 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 	return

@@ -34,7 +34,7 @@ var _ = Describe("restage command", func() {
 		appRepo.ReadReturns.App = app
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 		stagingWatcher = &fakeStagingWatcher{}
 	})
@@ -54,6 +54,11 @@ var _ = Describe("restage command", func() {
 			passed := runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
 			Expect(passed).To(BeFalse())
+		})
+		It("fails if a space is not targeted", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = false
+			Expect(runCommand("my-app")).To(BeFalse())
 		})
 	})
 
