@@ -9,6 +9,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/cloudfoundry/cli/plugin"
 )
@@ -21,6 +23,8 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		theFirstCmd()
 	} else if args[0] == "test_1_cmd2" {
 		theSecondCmd()
+	} else if args[0] == "CLI-MESSAGE-UNINSTALL" {
+		uninstalling()
 	}
 }
 
@@ -30,7 +34,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 		Version: plugin.VersionType{
 			Major: 1,
 			Minor: 2,
-			Build: 3,
+			Build: 4,
 		},
 		Commands: []plugin.Command{
 			{
@@ -60,6 +64,10 @@ func theFirstCmd() {
 
 func theSecondCmd() {
 	fmt.Println("You called cmd2 in test_1")
+}
+
+func uninstalling() {
+	os.Remove(filepath.Join(os.TempDir(), "uninstall-test-file-for-test_1.exe"))
 }
 
 func main() {

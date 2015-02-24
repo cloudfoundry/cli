@@ -3,12 +3,14 @@ package plugin
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/codegangsta/cli"
 )
 
@@ -41,7 +43,6 @@ func (cmd *PluginUninstall) GetRequirements(_ requirements.Factory, c *cli.Conte
 }
 
 func (cmd *PluginUninstall) Run(c *cli.Context) {
-
 	pluginName := c.Args()[0]
 	pluginNameMap := map[string]interface{}{"PluginName": pluginName}
 
@@ -54,10 +55,34 @@ func (cmd *PluginUninstall) Run(c *cli.Context) {
 	}
 
 	pluginMetadata := plugins[pluginName]
+
+	err := cmd.notifyPluginUninstalling(pluginMetadata)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
 	os.Remove(pluginMetadata.Location)
 
 	cmd.config.RemovePlugin(pluginName)
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully uninstalled.", pluginNameMap)))
+}
+
+func (cmd *PluginUninstall) notifyPluginUninstalling(meta plugin_config.PluginMetadata) error {
+	rpcService, err := rpc.NewRpcService(nil, nil, nil)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	err = rpcService.Start()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+	defer rpcService.Stop()
+
+	pluginInvocation := exec.Command(meta.Location, rpcService.Port(), "CLI-MESSAGE-UNINSTALL")
+	pluginInvocation.Stdout = os.Stdout
+
+	return pluginInvocation.Run()
 }

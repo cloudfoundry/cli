@@ -549,7 +549,7 @@ var _ = Describe("Install", func() {
 			Expect(pluginMetadata.Location).To(Equal(filepath.Join(pluginDir, "test_1.exe")))
 			Expect(pluginMetadata.Version.Major).To(Equal(1))
 			Expect(pluginMetadata.Version.Minor).To(Equal(2))
-			Expect(pluginMetadata.Version.Build).To(Equal(3))
+			Expect(pluginMetadata.Version.Build).To(Equal(4))
 			Expect(pluginMetadata.Commands[0].Name).To(Equal("test_1_cmd1"))
 			Expect(pluginMetadata.Commands[0].HelpText).To(Equal("help text for test_1_cmd1"))
 			Expect(pluginMetadata.Commands[1].Name).To(Equal("test_1_cmd2"))
@@ -557,7 +557,7 @@ var _ = Describe("Install", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Installing plugin", test_1},
 				[]string{"OK"},
-				[]string{"Plugin", "Test1", "v1.2.3", "successfully installed"},
+				[]string{"Plugin", "Test1", "v1.2.4", "successfully installed"},
 			))
 		})
 
