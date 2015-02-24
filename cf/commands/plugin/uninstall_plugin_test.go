@@ -2,6 +2,7 @@ package plugin_test
 
 import (
 	"io/ioutil"
+	"net/rpc"
 	"os"
 	"path/filepath"
 
@@ -51,6 +52,9 @@ var _ = Describe("Uninstall", func() {
 		pluginConfig = plugin_config.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
 		pluginConfig.SetPlugin("test_1.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_1.exe")})
 		pluginConfig.SetPlugin("test_2.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_2.exe")})
+
+		//reset rpc registration, each service can only be registered once
+		rpc.DefaultServer = rpc.NewServer()
 	})
 
 	AfterEach(func() {
@@ -81,6 +85,32 @@ var _ = Describe("Uninstall", func() {
 	})
 
 	Describe("success", func() {
+
+		Context("notifying plugin of uninstalling", func() {
+			var path2file string
+
+			BeforeEach(func() {
+				path2file = filepath.Join(os.TempDir(), "uninstall-test-file-for-test_1.exe")
+
+				_, err := os.Create(path2file)
+				Ω(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				os.Remove(path2file)
+			})
+
+			It("notifies the plugin upon uninstalling", func() {
+				_, err := os.Stat(path2file)
+				Ω(err).ToNot(HaveOccurred())
+
+				runCommand("test_1.exe")
+
+				_, err = os.Stat(path2file)
+				Ω(err).To(HaveOccurred())
+				Ω(os.IsNotExist(err)).To(BeTrue())
+			})
+		})
 
 		It("removes the binary from the <FAKE_HOME_DIR>/.cf/plugins dir", func() {
 			_, err := os.Stat(filepath.Join(pluginDir, "test_1.exe"))
