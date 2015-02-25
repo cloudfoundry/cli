@@ -20,12 +20,14 @@ func (c *Test2) Run(cliConnection plugin.CliConnection, args []string) {
 		theFirstCmd()
 	} else if args[0] == "test_2_cmd2" {
 		theSecondCmd()
+	} else if args[0] == "CLI-MESSAGE-UNINSTALL" {
+		uninstall(cliConnection)
 	}
 }
 
 func (c *Test2) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
-		Name: "Test2",
+		Name: "Uninstall-Test",
 		Commands: []plugin.Command{
 			{
 				Name:     "test_2_cmd1",
@@ -45,6 +47,11 @@ func theFirstCmd() {
 
 func theSecondCmd() {
 	fmt.Println("You called cmd2 in test_2")
+}
+
+func uninstall(cliConnection plugin.CliConnection) {
+	fmt.Println("This plugin is being uninstalled, here are a list of apps you have running.")
+	cliConnection.CliCommand("apps")
 }
 
 func main() {
