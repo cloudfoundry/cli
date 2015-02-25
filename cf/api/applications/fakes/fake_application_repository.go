@@ -2,6 +2,7 @@ package fakes
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
