@@ -5113,5 +5113,10 @@
       "id": "state",
       "translation": "state",
       "modified": false
+   },
+   {
+      "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
+      "translation": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
+      "modified": false
    }
 ]
