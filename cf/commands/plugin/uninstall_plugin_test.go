@@ -8,6 +8,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	cliRpc "github.com/cloudfoundry/cli/plugin/rpc"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -53,8 +54,6 @@ var _ = Describe("Uninstall", func() {
 		pluginConfig.SetPlugin("test_1.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_1.exe")})
 		pluginConfig.SetPlugin("test_2.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_2.exe")})
 
-		//reset rpc registration, each service can only be registered once
-		rpc.DefaultServer = rpc.NewServer()
 	})
 
 	AfterEach(func() {
@@ -62,7 +61,10 @@ var _ = Describe("Uninstall", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPluginUninstall(ui, pluginConfig)
+		//reset rpc registration, each service can only be registered once
+		rpc.DefaultServer = rpc.NewServer()
+		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil)
+		cmd := NewPluginUninstall(ui, pluginConfig, rpcService)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 

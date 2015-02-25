@@ -35,9 +35,10 @@ type PluginInstall struct {
 	coreCmds     map[string]command.Command
 	pluginRepo   plugin_repo.PluginRepo
 	checksum     utils.Sha1Checksum
+	rpcService   *rpc.CliRpcService
 }
 
-func NewPluginInstall(ui terminal.UI, config core_config.Reader, pluginConfig plugin_config.PluginConfiguration, coreCmds map[string]command.Command, pluginRepo plugin_repo.PluginRepo, checksum utils.Sha1Checksum) *PluginInstall {
+func NewPluginInstall(ui terminal.UI, config core_config.Reader, pluginConfig plugin_config.PluginConfiguration, coreCmds map[string]command.Command, pluginRepo plugin_repo.PluginRepo, checksum utils.Sha1Checksum, rpcService *rpc.CliRpcService) *PluginInstall {
 	return &PluginInstall{
 		ui:           ui,
 		config:       config,
@@ -45,6 +46,7 @@ func NewPluginInstall(ui terminal.UI, config core_config.Reader, pluginConfig pl
 		coreCmds:     coreCmds,
 		pluginRepo:   pluginRepo,
 		checksum:     checksum,
+		rpcService:   rpcService,
 	}
 }
 
@@ -234,20 +236,15 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, p
 }
 
 func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) *plugin.PluginMetadata {
-	rpcService, err := rpc.NewRpcService(nil, nil, nil)
+	err := cmd.rpcService.Start()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
+	defer cmd.rpcService.Stop()
 
-	err = rpcService.Start()
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-	}
-	defer rpcService.Stop()
+	cmd.runPluginBinary(pluginSourceFilepath, cmd.rpcService.Port())
 
-	cmd.runPluginBinary(pluginSourceFilepath, rpcService.Port())
-
-	return rpcService.RpcCmd.PluginMetadata
+	return cmd.rpcService.RpcCmd.PluginMetadata
 }
 
 func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {

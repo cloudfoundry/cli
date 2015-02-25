@@ -15,14 +15,16 @@ import (
 )
 
 type PluginUninstall struct {
-	ui     terminal.UI
-	config plugin_config.PluginConfiguration
+	ui         terminal.UI
+	config     plugin_config.PluginConfiguration
+	rpcService *rpc.CliRpcService
 }
 
-func NewPluginUninstall(ui terminal.UI, config plugin_config.PluginConfiguration) *PluginUninstall {
+func NewPluginUninstall(ui terminal.UI, config plugin_config.PluginConfiguration, rpcService *rpc.CliRpcService) *PluginUninstall {
 	return &PluginUninstall{
-		ui:     ui,
-		config: config,
+		ui:         ui,
+		config:     config,
+		rpcService: rpcService,
 	}
 }
 
@@ -70,18 +72,13 @@ func (cmd *PluginUninstall) Run(c *cli.Context) {
 }
 
 func (cmd *PluginUninstall) notifyPluginUninstalling(meta plugin_config.PluginMetadata) error {
-	rpcService, err := rpc.NewRpcService(nil, nil, nil)
+	err := cmd.rpcService.Start()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
+	defer cmd.rpcService.Stop()
 
-	err = rpcService.Start()
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-	}
-	defer rpcService.Stop()
-
-	pluginInvocation := exec.Command(meta.Location, rpcService.Port(), "CLI-MESSAGE-UNINSTALL")
+	pluginInvocation := exec.Command(meta.Location, cmd.rpcService.Port(), "CLI-MESSAGE-UNINSTALL")
 	pluginInvocation.Stdout = os.Stdout
 
 	return pluginInvocation.Run()

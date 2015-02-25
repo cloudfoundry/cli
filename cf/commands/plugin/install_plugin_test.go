@@ -19,6 +19,7 @@ import (
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/plugin"
+	cliRpc "github.com/cloudfoundry/cli/plugin/rpc"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -78,8 +79,6 @@ var _ = Describe("Install", func() {
 		test_with_push_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push_short_name.exe")
 		aliasConflicts = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "alias_conflicts.exe")
 
-		rpc.DefaultServer = rpc.NewServer()
-
 		homeDir, err = ioutil.TempDir(os.TempDir(), "plugins")
 		Expect(err).ToNot(HaveOccurred())
 
@@ -103,7 +102,10 @@ var _ = Describe("Install", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPluginInstall(ui, config, pluginConfig, coreCmds, fakePluginRepo, fakeChecksum)
+		//reset rpc registration, each service can only be registered once
+		rpc.DefaultServer = rpc.NewServer()
+		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil)
+		cmd := NewPluginInstall(ui, config, pluginConfig, coreCmds, fakePluginRepo, fakeChecksum, rpcService)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 

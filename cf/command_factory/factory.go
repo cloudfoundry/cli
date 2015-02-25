@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	actor_plugin_repo "github.com/cloudfoundry/cli/cf/actors/plugin_repo"
+	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/cloudfoundry/cli/utils"
 
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
@@ -56,7 +57,7 @@ type concreteFactory struct {
 	cmdsByName map[string]command.Command
 }
 
-func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator, pluginConfig plugin_config.PluginConfiguration) (factory concreteFactory) {
+func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator, pluginConfig plugin_config.PluginConfiguration, rpcService *rpc.CliRpcService) (factory concreteFactory) {
 	factory.cmdsByName = make(map[string]command.Command)
 
 	planBuilder := plan_builder.NewBuilder(
@@ -292,8 +293,8 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["set-staging-environment-variable-group"] = environmentvariablegroup.NewSetStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-running-environment-variable-group"] = environmentvariablegroup.NewSetRunningEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 
-	factory.cmdsByName["uninstall-plugin"] = plugin.NewPluginUninstall(ui, pluginConfig)
-	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config, pluginConfig, factory.cmdsByName, actor_plugin_repo.NewPluginRepo(), utils.NewSha1Checksum(""))
+	factory.cmdsByName["uninstall-plugin"] = plugin.NewPluginUninstall(ui, pluginConfig, rpcService)
+	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config, pluginConfig, factory.cmdsByName, actor_plugin_repo.NewPluginRepo(), utils.NewSha1Checksum(""), rpcService)
 	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, pluginConfig)
 
 	factory.cmdsByName["add-plugin-repo"] = plugin_repo.NewAddPluginRepo(ui, config)

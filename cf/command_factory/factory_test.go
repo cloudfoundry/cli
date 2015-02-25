@@ -10,6 +10,7 @@ import (
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/plugin/rpc"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -34,7 +35,8 @@ var _ = Describe("factory", func() {
 			"uaa":              net.NewUAAGateway(config, fakeUI),
 		})
 
-		factory = NewFactory(fakeUI, config, manifestRepo, repoLocator, pluginConfig)
+		rpcService, _ := rpc.NewRpcService(nil, nil, nil)
+		factory = NewFactory(fakeUI, config, manifestRepo, repoLocator, pluginConfig, rpcService)
 	})
 
 	It("provides the metadata for its commands", func() {

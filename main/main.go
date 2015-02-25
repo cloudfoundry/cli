@@ -84,7 +84,9 @@ func main() {
 	defer handlePanics(deps.teePrinter)
 	defer deps.configRepo.Close()
 
-	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator, deps.pluginConfig)
+	rpcService := newCliRpcServer(deps.teePrinter, deps.teePrinter)
+
+	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator, deps.pluginConfig, rpcService)
 	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, deps.termUI)
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
@@ -111,6 +113,8 @@ func main() {
 	injectHelpTemplate(badFlags)
 
 	theApp := app.NewApp(cmdRunner, metaDatas...)
+	rpcService.SetTheApp(theApp)
+
 	//command `cf` without argument
 	if len(os.Args) == 1 || os.Args[1] == "help" || requestHelp(os.Args[2:]) {
 		theApp.Run(os.Args)
@@ -119,8 +123,7 @@ func main() {
 	} else {
 		// run each plugin and find the method/
 		// run method if exist
-
-		ran := rpc.RunMethodIfExists(theApp, os.Args[1:], deps.teePrinter, deps.teePrinter, pluginList)
+		ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
 		if !ran {
 			theApp.Run(os.Args)
 		}
@@ -276,4 +279,14 @@ func requestHelp(args []string) bool {
 	}
 
 	return false
+}
+
+func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {
+	cliServer, err := rpc.NewRpcService(nil, outputCapture, terminalOutputSwitch)
+	if err != nil {
+		fmt.Println("Error initializing RPC service: ", err)
+		os.Exit(1)
+	}
+
+	return cliServer
 }

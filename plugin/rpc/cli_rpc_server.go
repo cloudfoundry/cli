@@ -81,6 +81,10 @@ func (cli *CliRpcService) Start() error {
 	return nil
 }
 
+func (cmd *CliRpcService) SetTheApp(app *cli.App) {
+	cmd.RpcCmd.coreCommandRunner = app
+}
+
 func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
 	cmd.PluginMetadata = &pluginMetadata
 	*retVal = true

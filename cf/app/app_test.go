@@ -11,6 +11,7 @@ import (
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/trace"
+	"github.com/cloudfoundry/cli/plugin/rpc"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
 	testmanifest "github.com/cloudfoundry/cli/testhelpers/manifest"
@@ -57,7 +58,8 @@ var _ = Describe("App", func() {
 			"uaa":              net.NewUAAGateway(config, ui),
 		})
 
-		cmdFactory := command_factory.NewFactory(ui, config, manifestRepo, repoLocator, pluginConfig)
+		rpcService, _ := rpc.NewRpcService(nil, nil, nil)
+		cmdFactory := command_factory.NewFactory(ui, config, manifestRepo, repoLocator, pluginConfig, rpcService)
 		cmdRunner = &FakeRunner{cmdFactory: cmdFactory}
 		app = NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
 	})
