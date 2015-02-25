@@ -28,10 +28,11 @@ OK
 $ cf push
 ```
 #Further Reading and Getting Help
-You can find further documentation at the docs page for the CLI [here](http://docs.cloudfoundry.org/devguide/#cf).
-There is also help available in the CLI itself; type `cf help` for more information.
-Each command also has help output available via `cf [command] --help` or `cf [command] -h`.   For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples).  
-Finally, if you are still stuck, feel free to open a GitHub issue.
+* You can find further documentation at the docs page for the CLI [here](http://docs.cloudfoundry.org/devguide/#cf).
+* There is also help available in the CLI itself; type `cf help` for more information.
+* Each command also has help output available via `cf [command] --help` or `cf [command] -h`.   
+* For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples).  
+* Finally, if you are still stuck, feel free to open a GitHub issue.
 
 Downloads
 =========
