@@ -94,8 +94,9 @@ var _ = Describe("Uninstall", func() {
 			BeforeEach(func() {
 				path2file = filepath.Join(os.TempDir(), "uninstall-test-file-for-test_1.exe")
 
-				_, err := os.Create(path2file)
+				f, err := os.Create(path2file)
 				Ω(err).ToNot(HaveOccurred())
+				defer f.Close()
 			})
 
 			AfterEach(func() {
