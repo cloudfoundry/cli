@@ -13,6 +13,7 @@ import (
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/plugin/rpc"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -61,7 +62,8 @@ func findCommand(cmdName string) (cmd cli.Command) {
 		"uaa":              net.NewUAAGateway(configRepo, fakeUI),
 	})
 
-	cmdFactory := command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig)
+	rpcService, _ := rpc.NewRpcService(nil, nil, nil)
+	cmdFactory := command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig, rpcService)
 	requirementsFactory := &testreq.FakeReqFactory{}
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, fakeUI)
 	myApp := app.NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)

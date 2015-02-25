@@ -12,6 +12,7 @@ import (
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/plugin/rpc"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -93,7 +94,8 @@ func createCommandFactory() command_factory.Factory {
 		"uaa":              net.NewUAAGateway(configRepo, fakeUI),
 	})
 
-	return command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig)
+	rpcService, _ := rpc.NewRpcService(nil, nil, nil)
+	return command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig, rpcService)
 }
 
 func createApp(commandFactory command_factory.Factory) *cli.App {
