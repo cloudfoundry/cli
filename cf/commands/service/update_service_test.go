@@ -137,7 +137,7 @@ var _ = Describe("update-service command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Updating service", "my-service", "as", "my-user", "..."},
 					[]string{"OK"},
-					[]string{"Update in progress. Use cf services or cf service my-service-instance to check operation status."},
+					[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
 				))
 				Expect(serviceRepo.FindInstanceByNameName).To(Equal("my-service-instance"))
 				Expect(serviceRepo.UpdateServiceInstanceArgs.InstanceGuid).To(Equal("my-service-instance-guid"))
