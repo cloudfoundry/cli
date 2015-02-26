@@ -60,7 +60,7 @@ func (cmd *PluginUninstall) Run(c *cli.Context) {
 
 	err := cmd.notifyPluginUninstalling(pluginMetadata)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		cmd.ui.Say("Error invoking plugin: " + err.Error() + ". Process to uninstall ...")
 	}
 
 	os.Remove(pluginMetadata.Location)
