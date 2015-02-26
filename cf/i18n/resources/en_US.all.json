@@ -1465,8 +1465,8 @@
       "modified": false
    },
    {
-      "id": "Creating user {{.TargetUser}} as {{.CurrentUser}}...",
-      "translation": "Creating user {{.TargetUser}} as {{.CurrentUser}}...",
+      "id": "Creating user {{.TargetUser}}...",
+      "translation": "Creating user {{.TargetUser}}...",
       "modified": false
    },
    {
