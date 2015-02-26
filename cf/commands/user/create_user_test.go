@@ -42,7 +42,7 @@ var _ = Describe("Create user command", func() {
 		runCommand("my-user", "my-password")
 
 		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Creating user", "my-user", "current-user"},
+			[]string{"Creating user", "my-user"},
 			[]string{"OK"},
 			[]string{"TIP"},
 		))
