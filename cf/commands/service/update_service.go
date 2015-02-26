@@ -126,11 +126,11 @@ func printSuccessMessageForServiceInstance(serviceInstanceName string, serviceRe
 	if instance.ServiceInstanceFields.LastOperation.State == "in progress" {
 		ui.Ok()
 		ui.Say("")
-		ui.Say(T("{{.State}} in progress. Use {{.ServicesCommand}} or {{.ServiceCommand}} to check operation status.",
+		ui.Say(T("{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
 			map[string]interface{}{
 				"State":           strings.Title(instance.ServiceInstanceFields.LastOperation.Type),
-				"ServicesCommand": terminal.EntityNameColor("cf services"),
-				"ServiceCommand":  terminal.EntityNameColor(fmt.Sprintf("cf service %s", serviceInstanceName)),
+				"ServicesCommand": terminal.CommandColor("cf services"),
+				"ServiceCommand":  terminal.CommandColor(fmt.Sprintf("cf service %s", serviceInstanceName)),
 			}))
 	} else {
 		ui.Ok()
