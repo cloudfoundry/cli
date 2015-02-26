@@ -80,7 +80,7 @@ var _ = Describe("delete-service command", func() {
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
 							[]string{"OK"},
-							[]string{"Delete in progress. Use cf services or cf service my-service to check operation status."},
+							[]string{"Delete in progress. Use 'cf services' or 'cf service my-service' to check operation status."},
 						))
 
 						Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
@@ -94,7 +94,7 @@ var _ = Describe("delete-service command", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Deleting service", "foo.com"},
 						[]string{"OK"},
-						[]string{"Delete in progress. Use cf services or cf service foo.com to check operation status."},
+						[]string{"Delete in progress. Use 'cf services' or 'cf service foo.com' to check operation status."},
 					))
 				})
 			})

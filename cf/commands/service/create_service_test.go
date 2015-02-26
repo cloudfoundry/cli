@@ -121,7 +121,7 @@ var _ = Describe("create-service command", func() {
 			Expect(spaceGuid).To(Equal(config.SpaceFields().Guid))
 			Expect(serviceName).To(Equal("cleardb"))
 
-			creatingServiceMessage := fmt.Sprintf("Create in progress. Use cf services or cf service %s to check operation status.", serviceInstance.ServiceInstanceFields.Name)
+			creatingServiceMessage := fmt.Sprintf("Create in progress. Use 'cf services' or 'cf service %s' to check operation status.", serviceInstance.ServiceInstanceFields.Name)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
