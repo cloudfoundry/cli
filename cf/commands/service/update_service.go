@@ -75,15 +75,23 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 				"UserName":    terminal.EntityNameColor(cmd.config.Username()),
 			}))
 
-		err := cmd.updateServiceWithPlan(serviceInstance, planName)
-		switch err.(type) {
-		case nil:
-			err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
-			if err != nil {
+		if cmd.config.IsMinApiVersion("2.16.0") {
+			err := cmd.updateServiceWithPlan(serviceInstance, planName)
+			switch err.(type) {
+			case nil:
+				err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
+				if err != nil {
+					cmd.ui.Failed(err.Error())
+				}
+			default:
 				cmd.ui.Failed(err.Error())
 			}
-		default:
-			cmd.ui.Failed(err.Error())
+		} else {
+			cmd.ui.Failed(T("Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
+				map[string]interface{}{
+					"RequiredCCAPIVersion": "2.16.0",
+					"CurrentCCAPIVersion":  cmd.config.ApiVersion(),
+				}))
 		}
 	} else {
 		cmd.ui.Ok()
