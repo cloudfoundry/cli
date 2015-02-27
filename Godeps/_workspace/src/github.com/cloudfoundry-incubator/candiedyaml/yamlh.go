@@ -359,6 +359,8 @@ const (
 	yaml_DEFAULT_SEQUENCE_TAG = yaml_SEQ_TAG
 	/** The default mapping tag is @c !!map. */
 	yaml_DEFAULT_MAPPING_TAG = yaml_MAP_TAG
+
+	yaml_BINARY_TAG = "tag:yaml.org,2002:binary"
 )
 
 /** Node types. */
