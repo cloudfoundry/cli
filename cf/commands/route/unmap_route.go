@@ -75,8 +75,8 @@ func (cmd *UnmapRoute) Run(c *cli.Context) {
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	var routeFound bool
-	for _, appRoute := range app.Routes {
-		if appRoute.Guid == route.Guid {
+	for _, routeApp := range route.Apps {
+		if routeApp.Guid == app.Guid {
 			routeFound = true
 			apiErr = cmd.routeRepo.Unbind(route.Guid, app.Guid)
 			if apiErr != nil {
