@@ -175,10 +175,7 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, endpoint, apiUrl strin
 	}
 
 	if resource == nil {
-		var res *http.Response
-		defer res.Body.Close()
-
-		res, apiErr = gateway.PerformRequest(request)
+		_, apiErr = gateway.PerformRequest(request)
 		return
 	}
 
@@ -271,7 +268,6 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 	if apiErr != nil {
 		return
 	}
-	defer rawResponse.Body.Close()
 
 	if rawResponse.StatusCode > 203 || strings.TrimSpace(string(bytes)) == "" {
 		return
