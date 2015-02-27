@@ -31,6 +31,7 @@ var _ = Describe("update-service command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
+		config.SetApiVersion("2.26.0")
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		serviceRepo = &testapi.FakeServiceRepo{}
 		planBuilder = &testplanbuilder.FakePlanBuilder{}
@@ -86,6 +87,7 @@ var _ = Describe("update-service command", func() {
 				))
 			})
 		})
+
 		Context("when the instance exists", func() {
 			It("prints a user indicating it is a no-op", func() {
 				callUpdateService([]string{"my-service"})
@@ -127,8 +129,8 @@ var _ = Describe("update-service command", func() {
 				}
 				serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
 				planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
-
 			})
+
 			It("successfully updates a service", func() {
 				callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
@@ -142,48 +144,82 @@ var _ = Describe("update-service command", func() {
 				Expect(serviceRepo.UpdateServiceInstanceArgs.PlanGuid).To(Equal("murkydb-flare-guid"))
 			})
 
-			Context("when there is an err finding the instance", func() {
-				It("returns an error", func() {
-					serviceRepo.FindInstanceByNameErr = true
-
-					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
-
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Error finding instance"},
-						[]string{"FAILED"},
-					))
+			Context("and the CC API Version >= 2.16.0", func() {
+				BeforeEach(func() {
+					config.SetApiVersion("2.16.0")
 				})
-			})
-			Context("when there is an err finding service plans", func() {
-				It("returns an error", func() {
-					planBuilder.GetPlansForServiceForOrgReturns(nil, errors.New("Error fetching plans"))
 
-					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
-
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Error fetching plans"},
-						[]string{"FAILED"},
-					))
-				})
-			})
-			Context("when the plan specified does not exist in the service offering", func() {
-				It("returns an error", func() {
-					callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
-
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Plan does not exist for the murkydb service"},
-						[]string{"FAILED"},
-					))
-				})
-			})
-			Context("when there is an error updating the service instance", func() {
-				It("returns an error", func() {
-					serviceRepo.UpdateServiceInstanceReturnsErr = true
+				It("successfully updates a service", func() {
 					callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Error updating service instance"},
+						[]string{"Updating service", "my-service", "as", "my-user", "..."},
+						[]string{"OK"},
+						[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
+					))
+					Expect(serviceRepo.FindInstanceByNameName).To(Equal("my-service-instance"))
+					Expect(serviceRepo.UpdateServiceInstanceArgs.InstanceGuid).To(Equal("my-service-instance-guid"))
+					Expect(serviceRepo.UpdateServiceInstanceArgs.PlanGuid).To(Equal("murkydb-flare-guid"))
+				})
+
+				Context("when there is an err finding the instance", func() {
+					It("returns an error", func() {
+						serviceRepo.FindInstanceByNameErr = true
+
+						callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Error finding instance"},
+							[]string{"FAILED"},
+						))
+					})
+				})
+				Context("when there is an err finding service plans", func() {
+					It("returns an error", func() {
+						planBuilder.GetPlansForServiceForOrgReturns(nil, errors.New("Error fetching plans"))
+
+						callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Error fetching plans"},
+							[]string{"FAILED"},
+						))
+					})
+				})
+				Context("when the plan specified does not exist in the service offering", func() {
+					It("returns an error", func() {
+						callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Plan does not exist for the murkydb service"},
+							[]string{"FAILED"},
+						))
+					})
+				})
+				Context("when there is an error updating the service instance", func() {
+					It("returns an error", func() {
+						serviceRepo.UpdateServiceInstanceReturnsErr = true
+						callUpdateService([]string{"-p", "flare", "my-service-instance"})
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Error updating service instance"},
+							[]string{"FAILED"},
+						))
+					})
+				})
+			})
+
+			Context("and the CC API Version < 2.16.0", func() {
+				BeforeEach(func() {
+					config.SetApiVersion("2.15.0")
+				})
+
+				It("returns an error", func() {
+					callUpdateService([]string{"-p", "flare", "instance-without-service-offering"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
+						[]string{"Updating a plan requires API v2.16.0 or newer. Your current target is v2.15.0."},
 					))
 				})
 			})
