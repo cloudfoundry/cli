@@ -75,6 +75,12 @@ var _ = Describe("unmap-route command", func() {
 					Domain: requirementsFactory.Domain,
 					Guid:   "my-route-guid",
 					Host:   "foo",
+					Apps: []models.ApplicationFields{
+						models.ApplicationFields{
+							Guid: "my-app-guid",
+							Name: "my-app",
+						},
+					},
 				}
 			})
 
@@ -107,12 +113,12 @@ var _ = Describe("unmap-route command", func() {
 				BeforeEach(func() {
 					requirementsFactory.Application = models.Application{
 						ApplicationFields: models.ApplicationFields{
-							Guid: "my-app-guid",
+							Guid: "not-my-app-guid",
 							Name: "my-app",
 						},
 						Routes: []models.RouteSummary{
 							models.RouteSummary{
-								Guid: "not-my-route-guid",
+								Guid: "my-route-guid",
 							},
 						},
 					}
