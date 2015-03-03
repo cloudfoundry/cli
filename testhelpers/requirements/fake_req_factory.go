@@ -112,6 +112,9 @@ func (r FakeRequirement) Execute() (success bool) {
 	return r.success
 }
 
+func (r FakeRequirement) SetApplicationName(name string) {
+}
+
 func (r FakeRequirement) GetApplication() models.Application {
 	return r.factory.Application
 }

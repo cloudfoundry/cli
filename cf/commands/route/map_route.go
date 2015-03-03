@@ -45,10 +45,14 @@ func (cmd *MapRoute) GetRequirements(requirementsFactory requirements.Factory, c
 		cmd.ui.FailWithUsage(c)
 	}
 
-	appName := c.Args()[0]
 	domainName := c.Args()[1]
 
-	cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
+	if cmd.appReq == nil {
+		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
+	} else {
+		cmd.appReq.SetApplicationName(c.Args()[0])
+	}
+
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
 	reqs = []requirements.Requirement{

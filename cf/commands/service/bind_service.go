@@ -48,10 +48,14 @@ func (cmd *BindService) GetRequirements(requirementsFactory requirements.Factory
 		cmd.ui.FailWithUsage(c)
 	}
 
-	appName := c.Args()[0]
 	serviceName := c.Args()[1]
 
-	cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
+	if cmd.appReq == nil {
+		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
+	} else {
+		cmd.appReq.SetApplicationName(c.Args()[0])
+	}
+
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
 	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(), cmd.appReq, cmd.serviceInstanceReq}

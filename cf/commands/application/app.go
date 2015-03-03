@@ -32,7 +32,7 @@ type ApplicationDisplayer interface {
 }
 
 func NewShowApp(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo app_instances.AppInstancesRepository) (cmd *ShowApp) {
-	cmd = new(ShowApp)
+	cmd = &ShowApp{}
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appSummaryRepo = appSummaryRepo
@@ -56,7 +56,11 @@ func (cmd *ShowApp) GetRequirements(requirementsFactory requirements.Factory, c 
 		cmd.ui.FailWithUsage(c)
 	}
 
-	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
+	if cmd.appReq == nil {
+		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
+	} else {
+		cmd.appReq.SetApplicationName(c.Args()[0])
+	}
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
