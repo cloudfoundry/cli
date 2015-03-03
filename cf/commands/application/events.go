@@ -38,7 +38,11 @@ func (cmd *Events) GetRequirements(requirementsFactory requirements.Factory, c *
 		cmd.ui.FailWithUsage(c)
 	}
 
-	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
+	if cmd.appReq == nil {
+		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
+	} else {
+		cmd.appReq.SetApplicationName(c.Args()[0])
+	}
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
