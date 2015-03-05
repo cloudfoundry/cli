@@ -45,6 +45,7 @@ type Reader interface {
 
 	AuthenticationEndpoint() string
 	LoggregatorEndpoint() string
+	DopplerEndpoint() string
 	UaaEndpoint() string
 	AccessToken() string
 	RefreshToken() string
@@ -79,6 +80,7 @@ type ReadWriter interface {
 	SetApiVersion(string)
 	SetAuthenticationEndpoint(string)
 	SetLoggregatorEndpoint(string)
+	SetDopplerEndpoint(string)
 	SetUaaEndpoint(string)
 	SetAccessToken(string)
 	SetRefreshToken(string)
@@ -157,6 +159,13 @@ func (c *ConfigRepository) AuthenticationEndpoint() (authEndpoint string) {
 func (c *ConfigRepository) LoggregatorEndpoint() (logEndpoint string) {
 	c.read(func() {
 		logEndpoint = c.data.LoggregatorEndPoint
+	})
+	return
+}
+
+func (c *ConfigRepository) DopplerEndpoint() (logEndpoint string) {
+	c.read(func() {
+		logEndpoint = c.data.DopplerEndPoint
 	})
 	return
 }
@@ -334,6 +343,12 @@ func (c *ConfigRepository) SetAuthenticationEndpoint(endpoint string) {
 func (c *ConfigRepository) SetLoggregatorEndpoint(endpoint string) {
 	c.write(func() {
 		c.data.LoggregatorEndPoint = endpoint
+	})
+}
+
+func (c *ConfigRepository) SetDopplerEndpoint(endpoint string) {
+	c.write(func() {
+		c.data.DopplerEndPoint = endpoint
 	})
 }
 
