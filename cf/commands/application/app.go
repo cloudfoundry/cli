@@ -23,6 +23,7 @@ type ShowApp struct {
 	ui               terminal.UI
 	config           core_config.Reader
 	appSummaryRepo   api.AppSummaryRepository
+	appLogsNoaaRepo  api.LogsNoaaRepository
 	appInstancesRepo app_instances.AppInstancesRepository
 	appReq           requirements.ApplicationRequirement
 }
@@ -31,12 +32,13 @@ type ApplicationDisplayer interface {
 	ShowApp(app models.Application, orgName string, spaceName string)
 }
 
-func NewShowApp(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo app_instances.AppInstancesRepository) (cmd *ShowApp) {
+func NewShowApp(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo app_instances.AppInstancesRepository, appLogsNoaaRepo api.LogsNoaaRepository) (cmd *ShowApp) {
 	cmd = &ShowApp{}
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appSummaryRepo = appSummaryRepo
 	cmd.appInstancesRepo = appInstancesRepo
+	cmd.appLogsNoaaRepo = appLogsNoaaRepo
 	return
 }
 
@@ -104,6 +106,17 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 
 	var instances []models.AppInstanceFields
 	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.Guid)
+
+	//temp solution, diego app metrics only come from noaa, not CC
+	if application.Diego {
+		instances, apiErr = cmd.appLogsNoaaRepo.GetContainerMetrics(app.Guid, instances)
+
+		for i := 0; i < len(instances); i++ {
+			instances[i].MemQuota = application.Memory * 1024 * 1024
+			instances[i].DiskQuota = application.DiskQuota * 1024 * 1024
+		}
+	}
+
 	if apiErr != nil && !appIsStopped {
 		cmd.ui.Failed(apiErr.Error())
 		return
