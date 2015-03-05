@@ -2,11 +2,12 @@ package api
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/net"
-	"regexp"
-	"strings"
 )
 
 type EndpointRepository interface {
@@ -79,6 +80,8 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) error {
 	} else {
 		repo.config.SetLoggregatorEndpoint(serverResponse.LoggregatorEndpoint)
 	}
+
+	repo.config.SetDopplerEndpoint(strings.Replace(repo.config.LoggregatorEndpoint(), "loggregator", "doppler", 1))
 
 	return nil
 }

@@ -103,6 +103,7 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.AccessToken()).To(Equal(""))
 				Expect(config.AuthenticationEndpoint()).To(Equal("https://login.example.com"))
 				Expect(config.LoggregatorEndpoint()).To(Equal("wss://loggregator.foo.example.org:4443"))
+				Expect(config.DopplerEndpoint()).To(Equal("wss://doppler.foo.example.org:4443"))
 				Expect(config.ApiEndpoint()).To(Equal(testServer.URL))
 				Expect(config.ApiVersion()).To(Equal("42.0.0"))
 				Expect(config.HasOrganization()).To(BeFalse())
