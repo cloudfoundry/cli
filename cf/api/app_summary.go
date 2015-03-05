@@ -26,7 +26,8 @@ type ApplicationFromSummary struct {
 	Name               string
 	Routes             []RouteSummary
 	Services           []ServicePlanSummary
-	RunningInstances   int `json:"running_instances"`
+	Diego              bool `json:"diego,omitempty"`
+	RunningInstances   int  `json:"running_instances"`
 	Memory             int64
 	Instances          int
 	DiskQuota          int64 `json:"disk_quota"`
@@ -42,6 +43,7 @@ func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields)
 	app = models.ApplicationFields{}
 	app.Guid = resource.Guid
 	app.Name = resource.Name
+	app.Diego = resource.Diego
 	app.State = strings.ToLower(resource.State)
 	app.InstanceCount = resource.Instances
 	app.DiskQuota = resource.DiskQuota
