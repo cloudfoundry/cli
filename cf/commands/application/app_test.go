@@ -27,12 +27,15 @@ var _ = Describe("app Command", func() {
 		configRepo          core_config.ReadWriter
 		appSummaryRepo      *testapi.FakeAppSummaryRepo
 		appInstancesRepo    *testAppInstanaces.FakeAppInstancesRepository
+		appLogsNoaaRepo     *testapi.FakeLogsNoaaRepository
 		requirementsFactory *testreq.FakeReqFactory
+		app                 models.Application
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
+		appLogsNoaaRepo = &testapi.FakeLogsNoaaRepository{}
 		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
@@ -42,7 +45,7 @@ var _ = Describe("app Command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewShowApp(ui, configRepo, appSummaryRepo, appInstancesRepo)
+		cmd := NewShowApp(ui, configRepo, appSummaryRepo, appInstancesRepo, appLogsNoaaRepo)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -67,7 +70,7 @@ var _ = Describe("app Command", func() {
 
 	Describe("displaying a summary of an app", func() {
 		BeforeEach(func() {
-			app := makeAppWithRoute("my-app")
+			app = makeAppWithRoute("my-app")
 			appInstance := models.AppInstanceFields{
 				State:     models.InstanceRunning,
 				Since:     testtime.MustParse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012"),
@@ -89,6 +92,26 @@ var _ = Describe("app Command", func() {
 			appSummaryRepo.GetSummarySummary = app
 			appInstancesRepo.GetInstancesReturns(instances, nil)
 			requirementsFactory.Application = app
+		})
+
+		Context("When app is a diego app", func() {
+			It("uses noaa log library to gather metrics", func() {
+				app.Diego = true
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+				runCommand("my-app")
+				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("When app is not a diego app", func() {
+			It("does not use noaa log library to gather metrics", func() {
+				app.Diego = false
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+				runCommand("my-app")
+				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(0))
+			})
 		})
 
 		It("displays a summary of the app", func() {
