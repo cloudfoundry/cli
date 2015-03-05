@@ -81,6 +81,8 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) error {
 		repo.config.SetLoggregatorEndpoint(serverResponse.LoggregatorEndpoint)
 	}
 
+	//* 3/5/15: loggregator endpoint will be renamed to doppler eventually,
+	//          we just have to use the loggregator endpoint as doppler for now
 	repo.config.SetDopplerEndpoint(strings.Replace(repo.config.LoggregatorEndpoint(), "loggregator", "doppler", 1))
 
 	return nil
