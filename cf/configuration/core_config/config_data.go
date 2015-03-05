@@ -24,6 +24,7 @@ type Data struct {
 	ApiVersion            string
 	AuthorizationEndpoint string
 	LoggregatorEndPoint   string
+	DopplerEndPoint       string
 	UaaEndpoint           string
 	AccessToken           string
 	RefreshToken          string
