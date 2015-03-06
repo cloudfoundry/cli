@@ -25,6 +25,7 @@ func (cliConnection *cliConnection) sendPluginMetadataToCliServer(metadata Plugi
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	defer cliServerConn.Close()
 
 	var success bool
 
@@ -54,6 +55,7 @@ func (cliConnection *cliConnection) callCliCommand(silently bool, args ...string
 	if err != nil {
 		return []string{}, err
 	}
+	defer client.Close()
 
 	var success bool
 
@@ -81,10 +83,10 @@ func (cliConnection *cliConnection) pingCLI() {
 	var conn net.Conn
 	for i := 0; i < 5; i++ {
 		conn, connErr = net.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+		defer conn.Close()
 		if connErr != nil {
 			time.Sleep(200 * time.Millisecond)
 		} else {
-			conn.Close()
 			break
 		}
 	}
