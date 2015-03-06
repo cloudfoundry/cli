@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/cloudfoundry/cli",
-	"GoVersion": "go1.2.2",
+	"GoVersion": "go1.2.1",
 	"Packages": [
 		"./..."
 	],
@@ -12,8 +12,8 @@
 		},
 		{
 			"ImportPath": "code.google.com/p/go.net/websocket",
-			"Comment": "null-145",
-			"Rev": "81cc697d50c43e5525cf90ae3fa1699a51e02324"
+			"Comment": "null-147",
+			"Rev": "d3882abcf003a8a50502be58e9f969329d331dce"
 		},
 		{
 			"ImportPath": "code.google.com/p/gogoprotobuf/proto",
@@ -21,11 +21,11 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "39fb5c673e898bc3343f306217f91f485c40a831"
+			"Rev": "150e4e8f749b21a7f0de8e3cfd885143fcea6b32"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/cli-plugin-repo/models",
-			"Rev": "a48c8939fa194e1b7221b1a184f0d91998593a97"
+			"Rev": "eed6c74b777b9d124c33b195103079f8a4cab588"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
@@ -33,15 +33,19 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
-			"Rev": "a35b4068c1a008dce5b2a78460ff9828e61b164b"
+			"Rev": "89d7fe237afae1e8222554359ec03b72c8466d10"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
-			"Rev": "59e4fb600f6a950861ecf3de2f99c71b15cf83d9"
+			"Rev": "28ce6c1f1aa0352189bed34cdc9aa4ea8fcb9089"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/signature",
-			"Rev": "59e4fb600f6a950861ecf3de2f99c71b15cf83d9"
+			"Rev": "28ce6c1f1aa0352189bed34cdc9aa4ea8fcb9089"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa",
+			"Rev": "7ec5b0dce4f86d1d79e3d68df670760bffd7c7c5"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
@@ -49,8 +53,20 @@
 			"Rev": "7381bc4e62942763475703c7edd405f1e42adf4f"
 		},
 		{
+			"ImportPath": "github.com/gogo/protobuf/proto",
+			"Rev": "bc946d07d1016848dfd2507f90f0859c9471681e"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "8a875a034c69b940914d83ea03d3f1299b4d094b"
+		},
+		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "a6f041ac33b84488bb44137d6866cd3c8706d792"
+			"Rev": "f761cdb666383d5db7a8bea9ff8c9db35332b4a0"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
@@ -63,12 +79,12 @@
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Comment": "v1.0-12-g3ca2515",
-			"Rev": "3ca2515afb00bc39bc77d27cdbce85a7caaf103e"
+			"Comment": "v1.0-23-g2cd6d99",
+			"Rev": "2cd6d99ccf3ac7ae8398d8296429161bf7061ae2"
 		},
 		{
 			"ImportPath": "github.com/pivotal-cf-experimental/jibber_jabber",
-			"Rev": "901694860a59e63e1d392e6597ca919364f6abd1"
+			"Rev": "66b05988ee1e223bf019acdeeb3e2132c2249942"
 		}
 	]
 }

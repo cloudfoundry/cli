@@ -47,11 +47,13 @@ func (n Number) Int64() (int64, error) {
 }
 
 type Decoder struct {
-	parser    yaml_parser_t
-	event     yaml_event_t
-	useNumber bool
+	parser        yaml_parser_t
+	event         yaml_event_t
+	replay_events []yaml_event_t
+	useNumber     bool
 
-	anchors map[string]interface{}
+	anchors          map[string][]yaml_event_t
+	tracking_anchors [][]yaml_event_t
 }
 
 type ParserError struct {
@@ -104,7 +106,8 @@ func Unmarshal(data []byte, v interface{}) error {
 
 func NewDecoder(r io.Reader) *Decoder {
 	d := &Decoder{
-		anchors: make(map[string]interface{}),
+		anchors:          make(map[string][]yaml_event_t),
+		tracking_anchors: make([][]yaml_event_t, 1),
 	}
 	yaml_parser_initialize(&d.parser)
 	yaml_parser_set_input_reader(&d.parser, r)
@@ -149,16 +152,30 @@ func (d *Decoder) nextEvent() {
 		d.error(errors.New("The stream is closed"))
 	}
 
-	if !yaml_parser_parse(&d.parser, &d.event) {
-		yaml_event_delete(&d.event)
+	if d.replay_events != nil {
+		d.event = d.replay_events[0]
+		if len(d.replay_events) == 1 {
+			d.replay_events = nil
+		} else {
+			d.replay_events = d.replay_events[1:]
+		}
+	} else {
+		if !yaml_parser_parse(&d.parser, &d.event) {
+			yaml_event_delete(&d.event)
 
-		d.error(&ParserError{
-			ErrorType:   d.parser.error,
-			Context:     d.parser.context,
-			ContextMark: d.parser.context_mark,
-			Problem:     d.parser.problem,
-			ProblemMark: d.parser.problem_mark,
-		})
+			d.error(&ParserError{
+				ErrorType:   d.parser.error,
+				Context:     d.parser.context,
+				ContextMark: d.parser.context_mark,
+				Problem:     d.parser.problem,
+				ProblemMark: d.parser.problem_mark,
+			})
+		}
+	}
+
+	last := len(d.tracking_anchors)
+	if last > 0 {
+		d.tracking_anchors[last-1] = append(d.tracking_anchors[last-1], d.event)
 	}
 }
 
@@ -187,14 +204,17 @@ func (d *Decoder) parse(rv reflect.Value) {
 	anchor := string(d.event.anchor)
 	switch d.event.event_type {
 	case yaml_SEQUENCE_START_EVENT:
+		d.begin_anchor(anchor)
 		d.sequence(rv)
-		d.anchor(anchor, rv)
+		d.end_anchor(anchor)
 	case yaml_MAPPING_START_EVENT:
+		d.begin_anchor(anchor)
 		d.mapping(rv)
-		d.anchor(anchor, rv)
+		d.end_anchor(anchor)
 	case yaml_SCALAR_EVENT:
+		d.begin_anchor(anchor)
 		d.scalar(rv)
-		d.anchor(anchor, rv)
+		d.end_anchor(anchor)
 	case yaml_ALIAS_EVENT:
 		d.alias(rv)
 	case yaml_DOCUMENT_END_EVENT:
@@ -207,13 +227,30 @@ func (d *Decoder) parse(rv reflect.Value) {
 	}
 }
 
-func (d *Decoder) anchor(anchor string, rv reflect.Value) {
+func (d *Decoder) begin_anchor(anchor string) {
 	if anchor != "" {
-		d.anchors[anchor] = rv.Interface()
+		events := []yaml_event_t{d.event}
+		d.tracking_anchors = append(d.tracking_anchors, events)
 	}
 }
 
-func (d *Decoder) indirect(v reflect.Value) (Unmarshaler, reflect.Value) {
+func (d *Decoder) end_anchor(anchor string) {
+	if anchor != "" {
+		events := d.tracking_anchors[len(d.tracking_anchors)-1]
+		d.tracking_anchors = d.tracking_anchors[0 : len(d.tracking_anchors)-1]
+		// remove the anchor, replaying events shouldn't have anchors
+		events[0].anchor = nil
+		// we went one too many, remove the extra event
+		events = events[:len(events)-1]
+		// if nested, append to all the other anchors
+		for i, e := range d.tracking_anchors {
+			d.tracking_anchors[i] = append(e, events...)
+		}
+		d.anchors[anchor] = events
+	}
+}
+
+func (d *Decoder) indirect(v reflect.Value, decodingNull bool) (Unmarshaler, reflect.Value) {
 	// If v is a named type and is addressable,
 	// start with its address, so that if the type has pointer methods,
 	// we find them.
@@ -225,13 +262,17 @@ func (d *Decoder) indirect(v reflect.Value) (Unmarshaler, reflect.Value) {
 		// usefully addressable.
 		if v.Kind() == reflect.Interface && !v.IsNil() {
 			e := v.Elem()
-			if e.Kind() == reflect.Ptr && !e.IsNil() {
+			if e.Kind() == reflect.Ptr && !e.IsNil() && (!decodingNull || e.Elem().Kind() == reflect.Ptr) {
 				v = e
 				continue
 			}
 		}
 
 		if v.Kind() != reflect.Ptr {
+			break
+		}
+
+		if v.Elem().Kind() != reflect.Ptr && decodingNull && v.CanSet() {
 			break
 		}
 
@@ -257,14 +298,14 @@ func (d *Decoder) sequence(v reflect.Value) {
 		d.error(fmt.Errorf("Expected sequence start - found %d", d.event.event_type))
 	}
 
-	u, pv := d.indirect(v)
+	u, pv := d.indirect(v, false)
 	if u != nil {
 		defer func() {
-			if err := u.UnmarshalYAML("!!seq", pv.Interface()); err != nil {
+			if err := u.UnmarshalYAML(yaml_SEQ_TAG, pv.Interface()); err != nil {
 				d.error(err)
 			}
 		}()
-		_, pv = d.indirect(pv)
+		_, pv = d.indirect(pv, false)
 	}
 
 	v = pv
@@ -289,9 +330,11 @@ func (d *Decoder) sequence(v reflect.Value) {
 	d.nextEvent()
 
 	i := 0
+done:
 	for {
-		if d.event.event_type == yaml_SEQUENCE_END_EVENT {
-			break
+		switch d.event.event_type {
+		case yaml_SEQUENCE_END_EVENT, yaml_DOCUMENT_END_EVENT:
+			break done
 		}
 
 		// Get element of array, growing if necessary.
@@ -336,18 +379,20 @@ func (d *Decoder) sequence(v reflect.Value) {
 		v.Set(reflect.MakeSlice(v.Type(), 0, 0))
 	}
 
-	d.nextEvent()
+	if d.event.event_type != yaml_DOCUMENT_END_EVENT {
+		d.nextEvent()
+	}
 }
 
 func (d *Decoder) mapping(v reflect.Value) {
-	u, pv := d.indirect(v)
+	u, pv := d.indirect(v, false)
 	if u != nil {
 		defer func() {
-			if err := u.UnmarshalYAML("!!map", pv.Interface()); err != nil {
+			if err := u.UnmarshalYAML(yaml_MAP_TAG, pv.Interface()); err != nil {
 				d.error(err)
 			}
 		}()
-		_, pv = d.indirect(pv)
+		_, pv = d.indirect(pv, false)
 	}
 	v = pv
 
@@ -378,10 +423,15 @@ func (d *Decoder) mapping(v reflect.Value) {
 	mapElemt := mapt.Elem()
 
 	var mapElem reflect.Value
+done:
 	for {
-		if d.event.event_type == yaml_MAPPING_END_EVENT {
-			break
+		switch d.event.event_type {
+		case yaml_MAPPING_END_EVENT:
+			break done
+		case yaml_DOCUMENT_END_EVENT:
+			return
 		}
+
 		key := reflect.New(keyt)
 		d.parse(key.Elem())
 
@@ -406,10 +456,15 @@ func (d *Decoder) mappingStruct(v reflect.Value) {
 
 	d.nextEvent()
 
+done:
 	for {
-		if d.event.event_type == yaml_MAPPING_END_EVENT {
-			break
+		switch d.event.event_type {
+		case yaml_MAPPING_END_EVENT:
+			break done
+		case yaml_DOCUMENT_END_EVENT:
+			return
 		}
+
 		key := ""
 		d.parse(reflect.ValueOf(&key))
 
@@ -448,7 +503,10 @@ func (d *Decoder) mappingStruct(v reflect.Value) {
 }
 
 func (d *Decoder) scalar(v reflect.Value) {
-	u, pv := d.indirect(v)
+	val := string(d.event.value)
+	wantptr := null_values[val]
+
+	u, pv := d.indirect(v, wantptr)
 
 	var tag string
 	if u != nil {
@@ -458,7 +516,7 @@ func (d *Decoder) scalar(v reflect.Value) {
 			}
 		}()
 
-		_, pv = d.indirect(pv)
+		_, pv = d.indirect(pv, wantptr)
 	}
 	v = pv
 
@@ -472,11 +530,14 @@ func (d *Decoder) scalar(v reflect.Value) {
 }
 
 func (d *Decoder) alias(rv reflect.Value) {
-	if val, ok := d.anchors[string(d.event.anchor)]; ok {
-		rv.Set(reflect.ValueOf(val))
+	val, ok := d.anchors[string(d.event.anchor)]
+	if !ok {
+		d.error(fmt.Errorf("missing anchor: %s", d.event.anchor))
 	}
 
+	d.replay_events = val
 	d.nextEvent()
+	d.parse(rv)
 }
 
 func (d *Decoder) valueInterface() interface{} {
@@ -485,13 +546,18 @@ func (d *Decoder) valueInterface() interface{} {
 	anchor := string(d.event.anchor)
 	switch d.event.event_type {
 	case yaml_SEQUENCE_START_EVENT:
+		d.begin_anchor(anchor)
 		v = d.sequenceInterface()
 	case yaml_MAPPING_START_EVENT:
+		d.begin_anchor(anchor)
 		v = d.mappingInterface()
 	case yaml_SCALAR_EVENT:
+		d.begin_anchor(anchor)
 		v = d.scalarInterface()
 	case yaml_ALIAS_EVENT:
-		return d.aliasInterface()
+		rv := reflect.ValueOf(&v)
+		d.alias(rv)
+		return v
 	case yaml_DOCUMENT_END_EVENT:
 		d.error(&UnexpectedEventError{
 			Value:     string(d.event.value),
@@ -500,8 +566,8 @@ func (d *Decoder) valueInterface() interface{} {
 		})
 
 	}
+	d.end_anchor(anchor)
 
-	d.anchorInterface(anchor, v)
 	return v
 }
 
@@ -512,33 +578,26 @@ func (d *Decoder) scalarInterface() interface{} {
 	return v
 }
 
-func (d *Decoder) anchorInterface(anchor string, i interface{}) {
-	if anchor != "" {
-		d.anchors[anchor] = i
-	}
-}
-
-func (d *Decoder) aliasInterface() interface{} {
-	v := d.anchors[string(d.event.anchor)]
-
-	d.nextEvent()
-	return v
-}
-
 // arrayInterface is like array but returns []interface{}.
 func (d *Decoder) sequenceInterface() []interface{} {
 	var v = make([]interface{}, 0)
 
 	d.nextEvent()
+
+done:
 	for {
-		if d.event.event_type == yaml_SEQUENCE_END_EVENT {
-			break
+		switch d.event.event_type {
+		case yaml_SEQUENCE_END_EVENT, yaml_DOCUMENT_END_EVENT:
+			break done
 		}
 
 		v = append(v, d.valueInterface())
 	}
 
-	d.nextEvent()
+	if d.event.event_type != yaml_DOCUMENT_END_EVENT {
+		d.nextEvent()
+	}
+
 	return v
 }
 
@@ -548,9 +607,11 @@ func (d *Decoder) mappingInterface() map[interface{}]interface{} {
 
 	d.nextEvent()
 
+done:
 	for {
-		if d.event.event_type == yaml_MAPPING_END_EVENT {
-			break
+		switch d.event.event_type {
+		case yaml_MAPPING_END_EVENT, yaml_DOCUMENT_END_EVENT:
+			break done
 		}
 
 		key := d.valueInterface()
@@ -559,6 +620,9 @@ func (d *Decoder) mappingInterface() map[interface{}]interface{} {
 		m[key] = d.valueInterface()
 	}
 
-	d.nextEvent()
+	if d.event.event_type != yaml_DOCUMENT_END_EVENT {
+		d.nextEvent()
+	}
+
 	return m
 }

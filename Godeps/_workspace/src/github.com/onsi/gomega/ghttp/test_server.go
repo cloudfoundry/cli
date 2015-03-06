@@ -112,6 +112,7 @@ import (
 	"reflect"
 	"regexp"
 	"sync"
+
 	. "github.com/onsi/gomega"
 )
 
@@ -134,6 +135,13 @@ type routedHandler struct {
 func NewServer() *Server {
 	s := new()
 	s.HTTPTestServer = httptest.NewServer(s)
+	return s
+}
+
+// NewUnstartedServer return a new, unstarted, `*ghttp.Server`.  Useful for specifying a custom listener on `server.HTTPTestServer`.
+func NewUnstartedServer() *Server {
+	s := new()
+	s.HTTPTestServer = httptest.NewUnstartedServer(s)
 	return s
 }
 
@@ -164,6 +172,11 @@ type Server struct {
 	calls     int
 }
 
+//Start() starts an unstarted ghttp server.  It is a catastrophic error to call Start more than once (thanks, httptest).
+func (s *Server) Start() {
+	s.HTTPTestServer.Start()
+}
+
 //URL() returns a url that will hit the server
 func (s *Server) URL() string {
 	return s.HTTPTestServer.URL
@@ -171,6 +184,9 @@ func (s *Server) URL() string {
 
 //Close() should be called at the end of each test.  It spins down and cleans up the test server.
 func (s *Server) Close() {
+	s.writeLock.Lock()
+	defer s.writeLock.Unlock()
+
 	server := s.HTTPTestServer
 	s.HTTPTestServer = nil
 	server.Close()
@@ -186,17 +202,21 @@ func (s *Server) Close() {
 //   b) If AllowUnhandledRequests is false, the request will not be handled and the current test will be marked as failed.
 func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	s.writeLock.Lock()
-	defer s.writeLock.Unlock()
 	defer func() {
 		recover()
 	}()
 
+	s.receivedRequests = append(s.receivedRequests, req)
 	if routedHandler, ok := s.handlerForRoute(req.Method, req.URL.Path); ok {
+		s.writeLock.Unlock()
 		routedHandler(w, req)
 	} else if s.calls < len(s.requestHandlers) {
-		s.requestHandlers[s.calls](w, req)
+		h := s.requestHandlers[s.calls]
 		s.calls++
+		s.writeLock.Unlock()
+		h(w, req)
 	} else {
+		s.writeLock.Unlock()
 		if s.AllowUnhandledRequests {
 			ioutil.ReadAll(req.Body)
 			req.Body.Close()
@@ -205,7 +225,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			Ω(req).Should(BeNil(), "Received Unhandled Request")
 		}
 	}
-	s.receivedRequests = append(s.receivedRequests, req)
 }
 
 //ReceivedRequests is an array containing all requests received by the server (both handled and unhandled requests)
@@ -300,4 +319,11 @@ func (s *Server) GetHandler(index int) http.HandlerFunc {
 func (s *Server) WrapHandler(index int, handler http.HandlerFunc) {
 	existingHandler := s.GetHandler(index)
 	s.SetHandler(index, CombineHandlers(existingHandler, handler))
+}
+
+func (s *Server) CloseClientConnections() {
+	s.writeLock.Lock()
+	defer s.writeLock.Unlock()
+
+	s.HTTPTestServer.CloseClientConnections()
 }

@@ -2,8 +2,8 @@ package logmessage
 
 import (
 	"bytes"
-	"code.google.com/p/gogoprotobuf/proto"
 	"encoding/binary"
+	"github.com/gogo/protobuf/proto"
 )
 
 func DumpMessage(msg Message, buffer *bytes.Buffer) {

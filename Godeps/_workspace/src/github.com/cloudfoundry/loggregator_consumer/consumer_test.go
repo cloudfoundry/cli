@@ -3,13 +3,14 @@ package loggregator_consumer_test
 import (
 	"bytes"
 	"code.google.com/p/go.net/websocket"
-	"code.google.com/p/gogoprotobuf/proto"
 	"crypto/tls"
 	"fmt"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
-	"github.com/cloudfoundry/loggregator_consumer/noaa_errors"
+	"github.com/cloudfoundry/loggregatorlib/loggertesthelper"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/cloudfoundry/loggregatorlib/server/handlers"
+	noaa_errors "github.com/cloudfoundry/noaa/errors"
+	"github.com/gogo/protobuf/proto"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"log"
@@ -55,7 +56,7 @@ var _ = Describe("Loggregator Consumer", func() {
 
 	Describe("SetOnConnectCallback", func() {
 		BeforeEach(func() {
-			testServer = httptest.NewServer(handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond))
+			testServer = httptest.NewServer(handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond, loggertesthelper.Logger()))
 			endpoint = "ws://" + testServer.Listener.Addr().String()
 			close(messagesToSend)
 		})
@@ -111,7 +112,7 @@ var _ = Describe("Loggregator Consumer", func() {
 	})
 
 	var startFakeTrafficController = func() {
-		fakeHandler = &FakeHandler{innerHandler: handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond)}
+		fakeHandler = &FakeHandler{innerHandler: handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond, loggertesthelper.Logger())}
 		testServer = httptest.NewServer(fakeHandler)
 		endpoint = "ws://" + testServer.Listener.Addr().String()
 		appGuid = "app-guid"
@@ -261,7 +262,7 @@ var _ = Describe("Loggregator Consumer", func() {
 		Context("when SSL settings are passed in", func() {
 			BeforeEach(func() {
 				//				fakeHandler = &FakeHandler{innerHandler: }
-				testServer = httptest.NewTLSServer(handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond))
+				testServer = httptest.NewTLSServer(handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond, loggertesthelper.Logger()))
 				endpoint = "wss://" + testServer.Listener.Addr().String()
 
 				tlsSettings = &tls.Config{InsecureSkipVerify: true}
@@ -278,7 +279,7 @@ var _ = Describe("Loggregator Consumer", func() {
 
 	Describe("Close", func() {
 		BeforeEach(func() {
-			fakeHandler = &FakeHandler{innerHandler: handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond)}
+			fakeHandler = &FakeHandler{innerHandler: handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond, loggertesthelper.Logger())}
 			testServer = httptest.NewServer(fakeHandler)
 			endpoint = "ws://" + testServer.Listener.Addr().String()
 		})
@@ -336,7 +337,7 @@ var _ = Describe("Loggregator Consumer", func() {
 		Context("when the connection can be established", func() {
 
 			BeforeEach(func() {
-				testServer = httptest.NewServer(handlers.NewHttpHandler(messagesToSend))
+				testServer = httptest.NewServer(handlers.NewHttpHandler(messagesToSend, loggertesthelper.Logger()))
 				endpoint = "ws://" + testServer.Listener.Addr().String()
 			})
 
@@ -376,7 +377,7 @@ var _ = Describe("Loggregator Consumer", func() {
 
 		Context("when the content length is unknown", func() {
 			BeforeEach(func() {
-				fakeHandler = &FakeHandler{contentLen: "-1", innerHandler: handlers.NewHttpHandler(messagesToSend)}
+				fakeHandler = &FakeHandler{contentLen: "-1", innerHandler: handlers.NewHttpHandler(messagesToSend, loggertesthelper.Logger())}
 				testServer = httptest.NewServer(fakeHandler)
 				endpoint = "ws://" + testServer.Listener.Addr().String()
 			})
@@ -488,7 +489,7 @@ var _ = Describe("Loggregator Consumer", func() {
 		}
 
 		BeforeEach(func() {
-			fakeHandler = &FakeHandler{innerHandler: handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond)}
+			fakeHandler = &FakeHandler{innerHandler: handlers.NewWebsocketHandler(messagesToSend, 100*time.Millisecond, loggertesthelper.Logger())}
 			testServer = httptest.NewServer(fakeHandler)
 			endpoint = "ws://" + testServer.Listener.Addr().String()
 		})

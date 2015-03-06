@@ -6,8 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/loggregator_consumer/noaa_errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	noaa_errors "github.com/cloudfoundry/noaa/errors"
 
 	"time"
 

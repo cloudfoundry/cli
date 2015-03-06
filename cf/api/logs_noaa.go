@@ -4,7 +4,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/loggregator_consumer/noaa_errors"
+
+	noaa_errors "github.com/cloudfoundry/noaa/errors"
 )
 
 type LogsNoaaRepository interface {

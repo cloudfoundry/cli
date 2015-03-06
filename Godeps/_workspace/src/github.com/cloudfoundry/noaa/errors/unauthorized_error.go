@@ -1,4 +1,4 @@
-package noaa_errors
+package errors
 
 type UnauthorizedError struct {
 	description string

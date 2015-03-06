@@ -1,9 +1,9 @@
 package logmessage
 
 import (
-	"code.google.com/p/gogoprotobuf/proto"
 	"errors"
 	"github.com/cloudfoundry/loggregatorlib/signature"
+	"github.com/gogo/protobuf/proto"
 	"time"
 )
 

@@ -24,6 +24,13 @@ var _ = Describe("Models", func() {
 					map[interface{}]interface{}{
 						"name":        "test1",
 						"description": "n/a",
+						"authors": []interface{}{
+							map[interface{}]interface{}{
+								"name":     "sample_name",
+								"homepage": "",
+								"contact":  "cant.find.me@mars.com",
+							},
+						},
 						"binaries": []interface{}{
 							map[interface{}]interface{}{
 								"platform": "osx",
@@ -65,10 +72,9 @@ var _ = Describe("Models", func() {
 
 		It("turns optional string fields with nil value into empty string", func() {
 			Ω(len(data)).To(Equal(2))
-			Ω(data[0].Author).To(Equal(""))
+			Ω(data[0].Authors[0].Name).To(Equal("sample_name"))
 			Ω(data[0].Company).To(Equal(""))
 			Ω(data[0].Homepage).To(Equal(""))
-			Ω(data[0].Contact).To(Equal(""))
 		})
 	})
 
