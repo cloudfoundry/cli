@@ -99,7 +99,15 @@ var _ = Describe("service-brokers command", func() {
 		}}
 
 		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
-		Expect(inAlphabeticalOrder(ui.Outputs, 3)).To(Equal(true))
+
+		Expect(ui.Outputs).To(BeInDisplayOrder(
+			[]string{"Getting service brokers as", "my-user"},
+			[]string{"name", "url"},
+			[]string{"123-service-broker-to-list", "http://service-d-url.com"},
+			[]string{"a-service-broker-to-list", "http://service-c-url.com"},
+			[]string{"fun-service-broker-to-list", "http://service-b-url.com"},
+			[]string{"z-service-broker-to-list", "http://service-a-url.com"},
+		))
 	})
 
 	It("says when no service brokers were found", func() {
@@ -121,21 +129,3 @@ var _ = Describe("service-brokers command", func() {
 		))
 	})
 })
-
-func inAlphabeticalOrder(actual []string, skipLine int) bool {
-	lastIndex := skipLine
-	index := skipLine + 1
-
-	if len(actual) <= skipLine+1 {
-		return true
-	}
-
-	for index < len(actual)-1 {
-		if actual[index] < actual[lastIndex] {
-			return false
-		}
-		index++
-		lastIndex++
-	}
-	return true
-}
