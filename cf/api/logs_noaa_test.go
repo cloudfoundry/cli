@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/loggregator_consumer/noaa_errors"
+	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/noaa/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

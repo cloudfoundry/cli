@@ -1,8 +1,8 @@
 package testhelpers
 
 import (
-	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"

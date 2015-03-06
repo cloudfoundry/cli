@@ -1,65 +1,63 @@
 package signature
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestSimpleEncryption(t *testing.T) {
-	key := "aaaaaaaaaaaaaaaa"
-	message := []byte("Super secret message that no one should read")
-	encrypted, err := Encrypt(key, message)
-	assert.NoError(t, err)
+var _ = Describe("Encryption", func() {
+	var message = []byte("Super secret message that no one should read")
 
-	decrypted, err := Decrypt(key, encrypted)
-	assert.NoError(t, err)
+	It("encrypts and decrypts with a 'long' key", func() {
+		key := "aaaaaaaaaaaaaaaa"
+		encrypted, err := Encrypt(key, message)
+		Expect(err).NotTo(HaveOccurred())
 
-	assert.Equal(t, decrypted, message)
-	assert.NotEqual(t, encrypted, message)
-}
+		decrypted, err := Decrypt(key, encrypted)
+		Expect(err).NotTo(HaveOccurred())
 
-func TestEncryptionWithAShortKey(t *testing.T) {
-	key := "short key"
-	message := []byte("Super secret message that no one should read")
-	encrypted, err := Encrypt(key, message)
-	assert.NoError(t, err)
+		Expect(decrypted).To(Equal(message))
+		Expect(encrypted).NotTo(Equal(message))
+	})
 
-	decrypted, err := Decrypt(key, encrypted)
-	assert.NoError(t, err)
+	It("encrypts and decrypts with a 'short' key", func() {
+		key := "short key"
+		encrypted, err := Encrypt(key, message)
+		Expect(err).NotTo(HaveOccurred())
 
-	assert.Equal(t, decrypted, message)
-	assert.NotEqual(t, encrypted, message)
-}
+		decrypted, err := Decrypt(key, encrypted)
+		Expect(err).NotTo(HaveOccurred())
 
-func TestDecryptionWithWrongKey(t *testing.T) {
-	key := "short key"
-	message := []byte("Super secret message that no one should read")
-	encrypted, err := Encrypt(key, message)
-	assert.NoError(t, err)
+		Expect(decrypted).To(Equal(message))
+		Expect(encrypted).NotTo(Equal(message))
+	})
 
-	_, err = Decrypt("wrong key", encrypted)
-	assert.Error(t, err)
-}
+	It("fails to decrypt with the wrong key", func() {
+		key := "short key"
+		encrypted, err := Encrypt(key, message)
+		Expect(err).NotTo(HaveOccurred())
 
-func TestThatEncryptionIsNonDeterministic(t *testing.T) {
-	key := "aaaaaaaaaaaaaaaa"
-	message := []byte("Super secret message that no one should read")
-	encrypted1, err := Encrypt(key, message)
-	assert.NoError(t, err)
+		_, err = Decrypt("wrong key", encrypted)
+		Expect(err).To(HaveOccurred())
+	})
 
-	encrypted2, err := Encrypt(key, message)
-	assert.NoError(t, err)
+	It("is non-deterministic", func() {
+		key := "aaaaaaaaaaaaaaaa"
+		encrypted1, err := Encrypt(key, message)
+		Expect(err).NotTo(HaveOccurred())
 
-	assert.NotEqual(t, encrypted1, encrypted2)
-}
+		encrypted2, err := Encrypt(key, message)
+		Expect(err).NotTo(HaveOccurred())
 
-//Test so that we are able to test that Ruby encrypts/signs the same way
-func TestDigest(t *testing.T) {
-	assert.Equal(t, DigestBytes([]byte("some-key")), []byte{0x68, 0x2f, 0x66, 0x97, 0xfa, 0x93, 0xec, 0xa6, 0xc8, 0x1, 0xa2, 0x32, 0x51, 0x9a, 0x9, 0xe3, 0xfe, 0xc, 0x5c, 0x33, 0x94, 0x65, 0xee, 0x53, 0xc3, 0xf9, 0xed, 0xf9, 0x2f, 0xd0, 0x1f, 0x35})
-}
+		Expect(encrypted1).NotTo(Equal(encrypted2))
+	})
 
-//Test so that we are able to test that Ruby encrypts/signs the same way
-func TestForKeyCreation(t *testing.T) {
-	key := "12345"
-	assert.Equal(t, getEncryptionKey(key), []byte{0x59, 0x94, 0x47, 0x1a, 0xbb, 0x1, 0x11, 0x2a, 0xfc, 0xc1, 0x81, 0x59, 0xf6, 0xcc, 0x74, 0xb4})
-}
+	It("correctly computes a digest", func() {
+		Expect(DigestBytes([]byte("some-key"))).To(Equal([]byte{0x68, 0x2f, 0x66, 0x97, 0xfa, 0x93, 0xec, 0xa6, 0xc8, 0x1, 0xa2, 0x32, 0x51, 0x9a, 0x9, 0xe3, 0xfe, 0xc, 0x5c, 0x33, 0x94, 0x65, 0xee, 0x53, 0xc3, 0xf9, 0xed, 0xf9, 0x2f, 0xd0, 0x1f, 0x35}))
+	})
+
+	It("deterministically computes the actual encryption key", func() {
+		key := "12345"
+		Expect(getEncryptionKey(key)).To(Equal([]byte{0x59, 0x94, 0x47, 0x1a, 0xbb, 0x1, 0x11, 0x2a, 0xfc, 0xc1, 0x81, 0x59, 0xf6, 0xcc, 0x74, 0xb4}))
+	})
+})
