@@ -83,10 +83,10 @@ func (cliConnection *cliConnection) pingCLI() {
 	var conn net.Conn
 	for i := 0; i < 5; i++ {
 		conn, connErr = net.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
-		defer conn.Close()
 		if connErr != nil {
 			time.Sleep(200 * time.Millisecond)
 		} else {
+			conn.Close()
 			break
 		}
 	}
