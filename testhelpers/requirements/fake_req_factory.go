@@ -123,8 +123,14 @@ func (r FakeRequirement) GetServiceInstance() models.ServiceInstance {
 	return r.factory.ServiceInstance
 }
 
+func (r FakeRequirement) SetSpaceName(name string) {
+}
+
 func (r FakeRequirement) GetSpace() models.Space {
 	return r.factory.Space
+}
+
+func (r FakeRequirement) SetOrganizationName(name string) {
 }
 
 func (r FakeRequirement) GetOrganization() models.Organization {

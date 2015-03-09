@@ -49,10 +49,13 @@ func (cmd *CreateRoute) GetRequirements(requirementsFactory requirements.Factory
 		cmd.ui.FailWithUsage(c)
 	}
 
-	spaceName := c.Args()[0]
 	domainName := c.Args()[1]
 
-	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(spaceName)
+	if cmd.spaceReq == nil {
+		cmd.spaceReq = requirementsFactory.NewSpaceRequirement(c.Args()[0])
+	} else {
+		cmd.spaceReq.SetSpaceName(c.Args()[0])
+	}
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
 	reqs = []requirements.Requirement{

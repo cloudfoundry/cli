@@ -8,6 +8,7 @@ import (
 
 type SpaceRequirement interface {
 	Requirement
+	SetSpaceName(string)
 	GetSpace() models.Space
 }
 
@@ -18,12 +19,16 @@ type spaceApiRequirement struct {
 	space     models.Space
 }
 
-func NewSpaceRequirement(name string, ui terminal.UI, sR spaces.SpaceRepository) (req *spaceApiRequirement) {
-	req = new(spaceApiRequirement)
+func NewSpaceRequirement(name string, ui terminal.UI, sR spaces.SpaceRepository) *spaceApiRequirement {
+	req := &spaceApiRequirement{}
 	req.name = name
 	req.ui = ui
 	req.spaceRepo = sR
-	return
+	return req
+}
+
+func (req *spaceApiRequirement) SetSpaceName(name string) {
+	req.name = name
 }
 
 func (req *spaceApiRequirement) Execute() (success bool) {

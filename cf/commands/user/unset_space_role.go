@@ -48,8 +48,11 @@ func (cmd *UnsetSpaceRole) GetRequirements(requirementsFactory requirements.Fact
 	}
 
 	cmd.userReq = requirementsFactory.NewUserRequirement(c.Args()[0])
-	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[1])
-
+	if cmd.orgReq == nil {
+		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[1])
+	} else {
+		cmd.orgReq.SetOrganizationName(c.Args()[1])
+	}
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.userReq,
