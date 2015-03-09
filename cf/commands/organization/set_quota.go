@@ -38,7 +38,11 @@ func (cmd *SetQuota) GetRequirements(requirementsFactory requirements.Factory, c
 		cmd.ui.FailWithUsage(c)
 	}
 
-	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
+	if cmd.orgReq == nil {
+		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
+	} else {
+		cmd.orgReq.SetOrganizationName(c.Args()[0])
+	}
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),

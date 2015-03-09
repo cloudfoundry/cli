@@ -38,7 +38,11 @@ func (cmd *RenameSpace) GetRequirements(requirementsFactory requirements.Factory
 		cmd.ui.FailWithUsage(c)
 	}
 
-	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(c.Args()[0])
+	if cmd.spaceReq == nil {
+		cmd.spaceReq = requirementsFactory.NewSpaceRequirement(c.Args()[0])
+	} else {
+		cmd.spaceReq.SetSpaceName(c.Args()[0])
+	}
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),

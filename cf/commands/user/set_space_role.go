@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api"
@@ -54,7 +55,11 @@ func (cmd *SetSpaceRole) GetRequirements(requirementsFactory requirements.Factor
 	}
 
 	cmd.userReq = requirementsFactory.NewUserRequirement(c.Args()[0])
-	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[1])
+	if cmd.orgReq == nil {
+		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[1])
+	} else {
+		cmd.orgReq.SetOrganizationName(c.Args()[1])
+	}
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),

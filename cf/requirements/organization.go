@@ -8,6 +8,7 @@ import (
 
 type OrganizationRequirement interface {
 	Requirement
+	SetOrganizationName(string)
 	GetOrganization() models.Organization
 }
 
@@ -18,12 +19,12 @@ type organizationApiRequirement struct {
 	org     models.Organization
 }
 
-func NewOrganizationRequirement(name string, ui terminal.UI, sR organizations.OrganizationRepository) (req *organizationApiRequirement) {
-	req = new(organizationApiRequirement)
+func NewOrganizationRequirement(name string, ui terminal.UI, sR organizations.OrganizationRepository) *organizationApiRequirement {
+	req := &organizationApiRequirement{}
 	req.name = name
 	req.ui = ui
 	req.orgRepo = sR
-	return
+	return req
 }
 
 func (req *organizationApiRequirement) Execute() (success bool) {
@@ -36,6 +37,10 @@ func (req *organizationApiRequirement) Execute() (success bool) {
 	}
 
 	return true
+}
+
+func (req *organizationApiRequirement) SetOrganizationName(name string) {
+	req.name = name
 }
 
 func (req *organizationApiRequirement) GetOrganization() models.Organization {

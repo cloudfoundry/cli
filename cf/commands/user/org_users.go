@@ -48,8 +48,11 @@ func (cmd *OrgUsers) GetRequirements(requirementsFactory requirements.Factory, c
 		return
 	}
 
-	orgName := c.Args()[0]
-	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(orgName)
+	if cmd.orgReq == nil {
+		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
+	} else {
+		cmd.orgReq.SetOrganizationName(c.Args()[0])
+	}
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement(), cmd.orgReq)
 
 	return
