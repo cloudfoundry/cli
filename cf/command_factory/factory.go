@@ -156,7 +156,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["stacks"] = commands.NewListStacks(ui, config, repoLocator.GetStackRepository())
 	factory.cmdsByName["stack"] = commands.NewListStack(ui, config, repoLocator.GetStackRepository())
 	factory.cmdsByName["target"] = commands.NewTarget(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
-	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, config, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["unset-org-role"] = user.NewUnsetOrgRole(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["unset-space-role"] = user.NewUnsetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
@@ -215,10 +214,12 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
 	restart := application.NewRestart(ui, config, start, stop)
 	restage := application.NewRestage(ui, config, repoLocator.GetApplicationRepository(), start)
-	bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
+	bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository(), repoLocator.GetApplicationRepository(), start)
+	unbind := service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository(), repoLocator.GetApplicationRepository(), start)
 
 	factory.cmdsByName["app"] = displayApp
 	factory.cmdsByName["bind-service"] = bind
+	factory.cmdsByName["unbind-service"] = unbind
 	factory.cmdsByName["start"] = start
 	factory.cmdsByName["stop"] = stop
 	factory.cmdsByName["restart"] = restart
