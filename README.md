@@ -115,7 +115,7 @@ Developing
 ==========
 
 1. Install [Mercurial](http://mercurial.selenic.com/)
-1. Run `go get code.google.com/p/go.tools/cmd/vet`
+1. Run `go get golang.org/x/tools/cmd/vet`
 1. Write a Ginkgo test.
 1. Run `bin/test` and watch the test fail.
 1. Make the test pass.
