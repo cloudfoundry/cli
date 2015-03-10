@@ -42,7 +42,11 @@ func (cmd *Restage) GetRequirements(requirementsFactory requirements.Factory, c 
 		cmd.ui.FailWithUsage(c)
 	}
 
-	return []requirements.Requirement{requirementsFactory.NewLoginRequirement()}, nil
+	reqs = []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
+	}
+	return
 }
 
 func (cmd *Restage) Run(c *cli.Context) {

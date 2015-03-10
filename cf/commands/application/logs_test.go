@@ -52,6 +52,12 @@ var _ = Describe("logs command", func() {
 		It("fails requirements when not logged in", func() {
 			Expect(runCommand("my-app")).To(BeFalse())
 		})
+		It("fails if a space is not targeted", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = false
+			Expect(runCommand("--recent", "my-app")).To(BeFalse())
+		})
+
 	})
 
 	Context("when logged in", func() {
@@ -61,6 +67,7 @@ var _ = Describe("logs command", func() {
 
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = true
 
 			app = models.Application{}
 			app.Name = "my-app"

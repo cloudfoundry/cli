@@ -50,10 +50,16 @@ var _ = Describe("delete app command", func() {
 		requirementsFactory.LoginSuccess = false
 		Expect(runCommand("-f", "delete-this-app-plz")).To(BeFalse())
 	})
+	It("fails if a space is not targeted", func() {
+		requirementsFactory.LoginSuccess = true
+		requirementsFactory.TargetedSpaceSuccess = false
+		Expect(runCommand("-f", "delete-this-app-plz")).To(BeFalse())
+	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = true
 		})
 
 		It("fails with usage when not provided exactly one arg", func() {
