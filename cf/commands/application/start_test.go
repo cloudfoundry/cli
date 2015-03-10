@@ -141,6 +141,12 @@ var _ = Describe("start command", func() {
 
 		Expect(testcmd.RunCommand(cmd, []string{"some-app-name"}, requirementsFactory)).To(BeFalse())
 	})
+	It("fails requirements when a space is not targeted", func() {
+		requirementsFactory.LoginSuccess = true
+		requirementsFactory.TargetedSpaceSuccess = false
+		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testApplication.FakeApplicationRepository{}, &testAppInstanaces.FakeAppInstancesRepository{}, &testapi.FakeLogsRepository{})
+		Expect(testcmd.RunCommand(cmd, []string{"some-app-name"}, requirementsFactory)).To(BeFalse())
+	})
 
 	Describe("timeouts", func() {
 		It("has sane default timeout values", func() {
@@ -182,6 +188,7 @@ var _ = Describe("start command", func() {
 				appInstancesRepo.GetInstancesReturns(instances, errors.New("Error staging app"))
 
 				requirementsFactory.LoginSuccess = true
+				requirementsFactory.TargetedSpaceSuccess = true
 				requirementsFactory.Application = app
 				config := testconfig.NewRepository()
 				displayApp := &testcmd.FakeAppDisplayer{}
@@ -207,6 +214,7 @@ var _ = Describe("start command", func() {
 	Context("when logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = true
 		})
 
 		It("fails with usage when not provided exactly one arg", func() {

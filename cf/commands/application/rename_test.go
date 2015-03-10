@@ -44,6 +44,11 @@ var _ = Describe("Rename command", func() {
 		It("fails when not logged in", func() {
 			Expect(runCommand("my-app", "my-new-app")).To(BeFalse())
 		})
+		It("fails if a space is not targeted", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = false
+			Expect(runCommand("my-app", "my-new-app")).To(BeFalse())
+		})
 	})
 
 	It("renames an application", func() {
@@ -51,6 +56,7 @@ var _ = Describe("Rename command", func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		requirementsFactory.LoginSuccess = true
+		requirementsFactory.TargetedSpaceSuccess = true
 		requirementsFactory.Application = app
 		runCommand("my-app", "my-new-app")
 

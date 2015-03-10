@@ -54,7 +54,8 @@ func (cmd *Stop) GetRequirements(requirementsFactory requirements.Factory, c *cl
 		cmd.appReq.SetApplicationName(c.Args()[0])
 	}
 
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(), cmd.appReq}
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(), cmd.appReq}
 	return
 }
 

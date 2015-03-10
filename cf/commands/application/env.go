@@ -38,12 +38,15 @@ func (cmd *Env) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *Env) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
+func (cmd *Env) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		cmd.ui.FailWithUsage(c)
 	}
-
-	return []requirements.Requirement{requirementsFactory.NewLoginRequirement()}, nil
+	reqs = []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
+	}
+	return
 }
 
 func (cmd *Env) Run(c *cli.Context) {
