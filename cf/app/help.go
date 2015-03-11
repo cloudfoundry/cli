@@ -137,6 +137,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("unset-env"),
 				}, {
 					presentCommand("stacks"),
+					presentCommand("stack"),
 				}, {
 					presentCommand("copy-source"),
 				}, {

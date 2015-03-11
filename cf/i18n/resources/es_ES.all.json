@@ -2420,6 +2420,11 @@
       "modified": false
    },
    {
+      "id": "Getting stack '{{.Stack}}' in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Getting stack '{{.Stack}}' in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
       "id": "Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
       "translation": "Obteniendo stacks en org {{.OrganizationName}} / space {{.SpaceName}} como {{.Username}}...",
       "modified": false
@@ -2522,11 +2527,6 @@
    {
       "id": "Instance must be a non-negative integer",
       "translation": "Instance must be a non-negative integer",
-      "modified": false
-   },
-   {
-      "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
-      "translation": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
       "modified": false
    },
    {
@@ -2645,6 +2645,11 @@
       "modified": false
    },
    {
+      "id": "Last Operation",
+      "translation": "Last Operation",
+      "modified": false
+   },
+   {
       "id": "List all apps in the target space",
       "translation": "Lista todas las apps en el space seleccionado",
       "modified": false
@@ -2670,11 +2675,6 @@
       "modified": false
    },
    {
-      "id": "List all the routes for all spaces of current organization",
-      "translation": "List all the routes for all spaces of current organization",
-      "modified": false
-   },
-   {
       "id": "List all security groups",
       "translation": "List all security groups",
       "modified": false
@@ -2692,6 +2692,11 @@
    {
       "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
       "translation": "Lista todos los stacks(un stack es un sistema de archivos pre construid, Incluyendo un sistema operativo, que puede correr apps)",
+      "modified": false
+   },
+   {
+      "id": "List all the routes for all spaces of current organization",
+      "translation": "List all the routes for all spaces of current organization",
       "modified": false
    },
    {
@@ -4280,6 +4285,11 @@
       "modified": false
    },
    {
+      "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
+      "translation": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
+      "modified": false
+   },
+   {
       "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "translation": "Actualizando app {{.AppName}} en la org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}...",
       "modified": false
@@ -4525,11 +4535,6 @@
       "modified": false
    },
    {
-      "id": "{{.OperationType}} succeeded",
-      "translation": "{{.OperationType}} succeeded",
-      "modified": false
-   },
-   {
       "id": "bound apps",
       "translation": "apps ligadas",
       "modified": false
@@ -4620,11 +4625,6 @@
       "modified": false
    },
    {
-      "id": "{{.OperationType}} failed",
-      "translation": "{{.OperationType}} failed",
-      "modified": false
-   },
-   {
       "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
       "translation": "Fallo al apagar el eco de la consola para la entrada de clave:\n{{.ErrorDescription}}",
       "modified": false
@@ -4687,6 +4687,11 @@
    {
       "id": "label",
       "translation": "label",
+      "modified": false
+   },
+   {
+      "id": "last operation",
+      "translation": "last operation",
       "modified": false
    },
    {
@@ -4900,6 +4905,11 @@
       "modified": false
    },
    {
+      "id": "state",
+      "translation": "estado",
+      "modified": false
+   },
+   {
       "id": "status",
       "translation": "estado",
       "modified": false
@@ -4923,11 +4933,6 @@
       "id": "total memory limit",
       "translation": "limite de memoria",
       "modified": true
-   },
-   {
-      "id": "{{.OperationType}} in progress",
-      "translation": "{{.OperationType}} in progress",
-      "modified": false
    },
    {
       "id": "unknown authority",
@@ -5055,6 +5060,21 @@
       "modified": false
    },
    {
+      "id": "{{.OperationType}} failed",
+      "translation": "{{.OperationType}} failed",
+      "modified": false
+   },
+   {
+      "id": "{{.OperationType}} in progress",
+      "translation": "{{.OperationType}} in progress",
+      "modified": false
+   },
+   {
+      "id": "{{.OperationType}} succeeded",
+      "translation": "{{.OperationType}} succeeded",
+      "modified": false
+   },
+   {
       "id": "{{.PropertyName}} must be a string or null value",
       "translation": "{{.PropertyName}} Debe ser una cadena o null como valor",
       "modified": false
@@ -5090,33 +5110,13 @@
       "modified": false
    },
    {
+      "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
+      "translation": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
+      "modified": false
+   },
+   {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instancias",
-      "modified": false
-   },
-   {
-      "id": "details",
-      "translation": "details",
-      "modified": false
-   },
-   {
-      "id": "Last Operation",
-      "translation": "Last Operation",
-      "modified": false
-   },
-   {
-      "id": "last operation",
-      "translation": "last operation",
-      "modified": false
-   },
-   {
-      "id": "state",
-      "translation": "estado",
-      "modified": false
-   },
-   {
-      "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-      "translation": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
       "modified": false
    }
 ]
