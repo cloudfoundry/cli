@@ -154,7 +154,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["space-users"] = user.NewSpaceUsers(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
 	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, config, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["stacks"] = commands.NewListStacks(ui, config, repoLocator.GetStackRepository())
-	factory.cmdsByName["target"] = commands.NewTarget(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
+	factory.cmdsByName["target"] = commands.NewTarget(ui, config, repoLocator.GetEndpointRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, config, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["unset-org-role"] = user.NewUnsetOrgRole(ui, config, repoLocator.GetUserRepository())
