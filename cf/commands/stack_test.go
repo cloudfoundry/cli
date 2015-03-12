@@ -41,22 +41,43 @@ var _ = Describe("stack command", func() {
 		})
 	})
 
-	It("lists the stack requested", func() {
+	It("returns the stack guid when '--guid' flag is provided", func() {
 		stack1 := models.Stack{
 			Name:        "Stack-1",
 			Description: "Stack 1 Description",
-			Guid:        "Fake-GUID",
+			Guid:        "Stack-1-GUID",
 		}
 
 		repo.FindByNameReturns(stack1, nil)
 
-		testcmd.RunCommand(cmd, []string{"Stack-1"}, requirementsFactory)
+		testcmd.RunCommand(cmd, []string{"Stack-1", "--guid"}, requirementsFactory)
 
-		Expect(ui.Outputs).To(BeInDisplayOrder(
-			[]string{"Getting stack 'Stack-1' in org", "my-org", "my-space", "my-user"},
-			[]string{"OK"},
-			[]string{"Stack-1", "Stack 1 Description"},
-		))
+		Expect(len(ui.Outputs)).To(Equal(1))
+		Expect(ui.Outputs[0]).To(Equal("Stack-1-GUID"))
+	})
+
+	It("returns the empty string as guid when '--guid' flag is provided and stack doesn't exist", func() {
+		stack1 := models.Stack{
+			Name:        "Stack-1",
+			Description: "Stack 1 Description",
+			Guid:        "Stack-1-GUID",
+		}
+
+		repo.FindByNameReturns(stack1, nil)
+
+		testcmd.RunCommand(cmd, []string{"Stack-1", "--guid"}, requirementsFactory)
+
+		Expect(len(ui.Outputs)).To(Equal(1))
+		Expect(ui.Outputs[0]).To(Equal("Stack-1-GUID"))
+	})
+
+	It("lists the stack requested", func() {
+		repo.FindByNameReturns(models.Stack{}, errors.New("Stack Stack-1 not found"))
+
+		testcmd.RunCommand(cmd, []string{"Stack-1", "--guid"}, requirementsFactory)
+
+		Expect(len(ui.Outputs)).To(Equal(1))
+		Expect(ui.Outputs[0]).To(Equal(""))
 	})
 
 	It("informs user if stack is not found", func() {
