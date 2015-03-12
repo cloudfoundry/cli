@@ -2,9 +2,10 @@
 package fakes
 
 import (
+	"sync"
+
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/models"
-	"sync"
 )
 
 type FakeOrganizationRepository struct {
@@ -49,12 +50,30 @@ type FakeOrganizationRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
+	SharePrivateDomainStub        func(orgGuid string, domainGuid string) (apiErr error)
+	sharePrivateDomainMutex       sync.RWMutex
+	sharePrivateDomainArgsForCall []struct {
+		orgGuid    string
+		domainGuid string
+	}
+	sharePrivateDomainReturns struct {
+		result1 error
+	}
+	UnsharePrivateDomainStub        func(orgGuid string, domainGuid string) (apiErr error)
+	unsharePrivateDomainMutex       sync.RWMutex
+	unsharePrivateDomainArgsForCall []struct {
+		orgGuid    string
+		domainGuid string
+	}
+	unsharePrivateDomainReturns struct {
+		result1 error
+	}
 }
 
 func (fake *FakeOrganizationRepository) ListOrgs() (orgs []models.Organization, apiErr error) {
 	fake.listOrgsMutex.Lock()
-	defer fake.listOrgsMutex.Unlock()
 	fake.listOrgsArgsForCall = append(fake.listOrgsArgsForCall, struct{}{})
+	fake.listOrgsMutex.Unlock()
 	if fake.ListOrgsStub != nil {
 		return fake.ListOrgsStub()
 	} else {
@@ -78,10 +97,10 @@ func (fake *FakeOrganizationRepository) ListOrgsReturns(result1 []models.Organiz
 
 func (fake *FakeOrganizationRepository) FindByName(name string) (org models.Organization, apiErr error) {
 	fake.findByNameMutex.Lock()
-	defer fake.findByNameMutex.Unlock()
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		name string
 	}{name})
+	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(name)
 	} else {
@@ -111,10 +130,10 @@ func (fake *FakeOrganizationRepository) FindByNameReturns(result1 models.Organiz
 
 func (fake *FakeOrganizationRepository) Create(org models.Organization) (apiErr error) {
 	fake.createMutex.Lock()
-	defer fake.createMutex.Unlock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		org models.Organization
 	}{org})
+	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(org)
 	} else {
@@ -143,11 +162,11 @@ func (fake *FakeOrganizationRepository) CreateReturns(result1 error) {
 
 func (fake *FakeOrganizationRepository) Rename(orgGuid string, name string) (apiErr error) {
 	fake.renameMutex.Lock()
-	defer fake.renameMutex.Unlock()
 	fake.renameArgsForCall = append(fake.renameArgsForCall, struct {
 		orgGuid string
 		name    string
 	}{orgGuid, name})
+	fake.renameMutex.Unlock()
 	if fake.RenameStub != nil {
 		return fake.RenameStub(orgGuid, name)
 	} else {
@@ -176,10 +195,10 @@ func (fake *FakeOrganizationRepository) RenameReturns(result1 error) {
 
 func (fake *FakeOrganizationRepository) Delete(orgGuid string) (apiErr error) {
 	fake.deleteMutex.Lock()
-	defer fake.deleteMutex.Unlock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		orgGuid string
 	}{orgGuid})
+	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(orgGuid)
 	} else {
@@ -202,6 +221,72 @@ func (fake *FakeOrganizationRepository) DeleteArgsForCall(i int) string {
 func (fake *FakeOrganizationRepository) DeleteReturns(result1 error) {
 	fake.DeleteStub = nil
 	fake.deleteReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeOrganizationRepository) SharePrivateDomain(orgGuid string, domainGuid string) (apiErr error) {
+	fake.sharePrivateDomainMutex.Lock()
+	fake.sharePrivateDomainArgsForCall = append(fake.sharePrivateDomainArgsForCall, struct {
+		orgGuid    string
+		domainGuid string
+	}{orgGuid, domainGuid})
+	fake.sharePrivateDomainMutex.Unlock()
+	if fake.SharePrivateDomainStub != nil {
+		return fake.SharePrivateDomainStub(orgGuid, domainGuid)
+	} else {
+		return fake.sharePrivateDomainReturns.result1
+	}
+}
+
+func (fake *FakeOrganizationRepository) SharePrivateDomainCallCount() int {
+	fake.sharePrivateDomainMutex.RLock()
+	defer fake.sharePrivateDomainMutex.RUnlock()
+	return len(fake.sharePrivateDomainArgsForCall)
+}
+
+func (fake *FakeOrganizationRepository) SharePrivateDomainArgsForCall(i int) (string, string) {
+	fake.sharePrivateDomainMutex.RLock()
+	defer fake.sharePrivateDomainMutex.RUnlock()
+	return fake.sharePrivateDomainArgsForCall[i].orgGuid, fake.sharePrivateDomainArgsForCall[i].domainGuid
+}
+
+func (fake *FakeOrganizationRepository) SharePrivateDomainReturns(result1 error) {
+	fake.SharePrivateDomainStub = nil
+	fake.sharePrivateDomainReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeOrganizationRepository) UnsharePrivateDomain(orgGuid string, domainGuid string) (apiErr error) {
+	fake.unsharePrivateDomainMutex.Lock()
+	fake.unsharePrivateDomainArgsForCall = append(fake.unsharePrivateDomainArgsForCall, struct {
+		orgGuid    string
+		domainGuid string
+	}{orgGuid, domainGuid})
+	fake.unsharePrivateDomainMutex.Unlock()
+	if fake.UnsharePrivateDomainStub != nil {
+		return fake.UnsharePrivateDomainStub(orgGuid, domainGuid)
+	} else {
+		return fake.unsharePrivateDomainReturns.result1
+	}
+}
+
+func (fake *FakeOrganizationRepository) UnsharePrivateDomainCallCount() int {
+	fake.unsharePrivateDomainMutex.RLock()
+	defer fake.unsharePrivateDomainMutex.RUnlock()
+	return len(fake.unsharePrivateDomainArgsForCall)
+}
+
+func (fake *FakeOrganizationRepository) UnsharePrivateDomainArgsForCall(i int) (string, string) {
+	fake.unsharePrivateDomainMutex.RLock()
+	defer fake.unsharePrivateDomainMutex.RUnlock()
+	return fake.unsharePrivateDomainArgsForCall[i].orgGuid, fake.unsharePrivateDomainArgsForCall[i].domainGuid
+}
+
+func (fake *FakeOrganizationRepository) UnsharePrivateDomainReturns(result1 error) {
+	fake.UnsharePrivateDomainStub = nil
+	fake.unsharePrivateDomainReturns = struct {
 		result1 error
 	}{result1}
 }

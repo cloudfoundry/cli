@@ -250,6 +250,40 @@ var _ = Describe("Organization Repository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
+
+	Describe("SharePrivateDomain", func() {
+		It("shares the private domain with the given org", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/organizations/my-org-guid/private_domains/domain-guid",
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			})
+
+			testserver, handler, repo := createOrganizationRepo(req)
+			defer testserver.Close()
+
+			apiErr := repo.SharePrivateDomain("my-org-guid", "domain-guid")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+	})
+
+	Describe("UnsharePrivateDomain", func() {
+		It("unshares the private domain with the given org", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "DELETE",
+				Path:     "/v2/organizations/my-org-guid/private_domains/domain-guid",
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			})
+
+			testserver, handler, repo := createOrganizationRepo(req)
+			defer testserver.Close()
+
+			apiErr := repo.UnsharePrivateDomain("my-org-guid", "domain-guid")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+	})
 })
 
 func createOrganizationRepo(reqs ...testnet.TestRequest) (testserver *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {

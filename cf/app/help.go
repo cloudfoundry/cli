@@ -251,6 +251,10 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("delete-quota"),
 					presentCommand("update-quota"),
 				},
+				{
+					presentCommand("share-private-domain"),
+					presentCommand("unshare-private-domain"),
+				},
 			},
 		}, {
 			Name: T("SPACE ADMIN"),

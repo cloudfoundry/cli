@@ -12,12 +12,15 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter -o fakes/fake_organization_repository.go . OrganizationRepository
 type OrganizationRepository interface {
 	ListOrgs() (orgs []models.Organization, apiErr error)
 	FindByName(name string) (org models.Organization, apiErr error)
 	Create(org models.Organization) (apiErr error)
 	Rename(orgGuid string, name string) (apiErr error)
 	Delete(orgGuid string) (apiErr error)
+	SharePrivateDomain(orgGuid string, domainGuid string) (apiErr error)
+	UnsharePrivateDomain(orgGuid string, domainGuid string) (apiErr error)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -85,5 +88,15 @@ func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name st
 
 func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiErr error) {
 	url := fmt.Sprintf("/v2/organizations/%s?recursive=true", orgGuid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
+}
+
+func (repo CloudControllerOrganizationRepository) SharePrivateDomain(orgGuid string, domainGuid string) error {
+	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGuid, domainGuid)
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, nil)
+}
+
+func (repo CloudControllerOrganizationRepository) UnsharePrivateDomain(orgGuid string, domainGuid string) error {
+	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGuid, domainGuid)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
 }
