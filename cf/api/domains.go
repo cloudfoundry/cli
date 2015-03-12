@@ -16,7 +16,8 @@ import (
 
 type DomainRepository interface {
 	ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error
-	FindByName(name string) (domain models.DomainFields, apiErr error)
+	FindSharedByName(name string) (domain models.DomainFields, apiErr error)
+	FindPrivateByName(name string) (domain models.DomainFields, apiErr error)
 	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiErr error)
 	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr error)
 	CreateSharedDomain(domainName string) (apiErr error)
@@ -62,8 +63,12 @@ func (repo CloudControllerDomainRepository) isOrgDomain(orgGuid string, domain m
 	return orgGuid == domain.OwningOrganizationGuid || domain.Shared
 }
 
-func (repo CloudControllerDomainRepository) FindByName(name string) (domain models.DomainFields, apiErr error) {
-	return repo.findOneWithPath(repo.strategy.DomainURL(name), name)
+func (repo CloudControllerDomainRepository) FindSharedByName(name string) (domain models.DomainFields, apiErr error) {
+	return repo.findOneWithPath(repo.strategy.SharedDomainURL(name), name)
+}
+
+func (repo CloudControllerDomainRepository) FindPrivateByName(name string) (domain models.DomainFields, apiErr error) {
+	return repo.findOneWithPath(repo.strategy.PrivateDomainURL(name), name)
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain models.DomainFields, apiErr error) {
@@ -71,7 +76,7 @@ func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid
 
 	switch apiErr.(type) {
 	case *errors.ModelNotFoundError:
-		domain, apiErr = repo.FindByName(name)
+		domain, apiErr = repo.FindSharedByName(name)
 		if !domain.Shared {
 			apiErr = errors.NewModelNotFoundError("Domain", name)
 		}

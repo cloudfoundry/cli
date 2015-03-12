@@ -313,6 +313,10 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		repoLocator.GetCopyApplicationSourceRepository(),
 		restart, //note this is built up above.
 	)
+
+	factory.cmdsByName["share-private-domain"] = organization.NewSharePrivateDomain(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetDomainRepository())
+	factory.cmdsByName["unshare-private-domain"] = organization.NewUnsharePrivateDomain(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetDomainRepository())
+
 	return
 }
 
