@@ -3545,6 +3545,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve and display the given stack's guid. All other output for the stack is suppressed.",
+      "translation": "Retrieve and display the given stack's guid. All other output for the stack is suppressed.",
+      "modified": false
+   },
+   {
       "id": "Retrieve list of feature flags with status of each flag-able feature",
       "translation": "Retrieve list of feature flags with status of each flag-able feature",
       "modified": false
