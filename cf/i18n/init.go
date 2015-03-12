@@ -102,7 +102,7 @@ func mustLoadDefaultLocale() string {
 
 	err := loadFromAsset(DEFAULT_LOCALE)
 	if err != nil {
-		panic("Could not load en_US language files. God save the queen. " + err.Error())
+		panic("Could not load en_US language files. God save the queen. \n" + err.Error() + "\n\n")
 	}
 
 	return userLocale
@@ -119,6 +119,15 @@ func loadFromAsset(locale string) error {
 
 	if len(byteArray) == 0 {
 		return errors.New(fmt.Sprintf("Could not load i18n asset: %v", assetKey))
+	}
+
+	_, err = os.Stat(os.TempDir())
+	if err != nil {
+		if !os.IsExist(err) {
+			return errors.New("Please make sure Temp dir exist - " + os.TempDir())
+		} else {
+			return err
+		}
 	}
 
 	tmpDir, err := ioutil.TempDir("", "cloudfoundry_cli_i18n_res")
