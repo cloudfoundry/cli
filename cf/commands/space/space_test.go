@@ -68,8 +68,12 @@ var _ = Describe("space command", func() {
 			serviceInstance.Guid = "service1-guid"
 			services := []models.ServiceInstanceFields{serviceInstance}
 
-			securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security"}
-			securityGroup2 := models.SecurityGroupFields{Name: "Nacho Prime"}
+			securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security", Rules: []map[string]interface{}{
+				{"protocol": "all", "destination": "0.0.0.0-9.255.255.255"},
+			}}
+			securityGroup2 := models.SecurityGroupFields{Name: "Nacho Prime", Rules: []map[string]interface{}{
+				{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
+			}}
 			securityGroups := []models.SecurityGroupFields{securityGroup1, securityGroup2}
 
 			space := models.Space{}
@@ -117,7 +121,13 @@ var _ = Describe("space command", func() {
 				runCommand("--security-group-rules", "whose-space-is-it-anyway")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Getting rules for the security group"},
+					[]string{"Getting rules for the security group", "Nacho Security"},
+					[]string{"protocol", "all"},
+					[]string{"destination", "0.0.0.0-9.255.255.255"},
+					[]string{"Getting rules for the security group", "Nacho Prime"},
+					[]string{"protocol", "udp"},
+					[]string{"ports", "8080-9090"},
+					[]string{"destination", "198.41.191.47/1"},
 				))
 			})
 		})
