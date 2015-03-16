@@ -89,6 +89,127 @@ var _ = Describe("Space Repository", func() {
 		Expect(handler).To(HaveAllRequestsCalled())
 	})
 
+	Describe("finding spaces by role", func() {
+		It("returns the space with developer role", func() {
+
+			pageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/spaces?q=developer_guid:my-user-guid;q=name:my-space",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body: `
+				{
+					  "total_results": 1,
+					  "total_pages": 1,
+					  "prev_url": null,
+					  "next_url": null,
+					  "resources": [
+					    {
+					      "metadata": {
+					        "guid": "my-org-guid",
+					        "url": "/v2/spaces/my-space-guid",
+					        "updated_at": null
+					      },
+					      "entity": {
+					        "name": "my-space",
+					        "organization_guid": "my-org-guid",
+					        "space_quota_definition_guid": null
+					      }
+					    }
+					  ]
+
+
+				}`}})
+			ts, handler, repo := createSpacesRepo(pageSpacesRequest)
+			defer ts.Close()
+
+			spaces := []models.Space{}
+			apiErr := repo.GetSpaceRole(func(space models.Space) bool {
+				spaces = append(spaces, space)
+				return true
+			}, "developer_guid")
+			Expect(len(spaces)).To(Equal(1))
+			Expect(spaces[0].Name).To(Equal("my-space"))
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+		})
+
+		It("returns the space with manager role", func() {
+
+			pageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/users/my-user-guid/managed_spaces?q=organization_guid:my-org-guid;q=name:my-space",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body: `
+				{
+					  "total_results": 1,
+					  "total_pages": 1,
+					  "prev_url": null,
+					  "next_url": null,
+					  "resources": [
+					    {
+					      "metadata": {
+					        "guid": "my-org-guid",
+					        "url": "/v2/spaces/my-space-guid",
+					        "created_at": "2015-03-03T20:46:20Z",
+					        "updated_at": null
+					      },
+					      "entity": {
+					        "name": "my-space",
+					        "organization_guid": "my-org-guid",
+					        "space_quota_definition_guid": null,
+					        "organization_url": "/v2/organizations/7d080c6f-6b58-4b71-9079-f72839d9d0d3",
+					        "developers_url": "/v2/spaces/2d837a89-60c0-4bd8-a6b9-7dfe7aea8db8/developers"
+					        
+					      }
+					    }
+					  ]
+				}`}})
+			ts, handler, repo := createSpacesRepo(pageSpacesRequest)
+			defer ts.Close()
+
+			spaces := []models.Space{}
+			apiErr := repo.GetSpaceRole(func(space models.Space) bool {
+				spaces = append(spaces, space)
+				return true
+			}, "managed_spaces")
+			Expect(len(spaces)).To(Equal(1))
+			Expect(spaces[0].Name).To(Equal("my-space"))
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+		})
+
+		It("returns the apiErr while fetching space role", func() {
+
+			pageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/users/my-user-guid/managed_spaces?q=organization_guid:my-org-guid;q=name:my-space",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body: `
+				{ 
+					  "code": 10000,
+					  "description": "Unknown request",
+					  "error_code": "CF-NotFound"
+
+
+				}`}})
+			ts, handler, repo := createSpacesRepo(pageSpacesRequest)
+			defer ts.Close()
+
+			spaces := []models.Space{}
+			apiErr := repo.GetSpaceRole(func(space models.Space) bool {
+				spaces = append(spaces, space)
+				return true
+			}, "managed_spaces")
+			Expect(len(spaces)).To(Equal(0))
+			Expect(apiErr).To(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+		})
+
+	})
+
 	Describe("finding spaces by name", func() {
 		It("returns the space", func() {
 			testSpacesFindByNameWithOrg("my-org-guid",

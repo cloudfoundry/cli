@@ -81,6 +81,83 @@ var _ = Describe("Organization Repository", func() {
 		})
 	})
 
+	Describe("getting OrgRoles", func() {
+		It("getting Orgs with a manager role", func() {
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations?q=manager_guid:my-user-guid;q=name:Org1",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [{
+					  "metadata": {
+					  "guid": "my-user-guid",
+					  "url": "/v2/organizations/org1-guid"
+        				},
+				      "entity": {
+				        "name": "Org1",
+				        "billing_enabled": false
+				      }}]}`},
+			})
+			testserver, handler, repo := createOrganizationRepo(req)
+			defer testserver.Close()
+			existingOrg := models.Organization{}
+			existingOrg.Name = "Org1"
+
+			org, apiErr := repo.GetOrgRoleForUser("manager_guid", "Org1")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+
+			Expect(org.Name).To(Equal(existingOrg.Name))
+		})
+
+		It("getting Orgs with a billing manager role", func() {
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations?q=billing_manager_guid:my-user-guid;q=name:Org1",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [{
+					  "metadata": {
+       				  "guid": "my-user-guid",
+        				"url": "/v2/organizations/org1-guid"
+        				},
+				      "entity": {
+				        "name": "Org1",
+				        "billing_enabled": false
+				      }}]}`},
+			})
+			testserver, handler, repo := createOrganizationRepo(req)
+			defer testserver.Close()
+			existingOrg := models.Organization{}
+			existingOrg.Name = "Org1"
+
+			org, apiErr := repo.GetOrgRoleForUser("billing_manager_guid", "Org1")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(org.Name).To(Equal(existingOrg.Name))
+
+		})
+
+		It("checking for apiErr", func() {
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations?q=apiErr:my-user-guid;q=name:Org1",
+				Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `
+					{
+					  "code": 10000,
+					  "description": "Unknown request",
+					  "error_code": "CF-NotFound"
+					}
+					`},
+			})
+			testserver, handler, repo := createOrganizationRepo(req)
+			defer testserver.Close()
+
+			_, apiErr := repo.GetOrgRoleForUser("apiErr", "Org1")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).To(HaveOccurred())
+		})
+	})
+
 	Describe("finding organizations by name", func() {
 		It("returns the org with that name", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{

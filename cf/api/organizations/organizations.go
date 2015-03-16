@@ -21,6 +21,7 @@ type OrganizationRepository interface {
 	Delete(orgGuid string) (apiErr error)
 	SharePrivateDomain(orgGuid string, domainGuid string) (apiErr error)
 	UnsharePrivateDomain(orgGuid string, domainGuid string) (apiErr error)
+	GetOrgRoleForUser(name string, orgName string) (org models.Organization, apiErr error)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -94,6 +95,25 @@ func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiErr
 func (repo CloudControllerOrganizationRepository) SharePrivateDomain(orgGuid string, domainGuid string) error {
 	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGuid, domainGuid)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, nil)
+}
+
+func (repo CloudControllerOrganizationRepository) GetOrgRoleForUser(name string, orgName string) (models.Organization, error) {
+	path := fmt.Sprintf("/v2/organizations?q=%s:%s;q=name:%s", name, repo.config.UserGuid(), orgName)
+	org := models.Organization{}
+	err := repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		path,
+		resources.OrganizationResource{},
+		func(resource interface{}) bool {
+			orgResource, ok := resource.(resources.OrganizationResource)
+			if ok {
+				org = orgResource.ToModel()
+				return true
+			} else {
+				return false
+			}
+		})
+	return org, err
 }
 
 func (repo CloudControllerOrganizationRepository) UnsharePrivateDomain(orgGuid string, domainGuid string) error {
