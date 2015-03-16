@@ -105,9 +105,9 @@
       "modified": false
    },
    {
-      "id": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+      "id": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)\n",
       "translation": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
-      "modified": false
+      "modified": true
    },
    {
       "id": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n",
@@ -990,6 +990,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME share-private-domain ORG DOMAIN",
+      "translation": "CF_NAME share-private-domain ORG DOMAIN",
+      "modified": false
+   },
+   {
       "id": "CF_NAME space SPACE",
       "translation": "CF_NAME space SPACE",
       "modified": false
@@ -1087,6 +1092,11 @@
    {
       "id": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n",
       "translation": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
+      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
       "modified": false
    },
    {
@@ -3800,6 +3810,16 @@
       "modified": false
    },
    {
+      "id": "Share a private domain with an org",
+      "translation": "Share a private domain with an org",
+      "modified": false
+   },
+   {
+      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
+      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
       "id": "Show a single security group",
       "translation": "Show a single security group",
       "modified": false
@@ -4262,6 +4282,16 @@
    {
       "id": "Unsetting api endpoint...",
       "translation": "Unsetting api endpoint...",
+      "modified": false
+   },
+   {
+      "id": "Unshare a private domain with an org",
+      "translation": "Unshare a private domain with an org",
+      "modified": false
+   },
+   {
+      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
+      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
       "modified": false
    },
    {
@@ -5132,36 +5162,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
-      "modified": false
-   },
-   {
-      "id": "Share a private domain with an org",
-      "translation": "Share a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME share-private-domain ORG DOMAIN",
-      "translation": "CF_NAME share-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Unshare a private domain with an org",
-      "translation": "Unshare a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
       "modified": false
    }
 ]
