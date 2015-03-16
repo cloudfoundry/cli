@@ -594,6 +594,7 @@ a: *missing
 			m := make(map[string]string)
 			err := d.Decode(&m)
 			Ω(err).Should(HaveOccurred())
+			Ω(err.Error()).Should(MatchRegexp("missing anchor.*line.*column.*"))
 		})
 
 		Context("to Interface", func() {
@@ -688,6 +689,7 @@ a: *missing
 				var i interface{}
 				err := d.Decode(&i)
 				Ω(err).Should(HaveOccurred())
+				Ω(err.Error()).Should(MatchRegexp("missing anchor.*line.*column.*"))
 			})
 
 		})
@@ -727,6 +729,25 @@ y: *a
 				"y": int64(1),
 			}))
 		})
+
+		It("can parse nested anchors", func() {
+			d := NewDecoder(strings.NewReader(`
+---
+a:
+  aa: &x
+    aaa: 1
+  ab:
+    aba: &y
+      abaa:
+        abaaa: *x
+b:
+- ba:
+    baa: *y
+`))
+			v := make(map[string]interface{})
+			err := d.Decode(&v)
+			Ω(err).ShouldNot(HaveOccurred())
+		})
 	})
 
 	Context("When decoding fails", func() {
@@ -737,6 +758,7 @@ y: *a
 
 			err := d.Decode(&v)
 			Ω(err).Should(HaveOccurred())
+			Ω(err.Error()).Should(Equal("Expected document start at line 0, column 0"))
 		})
 	})
 
@@ -821,6 +843,7 @@ y: *a
 
 			err := d.Decode(&v)
 			Ω(err).Should(HaveOccurred())
+			Ω(err.Error()).Should(MatchRegexp("Not a number: 'on' at line 0, column 0"))
 		})
 
 		It("returns a Number", func() {
@@ -834,6 +857,22 @@ y: *a
 
 			n := v.(Number)
 			Ω(n.String()).Should(Equal("123"))
+		})
+	})
+	Context("When there are special characters", func() {
+		It("returns an error", func() {
+			d := NewDecoder(strings.NewReader(`
+---
+applications:
+ - name: m
+   services:
+       - !@#
+`))
+			var v interface{}
+
+			err := d.Decode(&v)
+			Ω(err).Should(HaveOccurred())
+			Ω(err.Error()).Should(MatchRegexp("yaml.*did not find.*line.*column.*"))
 		})
 	})
 })

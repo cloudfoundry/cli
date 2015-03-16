@@ -21,7 +21,6 @@ import (
 	"io"
 	"reflect"
 	"runtime"
-	"runtime/debug"
 	"strconv"
 	"strings"
 )
@@ -91,11 +90,10 @@ func recovery(err *error) {
 		case string:
 			tmpError = errors.New(r)
 		default:
-			tmpError = errors.New("Unknown panic: " + reflect.TypeOf(r).String())
+			tmpError = errors.New("Unknown panic: " + reflect.ValueOf(r).String())
 		}
 
-		stackTrace := debug.Stack()
-		*err = fmt.Errorf("%s\n%s", tmpError.Error(), string(stackTrace))
+		*err = tmpError
 	}
 }
 
@@ -119,12 +117,7 @@ func (d *Decoder) Decode(v interface{}) (err error) {
 
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		rType := reflect.TypeOf(v)
-		msg := "nil"
-		if rType != nil {
-			msg = rType.String()
-		}
-		return errors.New("Invalid type: " + msg)
+		return fmt.Errorf("Expected a pointer or nil but was a %s at %s", rv.String(), d.event.start_mark)
 	}
 
 	if d.event.event_type == yaml_NO_EVENT {
@@ -174,21 +167,22 @@ func (d *Decoder) nextEvent() {
 	}
 
 	last := len(d.tracking_anchors)
-	if last > 0 {
+	// skip aliases when tracking an anchor
+	if last > 0 && d.event.event_type != yaml_ALIAS_EVENT {
 		d.tracking_anchors[last-1] = append(d.tracking_anchors[last-1], d.event)
 	}
 }
 
 func (d *Decoder) document(rv reflect.Value) {
 	if d.event.event_type != yaml_DOCUMENT_START_EVENT {
-		d.error(fmt.Errorf("Expected document start - found %d", d.event.event_type))
+		d.error(fmt.Errorf("Expected document start at %s", d.event.start_mark))
 	}
 
 	d.nextEvent()
 	d.parse(rv)
 
 	if d.event.event_type != yaml_DOCUMENT_END_EVENT {
-		d.error(fmt.Errorf("Expected document end - found %d", d.event.event_type))
+		d.error(fmt.Errorf("Expected document end at %s", d.event.start_mark))
 	}
 
 	d.nextEvent()
@@ -295,7 +289,7 @@ func (d *Decoder) indirect(v reflect.Value, decodingNull bool) (Unmarshaler, ref
 
 func (d *Decoder) sequence(v reflect.Value) {
 	if d.event.event_type != yaml_SEQUENCE_START_EVENT {
-		d.error(fmt.Errorf("Expected sequence start - found %d", d.event.event_type))
+		d.error(fmt.Errorf("Expected sequence start at %s", d.event.start_mark))
 	}
 
 	u, pv := d.indirect(v, false)
@@ -321,7 +315,7 @@ func (d *Decoder) sequence(v reflect.Value) {
 		// Otherwise it's invalid.
 		fallthrough
 	default:
-		d.error(errors.New("sequence: invalid type: " + v.Type().String()))
+		d.error(fmt.Errorf("Expected an array, slice or interface{} but was a %s at %s", v, d.event.start_mark))
 	case reflect.Array:
 	case reflect.Slice:
 		break
@@ -409,7 +403,7 @@ func (d *Decoder) mapping(v reflect.Value) {
 		return
 	case reflect.Map:
 	default:
-		d.error(errors.New("mapping: invalid type: " + v.Type().String()))
+		d.error(fmt.Errorf("Expected a struct or map but was a %s at %s ", v, d.event.start_mark))
 	}
 
 	mapt := v.Type()
@@ -532,7 +526,7 @@ func (d *Decoder) scalar(v reflect.Value) {
 func (d *Decoder) alias(rv reflect.Value) {
 	val, ok := d.anchors[string(d.event.anchor)]
 	if !ok {
-		d.error(fmt.Errorf("missing anchor: %s", d.event.anchor))
+		d.error(fmt.Errorf("missing anchor: '%s' at %s", d.event.anchor, d.event.start_mark))
 	}
 
 	d.replay_events = val

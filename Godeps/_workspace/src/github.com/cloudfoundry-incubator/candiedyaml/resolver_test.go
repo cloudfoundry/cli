@@ -147,6 +147,7 @@ var _ = Describe("Resolver", func() {
 
 					_, err := resolve(event, v.Elem(), false)
 					Ω(err).Should(HaveOccurred())
+					Ω(err.Error()).Should(Equal("Invalid boolean: 'fail' at line 0, column 0"))
 				})
 
 				It("resolves null", func() {
@@ -238,6 +239,7 @@ var _ = Describe("Resolver", func() {
 
 					_, err := resolve(event, v.Elem(), false)
 					Ω(err).Should(HaveOccurred())
+					Ω(err.Error()).Should(Equal("Invalid integer: '2345' at line 0, column 0"))
 				})
 
 				It("fails on invalid int", func() {
@@ -247,6 +249,7 @@ var _ = Describe("Resolver", func() {
 
 					_, err := resolve(event, v.Elem(), false)
 					Ω(err).Should(HaveOccurred())
+					Ω(err.Error()).Should(Equal("Invalid integer: '234f' at line 0, column 0"))
 				})
 
 				It("resolves null", func() {
@@ -278,7 +281,7 @@ var _ = Describe("Resolver", func() {
 					var i Number
 					v := reflect.ValueOf(&i)
 
-					tag, err := resolve_int("12345", v.Elem(), true)
+					tag, err := resolve_int("12345", v.Elem(), true, event)
 					Ω(err).ShouldNot(HaveOccurred())
 					Ω(tag).Should(Equal(yaml_INT_TAG))
 					Ω(i).To(Equal(Number("12345")))
@@ -344,6 +347,7 @@ var _ = Describe("Resolver", func() {
 
 					_, err := resolve(event, v.Elem(), false)
 					Ω(err).Should(HaveOccurred())
+					Ω(err.Error()).Should(Equal("Unsigned int with negative value: '-2345' at line 0, column 0"))
 				})
 
 				It("fails on overflow", func() {
@@ -353,6 +357,7 @@ var _ = Describe("Resolver", func() {
 
 					_, err := resolve(event, v.Elem(), false)
 					Ω(err).Should(HaveOccurred())
+					Ω(err.Error()).Should(Equal("Invalid unsigned integer: '2345' at line 0, column 0"))
 				})
 
 				It("resolves null", func() {
@@ -384,7 +389,7 @@ var _ = Describe("Resolver", func() {
 					var i Number
 					v := reflect.ValueOf(&i)
 
-					tag, err := resolve_uint("12345", v.Elem(), true)
+					tag, err := resolve_uint("12345", v.Elem(), true, event)
 					Ω(err).ShouldNot(HaveOccurred())
 					Ω(tag).Should(Equal(yaml_INT_TAG))
 					Ω(i).To(Equal(Number("12345")))
@@ -460,6 +465,7 @@ var _ = Describe("Resolver", func() {
 
 					_, err := resolve(event, v.Elem(), false)
 					Ω(err).Should(HaveOccurred())
+					Ω(err.Error()).Should(Equal("Invalid float: '123e10000' at line 0, column 0"))
 				})
 
 				It("fails on invalid float", func() {
@@ -469,6 +475,7 @@ var _ = Describe("Resolver", func() {
 
 					_, err := resolve(event, v.Elem(), false)
 					Ω(err).Should(HaveOccurred())
+					Ω(err.Error()).Should(Equal("Invalid float: '123e1a' at line 0, column 0"))
 				})
 
 				It("resolves null", func() {
@@ -500,7 +507,7 @@ var _ = Describe("Resolver", func() {
 					var i Number
 					v := reflect.ValueOf(&i)
 
-					tag, err := resolve_float("12.345", v.Elem(), true)
+					tag, err := resolve_float("12.345", v.Elem(), true, event)
 					Ω(err).ShouldNot(HaveOccurred())
 					Ω(tag).Should(Equal(yaml_FLOAT_TAG))
 					Ω(i).To(Equal(Number("12.345")))
@@ -624,6 +631,7 @@ var _ = Describe("Resolver", func() {
 
 				_, err := resolve(event, v.Elem(), false)
 				Ω(err).Should(HaveOccurred())
+				Ω(err.Error()).Should(Equal("Unknown resolution for 'abc' using <*string Value> at line 0, column 0"))
 			})
 		})
 
