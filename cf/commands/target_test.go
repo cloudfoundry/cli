@@ -162,6 +162,40 @@ var _ = Describe("target command", func() {
 					[]string{"Unable to access space", "my-space"},
 				))
 			})
+
+			Describe("when there is only a single space", func() {
+				It("target space automatically ", func() {
+					space := models.Space{}
+					space.Name = "my-space"
+					space.Guid = "my-space-guid"
+					spaceRepo.Spaces = []models.Space{space}
+
+					callTarget([]string{"-o", "my-organization"})
+
+					Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+					Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+
+					Expect(ui.ShowConfigurationCalled).To(BeTrue())
+				})
+
+			})
+
+			It("not target space automatically for orgs having multiple spaces", func() {
+				space1 := models.Space{}
+				space1.Name = "my-space"
+				space1.Guid = "my-space-guid"
+				space2 := models.Space{}
+				space2.Name = "my-space"
+				space2.Guid = "my-space-guid"
+				spaceRepo.Spaces = []models.Space{space1, space2}
+
+				callTarget([]string{"-o", "my-organization"})
+
+				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.SpaceFields().Guid).To(Equal(""))
+
+				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			})
 		})
 
 		Context("there are errors", func() {
@@ -228,6 +262,23 @@ var _ = Describe("target command", func() {
 					[]string{"FAILED"},
 					[]string{"my-space", "not found"},
 				))
+			})
+			It("fails to target the space automatically if is not found", func() {
+				org := models.Organization{}
+				org.Name = "my-organization"
+				org.Guid = "my-organization-guid"
+
+				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
+				orgRepo.FindByNameReturns(org, nil)
+
+				spaceRepo.FindByNameNotFound = true
+
+				callTarget([]string{"-o", "my-organization"})
+
+				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.SpaceFields().Guid).To(Equal(""))
+
+				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 		})
 	})
