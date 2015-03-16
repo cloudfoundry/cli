@@ -21,7 +21,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "150e4e8f749b21a7f0de8e3cfd885143fcea6b32"
+			"Rev": "5f3b3579b3dc360c8ad3f86fe9e59e58c5652d10"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/cli-plugin-repo/models",

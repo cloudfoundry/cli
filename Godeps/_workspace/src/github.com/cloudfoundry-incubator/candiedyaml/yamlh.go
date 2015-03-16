@@ -15,6 +15,7 @@ limitations under the License.
 package candiedyaml
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -89,6 +90,10 @@ type YAML_mark_t struct {
 
 	/** The position column. */
 	column int
+}
+
+func (m YAML_mark_t) String() string {
+	return fmt.Sprintf("line %d, column %d", m.line, m.column)
 }
 
 /** @} */

@@ -17,7 +17,7 @@ package candiedyaml
 import (
 	"bytes"
 	"encoding/base64"
-	"errors"
+	"fmt"
 	"math"
 	"reflect"
 	"regexp"
@@ -76,18 +76,18 @@ func resolve(event yaml_event_t, v reflect.Value, useNumber bool) (string, error
 				v.Set(reflect.ValueOf(n))
 				return tag, nil
 			}
-			return "", errors.New("Not a Number: " + reflect.TypeOf(i).String())
+			return "", fmt.Errorf("Not a number: '%s' at %s", event.value, event.start_mark)
 		}
 
 		return resolve_string(val, v, event)
 	case reflect.Bool:
-		return resolve_bool(val, v)
+		return resolve_bool(val, v, event)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return resolve_int(val, v, useNumber)
+		return resolve_int(val, v, useNumber, event)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return resolve_uint(val, v, useNumber)
+		return resolve_uint(val, v, useNumber, event)
 	case reflect.Float32, reflect.Float64:
-		return resolve_float(val, v, useNumber)
+		return resolve_float(val, v, useNumber, event)
 	case reflect.Interface:
 		_, i := resolveInterface(event, useNumber)
 		if i != nil {
@@ -97,19 +97,19 @@ func resolve(event yaml_event_t, v reflect.Value, useNumber bool) (string, error
 		}
 
 	case reflect.Struct:
-		return resolve_time(val, v)
+		return resolve_time(val, v, event)
 	case reflect.Slice:
 		if v.Type() != byteSliceType {
-			return "", errors.New("Cannot resolve into " + v.Type().String())
+			return "", fmt.Errorf("Cannot resolve %s into %s at %s", val, v.String(), event.start_mark)
 		}
-		b, err := decode_binary(event.value)
+		b, err := decode_binary(event.value, event)
 		if err != nil {
 			return "", err
 		}
 
 		v.Set(reflect.ValueOf(b))
 	default:
-		return "", errors.New("Resolve failed for " + v.Kind().String())
+		return "", fmt.Errorf("Unknown resolution for '%s' using %s at %s", val, v.String(), event.start_mark)
 	}
 
 	return yaml_STR_TAG, nil
@@ -124,16 +124,19 @@ func hasBinaryTag(event yaml_event_t) bool {
 	return false
 }
 
-func decode_binary(value []byte) ([]byte, error) {
+func decode_binary(value []byte, event yaml_event_t) ([]byte, error) {
 	b := make([]byte, base64.StdEncoding.DecodedLen(len(value)))
 	n, err := base64.StdEncoding.Decode(b, value)
-	return b[:n], err
+	if err != nil {
+		return nil, fmt.Errorf("Invalid base64 text: '%s' at %s", string(b), event.start_mark)
+	}
+	return b[:n], nil
 }
 
 func resolve_string(val string, v reflect.Value, event yaml_event_t) (string, error) {
 	if len(event.tag) > 0 {
 		if hasBinaryTag(event) {
-			b, err := decode_binary(event.value)
+			b, err := decode_binary(event.value, event)
 			if err != nil {
 				return "", err
 			}
@@ -144,17 +147,17 @@ func resolve_string(val string, v reflect.Value, event yaml_event_t) (string, er
 	return yaml_STR_TAG, nil
 }
 
-func resolve_bool(val string, v reflect.Value) (string, error) {
+func resolve_bool(val string, v reflect.Value, event yaml_event_t) (string, error) {
 	b, found := bool_values[strings.ToLower(val)]
 	if !found {
-		return "", errors.New("Invalid boolean: " + val)
+		return "", fmt.Errorf("Invalid boolean: '%s' at %s", val, event.start_mark)
 	}
 
 	v.SetBool(b)
 	return yaml_BOOL_TAG, nil
 }
 
-func resolve_int(val string, v reflect.Value, useNumber bool) (string, error) {
+func resolve_int(val string, v reflect.Value, useNumber bool, event yaml_event_t) (string, error) {
 	original := val
 	val = strings.Replace(val, "_", "", -1)
 	var value uint64
@@ -187,7 +190,7 @@ func resolve_int(val string, v reflect.Value, useNumber bool) (string, error) {
 
 	value, err := strconv.ParseUint(val, base, 64)
 	if err != nil {
-		return "", errors.New("Integer: " + original)
+		return "", fmt.Errorf("Invalid integer: '%s' at %s", original, event.start_mark)
 	}
 
 	var val64 int64
@@ -199,14 +202,14 @@ func resolve_int(val string, v reflect.Value, useNumber bool) (string, error) {
 	} else if sign == -1 && value == uint64(math.MaxInt64)+1 {
 		val64 = math.MinInt64
 	} else {
-		return "", errors.New("Integer: " + original)
+		return "", fmt.Errorf("Invalid integer: '%s' at %s", original, event.start_mark)
 	}
 
 	if isNumberValue {
 		v.SetString(strconv.FormatInt(val64, 10))
 	} else {
 		if v.OverflowInt(val64) {
-			return "", errors.New("Integer: " + original)
+			return "", fmt.Errorf("Invalid integer: '%s' at %s", original, event.start_mark)
 		}
 		v.SetInt(val64)
 	}
@@ -214,7 +217,7 @@ func resolve_int(val string, v reflect.Value, useNumber bool) (string, error) {
 	return yaml_INT_TAG, nil
 }
 
-func resolve_uint(val string, v reflect.Value, useNumber bool) (string, error) {
+func resolve_uint(val string, v reflect.Value, useNumber bool, event yaml_event_t) (string, error) {
 	original := val
 	val = strings.Replace(val, "_", "", -1)
 	var value uint64
@@ -222,7 +225,7 @@ func resolve_uint(val string, v reflect.Value, useNumber bool) (string, error) {
 	isNumberValue := v.Type() == numberType
 
 	if val[0] == '-' {
-		return "", errors.New("Unsigned int with negative value: " + original)
+		return "", fmt.Errorf("Unsigned int with negative value: '%s' at %s", original, event.start_mark)
 	}
 
 	if val[0] == '+' {
@@ -247,14 +250,14 @@ func resolve_uint(val string, v reflect.Value, useNumber bool) (string, error) {
 
 	value, err := strconv.ParseUint(val, base, 64)
 	if err != nil {
-		return "", errors.New("Unsigned Integer: " + val)
+		return "", fmt.Errorf("Invalid unsigned integer: '%s' at %s", val, event.start_mark)
 	}
 
 	if isNumberValue {
 		v.SetString(strconv.FormatUint(value, 10))
 	} else {
 		if v.OverflowUint(value) {
-			return "", errors.New("Unsigned Integer: " + val)
+			return "", fmt.Errorf("Invalid unsigned integer: '%s' at %s", val, event.start_mark)
 		}
 
 		v.SetUint(value)
@@ -263,7 +266,7 @@ func resolve_uint(val string, v reflect.Value, useNumber bool) (string, error) {
 	return yaml_INT_TAG, nil
 }
 
-func resolve_float(val string, v reflect.Value, useNumber bool) (string, error) {
+func resolve_float(val string, v reflect.Value, useNumber bool, event yaml_event_t) (string, error) {
 	val = strings.Replace(val, "_", "", -1)
 	var value float64
 
@@ -292,7 +295,7 @@ func resolve_float(val string, v reflect.Value, useNumber bool) (string, error) 
 		value *= float64(sign)
 
 		if err != nil {
-			return "", errors.New("Float: " + val)
+			return "", fmt.Errorf("Invalid float: '%s' at %s", val, event.start_mark)
 		}
 	}
 
@@ -300,7 +303,7 @@ func resolve_float(val string, v reflect.Value, useNumber bool) (string, error) 
 		v.SetString(strconv.FormatFloat(value, 'g', -1, typeBits))
 	} else {
 		if v.OverflowFloat(value) {
-			return "", errors.New("Float: " + val)
+			return "", fmt.Errorf("Invalid float: '%s' at %s", val, event.start_mark)
 		}
 
 		v.SetFloat(value)
@@ -309,7 +312,7 @@ func resolve_float(val string, v reflect.Value, useNumber bool) (string, error) 
 	return yaml_FLOAT_TAG, nil
 }
 
-func resolve_time(val string, v reflect.Value) (string, error) {
+func resolve_time(val string, v reflect.Value, event yaml_event_t) (string, error) {
 	var parsedTime time.Time
 	matches := ymd_regexp.FindStringSubmatch(val)
 	if len(matches) > 0 {
@@ -320,7 +323,7 @@ func resolve_time(val string, v reflect.Value) (string, error) {
 	} else {
 		matches = timestamp_regexp.FindStringSubmatch(val)
 		if len(matches) == 0 {
-			return "", errors.New("Unexpected timestamp: " + val)
+			return "", fmt.Errorf("Invalid timestap: '%s' at %s", val, event.start_mark)
 		}
 
 		year, _ := strconv.Atoi(matches[1])
@@ -386,7 +389,7 @@ func resolveInterface(event yaml_event_t, useNumber bool) (string, interface{}) 
 		}
 
 		v := reflect.ValueOf(result).Elem()
-		if _, err := resolve_int(val, v, useNumber); err == nil {
+		if _, err := resolve_int(val, v, useNumber, event); err == nil {
 			return yaml_INT_TAG, v.Interface()
 		}
 
@@ -398,13 +401,13 @@ func resolveInterface(event yaml_event_t, useNumber bool) (string, interface{}) 
 		}
 
 		v = reflect.ValueOf(result).Elem()
-		if _, err := resolve_float(val, v, useNumber); err == nil {
+		if _, err := resolve_float(val, v, useNumber, event); err == nil {
 			return yaml_FLOAT_TAG, v.Interface()
 		}
 
 		if !sign {
 			t := time.Time{}
-			if _, err := resolve_time(val, reflect.ValueOf(&t).Elem()); err == nil {
+			if _, err := resolve_time(val, reflect.ValueOf(&t).Elem(), event); err == nil {
 				return "", t
 			}
 		}
@@ -413,7 +416,7 @@ func resolveInterface(event yaml_event_t, useNumber bool) (string, interface{}) 
 			return yaml_NULL_TAG, nil
 		}
 		b := false
-		if _, err := resolve_bool(val, reflect.ValueOf(&b).Elem()); err == nil {
+		if _, err := resolve_bool(val, reflect.ValueOf(&b).Elem(), event); err == nil {
 			return yaml_BOOL_TAG, b
 		}
 	case c == '.':
@@ -425,18 +428,18 @@ func resolveInterface(event yaml_event_t, useNumber bool) (string, interface{}) 
 		}
 
 		v := reflect.ValueOf(result).Elem()
-		if _, err := resolve_float(val, v, useNumber); err == nil {
+		if _, err := resolve_float(val, v, useNumber, event); err == nil {
 			return yaml_FLOAT_TAG, v.Interface()
 		}
 	case bytes.IndexByte(bools, c) != -1:
 		b := false
-		if _, err := resolve_bool(val, reflect.ValueOf(&b).Elem()); err == nil {
+		if _, err := resolve_bool(val, reflect.ValueOf(&b).Elem(), event); err == nil {
 			return yaml_BOOL_TAG, b
 		}
 	}
 
 	if hasBinaryTag(event) {
-		bytes, err := decode_binary(event.value)
+		bytes, err := decode_binary(event.value, event)
 		if err == nil {
 			return yaml_BINARY_TAG, bytes
 		}
