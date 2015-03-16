@@ -35,6 +35,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/commands/servicekey"
 	"github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 	"github.com/cloudfoundry/cli/cf/commands/user"
@@ -100,6 +101,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 
 	factory.cmdsByName["create-service-auth-token"] = serviceauthtoken.NewCreateServiceAuthToken(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["create-service-broker"] = servicebroker.NewCreateServiceBroker(ui, config, repoLocator.GetServiceBrokerRepository())
+	factory.cmdsByName["create-service-key"] = servicekey.NewCreateServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["create-user"] = user.NewCreateUser(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["create-user-provided-service"] = service.NewCreateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
 	factory.cmdsByName["curl"] = commands.NewCurl(ui, config, repoLocator.GetCurlRepository())
