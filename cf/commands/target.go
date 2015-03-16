@@ -70,6 +70,11 @@ func (cmd Target) Run(c *cli.Context) {
 		err := cmd.setOrganization(orgName)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
+		} else if spaceName == "" {
+			spaceList, apiErr := cmd.getSpaceList()
+			if apiErr == nil && len(spaceList) == 1 {
+				cmd.setSpace(spaceList[0].Name)
+			}
 		}
 	}
 
@@ -117,4 +122,14 @@ func (cmd Target) setSpace(spaceName string) error {
 
 	cmd.config.SetSpaceFields(space.SpaceFields)
 	return nil
+}
+
+func (cmd Target) getSpaceList() ([]models.Space, error) {
+	spaceList := []models.Space{}
+	apiErr := cmd.spaceRepo.ListSpaces(
+		func(space models.Space) bool {
+			spaceList = append(spaceList, space)
+			return true
+		})
+	return spaceList, apiErr
 }
