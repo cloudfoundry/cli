@@ -38,6 +38,7 @@ func (cmd *ShowSpace) Metadata() command_metadata.CommandMetadata {
 		Usage:       T("CF_NAME space SPACE"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given space's guid.  All other output for the space is suppressed.")},
+			cli.BoolFlag{Name: "security-group-rules", Usage: T("Retrive the rules for all the security groups associated with the space")},
 		},
 	}
 }
@@ -107,6 +108,21 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 		table.Add("", T("Space Quota:"), quotaString)
 
 		table.Print()
+	}
+	if c.Bool("security-group-rules") {
+		cmd.ui.Say("")
+		for _, group := range space.SecurityGroups {
+			cmd.ui.Say(T("Getting rules for the security group  : {{.SecurityGroupName}}...",
+				map[string]interface{}{"SecurityGroupName": terminal.EntityNameColor(group.Name)}))
+			table := terminal.NewTable(cmd.ui, []string{"", "", "", ""})
+			for _, rules := range group.Rules {
+				for ruleName, ruleValue := range rules {
+					table.Add("", ruleName, ":", ruleValue.(string))
+				}
+				table.Add("", "", "", "")
+			}
+			table.Print()
+		}
 	}
 }
 
