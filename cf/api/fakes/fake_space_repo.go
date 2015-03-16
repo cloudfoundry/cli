@@ -32,10 +32,23 @@ type FakeSpaceRepository struct {
 	RenameNewName   string
 
 	DeletedSpaceGuid string
+
+	ListOfRolesOfSpace map[string]string
 }
 
 func (repo FakeSpaceRepository) GetCurrentSpace() (space models.Space) {
 	return repo.CurrentSpace
+}
+
+func (repo FakeSpaceRepository) GetSpaceRole(callback func(models.Space) bool, apiName string) error {
+	if repo.ListOfRolesOfSpace[apiName] != "" {
+		space := models.Space{}
+		space.Name = repo.ListOfRolesOfSpace[apiName]
+		if !callback(space) {
+			return nil
+		}
+	}
+	return nil
 }
 
 func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) error {

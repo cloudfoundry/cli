@@ -27,3 +27,15 @@ var SpaceRoleToUserInput = map[string]string{
 	SPACE_DEVELOPER: "SpaceDeveloper",
 	SPACE_AUDITOR:   "SpaceAuditor",
 }
+
+var QueryParmToOrgRole = map[string]string{
+	"manager_guid":         ORG_MANAGER,
+	"billing_manager_guid": BILLING_MANAGER,
+	"auditor_guid":         ORG_AUDITOR,
+}
+
+var QueryParmToSpaceRole = map[string]string{
+	"managed_spaces": SPACE_MANAGER,
+	"developer_guid": SPACE_DEVELOPER,
+	"audited_spaces": SPACE_AUDITOR,
+}

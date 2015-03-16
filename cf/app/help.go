@@ -105,6 +105,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("logout"),
 					presentCommand("passwd"),
 					presentCommand("target"),
+					presentCommand("user-info"),
 				}, {
 					presentCommand("api"),
 					presentCommand("auth"),

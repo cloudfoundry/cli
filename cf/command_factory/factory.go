@@ -316,7 +316,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 
 	factory.cmdsByName["share-private-domain"] = organization.NewSharePrivateDomain(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetDomainRepository())
 	factory.cmdsByName["unshare-private-domain"] = organization.NewUnsharePrivateDomain(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetDomainRepository())
-
+	factory.cmdsByName["user-info"] = user.ShowUserInfo(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	return
 }
 

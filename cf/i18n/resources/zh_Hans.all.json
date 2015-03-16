@@ -5153,5 +5153,30 @@
       "id": "CF_NAME unshare-private-domain ORG DOMAIN",
       "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
       "modified": false
+   },
+   {
+      "id": "Show user-info with roles",
+      "translation": "Show user-info with roles",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME user-info",
+      "translation": "CF_NAME user-info",
+      "modified": false
+   },
+   {
+      "id": "Getting user information...",
+      "translation": "Getting user information...",
+      "modified": false
+   },
+   {
+      "id": "User",
+      "translation": "User",
+      "modified": false
+   },
+   {
+      "id": "Role",
+      "translation": "Role",
+      "modified": false
    }
 ]

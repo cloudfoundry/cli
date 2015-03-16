@@ -20,6 +20,7 @@ type SpaceRepository interface {
 	Create(name string, orgGuid string, spaceQuotaGuid string) (space models.Space, apiErr error)
 	Rename(spaceGuid, newName string) (apiErr error)
 	Delete(spaceGuid string) (apiErr error)
+	GetSpaceRole(func(models.Space) bool, string) error
 }
 
 type CloudControllerSpaceRepository struct {
@@ -97,4 +98,21 @@ func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (ap
 func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiErr error) {
 	path := fmt.Sprintf("/v2/spaces/%s?recursive=true", spaceGuid)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+}
+
+func (repo CloudControllerSpaceRepository) GetSpaceRole(callback func(models.Space) bool, apiName string) error {
+	var path string
+	if apiName == "developer_guid" {
+		path = fmt.Sprintf("/v2/spaces?q=%s:%s;q=name:%s", apiName, repo.config.UserGuid(), repo.config.SpaceFields().Name)
+	} else {
+		path = fmt.Sprintf("/v2/users/%s/%s?q=organization_guid:%s;q=name:%s", repo.config.UserGuid(), apiName, repo.config.OrganizationFields().Guid, repo.config.SpaceFields().Name)
+	}
+
+	return repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		path,
+		resources.SpaceResource{},
+		func(resource interface{}) bool {
+			return callback(resource.(resources.SpaceResource).ToModel())
+		})
 }

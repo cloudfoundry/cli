@@ -2,10 +2,10 @@
 package fakes
 
 import (
-	"sync"
-
+	"errors"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/models"
+	"sync"
 )
 
 type FakeOrganizationRepository struct {
@@ -68,6 +68,8 @@ type FakeOrganizationRepository struct {
 	unsharePrivateDomainReturns struct {
 		result1 error
 	}
+
+	ListOfRolesOfAnOrg map[string]string
 }
 
 func (fake *FakeOrganizationRepository) ListOrgs() (orgs []models.Organization, apiErr error) {
@@ -79,6 +81,26 @@ func (fake *FakeOrganizationRepository) ListOrgs() (orgs []models.Organization, 
 	} else {
 		return fake.listOrgsReturns.result1, fake.listOrgsReturns.result2
 	}
+}
+
+func (fake *FakeOrganizationRepository) GetOrgRoleForUser(name string, orgName string) (models.Organization, error) {
+	fake.listOrgsMutex.Lock()
+	defer fake.listOrgsMutex.Unlock()
+	org := models.Organization{}
+	_, validQueryParam := fake.ListOfRolesOfAnOrg[name]
+	if validQueryParam {
+		if fake.ListOfRolesOfAnOrg[name] == orgName {
+			org.Name = orgName
+		} else {
+			org.Name = ""
+		}
+		return org, nil
+
+	} else {
+		apiError := errors.New("query param not found")
+		return org, apiError
+	}
+
 }
 
 func (fake *FakeOrganizationRepository) ListOrgsCallCount() int {
