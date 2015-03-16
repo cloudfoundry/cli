@@ -5,6 +5,16 @@
       "modified": false
    },
    {
+      "id": "Getting rules for the security group  : {{.SecurityGroupName}}...",
+      "translation": "Getting rules for the security group  : {{.SecurityGroupName}}...",
+      "modified": false
+   },
+   {
+      "id": "Retrive the rules for all the security groups associated with the space",
+      "translation": "Retrive the rules for all the security groups associated with the space",
+      "modified": false
+   },
+   {
       "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
       "translation": "\n\nLa syntaxe JSON est invalide.  Syntaxe correcte:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
       "modified": false
