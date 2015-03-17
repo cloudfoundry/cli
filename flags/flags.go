@@ -20,8 +20,6 @@ import (
  *		now run cmd, pass Context obj over
  * **/
 
-//to do: flag=value (= sign), Args() to return list arguemnts
-
 type FlagSet interface {
 	fmt.Stringer
 	GetName() string
@@ -64,6 +62,14 @@ func (c *flagContext) Parse(args ...string) error {
 
 		if strings.HasPrefix(arg, "-") || strings.HasPrefix(arg, "--") {
 			flg := strings.TrimLeft(strings.TrimLeft(arg, "-"), "-")
+
+			if strings.Contains(flg, "=") {
+				tmpAry := strings.SplitN(flg, "=", 2)
+				flg = tmpAry[0]
+				tmpArg := append(args[:c.cursor], tmpAry[1])
+				args = append(tmpArg, args[c.cursor:]...)
+			}
+
 			if flagset, ok = c.cmdFlags[flg]; !ok {
 				return errors.New("Invalid flag: " + arg)
 			}
@@ -86,6 +92,8 @@ func (c *flagContext) Parse(args ...string) error {
 				}
 				c.flagsets[flg] = &cliFlags.StringFlag{Name: flg, Value: v}
 			}
+		} else {
+			c.args = append(c.args, args[c.cursor])
 		}
 		c.cursor++
 	}
