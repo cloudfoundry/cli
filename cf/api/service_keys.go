@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
 type ServiceKeyRepository interface {
-	CreateServiceKey(instanceId string, keyName string) (apiErr error)
+	CreateServiceKey(instanceId string, keyName string) error
+	ListServiceKeys(instanceId string) ([]models.ServiceKey, error)
 }
 
 type CloudControllerServiceKeyRepository struct {
@@ -25,7 +28,7 @@ func NewCloudControllerServiceKeyRepository(config core_config.Reader, gateway n
 	}
 }
 
-func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceId string, keyName string) (apiErr error) {
+func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceId string, keyName string) error {
 	path := "/v2/service_keys"
 	data := fmt.Sprintf(`{"service_instance_guid":"%s","name":"%s"}`, instanceId, keyName)
 
@@ -40,4 +43,25 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceId string,
 	}
 
 	return nil
+}
+
+func (c CloudControllerServiceKeyRepository) ListServiceKeys(instanceId string) ([]models.ServiceKey, error) {
+	path := fmt.Sprintf("/v2/service_keys?q=service_instance_guid:%s", instanceId)
+
+	serviceKeys := []models.ServiceKey{}
+	apiErr := c.gateway.ListPaginatedResources(
+		c.config.ApiEndpoint(),
+		path,
+		resources.ServiceKeyResource{},
+		func(resource interface{}) bool {
+			serviceKey := resource.(resources.ServiceKeyResource).ToModel()
+			serviceKeys = append(serviceKeys, serviceKey)
+			return true
+		})
+
+	if apiErr != nil {
+		return []models.ServiceKey{}, apiErr
+	}
+
+	return serviceKeys, nil
 }

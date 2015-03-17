@@ -5193,5 +5193,75 @@
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "modified": false
+   },
+   {
+      "id": "Share a private domain with an org",
+      "translation": "Share a private domain with an org",
+      "modified": false
+   },
+   {
+      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
+      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME share-private-domain ORG DOMAIN",
+      "translation": "CF_NAME share-private-domain ORG DOMAIN",
+      "modified": false
+   },
+   {
+      "id": "Unshare a private domain with an org",
+      "translation": "Unshare a private domain with an org",
+      "modified": false
+   },
+   {
+      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
+      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
+      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
+      "modified": false
+   },
+   {
+      "id": "Create key for a service instance",
+      "translation": "Create key for a service instance",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
+      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "This service doesn't support creation of keys.",
+      "translation": "Ce service ne supporte pas la création de clefs.",
+      "modified": false
+   },
+   {
+      "id": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Récupération des clefs pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "No service key for service instance {{.ServiceInstanceName}}",
+      "translation": "Pas de clef pour instance de service {{.ServiceInstanceName}}",
+      "modified": false
+   },
+   {
+      "id": "List keys for a service instance",
+      "translation": "Lister les clefs pour un instance de service",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
+      "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\nÉXAMPLE:\n   CF_NAME service-keys mydb",
+      "modified": false
    }
 ]

@@ -5193,5 +5193,75 @@
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} 乘以 {{.InstanceCount}}实例数",
       "modified": false
+   },
+   {
+      "id": "Share a private domain with an org",
+      "translation": "Share a private domain with an org",
+      "modified": false
+   },
+   {
+      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
+      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME share-private-domain ORG DOMAIN",
+      "translation": "CF_NAME share-private-domain ORG DOMAIN",
+      "modified": false
+   },
+   {
+      "id": "Unshare a private domain with an org",
+      "translation": "Unshare a private domain with an org",
+      "modified": false
+   },
+   {
+      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
+      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
+      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
+      "modified": false
+   },
+   {
+      "id": "Create key for a service instance",
+      "translation": "为服务实例创建密钥",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
+      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\n样例：\n   CF_NAME create-service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}正在为服务实例{{.ServiceInstanceName}}创建名为{{.ServiceKeyName}}的密钥...",
+      "modified": false
+   },
+   {
+      "id": "This service doesn't support creation of keys.",
+      "translation": "此服务不支持创建密钥。",
+      "modified": false
+   },
+   {
+      "id": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}正在获取服务实例{{.ServiceInstanceName}}的密钥列表...",
+      "modified": false
+   },
+   {
+      "id": "No service key for service instance {{.ServiceInstanceName}}",
+      "translation": "服务实例{{.ServiceInstanceName}}没有密钥",
+      "modified": false
+   },
+   {
+      "id": "List keys for a service instance",
+      "translation": "获取服务实例的密钥列表",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
+      "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\n样例：\n   CF_NAME service-keys mydb",
+      "modified": false
    }
 ]

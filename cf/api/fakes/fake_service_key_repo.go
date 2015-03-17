@@ -1,25 +1,44 @@
 package fakes
 
-type FakeServiceKeyRepo struct {
-	CreateServiceKeyError error
+import (
+	"github.com/cloudfoundry/cli/cf/models"
+)
 
-	CreateServiceKeyArgs CreateServiceKeyArgsType
+type FakeServiceKeyRepo struct {
+	CreateServiceKeyMethod CreateServiceKeyType
+	ListServiceKeysMethod  ListServiceKeysType
 }
 
-type CreateServiceKeyArgsType struct {
-	ServiceInstanceId string
-	ServiceKeyName    string
+type CreateServiceKeyType struct {
+	InstanceId string
+	KeyName    string
+
+	Error error
+}
+
+type ListServiceKeysType struct {
+	InstanceId string
+
+	ServiceKeys []models.ServiceKey
+	Error       error
 }
 
 func NewFakeServiceKeyRepo() *FakeServiceKeyRepo {
 	return &FakeServiceKeyRepo{
-		CreateServiceKeyArgs: CreateServiceKeyArgsType{},
+		CreateServiceKeyMethod: CreateServiceKeyType{},
+		ListServiceKeysMethod:  ListServiceKeysType{},
 	}
 }
 
-func (f *FakeServiceKeyRepo) CreateServiceKey(instanceId string, serviceKeyName string) (apiErr error) {
-	f.CreateServiceKeyArgs.ServiceInstanceId = instanceId
-	f.CreateServiceKeyArgs.ServiceKeyName = serviceKeyName
+func (f *FakeServiceKeyRepo) CreateServiceKey(instanceId string, serviceKeyName string) error {
+	f.CreateServiceKeyMethod.InstanceId = instanceId
+	f.CreateServiceKeyMethod.KeyName = serviceKeyName
 
-	return f.CreateServiceKeyError
+	return f.CreateServiceKeyMethod.Error
+}
+
+func (f *FakeServiceKeyRepo) ListServiceKeys(instanceId string) ([]models.ServiceKey, error) {
+	f.ListServiceKeysMethod.InstanceId = instanceId
+
+	return f.ListServiceKeysMethod.ServiceKeys, f.ListServiceKeysMethod.Error
 }
