@@ -201,6 +201,7 @@ var _ = Describe("Manifests", func() {
 					"instances":    nil,
 					"timeout":      nil,
 					"no-route":     nil,
+					"no-hostname":  nil,
 					"services":     nil,
 					"env":          nil,
 					"random-route": nil,
@@ -212,7 +213,7 @@ var _ = Describe("Manifests", func() {
 		Expect(err).To(HaveOccurred())
 		errorSlice := strings.Split(err.Error(), "\n")
 		manifestKeys := []string{"disk_quota", "domain", "host", "name", "path", "stack",
-			"memory", "instances", "timeout", "no-route", "services", "env", "random-route"}
+			"memory", "instances", "timeout", "no-route", "no-hostname", "services", "env", "random-route"}
 
 		for _, key := range manifestKeys {
 			Expect(errorSlice).To(ContainSubstrings([]string{key, "not be null"}))
@@ -234,6 +235,7 @@ var _ = Describe("Manifests", func() {
 					"instances":    1,
 					"timeout":      11,
 					"no-route":     true,
+					"no-hostname":  true,
 					"random-route": true,
 				},
 			},
@@ -253,6 +255,7 @@ var _ = Describe("Manifests", func() {
 		Expect(*apps[0].InstanceCount).To(Equal(1))
 		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
 		Expect(apps[0].NoRoute).To(BeTrue())
+		Expect(apps[0].NoHostname).To(BeTrue())
 		Expect(apps[0].UseRandomHostname).To(BeTrue())
 	})
 

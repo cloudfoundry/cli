@@ -125,13 +125,12 @@ func (cmd *Push) Run(c *cli.Context) {
 	}
 
 	routeActor := actors.NewRouteActor(cmd.ui, cmd.routeRepo)
-	noHostname := c.Bool("no-hostname")
 
 	for _, appParams := range appSet {
 		cmd.fetchStackGuid(&appParams)
 		app := cmd.createOrUpdateApp(appParams)
 
-		cmd.updateRoutes(routeActor, app, appParams, noHostname)
+		cmd.updateRoutes(routeActor, app, appParams)
 
 		cmd.ui.Say(T("Uploading {{.AppName}}...",
 			map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
@@ -152,9 +151,9 @@ func (cmd *Push) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Application, appParams models.AppParams, noHostName bool) {
+func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Application, appParams models.AppParams) {
 	defaultRouteAcceptable := len(app.Routes) == 0
-	routeDefined := appParams.Domain != nil || !appParams.IsHostEmpty() || noHostName
+	routeDefined := appParams.Domain != nil || !appParams.IsHostEmpty() || appParams.NoHostname
 
 	if appParams.NoRoute {
 		cmd.removeRoutes(app, routeActor)
@@ -163,10 +162,10 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 
 	if routeDefined || defaultRouteAcceptable {
 		if appParams.IsHostEmpty() {
-			cmd.createAndBindRoute(nil, appParams, routeActor, app, noHostName)
+			cmd.createAndBindRoute(nil, appParams, routeActor, app, appParams.NoHostname)
 		} else {
 			for _, host := range *(appParams.Hosts) {
-				cmd.createAndBindRoute(&host, appParams, routeActor, app, noHostName)
+				cmd.createAndBindRoute(&host, appParams, routeActor, app, appParams.NoHostname)
 			}
 		}
 	}
@@ -479,6 +478,7 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 
 	appParams.NoRoute = c.Bool("no-route")
 	appParams.UseRandomHostname = c.Bool("random-route")
+	appParams.NoHostname = c.Bool("no-hostname")
 
 	if c.String("n") != "" {
 		hostname := c.String("n")

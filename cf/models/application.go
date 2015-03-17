@@ -74,6 +74,7 @@ type AppParams struct {
 	InstanceCount      *int
 	Memory             *int64
 	Name               *string
+	NoHostname         bool
 	NoRoute            bool
 	UseRandomHostname  bool
 	Path               *string
@@ -141,6 +142,7 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 
 	app.NoRoute = app.NoRoute || other.NoRoute
+	app.NoHostname = app.NoHostname || other.NoHostname
 	app.UseRandomHostname = app.UseRandomHostname || other.UseRandomHostname
 }
 
