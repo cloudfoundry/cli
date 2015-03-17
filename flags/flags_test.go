@@ -64,6 +64,13 @@ var _ = Describe("Flags", func() {
 				Ω(fCtx.Bool("skip")).To(Equal(true), "skip should be true")
 			})
 
+			It("errors when a non-boolean flag is provided without a value", func() {
+				err := fCtx.Parse("-name")
+				Ω(err).To(HaveOccurred())
+				Ω(err.Error()).To(ContainSubstring("No value provided for flag"))
+				Ω(fCtx.String("name")).To(Equal(""))
+			})
+
 			It("sets Int(<flag>) to return provided value when a int flag is provided", func() {
 				err := fCtx.Parse("--instance", "10")
 				Ω(err).ToNot(HaveOccurred())
@@ -75,20 +82,31 @@ var _ = Describe("Flags", func() {
 				Ω(fCtx.IsSet("non-exist-flag")).To(Equal(false))
 			})
 
-			// It("sets flags regardless of order", func() {
-			// 	err := fCtx.Parse("--skip", "-name", "doe", "-instance", "10")
-			// 	Ω(err).ToNot(HaveOccurred())
-			// 	Ω(fCtx.String("name")).To(Equal("doe"))
-			// 	Ω(fCtx.Bool("skip")).To(Equal(true), "skip should be true")
-			// 	Ω(fCtx.Int("instance")).To(Equal(10))
+			It("returns any non-flag arguments in Args()", func() {
+				err := fCtx.Parse("Arg-1", "--instance", "10", "--skip", "Arg-2")
+				Ω(err).ToNot(HaveOccurred())
 
-			// 	fCtx = NewFlagContext(cmdFlagMap)
-			// 	err = fCtx.Parse("-instance", "20", "APP-NAME", "APP-ROUTE", "-name", "smith", "--skip")
-			// 	Ω(err).ToNot(HaveOccurred())
-			// 	Ω(fCtx.String("name")).To(Equal("smith"))
-			// 	Ω(fCtx.Bool("skip")).To(Equal(true), "skip should be true")
-			// 	Ω(fCtx.Int("instance")).To(Equal(20))
-			// })
+				Ω(len(fCtx.Args())).To(Equal(2))
+				Ω(fCtx.Args()[0]).To(Equal("Arg-1"))
+				Ω(fCtx.Args()[1]).To(Equal("Arg-2"))
+			})
+
+			It("accepts flag/value in the forms of '-flag=value' and '-flag value'", func() {
+				err := fCtx.Parse("-instance", "10", "--name=foo", "--skip", "Arg-1")
+				Ω(err).ToNot(HaveOccurred())
+
+				Ω(fCtx.IsSet("instance")).To(Equal(true))
+				Ω(fCtx.Int("instance")).To(Equal(10))
+
+				Ω(fCtx.IsSet("name")).To(Equal(true))
+				Ω(fCtx.String("name")).To(Equal("foo"))
+
+				Ω(fCtx.IsSet("skip")).To(Equal(true))
+
+				Ω(len(fCtx.Args())).To(Equal(1))
+				Ω(fCtx.Args()[0]).To(Equal("Arg-1"))
+			})
+
 		})
 
 	})
