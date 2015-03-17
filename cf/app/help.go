@@ -158,6 +158,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("rename-service"),
 				}, {
 					presentCommand("create-service-key"),
+					presentCommand("service-keys"),
 				}, {
 					presentCommand("bind-service"),
 					presentCommand("unbind-service"),

@@ -77,12 +77,13 @@ var _ = Describe("create-service-key command", func() {
 				[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(serviceKeyRepo.CreateServiceKeyArgs.ServiceInstanceId).To(Equal("fake-instance-guid"))
-			Expect(serviceKeyRepo.CreateServiceKeyArgs.ServiceKeyName).To(Equal("fake-service-key"))
+			Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceId).To(Equal("fake-instance-guid"))
+			Expect(serviceKeyRepo.CreateServiceKeyMethod.KeyName).To(Equal("fake-service-key"))
 		})
 
 		It("create service key failed when the service key already exists", func() {
-			serviceKeyRepo.CreateServiceKeyError = errors.NewModelAlreadyExistsError("Service key", "exist-service-key")
+			serviceKeyRepo.CreateServiceKeyMethod.Error = errors.NewModelAlreadyExistsError("Service key", "exist-service-key")
+
 			callCreateService([]string{"fake-service-instance", "exist-service-key"})
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -92,7 +93,7 @@ var _ = Describe("create-service-key command", func() {
 		})
 
 		It("create service key failed when the service is unbindable", func() {
-			serviceKeyRepo.CreateServiceKeyError = errors.NewUnbindableServiceError()
+			serviceKeyRepo.CreateServiceKeyMethod.Error = errors.NewUnbindableServiceError()
 			callCreateService([]string{"fake-service-instance", "exist-service-key"})
 
 			Expect(ui.Outputs).To(ContainSubstrings(
