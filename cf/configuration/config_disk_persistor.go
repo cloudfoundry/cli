@@ -47,6 +47,10 @@ func (dp DiskPersistor) Delete() {
 
 func (dp DiskPersistor) Load(data DataInterface) error {
 	err := dp.read(data)
+	if os.IsPermission(err) {
+		return err
+	}
+
 	if err != nil {
 		err = dp.write(data)
 	}
