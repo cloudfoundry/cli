@@ -76,7 +76,7 @@ func (c *flagContext) Parse(args ...string) error {
 
 			switch flagset.GetValue().(type) {
 			case bool:
-				c.flagsets[flg] = &cliFlags.BoolFlag{Name: flg, Value: true}
+				c.flagsets[flg] = &cliFlags.BoolFlag{Name: flg, Value: c.getBoolFlagValue(args)}
 			case int:
 				if v, err = c.getFlagValue(args); err != nil {
 					return err
@@ -107,6 +107,19 @@ func (c *flagContext) getFlagValue(args []string) (string, error) {
 
 	c.cursor++
 	return args[c.cursor], nil
+}
+
+func (c *flagContext) getBoolFlagValue(args []string) bool {
+	if c.cursor >= len(args)-1 {
+		return true
+	}
+
+	b, err := strconv.ParseBool(args[c.cursor+1])
+	if err == nil {
+		c.cursor++
+		return b
+	}
+	return true
 }
 
 func (c *flagContext) Args() []string {

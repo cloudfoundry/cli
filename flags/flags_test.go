@@ -24,6 +24,7 @@ var _ = Describe("Flags", func() {
 				cmdFlagMap["name"] = &cliFlags.StringFlag{Name: "name", Value: "", Usage: "test string flag"}
 				cmdFlagMap["skip"] = &cliFlags.BoolFlag{Name: "skip", Value: false, Usage: "test bool flag"}
 				cmdFlagMap["instance"] = &cliFlags.IntFlag{Name: "instance", Value: 0, Usage: "test int flag"}
+				cmdFlagMap["skip2"] = &cliFlags.BoolFlag{Name: "skip2", Value: false, Usage: "test bool flag"}
 
 				fCtx = NewFlagContext(cmdFlagMap)
 			})
@@ -47,7 +48,25 @@ var _ = Describe("Flags", func() {
 				Ω(err).ToNot(HaveOccurred())
 			})
 
-			It("sets Bool(<flag>) to return true when a bool flag is provided", func() {
+			It("sets Bool(<flag>) to return value if bool flag is provided with value true/false", func() {
+				err := fCtx.Parse("--skip=false", "-skip2", "true", "-name", "johndoe")
+				Ω(err).ToNot(HaveOccurred())
+
+				Ω(fCtx.Bool("skip")).To(Equal(false), "skip should be false")
+				Ω(fCtx.Bool("skip2")).To(Equal(true), "skip2 should be true")
+				Ω(fCtx.Bool("name")).To(Equal(false), "name should be false")
+				Ω(fCtx.Bool("non-exisit-flag")).To(Equal(false))
+			})
+
+			It("sets Bool(<flag>) to return true if bool flag is provided with invalid value", func() {
+				err := fCtx.Parse("--skip=Not_Valid","skip2","FALSE", "-name", "johndoe")
+				Ω(err).ToNot(HaveOccurred())
+
+				Ω(fCtx.Bool("skip")).To(Equal(true), "skip should be true")
+				Ω(fCtx.Bool("skip2")).To(Equal(false), "skip2 should be false")
+			})
+
+			It("sets Bool(<flag>) to return true when a bool flag is provided without value", func() {
 				err := fCtx.Parse("--skip", "-name", "johndoe")
 				Ω(err).ToNot(HaveOccurred())
 
