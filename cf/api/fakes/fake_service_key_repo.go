@@ -7,6 +7,7 @@ import (
 type FakeServiceKeyRepo struct {
 	CreateServiceKeyMethod CreateServiceKeyType
 	ListServiceKeysMethod  ListServiceKeysType
+	GetServiceKeyMethod    GetServiceKeyType
 }
 
 type CreateServiceKeyType struct {
@@ -23,10 +24,19 @@ type ListServiceKeysType struct {
 	Error       error
 }
 
+type GetServiceKeyType struct {
+	InstanceId string
+	KeyName    string
+
+	ServiceKey models.ServiceKey
+	Error      error
+}
+
 func NewFakeServiceKeyRepo() *FakeServiceKeyRepo {
 	return &FakeServiceKeyRepo{
 		CreateServiceKeyMethod: CreateServiceKeyType{},
 		ListServiceKeysMethod:  ListServiceKeysType{},
+		GetServiceKeyMethod:    GetServiceKeyType{},
 	}
 }
 
@@ -41,4 +51,10 @@ func (f *FakeServiceKeyRepo) ListServiceKeys(instanceId string) ([]models.Servic
 	f.ListServiceKeysMethod.InstanceId = instanceId
 
 	return f.ListServiceKeysMethod.ServiceKeys, f.ListServiceKeysMethod.Error
+}
+
+func (f *FakeServiceKeyRepo) GetServiceKey(instanceId string, serviceKeyName string) (models.ServiceKey, error) {
+	f.GetServiceKeyMethod.InstanceId = instanceId
+
+	return f.GetServiceKeyMethod.ServiceKey, f.GetServiceKeyMethod.Error
 }
