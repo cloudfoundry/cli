@@ -41,10 +41,18 @@ func (cmd CreateUserProvidedService) Metadata() command_metadata.CommandMetadata
    Pass credential parameters as JSON to create a service non-interactively:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"name":"value","name":"value"}'
 
-EXAMPLE:
-   CF_NAME create-user-provided-service my-db-mine -p "username, password"
-   CF_NAME create-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
-   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
+EXAMPLE 
+      CF_NAME create-user-provided-service my-db-mine -p "username, password"
+      CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
+
+   Linux/Mac:
+      CF_NAME create-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
+
+   Windows Command Line
+      CF_NAME create-user-provided-service my-db-mine -p "{\"username\":\"admin\",\"password\":\"pa55woRD\"}"
+
+   Windows PowerShell
+      CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'
 `),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Credentials")),
