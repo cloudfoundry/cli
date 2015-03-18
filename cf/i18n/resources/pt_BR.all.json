@@ -10,16 +10,6 @@
       "modified": false
    },
    {
-      "id": "Getting rules for the security group  : {{.SecurityGroupName}}...",
-      "translation": "Getting rules for the security group  : {{.SecurityGroupName}}...",
-      "modified": false
-   },
-   {
-      "id": "Retrive the rules for all the security groups associated with the space",
-      "translation": "Retrive the rules for all the security groups associated with the space",
-      "modified": false
-   },
-   {
       "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
       "translation": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
       "modified": false
@@ -680,7 +670,7 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n   CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
+      "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE \n      CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n      CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n\n   Linux/Mac:\n      CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n      CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\n",
       "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE:\n   CF_NAME create-user-provided-service oracle-db-mine -p \"username, password\"\n   CF_NAME create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n",
       "modified": true
    },
@@ -2350,6 +2340,11 @@
       "modified": false
    },
    {
+      "id": "Getting rules for the security group  : {{.SecurityGroupName}}...",
+      "translation": "Getting rules for the security group  : {{.SecurityGroupName}}...",
+      "modified": false
+   },
+   {
       "id": "Getting security groups as {{.username}}",
       "translation": "Obtendo grupos de segurança como {{.username}}",
       "modified": false
@@ -3602,6 +3597,11 @@
    {
       "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
       "translation": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Retrive the rules for all the security groups associated with the space",
+      "translation": "Retrive the rules for all the security groups associated with the space",
       "modified": false
    },
    {
