@@ -101,7 +101,7 @@ func ServiceInstanceStateToStatus(operationType string, state string, isUserProv
 		return T("{{.OperationType}} in progress", map[string]interface{}{"OperationType": operationType})
 	case "failed":
 		return T("{{.OperationType}} failed", map[string]interface{}{"OperationType": operationType})
-	case "succeeded", "":
+	case "succeeded":
 		return T("{{.OperationType}} succeeded", map[string]interface{}{"OperationType": operationType})
 	default:
 		return ""
