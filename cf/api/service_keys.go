@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
@@ -14,6 +15,7 @@ import (
 type ServiceKeyRepository interface {
 	CreateServiceKey(instanceId string, keyName string) error
 	ListServiceKeys(instanceId string) ([]models.ServiceKey, error)
+	GetServiceKey(instanceId string, keyName string) (models.ServiceKey, error)
 }
 
 type CloudControllerServiceKeyRepository struct {
@@ -48,6 +50,21 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceId string,
 func (c CloudControllerServiceKeyRepository) ListServiceKeys(instanceId string) ([]models.ServiceKey, error) {
 	path := fmt.Sprintf("/v2/service_keys?q=service_instance_guid:%s", instanceId)
 
+	return c.listServiceKeys(path)
+}
+
+func (c CloudControllerServiceKeyRepository) GetServiceKey(instanceId string, keyName string) (models.ServiceKey, error) {
+	path := fmt.Sprintf("/v2/service_keys?q=%s", url.QueryEscape("service_instance_guid:"+instanceId+";name:"+keyName))
+
+	serviceKeys, err := c.listServiceKeys(path)
+	if err != nil || len(serviceKeys) == 0 {
+		return models.ServiceKey{}, err
+	}
+
+	return serviceKeys[0], nil
+}
+
+func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]models.ServiceKey, error) {
 	serviceKeys := []models.ServiceKey{}
 	apiErr := c.gateway.ListPaginatedResources(
 		c.config.ApiEndpoint(),
