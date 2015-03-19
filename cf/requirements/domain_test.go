@@ -25,7 +25,7 @@ var _ = Describe("DomainRequirement", func() {
 
 	It("succeeds when the domain is found", func() {
 		domain := models.DomainFields{Name: "example.com", Guid: "domain-guid"}
-		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgDomain: domain}
+		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgDomain: []models.DomainFields{domain}}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 		success := domainReq.Execute()
 

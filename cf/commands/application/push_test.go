@@ -185,6 +185,63 @@ var _ = Describe("Push Command", func() {
 				})
 			})
 
+			Context("when multiple domains are specified in manifest", func() {
+
+				BeforeEach(func() {
+					domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+						models.DomainFields{Name: "example1.com", Guid: "example-domain-guid"},
+						models.DomainFields{Name: "example2.com", Guid: "example-domain-guid"},
+					}
+
+					manifestRepo.ReadManifestReturns.Manifest = multipleDomainsManifest()
+				})
+
+				It("creates a route for each domain", func() {
+					callPush()
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating", "manifest-host.example1.com"},
+						[]string{"OK"},
+						[]string{"Binding", "manifest-host.example1.com"},
+						[]string{"OK"},
+						[]string{"Creating", "manifest-host.example2.com"},
+						[]string{"OK"},
+						[]string{"Binding", "manifest-host.example2.com"},
+						[]string{"OK"},
+					))
+				})
+
+				It("creates a route for each host on every domains", func() {
+					callPush()
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating", "manifest-host.example1.com"},
+						[]string{"Binding", "manifest-host.example1.com"},
+						[]string{"Creating", "host2.example1.com"},
+						[]string{"Binding", "host2.example1.com"},
+						[]string{"Creating", "manifest-host.example2.com"},
+						[]string{"Binding", "manifest-host.example2.com"},
+						[]string{"Creating", "host2.example2.com"},
+						[]string{"Binding", "host2.example2.com"},
+					))
+				})
+
+				It("`-d` from argument will override the domains in manifest", func() {
+					callPush("-d", "example1.com")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating", "manifest-host.example1.com"},
+						[]string{"OK"},
+						[]string{"Binding", "manifest-host.example1.com"},
+					))
+
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Creating", "manifest-host.example2.com"},
+					))
+				})
+
+			})
+
 			It("creates an app", func() {
 				callPush("-t", "111", "my-new-app")
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
@@ -237,9 +294,11 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("sets the app params from the flags", func() {
-				domainRepo.FindByNameInOrgDomain = models.DomainFields{
-					Name: "bar.cf-app.com",
-					Guid: "bar-domain-guid",
+				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+					models.DomainFields{
+						Name: "bar.cf-app.com",
+						Guid: "bar-domain-guid",
+					},
 				}
 				stackRepo.FindByNameReturns(models.Stack{
 					Name: "customLinux",
@@ -457,9 +516,11 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("pushes an app when provided a manifest with one app defined", func() {
-				domainRepo.FindByNameInOrgDomain = models.DomainFields{
-					Name: "manifest-example.com",
-					Guid: "bar-domain-guid",
+				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+					models.DomainFields{
+						Name: "manifest-example.com",
+						Guid: "bar-domain-guid",
+					},
 				}
 
 				manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
@@ -488,9 +549,11 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("pushes an app with multiple routes when multiple hosts are provided", func() {
-				domainRepo.FindByNameInOrgDomain = models.DomainFields{
-					Name: "manifest-example.com",
-					Guid: "bar-domain-guid",
+				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+					models.DomainFields{
+						Name: "manifest-example.com",
+						Guid: "bar-domain-guid",
+					},
 				}
 
 				manifestRepo.ReadManifestReturns.Manifest = multipleHostManifest()
@@ -522,9 +585,11 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("does not create a route when provided the --no-route flag", func() {
-				domainRepo.FindByNameInOrgDomain = models.DomainFields{
-					Name: "bar.cf-app.com",
-					Guid: "bar-domain-guid",
+				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+					models.DomainFields{
+						Name: "bar.cf-app.com",
+						Guid: "bar-domain-guid",
+					},
 				}
 
 				callPush("--no-route", "my-new-app")
@@ -783,9 +848,8 @@ var _ = Describe("Push Command", func() {
 
 						routeRepo.FindByHostAndDomainReturns.Error = errors.NewModelNotFoundError("Org", "uh oh")
 
-						domainRepo.FindByNameInOrgDomain = models.DomainFields{
-							Name: "example.com",
-							Guid: "example-domain-guid",
+						domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+							models.DomainFields{Name: "example.com", Guid: "example-domain-guid"},
 						}
 					})
 
@@ -797,9 +861,10 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("creates and binds a route when a different domain is specified", func() {
-				newDomain := models.DomainFields{Guid: "domain-guid", Name: "newdomain.com"}
 				routeRepo.FindByHostAndDomainReturns.Error = errors.NewModelNotFoundError("Org", "existing-app.newdomain.com")
-				domainRepo.FindByNameInOrgDomain = newDomain
+				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+					models.DomainFields{Guid: "domain-guid", Name: "newdomain.com"},
+				}
 
 				callPush("-d", "newdomain.com", "existing-app")
 
@@ -1071,6 +1136,33 @@ func multipleHostManifest() *manifest.Manifest {
 					"instances": 1,
 					"hosts":     []interface{}{"manifest-host-1", "manifest-host-2"},
 					"domain":    "manifest-example.com",
+					"stack":     "custom-stack",
+					"timeout":   360,
+					"buildpack": "some-buildpack",
+					"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
+					"path":      filepath.Clean("some/path/from/manifest"),
+					"env": generic.NewMap(map[interface{}]interface{}{
+						"FOO":  "baz",
+						"PATH": "/u/apps/my-app/bin",
+					}),
+				}),
+			},
+		}),
+	}
+}
+
+func multipleDomainsManifest() *manifest.Manifest {
+	return &manifest.Manifest{
+		Path: "manifest.yml",
+		Data: generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				generic.NewMap(map[interface{}]interface{}{
+					"name":      "manifest-app-name",
+					"memory":    "128MB",
+					"instances": 1,
+					"host":      "manifest-host",
+					"hosts":     []interface{}{"host2"},
+					"domains":   []interface{}{"example1.com", "example2.com"},
 					"stack":     "custom-stack",
 					"timeout":   360,
 					"buildpack": "some-buildpack",

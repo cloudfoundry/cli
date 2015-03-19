@@ -248,8 +248,7 @@ var _ = Describe("Manifests", func() {
 
 		Expect(*apps[0].BuildpackUrl).To(Equal("my-buildpack"))
 		Expect(*apps[0].DiskQuota).To(Equal(int64(512)))
-		Expect(*apps[0].Domain).To(Equal("my-domain"))
-		Expect(*apps[0].Domains).To(Equal([]string{"domain1.test", "domain2.test"}))
+		Expect(*apps[0].Domains).To(Equal([]string{"domain1.test", "domain2.test", "my-domain"}))
 		Expect(*apps[0].Hosts).To(Equal([]string{"host-1", "host-2", "my-hostname"}))
 		Expect(*apps[0].Name).To(Equal("my-app-name"))
 		Expect(*apps[0].StackName).To(Equal("my-stack"))
@@ -259,6 +258,29 @@ var _ = Describe("Manifests", func() {
 		Expect(apps[0].NoRoute).To(BeTrue())
 		Expect(apps[0].NoHostname).To(BeTrue())
 		Expect(apps[0].UseRandomHostname).To(BeTrue())
+	})
+
+	It("removes duplicated values in 'hosts' and 'domains'", func() {
+		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				map[interface{}]interface{}{
+					"domain":  "my-domain",
+					"domains": []interface{}{"my-domain", "domain1.test", "domain1.test", "domain2.test"},
+					"host":    "my-hostname",
+					"hosts":   []interface{}{"my-hostname", "host-1", "host-1", "host-2"},
+					"name":    "my-app-name",
+				},
+			},
+		}))
+
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(len(apps)).To(Equal(1))
+
+		Expect(len(*apps[0].Domains)).To(Equal(3))
+		Expect(*apps[0].Domains).To(Equal([]string{"my-domain", "domain1.test", "domain2.test"}))
+		Expect(len(*apps[0].Hosts)).To(Equal(3))
+		Expect(*apps[0].Hosts).To(Equal([]string{"my-hostname", "host-1", "host-2"}))
 	})
 
 	Describe("old-style property syntax", func() {

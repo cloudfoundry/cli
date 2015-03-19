@@ -136,14 +136,17 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	appParams.BuildpackUrl = stringValOrDefault(yamlMap, "buildpack", &errs)
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 
-	appParams.Domains = sliceOrEmptyVal(yamlMap, "domains", &errs)
-	appParams.Domain = stringVal(yamlMap, "domain", &errs)
+	domainAry := *sliceOrEmptyVal(yamlMap, "domains", &errs)
+	if domain := stringVal(yamlMap, "domain", &errs); domain != nil {
+		domainAry = append(domainAry, *domain)
+	}
+	appParams.Domains = removeDuplicatedValue(domainAry)
 
 	hostsArr := *sliceOrEmptyVal(yamlMap, "hosts", &errs)
 	if host := stringVal(yamlMap, "host", &errs); host != nil {
 		hostsArr = append(hostsArr, *host)
 	}
-	appParams.Hosts = &hostsArr
+	appParams.Hosts = removeDuplicatedValue(hostsArr)
 
 	appParams.Name = stringVal(yamlMap, "name", &errs)
 	appParams.Path = stringVal(yamlMap, "path", &errs)
@@ -169,6 +172,23 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	}
 
 	return
+}
+
+func removeDuplicatedValue(ary []string) *[]string {
+	if ary == nil {
+		return nil
+	}
+
+	m := make(map[string]bool)
+	for _, v := range ary {
+		m[v] = true
+	}
+
+	newAry := []string{}
+	for k, _ := range m {
+		newAry = append(newAry, k)
+	}
+	return &newAry
 }
 
 func checkForNulls(yamlMap generic.Map) (errs []error) {

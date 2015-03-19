@@ -53,10 +53,12 @@ var _ = Describe("delete-shared-domain command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-			domainRepo.FindByNameInOrgDomain = models.DomainFields{
-				Name:   "foo.com",
-				Guid:   "foo-guid",
-				Shared: true,
+			domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+				models.DomainFields{
+					Name:   "foo.com",
+					Guid:   "foo-guid",
+					Shared: true,
+				},
 			}
 		})
 
