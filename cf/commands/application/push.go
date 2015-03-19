@@ -84,7 +84,7 @@ func (cmd *Push) Metadata() command_metadata.CommandMetadata {
 			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n" +
 			"\n" + T("   Push multiple apps with a manifest:\n") + T("   CF_NAME push [-f MANIFEST_PATH]\n"),
 		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("b", T("Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch) ")),
+			flag_helpers.NewStringFlag("b", T("Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch). Use built-in buildpacks only by setting value to 'null' or 'default'")),
 			flag_helpers.NewStringFlag("c", T("Startup command, set to null to reset to default start command")),
 			flag_helpers.NewStringFlag("d", T("Domain (e.g. example.com)")),
 			flag_helpers.NewStringFlag("f", T("Path to manifest")),
