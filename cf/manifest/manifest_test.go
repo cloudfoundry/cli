@@ -227,6 +227,7 @@ var _ = Describe("Manifests", func() {
 					"buildpack":    "my-buildpack",
 					"disk_quota":   "512M",
 					"domain":       "my-domain",
+					"domains":      []interface{}{"domain1.test", "domain2.test"},
 					"host":         "my-hostname",
 					"hosts":        []interface{}{"host-1", "host-2"},
 					"name":         "my-app-name",
@@ -248,6 +249,7 @@ var _ = Describe("Manifests", func() {
 		Expect(*apps[0].BuildpackUrl).To(Equal("my-buildpack"))
 		Expect(*apps[0].DiskQuota).To(Equal(int64(512)))
 		Expect(*apps[0].Domain).To(Equal("my-domain"))
+		Expect(*apps[0].Domains).To(Equal([]string{"domain1.test", "domain2.test"}))
 		Expect(*apps[0].Hosts).To(Equal([]string{"host-1", "host-2", "my-hostname"}))
 		Expect(*apps[0].Name).To(Equal("my-app-name"))
 		Expect(*apps[0].StackName).To(Equal("my-stack"))

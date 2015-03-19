@@ -67,6 +67,7 @@ type AppParams struct {
 	Command            *string
 	DiskQuota          *int64
 	Domain             *string
+	Domains            *[]string
 	EnvironmentVars    *map[string]interface{}
 	Guid               *string
 	HealthCheckTimeout *int
