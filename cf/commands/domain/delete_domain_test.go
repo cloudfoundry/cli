@@ -59,9 +59,11 @@ var _ = Describe("delete-domain command", func() {
 
 	Context("when the domain exists", func() {
 		BeforeEach(func() {
-			domainRepo.FindByNameInOrgDomain = models.DomainFields{
-				Name: "foo.com",
-				Guid: "foo-guid",
+			domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+				models.DomainFields{
+					Name: "foo.com",
+					Guid: "foo-guid",
+				},
 			}
 		})
 

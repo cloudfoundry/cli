@@ -66,7 +66,6 @@ type AppParams struct {
 	BuildpackUrl       *string
 	Command            *string
 	DiskQuota          *int64
-	Domain             *string
 	Domains            *[]string
 	EnvironmentVars    *map[string]interface{}
 	Guid               *string
@@ -96,8 +95,8 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.DiskQuota != nil {
 		app.DiskQuota = other.DiskQuota
 	}
-	if other.Domain != nil {
-		app.Domain = other.Domain
+	if other.Domains != nil {
+		app.Domains = other.Domains
 	}
 	if other.EnvironmentVars != nil {
 		app.EnvironmentVars = other.EnvironmentVars
