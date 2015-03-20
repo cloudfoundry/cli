@@ -103,7 +103,7 @@ var _ = Describe("service-key command", func() {
 					[]string{"uri", "mysql://fake-user:fake-password@fake-host:3306/fake-db-name"},
 					[]string{"OK"},
 				))
-				Expect(serviceKeyRepo.GetServiceKeyMethod.InstanceId).To(Equal("fake-service-instance-guid"))
+				Expect(serviceKeyRepo.GetServiceKeyMethod.InstanceGuid).To(Equal("fake-service-instance-guid"))
 			})
 
 			It("gets service guid when '--guid' flag is provided", func() {

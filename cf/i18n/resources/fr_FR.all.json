@@ -5293,5 +5293,35 @@
       "id": "Show service key info",
       "translation": "Montrer information pour la clef de service",
       "modified": false
+   },
+   {
+      "id": "Delete a service key",
+      "translation": "Suprimer une clef de service",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
+      "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nÉXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Suprimer la clef {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Service instance {{.ServiceInstanceName}} does not exist.",
+      "translation": "Instance de service {{.ServiceInstanceName}} n'existe pas.",
+      "modified": false
+   },
+   {
+      "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
+      "translation": "La clef de service {{.ServiceKeyName}} n'existe pas pour l'instance de service {{.ServiceInstanceName}}.",
+      "modified": false
+   },
+   {
+      "id": "service key",
+      "translation": "clef de service",
+      "modified": false
    }
 ]

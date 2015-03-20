@@ -13,9 +13,10 @@ import (
 )
 
 type ServiceKeyRepository interface {
-	CreateServiceKey(instanceId string, keyName string) error
-	ListServiceKeys(instanceId string) ([]models.ServiceKey, error)
-	GetServiceKey(instanceId string, keyName string) (models.ServiceKey, error)
+	CreateServiceKey(serviceKeyGuid string, keyName string) error
+	ListServiceKeys(serviceKeyGuid string) ([]models.ServiceKey, error)
+	GetServiceKey(serviceKeyGuid string, keyName string) (models.ServiceKey, error)
+	DeleteServiceKey(serviceKeyGuid string) error
 }
 
 type CloudControllerServiceKeyRepository struct {
@@ -30,9 +31,9 @@ func NewCloudControllerServiceKeyRepository(config core_config.Reader, gateway n
 	}
 }
 
-func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceId string, keyName string) error {
+func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid string, keyName string) error {
 	path := "/v2/service_keys"
-	data := fmt.Sprintf(`{"service_instance_guid":"%s","name":"%s"}`, instanceId, keyName)
+	data := fmt.Sprintf(`{"service_instance_guid":"%s","name":"%s"}`, instanceGuid, keyName)
 
 	err := c.gateway.CreateResource(c.config.ApiEndpoint(), path, strings.NewReader(data))
 
@@ -47,8 +48,8 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceId string,
 	return nil
 }
 
-func (c CloudControllerServiceKeyRepository) ListServiceKeys(instanceId string) ([]models.ServiceKey, error) {
-	path := fmt.Sprintf("/v2/service_keys?q=service_instance_guid:%s", instanceId)
+func (c CloudControllerServiceKeyRepository) ListServiceKeys(instanceGuid string) ([]models.ServiceKey, error) {
+	path := fmt.Sprintf("/v2/service_keys?q=service_instance_guid:%s", instanceGuid)
 
 	return c.listServiceKeys(path)
 }
@@ -81,4 +82,9 @@ func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]mod
 	}
 
 	return serviceKeys, nil
+}
+
+func (c CloudControllerServiceKeyRepository) DeleteServiceKey(serviceKeyGuid string) error {
+	path := fmt.Sprintf("/v2/service_keys/%s", serviceKeyGuid)
+	return c.gateway.DeleteResource(c.config.ApiEndpoint(), path)
 }
