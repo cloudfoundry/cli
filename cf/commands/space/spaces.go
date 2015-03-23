@@ -57,7 +57,6 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 		foundSpaces = true
 		return true
 	})
-	table.Print()
 
 	if apiErr != nil {
 		cmd.ui.Failed(T("Failed fetching spaces.\n{{.ErrorDescription}}",
@@ -66,6 +65,8 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 			}))
 		return
 	}
+
+	table.Print()
 
 	if !foundSpaces {
 		cmd.ui.Say(T("No spaces found"))
