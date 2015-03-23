@@ -111,6 +111,19 @@ var _ = Describe("generate_manifest", func() {
 		))
 	})
 
+	It("generates a manifest containing the attributes noHostName", func() {
+		m.Memory("app1", 128)
+		m.Domain("app1", "", "blahblahblah.com")
+		err := m.Save()
+		Ω(err).NotTo(HaveOccurred())
+
+		Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
+			[]string{"- name: app1"},
+			[]string{"  memory: 128M"},
+			[]string{"  no-hostname: true"},
+			[]string{"  domain: blahblahblah.com"},
+		))
+	})
 })
 
 func getYamlContent(path string) []string {
