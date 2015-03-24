@@ -4,6 +4,7 @@ package fakes
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/noaa/events"
 	"sync"
 )
 
@@ -17,6 +18,25 @@ type FakeLogsNoaaRepository struct {
 	getContainerMetricsReturns struct {
 		result1 []models.AppInstanceFields
 		result2 error
+	}
+	RecentLogsForStub        func(appGuid string) ([]*events.LogMessage, error)
+	recentLogsForMutex       sync.RWMutex
+	recentLogsForArgsForCall []struct {
+		appGuid string
+	}
+	recentLogsForReturns struct {
+		result1 []*events.LogMessage
+		result2 error
+	}
+	TailNoaaLogsForStub        func(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error
+	tailNoaaLogsForMutex       sync.RWMutex
+	tailNoaaLogsForArgsForCall []struct {
+		appGuid   string
+		onConnect func()
+		onMessage func(*events.LogMessage)
+	}
+	tailNoaaLogsForReturns struct {
+		result1 error
 	}
 }
 
@@ -52,6 +72,73 @@ func (fake *FakeLogsNoaaRepository) GetContainerMetricsReturns(result1 []models.
 		result1 []models.AppInstanceFields
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeLogsNoaaRepository) RecentLogsFor(appGuid string) ([]*events.LogMessage, error) {
+	fake.recentLogsForMutex.Lock()
+	defer fake.recentLogsForMutex.Unlock()
+	fake.recentLogsForArgsForCall = append(fake.recentLogsForArgsForCall, struct {
+		appGuid string
+	}{appGuid})
+	if fake.RecentLogsForStub != nil {
+		return fake.RecentLogsForStub(appGuid)
+	} else {
+		return fake.recentLogsForReturns.result1, fake.recentLogsForReturns.result2
+	}
+}
+
+func (fake *FakeLogsNoaaRepository) RecentLogsForCallCount() int {
+	fake.recentLogsForMutex.RLock()
+	defer fake.recentLogsForMutex.RUnlock()
+	return len(fake.recentLogsForArgsForCall)
+}
+
+func (fake *FakeLogsNoaaRepository) RecentLogsForArgsForCall(i int) string {
+	fake.recentLogsForMutex.RLock()
+	defer fake.recentLogsForMutex.RUnlock()
+	return fake.recentLogsForArgsForCall[i].appGuid
+}
+
+func (fake *FakeLogsNoaaRepository) RecentLogsForReturns(result1 []*events.LogMessage, result2 error) {
+	fake.RecentLogsForStub = nil
+	fake.recentLogsForReturns = struct {
+		result1 []*events.LogMessage
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeLogsNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error {
+	fake.tailNoaaLogsForMutex.Lock()
+	defer fake.tailNoaaLogsForMutex.Unlock()
+	fake.tailNoaaLogsForArgsForCall = append(fake.tailNoaaLogsForArgsForCall, struct {
+		appGuid   string
+		onConnect func()
+		onMessage func(*events.LogMessage)
+	}{appGuid, onConnect, onMessage})
+	if fake.TailNoaaLogsForStub != nil {
+		return fake.TailNoaaLogsForStub(appGuid, onConnect, onMessage)
+	} else {
+		return fake.tailNoaaLogsForReturns.result1
+	}
+}
+
+func (fake *FakeLogsNoaaRepository) TailNoaaLogsForCallCount() int {
+	fake.tailNoaaLogsForMutex.RLock()
+	defer fake.tailNoaaLogsForMutex.RUnlock()
+	return len(fake.tailNoaaLogsForArgsForCall)
+}
+
+func (fake *FakeLogsNoaaRepository) TailNoaaLogsForArgsForCall(i int) (string, func(), func(*events.LogMessage)) {
+	fake.tailNoaaLogsForMutex.RLock()
+	defer fake.tailNoaaLogsForMutex.RUnlock()
+	return fake.tailNoaaLogsForArgsForCall[i].appGuid, fake.tailNoaaLogsForArgsForCall[i].onConnect, fake.tailNoaaLogsForArgsForCall[i].onMessage
+}
+
+func (fake *FakeLogsNoaaRepository) TailNoaaLogsForReturns(result1 error) {
+	fake.TailNoaaLogsForStub = nil
+	fake.tailNoaaLogsForReturns = struct {
+		result1 error
+	}{result1}
 }
 
 var _ api.LogsNoaaRepository = new(FakeLogsNoaaRepository)

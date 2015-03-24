@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"github.com/cloudfoundry/noaa/events"
 	"github.com/codegangsta/cli"
 )
 
@@ -21,14 +22,16 @@ type Logs struct {
 	ui       terminal.UI
 	config   core_config.Reader
 	logsRepo api.LogsRepository
+	noaaRepo api.LogsNoaaRepository
 	appReq   requirements.ApplicationRequirement
 }
 
-func NewLogs(ui terminal.UI, config core_config.Reader, logsRepo api.LogsRepository) (cmd *Logs) {
+func NewLogs(ui terminal.UI, config core_config.Reader, logsRepo api.LogsRepository, noaaRepo api.LogsNoaaRepository) (cmd *Logs) {
 	cmd = new(Logs)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.logsRepo = logsRepo
+	cmd.noaaRepo = noaaRepo
 	return
 }
 
@@ -81,13 +84,13 @@ func (cmd *Logs) recentLogsFor(app models.Application) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	messages, err := cmd.logsRepo.RecentLogsFor(app.Guid)
+	messages, err := cmd.noaaRepo.RecentLogsFor(app.Guid)
 	if err != nil {
 		cmd.handleError(err)
 	}
 
 	for _, msg := range messages {
-		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
+		cmd.ui.Say("%s", LogNoaaMessageOutput(msg, time.Local))
 	}
 }
 
@@ -123,6 +126,13 @@ func (cmd *Logs) handleError(err error) {
 func LogMessageOutput(msg *logmessage.LogMessage, loc *time.Location) string {
 	logHeader, coloredLogHeader := ui_helpers.ExtractLogHeader(msg, loc)
 	logContent := ui_helpers.ExtractLogContent(msg, logHeader)
+
+	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
+}
+
+func LogNoaaMessageOutput(msg *events.LogMessage, loc *time.Location) string {
+	logHeader, coloredLogHeader := ui_helpers.ExtractNoaaLogHeader(msg, loc)
+	logContent := ui_helpers.ExtractNoaaLogContent(msg, logHeader)
 
 	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }
