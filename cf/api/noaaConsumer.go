@@ -7,6 +7,8 @@ import (
 
 type NoaaConsumer interface {
 	GetContainerMetrics(string, string) ([]*events.ContainerMetric, error)
+	RecentLogs(string, string) ([]*events.LogMessage, error)
+	TailingLogs(string, string, chan<- *events.LogMessage, chan<- error, chan struct{})
 }
 
 type noaaConsumer struct {
@@ -21,4 +23,12 @@ func NewNoaaConsumer(consumer *noaa.Consumer) NoaaConsumer {
 
 func (n *noaaConsumer) GetContainerMetrics(appGuid, token string) ([]*events.ContainerMetric, error) {
 	return n.consumer.ContainerMetrics(appGuid, token)
+}
+
+func (n *noaaConsumer) RecentLogs(appGuid string, authToken string) ([]*events.LogMessage, error) {
+	return n.consumer.RecentLogs(appGuid, authToken)
+}
+
+func (n *noaaConsumer) TailingLogs(appGuid string, authToken string, outputChan chan<- *events.LogMessage, errorChan chan<- error, stopChan chan struct{}) {
+	n.consumer.TailingLogs(appGuid, authToken, outputChan, errorChan, stopChan)
 }

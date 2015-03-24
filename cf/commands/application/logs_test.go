@@ -14,6 +14,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"github.com/cloudfoundry/noaa/events"
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -26,6 +27,7 @@ var _ = Describe("logs command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		logsRepo            *testapi.FakeLogsRepository
+		noaaRepo            *testapi.FakeLogsNoaaRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.ReadWriter
 	)
@@ -34,11 +36,12 @@ var _ = Describe("logs command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		logsRepo = &testapi.FakeLogsRepository{}
+		noaaRepo = &testapi.FakeLogsNoaaRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewLogs(ui, configRepo, logsRepo), args, requirementsFactory)
+		return testcmd.RunCommand(NewLogs(ui, configRepo, logsRepo, noaaRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -74,9 +77,9 @@ var _ = Describe("logs command", func() {
 			app.Guid = "my-app-guid"
 
 			currentTime := time.Now()
-			recentLogs := []*logmessage.LogMessage{
-				testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", currentTime),
-				testlogs.NewLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
+			recentLogs := []*events.LogMessage{
+				testlogs.NewNoaaLogMessage("Log Line 1", app.Guid, "DEA", currentTime),
+				testlogs.NewNoaaLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
 			}
 
 			appLogs := []*logmessage.LogMessage{
@@ -84,7 +87,7 @@ var _ = Describe("logs command", func() {
 			}
 
 			requirementsFactory.Application = app
-			logsRepo.RecentLogsForReturns(recentLogs, nil)
+			noaaRepo.RecentLogsForReturns(recentLogs, nil)
 
 			logsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
 				onConnect()
@@ -99,7 +102,7 @@ var _ = Describe("logs command", func() {
 			runCommand("--recent", "my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(app.Guid).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
+			Expect(app.Guid).To(Equal(noaaRepo.RecentLogsForArgsForCall(0)))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
@@ -109,8 +112,8 @@ var _ = Describe("logs command", func() {
 
 		Context("when the log messages contain format string identifiers", func() {
 			BeforeEach(func() {
-				logsRepo.RecentLogsForReturns([]*logmessage.LogMessage{
-					testlogs.NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
+				noaaRepo.RecentLogsForReturns([]*events.LogMessage{
+					testlogs.NewNoaaLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
 				}, nil)
 			})
 
@@ -145,7 +148,7 @@ var _ = Describe("logs command", func() {
 				})
 
 				It("informs the user of the error when they include the --recent flag", func() {
-					logsRepo.RecentLogsForReturns(nil, errors.NewInvalidSSLCert("https://example.com", "how does SSL work???"))
+					noaaRepo.RecentLogsForReturns(nil, errors.NewInvalidSSLCert("https://example.com", "how does SSL work???"))
 					runCommand("--recent", "my-app")
 
 					Expect(ui.Outputs).To(ContainSubstrings(

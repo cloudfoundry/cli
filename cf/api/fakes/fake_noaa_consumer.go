@@ -18,6 +18,25 @@ type FakeNoaaConsumer struct {
 		result1 []*events.ContainerMetric
 		result2 error
 	}
+	RecentLogsStub        func(string, string) ([]*events.LogMessage, error)
+	recentLogsMutex       sync.RWMutex
+	recentLogsArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	recentLogsReturns struct {
+		result1 []*events.LogMessage
+		result2 error
+	}
+	TailingLogsStub        func(string, string, chan<- *events.LogMessage, chan<- error, chan struct{})
+	tailingLogsMutex       sync.RWMutex
+	tailingLogsArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 chan<- *events.LogMessage
+		arg4 chan<- error
+		arg5 chan struct{}
+	}
 }
 
 func (fake *FakeNoaaConsumer) GetContainerMetrics(arg1 string, arg2 string) ([]*events.ContainerMetric, error) {
@@ -52,6 +71,67 @@ func (fake *FakeNoaaConsumer) GetContainerMetricsReturns(result1 []*events.Conta
 		result1 []*events.ContainerMetric
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeNoaaConsumer) RecentLogs(arg1 string, arg2 string) ([]*events.LogMessage, error) {
+	fake.recentLogsMutex.Lock()
+	defer fake.recentLogsMutex.Unlock()
+	fake.recentLogsArgsForCall = append(fake.recentLogsArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	if fake.RecentLogsStub != nil {
+		return fake.RecentLogsStub(arg1, arg2)
+	} else {
+		return fake.recentLogsReturns.result1, fake.recentLogsReturns.result2
+	}
+}
+
+func (fake *FakeNoaaConsumer) RecentLogsCallCount() int {
+	fake.recentLogsMutex.RLock()
+	defer fake.recentLogsMutex.RUnlock()
+	return len(fake.recentLogsArgsForCall)
+}
+
+func (fake *FakeNoaaConsumer) RecentLogsArgsForCall(i int) (string, string) {
+	fake.recentLogsMutex.RLock()
+	defer fake.recentLogsMutex.RUnlock()
+	return fake.recentLogsArgsForCall[i].arg1, fake.recentLogsArgsForCall[i].arg2
+}
+
+func (fake *FakeNoaaConsumer) RecentLogsReturns(result1 []*events.LogMessage, result2 error) {
+	fake.RecentLogsStub = nil
+	fake.recentLogsReturns = struct {
+		result1 []*events.LogMessage
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeNoaaConsumer) TailingLogs(arg1 string, arg2 string, arg3 chan<- *events.LogMessage, arg4 chan<- error, arg5 chan struct{}) {
+	fake.tailingLogsMutex.Lock()
+	defer fake.tailingLogsMutex.Unlock()
+	fake.tailingLogsArgsForCall = append(fake.tailingLogsArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 chan<- *events.LogMessage
+		arg4 chan<- error
+		arg5 chan struct{}
+	}{arg1, arg2, arg3, arg4, arg5})
+	if fake.TailingLogsStub != nil {
+		fake.TailingLogsStub(arg1, arg2, arg3, arg4, arg5)
+	}
+}
+
+func (fake *FakeNoaaConsumer) TailingLogsCallCount() int {
+	fake.tailingLogsMutex.RLock()
+	defer fake.tailingLogsMutex.RUnlock()
+	return len(fake.tailingLogsArgsForCall)
+}
+
+func (fake *FakeNoaaConsumer) TailingLogsArgsForCall(i int) (string, string, chan<- *events.LogMessage, chan<- error, chan struct{}) {
+	fake.tailingLogsMutex.RLock()
+	defer fake.tailingLogsMutex.RUnlock()
+	return fake.tailingLogsArgsForCall[i].arg1, fake.tailingLogsArgsForCall[i].arg2, fake.tailingLogsArgsForCall[i].arg3, fake.tailingLogsArgsForCall[i].arg4, fake.tailingLogsArgsForCall[i].arg5
 }
 
 var _ api.NoaaConsumer = new(FakeNoaaConsumer)

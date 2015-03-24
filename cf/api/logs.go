@@ -1,7 +1,6 @@
 package api
 
 import (
-	"crypto/tls"
 	"errors"
 	"time"
 
@@ -21,9 +20,9 @@ type LogsRepository interface {
 }
 
 type LoggregatorLogsRepository struct {
-	consumer       consumer.LoggregatorConsumer
-	config         core_config.Reader
-	TrustedCerts   []tls.Certificate
+	consumer consumer.LoggregatorConsumer
+	config   core_config.Reader
+	// TrustedCerts   []tls.Certificate
 	tokenRefresher authentication.TokenRefresher
 	messageQueue   *SortedMessageQueue
 

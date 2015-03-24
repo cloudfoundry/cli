@@ -1,9 +1,11 @@
 package logs
 
 import (
+	"time"
+
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"time"
+	"github.com/cloudfoundry/noaa/events"
 )
 
 const (
@@ -18,6 +20,18 @@ func NewLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *lo
 		AppId:       proto.String(appGuid),
 		MessageType: &messageType,
 		SourceName:  proto.String(sourceName),
+		Timestamp:   proto.Int64(timestamp.UnixNano()),
+	}
+}
+
+func NewNoaaLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *events.LogMessage {
+	messageType := events.LogMessage_ERR
+
+	return &events.LogMessage{
+		Message:     []byte(msgText),
+		AppId:       proto.String(appGuid),
+		MessageType: &messageType,
+		SourceType:  proto.String(sourceName),
 		Timestamp:   proto.Int64(timestamp.UnixNano()),
 	}
 }
