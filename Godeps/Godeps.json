@@ -25,15 +25,11 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-incubator/cli-plugin-repo/models",
-			"Rev": "eed6c74b777b9d124c33b195103079f8a4cab588"
+			"Rev": "3e9ef0bb61c9271e963e1b795896ec652723369c"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
 			"Rev": "a4a0cae5ff8a342ba01fce700b9e41c6942c0e5e"
-		},
-		{
-			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
-			"Rev": "89d7fe237afae1e8222554359ec03b72c8466d10"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",

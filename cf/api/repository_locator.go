@@ -29,7 +29,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	consumer "github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/noaa"
 )
 
@@ -85,8 +84,6 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
-	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{})
 
 	noaaLib := noaa.NewConsumer(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 	noaaLib.SetDebugPrinter(terminal.DebugPrinter{})
