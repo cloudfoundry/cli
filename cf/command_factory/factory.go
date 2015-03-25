@@ -121,7 +121,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["files"] = application.NewFiles(ui, config, repoLocator.GetAppFilesRepository())
 	factory.cmdsByName["login"] = commands.NewLogin(ui, config, repoLocator.GetAuthenticationRepository(), repoLocator.GetEndpointRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["logout"] = commands.NewLogout(ui, config)
-	factory.cmdsByName["logs"] = application.NewLogs(ui, config, repoLocator.GetLogsRepository(), repoLocator.GetLogsNoaaRepository())
+	factory.cmdsByName["logs"] = application.NewLogs(ui, config, repoLocator.GetLogsNoaaRepository())
 	factory.cmdsByName["oauth-token"] = commands.NewOAuthToken(ui, config, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["org"] = organization.NewShowOrg(ui, config)
 	factory.cmdsByName["org-users"] = user.NewOrgUsers(ui, config, repoLocator.GetUserRepository())
@@ -211,7 +211,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["unmap-route"] = route.NewUnmapRoute(ui, config, repoLocator.GetRouteRepository())
 
 	displayApp := application.NewShowApp(ui, config, repoLocator.GetAppSummaryRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository())
-	start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsRepository())
+	start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
 	restart := application.NewRestart(ui, config, start, stop)
 	restage := application.NewRestage(ui, config, repoLocator.GetApplicationRepository(), start)

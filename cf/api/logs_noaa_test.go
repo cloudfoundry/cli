@@ -2,6 +2,8 @@ package api_test
 
 import (
 	"errors"
+	"reflect"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
@@ -16,22 +18,23 @@ import (
 )
 
 var _ = Describe("logs with noaa repository", func() {
+	var (
+		fakeNoaaConsumer   *testapi.FakeNoaaConsumer
+		config             core_config.ReadWriter
+		fakeTokenRefresher *testapi.FakeAuthenticationRepository
+		repo               api.LogsNoaaRepository
+	)
+
+	BeforeEach(func() {
+		fakeNoaaConsumer = &testapi.FakeNoaaConsumer{}
+		config = testconfig.NewRepositoryWithDefaults()
+		config.SetDopplerEndpoint("doppler-server.test.com")
+		config.SetAccessToken("the-access-token")
+		fakeTokenRefresher = &testapi.FakeAuthenticationRepository{}
+		repo = api.NewLogsNoaaRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
+	})
 
 	Describe("RecentLogsFor", func() {
-
-		var (
-			fakeNoaaConsumer   *testapi.FakeNoaaConsumer
-			config             core_config.ReadWriter
-			fakeTokenRefresher *testapi.FakeAuthenticationRepository
-			repo               api.LogsNoaaRepository
-		)
-
-		BeforeEach(func() {
-			fakeNoaaConsumer = &testapi.FakeNoaaConsumer{}
-			config = testconfig.NewRepositoryWithDefaults()
-			fakeTokenRefresher = &testapi.FakeAuthenticationRepository{}
-			repo = api.NewLogsNoaaRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
-		})
 
 		It("refreshes token and get metric once more if token has expired.", func() {
 			fakeNoaaConsumer.RecentLogsReturns([]*events.LogMessage{},
@@ -74,6 +77,128 @@ var _ = Describe("logs with noaa repository", func() {
 				Expect(string(messages[0].Message)).To(Equal("message 1"))
 				Expect(string(messages[1].Message)).To(Equal("message 2"))
 				Expect(string(messages[2].Message)).To(Equal("message 3"))
+			})
+		})
+	})
+
+	Describe("tailing logs", func() {
+
+		Context("when an error occurs", func() {
+			It("returns an error when it occurs", func() {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+					errChan <- errors.New("oops")
+				}
+
+				err := repo.TailNoaaLogsFor("app-guid", func() {}, func(*events.LogMessage) {})
+				Expect(err).To(Equal(errors.New("oops")))
+			})
+		})
+
+		Context("when a noaa_errors.UnauthorizedError occurs", func() {
+			It("refreshes the access token and tail logs once more", func() {
+				calledOnce := false
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+					if !calledOnce {
+						calledOnce = true
+						errChan <- noaa_errors.NewUnauthorizedError("i'm sorry dave")
+					} else {
+						errChan <- errors.New("2nd Error")
+					}
+				}
+
+				err := repo.TailNoaaLogsFor("app-guid", func() {}, func(*events.LogMessage) {})
+				Ω(fakeTokenRefresher.RefreshTokenCalled).To(BeTrue())
+				Ω(err.Error()).To(Equal("2nd Error"))
+			})
+		})
+
+		Context("when no error occurs", func() {
+			It("asks for the logs for the given app", func() {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+					errChan <- errors.New("quit Tailing")
+				}
+
+				repo.TailNoaaLogsFor("app-guid", func() {}, func(msg *events.LogMessage) {})
+
+				appGuid, token, _, _, _ := fakeNoaaConsumer.TailingLogsArgsForCall(0)
+				Ω(appGuid).To(Equal("app-guid"))
+				Ω(token).To(Equal("the-access-token"))
+			})
+
+			It("sets the on connect callback", func() {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+					errChan <- errors.New("quit Tailing")
+				}
+
+				var cb = func() { return }
+				repo.TailNoaaLogsFor("app-guid", cb, func(msg *events.LogMessage) {})
+
+				Ω(fakeNoaaConsumer.SetOnConnectCallbackCallCount()).To(Equal(1))
+				arg := fakeNoaaConsumer.SetOnConnectCallbackArgsForCall(0)
+				Ω(reflect.ValueOf(arg).Pointer() == reflect.ValueOf(cb).Pointer()).To(BeTrue())
+			})
+		})
+
+		Context("and the buffer time is sufficient for sorting", func() {
+			BeforeEach(func() {
+				api.BufferTime = 250 * time.Millisecond
+				repo = api.NewLogsNoaaRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
+			})
+
+			It("sorts the messages before yielding them", func() {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+					logChan <- makeLogMessage("hello3", 300)
+					logChan <- makeLogMessage("hello2", 200)
+					logChan <- makeLogMessage("hello1", 100)
+					time.Sleep(250 * time.Millisecond)
+					errChan <- errors.New("quit Tailing") //err quits tailing func and call close
+				}
+
+				receivedMessages := []*events.LogMessage{}
+				repo.TailNoaaLogsFor("app-guid", func() {}, func(msg *events.LogMessage) {
+					receivedMessages = append(receivedMessages, msg)
+					if len(receivedMessages) >= 3 {
+						repo.Close()
+					}
+				})
+
+				Expect(receivedMessages).To(Equal([]*events.LogMessage{
+					makeLogMessage("hello1", 100),
+					makeLogMessage("hello2", 200),
+					makeLogMessage("hello3", 300),
+				}))
+
+			})
+		})
+
+		Context("and the buffer time is very long", func() {
+			BeforeEach(func() {
+				api.BufferTime = 30 * time.Second
+				repo = api.NewLogsNoaaRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
+			})
+
+			It("flushes remaining log messages when Close is called", func() {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+					logChan <- makeLogMessage("hello3", 300)
+					logChan <- makeLogMessage("hello2", 200)
+					logChan <- makeLogMessage("hello1", 100)
+					errChan <- errors.New("quit Tailing") //err quits tailing func and call close
+				}
+
+				receivedMessages := []*events.LogMessage{}
+				repo.TailNoaaLogsFor("app-guid", func() {}, func(msg *events.LogMessage) {
+					receivedMessages = append(receivedMessages, msg)
+					if len(receivedMessages) >= 3 {
+						repo.Close()
+					}
+				})
+
+				Expect(receivedMessages).To(Equal([]*events.LogMessage{
+					makeLogMessage("hello1", 100),
+					makeLogMessage("hello2", 200),
+					makeLogMessage("hello3", 300),
+				}))
+
 			})
 		})
 	})
@@ -143,3 +268,15 @@ var _ = Describe("logs with noaa repository", func() {
 	})
 
 })
+
+func makeLogMessage(message string, timestamp int64) *events.LogMessage {
+	messageType := events.LogMessage_OUT
+	sourceName := "DEA"
+	return &events.LogMessage{
+		Message:     []byte(message),
+		AppId:       proto.String("app-guid"),
+		MessageType: &messageType,
+		SourceType:  &sourceName,
+		Timestamp:   proto.Int64(timestamp),
+	}
+}

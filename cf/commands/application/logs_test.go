@@ -13,7 +13,6 @@ import (
 	testlogs "github.com/cloudfoundry/cli/testhelpers/logs"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/cloudfoundry/noaa/events"
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
@@ -26,7 +25,6 @@ import (
 var _ = Describe("logs command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		logsRepo            *testapi.FakeLogsRepository
 		noaaRepo            *testapi.FakeLogsNoaaRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.ReadWriter
@@ -35,13 +33,12 @@ var _ = Describe("logs command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		logsRepo = &testapi.FakeLogsRepository{}
 		noaaRepo = &testapi.FakeLogsNoaaRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewLogs(ui, configRepo, logsRepo, noaaRepo), args, requirementsFactory)
+		return testcmd.RunCommand(NewLogs(ui, configRepo, noaaRepo), args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -82,14 +79,14 @@ var _ = Describe("logs command", func() {
 				testlogs.NewNoaaLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
 			}
 
-			appLogs := []*logmessage.LogMessage{
+			appLogs := []*events.LogMessage{
 				testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", time.Now()),
 			}
 
 			requirementsFactory.Application = app
 			noaaRepo.RecentLogsForReturns(recentLogs, nil)
 
-			logsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+			noaaRepo.TailNoaaLogsForStub = func(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error {
 				onConnect()
 				for _, log := range appLogs {
 					onMessage(log)
@@ -127,7 +124,7 @@ var _ = Describe("logs command", func() {
 			runCommand("my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			appGuid, _, _ := logsRepo.TailLogsForArgsForCall(0)
+			appGuid, _, _ := noaaRepo.TailNoaaLogsForArgsForCall(0)
 			Expect(app.Guid).To(Equal(appGuid))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
@@ -138,7 +135,7 @@ var _ = Describe("logs command", func() {
 		Context("when the loggregator server has an invalid cert", func() {
 			Context("when the skip-ssl-validation flag is not set", func() {
 				It("fails and informs the user about the skip-ssl-validation flag", func() {
-					logsRepo.TailLogsForReturns(errors.NewInvalidSSLCert("https://example.com", "it don't work good"))
+					noaaRepo.TailNoaaLogsForReturns(errors.NewInvalidSSLCert("https://example.com", "it don't work good"))
 					runCommand("my-app")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -171,40 +168,40 @@ var _ = Describe("logs command", func() {
 		Describe("Helpers", func() {
 			date := time.Date(2014, 4, 4, 11, 39, 20, 5, time.UTC)
 
-			createMessage := func(sourceId string, sourceName string, msgType logmessage.LogMessage_MessageType, date time.Time) *logmessage.LogMessage {
+			createMessage := func(sourceId string, sourceName string, msgType events.LogMessage_MessageType, date time.Time) *events.LogMessage {
 				timestamp := date.UnixNano()
-				return &logmessage.LogMessage{
-					Message:     []byte("Hello World!\n\r\n\r"),
-					AppId:       proto.String("my-app-guid"),
-					MessageType: &msgType,
-					SourceId:    &sourceId,
-					Timestamp:   &timestamp,
-					SourceName:  &sourceName,
+				return &events.LogMessage{
+					Message:        []byte("Hello World!\n\r\n\r"),
+					AppId:          proto.String("my-app-guid"),
+					MessageType:    &msgType,
+					SourceInstance: &sourceId,
+					Timestamp:      &timestamp,
+					SourceType:     &sourceName,
 				}
 			}
 
 			Context("when the message comes", func() {
 				It("include the instance index", func() {
-					msg := createMessage("4", "DEA", logmessage.LogMessage_OUT, date)
-					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA/4]      OUT Hello World!"))
+					msg := createMessage("4", "DEA", events.LogMessage_OUT, date)
+					Expect(terminal.Decolorize(LogNoaaMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA/4]      OUT Hello World!"))
 				})
 
 				It("doesn't include the instance index if sourceID is empty", func() {
-					msg := createMessage("", "DEA", logmessage.LogMessage_OUT, date)
-					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA]        OUT Hello World!"))
+					msg := createMessage("", "DEA", events.LogMessage_OUT, date)
+					Expect(terminal.Decolorize(LogNoaaMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA]        OUT Hello World!"))
 				})
 			})
 
 			Context("when the message was written to stderr", func() {
 				It("shows the log type as 'ERR'", func() {
-					msg := createMessage("4", "STG", logmessage.LogMessage_ERR, date)
-					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [STG/4]      ERR Hello World!"))
+					msg := createMessage("4", "STG", events.LogMessage_ERR, date)
+					Expect(terminal.Decolorize(LogNoaaMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [STG/4]      ERR Hello World!"))
 				})
 			})
 
 			It("formats the time in the given time zone", func() {
-				msg := createMessage("4", "RTR", logmessage.LogMessage_ERR, date)
-				Expect(terminal.Decolorize(LogMessageOutput(msg, time.FixedZone("the-zone", 3*60*60)))).To(Equal("2014-04-04T14:39:20.00+0300 [RTR/4]      ERR Hello World!"))
+				msg := createMessage("4", "RTR", events.LogMessage_ERR, date)
+				Expect(terminal.Decolorize(LogNoaaMessageOutput(msg, time.FixedZone("the-zone", 3*60*60)))).To(Equal("2014-04-04T14:39:20.00+0300 [RTR/4]      ERR Hello World!"))
 			})
 		})
 	})

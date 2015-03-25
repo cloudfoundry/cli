@@ -5,13 +5,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"github.com/cloudfoundry/noaa/events"
 )
 
 const MAX_INT64 int64 = 1<<63 - 1
 
 type item struct {
-	message                  *logmessage.LogMessage
+	message                  *events.LogMessage
 	timestampWhenOutputtable int64
 }
 
@@ -30,7 +30,7 @@ func NewSortedMessageQueue(printTimeBuffer time.Duration, clock func() time.Time
 	}
 }
 
-func (pq *SortedMessageQueue) PushMessage(message *logmessage.LogMessage) {
+func (pq *SortedMessageQueue) PushMessage(message *events.LogMessage) {
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 
@@ -39,7 +39,7 @@ func (pq *SortedMessageQueue) PushMessage(message *logmessage.LogMessage) {
 	sort.Stable(pq)
 }
 
-func (pq *SortedMessageQueue) PopMessage() *logmessage.LogMessage {
+func (pq *SortedMessageQueue) PopMessage() *events.LogMessage {
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 

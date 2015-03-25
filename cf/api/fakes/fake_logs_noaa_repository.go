@@ -2,10 +2,11 @@
 package fakes
 
 import (
+	"sync"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/noaa/events"
-	"sync"
 )
 
 type FakeLogsNoaaRepository struct {
@@ -38,6 +39,9 @@ type FakeLogsNoaaRepository struct {
 	tailNoaaLogsForReturns struct {
 		result1 error
 	}
+	CloseStub        func()
+	closeMutex       sync.RWMutex
+	closeArgsForCall []struct{}
 }
 
 func (fake *FakeLogsNoaaRepository) GetContainerMetrics(arg1 string, arg2 []models.AppInstanceFields) ([]models.AppInstanceFields, error) {
@@ -139,6 +143,21 @@ func (fake *FakeLogsNoaaRepository) TailNoaaLogsForReturns(result1 error) {
 	fake.tailNoaaLogsForReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeLogsNoaaRepository) Close() {
+	fake.closeMutex.Lock()
+	defer fake.closeMutex.Unlock()
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	if fake.CloseStub != nil {
+		fake.CloseStub()
+	}
+}
+
+func (fake *FakeLogsNoaaRepository) CloseCallCount() int {
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return len(fake.closeArgsForCall)
 }
 
 var _ api.LogsNoaaRepository = new(FakeLogsNoaaRepository)
