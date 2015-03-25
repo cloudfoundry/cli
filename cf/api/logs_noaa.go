@@ -28,6 +28,7 @@ type logNoaaRepository struct {
 	tokenRefresher authentication.TokenRefresher
 	messageQueue   *SortedMessageQueue
 	onMessage      func(*events.LogMessage)
+	doneChan       chan struct{}
 }
 
 var BufferTime time.Duration = 5 * time.Second
@@ -44,6 +45,7 @@ func NewLogsNoaaRepository(config core_config.Reader, consumer NoaaConsumer, tr 
 func (l *logNoaaRepository) Close() {
 	l.consumer.Close()
 	l.flushMessageQueue()
+	close(l.doneChan)
 }
 
 func (l *logNoaaRepository) GetContainerMetrics(appGuid string, instances []models.AppInstanceFields) ([]models.AppInstanceFields, error) {
@@ -82,6 +84,7 @@ func (l *logNoaaRepository) RecentLogsFor(appGuid string) ([]*events.LogMessage,
 }
 
 func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error {
+	l.doneChan = make(chan struct{})
 	l.onMessage = onMessage
 	endpoint := l.config.DopplerEndpoint()
 	if endpoint == "" {
@@ -118,6 +121,8 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 			}
 		case log := <-logChan:
 			l.messageQueue.PushMessage(log)
+		case <-l.doneChan:
+			return nil
 		default:
 			time.Sleep(10 * time.Millisecond)
 		}
