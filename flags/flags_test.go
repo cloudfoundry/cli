@@ -59,7 +59,7 @@ var _ = Describe("Flags", func() {
 			})
 
 			It("sets Bool(<flag>) to return true if bool flag is provided with invalid value", func() {
-				err := fCtx.Parse("--skip=Not_Valid","skip2","FALSE", "-name", "johndoe")
+				err := fCtx.Parse("--skip=Not_Valid", "skip2", "FALSE", "-name", "johndoe")
 				Ω(err).ToNot(HaveOccurred())
 
 				Ω(fCtx.Bool("skip")).To(Equal(true), "skip should be true")
