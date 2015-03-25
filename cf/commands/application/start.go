@@ -10,6 +10,7 @@ import (
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/noaa/events"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -21,7 +22,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
 )
 
@@ -40,7 +40,7 @@ type Start struct {
 	appReq           requirements.ApplicationRequirement
 	appRepo          applications.ApplicationRepository
 	appInstancesRepo app_instances.AppInstancesRepository
-	logRepo          api.LogsRepository
+	logRepo          api.LogsNoaaRepository
 
 	StartupTimeout time.Duration
 	StagingTimeout time.Duration
@@ -56,7 +56,7 @@ type ApplicationStagingWatcher interface {
 	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsNoaaRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config
@@ -201,7 +201,7 @@ func (cmd *Start) SetStartTimeoutInSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
-func simpleLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
+func simpleLogMessageOutput(logMsg *events.LogMessage) (msgText string) {
 	msgText = string(logMsg.GetMessage())
 	reg, err := regexp.Compile("[\n\r]+$")
 	if err != nil {
@@ -216,8 +216,8 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan, doneChan cha
 		startChan <- true
 	}
 
-	err := cmd.logRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
-		if msg.GetSourceName() == LogMessageTypeStaging {
+	err := cmd.logRepo.TailNoaaLogsFor(app.Guid, onConnect, func(msg *events.LogMessage) {
+		if msg.GetSourceType() == LogMessageTypeStaging {
 			cmd.ui.Say(simpleLogMessageOutput(msg))
 		}
 	})

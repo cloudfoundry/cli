@@ -54,7 +54,6 @@ type RepositoryLocator struct {
 	serviceSummaryRepo              CloudControllerServiceSummaryRepository
 	userRepo                        CloudControllerUserRepository
 	passwordRepo                    password.CloudControllerPasswordRepository
-	logsRepo                        LogsRepository
 	logsNoaaRepo                    LogsNoaaRepository
 	authTokenRepo                   CloudControllerServiceAuthTokenRepository
 	serviceBrokerRepo               CloudControllerServiceBrokerRepository
@@ -103,7 +102,6 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
-	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
 	loc.logsNoaaRepo = NewLogsNoaaRepository(config, logNoaaConsumer, loc.authRepo)
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
@@ -210,10 +208,6 @@ func (locator RepositoryLocator) GetUserRepository() UserRepository {
 
 func (locator RepositoryLocator) GetPasswordRepository() password.PasswordRepository {
 	return locator.passwordRepo
-}
-
-func (locator RepositoryLocator) GetLogsRepository() LogsRepository {
-	return locator.logsRepo
 }
 
 func (locator RepositoryLocator) GetLogsNoaaRepository() LogsNoaaRepository {

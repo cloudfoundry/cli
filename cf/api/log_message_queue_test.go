@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"code.google.com/p/gogoprotobuf/proto"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
-
 	. "github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/noaa/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -85,22 +84,22 @@ var _ = Describe("is a priority queue used to sort loggregator messages", func()
 	})
 })
 
-func logMessageWithTime(messageString string, timestamp int) *logmessage.LogMessage {
+func logMessageWithTime(messageString string, timestamp int) *events.LogMessage {
 	return generateMessage(messageString, int64(timestamp))
 }
 
-func generateMessage(messageString string, timestamp int64) *logmessage.LogMessage {
-	messageType := logmessage.LogMessage_OUT
+func generateMessage(messageString string, timestamp int64) *events.LogMessage {
+	messageType := events.LogMessage_OUT
 	sourceName := "DEA"
-	return &logmessage.LogMessage{
+	return &events.LogMessage{
 		Message:     []byte(messageString),
 		AppId:       proto.String("my-app-guid"),
 		MessageType: &messageType,
-		SourceName:  &sourceName,
+		SourceType:  &sourceName,
 		Timestamp:   proto.Int64(timestamp),
 	}
 }
 
-func getMsgString(message *logmessage.LogMessage) string {
+func getMsgString(message *events.LogMessage) string {
 	return string(message.GetMessage())
 }
