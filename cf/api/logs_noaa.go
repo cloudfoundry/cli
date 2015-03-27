@@ -44,12 +44,10 @@ func NewLogsNoaaRepository(config core_config.Reader, consumer NoaaConsumer, tr 
 }
 
 func (l *logNoaaRepository) Close() {
-	l.consumer.Close()
+	l.tailing = false
+	defer l.consumer.Close()
 	l.flushMessageQueue()
-	if l.tailing {
-		close(l.doneChan)
-		l.tailing = false
-	}
+	close(l.doneChan)
 }
 
 func (l *logNoaaRepository) GetContainerMetrics(appGuid string, instances []models.AppInstanceFields) ([]models.AppInstanceFields, error) {
@@ -107,6 +105,8 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 		sendNoaaMessages(l.messageQueue, onMessage)
 
 		select {
+		case <-l.doneChan:
+			return nil
 		case err := <-errChan:
 			switch err.(type) {
 			case nil: // do nothing
@@ -121,13 +121,14 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 					return err
 				}
 			default:
-				l.Close()
-				return err
+				if !l.tailing { //"use of closed network connection" is expected since we closed the websocket connection
+					return nil
+				} else {
+					return err
+				}
 			}
 		case log := <-logChan:
 			l.messageQueue.PushMessage(log)
-		case <-l.doneChan:
-			return nil
 		default:
 			time.Sleep(10 * time.Millisecond)
 		}
