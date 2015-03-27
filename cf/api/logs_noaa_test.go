@@ -181,10 +181,15 @@ var _ = Describe("logs with noaa repository", func() {
 					logChan <- makeLogMessage("hello3", 300)
 					logChan <- makeLogMessage("hello2", 200)
 					logChan <- makeLogMessage("hello1", 100)
-					errChan <- errors.New("quit Tailing") //err quits tailing func and call close
 				}
 
 				receivedMessages := []*events.LogMessage{}
+
+				go func() {
+					time.Sleep(500 * time.Millisecond)
+					repo.Close()
+				}()
+
 				repo.TailNoaaLogsFor("app-guid", func() {}, func(msg *events.LogMessage) {
 					receivedMessages = append(receivedMessages, msg)
 				})
