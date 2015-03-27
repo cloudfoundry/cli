@@ -126,12 +126,12 @@ var _ = Describe("service command", func() {
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
 
-				It("shows status: `create succeeded` when state is ``", func() {
+				It("shows status: `` when state is ``", func() {
 					createServiceInstanceWithState("")
 					runCommand("service1")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Status: ", "create succeeded"},
+						[]string{"Status: ", ""},
 					))
 					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
@@ -196,9 +196,9 @@ var _ = Describe("ServiceInstanceStateToStatus", func() {
 				Expect(status).To(Equal("create failed"))
 			})
 
-			It("returns status: `create succeeded` when state: ``", func() {
+			It("returns status: `` when state: ``", func() {
 				status := ServiceInstanceStateToStatus(operationType, "", isUserProvided)
-				Expect(status).To(Equal("create succeeded"))
+				Expect(status).To(Equal(""))
 			})
 		})
 	})
