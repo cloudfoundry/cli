@@ -10,9 +10,11 @@ const (
 	SPACE_EXISTS                = "40002"
 	QUOTA_EXISTS                = "240002"
 	SERVICE_INSTANCE_NAME_TAKEN = "60002"
+	SERVICE_KEY_NAME_TAKEN      = "360001"
 	APP_NOT_STAGED              = "170002"
 	APP_STOPPED                 = "220001"
 	BUILDPACK_EXISTS            = "290001"
 	SECURITY_GROUP_EXISTS       = "300005"
 	APP_ALREADY_BOUND           = "90003"
+	UNBINDABLE_SERVICE          = "90005"
 )

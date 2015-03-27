@@ -19,6 +19,8 @@ type FakeReqFactory struct {
 	TargetedOrgSuccess      bool
 	BuildpackSuccess        bool
 
+	ServiceInstanceNotFound bool
+
 	SpaceName string
 	Space     models.Space
 
@@ -51,7 +53,7 @@ func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.App
 
 func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements.ServiceInstanceRequirement {
 	f.ServiceInstanceName = name
-	return FakeRequirement{f, true}
+	return FakeRequirement{f, !f.ServiceInstanceNotFound}
 }
 
 func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
