@@ -96,6 +96,12 @@ var _ = Describe("Configuration Repository", func() {
 		Expect(config.PluginRepos()[0].Url).To(Equal("nowhere.com"))
 
 		Expect(config.IsMinApiVersion("3.1")).To(Equal(false))
+
+		config.SetMinCliVersion("6.0.0")
+		Expect(config.IsMinCliVersion("5.0.0")).To(Equal(false))
+
+		config.SetMinRecommendedCliVersion("6.9.0")
+		Expect(config.MinRecommendedCliVersion()).To(Equal("6.9.0"))
 	})
 
 	Describe("HasAPIEndpoint", func() {

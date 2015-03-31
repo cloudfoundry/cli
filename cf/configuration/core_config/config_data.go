@@ -19,23 +19,25 @@ type AuthPrompt struct {
 }
 
 type Data struct {
-	ConfigVersion         int
-	Target                string
-	ApiVersion            string
-	AuthorizationEndpoint string
-	LoggregatorEndPoint   string
-	DopplerEndPoint       string
-	UaaEndpoint           string
-	AccessToken           string
-	RefreshToken          string
-	OrganizationFields    models.OrganizationFields
-	SpaceFields           models.SpaceFields
-	SSLDisabled           bool
-	AsyncTimeout          uint
-	Trace                 string
-	ColorEnabled          string
-	Locale                string
-	PluginRepos           []models.PluginRepo
+	ConfigVersion            int
+	Target                   string
+	ApiVersion               string
+	AuthorizationEndpoint    string
+	LoggregatorEndPoint      string
+	DopplerEndPoint          string
+	UaaEndpoint              string
+	AccessToken              string
+	RefreshToken             string
+	OrganizationFields       models.OrganizationFields
+	SpaceFields              models.SpaceFields
+	SSLDisabled              bool
+	AsyncTimeout             uint
+	Trace                    string
+	ColorEnabled             string
+	Locale                   string
+	PluginRepos              []models.PluginRepo
+	MinCliVersion            string
+	MinRecommendedCliVersion string
 }
 
 func NewData() (data *Data) {

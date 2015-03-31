@@ -46,18 +46,22 @@ var exampleJSON = `
 			"Name": "repo1",
 			"Url": "http://repo.com"
 		}
-	]
+	],
+	"MinCliVersion": "6.0.0",
+	"MinRecommendedCliVersion": "6.9.0"
 }`
 
 var exampleData = &Data{
-	Target:                "api.example.com",
-	ApiVersion:            "3",
-	AuthorizationEndpoint: "auth.example.com",
-	LoggregatorEndPoint:   "loggregator.example.com",
-	DopplerEndPoint:       "doppler.example.com",
-	UaaEndpoint:           "uaa.example.com",
-	AccessToken:           "the-access-token",
-	RefreshToken:          "the-refresh-token",
+	Target:                   "api.example.com",
+	ApiVersion:               "3",
+	AuthorizationEndpoint:    "auth.example.com",
+	LoggregatorEndPoint:      "loggregator.example.com",
+	DopplerEndPoint:          "doppler.example.com",
+	UaaEndpoint:              "uaa.example.com",
+	AccessToken:              "the-access-token",
+	RefreshToken:             "the-refresh-token",
+	MinCliVersion:            "6.0.0",
+	MinRecommendedCliVersion: "6.9.0",
 	OrganizationFields: models.OrganizationFields{
 		Guid: "the-org-guid",
 		Name: "the-org",
