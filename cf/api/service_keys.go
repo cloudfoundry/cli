@@ -35,6 +35,8 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceId string,
 		return errors.NewModelAlreadyExistsError("Service key", keyName)
 	} else if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.UNBINDABLE_SERVICE {
 		return errors.NewUnbindableServiceError()
+	} else if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() != "" {
+		return errors.New(httpErr.Error())
 	}
 
 	return nil
