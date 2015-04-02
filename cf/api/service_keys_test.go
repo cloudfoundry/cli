@@ -70,6 +70,22 @@ var _ = Describe("Service Keys Repo", func() {
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
 		})
+
+		It("returns a NotAuthorizedError when CLI user is not the space developer or admin", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/service_keys",
+				Matcher: testnet.RequestBodyMatcher(`{"service_instance_guid":"fake-instance-guid","name":"fake-service-key"}`),
+				Response: testnet.TestResponse{
+					Status: http.StatusBadRequest,
+					Body:   `{"code":10003,"description":"You are not authorized to perform the requested action"}`},
+			}))
+
+			err := repo.CreateServiceKey("fake-instance-guid", "fake-service-key")
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("You are not authorized to perform the requested action"))
+		})
 	})
 
 	AfterEach(func() {
