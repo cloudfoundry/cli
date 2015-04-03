@@ -128,6 +128,7 @@ var _ = Describe("app Command", func() {
 				[]string{"last uploaded", "Wed Oct 24 19:54:00 UTC 2012"},
 				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
 				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0", "failure"},
+				[]string{"stack", "fake_stack"},
 			))
 		})
 
@@ -275,6 +276,10 @@ func makeAppWithRoute(appName string) models.Application {
 	application.InstanceCount = 2
 	application.RunningInstances = 2
 	application.Memory = 256
+	application.Stack = &models.Stack{
+		Name: "fake_stack",
+		Guid: "123-123-123",
+	}
 	application.Routes = []models.RouteSummary{route, secondRoute}
 	application.PackageUpdatedAt = &packgeUpdatedAt
 
