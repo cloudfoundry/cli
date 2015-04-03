@@ -32,7 +32,7 @@ $ cf push
 * There is also help available in the CLI itself; type `cf help` for more information.
 * Each command also has help output available via `cf [command] --help` or `cf [command] -h`.   
 * For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples).  
-* Finally, if you are still stuck, feel free to open a GitHub issue.
+* Finally, if you are still stuck or have any questions or issues, feel free to open a GitHub issue.
 
 Downloads
 =========
