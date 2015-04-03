@@ -31,6 +31,7 @@ var spaceRoleToPathMap = map[string]string{
 
 type UserRepository interface {
 	FindByUsername(username string) (user models.UserFields, apiErr error)
+	ListUsersInOrgWithNoUAA(orgGuid string) ([]models.UserFields, error)
 	ListUsersInOrgForRole(orgGuid string, role string) ([]models.UserFields, error)
 	ListUsersInOrgForRoleWithNoUAA(orgGuid string, role string) ([]models.UserFields, error)
 	ListUsersInSpaceForRole(spaceGuid string, role string) ([]models.UserFields, error)
@@ -58,28 +59,76 @@ func NewCloudControllerUserRepository(config core_config.Reader, uaaGateway net.
 
 func (repo CloudControllerUserRepository) FindByUsername(username string) (models.UserFields, error) {
 	uaaEndpoint, apiErr := repo.getAuthEndpoint()
+
 	var user models.UserFields
+
 	if apiErr != nil {
 		return user, apiErr
 	}
 
-	usernameFilter := neturl.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
-	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
-	users, apiErr := repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
+	// var myGUID string
+	// myGUID = "4a962676-e687-46c4-95f4-7a83712065c6"
+	// myGUID := repo.config.OrganizationFields().Guid
 
-	if apiErr != nil {
-		errType, ok := apiErr.(errors.HttpError)
-		if ok {
-			if errType.StatusCode() == 403 {
-				return user, errors.NewAccessDeniedError()
+	if repo.config.IsMinApiVersion("2.21.0") {
+		orgs := []models.Organization{}
+		err := repo.ccGateway.ListPaginatedResources(
+			repo.config.ApiEndpoint(),
+			"/v2/organizations",
+			resources.OrganizationResource{},
+			func(resource interface{}) bool {
+				orgResource, ok := resource.(resources.OrganizationResource)
+				if ok {
+					orgs = append(orgs, orgResource.ToModel())
+					return true
+				} else {
+					return false
+				}
+			})
+
+		if err != nil {
+			return user, err
+		}
+
+		for _, o := range orgs {
+			myGUID := o.Guid
+			results, apiErr := repo.ListUsersInOrgWithNoUAA(myGUID)
+			for _, u := range results {
+				if u.Username == username {
+					user = u
+					break
+				}
+			}
+			if user.Username != "" {
+				return user, apiErr
+			} else {
+				return user, errors.NewModelNotFoundError("User", username)
 			}
 		}
-		return user, apiErr
-	} else if len(users) == 0 {
-		return user, errors.NewModelNotFoundError("User", username)
-	}
+	} else {
+		usernameFilter := neturl.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
+		path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
+		users, apiErr := repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
 
-	return users[0], apiErr
+		if apiErr != nil {
+			errType, ok := apiErr.(errors.HttpError)
+			if ok {
+				if errType.StatusCode() == 403 {
+					return user, errors.NewAccessDeniedError()
+				}
+			}
+			return user, apiErr
+		} else if len(users) == 0 {
+			return user, errors.NewModelNotFoundError("User", username)
+		}
+
+		return users[0], apiErr
+	}
+	return user, apiErr
+}
+
+func (repo CloudControllerUserRepository) ListUsersInOrgWithNoUAA(orgGuid string) (users []models.UserFields, apiErr error) {
+	return repo.listUsersWithPathWithNoUAA(fmt.Sprintf("/v2/organizations/%s/users", orgGuid))
 }
 
 func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) (users []models.UserFields, apiErr error) {
