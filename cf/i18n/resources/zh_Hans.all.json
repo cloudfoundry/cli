@@ -4945,6 +4945,11 @@
       "modified": true
    },
    {
+      "id": "stack:",
+      "translation": "stack:",
+      "modified": false
+   },
+   {
       "id": "starting",
       "translation": "启动中",
       "modified": false

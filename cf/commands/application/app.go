@@ -143,7 +143,12 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	} else {
 		lastUpdated = "unknown"
 	}
-	cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("last uploaded:")), lastUpdated)
+	cmd.ui.Say("%s %s", terminal.HeaderColor(T("last uploaded:")), lastUpdated)
+	if app.Stack != nil {
+		cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("stack:")), app.Stack.Name)
+	} else {
+		cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("stack:")), "unknown")
+	}
 
 	if appIsStopped {
 		cmd.ui.Say(T("There are no running instances of this app."))
