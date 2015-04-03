@@ -2665,8 +2665,8 @@
       "modified": false
    },
    {
-      "id": "List all apps in the target space",
-      "translation": "Lista todas las apps en el space seleccionado",
+      "id": "List all apps in space of targeted organization",
+      "translation": "List all apps in space of targeted organization",
       "modified": false
    },
    {
@@ -5217,6 +5217,16 @@
    {
       "id": "This service doesn't support creation of keys.",
       "translation": "This service doesn't support creation of keys.",
+      "modified": false
+   },
+   {
+      "id": "Space name (To see the apps in specified space of current organization)",
+      "translation": "Space name (To see the apps in specified space of current organization)",
+      "modified": false
+   },
+   {
+      "id": "    By default it will list all apps of current targeted space if '-s' flag is not provided.",
+      "translation": "    By default it will list all apps of current targeted space if '-s' flag is not provided.",
       "modified": false
    }
 ]

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -22,6 +23,7 @@ var _ = Describe("AppSummaryRepository", func() {
 		testServer *httptest.Server
 		handler    *testnet.TestHandler
 		repo       AppSummaryRepository
+		spaceRepo  *testapi.FakeSpaceRepository
 	)
 
 	BeforeEach(func() {
@@ -39,14 +41,49 @@ var _ = Describe("AppSummaryRepository", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
 		repo = NewCloudControllerAppSummaryRepository(configRepo, gateway)
+		spaceRepo = new(testapi.FakeSpaceRepository)
 	})
 
 	AfterEach(func() {
 		testServer.Close()
 	})
 
-	It("returns a slice of app summaries for each instance", func() {
+	It("returns a slice of app summaries for each instance in current space", func() {
 		apps, apiErr := repo.GetSummariesInCurrentSpace()
+		Expect(handler).To(HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+		Expect(3).To(Equal(len(apps)))
+		app1 := apps[0]
+		Expect(app1.Name).To(Equal("app1"))
+		Expect(app1.Guid).To(Equal("app-1-guid"))
+		Expect(len(app1.Routes)).To(Equal(1))
+		Expect(app1.Routes[0].URL()).To(Equal("app1.cfapps.io"))
+		Expect(app1.State).To(Equal("started"))
+		Expect(app1.InstanceCount).To(Equal(1))
+		Expect(app1.RunningInstances).To(Equal(1))
+		Expect(app1.Memory).To(Equal(int64(128)))
+		Expect(app1.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2014-10-24T19:54:00Z"))
+		app2 := apps[1]
+		Expect(app2.Name).To(Equal("app2"))
+		Expect(app2.Guid).To(Equal("app-2-guid"))
+		Expect(len(app2.Routes)).To(Equal(2))
+		Expect(app2.Routes[0].URL()).To(Equal("app2.cfapps.io"))
+		Expect(app2.Routes[1].URL()).To(Equal("foo.cfapps.io"))
+		Expect(app2.State).To(Equal("started"))
+		Expect(app2.InstanceCount).To(Equal(3))
+		Expect(app2.RunningInstances).To(Equal(1))
+		Expect(app2.Memory).To(Equal(int64(512)))
+		Expect(app2.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2012-10-24T19:55:00Z"))
+		nullUpdateAtApp := apps[2]
+		Expect(nullUpdateAtApp.PackageUpdatedAt).To(BeNil())
+	})
+
+	It("returns a slice of app summaries for each instance in specified space", func() {
+		space := models.Space{}
+		space.Name = "my-space"
+		space.Guid = "my-space-guid"
+		spaceRepo.Spaces = []models.Space{space}
+		apps, apiErr := repo.GetSpaceSummaries(space.Guid)
 		Expect(handler).To(HaveAllRequestsCalled())
 
 		Expect(apiErr).NotTo(HaveOccurred())

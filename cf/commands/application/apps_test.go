@@ -21,12 +21,14 @@ var _ = Describe("list-apps command", func() {
 		configRepo          core_config.ReadWriter
 		appSummaryRepo      *testapi.FakeAppSummaryRepo
 		requirementsFactory *testreq.FakeReqFactory
+		spaceRepo           *testapi.FakeSpaceRepository
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
+		spaceRepo = new(testapi.FakeSpaceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
@@ -34,7 +36,7 @@ var _ = Describe("list-apps command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewListApps(ui, configRepo, appSummaryRepo)
+		cmd := NewListApps(ui, configRepo, appSummaryRepo, spaceRepo)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}
 
@@ -50,6 +52,7 @@ var _ = Describe("list-apps command", func() {
 
 			Expect(runCommand()).To(BeFalse())
 		})
+
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
@@ -145,6 +148,164 @@ var _ = Describe("list-apps command", func() {
 					[]string{"Getting apps in", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 					[]string{"No apps found"},
+				))
+			})
+		})
+
+		Context("when space flag is provided", func() {
+			BeforeEach(func() {
+				space := models.Space{}
+				space.Name = "my-space"
+				space.Guid = "my-space-guid"
+				spaceRepo.Spaces = []models.Space{space}
+			})
+
+			It("lists apps in a table", func() {
+				app1Routes := []models.RouteSummary{
+					models.RouteSummary{
+						Host: "app1",
+						Domain: models.DomainFields{
+							Name: "cfapps.io",
+						},
+					},
+					models.RouteSummary{
+						Host: "app1",
+						Domain: models.DomainFields{
+							Name: "example.com",
+						},
+					}}
+
+				app2Routes := []models.RouteSummary{
+					models.RouteSummary{
+						Host:   "app2",
+						Domain: models.DomainFields{Name: "cfapps.io"},
+					}}
+
+				app := models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name:             "Application-1",
+						State:            "started",
+						RunningInstances: 1,
+						InstanceCount:    1,
+						Memory:           512,
+						DiskQuota:        1024,
+					},
+					Routes: app1Routes,
+				}
+
+				app2 := models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name:             "Application-2",
+						State:            "started",
+						RunningInstances: 1,
+						InstanceCount:    2,
+						Memory:           256,
+						DiskQuota:        1024,
+					},
+					Routes: app2Routes,
+				}
+
+				appSummaryRepo.GetSpaceSummariesApps = []models.Application{app, app2}
+
+				runCommand("-s", "my-space")
+				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting apps in", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
+					[]string{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
+				))
+			})
+
+			It("fails when the space is not found", func() {
+				spaceRepo.FindByNameNotFound = true
+
+				runCommand("-s", "my-space")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"my-space", "not found"},
+				))
+			})
+
+			It("should not list apps in the current space", func() {
+				appRoutes1 := []models.RouteSummary{
+					models.RouteSummary{
+						Host:   "app1",
+						Domain: models.DomainFields{Name: "cfapps.io"},
+					}}
+
+				appRoutes2 := []models.RouteSummary{
+					models.RouteSummary{
+						Host:   "app2",
+						Domain: models.DomainFields{Name: "cfapps.io"},
+					}}
+
+				app1 := models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name:             "Application-1",
+						State:            "started",
+						RunningInstances: 1,
+						InstanceCount:    2,
+						Memory:           512,
+						DiskQuota:        1024,
+					},
+					Routes: appRoutes1,
+				}
+
+				app2 := models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name:             "Application-2",
+						State:            "started",
+						RunningInstances: 1,
+						InstanceCount:    2,
+						Memory:           512,
+						DiskQuota:        1024,
+					},
+					Routes: appRoutes2,
+				}
+
+				appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app1}
+
+				appSummaryRepo.GetSpaceSummariesApps = []models.Application{app2}
+
+				runCommand("-s", "my-space")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting apps in", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"Application-2", "started", "1/2", "512M", "1G", "app2.cfapps.io"},
+				))
+			})
+
+			It("should list apps even if the space name is current space", func() {
+				appRoutes1 := []models.RouteSummary{
+					models.RouteSummary{
+						Host:   "app1",
+						Domain: models.DomainFields{Name: "cfapps.io"},
+					}}
+
+				app1 := models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name:             "Application-1",
+						State:            "started",
+						RunningInstances: 1,
+						InstanceCount:    2,
+						Memory:           512,
+						DiskQuota:        1024,
+					},
+					Routes: appRoutes1,
+				}
+
+				appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app1}
+
+				appSummaryRepo.GetSpaceSummariesApps = []models.Application{app1}
+
+				runCommand("-s", "my-space")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting apps in", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"Application-1", "started", "1/2", "512M", "1G", "app1.cfapps.io"},
 				))
 			})
 		})
