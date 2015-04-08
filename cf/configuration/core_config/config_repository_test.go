@@ -99,6 +99,7 @@ var _ = Describe("Configuration Repository", func() {
 
 		config.SetMinCliVersion("6.0.0")
 		Expect(config.IsMinCliVersion("5.0.0")).To(Equal(false))
+		Expect(config.MinCliVersion()).To(Equal("6.0.0"))
 
 		config.SetMinRecommendedCliVersion("6.9.0")
 		Expect(config.MinRecommendedCliVersion()).To(Equal("6.9.0"))
