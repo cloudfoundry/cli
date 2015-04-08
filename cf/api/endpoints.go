@@ -20,9 +20,11 @@ type RemoteEndpointRepository struct {
 }
 
 type endpointResource struct {
-	ApiVersion            string `json:"api_version"`
-	AuthorizationEndpoint string `json:"authorization_endpoint"`
-	LoggregatorEndpoint   string `json:"logging_endpoint"`
+	ApiVersion               string `json:"api_version"`
+	AuthorizationEndpoint    string `json:"authorization_endpoint"`
+	LoggregatorEndpoint      string `json:"logging_endpoint"`
+	MinCliVersion            string `json:"min_cli_version"`
+	MinRecommendedCliVersion string `json:"min_recommended_cli_version"`
 }
 
 func NewEndpointRepository(config core_config.ReadWriter, gateway net.Gateway) (repo RemoteEndpointRepository) {
@@ -74,6 +76,8 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) error {
 	repo.config.SetApiEndpoint(endpoint)
 	repo.config.SetApiVersion(serverResponse.ApiVersion)
 	repo.config.SetAuthenticationEndpoint(serverResponse.AuthorizationEndpoint)
+	repo.config.SetMinCliVersion(serverResponse.MinCliVersion)
+	repo.config.SetMinRecommendedCliVersion(serverResponse.MinRecommendedCliVersion)
 
 	if serverResponse.LoggregatorEndpoint == "" {
 		repo.config.SetLoggregatorEndpoint(defaultLoggregatorEndpoint(endpoint))

@@ -63,6 +63,7 @@ type Reader interface {
 	IsSSLDisabled() bool
 	IsMinApiVersion(string) bool
 	IsMinCliVersion(string) bool
+	MinCliVersion() string
 	MinRecommendedCliVersion() string
 
 	AsyncTimeout() uint
@@ -289,6 +290,13 @@ func (c *ConfigRepository) IsMinCliVersion(version string) bool {
 		minCliVersion = c.data.MinCliVersion
 	})
 	return version >= minCliVersion
+}
+
+func (c *ConfigRepository) MinCliVersion() (minCliVersion string) {
+	c.read(func() {
+		minCliVersion = c.data.MinCliVersion
+	})
+	return
 }
 
 func (c *ConfigRepository) MinRecommendedCliVersion() (minRecommendedCliVersion string) {

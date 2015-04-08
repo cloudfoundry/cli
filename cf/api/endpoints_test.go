@@ -34,7 +34,9 @@ func validApiInfoEndpoint(w http.ResponseWriter, r *http.Request) {
   "description": "Cloud Foundry sponsored by Pivotal",
   "authorization_endpoint": "https://login.example.com",
   "logging_endpoint": "wss://loggregator.foo.example.org:4443",
-  "api_version": "42.0.0"
+  "api_version": "42.0.0",
+	"min_cli_version": "6.5.0",
+	"min_recommended_cli_version": "6.7.0"
 }`)
 }
 
@@ -108,6 +110,8 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.ApiVersion()).To(Equal("42.0.0"))
 				Expect(config.HasOrganization()).To(BeFalse())
 				Expect(config.HasSpace()).To(BeFalse())
+				Expect(config.MinCliVersion()).To(Equal("6.5.0"))
+				Expect(config.MinRecommendedCliVersion()).To(Equal("6.7.0"))
 			})
 
 			Context("when the api endpoint does not change", func() {
