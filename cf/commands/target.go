@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/utils"
 	"github.com/codegangsta/cli"
 )
 
@@ -89,6 +90,7 @@ func (cmd Target) Run(c *cli.Context) {
 	if !cmd.config.IsLoggedIn() {
 		cmd.ui.PanicQuietly()
 	}
+	utils.NotifyUpdateIfNeeded(cmd.ui, cmd.config)
 	return
 }
 
