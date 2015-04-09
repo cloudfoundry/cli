@@ -3,6 +3,7 @@ package commands_test
 import (
 	"errors"
 
+	"github.com/cloudfoundry/cli/cf"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
@@ -195,6 +196,19 @@ var _ = Describe("target command", func() {
 				Expect(config.SpaceFields().Guid).To(Equal(""))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			})
+
+			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
+				config.SetMinCliVersion("5.0.0")
+				config.SetMinRecommendedCliVersion("5.5.0")
+				cf.Version = "4.5.0"
+
+				callTarget([]string{"-o", "my-organization"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"To upgrade your CLI"},
+					[]string{"5.5.0"},
+				))
 			})
 		})
 
