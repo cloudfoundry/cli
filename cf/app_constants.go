@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-const (
+var (
 	Version     = "BUILT_FROM_SOURCE"
 	BuiltOnDate = "BUILT_AT_UNKNOWN_TIME"
 )

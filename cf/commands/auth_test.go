@@ -1,6 +1,7 @@
 package commands_test
 
 import (
+	"github.com/cloudfoundry/cli/cf"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -70,6 +71,19 @@ var _ = Describe("auth command", func() {
 					"password": "password",
 				},
 			}))
+		})
+
+		It("prompts users to upgrade if CLI version < min cli version requirement", func() {
+			config.SetMinCliVersion("5.0.0")
+			config.SetMinRecommendedCliVersion("5.5.0")
+			cf.Version = "4.5.0"
+
+			testcmd.RunCommand(cmd, []string{"foo@example.com", "password"}, requirementsFactory)
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"To upgrade your CLI"},
+				[]string{"5.5.0"},
+			))
 		})
 
 		It("gets the UAA endpoint and saves it to the config file", func() {
