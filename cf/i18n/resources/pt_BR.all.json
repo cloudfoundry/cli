@@ -650,6 +650,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
+      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
+      "modified": false
+   },
+   {
       "id": "CF_NAME create-shared-domain DOMAIN",
       "translation": "CF_NAME create-shared-domain DOMÍNIO",
       "modified": false
@@ -1205,6 +1210,11 @@
       "modified": false
    },
    {
+      "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+      "translation": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}.  To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+      "modified": true
+   },
+   {
       "id": "Command Help",
       "translation": "Command Help",
       "modified": false
@@ -1395,6 +1405,11 @@
       "modified": false
    },
    {
+      "id": "Create key for a service instance",
+      "translation": "Create key for a service instance",
+      "modified": false
+   },
+   {
       "id": "Creating an app manifest from current settings of app ",
       "translation": "Creating an app manifest from current settings of app ",
       "modified": false
@@ -1452,6 +1467,11 @@
    {
       "id": "Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "Criando serviço {{.ServiceName}} na org {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
       "modified": false
    },
    {
@@ -4105,6 +4125,11 @@
       "modified": false
    },
    {
+      "id": "This service doesn't support creation of keys.",
+      "translation": "This service doesn't support creation of keys.",
+      "modified": false
+   },
+   {
       "id": "This space already has an assigned space quota.",
       "translation": "This space already has an assigned space quota.",
       "modified": false
@@ -5167,56 +5192,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instâncias",
-      "modified": false
-   },
-   {
-      "id": "Share a private domain with an org",
-      "translation": "Share a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME share-private-domain ORG DOMAIN",
-      "translation": "CF_NAME share-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Unshare a private domain with an org",
-      "translation": "Unshare a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Create key for a service instance",
-      "translation": "Create key for a service instance",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "This service doesn't support creation of keys.",
-      "translation": "This service doesn't support creation of keys.",
       "modified": false
    }
 ]
