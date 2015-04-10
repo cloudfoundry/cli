@@ -3,6 +3,7 @@ package commands_test
 import (
 	"strconv"
 
+	"github.com/cloudfoundry/cli/cf"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_organizations "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands"
@@ -195,6 +196,25 @@ var _ = Describe("Login Command", func() {
 
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			})
+		})
+		Describe("when the CLI version is below the minimum required", func() {
+			BeforeEach(func() {
+				Config.SetMinCliVersion("5.0.0")
+				Config.SetMinRecommendedCliVersion("5.5.0")
+			})
+
+			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
+				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				cf.Version = "4.5.0"
+
+				testcmd.RunCommand(l, Flags, nil)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"To upgrade your CLI"},
+					[]string{"5.5.0"},
+				))
 			})
 		})
 
