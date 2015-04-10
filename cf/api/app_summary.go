@@ -110,6 +110,7 @@ type DomainSummary struct {
 type AppSummaryRepository interface {
 	GetSummariesInCurrentSpace() (apps []models.Application, apiErr error)
 	GetSummary(appGuid string) (summary models.Application, apiErr error)
+	GetSpaceSummaries(spaceGuid string) (apps []models.Application, apiErr error)
 }
 
 type CloudControllerAppSummaryRepository struct {
@@ -148,5 +149,18 @@ func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summ
 
 	summary = summaryResponse.ToModel()
 
+	return
+}
+
+func (repo CloudControllerAppSummaryRepository) GetSpaceSummaries(spaceGuid string) (apps []models.Application, apiErr error) {
+	resources := new(ApplicationSummaries)
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), spaceGuid)
+	apiErr = repo.gateway.GetResource(path, resources)
+	if apiErr != nil {
+		return
+	}
+	for _, resource := range resources.Apps {
+		apps = append(apps, resource.ToModel())
+	}
 	return
 }
