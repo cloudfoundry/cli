@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/utils"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
@@ -101,6 +102,7 @@ func (cmd Login) Run(c *cli.Context) {
 	if orgIsSet {
 		cmd.setSpace(c)
 	}
+	utils.NotifyUpdateIfNeeded(cmd.ui, cmd.config)
 }
 
 func (cmd Login) decideEndpoint(c *cli.Context) (string, bool) {
