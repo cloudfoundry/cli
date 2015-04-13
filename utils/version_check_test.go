@@ -34,7 +34,7 @@ var _ = Describe("NotifyUpdateIfNeeded", func() {
 		NotifyUpdateIfNeeded(ui, config)
 
 		Ω(ui.Outputs).To(ContainSubstrings([]string{"Cloud Foundry API version",
-			"requires CLI version 6.5.0",
+			"requires CLI version 6.0.0",
 			"You are currently on version 5.0.0",
 			"To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
 		}))
