@@ -82,7 +82,7 @@ var _ = Describe("auth command", func() {
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"To upgrade your CLI"},
-				[]string{"5.5.0"},
+				[]string{"5.0.0"},
 			))
 		})
 
