@@ -220,6 +220,29 @@ var _ = Describe("Manifests", func() {
 		}
 	})
 
+	It("returns errors when there is invalid value in 'hosts' and 'domains'", func() {
+		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				map[interface{}]interface{}{
+					"buildpack":  "my-buildpack",
+					"disk_quota": "512M",
+					"hosts":      "n",
+					"domains":    "m",
+				},
+			},
+		}))
+
+		_, err := m.Applications()
+		Expect(err).To(HaveOccurred())
+		errorSlice := strings.Split(err.Error(), "\n")
+		manifestKeys := []string{"hosts", "domains"}
+
+		for _, key := range manifestKeys {
+			Expect(errorSlice).To(ContainSubstrings([]string{key, "to be a list of strings"}))
+		}
+
+	})
+
 	It("parses known manifest keys", func() {
 		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
