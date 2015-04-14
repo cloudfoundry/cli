@@ -12,7 +12,7 @@ if [ $OUTPUT -ne 0 ]; then
   exit 1
 fi
 
-OUTPUT=`gi18n -c checkup`
+OUTPUT=`i18n4go -c checkup`
 
 if [ "$OUTPUT" != "OK" ]; then
   echo "Error:"
