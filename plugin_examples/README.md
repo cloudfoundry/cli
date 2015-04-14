@@ -1,7 +1,5 @@
-# Changes in v6.10.0
-[CF-Community Plugin Repository](https://github.com/cloudfoundry-incubator/cli-plugin-repo) introduced.
-- Plugin developers can submit any open-source plugins 
-- Plugins in the community repo can be browsed and installed from the CLI
+# Changes in v6.11.0
+-Plugins now have a hook-in that is called when the plugin is uninstalled, allowing cleanup of files.
 
 [Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md) 
 
