@@ -1,3 +1,115 @@
+##v6.11.0
+* Fixed more version checking tests 
+* Fixed version check tests 
+* Changed update message to min-cli-version, not min-reccommended-version 
+* Updated translation files. Removed duplicate entries in translation files. 
+* Added version checking to login. Finishes [#92086178]
+* Updated gi18n package name in bin/gi18n-checkup 
+* `cf target` now checks for minimum CLI version. [Finishes #92086308]
+* login command prompts user to update cli version [finishes #86074346]
+* get min_cli_version from CC [#86074346]
+* Merge pull request #400 from att-cloudfoundry/rd7869-patch-1 Update README.md
+* associate stack with an app in `cf app` [finishes #91056294]
+* Merge pull request #397 from xingzhou/service_key Print the "not authorized" error returned from CC when creating service key
+* Added Min CLI and Reecommended CLI version numbers to config. [Finishes #86074256]
+* Print out the "not authorized" error returned from CC when creating service keys Fix a bug that only the spacedeveloper or admin can create a service key. CC will return "Not authorized error" and CLI need to report the error and print out the error message.
+* Merge pull request #385 from xingzhou/service_key Add 'create-service-key' command in cli [#87057732, #87157018]
+* Merge pull request #384 from cloudfoundry/async Show blank last operation if the CC returns null last_operation in API response.
+* fix bug in logging unit test
+* improve error reporting during log tailing Signed-off-by: Jonathan Berkhahn <jaberkha@us.ibm.com>
+* Merge pull request #375 from HuaweiTech/hwcf-issue-22 Updated the package path
+* avoid closing channel twice 
+* quit listening loop properly while tailing logs
+* go fmt
+* godeps - remove loggregator_consumer [finishes #83692758]
+* use noaa to tail logs/get recent logs [#83692758]
+* use noaa instead of loggregator_consumer when getting recent logs [#83692758]
+* Add 'create-service-key' command in cli 1. Add a new command named "create-service-key" to create a service key
+for a specified service instance.
+2. Add error of unbindable service
+[finishes #87057732 & #87157018]
+* enable bool flag value to be set
+* populate Args() and accept form in '-flag=value' [finsihes #90067220]
+* flag parsing: int, bool, string [#90067220]
+* allows multiple domains in app manifest [finishes #88801706]
+* add domains field to manifest [#88801706]
+* update help text: buildpack 'null/default' usage [finishes #89827178]
+* language files for command cups help [#90319606]
+* windows help example for command cups [finishes #90319606]
+* return correct error when unable to create config [finishes #88666504]
+* manifest.yml now supports `no-hostname` field [finsihes #88386830]
+* Update README.md 
+* bump candiedyaml version [finishes #89305904]
+* improve help text examples for `cf login` [finishes #89650282]
+* Merge pull request #379 from HuaweiTech/hwcf-issue-17 Added way to put user in org's space with 'cf target -o ORG' command if there is only one space
+* Merge pull request #344 from HuaweiTech/hwcf-issue-9 Adding a way to see Security Group Rules
+* Added way to put user in org's space with 'cf target -o ORG' command if there is only one space cf target with [-o] flag will internally target org's space if there is only one space. [#73568408]
+* Merge pull request #353 from fraenkel/shared_private_domains Shared private domains
+* better error message when tmp dir does not exist while not load language files [finishes #86888672]
+* --guid flag for command stack [finishes #89221186]
+* new command `stack` [finishes #89220886]
+* Update README.md 
+* Merge pull request #360 from SrinivasChilveri/hwcf-issue-11 Fix the requirmements issue in some of the application commands
+* Make OrgReq and SpaceReq creation concurrency-safe for plugins. [Finishes #89473078]
+
+* Updated the package path 
+* fixes error when plugin rpc server is not reachable
+* closes client rpc connection [finishes #89307102]
+* Merge pull request #345 from simonleung8/master Ginkgo matcher BeInDisplayOrder()
+* godeps
+* `app` command gets metric directly from loggregator for diego app [finishes #89468688]
+* noaa api library for diego app metric and fakes [#89468688]
+* wrapper for noaa and fakes for tests [#89468688]
+* comment explains temp solution for doppler endpoint [#89468688]
+* add diego flag to app model [#89468688]
+* read doppler endpoint from manifest [#89468688]
+* populate doppler endpoint from loggreator endpoint [#89468688]
+* fixes problem with plugin calling CLI concurrently - fixes ApplicationRequirement 404 error [finishes #89452922]
+* Revert "closes http.Response body" This reverts commit 86a2b55bc1850369f500dd94ef2abb1998b4747a.
+* closes http.Response body
+* uses app.guid within route object to unmap routes [finishes #87160260]
+* Merge pull request #363 from cloudfoundry/old_cc_update_plan_bug Prevent updating service plans when the CC is less than v191.
+* Merge pull request #357 from cloudfoundry/async Changed service instance commands to yellow (CommandColor).
+* Merge branch 'async' into old_cc_update_plan_bug 
+* Remove unused import 
+* fix bug where uninstall-plugin fails
+* Prevent updating service plans when the CC is less than v191. v191 corresponds to CC API 2.16.0.
+This is to prevent a bug with older CC and newer CLIs where plans can be
+updated without talking to the service broker.
+[#88798806, #88689444]
+* update test fixtures to react to plugin uninstall 
+* closing a file in test
+* Plugin can call CoreCliCommands upon uninstalling - extract rpcService constructing into main
+- pass rpcService to command_factory
+- rpcService is passed into `install-plugin`, `uninstall-plugin`
+[#88259326]
+* made further reading into a bulleted list 
+* Added plugin dev guide link to Further Reading section.  Now it appears in main readme twice 
+* Made link to plugin docs **bold** 
+* Update README.md 
+* send `CLI-MESSAGE-UNINSTALL` to plugin upon uninstalling [finishes #88259326]
+* Fixed OK message formatting in enable-service-access. [Finishes #86670482]
+* Fix the requirmements issue in some of the application commands
+* Changed service instance commands to yellow (CommandColor). [Fixes #86668046]
+* Merge pull request #351 from cloudfoundry/async Finishes async work for CLI
+* bubble up any error when zipping up files during push [#87228574]
+* Added accepts_incomplete=true param to delete service instance. [#87584124].
+* Updated text output when deleting services instances asynchronously. [Finishes #88279874]
+* Updated text output when updating services instances asynchronously. [Finishes #88279828].
+* Updated text output of cf create-service. [Finishes #86668046]
+* Merge pull request #348 from SrinivasChilveri/hwcf-issue-2 Fix 'cf routes'output should be scoped to org and grouped by space
+* Add new share/unshare private domains command - Allow an admin to share a private domain with an org
+- Allow an admin to unshare a private domain with an org
+* Detect private domains properly - Shared private domains make the owning org null
+  Rather than check if owning_organization is present, check for the
+  presence of the shared_organization_url
+* Update CHANGELOG.md 
+* Update README.md 
+* Fix 'cf routes'output should be scoped to org and grouped by space Solution to the bug:- [#70300846]
+* `service-brokers` uses BeInDisplayOrder() to assert output order 
+* ginkgo matcher to assert string output order 
+* Adding a way to see Security Group Rules
+
 ##v6.10.0
 * rename default plugin repo
 * Update README.md 
