@@ -313,8 +313,7 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *[]error) *[]string {
 		err         error
 	)
 
-	sliceErr := errors.NewWithFmt(T("Expected {{.PropertyName}} to be a list of strings.",
-		map[string]interface{}{"PropertyName": key}))
+	sliceErr := errors.NewWithFmt(T("Expected {{.PropertyName}} to be a list of strings.", map[string]interface{}{"PropertyName": key}))
 
 	switch input := yamlMap.Get(key).(type) {
 	case []interface{}:
@@ -332,7 +331,7 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *[]error) *[]string {
 
 	if err != nil {
 		*errs = append(*errs, err)
-		return nil
+		return &[]string{}
 	}
 
 	return &stringSlice

@@ -220,6 +220,24 @@ var _ = Describe("Manifests", func() {
 		}
 	})
 
+	It("returns errors when hosts/domains is not valid slice", func() {
+		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				map[interface{}]interface{}{
+					"hosts":   "bad-value",
+					"domains": []interface{}{"val1", "val2", false, true},
+				},
+			},
+		}))
+
+		_, err := m.Applications()
+		Expect(err).To(HaveOccurred())
+		errorSlice := strings.Split(err.Error(), "\n")
+
+		Expect(errorSlice).To(ContainSubstrings([]string{"hosts", "to be a list of strings"}))
+		Expect(errorSlice).To(ContainSubstrings([]string{"domains", "to be a list of strings"}))
+	})
+
 	It("parses known manifest keys", func() {
 		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
