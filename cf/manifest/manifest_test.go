@@ -248,8 +248,8 @@ var _ = Describe("Manifests", func() {
 
 		Expect(*apps[0].BuildpackUrl).To(Equal("my-buildpack"))
 		Expect(*apps[0].DiskQuota).To(Equal(int64(512)))
-		Expect(*apps[0].Domains).To(Equal([]string{"domain1.test", "domain2.test", "my-domain"}))
-		Expect(*apps[0].Hosts).To(Equal([]string{"host-1", "host-2", "my-hostname"}))
+		Expect(*apps[0].Domains).Should(ConsistOf([]string{"domain1.test", "domain2.test", "my-domain"}))
+		Expect(*apps[0].Hosts).Should(ConsistOf([]string{"host-1", "host-2", "my-hostname"}))
 		Expect(*apps[0].Name).To(Equal("my-app-name"))
 		Expect(*apps[0].StackName).To(Equal("my-stack"))
 		Expect(*apps[0].Memory).To(Equal(int64(256)))
@@ -278,9 +278,9 @@ var _ = Describe("Manifests", func() {
 		Expect(len(apps)).To(Equal(1))
 
 		Expect(len(*apps[0].Domains)).To(Equal(3))
-		Expect(*apps[0].Domains).To(Equal([]string{"my-domain", "domain1.test", "domain2.test"}))
+		Expect(*apps[0].Domains).Should(ConsistOf([]string{"my-domain", "domain1.test", "domain2.test"}))
 		Expect(len(*apps[0].Hosts)).To(Equal(3))
-		Expect(*apps[0].Hosts).To(Equal([]string{"my-hostname", "host-1", "host-2"}))
+		Expect(*apps[0].Hosts).Should(ConsistOf([]string{"my-hostname", "host-1", "host-2"}))
 	})
 
 	Describe("old-style property syntax", func() {
