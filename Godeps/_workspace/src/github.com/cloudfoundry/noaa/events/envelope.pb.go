@@ -86,6 +86,10 @@ type Envelope struct {
 	Origin           *string             `protobuf:"bytes,1,req,name=origin" json:"origin,omitempty"`
 	EventType        *Envelope_EventType `protobuf:"varint,2,req,name=eventType,enum=events.Envelope_EventType" json:"eventType,omitempty"`
 	Timestamp        *int64              `protobuf:"varint,6,opt,name=timestamp" json:"timestamp,omitempty"`
+	Deployment       *string             `protobuf:"bytes,13,opt,name=deployment" json:"deployment,omitempty"`
+	Job              *string             `protobuf:"bytes,14,opt,name=job" json:"job,omitempty"`
+	Index            *string             `protobuf:"bytes,15,opt,name=index" json:"index,omitempty"`
+	Ip               *string             `protobuf:"bytes,16,opt,name=ip" json:"ip,omitempty"`
 	Heartbeat        *Heartbeat          `protobuf:"bytes,3,opt,name=heartbeat" json:"heartbeat,omitempty"`
 	HttpStart        *HttpStart          `protobuf:"bytes,4,opt,name=httpStart" json:"httpStart,omitempty"`
 	HttpStop         *HttpStop           `protobuf:"bytes,5,opt,name=httpStop" json:"httpStop,omitempty"`
@@ -121,6 +125,34 @@ func (m *Envelope) GetTimestamp() int64 {
 		return *m.Timestamp
 	}
 	return 0
+}
+
+func (m *Envelope) GetDeployment() string {
+	if m != nil && m.Deployment != nil {
+		return *m.Deployment
+	}
+	return ""
+}
+
+func (m *Envelope) GetJob() string {
+	if m != nil && m.Job != nil {
+		return *m.Job
+	}
+	return ""
+}
+
+func (m *Envelope) GetIndex() string {
+	if m != nil && m.Index != nil {
+		return *m.Index
+	}
+	return ""
+}
+
+func (m *Envelope) GetIp() string {
+	if m != nil && m.Ip != nil {
+		return *m.Ip
+	}
+	return ""
 }
 
 func (m *Envelope) GetHeartbeat() *Heartbeat {

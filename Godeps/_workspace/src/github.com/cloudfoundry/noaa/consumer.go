@@ -16,9 +16,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/noaa/events"
+	"github.com/gogo/protobuf/proto"
 	"github.com/gorilla/websocket"
 )
 
@@ -312,6 +312,7 @@ func (cnsmr *Consumer) Close() error {
 		return errors.New("connection does not exist")
 	}
 
+	cnsmr.ws.WriteControl(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""), time.Time{})
 	return cnsmr.ws.Close()
 }
 
