@@ -671,6 +671,12 @@ var _ = Describe("Push Command", func() {
 					Expect(*appRepo.CreateAppParams[0].Name).To(Equal("app2"))
 				})
 
+				It("re-instantiate the noaa obj on each push to avoid connection issue", func() {
+					callPush()
+
+					Expect(starter.RenewNoaaConsumerCallCount()).To(Equal(2))
+				})
+
 				It("fails when given the name of an app that is not in the manifest", func() {
 					callPush("non-existant-app")
 

@@ -300,6 +300,10 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli
 		cmd.appStarter.SetStartTimeoutInSeconds(*params.HealthCheckTimeout)
 	}
 
+	//here we instantiate a new noaa object on every restart
+	//reusing an existing noaa connection to re-connect multiple times might not be successful,
+	//we have seen CLI stalls because noaa is not calling back on connect.
+	cmd.appStarter.RenewNoaaConsumer()
 	cmd.appStarter.ApplicationStart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 }
 
