@@ -26,8 +26,8 @@ func NewListStack(ui terminal.UI, config core_config.Reader, stacksRepo stacks.S
 func (cmd ListStack) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "stack",
-		Description: "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
-		Usage:       "CF_NAME stack",
+		Description: T("Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"),
+		Usage:       T("CF_NAME stack STACK_NAME"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given stack's guid. All other output for the stack is suppressed.")},
 		},

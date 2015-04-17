@@ -1020,6 +1020,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME stack STACK_NAME",
+      "translation": "CF_NAME stack STACK_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME staging-environment-variable-group",
       "translation": "CF_NAME staging-environment-variable-group",
       "modified": false
@@ -2727,6 +2732,11 @@
    {
       "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
       "translation": "列出所有stacks (stack是预先建立好的文件系统， 包含可以运行应用程序的操作系统)",
+      "modified": false
+   },
+   {
+      "id": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "示信息为叠层（堆叠是一个预先建立的文件系统，包括一个操作系统，可以运行应用程序）",
       "modified": false
    },
    {
