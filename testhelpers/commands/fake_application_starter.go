@@ -4,7 +4,7 @@ package commands
 import (
 	"sync"
 
-	. "github.com/cloudfoundry/cli/cf/commands/application"
+	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -12,29 +12,32 @@ type FakeApplicationStarter struct {
 	SetStartTimeoutInSecondsStub        func(timeout int)
 	setStartTimeoutInSecondsMutex       sync.RWMutex
 	setStartTimeoutInSecondsArgsForCall []struct {
-		arg1 int
+		timeout int
 	}
 	ApplicationStartStub        func(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 	applicationStartMutex       sync.RWMutex
 	applicationStartArgsForCall []struct {
-		arg1 models.Application
-		arg2 string
-		arg3 string
+		app       models.Application
+		orgName   string
+		spaceName string
 	}
 	applicationStartReturns struct {
 		result1 models.Application
 		result2 error
 	}
+	RenewNoaaConsumerStub        func()
+	renewNoaaConsumerMutex       sync.RWMutex
+	renewNoaaConsumerArgsForCall []struct{}
 }
 
-func (fake *FakeApplicationStarter) SetStartTimeoutInSeconds(arg1 int) {
+func (fake *FakeApplicationStarter) SetStartTimeoutInSeconds(timeout int) {
 	fake.setStartTimeoutInSecondsMutex.Lock()
 	defer fake.setStartTimeoutInSecondsMutex.Unlock()
 	fake.setStartTimeoutInSecondsArgsForCall = append(fake.setStartTimeoutInSecondsArgsForCall, struct {
-		arg1 int
-	}{arg1})
+		timeout int
+	}{timeout})
 	if fake.SetStartTimeoutInSecondsStub != nil {
-		fake.SetStartTimeoutInSecondsStub(arg1)
+		fake.SetStartTimeoutInSecondsStub(timeout)
 	}
 }
 
@@ -47,19 +50,19 @@ func (fake *FakeApplicationStarter) SetStartTimeoutInSecondsCallCount() int {
 func (fake *FakeApplicationStarter) SetStartTimeoutInSecondsArgsForCall(i int) int {
 	fake.setStartTimeoutInSecondsMutex.RLock()
 	defer fake.setStartTimeoutInSecondsMutex.RUnlock()
-	return fake.setStartTimeoutInSecondsArgsForCall[i].arg1
+	return fake.setStartTimeoutInSecondsArgsForCall[i].timeout
 }
 
-func (fake *FakeApplicationStarter) ApplicationStart(arg1 models.Application, arg2 string, arg3 string) (updatedApp models.Application, err error) {
+func (fake *FakeApplicationStarter) ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error) {
 	fake.applicationStartMutex.Lock()
 	defer fake.applicationStartMutex.Unlock()
 	fake.applicationStartArgsForCall = append(fake.applicationStartArgsForCall, struct {
-		arg1 models.Application
-		arg2 string
-		arg3 string
-	}{arg1, arg2, arg3})
+		app       models.Application
+		orgName   string
+		spaceName string
+	}{app, orgName, spaceName})
 	if fake.ApplicationStartStub != nil {
-		return fake.ApplicationStartStub(arg1, arg2, arg3)
+		return fake.ApplicationStartStub(app, orgName, spaceName)
 	} else {
 		return fake.applicationStartReturns.result1, fake.applicationStartReturns.result2
 	}
@@ -74,14 +77,30 @@ func (fake *FakeApplicationStarter) ApplicationStartCallCount() int {
 func (fake *FakeApplicationStarter) ApplicationStartArgsForCall(i int) (models.Application, string, string) {
 	fake.applicationStartMutex.RLock()
 	defer fake.applicationStartMutex.RUnlock()
-	return fake.applicationStartArgsForCall[i].arg1, fake.applicationStartArgsForCall[i].arg2, fake.applicationStartArgsForCall[i].arg3
+	return fake.applicationStartArgsForCall[i].app, fake.applicationStartArgsForCall[i].orgName, fake.applicationStartArgsForCall[i].spaceName
 }
 
 func (fake *FakeApplicationStarter) ApplicationStartReturns(result1 models.Application, result2 error) {
+	fake.ApplicationStartStub = nil
 	fake.applicationStartReturns = struct {
 		result1 models.Application
 		result2 error
 	}{result1, result2}
 }
 
-var _ ApplicationStarter = new(FakeApplicationStarter)
+func (fake *FakeApplicationStarter) RenewNoaaConsumer() {
+	fake.renewNoaaConsumerMutex.Lock()
+	defer fake.renewNoaaConsumerMutex.Unlock()
+	fake.renewNoaaConsumerArgsForCall = append(fake.renewNoaaConsumerArgsForCall, struct{}{})
+	if fake.RenewNoaaConsumerStub != nil {
+		fake.RenewNoaaConsumerStub()
+	}
+}
+
+func (fake *FakeApplicationStarter) RenewNoaaConsumerCallCount() int {
+	fake.renewNoaaConsumerMutex.RLock()
+	defer fake.renewNoaaConsumerMutex.RUnlock()
+	return len(fake.renewNoaaConsumerArgsForCall)
+}
+
+var _ application.ApplicationStarter = new(FakeApplicationStarter)
