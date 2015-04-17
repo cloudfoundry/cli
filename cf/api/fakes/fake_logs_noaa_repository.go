@@ -39,6 +39,11 @@ type FakeLogsNoaaRepository struct {
 	tailNoaaLogsForReturns struct {
 		result1 error
 	}
+	NewConsumerStub        func(api.NoaaConsumer)
+	newConsumerMutex       sync.RWMutex
+	newConsumerArgsForCall []struct {
+		arg1 api.NoaaConsumer
+	}
 	CloseStub        func()
 	closeMutex       sync.RWMutex
 	closeArgsForCall []struct{}
@@ -143,6 +148,29 @@ func (fake *FakeLogsNoaaRepository) TailNoaaLogsForReturns(result1 error) {
 	fake.tailNoaaLogsForReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeLogsNoaaRepository) NewConsumer(arg1 api.NoaaConsumer) {
+	fake.newConsumerMutex.Lock()
+	defer fake.newConsumerMutex.Unlock()
+	fake.newConsumerArgsForCall = append(fake.newConsumerArgsForCall, struct {
+		arg1 api.NoaaConsumer
+	}{arg1})
+	if fake.NewConsumerStub != nil {
+		fake.NewConsumerStub(arg1)
+	}
+}
+
+func (fake *FakeLogsNoaaRepository) NewConsumerCallCount() int {
+	fake.newConsumerMutex.RLock()
+	defer fake.newConsumerMutex.RUnlock()
+	return len(fake.newConsumerArgsForCall)
+}
+
+func (fake *FakeLogsNoaaRepository) NewConsumerArgsForCall(i int) api.NoaaConsumer {
+	fake.newConsumerMutex.RLock()
+	defer fake.newConsumerMutex.RUnlock()
+	return fake.newConsumerArgsForCall[i].arg1
 }
 
 func (fake *FakeLogsNoaaRepository) Close() {
