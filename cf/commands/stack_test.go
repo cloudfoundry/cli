@@ -39,6 +39,16 @@ var _ = Describe("stack command", func() {
 
 			Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
 		})
+
+		It("fails with usage when not provided exactly one arg", func() {
+			requirementsFactory.LoginSuccess = true
+			Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
+			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"Incorrect Usage."},
+			))
+		})
 	})
 
 	It("returns the stack guid when '--guid' flag is provided", func() {

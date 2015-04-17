@@ -1020,6 +1020,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME stack STACK_NAME",
+      "translation": "CF_NAME stack STACK_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME staging-environment-variable-group",
       "translation": "CF_NAME staging-environment-variable-group",
       "modified": false
@@ -2727,6 +2732,11 @@
    {
       "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
       "translation": "Lista todos los stacks(un stack es un sistema de archivos pre construid, Incluyendo un sistema operativo, que puede correr apps)",
+      "modified": false
+   },
+   {
+      "id": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
       "modified": false
    },
    {
