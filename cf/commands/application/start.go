@@ -146,16 +146,25 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 }
 
 func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
-	stopLoggingChan := make(chan bool, 1)
+	var isConnected bool
 	loggingStartedChan := make(chan bool)
 	doneLoggingChan := make(chan bool)
 
 	go cmd.tailStagingLogs(app, loggingStartedChan, doneLoggingChan)
+	timeout := make(chan struct{})
 	go func() {
-		<-stopLoggingChan
-		cmd.logRepo.Close()
+		time.Sleep(20 * time.Second)
+		close(timeout)
 	}()
-	<-loggingStartedChan // block until we have established connection to Loggregator
+
+	select {
+	case <-timeout:
+		cmd.ui.Warn("timeout connecting to log server, no log will be shown")
+		break
+	case <-loggingStartedChan: // block until we have established connection to Loggregator
+		isConnected = true
+		break
+	}
 
 	updatedApp, apiErr := start(app)
 	if apiErr != nil {
@@ -164,7 +173,11 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	}
 
 	isStaged := cmd.waitForInstancesToStage(updatedApp)
-	stopLoggingChan <- true
+
+	if isConnected { //only close when actually connected, else CLI hangs at closing consumer connection
+		cmd.logRepo.Close()
+	}
+
 	<-doneLoggingChan
 
 	cmd.ui.Say("")
@@ -219,7 +232,7 @@ func simpleLogMessageOutput(logMsg *events.LogMessage) (msgText string) {
 func (cmd *Start) RenewNoaaConsumer() {
 	//allows instantiating a new noaa object
 	//reusing an existing noaa connection to re-connect multiple times might not be successful,
-	//we have seen CLI stalls because noaa is not calling back on connect.
+	//we have seen CLI stalls waiting for connection to close, happens when noaa fails to call back on connect.
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, cmd.config.IsSSLDisabled())
 	noaaLib := noaa.NewConsumer(cmd.config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 	noaaLib.SetDebugPrinter(terminal.DebugPrinter{})
