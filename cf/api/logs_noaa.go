@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"sync"
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -31,6 +32,7 @@ type logNoaaRepository struct {
 	onMessage      func(*events.LogMessage)
 	doneChan       chan struct{}
 	tailing        bool
+	mutexLock      sync.Mutex
 }
 
 var BufferTime time.Duration = 5 * time.Second
@@ -49,10 +51,12 @@ func (l *logNoaaRepository) NewConsumer(c NoaaConsumer) {
 }
 
 func (l *logNoaaRepository) Close() {
+	l.mutexLock.Lock()
+	defer l.mutexLock.Unlock()
 	l.tailing = false
-	defer l.consumer.Close()
 	l.flushMessageQueue()
 	close(l.doneChan)
+	l.consumer.Close()
 }
 
 func (l *logNoaaRepository) GetContainerMetrics(appGuid string, instances []models.AppInstanceFields) ([]models.AppInstanceFields, error) {
@@ -91,9 +95,13 @@ func (l *logNoaaRepository) RecentLogsFor(appGuid string) ([]*events.LogMessage,
 }
 
 func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error {
+	l.mutexLock.Lock()
+	var hasReauthed bool
 	l.doneChan = make(chan struct{})
 	l.tailing = true
 	l.onMessage = onMessage
+	l.mutexLock.Unlock()
+
 	endpoint := l.config.DopplerEndpoint()
 	if endpoint == "" {
 		return errors.New(T("Loggregator endpoint missing from config file"))
