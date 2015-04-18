@@ -124,12 +124,13 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 			switch err.(type) {
 			case nil: // do nothing
 			case *noaa_errors.UnauthorizedError:
-				if closeChan != nil {
+				if !hasReauthed {
 					l.tokenRefresher.RefreshAuthToken()
-					close(closeChan)
-					closeChan = nil
-					go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan, make(chan struct{}))
+					hasReauthed = true
+					l.consumer.Close()
+					go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan, closeChan)
 				} else {
+					close(closeChan)
 					l.Close()
 					return err
 				}
