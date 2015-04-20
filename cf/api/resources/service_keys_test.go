@@ -39,7 +39,7 @@ var _ = Describe("ServiceKeyResource", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	Context("Brokers supporting service keys", func() {
+	Context("Brokers unmarshall service keys", func() {
 		Describe("#ToFields", func() {
 			It("unmarshalls the fields of a service key resource", func() {
 				fields := resource.ToFields()
@@ -59,7 +59,6 @@ var _ = Describe("ServiceKeyResource", func() {
 				Expect(instance.Fields.ServiceInstanceGuid).To(Equal("fake-service-instance-guid"))
 				Expect(instance.Fields.ServiceInstanceUrl).To(Equal("http://fake/service/instance/url"))
 
-				Expect(instance.Credentials).ToNot(BeNil())
 				Expect(instance.Credentials).To(HaveKeyWithValue("username", "fake-username"))
 				Expect(instance.Credentials).To(HaveKeyWithValue("password", "fake-password"))
 				Expect(instance.Credentials).To(HaveKeyWithValue("host", "fake-host"))
