@@ -1,3 +1,14 @@
+##v6.11.1
+* close channel properly during re-auth when connecting with noaa [#92716720]
+* 20 second timeout for connecting to logging server while pushing [#92702342]
+* mutex to avoid race condition [#92702342]
+* renew the noaa obj when pushing mutilple apps to avoid stalling bug [#92716720]
+* enable re-instantiating noaa obj in app starter [#92716720]
+* deps noaa package
+* added service keys command [#87057920]
+* fix panicing when slice contains invalid values [#92135482]
+* Updated gi18n binary name
+
 ##v6.11.0
 * Fixed more version checking tests 
 * Fixed version check tests 
