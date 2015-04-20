@@ -1470,11 +1470,6 @@
       "modified": false
    },
    {
-      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
       "id": "Creating shared domain {{.DomainName}} as {{.Username}}...",
       "translation": "Création du domaine partagé {{.DomainName}} en tant que {{.Username}}...",
       "modified": false
@@ -5226,17 +5221,17 @@
    },
    {
       "id": "Create key for a service instance",
-      "translation": "Create key for a service instance",
+      "translation": "Creation de la clef pour l'instance de service",
       "modified": false
    },
    {
       "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
+      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nÉXAMPLE:\n   CF_NAME create-service-key mydb mykey",
       "modified": false
    },
    {
       "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "En trains de créer clef de service {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
       "modified": false
    },
    {
