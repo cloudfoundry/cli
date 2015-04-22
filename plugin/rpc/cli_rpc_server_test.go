@@ -248,7 +248,7 @@ var _ = Describe("Server", func() {
 			)
 
 			BeforeEach(func() {
-				config = testconfig.NewRepository()
+				config = testconfig.NewRepositoryWithDefaults()
 			})
 
 			AfterEach(func() {
@@ -325,6 +325,34 @@ var _ = Describe("Server", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(space.Name).To(Equal("space-name"))
 					Expect(space.Guid).To(Equal("space-guid"))
+				})
+			})
+
+			Context(".Username, .UserGuid, .UserEmail", func() {
+				BeforeEach(func() {
+					rpcService, err = NewRpcService(nil, nil, nil, config)
+					err := rpcService.Start()
+					Expect(err).ToNot(HaveOccurred())
+
+					pingCli(rpcService.Port())
+				})
+
+				It("returns username, user guid and user email", func() {
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result string
+					err = client.Call("CliRpcCmd.Username", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(Equal("my-user"))
+
+					err = client.Call("CliRpcCmd.UserGuid", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(Equal("my-user-guid"))
+
+					err = client.Call("CliRpcCmd.UserEmail", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(Equal("my-user-email"))
 				})
 			})
 		})

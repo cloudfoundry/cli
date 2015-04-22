@@ -34,14 +34,39 @@ type FakeCliConnection struct {
 		result1 plugin_models.Organization
 		result2 error
 	}
+	GetCurrentSpaceStub        func() (plugin_models.Space, error)
+	getCurrentSpaceMutex       sync.RWMutex
+	getCurrentSpaceArgsForCall []struct{}
+	getCurrentSpaceReturns     struct {
+		result1 plugin_models.Space
+		result2 error
+	}
+	UsernameStub        func() string
+	usernameMutex       sync.RWMutex
+	usernameArgsForCall []struct{}
+	usernameReturns     struct {
+		result1 string
+	}
+	UserGuidStub        func() string
+	userGuidMutex       sync.RWMutex
+	userGuidArgsForCall []struct{}
+	userGuidReturns     struct {
+		result1 string
+	}
+	UserEmailStub        func() string
+	userEmailMutex       sync.RWMutex
+	userEmailArgsForCall []struct{}
+	userEmailReturns     struct {
+		result1 string
+	}
 }
 
 func (fake *FakeCliConnection) CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
 	fake.cliCommandWithoutTerminalOutputMutex.Lock()
-	defer fake.cliCommandWithoutTerminalOutputMutex.Unlock()
 	fake.cliCommandWithoutTerminalOutputArgsForCall = append(fake.cliCommandWithoutTerminalOutputArgsForCall, struct {
 		args []string
 	}{args})
+	fake.cliCommandWithoutTerminalOutputMutex.Unlock()
 	if fake.CliCommandWithoutTerminalOutputStub != nil {
 		return fake.CliCommandWithoutTerminalOutputStub(args...)
 	} else {
@@ -71,10 +96,10 @@ func (fake *FakeCliConnection) CliCommandWithoutTerminalOutputReturns(result1 []
 
 func (fake *FakeCliConnection) CliCommand(args ...string) ([]string, error) {
 	fake.cliCommandMutex.Lock()
-	defer fake.cliCommandMutex.Unlock()
 	fake.cliCommandArgsForCall = append(fake.cliCommandArgsForCall, struct {
 		args []string
 	}{args})
+	fake.cliCommandMutex.Unlock()
 	if fake.CliCommandStub != nil {
 		return fake.CliCommandStub(args...)
 	} else {
@@ -104,8 +129,8 @@ func (fake *FakeCliConnection) CliCommandReturns(result1 []string, result2 error
 
 func (fake *FakeCliConnection) GetCurrentOrg() (plugin_models.Organization, error) {
 	fake.getCurrentOrgMutex.Lock()
-	defer fake.getCurrentOrgMutex.Unlock()
 	fake.getCurrentOrgArgsForCall = append(fake.getCurrentOrgArgsForCall, struct{}{})
+	fake.getCurrentOrgMutex.Unlock()
 	if fake.GetCurrentOrgStub != nil {
 		return fake.GetCurrentOrgStub()
 	} else {
@@ -125,6 +150,103 @@ func (fake *FakeCliConnection) GetCurrentOrgReturns(result1 plugin_models.Organi
 		result1 plugin_models.Organization
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) GetCurrentSpace() (plugin_models.Space, error) {
+	fake.getCurrentSpaceMutex.Lock()
+	fake.getCurrentSpaceArgsForCall = append(fake.getCurrentSpaceArgsForCall, struct{}{})
+	fake.getCurrentSpaceMutex.Unlock()
+	if fake.GetCurrentSpaceStub != nil {
+		return fake.GetCurrentSpaceStub()
+	} else {
+		return fake.getCurrentSpaceReturns.result1, fake.getCurrentSpaceReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) GetCurrentSpaceCallCount() int {
+	fake.getCurrentSpaceMutex.RLock()
+	defer fake.getCurrentSpaceMutex.RUnlock()
+	return len(fake.getCurrentSpaceArgsForCall)
+}
+
+func (fake *FakeCliConnection) GetCurrentSpaceReturns(result1 plugin_models.Space, result2 error) {
+	fake.GetCurrentSpaceStub = nil
+	fake.getCurrentSpaceReturns = struct {
+		result1 plugin_models.Space
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) Username() string {
+	fake.usernameMutex.Lock()
+	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct{}{})
+	fake.usernameMutex.Unlock()
+	if fake.UsernameStub != nil {
+		return fake.UsernameStub()
+	} else {
+		return fake.usernameReturns.result1
+	}
+}
+
+func (fake *FakeCliConnection) UsernameCallCount() int {
+	fake.usernameMutex.RLock()
+	defer fake.usernameMutex.RUnlock()
+	return len(fake.usernameArgsForCall)
+}
+
+func (fake *FakeCliConnection) UsernameReturns(result1 string) {
+	fake.UsernameStub = nil
+	fake.usernameReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCliConnection) UserGuid() string {
+	fake.userGuidMutex.Lock()
+	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct{}{})
+	fake.userGuidMutex.Unlock()
+	if fake.UserGuidStub != nil {
+		return fake.UserGuidStub()
+	} else {
+		return fake.userGuidReturns.result1
+	}
+}
+
+func (fake *FakeCliConnection) UserGuidCallCount() int {
+	fake.userGuidMutex.RLock()
+	defer fake.userGuidMutex.RUnlock()
+	return len(fake.userGuidArgsForCall)
+}
+
+func (fake *FakeCliConnection) UserGuidReturns(result1 string) {
+	fake.UserGuidStub = nil
+	fake.userGuidReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCliConnection) UserEmail() string {
+	fake.userEmailMutex.Lock()
+	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct{}{})
+	fake.userEmailMutex.Unlock()
+	if fake.UserEmailStub != nil {
+		return fake.UserEmailStub()
+	} else {
+		return fake.userEmailReturns.result1
+	}
+}
+
+func (fake *FakeCliConnection) UserEmailCallCount() int {
+	fake.userEmailMutex.RLock()
+	defer fake.userEmailMutex.RUnlock()
+	return len(fake.userEmailArgsForCall)
+}
+
+func (fake *FakeCliConnection) UserEmailReturns(result1 string) {
+	fake.UserEmailStub = nil
+	fake.userEmailReturns = struct {
+		result1 string
+	}{result1}
 }
 
 var _ plugin.CliConnection = new(FakeCliConnection)
