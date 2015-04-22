@@ -355,6 +355,72 @@ var _ = Describe("Server", func() {
 					Expect(result).To(Equal("my-user-email"))
 				})
 			})
+
+			Context(".IsSSLDisabled", func() {
+				BeforeEach(func() {
+					rpcService, err = NewRpcService(nil, nil, nil, config)
+					err := rpcService.Start()
+					Expect(err).ToNot(HaveOccurred())
+
+					pingCli(rpcService.Port())
+				})
+
+				It("returns the IsSSLDisabled setting in config", func() {
+					config.SetSSLDisabled(true)
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result bool
+					err = client.Call("CliRpcCmd.IsSSLDisabled", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(BeTrue())
+				})
+			})
+
+			Context(".IsLoggedIn", func() {
+				BeforeEach(func() {
+					rpcService, err = NewRpcService(nil, nil, nil, config)
+					err := rpcService.Start()
+					Expect(err).ToNot(HaveOccurred())
+
+					pingCli(rpcService.Port())
+				})
+
+				It("returns the IsLoggedIn setting in config", func() {
+					config.SetAccessToken("Logged-In-Token")
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result bool
+					err = client.Call("CliRpcCmd.IsLoggedIn", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(BeTrue())
+				})
+			})
+
+			Context(".HasOrganization and .HasSpace ", func() {
+				BeforeEach(func() {
+					rpcService, err = NewRpcService(nil, nil, nil, config)
+					err := rpcService.Start()
+					Expect(err).ToNot(HaveOccurred())
+
+					pingCli(rpcService.Port())
+				})
+
+				It("returns the HasOrganization() and HasSpace() setting in config", func() {
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result bool
+					err = client.Call("CliRpcCmd.HasOrganization", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(BeTrue())
+
+					err = client.Call("CliRpcCmd.HasSpace", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(BeTrue())
+				})
+			})
 		})
 
 		Context("fail", func() {
