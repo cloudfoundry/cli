@@ -90,6 +90,48 @@ type FakeCliConnection struct {
 		result1 bool
 		result2 error
 	}
+	ApiEndpointStub        func() (string, error)
+	apiEndpointMutex       sync.RWMutex
+	apiEndpointArgsForCall []struct{}
+	apiEndpointReturns     struct {
+		result1 string
+		result2 error
+	}
+	ApiVersionStub        func() (string, error)
+	apiVersionMutex       sync.RWMutex
+	apiVersionArgsForCall []struct{}
+	apiVersionReturns     struct {
+		result1 string
+		result2 error
+	}
+	HasAPIEndpointStub        func() (bool, error)
+	hasAPIEndpointMutex       sync.RWMutex
+	hasAPIEndpointArgsForCall []struct{}
+	hasAPIEndpointReturns     struct {
+		result1 bool
+		result2 error
+	}
+	LoggregatorEndpointStub        func() (string, error)
+	loggregatorEndpointMutex       sync.RWMutex
+	loggregatorEndpointArgsForCall []struct{}
+	loggregatorEndpointReturns     struct {
+		result1 string
+		result2 error
+	}
+	DopplerEndpointStub        func() (string, error)
+	dopplerEndpointMutex       sync.RWMutex
+	dopplerEndpointArgsForCall []struct{}
+	dopplerEndpointReturns     struct {
+		result1 string
+		result2 error
+	}
+	AccessTokenStub        func() (string, error)
+	accessTokenMutex       sync.RWMutex
+	accessTokenArgsForCall []struct{}
+	accessTokenReturns     struct {
+		result1 string
+		result2 error
+	}
 }
 
 func (fake *FakeCliConnection) CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
@@ -379,6 +421,156 @@ func (fake *FakeCliConnection) HasSpaceReturns(result1 bool, result2 error) {
 	fake.HasSpaceStub = nil
 	fake.hasSpaceReturns = struct {
 		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) ApiEndpoint() (string, error) {
+	fake.apiEndpointMutex.Lock()
+	fake.apiEndpointArgsForCall = append(fake.apiEndpointArgsForCall, struct{}{})
+	fake.apiEndpointMutex.Unlock()
+	if fake.ApiEndpointStub != nil {
+		return fake.ApiEndpointStub()
+	} else {
+		return fake.apiEndpointReturns.result1, fake.apiEndpointReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) ApiEndpointCallCount() int {
+	fake.apiEndpointMutex.RLock()
+	defer fake.apiEndpointMutex.RUnlock()
+	return len(fake.apiEndpointArgsForCall)
+}
+
+func (fake *FakeCliConnection) ApiEndpointReturns(result1 string, result2 error) {
+	fake.ApiEndpointStub = nil
+	fake.apiEndpointReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) ApiVersion() (string, error) {
+	fake.apiVersionMutex.Lock()
+	fake.apiVersionArgsForCall = append(fake.apiVersionArgsForCall, struct{}{})
+	fake.apiVersionMutex.Unlock()
+	if fake.ApiVersionStub != nil {
+		return fake.ApiVersionStub()
+	} else {
+		return fake.apiVersionReturns.result1, fake.apiVersionReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) ApiVersionCallCount() int {
+	fake.apiVersionMutex.RLock()
+	defer fake.apiVersionMutex.RUnlock()
+	return len(fake.apiVersionArgsForCall)
+}
+
+func (fake *FakeCliConnection) ApiVersionReturns(result1 string, result2 error) {
+	fake.ApiVersionStub = nil
+	fake.apiVersionReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) HasAPIEndpoint() (bool, error) {
+	fake.hasAPIEndpointMutex.Lock()
+	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct{}{})
+	fake.hasAPIEndpointMutex.Unlock()
+	if fake.HasAPIEndpointStub != nil {
+		return fake.HasAPIEndpointStub()
+	} else {
+		return fake.hasAPIEndpointReturns.result1, fake.hasAPIEndpointReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) HasAPIEndpointCallCount() int {
+	fake.hasAPIEndpointMutex.RLock()
+	defer fake.hasAPIEndpointMutex.RUnlock()
+	return len(fake.hasAPIEndpointArgsForCall)
+}
+
+func (fake *FakeCliConnection) HasAPIEndpointReturns(result1 bool, result2 error) {
+	fake.HasAPIEndpointStub = nil
+	fake.hasAPIEndpointReturns = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) LoggregatorEndpoint() (string, error) {
+	fake.loggregatorEndpointMutex.Lock()
+	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct{}{})
+	fake.loggregatorEndpointMutex.Unlock()
+	if fake.LoggregatorEndpointStub != nil {
+		return fake.LoggregatorEndpointStub()
+	} else {
+		return fake.loggregatorEndpointReturns.result1, fake.loggregatorEndpointReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) LoggregatorEndpointCallCount() int {
+	fake.loggregatorEndpointMutex.RLock()
+	defer fake.loggregatorEndpointMutex.RUnlock()
+	return len(fake.loggregatorEndpointArgsForCall)
+}
+
+func (fake *FakeCliConnection) LoggregatorEndpointReturns(result1 string, result2 error) {
+	fake.LoggregatorEndpointStub = nil
+	fake.loggregatorEndpointReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) DopplerEndpoint() (string, error) {
+	fake.dopplerEndpointMutex.Lock()
+	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct{}{})
+	fake.dopplerEndpointMutex.Unlock()
+	if fake.DopplerEndpointStub != nil {
+		return fake.DopplerEndpointStub()
+	} else {
+		return fake.dopplerEndpointReturns.result1, fake.dopplerEndpointReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) DopplerEndpointCallCount() int {
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	return len(fake.dopplerEndpointArgsForCall)
+}
+
+func (fake *FakeCliConnection) DopplerEndpointReturns(result1 string, result2 error) {
+	fake.DopplerEndpointStub = nil
+	fake.dopplerEndpointReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) AccessToken() (string, error) {
+	fake.accessTokenMutex.Lock()
+	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
+	fake.accessTokenMutex.Unlock()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
+	} else {
+		return fake.accessTokenReturns.result1, fake.accessTokenReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) AccessTokenCallCount() int {
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
+	return len(fake.accessTokenArgsForCall)
+}
+
+func (fake *FakeCliConnection) AccessTokenReturns(result1 string, result2 error) {
+	fake.AccessTokenStub = nil
+	fake.accessTokenReturns = struct {
+		result1 string
 		result2 error
 	}{result1, result2}
 }

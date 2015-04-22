@@ -25,6 +25,12 @@ type CliConnection interface {
 	IsSSLDisabled() (bool, error)
 	HasOrganization() (bool, error)
 	HasSpace() (bool, error)
+	ApiEndpoint() (string, error)
+	ApiVersion() (string, error)
+	HasAPIEndpoint() (bool, error)
+	LoggregatorEndpoint() (string, error)
+	DopplerEndpoint() (string, error)
+	AccessToken() (string, error)
 }
 
 type VersionType struct {

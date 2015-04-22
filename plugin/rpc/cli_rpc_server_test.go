@@ -421,6 +421,89 @@ var _ = Describe("Server", func() {
 					Expect(result).To(BeTrue())
 				})
 			})
+
+			Context(".LoggregatorEndpoint and .DopplerEndpoint ", func() {
+				BeforeEach(func() {
+					rpcService, err = NewRpcService(nil, nil, nil, config)
+					err := rpcService.Start()
+					Expect(err).ToNot(HaveOccurred())
+
+					pingCli(rpcService.Port())
+				})
+
+				It("returns the LoggregatorEndpoint() and DopplerEndpoint() setting in config", func() {
+					config.SetLoggregatorEndpoint("loggregator-endpoint-sample")
+					config.SetDopplerEndpoint("doppler-endpoint-sample")
+
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result string
+					err = client.Call("CliRpcCmd.LoggregatorEndpoint", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(Equal("loggregator-endpoint-sample"))
+
+					err = client.Call("CliRpcCmd.DopplerEndpoint", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(Equal("doppler-endpoint-sample"))
+				})
+			})
+
+			Context(".ApiEndpoint, .ApiVersion and .HasAPIEndpoint", func() {
+				BeforeEach(func() {
+					rpcService, err = NewRpcService(nil, nil, nil, config)
+					err := rpcService.Start()
+					Expect(err).ToNot(HaveOccurred())
+
+					pingCli(rpcService.Port())
+				})
+
+				It("returns the ApiEndpoint(), ApiVersion() and HasAPIEndpoint() setting in config", func() {
+					config.SetApiVersion("v1.1.1")
+					config.SetApiEndpoint("www.fake-domain.com")
+
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result string
+					err = client.Call("CliRpcCmd.ApiEndpoint", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(Equal("www.fake-domain.com"))
+
+					err = client.Call("CliRpcCmd.ApiVersion", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(Equal("v1.1.1"))
+
+					var exists bool
+					err = client.Call("CliRpcCmd.HasAPIEndpoint", "", &exists)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(exists).To(BeTrue())
+
+				})
+			})
+
+			Context(".AccessToken", func() {
+				BeforeEach(func() {
+					rpcService, err = NewRpcService(nil, nil, nil, config)
+					err := rpcService.Start()
+					Expect(err).ToNot(HaveOccurred())
+
+					pingCli(rpcService.Port())
+				})
+
+				It("returns the LoggregatorEndpoint() and DopplerEndpoint() setting in config", func() {
+					config.SetAccessToken("fake-access-token")
+
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result string
+					err = client.Call("CliRpcCmd.AccessToken", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(Equal("fake-access-token"))
+				})
+			})
+
 		})
 
 		Context("fail", func() {
