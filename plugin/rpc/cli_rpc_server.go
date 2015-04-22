@@ -135,3 +135,10 @@ func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organizat
 
 	return nil
 }
+
+func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
+	retVal.Name = cmd.cliConfig.SpaceFields().Name
+	retVal.Guid = cmd.cliConfig.SpaceFields().Guid
+
+	return nil
+}

@@ -17,6 +17,7 @@ type CliConnection interface {
 	CliCommandWithoutTerminalOutput(args ...string) ([]string, error)
 	CliCommand(args ...string) ([]string, error)
 	GetCurrentOrg() (plugin_models.Organization, error)
+	GetCurrentSpace() (plugin_models.Space, error)
 }
 
 type VersionType struct {
