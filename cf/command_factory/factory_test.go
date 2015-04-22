@@ -35,7 +35,7 @@ var _ = Describe("factory", func() {
 			"uaa":              net.NewUAAGateway(config, fakeUI),
 		})
 
-		rpcService, _ := rpc.NewRpcService(nil, nil, nil)
+		rpcService, _ := rpc.NewRpcService(nil, nil, nil, nil)
 		factory = NewFactory(fakeUI, config, manifestRepo, repoLocator, pluginConfig, rpcService)
 	})
 

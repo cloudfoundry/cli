@@ -63,7 +63,7 @@ var _ = Describe("Uninstall", func() {
 	runCommand := func(args ...string) bool {
 		//reset rpc registration, each service can only be registered once
 		rpc.DefaultServer = rpc.NewServer()
-		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil)
+		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil, nil)
 		cmd := NewPluginUninstall(ui, pluginConfig, rpcService)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}

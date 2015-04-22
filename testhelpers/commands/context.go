@@ -62,7 +62,7 @@ func findCommand(cmdName string) (cmd cli.Command) {
 		"uaa":              net.NewUAAGateway(configRepo, fakeUI),
 	})
 
-	rpcService, _ := rpc.NewRpcService(nil, nil, nil)
+	rpcService, _ := rpc.NewRpcService(nil, nil, nil, nil)
 	cmdFactory := command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig, rpcService)
 	requirementsFactory := &testreq.FakeReqFactory{}
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, fakeUI)
