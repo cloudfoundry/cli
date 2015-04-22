@@ -154,8 +154,33 @@ func (cmd *CliRpcCmd) UserGuid(args string, retVal *string) error {
 
 	return nil
 }
+
 func (cmd *CliRpcCmd) UserEmail(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.UserEmail()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) IsLoggedIn(args string, retVal *bool) error {
+	*retVal = cmd.cliConfig.IsLoggedIn()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) IsSSLDisabled(args string, retVal *bool) error {
+	*retVal = cmd.cliConfig.IsSSLDisabled()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) HasOrganization(args string, retVal *bool) error {
+	*retVal = cmd.cliConfig.HasOrganization()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) HasSpace(args string, retVal *bool) error {
+	*retVal = cmd.cliConfig.HasSpace()
 
 	return nil
 }

@@ -18,9 +18,13 @@ type CliConnection interface {
 	CliCommand(args ...string) ([]string, error)
 	GetCurrentOrg() (plugin_models.Organization, error)
 	GetCurrentSpace() (plugin_models.Space, error)
-	Username() string
-	UserGuid() string
-	UserEmail() string
+	Username() (string, error)
+	UserGuid() (string, error)
+	UserEmail() (string, error)
+	IsLoggedIn() (bool, error)
+	IsSSLDisabled() (bool, error)
+	HasOrganization() (bool, error)
+	HasSpace() (bool, error)
 }
 
 type VersionType struct {

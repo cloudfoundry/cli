@@ -122,38 +122,86 @@ func (cliConnection *cliConnection) GetCurrentSpace() (plugin_models.Space, erro
 	return result, err
 }
 
-func (cliConnection *cliConnection) Username() string {
+func (cliConnection *cliConnection) Username() (string, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	var result string
 
 	err = client.Call("CliRpcCmd.Username", "", &result)
-	return result
+	return result, err
 }
 
-func (cliConnection *cliConnection) UserGuid() string {
+func (cliConnection *cliConnection) UserGuid() (string, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	var result string
 
 	err = client.Call("CliRpcCmd.UserGuid", "", &result)
-	return result
+	return result, err
 }
 
-func (cliConnection *cliConnection) UserEmail() string {
+func (cliConnection *cliConnection) UserEmail() (string, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	var result string
 
 	err = client.Call("CliRpcCmd.UserEmail", "", &result)
-	return result
+	return result, err
+}
+
+func (cliConnection *cliConnection) IsSSLDisabled() (bool, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return false, err
+	}
+
+	var result bool
+
+	err = client.Call("CliRpcCmd.IsSSLDisabled", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) IsLoggedIn() (bool, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return false, err
+	}
+
+	var result bool
+
+	err = client.Call("CliRpcCmd.IsLoggedIn", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) HasOrganization() (bool, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return false, err
+	}
+
+	var result bool
+
+	err = client.Call("CliRpcCmd.HasOrganization", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) HasSpace() (bool, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return false, err
+	}
+
+	var result bool
+
+	err = client.Call("CliRpcCmd.HasSpace", "", &result)
+	return result, err
 }
