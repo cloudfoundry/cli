@@ -26,6 +26,7 @@ func NewRepositoryWithDefaults() core_config.Repository {
 	configRepo := NewRepositoryWithAccessToken(core_config.TokenInfo{
 		UserGuid: "my-user-guid",
 		Username: "my-user",
+		Email:    "my-user-email",
 	})
 
 	configRepo.SetSpaceFields(models.SpaceFields{

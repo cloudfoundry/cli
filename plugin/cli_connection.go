@@ -121,3 +121,39 @@ func (cliConnection *cliConnection) GetCurrentSpace() (plugin_models.Space, erro
 	err = client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
 	return result, err
 }
+
+func (cliConnection *cliConnection) Username() string {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return ""
+	}
+
+	var result string
+
+	err = client.Call("CliRpcCmd.Username", "", &result)
+	return result
+}
+
+func (cliConnection *cliConnection) UserGuid() string {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return ""
+	}
+
+	var result string
+
+	err = client.Call("CliRpcCmd.UserGuid", "", &result)
+	return result
+}
+
+func (cliConnection *cliConnection) UserEmail() string {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return ""
+	}
+
+	var result string
+
+	err = client.Call("CliRpcCmd.UserEmail", "", &result)
+	return result
+}

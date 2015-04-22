@@ -142,3 +142,20 @@ func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) 
 
 	return nil
 }
+
+func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.Username()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) UserGuid(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.UserGuid()
+
+	return nil
+}
+func (cmd *CliRpcCmd) UserEmail(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.UserEmail()
+
+	return nil
+}
