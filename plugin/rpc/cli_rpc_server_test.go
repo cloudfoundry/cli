@@ -300,6 +300,33 @@ var _ = Describe("Server", func() {
 					Expect(org.QuotaDefinition.NonBasicServicesAllowed).To(BeTrue())
 				})
 			})
+
+			Context(".GetCurrentSpace", func() {
+				BeforeEach(func() {
+					config.SetSpaceFields(models.SpaceFields{
+						Guid: "space-guid",
+						Name: "space-name",
+					})
+
+					rpcService, err = NewRpcService(nil, nil, nil, config)
+					err := rpcService.Start()
+					Expect(err).ToNot(HaveOccurred())
+
+					pingCli(rpcService.Port())
+				})
+
+				It("populates the plugin Space object with the current space settings in config", func() {
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var space plugin_models.Space
+					err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
+
+					Expect(err).ToNot(HaveOccurred())
+					Expect(space.Name).To(Equal("space-name"))
+					Expect(space.Guid).To(Equal("space-guid"))
+				})
+			})
 		})
 
 		Context("fail", func() {
