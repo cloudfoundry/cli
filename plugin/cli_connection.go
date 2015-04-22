@@ -205,3 +205,75 @@ func (cliConnection *cliConnection) HasSpace() (bool, error) {
 	err = client.Call("CliRpcCmd.HasSpace", "", &result)
 	return result, err
 }
+
+func (cliConnection *cliConnection) ApiEndpoint() (string, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return "", err
+	}
+
+	var result string
+
+	err = client.Call("CliRpcCmd.ApiEndpoint", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) HasAPIEndpoint() (bool, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return false, err
+	}
+
+	var result bool
+
+	err = client.Call("CliRpcCmd.HasApiEndpoint", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) ApiVersion() (string, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return "", err
+	}
+
+	var result string
+
+	err = client.Call("CliRpcCmd.ApiVersion", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) LoggregatorEndpoint() (string, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return "", err
+	}
+
+	var result string
+
+	err = client.Call("CliRpcCmd.LoggregatorEndpoint", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) DopplerEndpoint() (string, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return "", err
+	}
+
+	var result string
+
+	err = client.Call("CliRpcCmd.DopplerEndpoint", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) AccessToken() (string, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return "", err
+	}
+
+	var result string
+
+	err = client.Call("CliRpcCmd.AccessToken", "", &result)
+	return result, err
+}

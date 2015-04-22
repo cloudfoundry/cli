@@ -184,3 +184,39 @@ func (cmd *CliRpcCmd) HasSpace(args string, retVal *bool) error {
 
 	return nil
 }
+
+func (cmd *CliRpcCmd) ApiEndpoint(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.ApiEndpoint()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) HasAPIEndpoint(args string, retVal *bool) error {
+	*retVal = cmd.cliConfig.HasAPIEndpoint()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) ApiVersion(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.ApiVersion()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) LoggregatorEndpoint(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.LoggregatorEndpoint()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) DopplerEndpoint(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.DopplerEndpoint()
+
+	return nil
+}
+
+func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.AccessToken()
+
+	return nil
+}
