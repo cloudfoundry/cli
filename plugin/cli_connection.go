@@ -7,6 +7,8 @@ import (
 	"net/rpc"
 	"os"
 	"time"
+
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 type cliConnection struct {
@@ -94,4 +96,16 @@ func (cliConnection *cliConnection) pingCLI() {
 		fmt.Println(connErr)
 		os.Exit(1)
 	}
+}
+
+func (cliConnection *cliConnection) GetCurrentOrg() (plugin_models.Organization, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return plugin_models.Organization{}, err
+	}
+
+	var result plugin_models.Organization
+
+	err = client.Call("CliRpcCmd.GetCurrentOrg", "", &result)
+	return result, err
 }

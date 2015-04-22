@@ -4,7 +4,8 @@ package fakes
 import (
 	"sync"
 
-	. "github.com/cloudfoundry/cli/plugin"
+	"github.com/cloudfoundry/cli/plugin"
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 type FakeCliConnection struct {
@@ -24,6 +25,13 @@ type FakeCliConnection struct {
 	}
 	cliCommandReturns struct {
 		result1 []string
+		result2 error
+	}
+	GetCurrentOrgStub        func() (plugin_models.Organization, error)
+	getCurrentOrgMutex       sync.RWMutex
+	getCurrentOrgArgsForCall []struct{}
+	getCurrentOrgReturns     struct {
+		result1 plugin_models.Organization
 		result2 error
 	}
 }
@@ -54,6 +62,7 @@ func (fake *FakeCliConnection) CliCommandWithoutTerminalOutputArgsForCall(i int)
 }
 
 func (fake *FakeCliConnection) CliCommandWithoutTerminalOutputReturns(result1 []string, result2 error) {
+	fake.CliCommandWithoutTerminalOutputStub = nil
 	fake.cliCommandWithoutTerminalOutputReturns = struct {
 		result1 []string
 		result2 error
@@ -86,10 +95,36 @@ func (fake *FakeCliConnection) CliCommandArgsForCall(i int) []string {
 }
 
 func (fake *FakeCliConnection) CliCommandReturns(result1 []string, result2 error) {
+	fake.CliCommandStub = nil
 	fake.cliCommandReturns = struct {
 		result1 []string
 		result2 error
 	}{result1, result2}
 }
 
-var _ CliConnection = new(FakeCliConnection)
+func (fake *FakeCliConnection) GetCurrentOrg() (plugin_models.Organization, error) {
+	fake.getCurrentOrgMutex.Lock()
+	defer fake.getCurrentOrgMutex.Unlock()
+	fake.getCurrentOrgArgsForCall = append(fake.getCurrentOrgArgsForCall, struct{}{})
+	if fake.GetCurrentOrgStub != nil {
+		return fake.GetCurrentOrgStub()
+	} else {
+		return fake.getCurrentOrgReturns.result1, fake.getCurrentOrgReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) GetCurrentOrgCallCount() int {
+	fake.getCurrentOrgMutex.RLock()
+	defer fake.getCurrentOrgMutex.RUnlock()
+	return len(fake.getCurrentOrgArgsForCall)
+}
+
+func (fake *FakeCliConnection) GetCurrentOrgReturns(result1 plugin_models.Organization, result2 error) {
+	fake.GetCurrentOrgStub = nil
+	fake.getCurrentOrgReturns = struct {
+		result1 plugin_models.Organization
+		result2 error
+	}{result1, result2}
+}
+
+var _ plugin.CliConnection = new(FakeCliConnection)

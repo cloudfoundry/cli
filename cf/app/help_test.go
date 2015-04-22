@@ -94,7 +94,7 @@ func createCommandFactory() command_factory.Factory {
 		"uaa":              net.NewUAAGateway(configRepo, fakeUI),
 	})
 
-	rpcService, _ := rpc.NewRpcService(nil, nil, nil)
+	rpcService, _ := rpc.NewRpcService(nil, nil, nil, nil)
 	return command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig, rpcService)
 }
 
