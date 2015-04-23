@@ -106,7 +106,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				Ω(fakeManifest.EnvironmentVarsCallCount()).To(Equal(1))
 				Ω(fakeManifest.HealthCheckTimeoutCallCount()).To(Equal(1))
 				Ω(fakeManifest.InstancesCallCount()).To(Equal(1))
-				Ω(fakeManifest.DomainCallCount()).To(Equal(1))
+				Ω(fakeManifest.DomainCallCount()).To(Equal(2))
 				Ω(fakeManifest.ServiceCallCount()).To(Equal(1))
 				Ω(fakeManifest.StartupCommandCallCount()).To(Equal(1))
 			})

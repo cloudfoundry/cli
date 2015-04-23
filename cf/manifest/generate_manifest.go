@@ -131,11 +131,17 @@ func (m *appManifest) Save() error {
 		}
 
 		if len(app.Routes) > 0 {
-			if _, err := fmt.Fprintf(f, "  host: %s\n", app.Routes[0].Host); err != nil {
-				return err
-			}
-			if _, err := fmt.Fprintf(f, "  domain: %s\n", app.Routes[0].Domain.Name); err != nil {
-				return err
+			if len(app.Routes) == 1 {
+				if _, err := fmt.Fprintf(f, "  host: %s\n", app.Routes[0].Host); err != nil {
+					return err
+				}
+				if _, err := fmt.Fprintf(f, "  domain: %s\n", app.Routes[0].Domain.Name); err != nil {
+					return err
+				}
+			} else {
+				if err := writeRoutesToFile(f, app.Routes); err != nil {
+					return err
+				}
 			}
 		} else {
 			if _, err := fmt.Fprintf(f, "  no-route: true\n"); err != nil {
@@ -177,7 +183,63 @@ func (m *appManifest) addApplication(name string) {
 		},
 	})
 }
+func writeRoutesToFile(f *os.File, routes []models.RouteSummary) error {
+	var (
+		hostSlice    []string
+		domainSlice  []string
+		hostPSlice   *[]string
+		domainPSlice *[]string
+		hosts        []string
+		domains      []string
+	)
 
+	for i := 0; i < len(routes); i++ {
+		hostSlice = append(hostSlice, routes[i].Host)
+		domainSlice = append(domainSlice, routes[i].Domain.Name)
+	}
+
+	hostPSlice = removeDuplicatedValue(hostSlice)
+	domainPSlice = removeDuplicatedValue(domainSlice)
+
+	if hostPSlice != nil {
+		hosts = *hostPSlice
+	}
+	if domainPSlice != nil {
+		domains = *domainPSlice
+	}
+
+	if len(hosts) == 1 {
+		if _, err := fmt.Fprintf(f, "  host: %s\n", hosts[0]); err != nil {
+			return err
+		}
+	} else {
+		if _, err := fmt.Fprintln(f, "  hosts:"); err != nil {
+			return err
+		}
+		for i := 0; i < len(hosts); i++ {
+			if _, err := fmt.Fprintf(f, "  - %s\n", hosts[i]); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(domains) == 1 {
+		if _, err := fmt.Fprintf(f, "  domain: %s\n", domains[0]); err != nil {
+			return err
+		}
+	} else {
+		if _, err := fmt.Fprintln(f, "  domains:"); err != nil {
+			return err
+		}
+		for i := 0; i < len(domains); i++ {
+			if _, err := fmt.Fprintf(f, "  - %s\n", domains[i]); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
 func writeServicesToFile(f *os.File, entries []models.ServicePlanSummary) error {
 	_, err := fmt.Fprintln(f, "  services:")
 	if err != nil {
