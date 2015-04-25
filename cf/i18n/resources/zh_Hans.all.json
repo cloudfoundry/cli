@@ -5263,5 +5263,30 @@
       "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
       "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\n样例：\n   CF_NAME service-keys mydb",
       "modified": false
+   },
+   {
+      "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}正在为服务实例{{.ServiceInstanceName}}获取密钥{{.ServiceKeyName}}...",
+      "modified": false
+   },
+   {
+      "id": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+      "translation": "未找到服务实例{{.ServiceInstanceName}}的密钥{{.ServiceKeyName}}",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\n样例：\n   CF_NAME service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
+      "translation": "获取并显示服务密钥的guid。 不显示服务的其它全部信息。",
+      "modified": false
+   },
+   {
+      "id": "Show service key info",
+      "translation": "显示服务密钥信息",
+      "modified": false
    }
 ]

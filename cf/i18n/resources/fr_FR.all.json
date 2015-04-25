@@ -5258,5 +5258,30 @@
       "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
       "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\nÉXAMPLE:\n   CF_NAME service-keys mydb",
       "modified": false
+   },
+   {
+      "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "En train d'obtenir la clef {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+      "translation": "Pas de clef de service {{.ServiceKeyName}} trouver pour instance de service {{.ServiceInstanceName}}",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nÉXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
+      "translation": "Récupérer et montrer le guid d'un clef the service.  Tout autre information pour la clef de service a été suprimer.",
+      "modified": false
+   },
+   {
+      "id": "Show service key info",
+      "translation": "Montrer information pour la clef de service",
+      "modified": false
    }
 ]
