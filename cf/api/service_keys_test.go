@@ -12,6 +12,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
@@ -42,7 +43,7 @@ var _ = Describe("Service Keys Repo", func() {
 		repo = NewCloudControllerServiceKeyRepository(configRepo, gateway)
 	})
 
-	Describe("creating a service key", func() {
+	Describe("CreateServiceKey", func() {
 		It("makes the right request", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
@@ -88,7 +89,7 @@ var _ = Describe("Service Keys Repo", func() {
 		})
 	})
 
-	Describe("listing service keys", func() {
+	Describe("ListServiceKeys", func() {
 		It("returns empty result when no service key is found", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
@@ -139,6 +140,46 @@ var _ = Describe("Service Keys Repo", func() {
 			Expect(serviceKeys[1].Credentials).To(HaveKeyWithValue("port", float64(3306)))
 			Expect(serviceKeys[1].Credentials).To(HaveKeyWithValue("database", "fake-db-name-2"))
 			Expect(serviceKeys[1].Credentials).To(HaveKeyWithValue("uri", "mysql://fake-user-2:fake-password-2@fake-host-2:3306/fake-db-name-2"))
+		})
+	})
+
+	Describe("GetServiceKey", func() {
+		It("returns service key detail", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/service_keys?q=service_instance_guid:fake-instance-guid;name:fake-service-key-name",
+				Response: serviceKeyDetailResponse,
+			}))
+
+			serviceKey, err := repo.GetServiceKey("fake-instance-guid", "fake-service-key-name")
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(serviceKey.Fields.Guid).To(Equal("fake-service-key-guid"))
+			Expect(serviceKey.Fields.Url).To(Equal("/v2/service_keys/fake-guid"))
+			Expect(serviceKey.Fields.Name).To(Equal("fake-service-key-name"))
+			Expect(serviceKey.Fields.ServiceInstanceGuid).To(Equal("fake-service-instance-guid"))
+			Expect(serviceKey.Fields.ServiceInstanceUrl).To(Equal("http://fake/service/instance/url"))
+
+			Expect(serviceKey.Credentials).To(HaveKeyWithValue("username", "fake-username"))
+			Expect(serviceKey.Credentials).To(HaveKeyWithValue("password", "fake-password"))
+			Expect(serviceKey.Credentials).To(HaveKeyWithValue("host", "fake-host"))
+			Expect(serviceKey.Credentials).To(HaveKeyWithValue("port", float64(3306)))
+			Expect(serviceKey.Credentials).To(HaveKeyWithValue("database", "fake-db-name"))
+			Expect(serviceKey.Credentials).To(HaveKeyWithValue("uri", "mysql://fake-user:fake-password@fake-host:3306/fake-db-name"))
+		})
+
+		It("returns empty result when the service key is not found", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/service_keys?q=service_instance_guid:fake-instance-guid;name:non-exist-key-name",
+				Response: emptyServiceKeysResponse,
+			}))
+
+			serviceKey, err := repo.GetServiceKey("fake-instance-guid", "non-exist-key-name")
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(serviceKey).To(Equal(models.ServiceKey{}))
 		})
 	})
 
@@ -194,4 +235,30 @@ var serviceKeysResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{
 	      }
 	    }
 	]}`,
+}
+
+var serviceKeyDetailResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{
+	"resources": [
+		{
+	      "metadata": {
+	        "guid": "fake-service-key-guid",
+	        "url": "/v2/service_keys/fake-guid",
+	        "created_at": "2015-01-13T18:52:08+00:00",
+	        "updated_at": null
+	      },
+	      "entity": {
+	        "name": "fake-service-key-name",
+	        "service_instance_guid":"fake-service-instance-guid",
+	        "service_instance_url":"http://fake/service/instance/url",
+	        "credentials": {
+	          "username": "fake-username",
+	          "password": "fake-password",
+	          "host": "fake-host",
+	          "port": 3306,
+	          "database": "fake-db-name",
+	          "uri": "mysql://fake-user:fake-password@fake-host:3306/fake-db-name"
+	        }
+	      }
+		}]
+	}`,
 }
