@@ -1,3 +1,12 @@
+##v6.11.2
+* not renewing noaa consumer on every push instead, we instruct noaa to stop reconnecting in the background
+* hardcode doppler endpoints into config getter [#93208696]
+* Fix for stack and stacks command
+* Merge pull request #419 from xingzhou/service_key_get add show service key detail
+* add show service key detail [#87061876]
+* Merge pull request #396 from xingzhou/service_key_list added service keys command
+* minor fixes for max's comments on service key list PR [#87057920]
+
 ##v6.11.1
 * close channel properly during re-auth when connecting with noaa [#92716720]
 * 20 second timeout for connecting to logging server while pushing [#92702342]
