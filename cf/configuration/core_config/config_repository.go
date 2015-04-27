@@ -1,6 +1,7 @@
 package core_config
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
@@ -169,10 +170,17 @@ func (c *ConfigRepository) LoggregatorEndpoint() (logEndpoint string) {
 }
 
 func (c *ConfigRepository) DopplerEndpoint() (logEndpoint string) {
+	//revert this in v7.0, once CC advertise doppler endpoint, and
+	//everyone has migrated from loggregator to doppler
+
+	// c.read(func() {
+	// 	logEndpoint = c.data.DopplerEndPoint
+	// })
 	c.read(func() {
-		logEndpoint = c.data.DopplerEndPoint
+		logEndpoint = c.data.LoggregatorEndPoint
 	})
-	return
+
+	return strings.Replace(logEndpoint, "loggregator", "doppler", 1)
 }
 
 func (c *ConfigRepository) UaaEndpoint() (uaaEndpoint string) {

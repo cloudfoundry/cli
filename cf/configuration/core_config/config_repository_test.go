@@ -62,8 +62,8 @@ var _ = Describe("Configuration Repository", func() {
 		config.SetAuthenticationEndpoint("http://auth.the-endpoint")
 		Expect(config.AuthenticationEndpoint()).To(Equal("http://auth.the-endpoint"))
 
-		config.SetLoggregatorEndpoint("http://logs.the-endpoint")
-		Expect(config.LoggregatorEndpoint()).To(Equal("http://logs.the-endpoint"))
+		config.SetLoggregatorEndpoint("http://loggregator.the-endpoint")
+		Expect(config.LoggregatorEndpoint()).To(Equal("http://loggregator.the-endpoint"))
 
 		config.SetDopplerEndpoint("http://doppler.the-endpoint")
 		Expect(config.DopplerEndpoint()).To(Equal("http://doppler.the-endpoint"))
