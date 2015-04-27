@@ -20,7 +20,6 @@ type LogsNoaaRepository interface {
 	GetContainerMetrics(string, []models.AppInstanceFields) ([]models.AppInstanceFields, error)
 	RecentLogsFor(appGuid string) ([]*events.LogMessage, error)
 	TailNoaaLogsFor(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error
-	NewConsumer(NoaaConsumer)
 	Close()
 }
 
@@ -44,10 +43,6 @@ func NewLogsNoaaRepository(config core_config.Reader, consumer NoaaConsumer, tr 
 		tokenRefresher: tr,
 		messageQueue:   NewSortedMessageQueue(BufferTime, time.Now),
 	}
-}
-
-func (l *logNoaaRepository) NewConsumer(c NoaaConsumer) {
-	l.consumer = c
 }
 
 func (l *logNoaaRepository) Close() {

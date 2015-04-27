@@ -1,9 +1,7 @@
 package application
 
 import (
-	"crypto/tls"
 	"fmt"
-	"net/http"
 	"os"
 	"regexp"
 	"sort"
@@ -12,8 +10,6 @@ import (
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/noaa"
 	"github.com/cloudfoundry/noaa/events"
 
 	"github.com/cloudfoundry/cli/cf"
@@ -54,7 +50,6 @@ type Start struct {
 type ApplicationStarter interface {
 	SetStartTimeoutInSeconds(timeout int)
 	ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
-	RenewNoaaConsumer()
 }
 
 type ApplicationStagingWatcher interface {
@@ -227,17 +222,6 @@ func simpleLogMessageOutput(logMsg *events.LogMessage) (msgText string) {
 	}
 	msgText = reg.ReplaceAllString(msgText, "")
 	return
-}
-
-func (cmd *Start) RenewNoaaConsumer() {
-	//allows instantiating a new noaa object
-	//reusing an existing noaa connection to re-connect multiple times might not be successful,
-	//we have seen CLI stalls waiting for connection to close, happens when noaa fails to call back on connect.
-	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, cmd.config.IsSSLDisabled())
-	noaaLib := noaa.NewConsumer(cmd.config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	noaaLib.SetDebugPrinter(terminal.DebugPrinter{})
-	logNoaaConsumer := api.NewNoaaConsumer(noaaLib)
-	cmd.logRepo.NewConsumer(logNoaaConsumer)
 }
 
 func (cmd Start) tailStagingLogs(app models.Application, startChan, doneChan chan bool) {
