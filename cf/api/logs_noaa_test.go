@@ -28,7 +28,8 @@ var _ = Describe("logs with noaa repository", func() {
 	BeforeEach(func() {
 		fakeNoaaConsumer = &testapi.FakeNoaaConsumer{}
 		config = testconfig.NewRepositoryWithDefaults()
-		config.SetDopplerEndpoint("doppler-server.test.com")
+		config.SetLoggregatorEndpoint("loggregator.test.com")
+		config.SetDopplerEndpoint("doppler.test.com")
 		config.SetAccessToken("the-access-token")
 		fakeTokenRefresher = &testapi.FakeAuthenticationRepository{}
 		repo = api.NewLogsNoaaRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
