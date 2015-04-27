@@ -19,7 +19,44 @@ type Test1 struct {
 }
 
 func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
-	if args[0] == "test_1_cmd1" {
+	if args[0] == "new-api" {
+		token, _ := cliConnection.AccessToken()
+		fmt.Println("Access Token:", token)
+		fmt.Println("")
+
+		hasOrg, _ := cliConnection.HasOrganization()
+		fmt.Println("Has Organization Targeted:", hasOrg)
+		org, _ := cliConnection.GetCurrentOrg()
+		fmt.Println("Current Org:", org)
+		hasSpace, _ := cliConnection.HasSpace()
+		fmt.Println("Has Space Targeted:", hasSpace)
+		space, _ := cliConnection.GetCurrentSpace()
+		fmt.Println("Current space:", space)
+
+		loggregator, _ := cliConnection.LoggregatorEndpoint()
+		fmt.Println("Loggregator Endpoint:", loggregator)
+		dopplerEndpoint, _ := cliConnection.DopplerEndpoint()
+		fmt.Println("Doppler Endpoint:", dopplerEndpoint)
+
+		user, _ := cliConnection.Username()
+		fmt.Println("Current user:", user)
+		userGuid, _ := cliConnection.UserGuid()
+		fmt.Println("Current user guid:", userGuid)
+		email, _ := cliConnection.UserEmail()
+		fmt.Println("Current user email:", email)
+
+		hasAPI, _ := cliConnection.HasAPIEndpoint()
+		fmt.Println("Has API Endpoint:", hasAPI)
+		api, _ := cliConnection.ApiEndpoint()
+		fmt.Println("Current api:", api)
+		version, _ := cliConnection.ApiVersion()
+		fmt.Println("Current api version:", version)
+
+		loggedIn, _ := cliConnection.IsLoggedIn()
+		fmt.Println("Is Logged In:", loggedIn)
+		isSSLDisabled, _ := cliConnection.IsSSLDisabled()
+		fmt.Println("Is SSL Disabled:", isSSLDisabled)
+	} else if args[0] == "test_1_cmd1" {
 		theFirstCmd()
 	} else if args[0] == "test_1_cmd2" {
 		theSecondCmd()
@@ -53,6 +90,10 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			{
 				Name:     "test_1_cmd2",
 				HelpText: "help text for test_1_cmd2",
+			},
+			{
+				Name:     "new-api",
+				HelpText: "test new api for plugins",
 			},
 		},
 	}
