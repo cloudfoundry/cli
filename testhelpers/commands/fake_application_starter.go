@@ -25,17 +25,14 @@ type FakeApplicationStarter struct {
 		result1 models.Application
 		result2 error
 	}
-	RenewNoaaConsumerStub        func()
-	renewNoaaConsumerMutex       sync.RWMutex
-	renewNoaaConsumerArgsForCall []struct{}
 }
 
 func (fake *FakeApplicationStarter) SetStartTimeoutInSeconds(timeout int) {
 	fake.setStartTimeoutInSecondsMutex.Lock()
-	defer fake.setStartTimeoutInSecondsMutex.Unlock()
 	fake.setStartTimeoutInSecondsArgsForCall = append(fake.setStartTimeoutInSecondsArgsForCall, struct {
 		timeout int
 	}{timeout})
+	fake.setStartTimeoutInSecondsMutex.Unlock()
 	if fake.SetStartTimeoutInSecondsStub != nil {
 		fake.SetStartTimeoutInSecondsStub(timeout)
 	}
@@ -55,12 +52,12 @@ func (fake *FakeApplicationStarter) SetStartTimeoutInSecondsArgsForCall(i int) i
 
 func (fake *FakeApplicationStarter) ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error) {
 	fake.applicationStartMutex.Lock()
-	defer fake.applicationStartMutex.Unlock()
 	fake.applicationStartArgsForCall = append(fake.applicationStartArgsForCall, struct {
 		app       models.Application
 		orgName   string
 		spaceName string
 	}{app, orgName, spaceName})
+	fake.applicationStartMutex.Unlock()
 	if fake.ApplicationStartStub != nil {
 		return fake.ApplicationStartStub(app, orgName, spaceName)
 	} else {
@@ -86,21 +83,6 @@ func (fake *FakeApplicationStarter) ApplicationStartReturns(result1 models.Appli
 		result1 models.Application
 		result2 error
 	}{result1, result2}
-}
-
-func (fake *FakeApplicationStarter) RenewNoaaConsumer() {
-	fake.renewNoaaConsumerMutex.Lock()
-	defer fake.renewNoaaConsumerMutex.Unlock()
-	fake.renewNoaaConsumerArgsForCall = append(fake.renewNoaaConsumerArgsForCall, struct{}{})
-	if fake.RenewNoaaConsumerStub != nil {
-		fake.RenewNoaaConsumerStub()
-	}
-}
-
-func (fake *FakeApplicationStarter) RenewNoaaConsumerCallCount() int {
-	fake.renewNoaaConsumerMutex.RLock()
-	defer fake.renewNoaaConsumerMutex.RUnlock()
-	return len(fake.renewNoaaConsumerArgsForCall)
 }
 
 var _ application.ApplicationStarter = new(FakeApplicationStarter)

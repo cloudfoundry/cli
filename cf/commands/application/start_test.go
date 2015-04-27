@@ -2,7 +2,6 @@ package application_test
 
 import (
 	"os"
-	"reflect"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
@@ -135,27 +134,6 @@ var _ = Describe("start command", func() {
 		ui = callStart(args, configRepo, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 		return
 	}
-
-	Describe("RenewNoaaConsumer", func() {
-		It("creates a new noaa_consumer object everytime func is called", func() {
-			config := testconfig.NewRepositoryWithDefaults()
-			displayApp := &testcmd.FakeAppDisplayer{}
-			appRepo := &testApplication.FakeApplicationRepository{
-				UpdateAppResult: defaultAppForStart,
-			}
-			appInstancesRepo := &testAppInstanaces.FakeAppInstancesRepository{}
-
-			cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
-			cmd.RenewNoaaConsumer()
-			Ω(logRepo.NewConsumerCallCount()).To(Equal(1))
-			noaa1 := logRepo.NewConsumerArgsForCall(0)
-
-			cmd.RenewNoaaConsumer()
-			Ω(logRepo.NewConsumerCallCount()).To(Equal(2))
-			noaa2 := logRepo.NewConsumerArgsForCall(1)
-			Ω(reflect.DeepEqual(noaa1, noaa2)).To(BeFalse())
-		})
-	})
 
 	It("fails requirements when not logged in", func() {
 		requirementsFactory.LoginSuccess = false
