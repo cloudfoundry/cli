@@ -56,7 +56,6 @@ func (l *logNoaaRepository) Close() {
 	l.tailing = false
 	l.flushMessageQueue()
 	close(l.doneChan)
-	l.consumer.Close()
 }
 
 func (l *logNoaaRepository) GetContainerMetrics(appGuid string, instances []models.AppInstanceFields) ([]models.AppInstanceFields, error) {
@@ -109,16 +108,18 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 
 	l.consumer.SetOnConnectCallback(onConnect)
 
+	var stopChan chan struct{}
 	logChan := make(chan *events.LogMessage)
 	errChan := make(chan error)
-	closeChan := make(chan struct{})
-	go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan, closeChan)
+	stopChan = make(chan struct{})
+	go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan, stopChan)
 
 	for {
 		sendNoaaMessages(l.messageQueue, onMessage)
 
 		select {
 		case <-l.doneChan:
+			l.stopNoaa(stopChan)
 			return nil
 		case err := <-errChan:
 			switch err.(type) {
@@ -127,11 +128,12 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 				if !hasReauthed {
 					l.tokenRefresher.RefreshAuthToken()
 					hasReauthed = true
-					l.consumer.Close()
-					go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan, closeChan)
+					l.stopNoaa(stopChan)
+					time.Sleep(100 * time.Millisecond) //wait a little before retrying
+					stopChan = make(chan struct{})
+					go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan, stopChan)
 				} else {
-					close(closeChan)
-					l.Close()
+					l.stopNoaa(stopChan)
 					return err
 				}
 			default:
@@ -147,6 +149,11 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 			time.Sleep(10 * time.Millisecond)
 		}
 	}
+}
+
+func (l *logNoaaRepository) stopNoaa(stopChan chan struct{}) {
+	close(stopChan)
+	l.consumer.Close()
 }
 
 func sendNoaaMessages(queue *SortedMessageQueue, onMessage func(*events.LogMessage)) {
