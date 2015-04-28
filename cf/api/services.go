@@ -23,10 +23,10 @@ type ServiceRepository interface {
 	GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr error)
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
-	CreateServiceInstance(name, planGuid string) (apiErr error)
-	UpdateServiceInstance(instanceGuid, planGuid string) (apiErr error)
-	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
-	DeleteService(instance models.ServiceInstance) (apiErr error)
+	CreateServiceInstance(name, planGuid string, wait bool) (apiErr error)
+	UpdateServiceInstance(instanceGuid, planGuid string, wait bool) (apiErr error)
+	RenameService(instance models.ServiceInstance, newName string, wait bool) (apiErr error)
+	DeleteService(instance models.ServiceInstance, wait bool) (apiErr error)
 	FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error)
 	ListServicesFromBroker(brokerGuid string) (services []models.ServiceOffering, err error)
 	GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiErr error)
@@ -132,8 +132,11 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (err error) {
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string, wait bool) (err error) {
 	path := "/v2/service_instances?accepts_incomplete=true"
+	if wait == true {
+		path = "/v2/service_instances?accepts_incomplete=false"
+	}
 	data := fmt.Sprintf(
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s", "async": true}`,
 		name, planGuid, repo.config.SpaceFields().Guid,
@@ -152,8 +155,11 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 	return
 }
 
-func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string) (err error) {
+func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string, wait bool) (err error) {
 	path := fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=true", instanceGuid)
+	if wait == true {
+		path = fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=false", instanceGuid)
+	}
 	data := fmt.Sprintf(`{"service_plan_guid":"%s"}`, planGuid)
 
 	err = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data))
@@ -161,9 +167,13 @@ func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid,
 	return
 }
 
-func (repo CloudControllerServiceRepository) RenameService(instance models.ServiceInstance, newName string) (apiErr error) {
+func (repo CloudControllerServiceRepository) RenameService(instance models.ServiceInstance, newName string, wait bool) (apiErr error) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
+
 	path := fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=true", instance.Guid)
+	if wait == true {
+		path = fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=false", instance.Guid)
+	}
 
 	if instance.IsUserProvided() {
 		path = fmt.Sprintf("/v2/user_provided_service_instances/%s", instance.Guid)
@@ -171,11 +181,15 @@ func (repo CloudControllerServiceRepository) RenameService(instance models.Servi
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceRepository) DeleteService(instance models.ServiceInstance) (apiErr error) {
+func (repo CloudControllerServiceRepository) DeleteService(instance models.ServiceInstance, wait bool) (apiErr error) {
 	if len(instance.ServiceBindings) > 0 {
 		return errors.New("Cannot delete service instance, apps are still bound to it")
 	}
+
 	path := fmt.Sprintf("/v2/service_instances/%s?%s", instance.Guid, "accepts_incomplete=true")
+	if wait == true {
+		path = fmt.Sprintf("/v2/service_instances/%s?%s", instance.Guid, "accepts_incomplete=false")
+	}
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 

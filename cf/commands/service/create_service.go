@@ -40,6 +40,9 @@ EXAMPLE:
 
 TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`),
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "w", Usage: T("Wait for creation confirmation")},
+		},
 	}
 }
 
@@ -69,7 +72,8 @@ func (cmd CreateService) Run(c *cli.Context) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	plan, err := cmd.CreateService(serviceName, planName, serviceInstanceName)
+	var wait bool = c.Bool("w") || false
+	plan, err := cmd.CreateService(serviceName, planName, serviceInstanceName, wait)
 
 	switch err.(type) {
 	case nil:
@@ -96,7 +100,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	}
 }
 
-func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (models.ServicePlanFields, error) {
+func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string, wait bool) (models.ServicePlanFields, error) {
 	offerings, apiErr := cmd.serviceBuilder.GetServicesByNameForSpaceWithPlans(cmd.config.SpaceFields().Guid, serviceName)
 	if apiErr != nil {
 		return models.ServicePlanFields{}, apiErr
@@ -107,7 +111,7 @@ func (cmd CreateService) CreateService(serviceName string, planName string, serv
 		return plan, apiErr
 	}
 
-	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
+	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid, wait)
 	return plan, apiErr
 }
 

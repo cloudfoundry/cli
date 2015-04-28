@@ -32,6 +32,9 @@ func (cmd *RenameService) Metadata() command_metadata.CommandMetadata {
 		Name:        "rename-service",
 		Description: T("Rename a service instance"),
 		Usage:       T("CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"),
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "w", Usage: T("Wait for rename confirmation")},
+		},
 	}
 }
 
@@ -64,7 +67,8 @@ func (cmd *RenameService) Run(c *cli.Context) {
 			"SpaceName":      terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"CurrentUser":    terminal.EntityNameColor(cmd.config.Username()),
 		}))
-	err := cmd.serviceRepo.RenameService(serviceInstance, newName)
+	var wait bool = c.Bool("w") || false
+	err := cmd.serviceRepo.RenameService(serviceInstance, newName, wait)
 
 	if err != nil {
 		if httpError, ok := err.(errors.HttpError); ok && httpError.ErrorCode() == errors.SERVICE_INSTANCE_NAME_TAKEN {
