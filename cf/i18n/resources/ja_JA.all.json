@@ -1660,6 +1660,16 @@
       "modified": false
    },
    {
+      "id": "domain {{.DomainName}} is not a owned domain",
+      "translation": "domain {{.DomainName}} is not a owned domain",
+      "modified": false
+   },
+   {
+      "id": "domain {{.DomainName}} is not a shared domain",
+      "translation": "domain {{.DomainName}} is not a shared domain",
+      "modified": false
+   },
+   {
       "id": "Deleting org {{.OrgName}} as {{.Username}}...",
       "translation": "Deleting org {{.OrgName}} as {{.Username}}...",
       "modified": false
