@@ -19,6 +19,12 @@ func init() {
 				"nest2": []interface{}{
 					"nest2Val1",
 				},
+				"nest3": []interface{}{
+					map[interface{}]interface{}{
+						"nestKey1": "nest3Val1",
+						"nestKey2": "nest3Val2",
+					},
+				},
 			})
 
 			map2 := NewMap(map[interface{}]interface{}{
@@ -28,6 +34,11 @@ func init() {
 				},
 				"nest2": []interface{}{
 					"something",
+				},
+				"nest3": []interface{}{
+					map[interface{}]interface{}{
+						"nestKey2": "nest3newval",
+					},
 				},
 			})
 
@@ -41,6 +52,12 @@ func init() {
 				"nest2": []interface{}{
 					"nest2Val1",
 					"something",
+				},
+				"nest3": []interface{}{
+					map[interface{}]interface{}{
+						"nestKey1": "nest3Val1",
+						"nestKey2": "nest3newval",
+					},
 				},
 			})
 
