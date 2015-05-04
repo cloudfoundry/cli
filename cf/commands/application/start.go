@@ -10,6 +10,7 @@ import (
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/cloudfoundry/noaa/events"
 
 	"github.com/cloudfoundry/cli/cf"
@@ -40,6 +41,7 @@ type Start struct {
 	appReq           requirements.ApplicationRequirement
 	appRepo          applications.ApplicationRepository
 	appInstancesRepo app_instances.AppInstancesRepository
+	oldLogsRepo      api.OldLogsRepository
 	logRepo          api.LogsNoaaRepository
 
 	StartupTimeout time.Duration
@@ -56,7 +58,7 @@ type ApplicationStagingWatcher interface {
 	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsNoaaRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsNoaaRepository, oldLogsRepo api.OldLogsRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config
@@ -64,6 +66,7 @@ func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer Applicatio
 	cmd.appRepo = appRepo
 	cmd.appInstancesRepo = appInstancesRepo
 	cmd.logRepo = logRepo
+	cmd.oldLogsRepo = oldLogsRepo
 
 	cmd.PingerThrottle = DefaultPingerThrottle
 
@@ -170,7 +173,8 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	isStaged := cmd.waitForInstancesToStage(updatedApp)
 
 	if isConnected { //only close when actually connected, else CLI hangs at closing consumer connection
-		cmd.logRepo.Close()
+		// cmd.logRepo.Close()
+		cmd.oldLogsRepo.Close()
 	}
 
 	<-doneLoggingChan
@@ -214,6 +218,16 @@ func (cmd *Start) SetStartTimeoutInSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
+func simpleOldLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
+	msgText = string(logMsg.GetMessage())
+	reg, err := regexp.Compile("[\n\r]+$")
+	if err != nil {
+		return
+	}
+	msgText = reg.ReplaceAllString(msgText, "")
+	return
+}
+
 func simpleLogMessageOutput(logMsg *events.LogMessage) (msgText string) {
 	msgText = string(logMsg.GetMessage())
 	reg, err := regexp.Compile("[\n\r]+$")
@@ -229,11 +243,16 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan, doneChan cha
 		startChan <- true
 	}
 
-	err := cmd.logRepo.TailNoaaLogsFor(app.Guid, onConnect, func(msg *events.LogMessage) {
-		if msg.GetSourceType() == LogMessageTypeStaging {
-			cmd.ui.Say(simpleLogMessageOutput(msg))
+	err := cmd.oldLogsRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
+		if msg.GetSourceName() == LogMessageTypeStaging {
+			cmd.ui.Say(simpleOldLogMessageOutput(msg))
 		}
 	})
+	// err := cmd.logRepo.TailNoaaLogsFor(app.Guid, onConnect, func(msg *events.LogMessage) {
+	// 	if msg.GetSourceType() == LogMessageTypeStaging {
+	// 		cmd.ui.Say(simpleLogMessageOutput(msg))
+	// 	}
+	// })
 
 	if err != nil {
 		cmd.ui.Warn(T("Warning: error tailing logs"))
