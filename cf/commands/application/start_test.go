@@ -124,8 +124,8 @@ var _ = Describe("start command", func() {
 		appInstancesRepo.GetInstancesStub = getInstance
 
 		logsForTail = []*events.LogMessage{
-			testlogs.NewLogMessage("Log Line 1", app.Guid, LogMessageTypeStaging, time.Now()),
-			testlogs.NewLogMessage("Log Line 2", app.Guid, LogMessageTypeStaging, time.Now()),
+			testlogs.NewNoaaLogMessage("Log Line 1", app.Guid, LogMessageTypeStaging, time.Now()),
+			testlogs.NewNoaaLogMessage("Log Line 2", app.Guid, LogMessageTypeStaging, time.Now()),
 		}
 
 		args := []string{"my-app"}
@@ -305,10 +305,10 @@ var _ = Describe("start command", func() {
 			correctSourceName := "STG"
 
 			logsForTail = []*events.LogMessage{
-				testlogs.NewLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
-				testlogs.NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
-				testlogs.NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
-				testlogs.NewLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
+				testlogs.NewNoaaLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
+				testlogs.NewNoaaLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
+				testlogs.NewNoaaLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
+				testlogs.NewNoaaLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
 			}
 
 			ui := callStart([]string{"my-app"}, testconfig.NewRepository(), requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
@@ -330,13 +330,13 @@ var _ = Describe("start command", func() {
 
 			logRepo.TailNoaaLogsForStub = func(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error {
 				onConnect()
-				onMessage(testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, time.Now()))
+				onMessage(testlogs.NewNoaaLogMessage("Before close", appGuid, LogMessageTypeStaging, time.Now()))
 
 				<-logRepoClosed
 
 				time.Sleep(50 * time.Millisecond)
-				onMessage(testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, time.Now()))
-				onMessage(testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, time.Now()))
+				onMessage(testlogs.NewNoaaLogMessage("After close 1", appGuid, LogMessageTypeStaging, time.Now()))
+				onMessage(testlogs.NewNoaaLogMessage("After close 2", appGuid, LogMessageTypeStaging, time.Now()))
 
 				return nil
 			}

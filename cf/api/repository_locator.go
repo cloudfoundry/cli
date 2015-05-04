@@ -29,6 +29,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	consumer "github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/noaa"
 )
 
@@ -55,6 +56,7 @@ type RepositoryLocator struct {
 	userRepo                        CloudControllerUserRepository
 	passwordRepo                    password.CloudControllerPasswordRepository
 	logsNoaaRepo                    LogsNoaaRepository
+	oldLogsRepo                     OldLogsRepository
 	authTokenRepo                   CloudControllerServiceAuthTokenRepository
 	serviceBrokerRepo               CloudControllerServiceBrokerRepository
 	servicePlanRepo                 CloudControllerServicePlanRepository
@@ -85,6 +87,8 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
+	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{})
 
 	noaaLib := noaa.NewConsumer(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 	noaaLib.SetDebugPrinter(terminal.DebugPrinter{})
@@ -101,6 +105,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
 	loc.logsNoaaRepo = NewLogsNoaaRepository(config, logNoaaConsumer, loc.authRepo)
+	loc.oldLogsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
@@ -211,6 +216,10 @@ func (locator RepositoryLocator) GetUserRepository() UserRepository {
 
 func (locator RepositoryLocator) GetPasswordRepository() password.PasswordRepository {
 	return locator.passwordRepo
+}
+
+func (locator RepositoryLocator) GetOldLogsRepository() OldLogsRepository {
+	return locator.oldLogsRepo
 }
 
 func (locator RepositoryLocator) GetLogsNoaaRepository() LogsNoaaRepository {
