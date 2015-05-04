@@ -97,6 +97,7 @@ func ExtractNoaaLogContent(logMsg *events.LogMessage, logHeader string) (logCont
 
 	return
 }
+
 func ExtractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logContent string) {
 	msgText := string(logMsg.GetMessage())
 	msgText = newLinesPattern.ReplaceAllString(msgText, "")
