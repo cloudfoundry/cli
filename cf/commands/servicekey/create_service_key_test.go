@@ -77,7 +77,7 @@ var _ = Describe("create-service-key command", func() {
 				[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceId).To(Equal("fake-instance-guid"))
+			Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGuid).To(Equal("fake-instance-guid"))
 			Expect(serviceKeyRepo.CreateServiceKeyMethod.KeyName).To(Equal("fake-service-key"))
 		})
 

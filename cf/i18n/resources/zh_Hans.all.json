@@ -5298,5 +5298,35 @@
       "id": "Show service key info",
       "translation": "显示服务密钥信息",
       "modified": false
+   },
+   {
+      "id": "Delete a service key",
+      "translation": "删除服务密钥",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
+      "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\n样例：\n   CF_NAME delete-service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}正在删除服务实例{{.ServiceInstanceName}}的密钥{{.ServiceKeyName}}...",
+      "modified": false
+   },
+   {
+      "id": "Service instance {{.ServiceInstanceName}} does not exist.",
+      "translation": "服务实例{{.ServiceInstanceName}}不存在。",
+      "modified": false
+   },
+   {
+      "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
+      "translation": "服务实例{{.ServiceInstanceName}}的密钥{{.ServiceKeyName}}不存在。",
+      "modified": false
+   },
+   {
+      "id": "service key",
+      "translation": "服务密钥",
+      "modified": false
    }
 ]

@@ -8,28 +8,35 @@ type FakeServiceKeyRepo struct {
 	CreateServiceKeyMethod CreateServiceKeyType
 	ListServiceKeysMethod  ListServiceKeysType
 	GetServiceKeyMethod    GetServiceKeyType
+	DeleteServiceKeyMethod DeleteServiceKeyType
 }
 
 type CreateServiceKeyType struct {
-	InstanceId string
-	KeyName    string
+	InstanceGuid string
+	KeyName      string
 
 	Error error
 }
 
 type ListServiceKeysType struct {
-	InstanceId string
+	InstanceGuid string
 
 	ServiceKeys []models.ServiceKey
 	Error       error
 }
 
 type GetServiceKeyType struct {
-	InstanceId string
-	KeyName    string
+	InstanceGuid string
+	KeyName      string
 
 	ServiceKey models.ServiceKey
 	Error      error
+}
+
+type DeleteServiceKeyType struct {
+	Guid string
+
+	Error error
 }
 
 func NewFakeServiceKeyRepo() *FakeServiceKeyRepo {
@@ -37,24 +44,31 @@ func NewFakeServiceKeyRepo() *FakeServiceKeyRepo {
 		CreateServiceKeyMethod: CreateServiceKeyType{},
 		ListServiceKeysMethod:  ListServiceKeysType{},
 		GetServiceKeyMethod:    GetServiceKeyType{},
+		DeleteServiceKeyMethod: DeleteServiceKeyType{},
 	}
 }
 
-func (f *FakeServiceKeyRepo) CreateServiceKey(instanceId string, serviceKeyName string) error {
-	f.CreateServiceKeyMethod.InstanceId = instanceId
+func (f *FakeServiceKeyRepo) CreateServiceKey(instanceGuid string, serviceKeyName string) error {
+	f.CreateServiceKeyMethod.InstanceGuid = instanceGuid
 	f.CreateServiceKeyMethod.KeyName = serviceKeyName
 
 	return f.CreateServiceKeyMethod.Error
 }
 
-func (f *FakeServiceKeyRepo) ListServiceKeys(instanceId string) ([]models.ServiceKey, error) {
-	f.ListServiceKeysMethod.InstanceId = instanceId
+func (f *FakeServiceKeyRepo) ListServiceKeys(instanceGuid string) ([]models.ServiceKey, error) {
+	f.ListServiceKeysMethod.InstanceGuid = instanceGuid
 
 	return f.ListServiceKeysMethod.ServiceKeys, f.ListServiceKeysMethod.Error
 }
 
-func (f *FakeServiceKeyRepo) GetServiceKey(instanceId string, serviceKeyName string) (models.ServiceKey, error) {
-	f.GetServiceKeyMethod.InstanceId = instanceId
+func (f *FakeServiceKeyRepo) GetServiceKey(instanceGuid string, serviceKeyName string) (models.ServiceKey, error) {
+	f.GetServiceKeyMethod.InstanceGuid = instanceGuid
 
 	return f.GetServiceKeyMethod.ServiceKey, f.GetServiceKeyMethod.Error
+}
+
+func (f *FakeServiceKeyRepo) DeleteServiceKey(serviceKeyGuid string) error {
+	f.DeleteServiceKeyMethod.Guid = serviceKeyGuid
+
+	return f.DeleteServiceKeyMethod.Error
 }
