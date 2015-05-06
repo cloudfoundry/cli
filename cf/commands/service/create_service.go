@@ -69,9 +69,8 @@ func (cmd CreateService) Run(c *cli.Context) {
 	serviceInstanceName := c.Args()[2]
 	params := c.String("c")
 
-	paramsMap := make(map[string]interface{})
 	paramsMap, err := cmd.parseArbitraryParams(params)
-	if err != nil && params != "" {
+	if err != nil {
 		cmd.ui.Failed(T("Invalid JSON provided in -c argument"))
 	}
 
