@@ -2,11 +2,11 @@
 package fakes
 
 import (
-	. "github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/api/resources"
-
 	"os"
 	"sync"
+
+	"github.com/cloudfoundry/cli/cf/actors"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 )
 
 type FakePushActor struct {
@@ -20,7 +20,7 @@ type FakePushActor struct {
 	uploadAppReturns struct {
 		result1 error
 	}
-	GatherFilesStub        func(appDir string, uploadDir string) ([]resources.AppFileResource, error)
+	GatherFilesStub        func(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 	gatherFilesMutex       sync.RWMutex
 	gatherFilesArgsForCall []struct {
 		appDir    string
@@ -28,18 +28,19 @@ type FakePushActor struct {
 	}
 	gatherFilesReturns struct {
 		result1 []resources.AppFileResource
-		result2 error
+		result2 bool
+		result3 error
 	}
 }
 
 func (fake *FakePushActor) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
 	fake.uploadAppMutex.Lock()
-	defer fake.uploadAppMutex.Unlock()
 	fake.uploadAppArgsForCall = append(fake.uploadAppArgsForCall, struct {
 		appGuid      string
 		zipFile      *os.File
 		presentFiles []resources.AppFileResource
 	}{appGuid, zipFile, presentFiles})
+	fake.uploadAppMutex.Unlock()
 	if fake.UploadAppStub != nil {
 		return fake.UploadAppStub(appGuid, zipFile, presentFiles)
 	} else {
@@ -60,22 +61,23 @@ func (fake *FakePushActor) UploadAppArgsForCall(i int) (string, *os.File, []reso
 }
 
 func (fake *FakePushActor) UploadAppReturns(result1 error) {
+	fake.UploadAppStub = nil
 	fake.uploadAppReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakePushActor) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, error) {
+func (fake *FakePushActor) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
 	fake.gatherFilesMutex.Lock()
-	defer fake.gatherFilesMutex.Unlock()
 	fake.gatherFilesArgsForCall = append(fake.gatherFilesArgsForCall, struct {
 		appDir    string
 		uploadDir string
 	}{appDir, uploadDir})
+	fake.gatherFilesMutex.Unlock()
 	if fake.GatherFilesStub != nil {
 		return fake.GatherFilesStub(appDir, uploadDir)
 	} else {
-		return fake.gatherFilesReturns.result1, fake.gatherFilesReturns.result2
+		return fake.gatherFilesReturns.result1, fake.gatherFilesReturns.result2, fake.gatherFilesReturns.result3
 	}
 }
 
@@ -91,11 +93,13 @@ func (fake *FakePushActor) GatherFilesArgsForCall(i int) (string, string) {
 	return fake.gatherFilesArgsForCall[i].appDir, fake.gatherFilesArgsForCall[i].uploadDir
 }
 
-func (fake *FakePushActor) GatherFilesReturns(result1 []resources.AppFileResource, result2 error) {
+func (fake *FakePushActor) GatherFilesReturns(result1 []resources.AppFileResource, result2 bool, result3 error) {
+	fake.GatherFilesStub = nil
 	fake.gatherFilesReturns = struct {
 		result1 []resources.AppFileResource
-		result2 error
-	}{result1, result2}
+		result2 bool
+		result3 error
+	}{result1, result2, result3}
 }
 
-var _ PushActor = new(FakePushActor)
+var _ actors.PushActor = new(FakePushActor)

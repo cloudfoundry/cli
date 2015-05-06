@@ -14,7 +14,7 @@ import (
 
 type PushActor interface {
 	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
-	GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, error)
+	GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 }
 
 type PushActorImpl struct {
@@ -31,7 +31,7 @@ func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper
 	}
 }
 
-func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) (presentFiles []resources.AppFileResource, apiErr error) {
+func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) (presentFiles []resources.AppFileResource, hasFileToUpload bool, apiErr error) {
 	if actor.zipper.IsZipFile(appDir) {
 		fileutils.TempDir("unzipped-app", func(tmpDir string, err error) {
 			err = actor.zipper.Unzip(appDir, tmpDir)
@@ -40,19 +40,19 @@ func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) (present
 				apiErr = err
 				return
 			}
-			presentFiles, apiErr = actor.copyUploadableFiles(tmpDir, uploadDir)
+			presentFiles, hasFileToUpload, apiErr = actor.copyUploadableFiles(tmpDir, uploadDir)
 		})
 	} else {
-		presentFiles, apiErr = actor.copyUploadableFiles(appDir, uploadDir)
+		presentFiles, hasFileToUpload, apiErr = actor.copyUploadableFiles(appDir, uploadDir)
 	}
-	return presentFiles, apiErr
+	return presentFiles, hasFileToUpload, apiErr
 }
 
 func (actor PushActorImpl) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
 	return actor.appBitsRepo.UploadBits(appGuid, zipFile, presentFiles)
 }
 
-func (actor PushActorImpl) copyUploadableFiles(appDir string, uploadDir string) (presentFiles []resources.AppFileResource, err error) {
+func (actor PushActorImpl) copyUploadableFiles(appDir string, uploadDir string) (presentFiles []resources.AppFileResource, hasFileToUpload bool, err error) {
 	// Find which files need to be uploaded
 	allAppFiles, err := actor.appfiles.AppFilesInDir(appDir)
 	if err != nil {
@@ -64,6 +64,7 @@ func (actor PushActorImpl) copyUploadableFiles(appDir string, uploadDir string) 
 		err = errors.New(apiErr.Error())
 		return
 	}
+	hasFileToUpload = len(appFilesToUpload) > 0
 
 	// Copy files into a temporary directory and return it
 	err = actor.appfiles.CopyFiles(appFilesToUpload, appDir, uploadDir)
