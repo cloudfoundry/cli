@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -23,7 +25,7 @@ type ServiceRepository interface {
 	GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr error)
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
-	CreateServiceInstance(name, planGuid string) (apiErr error)
+	CreateServiceInstance(name, planGuid string, params map[string]interface{}) (apiErr error)
 	UpdateServiceInstance(instanceGuid, planGuid string) (apiErr error)
 	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
 	DeleteService(instance models.ServiceInstance) (apiErr error)
@@ -132,14 +134,22 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (err error) {
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string, params map[string]interface{}) (err error) {
 	path := "/v2/service_instances?accepts_incomplete=true"
-	data := fmt.Sprintf(
-		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s"}`,
-		name, planGuid, repo.config.SpaceFields().Guid,
-	)
+	request := models.ServiceInstanceRequest{
+		Name:      name,
+		PlanGuid:  planGuid,
+		SpaceGuid: repo.config.SpaceFields().Guid,
+		Params:    params,
+	}
 
-	err = repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data))
+	jsonBytes, err := json.Marshal(request)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	err = repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 
 	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SERVICE_INSTANCE_NAME_TAKEN {
 		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)

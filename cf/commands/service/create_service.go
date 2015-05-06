@@ -1,11 +1,14 @@
 package service
 
 import (
+	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -40,6 +43,9 @@ EXAMPLE:
 
 TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`),
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
+		},
 	}
 }
 
@@ -60,6 +66,13 @@ func (cmd CreateService) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
 	planName := c.Args()[1]
 	serviceInstanceName := c.Args()[2]
+	params := c.String("c")
+
+	paramsMap := make(map[string]interface{})
+	err := json.Unmarshal([]byte(params), &paramsMap)
+	if err != nil && params != "" {
+		cmd.ui.Failed("Invalid JSON provided in parameters argument")
+	}
 
 	cmd.ui.Say(T("Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
@@ -69,7 +82,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	plan, err := cmd.CreateService(serviceName, planName, serviceInstanceName)
+	plan, err := cmd.CreateService(serviceName, planName, serviceInstanceName, paramsMap)
 
 	switch err.(type) {
 	case nil:
@@ -96,7 +109,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	}
 }
 
-func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (models.ServicePlanFields, error) {
+func (cmd CreateService) CreateService(serviceName, planName, serviceInstanceName string, params map[string]interface{}) (models.ServicePlanFields, error) {
 	offerings, apiErr := cmd.serviceBuilder.GetServicesByNameForSpaceWithPlans(cmd.config.SpaceFields().Guid, serviceName)
 	if apiErr != nil {
 		return models.ServicePlanFields{}, apiErr
@@ -107,7 +120,7 @@ func (cmd CreateService) CreateService(serviceName string, planName string, serv
 		return plan, apiErr
 	}
 
-	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
+	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid, params)
 	return plan, apiErr
 }
 

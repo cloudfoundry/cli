@@ -46,7 +46,9 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	AfterEach(func() {
-		testServer.Close()
+		if testServer != nil {
+			testServer.Close()
+		}
 	})
 
 	Describe("GetAllServiceOfferings", func() {
@@ -201,9 +203,37 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			}))
 
-			err := repo.CreateServiceInstance("instance-name", "plan-guid")
+			err := repo.CreateServiceInstance("instance-name", "plan-guid", nil)
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
+		})
+
+		Context("when there are parameters", func() {
+			It("sends the parameters as part of the request body", func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "POST",
+					Path:     "/v2/service_instances?accepts_incomplete=true",
+					Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","parameters": {"data": "hello"}}`),
+					Response: testnet.TestResponse{Status: http.StatusCreated},
+				}))
+
+				paramsMap := make(map[string]interface{})
+				paramsMap["data"] = "hello"
+
+				err := repo.CreateServiceInstance("instance-name", "plan-guid", paramsMap)
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("and there is a failure during serialization", func() {
+			It("returns the serialization error", func() {
+				paramsMap := make(map[string]interface{})
+				paramsMap["data"] = make(chan bool)
+
+				err := repo.CreateServiceInstance("instance-name", "plan-guid", paramsMap)
+				Expect(err).To(MatchError("json: unsupported type: chan bool"))
+			})
 		})
 
 		Context("when the name is taken but an identical service exists", func() {
@@ -222,7 +252,7 @@ var _ = Describe("Services Repo", func() {
 			})
 
 			It("returns a ModelAlreadyExistsError if the plan is the same", func() {
-				err := repo.CreateServiceInstance("my-service", "plan-guid")
+				err := repo.CreateServiceInstance("my-service", "plan-guid", nil)
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
 			})
@@ -244,7 +274,7 @@ var _ = Describe("Services Repo", func() {
 			})
 
 			It("fails if the plan is different", func() {
-				err := repo.CreateServiceInstance("my-service", "different-plan-guid")
+				err := repo.CreateServiceInstance("my-service", "different-plan-guid", nil)
 
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(HaveOccurred())
