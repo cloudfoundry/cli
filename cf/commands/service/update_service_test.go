@@ -100,7 +100,7 @@ var _ = Describe("update-service command", func() {
 		})
 	})
 
-	Context("when service creation is asynchronous", func() {
+	Context("when service update is asynchronous", func() {
 		Context("when the plan flag is passed", func() {
 			BeforeEach(func() {
 				serviceInstance := models.ServiceInstance{
@@ -226,7 +226,7 @@ var _ = Describe("update-service command", func() {
 		})
 	})
 
-	Context("when service creation is synchronous", func() {
+	Context("when service update is synchronous", func() {
 		Context("when the plan flag is passed", func() {
 			BeforeEach(func() {
 				serviceInstance := models.ServiceInstance{
