@@ -125,8 +125,15 @@ var _ = Describe("Push Command", func() {
 
 			zipper.ZipReturns(nil)
 			zipper.GetZipSizeReturns(9001, nil)
-			actor.GatherFilesReturns(nil, nil)
+			actor.GatherFilesReturns(nil, true, nil)
 			actor.UploadAppReturns(nil)
+		})
+
+		It("does not call Zip() when there is no file to be uploaded", func() {
+			actor.GatherFilesReturns(nil, false, nil)
+			callPush("my-new-app")
+
+			Expect(zipper.ZipCallCount()).To(Equal(0))
 		})
 
 		Context("when the default route for the app already exists", func() {
@@ -1028,7 +1035,7 @@ var _ = Describe("Push Command", func() {
 			app_files.CountFilesReturns(11)
 			zipper.ZipReturns(nil)
 			zipper.GetZipSizeReturns(6100000, nil)
-			actor.GatherFilesReturns([]resources.AppFileResource{resources.AppFileResource{Path: "path/to/app"}, resources.AppFileResource{Path: "bar"}}, nil)
+			actor.GatherFilesReturns([]resources.AppFileResource{resources.AppFileResource{Path: "path/to/app"}, resources.AppFileResource{Path: "bar"}}, true, nil)
 
 			curDir, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
@@ -1037,15 +1044,6 @@ var _ = Describe("Push Command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Uploading", curDir},
 				[]string{"5.8M", "11 files"},
-			))
-		})
-
-		It("omits the size when there are no files being uploaded", func() {
-			app_files.CountFilesReturns(0)
-
-			callPush("appName")
-			Expect(ui.WarnOutputs).To(ContainSubstrings(
-				[]string{"None of your application files have changed", "Nothing will be uploaded"},
 			))
 		})
 	})

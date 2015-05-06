@@ -570,17 +570,19 @@ func (cmd *Push) uploadApp(appGuid string, appDir string) (apiErr error) {
 			return
 		}
 
-		presentFiles, err := cmd.actor.GatherFiles(appDir, uploadDir)
+		presentFiles, hasFileToUpload, err := cmd.actor.GatherFiles(appDir, uploadDir)
 		if err != nil {
 			apiErr = err
 			return
 		}
 
 		fileutils.TempFile("uploads", func(zipFile *os.File, err error) {
-			err = cmd.zipAppFiles(zipFile, appDir, uploadDir)
-			if err != nil {
-				apiErr = err
-				return
+			if hasFileToUpload {
+				err = cmd.zipAppFiles(zipFile, appDir, uploadDir)
+				if err != nil {
+					apiErr = err
+					return
+				}
 			}
 
 			err = cmd.actor.UploadApp(appGuid, zipFile, presentFiles)
@@ -631,7 +633,5 @@ func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount in
 			map[string]interface{}{
 				"ZipFileBytes": formatters.ByteSize(zipFileBytes),
 				"FileCount":    fileCount}))
-	} else {
-		cmd.ui.Warn(T("None of your application files have changed. Nothing will be uploaded."))
 	}
 }
