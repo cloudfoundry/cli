@@ -950,6 +950,16 @@
       "modified": false
    },
    {
+      "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nÉXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
+      "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\nÉXAMPLE:\n   CF_NAME service-keys mydb",
+      "modified": false
+   },
+   {
       "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
       "translation": "CF_NAME set-env APP NOM VALEUR",
       "modified": true
@@ -1015,13 +1025,13 @@
       "modified": false
    },
    {
-      "id": "CF_NAME stacks",
-      "translation": "CF_NAME stacks",
+      "id": "CF_NAME stack STACK_NAME",
+      "translation": "CF_NAME stack STACK_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME stack STACK_NAME",
-      "translation": "CF_NAME stack STACK_NAME",
+      "id": "CF_NAME stacks",
+      "translation": "CF_NAME stacks",
       "modified": false
    },
    {
@@ -1472,6 +1482,11 @@
    {
       "id": "Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "Création d'un service {{.ServiceName}} dans l'org {{.OrgName}} / espace {{.SpaceName}} en tant que {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
       "modified": false
    },
    {
@@ -2330,6 +2345,16 @@
       "modified": false
    },
    {
+      "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "En train d'obtenir la clef {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
       "id": "Getting orgs as {{.Username}}...\n",
       "translation": "Récupération des orgs en tant que {{.Username}}...\n",
       "modified": false
@@ -2730,11 +2755,6 @@
       "modified": false
    },
    {
-      "id": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "translation": "Montrez information pour un stack (un stack est un system de fichier pré-construit qui inclus un system d'exploitation qui peut executer des logiciels)",
-      "modified": false
-   },
-   {
       "id": "List all the routes for all spaces of current organization",
       "translation": "Lister toutes les routes pour tous les espaces de l'organization courrant",
       "modified": false
@@ -2762,6 +2782,11 @@
    {
       "id": "List domains in the target org",
       "translation": "domaines de la liste dans la org ciblé",
+      "modified": false
+   },
+   {
+      "id": "List keys for a service instance",
+      "translation": "Lister les clefs pour un instance de service",
       "modified": false
    },
    {
@@ -3020,6 +3045,16 @@
       "modified": false
    },
    {
+      "id": "No service key for service instance {{.ServiceInstanceName}}",
+      "translation": "Pas de clef pour instance de service {{.ServiceInstanceName}}",
+      "modified": false
+   },
+   {
+      "id": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+      "translation": "Pas de clef de service {{.ServiceKeyName}} trouver pour instance de service {{.ServiceInstanceName}}",
+      "modified": false
+   },
+   {
       "id": "No service offerings found",
       "translation": "Aucune offre de services trouvés",
       "modified": false
@@ -3067,11 +3102,6 @@
    {
       "id": "No user-defined env variables have been set",
       "translation": "Variables d'environnement utilisateur non définis",
-      "modified": false
-   },
-   {
-      "id": "None of your application files have changed. Nothing will be uploaded.",
-      "translation": "Aucun de vos dossiers de l'application ont changé. Rien ne sera téléchargé.",
       "modified": false
    },
    {
@@ -3580,6 +3610,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
+      "translation": "Récupérer et montrer le guid d'un clef the service.  Tout autre information pour la clef de service a été suprimer.",
+      "modified": false
+   },
+   {
       "id": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
       "translation": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
       "modified": false
@@ -3860,6 +3895,11 @@
       "modified": false
    },
    {
+      "id": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "Montrez information pour un stack (un stack est un system de fichier pré-construit qui inclus un system d'exploitation qui peut executer des logiciels)",
+      "modified": false
+   },
+   {
       "id": "Show org info",
       "translation": "Afficher les informations org",
       "modified": false
@@ -3887,6 +3927,11 @@
    {
       "id": "Show service instance info",
       "translation": "Afficher infos d'instances de service",
+      "modified": false
+   },
+   {
+      "id": "Show service key info",
+      "translation": "Montrer information pour la clef de service",
       "modified": false
    },
    {
