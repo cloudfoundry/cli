@@ -740,6 +740,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
+      "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\n样例：\n   CF_NAME delete-service-key mydb mykey",
+      "modified": false
+   },
+   {
       "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
       "translation": "CF_NAME delete-shared-domain DOMAIN [-f]",
       "modified": false
@@ -1610,6 +1615,11 @@
       "modified": false
    },
    {
+      "id": "Delete a service key",
+      "translation": "删除服务密钥",
+      "modified": false
+   },
+   {
       "id": "Delete a shared domain",
       "translation": "Delete a shared domain",
       "modified": false
@@ -1667,6 +1677,11 @@
    {
       "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
       "translation": "Deleting domain {{.DomainName}} as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "用户{{.CurrentUser}}正在删除服务实例{{.ServiceInstanceName}}的密钥{{.ServiceKeyName}}...",
       "modified": false
    },
    {
@@ -3790,8 +3805,18 @@
       "modified": false
    },
    {
+      "id": "Service instance {{.ServiceInstanceName}} does not exist.",
+      "translation": "服务实例{{.ServiceInstanceName}}不存在。",
+      "modified": false
+   },
+   {
       "id": "Service instance: {{.ServiceName}}",
       "translation": "服务实例: {{.ServiceName}}",
+      "modified": false
+   },
+   {
+      "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
+      "translation": "服务实例{{.ServiceInstanceName}}的密钥{{.ServiceKeyName}}不存在。",
       "modified": false
    },
    {
@@ -4980,6 +5005,11 @@
       "modified": false
    },
    {
+      "id": "service key",
+      "translation": "服务密钥",
+      "modified": false
+   },
+   {
       "id": "service plan",
       "translation": "service plan",
       "modified": false
@@ -5242,131 +5272,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} 乘以 {{.InstanceCount}}实例数",
-      "modified": false
-   },
-   {
-      "id": "Share a private domain with an org",
-      "translation": "Share a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME share-private-domain ORG DOMAIN",
-      "translation": "CF_NAME share-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Unshare a private domain with an org",
-      "translation": "Unshare a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Create key for a service instance",
-      "translation": "为服务实例创建密钥",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\n样例：\n   CF_NAME create-service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "用户{{.CurrentUser}}正在为服务实例{{.ServiceInstanceName}}创建名为{{.ServiceKeyName}}的密钥...",
-      "modified": false
-   },
-   {
-      "id": "This service doesn't support creation of keys.",
-      "translation": "此服务不支持创建密钥。",
-      "modified": false
-   },
-   {
-      "id": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "用户{{.CurrentUser}}正在获取服务实例{{.ServiceInstanceName}}的密钥列表...",
-      "modified": false
-   },
-   {
-      "id": "No service key for service instance {{.ServiceInstanceName}}",
-      "translation": "服务实例{{.ServiceInstanceName}}没有密钥",
-      "modified": false
-   },
-   {
-      "id": "List keys for a service instance",
-      "translation": "获取服务实例的密钥列表",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
-      "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\n样例：\n   CF_NAME service-keys mydb",
-      "modified": false
-   },
-   {
-      "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "用户{{.CurrentUser}}正在为服务实例{{.ServiceInstanceName}}获取密钥{{.ServiceKeyName}}...",
-      "modified": false
-   },
-   {
-      "id": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
-      "translation": "未找到服务实例{{.ServiceInstanceName}}的密钥{{.ServiceKeyName}}",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
-      "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\n样例：\n   CF_NAME service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
-      "translation": "获取并显示服务密钥的guid。 不显示服务的其它全部信息。",
-      "modified": false
-   },
-   {
-      "id": "Show service key info",
-      "translation": "显示服务密钥信息",
-      "modified": false
-   },
-   {
-      "id": "Delete a service key",
-      "translation": "删除服务密钥",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
-      "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\n样例：\n   CF_NAME delete-service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "用户{{.CurrentUser}}正在删除服务实例{{.ServiceInstanceName}}的密钥{{.ServiceKeyName}}...",
-      "modified": false
-   },
-   {
-      "id": "Service instance {{.ServiceInstanceName}} does not exist.",
-      "translation": "服务实例{{.ServiceInstanceName}}不存在。",
-      "modified": false
-   },
-   {
-      "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
-      "translation": "服务实例{{.ServiceInstanceName}}的密钥{{.ServiceKeyName}}不存在。",
-      "modified": false
-   },
-   {
-      "id": "service key",
-      "translation": "服务密钥",
       "modified": false
    }
 ]
