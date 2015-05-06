@@ -55,7 +55,7 @@ func (cmd UpdateSecurityGroup) Run(context *cli.Context) {
 	}
 
 	pathToJSONFile := context.Args()[1]
-	rules, err := json.ParseJSON(pathToJSONFile)
+	rules, err := json.ParseJsonArray(pathToJSONFile)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

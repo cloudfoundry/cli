@@ -63,7 +63,7 @@ func (cmd CreateSecurityGroup) GetRequirements(requirementsFactory requirements.
 func (cmd CreateSecurityGroup) Run(context *cli.Context) {
 	name := context.Args()[0]
 	pathToJSONFile := context.Args()[1]
-	rules, err := json.ParseJSON(pathToJSONFile)
+	rules, err := json.ParseJsonArray(pathToJSONFile)
 	if err != nil {
 		cmd.ui.Failed(T(`Incorrect json format: file: {{.JSONFile}}
 		

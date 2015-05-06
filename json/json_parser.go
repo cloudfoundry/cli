@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 )
 
-func ParseJSON(path string) ([]map[string]interface{}, error) {
+func ParseJsonArray(path string) ([]map[string]interface{}, error) {
 	if path == "" {
 		return nil, nil
 	}

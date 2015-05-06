@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ParseJson", func() {
+var _ = Describe("ParseJsonArray", func() {
 	var filename string
 	var tmpFile *os.File
 
@@ -26,7 +26,7 @@ var _ = Describe("ParseJson", func() {
 		})
 
 		It("converts a json file into an unmarshalled slice of string->string map objects", func() {
-			stringMaps, err := json.ParseJSON(filename)
+			stringMaps, err := json.ParseJsonArray(filename)
 			Expect(err).To(BeNil())
 			Expect(stringMaps[0]["akey"]).To(Equal("avalue"))
 		})
@@ -45,7 +45,7 @@ var _ = Describe("ParseJson", func() {
 		})
 
 		It("tries to convert the json file but fails because it was given something it didn't like", func() {
-			_, err := json.ParseJSON(filename)
+			_, err := json.ParseJsonArray(filename)
 			Expect(err).ToNot(BeNil())
 		})
 	})
