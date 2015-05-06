@@ -193,11 +193,11 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	Describe("creating a service instance", func() {
-		It("makes the right request with the async flag", func() {
+		It("makes the right request", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/service_instances?accepts_incomplete=true",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			}))
 
@@ -212,7 +212,7 @@ var _ = Describe("Services Repo", func() {
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/service_instances?accepts_incomplete=true",
-						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
+						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
 						Response: testnet.TestResponse{
 							Status: http.StatusBadRequest,
 							Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
@@ -234,7 +234,7 @@ var _ = Describe("Services Repo", func() {
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/service_instances?accepts_incomplete=true",
-						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
+						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
 						Response: testnet.TestResponse{
 							Status: http.StatusBadRequest,
 							Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
