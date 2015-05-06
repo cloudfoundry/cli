@@ -740,6 +740,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
+      "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
+      "modified": false
+   },
+   {
       "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
       "translation": "CF_NAME delete-shared-domain DOMÍNIO [-f]",
       "modified": false
@@ -1610,6 +1615,11 @@
       "modified": false
    },
    {
+      "id": "Delete a service key",
+      "translation": "Delete a service key",
+      "modified": false
+   },
+   {
       "id": "Delete a shared domain",
       "translation": "Remover um domínio compartilhado",
       "modified": false
@@ -1667,6 +1677,11 @@
    {
       "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
       "translation": "Removendo domínio {{.DomainName}} como {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
       "modified": false
    },
    {
@@ -3790,8 +3805,18 @@
       "modified": false
    },
    {
+      "id": "Service instance {{.ServiceInstanceName}} does not exist.",
+      "translation": "Service instance {{.ServiceInstanceName}} does not exist.",
+      "modified": false
+   },
+   {
       "id": "Service instance: {{.ServiceName}}",
       "translation": "Instância de serviço: {{.ServiceName}}",
+      "modified": false
+   },
+   {
+      "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
+      "translation": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
       "modified": false
    },
    {
@@ -4980,6 +5005,11 @@
       "modified": false
    },
    {
+      "id": "service key",
+      "translation": "service key",
+      "modified": false
+   },
+   {
       "id": "service plan",
       "translation": "service plan",
       "modified": false
@@ -5242,131 +5272,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instâncias",
-      "modified": false
-   },
-   {
-      "id": "Share a private domain with an org",
-      "translation": "Share a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME share-private-domain ORG DOMAIN",
-      "translation": "CF_NAME share-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Unshare a private domain with an org",
-      "translation": "Unshare a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Create key for a service instance",
-      "translation": "Create key for a service instance",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "This service doesn't support creation of keys.",
-      "translation": "This service doesn't support creation of keys.",
-      "modified": false
-   },
-   {
-      "id": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "No service key for service instance {{.ServiceInstanceName}}",
-      "translation": "No service key for service instance {{.ServiceInstanceName}}",
-      "modified": false
-   },
-   {
-      "id": "List keys for a service instance",
-      "translation": "List keys for a service instance",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
-      "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
-      "modified": false
-   },
-   {
-      "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
-      "translation": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
-      "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
-      "translation": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
-      "modified": false
-   },
-   {
-      "id": "Show service key info",
-      "translation": "Show service key info",
-      "modified": false
-   },
-   {
-      "id": "Delete a service key",
-      "translation": "Delete a service key",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
-      "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "Service instance {{.ServiceInstanceName}} does not exist.",
-      "translation": "Service instance {{.ServiceInstanceName}} does not exist.",
-      "modified": false
-   },
-   {
-      "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
-      "translation": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
-      "modified": false
-   },
-   {
-      "id": "service key",
-      "translation": "service key",
       "modified": false
    }
 ]
