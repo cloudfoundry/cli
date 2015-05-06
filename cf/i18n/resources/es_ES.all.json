@@ -950,6 +950,16 @@
       "modified": false
    },
    {
+      "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
+      "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
+      "modified": false
+   },
+   {
       "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
       "translation": "CF_NAME set-env APP NOMBRE VALOR",
       "modified": true
@@ -1015,13 +1025,13 @@
       "modified": false
    },
    {
-      "id": "CF_NAME stacks",
-      "translation": "CF_NAME stacks",
+      "id": "CF_NAME stack STACK_NAME",
+      "translation": "CF_NAME stack STACK_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME stack STACK_NAME",
-      "translation": "CF_NAME stack STACK_NAME",
+      "id": "CF_NAME stacks",
+      "translation": "CF_NAME stacks",
       "modified": false
    },
    {
@@ -2335,6 +2345,16 @@
       "modified": false
    },
    {
+      "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
       "id": "Getting orgs as {{.Username}}...\n",
       "translation": "Trayendo las orgs como {{.Username}}...\n",
       "modified": false
@@ -2735,11 +2755,6 @@
       "modified": false
    },
    {
-      "id": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "translation": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "modified": false
-   },
-   {
       "id": "List all the routes for all spaces of current organization",
       "translation": "List all the routes for all spaces of current organization",
       "modified": false
@@ -2767,6 +2782,11 @@
    {
       "id": "List domains in the target org",
       "translation": "Lista dominios en la org apuntada",
+      "modified": false
+   },
+   {
+      "id": "List keys for a service instance",
+      "translation": "List keys for a service instance",
       "modified": false
    },
    {
@@ -3025,6 +3045,16 @@
       "modified": false
    },
    {
+      "id": "No service key for service instance {{.ServiceInstanceName}}",
+      "translation": "No service key for service instance {{.ServiceInstanceName}}",
+      "modified": false
+   },
+   {
+      "id": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+      "translation": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+      "modified": false
+   },
+   {
       "id": "No service offerings found",
       "translation": "No se encontraron ofertas de servicio",
       "modified": false
@@ -3072,11 +3102,6 @@
    {
       "id": "No user-defined env variables have been set",
       "translation": "Ninguna variable de entorno provista por el usuario ha sido establecida",
-      "modified": false
-   },
-   {
-      "id": "None of your application files have changed. Nothing will be uploaded.",
-      "translation": "Ninguno archivo de la aplicación ha cambiado. Nada sera subido.",
       "modified": false
    },
    {
@@ -3585,6 +3610,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
+      "translation": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
+      "modified": false
+   },
+   {
       "id": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
       "translation": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
       "modified": false
@@ -3865,6 +3895,11 @@
       "modified": false
    },
    {
+      "id": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "modified": false
+   },
+   {
       "id": "Show org info",
       "translation": "Muestra info de org",
       "modified": false
@@ -3892,6 +3927,11 @@
    {
       "id": "Show service instance info",
       "translation": "Show service instance info",
+      "modified": false
+   },
+   {
+      "id": "Show service key info",
+      "translation": "Show service key info",
       "modified": false
    },
    {
