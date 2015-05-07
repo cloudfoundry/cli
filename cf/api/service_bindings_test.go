@@ -50,7 +50,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "POST",
 					Path:     "/v2/service_bindings",
-					Matcher:  testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid","async":true}`),
+					Matcher:  testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
 					Response: testnet.TestResponse{Status: http.StatusCreated},
 				}))
 			})
@@ -68,7 +68,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/service_bindings",
-					Matcher: testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid","async":true}`),
+					Matcher: testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
 					Response: testnet.TestResponse{
 						Status: http.StatusBadRequest,
 						Body:   `{"code":90003,"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"}`,
