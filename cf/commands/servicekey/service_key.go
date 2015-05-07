@@ -97,7 +97,7 @@ func (cmd ServiceKey) Run(c *cli.Context) {
 			return
 		}
 
+		cmd.ui.Say("")
 		cmd.ui.Say(string(jsonBytes))
-		cmd.ui.Ok()
 	}
 }
