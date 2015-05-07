@@ -113,7 +113,7 @@ var _ = Describe("create-service command", func() {
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
-					[]string{"Invalid JSON provided in parameters argument"},
+					[]string{"Invalid JSON provided in -c argument"},
 				))
 			})
 		})
