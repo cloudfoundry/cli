@@ -1,8 +1,6 @@
 package service
 
 import (
-	"encoding/json"
-
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -13,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	cli_json "github.com/cloudfoundry/cli/json"
+	"github.com/cloudfoundry/cli/json"
 	"github.com/codegangsta/cli"
 )
 
@@ -69,7 +67,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	serviceInstanceName := c.Args()[2]
 	params := c.String("c")
 
-	paramsMap, err := cmd.parseArbitraryParams(params)
+	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {
 		cmd.ui.Failed(T("Invalid JSON provided in -c argument"))
 	}
@@ -122,21 +120,6 @@ func (cmd CreateService) CreateService(serviceName, planName, serviceInstanceNam
 
 	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid, params)
 	return plan, apiErr
-}
-
-func (cmd CreateService) parseArbitraryParams(paramsFileOrJson string) (map[string]interface{}, error) {
-	var paramsMap map[string]interface{}
-	var err error
-
-	paramsMap, err = cli_json.ParseJsonHash(paramsFileOrJson)
-	if err != nil {
-		paramsMap = make(map[string]interface{})
-		err = json.Unmarshal([]byte(paramsFileOrJson), &paramsMap)
-		if err != nil && paramsFileOrJson != "" {
-			return nil, err
-		}
-	}
-	return paramsMap, nil
 }
 
 func findPlanFromOfferings(offerings models.ServiceOfferings, name string) (plan models.ServicePlanFields, err error) {

@@ -93,4 +93,77 @@ var _ = Describe("JSON Parser", func() {
 			})
 		})
 	})
+
+	Describe("ParseJsonFromFileOrString", func() {
+		Context("when the input is a file", func() {
+			var jsonFile *os.File
+			var fileContent string
+
+			AfterEach(func() {
+				if jsonFile != nil {
+					jsonFile.Close()
+					os.Remove(jsonFile.Name())
+				}
+			})
+
+			BeforeEach(func() {
+				fileContent = `{"foo": "bar"}`
+			})
+
+			JustBeforeEach(func() {
+				var err error
+				jsonFile, err = ioutil.TempFile("", "")
+				Expect(err).ToNot(HaveOccurred())
+
+				err = ioutil.WriteFile(jsonFile.Name(), []byte(fileContent), os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("returns the parsed json from the file", func() {
+				result, err := json.ParseJsonFromFileOrString(jsonFile.Name())
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(result).To(Equal(map[string]interface{}{"foo": "bar"}))
+			})
+
+			Context("when the file contains invalid json", func() {
+				BeforeEach(func() {
+					fileContent = `badtimes`
+				})
+
+				It("returns an error", func() {
+					_, err := json.ParseJsonFromFileOrString(jsonFile.Name())
+					Expect(err).To(HaveOccurred())
+				})
+			})
+		})
+
+		Context("when the input is a json string", func() {
+			var jsonString string
+
+			BeforeEach(func() {
+				jsonString = `{"foo": "bar"}`
+			})
+
+			It("returns the parsed json", func() {
+				result, err := json.ParseJsonFromFileOrString(jsonString)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(result).To(Equal(map[string]interface{}{"foo": "bar"}))
+			})
+		})
+
+		Context("when the input is neither a file nor a json string", func() {
+			var invalidInput string
+
+			BeforeEach(func() {
+				invalidInput = "boo"
+			})
+
+			It("returns an error", func() {
+				_, err := json.ParseJsonFromFileOrString(invalidInput)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })
