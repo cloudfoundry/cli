@@ -1,8 +1,8 @@
 package api
 
 import (
-	"fmt"
-	"strings"
+	"bytes"
+	"encoding/json"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -10,7 +10,7 @@ import (
 )
 
 type ServiceBindingRepository interface {
-	Create(instanceGuid, appGuid string) (apiErr error)
+	Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error)
 	Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error)
 }
 
@@ -25,13 +25,20 @@ func NewCloudControllerServiceBindingRepository(config core_config.Reader, gatew
 	return
 }
 
-func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid string) (apiErr error) {
+func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error) {
 	path := "/v2/service_bindings"
-	body := fmt.Sprintf(
-		`{"app_guid":"%s","service_instance_guid":"%s"}`,
-		appGuid, instanceGuid,
-	)
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
+	request := models.ServiceBindingRequest{
+		AppGuid:             appGuid,
+		ServiceInstanceGuid: instanceGuid,
+		Params:              paramsMap,
+	}
+
+	jsonBytes, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+
+	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
 func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error) {

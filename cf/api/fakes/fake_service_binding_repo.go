@@ -9,6 +9,7 @@ type FakeServiceBindingRepo struct {
 	CreateServiceInstanceGuid string
 	CreateApplicationGuid     string
 	CreateErrorCode           string
+	CreateParams              map[string]interface{}
 
 	DeleteServiceInstance models.ServiceInstance
 	DeleteApplicationGuid string
@@ -16,9 +17,11 @@ type FakeServiceBindingRepo struct {
 	CreateNonHttpErrCode  string
 }
 
-func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string) (apiErr error) {
+func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error) {
 	repo.CreateServiceInstanceGuid = instanceGuid
 	repo.CreateApplicationGuid = appGuid
+	repo.CreateParams = paramsMap
+
 	if repo.CreateNonHttpErrCode != "" {
 		apiErr = errors.New(repo.CreateNonHttpErrCode)
 		return
