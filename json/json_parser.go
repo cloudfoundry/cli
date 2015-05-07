@@ -46,6 +46,21 @@ func ParseJsonHash(path string) (map[string]interface{}, error) {
 	return stringMap, nil
 }
 
+func ParseJsonFromFileOrString(fileOrJson string) (map[string]interface{}, error) {
+	var jsonMap map[string]interface{}
+	var err error
+
+	jsonMap, err = ParseJsonHash(fileOrJson)
+	if err != nil {
+		jsonMap = make(map[string]interface{})
+		err = json.Unmarshal([]byte(fileOrJson), &jsonMap)
+		if err != nil && fileOrJson != "" {
+			return nil, err
+		}
+	}
+	return jsonMap, nil
+}
+
 func readJsonFile(path string) ([]byte, error) {
 	file, err := os.Open(path)
 	if err != nil {
