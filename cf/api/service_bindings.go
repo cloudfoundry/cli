@@ -28,7 +28,7 @@ func NewCloudControllerServiceBindingRepository(config core_config.Reader, gatew
 func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid string) (apiErr error) {
 	path := "/v2/service_bindings"
 	body := fmt.Sprintf(
-		`{"app_guid":"%s","service_instance_guid":"%s","async":true}`,
+		`{"app_guid":"%s","service_instance_guid":"%s"}`,
 		appGuid, instanceGuid,
 	)
 	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
