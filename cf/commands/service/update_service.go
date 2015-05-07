@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/json"
 	"github.com/codegangsta/cli"
 )
 
@@ -40,6 +41,7 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
 		Usage:       T("CF_NAME update-service SERVICE [-p NEW_PLAN]"),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Change service plan for a service instance")),
+			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
 		},
 	}
 }
@@ -67,6 +69,11 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 	}
 
 	planName := c.String("p")
+	params := c.String("c")
+	paramsMap, err := json.ParseJsonFromFileOrString(params)
+	if err != nil {
+		cmd.ui.Failed("Invalid JSON provided in -c argument")
+	}
 
 	if planName != "" {
 		cmd.ui.Say(T("Updating service instance {{.ServiceName}} as {{.UserName}}...",
@@ -76,7 +83,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 			}))
 
 		if cmd.config.IsMinApiVersion("2.16.0") {
-			err := cmd.updateServiceWithPlan(serviceInstance, planName)
+			err := cmd.updateServiceWithPlan(serviceInstance, planName, paramsMap)
 			switch err.(type) {
 			case nil:
 				err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
@@ -99,7 +106,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceInstance, planName string) (err error) {
+func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceInstance, planName string, paramsMap map[string]interface{}) (err error) {
 	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.Guid, cmd.config.OrganizationFields().Name)
 	if err != nil {
 		return
@@ -107,7 +114,7 @@ func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceIn
 
 	for _, plan := range plans {
 		if plan.Name == planName {
-			err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid)
+			err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap)
 			return
 		}
 	}

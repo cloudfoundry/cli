@@ -6,11 +6,16 @@ type LastOperationFields struct {
 	Description string
 }
 
-type ServiceInstanceRequest struct {
+type ServiceInstanceCreateRequest struct {
 	Name      string                 `json:"name"`
 	SpaceGuid string                 `json:"space_guid"`
 	PlanGuid  string                 `json:"service_plan_guid"`
 	Params    map[string]interface{} `json:"parameters,omitempty"`
+}
+
+type ServiceInstanceUpdateRequest struct {
+	PlanGuid string                 `json:"service_plan_guid"`
+	Params   map[string]interface{} `json:"parameters,omitempty"`
 }
 
 type ServiceInstanceFields struct {

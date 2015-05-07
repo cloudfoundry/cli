@@ -292,7 +292,7 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{Status: http.StatusOK},
 			}))
 
-			err := repo.UpdateServiceInstance("instance-guid", "plan-guid")
+			err := repo.UpdateServiceInstance("instance-guid", "plan-guid", nil)
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -306,9 +306,36 @@ var _ = Describe("Services Repo", func() {
 					Response: testnet.TestResponse{Status: http.StatusNotFound},
 				}))
 
-				err := repo.UpdateServiceInstance("instance-guid", "plan-guid")
+				err := repo.UpdateServiceInstance("instance-guid", "plan-guid", nil)
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when the user passes arbitrary params", func() {
+			It("passes the parameters in the correct field for the request", func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
+					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid", "parameters": {"foo": "bar"}}`),
+					Response: testnet.TestResponse{Status: http.StatusOK},
+				}))
+
+				paramsMap := map[string]interface{}{"foo": "bar"}
+
+				err := repo.UpdateServiceInstance("instance-guid", "plan-guid", paramsMap)
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			Context("and there is a failure during serialization", func() {
+				It("returns the serialization error", func() {
+					paramsMap := make(map[string]interface{})
+					paramsMap["data"] = make(chan bool)
+
+					err := repo.UpdateServiceInstance("instance-guid", "plan-guid", paramsMap)
+					Expect(err).To(MatchError("json: unsupported type: chan bool"))
+				})
 			})
 		})
 	})
