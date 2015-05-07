@@ -71,7 +71,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	paramsMap := make(map[string]interface{})
 	err := json.Unmarshal([]byte(params), &paramsMap)
 	if err != nil && params != "" {
-		cmd.ui.Failed(T("Invalid JSON provided in parameters argument"))
+		cmd.ui.Failed(T("Invalid JSON provided in -c argument"))
 	}
 
 	cmd.ui.Say(T("Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
