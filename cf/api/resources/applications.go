@@ -51,7 +51,7 @@ type ApplicationEntity struct {
 	Buildpack            *string                 `json:"buildpack,omitempty"`
 	EnvironmentJson      *map[string]interface{} `json:"environment_json,omitempty"`
 	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
-	PackageState         *string                 `json:"package_state"`
+	PackageState         *string                 `json:"package_state,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
