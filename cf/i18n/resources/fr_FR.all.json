@@ -5326,7 +5326,7 @@
    },
    {
       "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-      "translation": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
+      "translation": "Objet JSON valide contenant les paramètres de configuration spécifiques au service, fourni soit en ligne ou dans un fichier. Pour une liste des paramètres de configuration valide, voir la documentation de l'offre de service particulier.",
       "modified": false
    }
 ]
