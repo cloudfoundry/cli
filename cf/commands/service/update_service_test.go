@@ -2,6 +2,8 @@ package service_test
 
 import (
 	"errors"
+	"io/ioutil"
+	"os"
 
 	testplanbuilder "github.com/cloudfoundry/cli/cf/actors/plan_builder/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
@@ -101,36 +103,36 @@ var _ = Describe("update-service command", func() {
 	})
 
 	Context("when passing arbitrary params", func() {
-		Context("as a json string", func() {
-			BeforeEach(func() {
-				serviceInstance := models.ServiceInstance{
-					ServiceInstanceFields: models.ServiceInstanceFields{
-						Name: "my-service-instance",
-						Guid: "my-service-instance-guid",
-						LastOperation: models.LastOperationFields{
-							Type:        "update",
-							State:       "in progress",
-							Description: "fake service instance description",
-						},
+		BeforeEach(func() {
+			serviceInstance := models.ServiceInstance{
+				ServiceInstanceFields: models.ServiceInstanceFields{
+					Name: "my-service-instance",
+					Guid: "my-service-instance-guid",
+					LastOperation: models.LastOperationFields{
+						Type:        "update",
+						State:       "in progress",
+						Description: "fake service instance description",
 					},
-					ServiceOffering: models.ServiceOfferingFields{
-						Label: "murkydb",
-						Guid:  "murkydb-guid",
-					},
-				}
-
-				servicePlans := []models.ServicePlanFields{{
-					Name: "spark",
-					Guid: "murkydb-spark-guid",
-				}, {
-					Name: "flare",
-					Guid: "murkydb-flare-guid",
 				},
-				}
-				serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
-				planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
-			})
+				ServiceOffering: models.ServiceOfferingFields{
+					Label: "murkydb",
+					Guid:  "murkydb-guid",
+				},
+			}
 
+			servicePlans := []models.ServicePlanFields{{
+				Name: "spark",
+				Guid: "murkydb-spark-guid",
+			}, {
+				Name: "flare",
+				Guid: "murkydb-flare-guid",
+			},
+			}
+			serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
+			planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
+		})
+
+		Context("as a json string", func() {
 			It("successfully updates a service", func() {
 				callUpdateService([]string{"-p", "flare", "-c", `{"foo": "bar"}`, "my-service-instance"})
 
@@ -148,6 +150,60 @@ var _ = Describe("update-service command", func() {
 			Context("that are not valid json", func() {
 				It("returns an error to the UI", func() {
 					callUpdateService([]string{"-p", "flare", "-c", `bad-json`, "my-service-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Invalid JSON provided in -c argument"},
+					))
+				})
+			})
+		})
+
+		Context("as a file that contains json", func() {
+			var jsonFile *os.File
+			var params string
+
+			BeforeEach(func() {
+				params = "{\"foo\": \"bar\"}"
+			})
+
+			AfterEach(func() {
+				if jsonFile != nil {
+					jsonFile.Close()
+					os.Remove(jsonFile.Name())
+				}
+			})
+
+			JustBeforeEach(func() {
+				var err error
+				jsonFile, err = ioutil.TempFile("", "")
+				Expect(err).ToNot(HaveOccurred())
+
+				err = ioutil.WriteFile(jsonFile.Name(), []byte(params), os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("successfully updates a service and passes the params as a json", func() {
+				callUpdateService([]string{"-p", "flare", "-c", jsonFile.Name(), "my-service-instance"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating service", "my-service", "as", "my-user", "..."},
+					[]string{"OK"},
+					[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
+				))
+				Expect(serviceRepo.FindInstanceByNameName).To(Equal("my-service-instance"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.InstanceGuid).To(Equal("my-service-instance-guid"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.PlanGuid).To(Equal("murkydb-flare-guid"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+			})
+
+			Context("that are not valid json", func() {
+				BeforeEach(func() {
+					params = "bad-json"
+				})
+
+				It("returns an error to the UI", func() {
+					callUpdateService([]string{"-p", "flare", "-c", jsonFile.Name(), "my-service-instance"})
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
