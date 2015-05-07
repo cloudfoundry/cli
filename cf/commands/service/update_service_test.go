@@ -100,6 +100,64 @@ var _ = Describe("update-service command", func() {
 		})
 	})
 
+	Context("when passing arbitrary params", func() {
+		Context("as a json string", func() {
+			BeforeEach(func() {
+				serviceInstance := models.ServiceInstance{
+					ServiceInstanceFields: models.ServiceInstanceFields{
+						Name: "my-service-instance",
+						Guid: "my-service-instance-guid",
+						LastOperation: models.LastOperationFields{
+							Type:        "update",
+							State:       "in progress",
+							Description: "fake service instance description",
+						},
+					},
+					ServiceOffering: models.ServiceOfferingFields{
+						Label: "murkydb",
+						Guid:  "murkydb-guid",
+					},
+				}
+
+				servicePlans := []models.ServicePlanFields{{
+					Name: "spark",
+					Guid: "murkydb-spark-guid",
+				}, {
+					Name: "flare",
+					Guid: "murkydb-flare-guid",
+				},
+				}
+				serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
+				planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
+			})
+
+			It("successfully updates a service", func() {
+				callUpdateService([]string{"-p", "flare", "-c", `{"foo": "bar"}`, "my-service-instance"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating service", "my-service", "as", "my-user", "..."},
+					[]string{"OK"},
+					[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
+				))
+				Expect(serviceRepo.FindInstanceByNameName).To(Equal("my-service-instance"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.InstanceGuid).To(Equal("my-service-instance-guid"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.PlanGuid).To(Equal("murkydb-flare-guid"))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+			})
+
+			Context("that are not valid json", func() {
+				It("returns an error to the UI", func() {
+					callUpdateService([]string{"-p", "flare", "-c", `bad-json`, "my-service-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Invalid JSON provided in -c argument"},
+					))
+				})
+			})
+		})
+	})
+
 	Context("when service update is asynchronous", func() {
 		Context("when the plan flag is passed", func() {
 			BeforeEach(func() {

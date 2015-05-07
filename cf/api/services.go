@@ -26,7 +26,7 @@ type ServiceRepository interface {
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
 	CreateServiceInstance(name, planGuid string, params map[string]interface{}) (apiErr error)
-	UpdateServiceInstance(instanceGuid, planGuid string) (apiErr error)
+	UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}) (apiErr error)
 	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
 	DeleteService(instance models.ServiceInstance) (apiErr error)
 	FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error)
@@ -136,7 +136,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 
 func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string, params map[string]interface{}) (err error) {
 	path := "/v2/service_instances?accepts_incomplete=true"
-	request := models.ServiceInstanceRequest{
+	request := models.ServiceInstanceCreateRequest{
 		Name:      name,
 		PlanGuid:  planGuid,
 		SpaceGuid: repo.config.SpaceFields().Guid,
@@ -162,11 +162,20 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 	return
 }
 
-func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string) (err error) {
+func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}) (err error) {
 	path := fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=true", instanceGuid)
-	data := fmt.Sprintf(`{"service_plan_guid":"%s"}`, planGuid)
+	request := models.ServiceInstanceUpdateRequest{
+		PlanGuid: planGuid,
+		Params:   params,
+	}
 
-	err = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data))
+	jsonBytes, err := json.Marshal(request)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	err = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 
 	return
 }
