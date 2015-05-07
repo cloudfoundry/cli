@@ -146,7 +146,7 @@ var _ = Describe("create-service command", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			It("successfully creates a service and passes the params as a json string", func() {
+			It("successfully creates a service and passes the params as a json", func() {
 				callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", jsonFile.Name()})
 
 				Expect(ui.Outputs).To(ContainSubstrings(
