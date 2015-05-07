@@ -145,7 +145,6 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 
 	jsonBytes, err := json.Marshal(request)
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 
@@ -171,7 +170,6 @@ func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid,
 
 	jsonBytes, err := json.Marshal(request)
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 
