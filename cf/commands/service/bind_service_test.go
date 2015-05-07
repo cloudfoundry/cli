@@ -1,6 +1,9 @@
 package service_test
 
 import (
+	"io/ioutil"
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	. "github.com/cloudfoundry/cli/cf/commands/service"
@@ -107,6 +110,109 @@ var _ = Describe("bind-service command", func() {
 
 			ui = callBindService([]string{"my-app", "my-service"}, requirementsFactory, serviceBindingRepo)
 			Expect(ui.FailedWithUsage).To(BeFalse())
+		})
+
+		Context("when passing arbitrary params", func() {
+			var (
+				app             models.Application
+				serviceInstance models.ServiceInstance
+			)
+
+			BeforeEach(func() {
+				app = models.Application{}
+				app.Name = "my-app"
+				app.Guid = "my-app-guid"
+
+				serviceInstance = models.ServiceInstance{}
+				serviceInstance.Name = "my-service"
+				serviceInstance.Guid = "my-service-guid"
+
+				requirementsFactory.Application = app
+				requirementsFactory.ServiceInstance = serviceInstance
+			})
+
+			Context("as a json string", func() {
+				It("successfully creates a service and passes the params as a json string", func() {
+					serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+					ui := callBindService([]string{"my-app", "my-service", "-c", `{"foo": "bar"}`}, requirementsFactory, serviceBindingRepo)
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
+						[]string{"OK"},
+						[]string{"TIP"},
+					))
+					Expect(serviceBindingRepo.CreateServiceInstanceGuid).To(Equal("my-service-guid"))
+					Expect(serviceBindingRepo.CreateApplicationGuid).To(Equal("my-app-guid"))
+					Expect(serviceBindingRepo.CreateParams).To(Equal(map[string]interface{}{"foo": "bar"}))
+				})
+
+				Context("that are not valid json", func() {
+					It("returns an error to the UI", func() {
+						serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+						ui := callBindService([]string{"my-app", "my-service", "-c", `bad-json`}, requirementsFactory, serviceBindingRepo)
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Invalid JSON provided in -c argument"},
+						))
+					})
+				})
+			})
+
+			Context("as a file that contains json", func() {
+				var jsonFile *os.File
+				var params string
+
+				BeforeEach(func() {
+					params = "{\"foo\": \"bar\"}"
+				})
+
+				AfterEach(func() {
+					if jsonFile != nil {
+						jsonFile.Close()
+						os.Remove(jsonFile.Name())
+					}
+				})
+
+				JustBeforeEach(func() {
+					var err error
+					jsonFile, err = ioutil.TempFile("", "")
+					Expect(err).ToNot(HaveOccurred())
+
+					err = ioutil.WriteFile(jsonFile.Name(), []byte(params), os.ModePerm)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("successfully creates a service and passes the params as a json", func() {
+					serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+					ui := callBindService([]string{"my-app", "my-service", "-c", jsonFile.Name()}, requirementsFactory, serviceBindingRepo)
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
+						[]string{"OK"},
+						[]string{"TIP"},
+					))
+					Expect(serviceBindingRepo.CreateServiceInstanceGuid).To(Equal("my-service-guid"))
+					Expect(serviceBindingRepo.CreateApplicationGuid).To(Equal("my-app-guid"))
+					Expect(serviceBindingRepo.CreateParams).To(Equal(map[string]interface{}{"foo": "bar"}))
+				})
+
+				Context("that are not valid json", func() {
+					BeforeEach(func() {
+						params = "bad-json"
+					})
+
+					It("returns an error to the UI", func() {
+						serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+						ui := callBindService([]string{"my-app", "my-service", "-c", jsonFile.Name()}, requirementsFactory, serviceBindingRepo)
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Invalid JSON provided in -c argument"},
+						))
+					})
+				})
+			})
 		})
 	})
 })
