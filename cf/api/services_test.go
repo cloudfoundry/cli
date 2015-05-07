@@ -224,15 +224,15 @@ var _ = Describe("Services Repo", func() {
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).NotTo(HaveOccurred())
 			})
-		})
 
-		Context("and there is a failure during serialization", func() {
-			It("returns the serialization error", func() {
-				paramsMap := make(map[string]interface{})
-				paramsMap["data"] = make(chan bool)
+			Context("and there is a failure during serialization", func() {
+				It("returns the serialization error", func() {
+					paramsMap := make(map[string]interface{})
+					paramsMap["data"] = make(chan bool)
 
-				err := repo.CreateServiceInstance("instance-name", "plan-guid", paramsMap)
-				Expect(err).To(MatchError("json: unsupported type: chan bool"))
+					err := repo.CreateServiceInstance("instance-name", "plan-guid", paramsMap)
+					Expect(err).To(MatchError("json: unsupported type: chan bool"))
+				})
 			})
 		})
 
