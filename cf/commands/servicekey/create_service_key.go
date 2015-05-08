@@ -5,8 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/json"
 	"github.com/codegangsta/cli"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -37,6 +39,9 @@ func (cmd CreateServiceKey) Metadata() command_metadata.CommandMetadata {
 
 EXAMPLE:
    CF_NAME create-service-key mydb mykey`),
+		Flags: []cli.Flag{
+			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
+		},
 	}
 }
 
@@ -57,6 +62,12 @@ func (cmd CreateServiceKey) GetRequirements(requirementsFactory requirements.Fac
 func (cmd CreateServiceKey) Run(c *cli.Context) {
 	serviceInstanceName := c.Args()[0]
 	serviceKeyName := c.Args()[1]
+	params := c.String("c")
+
+	paramsMap, err := json.ParseJsonFromFileOrString(params)
+	if err != nil {
+		cmd.ui.Failed(T("Invalid JSON provided in -c argument"))
+	}
 
 	cmd.ui.Say(T("Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
@@ -71,7 +82,7 @@ func (cmd CreateServiceKey) Run(c *cli.Context) {
 		return
 	}
 
-	err = cmd.serviceKeyRepo.CreateServiceKey(serviceInstance.Guid, serviceKeyName)
+	err = cmd.serviceKeyRepo.CreateServiceKey(serviceInstance.Guid, serviceKeyName, paramsMap)
 	switch err.(type) {
 	case nil:
 		cmd.ui.Ok()

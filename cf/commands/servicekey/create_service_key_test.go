@@ -1,6 +1,9 @@
 package servicekey_test
 
 import (
+	"io/ioutil"
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -100,6 +103,82 @@ var _ = Describe("create-service-key command", func() {
 				[]string{"Creating service key", "exist-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"FAILED"},
 				[]string{"This service doesn't support creation of keys."}))
+		})
+	})
+
+	Context("when passing arbitrary params", func() {
+		Context("as a json string", func() {
+			It("successfully creates a service key and passes the params as a json string", func() {
+				callCreateService([]string{"fake-service-instance", "fake-service-key", "-c", `{"foo": "bar"}`})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
+					[]string{"OK"},
+				))
+				Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGuid).To(Equal("fake-instance-guid"))
+				Expect(serviceKeyRepo.CreateServiceKeyMethod.KeyName).To(Equal("fake-service-key"))
+				Expect(serviceKeyRepo.CreateServiceKeyMethod.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+			})
+		})
+
+		Context("that are not valid json", func() {
+			It("returns an error to the UI", func() {
+				callCreateService([]string{"fake-service-instance", "fake-service-key", "-c", `bad-json`})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Invalid JSON provided in -c argument"},
+				))
+			})
+		})
+		Context("as a file that contains json", func() {
+			var jsonFile *os.File
+			var params string
+
+			BeforeEach(func() {
+				params = "{\"foo\": \"bar\"}"
+			})
+
+			AfterEach(func() {
+				if jsonFile != nil {
+					jsonFile.Close()
+					os.Remove(jsonFile.Name())
+				}
+			})
+
+			JustBeforeEach(func() {
+				var err error
+				jsonFile, err = ioutil.TempFile("", "")
+				Expect(err).ToNot(HaveOccurred())
+
+				err = ioutil.WriteFile(jsonFile.Name(), []byte(params), os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("successfully creates a service key and passes the params as a json", func() {
+				callCreateService([]string{"fake-service-instance", "fake-service-key", "-c", jsonFile.Name()})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
+					[]string{"OK"},
+				))
+				Expect(serviceKeyRepo.CreateServiceKeyMethod.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+			})
+
+			Context("that are not valid json", func() {
+				BeforeEach(func() {
+					params = "bad-json"
+				})
+
+				It("returns an error to the UI", func() {
+					callCreateService([]string{"fake-service-instance", "fake-service-key", "-c", jsonFile.Name()})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Invalid JSON provided in -c argument"},
+					))
+				})
+			})
 		})
 	})
 })
