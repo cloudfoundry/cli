@@ -19,7 +19,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -263,25 +262,26 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan, doneChan cha
 	close(doneChan)
 }
 
-func isStagingError(err error) bool {
-	httpError, ok := err.(errors.HttpError)
-	return ok && httpError.ErrorCode() == errors.APP_NOT_STAGED
-}
-
 func (cmd Start) waitForInstancesToStage(app models.Application) bool {
 	stagingStartTime := time.Now()
-	_, err := cmd.appInstancesRepo.GetInstances(app.Guid)
 
-	for isStagingError(err) && time.Since(stagingStartTime) < cmd.StagingTimeout {
+	var err error
+
+	app, err = cmd.appRepo.GetApp(app.Guid)
+	for app.PackageState != "STAGED" && app.PackageState != "FAILED" && time.Since(stagingStartTime) < cmd.StagingTimeout {
 		cmd.ui.Wait(cmd.PingerThrottle)
-		_, err = cmd.appInstancesRepo.GetInstances(app.Guid)
+		app, err = cmd.appRepo.GetApp(app.Guid)
 	}
 
-	if err != nil && !isStagingError(err) {
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	if app.PackageState == "FAILED" {
 		cmd.ui.Say("")
 		cmd.ui.Failed(T("{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
 			map[string]interface{}{
-				"Err":     err.Error(),
+				"Err":     app.StagingFailedReason,
 				"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))}))
 	}
 

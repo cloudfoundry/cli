@@ -66,6 +66,7 @@ var _ = Describe("start command", func() {
 		defaultAppForStart.Name = "my-app"
 		defaultAppForStart.Guid = "my-app-guid"
 		defaultAppForStart.InstanceCount = 2
+		defaultAppForStart.PackageState = "STAGED"
 
 		domain := models.DomainFields{}
 		domain.Name = "example.com"
@@ -133,6 +134,7 @@ var _ = Describe("start command", func() {
 			UpdateAppResult: app,
 		}
 		appRepo.ReadReturns.App = app
+		appRepo.GetAppReturns(app, nil)
 		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 		appInstancesRepo.GetInstancesStub = getInstance
 
@@ -192,13 +194,14 @@ var _ = Describe("start command", func() {
 			BeforeEach(func() {
 				app = defaultAppForStart
 
-				instances := []models.AppInstanceFields{models.AppInstanceFields{}}
 				appRepo := &testApplication.FakeApplicationRepository{
 					UpdateAppResult: app,
 				}
-				appRepo.ReadReturns.App = app
+
+				app.PackageState = "FAILED"
+				app.StagingFailedReason = "BLAH, FAILED"
+				appRepo.GetAppReturns(app, nil)
 				appInstancesRepo := &testAppInstanaces.FakeAppInstancesRepository{}
-				appInstancesRepo.GetInstancesReturns(instances, errors.New("Error staging app"))
 
 				requirementsFactory.LoginSuccess = true
 				requirementsFactory.TargetedSpaceSuccess = true
@@ -218,7 +221,7 @@ var _ = Describe("start command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},
 					[]string{"FAILED"},
-					[]string{"Error staging app"},
+					[]string{"BLAH, FAILED"},
 				))
 			})
 		})
@@ -249,6 +252,7 @@ var _ = Describe("start command", func() {
 			appInstancesRepo := &testAppInstanaces.FakeAppInstancesRepository{}
 
 			appRepo.ReadReturns.App = defaultAppForStart
+			appRepo.GetAppReturns(defaultAppForStart, nil)
 			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 			appInstancesRepo.GetInstancesStub = getInstance
 
@@ -285,6 +289,7 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.DetectedStartCommand = "detected start command"
 			displayApp := &testcmd.FakeAppDisplayer{}
 			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			appRepo.GetAppReturns(defaultAppForStart, nil)
 
 			Expect(appRepo.ReadCalls).To(Equal(1))
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -392,10 +397,10 @@ var _ = Describe("start command", func() {
 			}
 
 			defaultInstanceErrorCodes = []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, "", "", ""}
+			defaultAppForStart.PackageState = "PENDING"
+			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
 
-			ui, _, appInstancesRepo := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
-
-			Expect(appInstancesRepo.GetInstancesArgsForCall(0)).To(Equal("my-app-guid"))
+			Expect(appRepo.GetAppArgsForCall(0)).To(Equal("my-app-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Before close"},
@@ -407,15 +412,15 @@ var _ = Describe("start command", func() {
 
 		It("displays an error message when staging fails", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
-			defaultInstanceResponses = [][]models.AppInstanceFields{[]models.AppInstanceFields{}}
-			defaultInstanceErrorCodes = []string{"170001"}
+			defaultAppForStart.PackageState = "FAILED"
+			defaultAppForStart.StagingFailedReason = "AWWW, FAILED"
 
 			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"my-app"},
 				[]string{"FAILED"},
-				[]string{"Error staging app"},
+				[]string{"AWWW, FAILED"},
 			))
 		})
 
@@ -533,28 +538,12 @@ var _ = Describe("start command", func() {
 			})
 		})
 
-		It("tells the user about the failure when waiting for the app to start times out", func() {
+		It("tells the user about the failure when waiting for the app to stage times out", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
-			appInstance := models.AppInstanceFields{}
-			appInstance.State = models.InstanceStarting
-			appInstance2 := models.AppInstanceFields{}
-			appInstance2.State = models.InstanceStarting
-			appInstance3 := models.AppInstanceFields{}
-			appInstance3.State = models.InstanceStarting
-			appInstance4 := models.AppInstanceFields{}
-			appInstance4.State = models.InstanceDown
-			appInstance5 := models.AppInstanceFields{}
-			appInstance5.State = models.InstanceDown
-			appInstance6 := models.AppInstanceFields{}
-			appInstance6.State = models.InstanceDown
-			defaultInstanceResponses = [][]models.AppInstanceFields{
-				[]models.AppInstanceFields{appInstance, appInstance2},
-				[]models.AppInstanceFields{appInstance3, appInstance4},
-				[]models.AppInstanceFields{appInstance5, appInstance6},
-			}
 
 			defaultInstanceErrorCodes = []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, errors.APP_NOT_STAGED}
 
+			defaultAppForStart.PackageState = "PENDING"
 			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
