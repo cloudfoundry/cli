@@ -72,7 +72,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 	params := c.String("c")
 	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {
-		cmd.ui.Failed("Invalid JSON provided in -c argument")
+		cmd.ui.Failed(T("Invalid JSON provided in -c argument"))
 	}
 
 	if planName != "" {
