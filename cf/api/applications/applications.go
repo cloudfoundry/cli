@@ -56,19 +56,14 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 
 func (repo CloudControllerApplicationRepository) GetApp(appGuid string) (app models.Application, apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.ApiEndpoint(), appGuid)
-	appResources := new(resources.PaginatedApplicationResources)
+	appResources := new(resources.ApplicationResource)
+
 	apiErr = repo.gateway.GetResource(path, appResources)
 	if apiErr != nil {
 		return
 	}
 
-	if len(appResources.Resources) == 0 {
-		apiErr = errors.NewModelNotFoundError("App", appGuid)
-		return
-	}
-
-	res := appResources.Resources[0]
-	app = res.ToModel()
+	app = appResources.ToModel()
 	return
 }
 
