@@ -210,7 +210,7 @@ var _ = Describe("start command", func() {
 				displayApp := &testcmd.FakeAppDisplayer{}
 
 				cmd = NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo, oldLogsRepo)
-				cmd.StagingTimeout = 1
+				cmd.StagingTimeout = 0
 				cmd.PingerThrottle = 1
 				cmd.StartupTimeout = 1
 			})
