@@ -267,13 +267,20 @@ func (cmd Start) waitForInstancesToStage(app models.Application) bool {
 
 	var err error
 
-	app, err = cmd.appRepo.GetApp(app.Guid)
-	for app.PackageState != "STAGED" && app.PackageState != "FAILED" && time.Since(stagingStartTime) < cmd.StagingTimeout {
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-		}
-		cmd.ui.Wait(cmd.PingerThrottle)
+	if cmd.StagingTimeout == 0 {
 		app, err = cmd.appRepo.GetApp(app.Guid)
+	} else {
+		for app.PackageState != "STAGED" && app.PackageState != "FAILED" && time.Since(stagingStartTime) < cmd.StagingTimeout {
+			app, err = cmd.appRepo.GetApp(app.Guid)
+			if err != nil {
+				break
+			}
+			cmd.ui.Wait(cmd.PingerThrottle)
+		}
+	}
+
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 
 	if app.PackageState == "FAILED" {
