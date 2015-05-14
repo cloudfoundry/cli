@@ -34,6 +34,7 @@ func (cmd *DeleteService) Metadata() command_metadata.CommandMetadata {
 		Usage:       T("CF_NAME delete-service SERVICE_INSTANCE [-f]"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
+			cli.BoolFlag{Name: "w", Usage: T("Wait for deletion confirmation")},
 		},
 	}
 }
@@ -76,7 +77,9 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 		return
 	}
 
-	apiErr = cmd.serviceRepo.DeleteService(instance)
+	var wait bool = c.Bool("w") || false
+
+	apiErr = cmd.serviceRepo.DeleteService(instance, wait)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

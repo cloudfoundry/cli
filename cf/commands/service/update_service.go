@@ -40,6 +40,7 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
 		Usage:       T("CF_NAME update-service SERVICE [-p NEW_PLAN]"),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Change service plan for a service instance")),
+			cli.BoolFlag{Name: "w", Usage: T("Wait for update confirmation")},
 		},
 	}
 }
@@ -76,7 +77,8 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 			}))
 
 		if cmd.config.IsMinApiVersion("2.16.0") {
-			err := cmd.updateServiceWithPlan(serviceInstance, planName)
+			var wait bool = c.Bool("w") || false
+			err := cmd.updateServiceWithPlan(serviceInstance, planName, wait)
 			switch err.(type) {
 			case nil:
 				err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
@@ -99,7 +101,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceInstance, planName string) (err error) {
+func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceInstance, planName string, wait bool) (err error) {
 	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.Guid, cmd.config.OrganizationFields().Name)
 	if err != nil {
 		return
@@ -107,7 +109,7 @@ func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceIn
 
 	for _, plan := range plans {
 		if plan.Name == planName {
-			err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid)
+			err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, wait)
 			return
 		}
 	}
