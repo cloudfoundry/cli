@@ -3235,8 +3235,8 @@
       "modified": false
    },
    {
-      "id": "Path to app directory or file",
-      "translation": "应用程序目录或zip压缩文件路径",
+      "id": "Path to app directory or to a zip file of the contents of the app directory",
+      "translation": "路径的应用程序目录或的应用程序目录中的内容的zip文件",
       "modified": true
    },
    {
