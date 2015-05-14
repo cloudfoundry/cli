@@ -3235,8 +3235,8 @@
       "modified": false
    },
    {
-      "id": "Path to app directory or file",
-      "translation": "Path of app directory or zip file",
+      "id": "Path to app directory or to a zip file of the contents of the app directory",
+      "translation": "Path to app directory or to a zip file of the contents of the app directory",
       "modified": true
    },
    {
