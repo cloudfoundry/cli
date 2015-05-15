@@ -39,6 +39,7 @@ type FakeServiceRepo struct {
 	CreateServiceInstanceArgs struct {
 		Name     string
 		PlanGuid string
+		Params   map[string]interface{}
 	}
 	CreateServiceInstanceReturns struct {
 		Error error
@@ -140,9 +141,10 @@ func (repo *FakeServiceRepo) FindServiceOfferingsByLabel(name string) (offerings
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (apiErr error) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string, params map[string]interface{}) (apiErr error) {
 	repo.CreateServiceInstanceArgs.Name = name
 	repo.CreateServiceInstanceArgs.PlanGuid = planGuid
+	repo.CreateServiceInstanceArgs.Params = params
 
 	return repo.CreateServiceInstanceReturns.Error
 }
