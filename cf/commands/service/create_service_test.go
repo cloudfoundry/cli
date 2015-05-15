@@ -96,6 +96,29 @@ var _ = Describe("create-service command", func() {
 		Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
 	})
 
+	Context("when passing arbitrary params", func() {
+		It("successfully creates a service and passes the params as a json string", func() {
+			callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", `{"foo": "bar"}`})
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+			))
+			Expect(serviceRepo.CreateServiceInstanceArgs.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+		})
+
+		Context("that are not valid json", func() {
+			It("returns an error to the UI", func() {
+				callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", `bad-json`})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Invalid JSON provided in -c argument"},
+				))
+			})
+		})
+	})
+
 	Context("when service creation is asynchronous", func() {
 		var serviceInstance models.ServiceInstance
 

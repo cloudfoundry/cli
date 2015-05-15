@@ -2605,6 +2605,11 @@
       "modified": false
    },
    {
+      "id": "Invalid JSON provided in -c argument",
+      "translation": "Invalid JSON provided in -c argument",
+      "modified": false
+   },
+   {
       "id": "Invalid JSON response from server",
       "translation": "无效的服务器JSON响应",
       "modified": false
@@ -4552,6 +4557,11 @@
    {
       "id": "VERSION:",
       "translation": "版本:",
+      "modified": false
+   },
+   {
+      "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
+      "translation": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
       "modified": false
    },
    {
