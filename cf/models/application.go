@@ -60,6 +60,8 @@ type ApplicationFields struct {
 	State                string
 	SpaceGuid            string
 	PackageUpdatedAt     *time.Time
+	PackageState         string
+	StagingFailedReason  string
 }
 
 type AppParams struct {

@@ -53,6 +53,23 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 	})
 
+	Describe(".GetApp", func() {
+		It("returns an application using the given app guid", func() {
+			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/apps/app-guid",
+				Response: appModelResponse,
+			})
+			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
+			defer ts.Close()
+			app, err := repo.GetApp("app-guid")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(app.Name).To(Equal("My App"))
+		})
+	})
+
 	Describe(".ReadFromSpace", func() {
 		It("returns an application using the given space guid", func() {
 			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -312,6 +329,53 @@ var _ = Describe("ApplicationsRepository", func() {
 		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
+
+var appModelResponse = testnet.TestResponse{
+	Status: http.StatusOK,
+	Body: `
+    {
+      "metadata": {
+        "guid": "app1-guid"
+      },
+      "entity": {
+        "name": "My App",
+        "environment_json": {
+      		"foo": "bar",
+      		"baz": "boom"
+    	},
+        "memory": 128,
+        "instances": 1,
+        "disk_quota": 512,
+        "state": "STOPPED",
+        "stack": {
+			"metadata": {
+				  "guid": "app1-route-guid"
+				},
+			"entity": {
+			  "name": "awesome-stacks-ahoy"
+			  }
+        },
+        "routes": [
+      	  {
+      	    "metadata": {
+      	      "guid": "app1-route-guid"
+      	    },
+      	    "entity": {
+      	      "host": "app1",
+      	      "domain": {
+      	      	"metadata": {
+      	      	  "guid": "domain1-guid"
+      	      	},
+      	      	"entity": {
+      	      	  "name": "cfapps.io"
+      	      	}
+      	      }
+      	    }
+      	  }
+        ]
+      }
+    }
+`}
 
 var singleAppResponse = testnet.TestResponse{
 	Status: http.StatusOK,
