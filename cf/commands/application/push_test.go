@@ -455,11 +455,11 @@ var _ = Describe("Push Command", func() {
 				})
 			})
 
-			It("pushes the contents of the directory specified using the -p flag", func() {
-				callPush("-p", "../some/path-to/an-app", "app-with-path")
+			It("pushes the contents of the app directory or zip file specified using the -p flag", func() {
+				callPush("-p", "../some/path-to/an-app/zip-file", "app-with-path")
 
 				appDir, _ := actor.GatherFilesArgsForCall(0)
-				Expect(appDir).To(Equal("../some/path-to/an-app"))
+				Expect(appDir).To(Equal("../some/path-to/an-app/zip-file"))
 			})
 
 			It("pushes the contents of the current working directory by default", func() {
