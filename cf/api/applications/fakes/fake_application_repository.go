@@ -53,6 +53,16 @@ type FakeApplicationRepository struct {
 		result1 *models.Environment
 		result2 error
 	}
+
+	GetAppStub        func(appGuid string) (models.Application, error)
+	getAppMutex       sync.RWMutex
+	getAppArgsForCall []struct {
+		appGuid string
+	}
+	getAppReturns struct {
+		result1 models.Application
+		result2 error
+	}
 }
 
 //counterfeiter section
@@ -117,6 +127,39 @@ func (fake *FakeApplicationRepository) ReadEnvReturns(result1 *models.Environmen
 	fake.ReadEnvStub = nil
 	fake.readEnvReturns = struct {
 		result1 *models.Environment
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeApplicationRepository) GetApp(appGuid string) (models.Application, error) {
+	fake.getAppMutex.Lock()
+	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
+		appGuid string
+	}{appGuid})
+	fake.getAppMutex.Unlock()
+	if fake.GetAppStub != nil {
+		return fake.GetAppStub(appGuid)
+	} else {
+		return fake.getAppReturns.result1, fake.getAppReturns.result2
+	}
+}
+
+func (fake *FakeApplicationRepository) GetAppCallCount() int {
+	fake.getAppMutex.RLock()
+	defer fake.getAppMutex.RUnlock()
+	return len(fake.getAppArgsForCall)
+}
+
+func (fake *FakeApplicationRepository) GetAppArgsForCall(i int) string {
+	fake.getAppMutex.RLock()
+	defer fake.getAppMutex.RUnlock()
+	return fake.getAppArgsForCall[i].appGuid
+}
+
+func (fake *FakeApplicationRepository) GetAppReturns(result1 models.Application, result2 error) {
+	fake.GetAppStub = nil
+	fake.getAppReturns = struct {
+		result1 models.Application
 		result2 error
 	}{result1, result2}
 }

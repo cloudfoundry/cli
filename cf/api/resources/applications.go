@@ -51,6 +51,8 @@ type ApplicationEntity struct {
 	Buildpack            *string                 `json:"buildpack,omitempty"`
 	EnvironmentJson      *map[string]interface{} `json:"environment_json,omitempty"`
 	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
+	PackageState         *string                 `json:"package_state,omitempty"`
+	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
@@ -119,6 +121,12 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	}
 	if entity.Command != nil {
 		app.Command = *entity.Command
+	}
+	if entity.PackageState != nil {
+		app.PackageState = *entity.PackageState
+	}
+	if entity.StagingFailedReason != nil {
+		app.StagingFailedReason = *entity.StagingFailedReason
 	}
 	return
 }

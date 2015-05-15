@@ -17,6 +17,7 @@ import (
 
 type ApplicationRepository interface {
 	Create(params models.AppParams) (createdApp models.Application, apiErr error)
+	GetApp(appGuid string) (models.Application, error)
 	Read(name string) (app models.Application, apiErr error)
 	ReadFromSpace(name string, spaceGuid string) (app models.Application, apiErr error)
 	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error)
@@ -50,6 +51,19 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 	}
 
 	createdApp = resource.ToModel()
+	return
+}
+
+func (repo CloudControllerApplicationRepository) GetApp(appGuid string) (app models.Application, apiErr error) {
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.ApiEndpoint(), appGuid)
+	appResources := new(resources.ApplicationResource)
+
+	apiErr = repo.gateway.GetResource(path, appResources)
+	if apiErr != nil {
+		return
+	}
+
+	app = appResources.ToModel()
 	return
 }
 
