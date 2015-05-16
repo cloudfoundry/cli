@@ -63,6 +63,8 @@ func (cmd *Restage) Run(c *cli.Context) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
+	app.PackageState = ""
+
 	cmd.appStagingWatcher.ApplicationWatchStaging(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, func(app models.Application) (models.Application, error) {
 		return app, cmd.appRepo.CreateRestageRequest(app.Guid)
 	})

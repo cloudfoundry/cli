@@ -30,6 +30,7 @@ var _ = Describe("restage command", func() {
 
 		app = models.Application{}
 		app.Name = "my-app"
+		app.PackageState = "STAGED"
 		appRepo = &testApplication.FakeApplicationRepository{}
 		appRepo.ReadReturns.App = app
 
@@ -87,6 +88,11 @@ var _ = Describe("restage command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Restaging app", "my-app", "my-org", "my-space", "my-user"},
 			))
+		})
+
+		It("resets app's PackageState", func() {
+			runCommand("my-app")
+			Expect(stagingWatcher.watched.PackageState).ToNot(Equal("STAGED"))
 		})
 
 		It("watches the staging output", func() {
