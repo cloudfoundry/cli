@@ -70,6 +70,8 @@ var _ = Describe("service command", func() {
 				serviceInstance.ServiceOffering = offering
 				serviceInstance.DashboardUrl = "some-url"
 				serviceInstance.LastOperation.State = state
+				serviceInstance.LastOperation.CreatedAt = "created-date"
+				serviceInstance.LastOperation.UpdatedAt = "updated-date"
 				requirementsFactory.ServiceInstance = serviceInstance
 			}
 
@@ -91,6 +93,8 @@ var _ = Describe("service command", func() {
 					[]string{"Last Operation"},
 					[]string{"Status: ", "create in progress"},
 					[]string{"Message: ", "creating resource - step 1"},
+					[]string{"Started: ", "created-date"},
+					[]string{"Updated: ", "updated-date"},
 				))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 			})
