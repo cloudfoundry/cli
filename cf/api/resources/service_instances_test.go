@@ -36,7 +36,9 @@ var _ = Describe("ServiceInstanceResource", func() {
         "last_operation": {
           "type": "create",
           "state": "in progress",
-          "description": "fake state description"
+          "description": "fake state description",
+          "created_at": "fake created at",
+          "updated_at": "fake updated at"
         },
         "service_plan": {
           "metadata": {
@@ -125,6 +127,8 @@ var _ = Describe("ServiceInstanceResource", func() {
 				Expect(fields.LastOperation.Type).To(Equal("create"))
 				Expect(fields.LastOperation.State).To(Equal("in progress"))
 				Expect(fields.LastOperation.Description).To(Equal("fake state description"))
+				Expect(fields.LastOperation.CreatedAt).To(Equal("fake created at"))
+				Expect(fields.LastOperation.UpdatedAt).To(Equal("fake updated at"))
 			})
 		})
 
@@ -138,6 +142,8 @@ var _ = Describe("ServiceInstanceResource", func() {
 				Expect(instance.ServiceInstanceFields.LastOperation.Type).To(Equal("create"))
 				Expect(instance.ServiceInstanceFields.LastOperation.State).To(Equal("in progress"))
 				Expect(instance.ServiceInstanceFields.LastOperation.Description).To(Equal("fake state description"))
+				Expect(instance.ServiceInstanceFields.LastOperation.CreatedAt).To(Equal("fake created at"))
+				Expect(instance.ServiceInstanceFields.LastOperation.UpdatedAt).To(Equal("fake updated at"))
 
 				Expect(instance.ServicePlan.Guid).To(Equal("fake-service-plan-guid"))
 				Expect(instance.ServicePlan.Free).To(BeTrue())

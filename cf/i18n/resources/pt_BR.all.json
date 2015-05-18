@@ -4105,6 +4105,11 @@
       "modified": false
    },
    {
+      "id": "Started: {{.Started}}",
+      "translation": "Started: {{.Started}}",
+      "modified": false
+   },
+   {
       "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "Inicializando app {{.AppName}} na org {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}...",
       "modified": false
@@ -4497,6 +4502,11 @@
    {
       "id": "Update user-provided service instance name value pairs",
       "translation": "Atualizar par de valores de nome de instância de serviço fornecido pelo usuário",
+      "modified": false
+   },
+   {
+      "id": "Updated: {{.Updated}}",
+      "translation": "Updated: {{.Updated}}",
       "modified": false
    },
    {

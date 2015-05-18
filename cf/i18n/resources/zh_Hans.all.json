@@ -4105,6 +4105,11 @@
       "modified": false
    },
    {
+      "id": "Started: {{.Started}}",
+      "translation": "Started: {{.Started}}",
+      "modified": false
+   },
+   {
       "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "作为用户{{.CurrentUser}}启动组织{{.OrgName}}/空间{{.SpaceName}}中的应用程序{{.AppName}}...",
       "modified": false
@@ -4497,6 +4502,11 @@
    {
       "id": "Update user-provided service instance name value pairs",
       "translation": "更新用户提供的服务实例名称值对",
+      "modified": false
+   },
+   {
+      "id": "Updated: {{.Updated}}",
+      "translation": "Updated: {{.Updated}}",
       "modified": false
    },
    {
