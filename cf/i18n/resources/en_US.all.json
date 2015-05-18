@@ -915,13 +915,28 @@
       "modified": false
    },
    {
+      "id": "Restart a single app:\n",
+      "translation": "Restart a single app:\n",
+      "modified": false
+   },
+   {
       "id": "CF_NAME restage APP_NAME",
       "translation": "CF_NAME restage APP_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME restart APP_NAME",
-      "translation": "CF_NAME restart APP_NAME",
+      "id": "   CF_NAME restart APP_NAME\n",
+      "translation": "   CF_NAME restart APP_NAME\n",
+      "modified": false
+   },
+   {
+      "id": "   Restart an app(s) with a manifest from a current directory:\n",
+      "translation": "   Restart an app(s) with a manifest from a current directory:\n",
+      "modified": false
+   },
+   {
+      "id": "   CF_NAME restart\n",
+      "translation": "   CF_NAME restart\n",
       "modified": false
    },
    {
