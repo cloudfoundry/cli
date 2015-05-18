@@ -1,8 +1,11 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -18,27 +21,40 @@ type BindService struct {
 	config             core_config.Reader
 	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
+	appRepo            applications.ApplicationRepository
 	serviceInstanceReq requirements.ServiceInstanceRequirement
+	appStagingWatcher  ApplicationStagingWatcher
 }
 
 type ServiceBinder interface {
 	BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiErr error)
 }
 
-func NewBindService(ui terminal.UI, config core_config.Reader, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
+type ApplicationStagingWatcher interface {
+	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
+}
+
+func NewBindService(ui terminal.UI, config core_config.Reader, serviceBindingRepo api.ServiceBindingRepository, appRepo applications.ApplicationRepository, stagingWatcher ApplicationStagingWatcher) (cmd *BindService) {
 	cmd = new(BindService)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceBindingRepo = serviceBindingRepo
+	cmd.appRepo = appRepo
+	cmd.appStagingWatcher = stagingWatcher
 	return
 }
 
 func (cmd *BindService) Metadata() command_metadata.CommandMetadata {
+	flagUsage := T("Restage app")
+	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restaged. Use `bind-service --force-restage` to force restage app.")
 	return command_metadata.CommandMetadata{
 		Name:        "bind-service",
 		ShortName:   "bs",
 		Description: T("Bind a service instance to an app"),
 		Usage:       T("CF_NAME bind-service APP_NAME SERVICE_INSTANCE"),
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "force-restage", Usage: strings.Join([]string{flagUsage, tipUsage}, "\n\n")},
+		},
 	}
 }
 
@@ -65,6 +81,7 @@ func (cmd *BindService) GetRequirements(requirementsFactory requirements.Factory
 func (cmd *BindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
+	restageFlag := c.Bool("force-restage")
 
 	cmd.ui.Say(T("Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
@@ -91,8 +108,24 @@ func (cmd *BindService) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say(T("TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect",
-		map[string]interface{}{"CFCommand": terminal.CommandColor(cf.Name() + " restage")}))
+
+	if true == restageFlag {
+		cmd.ui.Say("")
+		cmd.ui.Say(T("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+			map[string]interface{}{
+				"AppName":     terminal.EntityNameColor(app.Name),
+				"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			}))
+
+		cmd.appStagingWatcher.ApplicationWatchStaging(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, func(app models.Application) (models.Application, error) {
+			return app, cmd.appRepo.CreateRestageRequest(app.Guid)
+		})
+	} else {
+		cmd.ui.Say(T("TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect",
+			map[string]interface{}{"CFCommand": terminal.CommandColor(cf.Name() + " restage")}))
+	}
 }
 
 func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiErr error) {
