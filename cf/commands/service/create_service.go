@@ -35,10 +35,28 @@ func (cmd CreateService) Metadata() command_metadata.CommandMetadata {
 		Name:        "create-service",
 		ShortName:   "cs",
 		Description: T("Create a service instance"),
-		Usage: T(`CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE
+		Usage: T(`CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]
+
+Optionally provide service-specific configuration parameters in a valid JSON object in-line:
+CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+
+Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
+CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE
+
+Example of valid JSON object:
+{
+	"cluster_nodes": {
+		"count": 5,
+		"memory_mb": 1024
+	}
+}
 
 EXAMPLE:
-   CF_NAME create-service dbaas silver mydb
+   CF_NAME create-service db-service silver mydb -c '{"ram_gb":4}'
+   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json
+
+OPTIONS:
+   -c  Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.
 
 TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`),
