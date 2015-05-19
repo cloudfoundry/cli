@@ -740,6 +740,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
+      "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nÉXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
+      "modified": false
+   },
+   {
       "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
       "translation": "CF_NAME delete-shared-domain DOMAINE [-f]",
       "modified": false
@@ -950,6 +955,16 @@
       "modified": false
    },
    {
+      "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nÉXAMPLE:\n   CF_NAME service-key mydb mykey",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
+      "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\nÉXAMPLE:\n   CF_NAME service-keys mydb",
+      "modified": false
+   },
+   {
       "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
       "translation": "CF_NAME set-env APP NOM VALEUR",
       "modified": true
@@ -1015,13 +1030,13 @@
       "modified": false
    },
    {
-      "id": "CF_NAME stacks",
-      "translation": "CF_NAME stacks",
+      "id": "CF_NAME stack STACK_NAME",
+      "translation": "CF_NAME stack STACK_NAME",
       "modified": false
    },
    {
-      "id": "CF_NAME stack STACK_NAME",
-      "translation": "CF_NAME stack STACK_NAME",
+      "id": "CF_NAME stacks",
+      "translation": "CF_NAME stacks",
       "modified": false
    },
    {
@@ -1475,6 +1490,11 @@
       "modified": false
    },
    {
+      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
       "id": "Creating shared domain {{.DomainName}} as {{.Username}}...",
       "translation": "Création du domaine partagé {{.DomainName}} en tant que {{.Username}}...",
       "modified": false
@@ -1595,6 +1615,11 @@
       "modified": false
    },
    {
+      "id": "Delete a service key",
+      "translation": "Suprimer une clef de service",
+      "modified": false
+   },
+   {
       "id": "Delete a shared domain",
       "translation": "Supprimer un domaine partagé",
       "modified": false
@@ -1652,6 +1677,11 @@
    {
       "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
       "translation": "Suppression du domaine {{.DomainName}} en tant que {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Suprimer la clef {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
       "modified": false
    },
    {
@@ -2330,6 +2360,16 @@
       "modified": false
    },
    {
+      "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "En train d'obtenir la clef {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "translation": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
       "id": "Getting orgs as {{.Username}}...\n",
       "translation": "Récupération des orgs en tant que {{.Username}}...\n",
       "modified": false
@@ -2565,6 +2605,11 @@
       "modified": false
    },
    {
+      "id": "Invalid JSON provided in -c argument",
+      "translation": "Invalid JSON provided in -c argument",
+      "modified": false
+   },
+   {
       "id": "Invalid JSON response from server",
       "translation": "Serveur JSON réponse invalide",
       "modified": false
@@ -2730,11 +2775,6 @@
       "modified": false
    },
    {
-      "id": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
-      "translation": "Montrez information pour un stack (un stack est un system de fichier pré-construit qui inclus un system d'exploitation qui peut executer des logiciels)",
-      "modified": false
-   },
-   {
       "id": "List all the routes for all spaces of current organization",
       "translation": "Lister toutes les routes pour tous les espaces de l'organization courrant",
       "modified": false
@@ -2762,6 +2802,11 @@
    {
       "id": "List domains in the target org",
       "translation": "domaines de la liste dans la org ciblé",
+      "modified": false
+   },
+   {
+      "id": "List keys for a service instance",
+      "translation": "Lister les clefs pour un instance de service",
       "modified": false
    },
    {
@@ -3020,6 +3065,16 @@
       "modified": false
    },
    {
+      "id": "No service key for service instance {{.ServiceInstanceName}}",
+      "translation": "Pas de clef pour instance de service {{.ServiceInstanceName}}",
+      "modified": false
+   },
+   {
+      "id": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+      "translation": "Pas de clef de service {{.ServiceKeyName}} trouver pour instance de service {{.ServiceInstanceName}}",
+      "modified": false
+   },
+   {
       "id": "No service offerings found",
       "translation": "Aucune offre de services trouvés",
       "modified": false
@@ -3067,11 +3122,6 @@
    {
       "id": "No user-defined env variables have been set",
       "translation": "Variables d'environnement utilisateur non définis",
-      "modified": false
-   },
-   {
-      "id": "None of your application files have changed. Nothing will be uploaded.",
-      "translation": "Aucun de vos dossiers de l'application ont changé. Rien ne sera téléchargé.",
       "modified": false
    },
    {
@@ -3190,8 +3240,8 @@
       "modified": false
    },
    {
-      "id": "Path to app directory or file",
-      "translation": "Chemin de répertoire de l'application ou un fichier zip",
+      "id": "Path to app directory or to a zip file of the contents of the app directory",
+      "translation": "Chemin vers le répertoire de l'application ou à un fichier zip du contenu du répertoire de l'application",
       "modified": true
    },
    {
@@ -3580,6 +3630,11 @@
       "modified": false
    },
    {
+      "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
+      "translation": "Récupérer et montrer le guid d'un clef the service.  Tout autre information pour la clef de service a été suprimer.",
+      "modified": false
+   },
+   {
       "id": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
       "translation": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
       "modified": false
@@ -3755,8 +3810,18 @@
       "modified": false
    },
    {
+      "id": "Service instance {{.ServiceInstanceName}} does not exist.",
+      "translation": "Instance de service {{.ServiceInstanceName}} n'existe pas.",
+      "modified": false
+   },
+   {
       "id": "Service instance: {{.ServiceName}}",
       "translation": "Instance de service: {{.ServiceName}}",
+      "modified": false
+   },
+   {
+      "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
+      "translation": "La clef de service {{.ServiceKeyName}} n'existe pas pour l'instance de service {{.ServiceInstanceName}}.",
       "modified": false
    },
    {
@@ -3860,6 +3925,11 @@
       "modified": false
    },
    {
+      "id": "Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)",
+      "translation": "Montrez information pour un stack (un stack est un system de fichier pré-construit qui inclus un system d'exploitation qui peut executer des logiciels)",
+      "modified": false
+   },
+   {
       "id": "Show org info",
       "translation": "Afficher les informations org",
       "modified": false
@@ -3887,6 +3957,11 @@
    {
       "id": "Show service instance info",
       "translation": "Afficher infos d'instances de service",
+      "modified": false
+   },
+   {
+      "id": "Show service key info",
+      "translation": "Montrer information pour la clef de service",
       "modified": false
    },
    {
@@ -4485,6 +4560,11 @@
       "modified": false
    },
    {
+      "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
+      "translation": "Objet JSON valide contenant les paramètres de configuration spécifiques au service, fourni soit en ligne ou dans un fichier. Pour une liste des paramètres de configuration valide, voir la documentation de l'offre de service particulier.",
+      "modified": false
+   },
+   {
       "id": "Variable Name",
       "translation": "Variable Name",
       "modified": false
@@ -4935,6 +5015,11 @@
       "modified": false
    },
    {
+      "id": "service key",
+      "translation": "clef de service",
+      "modified": false
+   },
+   {
       "id": "service plan",
       "translation": "service plan",
       "modified": false
@@ -5197,141 +5282,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
-      "modified": false
-   },
-   {
-      "id": "Share a private domain with an org",
-      "translation": "Share a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "translation": "Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME share-private-domain ORG DOMAIN",
-      "translation": "CF_NAME share-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Unshare a private domain with an org",
-      "translation": "Unshare a private domain with an org",
-      "modified": false
-   },
-   {
-      "id": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "translation": "Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "translation": "CF_NAME unshare-private-domain ORG DOMAIN",
-      "modified": false
-   },
-   {
-      "id": "Create key for a service instance",
-      "translation": "Creation de la clef pour l'instance de service",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nÉXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "En trains de créer clef de service {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "This service doesn't support creation of keys.",
-      "translation": "Ce service ne supporte pas la création de clefs.",
-      "modified": false
-   },
-   {
-      "id": "Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Récupération des clefs pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "No service key for service instance {{.ServiceInstanceName}}",
-      "translation": "Pas de clef pour instance de service {{.ServiceInstanceName}}",
-      "modified": false
-   },
-   {
-      "id": "List keys for a service instance",
-      "translation": "Lister les clefs pour un instance de service",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
-      "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\nÉXAMPLE:\n   CF_NAME service-keys mydb",
-      "modified": false
-   },
-   {
-      "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "En train d'obtenir la clef {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
-      "translation": "Pas de clef de service {{.ServiceKeyName}} trouver pour instance de service {{.ServiceInstanceName}}",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
-      "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nÉXAMPLE:\n   CF_NAME service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
-      "translation": "Récupérer et montrer le guid d'un clef the service.  Tout autre information pour la clef de service a été suprimer.",
-      "modified": false
-   },
-   {
-      "id": "Show service key info",
-      "translation": "Montrer information pour la clef de service",
-      "modified": false
-   },
-   {
-      "id": "Delete a service key",
-      "translation": "Suprimer une clef de service",
-      "modified": false
-   },
-   {
-      "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
-      "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nÉXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
-      "modified": false
-   },
-   {
-      "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
-      "translation": "Suprimer la clef {{.ServiceKeyName}} pour instance de service {{.ServiceInstanceName}} étant {{.CurrentUser}}...",
-      "modified": false
-   },
-   {
-      "id": "Service instance {{.ServiceInstanceName}} does not exist.",
-      "translation": "Instance de service {{.ServiceInstanceName}} n'existe pas.",
-      "modified": false
-   },
-   {
-      "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
-      "translation": "La clef de service {{.ServiceKeyName}} n'existe pas pour l'instance de service {{.ServiceInstanceName}}.",
-      "modified": false
-   },
-   {
-      "id": "service key",
-      "translation": "clef de service",
-      "modified": false
-   },
-   {
-      "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-      "translation": "Objet JSON valide contenant les paramètres de configuration spécifiques au service, fourni soit en ligne ou dans un fichier. Pour une liste des paramètres de configuration valide, voir la documentation de l'offre de service particulier.",
-      "modified": false
-   },
-   {
-      "id": "Invalid JSON provided in -c argument",
-      "translation": "Invalid JSON provided in -c argument",
       "modified": false
    }
 ]

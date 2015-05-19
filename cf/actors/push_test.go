@@ -2,6 +2,9 @@ package actors_test
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
+
 	"github.com/cloudfoundry/cli/cf/actors"
 	fakeBits "github.com/cloudfoundry/cli/cf/api/application_bits/fakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
@@ -10,8 +13,6 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
-	"path/filepath"
 )
 
 var _ = Describe("Push Actor", func() {
@@ -66,7 +67,7 @@ var _ = Describe("Push Actor", func() {
 
 			It("extracts the zip", func() {
 				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					files, err := actor.GatherFiles(appDir, tmpDir)
+					files, _, err := actor.GatherFiles(appDir, tmpDir)
 					Expect(zipper.UnzipCallCount()).To(Equal(1))
 					Expect(err).NotTo(HaveOccurred())
 					Expect(files).To(Equal(presentFiles))
@@ -82,7 +83,7 @@ var _ = Describe("Push Actor", func() {
 
 			It("does not try to unzip the directory", func() {
 				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					files, err := actor.GatherFiles(appDir, tmpDir)
+					files, _, err := actor.GatherFiles(appDir, tmpDir)
 					Expect(zipper.UnzipCallCount()).To(Equal(0))
 					Expect(err).NotTo(HaveOccurred())
 					Expect(files).To(Equal(presentFiles))
@@ -95,7 +96,7 @@ var _ = Describe("Push Actor", func() {
 				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
 					zipper.IsZipFileReturns(true)
 					zipper.UnzipReturns(errors.New("error"))
-					_, err = actor.GatherFiles(appDir, tmpDir)
+					_, _, err = actor.GatherFiles(appDir, tmpDir)
 					Expect(err).To(HaveOccurred())
 				})
 			})
@@ -103,7 +104,7 @@ var _ = Describe("Push Actor", func() {
 			It("returns an error if it cannot walk the files", func() {
 				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
 					appFiles.AppFilesInDirReturns(nil, errors.New("error"))
-					_, err = actor.GatherFiles(appDir, tmpDir)
+					_, _, err = actor.GatherFiles(appDir, tmpDir)
 					Expect(err).To(HaveOccurred())
 				})
 			})
@@ -111,7 +112,7 @@ var _ = Describe("Push Actor", func() {
 			It("returns an error if we cannot reach the cc", func() {
 				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
 					appBitsRepo.GetApplicationFilesReturns(nil, errors.New("error"))
-					_, err = actor.GatherFiles(appDir, tmpDir)
+					_, _, err = actor.GatherFiles(appDir, tmpDir)
 					Expect(err).To(HaveOccurred())
 				})
 			})
@@ -125,7 +126,7 @@ var _ = Describe("Push Actor", func() {
 
 			It("includes the .cfignore file in the upload directory", func() {
 				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					files, err := actor.GatherFiles(appDir, tmpDir)
+					files, _, err := actor.GatherFiles(appDir, tmpDir)
 					Expect(err).NotTo(HaveOccurred())
 
 					_, err = os.Stat(filepath.Join(tmpDir, ".cfignore"))

@@ -92,7 +92,7 @@ func (cmd *Push) Metadata() command_metadata.CommandMetadata {
 			flag_helpers.NewStringFlag("k", T("Disk limit (e.g. 256M, 1024M, 1G)")),
 			flag_helpers.NewStringFlag("m", T("Memory limit (e.g. 256M, 1024M, 1G)")),
 			flag_helpers.NewStringFlag("n", T("Hostname (e.g. my-subdomain)")),
-			flag_helpers.NewStringFlag("p", T("Path to app directory or file")),
+			flag_helpers.NewStringFlag("p", T("Path to app directory or to a zip file of the contents of the app directory")),
 			flag_helpers.NewStringFlag("s", T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")),
 			flag_helpers.NewStringFlag("t", T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")),
 			cli.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")},
@@ -570,17 +570,19 @@ func (cmd *Push) uploadApp(appGuid string, appDir string) (apiErr error) {
 			return
 		}
 
-		presentFiles, err := cmd.actor.GatherFiles(appDir, uploadDir)
+		presentFiles, hasFileToUpload, err := cmd.actor.GatherFiles(appDir, uploadDir)
 		if err != nil {
 			apiErr = err
 			return
 		}
 
 		fileutils.TempFile("uploads", func(zipFile *os.File, err error) {
-			err = cmd.zipAppFiles(zipFile, appDir, uploadDir)
-			if err != nil {
-				apiErr = err
-				return
+			if hasFileToUpload {
+				err = cmd.zipAppFiles(zipFile, appDir, uploadDir)
+				if err != nil {
+					apiErr = err
+					return
+				}
 			}
 
 			err = cmd.actor.UploadApp(appGuid, zipFile, presentFiles)
@@ -631,7 +633,5 @@ func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount in
 			map[string]interface{}{
 				"ZipFileBytes": formatters.ByteSize(zipFileBytes),
 				"FileCount":    fileCount}))
-	} else {
-		cmd.ui.Warn(T("None of your application files have changed. Nothing will be uploaded."))
 	}
 }
