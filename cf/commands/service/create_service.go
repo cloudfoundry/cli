@@ -37,19 +37,19 @@ func (cmd CreateService) Metadata() command_metadata.CommandMetadata {
 		Description: T("Create a service instance"),
 		Usage: T(`CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]
 
-Optionally provide service-specific configuration parameters in a valid JSON object in-line:
-CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+  Optionally provide service-specific configuration parameters in a valid JSON object in-line:
+  CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
 
-Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
-CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE
+  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
+  CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE
 
-Example of valid JSON object:
-{
-	"cluster_nodes": {
-		"count": 5,
-		"memory_mb": 1024
-	}
-}
+	Example of valid JSON object:
+  {
+    "cluster_nodes": {
+      "count": 5,
+      "memory_mb": 1024
+    }
+  }
 
 EXAMPLE:
    CF_NAME create-service db-service silver mydb -c '{"ram_gb":4}'
