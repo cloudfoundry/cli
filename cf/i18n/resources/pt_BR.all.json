@@ -4115,9 +4115,9 @@
       "modified": false
    },
    {
-      "id": "TIP: Use '{{.CFCommand}}' to ensure your env variable changes take effect",
+      "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
       "translation": "DICA: Utilize '{{.CFCommand}}' para garantir que mudanças nas variáveis de ambiente entrem em vigor",
-      "modified": false
+      "modified": true
    },
    {
       "id": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
