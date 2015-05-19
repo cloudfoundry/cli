@@ -38,7 +38,26 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-service",
 		Description: T("Update a service instance"),
-		Usage:       T("CF_NAME update-service SERVICE [-p NEW_PLAN]"),
+		Usage: T(`CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]
+
+  Optionally provide service-specific configuration parameters in a valid JSON object in-line.
+  cf create--service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+
+  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
+  cf create-service SERVICE_INSTANCE -c PATH_TO_FILE
+
+   Example of valid JSON object:
+   {
+     "cluster_nodes": {
+        "count": 5,
+        "memory_mb": 1024
+      }
+   }
+
+EXAMPLE:
+   cf update-service mydb -p gold
+   cf update-service mydb -c '{"ram_gb":4}'
+   cf update-service mydb -c ~/workspace/tmp/instance_config.json`),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Change service plan for a service instance")),
 			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
