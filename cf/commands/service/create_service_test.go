@@ -2,6 +2,8 @@ package service_test
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -97,24 +99,76 @@ var _ = Describe("create-service command", func() {
 	})
 
 	Context("when passing arbitrary params", func() {
-		It("successfully creates a service and passes the params as a json string", func() {
-			callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", `{"foo": "bar"}`})
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
-				[]string{"OK"},
-			))
-			Expect(serviceRepo.CreateServiceInstanceArgs.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
-		})
-
-		Context("that are not valid json", func() {
-			It("returns an error to the UI", func() {
-				callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", `bad-json`})
+		Context("as a json string", func() {
+			It("successfully creates a service and passes the params as a json string", func() {
+				callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", `{"foo": "bar"}`})
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"Invalid JSON provided in -c argument"},
+					[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
 				))
+				Expect(serviceRepo.CreateServiceInstanceArgs.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+			})
+
+			Context("that are not valid json", func() {
+				It("returns an error to the UI", func() {
+					callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", `bad-json`})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Invalid JSON provided in -c argument"},
+					))
+				})
+			})
+		})
+
+		Context("as a file that contains json", func() {
+			var jsonFile *os.File
+			var params string
+
+			BeforeEach(func() {
+				params = "{\"foo\": \"bar\"}"
+			})
+
+			AfterEach(func() {
+				if jsonFile != nil {
+					jsonFile.Close()
+					os.Remove(jsonFile.Name())
+				}
+			})
+
+			JustBeforeEach(func() {
+				var err error
+				jsonFile, err = ioutil.TempFile("", "")
+				Expect(err).ToNot(HaveOccurred())
+
+				err = ioutil.WriteFile(jsonFile.Name(), []byte(params), os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("successfully creates a service and passes the params as a json string", func() {
+				callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", jsonFile.Name()})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+				))
+				Expect(serviceRepo.CreateServiceInstanceArgs.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+			})
+
+			Context("that are not valid json", func() {
+				BeforeEach(func() {
+					params = "bad-json"
+				})
+
+				It("returns an error to the UI", func() {
+					callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", jsonFile.Name()})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Invalid JSON provided in -c argument"},
+					))
+				})
 			})
 		})
 	})
