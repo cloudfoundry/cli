@@ -35,10 +35,22 @@ func (cmd CreateServiceKey) Metadata() command_metadata.CommandMetadata {
 		Name:        "create-service-key",
 		ShortName:   "csk",
 		Description: T("Create key for a service instance"),
-		Usage: T(`CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY
+		Usage: T(`CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]
+
+  Optionally provide service-specific configuration parameters in a valid JSON object in-line.
+  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{"name":"value","name":"value"}'
+
+  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
+  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE
+
+   Example of valid JSON object:
+   {
+     "permissions": "read-only"
+   }
 
 EXAMPLE:
-   CF_NAME create-service-key mydb mykey`),
+   CF_NAME create-service-key mydb mykey -c '{"permissions":"read-only"}'
+   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json`),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
 		},
