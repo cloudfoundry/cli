@@ -53,7 +53,7 @@ var _ = Describe("bind-service command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
-				[]string{"TIP"},
+				[]string{"TIP", "my-app"},
 			))
 			Expect(serviceBindingRepo.CreateServiceInstanceGuid).To(Equal("my-service-guid"))
 			Expect(serviceBindingRepo.CreateApplicationGuid).To(Equal("my-app-guid"))
