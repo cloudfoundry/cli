@@ -575,8 +575,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE",
-      "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE",
+      "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n   CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
+      "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n   CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
       "modified": false
    },
    {

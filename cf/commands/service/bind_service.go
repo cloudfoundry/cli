@@ -40,7 +40,25 @@ func (cmd *BindService) Metadata() command_metadata.CommandMetadata {
 		Name:        "bind-service",
 		ShortName:   "bs",
 		Description: T("Bind a service instance to an app"),
-		Usage:       T("CF_NAME bind-service APP_NAME SERVICE_INSTANCE"),
+		Usage: T(`CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]
+
+  Optionally provide service-specific configuration parameters in a valid JSON object in-line.
+  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+
+  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
+  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE
+
+   Example of valid JSON object:
+   {
+     "cluster_nodes": {
+        "count": 5,
+        "memory_mb": 1024
+      }
+   }
+
+EXAMPLE:
+   CF_NAME bind-service myapp mydb -c '{"permissions":"read-only"}'
+   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json`),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
 		},
