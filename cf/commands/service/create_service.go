@@ -55,9 +55,6 @@ EXAMPLE:
    CF_NAME create-service db-service silver mydb -c '{"ram_gb":4}'
    CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json
 
-OPTIONS:
-   -c  Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.
-
 TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`),
 		Flags: []cli.Flag{
