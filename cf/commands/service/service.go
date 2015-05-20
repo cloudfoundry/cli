@@ -87,10 +87,12 @@ func (cmd *ShowService) Run(c *cli.Context) {
 				map[string]interface{}{
 					"Message": terminal.EntityNameColor(serviceInstance.LastOperation.Description),
 				}))
-			cmd.ui.Say(T("Started: {{.Started}}",
-				map[string]interface{}{
-					"Started": terminal.EntityNameColor(serviceInstance.LastOperation.CreatedAt),
-				}))
+			if "" != serviceInstance.LastOperation.CreatedAt {
+				cmd.ui.Say(T("Started: {{.Started}}",
+					map[string]interface{}{
+						"Started": terminal.EntityNameColor(serviceInstance.LastOperation.CreatedAt),
+					}))
+			}
 			cmd.ui.Say(T("Updated: {{.Updated}}",
 				map[string]interface{}{
 					"Updated": terminal.EntityNameColor(serviceInstance.LastOperation.UpdatedAt),

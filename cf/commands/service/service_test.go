@@ -99,6 +99,30 @@ var _ = Describe("service command", func() {
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 			})
 
+			Context("when the service instance CreatedAt is empty", func() {
+				It("does not output the Started line", func() {
+					createServiceInstanceWithState("in progress")
+					requirementsFactory.ServiceInstance.LastOperation.CreatedAt = ""
+					runCommand("service1")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Service instance:", "service1"},
+						[]string{"Service: ", "mysql"},
+						[]string{"Plan: ", "plan-name"},
+						[]string{"Description: ", "the-description"},
+						[]string{"Documentation url: ", "http://documentation.url"},
+						[]string{"Dashboard: ", "some-url"},
+						[]string{"Last Operation"},
+						[]string{"Status: ", "create in progress"},
+						[]string{"Message: ", "creating resource - step 1"},
+						[]string{"Updated: ", "updated-date"},
+					))
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Started: "},
+					))
+				})
+			})
+
 			Context("shows correct status information based on service instance state", func() {
 				It("shows status: `create in progress` when state is `in progress`", func() {
 					createServiceInstanceWithState("in progress")
