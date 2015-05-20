@@ -1,3 +1,34 @@
+##v6.11.3
+* Improve Tip for bind-service command [#94153632]
+* fix bug where app's PackageState is incorrectly set in restage [#93382608]
+* Merge branch 'hwcf-issue-32' of https://github.com/HuaweiTech/cli into HuaweiTech-hwcf-issue-32
+* fixed push -p help verbiage
+* refactor to make err will always be caught in start.go
+* improve error checking after calling endpoint [#93382608]
+* use proper model for /apps endpoint [#93382608]
+* using /apps instead /instances to poll for staging [#93382608]
+* Translate failure message for invalid JSON in arbitary params arg for create-service [#88670540]
+* Add French translation for arbitrary params description
+* new staging_failed_reason field in App Model [#93382608]
+* new GetApp() method in ApplicationRepository package [#93382608]
+* add package_state to App Model [#93382608]
+* fix conflicts in language files 
+* do not create zip when no file to upload [#94014700]
+* updated and resolves conflicts in language files [#94014700]
+* Add -c flag to pass arbitrary params during create-service [#89843658]
+* Remove async from request body during create-service Two problems here:[#92396108]
+  1. Async is a query parameter flag, not a post body paramter
+  2. POST /v2/service_instances does not respect async flag anyway
+* Merge pull request #427 from xingzhou/service_key_delete add delete service key command
+* cf start uses old loggregator to tail logs, instad of noaa [#93554176]
+* use old loggregator consumer to retrieve logs [#93554176]
+* godeps [#93554176]
+* add old loggregator_consumer package [#93554176]
+* rename noaa specific packages [#93554176]
+* Merge pull request #415 from HuaweiTech/hwcf-issue-30  Fix for stack and stacks command
+* add delete service key command [#87062548]
+* Fix for stack and stacks command
+
 ##v6.11.2
 * not renewing noaa consumer on every push instead, we instruct noaa to stop reconnecting in the background
 * hardcode doppler endpoints into config getter [#93208696]
