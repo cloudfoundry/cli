@@ -14,7 +14,7 @@ func (f *BoolFlag) Set(v string) {
 }
 
 func (f *BoolFlag) String() string {
-	return f.Name
+	return f.Usage
 }
 
 func (f *BoolFlag) GetName() string {
