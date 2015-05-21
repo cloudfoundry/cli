@@ -14,7 +14,7 @@ func (f *IntFlag) Set(v string) {
 }
 
 func (f *IntFlag) String() string {
-	return f.Name
+	return f.Usage
 }
 
 func (f *IntFlag) GetName() string {
