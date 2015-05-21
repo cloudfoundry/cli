@@ -2270,11 +2270,6 @@
       "modified": false
    },
    {
-      "id": "Failed fetching service brokers.\n{{.Error}}",
-      "translation": "Failed fetching service brokers.\n{{.Error}}",
-      "modified": false
-   },
-   {
       "id": "Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
       "translation": "Fallo trayendo usuarios-de-space para rol {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
       "modified": false
@@ -5277,6 +5272,11 @@
    {
       "id": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
       "translation": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
+      "modified": false
+   },
+   {
+      "id": "{{.Error}}",
+      "translation": "{{.Error}}",
       "modified": false
    },
    {

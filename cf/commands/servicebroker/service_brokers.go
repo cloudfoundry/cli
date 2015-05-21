@@ -77,7 +77,7 @@ func (cmd ListServiceBrokers) Run(c *cli.Context) {
 	table.Print()
 
 	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching service brokers.\n{{.Error}}", map[string]interface{}{"Error": apiErr}))
+		cmd.ui.Failed(T("{{.Error}}", map[string]interface{}{"Error": apiErr}))
 		return
 	}
 
