@@ -54,17 +54,29 @@ func main() {
 			fc := flags.NewFlagContext(cmdRegistry.FindCommand(os.Args[1]).MetaData().Flags)
 
 			if requestHelp(os.Args[2:]) {
-				deps.Ui.Say(showCommandUsage(cmd))
+				deps.Ui.Say(cmdRegistry.CommandUsage(cmd))
 				os.Exit(0)
 			} else {
 				err := fc.Parse(os.Args[2:]...)
 				if err != nil {
-					deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + showCommandUsage(cmd))
+					deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + cmdRegistry.CommandUsage(cmd))
 				}
 			}
 			cmdRegistry.SetCommand(cmdRegistry.FindCommand(cmd).SetDependency(deps))
 
-			cmdRegistry.FindCommand(cmd).Execute(fc)
+			cfCmd := cmdRegistry.FindCommand(cmd)
+			reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)
+			if err != nil {
+				deps.Ui.Failed(err.Error())
+			}
+
+			for _, r := range reqs {
+				if !r.Execute() {
+					os.Exit(1)
+				}
+			}
+
+			cfCmd.Execute(fc)
 			os.Exit(0)
 		}
 	}
@@ -275,51 +287,4 @@ func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch 
 	}
 
 	return cliServer
-}
-
-func showCommandUsage(cmdName string) string {
-	output := ""
-	cmd := cmdRegistry.FindCommand(cmdName)
-
-	output = T("NAME") + ":" + "\n"
-	output += "   " + cmd.MetaData().Name + " - " + cmd.MetaData().Description + "\n\n"
-
-	output += T("USAGE") + ":" + "\n"
-	output += "   " + cmd.MetaData().Usage + "\n\n"
-
-	if cmd.MetaData().ShortName != "" {
-		output += T("ALIAS") + ":" + "\n"
-		output += "   " + cmd.MetaData().ShortName + "\n\n"
-	}
-
-	if cmd.MetaData().Flags != nil {
-		output += T("OPTIONS") + ":" + "\n"
-
-		//find longest name length
-		l := 0
-		for n, _ := range cmd.MetaData().Flags {
-			if len(n) > l {
-				l = len(n)
-			}
-		}
-
-		//print non-bool flags first
-		for n, f := range cmd.MetaData().Flags {
-			switch f.GetValue().(type) {
-			case bool:
-			default:
-				output += "   -" + n + strings.Repeat(" ", 7+(l-len(n))) + f.String() + "\n"
-			}
-		}
-
-		//then bool flags
-		for n, f := range cmd.MetaData().Flags {
-			switch f.GetValue().(type) {
-			case bool:
-				output += "   --" + n + strings.Repeat(" ", 6+(l-len(n))) + f.String() + "\n"
-			}
-		}
-	}
-
-	return output
 }

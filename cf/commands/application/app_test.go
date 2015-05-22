@@ -46,7 +46,7 @@ var _ = Describe("app Command", func() {
 
 	runCommand := func(args ...string) bool {
 		cmd := NewShowApp(ui, configRepo, appSummaryRepo, appInstancesRepo, appLogsNoaaRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -62,7 +62,9 @@ var _ = Describe("app Command", func() {
 
 		It("fails with usage when not provided exactly one arg", func() {
 			passed := runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 			Expect(passed).To(BeFalse())
 		})
 

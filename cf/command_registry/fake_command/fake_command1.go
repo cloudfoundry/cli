@@ -1,6 +1,8 @@
 package fake_command
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -37,4 +39,5 @@ func (cmd FakeCommand1) SetDependency(deps command_registry.Dependency) command_
 }
 
 func (cmd FakeCommand1) Execute(c flags.FlagContext) {
+	fmt.Println("This is fake-command")
 }
