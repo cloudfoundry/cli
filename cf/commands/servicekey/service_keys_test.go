@@ -89,6 +89,7 @@ var _ = Describe("service-keys command", func() {
 				[]string{"fake-service-key-1"},
 				[]string{"fake-service-key-2"},
 			))
+			Expect(ui.Outputs[1]).To(BeEmpty())
 			Expect(serviceKeyRepo.ListServiceKeysMethod.InstanceGuid).To(Equal("fake-instance-guid"))
 		})
 
