@@ -1,9 +1,12 @@
 package command_registry_test
 
 import (
+	"strings"
+
 	. "github.com/cloudfoundry/cli/cf/command_registry/fake_command"
 
 	. "github.com/cloudfoundry/cli/cf/command_registry"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	. "github.com/onsi/ginkgo"
@@ -56,7 +59,49 @@ var _ = Describe("CommandRegistry", func() {
 				oldCmd = Commands.FindCommand("fake-command")
 				Ω(oldCmd).To(Equal(updatedCmd))
 			})
+		})
 
+		Context("CommandUsage()", func() {
+			It("prints the name, description and usage of a command", func() {
+				o := Commands.CommandUsage("fake-command")
+				outputs := strings.Split(o, "\n")
+				Ω(outputs).To(BeInDisplayOrder(
+					[]string{"NAME:"},
+					[]string{"   fake-command", "Description"},
+					[]string{"USAGE:"},
+				))
+			})
+
+			It("prints the flag options", func() {
+				o := Commands.CommandUsage("fake-command")
+				outputs := strings.Split(o, "\n")
+				Ω(outputs).To(BeInDisplayOrder(
+					[]string{"NAME:"},
+					[]string{"USAGE:"},
+					[]string{"OPTIONS:"},
+					[]string{"intFlag", "Usage for"},
+					[]string{"boolFlag", "Usage for"},
+				))
+			})
+
+			It("prefixes the non-bool flag with '-'", func() {
+				o := Commands.CommandUsage("fake-command")
+				outputs := strings.Split(o, "\n")
+				Ω(outputs).To(BeInDisplayOrder(
+					[]string{"OPTIONS:"},
+					[]string{"-intFlag", "Usage for"},
+				))
+			})
+
+			It("prefixes the bool flag with '--'", func() {
+				o := Commands.CommandUsage("fake-command")
+				outputs := strings.Split(o, "\n")
+				Ω(outputs).To(BeInDisplayOrder(
+					[]string{"OPTIONS:"},
+					[]string{"-intFlag", "Usage for"},
+					[]string{"--boolFlag", "Usage for"},
+				))
+			})
 		})
 	})
 
