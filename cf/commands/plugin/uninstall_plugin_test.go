@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	cliRpc "github.com/cloudfoundry/cli/plugin/rpc"
@@ -63,7 +64,7 @@ var _ = Describe("Uninstall", func() {
 	runCommand := func(args ...string) bool {
 		//reset rpc registration, each service can only be registered once
 		rpc.DefaultServer = rpc.NewServer()
-		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil, nil)
+		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{})
 		cmd := NewPluginUninstall(ui, pluginConfig, rpcService)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}

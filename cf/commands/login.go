@@ -74,7 +74,12 @@ func (cmd Login) Run(c *cli.Context) {
 	cmd.config.ClearSession()
 
 	endpoint, skipSSL := cmd.decideEndpoint(c)
-	NewApi(cmd.ui, cmd.config, cmd.endpointRepo).setApiEndpoint(endpoint, skipSSL, cmd.Metadata().Name)
+
+	Api{
+		ui:           cmd.ui,
+		config:       cmd.config,
+		endpointRepo: cmd.endpointRepo,
+	}.setApiEndpoint(endpoint, skipSSL, cmd.Metadata().Name)
 
 	defer func() {
 		cmd.ui.Say("")

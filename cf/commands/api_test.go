@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/api"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -18,18 +20,28 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-func callApi(args []string, config core_config.ReadWriter, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
+func callApi(args []string, config core_config.Repository, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
-	cmd := NewApi(ui, config, endpointRepo)
+	// cmd := NewApi(ui, config, endpointRepo)
+	var cmd command_registry.Command
+	cmd = Api{}
+	repoLocator := api.RepositoryLocator{}
+	repoLocator = repoLocator.SetEndpointRepository(endpointRepo)
+	deps := command_registry.Dependency{
+		Ui:          ui,
+		Config:      config,
+		RepoLocator: repoLocator,
+	}
+	cmd = cmd.SetDependency(deps)
 	requirementsFactory := &testreq.FakeReqFactory{}
-	testcmd.RunCommand(cmd, args, requirementsFactory)
+	testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	return
 }
 
 var _ = Describe("api command", func() {
 	var (
-		config       core_config.ReadWriter
+		config       core_config.Repository
 		endpointRepo *testapi.FakeEndpointRepo
 	)
 
@@ -68,7 +80,8 @@ var _ = Describe("api command", func() {
 			})
 
 			It("prints out the api endpoint and appropriately sets the config", func() {
-				testcmd.RunCommand(NewApi(ui, config, endpointRepo), []string{}, requirementsFactory)
+				// testcmd.RunCommand(NewApi(ui, config, endpointRepo), []string{}, requirementsFactory)
+				ui := callApi([]string{}, config, endpointRepo)
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"https://api.run.pivotal.io", "2.0"}))
 				Expect(config.IsSSLDisabled()).To(BeTrue())
@@ -76,7 +89,8 @@ var _ = Describe("api command", func() {
 
 			Context("when the --unset flag is passed", func() {
 				It("unsets the ApiEndpoint", func() {
-					testcmd.RunCommand(NewApi(ui, config, endpointRepo), []string{"--unset"}, requirementsFactory)
+					// testcmd.RunCommand(NewApi(ui, config, endpointRepo), []string{"--unset"}, requirementsFactory)
+					ui := callApi([]string{"--unset"}, config, endpointRepo)
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Unsetting api endpoint..."},

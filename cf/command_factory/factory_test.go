@@ -35,7 +35,7 @@ var _ = Describe("factory", func() {
 			"uaa":              net.NewUAAGateway(config, fakeUI),
 		})
 
-		rpcService, _ := rpc.NewRpcService(nil, nil, nil, nil)
+		rpcService, _ := rpc.NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{})
 		factory = NewFactory(fakeUI, config, manifestRepo, repoLocator, pluginConfig, rpcService)
 	})
 
@@ -51,6 +51,10 @@ var _ = Describe("factory", func() {
 
 		err := filepath.Walk("../commands", func(path string, info os.FileInfo, err error) error {
 			if info.IsDir() {
+				return nil
+			}
+
+			if info.Name() == "api.go" {
 				return nil
 			}
 

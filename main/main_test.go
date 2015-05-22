@@ -48,6 +48,12 @@ var _ = Describe("main", func() {
 		})
 	})
 
+	It("prints usage help for all non-codegangsta commands by providing `help` flag", func() {
+		output := Cf("api", "-h").Wait(1 * time.Second)
+		Eventually(output.Out.Contents).Should(ContainSubstring("USAGE"))
+		Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS"))
+	})
+
 	It("can print help for all core commands by executing only the command `cf`", func() {
 		output := Cf().Wait(3 * time.Second)
 		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
@@ -86,6 +92,14 @@ var _ = Describe("main", func() {
 		It("only checks input flags against flags from the provided command", func() {
 			result := Cf("push", "--no-hostname", "--skip-ssl-validation")
 			Eventually(result.Out).Should(Say("\"--skip-ssl-validation\""))
+		})
+
+		It("accepts -h and --h flags for non-codegangsta commands", func() {
+			result := Cf("api", "-h")
+			Consistently(result.Out).ShouldNot(Say("Invalid flag: -h"))
+
+			result = Cf("api", "--h")
+			Consistently(result.Out).ShouldNot(Say("Invalid flag: --h"))
 		})
 
 		It("accepts -h and --h flags for all commands", func() {
@@ -217,6 +231,10 @@ var _ = Describe("main", func() {
 			session := Cf("exit1").Wait(5 * time.Second)
 			Eventually(session).Should(Exit(1))
 		})
+	})
+
+	Describe("Commands /w new non-codegangsta structure", func() {
+
 	})
 })
 

@@ -255,6 +255,11 @@
       "modified": false
    },
    {
+      "id": "ALIAS",
+      "translation": "ALIAS",
+      "modified": false
+   },
+   {
       "id": "API endpoint",
       "translation": "API endpoint",
       "modified": false
@@ -2945,6 +2950,11 @@
       "modified": false
    },
    {
+      "id": "NAME",
+      "translation": "NAME",
+      "modified": false
+   },
+   {
       "id": "NAME:",
       "translation": "NAME:",
       "modified": false
@@ -3142,6 +3152,11 @@
    {
       "id": "OK",
       "translation": "OK",
+      "modified": false
+   },
+   {
+      "id": "OPTIONS",
+      "translation": "OPTIONS",
       "modified": false
    },
    {
@@ -4267,6 +4282,11 @@
    {
       "id": "UAA endpoint missing from config file",
       "translation": "UAA endpoint missing from config file",
+      "modified": false
+   },
+   {
+      "id": "USAGE",
+      "translation": "USAGE",
       "modified": false
    },
    {
