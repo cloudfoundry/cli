@@ -1,6 +1,8 @@
 package command_registry
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -45,4 +47,51 @@ func (r *registry) CommandExists(name string) bool {
 
 func (r *registry) SetCommand(cmd Command) {
 	r.cmd[cmd.MetaData().Name] = cmd
+}
+
+func (r *registry) CommandUsage(cmdName string) string {
+	output := ""
+	cmd := r.FindCommand(cmdName)
+
+	output = T("NAME") + ":" + "\n"
+	output += "   " + cmd.MetaData().Name + " - " + cmd.MetaData().Description + "\n\n"
+
+	output += T("USAGE") + ":" + "\n"
+	output += "   " + cmd.MetaData().Usage + "\n\n"
+
+	if cmd.MetaData().ShortName != "" {
+		output += T("ALIAS") + ":" + "\n"
+		output += "   " + cmd.MetaData().ShortName + "\n\n"
+	}
+
+	if cmd.MetaData().Flags != nil {
+		output += T("OPTIONS") + ":" + "\n"
+
+		//find longest name length
+		l := 0
+		for n, _ := range cmd.MetaData().Flags {
+			if len(n) > l {
+				l = len(n)
+			}
+		}
+
+		//print non-bool flags first
+		for n, f := range cmd.MetaData().Flags {
+			switch f.GetValue().(type) {
+			case bool:
+			default:
+				output += "   -" + n + strings.Repeat(" ", 7+(l-len(n))) + f.String() + "\n"
+			}
+		}
+
+		//then bool flags
+		for n, f := range cmd.MetaData().Flags {
+			switch f.GetValue().(type) {
+			case bool:
+				output += "   --" + n + strings.Repeat(" ", 6+(l-len(n))) + f.String() + "\n"
+			}
+		}
+	}
+
+	return output
 }
