@@ -101,8 +101,8 @@ var _ = Describe("service-key command", func() {
 					[]string{"port", "3306"},
 					[]string{"database", "fake-db-name"},
 					[]string{"uri", "mysql://fake-user:fake-password@fake-host:3306/fake-db-name"},
-					[]string{"OK"},
 				))
+				Expect(ui.Outputs[1]).To(BeEmpty())
 				Expect(serviceKeyRepo.GetServiceKeyMethod.InstanceGuid).To(Equal("fake-service-instance-guid"))
 			})
 
