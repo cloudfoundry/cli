@@ -6,14 +6,13 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/command_runner"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -23,12 +22,14 @@ import (
 	"github.com/cloudfoundry/cli/cf/panic_printer"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/trace"
+	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/codegangsta/cli"
 )
 
-var deps = setupDependencies()
+var deps = command_registry.NewDependency()
+
+var cmdRegistry = command_registry.Commands
 
 type cliDependencies struct {
 	termUI         terminal.UI
@@ -41,54 +42,39 @@ type cliDependencies struct {
 	detector       detection.Detector
 }
 
-func setupDependencies() (deps *cliDependencies) {
-	deps = new(cliDependencies)
+func main() {
+	defer handlePanics(deps.TeePrinter)
+	defer deps.Config.Close()
 
-	deps.teePrinter = terminal.NewTeePrinter()
+	//////////////// non-codegangsta path  ///////////////////////
+	if len(os.Args) > 1 {
+		cmd := os.Args[1]
+		if cmdRegistry.CommandExists(cmd) {
 
-	deps.termUI = terminal.NewUI(os.Stdin, deps.teePrinter)
+			fc := flags.NewFlagContext(cmdRegistry.FindCommand(os.Args[1]).MetaData().Flags)
 
-	deps.manifestRepo = manifest.NewManifestDiskRepository()
+			if requestHelp(os.Args[2:]) {
+				deps.Ui.Say(showCommandUsage(cmd))
+				os.Exit(0)
+			} else {
+				err := fc.Parse(os.Args[2:]...)
+				if err != nil {
+					deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + showCommandUsage(cmd))
+				}
+			}
+			cmdRegistry.SetCommand(cmdRegistry.FindCommand(cmd).SetDependency(deps))
 
-	errorHandler := func(err error) {
-		if err != nil {
-			deps.termUI.Failed(fmt.Sprintf("Config error: %s", err))
+			cmdRegistry.FindCommand(cmd).Execute(fc)
+			os.Exit(0)
 		}
 	}
-	deps.configRepo = core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler)
-	deps.pluginConfig = plugin_config.NewPluginConfig(errorHandler)
-	deps.detector = &detection.JibberJabberDetector{}
+	//////////////////////////////////////////
 
-	T = Init(deps.configRepo, deps.detector)
+	rpcService := newCliRpcServer(deps.TeePrinter, deps.TeePrinter)
 
-	terminal.UserAskedForColors = deps.configRepo.ColorEnabled()
-	terminal.InitColorSupport()
-
-	if os.Getenv("CF_TRACE") != "" {
-		trace.Logger = trace.NewLogger(os.Getenv("CF_TRACE"))
-	} else {
-		trace.Logger = trace.NewLogger(deps.configRepo.Trace())
-	}
-
-	deps.gateways = map[string]net.Gateway{
-		"auth":             net.NewUAAGateway(deps.configRepo, deps.termUI),
-		"cloud-controller": net.NewCloudControllerGateway(deps.configRepo, time.Now, deps.termUI),
-		"uaa":              net.NewUAAGateway(deps.configRepo, deps.termUI),
-	}
-	deps.apiRepoLocator = api.NewRepositoryLocator(deps.configRepo, deps.gateways)
-
-	return
-}
-
-func main() {
-	defer handlePanics(deps.teePrinter)
-	defer deps.configRepo.Close()
-
-	rpcService := newCliRpcServer(deps.teePrinter, deps.teePrinter)
-
-	cmdFactory := command_factory.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator, deps.pluginConfig, rpcService)
-	requirementsFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
-	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, deps.termUI)
+	cmdFactory := command_factory.NewFactory(deps.Ui, deps.Config, deps.ManifestRepo, deps.RepoLocator, deps.PluginConfig, rpcService)
+	requirementsFactory := requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator)
+	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, deps.Ui)
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
 	pluginList := pluginsConfig.Plugins()
 
@@ -185,9 +171,9 @@ func callCoreCommand(args []string, theApp *cli.App) {
 	if err != nil {
 		os.Exit(1)
 	}
-	gateways := gatewaySliceFromMap(deps.gateways)
+	gateways := gatewaySliceFromMap(deps.Gateways)
 
-	warningsCollector := net.NewWarningsCollector(deps.termUI, gateways...)
+	warningsCollector := net.NewWarningsCollector(deps.Ui, gateways...)
 	warningsCollector.PrintWarnings()
 }
 
@@ -273,7 +259,7 @@ func mergePluginMetaData(coreMetas []command_metadata.CommandMetadata, pluginMet
 
 func requestHelp(args []string) bool {
 	for _, v := range args {
-		if v == "-h" || v == "--help" {
+		if v == "-h" || v == "--help" || v == "--h" {
 			return true
 		}
 	}
@@ -282,11 +268,58 @@ func requestHelp(args []string) bool {
 }
 
 func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {
-	cliServer, err := rpc.NewRpcService(nil, outputCapture, terminalOutputSwitch, deps.configRepo)
+	cliServer, err := rpc.NewRpcService(nil, outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator)
 	if err != nil {
 		fmt.Println("Error initializing RPC service: ", err)
 		os.Exit(1)
 	}
 
 	return cliServer
+}
+
+func showCommandUsage(cmdName string) string {
+	output := ""
+	cmd := cmdRegistry.FindCommand(cmdName)
+
+	output = T("NAME") + ":" + "\n"
+	output += "   " + cmd.MetaData().Name + " - " + cmd.MetaData().Description + "\n\n"
+
+	output += T("USAGE") + ":" + "\n"
+	output += "   " + cmd.MetaData().Usage + "\n\n"
+
+	if cmd.MetaData().ShortName != "" {
+		output += T("ALIAS") + ":" + "\n"
+		output += "   " + cmd.MetaData().ShortName + "\n\n"
+	}
+
+	if cmd.MetaData().Flags != nil {
+		output += T("OPTIONS") + ":" + "\n"
+
+		//find longest name length
+		l := 0
+		for n, _ := range cmd.MetaData().Flags {
+			if len(n) > l {
+				l = len(n)
+			}
+		}
+
+		//print non-bool flags first
+		for n, f := range cmd.MetaData().Flags {
+			switch f.GetValue().(type) {
+			case bool:
+			default:
+				output += "   -" + n + strings.Repeat(" ", 7+(l-len(n))) + f.String() + "\n"
+			}
+		}
+
+		//then bool flags
+		for n, f := range cmd.MetaData().Flags {
+			switch f.GetValue().(type) {
+			case bool:
+				output += "   --" + n + strings.Repeat(" ", 6+(l-len(n))) + f.String() + "\n"
+			}
+		}
+	}
+
+	return output
 }

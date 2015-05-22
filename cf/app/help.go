@@ -9,6 +9,7 @@ import (
 	"text/template"
 	"unicode/utf8"
 
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -64,6 +65,15 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 		return
 	}
 
+	presentNonCodegangstaCommand := func(commandName string) (presenter cmdPresenter) {
+		cmd := command_registry.Commands.FindCommand(commandName)
+		presenter.Name = cmd.MetaData().Name
+		padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
+		presenter.Name = presenter.Name + padding
+		presenter.Description = cmd.MetaData().Description
+		return
+	}
+
 	presentPluginCommands := func() []cmdPresenter {
 		pluginConfig := plugin_config.NewPluginConfig(func(err error) {
 			//fail silently when running help?
@@ -106,7 +116,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("passwd"),
 					presentCommand("target"),
 				}, {
-					presentCommand("api"),
+					presentNonCodegangstaCommand("api"),
 					presentCommand("auth"),
 				},
 			},

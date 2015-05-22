@@ -11,6 +11,7 @@ import (
 	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/fakes"
+	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command"
 	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -104,7 +105,7 @@ var _ = Describe("Install", func() {
 	runCommand := func(args ...string) bool {
 		//reset rpc registration, each service can only be registered once
 		rpc.DefaultServer = rpc.NewServer()
-		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil, nil)
+		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{})
 		cmd := NewPluginInstall(ui, config, pluginConfig, coreCmds, fakePluginRepo, fakeChecksum, rpcService)
 		return testcmd.RunCommand(cmd, args, requirementsFactory)
 	}

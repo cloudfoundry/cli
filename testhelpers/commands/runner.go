@@ -1,7 +1,12 @@
 package commands
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/command"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/flags"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 )
@@ -41,6 +46,38 @@ func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq
 	cmd.Run(context)
 
 	return
+}
+
+func RunCliCommand(cmd command_registry.Command, args []string, requirementsFactory *testreq.FakeReqFactory) bool {
+	context := flags.NewFlagContext(cmd.MetaData().Flags)
+	err := context.Parse(args...)
+	if err != nil {
+		fmt.Println("ERROR:", err)
+		os.Exit(1)
+	}
+
+	defer func() {
+		errMsg := recover()
+
+		if errMsg != nil && errMsg != testterm.QuietPanic {
+			panic(errMsg)
+		}
+	}()
+	requirements, err := cmd.Requirements(requirementsFactory, context)
+	if err != nil {
+		return false
+	}
+
+	for _, requirement := range requirements {
+		success := requirement.Execute()
+		if !success {
+			return false
+		}
+	}
+
+	cmd.Execute(context)
+
+	return true
 }
 
 func RunCommandMoreBetter(cmd command.Command, requirementsFactory *testreq.FakeReqFactory, args ...string) (result RunCommandResult) {

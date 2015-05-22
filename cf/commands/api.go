@@ -1,3 +1,13 @@
+/*
+* to port command over to new architecture
+* Unit test:
+* short cutting all codegangsta func (NewApi(), Medadata(),GetRequirements(),Run()) w/
+* return, then fix all unit tests
+*
+* bin/test
+* Take out the short cutting and run test
+ */
+
 package commands
 
 import (
@@ -6,13 +16,14 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type Api struct {
@@ -21,30 +32,35 @@ type Api struct {
 	config       core_config.ReadWriter
 }
 
-func NewApi(ui terminal.UI, config core_config.ReadWriter, endpointRepo api.EndpointRepository) (cmd Api) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.endpointRepo = endpointRepo
-	return
+func init() {
+	command_registry.Register(Api{})
 }
 
-func (cmd Api) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd Api) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["unset"] = &cliFlags.BoolFlag{Name: "unset", Usage: T("Remove all api endpoint targeting")}
+	fs["skip-ssl-validation"] = &cliFlags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")}
+
+	return command_registry.CommandMetadata{
 		Name:        "api",
 		Description: T("Set or view target api url"),
 		Usage:       T("CF_NAME api [URL]"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")},
-			cli.BoolFlag{Name: "unset", Usage: T("Remove all api endpoint targeting")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd Api) GetRequirements(_ requirements.Factory, _ *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Api) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (cmd Api) Run(c *cli.Context) {
+func (cmd Api) SetDependency(deps command_registry.Dependency) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()
+	return cmd
+}
+
+func (cmd Api) Execute(c flags.FlagContext) {
 	if c.Bool("unset") {
 		cmd.ui.Say(T("Unsetting api endpoint..."))
 		cmd.config.SetApiEndpoint("")
@@ -66,7 +82,7 @@ func (cmd Api) Run(c *cli.Context) {
 
 		cmd.ui.Say(T("Setting api endpoint to {{.Endpoint}}...",
 			map[string]interface{}{"Endpoint": terminal.EntityNameColor(endpoint)}))
-		cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.Metadata().Name)
+		cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.MetaData().Name)
 		cmd.ui.Ok()
 
 		cmd.ui.Say("")

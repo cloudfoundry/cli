@@ -1,8 +1,11 @@
 package rpc
 
 import (
+	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
 	"github.com/codegangsta/cli"
@@ -26,9 +29,10 @@ type CliRpcCmd struct {
 	outputCapture        terminal.OutputCapture
 	terminalOutputSwitch terminal.TerminalOutputSwitch
 	cliConfig            core_config.Repository
+	repoLocator          api.RepositoryLocator
 }
 
-func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository) (*CliRpcService, error) {
+func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
 			PluginMetadata:       &plugin.PluginMetadata{},
@@ -36,6 +40,7 @@ func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture,
 			outputCapture:        outputCapture,
 			terminalOutputSwitch: terminalOutputSwitch,
 			cliConfig:            cliConfig,
+			repoLocator:          repoLocator,
 		},
 	}
 
@@ -106,7 +111,28 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		recover()
 	}()
 
-	err := cmd.coreCommandRunner.Run(append([]string{"CF_NAME"}, args...))
+	var err error
+	cmdRegistry := command_registry.Commands
+
+	if cmdRegistry.CommandExists(args[0]) {
+		//non-codegangsta path
+		deps := command_registry.NewDependency()
+
+		//set deps objs to be the one used by all other codegangsta commands
+		//once all commands are converted, we can make fresh deps for each command run
+		deps.Config = cmd.cliConfig
+		deps.RepoLocator = cmd.repoLocator
+
+		fc := flags.NewFlagContext(cmdRegistry.FindCommand(args[0]).MetaData().Flags)
+		err = fc.Parse(args[1:]...)
+		if err == nil {
+			cmdRegistry.SetCommand(cmdRegistry.FindCommand(args[0]).SetDependency(deps))
+			cmdRegistry.FindCommand(args[0]).Execute(fc)
+		}
+	} else {
+		//call codegangsta command
+		err = cmd.coreCommandRunner.Run(append([]string{"CF_NAME"}, args...))
+	}
 
 	if err != nil {
 		*retVal = false

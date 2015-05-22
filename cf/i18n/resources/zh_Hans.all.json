@@ -255,6 +255,11 @@
       "modified": false
    },
    {
+      "id": "ALIAS",
+      "translation": "ALIAS",
+      "modified": false
+   },
+   {
       "id": "API endpoint",
       "translation": "API 终端",
       "modified": false
@@ -2945,6 +2950,11 @@
       "modified": false
    },
    {
+      "id": "NAME",
+      "translation": "NAME",
+      "modified": false
+   },
+   {
       "id": "NAME:",
       "translation": "名称:",
       "modified": false
@@ -3142,6 +3152,11 @@
    {
       "id": "OK",
       "translation": "通过",
+      "modified": false
+   },
+   {
+      "id": "OPTIONS",
+      "translation": "OPTIONS",
       "modified": false
    },
    {
@@ -3861,7 +3876,7 @@
    },
    {
       "id": "Set or view target api url",
-      "translation": "设置或查看指定的API网络地址",
+      "translation": "Set or view target api url",
       "modified": false
    },
    {
@@ -4267,6 +4282,11 @@
    {
       "id": "UAA endpoint missing from config file",
       "translation": "配置文件中没有UAA API地址信息",
+      "modified": false
+   },
+   {
+      "id": "USAGE",
+      "translation": "USAGE",
       "modified": false
    },
    {
