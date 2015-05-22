@@ -69,8 +69,7 @@ func RunCliCommand(cmd command_registry.Command, args []string, requirementsFact
 	}
 
 	for _, requirement := range requirements {
-		success := requirement.Execute()
-		if !success {
+		if !requirement.Execute() {
 			return false
 		}
 	}

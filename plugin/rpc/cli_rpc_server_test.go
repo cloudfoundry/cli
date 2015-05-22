@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal/fakes"
@@ -15,6 +16,8 @@ import (
 	. "github.com/cloudfoundry/cli/plugin/rpc/fake_command"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -238,10 +241,32 @@ var _ = Describe("Server", func() {
 				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 				Expect(err).ToNot(HaveOccurred())
 
+				//provide fake UI for reqiurement
+				cmd := command_registry.Commands.FindCommand("fake-non-codegangsta-command")
+				ui := &testterm.FakeUI{}
+				command_registry.Commands.SetCommand(cmd.SetDependency(command_registry.Dependency{Ui: ui}))
+
 				var success bool
 				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command"}, &success)
 
 				Expect(err).ToNot(HaveOccurred())
+				Expect(success).To(BeTrue())
+			})
+
+			It("runs all the requirements of the non-codegangsta command", func() {
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+				Expect(err).ToNot(HaveOccurred())
+
+				//provide fake UI for reqiurement
+				cmd := command_registry.Commands.FindCommand("fake-non-codegangsta-command")
+				ui := &testterm.FakeUI{}
+				command_registry.Commands.SetCommand(cmd.SetDependency(command_registry.Dependency{Ui: ui}))
+
+				var success bool
+				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command"}, &success)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Requirement executed"}))
 				Expect(success).To(BeTrue())
 			})
 

@@ -54,7 +54,7 @@ var _ = Describe("factory", func() {
 				return nil
 			}
 
-			if info.Name() == "api.go" {
+			if info.Name() == "api.go" || info.Name() == "app.go" {
 				return nil
 			}
 

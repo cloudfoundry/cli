@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -34,6 +35,34 @@ var _ = Describe("main", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
+	Describe("Commands /w new non-codegangsta structure", func() {
+		It("prints usage help for all non-codegangsta commands by providing `help` flag", func() {
+			output := Cf("api", "-h").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS"))
+		})
+
+		It("accepts -h and --h flags for non-codegangsta commands", func() {
+			result := Cf("api", "-h")
+			Consistently(result.Out).ShouldNot(Say("Invalid flag: -h"))
+
+			result = Cf("api", "--h")
+			Consistently(result.Out).ShouldNot(Say("Invalid flag: --h"))
+		})
+
+		It("runs requirement of the non-codegangsta command", func() {
+			result := Cf("api")
+			result2 := Cf("app", "app-should-never-exist-blah-blah")
+
+			if strings.Contains(string(result.Out.Contents()), "No api endpoint set") {
+				Eventually(result2.Out).Should(Say("No API endpoint set."))
+			} else {
+				Eventually(result2.Out).Should(Say("App app-should-never-exist-blah-blah not found"))
+				Consistently(result2.Out).ShouldNot(Say("Server error"))
+			}
+		})
+	})
+
 	Describe("exit codes", func() {
 		It("exits non-zero when an unknown command is invoked", func() {
 			result := Cf("some-command-that-should-never-actually-be-a-real-thing-i-can-use")
@@ -46,12 +75,6 @@ var _ = Describe("main", func() {
 			result := Cf("push", "--crazy")
 			Eventually(result).Should(Exit(1))
 		})
-	})
-
-	It("prints usage help for all non-codegangsta commands by providing `help` flag", func() {
-		output := Cf("api", "-h").Wait(1 * time.Second)
-		Eventually(output.Out.Contents).Should(ContainSubstring("USAGE"))
-		Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS"))
 	})
 
 	It("can print help for all core commands by executing only the command `cf`", func() {
@@ -92,14 +115,6 @@ var _ = Describe("main", func() {
 		It("only checks input flags against flags from the provided command", func() {
 			result := Cf("push", "--no-hostname", "--skip-ssl-validation")
 			Eventually(result.Out).Should(Say("\"--skip-ssl-validation\""))
-		})
-
-		It("accepts -h and --h flags for non-codegangsta commands", func() {
-			result := Cf("api", "-h")
-			Consistently(result.Out).ShouldNot(Say("Invalid flag: -h"))
-
-			result = Cf("api", "--h")
-			Consistently(result.Out).ShouldNot(Say("Invalid flag: --h"))
 		})
 
 		It("accepts -h and --h flags for all commands", func() {
@@ -233,9 +248,6 @@ var _ = Describe("main", func() {
 		})
 	})
 
-	Describe("Commands /w new non-codegangsta structure", func() {
-
-	})
 })
 
 func Cf(args ...string) *Session {

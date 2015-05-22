@@ -223,7 +223,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	restage := application.NewRestage(ui, config, repoLocator.GetApplicationRepository(), start)
 	bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
 
-	factory.cmdsByName["app"] = displayApp
 	factory.cmdsByName["bind-service"] = bind
 	factory.cmdsByName["start"] = start
 	factory.cmdsByName["stop"] = stop

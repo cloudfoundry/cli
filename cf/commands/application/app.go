@@ -5,10 +5,12 @@ import (
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
@@ -16,7 +18,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
-	"github.com/codegangsta/cli"
 )
 
 type ShowApp struct {
@@ -42,26 +43,31 @@ func NewShowApp(ui terminal.UI, config core_config.Reader, appSummaryRepo api.Ap
 	return
 }
 
-func (cmd *ShowApp) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func init() {
+	command_registry.Register(&ShowApp{})
+}
+
+func (cmd *ShowApp) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.")}
+
+	return command_registry.CommandMetadata{
 		Name:        "app",
 		Description: T("Display health and status for app"),
 		Usage:       T("CF_NAME app APP_NAME"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *ShowApp) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ShowApp) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed("Incorrect Usage. Requires an argument\n\n" + command_registry.Commands.CommandUsage("api"))
 	}
 
 	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
+		cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
+		cmd.appReq.SetApplicationName(fc.Args()[0])
 	}
 
 	reqs = []requirements.Requirement{
@@ -72,7 +78,16 @@ func (cmd *ShowApp) GetRequirements(requirementsFactory requirements.Factory, c 
 	return
 }
 
-func (cmd *ShowApp) Run(c *cli.Context) {
+func (cmd *ShowApp) SetDependency(deps command_registry.Dependency) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
+	cmd.appLogsNoaaRepo = deps.RepoLocator.GetLogsNoaaRepository()
+	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
+	return cmd
+}
+
+func (cmd *ShowApp) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	if c.Bool("guid") {

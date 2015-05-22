@@ -1,9 +1,12 @@
 package rpc
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
@@ -125,9 +128,23 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 
 		fc := flags.NewFlagContext(cmdRegistry.FindCommand(args[0]).MetaData().Flags)
 		err = fc.Parse(args[1:]...)
+		cfCmd := cmdRegistry.FindCommand(args[0])
 		if err == nil {
-			cmdRegistry.SetCommand(cmdRegistry.FindCommand(args[0]).SetDependency(deps))
-			cmdRegistry.FindCommand(args[0]).Execute(fc)
+			cmdRegistry.SetCommand(cfCmd.SetDependency(deps))
+
+			reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)
+			if err == nil {
+				for _, r := range reqs {
+					if !r.Execute() {
+						err = errors.New("Error in requirement")
+						break
+					}
+				}
+
+				if err == nil {
+					cfCmd.Execute(fc)
+				}
+			}
 		}
 	} else {
 		//call codegangsta command
