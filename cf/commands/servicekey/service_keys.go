@@ -85,6 +85,7 @@ func (cmd ServiceKeys) Run(c *cli.Context) {
 			map[string]interface{}{"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName)}))
 		return
 	} else {
+		cmd.ui.Say("")
 		table.Print()
 	}
 }
