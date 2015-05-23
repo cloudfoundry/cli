@@ -53,7 +53,7 @@ func (cmd Api) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs [
 	return
 }
 
-func (cmd Api) SetDependency(deps command_registry.Dependency) command_registry.Command {
+func (cmd Api) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()

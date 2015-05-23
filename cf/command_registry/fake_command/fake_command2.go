@@ -22,7 +22,7 @@ func (cmd FakeCommand2) Requirements(_ requirements.Factory, _ flags.FlagContext
 	return
 }
 
-func (cmd FakeCommand2) SetDependency(deps command_registry.Dependency) command_registry.Command {
+func (cmd FakeCommand2) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
 	return cmd
 }
 

@@ -78,12 +78,13 @@ func (cmd *ShowApp) Requirements(requirementsFactory requirements.Factory, fc fl
 	return
 }
 
-func (cmd *ShowApp) SetDependency(deps command_registry.Dependency) command_registry.Command {
+func (cmd *ShowApp) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
 	cmd.appLogsNoaaRepo = deps.RepoLocator.GetLogsNoaaRepository()
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
+
 	return cmd
 }
 

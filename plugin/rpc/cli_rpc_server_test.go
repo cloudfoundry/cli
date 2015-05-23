@@ -244,7 +244,7 @@ var _ = Describe("Server", func() {
 				//provide fake UI for reqiurement
 				cmd := command_registry.Commands.FindCommand("fake-non-codegangsta-command")
 				ui := &testterm.FakeUI{}
-				command_registry.Commands.SetCommand(cmd.SetDependency(command_registry.Dependency{Ui: ui}))
+				command_registry.Commands.SetCommand(cmd.SetDependency(command_registry.Dependency{Ui: ui}, true))
 
 				var success bool
 				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command"}, &success)
@@ -260,7 +260,7 @@ var _ = Describe("Server", func() {
 				//provide fake UI for reqiurement
 				cmd := command_registry.Commands.FindCommand("fake-non-codegangsta-command")
 				ui := &testterm.FakeUI{}
-				command_registry.Commands.SetCommand(cmd.SetDependency(command_registry.Dependency{Ui: ui}))
+				command_registry.Commands.SetCommand(cmd.SetDependency(command_registry.Dependency{Ui: ui}, true))
 
 				var success bool
 				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command"}, &success)
