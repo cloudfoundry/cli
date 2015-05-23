@@ -130,7 +130,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		err = fc.Parse(args[1:]...)
 		cfCmd := cmdRegistry.FindCommand(args[0])
 		if err == nil {
-			cmdRegistry.SetCommand(cfCmd.SetDependency(deps))
+			cmdRegistry.SetCommand(cfCmd.SetDependency(deps, true))
 
 			reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)
 			if err == nil {
@@ -142,7 +142,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 				}
 
 				if err == nil {
-					cfCmd.Execute(fc)
+					cmdRegistry.FindCommand(args[0]).Execute(fc)
 				}
 			}
 		}

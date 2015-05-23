@@ -62,7 +62,7 @@ func main() {
 					deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + cmdRegistry.CommandUsage(cmd))
 				}
 			}
-			cmdRegistry.SetCommand(cmdRegistry.FindCommand(cmd).SetDependency(deps))
+			cmdRegistry.SetCommand(cmdRegistry.FindCommand(cmd).SetDependency(deps, false))
 
 			cfCmd := cmdRegistry.FindCommand(cmd)
 			reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)

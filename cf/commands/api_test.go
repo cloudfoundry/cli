@@ -33,7 +33,7 @@ func callApi(args []string, config core_config.Repository, endpointRepo *testapi
 		Config:      config,
 		RepoLocator: repoLocator,
 	}
-	cmd = cmd.SetDependency(deps)
+	cmd = cmd.SetDependency(deps, false)
 	requirementsFactory := &testreq.FakeReqFactory{}
 	testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	return

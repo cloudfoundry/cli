@@ -7,7 +7,7 @@ import (
 
 type Command interface {
 	MetaData() CommandMetadata
-	SetDependency(deps Dependency) Command
+	SetDependency(deps Dependency, pluginCall bool) Command
 	Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) (reqs []requirements.Requirement, err error)
 	Execute(context flags.FlagContext)
 }

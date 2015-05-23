@@ -28,7 +28,7 @@ func (cmd FakeCommand1) Requirements(_ requirements.Factory, _ flags.FlagContext
 	return []requirements.Requirement{cmd.req}, nil
 }
 
-func (cmd FakeCommand1) SetDependency(deps command_registry.Dependency) command_registry.Command {
+func (cmd FakeCommand1) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
 	cmd.req.ui = deps.Ui
 	return cmd
 }
