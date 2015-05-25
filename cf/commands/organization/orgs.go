@@ -5,9 +5,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
+	"sort"
 )
 
 type ListOrgs struct {
@@ -51,6 +53,9 @@ func (cmd ListOrgs) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{T("name")})
 
 	orgs, apiErr := cmd.orgRepo.ListOrgs()
+
+	sort.Sort(models.Organizations(orgs))
+
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}
