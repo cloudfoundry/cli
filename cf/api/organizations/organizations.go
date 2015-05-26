@@ -21,6 +21,7 @@ type OrganizationRepository interface {
 	Delete(orgGuid string) (apiErr error)
 	SharePrivateDomain(orgGuid string, domainGuid string) (apiErr error)
 	UnsharePrivateDomain(orgGuid string, domainGuid string) (apiErr error)
+	GetOrganizationQuotaUsage(orgGuid string) (quotaUsage models.QuotaUsage, apiErr error)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -69,6 +70,18 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 	}
 
 	return
+}
+
+func (repo CloudControllerOrganizationRepository) GetOrganizationQuotaUsage(orgGuid string) (models.QuotaUsage, error) {
+	url := fmt.Sprintf("%s/v2/organizations/%s/quota_usage", repo.config.ApiEndpoint(), orgGuid)
+
+	quotaUsageResource := new(resources.QuotaUsageResource)
+	err := repo.gateway.GetResource(url, quotaUsageResource)
+	if err != nil {
+		return models.QuotaUsage{}, err
+	}
+
+	return quotaUsageResource.ToFields(), nil
 }
 
 func (repo CloudControllerOrganizationRepository) Create(org models.Organization) (apiErr error) {

@@ -189,6 +189,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("create-org"),
 					presentCommand("delete-org"),
 					presentCommand("rename-org"),
+					presentCommand("org-quota-usage"),
 				},
 			},
 		}, {

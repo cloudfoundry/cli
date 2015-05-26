@@ -5303,5 +5303,30 @@
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "modified": false
+   },
+   {
+      "id": "Getting quota usage info for org {{.OrgName}} as {{.Username}}...",
+      "translation": "Obtenir des informations sur l'utilisation de quotas pour les org {{ }} .OrgName que {{ }} .Username ...",
+      "modified": false
+   },
+   {
+      "id": "Get quota usage for org",
+      "translation": "Obtenez l'utilisation des quotas pour org",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME org-quota-usage ORG_NAME \n\n",
+      "translation": "CF_NAME org-quota-usage ORG_NAME \n\n",
+      "modified": false
+   },
+   {
+      "id": "View all organizations with 'CF_NAME orgs'",
+      "translation": "Voir tous les organismes avec 'CF_NAME orgs'",
+      "modified": false
+   },
+   {
+      "id": "Memory",
+      "translation": "mémoire",
+      "modified": false
    }
 ]

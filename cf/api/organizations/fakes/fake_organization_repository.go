@@ -68,6 +68,15 @@ type FakeOrganizationRepository struct {
 	unsharePrivateDomainReturns struct {
 		result1 error
 	}
+	GetOrganizationQuotaUsageStub        func(orgGuid string) (quotaUsage models.QuotaUsage, apiErr error)
+	getOrganizationQuotaUsageMutex       sync.RWMutex
+	getOrganizationQuotaUsageArgsForCall []struct {
+		quotaUsage models.QuotaUsage
+	}
+	getOrganizationQuotaUsageReturns struct {
+		result1 models.QuotaUsage
+		result2 error
+	}
 }
 
 func (fake *FakeOrganizationRepository) ListOrgs() (orgs []models.Organization, apiErr error) {
@@ -91,6 +100,39 @@ func (fake *FakeOrganizationRepository) ListOrgsReturns(result1 []models.Organiz
 	fake.ListOrgsStub = nil
 	fake.listOrgsReturns = struct {
 		result1 []models.Organization
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeOrganizationRepository) GetOrganizationQuotaUsage(orgGuid string) (quotaUsage models.QuotaUsage, apiErr error) {
+	fake.getOrganizationQuotaUsageMutex.Lock()
+	fake.getOrganizationQuotaUsageArgsForCall = append(fake.getOrganizationQuotaUsageArgsForCall, struct {
+		quotaUsage models.QuotaUsage
+	}{quotaUsage})
+	fake.getOrganizationQuotaUsageMutex.Unlock()
+	if fake.GetOrganizationQuotaUsageStub != nil {
+		return fake.GetOrganizationQuotaUsageStub(orgGuid)
+	} else {
+		return fake.getOrganizationQuotaUsageReturns.result1, fake.getOrganizationQuotaUsageReturns.result2
+	}
+}
+
+func (fake *FakeOrganizationRepository) GetOrganizationQuotaUsageCallCount() int {
+	fake.getOrganizationQuotaUsageMutex.RLock()
+	defer fake.getOrganizationQuotaUsageMutex.RUnlock()
+	return len(fake.getOrganizationQuotaUsageArgsForCall)
+}
+
+func (fake *FakeOrganizationRepository) GetOrganizationQuotaUsageArgsForCall(i int) models.QuotaUsage {
+	fake.getOrganizationQuotaUsageMutex.RLock()
+	defer fake.getOrganizationQuotaUsageMutex.RUnlock()
+	return fake.getOrganizationQuotaUsageArgsForCall[i].quotaUsage
+}
+
+func (fake *FakeOrganizationRepository) GetOrganizationQuotaUsageReturns(result1 models.QuotaUsage, result2 error) {
+	fake.GetOrganizationQuotaUsageStub = nil
+	fake.getOrganizationQuotaUsageReturns = struct {
+		result1 models.QuotaUsage
 		result2 error
 	}{result1, result2}
 }
