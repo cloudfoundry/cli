@@ -98,6 +98,18 @@ var _ = Describe("create-service command", func() {
 		Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
 	})
 
+	Context("when passing in tags", func() {
+		It("sucessfully creates a service and passes the tags as json", func() {
+			callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-t", "tag1, tag2,tag3,  tag4"})
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+			))
+			Expect(serviceRepo.CreateServiceInstanceArgs.Tags).To(ConsistOf("tag1", "tag2", "tag3", "tag4"))
+		})
+	})
+
 	Context("when passing arbitrary params", func() {
 		Context("as a json string", func() {
 			It("successfully creates a service and passes the params as a json string", func() {
