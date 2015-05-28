@@ -277,3 +277,15 @@ func (cliConnection *cliConnection) AccessToken() (string, error) {
 	err = client.Call("CliRpcCmd.AccessToken", "", &result)
 	return result, err
 }
+
+func (cliConnection *cliConnection) GetApp(appName string) (plugin_models.Application, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return plugin_models.Application{}, err
+	}
+
+	var result plugin_models.Application
+
+	err = client.Call("CliRpcCmd.GetApp", appName, &result)
+	return result, err
+}

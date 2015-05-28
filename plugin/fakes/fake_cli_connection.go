@@ -132,6 +132,15 @@ type FakeCliConnection struct {
 		result1 string
 		result2 error
 	}
+	GetAppStub        func(string) (plugin_models.Application, error)
+	getAppMutex       sync.RWMutex
+	getAppArgsForCall []struct {
+		arg1 string
+	}
+	getAppReturns struct {
+		result1 plugin_models.Application
+		result2 error
+	}
 }
 
 func (fake *FakeCliConnection) CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
@@ -571,6 +580,39 @@ func (fake *FakeCliConnection) AccessTokenReturns(result1 string, result2 error)
 	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
 		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) GetApp(arg1 string) (plugin_models.Application, error) {
+	fake.getAppMutex.Lock()
+	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.getAppMutex.Unlock()
+	if fake.GetAppStub != nil {
+		return fake.GetAppStub(arg1)
+	} else {
+		return fake.getAppReturns.result1, fake.getAppReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) GetAppCallCount() int {
+	fake.getAppMutex.RLock()
+	defer fake.getAppMutex.RUnlock()
+	return len(fake.getAppArgsForCall)
+}
+
+func (fake *FakeCliConnection) GetAppArgsForCall(i int) string {
+	fake.getAppMutex.RLock()
+	defer fake.getAppMutex.RUnlock()
+	return fake.getAppArgsForCall[i].arg1
+}
+
+func (fake *FakeCliConnection) GetAppReturns(result1 plugin_models.Application, result2 error) {
+	fake.GetAppStub = nil
+	fake.getAppReturns = struct {
+		result1 plugin_models.Application
 		result2 error
 	}{result1, result2}
 }

@@ -39,6 +39,8 @@ func (ui *FakeUI) PrintPaginator(rows []string, err error) {
 	}
 }
 
+func (ui *FakeUI) DisableTerminalOutput(bool) {}
+
 func (ui *FakeUI) PrintCapturingNoOutput(message string, args ...interface{}) {
 	ui.sayMutex.Lock()
 	defer ui.sayMutex.Unlock()

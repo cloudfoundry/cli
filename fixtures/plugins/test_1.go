@@ -24,6 +24,10 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Access Token:", token)
 		fmt.Println("")
 
+		app, err := cliConnection.GetApp("test_app")
+		fmt.Println("err for test_app", err)
+		fmt.Println("test_app is: ", app)
+
 		hasOrg, _ := cliConnection.HasOrganization()
 		fmt.Println("Has Organization Targeted:", hasOrg)
 		org, _ := cliConnection.GetCurrentOrg()

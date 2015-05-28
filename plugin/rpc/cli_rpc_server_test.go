@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal/fakes"
@@ -14,16 +13,18 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
 	. "github.com/cloudfoundry/cli/plugin/rpc/fake_command"
+	fakeRunner "github.com/cloudfoundry/cli/plugin/rpc/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Server", func() {
+
+	_ = FakeCommand1{} //make sure fake_command is imported and self-registered with init()
+
 	var (
 		err        error
 		client     *rpc.Client
@@ -42,19 +43,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{})
+			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{})
+			_, err := NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{})
+			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -76,7 +77,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{})
+			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -104,7 +105,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{})
+			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -146,7 +147,7 @@ var _ = Describe("Server", func() {
 			BeforeEach(func() {
 				outputCapture := &fakes.FakeOutputCapture{}
 				outputCapture.GetOutputAndResetReturns([]string{"hi from command"})
-				rpcService, err = NewRpcService(nil, outputCapture, nil, nil, api.RepositoryLocator{})
+				rpcService, err = NewRpcService(nil, outputCapture, nil, nil, api.RepositoryLocator{}, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -178,7 +179,7 @@ var _ = Describe("Server", func() {
 
 		BeforeEach(func() {
 			terminalOutputSwitch = &fakes.FakeTerminalOutputSwitch{}
-			rpcService, err = NewRpcService(nil, nil, terminalOutputSwitch, nil, api.RepositoryLocator{})
+			rpcService, err = NewRpcService(nil, nil, terminalOutputSwitch, nil, api.RepositoryLocator{}, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -201,7 +202,48 @@ var _ = Describe("Server", func() {
 		})
 	})
 
+	Describe("GetApp()", func() {
+		var runner *fakeRunner.FakeNonCodegangstaRunner
+
+		BeforeEach(func() {
+			outputCapture := &fakes.FakeOutputCapture{}
+
+			runner = &fakeRunner.FakeNonCodegangstaRunner{}
+			rpcService, err = NewRpcService(nil, outputCapture, nil, nil, api.RepositoryLocator{}, runner)
+			Expect(err).ToNot(HaveOccurred())
+
+			err := rpcService.Start()
+			Expect(err).ToNot(HaveOccurred())
+
+			pingCli(rpcService.Port())
+		})
+
+		AfterEach(func() {
+			rpcService.Stop()
+
+			//give time for server to stop
+			time.Sleep(50 * time.Millisecond)
+		})
+
+		It("calls GetApp() with 'app' as argument", func() {
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
+
+			result := plugin_models.Application{}
+			err = client.Call("CliRpcCmd.GetApp", "fake-app", &result)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _ := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("app"))
+			Expect(arg1[1]).To(Equal("fake-app"))
+		})
+
+	})
+
 	Describe(".CallCoreCommand", func() {
+		var runner *fakeRunner.FakeNonCodegangstaRunner
+
 		Context("success", func() {
 			BeforeEach(func() {
 				app := &cli.App{
@@ -217,11 +259,10 @@ var _ = Describe("Server", func() {
 					},
 				}
 
-				_ = FakeCommand1{}
-
 				outputCapture := &fakes.FakeOutputCapture{}
+				runner = &fakeRunner.FakeNonCodegangstaRunner{}
 
-				rpcService, err = NewRpcService(app, outputCapture, nil, nil, api.RepositoryLocator{})
+				rpcService, err = NewRpcService(app, outputCapture, nil, nil, api.RepositoryLocator{}, runner)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -241,32 +282,10 @@ var _ = Describe("Server", func() {
 				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 				Expect(err).ToNot(HaveOccurred())
 
-				//provide fake UI for reqiurement
-				cmd := command_registry.Commands.FindCommand("fake-non-codegangsta-command")
-				ui := &testterm.FakeUI{}
-				command_registry.Commands.SetCommand(cmd.SetDependency(command_registry.Dependency{Ui: ui}, true))
-
 				var success bool
-				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command"}, &success)
+				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command3"}, &success)
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(success).To(BeTrue())
-			})
-
-			It("runs all the requirements of the non-codegangsta command", func() {
-				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-				Expect(err).ToNot(HaveOccurred())
-
-				//provide fake UI for reqiurement
-				cmd := command_registry.Commands.FindCommand("fake-non-codegangsta-command")
-				ui := &testterm.FakeUI{}
-				command_registry.Commands.SetCommand(cmd.SetDependency(command_registry.Dependency{Ui: ui}, true))
-
-				var success bool
-				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command"}, &success)
-
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Requirement executed"}))
 				Expect(success).To(BeTrue())
 			})
 
@@ -314,7 +333,7 @@ var _ = Describe("Server", func() {
 						},
 					})
 
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -348,7 +367,7 @@ var _ = Describe("Server", func() {
 						Name: "space-name",
 					})
 
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -370,7 +389,7 @@ var _ = Describe("Server", func() {
 
 			Context(".Username, .UserGuid, .UserEmail", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -398,7 +417,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsSSLDisabled", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -419,7 +438,7 @@ var _ = Describe("Server", func() {
 
 			Context(".IsLoggedIn", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -440,7 +459,7 @@ var _ = Describe("Server", func() {
 
 			Context(".HasOrganization and .HasSpace ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -464,7 +483,7 @@ var _ = Describe("Server", func() {
 
 			Context(".LoggregatorEndpoint and .DopplerEndpoint ", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -491,7 +510,7 @@ var _ = Describe("Server", func() {
 
 			Context(".ApiEndpoint, .ApiVersion and .HasAPIEndpoint", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -524,7 +543,7 @@ var _ = Describe("Server", func() {
 
 			Context(".AccessToken", func() {
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{})
+					rpcService, err = NewRpcService(nil, nil, nil, config, api.RepositoryLocator{}, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
@@ -561,7 +580,7 @@ var _ = Describe("Server", func() {
 					},
 				}
 				outputCapture := &fakes.FakeOutputCapture{}
-				rpcService, err = NewRpcService(app, outputCapture, nil, nil, api.RepositoryLocator{})
+				rpcService, err = NewRpcService(app, outputCapture, nil, nil, api.RepositoryLocator{}, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
