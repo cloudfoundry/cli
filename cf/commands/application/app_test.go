@@ -198,6 +198,17 @@ var _ = Describe("app Command", func() {
 				runCommand("my-app")
 				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(1))
 			})
+			It("gracefully handles when /instances is down but /noaa is not", func() {
+				app.Diego = true
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+				appInstancesRepo.GetInstancesReturns([]models.AppInstanceFields{}, errors.New("danger will robinson"))
+				updateCommandDependency(false)
+
+				runCommand("my-app")
+				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(0))
+
+			})
 		})
 
 		Context("When app is not a diego app", func() {
