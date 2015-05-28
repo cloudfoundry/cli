@@ -1520,8 +1520,8 @@
       "modified": false
    },
    {
-      "id": "Creating user {{.TargetUser}} as {{.CurrentUser}}...",
-      "translation": "Creando usuario {{.TargetUser}} como {{.CurrentUser}}...",
+      "id": "Creating user {{.TargetUser}}...",
+      "translation": "Creando usuario {{.TargetUser}}...",
       "modified": false
    },
    {
