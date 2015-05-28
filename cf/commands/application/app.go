@@ -169,6 +169,10 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 
 	var instances []models.AppInstanceFields
 	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.Guid)
+	if apiErr != nil && !appIsStopped {
+		cmd.ui.Failed(apiErr.Error())
+		return
+	}
 
 	//temp solution, diego app metrics only come from noaa, not CC
 	if application.Diego {
