@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 type Dependency struct {
@@ -25,6 +26,11 @@ type Dependency struct {
 	ManifestRepo manifest.ManifestRepository
 	Gateways     map[string]net.Gateway
 	TeePrinter   *terminal.TeePrinter
+	PluginModels *pluginModels
+}
+
+type pluginModels struct {
+	Application *plugin_models.Application
 }
 
 func NewDependency() Dependency {
@@ -57,6 +63,8 @@ func NewDependency() Dependency {
 		"uaa":              net.NewUAAGateway(deps.Config, deps.Ui),
 	}
 	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways)
+
+	deps.PluginModels = &pluginModels{Application: nil}
 
 	return deps
 }

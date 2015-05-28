@@ -42,8 +42,8 @@ type RepositoryLocator struct {
 	spaceRepo                       spaces.CloudControllerSpaceRepository
 	appRepo                         applications.CloudControllerApplicationRepository
 	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
-	appSummaryRepo                  CloudControllerAppSummaryRepository
-	appInstancesRepo                app_instances.CloudControllerAppInstancesRepository
+	appSummaryRepo                  AppSummaryRepository
+	appInstancesRepo                app_instances.AppInstancesRepository
 	appEventsRepo                   app_events.CloudControllerAppEventsRepository
 	appFilesRepo                    api_app_files.CloudControllerAppFilesRepository
 	domainRepo                      CloudControllerDomainRepository
@@ -171,8 +171,18 @@ func (locator RepositoryLocator) GetApplicationBitsRepository() application_bits
 	return locator.appBitsRepo
 }
 
+func (locator RepositoryLocator) SetAppSummaryRepository(repo AppSummaryRepository) RepositoryLocator {
+	locator.appSummaryRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetAppSummaryRepository() AppSummaryRepository {
 	return locator.appSummaryRepo
+}
+
+func (locator RepositoryLocator) SetAppInstancesRepository(repo app_instances.AppInstancesRepository) RepositoryLocator {
+	locator.appInstancesRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetAppInstancesRepository() app_instances.AppInstancesRepository {
@@ -225,6 +235,11 @@ func (locator RepositoryLocator) GetPasswordRepository() password.PasswordReposi
 
 func (locator RepositoryLocator) GetOldLogsRepository() OldLogsRepository {
 	return locator.oldLogsRepo
+}
+
+func (locator RepositoryLocator) SetLogsNoaaRepository(repo LogsNoaaRepository) RepositoryLocator {
+	locator.logsNoaaRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetLogsNoaaRepository() LogsNoaaRepository {

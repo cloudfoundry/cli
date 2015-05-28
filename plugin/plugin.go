@@ -31,6 +31,7 @@ type CliConnection interface {
 	LoggregatorEndpoint() (string, error)
 	DopplerEndpoint() (string, error)
 	AccessToken() (string, error)
+	GetApp(string) (plugin_models.Application, error)
 }
 
 type VersionType struct {

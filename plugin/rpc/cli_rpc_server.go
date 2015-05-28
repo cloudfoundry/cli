@@ -1,14 +1,10 @@
 package rpc
 
 import (
-	"errors"
-
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
 	"github.com/codegangsta/cli"
@@ -33,9 +29,10 @@ type CliRpcCmd struct {
 	terminalOutputSwitch terminal.TerminalOutputSwitch
 	cliConfig            core_config.Repository
 	repoLocator          api.RepositoryLocator
+	newCmdRunner         NonCodegangstaRunner
 }
 
-func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator) (*CliRpcService, error) {
+func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator, newCmdRunner NonCodegangstaRunner) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
 			PluginMetadata:       &plugin.PluginMetadata{},
@@ -44,6 +41,7 @@ func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture,
 			terminalOutputSwitch: terminalOutputSwitch,
 			cliConfig:            cliConfig,
 			repoLocator:          repoLocator,
+			newCmdRunner:         newCmdRunner,
 		},
 	}
 
@@ -118,7 +116,6 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	cmdRegistry := command_registry.Commands
 
 	if cmdRegistry.CommandExists(args[0]) {
-		//non-codegangsta path
 		deps := command_registry.NewDependency()
 
 		//set deps objs to be the one used by all other codegangsta commands
@@ -126,26 +123,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		deps.Config = cmd.cliConfig
 		deps.RepoLocator = cmd.repoLocator
 
-		fc := flags.NewFlagContext(cmdRegistry.FindCommand(args[0]).MetaData().Flags)
-		err = fc.Parse(args[1:]...)
-		cfCmd := cmdRegistry.FindCommand(args[0])
-		if err == nil {
-			cmdRegistry.SetCommand(cfCmd.SetDependency(deps, true))
-
-			reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)
-			if err == nil {
-				for _, r := range reqs {
-					if !r.Execute() {
-						err = errors.New("Error in requirement")
-						break
-					}
-				}
-
-				if err == nil {
-					cmdRegistry.FindCommand(args[0]).Execute(fc)
-				}
-			}
-		}
+		err = cmd.newCmdRunner.Command(args, deps)
 	} else {
 		//call codegangsta command
 		err = cmd.coreCommandRunner.Run(append([]string{"CF_NAME"}, args...))
@@ -262,4 +240,21 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.AccessToken()
 
 	return nil
+}
+
+func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.Application) error {
+	defer func() {
+		recover()
+	}()
+
+	deps := command_registry.NewDependency()
+
+	//set deps objs to be the one used by all other codegangsta commands
+	//once all commands are converted, we can make fresh deps for each command run
+	deps.Config = cmd.cliConfig
+	deps.RepoLocator = cmd.repoLocator
+	deps.PluginModels.Application = retVal
+	deps.Ui.DisableTerminalOutput(true)
+
+	return cmd.newCmdRunner.Command([]string{"app", appName}, deps)
 }

@@ -280,7 +280,7 @@ func requestHelp(args []string) bool {
 }
 
 func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {
-	cliServer, err := rpc.NewRpcService(nil, outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator)
+	cliServer, err := rpc.NewRpcService(nil, outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator, rpc.NewNonCodegangstaRunner())
 	if err != nil {
 		fmt.Println("Error initializing RPC service: ", err)
 		os.Exit(1)
