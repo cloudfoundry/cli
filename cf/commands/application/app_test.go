@@ -136,7 +136,7 @@ var _ = Describe("app Command", func() {
 			Ω(pluginAppModel.RunningInstances).To(Equal(2))
 			Ω(pluginAppModel.HealthCheckTimeout).To(Equal(100))
 			Ω(pluginAppModel.SpaceGuid).To(Equal("guids_in_spaaace"))
-			Ω(pluginAppModel.PackageUpdatedAt.String()).To(Equal(time.Date(2009, time.November, 10, 15, 0, 0, 0, time.Local).String()))
+			Ω(pluginAppModel.PackageUpdatedAt.String()).To(Equal(time.Date(2009, time.November, 10, 15, 0, 0, 0, time.UTC).String()))
 			Ω(pluginAppModel.PackageState).To(Equal("STAGED"))
 			Ω(pluginAppModel.StagingFailedReason).To(Equal("no reason"))
 			Ω(pluginAppModel.Stack.Name).To(Equal("fake_stack"))
@@ -228,7 +228,7 @@ var _ = Describe("app Command", func() {
 				[]string{"instances", "2/2"},
 				[]string{"usage", "256M x 2 instances"},
 				[]string{"urls", "my-app.example.com", "foo.example.com"},
-				[]string{"last uploaded", "Tue Nov 10 15:00:00 PST 2009"},
+				[]string{"last uploaded", "Tue Nov 10 15:00:00 UTC 2009"},
 				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
 				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0", "failure"},
 				[]string{"stack", "fake_stack"},
@@ -389,8 +389,7 @@ func makeAppWithRoute(appName string) models.Application {
 	application.RunningInstances = 2
 	application.Memory = 256
 
-	// t := time.Unix(100, 100)
-	t := time.Date(2009, time.November, 10, 15, 0, 0, 0, time.Local)
+	t := time.Date(2009, time.November, 10, 15, 0, 0, 0, time.UTC)
 	application.PackageUpdatedAt = &t
 
 	services := models.ServicePlanSummary{
