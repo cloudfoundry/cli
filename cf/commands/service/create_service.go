@@ -52,8 +52,16 @@ func (cmd CreateService) Metadata() command_metadata.CommandMetadata {
   }
 
 EXAMPLE:
-   CF_NAME create-service db-service silver mydb -c '{"ram_gb":4}'
-   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json
+	Linux/Mac:
+		CF_NAME create-service db-service silver -c '{"ram_gb":4}'
+
+	Windows Command Line
+		CF_NAME create-service db-service silver -c "{\"ram_gb\":4}"
+
+	Windows PowerShell
+		CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'
+
+	CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json
 
 TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`),
