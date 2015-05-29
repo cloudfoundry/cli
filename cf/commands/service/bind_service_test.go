@@ -153,7 +153,7 @@ var _ = Describe("bind-service command", func() {
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
-							[]string{"Invalid JSON provided in -c argument"},
+							[]string{"Invalid JSON provided in -c argument: Incorrect json format: invalid character 'b' looking for beginning of value"},
 						))
 					})
 				})

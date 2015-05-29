@@ -57,8 +57,16 @@ func (cmd *BindService) Metadata() command_metadata.CommandMetadata {
    }
 
 EXAMPLE:
-   CF_NAME bind-service myapp mydb -c '{"permissions":"read-only"}'
-   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json`),
+	Linux/Mac:
+		CF_NAME bind-service myapp mydb -c '{"permissions":"read-only"}'
+
+	Windows Command Line
+		CF_NAME bind-service myapp mydb -c "{\"permissions\":\"read-only\"}"
+
+	Windows PowerShell
+		CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'
+	
+	CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json`),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
 		},
@@ -92,7 +100,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {
-		cmd.ui.Failed("Invalid JSON provided in -c argument")
+		cmd.ui.Failed("Invalid JSON provided in -c argument: " + err.Error())
 	}
 
 	cmd.ui.Say(T("Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
