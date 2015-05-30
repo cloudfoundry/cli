@@ -45,9 +45,14 @@ var _ = Describe("TeePrinter", func() {
 	})
 
 	Describe(".Printf", func() {
+		var bucket *[]string
+
 		BeforeEach(func() {
+			bucket = &[]string{}
+
 			output = io_helpers.CaptureOutput(func() {
 				printer = NewTeePrinter()
+				printer.SetOutputBucket(bucket)
 				printer.Printf("Hello %s", "everybody")
 			})
 		})
@@ -58,6 +63,7 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should save the output to the slice", func() {
 			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello everybody"))
+			Expect((*bucket)[0]).To(Equal("Hello everybody"))
 		})
 
 		It("should decolorize text", func() {
@@ -99,9 +105,14 @@ var _ = Describe("TeePrinter", func() {
 	})
 
 	Describe(".ForcePrintf", func() {
+		var bucket *[]string
+
 		BeforeEach(func() {
+			bucket = &[]string{}
+
 			output = io_helpers.CaptureOutput(func() {
 				printer = NewTeePrinter()
+				printer.SetOutputBucket(bucket)
 				printer.ForcePrintf("Hello %s", "everybody")
 			})
 		})
@@ -112,6 +123,7 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should save the output to the slice", func() {
 			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello everybody"))
+			Expect((*bucket)[0]).To(Equal("Hello everybody"))
 		})
 
 		It("should decolorize text", func() {
@@ -126,9 +138,14 @@ var _ = Describe("TeePrinter", func() {
 	})
 
 	Describe(".ForcePrintln", func() {
+		var bucket *[]string
+
 		BeforeEach(func() {
+			bucket = &[]string{}
+
 			output = io_helpers.CaptureOutput(func() {
 				printer = NewTeePrinter()
+				printer.SetOutputBucket(bucket)
 				printer.ForcePrintln("Hello ", "everybody")
 			})
 		})
@@ -139,6 +156,7 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should save the output to the slice", func() {
 			Expect(printer.GetOutputAndReset()[0]).To(Equal("Hello everybody"))
+			Expect((*bucket)[0]).To(Equal("Hello everybody"))
 		})
 
 		It("should decolorize text", func() {
@@ -149,6 +167,26 @@ var _ = Describe("TeePrinter", func() {
 
 			output = printer.GetOutputAndReset()
 			Expect(output[0]).To(Equal("hi foo"))
+		})
+	})
+
+	Describe(".SetOutputBucket", func() {
+		var bucket *[]string
+
+		output = io_helpers.CaptureOutput(func() {
+			bucket = &[]string{}
+			printer = NewTeePrinter()
+			printer.SetOutputBucket(bucket)
+			printer.ForcePrintf("Hello %s", "everybody")
+		})
+
+		It("sets the []string used to save the output", func() {
+			Expect((*bucket)[0]).To(Equal("Hello everybody"))
+		})
+
+		It("disables the output saving when set to nil", func() {
+			printer.SetOutputBucket(nil)
+			Expect((*bucket)[0]).To(Equal("Hello everybody"))
 		})
 	})
 
@@ -168,9 +206,14 @@ var _ = Describe("TeePrinter", func() {
 	})
 
 	Describe("Pausing Output", func() {
+		var bucket *[]string
+
 		BeforeEach(func() {
+			bucket = &[]string{}
+
 			output = io_helpers.CaptureOutput(func() {
 				printer = NewTeePrinter()
+				printer.SetOutputBucket(bucket)
 				printer.DisableTerminalOutput(true)
 				printer.Print("Hello")
 				printer.Println("Mom!")
@@ -187,6 +230,7 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should still capture all output", func() {
 			Expect(printer.GetOutputAndReset()).To(Equal([]string{"Hello", "Mom!", "Dad!", "Forced Hello", "Forced Mom", "Forced Dad"}))
+			Expect(*bucket).To(Equal([]string{"Hello", "Mom!", "Dad!", "Forced Hello", "Forced Mom", "Forced Dad"}))
 		})
 
 		Describe(".ResumeOutput", func() {
