@@ -234,9 +234,10 @@ var _ = Describe("Server", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(runner.CommandCallCount()).To(Equal(1))
-			arg1, _ := runner.CommandArgsForCall(0)
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
 			Expect(arg1[0]).To(Equal("app"))
 			Expect(arg1[1]).To(Equal("fake-app"))
+			Expect(pluginApiCall).To(BeTrue())
 		})
 
 	})
@@ -287,6 +288,9 @@ var _ = Describe("Server", func() {
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(success).To(BeTrue())
+
+				_, _, pluginApiCall := runner.CommandArgsForCall(0)
+				Expect(pluginApiCall).To(BeFalse())
 			})
 
 			It("calls the code gangsta cli App command", func() {
