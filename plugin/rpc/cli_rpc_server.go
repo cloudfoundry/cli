@@ -123,7 +123,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		deps.Config = cmd.cliConfig
 		deps.RepoLocator = cmd.repoLocator
 
-		err = cmd.newCmdRunner.Command(args, deps)
+		err = cmd.newCmdRunner.Command(args, deps, false)
 	} else {
 		//call codegangsta command
 		err = cmd.coreCommandRunner.Run(append([]string{"CF_NAME"}, args...))
@@ -256,5 +256,5 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.Application) 
 	deps.PluginModels.Application = retVal
 	deps.Ui.DisableTerminalOutput(true)
 
-	return cmd.newCmdRunner.Command([]string{"app", appName}, deps)
+	return cmd.newCmdRunner.Command([]string{"app", appName}, deps, true)
 }

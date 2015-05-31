@@ -33,29 +33,29 @@ var _ = Describe("calling commands in command_registry", func() {
 	})
 
 	It("runs the command requirements", func() {
-		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps)
+		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps, false)
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"Requirement executed"}))
 	})
 
 	It("calls the command Execute() func", func() {
-		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps)
+		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps, false)
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"Command Executed"}))
 	})
 
 	It("sets the dependency of the command", func() {
-		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps)
+		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps, false)
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"SetDependency() called, pluginCall true"}))
 	})
 
 	It("returns an error if any of the requirements fail", func() {
-		err := NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command2"}, deps)
+		err := NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command2"}, deps, false)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("Error in requirement"))
 	})
 
 	It("returns an error if invalid flag is provided", func() {
-		err := NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command", "-badFlag"}, deps)
+		err := NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command", "-badFlag"}, deps, false)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("Invalid flag: -badFlag"))
