@@ -11,7 +11,6 @@ type Printer interface {
 	ForcePrint(a ...interface{}) (n int, err error)
 	ForcePrintf(format string, a ...interface{}) (n int, err error)
 	ForcePrintln(a ...interface{}) (n int, err error)
-	DisableTerminalOutput(bool)
 }
 
 type OutputCapture interface {
