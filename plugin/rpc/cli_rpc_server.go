@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -254,7 +256,8 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.Application) 
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Application = retVal
-	deps.Ui.DisableTerminalOutput(true)
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
 
 	return cmd.newCmdRunner.Command([]string{"app", appName}, deps, true)
 }
