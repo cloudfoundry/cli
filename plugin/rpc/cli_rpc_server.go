@@ -32,6 +32,7 @@ type CliRpcCmd struct {
 	cliConfig            core_config.Repository
 	repoLocator          api.RepositoryLocator
 	newCmdRunner         NonCodegangstaRunner
+	outputBucket         *[]string
 }
 
 func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator, newCmdRunner NonCodegangstaRunner) (*CliRpcService, error) {
@@ -117,6 +118,9 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	var err error
 	cmdRegistry := command_registry.Commands
 
+	cmd.outputBucket = &[]string{}
+	cmd.outputCapture.SetOutputBucket(cmd.outputBucket)
+
 	if cmdRegistry.CommandExists(args[0]) {
 		deps := command_registry.NewDependency()
 
@@ -124,6 +128,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		//once all commands are converted, we can make fresh deps for each command run
 		deps.Config = cmd.cliConfig
 		deps.RepoLocator = cmd.repoLocator
+		deps.Ui = terminal.NewUI(os.Stdin, cmd.outputCapture.(*terminal.TeePrinter))
 
 		err = cmd.newCmdRunner.Command(args, deps, false)
 	} else {
@@ -142,6 +147,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 
 func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	*retVal = cmd.outputCapture.GetOutputAndReset()
+	retVal = cmd.outputBucket
 	return nil
 }
 
