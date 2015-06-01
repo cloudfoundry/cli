@@ -22,7 +22,11 @@ var _ = Describe("UI", func() {
 
 	Describe("Printing message to stdout with PrintCapturingNoOutput", func() {
 		It("prints strings without using the TeePrinter", func() {
+			bucket := &[]string{}
+
 			printer := NewTeePrinter()
+			printer.SetOutputBucket(bucket)
+
 			io_helpers.SimulateStdin("", func(reader io.Reader) {
 				output := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader, printer)
@@ -30,7 +34,7 @@ var _ = Describe("UI", func() {
 				})
 
 				Expect("Hello").To(Equal(strings.Join(output, "")))
-				Expect(len(printer.GetOutputAndReset())).To(Equal(0))
+				Expect(len(*bucket)).To(Equal(0))
 			})
 		})
 	})

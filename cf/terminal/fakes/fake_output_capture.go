@@ -13,12 +13,6 @@ type FakeOutputCapture struct {
 	setOutputBucketArgsForCall []struct {
 		arg1 *[]string
 	}
-	GetOutputAndResetStub        func() []string
-	getOutputAndResetMutex       sync.RWMutex
-	getOutputAndResetArgsForCall []struct{}
-	getOutputAndResetReturns     struct {
-		result1 []string
-	}
 }
 
 func (fake *FakeOutputCapture) SetOutputBucket(arg1 *[]string) {
@@ -42,30 +36,6 @@ func (fake *FakeOutputCapture) SetOutputBucketArgsForCall(i int) *[]string {
 	fake.setOutputBucketMutex.RLock()
 	defer fake.setOutputBucketMutex.RUnlock()
 	return fake.setOutputBucketArgsForCall[i].arg1
-}
-
-func (fake *FakeOutputCapture) GetOutputAndReset() []string {
-	fake.getOutputAndResetMutex.Lock()
-	fake.getOutputAndResetArgsForCall = append(fake.getOutputAndResetArgsForCall, struct{}{})
-	fake.getOutputAndResetMutex.Unlock()
-	if fake.GetOutputAndResetStub != nil {
-		return fake.GetOutputAndResetStub()
-	} else {
-		return fake.getOutputAndResetReturns.result1
-	}
-}
-
-func (fake *FakeOutputCapture) GetOutputAndResetCallCount() int {
-	fake.getOutputAndResetMutex.RLock()
-	defer fake.getOutputAndResetMutex.RUnlock()
-	return len(fake.getOutputAndResetArgsForCall)
-}
-
-func (fake *FakeOutputCapture) GetOutputAndResetReturns(result1 []string) {
-	fake.GetOutputAndResetStub = nil
-	fake.getOutputAndResetReturns = struct {
-		result1 []string
-	}{result1}
 }
 
 var _ terminal.OutputCapture = new(FakeOutputCapture)
