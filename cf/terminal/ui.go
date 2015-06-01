@@ -40,7 +40,6 @@ type UI interface {
 	LoadingIndication()
 	Wait(duration time.Duration)
 	Table(headers []string) Table
-	DisableTerminalOutput(bool)
 }
 
 type terminalUI struct {
@@ -53,10 +52,6 @@ func NewUI(r io.Reader, printer Printer) UI {
 		stdin:   r,
 		printer: printer,
 	}
-}
-
-func (c *terminalUI) DisableTerminalOutput(disable bool) {
-	c.printer.DisableTerminalOutput(disable)
 }
 
 func (c *terminalUI) PrintPaginator(rows []string, err error) {

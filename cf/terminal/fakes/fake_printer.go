@@ -66,9 +66,6 @@ type FakePrinter struct {
 	}
 }
 
-func (fake *FakePrinter) DisableTerminalOutput(bool) {
-}
-
 func (fake *FakePrinter) Print(a ...interface{}) (n int, err error) {
 	fake.printMutex.Lock()
 	defer fake.printMutex.Unlock()

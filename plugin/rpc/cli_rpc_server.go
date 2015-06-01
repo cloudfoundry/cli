@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -30,6 +32,7 @@ type CliRpcCmd struct {
 	cliConfig            core_config.Repository
 	repoLocator          api.RepositoryLocator
 	newCmdRunner         NonCodegangstaRunner
+	outputBucket         *[]string
 }
 
 func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator, newCmdRunner NonCodegangstaRunner) (*CliRpcService, error) {
@@ -115,6 +118,9 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	var err error
 	cmdRegistry := command_registry.Commands
 
+	cmd.outputBucket = &[]string{}
+	cmd.outputCapture.SetOutputBucket(cmd.outputBucket)
+
 	if cmdRegistry.CommandExists(args[0]) {
 		deps := command_registry.NewDependency()
 
@@ -122,8 +128,9 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		//once all commands are converted, we can make fresh deps for each command run
 		deps.Config = cmd.cliConfig
 		deps.RepoLocator = cmd.repoLocator
+		deps.Ui = terminal.NewUI(os.Stdin, cmd.outputCapture.(*terminal.TeePrinter))
 
-		err = cmd.newCmdRunner.Command(args, deps)
+		err = cmd.newCmdRunner.Command(args, deps, false)
 	} else {
 		//call codegangsta command
 		err = cmd.coreCommandRunner.Run(append([]string{"CF_NAME"}, args...))
@@ -139,7 +146,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
-	*retVal = cmd.outputCapture.GetOutputAndReset()
+	*retVal = *cmd.outputBucket
 	return nil
 }
 
@@ -254,7 +261,8 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.Application) 
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Application = retVal
-	deps.Ui.DisableTerminalOutput(true)
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
 
-	return cmd.newCmdRunner.Command([]string{"app", appName}, deps)
+	return cmd.newCmdRunner.Command([]string{"app", appName}, deps, true)
 }

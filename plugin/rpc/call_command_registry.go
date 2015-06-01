@@ -9,7 +9,7 @@ import (
 )
 
 type NonCodegangstaRunner interface {
-	Command([]string, command_registry.Dependency) error
+	Command([]string, command_registry.Dependency, bool) error
 }
 
 type nonCodegangstaRunner struct{}
@@ -18,7 +18,7 @@ func NewNonCodegangstaRunner() NonCodegangstaRunner {
 	return &nonCodegangstaRunner{}
 }
 
-func (c *nonCodegangstaRunner) Command(args []string, deps command_registry.Dependency) error {
+func (c *nonCodegangstaRunner) Command(args []string, deps command_registry.Dependency, pluginApiCall bool) error {
 	var err error
 
 	cmdRegistry := command_registry.Commands
@@ -31,7 +31,7 @@ func (c *nonCodegangstaRunner) Command(args []string, deps command_registry.Depe
 		}
 
 		cfCmd := cmdRegistry.FindCommand(args[0])
-		cfCmd = cfCmd.SetDependency(deps, true)
+		cfCmd = cfCmd.SetDependency(deps, pluginApiCall)
 
 		reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)
 		if err != nil {
