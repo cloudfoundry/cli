@@ -3,15 +3,18 @@ package rpc_test
 import (
 	"net"
 	"net/rpc"
+	"os"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/terminal/fakes"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
+	cmdRunner "github.com/cloudfoundry/cli/plugin/rpc"
 	. "github.com/cloudfoundry/cli/plugin/rpc/fake_command"
 	fakeRunner "github.com/cloudfoundry/cli/plugin/rpc/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -145,9 +148,8 @@ var _ = Describe("Server", func() {
 	Describe(".GetOutputAndReset", func() {
 		Context("success", func() {
 			BeforeEach(func() {
-				outputCapture := &fakes.FakeOutputCapture{}
-				outputCapture.GetOutputAndResetReturns([]string{"hi from command"})
-				rpcService, err = NewRpcService(nil, outputCapture, nil, nil, api.RepositoryLocator{}, nil)
+				outputCapture := terminal.NewTeePrinter()
+				rpcService, err = NewRpcService(nil, outputCapture, nil, nil, api.RepositoryLocator{}, cmdRunner.NewNonCodegangstaRunner())
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -166,10 +168,19 @@ var _ = Describe("Server", func() {
 			It("should return the logs from the output capture", func() {
 				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 				Expect(err).ToNot(HaveOccurred())
+
+				success := false
+
+				oldStd := os.Stdout
+				os.Stdout = nil
+				client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command"}, &success)
+				Expect(success).To(BeTrue())
+				os.Stdout = oldStd
+
 				var output []string
 				client.Call("CliRpcCmd.GetOutputAndReset", false, &output)
 
-				Expect(output).To(Equal([]string{"hi from command"}))
+				Expect(output).To(Equal([]string{"Requirement executed\n", "Command Executed\n"}))
 			})
 		})
 	})
@@ -206,10 +217,11 @@ var _ = Describe("Server", func() {
 		var runner *fakeRunner.FakeNonCodegangstaRunner
 
 		BeforeEach(func() {
-			outputCapture := &fakes.FakeOutputCapture{}
+			outputCapture := terminal.NewTeePrinter()
+			terminalOutputSwitch := terminal.NewTeePrinter()
 
 			runner = &fakeRunner.FakeNonCodegangstaRunner{}
-			rpcService, err = NewRpcService(nil, outputCapture, nil, nil, api.RepositoryLocator{}, runner)
+			rpcService, err = NewRpcService(nil, outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -260,7 +272,7 @@ var _ = Describe("Server", func() {
 					},
 				}
 
-				outputCapture := &fakes.FakeOutputCapture{}
+				outputCapture := terminal.NewTeePrinter()
 				runner = &fakeRunner.FakeNonCodegangstaRunner{}
 
 				rpcService, err = NewRpcService(app, outputCapture, nil, nil, api.RepositoryLocator{}, runner)
@@ -287,7 +299,7 @@ var _ = Describe("Server", func() {
 				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command3"}, &success)
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(success).To(BeTrue())
+				Expect(runner.CommandCallCount()).To(Equal(1))
 
 				_, _, pluginApiCall := runner.CommandArgsForCall(0)
 				Expect(pluginApiCall).To(BeFalse())
