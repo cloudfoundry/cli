@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -51,15 +50,12 @@ var _ = Describe("main", func() {
 		})
 
 		It("runs requirement of the non-codegangsta command", func() {
-			result := Cf("api")
-			result2 := Cf("app", "app-should-never-exist-blah-blah")
+			dir, err := os.Getwd()
+			Expect(err).ToNot(HaveOccurred())
+			fullDir := filepath.Join(dir, "..", "fixtures") //set home to a config w/o targeted api
+			result := CfWith_CF_HOME(fullDir, "app", "app-should-never-exist-blah-blah")
 
-			if strings.Contains(string(result.Out.Contents()), "No api endpoint set") {
-				Eventually(result2.Out).Should(Say("No API endpoint set."))
-			} else {
-				Eventually(result2.Out).Should(Say("App app-should-never-exist-blah-blah not found"))
-				Consistently(result2.Out).ShouldNot(Say("Server error"))
-			}
+			Eventually(result.Out).Should(Say("No API endpoint set."))
 		})
 	})
 
@@ -272,6 +268,17 @@ func CfWithIo(command string, args string) *Session {
 	buffer.WriteString(args)
 	buffer.Flush()
 
+	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+	Expect(err).NotTo(HaveOccurred())
+
+	return session
+}
+func CfWith_CF_HOME(cfHome string, args ...string) *Session {
+	path, err := Build("github.com/cloudfoundry/cli/main")
+	Expect(err).NotTo(HaveOccurred())
+
+	cmd := exec.Command(path, args...)
+	cmd.Env = append(cmd.Env, "CF_HOME="+cfHome)
 	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 
