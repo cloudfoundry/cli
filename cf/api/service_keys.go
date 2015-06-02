@@ -1,9 +1,10 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/url"
-	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -13,7 +14,7 @@ import (
 )
 
 type ServiceKeyRepository interface {
-	CreateServiceKey(serviceKeyGuid string, keyName string) error
+	CreateServiceKey(serviceKeyGuid string, keyName string, params map[string]interface{}) error
 	ListServiceKeys(serviceKeyGuid string) ([]models.ServiceKey, error)
 	GetServiceKey(serviceKeyGuid string, keyName string) (models.ServiceKey, error)
 	DeleteServiceKey(serviceKeyGuid string) error
@@ -31,11 +32,20 @@ func NewCloudControllerServiceKeyRepository(config core_config.Reader, gateway n
 	}
 }
 
-func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid string, keyName string) error {
+func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid string, keyName string, params map[string]interface{}) error {
 	path := "/v2/service_keys"
-	data := fmt.Sprintf(`{"service_instance_guid":"%s","name":"%s"}`, instanceGuid, keyName)
 
-	err := c.gateway.CreateResource(c.config.ApiEndpoint(), path, strings.NewReader(data))
+	request := models.ServiceKeyRequest{
+		Name:                keyName,
+		ServiceInstanceGuid: instanceGuid,
+		Params:              params,
+	}
+	jsonBytes, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+
+	err = c.gateway.CreateResource(c.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 
 	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SERVICE_KEY_NAME_TAKEN {
 		return errors.NewModelAlreadyExistsError("Service key", keyName)

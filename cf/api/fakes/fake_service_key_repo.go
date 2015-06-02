@@ -14,6 +14,7 @@ type FakeServiceKeyRepo struct {
 type CreateServiceKeyType struct {
 	InstanceGuid string
 	KeyName      string
+	Params       map[string]interface{}
 
 	Error error
 }
@@ -48,9 +49,10 @@ func NewFakeServiceKeyRepo() *FakeServiceKeyRepo {
 	}
 }
 
-func (f *FakeServiceKeyRepo) CreateServiceKey(instanceGuid string, serviceKeyName string) error {
+func (f *FakeServiceKeyRepo) CreateServiceKey(instanceGuid string, serviceKeyName string, params map[string]interface{}) error {
 	f.CreateServiceKeyMethod.InstanceGuid = instanceGuid
 	f.CreateServiceKeyMethod.KeyName = serviceKeyName
+	f.CreateServiceKeyMethod.Params = params
 
 	return f.CreateServiceKeyMethod.Error
 }

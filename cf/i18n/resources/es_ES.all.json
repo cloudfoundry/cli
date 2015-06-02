@@ -580,9 +580,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE",
-      "translation": "CF_NAME bind-service APP SERVICE_INSTANCE",
-      "modified": true
+      "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n\tLinux/Mac:\n\t\tCF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n\tWindows Command Line\n\t\tCF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n\tWindows PowerShell\n\t\tCF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n\tCF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
+      "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n\tLinux/Mac:\n\t\tCF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n\tWindows Command Line\n\t\tCF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n\tWindows PowerShell\n\t\tCF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n\tCF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
+      "modified": false
    },
    {
       "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
@@ -640,9 +640,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME create-service dbaas silver mydb\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-      "translation": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME create-service cleardb spark clear-db-mine\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-      "modified": true
+      "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n  CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n\tExample of valid JSON object:\n  {\n    \"cluster_nodes\": {\n      \"count\": 5,\n      \"memory_mb\": 1024\n    }\n  }\n\nEXAMPLE:\n\tLinux/Mac:\n\t\tCF_NAME create-service db-service silver -c '{\"ram_gb\":4}'\n\n\tWindows Command Line\n\t\tCF_NAME create-service db-service silver -c \"{\\\"ram_gb\\\":4}\"\n\n\tWindows PowerShell\n\t\tCF_NAME create-service db-service silver -c '{\\\"ram_gb\\\":4}'\n\n\tCF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
+      "translation": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n  CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n\tExample of valid JSON object:\n  {\n    \"cluster_nodes\": {\n      \"count\": 5,\n      \"memory_mb\": 1024\n    }\n  }\n\nEXAMPLE:\n\tLinux/Mac:\n\t\tCF_NAME create-service db-service silver -c '{\"ram_gb\":4}'\n\n\tWindows Command Line\n\t\tCF_NAME create-service db-service silver -c \"{\\\"ram_gb\\\":4}\"\n\n\tWindows PowerShell\n\t\tCF_NAME create-service db-service silver -c '{\\\"ram_gb\\\":4}'\n\n\tCF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
+      "modified": false
    },
    {
       "id": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
@@ -655,8 +655,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
-      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey",
+      "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json",
+      "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json",
       "modified": false
    },
    {
@@ -1135,8 +1135,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME update-service SERVICE [-p NEW_PLAN]",
-      "translation": "CF_NAME update-service SERVICE [-p NEW_PLAN]",
+      "id": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  cf create--service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  cf create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n   cf update-service mydb -p gold\n   cf update-service mydb -c '{\"ram_gb\":4}'\n   cf update-service mydb -c ~/workspace/tmp/instance_config.json",
+      "translation": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  cf create--service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  cf create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n   cf update-service mydb -p gold\n   cf update-service mydb -c '{\"ram_gb\":4}'\n   cf update-service mydb -c ~/workspace/tmp/instance_config.json",
       "modified": false
    },
    {
@@ -2610,11 +2610,6 @@
       "modified": false
    },
    {
-      "id": "Invalid JSON provided in -c argument",
-      "translation": "Invalid JSON provided in -c argument",
-      "modified": false
-   },
-   {
       "id": "Invalid JSON response from server",
       "translation": "Respuesta JSON invalida del servidor",
       "modified": false
@@ -2637,6 +2632,11 @@
    {
       "id": "Invalid auth token: ",
       "translation": "Token de autenticacion inválido: ",
+      "modified": false
+   },
+   {
+      "id": "Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON.",
+      "translation": "Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON.",
       "modified": false
    },
    {

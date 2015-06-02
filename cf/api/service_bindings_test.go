@@ -45,30 +45,59 @@ var _ = Describe("ServiceBindingsRepository", func() {
 	})
 
 	Describe("Create", func() {
+		var requestMatcher testnet.RequestMatcher
 		Context("when the service binding can be created", func() {
 			BeforeEach(func() {
+				requestMatcher = testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`)
+			})
+
+			JustBeforeEach(func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "POST",
 					Path:     "/v2/service_bindings",
-					Matcher:  testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid","async":true}`),
+					Matcher:  requestMatcher,
 					Response: testnet.TestResponse{Status: http.StatusCreated},
 				}))
 			})
 
 			It("creates the service binding", func() {
-				apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
+				apiErr := repo.Create("my-service-instance-guid", "my-app-guid", nil)
 
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
+
+			Context("when there are arbitrary parameters", func() {
+				BeforeEach(func() {
+					requestMatcher = testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid", "parameters": { "foo": "bar"}}`)
+				})
+
+				It("send the parameters as part of the request body", func() {
+					paramsMap := map[string]interface{}{"foo": "bar"}
+					apiErr := repo.Create("my-service-instance-guid", "my-app-guid", paramsMap)
+
+					Expect(testHandler).To(HaveAllRequestsCalled())
+					Expect(apiErr).NotTo(HaveOccurred())
+				})
+
+				Context("and there is a failure during serialization", func() {
+					It("returns the serialization error", func() {
+						paramsMap := make(map[string]interface{})
+						paramsMap["data"] = make(chan bool)
+
+						err := repo.Create("my-service-instance-guid", "my-app-guid", paramsMap)
+						Expect(err).To(MatchError("json: unsupported type: chan bool"))
+					})
+				})
+			})
 		})
 
-		Context("when an error occurs", func() {
+		Context("when an API error occurs", func() {
 			BeforeEach(func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/service_bindings",
-					Matcher: testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid","async":true}`),
+					Matcher: testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
 					Response: testnet.TestResponse{
 						Status: http.StatusBadRequest,
 						Body:   `{"code":90003,"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"}`,
@@ -77,7 +106,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			})
 
 			It("returns an error", func() {
-				apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
+				apiErr := repo.Create("my-service-instance-guid", "my-app-guid", nil)
 
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(apiErr).To(HaveOccurred())

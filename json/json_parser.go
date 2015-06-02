@@ -27,23 +27,36 @@ func ParseJsonArray(path string) ([]map[string]interface{}, error) {
 	return stringMaps, nil
 }
 
-func ParseJsonHash(path string) (map[string]interface{}, error) {
-	if path == "" {
+func ParseJsonFromFileOrString(fileOrJson string) (map[string]interface{}, error) {
+	var jsonMap map[string]interface{}
+	var err error
+	var bytes []byte
+
+	if fileOrJson == "" {
 		return nil, nil
 	}
 
-	bytes, err := readJsonFile(path)
+	if fileExists(fileOrJson) {
+		bytes, err = readJsonFile(fileOrJson)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		bytes = []byte(fileOrJson)
+	}
+
+	jsonMap, err = parseJson(bytes)
+
 	if err != nil {
 		return nil, err
 	}
 
-	stringMap := map[string]interface{}{}
-	err = json.Unmarshal(bytes, &stringMap)
-	if err != nil {
-		return nil, errors.NewWithFmt("Incorrect json format: %s", err.Error())
-	}
+	return jsonMap, nil
+}
 
-	return stringMap, nil
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 func readJsonFile(path string) ([]byte, error) {
@@ -58,4 +71,14 @@ func readJsonFile(path string) ([]byte, error) {
 	}
 
 	return bytes, nil
+}
+
+func parseJson(bytes []byte) (map[string]interface{}, error) {
+	stringMap := map[string]interface{}{}
+	err := json.Unmarshal(bytes, &stringMap)
+	if err != nil {
+		return nil, errors.NewWithFmt("Incorrect json format: %s", err.Error())
+	}
+
+	return stringMap, nil
 }
