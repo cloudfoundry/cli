@@ -247,7 +247,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 				"Username":    terminal.EntityNameColor(cmd.config.Username())}))
 
-		err = cmd.serviceBinder.BindApplication(app, serviceInstance)
+		err = cmd.serviceBinder.BindApplication(app, serviceInstance, nil)
 
 		switch httpErr := err.(type) {
 		case errors.HttpError:

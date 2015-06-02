@@ -48,6 +48,7 @@ type FakeServiceRepo struct {
 	UpdateServiceInstanceArgs struct {
 		InstanceGuid string
 		PlanGuid     string
+		Params       map[string]interface{}
 	}
 
 	UpdateServiceInstanceReturnsErr bool
@@ -149,13 +150,14 @@ func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string, params
 	return repo.CreateServiceInstanceReturns.Error
 }
 
-func (repo *FakeServiceRepo) UpdateServiceInstance(instanceGuid, planGuid string) (apiErr error) {
+func (repo *FakeServiceRepo) UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}) (apiErr error) {
 
 	if repo.UpdateServiceInstanceReturnsErr {
 		apiErr = errors.New("Error updating service instance")
 	} else {
 		repo.UpdateServiceInstanceArgs.InstanceGuid = instanceGuid
 		repo.UpdateServiceInstanceArgs.PlanGuid = planGuid
+		repo.UpdateServiceInstanceArgs.Params = params
 	}
 
 	return

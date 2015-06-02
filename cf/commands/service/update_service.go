@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/json"
 	"github.com/codegangsta/cli"
 )
 
@@ -37,9 +38,29 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "update-service",
 		Description: T("Update a service instance"),
-		Usage:       T("CF_NAME update-service SERVICE [-p NEW_PLAN]"),
+		Usage: T(`CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]
+
+  Optionally provide service-specific configuration parameters in a valid JSON object in-line.
+  cf create--service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+
+  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
+  cf create-service SERVICE_INSTANCE -c PATH_TO_FILE
+
+   Example of valid JSON object:
+   {
+     "cluster_nodes": {
+        "count": 5,
+        "memory_mb": 1024
+      }
+   }
+
+EXAMPLE:
+   cf update-service mydb -p gold
+   cf update-service mydb -c '{"ram_gb":4}'
+   cf update-service mydb -c ~/workspace/tmp/instance_config.json`),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Change service plan for a service instance")),
+			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
 		},
 	}
 }
@@ -67,6 +88,11 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 	}
 
 	planName := c.String("p")
+	params := c.String("c")
+	paramsMap, err := json.ParseJsonFromFileOrString(params)
+	if err != nil {
+		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON."))
+	}
 
 	if planName != "" {
 		cmd.ui.Say(T("Updating service instance {{.ServiceName}} as {{.UserName}}...",
@@ -76,7 +102,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 			}))
 
 		if cmd.config.IsMinApiVersion("2.16.0") {
-			err := cmd.updateServiceWithPlan(serviceInstance, planName)
+			err := cmd.updateServiceWithPlan(serviceInstance, planName, paramsMap)
 			switch err.(type) {
 			case nil:
 				err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
@@ -99,7 +125,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceInstance, planName string) (err error) {
+func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceInstance, planName string, paramsMap map[string]interface{}) (err error) {
 	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.Guid, cmd.config.OrganizationFields().Name)
 	if err != nil {
 		return
@@ -107,7 +133,7 @@ func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceIn
 
 	for _, plan := range plans {
 		if plan.Name == planName {
-			err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid)
+			err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap)
 			return
 		}
 	}
