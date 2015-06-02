@@ -2605,11 +2605,6 @@
       "modified": false
    },
    {
-      "id": "Invalid JSON provided in -c argument",
-      "translation": "Invalid JSON provided in -c argument",
-      "modified": false
-   },
-   {
       "id": "Invalid JSON response from server",
       "translation": "Invalid JSON response from server",
       "modified": false
@@ -2632,6 +2627,11 @@
    {
       "id": "Invalid auth token: ",
       "translation": "Invalid auth token: ",
+      "modified": false
+   },
+   {
+      "id": "Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON.",
+      "translation": "Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON.",
       "modified": false
    },
    {

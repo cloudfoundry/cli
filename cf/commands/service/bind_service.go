@@ -100,7 +100,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {
-		cmd.ui.Failed("Invalid JSON provided in -c argument: " + err.Error())
+		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON."))
 	}
 
 	cmd.ui.Say(T("Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
