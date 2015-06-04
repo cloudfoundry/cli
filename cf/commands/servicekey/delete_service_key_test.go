@@ -134,8 +134,19 @@ var _ = Describe("delete-service-key command", func() {
 				))
 			})
 
-			It("fails to delete service key when service key does not exist", func() {
+			It("fails to delete service key when the service key repository returns an error", func() {
 				serviceKeyRepo.GetServiceKeyMethod.Error = errors.New("")
+				callDeleteServiceKey([]string{"fake-service-instance", "non-exist-service-key", "-f"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting key", "non-exist-service-key", "for service instance", "fake-service-instance", "as", "my-user..."},
+					[]string{"OK"},
+					[]string{"Service key", "non-exist-service-key", "does not exist for service instance", "fake-service-instance"},
+				))
+			})
+
+			It("fails to delete service key when service key does not exist", func() {
+				serviceKeyRepo.GetServiceKeyMethod.ServiceKey = models.ServiceKey{}
 				callDeleteServiceKey([]string{"fake-service-instance", "non-exist-service-key", "-f"})
 
 				Expect(ui.Outputs).To(ContainSubstrings(
