@@ -435,7 +435,7 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	Describe("DeleteService", func() {
-		It("it deletes the service when no apps are bound", func() {
+		It("deletes the service when no apps and keys are bound", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
 				Path:     "/v2/service_instances/my-service-instance-guid?accepts_incomplete=true&async=true",
@@ -467,7 +467,31 @@ var _ = Describe("Services Repo", func() {
 			}
 
 			err := repo.DeleteService(serviceInstance)
-			Expect(err.Error()).To(Equal("Cannot delete service instance, apps are still bound to it"))
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(BeAssignableToTypeOf(&errors.ServiceAssociationError{}))
+		})
+
+		It("doesn't delete the service when keys are bound", func() {
+			setupTestServer()
+
+			serviceInstance := models.ServiceInstance{}
+			serviceInstance.Guid = "my-service-instance-guid"
+			serviceInstance.ServiceKeys = []models.ServiceKeyFields{
+				{
+					Name: "fake-service-key-1",
+					Url:  "/v2/service_keys/service-key-1-guid",
+					Guid: "service-key-1-guid",
+				},
+				{
+					Name: "fake-service-key-2",
+					Url:  "/v2/service_keys/service-key-2-guid",
+					Guid: "service-key-2-guid",
+				},
+			}
+
+			err := repo.DeleteService(serviceInstance)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(BeAssignableToTypeOf(&errors.ServiceAssociationError{}))
 		})
 	})
 
