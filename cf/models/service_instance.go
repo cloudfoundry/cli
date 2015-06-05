@@ -31,6 +31,7 @@ type ServiceInstanceFields struct {
 type ServiceInstance struct {
 	ServiceInstanceFields
 	ServiceBindings []ServiceBindingFields
+	ServiceKeys     []ServiceKeyFields
 	ServicePlan     ServicePlanFields
 	ServiceOffering ServiceOfferingFields
 }

@@ -189,8 +189,8 @@ func (repo CloudControllerServiceRepository) RenameService(instance models.Servi
 }
 
 func (repo CloudControllerServiceRepository) DeleteService(instance models.ServiceInstance) (apiErr error) {
-	if len(instance.ServiceBindings) > 0 {
-		return errors.New("Cannot delete service instance, apps are still bound to it")
+	if len(instance.ServiceBindings) > 0 || len(instance.ServiceKeys) > 0 {
+		return errors.NewServiceAssociationError()
 	}
 	path := fmt.Sprintf("/v2/service_instances/%s?%s", instance.Guid, "accepts_incomplete=true")
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
