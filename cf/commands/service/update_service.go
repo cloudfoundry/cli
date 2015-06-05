@@ -102,9 +102,13 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 			}))
 
 		if cmd.config.IsMinApiVersion("2.16.0") {
-			err := cmd.updateServiceWithPlan(serviceInstance, planName, paramsMap)
+			err, plan := cmd.validatePlanUpdate(serviceInstance, planName)
 			switch err.(type) {
 			case nil:
+				err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap)
+				if err != nil {
+					cmd.ui.Failed(err.Error())
+				}
 				err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
 				if err != nil {
 					cmd.ui.Failed(err.Error())
@@ -125,21 +129,25 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *UpdateService) updateServiceWithPlan(serviceInstance models.ServiceInstance, planName string, paramsMap map[string]interface{}) (err error) {
+func (cmd *UpdateService) validatePlanUpdate(serviceInstance models.ServiceInstance, planName string) (err error, plan models.ServicePlanFields) {
+	err, plan = cmd.findPlan(serviceInstance, planName)
+	return
+}
+
+func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planName string) (err error, plan models.ServicePlanFields) {
 	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.Guid, cmd.config.OrganizationFields().Name)
 	if err != nil {
 		return
 	}
 
-	for _, plan := range plans {
-		if plan.Name == planName {
-			err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap)
+	for _, p := range plans {
+		if p.Name == planName {
+			plan = p
 			return
 		}
 	}
 	err = errors.New(T("Plan does not exist for the {{.ServiceName}} service",
 		map[string]interface{}{"ServiceName": serviceInstance.ServiceOffering.Label}))
-
 	return
 }
 
