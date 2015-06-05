@@ -26,7 +26,7 @@ type ServiceRepository interface {
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
 	CreateServiceInstance(name, planGuid string, params map[string]interface{}, tags []string) (apiErr error)
-	UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}) (apiErr error)
+	UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}, tags []string) (apiErr error)
 	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
 	DeleteService(instance models.ServiceInstance) (apiErr error)
 	FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error)
@@ -162,11 +162,12 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 	return
 }
 
-func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}) (err error) {
+func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}, tags []string) (err error) {
 	path := fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=true", instanceGuid)
 	request := models.ServiceInstanceUpdateRequest{
 		PlanGuid: planGuid,
 		Params:   params,
+		Tags:     tags,
 	}
 
 	jsonBytes, err := json.Marshal(request)

@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/cloudfoundry/cli/json"
 	"github.com/codegangsta/cli"
 )
@@ -41,10 +42,10 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
 		Usage: T(`CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]
 
   Optionally provide service-specific configuration parameters in a valid JSON object in-line.
-  cf create--service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+  CF_NAME update-service -c '{"name":"value","name":"value"}'
 
   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
-  cf create-service SERVICE_INSTANCE -c PATH_TO_FILE
+  CF_NAME update-service -c PATH_TO_FILE
 
    Example of valid JSON object:
    {
@@ -55,12 +56,14 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
    }
 
 EXAMPLE:
-   cf update-service mydb -p gold
-   cf update-service mydb -c '{"ram_gb":4}'
-   cf update-service mydb -c ~/workspace/tmp/instance_config.json`),
+   CF_NAME update-service mydb -p gold
+   CF_NAME update-service mydb -c '{"ram_gb":4}'
+   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json
+	 CF_NAME update-service mydb -t "list,of, tags"`),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Change service plan for a service instance")),
 			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
+			flag_helpers.NewStringFlag("t", T("User provided tags")),
 		},
 	}
 }
@@ -81,7 +84,9 @@ func (cmd *UpdateService) GetRequirements(requirementsFactory requirements.Facto
 func (cmd *UpdateService) Run(c *cli.Context) {
 	planName := c.String("p")
 	params := c.String("c")
-	if planName == "" && params == "" {
+	tagsList := c.String("t")
+
+	if planName == "" && params == "" && tagsList == "" {
 		cmd.ui.Ok()
 		cmd.ui.Say(T("No changes were made"))
 		return
@@ -98,6 +103,8 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON."))
 	}
 
+	tags := ui_helpers.ParseTags(tagsList)
+
 	var plan models.ServicePlanFields
 	if planName != "" {
 		cmd.checkUpdateServicePlanApiVersion()
@@ -109,7 +116,7 @@ func (cmd *UpdateService) Run(c *cli.Context) {
 
 	cmd.printUpdatingServiceInstanceMessage(serviceInstanceName)
 
-	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap)
+	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap, tags)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
