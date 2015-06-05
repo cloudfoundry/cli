@@ -77,18 +77,6 @@ var _ = Describe("update-service command", func() {
 	})
 
 	Context("when no flags are passed", func() {
-		Context("when there is an err finding the instance", func() {
-			It("returns an error", func() {
-				serviceRepo.FindInstanceByNameErr = true
-
-				callUpdateService([]string{"some-stupid-not-real-instance"})
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error finding instance"},
-					[]string{"FAILED"},
-				))
-			})
-		})
 
 		Context("when the instance exists", func() {
 			It("prints a user indicating it is a no-op", func() {

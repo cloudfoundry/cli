@@ -79,59 +79,44 @@ func (cmd *UpdateService) GetRequirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *UpdateService) Run(c *cli.Context) {
-	serviceInstanceName := c.Args()[0]
-
-	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	planName := c.String("p")
+	params := c.String("c")
+	if planName == "" && params == "" {
+		cmd.ui.Ok()
+		cmd.ui.Say(T("No changes were made"))
 		return
 	}
 
-	planName := c.String("p")
-	params := c.String("c")
+	serviceInstanceName := c.Args()[0]
+	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
 	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {
 		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON."))
 	}
 
+	var plan models.ServicePlanFields
 	if planName != "" {
-		cmd.ui.Say(T("Updating service instance {{.ServiceName}} as {{.UserName}}...",
-			map[string]interface{}{
-				"ServiceName": terminal.EntityNameColor(serviceInstanceName),
-				"UserName":    terminal.EntityNameColor(cmd.config.Username()),
-			}))
-
-		if cmd.config.IsMinApiVersion("2.16.0") {
-			err, plan := cmd.validatePlanUpdate(serviceInstance, planName)
-			switch err.(type) {
-			case nil:
-				err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap)
-				if err != nil {
-					cmd.ui.Failed(err.Error())
-				}
-				err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
-				if err != nil {
-					cmd.ui.Failed(err.Error())
-				}
-			default:
-				cmd.ui.Failed(err.Error())
-			}
-		} else {
-			cmd.ui.Failed(T("Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-				map[string]interface{}{
-					"RequiredCCAPIVersion": "2.16.0",
-					"CurrentCCAPIVersion":  cmd.config.ApiVersion(),
-				}))
+		cmd.checkUpdateServicePlanApiVersion()
+		err, plan = cmd.findPlan(serviceInstance, planName)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
 		}
-	} else {
-		cmd.ui.Ok()
-		cmd.ui.Say(T("No changes were made"))
 	}
-}
 
-func (cmd *UpdateService) validatePlanUpdate(serviceInstance models.ServiceInstance, planName string) (err error, plan models.ServicePlanFields) {
-	err, plan = cmd.findPlan(serviceInstance, planName)
-	return
+	cmd.printUpdatingServiceInstanceMessage(serviceInstanceName)
+
+	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+	err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 }
 
 func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planName string) (err error, plan models.ServicePlanFields) {
@@ -149,6 +134,24 @@ func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planN
 	err = errors.New(T("Plan does not exist for the {{.ServiceName}} service",
 		map[string]interface{}{"ServiceName": serviceInstance.ServiceOffering.Label}))
 	return
+}
+
+func (cmd *UpdateService) checkUpdateServicePlanApiVersion() {
+	if !cmd.config.IsMinApiVersion("2.16.0") {
+		cmd.ui.Failed(T("Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
+			map[string]interface{}{
+				"RequiredCCAPIVersion": "2.16.0",
+				"CurrentCCAPIVersion":  cmd.config.ApiVersion(),
+			}))
+	}
+}
+
+func (cmd *UpdateService) printUpdatingServiceInstanceMessage(serviceInstanceName string) {
+	cmd.ui.Say(T("Updating service instance {{.ServiceName}} as {{.UserName}}...",
+		map[string]interface{}{
+			"ServiceName": terminal.EntityNameColor(serviceInstanceName),
+			"UserName":    terminal.EntityNameColor(cmd.config.Username()),
+		}))
 }
 
 func printSuccessMessageForServiceInstance(serviceInstanceName string, serviceRepo api.ServiceRepository, ui terminal.UI) error {
