@@ -202,6 +202,40 @@ var _ = Describe("update-service command", func() {
 		})
 	})
 
+	Context("when passing in tags", func() {
+		It("successfully updates a service and passes the tags as json", func() {
+			callUpdateService([]string{"-t", "tag1, tag2,tag3,  tag4", "my-service-instance"})
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Updating service instance", "my-service-instance"},
+				[]string{"OK"},
+			))
+			Expect(serviceRepo.UpdateServiceInstanceArgs.Tags).To(ConsistOf("tag1", "tag2", "tag3", "tag4"))
+		})
+
+		It("successfully updates a service and passes the tags as json", func() {
+			callUpdateService([]string{"-t", "tag1", "my-service-instance"})
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Updating service instance", "my-service-instance"},
+				[]string{"OK"},
+			))
+			Expect(serviceRepo.UpdateServiceInstanceArgs.Tags).To(ConsistOf("tag1"))
+		})
+
+		Context("and the tags string is passed with an empty string", func() {
+
+			It("accepts an empty array of tags but doesn't update service", func() {
+				callUpdateService([]string{"-t", "", "my-service-instance"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"OK"},
+					[]string{"No changes were made"},
+				))
+			})
+		})
+	})
+
 	Context("when service update is asynchronous", func() {
 		Context("when the plan flag is passed", func() {
 			BeforeEach(func() {

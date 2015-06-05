@@ -1,8 +1,6 @@
 package service
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -13,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/cloudfoundry/cli/json"
 	"github.com/codegangsta/cli"
 )
@@ -96,7 +95,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	params := c.String("c")
 	tags := c.String("t")
 
-	tagsList := cmd.parseTags(tags)
+	tagsList := ui_helpers.ParseTags(tags)
 
 	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {
@@ -151,15 +150,6 @@ func (cmd CreateService) CreateService(serviceName, planName, serviceInstanceNam
 
 	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid, params, tags)
 	return plan, apiErr
-}
-
-func (cmd CreateService) parseTags(tags string) []string {
-	tags = strings.Trim(tags, `"`)
-	tagsList := strings.Split(tags, ",")
-	for index, tag := range tagsList {
-		tagsList[index] = strings.Trim(tag, " ")
-	}
-	return tagsList
 }
 
 func findPlanFromOfferings(offerings models.ServiceOfferings, name string) (plan models.ServicePlanFields, err error) {

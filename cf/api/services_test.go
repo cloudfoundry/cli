@@ -309,7 +309,7 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{Status: http.StatusOK},
 			}))
 
-			err := repo.UpdateServiceInstance("instance-guid", "plan-guid", nil)
+			err := repo.UpdateServiceInstance("instance-guid", "plan-guid", nil, nil)
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -323,7 +323,7 @@ var _ = Describe("Services Repo", func() {
 					Response: testnet.TestResponse{Status: http.StatusNotFound},
 				}))
 
-				err := repo.UpdateServiceInstance("instance-guid", "plan-guid", nil)
+				err := repo.UpdateServiceInstance("instance-guid", "plan-guid", nil, nil)
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(HaveOccurred())
 			})
@@ -334,13 +334,13 @@ var _ = Describe("Services Repo", func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
-					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid", "parameters": {"foo": "bar"}}`),
+					Matcher:  testnet.RequestBodyMatcher(`{"parameters": {"foo": "bar"}}`),
 					Response: testnet.TestResponse{Status: http.StatusOK},
 				}))
 
 				paramsMap := map[string]interface{}{"foo": "bar"}
 
-				err := repo.UpdateServiceInstance("instance-guid", "plan-guid", paramsMap)
+				err := repo.UpdateServiceInstance("instance-guid", "", paramsMap, nil)
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -350,9 +350,26 @@ var _ = Describe("Services Repo", func() {
 					paramsMap := make(map[string]interface{})
 					paramsMap["data"] = make(chan bool)
 
-					err := repo.UpdateServiceInstance("instance-guid", "plan-guid", paramsMap)
+					err := repo.UpdateServiceInstance("instance-guid", "", paramsMap, nil)
 					Expect(err).To(MatchError("json: unsupported type: chan bool"))
 				})
+			})
+		})
+
+		Context("when there are tags", func() {
+			It("sends the tags as part of the request body", func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
+					Matcher:  testnet.RequestBodyMatcher(`{"tags": ["foo", "bar"]}`),
+					Response: testnet.TestResponse{Status: http.StatusOK},
+				}))
+
+				tags := []string{"foo", "bar"}
+
+				err := repo.UpdateServiceInstance("instance-guid", "", nil, tags)
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 	})
