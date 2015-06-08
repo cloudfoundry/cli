@@ -41,7 +41,7 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
 		Usage: T(`CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]
 
   Optionally provide service-specific configuration parameters in a valid JSON object in-line.
-  cf create--service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+  cf create-service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
 
   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
   cf create-service SERVICE_INSTANCE -c PATH_TO_FILE
