@@ -191,6 +191,13 @@ Example command
 Create Space is a good example of a command. Its tests include checking arguments, requiring the user
 to be logged in, and the actual behavior of the command itself. You can find it in `cf/commands/space/create_space.go`.
 
+i18n
+----
+All pull requests which include user-facing strings should include updated translation files. These files are generated/ maintained using [i18n4go](https://github.com/maximilien/i18n4go). 
+
+To add/ update translation strings run the command `i18n4go -c fixup`. For each change or update, you will be presented with the choices `new` or `upd`. Type in the appropriate choice. If `upd` is chosen, you will be asked to confirm which string is being updated using a numbered list.
+
+
 Current conventions
 ===================
 
