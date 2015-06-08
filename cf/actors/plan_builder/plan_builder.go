@@ -82,7 +82,7 @@ func (builder Builder) GetPlansForService(serviceGuid string) ([]models.ServiceP
 }
 
 func (builder Builder) GetPlansForServiceWithOrgs(serviceGuid string) ([]models.ServicePlanFields, error) {
-	plans, err := builder.servicePlanRepo.Search(map[string]string{"service_guid": serviceGuid})
+	plans, err := builder.GetPlansForService(serviceGuid)
 	if err != nil {
 		return nil, err
 	}
