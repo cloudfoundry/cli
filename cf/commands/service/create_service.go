@@ -92,7 +92,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {
-		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON."))
+		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
 
 	cmd.ui.Say(T("Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
