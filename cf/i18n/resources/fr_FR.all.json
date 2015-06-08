@@ -130,6 +130,11 @@
       "modified": true
    },
    {
+      "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object.\n   The path to the parameters file can be an absolute or relative path to a file:\n\n   CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
+      "translation": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object.\n   The path to the parameters file can be an absolute or relative path to a file:\n\n   CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
+      "modified": false
+   },
+   {
       "id": "   OrgAuditor - Read-only access to org info and reports\n",
       "translation": "OrgAuditor - accès en lecture seule aux informations et rapports de l'org\n",
       "modified": false
@@ -650,9 +655,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n  CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n\u0009Example of valid JSON object:\n  {\n    \"cluster_nodes\": {\n      \"count\": 5,\n      \"memory_mb\": 1024\n    }\n  }\n\nEXAMPLE:\n\u0009Linux/Mac:\n\u0009\u0009CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'\n\n\u0009Windows Command Line\n\u0009\u0009CF_NAME create-service db-service silver -c \"{\\\"ram_gb\\\":4}\"\n\n\u0009Windows PowerShell\n\u0009\u0009CF_NAME create-service db-service silver -c '{\\\"ram_gb\\\":4}'\n\n\u0009CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n\u0009CF_NAME create-service dbaas silver mydb -t \"list, of, tags\"\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-      "translation": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n  CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n\u0009Example of valid JSON object:\n  {\n    \"cluster_nodes\": {\n      \"count\": 5,\n      \"memory_mb\": 1024\n    }\n  }\n\nEXAMPLE:\n\u0009Linux/Mac:\n\u0009\u0009CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'\n\n\u0009Windows Command Line\n\u0009\u0009CF_NAME create-service db-service silver -c \"{\\\"ram_gb\\\":4}\"\n\n\u0009Windows PowerShell\n\u0009\u0009CF_NAME create-service db-service silver -c '{\\\"ram_gb\\\":4}'\n\n\u0009CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\nTIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-      "modified": true
+      "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]",
+      "translation": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]",
+      "modified": false
    },
    {
       "id": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
@@ -1890,6 +1895,11 @@
       "modified": false
    },
    {
+      "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service dbaas silver mydb -t \"list, of, tags\"",
+      "translation": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service dbaas silver mydb -t \"list, of, tags\"",
+      "modified": false
+   },
+   {
       "id": "Enable CF_TRACE output for all requests and responses",
       "translation": "Activer la sortie de CF_TRACE pour toutes les demandes et les réponses",
       "modified": false
@@ -2157,6 +2167,11 @@
    {
       "id": "Error zipping application",
       "translation": "Erreur lors de la compression de l'application",
+      "modified": false
+   },
+   {
+      "id": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
+      "translation": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
       "modified": false
    },
    {
@@ -2727,11 +2742,6 @@
    {
       "id": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
       "translation": "Limite de mémoire non valide: {{.Memory}}\n{{.ErrorDescription}}",
-      "modified": false
-   },
-   {
-      "id": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
-      "translation": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
       "modified": false
    },
    {
@@ -4132,6 +4142,11 @@
    {
       "id": "TIP:\n",
       "translation": "TIP:\n",
+      "modified": false
+   },
+   {
+      "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
+      "translation": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
       "modified": false
    },
    {
