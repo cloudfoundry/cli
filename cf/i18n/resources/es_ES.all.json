@@ -125,6 +125,11 @@
       "modified": true
    },
    {
+      "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"permissions\": \"read-only\"\n   }",
+      "translation": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
+      "modified": true
+   },
+   {
       "id": "   OrgAuditor - Read-only access to org info and reports\n",
       "translation": "   OrgAuditor - Acceso de solo lectura a información y reportes de una org\n",
       "modified": false
@@ -585,8 +590,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n\u0009Linux/Mac:\n\u0009\u0009CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n\u0009Windows Command Line\n\u0009\u0009CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n\u0009Windows PowerShell\n\u0009\u0009CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\u0009\n\u0009CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
-      "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n\u0009Linux/Mac:\n\u0009\u0009CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n\u0009Windows Command Line\n\u0009\u0009CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n\u0009Windows PowerShell\n\u0009\u0009CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\u0009\n\u0009CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
+      "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
+      "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
       "modified": false
    },
    {
@@ -1873,6 +1878,11 @@
       "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n\u0009 CF_NAME update-service mydb -t \"list,of, tags\"",
       "translation": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n\u0009 CF_NAME update-service mydb -t \"list,of, tags\"",
       "modified": true
+   },
+   {
+      "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\u0009\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
+      "translation": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\u0009\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
+      "modified": false
    },
    {
       "id": "Enable CF_TRACE output for all requests and responses",
