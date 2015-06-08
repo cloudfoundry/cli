@@ -12,3 +12,17 @@ type Organization struct {
 	Domains     []DomainFields
 	SpaceQuotas []SpaceQuota
 }
+
+type Organizations []Organization
+
+func (o Organizations) Len() int {
+	return len(o)
+}
+
+func (o Organizations) Swap(i, j int) {
+	o[i], o[j] = o[j], o[i]
+}
+
+func (o Organizations) Less(i, j int) bool {
+	return o[i].Name < o[j].Name
+}
