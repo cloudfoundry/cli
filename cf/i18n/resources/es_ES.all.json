@@ -120,6 +120,11 @@
       "modified": false
    },
    {
+      "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME update-service -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME update-service -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
+      "translation": "\u0009Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME update-service -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME update-service -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n\u0009 }",
+      "modified": true
+   },
+   {
       "id": "   OrgAuditor - Read-only access to org info and reports\n",
       "translation": "   OrgAuditor - Acceso de solo lectura a información y reportes de una org\n",
       "modified": false
@@ -1135,8 +1140,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME update-service -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME update-service -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n\u0009 CF_NAME update-service mydb -t \"list,of, tags\"",
-      "translation": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  cf create--service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  cf create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"cluster_nodes\": {\n        \"count\": 5,\n        \"memory_mb\": 1024\n      }\n   }\n\nEXAMPLE:\n   cf update-service mydb -p gold\n   cf update-service mydb -c '{\"ram_gb\":4}'\n   cf update-service mydb -c ~/workspace/tmp/instance_config.json",
+      "id": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]",
+      "translation": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]",
       "modified": true
    },
    {
@@ -1863,6 +1868,11 @@
       "id": "EXAMPLE:\n",
       "translation": "EJEMPLO:\n",
       "modified": false
+   },
+   {
+      "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n\u0009 CF_NAME update-service mydb -t \"list,of, tags\"",
+      "translation": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n\u0009 CF_NAME update-service mydb -t \"list,of, tags\"",
+      "modified": true
    },
    {
       "id": "Enable CF_TRACE output for all requests and responses",
