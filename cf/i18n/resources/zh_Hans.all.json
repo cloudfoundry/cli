@@ -4125,11 +4125,6 @@
       "modified": false
    },
    {
-      "id": "TIP: To make these changes take effect, use '{{.CFUnbindCommand}}' to unbind the service, '{{.CFBindComand}}' to rebind, and then '{{.CFRestageCommand}}' to update the app with the new env variables",
-      "translation": "小贴士: 为了使这些更改生效， 使用'{{.CFUnbindCommand}}解除绑定的服务，使用'{{.CFBindComand}}重新绑定服务，然后使用'{{.CFRestageCommand}}'更新应用使环境变量生效。",
-      "modified": false
-   },
-   {
       "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
       "translation": "小贴士: 使用'{{.ApiCommand}}'继续非安全的API终端访问",
       "modified": false
@@ -4137,6 +4132,11 @@
    {
       "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
       "translation": "小贴士: 使用'{{.CFCommand}}'，来确保您的环境变量更改生效",
+      "modified": true
+   },
+   {
+      "id": "TIP: Use '{{.CFRestageCommand}}' for any bound apps to ensure your env variable changes take effect",
+      "translation": "小贴士: 为了使这些更改生效， 使用'{{.CFUnbindCommand}}解除绑定的服务，使用'{{.CFBindComand}}重新绑定服务，然后使用'{{.CFRestageCommand}}'更新应用使环境变量生效。",
       "modified": true
    },
    {

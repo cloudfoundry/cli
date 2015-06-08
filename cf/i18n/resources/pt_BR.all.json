@@ -4125,11 +4125,6 @@
       "modified": false
    },
    {
-      "id": "TIP: To make these changes take effect, use '{{.CFUnbindCommand}}' to unbind the service, '{{.CFBindComand}}' to rebind, and then '{{.CFRestageCommand}}' to update the app with the new env variables",
-      "translation": "DICA: Para fazer com que estas mudanças entrem em vigor, utilize '{{.CFUnbindCommand}}' para desvincular o serviço, '{{.CFBindComand}}' para re-vincular, e finalmente '{{.CFRestageCommand}}' para atualizar o app app com as novas variáveis de ambiente",
-      "modified": false
-   },
-   {
       "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
       "translation": "DICA: Utilize '{{.ApiCommand}}' para continuar com um terminal API inseguro",
       "modified": false
@@ -4137,6 +4132,11 @@
    {
       "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
       "translation": "DICA: Utilize '{{.CFCommand}}' para garantir que mudanças nas variáveis de ambiente entrem em vigor",
+      "modified": true
+   },
+   {
+      "id": "TIP: Use '{{.CFRestageCommand}}' for any bound apps to ensure your env variable changes take effect",
+      "translation": "DICA: Para fazer com que estas mudanças entrem em vigor, utilize '{{.CFUnbindCommand}}' para desvincular o serviço, '{{.CFBindComand}}' para re-vincular, e finalmente '{{.CFRestageCommand}}' para atualizar o app app com as novas variáveis de ambiente",
       "modified": true
    },
    {
