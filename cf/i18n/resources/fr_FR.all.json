@@ -2640,8 +2640,8 @@
       "modified": false
    },
    {
-      "id": "Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON.",
-      "translation": "Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON.",
+      "id": "Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.",
+      "translation": "Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.",
       "modified": false
    },
    {

@@ -153,7 +153,7 @@ var _ = Describe("update-service command", func() {
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
-						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON."},
+						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 					))
 				})
 			})
@@ -207,7 +207,7 @@ var _ = Describe("update-service command", func() {
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
-						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or a file path containing valid JSON."},
+						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 					))
 				})
 			})
