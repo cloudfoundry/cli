@@ -1190,6 +1190,11 @@
       "modified": false
    },
    {
+      "id": "Cannot delete service instance, service keys and bindings must first be deleted",
+      "translation": "Impossible de supprimer instance de service , clés de service et fixations doivent d'abord être supprimées",
+      "modified": false
+   },
+   {
       "id": "Cannot list marketplace services without a targeted space",
       "translation": "Ne peut pas lister des services du marketplace sans cibler un espace",
       "modified": false
@@ -5327,11 +5332,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
-      "modified": false
-   },
-   {
-      "id": "Cannot delete service instance, service keys and bindings must first be deleted",
-      "translation": "Impossible de supprimer instance de service , clés de service et fixations doivent d'abord être supprimées",
       "modified": false
    }
 ]

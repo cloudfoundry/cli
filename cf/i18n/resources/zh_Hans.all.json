@@ -1190,6 +1190,11 @@
       "modified": false
    },
    {
+      "id": "Cannot delete service instance, service keys and bindings must first be deleted",
+      "translation": "无法删除服务实例，需要先删除服务密钥和绑定",
+      "modified": false
+   },
+   {
       "id": "Cannot list marketplace services without a targeted space",
       "translation": "在没有指定空间的情况下无法获取服务列表",
       "modified": false
@@ -5327,11 +5332,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} 乘以 {{.InstanceCount}}实例数",
-      "modified": false
-   },
-   {
-      "id": "Cannot delete service instance, service keys and bindings must first be deleted",
-      "translation": "无法删除服务实例，需要先删除服务密钥和绑定",
       "modified": false
    }
 ]
