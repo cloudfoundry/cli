@@ -103,7 +103,7 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say(T("TIP: Use '{{.CFRestageCommand}}' for any bound apps to ensure your env variable changes take effect",
 		map[string]interface{}{
-			"CFRestageCommand": cf.Name() + " restage",
+			"CFRestageCommand": terminal.CommandColor(cf.Name() + " restage"),
 		}))
 
 	if params == "" && drainUrl == "" {
