@@ -251,6 +251,45 @@ var _ = Describe("Server", func() {
 			Expect(arg1[1]).To(Equal("fake-app"))
 			Expect(pluginApiCall).To(BeTrue())
 		})
+	})
+
+	Describe("GetApps()", func() {
+		var runner *fakeRunner.FakeNonCodegangstaRunner
+
+		BeforeEach(func() {
+			outputCapture := terminal.NewTeePrinter()
+			terminalOutputSwitch := terminal.NewTeePrinter()
+
+			runner = &fakeRunner.FakeNonCodegangstaRunner{}
+			rpcService, err = NewRpcService(nil, outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner)
+			Expect(err).ToNot(HaveOccurred())
+
+			err := rpcService.Start()
+			Expect(err).ToNot(HaveOccurred())
+
+			pingCli(rpcService.Port())
+		})
+
+		AfterEach(func() {
+			rpcService.Stop()
+
+			//give time for server to stop
+			time.Sleep(50 * time.Millisecond)
+		})
+
+		It("calls GetApps() ", func() {
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
+
+			result := []plugin_models.Application{}
+			err = client.Call("CliRpcCmd.GetApps", "", &result)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("apps"))
+			Expect(pluginApiCall).To(BeTrue())
+		})
 
 	})
 
