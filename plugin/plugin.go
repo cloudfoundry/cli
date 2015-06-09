@@ -33,6 +33,7 @@ type CliConnection interface {
 	AccessToken() (string, error)
 	GetApp(string) (plugin_models.Application, error)
 	GetApps() ([]plugin_models.ApplicationSummary, error)
+	GetOrgs() ([]plugin_models.Organization, error)
 }
 
 type VersionType struct {

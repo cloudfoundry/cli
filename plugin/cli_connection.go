@@ -301,3 +301,15 @@ func (cliConnection *cliConnection) GetApps() ([]plugin_models.ApplicationSummar
 	err = client.Call("CliRpcCmd.GetApps", "", &result)
 	return result, err
 }
+
+func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.Organization, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return []plugin_models.Organization{}, err
+	}
+
+	var result []plugin_models.Organization
+
+	err = client.Call("CliRpcCmd.GetOrgs", "", &result)
+	return result, err
+}
