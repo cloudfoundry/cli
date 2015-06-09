@@ -97,7 +97,11 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
 
 	if app.Command != "" {
-		cmd.manifest.StartupCommand(app.Name, app.Command)
+		cmd.manifest.StartCommand(app.Name, app.Command)
+	}
+
+	if app.BuildpackUrl != "" {
+		cmd.manifest.BuildpackUrl(app.Name, app.BuildpackUrl)
 	}
 
 	if len(app.Services) > 0 {
