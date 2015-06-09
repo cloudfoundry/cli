@@ -183,7 +183,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("ORGS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("orgs"),
+					presentNonCodegangstaCommand("orgs"),
 					presentCommand("org"),
 				}, {
 					presentCommand("create-org"),

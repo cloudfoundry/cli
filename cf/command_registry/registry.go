@@ -74,15 +74,15 @@ func (r *registry) CommandUsage(cmdName string) string {
 	output += "   " + cmd.MetaData().Name + " - " + cmd.MetaData().Description + "\n\n"
 
 	output += T("USAGE") + ":" + "\n"
-	output += "   " + cmd.MetaData().Usage + "\n\n"
+	output += "   " + cmd.MetaData().Usage + "\n"
 
 	if cmd.MetaData().ShortName != "" {
-		output += T("ALIAS") + ":" + "\n"
-		output += "   " + cmd.MetaData().ShortName + "\n\n"
+		output += "\n" + T("ALIAS") + ":" + "\n"
+		output += "   " + cmd.MetaData().ShortName + "\n"
 	}
 
 	if cmd.MetaData().Flags != nil {
-		output += T("OPTIONS") + ":" + "\n"
+		output += "\n" + T("OPTIONS") + ":" + "\n"
 
 		//find longest name length
 		l := 0
