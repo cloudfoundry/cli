@@ -1,5 +1,20 @@
 # Changes in v6.11.2
--Added GetCurrentOrg(), GetCurrentSpace(), Username(), UserEmail(), UserGuid(), HasOrganization(), HasSpace(), IsLoggedIn(), IsSSLDisabled(), ApiEndpoint(), HasAPIEndpoint(), ApiVersion(), LoggregatorEndpoint(), DopplerEndpoint(), and AccessToken() methods in cli_connection
+Added the following commands to cli_connection.go:
+  - GetCurrentOrg()  
+  - GetCurrentSpace()  
+  - Username()  
+  - UserEmail()  
+  - UserGuid()  
+  - HasOrganization()  
+  - HasSpace()  
+  - IsLoggedIn()  
+  - IsSSLDisabled()  
+  - ApiEndpoint()  
+  - HasAPIEndpoint()  
+  - ApiVersion()  
+  - LoggregatorEndpoint()  
+  - DopplerEndpoint()  
+  - AccessToken()  
 
 # Changes in v6.11.0
 -Plugins now have a hook-in that is called when the plugin is uninstalled, allowing cleanup of files.
