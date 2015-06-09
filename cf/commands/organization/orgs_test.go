@@ -2,7 +2,7 @@ package organization_test
 
 import (
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/commands/organization"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,13 +19,21 @@ var _ = Describe("org command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		orgRepo             *test_org.FakeOrganizationRepository
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("orgs").SetDependency(deps, pluginCall))
+	}
+
 	runCommand := func(args ...string) bool {
-		cmd := organization.NewListOrgs(ui, configRepo, orgRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		cmd := command_registry.Commands.FindCommand("orgs")
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	}
 
 	BeforeEach(func() {
@@ -33,6 +41,9 @@ var _ = Describe("org command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		orgRepo = &test_org.FakeOrganizationRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+
+		deps = command_registry.NewDependency()
+		updateCommandDependency(false)
 	})
 
 	Describe("requirements", func() {
@@ -44,7 +55,9 @@ var _ = Describe("org command", func() {
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument required"},
+			))
 		})
 
 	})
