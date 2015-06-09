@@ -18,30 +18,47 @@ func initI18nFunc() bool {
 }
 
 type registry struct {
-	cmd map[string]Command
+	cmd   map[string]Command
+	alias map[string]string
 }
 
 func NewRegistry() *registry {
 	return &registry{
-		cmd: make(map[string]Command),
+		cmd:   make(map[string]Command),
+		alias: make(map[string]string),
 	}
 }
 
 func Register(cmd Command) {
 	m := cmd.MetaData()
-	name := m.Name
-	Commands.cmd[name] = cmd
+	Commands.cmd[m.Name] = cmd
+
+	Commands.alias[m.ShortName] = m.Name
 }
 
 func (r *registry) FindCommand(name string) Command {
 	if _, ok := r.cmd[name]; ok {
 		return r.cmd[name]
 	}
+
+	if alias, exists := r.alias[name]; exists {
+		return r.cmd[alias]
+	}
+
 	return nil
 }
 
 func (r *registry) CommandExists(name string) bool {
-	_, ok := r.cmd[name]
+	var ok bool
+
+	if _, ok = r.cmd[name]; !ok {
+		alias, exists := r.alias[name]
+
+		if exists {
+			_, ok = r.cmd[alias]
+		}
+	}
+
 	return ok
 }
 

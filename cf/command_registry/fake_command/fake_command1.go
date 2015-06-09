@@ -24,6 +24,7 @@ func (cmd FakeCommand1) MetaData() command_registry.CommandMetadata {
 
 	return command_registry.CommandMetadata{
 		Name:        "fake-command",
+		ShortName:   "fc1",
 		Description: "Description for fake-command",
 		Usage:       "Usage of fake-command",
 		Flags:       fs,

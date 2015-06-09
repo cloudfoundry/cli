@@ -14,6 +14,7 @@ import (
 )
 
 var _ = Describe("CommandRegistry", func() {
+
 	Context("i18n", func() {
 		It("initialize i18n T() func", func() {
 			Ω(T).ToNot(BeNil())
@@ -21,12 +22,14 @@ var _ = Describe("CommandRegistry", func() {
 	})
 
 	Context("Register()", func() {
-		It("registers a command into the Command Registry map", func() {
+		It("registers a command and it's alias into the Command Registry map", func() {
 			Ω(Commands.CommandExists("fake-command2")).To(BeFalse())
+			Ω(Commands.CommandExists("fc2")).To(BeFalse())
 
 			Register(FakeCommand2{})
 
 			Ω(Commands.CommandExists("fake-command2")).To(BeTrue())
+			Ω(Commands.CommandExists("fc2")).To(BeTrue())
 		})
 	})
 
@@ -39,11 +42,21 @@ var _ = Describe("CommandRegistry", func() {
 			It("returns false if the command doesn't exists in the list", func() {
 				Ω(Commands.CommandExists("non-exist-cmd")).To(BeFalse())
 			})
+
+			It("returns true if the alias exists", func() {
+				Ω(Commands.CommandExists("fc1")).To(BeTrue())
+			})
 		})
 
 		Context("FindCommand()", func() {
 			It("returns the command interface when found", func() {
 				cmd := Commands.FindCommand("fake-command")
+				Ω(cmd.MetaData().Usage).To(Equal("Usage of fake-command"))
+				Ω(cmd.MetaData().Description).To(Equal("Description for fake-command"))
+			})
+
+			It("returns the command interface if an command alias is provided", func() {
+				cmd := Commands.FindCommand("fc1")
 				Ω(cmd.MetaData().Usage).To(Equal("Usage of fake-command"))
 				Ω(cmd.MetaData().Description).To(Equal("Description for fake-command"))
 			})
