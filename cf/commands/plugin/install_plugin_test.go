@@ -293,7 +293,7 @@ var _ = Describe("Install", func() {
 			})
 
 			Context("tries to locate binary file at local path if path has no internet prefix", func() {
-				It("reports error if local file is not found at given path", func() {
+				It("installs the plugin from a local file if found", func() {
 					runCommand("./install_plugin.go")
 
 					Expect(ui.Outputs).ToNot(ContainSubstrings(
@@ -304,11 +304,13 @@ var _ = Describe("Install", func() {
 					))
 				})
 
-				It("installs the plugin from a local file if found", func() {
+				It("reports error if local file is not found at given path", func() {
 					runCommand("./no/file/is/here.exe")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"File not found locally"},
+						[]string{"File not found locally",
+							"./no/file/is/here.exe",
+						},
 					))
 				})
 			})

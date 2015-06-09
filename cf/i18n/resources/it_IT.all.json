@@ -2280,9 +2280,9 @@
       "modified": false
    },
    {
-      "id": "File not found locally, make sure the file exists at given path ...",
-      "translation": "File not found locally, attempting to download binary file from internet ...",
-      "modified": true
+      "id": "File not found locally, make sure the file exists at given path {{.filepath}}",
+      "translation": "File not found locally, make sure the file exists at given path {{.filepath}}",
+      "modified": false
    },
    {
       "id": "Force delete (do not prompt for confirmation)",

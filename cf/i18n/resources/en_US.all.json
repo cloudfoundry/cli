@@ -2280,8 +2280,8 @@
       "modified": false
    },
    {
-      "id": "File not found locally, make sure the file exists at given path ...",
-      "translation": "File not found locally, make sure the file exists at given path ...",
+      "id": "File not found locally, make sure the file exists at given path {{.filepath}}",
+      "translation": "File not found locally, make sure the file exists at given path {{.filepath}}",
       "modified": false
    },
    {
