@@ -40,6 +40,7 @@ type FakeServiceRepo struct {
 		Name     string
 		PlanGuid string
 		Params   map[string]interface{}
+		Tags     []string
 	}
 	CreateServiceInstanceReturns struct {
 		Error error
@@ -49,6 +50,7 @@ type FakeServiceRepo struct {
 		InstanceGuid string
 		PlanGuid     string
 		Params       map[string]interface{}
+		Tags         []string
 	}
 
 	UpdateServiceInstanceReturnsErr bool
@@ -142,15 +144,16 @@ func (repo *FakeServiceRepo) FindServiceOfferingsByLabel(name string) (offerings
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string, params map[string]interface{}) (apiErr error) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string, params map[string]interface{}, tags []string) (apiErr error) {
 	repo.CreateServiceInstanceArgs.Name = name
 	repo.CreateServiceInstanceArgs.PlanGuid = planGuid
 	repo.CreateServiceInstanceArgs.Params = params
+	repo.CreateServiceInstanceArgs.Tags = tags
 
 	return repo.CreateServiceInstanceReturns.Error
 }
 
-func (repo *FakeServiceRepo) UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}) (apiErr error) {
+func (repo *FakeServiceRepo) UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}, tags []string) (apiErr error) {
 
 	if repo.UpdateServiceInstanceReturnsErr {
 		apiErr = errors.New("Error updating service instance")
@@ -158,6 +161,7 @@ func (repo *FakeServiceRepo) UpdateServiceInstance(instanceGuid, planGuid string
 		repo.UpdateServiceInstanceArgs.InstanceGuid = instanceGuid
 		repo.UpdateServiceInstanceArgs.PlanGuid = planGuid
 		repo.UpdateServiceInstanceArgs.Params = params
+		repo.UpdateServiceInstanceArgs.Tags = tags
 	}
 
 	return

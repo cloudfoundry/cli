@@ -77,18 +77,6 @@ var _ = Describe("update-service command", func() {
 	})
 
 	Context("when no flags are passed", func() {
-		Context("when there is an err finding the instance", func() {
-			It("returns an error", func() {
-				serviceRepo.FindInstanceByNameErr = true
-
-				callUpdateService([]string{"some-stupid-not-real-instance"})
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error finding instance"},
-					[]string{"FAILED"},
-				))
-			})
-		})
 
 		Context("when the instance exists", func() {
 			It("prints a user indicating it is a no-op", func() {
@@ -210,6 +198,40 @@ var _ = Describe("update-service command", func() {
 						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 					))
 				})
+			})
+		})
+	})
+
+	Context("when passing in tags", func() {
+		It("successfully updates a service and passes the tags as json", func() {
+			callUpdateService([]string{"-t", "tag1, tag2,tag3,  tag4", "my-service-instance"})
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Updating service instance", "my-service-instance"},
+				[]string{"OK"},
+			))
+			Expect(serviceRepo.UpdateServiceInstanceArgs.Tags).To(ConsistOf("tag1", "tag2", "tag3", "tag4"))
+		})
+
+		It("successfully updates a service and passes the tags as json", func() {
+			callUpdateService([]string{"-t", "tag1", "my-service-instance"})
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Updating service instance", "my-service-instance"},
+				[]string{"OK"},
+			))
+			Expect(serviceRepo.UpdateServiceInstanceArgs.Tags).To(ConsistOf("tag1"))
+		})
+
+		Context("and the tags string is passed with an empty string", func() {
+
+			It("accepts an empty array of tags but doesn't update service", func() {
+				callUpdateService([]string{"-t", "", "my-service-instance"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"OK"},
+					[]string{"No changes were made"},
+				))
 			})
 		})
 	})
