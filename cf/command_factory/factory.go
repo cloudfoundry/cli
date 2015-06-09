@@ -78,8 +78,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		serviceBuilder,
 	)
 
-	// factory.cmdsByName["api"] = commands.NewApi(ui, config, repoLocator.GetEndpointRepository())
-	factory.cmdsByName["apps"] = application.NewListApps(ui, config, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["auth"] = commands.NewAuthenticate(ui, config, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["buildpacks"] = buildpack.NewListBuildpacks(ui, repoLocator.GetBuildpackRepository())
 	factory.cmdsByName["config"] = commands.NewConfig(ui, config)
