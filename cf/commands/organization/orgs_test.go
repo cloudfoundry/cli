@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -59,7 +60,38 @@ var _ = Describe("org command", func() {
 				[]string{"Incorrect Usage", "No argument required"},
 			))
 		})
+	})
 
+	Describe("when invoked by a plugin", func() {
+		var (
+			pluginOrgsModel []plugin_models.Organization
+		)
+
+		BeforeEach(func() {
+			org1 := models.Organization{}
+			org1.Name = "Organization-1"
+			org1.Guid = "org-1-guid"
+
+			org2 := models.Organization{}
+			org2.Name = "Organization-2"
+
+			org3 := models.Organization{}
+			org3.Name = "Organization-3"
+
+			orgRepo.ListOrgsReturns([]models.Organization{org1, org2, org3}, nil)
+
+			pluginOrgsModel = []plugin_models.Organization{}
+			deps.PluginModels.Organizations = &pluginOrgsModel
+			updateCommandDependency(true)
+		})
+
+		It("populates the plugin models upon execution", func() {
+			runCommand()
+			Ω(pluginOrgsModel[0].Name).To(Equal("Organization-1"))
+			Ω(pluginOrgsModel[0].Guid).To(Equal("org-1-guid"))
+			Ω(pluginOrgsModel[1].Name).To(Equal("Organization-2"))
+			Ω(pluginOrgsModel[2].Name).To(Equal("Organization-3"))
+		})
 	})
 
 	Context("when there are orgs to be listed", func() {
