@@ -136,7 +136,7 @@ func (cmd *PluginInstall) Run(c *cli.Context) {
 			cmd.ui.Say(T("Attempting to download binary file from internet address..."))
 			pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
 		} else if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
-			cmd.ui.Failed(T("File not found locally, make sure the file exists at given path ..."))
+			cmd.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": pluginSourceFilepath}))
 		}
 
 	}
