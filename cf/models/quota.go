@@ -10,6 +10,17 @@ func NewQuotaFields(name string, memory int64, InstanceMemoryLimit int64, routes
 	return
 }
 
+type OrgUsageFields struct {
+	Routes   int   `json:"routes"`
+	Services int   `json:"services"`
+	Memory   int64 `json:"memory"`
+}
+
+type QuotaUsage struct {
+	QuotaFields
+	OrgUsage OrgUsageFields `json:"org_usage"`
+}
+
 type QuotaFields struct {
 	Guid                    string `json:"guid,omitempty"`
 	Name                    string `json:"name"`

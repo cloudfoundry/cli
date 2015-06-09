@@ -169,6 +169,66 @@ var _ = Describe("Organization Repository", func() {
 		})
 	})
 
+	Describe("get organization quota usage", func() {
+		It("returns the quota usage with quota limits", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations/my-org-guid/quota_usage",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+	  "metadata": { "guid": "my-quota-guid" },
+	  "entity": {
+			"name": "default",
+      		"non_basic_services_allowed": true,
+      		"total_services": 100,
+      		"total_routes": 1000,
+      		"memory_limit": 10240,
+      		"trial_db_allowed": false,
+      		"instance_memory_limit": -1,
+      		"org_usage": {
+         		"routes": 6,
+         		"services": 6,
+        		"memory": 1280
+      		}
+   		}
+	}`},
+			})
+
+			testserver, handler, repo := createOrganizationRepo(req)
+			defer testserver.Close()
+			existingQuota := models.QuotaFields{}
+			existingQuota.Guid = "my-quota-guid"
+			existingQuota.Name = "default"
+
+			quotaUsage, apiErr := repo.GetOrganizationQuotaUsage("my-org-guid")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+
+			Expect(quotaUsage.Name).To(Equal(existingQuota.Name))
+			Expect(quotaUsage.InstanceMemoryLimit).To(Equal(int64(-1)))
+			Expect(quotaUsage.MemoryLimit).To(Equal(int64(10240)))
+			Expect(quotaUsage.RoutesLimit).To(Equal(1000))
+			Expect(quotaUsage.ServicesLimit).To(Equal(100))
+			Expect(quotaUsage.OrgUsage.Services).To(Equal(6))
+			Expect(quotaUsage.OrgUsage.Routes).To(Equal(6))
+			Expect(quotaUsage.OrgUsage.Memory).To(Equal(int64(1280)))
+		})
+
+		It("returns an api error when the response is not successful", func() {
+			requestHandler := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/organizations/my-org-guid/quota_usage",
+				Response: testnet.TestResponse{Status: http.StatusBadGateway, Body: `{"resources": []}`},
+			})
+
+			testserver, handler, repo := createOrganizationRepo(requestHandler)
+			defer testserver.Close()
+
+			_, apiErr := repo.GetOrganizationQuotaUsage("my-org-guid")
+			Expect(apiErr).To(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+		})
+	})
+
 	Describe(".Create", func() {
 		It("creates the org and sends only the org name if the quota flag is not provided", func() {
 			org := models.Organization{
