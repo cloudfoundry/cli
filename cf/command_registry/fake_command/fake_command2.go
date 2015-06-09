@@ -13,6 +13,7 @@ type FakeCommand2 struct {
 func (cmd FakeCommand2) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "fake-command2",
+		ShortName:   "fc2",
 		Description: "Description for fake-command2",
 		Usage:       "Usage of fake-command2",
 	}
