@@ -5,44 +5,19 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 type ListOrgs struct {
-	ui      terminal.UI
-	config  core_config.Reader
-	orgRepo organizations.OrganizationRepository
-}
-
-func (cmd ListOrgs) Execute(fc flags.FlagContext) {
-	cmd.ui.Say(T("Getting orgs as {{.Username}}...\n",
-		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
-
-	noOrgs := true
-	table := cmd.ui.Table([]string{T("name")})
-
-	orgs, apiErr := cmd.orgRepo.ListOrgs()
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-	}
-	for _, org := range orgs {
-		table.Add(org.Name)
-		noOrgs = false
-	}
-
-	table.Print()
-
-	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching orgs.\n{{.ApiErr}}",
-			map[string]interface{}{"ApiErr": apiErr}))
-		return
-	}
-
-	if noOrgs {
-		cmd.ui.Say(T("No orgs found"))
-	}
+	ui              terminal.UI
+	config          core_config.Reader
+	orgRepo         organizations.OrganizationRepository
+	pluginOrgsModel *[]plugin_models.Organization
+	pluginCall      bool
 }
 
 func init() {
@@ -73,5 +48,50 @@ func (cmd *ListOrgs) SetDependency(deps command_registry.Dependency, pluginCall 
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
+	cmd.pluginOrgsModel = deps.PluginModels.Organizations
+	cmd.pluginCall = pluginCall
 	return cmd
+}
+
+func (cmd ListOrgs) Execute(fc flags.FlagContext) {
+	cmd.ui.Say(T("Getting orgs as {{.Username}}...\n",
+		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
+
+	noOrgs := true
+	table := cmd.ui.Table([]string{T("name")})
+
+	orgs, apiErr := cmd.orgRepo.ListOrgs()
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
+	}
+	for _, org := range orgs {
+		table.Add(org.Name)
+		noOrgs = false
+	}
+
+	table.Print()
+
+	if apiErr != nil {
+		cmd.ui.Failed(T("Failed fetching orgs.\n{{.ApiErr}}",
+			map[string]interface{}{"ApiErr": apiErr}))
+		return
+	}
+
+	if noOrgs {
+		cmd.ui.Say(T("No orgs found"))
+	}
+
+	if cmd.pluginCall {
+		cmd.populatePluginModel(orgs)
+	}
+
+}
+
+func (cmd *ListOrgs) populatePluginModel(orgs []models.Organization) {
+	for _, org := range orgs {
+		orgModel := plugin_models.Organization{}
+		orgModel.Name = org.Name
+		orgModel.Guid = org.Guid
+		*(cmd.pluginOrgsModel) = append(*(cmd.pluginOrgsModel), orgModel)
+	}
 }

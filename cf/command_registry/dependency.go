@@ -30,8 +30,9 @@ type Dependency struct {
 }
 
 type pluginModels struct {
-	Application *plugin_models.Application
-	AppsSummary *[]plugin_models.ApplicationSummary
+	Application   *plugin_models.Application
+	AppsSummary   *[]plugin_models.ApplicationSummary
+	Organizations *[]plugin_models.Organization
 }
 
 func NewDependency() Dependency {
