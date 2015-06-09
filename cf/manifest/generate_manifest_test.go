@@ -87,12 +87,13 @@ var _ = Describe("generate_manifest", func() {
 
 	It("generates a manifest containing all the attributes", func() {
 		m.Memory("app1", 128)
-		m.StartupCommand("app1", "run main.go")
+		m.StartCommand("app1", "run main.go")
 		m.Service("app1", "service1")
 		m.EnvironmentVars("app1", "foo", "boo")
 		m.HealthCheckTimeout("app1", 100)
 		m.Instances("app1", 3)
 		m.Domain("app1", "foo", "blahblahblah.com")
+		m.BuildpackUrl("app1", "ruby-buildpack")
 		err := m.Save()
 		Ω(err).NotTo(HaveOccurred())
 
@@ -108,6 +109,7 @@ var _ = Describe("generate_manifest", func() {
 			[]string{"  instances: 3"},
 			[]string{"  host: foo"},
 			[]string{"  domain: blahblahblah.com"},
+			[]string{"  buildpack: ruby-buildpack"},
 		))
 	})
 

@@ -108,7 +108,20 @@ var _ = Describe("create-app-manifest Command", func() {
 				Ω(fakeManifest.InstancesCallCount()).To(Equal(1))
 				Ω(fakeManifest.DomainCallCount()).To(Equal(1))
 				Ω(fakeManifest.ServiceCallCount()).To(Equal(1))
-				Ω(fakeManifest.StartupCommandCallCount()).To(Equal(1))
+				Ω(fakeManifest.StartCommandCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("app with buildpack", func() {
+			BeforeEach(func() {
+				app := makeAppWithOptions("my-app")
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+			})
+
+			It("creates a manifest with a buildpack", func() {
+				runCommand("my-app")
+				Ω(fakeManifest.BuildpackUrlCallCount()).To(Equal(1))
 			})
 		})
 
@@ -207,6 +220,7 @@ func makeAppWithOptions(appName string) models.Application {
 	application.Name = appName
 	application.Guid = "app-guid"
 	application.Command = "run main.go"
+	application.BuildpackUrl = "go-buildpack"
 
 	domain := models.DomainFields{}
 	domain.Name = "example.com"

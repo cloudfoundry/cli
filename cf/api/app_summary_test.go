@@ -55,6 +55,7 @@ var _ = Describe("AppSummaryRepository", func() {
 		app1 := apps[0]
 		Expect(app1.Name).To(Equal("app1"))
 		Expect(app1.Guid).To(Equal("app-1-guid"))
+		Expect(app1.BuildpackUrl).To(Equal("go_buildpack"))
 		Expect(len(app1.Routes)).To(Equal(1))
 		Expect(app1.Routes[0].URL()).To(Equal("app1.cfapps.io"))
 
@@ -101,6 +102,7 @@ const getAppSummariesResponseBody string = `
       "name":"app1",
       "memory":128,
       "instances":1,
+			"buildpack":"go_buildpack",
       "state":"STARTED",
       "service_names":[
       	"my-service-instance"
@@ -149,7 +151,7 @@ const getAppSummariesResponseBody string = `
       ],
       "running_instances":1,
       "name":"app-with-null-updated-at",
-      "memory":512,
+			"memory":512,
       "instances":3,
       "state":"STARTED",
       "service_names":[

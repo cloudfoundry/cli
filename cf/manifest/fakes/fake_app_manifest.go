@@ -9,6 +9,12 @@ import (
 )
 
 type FakeAppManifest struct {
+	BuildpackUrlStub        func(string, string)
+	buildpackUrlMutex       sync.RWMutex
+	buildpackUrlArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
 	MemoryStub        func(string, int64)
 	memoryMutex       sync.RWMutex
 	memoryArgsForCall []struct {
@@ -21,9 +27,9 @@ type FakeAppManifest struct {
 		arg1 string
 		arg2 string
 	}
-	StartupCommandStub        func(string, string)
-	startupCommandMutex       sync.RWMutex
-	startupCommandArgsForCall []struct {
+	StartCommandStub        func(string, string)
+	startCommandMutex       sync.RWMutex
+	startCommandArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
@@ -72,13 +78,37 @@ type FakeAppManifest struct {
 	}
 }
 
+func (fake *FakeAppManifest) BuildpackUrl(arg1 string, arg2 string) {
+	fake.buildpackUrlMutex.Lock()
+	fake.buildpackUrlArgsForCall = append(fake.buildpackUrlArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.buildpackUrlMutex.Unlock()
+	if fake.BuildpackUrlStub != nil {
+		fake.BuildpackUrlStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeAppManifest) BuildpackUrlCallCount() int {
+	fake.buildpackUrlMutex.RLock()
+	defer fake.buildpackUrlMutex.RUnlock()
+	return len(fake.buildpackUrlArgsForCall)
+}
+
+func (fake *FakeAppManifest) BuildpackUrlArgsForCall(i int) (string, string) {
+	fake.buildpackUrlMutex.RLock()
+	defer fake.buildpackUrlMutex.RUnlock()
+	return fake.buildpackUrlArgsForCall[i].arg1, fake.buildpackUrlArgsForCall[i].arg2
+}
+
 func (fake *FakeAppManifest) Memory(arg1 string, arg2 int64) {
 	fake.memoryMutex.Lock()
-	defer fake.memoryMutex.Unlock()
 	fake.memoryArgsForCall = append(fake.memoryArgsForCall, struct {
 		arg1 string
 		arg2 int64
 	}{arg1, arg2})
+	fake.memoryMutex.Unlock()
 	if fake.MemoryStub != nil {
 		fake.MemoryStub(arg1, arg2)
 	}
@@ -98,11 +128,11 @@ func (fake *FakeAppManifest) MemoryArgsForCall(i int) (string, int64) {
 
 func (fake *FakeAppManifest) Service(arg1 string, arg2 string) {
 	fake.serviceMutex.Lock()
-	defer fake.serviceMutex.Unlock()
 	fake.serviceArgsForCall = append(fake.serviceArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.serviceMutex.Unlock()
 	if fake.ServiceStub != nil {
 		fake.ServiceStub(arg1, arg2)
 	}
@@ -120,38 +150,38 @@ func (fake *FakeAppManifest) ServiceArgsForCall(i int) (string, string) {
 	return fake.serviceArgsForCall[i].arg1, fake.serviceArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) StartupCommand(arg1 string, arg2 string) {
-	fake.startupCommandMutex.Lock()
-	defer fake.startupCommandMutex.Unlock()
-	fake.startupCommandArgsForCall = append(fake.startupCommandArgsForCall, struct {
+func (fake *FakeAppManifest) StartCommand(arg1 string, arg2 string) {
+	fake.startCommandMutex.Lock()
+	fake.startCommandArgsForCall = append(fake.startCommandArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	if fake.StartupCommandStub != nil {
-		fake.StartupCommandStub(arg1, arg2)
+	fake.startCommandMutex.Unlock()
+	if fake.StartCommandStub != nil {
+		fake.StartCommandStub(arg1, arg2)
 	}
 }
 
-func (fake *FakeAppManifest) StartupCommandCallCount() int {
-	fake.startupCommandMutex.RLock()
-	defer fake.startupCommandMutex.RUnlock()
-	return len(fake.startupCommandArgsForCall)
+func (fake *FakeAppManifest) StartCommandCallCount() int {
+	fake.startCommandMutex.RLock()
+	defer fake.startCommandMutex.RUnlock()
+	return len(fake.startCommandArgsForCall)
 }
 
-func (fake *FakeAppManifest) StartupCommandArgsForCall(i int) (string, string) {
-	fake.startupCommandMutex.RLock()
-	defer fake.startupCommandMutex.RUnlock()
-	return fake.startupCommandArgsForCall[i].arg1, fake.startupCommandArgsForCall[i].arg2
+func (fake *FakeAppManifest) StartCommandArgsForCall(i int) (string, string) {
+	fake.startCommandMutex.RLock()
+	defer fake.startCommandMutex.RUnlock()
+	return fake.startCommandArgsForCall[i].arg1, fake.startCommandArgsForCall[i].arg2
 }
 
 func (fake *FakeAppManifest) EnvironmentVars(arg1 string, arg2 string, arg3 string) {
 	fake.environmentVarsMutex.Lock()
-	defer fake.environmentVarsMutex.Unlock()
 	fake.environmentVarsArgsForCall = append(fake.environmentVarsArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	fake.environmentVarsMutex.Unlock()
 	if fake.EnvironmentVarsStub != nil {
 		fake.EnvironmentVarsStub(arg1, arg2, arg3)
 	}
@@ -171,11 +201,11 @@ func (fake *FakeAppManifest) EnvironmentVarsArgsForCall(i int) (string, string, 
 
 func (fake *FakeAppManifest) HealthCheckTimeout(arg1 string, arg2 int) {
 	fake.healthCheckTimeoutMutex.Lock()
-	defer fake.healthCheckTimeoutMutex.Unlock()
 	fake.healthCheckTimeoutArgsForCall = append(fake.healthCheckTimeoutArgsForCall, struct {
 		arg1 string
 		arg2 int
 	}{arg1, arg2})
+	fake.healthCheckTimeoutMutex.Unlock()
 	if fake.HealthCheckTimeoutStub != nil {
 		fake.HealthCheckTimeoutStub(arg1, arg2)
 	}
@@ -195,11 +225,11 @@ func (fake *FakeAppManifest) HealthCheckTimeoutArgsForCall(i int) (string, int) 
 
 func (fake *FakeAppManifest) Instances(arg1 string, arg2 int) {
 	fake.instancesMutex.Lock()
-	defer fake.instancesMutex.Unlock()
 	fake.instancesArgsForCall = append(fake.instancesArgsForCall, struct {
 		arg1 string
 		arg2 int
 	}{arg1, arg2})
+	fake.instancesMutex.Unlock()
 	if fake.InstancesStub != nil {
 		fake.InstancesStub(arg1, arg2)
 	}
@@ -219,12 +249,12 @@ func (fake *FakeAppManifest) InstancesArgsForCall(i int) (string, int) {
 
 func (fake *FakeAppManifest) Domain(arg1 string, arg2 string, arg3 string) {
 	fake.domainMutex.Lock()
-	defer fake.domainMutex.Unlock()
 	fake.domainArgsForCall = append(fake.domainArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	fake.domainMutex.Unlock()
 	if fake.DomainStub != nil {
 		fake.DomainStub(arg1, arg2, arg3)
 	}
@@ -244,8 +274,8 @@ func (fake *FakeAppManifest) DomainArgsForCall(i int) (string, string, string) {
 
 func (fake *FakeAppManifest) GetContents() []models.Application {
 	fake.getContentsMutex.Lock()
-	defer fake.getContentsMutex.Unlock()
 	fake.getContentsArgsForCall = append(fake.getContentsArgsForCall, struct{}{})
+	fake.getContentsMutex.Unlock()
 	if fake.GetContentsStub != nil {
 		return fake.GetContentsStub()
 	} else {
@@ -268,10 +298,10 @@ func (fake *FakeAppManifest) GetContentsReturns(result1 []models.Application) {
 
 func (fake *FakeAppManifest) FileSavePath(arg1 string) {
 	fake.fileSavePathMutex.Lock()
-	defer fake.fileSavePathMutex.Unlock()
 	fake.fileSavePathArgsForCall = append(fake.fileSavePathArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.fileSavePathMutex.Unlock()
 	if fake.FileSavePathStub != nil {
 		fake.FileSavePathStub(arg1)
 	}
@@ -291,8 +321,8 @@ func (fake *FakeAppManifest) FileSavePathArgsForCall(i int) string {
 
 func (fake *FakeAppManifest) Save() error {
 	fake.saveMutex.Lock()
-	defer fake.saveMutex.Unlock()
 	fake.saveArgsForCall = append(fake.saveArgsForCall, struct{}{})
+	fake.saveMutex.Unlock()
 	if fake.SaveStub != nil {
 		return fake.SaveStub()
 	} else {
