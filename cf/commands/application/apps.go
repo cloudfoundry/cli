@@ -5,7 +5,9 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -19,6 +21,9 @@ type ListApps struct {
 	ui             terminal.UI
 	config         core_config.Reader
 	appSummaryRepo api.AppSummaryRepository
+
+	pluginAppModels *[]plugin_models.ApplicationSummary
+	pluginCall      bool
 }
 
 func init() {
@@ -50,6 +55,8 @@ func (cmd *ListApps) SetDependency(deps command_registry.Dependency, pluginCall 
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
+	cmd.pluginAppModels = deps.PluginModels.AppsSummary
+	cmd.pluginCall = pluginCall
 	return cmd
 }
 
@@ -94,4 +101,35 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 	}
 
 	table.Print()
+
+	if cmd.pluginCall {
+		cmd.populatePluginModel(apps)
+	}
+}
+
+func (cmd *ListApps) populatePluginModel(apps []models.Application) {
+	for _, app := range apps {
+		appModel := plugin_models.ApplicationSummary{}
+		appModel.Name = app.Name
+		appModel.TotalInstances = app.InstanceCount
+		appModel.RunningInstances = app.RunningInstances
+		appModel.Memory = app.Memory
+		appModel.State = app.State
+		appModel.DiskQuota = app.DiskQuota
+
+		*(cmd.pluginAppModels) = append(*(cmd.pluginAppModels), appModel)
+
+		for _, route := range app.Routes {
+			r := plugin_models.RouteSummary{}
+			r.Host = route.Host
+			r.Guid = route.Guid
+			r.Domain.Guid = route.Domain.Guid
+			r.Domain.Name = route.Domain.Name
+			r.Domain.OwningOrganizationGuid = route.Domain.OwningOrganizationGuid
+			r.Domain.Shared = route.Domain.Shared
+
+			(*(cmd.pluginAppModels))[len(*(cmd.pluginAppModels))-1].Routes = append((*(cmd.pluginAppModels))[len(*(cmd.pluginAppModels))-1].Routes, r)
+		}
+
+	}
 }

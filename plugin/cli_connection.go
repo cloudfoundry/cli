@@ -289,3 +289,15 @@ func (cliConnection *cliConnection) GetApp(appName string) (plugin_models.Applic
 	err = client.Call("CliRpcCmd.GetApp", appName, &result)
 	return result, err
 }
+
+func (cliConnection *cliConnection) GetApps() ([]plugin_models.ApplicationSummary, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return []plugin_models.ApplicationSummary{}, err
+	}
+
+	var result []plugin_models.ApplicationSummary
+
+	err = client.Call("CliRpcCmd.GetApps", "", &result)
+	return result, err
+}
