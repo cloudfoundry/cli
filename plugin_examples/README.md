@@ -1,5 +1,20 @@
-# Changes in v6.11.0
--Plugins now have a hook-in that is called when the plugin is uninstalled, allowing cleanup of files.
+# Changes in v6.11.2
+Added the following commands to cli_connection.go:
+  - GetCurrentOrg()  
+  - GetCurrentSpace()  
+  - Username()  
+  - UserEmail()  
+  - UserGuid()  
+  - HasOrganization()  
+  - HasSpace()  
+  - IsLoggedIn()  
+  - IsSSLDisabled()  
+  - ApiEndpoint()  
+  - HasAPIEndpoint()  
+  - ApiVersion()  
+  - LoggregatorEndpoint()  
+  - DopplerEndpoint()  
+  - AccessToken()  
 
 [Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md) 
 
