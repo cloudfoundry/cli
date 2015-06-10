@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -32,42 +34,43 @@ func NewCreateService(ui terminal.UI, config core_config.Reader, serviceRepo api
 }
 
 func (cmd CreateService) Metadata() command_metadata.CommandMetadata {
+	baseUsage := T("CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]")
+	paramsUsage := T(`   Optionally provide service-specific configuration parameters in a valid JSON object in-line:
+
+   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+
+   Optionally provide a file containing service-specific configuration parameters in a valid JSON object.
+   The path to the parameters file can be an absolute or relative path to a file:
+
+   CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE
+
+   Example of valid JSON object:
+   {
+      "cluster_nodes": {
+         "count": 5,
+         "memory_mb": 1024
+      }
+   }`)
+	exampleUsage := T(`EXAMPLE:
+   Linux/Mac:
+      CF_NAME create-service db-service silver -c '{"ram_gb":4}'
+
+   Windows Command Line:
+      CF_NAME create-service db-service silver -c "{\"ram_gb\":4}"
+
+   Windows PowerShell:
+      CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'
+
+   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json
+
+   CF_NAME create-service dbaas silver mydb -t "list, of, tags"`)
+	tipsUsage := T(`TIP:
+   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`)
 	return command_metadata.CommandMetadata{
 		Name:        "create-service",
 		ShortName:   "cs",
 		Description: T("Create a service instance"),
-		Usage: T(`CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]
-
-  Optionally provide service-specific configuration parameters in a valid JSON object in-line:
-  CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
-
-  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
-  CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE
-
-	Example of valid JSON object:
-  {
-    "cluster_nodes": {
-      "count": 5,
-      "memory_mb": 1024
-    }
-  }
-
-EXAMPLE:
-	Linux/Mac:
-		CF_NAME create-service db-service silver -c '{"ram_gb":4}'
-
-	Windows Command Line
-		CF_NAME create-service db-service silver -c "{\"ram_gb\":4}"
-
-	Windows PowerShell
-		CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'
-
-	CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json
-
-	CF_NAME create-service dbaas silver mydb -t "list, of, tags"
-
-TIP:
-   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`),
+		Usage:       strings.Join([]string{baseUsage, paramsUsage, exampleUsage, tipsUsage}, "\n\n"),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
 			flag_helpers.NewStringFlag("t", T("User provided tags")),
