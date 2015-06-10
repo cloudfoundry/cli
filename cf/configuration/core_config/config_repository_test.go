@@ -51,6 +51,11 @@ var _ = Describe("Configuration Repository", func() {
 		time.Sleep(10 * time.Millisecond)
 	})
 
+	It("returns nil repository if no error handler provided", func() {
+		config = NewRepositoryFromFilepath("this/shouldnt/matter", nil)
+		Expect(config).To(BeNil())
+	})
+
 	// TODO - test ClearTokens et al
 	It("has acccessor methods for all config fields", func() {
 		config.SetApiEndpoint("http://api.the-endpoint")

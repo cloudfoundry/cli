@@ -17,6 +17,9 @@ type ConfigRepository struct {
 }
 
 func NewRepositoryFromFilepath(filepath string, errorHandler func(error)) Repository {
+	if errorHandler == nil {
+		return nil
+	}
 	return NewRepositoryFromPersistor(configuration.NewDiskPersistor(filepath), errorHandler)
 }
 
