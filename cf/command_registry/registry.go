@@ -1,19 +1,29 @@
 package command_registry
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/i18n/detection"
+	. "github.com/cloudfoundry/cli/cf/terminal"
 )
 
 var _ = initI18nFunc()
 var Commands = NewRegistry()
 
 func initI18nFunc() bool {
-	T = Init(core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), nil), &detection.JibberJabberDetector{})
+	errorHandler := func(err error) {
+		if err != nil {
+			fmt.Println(FailureColor("FAILED"))
+			fmt.Println("Error read/writing config: ", err.Error())
+			os.Exit(1)
+		}
+	}
+	T = Init(core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler), &detection.JibberJabberDetector{})
 	return true
 }
 

@@ -87,7 +87,7 @@ func main() {
 	cmdFactory := command_factory.NewFactory(deps.Ui, deps.Config, deps.ManifestRepo, deps.RepoLocator, deps.PluginConfig, rpcService)
 	requirementsFactory := requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator)
 	cmdRunner := command_runner.NewRunner(cmdFactory, requirementsFactory, deps.Ui)
-	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { panic(err) })
+	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error())) })
 	pluginList := pluginsConfig.Plugins()
 
 	var badFlags string
