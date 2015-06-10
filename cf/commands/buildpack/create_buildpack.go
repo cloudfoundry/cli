@@ -95,7 +95,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiErr error) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
-		apiErr = errors.NewWithFmt(T("Invalid position. {{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err.Error()}))
+		apiErr = errors.NewWithFmt(T("Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.", map[string]interface{}{"ErrorDescription": c.Args()[2]}))
 		return
 	}
 
