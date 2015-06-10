@@ -2,8 +2,9 @@
 ChangesEnvironment=yes
 AppName=Cloud Foundry CLI
 AppVersion=VERSION
-AppVerName=VERSION
+AppVerName=Cloud Foundry CLI version VERSION
 DefaultDirName={pf}\CloudFoundry
+AppPublisher=Cloud Foundry Foundation
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; Check: NeedsAddPath(ExpandConstant('{app}'))
