@@ -2730,8 +2730,8 @@
       "modified": false
    },
    {
-      "id": "Invalid position. {{.ErrorDescription}}",
-      "translation": "Posicion invalida. {{.ErrorDescription}}",
+      "id": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
+      "translation": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
       "modified": false
    },
    {
