@@ -212,9 +212,17 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 	cmd.ui.Say("%s %s", terminal.HeaderColor(T("last uploaded:")), lastUpdated)
 	if app.Stack != nil {
-		cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("stack:")), app.Stack.Name)
+		cmd.ui.Say("%s %s", terminal.HeaderColor(T("stack:")), app.Stack.Name)
 	} else {
-		cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("stack:")), "unknown")
+		cmd.ui.Say("%s %s", terminal.HeaderColor(T("stack:")), "unknown")
+	}
+
+	if app.Buildpack != "" {
+		cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("buildpack:")), app.Buildpack)
+	} else if app.DetectedBuildpack != "" {
+		cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("buildpack:")), app.DetectedBuildpack)
+	} else {
+		cmd.ui.Say("%s %s\n", terminal.HeaderColor(T("buildpack:")), "unknown")
 	}
 
 	if appIsStopped {

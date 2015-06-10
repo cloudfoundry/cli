@@ -223,6 +223,57 @@ var _ = Describe("app Command", func() {
 			})
 		})
 
+		Context("Displaying buildpack info", func() {
+			It("Shows 'Buildpack' when buildpack is set", func() {
+				app.Diego = false
+				app.Buildpack = "go_buildpack"
+				app.DetectedBuildpack = "should_not_display"
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+
+				updateCommandDependency(false)
+				runCommand("my-app")
+
+				Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"buildpack", "go_buildpack"},
+				))
+			})
+
+			It("Shows 'DetectedBuildpack' when detected buildpack is set and 'Buildpack' is not set", func() {
+				app.Diego = false
+				app.DetectedBuildpack = "go_buildpack"
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+
+				updateCommandDependency(false)
+				runCommand("my-app")
+
+				Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"buildpack", "go_buildpack"},
+				))
+			})
+
+			It("Shows 'Unknown' when there is no buildpack set", func() {
+				app.Diego = false
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+
+				updateCommandDependency(false)
+				runCommand("my-app")
+
+				Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"buildpack", "unknown"},
+				))
+			})
+
+		})
+
 		It("displays a summary of the app", func() {
 			app.Diego = false
 			appSummaryRepo.GetSummarySummary = app

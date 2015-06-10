@@ -4765,6 +4765,11 @@
       "modified": false
    },
    {
+      "id": "buildpack:",
+      "translation": "buildpack:",
+      "modified": false
+   },
+   {
       "id": "bytes downloaded",
       "translation": "bytes downloaded",
       "modified": false

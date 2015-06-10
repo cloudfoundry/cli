@@ -62,6 +62,8 @@ type ApplicationFields struct {
 	PackageUpdatedAt     *time.Time
 	PackageState         string
 	StagingFailedReason  string
+	Buildpack            string
+	DetectedBuildpack    string
 }
 
 type AppParams struct {
