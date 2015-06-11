@@ -49,6 +49,8 @@ Downloads
 | [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&source=github)
 
 
+**Arch Linux:** Available on the [AUR](https://aur.archlinux.org/packages/cloudfoundry-cli/).
+
 **Experimental:** Install CF for OSX through [Homebrew](http://brew.sh/) via the [pivotal's homebrew-tap](https://github.com/pivotal/homebrew-tap):
 
 ```
