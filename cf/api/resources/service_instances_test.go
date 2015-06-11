@@ -2,6 +2,7 @@ package resources_test
 
 import (
 	"encoding/json"
+	"fmt"
 
 	. "github.com/cloudfoundry/cli/cf/api/resources"
 
@@ -36,7 +37,9 @@ var _ = Describe("ServiceInstanceResource", func() {
         "last_operation": {
           "type": "create",
           "state": "in progress",
-          "description": "fake state description"
+          "description": "fake state description",
+          "created_at": "fake created at",
+          "updated_at": "fake updated at"
         },
         "service_plan": {
           "metadata": {
@@ -115,6 +118,56 @@ var _ = Describe("ServiceInstanceResource", func() {
 	})
 
 	Context("Async brokers", func() {
+		var instanceString string
+
+		BeforeEach(func() {
+			instanceString = `
+						{
+							%s,
+							"entity": {
+								"name": "fake service name",
+								"credentials": {
+								},
+								"service_plan_guid": "fake-service-plan-guid",
+								"space_guid": "fake-space-guid",
+								"gateway_data": null,
+								"dashboard_url": "https://fake/dashboard/url",
+								"type": "managed_service_instance",
+								"space_url": "/v2/spaces/fake-space-guid",
+								"service_plan_url": "/v2/service_plans/fake-service-plan-guid",
+								"service_bindings_url": "/v2/service_instances/fake-guid/service_bindings",
+								"last_operation": {
+									"type": "create",
+									"state": "in progress",
+									"description": "fake state description",
+									"updated_at": "fake updated at"
+								},
+								"service_plan": {
+									"metadata": {
+										"guid": "fake-service-plan-guid"
+									},
+									"entity": {
+										"name": "fake-service-plan-name",
+										"free": true,
+										"description": "fake-description",
+										"public": true,
+										"active": true,
+										"service_guid": "fake-service-guid"
+									}
+								},
+								"service_bindings": [{
+									"metadata": {
+										"guid": "fake-service-binding-guid",
+										"url": "http://fake/url"
+									},
+									"entity": {
+										"app_guid": "fake-app-guid"
+									}
+								}]
+							}
+						}`
+		})
+
 		Describe("#ToFields", func() {
 			It("unmarshalls the fields of a service instance resource", func() {
 				fields := resource.ToFields()
@@ -125,6 +178,40 @@ var _ = Describe("ServiceInstanceResource", func() {
 				Expect(fields.LastOperation.Type).To(Equal("create"))
 				Expect(fields.LastOperation.State).To(Equal("in progress"))
 				Expect(fields.LastOperation.Description).To(Equal("fake state description"))
+				Expect(fields.LastOperation.CreatedAt).To(Equal("fake created at"))
+				Expect(fields.LastOperation.UpdatedAt).To(Equal("fake updated at"))
+			})
+
+			Context("When created_at is null", func() {
+				It("unmarshalls the service instance resource model", func() {
+					var resourceWithNullCreatedAt ServiceInstanceResource
+					metadata := `"metadata": {
+								"guid": "fake-guid",
+								"url": "/v2/service_instances/fake-guid",
+								"created_at": null,
+								"updated_at": "2015-01-13T18:52:08+00:00"
+							}`
+					stringWithNullCreatedAt := fmt.Sprintf(instanceString, metadata)
+
+					err := json.Unmarshal([]byte(stringWithNullCreatedAt), &resourceWithNullCreatedAt)
+					Expect(err).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("When created_at is missing", func() {
+				It("unmarshalls the service instance resource model", func() {
+					var resourceWithMissingCreatedAt ServiceInstanceResource
+
+					metadata := `"metadata": {
+								"guid": "fake-guid",
+								"url": "/v2/service_instances/fake-guid",
+								"updated_at": "2015-01-13T18:52:08+00:00"
+							}`
+					stringWithMissingCreatedAt := fmt.Sprintf(instanceString, metadata)
+
+					err := json.Unmarshal([]byte(stringWithMissingCreatedAt), &resourceWithMissingCreatedAt)
+					Expect(err).ToNot(HaveOccurred())
+				})
 			})
 		})
 
@@ -138,6 +225,8 @@ var _ = Describe("ServiceInstanceResource", func() {
 				Expect(instance.ServiceInstanceFields.LastOperation.Type).To(Equal("create"))
 				Expect(instance.ServiceInstanceFields.LastOperation.State).To(Equal("in progress"))
 				Expect(instance.ServiceInstanceFields.LastOperation.Description).To(Equal("fake state description"))
+				Expect(instance.ServiceInstanceFields.LastOperation.CreatedAt).To(Equal("fake created at"))
+				Expect(instance.ServiceInstanceFields.LastOperation.UpdatedAt).To(Equal("fake updated at"))
 
 				Expect(instance.ServicePlan.Guid).To(Equal("fake-service-plan-guid"))
 				Expect(instance.ServicePlan.Free).To(BeTrue())

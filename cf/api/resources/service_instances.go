@@ -16,6 +16,8 @@ type LastOperation struct {
 	Type        string `json:"type"`
 	State       string `json:"state"`
 	Description string `json:"description"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
 }
 
 type ServiceInstanceEntity struct {
@@ -36,6 +38,8 @@ func (resource ServiceInstanceResource) ToFields() models.ServiceInstanceFields 
 			Type:        resource.Entity.LastOperation.Type,
 			State:       resource.Entity.LastOperation.State,
 			Description: resource.Entity.LastOperation.Description,
+			CreatedAt:   resource.Entity.LastOperation.CreatedAt,
+			UpdatedAt:   resource.Entity.LastOperation.UpdatedAt,
 		},
 	}
 }

@@ -70,6 +70,8 @@ var _ = Describe("service command", func() {
 				serviceInstance.ServiceOffering = offering
 				serviceInstance.DashboardUrl = "some-url"
 				serviceInstance.LastOperation.State = state
+				serviceInstance.LastOperation.CreatedAt = "created-date"
+				serviceInstance.LastOperation.UpdatedAt = "updated-date"
 				requirementsFactory.ServiceInstance = serviceInstance
 			}
 
@@ -91,8 +93,34 @@ var _ = Describe("service command", func() {
 					[]string{"Last Operation"},
 					[]string{"Status: ", "create in progress"},
 					[]string{"Message: ", "creating resource - step 1"},
+					[]string{"Started: ", "created-date"},
+					[]string{"Updated: ", "updated-date"},
 				))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
+			})
+
+			Context("when the service instance CreatedAt is empty", func() {
+				It("does not output the Started line", func() {
+					createServiceInstanceWithState("in progress")
+					requirementsFactory.ServiceInstance.LastOperation.CreatedAt = ""
+					runCommand("service1")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Service instance:", "service1"},
+						[]string{"Service: ", "mysql"},
+						[]string{"Plan: ", "plan-name"},
+						[]string{"Description: ", "the-description"},
+						[]string{"Documentation url: ", "http://documentation.url"},
+						[]string{"Dashboard: ", "some-url"},
+						[]string{"Last Operation"},
+						[]string{"Status: ", "create in progress"},
+						[]string{"Message: ", "creating resource - step 1"},
+						[]string{"Updated: ", "updated-date"},
+					))
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Started: "},
+					))
+				})
 			})
 
 			Context("shows correct status information based on service instance state", func() {
