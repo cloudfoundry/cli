@@ -2,7 +2,7 @@ package space_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/api/spaces"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -10,26 +10,27 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/space"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-func callSpaces(args []string, requirementsFactory *testreq.FakeReqFactory, config core_config.Reader, spaceRepo spaces.SpaceRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	cmd := NewListSpaces(ui, config, spaceRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
-}
-
 var _ = Describe("spaces command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		spaceRepo           *testapi.FakeSpaceRepository
+
+		deps command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("spaces").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -38,8 +39,14 @@ var _ = Describe("spaces command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
+	JustBeforeEach(func() {
+		updateCommandDependency(false)
+	})
+
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewListSpaces(ui, configRepo, spaceRepo), args, requirementsFactory)
+		cmd := command_registry.Commands.FindCommand("spaces")
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+
 	}
 
 	Describe("requirements", func() {
@@ -57,7 +64,9 @@ var _ = Describe("spaces command", func() {
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument required"},
+			))
 		})
 	})
 

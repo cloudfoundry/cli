@@ -2,13 +2,13 @@ package space
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type ListSpaces struct {
@@ -24,26 +24,7 @@ func NewListSpaces(ui terminal.UI, config core_config.Reader, spaceRepo spaces.S
 	return
 }
 
-func (cmd ListSpaces) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
-		Name:        "spaces",
-		Description: T("List all spaces in an org"),
-		Usage:       T("CF_NAME spaces"),
-	}
-}
-
-func (cmd ListSpaces) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
-	}
-	reqs = []requirements.Requirement{
-		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewTargetedOrgRequirement(),
-	}
-	return
-}
-
-func (cmd ListSpaces) Run(c *cli.Context) {
+func (cmd *ListSpaces) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
 		map[string]interface{}{
 			"TargetOrgName": terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -70,4 +51,36 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 	if !foundSpaces {
 		cmd.ui.Say(T("No spaces found"))
 	}
+}
+
+func init() {
+	command_registry.Register(&ListSpaces{})
+}
+
+func (cmd *ListSpaces) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
+		Name:        "spaces",
+		Description: T("List all spaces in an org"),
+		Usage:       T("CF_NAME spaces"),
+	}
+
+}
+
+func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed("Incorrect Usage. No argument required\n\n" + command_registry.Commands.CommandUsage("spaces"))
+	}
+
+	reqs = []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedOrgRequirement(),
+	}
+	return
+}
+
+func (cmd *ListSpaces) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	return cmd
 }
