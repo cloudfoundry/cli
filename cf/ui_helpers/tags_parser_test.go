@@ -8,6 +8,12 @@ import (
 
 var _ = Describe("tags parser", func() {
 
+	It("parses an empty string", func() {
+		rawTag := ""
+
+		Expect(ParseTags(rawTag)).To(Equal([]string{}))
+	})
+
 	It("parses a single tag string", func() {
 		rawTag := "a, b, c, d"
 

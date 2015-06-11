@@ -86,9 +86,11 @@ func (cmd *UpdateService) GetRequirements(requirementsFactory requirements.Facto
 func (cmd *UpdateService) Run(c *cli.Context) {
 	planName := c.String("p")
 	params := c.String("c")
+
+	tagsSet := c.IsSet("t")
 	tagsList := c.String("t")
 
-	if planName == "" && params == "" && tagsList == "" {
+	if planName == "" && params == "" && tagsSet == false {
 		cmd.ui.Ok()
 		cmd.ui.Say(T("No changes were made"))
 		return
