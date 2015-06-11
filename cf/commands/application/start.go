@@ -43,9 +43,10 @@ type Start struct {
 	oldLogsRepo      api.OldLogsRepository
 	logRepo          api.LogsNoaaRepository
 
-	StartupTimeout time.Duration
-	StagingTimeout time.Duration
-	PingerThrottle time.Duration
+	LogServerConnectionTimeout time.Duration
+	StartupTimeout             time.Duration
+	StagingTimeout             time.Duration
+	PingerThrottle             time.Duration
 }
 
 type ApplicationStarter interface {
@@ -66,6 +67,7 @@ func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer Applicatio
 	cmd.appInstancesRepo = appInstancesRepo
 	cmd.logRepo = logRepo
 	cmd.oldLogsRepo = oldLogsRepo
+	cmd.LogServerConnectionTimeout = 20 * time.Second
 
 	cmd.PingerThrottle = DefaultPingerThrottle
 
@@ -150,7 +152,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	go cmd.tailStagingLogs(app, loggingStartedChan, doneLoggingChan)
 	timeout := make(chan struct{})
 	go func() {
-		time.Sleep(20 * time.Second)
+		time.Sleep(cmd.LogServerConnectionTimeout)
 		close(timeout)
 	}()
 
@@ -256,7 +258,7 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan, doneChan cha
 	if err != nil {
 		cmd.ui.Warn(T("Warning: error tailing logs"))
 		cmd.ui.Say("%s", err)
-		startChan <- true
+		close(startChan)
 	}
 
 	close(doneChan)
