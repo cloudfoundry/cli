@@ -224,14 +224,14 @@ var _ = Describe("update-service command", func() {
 		})
 
 		Context("and the tags string is passed with an empty string", func() {
-
-			It("accepts an empty array of tags but doesn't update service", func() {
+			It("successfully updates the service", func() {
 				callUpdateService([]string{"-t", "", "my-service-instance"})
 
 				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating service instance", "my-service-instance"},
 					[]string{"OK"},
-					[]string{"No changes were made"},
 				))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.Tags).To(Equal([]string{}))
 			})
 		})
 	})

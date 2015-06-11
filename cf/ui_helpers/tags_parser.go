@@ -5,7 +5,7 @@ import "strings"
 func ParseTags(tags string) []string {
 	tags = strings.Trim(tags, `"`)
 	tagsList := strings.Split(tags, ",")
-	var finalTagsList []string
+	finalTagsList := []string{}
 	for _, tag := range tagsList {
 		trimmed := strings.Trim(tag, " ")
 		if trimmed != "" {
