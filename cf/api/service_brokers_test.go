@@ -135,6 +135,27 @@ var _ = Describe("Service Brokers Repo", func() {
 			Expect(apiErr).To(HaveOccurred())
 			Expect(apiErr.Error()).To(Equal("Service Broker my-broker not found"))
 		})
+
+		It("returns an error when listing service brokers returns an api error", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/service_brokers?q=name%3Amy-broker",
+				Response: testnet.TestResponse{Status: http.StatusForbidden, Body: `{
+				  "code": 10003,
+				  "description": "You are not authorized to perform the requested action",
+				  "error_code": "CF-NotAuthorized"
+			  }`},
+			})
+
+			ts, handler, repo := createServiceBrokerRepo(req)
+			defer ts.Close()
+
+			_, apiErr := repo.FindByName("my-broker")
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).To(HaveOccurred())
+			Expect(apiErr.Error()).To(Equal("Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action"))
+		})
 	})
 
 	Describe("FindByGuid", func() {
