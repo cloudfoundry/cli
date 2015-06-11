@@ -86,7 +86,7 @@ func (cmd DeleteServiceKey) Run(c *cli.Context) {
 	}
 
 	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.Guid, serviceKeyName)
-	if err != nil {
+	if err != nil || serviceKey.Fields.Guid == "" {
 		cmd.ui.Ok()
 
 		cmd.ui.Say(T("Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
