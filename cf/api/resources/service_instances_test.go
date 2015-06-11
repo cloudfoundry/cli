@@ -2,6 +2,7 @@ package resources_test
 
 import (
 	"encoding/json"
+	"fmt"
 
 	. "github.com/cloudfoundry/cli/cf/api/resources"
 
@@ -117,6 +118,56 @@ var _ = Describe("ServiceInstanceResource", func() {
 	})
 
 	Context("Async brokers", func() {
+		var instanceString string
+
+		BeforeEach(func() {
+			instanceString = `
+						{
+							%s,
+							"entity": {
+								"name": "fake service name",
+								"credentials": {
+								},
+								"service_plan_guid": "fake-service-plan-guid",
+								"space_guid": "fake-space-guid",
+								"gateway_data": null,
+								"dashboard_url": "https://fake/dashboard/url",
+								"type": "managed_service_instance",
+								"space_url": "/v2/spaces/fake-space-guid",
+								"service_plan_url": "/v2/service_plans/fake-service-plan-guid",
+								"service_bindings_url": "/v2/service_instances/fake-guid/service_bindings",
+								"last_operation": {
+									"type": "create",
+									"state": "in progress",
+									"description": "fake state description",
+									"updated_at": "fake updated at"
+								},
+								"service_plan": {
+									"metadata": {
+										"guid": "fake-service-plan-guid"
+									},
+									"entity": {
+										"name": "fake-service-plan-name",
+										"free": true,
+										"description": "fake-description",
+										"public": true,
+										"active": true,
+										"service_guid": "fake-service-guid"
+									}
+								},
+								"service_bindings": [{
+									"metadata": {
+										"guid": "fake-service-binding-guid",
+										"url": "http://fake/url"
+									},
+									"entity": {
+										"app_guid": "fake-app-guid"
+									}
+								}]
+							}
+						}`
+		})
+
 		Describe("#ToFields", func() {
 			It("unmarshalls the fields of a service instance resource", func() {
 				fields := resource.ToFields()
@@ -134,58 +185,15 @@ var _ = Describe("ServiceInstanceResource", func() {
 			Context("When created_at is null", func() {
 				It("unmarshalls the service instance resource model", func() {
 					var resourceWithNullCreatedAt ServiceInstanceResource
-
-					err := json.Unmarshal([]byte(`
-						{
-							"metadata": {
+					metadata := `"metadata": {
 								"guid": "fake-guid",
 								"url": "/v2/service_instances/fake-guid",
 								"created_at": null,
 								"updated_at": "2015-01-13T18:52:08+00:00"
-							},
-							"entity": {
-								"name": "fake service name",
-								"credentials": {
-								},
-								"service_plan_guid": "fake-service-plan-guid",
-								"space_guid": "fake-space-guid",
-								"gateway_data": null,
-								"dashboard_url": "https://fake/dashboard/url",
-								"type": "managed_service_instance",
-								"space_url": "/v2/spaces/fake-space-guid",
-								"service_plan_url": "/v2/service_plans/fake-service-plan-guid",
-								"service_bindings_url": "/v2/service_instances/fake-guid/service_bindings",
-								"last_operation": {
-									"type": "create",
-									"state": "in progress",
-									"description": "fake state description",
-									"updated_at": "fake updated at"
-								},
-								"service_plan": {
-									"metadata": {
-										"guid": "fake-service-plan-guid"
-									},
-									"entity": {
-										"name": "fake-service-plan-name",
-										"free": true,
-										"description": "fake-description",
-										"public": true,
-										"active": true,
-										"service_guid": "fake-service-guid"
-									}
-								},
-								"service_bindings": [{
-									"metadata": {
-										"guid": "fake-service-binding-guid",
-										"url": "http://fake/url"
-									},
-									"entity": {
-										"app_guid": "fake-app-guid"
-									}
-								}]
-							}
-						}`), &resourceWithNullCreatedAt)
+							}`
+					stringWithNullCreatedAt := fmt.Sprintf(instanceString, metadata)
 
+					err := json.Unmarshal([]byte(stringWithNullCreatedAt), &resourceWithNullCreatedAt)
 					Expect(err).ToNot(HaveOccurred())
 				})
 			})
@@ -194,60 +202,17 @@ var _ = Describe("ServiceInstanceResource", func() {
 				It("unmarshalls the service instance resource model", func() {
 					var resourceWithMissingCreatedAt ServiceInstanceResource
 
-					err := json.Unmarshal([]byte(`
-						{
-							"metadata": {
+					metadata := `"metadata": {
 								"guid": "fake-guid",
 								"url": "/v2/service_instances/fake-guid",
 								"updated_at": "2015-01-13T18:52:08+00:00"
-							},
-							"entity": {
-								"name": "fake service name",
-								"credentials": {
-								},
-								"service_plan_guid": "fake-service-plan-guid",
-								"space_guid": "fake-space-guid",
-								"gateway_data": null,
-								"dashboard_url": "https://fake/dashboard/url",
-								"type": "managed_service_instance",
-								"space_url": "/v2/spaces/fake-space-guid",
-								"service_plan_url": "/v2/service_plans/fake-service-plan-guid",
-								"service_bindings_url": "/v2/service_instances/fake-guid/service_bindings",
-								"last_operation": {
-									"type": "create",
-									"state": "in progress",
-									"description": "fake state description",
-									"updated_at": "fake updated at"
-								},
-								"service_plan": {
-									"metadata": {
-										"guid": "fake-service-plan-guid"
-									},
-									"entity": {
-										"name": "fake-service-plan-name",
-										"free": true,
-										"description": "fake-description",
-										"public": true,
-										"active": true,
-										"service_guid": "fake-service-guid"
-									}
-								},
-								"service_bindings": [{
-									"metadata": {
-										"guid": "fake-service-binding-guid",
-										"url": "http://fake/url"
-									},
-									"entity": {
-										"app_guid": "fake-app-guid"
-									}
-								}]
-							}
-						}`), &resourceWithMissingCreatedAt)
+							}`
+					stringWithMissingCreatedAt := fmt.Sprintf(instanceString, metadata)
 
+					err := json.Unmarshal([]byte(stringWithMissingCreatedAt), &resourceWithMissingCreatedAt)
 					Expect(err).ToNot(HaveOccurred())
 				})
 			})
-
 		})
 
 		Describe("#ToModel", func() {
