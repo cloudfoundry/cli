@@ -36,7 +36,7 @@ func NewUpdateService(ui terminal.UI, config core_config.Reader, serviceRepo api
 }
 
 func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
-	baseUsage := T("CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON]")
+	baseUsage := T("CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]")
 	paramsUsage := T(`   Optionally provide service-specific configuration parameters in a valid JSON object in-line.
    CF_NAME update-service -c '{"name":"value","name":"value"}'
 
@@ -51,16 +51,17 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
          "memory_mb": 1024
       }
    }`)
+	tagsUsage := T(`   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.`)
 	exampleUsage := T(`EXAMPLE:
    CF_NAME update-service mydb -p gold
    CF_NAME update-service mydb -c '{"ram_gb":4}'
    CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json
-	 CF_NAME update-service mydb -t "list,of, tags"`)
+   CF_NAME update-service mydb -t "list,of, tags"`)
 
 	return command_metadata.CommandMetadata{
 		Name:        "update-service",
 		Description: T("Update a service instance"),
-		Usage:       T(strings.Join([]string{baseUsage, paramsUsage, exampleUsage}, "\n\n")),
+		Usage:       T(strings.Join([]string{baseUsage, paramsUsage, tagsUsage, exampleUsage}, "\n\n")),
 		Flags: []cli.Flag{
 			flag_helpers.NewStringFlag("p", T("Change service plan for a service instance")),
 			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
