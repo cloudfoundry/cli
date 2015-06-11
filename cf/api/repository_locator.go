@@ -39,7 +39,7 @@ type RepositoryLocator struct {
 	endpointRepo                    EndpointRepository
 	organizationRepo                organizations.OrganizationRepository
 	quotaRepo                       quotas.CloudControllerQuotaRepository
-	spaceRepo                       spaces.CloudControllerSpaceRepository
+	spaceRepo                       spaces.SpaceRepository
 	appRepo                         applications.CloudControllerApplicationRepository
 	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  AppSummaryRepository
@@ -162,6 +162,11 @@ func (locator RepositoryLocator) GetOrganizationRepository() organizations.Organ
 
 func (locator RepositoryLocator) GetQuotaRepository() quotas.QuotaRepository {
 	return locator.quotaRepo
+}
+
+func (locator RepositoryLocator) SetSpaceRepository(repo spaces.SpaceRepository) RepositoryLocator {
+	locator.spaceRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetSpaceRepository() spaces.SpaceRepository {
