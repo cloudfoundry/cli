@@ -46,6 +46,7 @@ var _ = Describe("factory", func() {
 			"i18n_init.go",  // ignore all i18n initializers
 			"_test.go",      // ignore test files
 			".test",         // ignore generated .test (temporary files)
+			".test.exe",     // ignore generated .test (temporary files)
 			".coverprofile", // ignore generated .coverprofile (ginkgo files to test code coverage)
 			"#",             // emacs autosave files
 		}
