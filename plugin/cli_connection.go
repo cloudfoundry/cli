@@ -313,3 +313,15 @@ func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.Organization, err
 	err = client.Call("CliRpcCmd.GetOrgs", "", &result)
 	return result, err
 }
+
+func (cliConnection *cliConnection) GetSpaces() ([]plugin_models.Space, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return []plugin_models.Space{}, err
+	}
+
+	var result []plugin_models.Space
+
+	err = client.Call("CliRpcCmd.GetSpaces", "", &result)
+	return result, err
+}

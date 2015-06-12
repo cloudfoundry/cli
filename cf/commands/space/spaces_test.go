@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -26,6 +27,7 @@ var _ = Describe("spaces command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
+
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
@@ -33,40 +35,72 @@ var _ = Describe("spaces command", func() {
 	}
 
 	BeforeEach(func() {
+		deps = command_registry.NewDependency()
 		ui = &testterm.FakeUI{}
 		spaceRepo = &testapi.FakeSpaceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	JustBeforeEach(func() {
-		updateCommandDependency(false)
-	})
-
 	runCommand := func(args ...string) bool {
 		cmd := command_registry.Commands.FindCommand("spaces")
 		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
-
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedOrgSuccess = true
+			updateCommandDependency(false)
 
 			Expect(runCommand()).To(BeFalse())
 		})
 
 		It("fails when an org is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
+			updateCommandDependency(false)
 
 			Expect(runCommand()).To(BeFalse())
 		})
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
+			updateCommandDependency(false)
+
 			Expect(runCommand("blahblah")).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "No argument required"},
 			))
+		})
+	})
+
+	Describe("when invoked by a plugin", func() {
+		var (
+			pluginModels []plugin_models.Space
+		)
+
+		BeforeEach(func() {
+			pluginModels = []plugin_models.Space{}
+			deps.PluginModels.Spaces = &pluginModels
+
+			space := models.Space{}
+			space.Name = "space1"
+			space.Guid = "123"
+			space2 := models.Space{}
+			space2.Name = "space2"
+			space2.Guid = "456"
+			spaceRepo.Spaces = []models.Space{space, space2}
+
+			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.LoginSuccess = true
+
+			updateCommandDependency(true)
+		})
+
+		It("populates the plugin models upon execution", func() {
+			runCommand()
+			Ω(pluginModels[0].Name).To(Equal("space1"))
+			Ω(pluginModels[0].Guid).To(Equal("123"))
+			Ω(pluginModels[1].Name).To(Equal("space2"))
+			Ω(pluginModels[1].Guid).To(Equal("456"))
 		})
 	})
 
@@ -81,6 +115,8 @@ var _ = Describe("spaces command", func() {
 			spaceRepo.Spaces = []models.Space{space, space2, space3}
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
+
+			updateCommandDependency(false)
 		})
 
 		It("lists all of the spaces", func() {

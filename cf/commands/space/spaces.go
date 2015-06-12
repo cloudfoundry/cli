@@ -9,12 +9,16 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 type ListSpaces struct {
 	ui        terminal.UI
 	config    core_config.Reader
 	spaceRepo spaces.SpaceRepository
+
+	pluginModel *[]plugin_models.Space
+	pluginCall  bool
 }
 
 func NewListSpaces(ui terminal.UI, config core_config.Reader, spaceRepo spaces.SpaceRepository) (cmd ListSpaces) {
@@ -22,35 +26,6 @@ func NewListSpaces(ui terminal.UI, config core_config.Reader, spaceRepo spaces.S
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	return
-}
-
-func (cmd *ListSpaces) Execute(c flags.FlagContext) {
-	cmd.ui.Say(T("Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
-		map[string]interface{}{
-			"TargetOrgName": terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			"CurrentUser":   terminal.EntityNameColor(cmd.config.Username()),
-		}))
-
-	foundSpaces := false
-	table := cmd.ui.Table([]string{T("name")})
-	apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
-		table.Add(space.Name)
-		foundSpaces = true
-		return true
-	})
-	table.Print()
-
-	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching spaces.\n{{.ErrorDescription}}",
-			map[string]interface{}{
-				"ErrorDescription": apiErr.Error(),
-			}))
-		return
-	}
-
-	if !foundSpaces {
-		cmd.ui.Say(T("No spaces found"))
-	}
 }
 
 func init() {
@@ -82,5 +57,44 @@ func (cmd *ListSpaces) SetDependency(deps command_registry.Dependency, pluginCal
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	cmd.pluginCall = pluginCall
+	cmd.pluginModel = deps.PluginModels.Spaces
 	return cmd
+}
+
+func (cmd *ListSpaces) Execute(c flags.FlagContext) {
+	cmd.ui.Say(T("Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
+		map[string]interface{}{
+			"TargetOrgName": terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"CurrentUser":   terminal.EntityNameColor(cmd.config.Username()),
+		}))
+
+	foundSpaces := false
+	table := cmd.ui.Table([]string{T("name")})
+	apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
+		table.Add(space.Name)
+		foundSpaces = true
+
+		if cmd.pluginCall {
+			s := plugin_models.Space{}
+			s.Name = space.Name
+			s.Guid = space.Guid
+			*(cmd.pluginModel) = append(*(cmd.pluginModel), s)
+		}
+
+		return true
+	})
+	table.Print()
+
+	if apiErr != nil {
+		cmd.ui.Failed(T("Failed fetching spaces.\n{{.ErrorDescription}}",
+			map[string]interface{}{
+				"ErrorDescription": apiErr.Error(),
+			}))
+		return
+	}
+
+	if !foundSpaces {
+		cmd.ui.Say(T("No spaces found"))
+	}
 }
