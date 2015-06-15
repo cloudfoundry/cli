@@ -150,4 +150,43 @@ var _ = Describe("org-users command", func() {
 			})
 		})
 	})
+
+	// Describe("when invoked by a plugin", func() {
+	// 	var (
+	// 		pluginUserModel *plugin_models.UserFields
+	// 	)
+
+	// 	BeforeEach(func() {
+	// 		org := models.Organization{}
+	// 		org.Name = "the-org"
+	// 		org.Guid = "the-org-guid"
+
+	// 		user := models.UserFields{}
+	// 		user.Username = "user1"
+	// 		user2 := models.UserFields{}
+	// 		user2.Username = "user2"
+	// 		user3 := models.UserFields{}
+	// 		user3.Username = "user3"
+	// 		user4 := models.UserFields{}
+	// 		user4.Username = "user4"
+	// 		userRepo.ListUsersByRole = map[string][]models.UserFields{
+	// 			models.ORG_MANAGER:     []models.UserFields{user, user2},
+	// 			models.BILLING_MANAGER: []models.UserFields{user4},
+	// 			models.ORG_AUDITOR:     []models.UserFields{user3},
+	// 		}
+
+	// 		requirementsFactory.LoginSuccess = true
+	// 		requirementsFactory.Organization = org
+	// 		deps.PluginModels.Application = pluginAppModel
+	// 		updateCommandDependency(true)
+	// 	})
+
+	// 	It("populates the plugin model upon execution", func() {
+	// 		// runCommand("my-app")
+	// 		// Ω(pluginAppModel.Name).To(Equal("my-app"))
+	// 		// // Ω(pluginAppModel.Instances[0].MemUsage).To(Equal(int64(13 * formatters.MEGABYTE)))
+
+	// 		// Ω(pluginAppModel.Routes[1].Host).To(Equal("my-app"))
+	// 	})
+	// })
 })
