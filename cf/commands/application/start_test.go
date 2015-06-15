@@ -564,8 +564,7 @@ var _ = Describe("start command", func() {
 				defaultInstanceErrorCodes = []string{"", ""}
 
 				ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
-
-				Eventually(ui.Outputs).Should(ContainSubstrings(
+				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},
 					[]string{"0 of 2 instances running", "2 starting"},
 					[]string{"0 of 2 instances running", "1 starting (no compatible cell)", "1 down"},
