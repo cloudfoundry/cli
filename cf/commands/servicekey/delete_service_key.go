@@ -89,10 +89,10 @@ func (cmd DeleteServiceKey) Run(c *cli.Context) {
 	if err != nil || serviceKey.Fields.Guid == "" {
 		cmd.ui.Ok()
 
-		cmd.ui.Say(T("Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
+		cmd.ui.Warn(T("Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
 			map[string]interface{}{
-				"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
-				"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName),
+				"ServiceKeyName":      serviceKeyName,
+				"ServiceInstanceName": serviceInstanceName,
 			}))
 
 		return
