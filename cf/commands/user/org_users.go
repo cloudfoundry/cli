@@ -1,16 +1,15 @@
 package user
 
 import (
-	"errors"
-
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 var orgRoles = []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR}
@@ -22,43 +21,73 @@ type OrgUsers struct {
 	userRepo api.UserRepository
 }
 
+func init() {
+	command_registry.Register(&OrgUsers{})
+}
+
 func NewOrgUsers(ui terminal.UI, config core_config.Reader, userRepo api.UserRepository) (cmd *OrgUsers) {
-	cmd = new(OrgUsers)
+	cmd = &OrgUsers{}
 	cmd.ui = ui
 	cmd.config = config
 	cmd.userRepo = userRepo
 	return
 }
 
-func (cmd *OrgUsers) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["a"] = &cliFlags.BoolFlag{Name: "a", Usage: T("List all users in the org")}
+
+	return command_registry.CommandMetadata{
 		Name:        "org-users",
 		Description: T("Show org users by role"),
 		Usage:       T("CF_NAME org-users ORG"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "a", Usage: T("List all users in the org")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *OrgUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		err = errors.New(T("Incorrect usage"))
-		cmd.ui.FailWithUsage(c)
-		return
+func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed("Incorrect Usage. Requires an argument\n\n" + command_registry.Commands.CommandUsage("org-users"))
 	}
 
-	if cmd.orgReq == nil {
-		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
-	} else {
-		cmd.orgReq.SetOrganizationName(c.Args()[0])
-	}
-	reqs = append(reqs, requirementsFactory.NewLoginRequirement(), cmd.orgReq)
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
 
+	reqs = []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		cmd.orgReq,
+	}
 	return
 }
 
-func (cmd *OrgUsers) Run(c *cli.Context) {
+func (cmd *OrgUsers) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	// TODO: plugin model...
+	// cmd.pluginCall = pluginCall
+	return cmd
+}
+
+// func (cmd *OrgUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+// 	if len(c.Args()) != 1 {
+// 		err = errors.New(T("Incorrect usage"))
+// 		cmd.ui.FailWithUsage(c)
+// 		return
+// 	}
+
+// 	if cmd.orgReq == nil {
+// 		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
+// 	} else {
+// 		cmd.orgReq.SetOrganizationName(c.Args()[0])
+// 	}
+// 	reqs = append(reqs, requirementsFactory.NewLoginRequirement(), cmd.orgReq)
+
+// 	return
+// }
+
+// func (cmd *OrgUsers) Execute(c *cli.Context) {
+func (cmd *OrgUsers) Execute(c flags.FlagContext) {
+
 	org := cmd.orgReq.GetOrganization()
 	all := c.Bool("a")
 

@@ -53,7 +53,7 @@ type RepositoryLocator struct {
 	serviceKeyRepo                  CloudControllerServiceKeyRepository
 	serviceBindingRepo              CloudControllerServiceBindingRepository
 	serviceSummaryRepo              CloudControllerServiceSummaryRepository
-	userRepo                        CloudControllerUserRepository
+	userRepo                        UserRepository
 	passwordRepo                    password.CloudControllerPasswordRepository
 	logsNoaaRepo                    LogsNoaaRepository
 	oldLogsRepo                     OldLogsRepository
@@ -183,6 +183,11 @@ func (locator RepositoryLocator) GetApplicationBitsRepository() application_bits
 
 func (locator RepositoryLocator) SetAppSummaryRepository(repo AppSummaryRepository) RepositoryLocator {
 	locator.appSummaryRepo = repo
+	return locator
+}
+
+func (locator RepositoryLocator) SetUserRepository(repo UserRepository) RepositoryLocator {
+	locator.userRepo = repo
 	return locator
 }
 
