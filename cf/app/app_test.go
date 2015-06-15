@@ -31,7 +31,7 @@ var expectedCommandNames = []string{
 	"delete", "delete-buildpack", "delete-domain", "delete-shared-domain", "delete-org", "delete-route",
 	"delete-service", "delete-service-auth-token", "delete-service-broker", "delete-space", "delete-user",
 	"domains", "env", "events", "files", "login", "logout", "logs", "marketplace", "map-route", "org",
-	"org-users", "passwd", "purge-service-offering", "push", "quotas", "rename", "rename-org",
+	"passwd", "purge-service-offering", "push", "quotas", "rename", "rename-org",
 	"rename-service", "rename-service-broker", "rename-space", "restage", "restart", "routes", "scale",
 	"service", "service-auth-tokens", "service-brokers", "services", "set-env", "set-org-role",
 	"set-space-role", "create-shared-domain", "space", "space-users", "stacks", "start", "stop",

@@ -245,7 +245,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("create-user"),
 					presentCommand("delete-user"),
 				}, {
-					presentCommand("org-users"),
+					presentNonCodegangstaCommand("org-users"),
 					presentCommand("set-org-role"),
 					presentCommand("unset-org-role"),
 				}, {
