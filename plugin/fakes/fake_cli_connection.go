@@ -172,6 +172,16 @@ type FakeCliConnection struct {
 		result1 []plugin_models.User
 		result2 error
 	}
+	GetSpaceUsersStub        func(string, string) ([]plugin_models.User, error)
+	getSpaceUsersMutex       sync.RWMutex
+	getSpaceUsersArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getSpaceUsersReturns struct {
+		result1 []plugin_models.User
+		result2 error
+	}
 }
 
 func (fake *FakeCliConnection) CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
@@ -752,6 +762,40 @@ func (fake *FakeCliConnection) GetOrgUsersArgsForCall(i int) (string, []string) 
 func (fake *FakeCliConnection) GetOrgUsersReturns(result1 []plugin_models.User, result2 error) {
 	fake.GetOrgUsersStub = nil
 	fake.getOrgUsersReturns = struct {
+		result1 []plugin_models.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) GetSpaceUsers(arg1 string, arg2 string) ([]plugin_models.User, error) {
+	fake.getSpaceUsersMutex.Lock()
+	fake.getSpaceUsersArgsForCall = append(fake.getSpaceUsersArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.getSpaceUsersMutex.Unlock()
+	if fake.GetSpaceUsersStub != nil {
+		return fake.GetSpaceUsersStub(arg1, arg2)
+	} else {
+		return fake.getSpaceUsersReturns.result1, fake.getSpaceUsersReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) GetSpaceUsersCallCount() int {
+	fake.getSpaceUsersMutex.RLock()
+	defer fake.getSpaceUsersMutex.RUnlock()
+	return len(fake.getSpaceUsersArgsForCall)
+}
+
+func (fake *FakeCliConnection) GetSpaceUsersArgsForCall(i int) (string, string) {
+	fake.getSpaceUsersMutex.RLock()
+	defer fake.getSpaceUsersMutex.RUnlock()
+	return fake.getSpaceUsersArgsForCall[i].arg1, fake.getSpaceUsersArgsForCall[i].arg2
+}
+
+func (fake *FakeCliConnection) GetSpaceUsersReturns(result1 []plugin_models.User, result2 error) {
+	fake.GetSpaceUsersStub = nil
+	fake.getSpaceUsersReturns = struct {
 		result1 []plugin_models.User
 		result2 error
 	}{result1, result2}

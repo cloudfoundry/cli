@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -143,4 +144,153 @@ var _ = Describe("space-users command", func() {
 			})
 		})
 	})
+
+	Describe("when invoked by a plugin", func() {
+		var (
+			pluginUserModel []plugin_models.User
+		)
+
+		Context("single roles", func() {
+
+			BeforeEach(func() {
+
+				org := models.Organization{}
+				org.Name = "the-org"
+				org.Guid = "the-org-guid"
+
+				space := models.Space{}
+				space.Name = "the-space"
+				space.Guid = "the-space-guid"
+
+				// space managers
+				user := models.UserFields{}
+				user.Username = "user1"
+				user.Guid = "1111"
+
+				user2 := models.UserFields{}
+				user2.Username = "user2"
+				user2.Guid = "2222"
+
+				// space auditor
+				user3 := models.UserFields{}
+				user3.Username = "user3"
+				user3.Guid = "3333"
+
+				// space developer
+				user4 := models.UserFields{}
+				user4.Username = "user4"
+				user4.Guid = "4444"
+
+				userRepo.ListUsersByRole = map[string][]models.UserFields{
+					models.SPACE_MANAGER:   []models.UserFields{user, user2},
+					models.SPACE_DEVELOPER: []models.UserFields{user4},
+					models.SPACE_AUDITOR:   []models.UserFields{user3},
+				}
+
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.Organization = org
+				requirementsFactory.Space = space
+				pluginUserModel = []plugin_models.User{}
+				deps.PluginModels.Users = &pluginUserModel
+				updateCommandDependency(true)
+			})
+
+			It("populates the plugin model with users with single roles", func() {
+				runCommand("the-org", "the-space")
+				Ω(len(pluginUserModel)).To(Equal(4))
+				Ω(pluginUserModel[0].Username).To(Equal("user1"))
+				Ω(pluginUserModel[0].Guid).To(Equal("1111"))
+				Ω(pluginUserModel[0].Roles[0]).To(Equal(models.SPACE_MANAGER))
+
+				Ω(pluginUserModel[1].Username).To(Equal("user2"))
+				Ω(pluginUserModel[1].Guid).To(Equal("2222"))
+				Ω(pluginUserModel[1].Roles[0]).To(Equal(models.SPACE_MANAGER))
+
+				Ω(pluginUserModel[2].Username).To(Equal("user4"))
+				Ω(pluginUserModel[2].Guid).To(Equal("4444"))
+				Ω(pluginUserModel[2].Roles[0]).To(Equal(models.SPACE_DEVELOPER))
+
+				Ω(pluginUserModel[3].Username).To(Equal("user3"))
+				Ω(pluginUserModel[3].Guid).To(Equal("3333"))
+				Ω(pluginUserModel[3].Roles[0]).To(Equal(models.SPACE_AUDITOR))
+
+			})
+
+		})
+
+		Context("multiple roles", func() {
+
+			BeforeEach(func() {
+
+				org := models.Organization{}
+				org.Name = "the-org"
+				org.Guid = "the-org-guid"
+
+				space := models.Space{}
+				space.Name = "the-space"
+				space.Guid = "the-space-guid"
+
+				// space managers
+				user := models.UserFields{}
+				user.Username = "user1"
+				user.Guid = "1111"
+
+				user2 := models.UserFields{}
+				user2.Username = "user2"
+				user2.Guid = "2222"
+
+				// space auditor
+				user3 := models.UserFields{}
+				user3.Username = "user3"
+				user3.Guid = "3333"
+
+				// space developer
+				user4 := models.UserFields{}
+				user4.Username = "user4"
+				user4.Guid = "4444"
+
+				userRepo.ListUsersByRole = map[string][]models.UserFields{
+					models.SPACE_MANAGER:   []models.UserFields{user, user2, user3, user4},
+					models.SPACE_DEVELOPER: []models.UserFields{user2, user4},
+					models.SPACE_AUDITOR:   []models.UserFields{user, user3},
+				}
+
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.Organization = org
+				requirementsFactory.Space = space
+				pluginUserModel = []plugin_models.User{}
+				deps.PluginModels.Users = &pluginUserModel
+				updateCommandDependency(true)
+			})
+
+			It("populates the plugin model with users with multiple roles", func() {
+				runCommand("the-org", "the-space")
+				Ω(len(pluginUserModel)).To(Equal(4))
+
+				// user1
+				Ω(len(pluginUserModel[0].Roles)).To(Equal(2))
+				Ω(pluginUserModel[0].Roles[0]).To(Equal(models.SPACE_MANAGER))
+				Ω(pluginUserModel[0].Roles[1]).To(Equal(models.SPACE_AUDITOR))
+
+				// user2
+				Ω(len(pluginUserModel[1].Roles)).To(Equal(2))
+				Ω(pluginUserModel[1].Roles[0]).To(Equal(models.SPACE_MANAGER))
+				Ω(pluginUserModel[1].Roles[1]).To(Equal(models.SPACE_DEVELOPER))
+
+				// user3
+				Ω(len(pluginUserModel[2].Roles)).To(Equal(2))
+				Ω(pluginUserModel[2].Roles[0]).To(Equal(models.SPACE_MANAGER))
+				Ω(pluginUserModel[2].Roles[1]).To(Equal(models.SPACE_AUDITOR))
+
+				// user4
+				Ω(len(pluginUserModel[3].Roles)).To(Equal(2))
+				Ω(pluginUserModel[3].Roles[0]).To(Equal(models.SPACE_MANAGER))
+				Ω(pluginUserModel[3].Roles[1]).To(Equal(models.SPACE_DEVELOPER))
+
+			})
+
+		})
+
+	})
+
 })
