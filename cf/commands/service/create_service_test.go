@@ -252,6 +252,23 @@ var _ = Describe("create-service command", func() {
 		})
 	})
 
+	It("warns the user when the service name already exists no matter the service plan", func() {
+		serviceRepo.CreateServiceInstanceReturns.Error = errors.NewModelAlreadyExistsError("Service", "my-cleardb-service")
+
+		callCreateService([]string{"cleardb", "expensive", "my-cleardb-service"})
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating service instance", "my-cleardb-service"},
+			[]string{"OK"},
+			[]string{"Service my-cleardb-service already exists"},
+		), "Expected output did not match with ModelAlreadyExistsError")
+
+		Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"),
+			"name argument did not match")
+		Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("luxury-guid"),
+			"plan argument did not match")
+	})
+
 	It("warns the user when the service already exists with the same service plan", func() {
 		serviceRepo.CreateServiceInstanceReturns.Error = errors.NewModelAlreadyExistsError("Service", "my-cleardb-service")
 

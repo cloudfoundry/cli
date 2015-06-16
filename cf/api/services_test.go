@@ -253,29 +253,7 @@ var _ = Describe("Services Repo", func() {
 			})
 		})
 
-		Context("when the name is taken but an identical service exists", func() {
-			BeforeEach(func() {
-				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-						Method:  "POST",
-						Path:    "/v2/service_instances?accepts_incomplete=true",
-						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
-						Response: testnet.TestResponse{
-							Status: http.StatusBadRequest,
-							Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-						}}),
-					findServiceInstanceReq,
-					serviceOfferingReq)
-			})
-
-			It("returns a ModelAlreadyExistsError if the plan is the same", func() {
-				err := repo.CreateServiceInstance("my-service", "plan-guid", nil, nil)
-				Expect(testHandler).To(HaveAllRequestsCalled())
-				Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
-			})
-		})
-
-		Context("when the name is taken and no identical service instance exists", func() {
+		Context("when the name is taken within the space", func() {
 			BeforeEach(func() {
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -293,9 +271,10 @@ var _ = Describe("Services Repo", func() {
 			It("fails if the plan is different", func() {
 				err := repo.CreateServiceInstance("my-service", "different-plan-guid", nil, nil)
 
-				Expect(testHandler).To(HaveAllRequestsCalled())
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(BeAssignableToTypeOf(errors.NewHttpError(400, "", "")))
+				Expect(testHandler).To(HaveAllRequestsCalled(), "All requests were not called")
+				Expect(err).To(HaveOccurred(), "Error should have occurred")
+				Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}),
+					"Missing ModelAlreadyExistsError")
 			})
 		})
 	})

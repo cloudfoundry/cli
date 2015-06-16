@@ -152,9 +152,9 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 	err = repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 
 	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SERVICE_INSTANCE_NAME_TAKEN {
-		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)
+		_, findInstanceErr := repo.FindInstanceByName(name)
 
-		if findInstanceErr == nil && serviceInstance.ServicePlan.Guid == planGuid {
+		if nil == findInstanceErr {
 			return errors.NewModelAlreadyExistsError("Service", name)
 		}
 	}
