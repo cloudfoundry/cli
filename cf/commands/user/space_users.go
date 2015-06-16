@@ -3,13 +3,13 @@ package user
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 var spaceRoles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
@@ -22,8 +22,12 @@ type SpaceUsers struct {
 	orgReq    requirements.OrganizationRequirement
 }
 
+func init() {
+	command_registry.Register(&SpaceUsers{})
+}
+
 func NewSpaceUsers(ui terminal.UI, config core_config.Reader, spaceRepo spaces.SpaceRepository, userRepo api.UserRepository) (cmd *SpaceUsers) {
-	cmd = new(SpaceUsers)
+	cmd = &SpaceUsers{}
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
@@ -31,30 +35,39 @@ func NewSpaceUsers(ui terminal.UI, config core_config.Reader, spaceRepo spaces.S
 	return
 }
 
-func (cmd *SpaceUsers) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *SpaceUsers) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "space-users",
 		Description: T("Show space users by role"),
 		Usage:       T("CF_NAME space-users ORG SPACE"),
 	}
 }
 
-func (cmd *SpaceUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *SpaceUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires arguments") + command_registry.Commands.CommandUsage("space-users"))
 	}
 
-	if cmd.orgReq == nil {
-		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
-	} else {
-		cmd.orgReq.SetOrganizationName(c.Args()[0])
-	}
-	reqs = append(reqs, requirementsFactory.NewLoginRequirement(), cmd.orgReq)
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
 
+	reqs = []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		cmd.orgReq,
+	}
 	return
 }
 
-func (cmd *SpaceUsers) Run(c *cli.Context) {
+func (cmd *SpaceUsers) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	//cmd.pluginCall = pluginCall
+	//cmd.pluginModel = deps.PluginModels.Users
+	return cmd
+}
+
+func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[1]
 	org := cmd.orgReq.GetOrganization()
 

@@ -2615,6 +2615,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires arguments",
+      "translation": "Incorrect Usage. Requires arguments",
+      "modified": false
+   },
+   {
       "id": "Incorrect json format: file: {{.JSONFile}}\n\u0009\u0009\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
       "translation": "Incorrect json format: file: {{.JSONFile}}\n\u0009\u0009\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
       "modified": false

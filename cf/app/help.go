@@ -249,7 +249,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("set-org-role"),
 					presentCommand("unset-org-role"),
 				}, {
-					presentCommand("space-users"),
+					presentNonCodegangstaCommand("space-users"),
 					presentCommand("set-space-role"),
 					presentCommand("unset-space-role"),
 				},

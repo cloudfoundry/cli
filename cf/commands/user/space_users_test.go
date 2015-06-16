@@ -2,7 +2,7 @@ package user_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/user"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,19 +21,32 @@ var _ = Describe("space-users command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		spaceRepo           *testapi.FakeSpaceRepository
 		userRepo            *testapi.FakeUserRepository
-		config              core_config.ReadWriter
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("space-users").SetDependency(deps, pluginCall))
+	}
+
 	BeforeEach(func() {
-		config = testconfig.NewRepositoryWithDefaults()
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		spaceRepo = &testapi.FakeSpaceRepository{}
 		userRepo = &testapi.FakeUserRepository{}
+		deps = command_registry.NewDependency()
+		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewSpaceUsers(ui, config, spaceRepo, userRepo), args, requirementsFactory)
+		cmd := command_registry.Commands.FindCommand("space-users")
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -52,7 +65,9 @@ var _ = Describe("space-users command", func() {
 
 	It("fails with usage when not invoked with exactly two args", func() {
 		runCommand("my-org")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires arguments"},
+		))
 	})
 
 	Context("when logged in and given some users in the org and space", func() {
@@ -110,7 +125,7 @@ var _ = Describe("space-users command", func() {
 			})
 
 			It("calls ListUsersInSpaceForRoleWithNoUAA()", func() {
-				config.SetApiVersion("2.22.0")
+				configRepo.SetApiVersion("2.22.0")
 				runCommand("my-org", "my-sapce")
 
 				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount).To(BeNumerically(">=", 1))
@@ -120,7 +135,7 @@ var _ = Describe("space-users command", func() {
 
 		Context("when cc api verson is < 2.21.0", func() {
 			It("calls ListUsersInSpaceForRole()", func() {
-				config.SetApiVersion("2.20.0")
+				configRepo.SetApiVersion("2.20.0")
 				runCommand("my-org", "my-space")
 
 				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount).To(Equal(0))
