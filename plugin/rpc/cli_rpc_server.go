@@ -320,3 +320,21 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.Space) error {
 
 	return cmd.newCmdRunner.Command([]string{"spaces"}, deps, true)
 }
+
+func (cmd *CliRpcCmd) GetOrgUsers(_ string, retVal *[]plugin_models.User) error {
+	defer func() {
+		recover()
+	}()
+
+	deps := command_registry.NewDependency()
+
+	//set deps objs to be the one used by all other codegangsta commands
+	//once all commands are converted, we can make fresh deps for each command run
+	deps.Config = cmd.cliConfig
+	deps.RepoLocator = cmd.repoLocator
+	deps.PluginModels.Users = retVal
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
+
+	return cmd.newCmdRunner.Command([]string{"org-users"}, deps, true)
+}
