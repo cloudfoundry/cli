@@ -321,7 +321,7 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.Space) error {
 	return cmd.newCmdRunner.Command([]string{"spaces"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrgUsers(_ string, retVal *[]plugin_models.User) error {
+func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.User) error {
 	defer func() {
 		recover()
 	}()
@@ -336,5 +336,5 @@ func (cmd *CliRpcCmd) GetOrgUsers(_ string, retVal *[]plugin_models.User) error 
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
 	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
 
-	return cmd.newCmdRunner.Command([]string{"org-users"}, deps, true)
+	return cmd.newCmdRunner.Command(append([]string{"org-users"}, args...), deps, true)
 }

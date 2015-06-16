@@ -118,6 +118,7 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 					u = plugin_models.User{}
 					u.Username = user.Username
 					u.Guid = user.Guid
+					u.IsAdmin = user.IsAdmin
 					u.Roles = make([]string, 1)
 					u.Roles[0] = role
 					usersMap[user.Username] = u

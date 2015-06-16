@@ -326,7 +326,7 @@ func (cliConnection *cliConnection) GetSpaces() ([]plugin_models.Space, error) {
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetOrgUsers() ([]plugin_models.User, error) {
+func (cliConnection *cliConnection) GetOrgUsers(orgName string, args ...string) ([]plugin_models.User, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
 		return []plugin_models.User{}, err
@@ -334,6 +334,8 @@ func (cliConnection *cliConnection) GetOrgUsers() ([]plugin_models.User, error) 
 
 	var result []plugin_models.User
 
-	err = client.Call("CliRpcCmd.GetOrgUsers", "", &result)
+	cmdArgs := append([]string{orgName}, args...)
+
+	err = client.Call("CliRpcCmd.GetOrgUsers", cmdArgs, &result)
 	return result, err
 }

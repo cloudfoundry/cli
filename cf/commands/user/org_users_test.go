@@ -238,6 +238,7 @@ var _ = Describe("org-users command", func() {
 				user := models.UserFields{}
 				user.Username = "user1"
 				user.Guid = "1111"
+				user.IsAdmin = true
 
 				user2 := models.UserFields{}
 				user2.Username = "user2"
@@ -277,6 +278,7 @@ var _ = Describe("org-users command", func() {
 				Ω(len(pluginUserModel[0].Roles)).To(Equal(2))
 				Ω(pluginUserModel[0].Roles[0]).To(Equal(models.ORG_MANAGER))
 				Ω(pluginUserModel[0].Roles[1]).To(Equal(models.ORG_AUDITOR))
+				Ω(pluginUserModel[0].IsAdmin).To(BeTrue())
 
 				// user2
 				Ω(pluginUserModel[1].Username).To(Equal("user2"))
