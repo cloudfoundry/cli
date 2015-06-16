@@ -58,7 +58,8 @@ var _ = Describe("Uninstall", func() {
 	})
 
 	AfterEach(func() {
-		os.Remove(fakePluginRepoDir)
+		err := os.RemoveAll(fakePluginRepoDir)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	runCommand := func(args ...string) bool {
