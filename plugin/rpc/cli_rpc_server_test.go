@@ -402,7 +402,8 @@ var _ = Describe("Server", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			result := []plugin_models.User{}
-			err = client.Call("CliRpcCmd.GetOrgUsers", "", &result)
+			args := []string{"orgName1", "-a"}
+			err = client.Call("CliRpcCmd.GetOrgUsers", args, &result)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(runner.CommandCallCount()).To(Equal(1))
