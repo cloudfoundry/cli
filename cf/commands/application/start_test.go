@@ -2,6 +2,7 @@ package application_test
 
 import (
 	"os"
+	"sync"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
@@ -39,6 +40,8 @@ var _ = Describe("start command", func() {
 		oldLogsForTail            []*logmessage.LogMessage
 		oldLogsRepo               *testapi.FakeOldLogsRepository
 	)
+
+	var mutex = &sync.Mutex{}
 
 	getInstance := func(appGuid string) (instances []models.AppInstanceFields, apiErr error) {
 		if len(defaultInstanceResponses) > 0 {
@@ -96,12 +99,16 @@ var _ = Describe("start command", func() {
 		}
 
 		oldLogsRepo = &testapi.FakeOldLogsRepository{}
+		mutex.Lock()
 		oldLogsForTail = []*logmessage.LogMessage{}
+		mutex.Unlock()
 		oldLogsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
 			onConnect()
+			mutex.Lock()
 			for _, log := range oldLogsForTail {
 				onMessage(log)
 			}
+			mutex.Unlock()
 			return nil
 		}
 
