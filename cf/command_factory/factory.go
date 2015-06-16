@@ -146,7 +146,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["service-brokers"] = servicebroker.NewListServiceBrokers(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["service-keys"] = servicekey.NewListServiceKeys(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["service-key"] = servicekey.NewGetServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
-	factory.cmdsByName["services"] = service.NewListServices(ui, config, repoLocator.GetServiceSummaryRepository())
 	factory.cmdsByName["migrate-service-instances"] = service.NewMigrateServiceInstances(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["set-env"] = application.NewSetEnv(ui, config, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["set-org-role"] = user.NewSetOrgRole(ui, config, repoLocator.GetUserRepository())
