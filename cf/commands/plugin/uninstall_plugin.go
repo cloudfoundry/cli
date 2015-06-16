@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
@@ -63,7 +64,12 @@ func (cmd *PluginUninstall) Run(c *cli.Context) {
 		cmd.ui.Say("Error invoking plugin: " + err.Error() + ". Process to uninstall ...")
 	}
 
-	os.Remove(pluginMetadata.Location)
+	time.Sleep(500 * time.Millisecond) //prevent 'process being used' error in Windows
+
+	err = os.Remove(pluginMetadata.Location)
+	if err != nil {
+		cmd.ui.Warn("Error removing plugin binary: " + err.Error())
+	}
 
 	cmd.config.RemovePlugin(pluginName)
 
