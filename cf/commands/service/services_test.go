@@ -2,6 +2,7 @@ package service_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -10,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	. "github.com/cloudfoundry/cli/cf/commands/service"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
@@ -22,24 +22,37 @@ var _ = Describe("services", func() {
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
+		serviceSummaryRepo  *testapi.FakeServiceSummaryRepo
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetServiceSummaryRepository(serviceSummaryRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("services").SetDependency(deps, pluginCall))
+	}
+
+	runCommand := func(args ...string) bool {
+		cmd := command_registry.Commands.FindCommand("services")
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
+		serviceSummaryRepo = &testapi.FakeServiceSummaryRepo{}
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 			TargetedOrgSuccess:   true,
 		}
+
+		deps = command_registry.NewDependency()
+		updateCommandDependency(false)
 	})
 
 	Describe("services requirements", func() {
-		var cmd ListServices
-
-		BeforeEach(func() {
-			cmd = NewListServices(ui, configRepo, &testapi.FakeServiceSummaryRepo{})
-		})
 
 		Context("when not logged in", func() {
 			BeforeEach(func() {
@@ -47,7 +60,7 @@ var _ = Describe("services", func() {
 			})
 
 			It("fails requirements", func() {
-				Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
+				Expect(runCommand()).To(BeFalse())
 			})
 		})
 
@@ -57,14 +70,16 @@ var _ = Describe("services", func() {
 			})
 
 			It("fails requirements", func() {
-				Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
+				Expect(runCommand()).To(BeFalse())
 			})
 		})
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
-			Expect(testcmd.RunCommand(cmd, []string{"blahblah"}, requirementsFactory)).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(runCommand("blahblah")).To(BeFalse())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument required"},
+			))
 		})
 	})
 
@@ -103,13 +118,10 @@ var _ = Describe("services", func() {
 		userProvidedServiceInstance.Name = "my-service-provided-by-user"
 
 		serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, userProvidedServiceInstance}
-		serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
-			GetSummariesInCurrentSpaceInstances: serviceInstances,
-		}
 
-		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
-		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		serviceSummaryRepo.GetSummariesInCurrentSpaceInstances = serviceInstances
 
+		runCommand()
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
 			[]string{"name", "service", "plan", "bound apps", "last operation"},
@@ -122,12 +134,9 @@ var _ = Describe("services", func() {
 
 	It("lists no services when none are found", func() {
 		serviceInstances := []models.ServiceInstance{}
-		serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
-			GetSummariesInCurrentSpaceInstances: serviceInstances,
-		}
+		serviceSummaryRepo.GetSummariesInCurrentSpaceInstances = serviceInstances
 
-		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
-		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		runCommand()
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
