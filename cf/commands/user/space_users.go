@@ -10,16 +10,19 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 var spaceRoles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 type SpaceUsers struct {
-	ui        terminal.UI
-	config    core_config.Reader
-	spaceRepo spaces.SpaceRepository
-	userRepo  api.UserRepository
-	orgReq    requirements.OrganizationRequirement
+	ui          terminal.UI
+	config      core_config.Reader
+	spaceRepo   spaces.SpaceRepository
+	userRepo    api.UserRepository
+	orgReq      requirements.OrganizationRequirement
+	pluginModel *[]plugin_models.User
+	pluginCall  bool
 }
 
 func init() {
@@ -62,8 +65,9 @@ func (cmd *SpaceUsers) SetDependency(deps command_registry.Dependency, pluginCal
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
-	//cmd.pluginCall = pluginCall
-	//cmd.pluginModel = deps.PluginModels.Users
+	cmd.pluginCall = pluginCall
+	cmd.pluginModel = deps.PluginModels.Users
+
 	return cmd
 }
 
@@ -89,6 +93,8 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 		models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
 	}
 
+	var usersMap = make(map[string]plugin_models.User)
+
 	var users []models.UserFields
 	for _, role := range spaceRoles {
 		displayName := spaceRoleToDisplayName[role]
@@ -104,6 +110,22 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 
 		for _, user := range users {
 			cmd.ui.Say("  %s", user.Username)
+
+			if cmd.pluginCall {
+				u, found := usersMap[user.Username]
+				if !found {
+					u = plugin_models.User{}
+					u.Username = user.Username
+					u.Guid = user.Guid
+					u.IsAdmin = user.IsAdmin
+					u.Roles = make([]string, 1)
+					u.Roles[0] = role
+					usersMap[user.Username] = u
+				} else {
+					u.Roles = append(u.Roles, role)
+					usersMap[user.Username] = u
+				}
+			}
 		}
 
 		if apiErr != nil {
@@ -113,6 +135,12 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 					"SpaceRoleToDisplayName": displayName,
 				}))
 			return
+		}
+	}
+
+	if cmd.pluginCall {
+		for _, v := range usersMap {
+			*(cmd.pluginModel) = append(*(cmd.pluginModel), v)
 		}
 	}
 }

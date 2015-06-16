@@ -339,3 +339,17 @@ func (cliConnection *cliConnection) GetOrgUsers(orgName string, args ...string) 
 	err = client.Call("CliRpcCmd.GetOrgUsers", cmdArgs, &result)
 	return result, err
 }
+
+func (cliConnection *cliConnection) GetSpaceUsers(orgName string, spaceName string) ([]plugin_models.User, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return []plugin_models.User{}, err
+	}
+
+	var result []plugin_models.User
+
+	cmdArgs := []string{orgName, spaceName}
+
+	err = client.Call("CliRpcCmd.GetSpaceUsers", cmdArgs, &result)
+	return result, err
+}

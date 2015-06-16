@@ -414,6 +414,47 @@ var _ = Describe("Server", func() {
 
 	})
 
+	Describe("GetSpaceUsers()", func() {
+		var runner *fakeRunner.FakeNonCodegangstaRunner
+
+		BeforeEach(func() {
+			outputCapture := terminal.NewTeePrinter()
+			terminalOutputSwitch := terminal.NewTeePrinter()
+
+			runner = &fakeRunner.FakeNonCodegangstaRunner{}
+			rpcService, err = NewRpcService(nil, outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner)
+			Expect(err).ToNot(HaveOccurred())
+
+			err := rpcService.Start()
+			Expect(err).ToNot(HaveOccurred())
+
+			pingCli(rpcService.Port())
+		})
+
+		AfterEach(func() {
+			rpcService.Stop()
+
+			//give time for server to stop
+			time.Sleep(50 * time.Millisecond)
+		})
+
+		It("calls GetSpaceUsers() ", func() {
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
+
+			result := []plugin_models.User{}
+			args := []string{"orgName1", "spaceName1"}
+			err = client.Call("CliRpcCmd.GetSpaceUsers", args, &result)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("space-users"))
+			Expect(pluginApiCall).To(BeTrue())
+		})
+
+	})
+
 	Describe(".CallCoreCommand", func() {
 		var runner *fakeRunner.FakeNonCodegangstaRunner
 
