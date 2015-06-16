@@ -10,15 +10,18 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 var orgRoles = []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR}
 
 type OrgUsers struct {
-	ui       terminal.UI
-	config   core_config.Reader
-	orgReq   requirements.OrganizationRequirement
-	userRepo api.UserRepository
+	ui          terminal.UI
+	config      core_config.Reader
+	orgReq      requirements.OrganizationRequirement
+	userRepo    api.UserRepository
+	pluginModel *[]plugin_models.User
+	pluginCall  bool
 }
 
 func init() {
@@ -63,31 +66,12 @@ func (cmd *OrgUsers) SetDependency(deps command_registry.Dependency, pluginCall 
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
-	// TODO: plugin model...
-	// cmd.pluginCall = pluginCall
+	cmd.pluginCall = pluginCall
+	cmd.pluginModel = deps.PluginModels.Users
 	return cmd
 }
 
-// func (cmd *OrgUsers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-// 	if len(c.Args()) != 1 {
-// 		err = errors.New(T("Incorrect usage"))
-// 		cmd.ui.FailWithUsage(c)
-// 		return
-// 	}
-
-// 	if cmd.orgReq == nil {
-// 		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
-// 	} else {
-// 		cmd.orgReq.SetOrganizationName(c.Args()[0])
-// 	}
-// 	reqs = append(reqs, requirementsFactory.NewLoginRequirement(), cmd.orgReq)
-
-// 	return
-// }
-
-// func (cmd *OrgUsers) Execute(c *cli.Context) {
 func (cmd *OrgUsers) Execute(c flags.FlagContext) {
-
 	org := cmd.orgReq.GetOrganization()
 	all := c.Bool("a")
 
@@ -109,8 +93,10 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 		models.ORG_AUDITOR:     T("ORG AUDITOR"),
 	}
 
+	var usersMap = make(map[string]plugin_models.User)
 	var users []models.UserFields
 	var apiErr error
+
 	for _, role := range roles {
 		displayName := orgRoleToDisplayName[role]
 
@@ -125,6 +111,21 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 
 		for _, user := range users {
 			cmd.ui.Say("  %s", user.Username)
+
+			if cmd.pluginCall {
+				u, found := usersMap[user.Username]
+				if !found {
+					u = plugin_models.User{}
+					u.Username = user.Username
+					u.Guid = user.Guid
+					u.Roles = make([]string, 1)
+					u.Roles[0] = role
+					usersMap[user.Username] = u
+				} else {
+					u.Roles = append(u.Roles, role)
+					usersMap[user.Username] = u
+				}
+			}
 		}
 
 		if apiErr != nil {
@@ -134,6 +135,12 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 					"OrgRoleToDisplayName": displayName,
 				}))
 			return
+		}
+	}
+
+	if cmd.pluginCall {
+		for _, v := range usersMap {
+			*(cmd.pluginModel) = append(*(cmd.pluginModel), v)
 		}
 	}
 }

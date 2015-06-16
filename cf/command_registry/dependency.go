@@ -34,6 +34,7 @@ type pluginModels struct {
 	AppsSummary   *[]plugin_models.ApplicationSummary
 	Organizations *[]plugin_models.Organization
 	Spaces        *[]plugin_models.Space
+	Users         *[]plugin_models.User
 }
 
 func NewDependency() Dependency {
