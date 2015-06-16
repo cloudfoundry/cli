@@ -48,7 +48,7 @@ func (cmd *SpaceUsers) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SpaceUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires arguments") + command_registry.Commands.CommandUsage("space-users"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + command_registry.Commands.CommandUsage("space-users"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])

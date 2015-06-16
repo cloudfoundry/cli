@@ -50,7 +50,7 @@ func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
 
 func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument") + command_registry.Commands.CommandUsage("org-users"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("org-users"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])

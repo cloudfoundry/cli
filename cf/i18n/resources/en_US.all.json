@@ -2615,13 +2615,18 @@
       "modified": false
    },
    {
-      "id": "Incorrect Usage. Requires an argument",
-      "translation": "Incorrect Usage. Requires an argument",
+      "id": "Incorrect Usage. No argument required\n\n",
+      "translation": "Incorrect Usage. No argument required\n\n",
       "modified": false
    },
    {
-      "id": "Incorrect Usage. Requires arguments",
-      "translation": "Incorrect Usage. Requires arguments",
+      "id": "Incorrect Usage. Requires an argument\n\n",
+      "translation": "Incorrect Usage. Requires an argument\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires arguments\n\n",
+      "translation": "Incorrect Usage. Requires arguments\n\n",
       "modified": false
    },
    {
