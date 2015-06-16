@@ -43,7 +43,7 @@ func (cmd *ListSpaces) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 0 {
-		cmd.ui.Failed("Incorrect Usage. No argument required\n\n" + command_registry.Commands.CommandUsage("spaces"))
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("spaces"))
 	}
 
 	reqs = []requirements.Requirement{
