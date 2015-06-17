@@ -199,27 +199,32 @@ var _ = Describe("org-users command", func() {
 
 			It("populates the plugin model with users with single roles", func() {
 				runCommand("the-org")
-				Ω(len(pluginUserModel)).To(Equal(4))
-				Ω(pluginUserModel[0].Username).To(Equal("user1"))
-				Ω(pluginUserModel[0].Guid).To(Equal("1111"))
-				Ω(pluginUserModel[0].Roles[0]).To(Equal(models.ORG_MANAGER))
+				Ω(pluginUserModel).To(HaveLen(4))
 
-				Ω(pluginUserModel[1].Username).To(Equal("user2"))
-				Ω(pluginUserModel[1].Guid).To(Equal("2222"))
-				Ω(pluginUserModel[1].Roles[0]).To(Equal(models.ORG_MANAGER))
+				for _, u := range pluginUserModel {
+					switch u.Username {
+					case "user1":
+						Ω(u.Guid).To(Equal("1111"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER}))
+					case "user2":
+						Ω(u.Guid).To(Equal("2222"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER}))
+					case "user3":
+						Ω(u.Guid).To(Equal("3333"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_AUDITOR}))
+					case "user4":
+						Ω(u.Guid).To(Equal("4444"))
+						Ω(u.Roles).To(ConsistOf([]string{models.BILLING_MANAGER}))
+					default:
+						Fail("unexpected user: " + u.Username)
+					}
+				}
 
-				Ω(pluginUserModel[2].Username).To(Equal("user4"))
-				Ω(pluginUserModel[2].Guid).To(Equal("4444"))
-				Ω(pluginUserModel[2].Roles[0]).To(Equal(models.BILLING_MANAGER))
-
-				Ω(pluginUserModel[3].Username).To(Equal("user3"))
-				Ω(pluginUserModel[3].Guid).To(Equal("3333"))
-				Ω(pluginUserModel[3].Roles[0]).To(Equal(models.ORG_AUDITOR))
 			})
 
 			It("populates the plugin model with users with single roles -a flag", func() {
 				runCommand("-a", "the-org")
-				Ω(len(pluginUserModel)).To(Equal(1))
+				Ω(pluginUserModel).To(HaveLen(1))
 				Ω(pluginUserModel[0].Username).To(Equal("user3"))
 				Ω(pluginUserModel[0].Guid).To(Equal("3333"))
 				Ω(pluginUserModel[0].Roles[0]).To(Equal(models.ORG_USER))
@@ -271,59 +276,51 @@ var _ = Describe("org-users command", func() {
 			It("populates the plugin model with users with multiple roles", func() {
 				runCommand("the-org")
 
-				Ω(len(pluginUserModel)).To(Equal(4))
-
-				// user1
-				Ω(pluginUserModel[0].Username).To(Equal("user1"))
-				Ω(len(pluginUserModel[0].Roles)).To(Equal(2))
-				Ω(pluginUserModel[0].Roles[0]).To(Equal(models.ORG_MANAGER))
-				Ω(pluginUserModel[0].Roles[1]).To(Equal(models.ORG_AUDITOR))
-				Ω(pluginUserModel[0].IsAdmin).To(BeTrue())
-
-				// user2
-				Ω(pluginUserModel[1].Username).To(Equal("user2"))
-				Ω(len(pluginUserModel[1].Roles)).To(Equal(2))
-				Ω(pluginUserModel[1].Roles[0]).To(Equal(models.ORG_MANAGER))
-				Ω(pluginUserModel[1].Roles[1]).To(Equal(models.BILLING_MANAGER))
-
-				// user3
-				Ω(pluginUserModel[2].Username).To(Equal("user3"))
-				Ω(len(pluginUserModel[2].Roles)).To(Equal(2))
-				Ω(pluginUserModel[2].Roles[0]).To(Equal(models.ORG_MANAGER))
-				Ω(pluginUserModel[2].Roles[1]).To(Equal(models.ORG_AUDITOR))
-
-				// user4
-				Ω(pluginUserModel[3].Username).To(Equal("user4"))
-				Ω(len(pluginUserModel[3].Roles)).To(Equal(2))
-				Ω(pluginUserModel[3].Roles[0]).To(Equal(models.ORG_MANAGER))
-				Ω(pluginUserModel[3].Roles[1]).To(Equal(models.BILLING_MANAGER))
+				Ω(pluginUserModel).To(HaveLen(4))
+				for _, u := range pluginUserModel {
+					switch u.Username {
+					case "user1":
+						Ω(u.Guid).To(Equal("1111"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER, models.ORG_AUDITOR}))
+						Ω(u.IsAdmin).To(BeTrue())
+					case "user2":
+						Ω(u.Guid).To(Equal("2222"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER, models.BILLING_MANAGER}))
+					case "user3":
+						Ω(u.Guid).To(Equal("3333"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_AUDITOR, models.ORG_MANAGER}))
+					case "user4":
+						Ω(u.Guid).To(Equal("4444"))
+						Ω(u.Roles).To(ConsistOf([]string{models.BILLING_MANAGER, models.ORG_MANAGER}))
+					default:
+						Fail("unexpected user: " + u.Username)
+					}
+				}
 
 			})
 
 			It("populates the plugin model with users with multiple roles -a flag", func() {
 				runCommand("-a", "the-org")
 
-				Ω(len(pluginUserModel)).To(Equal(4))
-
-				// user1
-				Ω(pluginUserModel[0].Username).To(Equal("user1"))
-				Ω(len(pluginUserModel[0].Roles)).To(Equal(1))
-				Ω(pluginUserModel[0].Roles[0]).To(Equal(models.ORG_USER))
-
-				// user2
-				Ω(pluginUserModel[1].Username).To(Equal("user2"))
-				Ω(len(pluginUserModel[1].Roles)).To(Equal(1))
-				Ω(pluginUserModel[1].Roles[0]).To(Equal(models.ORG_USER))
-
-				// user3
-				Ω(pluginUserModel[2].Username).To(Equal("user3"))
-				Ω(len(pluginUserModel[2].Roles)).To(Equal(1))
-				Ω(pluginUserModel[2].Roles[0]).To(Equal(models.ORG_USER))
-
-				// user4
-				Ω(pluginUserModel[3].Username).To(Equal("user4"))
-				Ω(len(pluginUserModel[3].Roles)).To(Equal(1))
-				Ω(pluginUserModel[3].Roles[0]).To(Equal(models.ORG_USER))
+				Ω(pluginUserModel).To(HaveLen(4))
+				for _, u := range pluginUserModel {
+					switch u.Username {
+					case "user1":
+						Ω(u.Guid).To(Equal("1111"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
+					case "user2":
+						Ω(u.Guid).To(Equal("2222"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
+					case "user3":
+						Ω(u.Guid).To(Equal("3333"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
+					case "user4":
+						Ω(u.Guid).To(Equal("4444"))
+						Ω(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
+					default:
+						Fail("unexpected user: " + u.Username)
+					}
+				}
 
 			})
 
