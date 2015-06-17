@@ -38,6 +38,7 @@ type CliConnection interface {
 	GetOrgUsers(string, ...string) ([]plugin_models.User, error)
 	GetSpaceUsers(string, string) ([]plugin_models.User, error)
 	GetServices() ([]plugin_models.ServiceInstance, error)
+	GetOrg(string) (plugin_models.Organization, error)
 }
 
 type VersionType struct {
