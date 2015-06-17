@@ -7,8 +7,10 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	"github.com/cloudfoundry/cli/cf/models"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
+	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
 
@@ -112,6 +114,37 @@ var _ = Describe("UI", func() {
 					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
 				})
 
+				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
+			})
+		})
+
+		It("treats 'yes' as an affirmative confirmation when default language is not en_US", func() {
+			oldLang := os.Getenv("LC_ALL")
+			defer os.Setenv("LC_ALL", oldLang)
+
+			oldT := i18n.T
+			defer func() {
+				i18n.T = oldT
+			}()
+
+			os.Setenv("LC_ALL", "fr_FR")
+
+			config := configuration.NewRepositoryWithDefaults()
+			i18n.T = i18n.Init(config, &detection.JibberJabberDetector{})
+
+			io_helpers.SimulateStdin("oui\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
+					ui := NewUI(reader, NewTeePrinter())
+					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
+				})
+				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
+			})
+
+			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
+				out := io_helpers.CaptureOutput(func() {
+					ui := NewUI(reader, NewTeePrinter())
+					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
+				})
 				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
 			})
 		})
