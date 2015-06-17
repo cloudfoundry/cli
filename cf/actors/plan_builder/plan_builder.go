@@ -11,6 +11,7 @@ type PlanBuilder interface {
 	AttachOrgToPlans([]models.ServicePlanFields, string) ([]models.ServicePlanFields, error)
 	GetPlansForServiceForOrg(string, string) ([]models.ServicePlanFields, error)
 	GetPlansForServiceWithOrgs(string) ([]models.ServicePlanFields, error)
+	GetPlansForManyServicesWithOrgs([]string) ([]models.ServicePlanFields, error)
 	GetPlansForService(string) ([]models.ServicePlanFields, error)
 	GetPlansVisibleToOrg(string) ([]models.ServicePlanFields, error)
 }
@@ -83,6 +84,19 @@ func (builder Builder) GetPlansForService(serviceGuid string) ([]models.ServiceP
 
 func (builder Builder) GetPlansForServiceWithOrgs(serviceGuid string) ([]models.ServicePlanFields, error) {
 	plans, err := builder.GetPlansForService(serviceGuid)
+	if err != nil {
+		return nil, err
+	}
+
+	plans, err = builder.AttachOrgsToPlans(plans)
+	if err != nil {
+		return nil, err
+	}
+	return plans, nil
+}
+
+func (builder Builder) GetPlansForManyServicesWithOrgs(serviceGuids []string) ([]models.ServicePlanFields, error) {
+	plans, err := builder.servicePlanRepo.ListPlansFromManyServices(serviceGuids)
 	if err != nil {
 		return nil, err
 	}

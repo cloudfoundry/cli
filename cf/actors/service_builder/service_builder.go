@@ -174,7 +174,7 @@ func (builder Builder) GetServicesForManyBrokers(brokerGuids []string) ([]models
 	if err != nil {
 		return nil, err
 	}
-	return builder.attachPlansToManyServices(services)
+	return builder.populateServicesWithPlansAndOrgs(services)
 }
 
 func (builder Builder) GetServicesForBroker(brokerGuid string) ([]models.ServiceOffering, error) {
@@ -182,7 +182,20 @@ func (builder Builder) GetServicesForBroker(brokerGuid string) ([]models.Service
 	if err != nil {
 		return nil, err
 	}
-	return builder.attachPlansToManyServices(services)
+	return builder.populateServicesWithPlansAndOrgs(services)
+}
+
+func (builder Builder) populateServicesWithPlansAndOrgs(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
+	serviceGuids := []string{}
+	for _, service := range services {
+		serviceGuids = append(serviceGuids, service.Guid)
+	}
+
+	plans, err := builder.planBuilder.GetPlansForManyServicesWithOrgs(serviceGuids)
+	if err != nil {
+		return nil, err
+	}
+	return builder.attachPlansToManyServices(services, plans)
 }
 
 func (builder Builder) GetServiceVisibleToOrg(serviceName string, orgName string) (models.ServiceOffering, error) {
@@ -221,13 +234,13 @@ func (builder Builder) attachPlansToServiceForOrg(service models.ServiceOffering
 	return service, nil
 }
 
-func (builder Builder) attachPlansToManyServices(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
-	var err error
-
-	for index, service := range services {
-		services[index], err = builder.attachPlansToService(service)
-		if err != nil {
-			return nil, err
+func (builder Builder) attachPlansToManyServices(services []models.ServiceOffering, plans []models.ServicePlanFields) ([]models.ServiceOffering, error) {
+	for _, plan := range plans {
+		for index, service := range services {
+			if service.Guid == plan.ServiceOfferingGuid {
+				services[index].Plans = append(service.Plans, plan)
+				break
+			}
 		}
 	}
 	return services, nil
