@@ -184,7 +184,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentNonCodegangstaCommand("orgs"),
-					presentCommand("org"),
+					presentNonCodegangstaCommand("org"),
 				}, {
 					presentCommand("create-org"),
 					presentCommand("delete-org"),
