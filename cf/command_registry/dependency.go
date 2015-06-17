@@ -30,11 +30,12 @@ type Dependency struct {
 }
 
 type pluginModels struct {
-	Application   *plugin_models.Application
-	AppsSummary   *[]plugin_models.ApplicationSummary
-	Organizations *[]plugin_models.Organization
-	Spaces        *[]plugin_models.Space
-	Users         *[]plugin_models.User
+	Application      *plugin_models.Application
+	AppsSummary      *[]plugin_models.ApplicationSummary
+	Organizations    *[]plugin_models.Organization
+	Spaces           *[]plugin_models.Space
+	Users            *[]plugin_models.User
+	ServiceInstances *[]plugin_models.ServiceInstance
 }
 
 func NewDependency() Dependency {

@@ -182,6 +182,13 @@ type FakeCliConnection struct {
 		result1 []plugin_models.User
 		result2 error
 	}
+	GetServicesStub        func() ([]plugin_models.ServiceInstance, error)
+	getServicesMutex       sync.RWMutex
+	getServicesArgsForCall []struct{}
+	getServicesReturns     struct {
+		result1 []plugin_models.ServiceInstance
+		result2 error
+	}
 }
 
 func (fake *FakeCliConnection) CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
@@ -797,6 +804,31 @@ func (fake *FakeCliConnection) GetSpaceUsersReturns(result1 []plugin_models.User
 	fake.GetSpaceUsersStub = nil
 	fake.getSpaceUsersReturns = struct {
 		result1 []plugin_models.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) GetServices() ([]plugin_models.ServiceInstance, error) {
+	fake.getServicesMutex.Lock()
+	fake.getServicesArgsForCall = append(fake.getServicesArgsForCall, struct{}{})
+	fake.getServicesMutex.Unlock()
+	if fake.GetServicesStub != nil {
+		return fake.GetServicesStub()
+	} else {
+		return fake.getServicesReturns.result1, fake.getServicesReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) GetServicesCallCount() int {
+	fake.getServicesMutex.RLock()
+	defer fake.getServicesMutex.RUnlock()
+	return len(fake.getServicesArgsForCall)
+}
+
+func (fake *FakeCliConnection) GetServicesReturns(result1 []plugin_models.ServiceInstance, result2 error) {
+	fake.GetServicesStub = nil
+	fake.getServicesReturns = struct {
+		result1 []plugin_models.ServiceInstance
 		result2 error
 	}{result1, result2}
 }

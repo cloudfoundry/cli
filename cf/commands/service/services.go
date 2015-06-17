@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -17,20 +18,13 @@ type ListServices struct {
 	ui                 terminal.UI
 	config             core_config.Reader
 	serviceSummaryRepo api.ServiceSummaryRepository
-	// pluginOrgsModel *[]plugin_models.Organization
-	// pluginCall      bool
+	pluginModel        *[]plugin_models.ServiceInstance
+	pluginCall         bool
 }
 
 func init() {
 	command_registry.Register(&ListServices{})
 }
-
-// func NewListServices(ui terminal.UI, config core_config.Reader, serviceSummaryRepo api.ServiceSummaryRepository) (cmd ListServices) {
-// 	cmd.ui = ui
-// 	cmd.config = config
-// 	cmd.serviceSummaryRepo = serviceSummaryRepo
-// 	return
-// }
 
 func (cmd ListServices) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
@@ -56,8 +50,8 @@ func (cmd *ListServices) SetDependency(deps command_registry.Dependency, pluginC
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceSummaryRepo = deps.RepoLocator.GetServiceSummaryRepository()
-	// cmd.pluginOrgsModel = deps.PluginModels.Organizations
-	// cmd.pluginCall = pluginCall
+	cmd.pluginModel = deps.PluginModels.ServiceInstances
+	cmd.pluginCall = pluginCall
 	return cmd
 }
 
@@ -104,6 +98,28 @@ func (cmd ListServices) Execute(fc flags.FlagContext) {
 			strings.Join(instance.ApplicationNames, ", "),
 			serviceStatus,
 		)
+		if cmd.pluginCall {
+			s := plugin_models.ServiceInstance{
+				Name: instance.Name,
+				Guid: instance.Guid,
+				ServicePlan: plugin_models.ServicePlanFields{
+					Name: instance.ServicePlan.Name,
+					Guid: instance.ServicePlan.Guid,
+				},
+				Service: plugin_models.ServiceFields{
+					Name: instance.ServiceOffering.Label,
+				},
+				ApplicationNames: instance.ApplicationNames,
+				LastOperation: plugin_models.LastOperationFields{
+					Type:  instance.LastOperation.Type,
+					State: instance.LastOperation.State,
+				},
+				IsUserProvided: instance.IsUserProvided(),
+			}
+
+			*(cmd.pluginModel) = append(*(cmd.pluginModel), s)
+		}
+
 	}
 
 	table.Print()
