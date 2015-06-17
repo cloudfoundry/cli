@@ -12,14 +12,15 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 type ShowOrg struct {
-	ui     terminal.UI
-	config core_config.Reader
-	orgReq requirements.OrganizationRequirement
-	// pluginModel *[]plugin_models.Space
-	// pluginCall  bool
+	ui          terminal.UI
+	config      core_config.Reader
+	orgReq      requirements.OrganizationRequirement
+	pluginModel *plugin_models.Organization
+	pluginCall  bool
 }
 
 func init() {
@@ -54,6 +55,8 @@ func (cmd *ShowOrg) Requirements(requirementsFactory requirements.Factory, fc fl
 func (cmd *ShowOrg) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
+	cmd.pluginCall = pluginCall
+	cmd.pluginModel = deps.PluginModels.Organization
 	return cmd
 }
 
@@ -97,11 +100,22 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 				"ServicesLimit":           quota.ServicesLimit,
 				"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
 
-		table.Add("", T("domains:"), terminal.EntityNameColor(strings.Join(domains, ", ")))
-		table.Add("", T("quota:"), terminal.EntityNameColor(orgQuota))
-		table.Add("", T("spaces:"), terminal.EntityNameColor(strings.Join(spaces, ", ")))
-		table.Add("", T("space quotas:"), terminal.EntityNameColor(strings.Join(spaceQuotas, ", ")))
+		if cmd.pluginCall {
+			cmd.pluginModel.Name = org.Name
+			cmd.pluginModel.Guid = org.Guid
+			cmd.pluginModel.QuotaDefinition.Name = quota.Name
+			cmd.pluginModel.QuotaDefinition.MemoryLimit = quota.MemoryLimit
+			cmd.pluginModel.QuotaDefinition.InstanceMemoryLimit = quota.InstanceMemoryLimit
+			cmd.pluginModel.QuotaDefinition.RoutesLimit = quota.RoutesLimit
+			cmd.pluginModel.QuotaDefinition.ServicesLimit = quota.ServicesLimit
+			cmd.pluginModel.QuotaDefinition.NonBasicServicesAllowed = quota.NonBasicServicesAllowed
+		} else {
+			table.Add("", T("domains:"), terminal.EntityNameColor(strings.Join(domains, ", ")))
+			table.Add("", T("quota:"), terminal.EntityNameColor(orgQuota))
+			table.Add("", T("spaces:"), terminal.EntityNameColor(strings.Join(spaces, ", ")))
+			table.Add("", T("space quotas:"), terminal.EntityNameColor(strings.Join(spaceQuotas, ", ")))
 
-		table.Print()
+			table.Print()
+		}
 	}
 }

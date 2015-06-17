@@ -4,6 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -51,6 +52,7 @@ var _ = Describe("org command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
+		deps = command_registry.NewDependency()
 		updateCommandDependency(false)
 	})
 
@@ -125,6 +127,30 @@ var _ = Describe("org command", func() {
 				Expect(ui.Outputs).ToNot(ContainSubstrings(
 					[]string{"Getting info for org", "my-org", "my-user"},
 				))
+			})
+		})
+
+		Context("when invoked by a plugin", func() {
+			var (
+				pluginModel plugin_models.Organization
+			)
+			BeforeEach(func() {
+				pluginModel = plugin_models.Organization{}
+				deps.PluginModels.Organization = &pluginModel
+				updateCommandDependency(true)
+			})
+
+			It("populates the plugin model", func() {
+				runCommand("my-org")
+
+				Ω(pluginModel.Name).To(Equal("my-org"))
+				Ω(pluginModel.Guid).To(Equal("my-org-guid"))
+				Ω(pluginModel.QuotaDefinition.Name).To(Equal("cantina-quota"))
+				Ω(pluginModel.QuotaDefinition.MemoryLimit).To(Equal(int64(512)))
+				Ω(pluginModel.QuotaDefinition.InstanceMemoryLimit).To(Equal(int64(256)))
+				Ω(pluginModel.QuotaDefinition.RoutesLimit).To(Equal(2))
+				Ω(pluginModel.QuotaDefinition.ServicesLimit).To(Equal(5))
+				Ω(pluginModel.QuotaDefinition.NonBasicServicesAllowed).To(BeTrue())
 			})
 		})
 	})
