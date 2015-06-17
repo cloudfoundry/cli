@@ -125,7 +125,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["logout"] = commands.NewLogout(ui, config)
 	factory.cmdsByName["logs"] = application.NewLogs(ui, config, repoLocator.GetLogsNoaaRepository(), repoLocator.GetOldLogsRepository())
 	factory.cmdsByName["oauth-token"] = commands.NewOAuthToken(ui, config, repoLocator.GetAuthenticationRepository())
-	factory.cmdsByName["org"] = organization.NewShowOrg(ui, config)
 	factory.cmdsByName["passwd"] = commands.NewPassword(ui, repoLocator.GetPasswordRepository(), config)
 	factory.cmdsByName["purge-service-offering"] = service.NewPurgeServiceOffering(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["quotas"] = quota.NewListQuotas(ui, config, repoLocator.GetQuotaRepository())

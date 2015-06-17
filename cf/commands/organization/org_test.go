@@ -1,6 +1,7 @@
 package organization_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -8,7 +9,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/organization"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,26 +29,34 @@ func callShowOrg(args []string, requirementsFactory *testreq.FakeReqFactory) (ui
 	configRepo.SetSpaceFields(spaceFields)
 	configRepo.SetOrganizationFields(orgFields)
 
-	cmd := NewShowOrg(ui, configRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
 	return
 }
 
 var _ = Describe("org command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("org").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
+
+		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewShowOrg(ui, configRepo), args, requirementsFactory)
+		cmd := command_registry.Commands.FindCommand("org")
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -59,7 +67,9 @@ var _ = Describe("org command", func() {
 		It("fails with usage when not provided exactly one arg", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("too", "much")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 		})
 	})
 
