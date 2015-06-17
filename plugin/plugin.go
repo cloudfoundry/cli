@@ -33,7 +33,7 @@ type CliConnection interface {
 	AccessToken() (string, error)
 	GetApp(string) (plugin_models.Application, error)
 	GetApps() ([]plugin_models.ApplicationSummary, error)
-	GetOrgs() ([]plugin_models.Organization, error)
+	GetOrgs() ([]plugin_models.OrganizationSummary, error)
 	GetSpaces() ([]plugin_models.Space, error)
 	GetOrgUsers(string, ...string) ([]plugin_models.User, error)
 	GetSpaceUsers(string, string) ([]plugin_models.User, error)

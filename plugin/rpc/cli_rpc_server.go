@@ -285,7 +285,7 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.ApplicationSumma
 	return cmd.newCmdRunner.Command([]string{"apps"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.Organization) error {
+func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.OrganizationSummary) error {
 	defer func() {
 		recover()
 	}()
