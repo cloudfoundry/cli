@@ -16,7 +16,7 @@ type ListOrgs struct {
 	ui              terminal.UI
 	config          core_config.Reader
 	orgRepo         organizations.OrganizationRepository
-	pluginOrgsModel *[]plugin_models.Organization
+	pluginOrgsModel *[]plugin_models.OrganizationSummary
 	pluginCall      bool
 }
 
@@ -89,7 +89,7 @@ func (cmd ListOrgs) Execute(fc flags.FlagContext) {
 
 func (cmd *ListOrgs) populatePluginModel(orgs []models.Organization) {
 	for _, org := range orgs {
-		orgModel := plugin_models.Organization{}
+		orgModel := plugin_models.OrganizationSummary{}
 		orgModel.Name = org.Name
 		orgModel.Guid = org.Guid
 		*(cmd.pluginOrgsModel) = append(*(cmd.pluginOrgsModel), orgModel)

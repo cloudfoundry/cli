@@ -277,7 +277,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetOrgs() ", func() {
-			result := []plugin_models.Organization{}
+			result := []plugin_models.OrganizationSummary{}
 			err = client.Call("CliRpcCmd.GetOrgs", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())

@@ -302,13 +302,13 @@ func (cliConnection *cliConnection) GetApps() ([]plugin_models.ApplicationSummar
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.Organization, error) {
+func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.OrganizationSummary, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.Organization{}, err
+		return []plugin_models.OrganizationSummary{}, err
 	}
 
-	var result []plugin_models.Organization
+	var result []plugin_models.OrganizationSummary
 
 	err = client.Call("CliRpcCmd.GetOrgs", "", &result)
 	return result, err
