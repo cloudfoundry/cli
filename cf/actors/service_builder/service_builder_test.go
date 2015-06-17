@@ -24,6 +24,7 @@ var _ = Describe("Service Builder", func() {
 		planWithoutOrgs models.ServicePlanFields
 		plan1           models.ServicePlanFields
 		plan2           models.ServicePlanFields
+		plan3           models.ServicePlanFields
 	)
 
 	BeforeEach(func() {
@@ -89,6 +90,12 @@ var _ = Describe("Service Builder", func() {
 			ServiceOfferingGuid: "service-guid1",
 		}
 
+		plan3 = models.ServicePlanFields{
+			Name:                "service-plan3",
+			Guid:                "service-plan3-guid",
+			ServiceOfferingGuid: "service-guid2",
+		}
+
 		planWithoutOrgs = models.ServicePlanFields{
 			Name:                "service-plan-without-orgs",
 			Guid:                "service-plan-without-orgs-guid",
@@ -97,6 +104,7 @@ var _ = Describe("Service Builder", func() {
 
 		planBuilder.GetPlansVisibleToOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
 		planBuilder.GetPlansForServiceWithOrgsReturns([]models.ServicePlanFields{plan1, plan2}, nil)
+		planBuilder.GetPlansForManyServicesWithOrgsReturns([]models.ServicePlanFields{plan1, plan2, plan3}, nil)
 		planBuilder.GetPlansForServiceForOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
 	})
 
@@ -407,14 +415,19 @@ var _ = Describe("Service Builder", func() {
 
 			broker_service2 := services[1]
 			Expect(broker_service2.Label).To(Equal("my-service2"))
-			Expect(len(broker_service2.Plans)).To(Equal(2))
-			Expect(broker_service.Plans[0].Name).To(Equal("service-plan1"))
-			Expect(broker_service.Plans[1].Name).To(Equal("service-plan2"))
-			Expect(broker_service.Plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
+			Expect(len(broker_service2.Plans)).To(Equal(1))
+			Expect(broker_service2.Plans[0].Name).To(Equal("service-plan3"))
 		})
 
 		It("raises errors from the service repo", func() {
 			serviceRepo.ListServicesFromManyBrokersErr = errors.New("error")
+			brokerGuids := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
+			_, err := serviceBuilder.GetServicesForManyBrokers(brokerGuids)
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("raises errors from the plan builder", func() {
+			planBuilder.GetPlansForManyServicesWithOrgsReturns(nil, errors.New("error"))
 			brokerGuids := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
 			_, err := serviceBuilder.GetServicesForManyBrokers(brokerGuids)
 			Expect(err).To(HaveOccurred())

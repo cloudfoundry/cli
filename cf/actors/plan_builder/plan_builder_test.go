@@ -1,6 +1,8 @@
 package plan_builder_test
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/api/fakes"
 	testorg "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
@@ -35,12 +37,12 @@ var _ = Describe("Plan builder", func() {
 			Guid:                "service-plan1-guid",
 			ServiceOfferingGuid: "service-guid1",
 		}
-
 		plan2 = models.ServicePlanFields{
 			Name:                "service-plan2",
 			Guid:                "service-plan2-guid",
 			ServiceOfferingGuid: "service-guid1",
 		}
+
 		planRepo.SearchReturns = map[string][]models.ServicePlanFields{
 			"service-guid1": []models.ServicePlanFields{plan1, plan2},
 		}
@@ -90,6 +92,29 @@ var _ = Describe("Plan builder", func() {
 			Expect(plans[0].Name).To(Equal("service-plan1"))
 			Expect(plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
 			Expect(plans[1].Name).To(Equal("service-plan2"))
+		})
+	})
+
+	Describe(".GetPlansForManyServicesWithOrgs", func() {
+		It("returns all the plans for all service in a list of guids", func() {
+			planRepo.ListPlansFromManyServicesReturns = []models.ServicePlanFields{
+				plan1, plan2,
+			}
+			serviceGuids := []string{"service-guid1", "service-guid2"}
+			plans, err := builder.GetPlansForManyServicesWithOrgs(serviceGuids)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(len(plans)).To(Equal(2))
+			Expect(plans[0].Name).To(Equal("service-plan1"))
+			Expect(plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
+			Expect(plans[1].Name).To(Equal("service-plan2"))
+		})
+
+		It("returns errors from the service plan repo", func() {
+			planRepo.ListPlansFromManyServicesError = errors.New("Error")
+			serviceGuids := []string{"service-guid1", "service-guid2"}
+			_, err := builder.GetPlansForManyServicesWithOrgs(serviceGuids)
+			Expect(err).To(HaveOccurred())
 		})
 	})
 
