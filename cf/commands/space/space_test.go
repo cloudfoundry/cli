@@ -2,9 +2,10 @@ package space_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/space"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -20,18 +21,30 @@ var _ = Describe("space command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("space").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
+
+		deps = command_registry.NewDependency()
+		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewShowSpace(ui, configRepo, quotaRepo), args, requirementsFactory)
+		cmd := command_registry.Commands.FindCommand("space")
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -46,12 +59,22 @@ var _ = Describe("space command", func() {
 
 			Expect(runCommand("some-space")).To(BeFalse())
 		})
+
+		It("Shows usage when called incorrectly", func() {
+			requirementsFactory.LoginSuccess = true
+
+			runCommand("some-space", "much")
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
+		})
 	})
 
 	Context("when logged in and an org is targeted", func() {
 		BeforeEach(func() {
 			org := models.OrganizationFields{}
 			org.Name = "my-org"
+			org.Guid = "my-org-guid"
 
 			app := models.ApplicationFields{}
 			app.Name = "app1"
@@ -147,6 +170,7 @@ var _ = Describe("space command", func() {
 					[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed)"},
 				))
 			})
+
 		})
 
 		Context("when the space does not have a space quota", func() {
@@ -167,5 +191,35 @@ var _ = Describe("space command", func() {
 				))
 			})
 		})
+
+		Context("When called as a plugin", func() {
+			var (
+				pluginModel plugin_models.Space
+			)
+			BeforeEach(func() {
+				pluginModel = plugin_models.Space{}
+				deps.PluginModels.Space = &pluginModel
+				updateCommandDependency(true)
+			})
+
+			BeforeEach(func() {
+				updateCommandDependency(true)
+			})
+
+			It("Fills in the PluginModel", func() {
+				runCommand("whose-space-is-it-anyway")
+				Ω(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
+				Ω(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
+
+				Ω(pluginModel.Organization.Name).To(Equal("my-org"))
+				Ω(pluginModel.Organization.Guid).To(Equal("my-org-guid"))
+
+				Ω(pluginModel.Applications).To(HaveLen(1))
+				Ω(pluginModel.Applications[0].Name).To(Equal("app1"))
+				Ω(pluginModel.Applications[0].Guid).To(Equal("app1-guid"))
+
+			})
+		})
 	})
+
 })

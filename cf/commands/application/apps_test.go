@@ -66,6 +66,7 @@ var _ = Describe("list-apps command", func() {
 
 		app := models.Application{}
 		app.Name = "Application-1"
+		app.Guid = "Application-1-guid"
 		app.State = "started"
 		app.RunningInstances = 1
 		app.InstanceCount = 1
@@ -75,6 +76,7 @@ var _ = Describe("list-apps command", func() {
 
 		app2 := models.Application{}
 		app2.Name = "Application-2"
+		app2.Guid = "Application-2-guid"
 		app2.State = "started"
 		app2.RunningInstances = 1
 		app2.InstanceCount = 2
@@ -130,7 +132,9 @@ var _ = Describe("list-apps command", func() {
 			runCommand()
 
 			Ω(pluginAppModels[0].Name).To(Equal("Application-1"))
+			Ω(pluginAppModels[0].Guid).To(Equal("Application-1-guid"))
 			Ω(pluginAppModels[1].Name).To(Equal("Application-2"))
+			Ω(pluginAppModels[1].Guid).To(Equal("Application-2-guid"))
 			Ω(pluginAppModels[0].State).To(Equal("started"))
 			Ω(pluginAppModels[0].TotalInstances).To(Equal(1))
 			Ω(pluginAppModels[0].RunningInstances).To(Equal(1))
@@ -166,6 +170,7 @@ var _ = Describe("list-apps command", func() {
 					}}
 				app := models.Application{}
 				app.Name = "Application-1"
+				app.Guid = "Application-1-guid"
 				app.State = "started"
 				app.RunningInstances = -1
 				app.InstanceCount = 2

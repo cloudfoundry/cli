@@ -35,6 +35,7 @@ type pluginModels struct {
 	Organizations    *[]plugin_models.OrganizationSummary
 	Organization     *plugin_models.Organization
 	Spaces           *[]plugin_models.SpaceSummary
+	Space            *plugin_models.Space
 	Users            *[]plugin_models.User
 	ServiceInstances *[]plugin_models.ServiceInstance
 }

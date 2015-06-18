@@ -4,23 +4,31 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
+	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type ShowSpace struct {
-	ui        terminal.UI
-	config    core_config.Reader
-	spaceReq  requirements.SpaceRequirement
-	quotaRepo space_quotas.SpaceQuotaRepository
+	ui          terminal.UI
+	config      core_config.Reader
+	spaceReq    requirements.SpaceRequirement
+	quotaRepo   space_quotas.SpaceQuotaRepository
+	pluginModel *plugin_models.Space
+	pluginCall  bool
+}
+
+func init() {
+	command_registry.Register(&ShowSpace{})
 }
 
 func NewShowSpace(ui terminal.UI, config core_config.Reader, quotaRepo space_quotas.SpaceQuotaRepository) (cmd *ShowSpace) {
@@ -31,28 +39,24 @@ func NewShowSpace(ui terminal.UI, config core_config.Reader, quotaRepo space_quo
 	return
 }
 
-func (cmd *ShowSpace) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ShowSpace) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given org's guid.  All other output for the org is suppressed.")}
+	fs["security-group-rules"] = &cliFlags.BoolFlag{Name: "security-group-rules", Usage: T("Retrive the rules for all the security groups associated with the space")}
+	return command_registry.CommandMetadata{
 		Name:        "space",
 		Description: T("Show space info"),
 		Usage:       T("CF_NAME space SPACE"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given space's guid.  All other output for the space is suppressed.")},
-			cli.BoolFlag{Name: "security-group-rules", Usage: T("Retrive the rules for all the security groups associated with the space")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *ShowSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ShowSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("space"))
 	}
 
-	if cmd.spaceReq == nil {
-		cmd.spaceReq = requirementsFactory.NewSpaceRequirement(c.Args()[0])
-	} else {
-		cmd.spaceReq.SetSpaceName(c.Args()[0])
-	}
+	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
@@ -61,9 +65,21 @@ func (cmd *ShowSpace) GetRequirements(requirementsFactory requirements.Factory, 
 	return
 }
 
-func (cmd *ShowSpace) Run(c *cli.Context) {
-	space := cmd.spaceReq.GetSpace()
+func (cmd *ShowSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.quotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
+	cmd.pluginCall = pluginCall
+	cmd.pluginModel = deps.PluginModels.Space
+	return cmd
+}
 
+func (cmd *ShowSpace) Execute(c flags.FlagContext) {
+	space := cmd.spaceReq.GetSpace()
+	if cmd.pluginCall {
+		cmd.populatePluginModel(space)
+		return
+	}
 	if c.Bool("guid") {
 		cmd.ui.Say(space.Guid)
 	} else {
@@ -75,7 +91,6 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 			}))
 
 		quotaString := cmd.quotaString(space)
-
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 		table := terminal.NewTable(cmd.ui, []string{terminal.EntityNameColor(space.Name), "", ""})
@@ -124,6 +139,7 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 			table.Print()
 		}
 	}
+
 }
 
 func (cmd *ShowSpace) quotaString(space models.Space) string {
@@ -157,4 +173,84 @@ func (cmd *ShowSpace) quotaString(space models.Space) string {
 	//			"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
 
 	return spaceQuota
+}
+
+func (cmd *ShowSpace) populatePluginModel(space models.Space) {
+	cmd.pluginModel.Name = space.Name
+	cmd.pluginModel.Guid = space.Guid
+
+	cmd.pluginModel.Organization.Name = space.Organization.Name
+	cmd.pluginModel.Organization.Guid = space.Organization.Guid
+
+	for _, app := range space.Applications {
+		a := plugin_models.ApplicationSummary{
+			Name: app.Name,
+			Guid: app.Guid,
+		}
+		cmd.pluginModel.Applications = append(cmd.pluginModel.Applications, a)
+	}
+
+	for _, domain := range space.Domains {
+		d := plugin_models.DomainFields{
+			Name: domain.Name,
+			Guid: domain.Guid,
+			OwningOrganizationGuid: domain.OwningOrganizationGuid,
+			Shared:                 domain.Shared,
+		}
+		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
+	}
+
+	/*
+		domains := []string{}
+		for _, domain := range space.Domains {
+			domains = append(domains, terminal.EntityNameColor(domain.Name))
+		}
+		table.Add("", T("Domains:"), strings.Join(domains, ", "))
+
+		services := []string{}
+		for _, service := range space.ServiceInstances {
+			services = append(services, terminal.EntityNameColor(service.Name))
+		}
+		table.Add("", T("Services:"), strings.Join(services, ", "))
+
+		securityGroups := []string{}
+		for _, group := range space.SecurityGroups {
+			securityGroups = append(securityGroups, terminal.EntityNameColor(group.Name))
+		}
+
+		cmd.pluginModel.QuotaDefinition.Name = quota.Name
+		cmd.pluginModel.QuotaDefinition.MemoryLimit = quota.MemoryLimit
+		cmd.pluginModel.QuotaDefinition.InstanceMemoryLimit = quota.InstanceMemoryLimit
+		cmd.pluginModel.QuotaDefinition.RoutesLimit = quota.RoutesLimit
+		cmd.pluginModel.QuotaDefinition.ServicesLimit = quota.ServicesLimit
+		cmd.pluginModel.QuotaDefinition.NonBasicServicesAllowed = quota.NonBasicServicesAllowed
+
+		for _, domain := range org.Domains {
+			d := plugin_models.DomainFields{
+				Name: domain.Name,
+				Guid: domain.Guid,
+				OwningOrganizationGuid: domain.OwningOrganizationGuid,
+				Shared:                 domain.Shared,
+			}
+			cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
+		}
+
+		for _, space := range org.Spaces {
+			s := plugin_models.SpaceFields{
+				Name: space.Name,
+				Guid: space.Guid,
+			}
+			cmd.pluginModel.Spaces = append(cmd.pluginModel.Spaces, s)
+		}
+
+		for _, spaceQuota := range org.SpaceQuotas {
+			sq := plugin_models.SpaceQuotaFields{
+				Name:                spaceQuota.Name,
+				Guid:                spaceQuota.Guid,
+				MemoryLimit:         spaceQuota.MemoryLimit,
+				InstanceMemoryLimit: spaceQuota.InstanceMemoryLimit,
+			}
+			cmd.pluginModel.SpaceQuotas = append(cmd.pluginModel.SpaceQuotas, sq)
+		}
+	*/
 }

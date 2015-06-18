@@ -7,4 +7,10 @@ type SpaceFields struct {
 
 type Space struct {
 	SpaceFields
+	Organization OrganizationSummary
+	Applications []ApplicationSummary
+	//ServiceInstances []ServiceInstances
+	Domains        []DomainFields
+	SecurityGroups []SecurityGroupFields
+	SpaceQuotaGuid string
 }
