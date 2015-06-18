@@ -34,7 +34,7 @@ type pluginModels struct {
 	AppsSummary      *[]plugin_models.ApplicationSummary
 	Organizations    *[]plugin_models.OrganizationSummary
 	Organization     *plugin_models.Organization
-	Spaces           *[]plugin_models.Space
+	Spaces           *[]plugin_models.SpaceSummary
 	Users            *[]plugin_models.User
 	ServiceInstances *[]plugin_models.ServiceInstance
 }
