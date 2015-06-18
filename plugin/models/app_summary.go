@@ -2,6 +2,7 @@ package plugin_models
 
 type ApplicationSummary struct {
 	Name             string
+	Guid             string
 	State            string
 	TotalInstances   int
 	RunningInstances int

@@ -196,7 +196,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentNonCodegangstaCommand("spaces"),
-					presentCommand("space"),
+					presentNonCodegangstaCommand("space"),
 				}, {
 					presentCommand("create-space"),
 					presentCommand("delete-space"),

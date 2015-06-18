@@ -59,7 +59,7 @@ var _ = Describe("factory", func() {
 				info.Name() == "apps.go" || info.Name() == "orgs.go" ||
 				info.Name() == "spaces.go" || info.Name() == "org_users.go" ||
 				info.Name() == "space_users.go" || info.Name() == "services.go" ||
-				info.Name() == "org.go" {
+				info.Name() == "org.go" || info.Name() == "space.go" {
 				return nil
 			}
 

@@ -111,6 +111,7 @@ func (cmd *ListApps) populatePluginModel(apps []models.Application) {
 	for _, app := range apps {
 		appModel := plugin_models.ApplicationSummary{}
 		appModel.Name = app.Name
+		appModel.Guid = app.Guid
 		appModel.TotalInstances = app.InstanceCount
 		appModel.RunningInstances = app.RunningInstances
 		appModel.Memory = app.Memory

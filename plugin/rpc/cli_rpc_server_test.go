@@ -447,13 +447,6 @@ var _ = Describe("Server", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(org.Name).To(Equal("test-org"))
 					Expect(org.Guid).To(Equal("test-guid"))
-					Expect(org.QuotaDefinition.Guid).To(Equal("guid123"))
-					Expect(org.QuotaDefinition.Name).To(Equal("quota123"))
-					Expect(org.QuotaDefinition.MemoryLimit).To(Equal(int64(128)))
-					Expect(org.QuotaDefinition.InstanceMemoryLimit).To(Equal(int64(16)))
-					Expect(org.QuotaDefinition.RoutesLimit).To(Equal(5))
-					Expect(org.QuotaDefinition.ServicesLimit).To(Equal(6))
-					Expect(org.QuotaDefinition.NonBasicServicesAllowed).To(BeTrue())
 				})
 			})
 
