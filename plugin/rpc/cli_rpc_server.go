@@ -160,6 +160,9 @@ func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organizat
 	retVal.QuotaDefinition.RoutesLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.RoutesLimit
 	retVal.QuotaDefinition.ServicesLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.ServicesLimit
 	retVal.QuotaDefinition.NonBasicServicesAllowed = cmd.cliConfig.OrganizationFields().QuotaDefinition.NonBasicServicesAllowed
+	retVal.Spaces = nil
+	retVal.Domains = nil
+	retVal.SpaceQuotas = nil
 
 	return nil
 }

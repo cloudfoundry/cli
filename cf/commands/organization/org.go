@@ -124,7 +124,6 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 	cmd.pluginModel.QuotaDefinition.ServicesLimit = quota.ServicesLimit
 	cmd.pluginModel.QuotaDefinition.NonBasicServicesAllowed = quota.NonBasicServicesAllowed
 
-	// domains
 	for _, domain := range org.Domains {
 		d := plugin_models.DomainFields{
 			Name: domain.Name,
@@ -135,12 +134,21 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
 	}
 
-	// spaces
 	for _, space := range org.Spaces {
 		s := plugin_models.SpaceFields{
 			Name: space.Name,
 			Guid: space.Guid,
 		}
 		cmd.pluginModel.Spaces = append(cmd.pluginModel.Spaces, s)
+	}
+
+	for _, spaceQuota := range org.SpaceQuotas {
+		sq := plugin_models.SpaceQuotaFields{
+			Name:                spaceQuota.Name,
+			Guid:                spaceQuota.Guid,
+			MemoryLimit:         spaceQuota.MemoryLimit,
+			InstanceMemoryLimit: spaceQuota.InstanceMemoryLimit,
+		}
+		cmd.pluginModel.SpaceQuotas = append(cmd.pluginModel.SpaceQuotas, sq)
 	}
 }

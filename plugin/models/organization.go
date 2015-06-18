@@ -6,5 +6,5 @@ type Organization struct {
 	QuotaDefinition QuotaFields
 	Spaces          []SpaceFields
 	Domains         []DomainFields
-	//SpaceQuotas     []SpaceQuota
+	SpaceQuotas     []SpaceQuotaFields
 }
