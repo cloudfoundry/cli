@@ -13,7 +13,7 @@ import (
 
 	"github.com/cloudfoundry/noaa"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
 type LogsNoaaRepository interface {
@@ -103,18 +103,16 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 
 	l.consumer.SetOnConnectCallback(onConnect)
 
-	var stopChan chan struct{}
 	logChan := make(chan *events.LogMessage)
 	errChan := make(chan error)
-	stopChan = make(chan struct{})
-	go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan, stopChan)
+	go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan)
 
 	for {
 		sendNoaaMessages(l.messageQueue, onMessage)
 
 		select {
 		case <-l.doneChan:
-			l.stopNoaa(stopChan)
+			l.consumer.Close()
 			return nil
 		case err := <-errChan:
 			switch err.(type) {
@@ -123,12 +121,11 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 				if !hasReauthed {
 					l.tokenRefresher.RefreshAuthToken()
 					hasReauthed = true
-					l.stopNoaa(stopChan)
+					l.consumer.Close()
 					time.Sleep(100 * time.Millisecond) //wait a little before retrying
-					stopChan = make(chan struct{})
-					go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan, stopChan)
+					go l.consumer.TailingLogs(appGuid, l.config.AccessToken(), logChan, errChan)
 				} else {
-					l.stopNoaa(stopChan)
+					l.consumer.Close()
 					return err
 				}
 			default:
@@ -144,11 +141,6 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 			time.Sleep(10 * time.Millisecond)
 		}
 	}
-}
-
-func (l *logNoaaRepository) stopNoaa(stopChan chan struct{}) {
-	close(stopChan)
-	l.consumer.Close()
 }
 
 func sendNoaaMessages(queue *SortedMessageQueue, onMessage func(*events.LogMessage)) {

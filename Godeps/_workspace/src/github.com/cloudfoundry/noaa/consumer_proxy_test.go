@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/loggertesthelper"
 	"github.com/cloudfoundry/loggregatorlib/server/handlers"
 	"github.com/cloudfoundry/noaa"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/elazarl/goproxy"
 
 	. "github.com/onsi/ginkgo"

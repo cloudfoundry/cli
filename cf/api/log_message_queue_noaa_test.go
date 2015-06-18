@@ -6,7 +6,7 @@ import (
 
 	"code.google.com/p/gogoprotobuf/proto"
 	. "github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

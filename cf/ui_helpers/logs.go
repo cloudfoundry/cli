@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
 func max(a, b int) int {
