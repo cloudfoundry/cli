@@ -132,14 +132,6 @@ var _ = Describe("UI", func() {
 			config := configuration.NewRepositoryWithDefaults()
 			i18n.T = i18n.Init(config, &detection.JibberJabberDetector{})
 
-			io_helpers.SimulateStdin("oui\n", func(reader io.Reader) {
-				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter())
-					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
-				})
-				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
-			})
-
 			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader, NewTeePrinter())
