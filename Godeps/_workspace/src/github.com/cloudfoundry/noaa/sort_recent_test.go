@@ -2,7 +2,7 @@ package noaa_test
 
 import (
 	"github.com/cloudfoundry/noaa"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

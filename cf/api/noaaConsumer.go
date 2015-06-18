@@ -2,13 +2,13 @@ package api
 
 import (
 	"github.com/cloudfoundry/noaa"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
 type NoaaConsumer interface {
 	GetContainerMetrics(string, string) ([]*events.ContainerMetric, error)
 	RecentLogs(string, string) ([]*events.LogMessage, error)
-	TailingLogs(string, string, chan<- *events.LogMessage, chan<- error, chan struct{})
+	TailingLogs(string, string, chan<- *events.LogMessage, chan<- error)
 	SetOnConnectCallback(func())
 	Close() error
 }
@@ -31,8 +31,8 @@ func (n *noaaConsumer) RecentLogs(appGuid string, authToken string) ([]*events.L
 	return n.consumer.RecentLogs(appGuid, authToken)
 }
 
-func (n *noaaConsumer) TailingLogs(appGuid string, authToken string, outputChan chan<- *events.LogMessage, errorChan chan<- error, stopChan chan struct{}) {
-	n.consumer.TailingLogs(appGuid, authToken, outputChan, errorChan, stopChan)
+func (n *noaaConsumer) TailingLogs(appGuid string, authToken string, outputChan chan<- *events.LogMessage, errorChan chan<- error) {
+	n.consumer.TailingLogs(appGuid, authToken, outputChan, errorChan)
 }
 
 func (n *noaaConsumer) SetOnConnectCallback(cb func()) {

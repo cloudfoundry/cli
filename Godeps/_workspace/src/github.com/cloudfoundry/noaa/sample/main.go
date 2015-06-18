@@ -6,15 +6,15 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/noaa"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
-var DopplerAddress = "wss://doppler.10.244.0.34.xip.io:443"
+var dopplerAddress = os.Getenv("DOPPLER_ADDR")
 var appGuid = os.Getenv("APP_GUID")
 var authToken = os.Getenv("CF_ACCESS_TOKEN")
 
 func main() {
-	connection := noaa.NewConsumer(DopplerAddress, &tls.Config{InsecureSkipVerify: true}, nil)
+	connection := noaa.NewConsumer(dopplerAddress, &tls.Config{InsecureSkipVerify: true}, nil)
 	connection.SetDebugPrinter(ConsoleDebugPrinter{})
 
 	messages, err := connection.RecentLogs(appGuid, authToken)
@@ -33,7 +33,7 @@ func main() {
 	go func() {
 		defer close(msgChan)
 		errorChan := make(chan error)
-		go connection.Stream(appGuid, authToken, msgChan, errorChan, nil)
+		go connection.Stream(appGuid, authToken, msgChan, errorChan)
 
 		for err := range errorChan {
 			fmt.Fprintf(os.Stderr, "%v\n", err.Error())

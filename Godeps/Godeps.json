@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/cloudfoundry/cli",
-	"GoVersion": "go1.2.1",
+	"GoVersion": "go1.2.2",
 	"Packages": [
 		"./..."
 	],
@@ -32,6 +32,10 @@
 			"Rev": "a4a0cae5ff8a342ba01fce700b9e41c6942c0e5e"
 		},
 		{
+			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
+			"Rev": "89d7fe237afae1e8222554359ec03b72c8466d10"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry/loggregatorlib/logmessage",
 			"Rev": "28ce6c1f1aa0352189bed34cdc9aa4ea8fcb9089"
 		},
@@ -41,7 +45,11 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/noaa",
-			"Rev": "9e379db26bbd042ec0202d9679ed8d753b64e0df"
+			"Rev": "3c78d4555842c8a7396fa4fc3ef18376c08a3e31"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/sonde-go/events",
+			"Rev": "32dccbbdfb14f855abd7b909bb2efe24c0b2ecff"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
@@ -50,15 +58,7 @@
 		},
 		{
 			"ImportPath": "github.com/gogo/protobuf/proto",
-			"Rev": "bc946d07d1016848dfd2507f90f0859c9471681e"
-		},
-		{
-			"ImportPath": "github.com/gorilla/context",
-			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
-		},
-		{
-			"ImportPath": "github.com/gorilla/mux",
-			"Rev": "8a875a034c69b940914d83ea03d3f1299b4d094b"
+			"Rev": "b9e369e8ffb6773efc654ea13594566404314ee1"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
