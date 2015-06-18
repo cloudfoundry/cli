@@ -135,4 +135,12 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
 	}
 
+	// spaces
+	for _, space := range org.Spaces {
+		s := plugin_models.SpaceFields{
+			Name: space.Name,
+			Guid: space.Guid,
+		}
+		cmd.pluginModel.Spaces = append(cmd.pluginModel.Spaces, s)
+	}
 }

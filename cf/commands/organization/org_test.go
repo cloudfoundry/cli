@@ -79,8 +79,10 @@ var _ = Describe("org command", func() {
 		BeforeEach(func() {
 			developmentSpaceFields := models.SpaceFields{}
 			developmentSpaceFields.Name = "development"
+			developmentSpaceFields.Guid = "dev-space-guid-1"
 			stagingSpaceFields := models.SpaceFields{}
 			stagingSpaceFields.Name = "staging"
+			stagingSpaceFields.Guid = "staging-space-guid-1"
 			domainFields := models.DomainFields{}
 			domainFields.Name = "cfapps.io"
 			domainFields.Guid = "1111"
@@ -171,6 +173,11 @@ var _ = Describe("org command", func() {
 				Ω(pluginModel.Domains[1].Shared).To(BeFalse())
 
 				// spaces
+				Ω(pluginModel.Spaces).To(HaveLen(2))
+				Ω(pluginModel.Spaces[0].Name).To(Equal("development"))
+				Ω(pluginModel.Spaces[0].Guid).To(Equal("dev-space-guid-1"))
+				Ω(pluginModel.Spaces[1].Name).To(Equal("staging"))
+				Ω(pluginModel.Spaces[1].Guid).To(Equal("staging-space-guid-1"))
 			})
 		})
 	})
