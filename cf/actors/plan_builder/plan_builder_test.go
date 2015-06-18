@@ -27,6 +27,8 @@ var _ = Describe("Plan builder", func() {
 	)
 
 	BeforeEach(func() {
+		plan_builder.PlanToOrgsVisibilityMap = nil
+		plan_builder.OrgToPlansVisibilityMap = nil
 		planRepo = &fakes.FakeServicePlanRepo{}
 		visibilityRepo = &fakes.FakeServicePlanVisibilityRepository{}
 		orgRepo = &testorg.FakeOrganizationRepository{}
@@ -56,8 +58,9 @@ var _ = Describe("Plan builder", func() {
 		visibilityRepo.ListReturns([]models.ServicePlanVisibilityFields{
 			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org1-guid"},
 			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org2-guid"},
+			{ServicePlanGuid: "service-plan2-guid", OrganizationGuid: "org1-guid"},
 		}, nil)
-		orgRepo.ListOrgsReturns([]models.Organization{org1, org2}, nil)
+		orgRepo.GetManyOrgsByGuidReturns([]models.Organization{org1, org2}, nil)
 	})
 
 	Describe(".AttachOrgsToPlans", func() {
@@ -103,6 +106,8 @@ var _ = Describe("Plan builder", func() {
 			serviceGuids := []string{"service-guid1", "service-guid2"}
 			plans, err := builder.GetPlansForManyServicesWithOrgs(serviceGuids)
 			Expect(err).ToNot(HaveOccurred())
+			Expect(orgRepo.GetManyOrgsByGuidCallCount()).To(Equal(1))
+			Expect(orgRepo.GetManyOrgsByGuidArgsForCall(0)).To(ConsistOf("org1-guid", "org2-guid"))
 
 			Expect(len(plans)).To(Equal(2))
 			Expect(plans[0].Name).To(Equal("service-plan1"))
@@ -148,7 +153,7 @@ var _ = Describe("Plan builder", func() {
 			plans, err := builder.GetPlansVisibleToOrg("org1")
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(len(plans)).To(Equal(1))
+			Expect(len(plans)).To(Equal(2))
 			Expect(plans[0].Name).To(Equal("service-plan1"))
 			Expect(plans[0].OrgNames).To(Equal([]string{"org1", "org2"}))
 		})
