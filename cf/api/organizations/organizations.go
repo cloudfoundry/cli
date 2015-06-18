@@ -15,6 +15,7 @@ import (
 //go:generate counterfeiter -o fakes/fake_organization_repository.go . OrganizationRepository
 type OrganizationRepository interface {
 	ListOrgs() (orgs []models.Organization, apiErr error)
+	GetManyOrgsByGuid(orgGuids []string) (orgs []models.Organization, apiErr error)
 	FindByName(name string) (org models.Organization, apiErr error)
 	Create(org models.Organization) (apiErr error)
 	Rename(orgGuid string, name string) (apiErr error)
@@ -50,6 +51,20 @@ func (repo CloudControllerOrganizationRepository) ListOrgs() ([]models.Organizat
 			}
 		})
 	return orgs, err
+}
+
+func (repo CloudControllerOrganizationRepository) GetManyOrgsByGuid(orgGuids []string) (orgs []models.Organization, err error) {
+	for _, orgGuid := range orgGuids {
+		url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
+		orgResource := resources.OrganizationResource{}
+		err = repo.gateway.GetResource(url, &orgResource)
+		if err != nil {
+			return nil, err
+		} else {
+			orgs = append(orgs, orgResource.ToModel())
+		}
+	}
+	return
 }
 
 func (repo CloudControllerOrganizationRepository) FindByName(name string) (org models.Organization, apiErr error) {
