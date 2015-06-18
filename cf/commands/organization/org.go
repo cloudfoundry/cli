@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -101,14 +102,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 				"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
 
 		if cmd.pluginCall {
-			cmd.pluginModel.Name = org.Name
-			cmd.pluginModel.Guid = org.Guid
-			cmd.pluginModel.QuotaDefinition.Name = quota.Name
-			cmd.pluginModel.QuotaDefinition.MemoryLimit = quota.MemoryLimit
-			cmd.pluginModel.QuotaDefinition.InstanceMemoryLimit = quota.InstanceMemoryLimit
-			cmd.pluginModel.QuotaDefinition.RoutesLimit = quota.RoutesLimit
-			cmd.pluginModel.QuotaDefinition.ServicesLimit = quota.ServicesLimit
-			cmd.pluginModel.QuotaDefinition.NonBasicServicesAllowed = quota.NonBasicServicesAllowed
+			cmd.populatePluginModel(org, quota)
 		} else {
 			table.Add("", T("domains:"), terminal.EntityNameColor(strings.Join(domains, ", ")))
 			table.Add("", T("quota:"), terminal.EntityNameColor(orgQuota))
@@ -118,4 +112,27 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 			table.Print()
 		}
 	}
+}
+
+func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.QuotaFields) {
+	cmd.pluginModel.Name = org.Name
+	cmd.pluginModel.Guid = org.Guid
+	cmd.pluginModel.QuotaDefinition.Name = quota.Name
+	cmd.pluginModel.QuotaDefinition.MemoryLimit = quota.MemoryLimit
+	cmd.pluginModel.QuotaDefinition.InstanceMemoryLimit = quota.InstanceMemoryLimit
+	cmd.pluginModel.QuotaDefinition.RoutesLimit = quota.RoutesLimit
+	cmd.pluginModel.QuotaDefinition.ServicesLimit = quota.ServicesLimit
+	cmd.pluginModel.QuotaDefinition.NonBasicServicesAllowed = quota.NonBasicServicesAllowed
+
+	// domains
+	for _, domain := range org.Domains {
+		d := plugin_models.DomainFields{
+			Name: domain.Name,
+			Guid: domain.Guid,
+			OwningOrganizationGuid: domain.OwningOrganizationGuid,
+			Shared:                 domain.Shared,
+		}
+		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
+	}
+
 }

@@ -5,6 +5,6 @@ type Organization struct {
 	Name            string
 	QuotaDefinition QuotaFields
 	//Spaces          []SpaceFields
-	//Domains         []DomainFields
+	Domains []DomainFields
 	//SpaceQuotas     []SpaceQuota
 }
