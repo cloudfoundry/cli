@@ -17,7 +17,7 @@ type ListSpaces struct {
 	config    core_config.Reader
 	spaceRepo spaces.SpaceRepository
 
-	pluginModel *[]plugin_models.Space
+	pluginModel *[]plugin_models.SpaceSummary
 	pluginCall  bool
 }
 
@@ -76,7 +76,7 @@ func (cmd *ListSpaces) Execute(c flags.FlagContext) {
 		foundSpaces = true
 
 		if cmd.pluginCall {
-			s := plugin_models.Space{}
+			s := plugin_models.SpaceSummary{}
 			s.Name = space.Name
 			s.Guid = space.Guid
 			*(cmd.pluginModel) = append(*(cmd.pluginModel), s)
