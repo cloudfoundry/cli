@@ -30,8 +30,10 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 
 		hasOrg, _ := cliConnection.HasOrganization()
 		fmt.Println("Has Organization Targeted:", hasOrg)
-		org, _ := cliConnection.GetCurrentOrg()
-		fmt.Println("Current Org:", org)
+		currentOrg, _ := cliConnection.GetCurrentOrg()
+		fmt.Println("Current Org:", currentOrg)
+		org, _ := cliConnection.GetOrg(currentOrg.Name)
+		fmt.Println(currentOrg.Name, " Org:", org)
 		orgs, _ := cliConnection.GetOrgs()
 		fmt.Println("Orgs:", orgs)
 		hasSpace, _ := cliConnection.HasSpace()

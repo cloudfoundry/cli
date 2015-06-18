@@ -101,8 +101,8 @@ var _ = Describe("org command", func() {
 			org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 			org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
 			org.SpaceQuotas = []models.SpaceQuota{
-				{Name: "space-quota-1"},
-				{Name: "space-quota-2"},
+				{Name: "space-quota-1", Guid: "space-quota-1-guid", MemoryLimit: 512, InstanceMemoryLimit: -1},
+				{Name: "space-quota-2", Guid: "space-quota-2-guid", MemoryLimit: 256, InstanceMemoryLimit: 128},
 			}
 
 			requirementsFactory.LoginSuccess = true
@@ -178,7 +178,19 @@ var _ = Describe("org command", func() {
 				Ω(pluginModel.Spaces[0].Guid).To(Equal("dev-space-guid-1"))
 				Ω(pluginModel.Spaces[1].Name).To(Equal("staging"))
 				Ω(pluginModel.Spaces[1].Guid).To(Equal("staging-space-guid-1"))
+
+				// space quotas
+				Ω(pluginModel.SpaceQuotas).To(HaveLen(2))
+				Ω(pluginModel.SpaceQuotas[0].Name).To(Equal("space-quota-1"))
+				Ω(pluginModel.SpaceQuotas[0].Guid).To(Equal("space-quota-1-guid"))
+				Ω(pluginModel.SpaceQuotas[0].MemoryLimit).To(Equal(int64(512)))
+				Ω(pluginModel.SpaceQuotas[0].InstanceMemoryLimit).To(Equal(int64(-1)))
+				Ω(pluginModel.SpaceQuotas[1].Name).To(Equal("space-quota-2"))
+				Ω(pluginModel.SpaceQuotas[1].Guid).To(Equal("space-quota-2-guid"))
+				Ω(pluginModel.SpaceQuotas[1].MemoryLimit).To(Equal(int64(256)))
+				Ω(pluginModel.SpaceQuotas[1].InstanceMemoryLimit).To(Equal(int64(128)))
 			})
+
 		})
 	})
 })
