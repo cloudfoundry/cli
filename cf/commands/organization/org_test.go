@@ -83,8 +83,14 @@ var _ = Describe("org command", func() {
 			stagingSpaceFields.Name = "staging"
 			domainFields := models.DomainFields{}
 			domainFields.Name = "cfapps.io"
+			domainFields.Guid = "1111"
+			domainFields.OwningOrganizationGuid = "my-org-guid"
+			domainFields.Shared = true
 			cfAppDomainFields := models.DomainFields{}
 			cfAppDomainFields.Name = "cf-app.com"
+			cfAppDomainFields.Guid = "2222"
+			cfAppDomainFields.OwningOrganizationGuid = "my-org-guid"
+			cfAppDomainFields.Shared = false
 
 			org := models.Organization{}
 			org.Name = "my-org"
@@ -145,12 +151,26 @@ var _ = Describe("org command", func() {
 
 				Ω(pluginModel.Name).To(Equal("my-org"))
 				Ω(pluginModel.Guid).To(Equal("my-org-guid"))
+				// quota
 				Ω(pluginModel.QuotaDefinition.Name).To(Equal("cantina-quota"))
 				Ω(pluginModel.QuotaDefinition.MemoryLimit).To(Equal(int64(512)))
 				Ω(pluginModel.QuotaDefinition.InstanceMemoryLimit).To(Equal(int64(256)))
 				Ω(pluginModel.QuotaDefinition.RoutesLimit).To(Equal(2))
 				Ω(pluginModel.QuotaDefinition.ServicesLimit).To(Equal(5))
 				Ω(pluginModel.QuotaDefinition.NonBasicServicesAllowed).To(BeTrue())
+
+				// domains
+				Ω(pluginModel.Domains).To(HaveLen(2))
+				Ω(pluginModel.Domains[0].Name).To(Equal("cfapps.io"))
+				Ω(pluginModel.Domains[0].Guid).To(Equal("1111"))
+				Ω(pluginModel.Domains[0].OwningOrganizationGuid).To(Equal("my-org-guid"))
+				Ω(pluginModel.Domains[0].Shared).To(BeTrue())
+				Ω(pluginModel.Domains[1].Name).To(Equal("cf-app.com"))
+				Ω(pluginModel.Domains[1].Guid).To(Equal("2222"))
+				Ω(pluginModel.Domains[1].OwningOrganizationGuid).To(Equal("my-org-guid"))
+				Ω(pluginModel.Domains[1].Shared).To(BeFalse())
+
+				// spaces
 			})
 		})
 	})
