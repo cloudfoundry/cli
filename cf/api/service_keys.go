@@ -59,13 +59,13 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid strin
 }
 
 func (c CloudControllerServiceKeyRepository) ListServiceKeys(instanceGuid string) ([]models.ServiceKey, error) {
-	path := fmt.Sprintf("/v2/service_keys?q=service_instance_guid:%s", instanceGuid)
+	path := fmt.Sprintf("/v2/service_instances/%s/service_keys", instanceGuid)
 
 	return c.listServiceKeys(path)
 }
 
-func (c CloudControllerServiceKeyRepository) GetServiceKey(instanceId string, keyName string) (models.ServiceKey, error) {
-	path := fmt.Sprintf("/v2/service_keys?q=%s", url.QueryEscape("service_instance_guid:"+instanceId+";name:"+keyName))
+func (c CloudControllerServiceKeyRepository) GetServiceKey(instanceGuid string, keyName string) (models.ServiceKey, error) {
+	path := fmt.Sprintf("/v2/service_instances/%s/service_keys?q=%s", instanceGuid, url.QueryEscape("name:"+keyName))
 
 	serviceKeys, err := c.listServiceKeys(path)
 	if err != nil || len(serviceKeys) == 0 {
