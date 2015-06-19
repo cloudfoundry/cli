@@ -200,57 +200,30 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
 	}
 
-	/*
-		domains := []string{}
-		for _, domain := range space.Domains {
-			domains = append(domains, terminal.EntityNameColor(domain.Name))
+	for _, service := range space.ServiceInstances {
+		si := plugin_models.ServiceInstanceSummary{
+			Name: service.Name,
+			Guid: service.Guid,
 		}
-		table.Add("", T("Domains:"), strings.Join(domains, ", "))
-
-		services := []string{}
-		for _, service := range space.ServiceInstances {
-			services = append(services, terminal.EntityNameColor(service.Name))
+		cmd.pluginModel.ServiceInstances = append(cmd.pluginModel.ServiceInstances, si)
+	}
+	for _, group := range space.SecurityGroups {
+		sg := plugin_models.SecurityGroupFields{
+			Name:  group.Name,
+			Guid:  group.Guid,
+			Rules: group.Rules,
 		}
-		table.Add("", T("Services:"), strings.Join(services, ", "))
+		cmd.pluginModel.SecurityGroups = append(cmd.pluginModel.SecurityGroups, sg)
+	}
 
-		securityGroups := []string{}
-		for _, group := range space.SecurityGroups {
-			securityGroups = append(securityGroups, terminal.EntityNameColor(group.Name))
-		}
-
-		cmd.pluginModel.QuotaDefinition.Name = quota.Name
-		cmd.pluginModel.QuotaDefinition.MemoryLimit = quota.MemoryLimit
-		cmd.pluginModel.QuotaDefinition.InstanceMemoryLimit = quota.InstanceMemoryLimit
-		cmd.pluginModel.QuotaDefinition.RoutesLimit = quota.RoutesLimit
-		cmd.pluginModel.QuotaDefinition.ServicesLimit = quota.ServicesLimit
-		cmd.pluginModel.QuotaDefinition.NonBasicServicesAllowed = quota.NonBasicServicesAllowed
-
-		for _, domain := range org.Domains {
-			d := plugin_models.DomainFields{
-				Name: domain.Name,
-				Guid: domain.Guid,
-				OwningOrganizationGuid: domain.OwningOrganizationGuid,
-				Shared:                 domain.Shared,
-			}
-			cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
-		}
-
-		for _, space := range org.Spaces {
-			s := plugin_models.SpaceFields{
-				Name: space.Name,
-				Guid: space.Guid,
-			}
-			cmd.pluginModel.Spaces = append(cmd.pluginModel.Spaces, s)
-		}
-
-		for _, spaceQuota := range org.SpaceQuotas {
-			sq := plugin_models.SpaceQuotaFields{
-				Name:                spaceQuota.Name,
-				Guid:                spaceQuota.Guid,
-				MemoryLimit:         spaceQuota.MemoryLimit,
-				InstanceMemoryLimit: spaceQuota.InstanceMemoryLimit,
-			}
-			cmd.pluginModel.SpaceQuotas = append(cmd.pluginModel.SpaceQuotas, sq)
-		}
-	*/
+	quota, err := cmd.quotaRepo.FindByGuid(space.SpaceQuotaGuid)
+	if err == nil {
+		cmd.pluginModel.SpaceQuota.Name = quota.Name
+		cmd.pluginModel.SpaceQuota.Guid = quota.Guid
+		cmd.pluginModel.SpaceQuota.MemoryLimit = quota.MemoryLimit
+		cmd.pluginModel.SpaceQuota.InstanceMemoryLimit = quota.InstanceMemoryLimit
+		cmd.pluginModel.SpaceQuota.RoutesLimit = quota.RoutesLimit
+		cmd.pluginModel.SpaceQuota.ServicesLimit = quota.ServicesLimit
+		cmd.pluginModel.SpaceQuota.NonBasicServicesAllowed = quota.NonBasicServicesAllowed
+	}
 }
