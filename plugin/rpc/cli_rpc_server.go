@@ -385,7 +385,7 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.Organization)
 	return cmd.newCmdRunner.Command([]string{"org", orgName}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.SpaceDetails) error {
+func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.Space) error {
 	defer func() {
 		recover()
 	}()

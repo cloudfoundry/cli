@@ -23,7 +23,7 @@ type ShowSpace struct {
 	config      core_config.Reader
 	spaceReq    requirements.SpaceRequirement
 	quotaRepo   space_quotas.SpaceQuotaRepository
-	pluginModel *plugin_models.SpaceDetails
+	pluginModel *plugin_models.Space
 	pluginCall  bool
 }
 

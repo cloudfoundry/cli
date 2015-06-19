@@ -4,7 +4,7 @@ type Organization struct {
 	Guid            string
 	Name            string
 	QuotaDefinition QuotaFields
-	Spaces          []SpaceFields
+	Spaces          []SpaceSummary
 	Domains         []DomainFields
 	SpaceQuotas     []SpaceQuotaFields
 }
