@@ -38,8 +38,10 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Orgs:", orgs)
 		hasSpace, _ := cliConnection.HasSpace()
 		fmt.Println("Has Space Targeted:", hasSpace)
-		space, _ := cliConnection.GetCurrentSpace()
-		fmt.Println("Current space:", space)
+		currentSpace, _ := cliConnection.GetCurrentSpace()
+		fmt.Println("Current space:", currentSpace)
+		space, _ := cliConnection.GetSpace(currentSpace.Name)
+		fmt.Println("Space:", space)
 
 		loggregator, _ := cliConnection.LoggregatorEndpoint()
 		fmt.Println("Loggregator Endpoint:", loggregator)
