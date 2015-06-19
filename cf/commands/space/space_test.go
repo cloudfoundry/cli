@@ -218,6 +218,40 @@ var _ = Describe("space command", func() {
 				Ω(pluginModel.Applications[0].Name).To(Equal("app1"))
 				Ω(pluginModel.Applications[0].Guid).To(Equal("app1-guid"))
 
+				Ω(pluginModel.Domains).To(HaveLen(1))
+				Ω(pluginModel.Domains[0].Name).To(Equal("domain1"))
+				Ω(pluginModel.Domains[0].Guid).To(Equal("domain1-guid"))
+
+				Ω(pluginModel.ServiceInstances).To(HaveLen(1))
+				Ω(pluginModel.ServiceInstances[0].Name).To(Equal("service1"))
+				Ω(pluginModel.ServiceInstances[0].Guid).To(Equal("service1-guid"))
+
+				Ω(pluginModel.SecurityGroups).To(HaveLen(2))
+				Ω(pluginModel.SecurityGroups[0].Name).To(Equal("Nacho Security"))
+				Ω(pluginModel.SecurityGroups[0].Rules).To(HaveLen(1))
+				Ω(pluginModel.SecurityGroups[0].Rules[0]).To(HaveLen(2))
+				val := pluginModel.SecurityGroups[0].Rules[0]["protocol"]
+				Ω(val).To(Equal("all"))
+				val = pluginModel.SecurityGroups[0].Rules[0]["destination"]
+				Ω(val).To(Equal("0.0.0.0-9.255.255.255"))
+
+				Ω(pluginModel.SecurityGroups[1].Name).To(Equal("Nacho Prime"))
+				Ω(pluginModel.SecurityGroups[1].Rules).To(HaveLen(1))
+				Ω(pluginModel.SecurityGroups[1].Rules[0]).To(HaveLen(3))
+				val = pluginModel.SecurityGroups[1].Rules[0]["protocol"]
+				Ω(val).To(Equal("udp"))
+				val = pluginModel.SecurityGroups[1].Rules[0]["destination"]
+				Ω(val).To(Equal("198.41.191.47/1"))
+				val = pluginModel.SecurityGroups[1].Rules[0]["ports"]
+				Ω(val).To(Equal("8080-9090"))
+
+				Ω(pluginModel.SpaceQuota.Name).To(Equal("runaway"))
+				Ω(pluginModel.SpaceQuota.Guid).To(Equal("runaway-guid"))
+				Ω(pluginModel.SpaceQuota.MemoryLimit).To(Equal(int64(102400)))
+				Ω(pluginModel.SpaceQuota.InstanceMemoryLimit).To(Equal(int64(-1)))
+				Ω(pluginModel.SpaceQuota.RoutesLimit).To(Equal(111))
+				Ω(pluginModel.SpaceQuota.ServicesLimit).To(Equal(222))
+				Ω(pluginModel.SpaceQuota.NonBasicServicesAllowed).To(BeFalse())
 			})
 		})
 	})

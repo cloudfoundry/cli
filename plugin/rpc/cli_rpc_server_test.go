@@ -265,6 +265,18 @@ var _ = Describe("Server", func() {
 			Expect(pluginApiCall).To(BeTrue())
 		})
 
+		It("calls GetSpace() with 'my-space' as argument", func() {
+			result := plugin_models.SpaceDetails{}
+			err = client.Call("CliRpcCmd.GetSpace", "my-space", &result)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("space"))
+			Expect(arg1[1]).To(Equal("my-space"))
+			Expect(pluginApiCall).To(BeTrue())
+		})
+
 		It("calls GetApps() ", func() {
 			result := []plugin_models.ApplicationSummary{}
 			err = client.Call("CliRpcCmd.GetApps", "", &result)
