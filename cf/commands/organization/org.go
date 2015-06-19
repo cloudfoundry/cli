@@ -135,7 +135,7 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 	}
 
 	for _, space := range org.Spaces {
-		s := plugin_models.SpaceFields{
+		s := plugin_models.SpaceSummary{
 			Name: space.Name,
 			Guid: space.Guid,
 		}

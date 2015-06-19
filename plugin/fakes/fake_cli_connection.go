@@ -198,13 +198,13 @@ type FakeCliConnection struct {
 		result1 plugin_models.Organization
 		result2 error
 	}
-	GetSpaceStub        func(string) (plugin_models.SpaceDetails, error)
+	GetSpaceStub        func(string) (plugin_models.Space, error)
 	getSpaceMutex       sync.RWMutex
 	getSpaceArgsForCall []struct {
 		arg1 string
 	}
 	getSpaceReturns struct {
-		result1 plugin_models.SpaceDetails
+		result1 plugin_models.Space
 		result2 error
 	}
 }
@@ -884,7 +884,7 @@ func (fake *FakeCliConnection) GetOrgReturns(result1 plugin_models.Organization,
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetSpace(arg1 string) (plugin_models.SpaceDetails, error) {
+func (fake *FakeCliConnection) GetSpace(arg1 string) (plugin_models.Space, error) {
 	fake.getSpaceMutex.Lock()
 	fake.getSpaceArgsForCall = append(fake.getSpaceArgsForCall, struct {
 		arg1 string
@@ -909,10 +909,10 @@ func (fake *FakeCliConnection) GetSpaceArgsForCall(i int) string {
 	return fake.getSpaceArgsForCall[i].arg1
 }
 
-func (fake *FakeCliConnection) GetSpaceReturns(result1 plugin_models.SpaceDetails, result2 error) {
+func (fake *FakeCliConnection) GetSpaceReturns(result1 plugin_models.Space, result2 error) {
 	fake.GetSpaceStub = nil
 	fake.getSpaceReturns = struct {
-		result1 plugin_models.SpaceDetails
+		result1 plugin_models.Space
 		result2 error
 	}{result1, result2}
 }

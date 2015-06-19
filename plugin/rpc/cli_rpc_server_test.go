@@ -266,7 +266,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetSpace() with 'my-space' as argument", func() {
-			result := plugin_models.SpaceDetails{}
+			result := plugin_models.Space{}
 			err = client.Call("CliRpcCmd.GetSpace", "my-space", &result)
 
 			Expect(err).ToNot(HaveOccurred())
