@@ -311,7 +311,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetSpaces() ", func() {
-			result := []plugin_models.Space{}
+			result := []plugin_models.SpaceSummary{}
 			err = client.Call("CliRpcCmd.GetSpaces", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -480,7 +480,7 @@ var _ = Describe("Server", func() {
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
-					var space plugin_models.Space
+					var space plugin_models.SpaceSummary
 					err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
 
 					Expect(err).ToNot(HaveOccurred())

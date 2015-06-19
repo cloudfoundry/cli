@@ -110,13 +110,13 @@ func (cliConnection *cliConnection) GetCurrentOrg() (plugin_models.OrganizationS
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetCurrentSpace() (plugin_models.Space, error) {
+func (cliConnection *cliConnection) GetCurrentSpace() (plugin_models.SpaceSummary, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.Space{}, err
+		return plugin_models.SpaceSummary{}, err
 	}
 
-	var result plugin_models.Space
+	var result plugin_models.SpaceSummary
 
 	err = client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
 	return result, err
