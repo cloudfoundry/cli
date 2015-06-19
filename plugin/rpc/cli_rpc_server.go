@@ -367,7 +367,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.User)
 	return cmd.newCmdRunner.Command(append([]string{"space-users"}, args...), deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.OrganizationDetails) error {
+func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.Organization) error {
 	defer func() {
 		recover()
 	}()

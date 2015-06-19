@@ -33,7 +33,7 @@ type pluginModels struct {
 	Application      *plugin_models.Application
 	AppsSummary      *[]plugin_models.ApplicationSummary
 	Organizations    *[]plugin_models.OrganizationSummary
-	Organization     *plugin_models.OrganizationDetails
+	Organization     *plugin_models.Organization
 	Spaces           *[]plugin_models.SpaceSummary
 	Space            *plugin_models.SpaceDetails
 	Users            *[]plugin_models.User

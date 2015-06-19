@@ -140,10 +140,10 @@ var _ = Describe("org command", func() {
 
 		Context("when invoked by a plugin", func() {
 			var (
-				pluginModel plugin_models.OrganizationDetails
+				pluginModel plugin_models.Organization
 			)
 			BeforeEach(func() {
-				pluginModel = plugin_models.OrganizationDetails{}
+				pluginModel = plugin_models.Organization{}
 				deps.PluginModels.Organization = &pluginModel
 				updateCommandDependency(true)
 			})
