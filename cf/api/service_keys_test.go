@@ -121,7 +121,7 @@ var _ = Describe("Service Keys Repo", func() {
 		It("returns empty result when no service key is found", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
-				Path:     "/v2/service_keys?q=service_instance_guid:fake-instance-guid",
+				Path:     "/v2/service_instances/fake-instance-guid/service_keys",
 				Response: emptyServiceKeysResponse,
 			}))
 
@@ -134,7 +134,7 @@ var _ = Describe("Service Keys Repo", func() {
 		It("returns correctly when service keys are found", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
-				Path:     "/v2/service_keys?q=service_instance_guid:fake-instance-guid",
+				Path:     "/v2/service_instances/fake-instance-guid/service_keys",
 				Response: serviceKeysResponse,
 			}))
 
@@ -175,7 +175,7 @@ var _ = Describe("Service Keys Repo", func() {
 		It("returns service key detail", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
-				Path:     "/v2/service_keys?q=service_instance_guid:fake-instance-guid;name:fake-service-key-name",
+				Path:     "/v2/service_instances/fake-instance-guid/service_keys?q=name:fake-service-key-name",
 				Response: serviceKeyDetailResponse,
 			}))
 
@@ -200,7 +200,7 @@ var _ = Describe("Service Keys Repo", func() {
 		It("returns empty result when the service key is not found", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
-				Path:     "/v2/service_keys?q=service_instance_guid:fake-instance-guid;name:non-exist-key-name",
+				Path:     "/v2/service_instances/fake-instance-guid/service_keys?q=name:non-exist-key-name",
 				Response: emptyServiceKeysResponse,
 			}))
 
