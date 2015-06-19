@@ -366,13 +366,13 @@ func (cliConnection *cliConnection) GetSpaceUsers(orgName string, spaceName stri
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetOrg(orgName string) (plugin_models.OrganizationDetails, error) {
+func (cliConnection *cliConnection) GetOrg(orgName string) (plugin_models.Organization, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.OrganizationDetails{}, err
+		return plugin_models.Organization{}, err
 	}
 
-	var result plugin_models.OrganizationDetails
+	var result plugin_models.Organization
 
 	err = client.Call("CliRpcCmd.GetOrg", orgName, &result)
 	return result, err
