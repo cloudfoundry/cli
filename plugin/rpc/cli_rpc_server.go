@@ -150,14 +150,21 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.OrganizationSummary) error {
+func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
 	retVal.Name = cmd.cliConfig.OrganizationFields().Name
 	retVal.Guid = cmd.cliConfig.OrganizationFields().Guid
+	retVal.QuotaDefinition.Guid = cmd.cliConfig.OrganizationFields().QuotaDefinition.Guid
+	retVal.QuotaDefinition.Name = cmd.cliConfig.OrganizationFields().QuotaDefinition.Name
+	retVal.QuotaDefinition.MemoryLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.MemoryLimit
+	retVal.QuotaDefinition.InstanceMemoryLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.InstanceMemoryLimit
+	retVal.QuotaDefinition.RoutesLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.RoutesLimit
+	retVal.QuotaDefinition.ServicesLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.ServicesLimit
+	retVal.QuotaDefinition.NonBasicServicesAllowed = cmd.cliConfig.OrganizationFields().QuotaDefinition.NonBasicServicesAllowed
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.SpaceSummary) error {
+func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
 	retVal.Name = cmd.cliConfig.SpaceFields().Name
 	retVal.Guid = cmd.cliConfig.SpaceFields().Guid
 
@@ -368,7 +375,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.User)
 	return cmd.newCmdRunner.Command(append([]string{"space-users"}, args...), deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.Organization) error {
+func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.OrganizationDetails) error {
 	defer func() {
 		recover()
 	}()
