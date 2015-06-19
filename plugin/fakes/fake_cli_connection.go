@@ -27,11 +27,11 @@ type FakeCliConnection struct {
 		result1 []string
 		result2 error
 	}
-	GetCurrentOrgStub        func() (plugin_models.Organization, error)
+	GetCurrentOrgStub        func() (plugin_models.OrganizationSummary, error)
 	getCurrentOrgMutex       sync.RWMutex
 	getCurrentOrgArgsForCall []struct{}
 	getCurrentOrgReturns     struct {
-		result1 plugin_models.Organization
+		result1 plugin_models.OrganizationSummary
 		result2 error
 	}
 	GetCurrentSpaceStub        func() (plugin_models.Space, error)
@@ -275,7 +275,7 @@ func (fake *FakeCliConnection) CliCommandReturns(result1 []string, result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetCurrentOrg() (plugin_models.Organization, error) {
+func (fake *FakeCliConnection) GetCurrentOrg() (plugin_models.OrganizationSummary, error) {
 	fake.getCurrentOrgMutex.Lock()
 	fake.getCurrentOrgArgsForCall = append(fake.getCurrentOrgArgsForCall, struct{}{})
 	fake.getCurrentOrgMutex.Unlock()
@@ -292,10 +292,10 @@ func (fake *FakeCliConnection) GetCurrentOrgCallCount() int {
 	return len(fake.getCurrentOrgArgsForCall)
 }
 
-func (fake *FakeCliConnection) GetCurrentOrgReturns(result1 plugin_models.Organization, result2 error) {
+func (fake *FakeCliConnection) GetCurrentOrgReturns(result1 plugin_models.OrganizationSummary, result2 error) {
 	fake.GetCurrentOrgStub = nil
 	fake.getCurrentOrgReturns = struct {
-		result1 plugin_models.Organization
+		result1 plugin_models.OrganizationSummary
 		result2 error
 	}{result1, result2}
 }
