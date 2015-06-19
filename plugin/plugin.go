@@ -17,7 +17,7 @@ type CliConnection interface {
 	CliCommandWithoutTerminalOutput(args ...string) ([]string, error)
 	CliCommand(args ...string) ([]string, error)
 	GetCurrentOrg() (plugin_models.OrganizationSummary, error)
-	GetCurrentSpace() (plugin_models.Space, error)
+	GetCurrentSpace() (plugin_models.SpaceSummary, error)
 	Username() (string, error)
 	UserGuid() (string, error)
 	UserEmail() (string, error)
