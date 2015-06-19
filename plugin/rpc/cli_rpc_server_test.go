@@ -254,7 +254,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetOrg() with 'my-org' as argument", func() {
-			result := plugin_models.Organization{}
+			result := plugin_models.OrganizationDetails{}
 			err = client.Call("CliRpcCmd.GetOrg", "my-org", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -288,7 +288,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetServices() ", func() {
-			result := []plugin_models.Space{}
+			result := []plugin_models.ServiceInstance{}
 			err = client.Call("CliRpcCmd.GetServices", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -447,6 +447,13 @@ var _ = Describe("Server", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(org.Name).To(Equal("test-org"))
 					Expect(org.Guid).To(Equal("test-guid"))
+					Expect(org.QuotaDefinition.Guid).To(Equal("guid123"))
+					Expect(org.QuotaDefinition.Name).To(Equal("quota123"))
+					Expect(org.QuotaDefinition.MemoryLimit).To(Equal(int64(128)))
+					Expect(org.QuotaDefinition.InstanceMemoryLimit).To(Equal(int64(16)))
+					Expect(org.QuotaDefinition.RoutesLimit).To(Equal(5))
+					Expect(org.QuotaDefinition.ServicesLimit).To(Equal(6))
+					Expect(org.QuotaDefinition.NonBasicServicesAllowed).To(BeTrue())
 				})
 			})
 
@@ -468,7 +475,7 @@ var _ = Describe("Server", func() {
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
-					var space plugin_models.SpaceSummary
+					var space plugin_models.Space
 					err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
 
 					Expect(err).ToNot(HaveOccurred())

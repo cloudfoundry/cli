@@ -1,10 +1,11 @@
 package plugin_models
 
-type Organization struct {
+type OrganizationFields struct {
 	Guid            string
 	Name            string
 	QuotaDefinition QuotaFields
-	Spaces          []SpaceFields
-	Domains         []DomainFields
-	SpaceQuotas     []SpaceQuotaFields
+}
+
+type Organization struct {
+	OrganizationFields
 }
