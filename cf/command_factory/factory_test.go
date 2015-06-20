@@ -124,8 +124,24 @@ var _ = Describe("factory", func() {
 			Expect(contains(flags, "c")).To(Equal(true))
 			Expect(contains(flags, "no-hostname")).To(Equal(true))
 		})
-	})
 
+		It("returns a list of flags for the curl command", func() {
+			flags := factory.GetCommandFlags("curl")
+			Expect(contains(flags, "i")).To(Equal(true))
+			Expect(contains(flags, "v")).To(Equal(true))
+			Expect(contains(flags, "X")).To(Equal(true))
+			Expect(contains(flags, "H")).To(Equal(true))
+			Expect(contains(flags, "d")).To(Equal(true))
+			Expect(contains(flags, "output")).To(Equal(true))
+
+		})
+
+		It("returns the total no of flags for the curl command", func() {
+			flags := factory.GetCommandFlags("curl")
+			Expect(len(flags)).To(Equal(6))
+		})
+	})
+	
 	Describe("GetCommandTotalArgs", func() {
 		It("returns the total number of argument required by the command ", func() {
 			totalArgs, err := factory.GetCommandTotalArgs("create-buildpack")
