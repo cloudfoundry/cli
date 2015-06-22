@@ -256,10 +256,11 @@ func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDe
 	return planGuid, apiErr
 }
 
-func (repo CloudControllerServiceRepository) ListServicesFromManyBrokers(brokerGuids []string) (services []models.ServiceOffering, err error) {
+func (repo CloudControllerServiceRepository) ListServicesFromManyBrokers(brokerGuids []string) ([]models.ServiceOffering, error) {
 	brokerGuidsString := strings.Join(brokerGuids, ",")
+	services := []models.ServiceOffering{}
 
-	err = repo.gateway.ListPaginatedResources(
+	err := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("service_broker_guid IN "+brokerGuidsString)),
 		resources.ServiceOfferingResource{},
@@ -269,7 +270,7 @@ func (repo CloudControllerServiceRepository) ListServicesFromManyBrokers(brokerG
 			}
 			return true
 		})
-	return
+	return services, err
 }
 
 func (repo CloudControllerServiceRepository) ListServicesFromBroker(brokerGuid string) (offerings []models.ServiceOffering, err error) {
