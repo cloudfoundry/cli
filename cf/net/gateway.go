@@ -130,6 +130,10 @@ func (gateway Gateway) UpdateResourceSync(endpoint, apiUrl string, body io.ReadS
 	return gateway.createUpdateOrDeleteResource("PUT", endpoint, apiUrl, body, true, resource...)
 }
 
+func (gateway Gateway) DeleteResourceSynchronously(endpoint, apiUrl string) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiUrl, nil, true, &AsyncResource{})
+}
+
 func (gateway Gateway) DeleteResource(endpoint, apiUrl string) (apiErr error) {
 	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiUrl, nil, false, &AsyncResource{})
 }
