@@ -140,7 +140,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["rename-space"] = space.NewRenameSpace(ui, config, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["routes"] = route.NewListRoutes(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["check-route"] = route.NewCheckRoute(ui, config, repoLocator.GetRouteRepository(), repoLocator.GetDomainRepository())
-	factory.cmdsByName["service"] = service.NewShowService(ui)
 	factory.cmdsByName["service-auth-tokens"] = serviceauthtoken.NewListServiceAuthTokens(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["service-brokers"] = servicebroker.NewListServiceBrokers(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["service-keys"] = servicekey.NewListServiceKeys(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())

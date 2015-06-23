@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -16,7 +17,13 @@ var _ = Describe("service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("service").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -24,16 +31,23 @@ var _ = Describe("service command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewShowService(ui), args, requirementsFactory)
+		cmd := command_registry.Commands.FindCommand("service")
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
+		BeforeEach(func() {
+			updateCommandDependency(false)
+		})
+
 		It("fails when not provided the name of the service to show", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
 			runCommand()
 
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 		})
 
 		It("fails when not logged in", func() {
@@ -53,6 +67,8 @@ var _ = Describe("service command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
+
+			updateCommandDependency(false)
 		})
 
 		Context("when the service is externally provided", func() {
