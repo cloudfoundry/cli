@@ -42,7 +42,8 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Current space:", currentSpace)
 		space, _ := cliConnection.GetSpace(currentSpace.Name)
 		fmt.Println("Space:", space)
-
+		spaces, _ := cliConnection.GetSpaces()
+		fmt.Println("Spaces:", spaces)
 		loggregator, _ := cliConnection.LoggregatorEndpoint()
 		fmt.Println("Loggregator Endpoint:", loggregator)
 		dopplerEndpoint, _ := cliConnection.DopplerEndpoint()
