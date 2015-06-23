@@ -116,7 +116,7 @@ func (c *terminalUI) confirmDelete(message string) bool {
 func (c *terminalUI) Confirm(message string, args ...interface{}) bool {
 	response := c.Ask(message, args...)
 	switch strings.ToLower(response) {
-	case "y", T("yes"):
+	case "y", "yes", T("yes"):
 		return true
 	}
 	return false

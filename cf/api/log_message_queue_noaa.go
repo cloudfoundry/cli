@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
 const MAX_INT64 int64 = 1<<63 - 1

@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
-	"github.com/cloudfoundry/noaa/events"
+	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -86,7 +86,7 @@ var _ = Describe("logs with noaa repository", func() {
 
 		Context("when an error occurs", func() {
 			It("returns an error when it occurs", func() {
-				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error) {
 					errChan <- errors.New("oops")
 				}
 
@@ -98,7 +98,7 @@ var _ = Describe("logs with noaa repository", func() {
 		Context("when a noaa_errors.UnauthorizedError occurs", func() {
 			It("refreshes the access token and tail logs once more", func() {
 				calledOnce := false
-				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error) {
 					if !calledOnce {
 						calledOnce = true
 						errChan <- noaa_errors.NewUnauthorizedError("i'm sorry dave")
@@ -115,19 +115,19 @@ var _ = Describe("logs with noaa repository", func() {
 
 		Context("when no error occurs", func() {
 			It("asks for the logs for the given app", func() {
-				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error) {
 					errChan <- errors.New("quit Tailing")
 				}
 
 				repo.TailNoaaLogsFor("app-guid", func() {}, func(msg *events.LogMessage) {})
 
-				appGuid, token, _, _, _ := fakeNoaaConsumer.TailingLogsArgsForCall(0)
+				appGuid, token, _, _ := fakeNoaaConsumer.TailingLogsArgsForCall(0)
 				Ω(appGuid).To(Equal("app-guid"))
 				Ω(token).To(Equal("the-access-token"))
 			})
 
 			It("sets the on connect callback", func() {
-				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error) {
 					errChan <- errors.New("quit Tailing")
 				}
 
@@ -147,7 +147,7 @@ var _ = Describe("logs with noaa repository", func() {
 			})
 
 			It("sorts the messages before yielding them", func() {
-				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error) {
 					logChan <- makeLogMessage("hello3", 300)
 					logChan <- makeLogMessage("hello2", 200)
 					logChan <- makeLogMessage("hello1", 100)
@@ -178,7 +178,7 @@ var _ = Describe("logs with noaa repository", func() {
 			})
 
 			It("flushes remaining log messages when Close is called", func() {
-				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error, stopChan chan struct{}) {
+				fakeNoaaConsumer.TailFunc = func(logChan chan<- *events.LogMessage, errChan chan<- error) {
 					logChan <- makeLogMessage("hello3", 300)
 					logChan <- makeLogMessage("hello2", 200)
 					logChan <- makeLogMessage("hello1", 100)

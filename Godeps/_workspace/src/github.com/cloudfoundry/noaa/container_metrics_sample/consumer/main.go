@@ -5,20 +5,19 @@ import (
 	"fmt"
 	"os"
 	"time"
+
 	"github.com/cloudfoundry/noaa"
 )
 
-const DopplerAddress = "wss://doppler.10.244.0.34.xip.io:443"
-var appId = "60a13b0f-fce7-4c02-b92a-d43d583877ed"
-
+var dopplerAddress = os.Getenv("DOPPLER_ADDR")
+var appId = os.Getenv("APP_GUID")
 var authToken = os.Getenv("CF_ACCESS_TOKEN")
 
 func main() {
-	connection := noaa.NewConsumer(DopplerAddress, &tls.Config{InsecureSkipVerify: true}, nil)
+	connection := noaa.NewConsumer(dopplerAddress, &tls.Config{InsecureSkipVerify: true}, nil)
 	connection.SetDebugPrinter(ConsoleDebugPrinter{})
 
 	fmt.Println("===== Streaming ContainerMetrics (will only succeed if you have admin credentials)")
-
 
 	for {
 		containerMetrics, err := connection.ContainerMetrics(appId, authToken)

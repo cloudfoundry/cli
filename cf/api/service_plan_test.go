@@ -115,6 +115,28 @@ var _ = Describe("Service Plan Repository", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
+
+	Describe(".ListPlansFromManyServices", func() {
+		BeforeEach(func() {
+			setupTestServer(manyServiceRequest1, manyServiceRequest2)
+		})
+
+		It("returns all service plans for a list of service guids", func() {
+			serviceGuids := []string{"service-guid1", "service-guid2"}
+
+			servicePlansFields, err := repo.ListPlansFromManyServices(serviceGuids)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(len(servicePlansFields)).To(Equal(2))
+
+			Expect(servicePlansFields[0].Name).To(Equal("plan one"))
+			Expect(servicePlansFields[0].Guid).To(Equal("plan1"))
+
+			Expect(servicePlansFields[1].Name).To(Equal("plan two"))
+			Expect(servicePlansFields[1].Guid).To(Equal("plan2"))
+		})
+	})
 })
 
 var firstPlanRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -212,6 +234,59 @@ var secondPlanRequestWithParams = testapi.NewCloudControllerTestRequest(testnet.
         "free": true,
         "public": false,
         "active": false
+      }
+    }
+  ]
+}`,
+	},
+})
+
+var manyServiceRequest1 = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/service_plans?q=service_guid+IN+service-guid1,service-guid2",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+  "total_results": 2,
+  "total_pages": 2,
+  "next_url": "/v2/service_plans?q=service_guid+IN+service-guid1,service-guid2&page=2",
+  "resources": [
+    {
+      "metadata": {
+        "guid": "plan1"
+      },
+      "entity": {
+        "name": "plan one",
+        "free": true,
+        "public": true,
+        "active": true
+      }
+    }
+  ]
+}`,
+	},
+})
+
+var manyServiceRequest2 = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/service_plans?q=service_guid+IN+service-guid1,service-guid2&page=2",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+  "total_results": 2,
+  "total_pages": 1,
+  "next_url": null,
+  "prev_url": "/v2/service_plans?q=service_guid+IN+service-guid1,service-guid2",
+  "resources": [
+    {
+      "metadata": {
+        "guid": "plan2"
+      },
+      "entity": {
+        "name": "plan two",
+        "free": true,
+        "public": true,
+        "active": true
       }
     }
   ]

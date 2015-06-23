@@ -14,6 +14,7 @@ import (
 type ServicePlanRepository interface {
 	Search(searchParameters map[string]string) ([]models.ServicePlanFields, error)
 	Update(models.ServicePlanFields, string, bool) error
+	ListPlansFromManyServices(serviceGuids []string) ([]models.ServicePlanFields, error)
 }
 
 type CloudControllerServicePlanRepository struct {
@@ -41,6 +42,23 @@ func (repo CloudControllerServicePlanRepository) Update(servicePlan models.Servi
 
 	url := fmt.Sprintf("/v2/service_plans/%s", servicePlan.Guid)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, strings.NewReader(body))
+}
+
+func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(serviceGuids []string) ([]models.ServicePlanFields, error) {
+	serviceGuidsString := strings.Join(serviceGuids, ",")
+	plans := []models.ServicePlanFields{}
+
+	err := repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		fmt.Sprintf("/v2/service_plans?q=%s", url.QueryEscape("service_guid IN "+serviceGuidsString)),
+		resources.ServicePlanResource{},
+		func(resource interface{}) bool {
+			if plan, ok := resource.(resources.ServicePlanResource); ok {
+				plans = append(plans, plan.ToFields())
+			}
+			return true
+		})
+	return plans, err
 }
 
 func (repo CloudControllerServicePlanRepository) Search(queryParams map[string]string) (plans []models.ServicePlanFields, err error) {

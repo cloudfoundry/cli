@@ -3,6 +3,7 @@ package rpc
 import (
 	"os"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -98,6 +99,11 @@ func (cmd *CliRpcService) SetTheApp(app *cli.App) {
 	cmd.RpcCmd.coreCommandRunner = app
 }
 
+func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
+	*retVal = cf.Version >= version
+	return nil
+}
+
 func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
 	cmd.PluginMetadata = &pluginMetadata
 	*retVal = true
@@ -150,21 +156,13 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
+func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.OrganizationSummary) error {
 	retVal.Name = cmd.cliConfig.OrganizationFields().Name
 	retVal.Guid = cmd.cliConfig.OrganizationFields().Guid
-	retVal.QuotaDefinition.Guid = cmd.cliConfig.OrganizationFields().QuotaDefinition.Guid
-	retVal.QuotaDefinition.Name = cmd.cliConfig.OrganizationFields().QuotaDefinition.Name
-	retVal.QuotaDefinition.MemoryLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.MemoryLimit
-	retVal.QuotaDefinition.InstanceMemoryLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.InstanceMemoryLimit
-	retVal.QuotaDefinition.RoutesLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.RoutesLimit
-	retVal.QuotaDefinition.ServicesLimit = cmd.cliConfig.OrganizationFields().QuotaDefinition.ServicesLimit
-	retVal.QuotaDefinition.NonBasicServicesAllowed = cmd.cliConfig.OrganizationFields().QuotaDefinition.NonBasicServicesAllowed
-
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
+func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.SpaceSummary) error {
 	retVal.Name = cmd.cliConfig.SpaceFields().Name
 	retVal.Guid = cmd.cliConfig.SpaceFields().Guid
 
@@ -285,7 +283,7 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.ApplicationSumma
 	return cmd.newCmdRunner.Command([]string{"apps"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.Organization) error {
+func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.OrganizationSummary) error {
 	defer func() {
 		recover()
 	}()
@@ -301,4 +299,112 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.Organization) er
 	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
 
 	return cmd.newCmdRunner.Command([]string{"orgs"}, deps, true)
+}
+
+func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.SpaceSummary) error {
+	defer func() {
+		recover()
+	}()
+
+	deps := command_registry.NewDependency()
+
+	//set deps objs to be the one used by all other codegangsta commands
+	//once all commands are converted, we can make fresh deps for each command run
+	deps.Config = cmd.cliConfig
+	deps.RepoLocator = cmd.repoLocator
+	deps.PluginModels.Spaces = retVal
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
+
+	return cmd.newCmdRunner.Command([]string{"spaces"}, deps, true)
+}
+
+func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.ServiceInstance) error {
+	defer func() {
+		recover()
+	}()
+
+	deps := command_registry.NewDependency()
+
+	//set deps objs to be the one used by all other codegangsta commands
+	//once all commands are converted, we can make fresh deps for each command run
+	deps.Config = cmd.cliConfig
+	deps.RepoLocator = cmd.repoLocator
+	deps.PluginModels.ServiceInstances = retVal
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
+
+	return cmd.newCmdRunner.Command([]string{"services"}, deps, true)
+}
+
+func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.User) error {
+	defer func() {
+		recover()
+	}()
+
+	deps := command_registry.NewDependency()
+
+	//set deps objs to be the one used by all other codegangsta commands
+	//once all commands are converted, we can make fresh deps for each command run
+	deps.Config = cmd.cliConfig
+	deps.RepoLocator = cmd.repoLocator
+	deps.PluginModels.Users = retVal
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
+
+	return cmd.newCmdRunner.Command(append([]string{"org-users"}, args...), deps, true)
+}
+
+func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.User) error {
+	defer func() {
+		recover()
+	}()
+
+	deps := command_registry.NewDependency()
+
+	//set deps objs to be the one used by all other codegangsta commands
+	//once all commands are converted, we can make fresh deps for each command run
+	deps.Config = cmd.cliConfig
+	deps.RepoLocator = cmd.repoLocator
+	deps.PluginModels.Users = retVal
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
+
+	return cmd.newCmdRunner.Command(append([]string{"space-users"}, args...), deps, true)
+}
+
+func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.Organization) error {
+	defer func() {
+		recover()
+	}()
+
+	deps := command_registry.NewDependency()
+
+	//set deps objs to be the one used by all other codegangsta commands
+	//once all commands are converted, we can make fresh deps for each command run
+	deps.Config = cmd.cliConfig
+	deps.RepoLocator = cmd.repoLocator
+	deps.PluginModels.Organization = retVal
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
+
+	return cmd.newCmdRunner.Command([]string{"org", orgName}, deps, true)
+}
+
+func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.Space) error {
+	defer func() {
+		recover()
+	}()
+
+	deps := command_registry.NewDependency()
+
+	//set deps objs to be the one used by all other codegangsta commands
+	//once all commands are converted, we can make fresh deps for each command run
+	deps.Config = cmd.cliConfig
+	deps.RepoLocator = cmd.repoLocator
+	deps.PluginModels.Space = retVal
+	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
+	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
+
+	return cmd.newCmdRunner.Command([]string{"space", spaceName}, deps, true)
 }

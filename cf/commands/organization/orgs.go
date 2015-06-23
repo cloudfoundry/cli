@@ -16,7 +16,7 @@ type ListOrgs struct {
 	ui              terminal.UI
 	config          core_config.Reader
 	orgRepo         organizations.OrganizationRepository
-	pluginOrgsModel *[]plugin_models.Organization
+	pluginOrgsModel *[]plugin_models.OrganizationSummary
 	pluginCall      bool
 }
 
@@ -35,7 +35,7 @@ func (cmd *ListOrgs) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ListOrgs) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 0 {
-		cmd.ui.Failed("Incorrect Usage. No argument required\n\n" + command_registry.Commands.CommandUsage("orgs"))
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("orgs"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -89,7 +89,7 @@ func (cmd ListOrgs) Execute(fc flags.FlagContext) {
 
 func (cmd *ListOrgs) populatePluginModel(orgs []models.Organization) {
 	for _, org := range orgs {
-		orgModel := plugin_models.Organization{}
+		orgModel := plugin_models.OrganizationSummary{}
 		orgModel.Name = org.Name
 		orgModel.Guid = org.Guid
 		*(cmd.pluginOrgsModel) = append(*(cmd.pluginOrgsModel), orgModel)

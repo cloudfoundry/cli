@@ -41,7 +41,7 @@ func (cmd *ListApps) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ListApps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 0 {
-		cmd.ui.Failed("Incorrect Usage. No argument required\n\n" + command_registry.Commands.CommandUsage("apps"))
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("apps"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -111,6 +111,7 @@ func (cmd *ListApps) populatePluginModel(apps []models.Application) {
 	for _, app := range apps {
 		appModel := plugin_models.ApplicationSummary{}
 		appModel.Name = app.Name
+		appModel.Guid = app.Guid
 		appModel.TotalInstances = app.InstanceCount
 		appModel.RunningInstances = app.RunningInstances
 		appModel.Memory = app.Memory
