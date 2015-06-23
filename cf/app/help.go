@@ -160,7 +160,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentCommand("marketplace"),
 					presentNonCodegangstaCommand("services"),
-					presentCommand("service"),
+					presentNonCodegangstaCommand("service"),
 				}, {
 					presentCommand("create-service"),
 					presentCommand("update-service"),

@@ -1,11 +1,12 @@
 package service
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type ShowService struct {
@@ -13,39 +14,43 @@ type ShowService struct {
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewShowService(ui terminal.UI) (cmd *ShowService) {
-	cmd = new(ShowService)
-	cmd.ui = ui
-	return
+func init() {
+	command_registry.Register(&ShowService{})
 }
 
-func (cmd *ShowService) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ShowService) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given service's guid.  All other output for the service is suppressed.")}
+	return command_registry.CommandMetadata{
 		Name:        "service",
 		Description: T("Show service instance info"),
 		Usage:       T("CF_NAME service SERVICE_INSTANCE"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given service's guid.  All other output for the service is suppressed.")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *ShowService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ShowService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("service"))
 	}
 
-	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
+	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.serviceInstanceReq,
 	}
+
 	return
 }
 
-func (cmd *ShowService) Run(c *cli.Context) {
+func (cmd *ShowService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	return cmd
+}
+
+func (cmd *ShowService) Execute(c flags.FlagContext) {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
 	if c.Bool("guid") {
