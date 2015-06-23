@@ -16,6 +16,15 @@ type FakeOrganizationRepository struct {
 		result1 []models.Organization
 		result2 error
 	}
+	GetManyOrgsByGuidStub        func(orgGuids []string) (orgs []models.Organization, apiErr error)
+	getManyOrgsByGuidMutex       sync.RWMutex
+	getManyOrgsByGuidArgsForCall []struct {
+		orgGuids []string
+	}
+	getManyOrgsByGuidReturns struct {
+		result1 []models.Organization
+		result2 error
+	}
 	FindByNameStub        func(name string) (org models.Organization, apiErr error)
 	findByNameMutex       sync.RWMutex
 	findByNameArgsForCall []struct {
@@ -90,6 +99,39 @@ func (fake *FakeOrganizationRepository) ListOrgsCallCount() int {
 func (fake *FakeOrganizationRepository) ListOrgsReturns(result1 []models.Organization, result2 error) {
 	fake.ListOrgsStub = nil
 	fake.listOrgsReturns = struct {
+		result1 []models.Organization
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeOrganizationRepository) GetManyOrgsByGuid(orgGuids []string) (orgs []models.Organization, apiErr error) {
+	fake.getManyOrgsByGuidMutex.Lock()
+	fake.getManyOrgsByGuidArgsForCall = append(fake.getManyOrgsByGuidArgsForCall, struct {
+		orgGuids []string
+	}{orgGuids})
+	fake.getManyOrgsByGuidMutex.Unlock()
+	if fake.GetManyOrgsByGuidStub != nil {
+		return fake.GetManyOrgsByGuidStub(orgGuids)
+	} else {
+		return fake.getManyOrgsByGuidReturns.result1, fake.getManyOrgsByGuidReturns.result2
+	}
+}
+
+func (fake *FakeOrganizationRepository) GetManyOrgsByGuidCallCount() int {
+	fake.getManyOrgsByGuidMutex.RLock()
+	defer fake.getManyOrgsByGuidMutex.RUnlock()
+	return len(fake.getManyOrgsByGuidArgsForCall)
+}
+
+func (fake *FakeOrganizationRepository) GetManyOrgsByGuidArgsForCall(i int) []string {
+	fake.getManyOrgsByGuidMutex.RLock()
+	defer fake.getManyOrgsByGuidMutex.RUnlock()
+	return fake.getManyOrgsByGuidArgsForCall[i].orgGuids
+}
+
+func (fake *FakeOrganizationRepository) GetManyOrgsByGuidReturns(result1 []models.Organization, result2 error) {
+	fake.GetManyOrgsByGuidStub = nil
+	fake.getManyOrgsByGuidReturns = struct {
 		result1 []models.Organization
 		result2 error
 	}{result1, result2}

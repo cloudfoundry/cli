@@ -181,7 +181,7 @@ var _ = Describe("Broker Builder", func() {
 
 		It("returns an error if we cannot list the services for a broker", func() {
 			brokerRepo.ServiceBrokers = []models.ServiceBroker{serviceBroker1}
-			serviceBuilder.GetServicesForBrokerReturns(nil, errors.New("Cannot find services"))
+			serviceBuilder.GetServicesForManyBrokersReturns(nil, errors.New("Cannot find services"))
 
 			_, err := brokerBuilder.GetAllServiceBrokers()
 			Expect(err).To(HaveOccurred())
@@ -189,7 +189,7 @@ var _ = Describe("Broker Builder", func() {
 
 		It("returns all service brokers populated with their services", func() {
 			brokerRepo.ServiceBrokers = []models.ServiceBroker{serviceBroker1}
-			serviceBuilder.GetServicesForBrokerReturns(services, nil)
+			serviceBuilder.GetServicesForManyBrokersReturns(services, nil)
 
 			brokers, err := brokerBuilder.GetAllServiceBrokers()
 			Expect(err).NotTo(HaveOccurred())
