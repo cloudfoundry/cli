@@ -2,6 +2,7 @@ package serviceaccess_test
 
 import (
 	"errors"
+	"strings"
 
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
@@ -190,6 +191,15 @@ var _ = Describe("service-access command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting service access", "for broker brokername1", "and service my-service-1", "and organization fwip", "as", "my-user"},
 				))
+			})
+		})
+		Context("when filter brokers returns an error", func() {
+			It("gives only the access error", func() {
+				err := errors.New("Error finding service brokers")
+				actor.FilterBrokersReturns([]models.ServiceBroker{}, err)
+				runCommand()
+
+				Expect(strings.Join(ui.Outputs, "\n")).To(MatchRegexp(`FAILED\nError finding service brokers`))
 			})
 		})
 	})

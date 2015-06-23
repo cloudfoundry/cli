@@ -2270,11 +2270,6 @@
       "modified": false
    },
    {
-      "id": "Failed fetching service brokers.\n{{.Error}}",
-      "translation": "Falha ao obter corretores de serviços.\n{{.Error}}",
-      "modified": false
-   },
-   {
       "id": "Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
       "translation": "Falha obtendo usuários do espaço para função {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
       "modified": false
