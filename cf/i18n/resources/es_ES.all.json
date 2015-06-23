@@ -5275,11 +5275,6 @@
       "modified": false
    },
    {
-      "id": "{{.Error}}",
-      "translation": "{{.Error}}",
-      "modified": false
-   },
-   {
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
       "translation": "{{.Err}}\n\nTIP: usar '{{.Command}}' para mas informacion",
       "modified": false
