@@ -12,6 +12,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"strings"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -125,7 +127,7 @@ var _ = Describe("service-brokers command", func() {
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting service brokers as ", "my-user"},
-			[]string{"FAILED"},
 		))
+		Expect(strings.Join(ui.Outputs, "\n")).To(MatchRegexp(`FAILED\nError finding service brokers`))
 	})
 })
