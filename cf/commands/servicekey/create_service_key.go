@@ -15,14 +15,15 @@ import (
 )
 
 type CreateServiceKey struct {
-	ui             terminal.UI
-	config         core_config.Reader
-	serviceRepo    api.ServiceRepository
-	serviceKeyRepo api.ServiceKeyRepository
+	ui                  terminal.UI
+	config              core_config.Reader
+	serviceRepo         api.ServiceRepository
+	serviceKeyRepo      api.ServiceKeyRepository
+	serviceInstanceGuid string
 }
 
-func NewCreateServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd CreateServiceKey) {
-	return CreateServiceKey{
+func NewCreateServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd *CreateServiceKey) {
+	return &CreateServiceKey{
 		ui:             ui,
 		config:         config,
 		serviceRepo:    serviceRepo,
@@ -30,7 +31,7 @@ func NewCreateServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo 
 	}
 }
 
-func (cmd CreateServiceKey) Metadata() command_metadata.CommandMetadata {
+func (cmd *CreateServiceKey) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "create-service-key",
 		ShortName:   "csk",
@@ -57,13 +58,14 @@ EXAMPLE:
 	}
 }
 
-func (cmd CreateServiceKey) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateServiceKey) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		cmd.ui.FailWithUsage(c)
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
 	serviceInstanceRequirement := requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
+	cmd.serviceInstanceGuid = serviceInstanceRequirement.GetServiceInstance().Guid
 	targetSpaceRequirement := requirementsFactory.NewTargetedSpaceRequirement()
 
 	reqs = []requirements.Requirement{loginRequirement, serviceInstanceRequirement, targetSpaceRequirement}
@@ -71,7 +73,7 @@ func (cmd CreateServiceKey) GetRequirements(requirementsFactory requirements.Fac
 	return reqs, nil
 }
 
-func (cmd CreateServiceKey) Run(c *cli.Context) {
+func (cmd *CreateServiceKey) Run(c *cli.Context) {
 	serviceInstanceName := c.Args()[0]
 	serviceKeyName := c.Args()[1]
 	params := c.String("c")
@@ -88,13 +90,7 @@ func (cmd CreateServiceKey) Run(c *cli.Context) {
 			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
-	}
-
-	err = cmd.serviceKeyRepo.CreateServiceKey(serviceInstance.Guid, serviceKeyName, paramsMap)
+	err = cmd.serviceKeyRepo.CreateServiceKey(cmd.serviceInstanceGuid, serviceKeyName, paramsMap)
 	switch err.(type) {
 	case nil:
 		cmd.ui.Ok()

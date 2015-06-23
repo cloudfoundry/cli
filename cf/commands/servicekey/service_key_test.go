@@ -22,7 +22,7 @@ var _ = Describe("service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		cmd                 ServiceKey
+		cmd                 *ServiceKey
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceKeyRepo      *testapi.FakeServiceKeyRepo
@@ -39,6 +39,7 @@ var _ = Describe("service-key command", func() {
 		serviceKeyRepo = testapi.NewFakeServiceKeyRepo()
 		cmd = NewGetServiceKey(ui, config, serviceRepo, serviceKeyRepo)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstanceNotFound: false}
+		requirementsFactory.ServiceInstance = serviceInstance
 	})
 
 	var callGetServiceKey = func(args []string) bool {
