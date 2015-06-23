@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -99,6 +100,58 @@ var _ = Describe("Server", func() {
 		It("Start an Rpc server for communication", func() {
 			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
+		})
+	})
+
+	Describe(".IsMinCliVersion()", func() {
+		BeforeEach(func() {
+			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
+			Expect(err).ToNot(HaveOccurred())
+
+			err := rpcService.Start()
+			Expect(err).ToNot(HaveOccurred())
+
+			pingCli(rpcService.Port())
+
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			rpcService.Stop()
+
+			//give time for server to stop
+			time.Sleep(50 * time.Millisecond)
+		})
+
+		It("returns true if cli version is >= to required version", func() {
+			cf.Version = "2.0.0"
+
+			var result bool
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "1.0.0", &result)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(result).To(BeTrue())
+		})
+
+		It("returns true if cli version is >= to required version", func() {
+			cf.Version = "2.0.0"
+
+			var result bool
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "2.0.6", &result)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(result).To(BeFalse())
+		})
+
+		It("returns true if cli version is 'BUILT_FROM_SOURCE'", func() {
+			cf.Version = "BUILT_FROM_SOURCE"
+
+			var result bool
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "12.0.6", &result)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(result).To(BeTrue())
 		})
 	})
 

@@ -3,6 +3,7 @@ package rpc
 import (
 	"os"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -96,6 +97,11 @@ func (cli *CliRpcService) Start() error {
 
 func (cmd *CliRpcService) SetTheApp(app *cli.App) {
 	cmd.RpcCmd.coreCommandRunner = app
+}
+
+func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
+	*retVal = cf.Version >= version
+	return nil
 }
 
 func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
