@@ -159,7 +159,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentCommand("marketplace"),
-					presentCommand("services"),
+					presentNonCodegangstaCommand("services"),
 					presentCommand("service"),
 				}, {
 					presentCommand("create-service"),
@@ -184,7 +184,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentNonCodegangstaCommand("orgs"),
-					presentCommand("org"),
+					presentNonCodegangstaCommand("org"),
 				}, {
 					presentCommand("create-org"),
 					presentCommand("delete-org"),
@@ -195,8 +195,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("SPACES"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("spaces"),
-					presentCommand("space"),
+					presentNonCodegangstaCommand("spaces"),
+					presentNonCodegangstaCommand("space"),
 				}, {
 					presentCommand("create-space"),
 					presentCommand("delete-space"),
@@ -245,11 +245,11 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("create-user"),
 					presentCommand("delete-user"),
 				}, {
-					presentCommand("org-users"),
+					presentNonCodegangstaCommand("org-users"),
 					presentCommand("set-org-role"),
 					presentCommand("unset-org-role"),
 				}, {
-					presentCommand("space-users"),
+					presentNonCodegangstaCommand("space-users"),
 					presentCommand("set-space-role"),
 					presentCommand("unset-space-role"),
 				},

@@ -4,6 +4,8 @@ type LastOperationFields struct {
 	Type        string
 	State       string
 	Description string
+	CreatedAt   string
+	UpdatedAt   string
 }
 
 type ServiceInstanceCreateRequest struct {

@@ -3,7 +3,7 @@ notifications:
   email:
   - cf-lamb@pivotallabs.com
 before_install:
-- 'if [[ "${TRAVIS_GO_VERSION}" =~ 1.[2-3] ]]; then go get code.google.com/p/go.tools/cmd/cover; else go get golang.org/x/tools/cmd/cover; fi'
+- go get golang.org/x/tools/cmd/cover golang.org/x/tools/cmd/vet
 - go get github.com/mattn/goveralls
 - go get github.com/onsi/ginkgo/ginkgo
 after_success:
@@ -12,18 +12,17 @@ after_success:
 - PATH=$HOME/gopath/bin:$PATH goveralls -coverprofile=all.coverprofile -repotoken=$COVERALLS_TOKEN
 install:
 - go get -d -v -t ./...
+- SHA=$(curl -s https://api.github.com/repos/cloudfoundry/loggregator/contents/src/github.com/gogo/protobuf | grep sha | cut -f4 -d\")
+- pushd $HOME/gopath/src/github.com/gogo/protobuf && git checkout $SHA && popd
 
-script: PATH=$HOME/gopath/bin:$PATH ginkgo --race --randomizeAllSpecs --failOnPending --skipMeasurements --cover
+script: PATH=$HOME/gopath/bin:$PATH bin/test
 
 go:
-- 1.2
-- 1.3
 - 1.4
 - tip
 
 matrix:
   allow_failures:
-    - go: 1.3
     - go: tip
 
 env:

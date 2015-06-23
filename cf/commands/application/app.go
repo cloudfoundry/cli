@@ -64,7 +64,7 @@ func (cmd *ShowApp) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ShowApp) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed("Incorrect Usage. Requires an argument\n\n" + command_registry.Commands.CommandUsage("app"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("app"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])

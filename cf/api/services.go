@@ -31,6 +31,7 @@ type ServiceRepository interface {
 	DeleteService(instance models.ServiceInstance) (apiErr error)
 	FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error)
 	ListServicesFromBroker(brokerGuid string) (services []models.ServiceOffering, err error)
+	ListServicesFromManyBrokers(brokerGuids []string) (services []models.ServiceOffering, err error)
 	GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiErr error)
 	MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiErr error)
 }
@@ -253,6 +254,23 @@ func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDe
 	apiErr = errors.NewModelNotFoundError("Plan", planDescription.String())
 
 	return planGuid, apiErr
+}
+
+func (repo CloudControllerServiceRepository) ListServicesFromManyBrokers(brokerGuids []string) ([]models.ServiceOffering, error) {
+	brokerGuidsString := strings.Join(brokerGuids, ",")
+	services := []models.ServiceOffering{}
+
+	err := repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("service_broker_guid IN "+brokerGuidsString)),
+		resources.ServiceOfferingResource{},
+		func(resource interface{}) bool {
+			if service, ok := resource.(resources.ServiceOfferingResource); ok {
+				services = append(services, service.ToModel())
+			}
+			return true
+		})
+	return services, err
 }
 
 func (repo CloudControllerServiceRepository) ListServicesFromBroker(brokerGuid string) (offerings []models.ServiceOffering, err error) {

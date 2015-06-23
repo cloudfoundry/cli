@@ -39,7 +39,7 @@ type RepositoryLocator struct {
 	endpointRepo                    EndpointRepository
 	organizationRepo                organizations.OrganizationRepository
 	quotaRepo                       quotas.CloudControllerQuotaRepository
-	spaceRepo                       spaces.CloudControllerSpaceRepository
+	spaceRepo                       spaces.SpaceRepository
 	appRepo                         applications.CloudControllerApplicationRepository
 	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  AppSummaryRepository
@@ -52,8 +52,8 @@ type RepositoryLocator struct {
 	serviceRepo                     CloudControllerServiceRepository
 	serviceKeyRepo                  CloudControllerServiceKeyRepository
 	serviceBindingRepo              CloudControllerServiceBindingRepository
-	serviceSummaryRepo              CloudControllerServiceSummaryRepository
-	userRepo                        CloudControllerUserRepository
+	serviceSummaryRepo              ServiceSummaryRepository
+	userRepo                        UserRepository
 	passwordRepo                    password.CloudControllerPasswordRepository
 	logsNoaaRepo                    LogsNoaaRepository
 	oldLogsRepo                     OldLogsRepository
@@ -164,6 +164,11 @@ func (locator RepositoryLocator) GetQuotaRepository() quotas.QuotaRepository {
 	return locator.quotaRepo
 }
 
+func (locator RepositoryLocator) SetSpaceRepository(repo spaces.SpaceRepository) RepositoryLocator {
+	locator.spaceRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetSpaceRepository() spaces.SpaceRepository {
 	return locator.spaceRepo
 }
@@ -178,6 +183,11 @@ func (locator RepositoryLocator) GetApplicationBitsRepository() application_bits
 
 func (locator RepositoryLocator) SetAppSummaryRepository(repo AppSummaryRepository) RepositoryLocator {
 	locator.appSummaryRepo = repo
+	return locator
+}
+
+func (locator RepositoryLocator) SetUserRepository(repo UserRepository) RepositoryLocator {
+	locator.userRepo = repo
 	return locator
 }
 
@@ -228,6 +238,10 @@ func (locator RepositoryLocator) GetServiceBindingRepository() ServiceBindingRep
 
 func (locator RepositoryLocator) GetServiceSummaryRepository() ServiceSummaryRepository {
 	return locator.serviceSummaryRepo
+}
+func (locator RepositoryLocator) SetServiceSummaryRepository(repo ServiceSummaryRepository) RepositoryLocator {
+	locator.serviceSummaryRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetUserRepository() UserRepository {
@@ -297,6 +311,11 @@ func (locator RepositoryLocator) GetServicePlanVisibilityRepository() ServicePla
 
 func (locator RepositoryLocator) GetSpaceQuotaRepository() space_quotas.SpaceQuotaRepository {
 	return locator.spaceQuotaRepo
+}
+
+func (locator RepositoryLocator) SetSpaceQuotaRepository(repo space_quotas.SpaceQuotaRepository) RepositoryLocator {
+	locator.spaceQuotaRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetFeatureFlagRepository() feature_flags.FeatureFlagRepository {
