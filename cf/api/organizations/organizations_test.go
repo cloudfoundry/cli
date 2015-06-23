@@ -81,6 +81,38 @@ var _ = Describe("Organization Repository", func() {
 		})
 	})
 
+	Describe(".GetManyOrgsByGuid", func() {
+		It("requests each org", func() {
+			firstOrgRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations/org1-guid",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+		  "metadata": { "guid": "org1-guid" },
+		  "entity": { "name": "Org1" }
+		}`},
+			})
+			secondOrgRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations/org2-guid",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+			"metadata": { "guid": "org2-guid" },
+		  "entity": { "name": "Org2" }
+	  }`},
+			})
+			testserver, handler, repo := createOrganizationRepo(firstOrgRequest, secondOrgRequest)
+			defer testserver.Close()
+
+			orgGuids := []string{"org1-guid", "org2-guid"}
+			orgs, err := repo.GetManyOrgsByGuid(orgGuids)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(len(orgs)).To(Equal(2))
+			Expect(orgs[0].Guid).To(Equal("org1-guid"))
+			Expect(orgs[1].Guid).To(Equal("org2-guid"))
+		})
+	})
+
 	Describe("finding organizations by name", func() {
 		It("returns the org with that name", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{

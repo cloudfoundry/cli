@@ -19,6 +19,7 @@ type ServiceBuilder interface {
 	GetServicesByNameForSpaceWithPlans(string, string) (models.ServiceOfferings, error)
 	GetServiceByNameForOrg(string, string) (models.ServiceOffering, error)
 
+	GetServicesForManyBrokers([]string) ([]models.ServiceOffering, error)
 	GetServicesForBroker(string) ([]models.ServiceOffering, error)
 
 	GetServicesForSpace(string) ([]models.ServiceOffering, error)
@@ -168,18 +169,33 @@ func (builder Builder) GetServiceByNameWithPlansWithOrgNames(serviceLabel string
 	return service, nil
 }
 
+func (builder Builder) GetServicesForManyBrokers(brokerGuids []string) ([]models.ServiceOffering, error) {
+	services, err := builder.serviceRepo.ListServicesFromManyBrokers(brokerGuids)
+	if err != nil {
+		return nil, err
+	}
+	return builder.populateServicesWithPlansAndOrgs(services)
+}
+
 func (builder Builder) GetServicesForBroker(brokerGuid string) ([]models.ServiceOffering, error) {
 	services, err := builder.serviceRepo.ListServicesFromBroker(brokerGuid)
 	if err != nil {
 		return nil, err
 	}
-	for index, service := range services {
-		services[index], err = builder.attachPlansToService(service)
-		if err != nil {
-			return nil, err
-		}
+	return builder.populateServicesWithPlansAndOrgs(services)
+}
+
+func (builder Builder) populateServicesWithPlansAndOrgs(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
+	serviceGuids := []string{}
+	for _, service := range services {
+		serviceGuids = append(serviceGuids, service.Guid)
 	}
-	return services, nil
+
+	plans, err := builder.planBuilder.GetPlansForManyServicesWithOrgs(serviceGuids)
+	if err != nil {
+		return nil, err
+	}
+	return builder.attachPlansToManyServices(services, plans)
 }
 
 func (builder Builder) GetServiceVisibleToOrg(serviceName string, orgName string) (models.ServiceOffering, error) {
@@ -216,6 +232,18 @@ func (builder Builder) attachPlansToServiceForOrg(service models.ServiceOffering
 
 	service.Plans = plans
 	return service, nil
+}
+
+func (builder Builder) attachPlansToManyServices(services []models.ServiceOffering, plans []models.ServicePlanFields) ([]models.ServiceOffering, error) {
+	for _, plan := range plans {
+		for index, service := range services {
+			if service.Guid == plan.ServiceOfferingGuid {
+				services[index].Plans = append(service.Plans, plan)
+				break
+			}
+		}
+	}
+	return services, nil
 }
 
 func (builder Builder) attachPlansToService(service models.ServiceOffering) (models.ServiceOffering, error) {
