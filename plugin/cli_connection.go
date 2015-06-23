@@ -44,6 +44,25 @@ func (cliConnection *cliConnection) sendPluginMetadataToCliServer(metadata Plugi
 	os.Exit(0)
 }
 
+func (cliConnection *cliConnection) isMinCliVersion(version string) bool {
+	cliServerConn, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer cliServerConn.Close()
+
+	var result bool
+
+	err = cliServerConn.Call("CliRpcCmd.IsMinCliVersion", version, &result)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	return result
+}
+
 func (cliConnection *cliConnection) CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
 	return cliConnection.callCliCommand(true, args...)
 }

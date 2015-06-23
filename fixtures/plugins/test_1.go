@@ -83,6 +83,11 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			Minor: 2,
 			Build: 4,
 		},
+		MinCliVersion: plugin.VersionType{
+			Major: 5,
+			Minor: 0,
+			Build: 0,
+		},
 		Commands: []plugin.Command{
 			{
 				Name:     "test_1_cmd1",
