@@ -342,7 +342,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetOrgs() ", func() {
-			result := []plugin_models.OrganizationSummary{}
+			result := []plugin_models.GetOrgs_Model{}
 			err = client.Call("CliRpcCmd.GetOrgs", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -506,7 +506,7 @@ var _ = Describe("Server", func() {
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
-					var org plugin_models.OrganizationSummary
+					var org plugin_models.GetOrgs_Model
 					err = client.Call("CliRpcCmd.GetCurrentOrg", "", &org)
 
 					Expect(err).ToNot(HaveOccurred())

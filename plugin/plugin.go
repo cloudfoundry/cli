@@ -16,7 +16,7 @@ type Plugin interface {
 type CliConnection interface {
 	CliCommandWithoutTerminalOutput(args ...string) ([]string, error)
 	CliCommand(args ...string) ([]string, error)
-	GetCurrentOrg() (plugin_models.OrganizationSummary, error)
+	GetCurrentOrg() (plugin_models.GetOrgs_Model, error)
 	GetCurrentSpace() (plugin_models.SpaceSummary, error)
 	Username() (string, error)
 	UserGuid() (string, error)
@@ -33,7 +33,7 @@ type CliConnection interface {
 	AccessToken() (string, error)
 	GetApp(string) (plugin_models.GetAppModel, error)
 	GetApps() ([]plugin_models.GetAppsModel, error)
-	GetOrgs() ([]plugin_models.OrganizationSummary, error)
+	GetOrgs() ([]plugin_models.GetOrgs_Model, error)
 	GetSpaces() ([]plugin_models.SpaceSummary, error)
 	GetOrgUsers(string, ...string) ([]plugin_models.User, error)
 	GetSpaceUsers(string, string) ([]plugin_models.User, error)

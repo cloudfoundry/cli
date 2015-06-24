@@ -156,7 +156,7 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.OrganizationSummary) error {
+func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.GetOrgs_Model) error {
 	retVal.Name = cmd.cliConfig.OrganizationFields().Name
 	retVal.Guid = cmd.cliConfig.OrganizationFields().Guid
 	return nil
@@ -283,7 +283,7 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 	return cmd.newCmdRunner.Command([]string{"apps"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.OrganizationSummary) error {
+func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
 	defer func() {
 		recover()
 	}()

@@ -117,13 +117,13 @@ func (cliConnection *cliConnection) pingCLI() {
 	}
 }
 
-func (cliConnection *cliConnection) GetCurrentOrg() (plugin_models.OrganizationSummary, error) {
+func (cliConnection *cliConnection) GetCurrentOrg() (plugin_models.GetOrgs_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.OrganizationSummary{}, err
+		return plugin_models.GetOrgs_Model{}, err
 	}
 
-	var result plugin_models.OrganizationSummary
+	var result plugin_models.GetOrgs_Model
 
 	err = client.Call("CliRpcCmd.GetCurrentOrg", "", &result)
 	return result, err
@@ -321,13 +321,13 @@ func (cliConnection *cliConnection) GetApps() ([]plugin_models.GetAppsModel, err
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.OrganizationSummary, error) {
+func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.GetOrgs_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.OrganizationSummary{}, err
+		return []plugin_models.GetOrgs_Model{}, err
 	}
 
-	var result []plugin_models.OrganizationSummary
+	var result []plugin_models.GetOrgs_Model
 
 	err = client.Call("CliRpcCmd.GetOrgs", "", &result)
 	return result, err

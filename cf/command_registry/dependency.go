@@ -32,7 +32,7 @@ type Dependency struct {
 type pluginModels struct {
 	Application      *plugin_models.GetAppModel
 	AppsSummary      *[]plugin_models.GetAppsModel
-	Organizations    *[]plugin_models.OrganizationSummary
+	Organizations    *[]plugin_models.GetOrgs_Model
 	Organization     *plugin_models.Organization
 	Spaces           *[]plugin_models.SpaceSummary
 	Space            *plugin_models.Space
