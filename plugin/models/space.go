@@ -1,7 +1,7 @@
 package plugin_models
 
 type Space struct {
-	SpaceSummary
+	GetSpaces_Model
 	Organization     GetOrgs_Model
 	Applications     []GetAppsModel
 	ServiceInstances []ServiceInstanceSummary

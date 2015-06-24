@@ -162,7 +162,7 @@ func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.GetOrgs_M
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.SpaceSummary) error {
+func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.GetSpaces_Model) error {
 	retVal.Name = cmd.cliConfig.SpaceFields().Name
 	retVal.Guid = cmd.cliConfig.SpaceFields().Guid
 
@@ -301,7 +301,7 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 	return cmd.newCmdRunner.Command([]string{"orgs"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.SpaceSummary) error {
+func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
 	defer func() {
 		recover()
 	}()

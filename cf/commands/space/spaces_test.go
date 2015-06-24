@@ -74,11 +74,11 @@ var _ = Describe("spaces command", func() {
 
 	Describe("when invoked by a plugin", func() {
 		var (
-			pluginModels []plugin_models.SpaceSummary
+			pluginModels []plugin_models.GetSpaces_Model
 		)
 
 		BeforeEach(func() {
-			pluginModels = []plugin_models.SpaceSummary{}
+			pluginModels = []plugin_models.GetSpaces_Model{}
 			deps.PluginModels.Spaces = &pluginModels
 
 			space := models.Space{}

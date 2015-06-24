@@ -34,11 +34,11 @@ type FakeCliConnection struct {
 		result1 plugin_models.GetOrgs_Model
 		result2 error
 	}
-	GetCurrentSpaceStub        func() (plugin_models.SpaceSummary, error)
+	GetCurrentSpaceStub        func() (plugin_models.GetSpaces_Model, error)
 	getCurrentSpaceMutex       sync.RWMutex
 	getCurrentSpaceArgsForCall []struct{}
 	getCurrentSpaceReturns     struct {
-		result1 plugin_models.SpaceSummary
+		result1 plugin_models.GetSpaces_Model
 		result2 error
 	}
 	UsernameStub        func() (string, error)
@@ -155,11 +155,11 @@ type FakeCliConnection struct {
 		result1 []plugin_models.GetOrgs_Model
 		result2 error
 	}
-	GetSpacesStub        func() ([]plugin_models.SpaceSummary, error)
+	GetSpacesStub        func() ([]plugin_models.GetSpaces_Model, error)
 	getSpacesMutex       sync.RWMutex
 	getSpacesArgsForCall []struct{}
 	getSpacesReturns     struct {
-		result1 []plugin_models.SpaceSummary
+		result1 []plugin_models.GetSpaces_Model
 		result2 error
 	}
 	GetOrgUsersStub        func(string, ...string) ([]plugin_models.User, error)
@@ -300,7 +300,7 @@ func (fake *FakeCliConnection) GetCurrentOrgReturns(result1 plugin_models.GetOrg
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetCurrentSpace() (plugin_models.SpaceSummary, error) {
+func (fake *FakeCliConnection) GetCurrentSpace() (plugin_models.GetSpaces_Model, error) {
 	fake.getCurrentSpaceMutex.Lock()
 	fake.getCurrentSpaceArgsForCall = append(fake.getCurrentSpaceArgsForCall, struct{}{})
 	fake.getCurrentSpaceMutex.Unlock()
@@ -317,10 +317,10 @@ func (fake *FakeCliConnection) GetCurrentSpaceCallCount() int {
 	return len(fake.getCurrentSpaceArgsForCall)
 }
 
-func (fake *FakeCliConnection) GetCurrentSpaceReturns(result1 plugin_models.SpaceSummary, result2 error) {
+func (fake *FakeCliConnection) GetCurrentSpaceReturns(result1 plugin_models.GetSpaces_Model, result2 error) {
 	fake.GetCurrentSpaceStub = nil
 	fake.getCurrentSpaceReturns = struct {
-		result1 plugin_models.SpaceSummary
+		result1 plugin_models.GetSpaces_Model
 		result2 error
 	}{result1, result2}
 }
@@ -733,7 +733,7 @@ func (fake *FakeCliConnection) GetOrgsReturns(result1 []plugin_models.GetOrgs_Mo
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetSpaces() ([]plugin_models.SpaceSummary, error) {
+func (fake *FakeCliConnection) GetSpaces() ([]plugin_models.GetSpaces_Model, error) {
 	fake.getSpacesMutex.Lock()
 	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct{}{})
 	fake.getSpacesMutex.Unlock()
@@ -750,10 +750,10 @@ func (fake *FakeCliConnection) GetSpacesCallCount() int {
 	return len(fake.getSpacesArgsForCall)
 }
 
-func (fake *FakeCliConnection) GetSpacesReturns(result1 []plugin_models.SpaceSummary, result2 error) {
+func (fake *FakeCliConnection) GetSpacesReturns(result1 []plugin_models.GetSpaces_Model, result2 error) {
 	fake.GetSpacesStub = nil
 	fake.getSpacesReturns = struct {
-		result1 []plugin_models.SpaceSummary
+		result1 []plugin_models.GetSpaces_Model
 		result2 error
 	}{result1, result2}
 }
