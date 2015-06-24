@@ -22,7 +22,7 @@ type ListApps struct {
 	config         core_config.Reader
 	appSummaryRepo api.AppSummaryRepository
 
-	pluginAppModels *[]plugin_models.ApplicationSummary
+	pluginAppModels *[]plugin_models.GetAppsModel
 	pluginCall      bool
 }
 
@@ -109,7 +109,7 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 
 func (cmd *ListApps) populatePluginModel(apps []models.Application) {
 	for _, app := range apps {
-		appModel := plugin_models.ApplicationSummary{}
+		appModel := plugin_models.GetAppsModel{}
 		appModel.Name = app.Name
 		appModel.Guid = app.Guid
 		appModel.TotalInstances = app.InstanceCount
@@ -121,7 +121,7 @@ func (cmd *ListApps) populatePluginModel(apps []models.Application) {
 		*(cmd.pluginAppModels) = append(*(cmd.pluginAppModels), appModel)
 
 		for _, route := range app.Routes {
-			r := plugin_models.RouteSummary{}
+			r := plugin_models.GetAppsRouteSummary{}
 			r.Host = route.Host
 			r.Guid = route.Guid
 			r.Domain.Guid = route.Domain.Guid

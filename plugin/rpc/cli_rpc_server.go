@@ -265,7 +265,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.Application) 
 	return cmd.newCmdRunner.Command([]string{"app", appName}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.ApplicationSummary) error {
+func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
 	defer func() {
 		recover()
 	}()

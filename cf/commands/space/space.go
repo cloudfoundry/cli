@@ -183,7 +183,7 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	cmd.pluginModel.Organization.Guid = space.Organization.Guid
 
 	for _, app := range space.Applications {
-		a := plugin_models.ApplicationSummary{
+		a := plugin_models.GetAppsModel{
 			Name: app.Name,
 			Guid: app.Guid,
 		}

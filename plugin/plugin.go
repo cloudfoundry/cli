@@ -32,7 +32,7 @@ type CliConnection interface {
 	DopplerEndpoint() (string, error)
 	AccessToken() (string, error)
 	GetApp(string) (plugin_models.Application, error)
-	GetApps() ([]plugin_models.ApplicationSummary, error)
+	GetApps() ([]plugin_models.GetAppsModel, error)
 	GetOrgs() ([]plugin_models.OrganizationSummary, error)
 	GetSpaces() ([]plugin_models.SpaceSummary, error)
 	GetOrgUsers(string, ...string) ([]plugin_models.User, error)
