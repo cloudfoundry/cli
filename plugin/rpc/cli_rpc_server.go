@@ -247,7 +247,7 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.Application) error {
+func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
 	defer func() {
 		recover()
 	}()

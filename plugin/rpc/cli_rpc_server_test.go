@@ -295,7 +295,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetApp() with 'app' as argument", func() {
-			result := plugin_models.Application{}
+			result := plugin_models.GetAppModel{}
 			err = client.Call("CliRpcCmd.GetApp", "fake-app", &result)
 
 			Expect(err).ToNot(HaveOccurred())

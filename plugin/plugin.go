@@ -31,7 +31,7 @@ type CliConnection interface {
 	LoggregatorEndpoint() (string, error)
 	DopplerEndpoint() (string, error)
 	AccessToken() (string, error)
-	GetApp(string) (plugin_models.Application, error)
+	GetApp(string) (plugin_models.GetAppModel, error)
 	GetApps() ([]plugin_models.GetAppsModel, error)
 	GetOrgs() ([]plugin_models.OrganizationSummary, error)
 	GetSpaces() ([]plugin_models.SpaceSummary, error)
