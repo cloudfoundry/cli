@@ -132,13 +132,13 @@ type FakeCliConnection struct {
 		result1 string
 		result2 error
 	}
-	GetAppStub        func(string) (plugin_models.Application, error)
+	GetAppStub        func(string) (plugin_models.GetAppModel, error)
 	getAppMutex       sync.RWMutex
 	getAppArgsForCall []struct {
 		arg1 string
 	}
 	getAppReturns struct {
-		result1 plugin_models.Application
+		result1 plugin_models.GetAppModel
 		result2 error
 	}
 	GetAppsStub        func() ([]plugin_models.GetAppsModel, error)
@@ -650,7 +650,7 @@ func (fake *FakeCliConnection) AccessTokenReturns(result1 string, result2 error)
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetApp(arg1 string) (plugin_models.Application, error) {
+func (fake *FakeCliConnection) GetApp(arg1 string) (plugin_models.GetAppModel, error) {
 	fake.getAppMutex.Lock()
 	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
 		arg1 string
@@ -675,10 +675,10 @@ func (fake *FakeCliConnection) GetAppArgsForCall(i int) string {
 	return fake.getAppArgsForCall[i].arg1
 }
 
-func (fake *FakeCliConnection) GetAppReturns(result1 plugin_models.Application, result2 error) {
+func (fake *FakeCliConnection) GetAppReturns(result1 plugin_models.GetAppModel, result2 error) {
 	fake.GetAppStub = nil
 	fake.getAppReturns = struct {
-		result1 plugin_models.Application
+		result1 plugin_models.GetAppModel
 		result2 error
 	}{result1, result2}
 }

@@ -2,14 +2,7 @@ package plugin_models
 
 import "time"
 
-type Application struct {
-	ApplicationFields
-	Stack    *Stack
-	Routes   []RouteSummary
-	Services []ServicePlanSummary
-}
-
-type ApplicationFields struct {
+type GetAppModel struct {
 	Guid                 string
 	Name                 string
 	BuildpackUrl         string
@@ -27,10 +20,13 @@ type ApplicationFields struct {
 	PackageUpdatedAt     *time.Time
 	PackageState         string
 	StagingFailedReason  string
-	Instances            []AppInstanceFields
+	Stack                *GetApp_Stack
+	Instances            []GetApp_AppInstanceFields
+	Routes               []GetApp_RouteSummary
+	Services             []GetApp_ServiceSummary
 }
 
-type AppInstanceFields struct {
+type GetApp_AppInstanceFields struct {
 	State     string
 	Details   string
 	Since     time.Time
@@ -41,8 +37,19 @@ type AppInstanceFields struct {
 	MemUsage  int64
 }
 
-type Stack struct {
+type GetApp_Stack struct {
 	Guid        string
 	Name        string
 	Description string
+}
+
+type GetApp_RouteSummary struct {
+	Guid   string
+	Host   string
+	Domain DomainFields
+}
+
+type GetApp_ServiceSummary struct {
+	Guid string
+	Name string
 }

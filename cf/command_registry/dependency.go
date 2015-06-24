@@ -30,7 +30,7 @@ type Dependency struct {
 }
 
 type pluginModels struct {
-	Application      *plugin_models.Application
+	Application      *plugin_models.GetAppModel
 	AppsSummary      *[]plugin_models.GetAppsModel
 	Organizations    *[]plugin_models.OrganizationSummary
 	Organization     *plugin_models.Organization

@@ -28,7 +28,7 @@ type ShowApp struct {
 	appLogsNoaaRepo  api.LogsNoaaRepository
 	appInstancesRepo app_instances.AppInstancesRepository
 	appReq           requirements.ApplicationRequirement
-	pluginAppModel   *plugin_models.Application
+	pluginAppModel   *plugin_models.GetAppModel
 	pluginCall       bool
 }
 
@@ -112,13 +112,13 @@ func (cmd *ShowApp) Execute(c flags.FlagContext) {
 		cmd.pluginAppModel.PackageState = app.PackageState
 		cmd.pluginAppModel.StagingFailedReason = app.StagingFailedReason
 
-		cmd.pluginAppModel.Stack = &plugin_models.Stack{
+		cmd.pluginAppModel.Stack = &plugin_models.GetApp_Stack{
 			Name: app.Stack.Name,
 			Guid: app.Stack.Guid,
 		}
 
 		for i, _ := range app.Routes {
-			cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, plugin_models.RouteSummary{
+			cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, plugin_models.GetApp_RouteSummary{
 				Host: app.Routes[i].Host,
 				Guid: app.Routes[i].Guid,
 				Domain: plugin_models.DomainFields{
@@ -131,7 +131,7 @@ func (cmd *ShowApp) Execute(c flags.FlagContext) {
 		}
 
 		for i, _ := range app.Services {
-			cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, plugin_models.ServicePlanSummary{
+			cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, plugin_models.GetApp_ServiceSummary{
 				Name: app.Services[i].Name,
 				Guid: app.Services[i].Guid,
 			})
@@ -250,7 +250,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 		)
 
 		if cmd.pluginCall {
-			i := plugin_models.AppInstanceFields{}
+			i := plugin_models.GetApp_AppInstanceFields{}
 			i.State = fmt.Sprintf("%s", instance.State)
 			i.Details = instance.Details
 			i.Since = instance.Since

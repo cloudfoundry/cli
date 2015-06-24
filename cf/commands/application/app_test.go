@@ -87,7 +87,7 @@ var _ = Describe("app Command", func() {
 
 	Describe("when invoked by a plugin", func() {
 		var (
-			pluginAppModel *plugin_models.Application
+			pluginAppModel *plugin_models.GetAppModel
 		)
 
 		BeforeEach(func() {
@@ -115,7 +115,7 @@ var _ = Describe("app Command", func() {
 			appSummaryRepo.GetSummarySummary = app
 			requirementsFactory.Application = app
 
-			pluginAppModel = &plugin_models.Application{}
+			pluginAppModel = &plugin_models.GetAppModel{}
 			deps.PluginModels.Application = pluginAppModel
 			updateCommandDependency(true)
 		})
