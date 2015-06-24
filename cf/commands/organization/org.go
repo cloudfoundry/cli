@@ -20,7 +20,7 @@ type ShowOrg struct {
 	ui          terminal.UI
 	config      core_config.Reader
 	orgReq      requirements.OrganizationRequirement
-	pluginModel *plugin_models.Organization
+	pluginModel *plugin_models.GetOrg_Model
 	pluginCall  bool
 }
 

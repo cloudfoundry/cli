@@ -117,25 +117,25 @@ func (cliConnection *cliConnection) pingCLI() {
 	}
 }
 
-func (cliConnection *cliConnection) GetCurrentOrg() (plugin_models.GetOrgs_Model, error) {
+func (cliConnection *cliConnection) GetCurrentOrg() (plugin_models.Organization, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.GetOrgs_Model{}, err
+		return plugin_models.Organization{}, err
 	}
 
-	var result plugin_models.GetOrgs_Model
+	var result plugin_models.Organization
 
 	err = client.Call("CliRpcCmd.GetCurrentOrg", "", &result)
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetCurrentSpace() (plugin_models.GetSpaces_Model, error) {
+func (cliConnection *cliConnection) GetCurrentSpace() (plugin_models.Space, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.GetSpaces_Model{}, err
+		return plugin_models.Space{}, err
 	}
 
-	var result plugin_models.GetSpaces_Model
+	var result plugin_models.Space
 
 	err = client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
 	return result, err
@@ -385,25 +385,25 @@ func (cliConnection *cliConnection) GetSpaceUsers(orgName string, spaceName stri
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetOrg(orgName string) (plugin_models.Organization, error) {
+func (cliConnection *cliConnection) GetOrg(orgName string) (plugin_models.GetOrg_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.Organization{}, err
+		return plugin_models.GetOrg_Model{}, err
 	}
 
-	var result plugin_models.Organization
+	var result plugin_models.GetOrg_Model
 
 	err = client.Call("CliRpcCmd.GetOrg", orgName, &result)
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetSpace(spaceName string) (plugin_models.Space, error) {
+func (cliConnection *cliConnection) GetSpace(spaceName string) (plugin_models.GetSpace_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.Space{}, err
+		return plugin_models.GetSpace_Model{}, err
 	}
 
-	var result plugin_models.Space
+	var result plugin_models.GetSpace_Model
 
 	err = client.Call("CliRpcCmd.GetSpace", spaceName, &result)
 	return result, err

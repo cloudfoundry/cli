@@ -194,10 +194,10 @@ var _ = Describe("space command", func() {
 
 		Context("When called as a plugin", func() {
 			var (
-				pluginModel plugin_models.Space
+				pluginModel plugin_models.GetSpace_Model
 			)
 			BeforeEach(func() {
-				pluginModel = plugin_models.Space{}
+				pluginModel = plugin_models.GetSpace_Model{}
 				deps.PluginModels.Space = &pluginModel
 				updateCommandDependency(true)
 			})

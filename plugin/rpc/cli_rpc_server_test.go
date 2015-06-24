@@ -307,7 +307,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetOrg() with 'my-org' as argument", func() {
-			result := plugin_models.Organization{}
+			result := plugin_models.GetOrg_Model{}
 			err = client.Call("CliRpcCmd.GetOrg", "my-org", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -319,7 +319,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetSpace() with 'my-space' as argument", func() {
-			result := plugin_models.Space{}
+			result := plugin_models.GetSpace_Model{}
 			err = client.Call("CliRpcCmd.GetSpace", "my-space", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -506,7 +506,7 @@ var _ = Describe("Server", func() {
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
-					var org plugin_models.GetOrgs_Model
+					var org plugin_models.Organization
 					err = client.Call("CliRpcCmd.GetCurrentOrg", "", &org)
 
 					Expect(err).ToNot(HaveOccurred())
@@ -533,7 +533,7 @@ var _ = Describe("Server", func() {
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
 
-					var space plugin_models.GetSpaces_Model
+					var space plugin_models.Space
 					err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
 
 					Expect(err).ToNot(HaveOccurred())

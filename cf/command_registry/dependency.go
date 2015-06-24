@@ -33,9 +33,9 @@ type pluginModels struct {
 	Application      *plugin_models.GetAppModel
 	AppsSummary      *[]plugin_models.GetAppsModel
 	Organizations    *[]plugin_models.GetOrgs_Model
-	Organization     *plugin_models.Organization
+	Organization     *plugin_models.GetOrg_Model
 	Spaces           *[]plugin_models.GetSpaces_Model
-	Space            *plugin_models.Space
+	Space            *plugin_models.GetSpace_Model
 	Users            *[]plugin_models.User
 	ServiceInstances *[]plugin_models.ServiceInstance
 }

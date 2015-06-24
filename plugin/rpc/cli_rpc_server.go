@@ -156,13 +156,13 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.GetOrgs_Model) error {
+func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
 	retVal.Name = cmd.cliConfig.OrganizationFields().Name
 	retVal.Guid = cmd.cliConfig.OrganizationFields().Guid
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.GetSpaces_Model) error {
+func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
 	retVal.Name = cmd.cliConfig.SpaceFields().Name
 	retVal.Guid = cmd.cliConfig.SpaceFields().Guid
 
@@ -373,7 +373,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.User)
 	return cmd.newCmdRunner.Command(append([]string{"space-users"}, args...), deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.Organization) error {
+func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -391,7 +391,7 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.Organization)
 	return cmd.newCmdRunner.Command([]string{"org", orgName}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.Space) error {
+func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
 	defer func() {
 		recover()
 	}()

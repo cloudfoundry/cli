@@ -16,8 +16,8 @@ type Plugin interface {
 type CliConnection interface {
 	CliCommandWithoutTerminalOutput(args ...string) ([]string, error)
 	CliCommand(args ...string) ([]string, error)
-	GetCurrentOrg() (plugin_models.GetOrgs_Model, error)
-	GetCurrentSpace() (plugin_models.GetSpaces_Model, error)
+	GetCurrentOrg() (plugin_models.Organization, error)
+	GetCurrentSpace() (plugin_models.Space, error)
 	Username() (string, error)
 	UserGuid() (string, error)
 	UserEmail() (string, error)
@@ -38,8 +38,8 @@ type CliConnection interface {
 	GetOrgUsers(string, ...string) ([]plugin_models.User, error)
 	GetSpaceUsers(string, string) ([]plugin_models.User, error)
 	GetServices() ([]plugin_models.ServiceInstance, error)
-	GetOrg(string) (plugin_models.Organization, error)
-	GetSpace(string) (plugin_models.Space, error)
+	GetOrg(string) (plugin_models.GetOrg_Model, error)
+	GetSpace(string) (plugin_models.GetSpace_Model, error)
 }
 
 type VersionType struct {

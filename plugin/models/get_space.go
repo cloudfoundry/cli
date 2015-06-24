@@ -1,6 +1,6 @@
 package plugin_models
 
-type Space struct {
+type GetSpace_Model struct {
 	GetSpaces_Model
 	Organization     GetOrgs_Model
 	Applications     []GetAppsModel
