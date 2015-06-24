@@ -1,6 +1,6 @@
 package plugin_models
 
-type OrganizationSummary struct {
+type GetOrgs_Model struct {
 	Guid string
 	Name string
 }

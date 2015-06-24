@@ -64,7 +64,7 @@ var _ = Describe("org command", func() {
 
 	Describe("when invoked by a plugin", func() {
 		var (
-			pluginOrgsModel []plugin_models.OrganizationSummary
+			pluginOrgsModel []plugin_models.GetOrgs_Model
 		)
 
 		BeforeEach(func() {
@@ -80,7 +80,7 @@ var _ = Describe("org command", func() {
 
 			orgRepo.ListOrgsReturns([]models.Organization{org1, org2, org3}, nil)
 
-			pluginOrgsModel = []plugin_models.OrganizationSummary{}
+			pluginOrgsModel = []plugin_models.GetOrgs_Model{}
 			deps.PluginModels.Organizations = &pluginOrgsModel
 			updateCommandDependency(true)
 		})

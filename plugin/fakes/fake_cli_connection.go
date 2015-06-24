@@ -27,11 +27,11 @@ type FakeCliConnection struct {
 		result1 []string
 		result2 error
 	}
-	GetCurrentOrgStub        func() (plugin_models.OrganizationSummary, error)
+	GetCurrentOrgStub        func() (plugin_models.GetOrgs_Model, error)
 	getCurrentOrgMutex       sync.RWMutex
 	getCurrentOrgArgsForCall []struct{}
 	getCurrentOrgReturns     struct {
-		result1 plugin_models.OrganizationSummary
+		result1 plugin_models.GetOrgs_Model
 		result2 error
 	}
 	GetCurrentSpaceStub        func() (plugin_models.SpaceSummary, error)
@@ -148,11 +148,11 @@ type FakeCliConnection struct {
 		result1 []plugin_models.GetAppsModel
 		result2 error
 	}
-	GetOrgsStub        func() ([]plugin_models.OrganizationSummary, error)
+	GetOrgsStub        func() ([]plugin_models.GetOrgs_Model, error)
 	getOrgsMutex       sync.RWMutex
 	getOrgsArgsForCall []struct{}
 	getOrgsReturns     struct {
-		result1 []plugin_models.OrganizationSummary
+		result1 []plugin_models.GetOrgs_Model
 		result2 error
 	}
 	GetSpacesStub        func() ([]plugin_models.SpaceSummary, error)
@@ -275,7 +275,7 @@ func (fake *FakeCliConnection) CliCommandReturns(result1 []string, result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetCurrentOrg() (plugin_models.OrganizationSummary, error) {
+func (fake *FakeCliConnection) GetCurrentOrg() (plugin_models.GetOrgs_Model, error) {
 	fake.getCurrentOrgMutex.Lock()
 	fake.getCurrentOrgArgsForCall = append(fake.getCurrentOrgArgsForCall, struct{}{})
 	fake.getCurrentOrgMutex.Unlock()
@@ -292,10 +292,10 @@ func (fake *FakeCliConnection) GetCurrentOrgCallCount() int {
 	return len(fake.getCurrentOrgArgsForCall)
 }
 
-func (fake *FakeCliConnection) GetCurrentOrgReturns(result1 plugin_models.OrganizationSummary, result2 error) {
+func (fake *FakeCliConnection) GetCurrentOrgReturns(result1 plugin_models.GetOrgs_Model, result2 error) {
 	fake.GetCurrentOrgStub = nil
 	fake.getCurrentOrgReturns = struct {
-		result1 plugin_models.OrganizationSummary
+		result1 plugin_models.GetOrgs_Model
 		result2 error
 	}{result1, result2}
 }
@@ -708,7 +708,7 @@ func (fake *FakeCliConnection) GetAppsReturns(result1 []plugin_models.GetAppsMod
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetOrgs() ([]plugin_models.OrganizationSummary, error) {
+func (fake *FakeCliConnection) GetOrgs() ([]plugin_models.GetOrgs_Model, error) {
 	fake.getOrgsMutex.Lock()
 	fake.getOrgsArgsForCall = append(fake.getOrgsArgsForCall, struct{}{})
 	fake.getOrgsMutex.Unlock()
@@ -725,10 +725,10 @@ func (fake *FakeCliConnection) GetOrgsCallCount() int {
 	return len(fake.getOrgsArgsForCall)
 }
 
-func (fake *FakeCliConnection) GetOrgsReturns(result1 []plugin_models.OrganizationSummary, result2 error) {
+func (fake *FakeCliConnection) GetOrgsReturns(result1 []plugin_models.GetOrgs_Model, result2 error) {
 	fake.GetOrgsStub = nil
 	fake.getOrgsReturns = struct {
-		result1 []plugin_models.OrganizationSummary
+		result1 []plugin_models.GetOrgs_Model
 		result2 error
 	}{result1, result2}
 }

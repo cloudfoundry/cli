@@ -2,7 +2,7 @@ package plugin_models
 
 type Space struct {
 	SpaceSummary
-	Organization     OrganizationSummary
+	Organization     GetOrgs_Model
 	Applications     []GetAppsModel
 	ServiceInstances []ServiceInstanceSummary
 	Domains          []DomainFields
