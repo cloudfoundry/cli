@@ -1,6 +1,6 @@
 package plugin_models
 
-type SpaceSummary struct {
+type GetSpaces_Model struct {
 	Guid string
 	Name string
 }

@@ -129,13 +129,13 @@ func (cliConnection *cliConnection) GetCurrentOrg() (plugin_models.GetOrgs_Model
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetCurrentSpace() (plugin_models.SpaceSummary, error) {
+func (cliConnection *cliConnection) GetCurrentSpace() (plugin_models.GetSpaces_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.SpaceSummary{}, err
+		return plugin_models.GetSpaces_Model{}, err
 	}
 
-	var result plugin_models.SpaceSummary
+	var result plugin_models.GetSpaces_Model
 
 	err = client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
 	return result, err
@@ -333,13 +333,13 @@ func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.GetOrgs_Model, er
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetSpaces() ([]plugin_models.SpaceSummary, error) {
+func (cliConnection *cliConnection) GetSpaces() ([]plugin_models.GetSpaces_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.SpaceSummary{}, err
+		return []plugin_models.GetSpaces_Model{}, err
 	}
 
-	var result []plugin_models.SpaceSummary
+	var result []plugin_models.GetSpaces_Model
 
 	err = client.Call("CliRpcCmd.GetSpaces", "", &result)
 	return result, err
