@@ -1,6 +1,6 @@
 package plugin_models
 
-type Organization struct {
+type GetOrg_Model struct {
 	Guid            string
 	Name            string
 	QuotaDefinition QuotaFields
