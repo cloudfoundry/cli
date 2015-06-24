@@ -331,7 +331,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetApps() ", func() {
-			result := []plugin_models.ApplicationSummary{}
+			result := []plugin_models.GetAppsModel{}
 			err = client.Call("CliRpcCmd.GetApps", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())

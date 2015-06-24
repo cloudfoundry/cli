@@ -31,7 +31,7 @@ type Dependency struct {
 
 type pluginModels struct {
 	Application      *plugin_models.Application
-	AppsSummary      *[]plugin_models.ApplicationSummary
+	AppsSummary      *[]plugin_models.GetAppsModel
 	Organizations    *[]plugin_models.OrganizationSummary
 	Organization     *plugin_models.Organization
 	Spaces           *[]plugin_models.SpaceSummary

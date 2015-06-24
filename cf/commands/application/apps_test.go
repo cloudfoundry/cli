@@ -119,11 +119,11 @@ var _ = Describe("list-apps command", func() {
 
 	Describe("when invoked by a plugin", func() {
 		var (
-			pluginAppModels []plugin_models.ApplicationSummary
+			pluginAppModels []plugin_models.GetAppsModel
 		)
 
 		BeforeEach(func() {
-			pluginAppModels = []plugin_models.ApplicationSummary{}
+			pluginAppModels = []plugin_models.GetAppsModel{}
 			deps.PluginModels.AppsSummary = &pluginAppModels
 			updateCommandDependency(true)
 		})

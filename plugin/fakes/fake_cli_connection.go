@@ -141,11 +141,11 @@ type FakeCliConnection struct {
 		result1 plugin_models.Application
 		result2 error
 	}
-	GetAppsStub        func() ([]plugin_models.ApplicationSummary, error)
+	GetAppsStub        func() ([]plugin_models.GetAppsModel, error)
 	getAppsMutex       sync.RWMutex
 	getAppsArgsForCall []struct{}
 	getAppsReturns     struct {
-		result1 []plugin_models.ApplicationSummary
+		result1 []plugin_models.GetAppsModel
 		result2 error
 	}
 	GetOrgsStub        func() ([]plugin_models.OrganizationSummary, error)
@@ -683,7 +683,7 @@ func (fake *FakeCliConnection) GetAppReturns(result1 plugin_models.Application, 
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetApps() ([]plugin_models.ApplicationSummary, error) {
+func (fake *FakeCliConnection) GetApps() ([]plugin_models.GetAppsModel, error) {
 	fake.getAppsMutex.Lock()
 	fake.getAppsArgsForCall = append(fake.getAppsArgsForCall, struct{}{})
 	fake.getAppsMutex.Unlock()
@@ -700,10 +700,10 @@ func (fake *FakeCliConnection) GetAppsCallCount() int {
 	return len(fake.getAppsArgsForCall)
 }
 
-func (fake *FakeCliConnection) GetAppsReturns(result1 []plugin_models.ApplicationSummary, result2 error) {
+func (fake *FakeCliConnection) GetAppsReturns(result1 []plugin_models.GetAppsModel, result2 error) {
 	fake.GetAppsStub = nil
 	fake.getAppsReturns = struct {
-		result1 []plugin_models.ApplicationSummary
+		result1 []plugin_models.GetAppsModel
 		result2 error
 	}{result1, result2}
 }
