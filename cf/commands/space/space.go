@@ -183,7 +183,7 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	cmd.pluginModel.Organization.Guid = space.Organization.Guid
 
 	for _, app := range space.Applications {
-		a := plugin_models.GetAppsModel{
+		a := plugin_models.GetSpace_Apps{
 			Name: app.Name,
 			Guid: app.Guid,
 		}
@@ -191,7 +191,7 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	}
 
 	for _, domain := range space.Domains {
-		d := plugin_models.DomainFields{
+		d := plugin_models.GetSpace_Domains{
 			Name: domain.Name,
 			Guid: domain.Guid,
 			OwningOrganizationGuid: domain.OwningOrganizationGuid,
@@ -201,14 +201,14 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	}
 
 	for _, service := range space.ServiceInstances {
-		si := plugin_models.ServiceInstanceSummary{
+		si := plugin_models.GetSpace_ServiceInstance{
 			Name: service.Name,
 			Guid: service.Guid,
 		}
 		cmd.pluginModel.ServiceInstances = append(cmd.pluginModel.ServiceInstances, si)
 	}
 	for _, group := range space.SecurityGroups {
-		sg := plugin_models.SecurityGroupFields{
+		sg := plugin_models.GetSpace_SecurityGroup{
 			Name:  group.Name,
 			Guid:  group.Guid,
 			Rules: group.Rules,
