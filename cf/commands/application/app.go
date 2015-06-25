@@ -121,7 +121,7 @@ func (cmd *ShowApp) Execute(c flags.FlagContext) {
 			cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, plugin_models.GetApp_RouteSummary{
 				Host: app.Routes[i].Host,
 				Guid: app.Routes[i].Guid,
-				Domain: plugin_models.DomainFields{
+				Domain: plugin_models.GetApp_DomainFields{
 					Name:                   app.Routes[i].Domain.Name,
 					Guid:                   app.Routes[i].Domain.Guid,
 					Shared:                 app.Routes[i].Domain.Shared,

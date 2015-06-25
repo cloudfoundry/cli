@@ -46,7 +46,14 @@ type GetApp_Stack struct {
 type GetApp_RouteSummary struct {
 	Guid   string
 	Host   string
-	Domain DomainFields
+	Domain GetApp_DomainFields
+}
+
+type GetApp_DomainFields struct {
+	Guid                   string
+	Name                   string
+	OwningOrganizationGuid string
+	Shared                 bool
 }
 
 type GetApp_ServiceSummary struct {
