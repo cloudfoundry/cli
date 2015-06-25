@@ -132,8 +132,8 @@ jobs:
   plan:
   - aggregate:
     - get: cf-cli
-    - get: version
       trigger: true
+    - get: version
       params: {pre: plus}
   - put: version
     params: {file: version/number}
