@@ -21,7 +21,7 @@ type SpaceUsers struct {
 	spaceRepo   spaces.SpaceRepository
 	userRepo    api.UserRepository
 	orgReq      requirements.OrganizationRequirement
-	pluginModel *[]plugin_models.User
+	pluginModel *[]plugin_models.GetSpaceUsers_Model
 	pluginCall  bool
 }
 
@@ -66,7 +66,7 @@ func (cmd *SpaceUsers) SetDependency(deps command_registry.Dependency, pluginCal
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.pluginCall = pluginCall
-	cmd.pluginModel = deps.PluginModels.Users
+	cmd.pluginModel = deps.PluginModels.SpaceUsers
 
 	return cmd
 }
@@ -93,7 +93,7 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 		models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
 	}
 
-	var usersMap = make(map[string]plugin_models.User)
+	var usersMap = make(map[string]plugin_models.GetSpaceUsers_Model)
 
 	var users []models.UserFields
 	for _, role := range spaceRoles {
@@ -114,7 +114,7 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 			if cmd.pluginCall {
 				u, found := usersMap[user.Username]
 				if !found {
-					u = plugin_models.User{}
+					u = plugin_models.GetSpaceUsers_Model{}
 					u.Username = user.Username
 					u.Guid = user.Guid
 					u.IsAdmin = user.IsAdmin

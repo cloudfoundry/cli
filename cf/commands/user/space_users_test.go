@@ -147,7 +147,7 @@ var _ = Describe("space-users command", func() {
 
 	Describe("when invoked by a plugin", func() {
 		var (
-			pluginUserModel []plugin_models.User
+			pluginUserModel []plugin_models.GetSpaceUsers_Model
 		)
 
 		Context("single roles", func() {
@@ -190,8 +190,8 @@ var _ = Describe("space-users command", func() {
 				requirementsFactory.LoginSuccess = true
 				requirementsFactory.Organization = org
 				requirementsFactory.Space = space
-				pluginUserModel = []plugin_models.User{}
-				deps.PluginModels.Users = &pluginUserModel
+				pluginUserModel = []plugin_models.GetSpaceUsers_Model{}
+				deps.PluginModels.SpaceUsers = &pluginUserModel
 				updateCommandDependency(true)
 			})
 
@@ -262,8 +262,8 @@ var _ = Describe("space-users command", func() {
 				requirementsFactory.LoginSuccess = true
 				requirementsFactory.Organization = org
 				requirementsFactory.Space = space
-				pluginUserModel = []plugin_models.User{}
-				deps.PluginModels.Users = &pluginUserModel
+				pluginUserModel = []plugin_models.GetSpaceUsers_Model{}
+				deps.PluginModels.SpaceUsers = &pluginUserModel
 				updateCommandDependency(true)
 			})
 

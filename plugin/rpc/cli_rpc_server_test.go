@@ -375,7 +375,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetOrgUsers() ", func() {
-			result := []plugin_models.User{}
+			result := []plugin_models.GetOrgUsers_Model{}
 			args := []string{"orgName1", "-a"}
 			err = client.Call("CliRpcCmd.GetOrgUsers", args, &result)
 
@@ -387,7 +387,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetSpaceUsers() ", func() {
-			result := []plugin_models.User{}
+			result := []plugin_models.GetSpaceUsers_Model{}
 			args := []string{"orgName1", "spaceName1"}
 			err = client.Call("CliRpcCmd.GetSpaceUsers", args, &result)
 

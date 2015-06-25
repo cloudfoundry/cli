@@ -337,7 +337,7 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.ServiceInsta
 	return cmd.newCmdRunner.Command([]string{"services"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.User) error {
+func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -348,14 +348,14 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.User) e
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Users = retVal
+	deps.PluginModels.OrgUsers = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
 	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
 
 	return cmd.newCmdRunner.Command(append([]string{"org-users"}, args...), deps, true)
 }
 
-func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.User) error {
+func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -366,7 +366,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.User)
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Users = retVal
+	deps.PluginModels.SpaceUsers = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
 	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
 

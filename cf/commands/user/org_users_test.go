@@ -154,7 +154,7 @@ var _ = Describe("org-users command", func() {
 
 	Describe("when invoked by a plugin", func() {
 		var (
-			pluginUserModel []plugin_models.User
+			pluginUserModel []plugin_models.GetOrgUsers_Model
 		)
 
 		Context("single roles", func() {
@@ -192,8 +192,8 @@ var _ = Describe("org-users command", func() {
 
 				requirementsFactory.LoginSuccess = true
 				requirementsFactory.Organization = org
-				pluginUserModel = []plugin_models.User{}
-				deps.PluginModels.Users = &pluginUserModel
+				pluginUserModel = []plugin_models.GetOrgUsers_Model{}
+				deps.PluginModels.OrgUsers = &pluginUserModel
 				updateCommandDependency(true)
 			})
 
@@ -268,8 +268,8 @@ var _ = Describe("org-users command", func() {
 
 				requirementsFactory.LoginSuccess = true
 				requirementsFactory.Organization = org
-				pluginUserModel = []plugin_models.User{}
-				deps.PluginModels.Users = &pluginUserModel
+				pluginUserModel = []plugin_models.GetOrgUsers_Model{}
+				deps.PluginModels.OrgUsers = &pluginUserModel
 				updateCommandDependency(true)
 			})
 

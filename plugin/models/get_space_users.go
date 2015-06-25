@@ -1,6 +1,6 @@
 package plugin_models
 
-type User struct {
+type GetSpaceUsers_Model struct {
 	Guid     string
 	Username string
 	IsAdmin  bool
