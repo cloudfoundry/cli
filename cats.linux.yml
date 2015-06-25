@@ -1,0 +1,14 @@
+---
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+params:
+  BOSH_LITE_IP:
+
+inputs:
+  - name: cf-cli
+  - name: cf-release
+  - name: linux64-binary
+
+run:
+  path: cf-cli/ci/scripts/herd-cats-linux64-concourse

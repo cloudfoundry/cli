@@ -1,0 +1,104 @@
+#!/bin/bash
+
+set -e -x
+
+ROOT_DIR=$(pwd)
+OUT_DIR=${ROOT_DIR}/out
+RELEASE_DIR=${ROOT_DIR}/release
+INSTALLERS_DIR=${ROOT_DIR}/installers
+VERSION=$(${OUT_DIR}/cf-linux-amd64 -v | cut -d' ' -f 3 | cut -d'-' -f 1)
+
+# Instructions for installing iscc:
+# https://katastrophos.net/andre/blog/2009/03/16/setting-up-the-inno-setup-compiler-on-debian/
+#
+# To install ispack-5.2.3.exe, Start socat to expose local xquartz socket on a TCP port
+# socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"
+#More--
+# Pass the display to container (assuming virtualbox host is available on 192.168.59.3):
+# docker run -it -e DISPLAY=192.168.59.3:0 cloudfoundry/cli-ci /bin/bash
+
+echo "building windows-386 installer"
+pushd ${INSTALLERS_DIR}/windows
+  cp ${OUT_DIR}/cf-windows-386.exe cf.exe
+
+  sed -i -e "s/VERSION/${VERSION}/" ${ROOT_DIR}/ci/scripts/windows-installer-concourse.iss
+
+  # Change the Unix file path to a Windows file path for the Inno Setup script.
+  sed -i -e "s/CF_SOURCE/$(echo "z:$(pwd)/cf.exe" | sed 's,/,\\\\,g')/" ${ROOT_DIR}/ci/scripts/windows-installer-concourse.iss
+
+  ${ROOT_DIR}/ci/scripts/iscc-concourse ${ROOT_DIR}/ci/scripts/windows-installer-concourse.iss
+  mv ${ROOT_DIR}/ci/scripts/Output/setup.exe cf_installer.exe
+  zip ${ROOT_DIR}/release/installer-windows-386.zip cf_installer.exe
+  rm cf_installer.exe cf.exe
+popd
+
+echo "building windows-amd64 installer"
+pushd ${INSTALLERS_DIR}/windows
+  cp ${OUT_DIR}/cf-windows-amd64.exe cf.exe
+  ${ROOT_DIR}/ci/scripts/iscc-concourse ${ROOT_DIR}/ci/scripts/windows-installer-concourse.iss
+  mv ${ROOT_DIR}/ci/scripts/Output/setup.exe cf_installer.exe
+  zip ${RELEASE_DIR}/installer-windows-amd64.zip cf_installer.exe
+  rm cf_installer.exe cf.exe
+popd
+
+echo "building i386 DEB package"
+pushd ${INSTALLERS_DIR}/deb
+  mkdir -p cf/usr/bin
+  cp ${OUT_DIR}/cf-linux-386 cf/usr/bin/cf
+  cp control.template cf/DEBIAN/control
+  echo "Version: ${VERSION}" >> cf/DEBIAN/control
+  echo "Architecture: i386" >> cf/DEBIAN/control
+  fakeroot dpkg --build cf cf-cli_i386.deb
+  mv cf-cli_i386.deb ${RELEASE_DIR}/
+  rm -rf cf/usr/bin cf/DEBIAN/control
+popd
+
+echo "building amd64 DEB package"
+pushd ${INSTALLERS_DIR}/deb
+  mkdir -p cf/usr/bin
+  cp ${OUT_DIR}/cf-linux-amd64 cf/usr/bin/cf
+  cp control.template cf/DEBIAN/control
+  echo "Version: ${VERSION}" >> cf/DEBIAN/control
+  echo "Architecture: amd64" >> cf/DEBIAN/control
+  fakeroot dpkg --build cf cf-cli_amd64.deb
+  mv cf-cli_amd64.deb ${RELEASE_DIR}/
+  rm -rf cf/usr/bin cf/DEBIAN/control
+popd
+
+echo "building i386 RPM package"
+pushd ${INSTALLERS_DIR}/rpm
+  cp ${OUT_DIR}/cf-linux-386 cf
+  RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
+  echo "Version: ${RPM_VERSION}" > cf-cli.spec
+  cat cf-cli.spec.template >> cf-cli.spec
+  rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+  mv build/RPMS/i386/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_i386.rpm
+  rm -rf build cf cf-cli.spec
+popd
+
+echo "building amd64 RPM package"
+pushd ${INSTALLERS_DIR}/rpm
+  cp ${OUT_DIR}/cf-linux-amd64 cf
+  RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
+  echo "Version: ${RPM_VERSION}" > cf-cli.spec
+  cat cf-cli.spec.template >> cf-cli.spec
+  rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+  mv build/RPMS/x86_64/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_amd64.rpm
+  rm -rf build cf cf-cli.spec
+popd
+
+echo "building OS X installer"
+pushd ${INSTALLERS_DIR}/osx
+  mkdir -p cf-cli/usr/local/bin
+  mkdir -p cf-cli/usr/local/share/doc/cf-cli
+  cp ${OUT_DIR}/cf-darwin-amd64 cf-cli/usr/local/bin/cf
+  cp COPYING cf-cli/usr/local/share/doc/cf-cli
+  chmod -R go-w cf-cli
+  ( cd cf-cli && find usr | cpio -o --format=odc | gzip -c > ../Payload )
+  ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
+  mkbom -i bom_list Bom
+  mv Bom Payload com.cloudfoundry.cli.pkg
+  xar -c --compression none -f installer-osx-amd64.pkg com.cloudfoundry.cli.pkg Distribution
+  mv installer-osx-amd64.pkg ${RELEASE_DIR}/
+  rm -rf cf-cli com.cloudfoundry.cli.pkg/Payload com.cloudfoundry.cli.pkg/Bom bom_list
+popd

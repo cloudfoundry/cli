@@ -1,0 +1,15 @@
+---
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+params:
+  BOSH_LITE_IP:
+
+inputs:
+  - name: cf-cli
+  - name: gats
+    path: gopath/src/github.com/pivotal-cf-experimental/GATS
+  - name: linux64-binary
+
+run:
+  path: cf-cli/ci/scripts/unix-gats-concourse
