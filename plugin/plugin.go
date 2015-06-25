@@ -37,7 +37,7 @@ type CliConnection interface {
 	GetSpaces() ([]plugin_models.GetSpaces_Model, error)
 	GetOrgUsers(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
 	GetSpaceUsers(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
-	GetServices() ([]plugin_models.ServiceInstance, error)
+	GetServices() ([]plugin_models.GetServices_Model, error)
 	GetOrg(string) (plugin_models.GetOrg_Model, error)
 	GetSpace(string) (plugin_models.GetSpace_Model, error)
 }

@@ -182,11 +182,11 @@ type FakeCliConnection struct {
 		result1 []plugin_models.GetSpaceUsers_Model
 		result2 error
 	}
-	GetServicesStub        func() ([]plugin_models.ServiceInstance, error)
+	GetServicesStub        func() ([]plugin_models.GetServices_Model, error)
 	getServicesMutex       sync.RWMutex
 	getServicesArgsForCall []struct{}
 	getServicesReturns     struct {
-		result1 []plugin_models.ServiceInstance
+		result1 []plugin_models.GetServices_Model
 		result2 error
 	}
 	GetOrgStub        func(string) (plugin_models.GetOrg_Model, error)
@@ -826,7 +826,7 @@ func (fake *FakeCliConnection) GetSpaceUsersReturns(result1 []plugin_models.GetS
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetServices() ([]plugin_models.ServiceInstance, error) {
+func (fake *FakeCliConnection) GetServices() ([]plugin_models.GetServices_Model, error) {
 	fake.getServicesMutex.Lock()
 	fake.getServicesArgsForCall = append(fake.getServicesArgsForCall, struct{}{})
 	fake.getServicesMutex.Unlock()
@@ -843,10 +843,10 @@ func (fake *FakeCliConnection) GetServicesCallCount() int {
 	return len(fake.getServicesArgsForCall)
 }
 
-func (fake *FakeCliConnection) GetServicesReturns(result1 []plugin_models.ServiceInstance, result2 error) {
+func (fake *FakeCliConnection) GetServicesReturns(result1 []plugin_models.GetServices_Model, result2 error) {
 	fake.GetServicesStub = nil
 	fake.getServicesReturns = struct {
-		result1 []plugin_models.ServiceInstance
+		result1 []plugin_models.GetServices_Model
 		result2 error
 	}{result1, result2}
 }

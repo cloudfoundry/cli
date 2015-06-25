@@ -153,13 +153,13 @@ var _ = Describe("services", func() {
 	Describe("when invoked by a plugin", func() {
 
 		var (
-			pluginModels []plugin_models.ServiceInstance
+			pluginModels []plugin_models.GetServices_Model
 		)
 
 		BeforeEach(func() {
 
-			pluginModels = []plugin_models.ServiceInstance{}
-			deps.PluginModels.ServiceInstances = &pluginModels
+			pluginModels = []plugin_models.GetServices_Model{}
+			deps.PluginModels.Services = &pluginModels
 			plan := models.ServicePlanFields{
 				Guid: "spark-guid",
 				Name: "spark",

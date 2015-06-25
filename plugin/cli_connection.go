@@ -345,13 +345,13 @@ func (cliConnection *cliConnection) GetSpaces() ([]plugin_models.GetSpaces_Model
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetServices() ([]plugin_models.ServiceInstance, error) {
+func (cliConnection *cliConnection) GetServices() ([]plugin_models.GetServices_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.ServiceInstance{}, err
+		return []plugin_models.GetServices_Model{}, err
 	}
 
-	var result []plugin_models.ServiceInstance
+	var result []plugin_models.GetServices_Model
 
 	err = client.Call("CliRpcCmd.GetServices", "", &result)
 	return result, err

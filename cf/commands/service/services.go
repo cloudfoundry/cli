@@ -18,7 +18,7 @@ type ListServices struct {
 	ui                 terminal.UI
 	config             core_config.Reader
 	serviceSummaryRepo api.ServiceSummaryRepository
-	pluginModel        *[]plugin_models.ServiceInstance
+	pluginModel        *[]plugin_models.GetServices_Model
 	pluginCall         bool
 }
 
@@ -50,7 +50,7 @@ func (cmd *ListServices) SetDependency(deps command_registry.Dependency, pluginC
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceSummaryRepo = deps.RepoLocator.GetServiceSummaryRepository()
-	cmd.pluginModel = deps.PluginModels.ServiceInstances
+	cmd.pluginModel = deps.PluginModels.Services
 	cmd.pluginCall = pluginCall
 	return cmd
 }
@@ -99,18 +99,18 @@ func (cmd ListServices) Execute(fc flags.FlagContext) {
 			serviceStatus,
 		)
 		if cmd.pluginCall {
-			s := plugin_models.ServiceInstance{
+			s := plugin_models.GetServices_Model{
 				Name: instance.Name,
 				Guid: instance.Guid,
-				ServicePlan: plugin_models.ServicePlanFields{
+				ServicePlan: plugin_models.GetServices_ServicePlan{
 					Name: instance.ServicePlan.Name,
 					Guid: instance.ServicePlan.Guid,
 				},
-				Service: plugin_models.ServiceFields{
+				Service: plugin_models.GetServices_ServiceFields{
 					Name: instance.ServiceOffering.Label,
 				},
 				ApplicationNames: instance.ApplicationNames,
-				LastOperation: plugin_models.LastOperationFields{
+				LastOperation: plugin_models.GetServices_LastOperation{
 					Type:  instance.LastOperation.Type,
 					State: instance.LastOperation.State,
 				},
