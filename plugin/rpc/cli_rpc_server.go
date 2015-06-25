@@ -319,7 +319,7 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 	return cmd.newCmdRunner.Command([]string{"spaces"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.ServiceInstance) error {
+func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -330,7 +330,7 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.ServiceInsta
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.ServiceInstances = retVal
+	deps.PluginModels.Services = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
 	deps.Ui = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter))
 
