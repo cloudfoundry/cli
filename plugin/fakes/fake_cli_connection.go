@@ -189,6 +189,15 @@ type FakeCliConnection struct {
 		result1 []plugin_models.GetServices_Model
 		result2 error
 	}
+	GetServiceStub        func(string) (plugin_models.GetService_Model, error)
+	getServiceMutex       sync.RWMutex
+	getServiceArgsForCall []struct {
+		arg1 string
+	}
+	getServiceReturns struct {
+		result1 plugin_models.GetService_Model
+		result2 error
+	}
 	GetOrgStub        func(string) (plugin_models.GetOrg_Model, error)
 	getOrgMutex       sync.RWMutex
 	getOrgArgsForCall []struct {
@@ -847,6 +856,39 @@ func (fake *FakeCliConnection) GetServicesReturns(result1 []plugin_models.GetSer
 	fake.GetServicesStub = nil
 	fake.getServicesReturns = struct {
 		result1 []plugin_models.GetServices_Model
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) GetService(arg1 string) (plugin_models.GetService_Model, error) {
+	fake.getServiceMutex.Lock()
+	fake.getServiceArgsForCall = append(fake.getServiceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.getServiceMutex.Unlock()
+	if fake.GetServiceStub != nil {
+		return fake.GetServiceStub(arg1)
+	} else {
+		return fake.getServiceReturns.result1, fake.getServiceReturns.result2
+	}
+}
+
+func (fake *FakeCliConnection) GetServiceCallCount() int {
+	fake.getServiceMutex.RLock()
+	defer fake.getServiceMutex.RUnlock()
+	return len(fake.getServiceArgsForCall)
+}
+
+func (fake *FakeCliConnection) GetServiceArgsForCall(i int) string {
+	fake.getServiceMutex.RLock()
+	defer fake.getServiceMutex.RUnlock()
+	return fake.getServiceArgsForCall[i].arg1
+}
+
+func (fake *FakeCliConnection) GetServiceReturns(result1 plugin_models.GetService_Model, result2 error) {
+	fake.GetServiceStub = nil
+	fake.getServiceReturns = struct {
+		result1 plugin_models.GetService_Model
 		result2 error
 	}{result1, result2}
 }

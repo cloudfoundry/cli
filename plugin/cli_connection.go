@@ -408,3 +408,15 @@ func (cliConnection *cliConnection) GetSpace(spaceName string) (plugin_models.Ge
 	err = client.Call("CliRpcCmd.GetSpace", spaceName, &result)
 	return result, err
 }
+
+func (cliConnection *cliConnection) GetService(serviceInstance string) (plugin_models.GetService_Model, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return plugin_models.GetService_Model{}, err
+	}
+
+	var result plugin_models.GetService_Model
+
+	err = client.Call("CliRpcCmd.GetService", serviceInstance, &result)
+	return result, err
+}

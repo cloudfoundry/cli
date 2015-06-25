@@ -398,6 +398,18 @@ var _ = Describe("Server", func() {
 			Expect(pluginApiCall).To(BeTrue())
 		})
 
+		It("calls GetService() with 'serviceInstance' as argument", func() {
+			result := plugin_models.GetService_Model{}
+			err = client.Call("CliRpcCmd.GetService", "fake-service-instance", &result)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("service"))
+			Expect(arg1[1]).To(Equal("fake-service-instance"))
+			Expect(pluginApiCall).To(BeTrue())
+		})
+
 	})
 
 	Describe(".CallCoreCommand", func() {
