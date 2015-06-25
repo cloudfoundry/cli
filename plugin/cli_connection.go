@@ -357,13 +357,13 @@ func (cliConnection *cliConnection) GetServices() ([]plugin_models.ServiceInstan
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetOrgUsers(orgName string, args ...string) ([]plugin_models.User, error) {
+func (cliConnection *cliConnection) GetOrgUsers(orgName string, args ...string) ([]plugin_models.GetOrgUsers_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.User{}, err
+		return []plugin_models.GetOrgUsers_Model{}, err
 	}
 
-	var result []plugin_models.User
+	var result []plugin_models.GetOrgUsers_Model
 
 	cmdArgs := append([]string{orgName}, args...)
 
@@ -371,13 +371,13 @@ func (cliConnection *cliConnection) GetOrgUsers(orgName string, args ...string) 
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetSpaceUsers(orgName string, spaceName string) ([]plugin_models.User, error) {
+func (cliConnection *cliConnection) GetSpaceUsers(orgName string, spaceName string) ([]plugin_models.GetSpaceUsers_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.User{}, err
+		return []plugin_models.GetSpaceUsers_Model{}, err
 	}
 
-	var result []plugin_models.User
+	var result []plugin_models.GetSpaceUsers_Model
 
 	cmdArgs := []string{orgName, spaceName}
 

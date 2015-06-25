@@ -30,105 +30,105 @@ type FakeCliConnection struct {
 	GetCurrentOrgStub        func() (plugin_models.Organization, error)
 	getCurrentOrgMutex       sync.RWMutex
 	getCurrentOrgArgsForCall []struct{}
-	getCurrentOrgReturns struct {
+	getCurrentOrgReturns     struct {
 		result1 plugin_models.Organization
 		result2 error
 	}
 	GetCurrentSpaceStub        func() (plugin_models.Space, error)
 	getCurrentSpaceMutex       sync.RWMutex
 	getCurrentSpaceArgsForCall []struct{}
-	getCurrentSpaceReturns struct {
+	getCurrentSpaceReturns     struct {
 		result1 plugin_models.Space
 		result2 error
 	}
 	UsernameStub        func() (string, error)
 	usernameMutex       sync.RWMutex
 	usernameArgsForCall []struct{}
-	usernameReturns struct {
+	usernameReturns     struct {
 		result1 string
 		result2 error
 	}
 	UserGuidStub        func() (string, error)
 	userGuidMutex       sync.RWMutex
 	userGuidArgsForCall []struct{}
-	userGuidReturns struct {
+	userGuidReturns     struct {
 		result1 string
 		result2 error
 	}
 	UserEmailStub        func() (string, error)
 	userEmailMutex       sync.RWMutex
 	userEmailArgsForCall []struct{}
-	userEmailReturns struct {
+	userEmailReturns     struct {
 		result1 string
 		result2 error
 	}
 	IsLoggedInStub        func() (bool, error)
 	isLoggedInMutex       sync.RWMutex
 	isLoggedInArgsForCall []struct{}
-	isLoggedInReturns struct {
+	isLoggedInReturns     struct {
 		result1 bool
 		result2 error
 	}
 	IsSSLDisabledStub        func() (bool, error)
 	isSSLDisabledMutex       sync.RWMutex
 	isSSLDisabledArgsForCall []struct{}
-	isSSLDisabledReturns struct {
+	isSSLDisabledReturns     struct {
 		result1 bool
 		result2 error
 	}
 	HasOrganizationStub        func() (bool, error)
 	hasOrganizationMutex       sync.RWMutex
 	hasOrganizationArgsForCall []struct{}
-	hasOrganizationReturns struct {
+	hasOrganizationReturns     struct {
 		result1 bool
 		result2 error
 	}
 	HasSpaceStub        func() (bool, error)
 	hasSpaceMutex       sync.RWMutex
 	hasSpaceArgsForCall []struct{}
-	hasSpaceReturns struct {
+	hasSpaceReturns     struct {
 		result1 bool
 		result2 error
 	}
 	ApiEndpointStub        func() (string, error)
 	apiEndpointMutex       sync.RWMutex
 	apiEndpointArgsForCall []struct{}
-	apiEndpointReturns struct {
+	apiEndpointReturns     struct {
 		result1 string
 		result2 error
 	}
 	ApiVersionStub        func() (string, error)
 	apiVersionMutex       sync.RWMutex
 	apiVersionArgsForCall []struct{}
-	apiVersionReturns struct {
+	apiVersionReturns     struct {
 		result1 string
 		result2 error
 	}
 	HasAPIEndpointStub        func() (bool, error)
 	hasAPIEndpointMutex       sync.RWMutex
 	hasAPIEndpointArgsForCall []struct{}
-	hasAPIEndpointReturns struct {
+	hasAPIEndpointReturns     struct {
 		result1 bool
 		result2 error
 	}
 	LoggregatorEndpointStub        func() (string, error)
 	loggregatorEndpointMutex       sync.RWMutex
 	loggregatorEndpointArgsForCall []struct{}
-	loggregatorEndpointReturns struct {
+	loggregatorEndpointReturns     struct {
 		result1 string
 		result2 error
 	}
 	DopplerEndpointStub        func() (string, error)
 	dopplerEndpointMutex       sync.RWMutex
 	dopplerEndpointArgsForCall []struct{}
-	dopplerEndpointReturns struct {
+	dopplerEndpointReturns     struct {
 		result1 string
 		result2 error
 	}
 	AccessTokenStub        func() (string, error)
 	accessTokenMutex       sync.RWMutex
 	accessTokenArgsForCall []struct{}
-	accessTokenReturns struct {
+	accessTokenReturns     struct {
 		result1 string
 		result2 error
 	}
@@ -144,48 +144,48 @@ type FakeCliConnection struct {
 	GetAppsStub        func() ([]plugin_models.GetAppsModel, error)
 	getAppsMutex       sync.RWMutex
 	getAppsArgsForCall []struct{}
-	getAppsReturns struct {
+	getAppsReturns     struct {
 		result1 []plugin_models.GetAppsModel
 		result2 error
 	}
 	GetOrgsStub        func() ([]plugin_models.GetOrgs_Model, error)
 	getOrgsMutex       sync.RWMutex
 	getOrgsArgsForCall []struct{}
-	getOrgsReturns struct {
+	getOrgsReturns     struct {
 		result1 []plugin_models.GetOrgs_Model
 		result2 error
 	}
 	GetSpacesStub        func() ([]plugin_models.GetSpaces_Model, error)
 	getSpacesMutex       sync.RWMutex
 	getSpacesArgsForCall []struct{}
-	getSpacesReturns struct {
+	getSpacesReturns     struct {
 		result1 []plugin_models.GetSpaces_Model
 		result2 error
 	}
-	GetOrgUsersStub        func(string, ...string) ([]plugin_models.User, error)
+	GetOrgUsersStub        func(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
 	getOrgUsersMutex       sync.RWMutex
 	getOrgUsersArgsForCall []struct {
 		arg1 string
 		arg2 []string
 	}
 	getOrgUsersReturns struct {
-		result1 []plugin_models.User
+		result1 []plugin_models.GetOrgUsers_Model
 		result2 error
 	}
-	GetSpaceUsersStub        func(string, string) ([]plugin_models.User, error)
+	GetSpaceUsersStub        func(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
 	getSpaceUsersMutex       sync.RWMutex
 	getSpaceUsersArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getSpaceUsersReturns struct {
-		result1 []plugin_models.User
+		result1 []plugin_models.GetSpaceUsers_Model
 		result2 error
 	}
 	GetServicesStub        func() ([]plugin_models.ServiceInstance, error)
 	getServicesMutex       sync.RWMutex
 	getServicesArgsForCall []struct{}
-	getServicesReturns struct {
+	getServicesReturns     struct {
 		result1 []plugin_models.ServiceInstance
 		result2 error
 	}
@@ -758,7 +758,7 @@ func (fake *FakeCliConnection) GetSpacesReturns(result1 []plugin_models.GetSpace
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetOrgUsers(arg1 string, arg2 ...string) ([]plugin_models.User, error) {
+func (fake *FakeCliConnection) GetOrgUsers(arg1 string, arg2 ...string) ([]plugin_models.GetOrgUsers_Model, error) {
 	fake.getOrgUsersMutex.Lock()
 	fake.getOrgUsersArgsForCall = append(fake.getOrgUsersArgsForCall, struct {
 		arg1 string
@@ -784,15 +784,15 @@ func (fake *FakeCliConnection) GetOrgUsersArgsForCall(i int) (string, []string) 
 	return fake.getOrgUsersArgsForCall[i].arg1, fake.getOrgUsersArgsForCall[i].arg2
 }
 
-func (fake *FakeCliConnection) GetOrgUsersReturns(result1 []plugin_models.User, result2 error) {
+func (fake *FakeCliConnection) GetOrgUsersReturns(result1 []plugin_models.GetOrgUsers_Model, result2 error) {
 	fake.GetOrgUsersStub = nil
 	fake.getOrgUsersReturns = struct {
-		result1 []plugin_models.User
+		result1 []plugin_models.GetOrgUsers_Model
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) GetSpaceUsers(arg1 string, arg2 string) ([]plugin_models.User, error) {
+func (fake *FakeCliConnection) GetSpaceUsers(arg1 string, arg2 string) ([]plugin_models.GetSpaceUsers_Model, error) {
 	fake.getSpaceUsersMutex.Lock()
 	fake.getSpaceUsersArgsForCall = append(fake.getSpaceUsersArgsForCall, struct {
 		arg1 string
@@ -818,10 +818,10 @@ func (fake *FakeCliConnection) GetSpaceUsersArgsForCall(i int) (string, string) 
 	return fake.getSpaceUsersArgsForCall[i].arg1, fake.getSpaceUsersArgsForCall[i].arg2
 }
 
-func (fake *FakeCliConnection) GetSpaceUsersReturns(result1 []plugin_models.User, result2 error) {
+func (fake *FakeCliConnection) GetSpaceUsersReturns(result1 []plugin_models.GetSpaceUsers_Model, result2 error) {
 	fake.GetSpaceUsersStub = nil
 	fake.getSpaceUsersReturns = struct {
-		result1 []plugin_models.User
+		result1 []plugin_models.GetSpaceUsers_Model
 		result2 error
 	}{result1, result2}
 }

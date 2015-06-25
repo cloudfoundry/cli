@@ -36,7 +36,8 @@ type pluginModels struct {
 	Organization     *plugin_models.GetOrg_Model
 	Spaces           *[]plugin_models.GetSpaces_Model
 	Space            *plugin_models.GetSpace_Model
-	Users            *[]plugin_models.User
+	OrgUsers         *[]plugin_models.GetOrgUsers_Model
+	SpaceUsers       *[]plugin_models.GetSpaceUsers_Model
 	ServiceInstances *[]plugin_models.ServiceInstance
 }
 
