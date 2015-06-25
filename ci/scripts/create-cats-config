@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+cat<<EOF > config.json
+{
+  "api": "$API_ENDPOINT",
+  "apps_domain": "$APPS_DOMAIN",
+  "admin_user": "$ADMIN_USER",
+  "admin_password": "$ADMIN_PASSWORD",
+  "cf_user": "$CF_USER",
+  "cf_user_password": "$CF_USER_PASSWORD",
+  "cf_org": "$CF_ORG",
+  "cf_space": "$CF_SPACE",
+  "skip_ssl_validation": true,
+  "persistent_app_host": "persistent-app-linux64",
+  "default_timeout": 75,
+  "cf_push_timeout": 210,
+  "long_curl_timeout": 210,
+  "broker_start_timeout": 330
+}
+EOF
