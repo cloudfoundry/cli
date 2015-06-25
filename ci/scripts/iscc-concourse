@@ -1,0 +1,33 @@
+#!/bin/sh
+
+SCRIPTNAME=$1
+INNO_BIN="Inno Setup 5/ISCC.exe"
+
+# Check if variable is set
+[ -z "$SCRIPTNAME" ] && { echo "Usage: $0 <SCRIPT_NAME>"; echo; exit 1; }
+
+# Check if filename exist
+[ ! -f "$SCRIPTNAME" ] && { echo "File not found. Aborting."; echo; exit 1; }
+
+# Check if wine is present
+command -v wine >/dev/null 2>&1 || { echo >&2 "I require wine but it's not installed. Aborting."; echo; exit 1; }
+
+# Get inno setup path
+INNO_PATH="/tmp/.wine/${INNO_BIN}"
+echo $INNO_PATH
+
+# run a wine command to create the ~/.wine config directory, 'winepath' needs this to run
+wine version
+
+# Translate unix script path to windows path
+# SCRIPTNAME=$(winepath -w "$SCRIPTNAME" 2> /dev/null)
+SCRIPTNAME=$(winepath -w "$SCRIPTNAME")
+echo SCRIPTNAME: $SCRIPTNAME
+
+# Check if Inno Setup is installed into wine
+#[ ! -f "$INNO_PATH" ] && { echo "Install Inno Setup 5 Quickstart before running this script."; echo; exit 1; }
+
+# Compile!
+wine "$INNO_PATH" "$SCRIPTNAME"
+
+echo $?

@@ -1,0 +1,13 @@
+---
+platform: windows
+
+params:
+  BOSH_LITE_IP:
+
+inputs:
+  - name: windows64-binary
+  - name: cf-cli
+  - name: cf-release
+
+run:
+  path: cf-cli/ci/scripts/herd-cats-windows64-concourse.bat

@@ -1,0 +1,14 @@
+---
+platform: windows
+
+params:
+  BOSH_LITE_IP:
+
+inputs:
+  - name: windows64-binary
+  - name: cf-cli
+  - name: gats
+    path: gopath/src/github.com/pivotal-cf-experimental/GATS
+
+run:
+  path: cf-cli/ci/scripts/gats-windows64-concourse.bat
