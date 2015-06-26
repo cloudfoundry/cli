@@ -18,7 +18,8 @@ Added the following commands to cli_connection.go:
 
 [Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md) 
 
-# Developing a Plugin
+# Developing a Plugin 
+[Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
 
 This README discusses how to develop a cf CLI plugin.
 For user-focused documentation, see [Using the cf CLI](http://docs.cloudfoundry.org/devguide/installcf/use-cli-plugins.html).
@@ -56,6 +57,8 @@ Here is an illustration of the workflow when a plugin command is being invoked.
 - Plugins that you develop for the cf CLI must conform to a predefined plugin interface that we discuss below.
 
 ## Writing a Plugin
+
+[Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
 
 To write a plugin for the cf CLI, implement the 
 [predefined plugin interface](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin.go).
