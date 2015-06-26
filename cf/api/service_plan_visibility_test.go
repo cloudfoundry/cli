@@ -83,8 +83,9 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 		It("deletes a service plan visibility", func() {
 			servicePlanVisibilityGuid := "the-service-plan-visibility-guid"
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "DELETE",
-				Path:   "/v2/service_plan_visibilities/" + servicePlanVisibilityGuid,
+				Method:  "DELETE",
+				Path:    "/v2/service_plan_visibilities/" + servicePlanVisibilityGuid,
+				Matcher: testnet.EmptyQueryParamMatcher(),
 				Response: testnet.TestResponse{
 					Status: http.StatusNoContent,
 				},
