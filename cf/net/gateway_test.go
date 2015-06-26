@@ -143,6 +143,27 @@ var _ = Describe("Gateway", func() {
 		Describe("Delete", func() {
 			var apiServer *httptest.Server
 
+			Describe("DeleteResourceSynchronously", func() {
+				var queryParams string
+				BeforeEach(func() {
+					apiServer = httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
+						queryParams = request.URL.RawQuery
+					}))
+					ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
+				})
+
+				It("does not send the async=true flag", func() {
+					err := ccGateway.DeleteResourceSynchronously(apiServer.URL, "/v2/foobars/SOME_GUID")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(queryParams).ToNot(ContainSubstring("async=true"))
+				})
+
+				It("deletes a resource", func() {
+					err := ccGateway.DeleteResource(apiServer.URL, "/v2/foobars/SOME_GUID")
+					Expect(err).ToNot(HaveOccurred())
+				})
+			})
+
 			Context("when the config has an async timeout", func() {
 				BeforeEach(func() {
 					count := 0
