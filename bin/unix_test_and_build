@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+bin/replace-sha
+bin/test -cover
+mv out/cf $1
