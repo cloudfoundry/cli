@@ -56,10 +56,10 @@ GetSpaces() ([]plugin_models.GetSpaces_Model, error)
 
 GetSpace(spaceName string) (plugin_models.GetSpace_Model, error)
 
-GetOrgUsers(orgName string, options ...string) ([]plugin_models.GetOrgUsers_Model, error)
 /******************************************************************
 options takes the optional argument used in the `cf org` command, see `cf org -h`
 ******************************************************************/
+GetOrgUsers(orgName string, options ...string) ([]plugin_models.GetOrgUsers_Model, error)
 
 GetSpaceUsers(orgName string, spaceName string) ([]plugin_models.GetSpaceUsers_Model, error)
 
