@@ -1,11 +1,18 @@
 
 Latest Available API Commands
 ```go
+
+/******************************************************************
+returns the output printed by the command and an error.
+The output is returned as a slice of strings.
+The error will be present if the call to the CLI command fails.
+******************************************************************/
 CliCommand(args ...string) ([]string, error)
-  * returns the output printed by the command and an error. The output is returned as a slice of strings. The error will be present if the call to the CLI command fails.
-  
+
+/******************************************************************
+  just like CliCommand but without the output in the terminal
+******************************************************************/  
 CliCommandWithoutTerminalOutput(args ...string) ([]string, error)
-  * just like CliCommand but without the output in the terminal
 
 GetCurrentOrg() (plugin_models.Organization, error)
 
@@ -50,7 +57,9 @@ GetSpaces() ([]plugin_models.GetSpaces_Model, error)
 GetSpace(spaceName string) (plugin_models.GetSpace_Model, error)
 
 GetOrgUsers(orgName string, options ...string) ([]plugin_models.GetOrgUsers_Model, error)
-  * options takes the optional argument used in the `cf org` command, see `cf org -h`
+/******************************************************************
+options takes the optional argument used in the `cf org` command, see `cf org -h`
+******************************************************************/
 
 GetSpaceUsers(orgName string, spaceName string) ([]plugin_models.GetSpaceUsers_Model, error)
 
@@ -58,7 +67,7 @@ GetServices() ([]plugin_models.GetServices_Model, error)
 
 GetService(serviceInstance string) (plugin_models.GetService_Model, error)
 ```
-
+---
 Models return from APIs
 - [Organization](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_current_org.go#L3)
 - [Space](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_current_space.go#L3)
