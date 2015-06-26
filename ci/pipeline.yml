@@ -135,6 +135,7 @@ jobs:
       trigger: true
     - get: version
       params: {pre: plus}
+      trigger: false
   - put: version
     params: {file: version/number}
 
@@ -143,6 +144,7 @@ jobs:
   plan:
   - get: cf-cli
     passed: [rc]
+    trigger: false
   - get: version
     passed: [rc]
     trigger: true
@@ -156,6 +158,7 @@ jobs:
   plan:
   - get: cf-cli
     passed: [rc]
+    trigger: false
   - get: version
     passed: [rc]
     trigger: true
@@ -169,6 +172,7 @@ jobs:
   plan:
   - get: cf-cli
     passed: [rc]
+    trigger: false
   - get: version
     passed: [rc]
     trigger: true
@@ -182,6 +186,7 @@ jobs:
   plan:
   - get: cf-cli
     passed: [rc]
+    trigger: false
   - get: version
     passed: [rc]
     trigger: true
@@ -195,6 +200,7 @@ jobs:
   plan:
   - get: cf-cli
     passed: [rc]
+    trigger: false
   - get: version
     passed: [rc]
     trigger: true
