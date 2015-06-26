@@ -216,9 +216,10 @@ jobs:
   - aggregate:
     - get: cf-cli
       passed: [linux64-unit]
+      trigger: true
     - get: linux64-binary
       passed: [linux64-unit]
-      trigger: true
+      trigger: false
     - get: cf-release
       trigger: false
       passed: [provision-linux]
@@ -238,9 +239,10 @@ jobs:
   - aggregate:
     - get: cf-cli
       passed: [linux64-unit]
+      trigger: true
     - get: linux64-binary
       passed: [linux64-unit]
-      trigger: true
+      trigger: false
     - get: gats
   - task: gats
     file: cf-cli/ci/gats.linux.yml
@@ -255,9 +257,10 @@ jobs:
   - aggregate:
     - get: cf-cli
       passed: [win64-unit]
+      trigger: true
     - get: windows64-binary
       passed: [win64-unit]
-      trigger: true
+      trigger: false
     - get: cf-release
       trigger: false
       passed: [provision-windows]
@@ -277,9 +280,10 @@ jobs:
   - aggregate:
     - get: cf-cli
       passed: [win64-unit]
+      trigger: true
     - get: windows64-binary
       passed: [win64-unit]
-      trigger: true
+      trigger: false
     - get: gats
   - task: gats
     file: cf-cli/ci/gats.windows.yml
@@ -294,9 +298,10 @@ jobs:
   - aggregate:
     - get: cf-cli
       passed: [win64-unit]
+      trigger: true
     - get: windows64-binary
       passed: [win64-unit]
-      trigger: true
+      trigger: false
     - get: gats
   - task: gats
     file: cf-cli/ci/gats.french.windows.yml
