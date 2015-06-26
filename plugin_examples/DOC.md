@@ -12,7 +12,7 @@ Models return from APIs
 - [GetServices_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_services.go#L3)
 - [GetService_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_service.go#L3)
 
-Latest Avilable API Commands
+Latest Available API Commands
 ```go
 	CliCommandWithoutTerminalOutput(args ...string) ([]string, error)
 	CliCommand(args ...string) ([]string, error)
