@@ -1,4 +1,16 @@
 
+##Plugin API
+We wrote the Plugin API to make it easy for plugins to consume output from calling CLI commands.  Previously, plugins needed to parse the terminal output which was not optimal.  Before we wrote the API, only 2 methods were available to plugins: 
+```
+CliCommand()
+CliCommandWithoutTerminalOutput() 
+``` 
+
+Both commands returned the terminal output in a string array, which was hard to parse. Instead terminal output, the result of the API calls will be in an object which is much easier to parse.  Our goal  was to make the common resources readily available to plugins without parsing.
+
+
+
+
 Latest Available API Commands
 ```go
 
