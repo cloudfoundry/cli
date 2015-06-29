@@ -1,3 +1,234 @@
+##6.12.0 
+* Merge pull request #487 from cloudfoundry/96912324-disable-service-access-performance
+  - Improve performance of disable-service-access
+* Update plugin_examples/README.md 
+* Create plugin_examples/DOC.md 
+* Merge pull request #490 from zhang-hua/story-93578300
+  - Reduce API calls when creating,listing and getting details of service…
+* Merge pull request #478 from cloudfoundry/update-empty-tags
+  - Allow update service instances with empty tags
+* Use expect in test instead of eventually 
+* fix race condition in start_test.go 
+* fix bug in uninstall-plugin
+* add .exe to ignore list in command_factory test
+* add needed files for concourse to run
+* trigger concourse with cli changes
+* enable concourse ci on master branch
+* plugin API GetService() [#90442132]
+* restructure plugin models file names
+* Create unique plugin model for GetServices 
+* Create unique plugin model for GetOrgUsers, GetSpaceUsers 
+* expand model properties for GetSpace, GetOrg 
+* Merge pull request #484 from zhang-hua/list_key_endpoint
+  - Change api endpoint for listing service keys
+* Create unique plugin model for GetSpace, GetOrg, GetCurrentSpace, GetCurrentOrg
+* Create unique plugin model for GetSpaces
+* Create unique plugin model for GetOrgs 
+* Create unique plugin model for GetApp 
+* Create unique plugin model for GetApps
+* move command service to non-codegangsta structure [#90442132]
+* Reduce API calls when creating,listing and getting details of service keys [#93578300]
+  - Leveraging existing API calls in ServiceInstanceRequirement to find service
+    instance info by name so that no need to send the same request twice.
+* added GetSpaces to api test plugin 
+* Merge branch 'improved-service-broker-no-permissions-message' 
+* Merge branch 'master' into improved-service-broker-no-permissions-message 
+* no translation needed for error text [#95180230]
+* Merge pull request #483 from cloudfoundry/service_access_performance
+  - improve cf service-access performance
+* Merge pull request #470 from cloudfoundry/go14_flake
+  - Fix flaky test for go 1.4 where map iteration order is randomized.
+* Declare return vars explicitly in func - And return them by name
+* Improve performance of disable-service-access - It was making an `async=true` delete request for each
+  service_plan_visibility. This meant each delete would take at least 5 seconds due to polling.
+- Deleting service plan visibilities does not interact with the broker and can be completed synchronously in ~.5s
+- Add new http test matcher for testing empty query strings. [#96912324]
+* Refactor to rename SpaceDetails to Space for Plugin API [#97159474]
+* Change GetCurrentSpace to use SpaceSummary (vs Space) model [#97159474] 
+* Rename OrganizationDetails to Organization in the API Plugin Model [#97159476]
+* Change GetCurrentOrg to use OrganizationSummary vs. Organization plugin model structure [#97159476] 
+* Add test for GetSpace Plugin API [#97159474] 
+* Add getSpace API [#97159474]
+* Add plugin API getSpace. [#97159474]
+* Change api endpoint for listing service keys [#87481016]
+  - CLI should use the endpoint `/v2/service_instances/:fake-guid/service_keys`
+    to list service keys instead of using `/v2/service_keys?q=service_instance_guid:fake-guid`
+* Backwards compatibility for getCurrentOrg and getCurrentSpace getCurrentOrg returns Organization
+getOrg returns OrganizationDetails [#97159474]
+getOrgs returns OrganizationSummary
+getCurrentSpace returns Space
+getSpace returns SpaceDetails
+getSpaces returns SpaceSummary
+* Change getSpace to be non-CG. Updated some getCurrentSpace which will be reverted [#97159474]
+* Make delete service instance as Warn vs. regular Say. make consistent with delete service key 
+* Merge pull request #480 from cloudfoundry/missing_service_key_delete
+  - Missing service key coloring message from dsk  now matches the coloring from ds
+* Reduce service_access API requests: orgs - To map org guids to org names, we make individual requests for each
+  org instead of requesting all orgs. [#96912380]
+  - This is optimized for the case where there are fewer orgs associated
+    with service_plan_visibilities than the total number of org pages.
+    This seemed to be the case on all environments we checked.
+  - /v2/organizations does not support filtering on a list of org or
+    service_plan_visiblility guids, so we have to make separate GETs
+- In plan_builder, there are package variables that are used to memoize
+  maps. This causes pollution plan_builder tests, so we nil them in test
+  setup
+* Reduce service_access API requests: service plans [#96912380]
+  - Get all service plans in one request instead of a request per service offering
+
+* Reduce service_access API requests: service offerings - Get all service offerings in one request instead of a request per
+  broker [#96912380]
+* godeps newest noaa package - implement new noaa.Close() method
+* Changed the getSpaces API to use SpaceSummary model [#97159474]
+* Added space quotas to plugin_model.Organization, fixed plugin API GetCurrentOrg() to work with new org model [ #97159476]
+* Add Spaces in plugin API GetOrg() [#97159476]
+* Added domains to plugin API GetOrg() [#97159476] 
+* Refactor to change Organization to OrganizationSummary for Get Orgs plugin API [#97159476] 
+* Add 'org' Plugin API, still needs spaces and domains.. prerefactor for get current org and orgs usage [#97159476]
+* Convert 'org' command to non-CG [#97159476] 
+* remove windows incompatible language test 
+* enable yes for confirmation when lang is not en_US 
+* :snowflake: Deflakey-ify the org and space user tests. 
+  - Tests were failing in go1.4 due to random org in map.. fixed test to be less brittle
+* update vet tool url for travis build 
+* Added Services Plugin API [#90441956] 
+* Convert services command to non-CG [#90441956]
+* Fix up Incorrect Usage i18n in new Plugin APIs [#90440496, #90062486]
+* Updated to add the translated string for the usage [#97030456] 
+* Implemented the getSpaceUsers plugin API [#90441958]
+* Convert spaces-users to non CG [#90441958] 
+* Add OrgUsers plugin API [#97030456] 
+* Add GetOrgUsers Plugin API [#97030456]
+* Add plugin API for Get Org Users [#97030456] 
+* Finish convert Org users to non-codegansta cli framework [#97030456]
+* Add new plugin test 
+* Remove codegansta from Get Org Users [#97030456]
+* Missing service key coloring message from dsk  now matches the coloring from ds. - ui type is now `Warn` instead of `Say`
+  - Keyword highlight is now switched off [#94220156]
+* New plugin api GetSpaces() [#90442002]
+* allow command spaces to populate plugin model [#90442002]
+* Allow update service instances with empty tags [#96329216]
+* convert command `spaces` to non-codegangsta structure [#90442002]
+* Fix logic to handle graceful timeout if we cannot talk to log server. 
+  - Also make log server connection timeout internally configurable. [#96626036]
+* Merge pull request #453 from cloudfoundry/last-operation-timestamps
+  - Last operation timestamps
+* Updated cf service-access and cf service-brokers so that they only pass through the 403 error, 
+  rather than giving specific lookup information. [#91452714]
+* Refactor created_at test fixtures [#91240396]
+* Updated the CLI to not return a Started date if the service/operation does not have a CreatedAt in it's JSON. [#91240396]
+* Add started and updated timestamps to service instance operations [#91240396]
+* Merge pull request #465 from cloudfoundry/94892746-service-brokers-403 
+  - Expose api errors for service broker commands
+* Merge pull request #469 from cloudfoundry/missing_service_key_delete 
+  - Display correct error when deleting nonexistent service key
+* Merge pull request #472 from cloudfoundry/service_access_performance 
+  - Improve performance of enable/disable service access
+* Made command_factory_test.go ignore .coverprofile files from running ginkgo in code-coverage mode. [#89585004]
+* Update help text for update-service [#72117050]
+* Allow `cf app` to display buildpack [#96147958]
+* Fixed passing in nil error handler to command_registry [#90652456]
+* Merge pull request #463 from cloudfoundry/cli_user_can_provide_tags 
+  - Add optional tags to create-service command
+* Fix indentation in create-service help text - And rearrange translation files to appease i18n4go
+* Add fields to cli msi to show app/publisher name in windows. [#93634720]
+* Merge pull request #366 from HuaweiTech/hwcf-issue-15 
+  - Fixed error message when there is a mismatch in the order of arguments for create-buildpack
+* plugin Api `GetOrgs()` [#90442006]
+* enable `orgs` to populate plugin model [#90442006]
+* Highlight restage command in uups tip [#96470272]
+* convert command `orgs` to non-codegangsta structure [#90442006]
+* plugin api GetApps() [#90062486]
+* Add Buildpack to cf create-app-manifest [#96041780,91458856]
+* Update README.md 
+* Update CHANGELOG.md 
+* Merge pull request #474 from cloudfoundry/cli_update_service_tags Update user-provided service tags
+* Merge pull request #473 from cloudfoundry/i18n-readme-update Update readme with i18n info
+* Update error message when plugin file does not exist. [#96267092]
+* convert command `apps` to non-codegangsta structure [#90062486]
+* add alias support to command_registry [#90062486]
+* Update arbitrary params error message [#96313592]
+* Merge branch 'master' into cli_update_service_tags Conflicts:
+	cf/commands/service/update_service.go
+	cf/i18n/resources/de_DE.all.json
+	cf/i18n/resources/en_US.all.json
+	cf/i18n/resources/es_ES.all.json
+	cf/i18n/resources/fr_FR.all.json
+	cf/i18n/resources/it_IT.all.json
+	cf/i18n/resources/ja_JA.all.json
+	cf/i18n/resources/pt_BR.all.json
+	cf/i18n/resources/zh_Hans.all.json
+	cf/i18n/resources/zh_Hant.all.json
+* Update tip for updating UPSIs - UPSIs now propogate their credentials on update, so it is no longer
+  necessary to unbind and rebind them. [#96470272]
+* Update readme with i18n info 
+* Split bind-service usage for easier translation - Improve params example to resemble a bind [#96320118, #72117050]
+* Split long usage for update-service [#72117050]
+* Update service can pass instance tags - Add ui_helpers/tags_parser.go [#72117050]
+* Update service without changing plan works - Fixing a bug where passing arbitrary params without a plan change
+  would result in making no changess [#96250704]
+* Refactor update service - Plan validation in separate function [#72117050]
+* Add optional tags to create-service [#61861194]
+* Improve performance of enable/disable service access - Service access commands were embedding org names in service plans, but
+  not using them. This resulted in calls to /v2/organizations, which
+  would take a long time on environments with many orgs. [#95214984]
+* Update help text for update-service [#96313962]
+* Merge pull request #440 from xingzhou/service_key_cascade implement the story of delete service instance that has keys
+* implement the story of delete service instance that has keys [#92185380]
+  https://www.pivotaltracker.com/story/show/92185380
+* Fix flaky test for go 1.4 where map iteration order is randomized. [#96235836]
+* Display correct error when deleting nonexistent service key [#94220156]
+* Merge pull request #452 from cloudfoundry/arbitrary-params-final
+  - Arbitrary params for create-service, update-service, bind-service, create-service-key
+* Expose api errors for service broker commands - Unless it is a specific case where there was no error but there were
+  also no existing service brokers [#94892746]
+* Update arbitrary parameter error message - Sometimes it is unclear if the user is intending to provide a file
+  path or JSON. Showing the underlying error in these cases can be
+  confusing. [#89843658]
+* Merge branch 'cmdOutputCapture' 
+* update test for non-codegangsta command requirement execution 
+* take out unused output capturing method 
+* Toggle output to terminal from plugin calls without adding new interface 
+* not all calls to non-codegangsta command are from plugin APIs 
+* Alternative output capture method - exposes SetOutputBucket() for passing in *[]string as capture bucket
+  - passes in nil to disable output capturing.
+* Added the changes suggested in the pull request. - Errors no longer overwrite, they bubble up
+  - Files are now checked for existance before reading [#89843658]
+* Surface error when json from file is invalid - When parsing arbitrary parameters from a file path
+  - Only read file contents if we know it's a file [#88670540]
+* Merge pull request #365 from HuaweiTech/hwcf-issue-14 Removed as admin.. clause from create-user since it is confusing.
+* Added error handling for when diego /instances is up but /noaa is down. [#95483596]
+* test should be agnostic to location timezone 
+* `GetApp()` plugin api [#90440496]
+* plugin model for Application [#90440496]
+* new pluginCall field in Command SetDependency() [#90440496]
+* convert `app` to non-codegangsta structure [#90440496]
+* ShowUsage() to construct cmd usage template [#90440496]
+* Merge pull request #443 from xingzhou/service_key_list_newline
+  - add a new line before the table of listing keys
+* Merge pull request #442 from xingzhou/service_key_detail_newline 
+  - add new line before detail output of service key
+* move `api` command to new architecture (non-codegangsta) [#90562248]
+* flags.String() returns Usage [#90562248]
+* command_registry for non-codegangsta command [#90562248]
+* Add usage for service key arbitrary params. [#90163332]
+* Add more description to bind-service usage - To reflect arbitrary params [#89843654]
+* Add detailed usage for update-service - In light of arbitrary params feature [#89843656]
+* Remove repeated OPTIONS from create-service [#89843658]
+* Add more examples to create-service help file - Arbitrary params examples and description [#89843658]
+* User can pass arbitary params during create-service-key Includes code for both json file and raw json [#90163332, #90163330]
+* User can pass arbitrary params during  bind-service includes code for both json file and raw json [#89843654, #88670578]
+* Do not send async:true in request body for bind-service Two problems: [#92396108]
+  1. async flag is a query parameter, not a post body parameter
+  2. POST /v2/service_bindings does not respect the async flag anyway
+* Add translation for error during update-service with arbitrary params 
+* Backfill tests for update-service when sending arbitrary params when they are provided in a file [#88670566]
+* user can provide raw JSON when updating a service instance [#89843656]
+* add new line before detail output of service key implement story [#94024396]
+* add a new line before the table of listing keys implement story [#94026928]
+* Fixed error message when there is a mismatch in the order of arguments for create-buildpack. Story in CLI [#82598260].
+* Removed as admin.. clause from create-user since it is confusing. Story in CLI [#74893356].
+
 ##v6.11.3
 * Improve Tip for bind-service command [#94153632]
 * fix bug where app's PackageState is incorrectly set in restage [#93382608]
