@@ -22,7 +22,7 @@ var _ = Describe("service-keys command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		cmd                 *ServiceKeys
+		cmd                 ServiceKeys
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceKeyRepo      *testapi.FakeServiceKeyRepo
@@ -39,7 +39,6 @@ var _ = Describe("service-keys command", func() {
 		serviceKeyRepo = testapi.NewFakeServiceKeyRepo()
 		cmd = NewListServiceKeys(ui, config, serviceRepo, serviceKeyRepo)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstanceNotFound: false}
-		requirementsFactory.ServiceInstance = serviceInstance
 	})
 
 	var callListServiceKeys = func(args []string) bool {
@@ -99,6 +98,16 @@ var _ = Describe("service-keys command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting keys for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"No service key for service instance", "fake-service-instance"},
+			))
+		})
+
+		It("fails when service instance is not found", func() {
+			serviceRepo.FindInstanceByNameNotFound = true
+			callListServiceKeys([]string{"non-exist-service-instance"})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting keys for service instance", "non-exist-service-instance", "as", "my-user"},
+				[]string{"FAILED"},
+				[]string{"Service instance", "non-exist-service-instance", "not found"},
 			))
 		})
 	})
