@@ -56,6 +56,11 @@ func (c *BasicPlugin) GetMetadata() plugin.PluginMetadata {
 			Minor: 0,
 			Build: 0,
 		},
+		MinCliVersion: plugin.VersionType{
+			Major: 6,
+			Minor: 7,
+			Build: 0,
+		},
 		Commands: []plugin.Command{
 			plugin.Command{
 				Name:     "basic-plugin-command",
