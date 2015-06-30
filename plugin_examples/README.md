@@ -1,20 +1,31 @@
-# Changes in v6.11.2
-Added the following commands to cli_connection.go:
-  - GetCurrentOrg()  
-  - GetCurrentSpace()  
-  - Username()  
-  - UserEmail()  
-  - UserGuid()  
-  - HasOrganization()  
-  - HasSpace()  
-  - IsLoggedIn()  
-  - IsSSLDisabled()  
-  - ApiEndpoint()  
-  - HasAPIEndpoint()  
-  - ApiVersion()  
-  - LoggregatorEndpoint()  
-  - DopplerEndpoint()  
-  - AccessToken()  
+# Changes in v6.12.0
+- New API:
+```go
+GetApp(string) (plugin_models.GetAppModel, error)
+GetApps() ([]plugin_models.GetAppsModel, error)
+GetOrgs() ([]plugin_models.GetOrgs_Model, error)
+GetSpaces() ([]plugin_models.GetSpaces_Model, error)
+GetOrgUsers(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
+GetSpaceUsers(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
+GetServices() ([]plugin_models.GetServices_Model, error)
+GetService(string) (plugin_models.GetService_Model, error)
+GetOrg(string) (plugin_models.GetOrg_Model, error)
+GetSpace(string) (plugin_models.GetSpace_Model, error)
+```
+- Allow minimum CLI version required to be specified in plugin. Example:
+```go
+func (c *cmd) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "Test1",
+		MinCliVersion: plugin.VersionType{
+			Major: 6,
+			Minor: 12,
+			Build: 0,
+		},
+	}
+}
+```
+
 
 [Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md) 
 
@@ -69,8 +80,7 @@ and a plugin. This method receives the following arguments:
   - A struct `plugin.CliConnection` that contains methods for invoking cf CLI commands
   - A string array that contains the arguments passed from the `cf` process
 
-The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), the 
-commands it implements, and help text for each command that users can display 
+The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), minimum Cli version required (optional), the commands it implements, and help text for each command that users can display 
 with `cf help`.
 
   To initialize a plugin, call `plugin.Start(new(MyPluginStruct))` from within the `main()` method of your plugin. The `plugin.Start(...)` function requires a new reference to the struct that implements the defined interface. 
