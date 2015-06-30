@@ -27,12 +27,5 @@ func (resource SecurityGroupResource) ToFields() (fields models.SecurityGroupFie
 
 func (resource SecurityGroupResource) ToModel() (asg models.SecurityGroup) {
 	asg.SecurityGroupFields = resource.ToFields()
-
-	spaces := []models.Space{}
-	for _, s := range resource.Entity.Spaces {
-		spaces = append(spaces, s.ToModel())
-	}
-	asg.Spaces = spaces
-
 	return
 }
