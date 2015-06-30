@@ -12,15 +12,14 @@ import (
 )
 
 type ServiceKeys struct {
-	ui                  terminal.UI
-	config              core_config.Reader
-	serviceRepo         api.ServiceRepository
-	serviceKeyRepo      api.ServiceKeyRepository
-	serviceInstanceGuid string
+	ui             terminal.UI
+	config         core_config.Reader
+	serviceRepo    api.ServiceRepository
+	serviceKeyRepo api.ServiceKeyRepository
 }
 
-func NewListServiceKeys(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd *ServiceKeys) {
-	return &ServiceKeys{
+func NewListServiceKeys(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd ServiceKeys) {
+	return ServiceKeys{
 		ui:             ui,
 		config:         config,
 		serviceRepo:    serviceRepo,
@@ -28,7 +27,7 @@ func NewListServiceKeys(ui terminal.UI, config core_config.Reader, serviceRepo a
 	}
 }
 
-func (cmd *ServiceKeys) Metadata() command_metadata.CommandMetadata {
+func (cmd ServiceKeys) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "service-keys",
 		ShortName:   "sk",
@@ -40,14 +39,13 @@ EXAMPLE:
 	}
 }
 
-func (cmd *ServiceKeys) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ServiceKeys) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		cmd.ui.FailWithUsage(c)
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
 	serviceInstanceRequirement := requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
-	cmd.serviceInstanceGuid = serviceInstanceRequirement.GetServiceInstance().Guid
 	targetSpaceRequirement := requirementsFactory.NewTargetedSpaceRequirement()
 
 	reqs = []requirements.Requirement{loginRequirement, serviceInstanceRequirement, targetSpaceRequirement}
@@ -55,7 +53,7 @@ func (cmd *ServiceKeys) GetRequirements(requirementsFactory requirements.Factory
 	return reqs, nil
 }
 
-func (cmd *ServiceKeys) Run(c *cli.Context) {
+func (cmd ServiceKeys) Run(c *cli.Context) {
 	serviceInstanceName := c.Args()[0]
 
 	cmd.ui.Say(T("Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
@@ -64,7 +62,13 @@ func (cmd *ServiceKeys) Run(c *cli.Context) {
 			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	serviceKeys, err := cmd.serviceKeyRepo.ListServiceKeys(cmd.serviceInstanceGuid)
+	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+		return
+	}
+
+	serviceKeys, err := cmd.serviceKeyRepo.ListServiceKeys(serviceInstance.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
