@@ -77,7 +77,7 @@ func (c CloudControllerServiceKeyRepository) GetServiceKey(instanceGuid string, 
 
 func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]models.ServiceKey, error) {
 	serviceKeys := []models.ServiceKey{}
-	apiErr := c.gateway.ListPaginatedResources(
+	err := c.gateway.ListPaginatedResources(
 		c.config.ApiEndpoint(),
 		path,
 		resources.ServiceKeyResource{},
@@ -87,8 +87,12 @@ func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]mod
 			return true
 		})
 
-	if apiErr != nil {
-		return []models.ServiceKey{}, apiErr
+	if err != nil {
+		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.NOT_AUTHORIZED {
+			return []models.ServiceKey{}, errors.NewNotAuthorizedError()
+		} else {
+			return []models.ServiceKey{}, err
+		}
 	}
 
 	return serviceKeys, nil
