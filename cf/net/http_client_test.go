@@ -1,16 +1,17 @@
 package net_test
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"crypto/x509"
-	"github.com/cloudfoundry/cli/cf/errors"
-	. "github.com/cloudfoundry/cli/cf/net"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net"
 	"net/http"
 	"net/url"
 	"syscall"
+
+	"code.google.com/p/go.net/websocket"
+	"github.com/cloudfoundry/cli/cf/errors"
+	. "github.com/cloudfoundry/cli/cf/net"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("HTTP Client", func() {
@@ -22,7 +23,8 @@ var _ = Describe("HTTP Client", func() {
 			originalReq.Header.Set("Authorization", "my-auth-token")
 			originalReq.Header.Set("Accept", "application/json")
 
-			redirectReq, err := http.NewRequest("GET", "/bar", nil)
+			redirectReq, err := http.NewRequest("GET", "http://local.com/bar", nil)
+			redirectReq.Header["Referer"] = []string{"http://local.com"}
 			Expect(err).NotTo(HaveOccurred())
 
 			via := []*http.Request{originalReq}
@@ -34,13 +36,33 @@ var _ = Describe("HTTP Client", func() {
 			Expect(redirectReq.Header.Get("Accept")).To(Equal("application/json"))
 		})
 
+		It("transfers 'Authorization' headers during a redirect to the same Host", func() {
+			originalReq, err := http.NewRequest("GET", "/foo", nil)
+			Expect(err).NotTo(HaveOccurred())
+			originalReq.Header.Set("Authorization", "my-auth-token")
+			originalReq.Header.Set("Accept", "application/json")
+
+			redirectReq, err := http.NewRequest("GET", "http://local.com/bar", nil)
+			redirectReq.Header["Referer"] = []string{"http://remote.com"}
+			Expect(err).NotTo(HaveOccurred())
+
+			via := []*http.Request{originalReq}
+
+			err = PrepareRedirect(redirectReq, via)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(redirectReq.Header.Get("Authorization")).To(Equal(""))
+			Expect(redirectReq.Header.Get("Accept")).To(Equal("application/json"))
+		})
+
 		It("does not transfer POST-specific headers", func() {
 			originalReq, err := http.NewRequest("POST", "/foo", nil)
 			Expect(err).NotTo(HaveOccurred())
 			originalReq.Header.Set("Content-Type", "application/json")
 			originalReq.Header.Set("Content-Length", "100")
 
-			redirectReq, err := http.NewRequest("GET", "/bar", nil)
+			redirectReq, err := http.NewRequest("GET", "http://local.com/bar", nil)
+			redirectReq.Header["Referer"] = []string{"http://local.com"}
 			Expect(err).NotTo(HaveOccurred())
 
 			via := []*http.Request{originalReq}
@@ -59,7 +81,8 @@ var _ = Describe("HTTP Client", func() {
 			secondReq, err := http.NewRequest("GET", "/manchu", nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			redirectReq, err := http.NewRequest("GET", "/bar", nil)
+			redirectReq, err := http.NewRequest("GET", "http://local.com/bar", nil)
+			redirectReq.Header["Referer"] = []string{"http://local.com"}
 			Expect(err).NotTo(HaveOccurred())
 
 			via := []*http.Request{firstReq, secondReq}
