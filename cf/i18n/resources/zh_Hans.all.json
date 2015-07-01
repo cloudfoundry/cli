@@ -5368,5 +5368,10 @@
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} 乘以 {{.InstanceCount}}实例数",
       "modified": false
+   },
+   {
+      "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
+      "translation": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
+      "modified": false
    }
 ]

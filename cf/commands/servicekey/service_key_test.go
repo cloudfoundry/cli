@@ -2,6 +2,7 @@ package servicekey_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/generic"
 
@@ -22,7 +23,7 @@ var _ = Describe("service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		cmd                 ServiceKey
+		cmd                 *ServiceKey
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceKeyRepo      *testapi.FakeServiceKeyRepo
@@ -130,6 +131,19 @@ var _ = Describe("service-key command", func() {
 
 				Expect(len(ui.Outputs)).To(Equal(1))
 				Expect(ui.Outputs[0]).To(BeEmpty())
+			})
+		})
+
+		Context("when api returned NotAuthorizedError", func() {
+			It("shows no service key is found", func() {
+				serviceKeyRepo.GetServiceKeyMethod.ServiceKey = models.ServiceKey{}
+				serviceKeyRepo.GetServiceKeyMethod.Error = &errors.NotAuthorizedError{}
+
+				callGetServiceKey([]string{"fake-service-instance", "fake-service-key"})
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
+					[]string{"No service key", "fake-service-key", "found for service instance", "fake-service-instance"},
+				))
 			})
 		})
 	})

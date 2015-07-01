@@ -169,6 +169,18 @@ var _ = Describe("Service Keys Repo", func() {
 			Expect(serviceKeys[1].Credentials).To(HaveKeyWithValue("database", "fake-db-name-2"))
 			Expect(serviceKeys[1].Credentials).To(HaveKeyWithValue("uri", "mysql://fake-user-2:fake-password-2@fake-host-2:3306/fake-db-name-2"))
 		})
+
+		It("returns a NotAuthorizedError when server response is 403", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/service_instances/fake-instance-guid/service_keys",
+				Response: notAuthorizedResponse,
+			}))
+
+			_, err := repo.ListServiceKeys("fake-instance-guid")
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).To(BeAssignableToTypeOf(&errors.NotAuthorizedError{}))
+		})
 	})
 
 	Describe("GetServiceKey", func() {
@@ -208,6 +220,18 @@ var _ = Describe("Service Keys Repo", func() {
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(serviceKey).To(Equal(models.ServiceKey{}))
+		})
+
+		It("returns a NotAuthorizedError when server response is 403", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/service_instances/fake-instance-guid/service_keys?q=name:fake-service-key-name",
+				Response: notAuthorizedResponse,
+			}))
+
+			_, err := repo.GetServiceKey("fake-instance-guid", "fake-service-key-name")
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).To(BeAssignableToTypeOf(&errors.NotAuthorizedError{}))
 		})
 	})
 
@@ -301,5 +325,12 @@ var serviceKeyDetailResponse = testnet.TestResponse{Status: http.StatusOK, Body:
 	        }
 	      }
 		}]
+	}`,
+}
+
+var notAuthorizedResponse = testnet.TestResponse{Status: http.StatusForbidden, Body: `{
+		"code": 10003,
+		"description": "You are not authorized to perform the requested action",
+		"error_code": "CF-NotAuthorized"
 	}`,
 }
