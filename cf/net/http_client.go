@@ -33,16 +33,16 @@ func PrepareRedirect(req *http.Request, via []*http.Request) error {
 	}
 
 	prevReq := via[len(via)-1]
-	copyHeaders(prevReq, req)
+	copyHeaders(prevReq, req, getBaseDomain(req.URL.String()) == getBaseDomain(req.Header["Referer"][0]))
 	dumpRequest(req)
 
 	return nil
 }
 
-func copyHeaders(from *http.Request, to *http.Request) {
+func copyHeaders(from *http.Request, to *http.Request, sameDomain bool) {
 	for key, values := range from.Header {
 		// do not copy POST-specific headers
-		if key != "Content-Type" && key != "Content-Length" {
+		if key != "Content-Type" && key != "Content-Length" && !(!sameDomain && key == "Authorization") {
 			to.Header.Set(key, strings.Join(values, ","))
 		}
 	}
@@ -92,4 +92,10 @@ func WrapNetworkErrors(host string, err error) error {
 
 	return errors.NewWithError(T("Error performing request"), err)
 
+}
+
+func getBaseDomain(host string) string {
+	hostUrl, _ := url.Parse(host)
+	hostStrs := strings.Split(hostUrl.Host, ".")
+	return hostStrs[len(hostStrs)-2] + "." + hostStrs[len(hostStrs)-1]
 }
