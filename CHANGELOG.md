@@ -1,3 +1,13 @@
+##6.12.1
+* improve method to compare domains of local and redirecting target [98132086]
+* Updated config repo fake
+* only copy Authorization header when redirecting to same base domain [98132086]
+* Revert "Merge pull request #490 from zhang-hua/story-93578300" 
+  This reverts commit f449846870ab5fdb360a7345ff83ed73eedfbbfe,
+  reversing changes made to 81bf4c37fd40171dd64b48ac57287eb619038fdf.
+* security-groups to not use inline-relation-depth to populate spaces model [96033766]
+* add spaces_url field to SecurityGroup model [96033766]
+
 ##6.12.0 
 * Merge pull request #487 from cloudfoundry/96912324-disable-service-access-performance
   - Improve performance of disable-service-access
