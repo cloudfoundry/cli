@@ -33,7 +33,7 @@ func PrepareRedirect(req *http.Request, via []*http.Request) error {
 	}
 
 	prevReq := via[len(via)-1]
-	copyHeaders(prevReq, req, getBaseDomain(req.URL.String()) == getBaseDomain(req.Header["Referer"][0]))
+	copyHeaders(prevReq, req, getBaseDomain(req.URL.String()) == getBaseDomain(via[0].URL.String()))
 	dumpRequest(req)
 
 	return nil
