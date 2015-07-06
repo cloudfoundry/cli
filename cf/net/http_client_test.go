@@ -18,13 +18,12 @@ var _ = Describe("HTTP Client", func() {
 
 	Describe("PrepareRedirect", func() {
 		It("transfers original headers", func() {
-			originalReq, err := http.NewRequest("GET", "/foo", nil)
+			originalReq, err := http.NewRequest("GET", "http://local.com/foo", nil)
 			Expect(err).NotTo(HaveOccurred())
 			originalReq.Header.Set("Authorization", "my-auth-token")
 			originalReq.Header.Set("Accept", "application/json")
 
 			redirectReq, err := http.NewRequest("GET", "http://local.com/bar", nil)
-			redirectReq.Header["Referer"] = []string{"http://local.com"}
 			Expect(err).NotTo(HaveOccurred())
 
 			via := []*http.Request{originalReq}
@@ -36,14 +35,13 @@ var _ = Describe("HTTP Client", func() {
 			Expect(redirectReq.Header.Get("Accept")).To(Equal("application/json"))
 		})
 
-		It("transfers 'Authorization' headers during a redirect to the same Host", func() {
-			originalReq, err := http.NewRequest("GET", "/foo", nil)
+		It("does not transfer 'Authorization' headers during a redirect to different Host", func() {
+			originalReq, err := http.NewRequest("GET", "http://www.local.com/foo", nil)
 			Expect(err).NotTo(HaveOccurred())
 			originalReq.Header.Set("Authorization", "my-auth-token")
 			originalReq.Header.Set("Accept", "application/json")
 
-			redirectReq, err := http.NewRequest("GET", "http://local.com/bar", nil)
-			redirectReq.Header["Referer"] = []string{"http://remote.com"}
+			redirectReq, err := http.NewRequest("GET", "http://www.remote.com/bar", nil)
 			Expect(err).NotTo(HaveOccurred())
 
 			via := []*http.Request{originalReq}
@@ -56,13 +54,12 @@ var _ = Describe("HTTP Client", func() {
 		})
 
 		It("does not transfer POST-specific headers", func() {
-			originalReq, err := http.NewRequest("POST", "/foo", nil)
+			originalReq, err := http.NewRequest("POST", "http://local.com/foo", nil)
 			Expect(err).NotTo(HaveOccurred())
 			originalReq.Header.Set("Content-Type", "application/json")
 			originalReq.Header.Set("Content-Length", "100")
 
 			redirectReq, err := http.NewRequest("GET", "http://local.com/bar", nil)
-			redirectReq.Header["Referer"] = []string{"http://local.com"}
 			Expect(err).NotTo(HaveOccurred())
 
 			via := []*http.Request{originalReq}
@@ -75,10 +72,10 @@ var _ = Describe("HTTP Client", func() {
 		})
 
 		It("fails after one redirect", func() {
-			firstReq, err := http.NewRequest("GET", "/foo", nil)
+			firstReq, err := http.NewRequest("GET", "http://local.com/foo", nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			secondReq, err := http.NewRequest("GET", "/manchu", nil)
+			secondReq, err := http.NewRequest("GET", "http://local.com/manchu", nil)
 			Expect(err).NotTo(HaveOccurred())
 
 			redirectReq, err := http.NewRequest("GET", "http://local.com/bar", nil)
