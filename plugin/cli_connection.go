@@ -245,7 +245,7 @@ func (cliConnection *cliConnection) HasAPIEndpoint() (bool, error) {
 
 	var result bool
 
-	err = client.Call("CliRpcCmd.HasApiEndpoint", "", &result)
+	err = client.Call("CliRpcCmd.HasAPIEndpoint", "", &result)
 	return result, err
 }
 
