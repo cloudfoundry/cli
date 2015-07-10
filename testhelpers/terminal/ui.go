@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	term "github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -162,4 +163,10 @@ func (c FakeUI) Wait(duration time.Duration) {
 
 func (ui *FakeUI) Table(headers []string) term.Table {
 	return term.NewTable(ui, headers)
+}
+
+func (ui *FakeUI) NotifyUpdateIfNeeded(config core_config.Reader) {
+	if !config.IsMinCliVersion(cf.Version) {
+		ui.Say("Cloud Foundry API version {{.ApiVer}} requires CLI version " + config.MinCliVersion() + "  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads")
+	}
 }

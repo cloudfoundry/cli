@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/i18n/detection"
@@ -353,6 +354,48 @@ var _ = Describe("UI", func() {
 			})
 
 			i18n.T = t
+		})
+	})
+
+	Describe("NotifyUpdateIfNeeded", func() {
+
+		var (
+			output []string
+			config core_config.ReadWriter
+		)
+
+		BeforeEach(func() {
+			config = testconfig.NewRepository()
+		})
+
+		It("Prints a notification to user if current version < min cli version", func() {
+			config.SetMinCliVersion("6.0.0")
+			config.SetMinRecommendedCliVersion("6.5.0")
+			config.SetApiVersion("2.15.1")
+			cf.Version = "5.0.0"
+			output = io_helpers.CaptureOutput(func() {
+				ui := NewUI(os.Stdin, NewTeePrinter())
+				ui.NotifyUpdateIfNeeded(config)
+			})
+
+			Ω(output).To(ContainSubstrings([]string{"Cloud Foundry API version",
+				"requires CLI version 6.0.0",
+				"You are currently on version 5.0.0",
+				"To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+			}))
+		})
+
+		It("Doesn't print a notification to user if current version >= min cli version", func() {
+			config.SetMinCliVersion("6.0.0")
+			config.SetMinRecommendedCliVersion("6.5.0")
+			config.SetApiVersion("2.15.1")
+			cf.Version = "6.0.0"
+			output = io_helpers.CaptureOutput(func() {
+				ui := NewUI(os.Stdin, NewTeePrinter())
+				ui.NotifyUpdateIfNeeded(config)
+			})
+
+			Ω(output[0]).To(Equal(""))
 		})
 	})
 })

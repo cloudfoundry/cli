@@ -8,7 +8,6 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/utils"
 	"github.com/codegangsta/cli"
 )
 
@@ -61,7 +60,7 @@ func (cmd Authenticate) Run(c *cli.Context) {
 	cmd.ui.Say(T("Use '{{.Name}}' to view or set your target org and space",
 		map[string]interface{}{"Name": terminal.CommandColor(cf.Name() + " target")}))
 
-	utils.NotifyUpdateIfNeeded(cmd.ui, cmd.config)
+	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
 
 	return
 }
