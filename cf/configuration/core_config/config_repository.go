@@ -1,6 +1,7 @@
 package core_config
 
 import (
+	"strconv"
 	"strings"
 	"sync"
 
@@ -14,6 +15,37 @@ type ConfigRepository struct {
 	initOnce  *sync.Once
 	persistor configuration.Persistor
 	onError   func(error)
+}
+
+type Version struct {
+	Revisions []int
+}
+
+func (ver Version) GreaterThanOrEqual(target Version) bool {
+	if len(ver.Revisions) > 0 && len(target.Revisions) == 0 {
+		return true
+	} else if len(target.Revisions) > 0 && len(ver.Revisions) == 0 {
+		return false
+	}
+
+	if ver.Revisions[0] < target.Revisions[0] {
+		return false
+	} else if (len(ver.Revisions) > 1 || len(target.Revisions) > 1) && ver.Revisions[0] == target.Revisions[0] {
+		return Version{ver.Revisions[1:]}.GreaterThanOrEqual(Version{target.Revisions[1:]})
+	}
+
+	return true
+}
+
+func NewVersion(version string) Version {
+	split := strings.Split(version, ".")
+
+	retVersion := Version{[]int{}}
+	for _, v := range split {
+		parsed, _ := strconv.Atoi(v)
+		retVersion.Revisions = append(retVersion.Revisions, parsed)
+	}
+	return retVersion
 }
 
 func NewRepositoryFromFilepath(filepath string, errorHandler func(error)) Repository {
@@ -289,7 +321,10 @@ func (c *ConfigRepository) IsMinApiVersion(v string) bool {
 	c.read(func() {
 		apiVersion = c.data.ApiVersion
 	})
-	return apiVersion >= v
+
+	requiredVersion := NewVersion(v)
+	cliVersion := NewVersion(apiVersion)
+	return cliVersion.GreaterThanOrEqual(requiredVersion)
 }
 
 func (c *ConfigRepository) IsMinCliVersion(version string) bool {
@@ -300,7 +335,15 @@ func (c *ConfigRepository) IsMinCliVersion(version string) bool {
 	c.read(func() {
 		minCliVersion = c.data.MinCliVersion
 	})
-	return version >= minCliVersion
+	if minCliVersion == "" {
+		return true
+	}
+
+	minCliVersion = strings.Split(minCliVersion, "-")[0]
+	requiredVersion := NewVersion(version)
+	cliVersion := NewVersion(minCliVersion)
+
+	return requiredVersion.GreaterThanOrEqual(cliVersion)
 }
 
 func (c *ConfigRepository) MinCliVersion() (minCliVersion string) {

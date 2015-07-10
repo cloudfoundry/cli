@@ -102,12 +102,16 @@ var _ = Describe("Configuration Repository", func() {
 
 		Expect(config.IsMinApiVersion("3.1")).To(Equal(false))
 
-		config.SetMinCliVersion("6.0.0")
+		config.SetMinCliVersion("6.5.0")
 		Expect(config.IsMinCliVersion("5.0.0")).To(Equal(false))
-		Expect(config.MinCliVersion()).To(Equal("6.0.0"))
+		Expect(config.IsMinCliVersion("6.10.0")).To(Equal(true))
+		Expect(config.IsMinCliVersion("6.5.0")).To(Equal(true))
+		Expect(config.IsMinCliVersion("6.5.0.1")).To(Equal(true))
+		Expect(config.MinCliVersion()).To(Equal("6.5.0"))
 
 		config.SetMinRecommendedCliVersion("6.9.0")
 		Expect(config.MinRecommendedCliVersion()).To(Equal("6.9.0"))
+
 	})
 
 	Describe("HasAPIEndpoint", func() {
