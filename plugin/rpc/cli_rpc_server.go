@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
+	"github.com/cloudfoundry/cli/utils"
 	"github.com/codegangsta/cli"
 
 	"fmt"
@@ -100,7 +101,14 @@ func (cmd *CliRpcService) SetTheApp(app *cli.App) {
 }
 
 func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
-	*retVal = cf.Version >= version
+	if cf.Version == "BUILT_FROM_SOURCE" {
+		*retVal = true
+	} else {
+		curVersion := utils.NewVersion(cf.Version)
+		requiredVersion := utils.NewVersion(version)
+		*retVal = curVersion.GreaterThanOrEqual(requiredVersion)
+	}
+
 	return nil
 }
 
