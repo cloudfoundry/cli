@@ -45,7 +45,7 @@ var _ = Describe("space-users command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand_New("space-users", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCliCommand("space-users", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -193,7 +193,7 @@ var _ = Describe("space-users command", func() {
 			})
 
 			It("populates the plugin model with users with single roles", func() {
-				testcmd.RunCliCommand_New("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCliCommand("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
 
 				Ω(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {
@@ -264,7 +264,7 @@ var _ = Describe("space-users command", func() {
 			})
 
 			It("populates the plugin model with users with multiple roles", func() {
-				testcmd.RunCliCommand_New("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCliCommand("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
 
 				Ω(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {

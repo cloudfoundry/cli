@@ -42,7 +42,7 @@ var _ = Describe("spaces command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand_New("spaces", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCliCommand("spaces", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -90,7 +90,7 @@ var _ = Describe("spaces command", func() {
 		})
 
 		It("populates the plugin models upon execution", func() {
-			testcmd.RunCliCommand_New("spaces", []string{}, requirementsFactory, updateCommandDependency, true)
+			testcmd.RunCliCommand("spaces", []string{}, requirementsFactory, updateCommandDependency, true)
 			runCommand()
 			Ω(pluginModels[0].Name).To(Equal("space1"))
 			Ω(pluginModels[0].Guid).To(Equal("123"))

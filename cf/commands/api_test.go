@@ -35,7 +35,7 @@ var _ = Describe("api command", func() {
 	}
 
 	callApi := func(args []string, config core_config.Repository, endpointRepo *testapi.FakeEndpointRepo) {
-		testcmd.RunCliCommand_New("api", args, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCliCommand("api", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {

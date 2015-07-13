@@ -114,7 +114,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("login"),
 					presentCommand("logout"),
 					presentCommand("passwd"),
-					presentCommand("target"),
+					presentNonCodegangstaCommand("target"),
 				}, {
 					presentNonCodegangstaCommand("api"),
 					presentNonCodegangstaCommand("auth"),

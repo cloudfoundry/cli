@@ -4890,11 +4890,6 @@
       "modified": false
    },
    {
-      "id": "incorrect usage",
-      "translation": "utilisation incorrecte",
-      "modified": false
-   },
-   {
       "id": "instance memory limit",
       "translation": "limite de mémoire d'instance",
       "modified": false

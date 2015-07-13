@@ -48,7 +48,7 @@ func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq
 	return
 }
 
-func RunCliCommand_New(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) bool {
+func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) bool {
 	updateFunc(pluginCall)
 	cmd := command_registry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)

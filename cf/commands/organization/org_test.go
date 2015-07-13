@@ -56,7 +56,7 @@ var _ = Describe("org command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand_New("org", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCliCommand("org", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -146,7 +146,7 @@ var _ = Describe("org command", func() {
 			})
 
 			It("populates the plugin model", func() {
-				testcmd.RunCliCommand_New("org", []string{"my-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCliCommand("org", []string{"my-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Ω(pluginModel.Name).To(Equal("my-org"))
 				Ω(pluginModel.Guid).To(Equal("my-org-guid"))
