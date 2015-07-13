@@ -78,7 +78,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		serviceBuilder,
 	)
 
-	factory.cmdsByName["auth"] = commands.NewAuthenticate(ui, config, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["buildpacks"] = buildpack.NewListBuildpacks(ui, repoLocator.GetBuildpackRepository())
 	factory.cmdsByName["config"] = commands.NewConfig(ui, config)
 	factory.cmdsByName["create-app-manifest"] = commands.NewCreateAppManifest(ui, config, repoLocator.GetAppSummaryRepository(), manifest.NewGenerator())
