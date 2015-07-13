@@ -33,8 +33,7 @@ var _ = Describe("org command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("orgs")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand_New("orgs", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
@@ -44,7 +43,6 @@ var _ = Describe("org command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 
 		deps = command_registry.NewDependency()
-		updateCommandDependency(false)
 	})
 
 	Describe("requirements", func() {
@@ -82,11 +80,10 @@ var _ = Describe("org command", func() {
 
 			pluginOrgsModel = []plugin_models.GetOrgs_Model{}
 			deps.PluginModels.Organizations = &pluginOrgsModel
-			updateCommandDependency(true)
 		})
 
 		It("populates the plugin models upon execution", func() {
-			runCommand()
+			testcmd.RunCliCommand_New("orgs", []string{}, requirementsFactory, updateCommandDependency, true)
 			Ω(pluginOrgsModel[0].Name).To(Equal("Organization-1"))
 			Ω(pluginOrgsModel[0].Guid).To(Equal("org-1-guid"))
 			Ω(pluginOrgsModel[1].Name).To(Equal("Organization-2"))

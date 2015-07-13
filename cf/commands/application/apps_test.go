@@ -87,12 +87,10 @@ var _ = Describe("list-apps command", func() {
 		appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app, app2}
 
 		deps = command_registry.NewDependency()
-		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("apps")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand_New("apps", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -125,11 +123,10 @@ var _ = Describe("list-apps command", func() {
 		BeforeEach(func() {
 			pluginAppModels = []plugin_models.GetAppsModel{}
 			deps.PluginModels.AppsSummary = &pluginAppModels
-			updateCommandDependency(true)
 		})
 
 		It("populates the plugin models upon execution", func() {
-			runCommand()
+			testcmd.RunCliCommand_New("apps", []string{}, requirementsFactory, updateCommandDependency, true)
 
 			Ω(pluginAppModels[0].Name).To(Equal("Application-1"))
 			Ω(pluginAppModels[0].Guid).To(Equal("Application-1-guid"))
@@ -193,7 +190,6 @@ var _ = Describe("list-apps command", func() {
 		Context("when there are no apps", func() {
 			It("tells the user that there are no apps", func() {
 				appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{}
-				updateCommandDependency(false)
 
 				runCommand()
 				Expect(ui.Outputs).To(ContainSubstrings(

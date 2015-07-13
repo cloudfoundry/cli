@@ -39,12 +39,10 @@ var _ = Describe("org-users command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		deps = command_registry.NewDependency()
-		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("org-users")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand_New("org-users", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -83,7 +81,6 @@ var _ = Describe("org-users command", func() {
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.Organization = org
-			updateCommandDependency(false)
 		})
 
 		It("shows the special users in the given org", func() {
@@ -194,11 +191,10 @@ var _ = Describe("org-users command", func() {
 				requirementsFactory.Organization = org
 				pluginUserModel = []plugin_models.GetOrgUsers_Model{}
 				deps.PluginModels.OrgUsers = &pluginUserModel
-				updateCommandDependency(true)
 			})
 
 			It("populates the plugin model with users with single roles", func() {
-				runCommand("the-org")
+				testcmd.RunCliCommand_New("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
 				Ω(pluginUserModel).To(HaveLen(4))
 
 				for _, u := range pluginUserModel {
@@ -223,7 +219,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with single roles -a flag", func() {
-				runCommand("-a", "the-org")
+				testcmd.RunCliCommand_New("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
 				Ω(pluginUserModel).To(HaveLen(1))
 				Ω(pluginUserModel[0].Username).To(Equal("user3"))
 				Ω(pluginUserModel[0].Guid).To(Equal("3333"))
@@ -270,11 +266,10 @@ var _ = Describe("org-users command", func() {
 				requirementsFactory.Organization = org
 				pluginUserModel = []plugin_models.GetOrgUsers_Model{}
 				deps.PluginModels.OrgUsers = &pluginUserModel
-				updateCommandDependency(true)
 			})
 
 			It("populates the plugin model with users with multiple roles", func() {
-				runCommand("the-org")
+				testcmd.RunCliCommand_New("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Ω(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {
@@ -300,7 +295,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with multiple roles -a flag", func() {
-				runCommand("-a", "the-org")
+				testcmd.RunCliCommand_New("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Ω(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {

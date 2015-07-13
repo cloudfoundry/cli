@@ -35,8 +35,7 @@ var _ = Describe("services", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("services")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand_New("services", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
@@ -50,7 +49,6 @@ var _ = Describe("services", func() {
 		}
 
 		deps = command_registry.NewDependency()
-		updateCommandDependency(false)
 	})
 
 	Describe("services requirements", func() {
@@ -199,11 +197,10 @@ var _ = Describe("services", func() {
 			serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, userProvidedServiceInstance}
 
 			serviceSummaryRepo.GetSummariesInCurrentSpaceInstances = serviceInstances
-			updateCommandDependency(true)
 		})
 
 		It("populates the plugin model", func() {
-			runCommand()
+			testcmd.RunCliCommand_New("services", []string{}, requirementsFactory, updateCommandDependency, true)
 
 			Ω(len(pluginModels)).To(Equal(3))
 			Ω(pluginModels[0].Name).To(Equal("my-service-1"))
