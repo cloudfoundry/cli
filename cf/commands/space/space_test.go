@@ -39,12 +39,10 @@ var _ = Describe("space command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		deps = command_registry.NewDependency()
-		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("space")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand_New("space", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -199,15 +197,10 @@ var _ = Describe("space command", func() {
 			BeforeEach(func() {
 				pluginModel = plugin_models.GetSpace_Model{}
 				deps.PluginModels.Space = &pluginModel
-				updateCommandDependency(true)
-			})
-
-			BeforeEach(func() {
-				updateCommandDependency(true)
 			})
 
 			It("Fills in the PluginModel", func() {
-				runCommand("whose-space-is-it-anyway")
+				testcmd.RunCliCommand_New("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true)
 				Ω(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
 				Ω(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
 

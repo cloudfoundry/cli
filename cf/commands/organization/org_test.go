@@ -53,12 +53,10 @@ var _ = Describe("org command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
 		deps = command_registry.NewDependency()
-		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("org")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand_New("org", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -145,11 +143,10 @@ var _ = Describe("org command", func() {
 			BeforeEach(func() {
 				pluginModel = plugin_models.GetOrg_Model{}
 				deps.PluginModels.Organization = &pluginModel
-				updateCommandDependency(true)
 			})
 
 			It("populates the plugin model", func() {
-				runCommand("my-org")
+				testcmd.RunCliCommand_New("org", []string{"my-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Ω(pluginModel.Name).To(Equal("my-org"))
 				Ω(pluginModel.Guid).To(Equal("my-org-guid"))

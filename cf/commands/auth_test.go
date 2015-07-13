@@ -19,7 +19,6 @@ import (
 var _ = Describe("auth command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		cmd                 command_registry.Command
 		config              core_config.Repository
 		repo                *testapi.FakeAuthenticationRepository
 		requirementsFactory *testreq.FakeReqFactory
@@ -48,9 +47,7 @@ var _ = Describe("auth command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when given too few arguments", func() {
-			updateCommandDependency(false)
-			cmd = command_registry.Commands.FindCommand("auth")
-			testcmd.RunCliCommand(cmd, []string{}, requirementsFactory)
+			testcmd.RunCliCommand_New("auth", []string{}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -58,8 +55,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("fails if the user has not set an api endpoint", func() {
-			cmd = command_registry.Commands.FindCommand("auth")
-			Expect(testcmd.RunCliCommand(cmd, []string{"username", "password"}, requirementsFactory)).To(BeFalse())
+			Expect(testcmd.RunCliCommand_New("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 	})
 
@@ -71,9 +67,7 @@ var _ = Describe("auth command", func() {
 
 		It("authenticates successfully", func() {
 			requirementsFactory.ApiEndpointSuccess = true
-			updateCommandDependency(false)
-			cmd = command_registry.Commands.FindCommand("auth")
-			testcmd.RunCliCommand(cmd, []string{"foo@example.com", "password"}, requirementsFactory)
+			testcmd.RunCliCommand_New("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -94,9 +88,7 @@ var _ = Describe("auth command", func() {
 			config.SetMinRecommendedCliVersion("5.5.0")
 			cf.Version = "4.5.0"
 
-			updateCommandDependency(false)
-			cmd = command_registry.Commands.FindCommand("auth")
-			testcmd.RunCliCommand(cmd, []string{"foo@example.com", "password"}, requirementsFactory)
+			testcmd.RunCliCommand_New("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"To upgrade your CLI"},
@@ -106,19 +98,14 @@ var _ = Describe("auth command", func() {
 
 		It("gets the UAA endpoint and saves it to the config file", func() {
 			requirementsFactory.ApiEndpointSuccess = true
-			updateCommandDependency(false)
-
-			cmd = command_registry.Commands.FindCommand("auth")
-			testcmd.RunCliCommand(cmd, []string{"foo@example.com", "password"}, requirementsFactory)
+			testcmd.RunCliCommand_New("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 			Expect(repo.GetLoginPromptsWasCalled).To(BeTrue())
 		})
 
 		Describe("when authentication fails", func() {
 			BeforeEach(func() {
 				repo.AuthError = true
-				updateCommandDependency(false)
-				cmd = command_registry.Commands.FindCommand("auth")
-				testcmd.RunCliCommand(cmd, []string{"username", "password"}, requirementsFactory)
+				testcmd.RunCliCommand_New("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)
 			})
 
 			It("does not prompt the user when provided username and password", func() {

@@ -31,19 +31,13 @@ var _ = Describe("service command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		deps = command_registry.NewDependency()
-		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("service")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand_New("service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
-		BeforeEach(func() {
-			updateCommandDependency(false)
-		})
-
 		It("fails when not provided the name of the service to show", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
@@ -102,12 +96,11 @@ var _ = Describe("service command", func() {
 
 				pluginModel = &plugin_models.GetService_Model{}
 				deps.PluginModels.Service = pluginModel
-				updateCommandDependency(true)
 			})
 
 			It("populates the plugin model upon execution", func() {
 				createServiceInstanceWithState("in progress")
-				runCommand("service1")
+				testcmd.RunCliCommand_New("service", []string{"service1"}, requirementsFactory, updateCommandDependency, true)
 				Ω(pluginModel.Name).To(Equal("service1"))
 				Ω(pluginModel.Guid).To(Equal("service1-guid"))
 				Ω(pluginModel.LastOperation.Type).To(Equal("create"))
@@ -127,8 +120,6 @@ var _ = Describe("service command", func() {
 			BeforeEach(func() {
 				requirementsFactory.LoginSuccess = true
 				requirementsFactory.TargetedSpaceSuccess = true
-
-				updateCommandDependency(false)
 			})
 
 			Context("when the service is externally provided", func() {

@@ -27,7 +27,6 @@ var _ = Describe("spaces command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
@@ -43,27 +42,23 @@ var _ = Describe("spaces command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("spaces")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand_New("spaces", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.TargetedOrgSuccess = true
-			updateCommandDependency(false)
 
 			Expect(runCommand()).To(BeFalse())
 		})
 
 		It("fails when an org is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
-			updateCommandDependency(false)
 
 			Expect(runCommand()).To(BeFalse())
 		})
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
-			updateCommandDependency(false)
 
 			Expect(runCommand("blahblah")).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -92,10 +87,10 @@ var _ = Describe("spaces command", func() {
 			requirementsFactory.TargetedOrgSuccess = true
 			requirementsFactory.LoginSuccess = true
 
-			updateCommandDependency(true)
 		})
 
 		It("populates the plugin models upon execution", func() {
+			testcmd.RunCliCommand_New("spaces", []string{}, requirementsFactory, updateCommandDependency, true)
 			runCommand()
 			Ω(pluginModels[0].Name).To(Equal("space1"))
 			Ω(pluginModels[0].Guid).To(Equal("123"))
@@ -115,8 +110,6 @@ var _ = Describe("spaces command", func() {
 			spaceRepo.Spaces = []models.Space{space, space2, space3}
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-
-			updateCommandDependency(false)
 		})
 
 		It("lists all of the spaces", func() {
