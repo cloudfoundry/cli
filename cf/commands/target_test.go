@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
@@ -25,13 +25,22 @@ var _ = Describe("target command", func() {
 		orgRepo             *fake_org.FakeOrganizationRepository
 		spaceRepo           *testapi.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.ReadWriter
+		config              core_config.Repository
 		ui                  *testterm.FakeUI
+		deps                command_registry.Dependency
 	)
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("target").SetDependency(deps, pluginCall))
+	}
+
 	BeforeEach(func() {
-		ui = new(testterm.FakeUI)
-		orgRepo = new(fake_org.FakeOrganizationRepository)
+		ui = &testterm.FakeUI{}
+		orgRepo = &fake_org.FakeOrganizationRepository{}
 		spaceRepo = new(testapi.FakeSpaceRepository)
 		requirementsFactory = new(testreq.FakeReqFactory)
 		config = testconfig.NewRepositoryWithDefaults()
@@ -39,13 +48,14 @@ var _ = Describe("target command", func() {
 	})
 
 	var callTarget = func(args []string) bool {
-		cmd := NewTarget(ui, config, orgRepo, spaceRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("target", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails with usage when called with an argument but no flags", func() {
 		callTarget([]string{"some-argument"})
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "No argument required"},
+		))
 	})
 
 	Describe("when there is no api endpoint set", func() {

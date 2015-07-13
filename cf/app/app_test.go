@@ -35,7 +35,7 @@ var expectedCommandNames = []string{
 	"rename-service", "rename-service-broker", "rename-space", "restage", "restart", "routes", "scale",
 	"service-auth-tokens", "service-brokers", "set-env", "set-org-role",
 	"set-space-role", "create-shared-domain", "stacks", "start", "stop",
-	"target", "unbind-service", "unmap-route", "unset-env", "unset-org-role", "unset-space-role",
+	"unbind-service", "unmap-route", "unset-env", "unset-org-role", "unset-space-role",
 	"update-buildpack", "update-service-broker", "update-service-auth-token", "update-user-provided-service",
 	"quotas", "create-quota", "delete-quota", "quota", "set-quota", "install-plugin", "plugins", "uninstall-plugin",
 }

@@ -60,7 +60,7 @@ var _ = Describe("app Command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand_New("app", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCliCommand("app", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -118,7 +118,7 @@ var _ = Describe("app Command", func() {
 		})
 
 		It("populates the plugin model upon execution", func() {
-			testcmd.RunCliCommand_New("app", []string{"my-app"}, requirementsFactory, updateCommandDependency, true)
+			testcmd.RunCliCommand("app", []string{"my-app"}, requirementsFactory, updateCommandDependency, true)
 			Ω(pluginAppModel.Name).To(Equal("my-app"))
 			Ω(pluginAppModel.State).To(Equal("started"))
 			Ω(pluginAppModel.Guid).To(Equal("app-guid"))
