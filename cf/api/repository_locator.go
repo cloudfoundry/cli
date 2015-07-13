@@ -134,6 +134,11 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	return
 }
 
+func (locator RepositoryLocator) SetAuthenticationRepository(repo authentication.AuthenticationRepository) RepositoryLocator {
+	locator.authRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetAuthenticationRepository() authentication.AuthenticationRepository {
 	return locator.authRepo
 }
