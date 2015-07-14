@@ -2,13 +2,13 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/app_files"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type Files struct {
@@ -18,36 +18,29 @@ type Files struct {
 	appReq       requirements.ApplicationRequirement
 }
 
-func NewFiles(ui terminal.UI, config core_config.Reader, appFilesRepo app_files.AppFilesRepository) (cmd *Files) {
-	cmd = new(Files)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appFilesRepo = appFilesRepo
-	return
+func init() {
+	command_registry.Register(&Files{})
 }
 
-func (cmd *Files) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Files) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["i"] = &cliFlags.IntFlag{Name: "i", Usage: T("Instance")}
+
+	return command_registry.CommandMetadata{
 		Name:        "files",
 		ShortName:   "f",
 		Description: T("Print out a list of files in a directory or the contents of a specific file"),
 		Usage:       T("CF_NAME files APP_NAME [PATH] [-i INSTANCE]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewIntFlag("i", T("Instance")),
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *Files) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) < 1 {
-		cmd.ui.FailWithUsage(c)
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("files"))
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -57,7 +50,14 @@ func (cmd *Files) GetRequirements(requirementsFactory requirements.Factory, c *c
 	return
 }
 
-func (cmd *Files) Run(c *cli.Context) {
+func (cmd *Files) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appFilesRepo = deps.RepoLocator.GetAppFilesRepository()
+	return cmd
+}
+
+func (cmd *Files) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	var instance int
