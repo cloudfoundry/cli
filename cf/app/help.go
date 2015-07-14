@@ -139,7 +139,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("restart-app-instance"),
 				}, {
 					presentNonCodegangstaCommand("events"),
-					presentCommand("files"),
+					presentNonCodegangstaCommand("files"),
 					presentCommand("logs"),
 				}, {
 					presentCommand("env"),

@@ -2,6 +2,7 @@ package application_test
 
 import (
 	testappfiles "github.com/cloudfoundry/cli/cf/api/app_files/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -9,7 +10,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/application"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,10 +18,18 @@ import (
 var _ = Describe("files command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		appFilesRepo        *testappfiles.FakeAppFilesRepository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetAppFileRepository(appFilesRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("files").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -31,7 +39,7 @@ var _ = Describe("files command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewFiles(ui, configRepo, appFilesRepo), args, requirementsFactory)
+		return testcmd.RunCliCommand("files", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -50,7 +58,9 @@ var _ = Describe("files command", func() {
 			requirementsFactory.TargetedSpaceSuccess = true
 
 			passed := runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 			Expect(passed).To(BeFalse())
 		})
 	})
