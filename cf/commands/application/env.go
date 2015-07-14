@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"sort"
 
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type Env struct {
@@ -21,16 +21,12 @@ type Env struct {
 	appRepo applications.ApplicationRepository
 }
 
-func NewEnv(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) (cmd *Env) {
-	cmd = new(Env)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appRepo = appRepo
-	return
+func init() {
+	command_registry.Register(&Env{})
 }
 
-func (cmd *Env) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Env) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "env",
 		ShortName:   "e",
 		Description: T("Show all env variables for an app"),
@@ -38,10 +34,11 @@ func (cmd *Env) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *Env) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *Env) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("env"))
 	}
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
@@ -49,7 +46,14 @@ func (cmd *Env) GetRequirements(requirementsFactory requirements.Factory, c *cli
 	return
 }
 
-func (cmd *Env) Run(c *cli.Context) {
+func (cmd *Env) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
+	return cmd
+}
+
+func (cmd *Env) Execute(c flags.FlagContext) {
 	app, err := cmd.appRepo.Read(c.Args()[0])
 	if notFound, ok := err.(*errors.ModelNotFoundError); ok {
 		cmd.ui.Failed(notFound.Error())

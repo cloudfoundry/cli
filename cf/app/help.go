@@ -142,7 +142,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("files"),
 					presentNonCodegangstaCommand("logs"),
 				}, {
-					presentCommand("env"),
+					presentNonCodegangstaCommand("env"),
 					presentCommand("set-env"),
 					presentCommand("unset-env"),
 				}, {
