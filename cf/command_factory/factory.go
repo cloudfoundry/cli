@@ -120,8 +120,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["env"] = application.NewEnv(ui, config, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["events"] = application.NewEvents(ui, config, repoLocator.GetAppEventsRepository())
 	factory.cmdsByName["files"] = application.NewFiles(ui, config, repoLocator.GetAppFilesRepository())
-	factory.cmdsByName["login"] = commands.NewLogin(ui, config, repoLocator.GetAuthenticationRepository(), repoLocator.GetEndpointRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
-	factory.cmdsByName["logout"] = commands.NewLogout(ui, config)
 	factory.cmdsByName["logs"] = application.NewLogs(ui, config, repoLocator.GetLogsNoaaRepository(), repoLocator.GetOldLogsRepository())
 	factory.cmdsByName["oauth-token"] = commands.NewOAuthToken(ui, config, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["passwd"] = commands.NewPassword(ui, repoLocator.GetPasswordRepository(), config)
