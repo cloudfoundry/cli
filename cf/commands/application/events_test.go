@@ -4,7 +4,8 @@ import (
 	"time"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/app_events/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/application"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,25 +23,35 @@ var _ = Describe("events command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		eventsRepo          *testapi.FakeAppEventsRepository
 		ui                  *testterm.FakeUI
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
 
 	const TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetAppEventsRepository(eventsRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("events").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		eventsRepo = new(testapi.FakeAppEventsRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		ui = new(testterm.FakeUI)
+		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		configRepo := testconfig.NewRepositoryWithDefaults()
-		cmd := NewEvents(ui, configRepo, eventsRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("events", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails with usage when called without an app name", func() {
 		passed := runCommand()
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "argument"},
+		))
 		Expect(passed).To(BeFalse())
 	})
 
