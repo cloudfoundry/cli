@@ -111,8 +111,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("GETTING STARTED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("login"),
-					presentCommand("logout"),
+					presentNonCodegangstaCommand("login"),
+					presentNonCodegangstaCommand("logout"),
 					presentCommand("passwd"),
 					presentNonCodegangstaCommand("target"),
 				}, {

@@ -62,6 +62,7 @@ var _ = Describe("factory", func() {
 				info.Name() == "space_users.go" || info.Name() == "services.go" ||
 				info.Name() == "org.go" || info.Name() == "space.go" ||
 				info.Name() == "service.go" || info.Name() == "auth.go" ||
+				info.Name() == "login.go" || info.Name() == "logout.go" ||
 				info.Name() == "target.go" {
 				return nil
 			}
