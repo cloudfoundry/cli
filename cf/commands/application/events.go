@@ -2,12 +2,12 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/app_events"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type Events struct {
@@ -17,32 +17,24 @@ type Events struct {
 	eventsRepo app_events.AppEventsRepository
 }
 
-func NewEvents(ui terminal.UI, config core_config.Reader, eventsRepo app_events.AppEventsRepository) (cmd *Events) {
-	cmd = new(Events)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.eventsRepo = eventsRepo
-	return
+func init() {
+	command_registry.Register(&Events{})
 }
 
-func (cmd *Events) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Events) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "events",
 		Description: T("Show recent app events"),
 		Usage:       T("CF_NAME events APP_NAME"),
 	}
 }
 
-func (cmd *Events) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Events) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("events"))
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -52,7 +44,14 @@ func (cmd *Events) GetRequirements(requirementsFactory requirements.Factory, c *
 	return
 }
 
-func (cmd *Events) Run(c *cli.Context) {
+func (cmd *Events) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.eventsRepo = deps.RepoLocator.GetAppEventsRepository()
+	return cmd
+}
+
+func (cmd *Events) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	cmd.ui.Say(T("Getting events for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
