@@ -282,6 +282,11 @@ func (locator RepositoryLocator) GetPasswordRepository() password.PasswordReposi
 	return locator.passwordRepo
 }
 
+func (locator RepositoryLocator) SetOldLogsRepository(repo OldLogsRepository) RepositoryLocator {
+	locator.oldLogsRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetOldLogsRepository() OldLogsRepository {
 	return locator.oldLogsRepo
 }
