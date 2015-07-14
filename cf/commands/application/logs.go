@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -13,9 +13,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/cloudfoundry/sonde-go/events"
-	"github.com/codegangsta/cli"
 )
 
 type Logs struct {
@@ -24,6 +25,46 @@ type Logs struct {
 	noaaRepo    api.LogsNoaaRepository
 	oldLogsRepo api.OldLogsRepository
 	appReq      requirements.ApplicationRequirement
+}
+
+func init() {
+	command_registry.Register(&Logs{})
+}
+
+func (cmd *Logs) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["recent"] = &cliFlags.BoolFlag{Name: "recent", Usage: T("Dump recent logs instead of tailing")}
+
+	return command_registry.CommandMetadata{
+		Name:        "logs",
+		Description: T("Tail or show recent logs for an app"),
+		Usage:       T("CF_NAME logs APP_NAME"),
+		Flags:       fs,
+	}
+}
+
+func (cmd *Logs) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("logs"))
+	}
+
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
+
+	reqs = []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
+		cmd.appReq,
+	}
+
+	return
+}
+
+func (cmd *Logs) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.noaaRepo = deps.RepoLocator.GetLogsNoaaRepository()
+	cmd.oldLogsRepo = deps.RepoLocator.GetOldLogsRepository()
+	return cmd
 }
 
 func NewLogs(ui terminal.UI, config core_config.Reader, noaaRepo api.LogsNoaaRepository, oldLogsRepo api.OldLogsRepository) (cmd *Logs) {
@@ -35,38 +76,7 @@ func NewLogs(ui terminal.UI, config core_config.Reader, noaaRepo api.LogsNoaaRep
 	return
 }
 
-func (cmd *Logs) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
-		Name:        "logs",
-		Description: T("Tail or show recent logs for an app"),
-		Usage:       T("CF_NAME logs APP_NAME"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "recent", Usage: T("Dump recent logs instead of tailing")},
-		},
-	}
-}
-
-func (cmd *Logs) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
-	}
-
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
-
-	reqs = []requirements.Requirement{
-		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewTargetedSpaceRequirement(),
-		cmd.appReq,
-	}
-
-	return
-}
-
-func (cmd *Logs) Run(c *cli.Context) {
+func (cmd *Logs) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	if c.Bool("recent") {
