@@ -130,7 +130,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentCommand("push"),  //needs start/restart ...
 					presentCommand("scale"), //needs stop/restart
 					presentNonCodegangstaCommand("delete"),
-					presentCommand("rename"),
+					presentNonCodegangstaCommand("rename"),
 				}, {
 					presentCommand("start"),
 					presentCommand("stop"),
