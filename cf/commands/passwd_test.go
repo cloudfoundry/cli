@@ -2,7 +2,7 @@ package commands_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -16,31 +16,49 @@ import (
 )
 
 var _ = Describe("password command", func() {
-	var deps passwordDeps
+	var (
+		pwDeps passwordDeps
+		ui     *testterm.FakeUI
+		deps   command_registry.Dependency
+	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = pwDeps.Config
+		deps.RepoLocator = deps.RepoLocator.SetPasswordRepository(pwDeps.PwdRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("passwd").SetDependency(deps, pluginCall))
+	}
+
+	callPassword := func(inputs []string, pwDeps passwordDeps) (*testterm.FakeUI, bool) {
+		ui = &testterm.FakeUI{Inputs: inputs}
+		passed := testcmd.RunCliCommand("passwd", []string{}, pwDeps.ReqFactory, updateCommandDependency, false)
+		return ui, passed
+	}
 
 	BeforeEach(func() {
-		deps = getPasswordDeps()
+		pwDeps = getPasswordDeps()
 	})
 
 	It("does not pass requirements if you are not logged in", func() {
-		deps.ReqFactory.LoginSuccess = false
-		_, passed := callPassword([]string{}, deps)
+		pwDeps.ReqFactory.LoginSuccess = false
+		_, passed := callPassword([]string{}, pwDeps)
 		Expect(passed).To(BeFalse())
 	})
 
 	Context("when logged in successfully", func() {
 		BeforeEach(func() {
-			deps.ReqFactory.LoginSuccess = true
+			pwDeps.ReqFactory.LoginSuccess = true
+			pwDeps.PwdRepo.UpdateUnauthorized = false
 		})
 
 		It("passes requirements", func() {
-			_, passed := callPassword([]string{"", "", ""}, deps)
+			_, passed := callPassword([]string{"", "", ""}, pwDeps)
 			Expect(passed).To(BeTrue())
 		})
 
 		It("changes your password when given a new password", func() {
-			deps.PwdRepo.UpdateUnauthorized = false
-			ui, _ := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
+			pwDeps.PwdRepo.UpdateUnauthorized = false
+			ui, _ := callPassword([]string{"old-password", "new-password", "new-password"}, pwDeps)
 
 			Expect(ui.PasswordPrompts).To(ContainSubstrings(
 				[]string{"Current Password"},
@@ -54,16 +72,16 @@ var _ = Describe("password command", func() {
 				[]string{"Please log in again"},
 			))
 
-			Expect(deps.PwdRepo.UpdateNewPassword).To(Equal("new-password"))
-			Expect(deps.PwdRepo.UpdateOldPassword).To(Equal("old-password"))
+			Expect(pwDeps.PwdRepo.UpdateNewPassword).To(Equal("new-password"))
+			Expect(pwDeps.PwdRepo.UpdateOldPassword).To(Equal("old-password"))
 
-			Expect(deps.Config.AccessToken()).To(Equal(""))
-			Expect(deps.Config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
-			Expect(deps.Config.SpaceFields()).To(Equal(models.SpaceFields{}))
+			Expect(pwDeps.Config.AccessToken()).To(Equal(""))
+			Expect(pwDeps.Config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
+			Expect(pwDeps.Config.SpaceFields()).To(Equal(models.SpaceFields{}))
 		})
 
 		It("fails when the password verification does not match", func() {
-			ui, _ := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, deps)
+			ui, _ := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, pwDeps)
 
 			Expect(ui.PasswordPrompts).To(ContainSubstrings(
 				[]string{"Current Password"},
@@ -76,12 +94,12 @@ var _ = Describe("password command", func() {
 				[]string{"Password verification does not match"},
 			))
 
-			Expect(deps.PwdRepo.UpdateNewPassword).To(Equal(""))
+			Expect(pwDeps.PwdRepo.UpdateNewPassword).To(Equal(""))
 		})
 
 		It("fails when the current password does not match", func() {
-			deps.PwdRepo.UpdateUnauthorized = true
-			ui, _ := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
+			pwDeps.PwdRepo.UpdateUnauthorized = true
+			ui, _ := callPassword([]string{"old-password", "new-password", "new-password"}, pwDeps)
 
 			Expect(ui.PasswordPrompts).To(ContainSubstrings(
 				[]string{"Current Password"},
@@ -95,8 +113,8 @@ var _ = Describe("password command", func() {
 				[]string{"Current password did not match"},
 			))
 
-			Expect(deps.PwdRepo.UpdateNewPassword).To(Equal("new-password"))
-			Expect(deps.PwdRepo.UpdateOldPassword).To(Equal("old-password"))
+			Expect(pwDeps.PwdRepo.UpdateNewPassword).To(Equal("new-password"))
+			Expect(pwDeps.PwdRepo.UpdateOldPassword).To(Equal("old-password"))
 		})
 	})
 })
@@ -104,7 +122,7 @@ var _ = Describe("password command", func() {
 type passwordDeps struct {
 	ReqFactory *testreq.FakeReqFactory
 	PwdRepo    *testapi.FakePasswordRepo
-	Config     core_config.ReadWriter
+	Config     core_config.Repository
 }
 
 func getPasswordDeps() passwordDeps {
@@ -113,12 +131,4 @@ func getPasswordDeps() passwordDeps {
 		PwdRepo:    &testapi.FakePasswordRepo{UpdateUnauthorized: true},
 		Config:     testconfig.NewRepository(),
 	}
-}
-
-func callPassword(inputs []string, deps passwordDeps) (*testterm.FakeUI, bool) {
-	ui := &testterm.FakeUI{Inputs: inputs}
-	cmd := NewPassword(ui, deps.PwdRepo, deps.Config)
-	passed := testcmd.RunCommand(cmd, []string{}, deps.ReqFactory)
-
-	return ui, passed
 }

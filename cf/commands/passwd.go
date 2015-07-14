@@ -2,13 +2,13 @@ package commands
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/password"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type Password struct {
@@ -17,15 +17,12 @@ type Password struct {
 	config  core_config.ReadWriter
 }
 
-func NewPassword(ui terminal.UI, pwdRepo password.PasswordRepository, config core_config.ReadWriter) (cmd Password) {
-	cmd.ui = ui
-	cmd.pwdRepo = pwdRepo
-	cmd.config = config
-	return
+func init() {
+	command_registry.Register(&Password{})
 }
 
-func (cmd Password) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Password) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "passwd",
 		ShortName:   "pw",
 		Description: T("Change user password"),
@@ -33,12 +30,19 @@ func (cmd Password) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd Password) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Password) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return
 }
 
-func (cmd Password) Run(c *cli.Context) {
+func (cmd *Password) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.pwdRepo = deps.RepoLocator.GetPasswordRepository()
+	return cmd
+}
+
+func (cmd *Password) Execute(c flags.FlagContext) {
 	oldPassword := cmd.ui.AskForPassword(T("Current Password"))
 	newPassword := cmd.ui.AskForPassword(T("New Password"))
 	verifiedPassword := cmd.ui.AskForPassword(T("Verify Password"))
