@@ -2320,6 +2320,11 @@
       "modified": false
    },
    {
+      "id": "For API documentation, please visit http://apidocs.cloudfoundry.org",
+      "translation": "For API documentation, please visit http://apidocs.cloudfoundry.org",
+      "modified": false
+   },
+   {
       "id": "Force delete (do not prompt for confirmation)",
       "translation": "Force delete (do not prompt for confirmation)",
       "modified": false
