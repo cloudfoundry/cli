@@ -3,7 +3,7 @@ package application_test
 import (
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/application"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -19,14 +19,22 @@ import (
 
 var _ = Describe("delete app command", func() {
 	var (
-		cmd                 *DeleteApp
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		appRepo             *testApplication.FakeApplicationRepository
 		routeRepo           *testapi.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		app = models.Application{}
@@ -39,11 +47,10 @@ var _ = Describe("delete app command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		cmd = NewDeleteApp(ui, configRepo, appRepo, routeRepo)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails requirements when not logged in", func() {
@@ -64,7 +71,9 @@ var _ = Describe("delete app command", func() {
 
 		It("fails with usage when not provided exactly one arg", func() {
 			runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "argument"},
+			))
 		})
 
 		Context("When provided an app that exists", func() {

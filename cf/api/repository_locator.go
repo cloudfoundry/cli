@@ -40,14 +40,14 @@ type RepositoryLocator struct {
 	organizationRepo                organizations.OrganizationRepository
 	quotaRepo                       quotas.CloudControllerQuotaRepository
 	spaceRepo                       spaces.SpaceRepository
-	appRepo                         applications.CloudControllerApplicationRepository
+	appRepo                         applications.ApplicationRepository
 	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  AppSummaryRepository
 	appInstancesRepo                app_instances.AppInstancesRepository
 	appEventsRepo                   app_events.CloudControllerAppEventsRepository
 	appFilesRepo                    api_app_files.CloudControllerAppFilesRepository
 	domainRepo                      CloudControllerDomainRepository
-	routeRepo                       CloudControllerRouteRepository
+	routeRepo                       RouteRepository
 	stackRepo                       stacks.CloudControllerStackRepository
 	serviceRepo                     CloudControllerServiceRepository
 	serviceKeyRepo                  CloudControllerServiceKeyRepository
@@ -178,6 +178,11 @@ func (locator RepositoryLocator) GetSpaceRepository() spaces.SpaceRepository {
 	return locator.spaceRepo
 }
 
+func (locator RepositoryLocator) SetApplicationRepository(repo applications.ApplicationRepository) RepositoryLocator {
+	locator.appRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetApplicationRepository() applications.ApplicationRepository {
 	return locator.appRepo
 }
@@ -219,6 +224,11 @@ func (locator RepositoryLocator) GetAppFilesRepository() api_app_files.AppFilesR
 
 func (locator RepositoryLocator) GetDomainRepository() DomainRepository {
 	return locator.domainRepo
+}
+
+func (locator RepositoryLocator) SetRouteRepository(repo RouteRepository) RepositoryLocator {
+	locator.routeRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetRouteRepository() RouteRepository {
