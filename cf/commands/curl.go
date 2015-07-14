@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
@@ -38,7 +39,7 @@ func (cmd *Curl) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "curl",
 		Description: T("Executes a raw request, content-type set to application/json by default"),
-		Usage:       T("CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]"),
+		Usage:       T("CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]") + "\n   " + T("For API documentation, please visit http://apidocs.cloudfoundry.org"),
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "i", Usage: T("Include response headers in the output")},
 			cli.BoolFlag{Name: "v", Usage: T("Enable CF_TRACE output for all requests and responses")},
