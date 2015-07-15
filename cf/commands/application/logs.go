@@ -67,15 +67,6 @@ func (cmd *Logs) SetDependency(deps command_registry.Dependency, pluginCall bool
 	return cmd
 }
 
-func NewLogs(ui terminal.UI, config core_config.Reader, noaaRepo api.LogsNoaaRepository, oldLogsRepo api.OldLogsRepository) (cmd *Logs) {
-	cmd = new(Logs)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.noaaRepo = noaaRepo
-	cmd.oldLogsRepo = oldLogsRepo
-	return
-}
-
 func (cmd *Logs) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
