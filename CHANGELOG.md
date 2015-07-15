@@ -1,3 +1,35 @@
+##6.12.2
+* convert create-service to non-codegangsta [#97061558]
+* remove used constructor in cmd logs 
+* convert marketplace to non-codegangsta [#97061558] 
+* add ServiceBuilder to dependency object 
+* convert create-app-manifest to non-codegangsta [#97061558] 
+* add AppManifest to dependency object 
+* convert stack to non-codegangsta [#97061558] 
+* convert stacks to non-codegangsta [#97061558] 
+* convert unset-env to non-codegangsta [#97061558] 
+* convert set-env to non-codegangsta [#97061558] 
+* implement skipFlagParsing in flags package [#97061558]
+* convert env to non-codegangsta [#97061558] 
+* add tip to curl command for api doc url [#98862944]
+* convert logs to non-codegangsta [#97061558] 
+* convert files to non-codegangsta [#97061558] 
+* convert events to non-codegangsta [#97061558] 
+* convert rename to non-codegangsta [#97061558] 
+* convert delete to non-codegangsta [#97061558]
+* cmd passwd converted to non-codegangsta structure [#97061558]
+* convert login,logout to non-codegangsta structure [#97061558]
+* convert target into non-codegangsta structure [#97061558]
+* improve RunCliCommand in testhelper for non-CG command [#97061558]
+* change command auth to non codegangsta structure 
+* rpc server version check uses new version package [#98664206]
+* move version checking methods into utils package [#98664206]
+* move NotifyUpdateIfNeeded() into UI package [#98664206]
+* Fixed GetMinCliVersion and GetMinApiVersion to work with arbitrary version numbers. [#98664206]
+* Populate rpc test server with all plugin API interface 
+* Update README.md
+* fix bug in plugin API HasAPIEndpoint() 
+
 ##6.12.1
 * improve method to compare domains of local and redirecting target [98132086]
 * Updated config repo fake
