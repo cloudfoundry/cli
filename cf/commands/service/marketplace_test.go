@@ -2,7 +2,7 @@ package service_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -18,11 +18,19 @@ import (
 var _ = Describe("marketplace command", func() {
 	var ui *testterm.FakeUI
 	var requirementsFactory *testreq.FakeReqFactory
-	var config core_config.ReadWriter
+	var config core_config.Repository
 	var serviceBuilder *testapi.FakeServiceBuilder
 	var fakeServiceOfferings []models.ServiceOffering
 	var serviceWithAPaidPlan models.ServiceOffering
 	var service2 models.ServiceOffering
+	var deps command_registry.Dependency
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.ServiceBuilder = serviceBuilder
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("marketplace").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		serviceBuilder = &testapi.FakeServiceBuilder{}
@@ -54,18 +62,18 @@ var _ = Describe("marketplace command", func() {
 	Describe("Requirements", func() {
 		Context("when the an API endpoint is not targeted", func() {
 			It("does not meet its requirements", func() {
-				config := testconfig.NewRepository()
-				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
+				config = testconfig.NewRepository()
 				requirementsFactory.ApiEndpointSuccess = false
 
-				Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
+				Expect(testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 			})
 			It("should fail with usage when provided any arguments", func() {
-				config := testconfig.NewRepository()
-				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
+				config = testconfig.NewRepository()
 				requirementsFactory.ApiEndpointSuccess = true
-				Expect(testcmd.RunCommand(cmd, []string{"blahblah"}, requirementsFactory)).To(BeFalse())
-				Expect(ui.FailedWithUsage).To(BeTrue())
+				Expect(testcmd.RunCliCommand("marketplace", []string{"blahblah"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage", "No argument"},
+				))
 			})
 		})
 	})
@@ -85,8 +93,7 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			It("lists all of the service offerings for the space", func() {
-				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+				testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)
 
 				args := serviceBuilder.GetServicesForSpaceWithPlansArgsForCall(0)
 				Expect(args).To(Equal("the-space-guid"))
@@ -108,8 +115,7 @@ var _ = Describe("marketplace command", func() {
 				})
 
 				It("lists the service offerings without displaying the paid message", func() {
-					cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-					testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+					testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Getting services from marketplace in org", "my-org", "the-space-name", "my-user"},
@@ -128,8 +134,7 @@ var _ = Describe("marketplace command", func() {
 				It("Displays the list of plans for each service with info", func() {
 					serviceBuilder.GetServiceByNameForSpaceWithPlansReturns(serviceWithAPaidPlan, nil)
 
-					cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-					testcmd.RunCommand(cmd, []string{"-s", "aaa-my-service-offering"}, requirementsFactory)
+					testcmd.RunCliCommand("marketplace", []string{"-s", "aaa-my-service-offering"}, requirementsFactory, updateCommandDependency, false)
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Getting service plan information for service aaa-my-service-offering as my-user..."},
@@ -141,8 +146,7 @@ var _ = Describe("marketplace command", func() {
 				})
 
 				It("informs the user if the service cannot be found", func() {
-					cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-					testcmd.RunCommand(cmd, []string{"-s", "aaa-my-service-offering"}, requirementsFactory)
+					testcmd.RunCliCommand("marketplace", []string{"-s", "aaa-my-service-offering"}, requirementsFactory, updateCommandDependency, false)
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Service offering not found"},
@@ -160,8 +164,7 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			It("tells the user to target a space", func() {
-				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-				testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+				testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"without", "space"},
 				))
@@ -175,11 +178,10 @@ var _ = Describe("marketplace command", func() {
 		})
 
 		It("lists all public service offerings if any are available", func() {
-			serviceBuilder := &testapi.FakeServiceBuilder{}
+			serviceBuilder = &testapi.FakeServiceBuilder{}
 			serviceBuilder.GetAllServicesWithPlansReturns(fakeServiceOfferings, nil)
 
-			cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-			testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+			testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting all services from marketplace"},
@@ -194,8 +196,7 @@ var _ = Describe("marketplace command", func() {
 			serviceBuilder := &testapi.FakeServiceBuilder{}
 			serviceBuilder.GetAllServicesWithPlansReturns([]models.ServiceOffering{}, nil)
 
-			cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-			testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+			testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"No service offerings found"},
@@ -208,8 +209,7 @@ var _ = Describe("marketplace command", func() {
 		Context("when the user passes the -s flag", func() {
 			It("Displays the list of plans for each service with info", func() {
 				serviceBuilder.GetServiceByNameWithPlansReturns(serviceWithAPaidPlan, nil)
-				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-				testcmd.RunCommand(cmd, []string{"-s", "aaa-my-service-offering"}, requirementsFactory)
+				testcmd.RunCliCommand("marketplace", []string{"-s", "aaa-my-service-offering"}, requirementsFactory, updateCommandDependency, false)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting service plan information for service aaa-my-service-offering"},
@@ -221,8 +221,7 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			It("informs the user if the service cannot be found", func() {
-				cmd := NewMarketplaceServices(ui, config, serviceBuilder)
-				testcmd.RunCommand(cmd, []string{"-s", "aaa-my-service-offering"}, requirementsFactory)
+				testcmd.RunCliCommand("marketplace", []string{"-s", "aaa-my-service-offering"}, requirementsFactory, updateCommandDependency, false)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Service offering not found"},

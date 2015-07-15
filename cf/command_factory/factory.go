@@ -254,8 +254,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		repoLocator.GetAuthenticationRepository(),
 	)
 
-	factory.cmdsByName["marketplace"] = service.NewMarketplaceServices(ui, config, serviceBuilder)
-
 	factory.cmdsByName["create-space-quota"] = spacequota.NewCreateSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository(), repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["delete-space-quota"] = spacequota.NewDeleteSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository())
 
