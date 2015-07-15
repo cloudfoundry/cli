@@ -151,7 +151,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				}, {
 					presentCommand("copy-source"),
 				}, {
-					presentCommand("create-app-manifest"),
+					presentNonCodegangstaCommand("create-app-manifest"),
 				},
 			},
 		}, {
