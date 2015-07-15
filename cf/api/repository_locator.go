@@ -49,7 +49,7 @@ type RepositoryLocator struct {
 	domainRepo                      CloudControllerDomainRepository
 	routeRepo                       RouteRepository
 	stackRepo                       stacks.StackRepository
-	serviceRepo                     CloudControllerServiceRepository
+	serviceRepo                     ServiceRepository
 	serviceKeyRepo                  CloudControllerServiceKeyRepository
 	serviceBindingRepo              CloudControllerServiceBindingRepository
 	serviceSummaryRepo              ServiceSummaryRepository
@@ -252,6 +252,11 @@ func (locator RepositoryLocator) SetStackRepository(repo stacks.StackRepository)
 
 func (locator RepositoryLocator) GetStackRepository() stacks.StackRepository {
 	return locator.stackRepo
+}
+
+func (locator RepositoryLocator) SetServiceRepository(repo ServiceRepository) RepositoryLocator {
+	locator.serviceRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetServiceRepository() ServiceRepository {
