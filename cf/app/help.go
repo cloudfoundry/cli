@@ -158,7 +158,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("SERVICES"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("marketplace"),
+					presentNonCodegangstaCommand("marketplace"),
 					presentNonCodegangstaCommand("services"),
 					presentNonCodegangstaCommand("service"),
 				}, {
