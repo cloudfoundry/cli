@@ -34,13 +34,15 @@ type FlagContext interface {
 	Bool(string) bool
 	String(string) string
 	IsSet(string) bool
+	SkipFlagParsing(bool)
 }
 
 type flagContext struct {
-	flagsets map[string]FlagSet
-	args     []string
-	cmdFlags map[string]FlagSet //valid flags for command
-	cursor   int
+	flagsets        map[string]FlagSet
+	args            []string
+	cmdFlags        map[string]FlagSet //valid flags for command
+	cursor          int
+	skipFlagParsing bool
 }
 
 func NewFlagContext(cmdFlags map[string]FlagSet) FlagContext {
@@ -60,7 +62,7 @@ func (c *flagContext) Parse(args ...string) error {
 	for c.cursor <= len(args)-1 {
 		arg := args[c.cursor]
 
-		if strings.HasPrefix(arg, "-") || strings.HasPrefix(arg, "--") {
+		if !c.skipFlagParsing && (strings.HasPrefix(arg, "-") || strings.HasPrefix(arg, "--")) {
 			flg := strings.TrimLeft(strings.TrimLeft(arg, "-"), "-")
 
 			if strings.Contains(flg, "=") {
@@ -164,4 +166,8 @@ func (c *flagContext) Bool(k string) bool {
 		}
 	}
 	return false
+}
+
+func (c *flagContext) SkipFlagParsing(skip bool) {
+	c.skipFlagParsing = skip
 }
