@@ -24,6 +24,7 @@ type Dependency struct {
 	Detector     detection.Detector
 	PluginConfig plugin_config.PluginConfiguration
 	ManifestRepo manifest.ManifestRepository
+	AppManifest  manifest.AppManifest
 	Gateways     map[string]net.Gateway
 	TeePrinter   *terminal.TeePrinter
 	PluginModels *pluginModels
