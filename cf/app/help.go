@@ -186,7 +186,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("orgs"),
 					presentNonCodegangstaCommand("org"),
 				}, {
-					presentCommand("create-org"),
+					presentNonCodegangstaCommand("create-org"),
 					presentCommand("delete-org"),
 					presentCommand("rename-org"),
 				},
