@@ -17,7 +17,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -30,13 +30,21 @@ var _ = Describe("create-service command", func() {
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		cmd                 CreateService
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceBuilder      *fakes.FakeServiceBuilder
 
 		offering1 models.ServiceOffering
 		offering2 models.ServiceOffering
+		deps      command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
+		deps.ServiceBuilder = serviceBuilder
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-service").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -44,7 +52,6 @@ var _ = Describe("create-service command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		serviceRepo = &testapi.FakeServiceRepo{}
 		serviceBuilder = &fakes.FakeServiceBuilder{}
-		cmd = NewCreateService(ui, config, serviceRepo, serviceBuilder)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"
@@ -65,7 +72,7 @@ var _ = Describe("create-service command", func() {
 	})
 
 	var callCreateService = func(args []string) bool {
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("create-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
