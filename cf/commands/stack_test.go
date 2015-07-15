@@ -13,37 +13,44 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cloudfoundry/cli/cf/commands"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
 var _ = Describe("stack command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		cmd                 ListStack
+		config              core_config.Repository
 		repo                *testapi.FakeStackRepository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.RepoLocator = deps.RepoLocator.SetStackRepository(repo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("stack").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		config := testconfig.NewRepositoryWithDefaults()
+		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		repo = &testapi.FakeStackRepository{}
-		cmd = NewListStack(ui, config, repo)
 	})
 
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
 
-			Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
+			Expect(testcmd.RunCliCommand("stack", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 
 		It("fails with usage when not provided exactly one arg", func() {
 			requirementsFactory.LoginSuccess = true
-			Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(testcmd.RunCliCommand("stack", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"Incorrect Usage."},
@@ -60,7 +67,7 @@ var _ = Describe("stack command", func() {
 
 		repo.FindByNameReturns(stack1, nil)
 
-		testcmd.RunCommand(cmd, []string{"Stack-1", "--guid"}, requirementsFactory)
+		testcmd.RunCliCommand("stack", []string{"Stack-1", "--guid"}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(len(ui.Outputs)).To(Equal(1))
 		Expect(ui.Outputs[0]).To(Equal("Stack-1-GUID"))
@@ -75,7 +82,7 @@ var _ = Describe("stack command", func() {
 
 		repo.FindByNameReturns(stack1, nil)
 
-		testcmd.RunCommand(cmd, []string{"Stack-1", "--guid"}, requirementsFactory)
+		testcmd.RunCliCommand("stack", []string{"Stack-1", "--guid"}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(len(ui.Outputs)).To(Equal(1))
 		Expect(ui.Outputs[0]).To(Equal("Stack-1-GUID"))
@@ -84,7 +91,7 @@ var _ = Describe("stack command", func() {
 	It("lists the stack requested", func() {
 		repo.FindByNameReturns(models.Stack{}, errors.New("Stack Stack-1 not found"))
 
-		testcmd.RunCommand(cmd, []string{"Stack-1", "--guid"}, requirementsFactory)
+		testcmd.RunCliCommand("stack", []string{"Stack-1", "--guid"}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(len(ui.Outputs)).To(Equal(1))
 		Expect(ui.Outputs[0]).To(Equal(""))
@@ -93,7 +100,7 @@ var _ = Describe("stack command", func() {
 	It("informs user if stack is not found", func() {
 		repo.FindByNameReturns(models.Stack{}, errors.New("Stack Stack-1 not found"))
 
-		testcmd.RunCommand(cmd, []string{"Stack-1"}, requirementsFactory)
+		testcmd.RunCliCommand("stack", []string{"Stack-1"}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(BeInDisplayOrder(
 			[]string{"FAILED"},
