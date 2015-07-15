@@ -3,13 +3,13 @@ package application
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type SetEnv struct {
@@ -19,16 +19,12 @@ type SetEnv struct {
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewSetEnv(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) *SetEnv {
-	return &SetEnv{
-		ui:      ui,
-		config:  config,
-		appRepo: appRepo,
-	}
+func init() {
+	command_registry.Register(&SetEnv{})
 }
 
-func (cmd *SetEnv) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *SetEnv) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:            "set-env",
 		ShortName:       "se",
 		Description:     T("Set an env variable for an app"),
@@ -37,16 +33,12 @@ func (cmd *SetEnv) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *SetEnv) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 3 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *SetEnv) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 3 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n") + command_registry.Commands.CommandUsage("set-env"))
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -56,7 +48,14 @@ func (cmd *SetEnv) GetRequirements(requirementsFactory requirements.Factory, c *
 	return
 }
 
-func (cmd *SetEnv) Run(c *cli.Context) {
+func (cmd *SetEnv) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
+	return cmd
+}
+
+func (cmd *SetEnv) Execute(c flags.FlagContext) {
 	varName := c.Args()[1]
 	varValue := c.Args()[2]
 	app := cmd.appReq.GetApplication()
