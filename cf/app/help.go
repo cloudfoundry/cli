@@ -147,7 +147,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("unset-env"),
 				}, {
 					presentNonCodegangstaCommand("stacks"),
-					presentCommand("stack"),
+					presentNonCodegangstaCommand("stack"),
 				}, {
 					presentCommand("copy-source"),
 				}, {
