@@ -2625,6 +2625,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires 'app-name env-name' as arguments\n\n",
+      "translation": "Incorrect Usage. Requires 'app-name env-name' as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires 'username password' as arguments\n\n",
       "translation": "Incorrect Usage. Requires 'username password' as arguments\n\n",
       "modified": false

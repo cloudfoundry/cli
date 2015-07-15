@@ -3,13 +3,13 @@ package application
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type UnsetEnv struct {
@@ -19,32 +19,31 @@ type UnsetEnv struct {
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewUnsetEnv(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) (cmd *UnsetEnv) {
-	cmd = new(UnsetEnv)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appRepo = appRepo
-	return
+func init() {
+	command_registry.Register(&UnsetEnv{})
 }
 
-func (cmd *UnsetEnv) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *UnsetEnv) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
+	return cmd
+}
+
+func (cmd *UnsetEnv) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "unset-env",
 		Description: T("Remove an env variable"),
 		Usage:       T("CF_NAME unset-env APP_NAME ENV_VAR_NAME"),
 	}
 }
 
-func (cmd *UnsetEnv) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UnsetEnv) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires 'app-name env-name' as arguments\n\n") + command_registry.Commands.CommandUsage("unset-env"))
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -54,7 +53,7 @@ func (cmd *UnsetEnv) GetRequirements(requirementsFactory requirements.Factory, c
 	return
 }
 
-func (cmd *UnsetEnv) Run(c *cli.Context) {
+func (cmd *UnsetEnv) Execute(c flags.FlagContext) {
 	varName := c.Args()[1]
 	app := cmd.appReq.GetApplication()
 
