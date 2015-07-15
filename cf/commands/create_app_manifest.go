@@ -4,23 +4,19 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
-
-type AppManifestCreater interface {
-	CreateAppManifest(app models.Application, orgName string, spaceName string)
-}
 
 type CreateAppManifest struct {
 	ui               terminal.UI
@@ -31,36 +27,28 @@ type CreateAppManifest struct {
 	manifest         manifest.AppManifest
 }
 
-func NewCreateAppManifest(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository, manifestGenerator manifest.AppManifest) (cmd *CreateAppManifest) {
-	cmd = new(CreateAppManifest)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appSummaryRepo = appSummaryRepo
-	cmd.manifest = manifestGenerator
-	return
+func init() {
+	command_registry.Register(&CreateAppManifest{})
 }
 
-func (cmd *CreateAppManifest) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateAppManifest) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Specify a path for file creation. If path not specified, manifest file is created in current working directory.")}
+
+	return command_registry.CommandMetadata{
 		Name:        "create-app-manifest",
 		Description: T("Create an app manifest for an app that has been pushed successfully."),
 		Usage:       T("CF_NAME create-app-manifest APP [-p /path/to/<app-name>-manifest.yml ]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Specify a path for file creation. If path not specified, manifest file is created in current working directory.")),
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *CreateAppManifest) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *CreateAppManifest) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires app name as argument\n\n") + command_registry.Commands.CommandUsage("logs"))
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -70,7 +58,15 @@ func (cmd *CreateAppManifest) GetRequirements(requirementsFactory requirements.F
 	return
 }
 
-func (cmd *CreateAppManifest) Run(c *cli.Context) {
+func (cmd *CreateAppManifest) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
+	cmd.manifest = deps.AppManifest
+	return cmd
+}
+
+func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
