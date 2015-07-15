@@ -52,6 +52,7 @@ func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.F
 	updateFunc(pluginCall)
 	cmd := command_registry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
+	context.SkipFlagParsing(cmd.MetaData().SkipFlagParsing)
 	err := context.Parse(args...)
 	if err != nil {
 		fmt.Println("ERROR:", err)

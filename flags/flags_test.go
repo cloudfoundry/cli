@@ -126,6 +126,21 @@ var _ = Describe("Flags", func() {
 				Ω(fCtx.Args()[0]).To(Equal("Arg-1"))
 			})
 
+			Context("SkipFlagParsing", func() {
+				It("skips flag parsing and treats all arguments as values", func() {
+					fCtx.SkipFlagParsing(true)
+					err := fCtx.Parse("value1", "--name", "foo")
+					Ω(err).ToNot(HaveOccurred())
+
+					Ω(fCtx.IsSet("name")).To(Equal(false))
+
+					Ω(len(fCtx.Args())).To(Equal(3))
+					Ω(fCtx.Args()[0]).To(Equal("value1"))
+					Ω(fCtx.Args()[1]).To(Equal("--name"))
+					Ω(fCtx.Args()[2]).To(Equal("foo"))
+				})
+			})
+
 		})
 
 	})

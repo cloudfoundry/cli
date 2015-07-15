@@ -51,7 +51,9 @@ func main() {
 		cmd := os.Args[1]
 		if cmdRegistry.CommandExists(cmd) {
 
-			fc := flags.NewFlagContext(cmdRegistry.FindCommand(os.Args[1]).MetaData().Flags)
+			meta := cmdRegistry.FindCommand(os.Args[1]).MetaData()
+			fc := flags.NewFlagContext(meta.Flags)
+			fc.SkipFlagParsing(meta.SkipFlagParsing)
 
 			if requestHelp(os.Args[2:]) {
 				deps.Ui.Say(cmdRegistry.CommandUsage(cmd))
