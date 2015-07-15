@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
+	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -18,16 +20,17 @@ import (
 )
 
 type Dependency struct {
-	Ui           terminal.UI
-	Config       core_config.Repository
-	RepoLocator  api.RepositoryLocator
-	Detector     detection.Detector
-	PluginConfig plugin_config.PluginConfiguration
-	ManifestRepo manifest.ManifestRepository
-	AppManifest  manifest.AppManifest
-	Gateways     map[string]net.Gateway
-	TeePrinter   *terminal.TeePrinter
-	PluginModels *pluginModels
+	Ui             terminal.UI
+	Config         core_config.Repository
+	RepoLocator    api.RepositoryLocator
+	Detector       detection.Detector
+	PluginConfig   plugin_config.PluginConfiguration
+	ManifestRepo   manifest.ManifestRepository
+	AppManifest    manifest.AppManifest
+	Gateways       map[string]net.Gateway
+	TeePrinter     *terminal.TeePrinter
+	PluginModels   *pluginModels
+	ServiceBuilder service_builder.ServiceBuilder
 }
 
 type pluginModels struct {
@@ -75,6 +78,17 @@ func NewDependency() Dependency {
 	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways)
 
 	deps.PluginModels = &pluginModels{Application: nil}
+
+	planBuilder := plan_builder.NewBuilder(
+		deps.RepoLocator.GetServicePlanRepository(),
+		deps.RepoLocator.GetServicePlanVisibilityRepository(),
+		deps.RepoLocator.GetOrganizationRepository(),
+	)
+
+	deps.ServiceBuilder = service_builder.NewBuilder(
+		deps.RepoLocator.GetServiceRepository(),
+		planBuilder,
+	)
 
 	return deps
 }
