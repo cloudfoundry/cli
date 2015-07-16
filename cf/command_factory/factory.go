@@ -118,7 +118,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["rename-service"] = service.NewRenameService(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["rename-service-broker"] = servicebroker.NewRenameServiceBroker(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["rename-space"] = space.NewRenameSpace(ui, config, repoLocator.GetSpaceRepository())
-	factory.cmdsByName["routes"] = route.NewListRoutes(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["check-route"] = route.NewCheckRoute(ui, config, repoLocator.GetRouteRepository(), repoLocator.GetDomainRepository())
 	factory.cmdsByName["service-auth-tokens"] = serviceauthtoken.NewListServiceAuthTokens(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["service-brokers"] = servicebroker.NewListServiceBrokers(ui, config, repoLocator.GetServiceBrokerRepository())
@@ -178,7 +177,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["create-route"] = createRoute
 	factory.cmdsByName["map-route"] = route.NewMapRoute(ui, config, repoLocator.GetRouteRepository(), createRoute)
-	factory.cmdsByName["unmap-route"] = route.NewUnmapRoute(ui, config, repoLocator.GetRouteRepository())
 
 	displayApp := application.NewShowApp(ui, config, repoLocator.GetAppSummaryRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository())
 	start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository(), repoLocator.GetOldLogsRepository())

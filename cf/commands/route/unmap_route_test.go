@@ -2,7 +2,7 @@ package route_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/route"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -18,10 +18,18 @@ import (
 var _ = Describe("unmap-route command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		routeRepo           *testapi.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unmap-route").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
@@ -31,8 +39,7 @@ var _ = Describe("unmap-route command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewUnmapRoute(ui, configRepo, routeRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("unmap-route", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when the user is not logged in", func() {
@@ -49,7 +56,9 @@ var _ = Describe("unmap-route command", func() {
 		Context("when the user does not provide two args", func() {
 			It("fails with usage", func() {
 				runCommand()
-				Expect(ui.FailedWithUsage).To(BeTrue())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage", "Requires", "arguments"},
+				))
 			})
 		})
 

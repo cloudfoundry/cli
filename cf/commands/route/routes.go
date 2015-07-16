@@ -1,16 +1,18 @@
 package route
 
 import (
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
 
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
+
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type ListRoutes struct {
@@ -19,36 +21,42 @@ type ListRoutes struct {
 	config    core_config.Reader
 }
 
-func NewListRoutes(ui terminal.UI, config core_config.Reader, routeRepo api.RouteRepository) (cmd ListRoutes) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.routeRepo = routeRepo
-	return
+func init() {
+	command_registry.Register(&ListRoutes{})
 }
 
-func (cmd ListRoutes) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ListRoutes) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["orglevel"] = &cliFlags.BoolFlag{Name: "orglevel", Usage: T("List all the routes for all spaces of current organization")}
+
+	return command_registry.CommandMetadata{
 		Name:        "routes",
 		ShortName:   "r",
 		Description: T("List all routes in the current space or the current organization"),
 		Usage:       "CF_NAME routes",
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "orglevel", Usage: T("List all the routes for all spaces of current organization")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd ListRoutes) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ListRoutes) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("routes"))
 	}
+
 	return []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}, nil
 }
 
-func (cmd ListRoutes) Run(c *cli.Context) {
+func (cmd *ListRoutes) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
+	return cmd
+}
+
+func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Getting routes as {{.Username}} ...\n",
 		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
