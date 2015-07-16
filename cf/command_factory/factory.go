@@ -103,7 +103,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["delete-buildpack"] = buildpack.NewDeleteBuildpack(ui, repoLocator.GetBuildpackRepository())
 	factory.cmdsByName["delete-domain"] = domain.NewDeleteDomain(ui, config, repoLocator.GetDomainRepository())
 	factory.cmdsByName["delete-shared-domain"] = domain.NewDeleteSharedDomain(ui, config, repoLocator.GetDomainRepository())
-	factory.cmdsByName["delete-org"] = organization.NewDeleteOrg(ui, config, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["delete-orphaned-routes"] = route.NewDeleteOrphanedRoutes(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["delete-route"] = route.NewDeleteRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["delete-service"] = service.NewDeleteService(ui, config, repoLocator.GetServiceRepository())
