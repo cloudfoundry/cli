@@ -2,7 +2,7 @@ package domain_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/commands/domain"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,8 +21,16 @@ var _ = Describe("create domain command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
 		domainRepo          *testapi.FakeDomainRepository
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-domain").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
@@ -32,19 +40,25 @@ var _ = Describe("create domain command", func() {
 
 	runCommand := func(args ...string) bool {
 		ui = new(testterm.FakeUI)
-		cmd := domain.NewCreateDomain(ui, configRepo, domainRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("create-domain", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails with usage", func() {
 		runCommand("")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 
 		runCommand("org1")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 
 		runCommand("org1", "example.com")
-		Expect(ui.FailedWithUsage).To(BeFalse())
+		Expect(ui.Outputs).ToNot(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
+
 	})
 
 	Context("checks login", func() {

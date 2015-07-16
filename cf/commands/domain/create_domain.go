@@ -2,12 +2,12 @@ package domain
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type CreateDomain struct {
@@ -17,32 +17,24 @@ type CreateDomain struct {
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewCreateDomain(ui terminal.UI, config core_config.Reader, domainRepo api.DomainRepository) (cmd *CreateDomain) {
-	cmd = new(CreateDomain)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.domainRepo = domainRepo
-	return
+func init() {
+	command_registry.Register(&CreateDomain{})
 }
 
-func (cmd *CreateDomain) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateDomain) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "create-domain",
 		Description: T("Create a domain in an org for later use"),
 		Usage:       T("CF_NAME create-domain ORG DOMAIN"),
 	}
 }
 
-func (cmd *CreateDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *CreateDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires org_name, domain_name as arguments\n\n") + command_registry.Commands.CommandUsage("create-domain"))
 	}
 
-	if cmd.orgReq == nil {
-		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
-	} else {
-		cmd.orgReq.SetOrganizationName(c.Args()[0])
-	}
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.orgReq,
@@ -50,7 +42,14 @@ func (cmd *CreateDomain) GetRequirements(requirementsFactory requirements.Factor
 	return
 }
 
-func (cmd *CreateDomain) Run(c *cli.Context) {
+func (cmd *CreateDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
+	return cmd
+}
+
+func (cmd *CreateDomain) Execute(c flags.FlagContext) {
 	domainName := c.Args()[1]
 	owningOrg := cmd.orgReq.GetOrganization()
 

@@ -46,7 +46,7 @@ type RepositoryLocator struct {
 	appInstancesRepo                app_instances.AppInstancesRepository
 	appEventsRepo                   app_events.AppEventsRepository
 	appFilesRepo                    api_app_files.AppFilesRepository
-	domainRepo                      CloudControllerDomainRepository
+	domainRepo                      DomainRepository
 	routeRepo                       RouteRepository
 	stackRepo                       stacks.StackRepository
 	serviceRepo                     ServiceRepository
@@ -235,6 +235,11 @@ func (locator RepositoryLocator) SetAppFileRepository(repo api_app_files.AppFile
 
 func (locator RepositoryLocator) GetAppFilesRepository() api_app_files.AppFilesRepository {
 	return locator.appFilesRepo
+}
+
+func (locator RepositoryLocator) SetDomainRepository(repo DomainRepository) RepositoryLocator {
+	locator.domainRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetDomainRepository() DomainRepository {

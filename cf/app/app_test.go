@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_factory"
+	"github.com/cloudfoundry/cli/cf/commands/domain"
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/trace"
@@ -48,6 +49,9 @@ var _ = Describe("App", func() {
 		app       *cli.App
 		cmdRunner *FakeRunner
 	)
+
+	//make a reference to something in cf/commands/domain, so all init() in the directory will run
+	_ = domain.CreateDomain{}
 
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}
