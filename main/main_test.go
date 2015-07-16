@@ -123,13 +123,13 @@ var _ = Describe("main", func() {
 
 		Context("When TotalArgs is set in the metadata for a command", func() {
 			It("will only validate flags in the argument position after position <TotalArgs>", func() {
-				result := Cf("create-buildpack", "buildpack_name", "location/to/nowhere", "-100", "-bad_flag")
+				result := Cf("install-plugin", "-100", "-bad_flag")
 				Eventually(result.Out).ShouldNot(Say("\"-100\""))
 				Eventually(result.Out).Should(Say("\"-bad_flag\""))
 			})
 
 			It("will not validate arguments before the position <TotalArgs>", func() {
-				result := Cf("create-buildpack", "-bad-flag", "--bad-flag2")
+				result := Cf("add-plugin-repo", "-bad-flag", "--bad-flag2")
 				Eventually(result.Out).ShouldNot(Say("\"-bad-flag\""))
 				Eventually(result.Out).ShouldNot(Say("\"--bad_flag2\""))
 			})

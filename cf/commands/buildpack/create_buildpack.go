@@ -5,15 +5,16 @@ import (
 	"strconv"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type CreateBuildpack struct {
@@ -22,40 +23,45 @@ type CreateBuildpack struct {
 	buildpackBitsRepo api.BuildpackBitsRepository
 }
 
-func NewCreateBuildpack(ui terminal.UI, buildpackRepo api.BuildpackRepository, buildpackBitsRepo api.BuildpackBitsRepository) (cmd CreateBuildpack) {
-	cmd.ui = ui
-	cmd.buildpackRepo = buildpackRepo
-	cmd.buildpackBitsRepo = buildpackBitsRepo
-	return
+func init() {
+	command_registry.Register(&CreateBuildpack{})
 }
 
-func (cmd CreateBuildpack) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateBuildpack) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["enable"] = &cliFlags.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")}
+	fs["disable"] = &cliFlags.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")}
+
+	return command_registry.CommandMetadata{
 		Name:        "create-buildpack",
 		Description: T("Create a buildpack"),
 		Usage: T("CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]") +
 			T("\n\nTIP:\n") + T("   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")},
-			cli.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")},
-		},
+		Flags:     fs,
 		TotalArgs: 3,
 	}
 }
 
-func (cmd CreateBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 3 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n") + command_registry.Commands.CommandUsage("create-buildpack"))
+	}
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
+
 	return
 }
 
-func (cmd CreateBuildpack) Run(c *cli.Context) {
-	if len(c.Args()) != 3 {
-		cmd.ui.FailWithUsage(c)
-		return
-	}
+func (cmd *CreateBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
+	cmd.buildpackBitsRepo = deps.RepoLocator.GetBuildpackBitsRepository()
+	return cmd
+}
 
+func (cmd *CreateBuildpack) Execute(c flags.FlagContext) {
 	buildpackName := c.Args()[0]
 
 	cmd.ui.Say(T("Creating buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
@@ -92,7 +98,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	cmd.ui.Ok()
 }
 
-func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiErr error) {
+func (cmd CreateBuildpack) createBuildpack(buildpackName string, c flags.FlagContext) (buildpack models.Buildpack, apiErr error) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
 		apiErr = errors.NewWithFmt(T("Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.", map[string]interface{}{"ErrorDescription": c.Args()[2]}))

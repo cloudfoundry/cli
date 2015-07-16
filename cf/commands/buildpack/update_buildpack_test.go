@@ -8,7 +8,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/buildpack"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,7 +34,15 @@ var _ = Describe("Updating buildpack command", func() {
 		ui                  *testterm.FakeUI
 		repo                *testapi.FakeBuildpackRepository
 		bitsRepo            *testapi.FakeBuildpackBitsRepository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(repo)
+		deps.RepoLocator = deps.RepoLocator.SetBuildpackBitsRepository(bitsRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-buildpack").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
@@ -44,8 +52,7 @@ var _ = Describe("Updating buildpack command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewUpdateBuildpack(ui, repo, bitsRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("update-buildpack", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("is only successful on login and buildpack success", func() {
