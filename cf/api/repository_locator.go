@@ -62,8 +62,8 @@ type RepositoryLocator struct {
 	servicePlanRepo                 CloudControllerServicePlanRepository
 	servicePlanVisibilityRepo       ServicePlanVisibilityRepository
 	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
-	buildpackRepo                   CloudControllerBuildpackRepository
-	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
+	buildpackRepo                   BuildpackRepository
+	buildpackBitsRepo               BuildpackBitsRepository
 	securityGroupRepo               security_groups.SecurityGroupRepo
 	stagingSecurityGroupRepo        staging.StagingSecurityGroupsRepo
 	runningSecurityGroupRepo        running.RunningSecurityGroupsRepo
@@ -336,8 +336,18 @@ func (locator RepositoryLocator) GetUserProvidedServiceInstanceRepository() User
 	return locator.userProvidedServiceInstanceRepo
 }
 
+func (locator RepositoryLocator) SetBuildpackRepository(repo BuildpackRepository) RepositoryLocator {
+	locator.buildpackRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetBuildpackRepository() BuildpackRepository {
 	return locator.buildpackRepo
+}
+
+func (locator RepositoryLocator) SetBuildpackBitsRepository(repo BuildpackBitsRepository) RepositoryLocator {
+	locator.buildpackBitsRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepository {

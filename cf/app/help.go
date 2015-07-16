@@ -231,9 +231,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("BUILDPACKS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("buildpacks"),
-					presentCommand("create-buildpack"),
-					presentCommand("update-buildpack"),
+					presentNonCodegangstaCommand("buildpacks"),
+					presentNonCodegangstaCommand("create-buildpack"),
+					presentNonCodegangstaCommand("update-buildpack"),
 					presentCommand("rename-buildpack"),
 					presentCommand("delete-buildpack"),
 				},

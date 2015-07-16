@@ -2,7 +2,7 @@ package buildpack_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/commands/buildpack"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -18,7 +18,14 @@ var _ = Describe("ListBuildpacks", func() {
 		ui                  *testterm.FakeUI
 		buildpackRepo       *testapi.FakeBuildpackRepository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(buildpackRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("buildpacks").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -27,14 +34,15 @@ var _ = Describe("ListBuildpacks", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := buildpack.NewListBuildpacks(ui, buildpackRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("buildpacks", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("should fail with usage when provided any arguments", func() {
 		requirementsFactory.LoginSuccess = true
 		Expect(runCommand("blahblah")).To(BeFalse())
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "No argument required"},
+		))
 	})
 
 	It("fails requirements when login fails", func() {

@@ -138,9 +138,9 @@ var _ = Describe("factory", func() {
 
 	Describe("GetCommandTotalArgs", func() {
 		It("returns the total number of argument required by the command ", func() {
-			totalArgs, err := factory.GetCommandTotalArgs("create-buildpack")
+			totalArgs, err := factory.GetCommandTotalArgs("install-plugin")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(totalArgs).To(Equal(3))
+			Expect(totalArgs).To(Equal(1))
 		})
 
 		It("returns an error if command does not exist", func() {
