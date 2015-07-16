@@ -220,11 +220,11 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentNonCodegangstaCommand("routes"),
 					presentCommand("create-route"),
-					presentCommand("check-route"),
+					presentNonCodegangstaCommand("check-route"),
 					presentCommand("map-route"),
 					presentNonCodegangstaCommand("unmap-route"),
-					presentCommand("delete-route"),
-					presentCommand("delete-orphaned-routes"),
+					presentNonCodegangstaCommand("delete-route"),
+					presentNonCodegangstaCommand("delete-orphaned-routes"),
 				},
 			},
 		}, {

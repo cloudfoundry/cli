@@ -2,12 +2,12 @@ package route
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type CheckRoute struct {
@@ -17,28 +17,23 @@ type CheckRoute struct {
 	domainRepo api.DomainRepository
 }
 
-func NewCheckRoute(ui terminal.UI, config core_config.Reader, routeRepo api.RouteRepository, domainRepo api.DomainRepository) (cmd *CheckRoute) {
-	cmd = new(CheckRoute)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.routeRepo = routeRepo
-	cmd.domainRepo = domainRepo
-	return
+func init() {
+	command_registry.Register(&CheckRoute{})
 }
 
-func (cmd *CheckRoute) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CheckRoute) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "check-route",
 		Description: T("Perform a simple check to determine whether a route currently exists or not."),
 		Usage:       T("CF_NAME check-route HOST DOMAIN"),
 	}
 }
 
-func (cmd *CheckRoute) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
-		return
+func (cmd *CheckRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires host and domain as arguments\n\n") + command_registry.Commands.CommandUsage("check-route"))
 	}
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewTargetedOrgRequirement(),
 		requirementsFactory.NewLoginRequirement(),
@@ -46,7 +41,15 @@ func (cmd *CheckRoute) GetRequirements(requirementsFactory requirements.Factory,
 	return
 }
 
-func (cmd *CheckRoute) Run(c *cli.Context) {
+func (cmd *CheckRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
+	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
+	return cmd
+}
+
+func (cmd *CheckRoute) Execute(c flags.FlagContext) {
 	hostName := c.Args()[0]
 	domainName := c.Args()[1]
 

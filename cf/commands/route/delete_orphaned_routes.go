@@ -2,13 +2,14 @@ package route
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DeleteOrphanedRoutes struct {
@@ -17,34 +18,39 @@ type DeleteOrphanedRoutes struct {
 	config    core_config.Reader
 }
 
-func NewDeleteOrphanedRoutes(ui terminal.UI, config core_config.Reader, routeRepo api.RouteRepository) (cmd DeleteOrphanedRoutes) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.routeRepo = routeRepo
-	return
+func init() {
+	command_registry.Register(&DeleteOrphanedRoutes{})
 }
 
-func (cmd DeleteOrphanedRoutes) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *DeleteOrphanedRoutes) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
+
+	return command_registry.CommandMetadata{
 		Name:        "delete-orphaned-routes",
 		Description: T("Delete all orphaned routes (e.g.: those that are not mapped to an app)"),
 		Usage:       T("CF_NAME delete-orphaned-routes [-f]"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd DeleteOrphanedRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *DeleteOrphanedRoutes) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("delete-orphaned-routes"))
 	}
-	reqs = append(reqs, reqFactory.NewLoginRequirement())
+
+	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	return
 }
 
-func (cmd DeleteOrphanedRoutes) Run(c *cli.Context) {
+func (cmd *DeleteOrphanedRoutes) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
+	return cmd
+}
 
+func (cmd *DeleteOrphanedRoutes) Execute(c flags.FlagContext) {
 	force := c.Bool("f")
 	if !force {
 		response := cmd.ui.Confirm(T("Really delete orphaned routes?{{.Prompt}}",

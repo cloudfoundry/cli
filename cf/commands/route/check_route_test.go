@@ -4,13 +4,13 @@ import (
 	"errors"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/route"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,8 +22,17 @@ var _ = Describe("check-route command", func() {
 		routeRepo           *testapi.FakeRouteRepository
 		domainRepo          *testapi.FakeDomainRepository
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.ReadWriter
+		config              core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("check-route").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -34,7 +43,7 @@ var _ = Describe("check-route command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewCheckRoute(ui, config, routeRepo, domainRepo), args, requirementsFactory)
+		return testcmd.RunCliCommand("check-route", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -55,7 +64,9 @@ var _ = Describe("check-route command", func() {
 			passed := runCommand("foobar.example.com", "hello", "world")
 
 			Expect(passed).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 
 		It("fails when the number of arguments is less than two", func() {
@@ -64,7 +75,9 @@ var _ = Describe("check-route command", func() {
 			passed := runCommand("foobar.example.com")
 
 			Expect(passed).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 	})
 
