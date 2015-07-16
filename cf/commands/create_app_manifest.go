@@ -129,7 +129,9 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 	}
 
 	if len(app.Routes) > 0 {
-		cmd.manifest.Domain(app.Name, app.Routes[0].Host, app.Routes[0].Domain.Name)
+		for i := 0; i < len(app.Routes); i++ {
+			cmd.manifest.Domain(app.Name, app.Routes[i].Host, app.Routes[i].Domain.Name)
+		}
 	}
 
 	err := cmd.manifest.Save()
