@@ -2,7 +2,7 @@ package organization_test
 
 import (
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/commands/organization"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,8 +20,16 @@ var _ = Describe("rename-org command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		orgRepo             *test_org.FakeOrganizationRepository
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("rename-org").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
@@ -31,16 +39,19 @@ var _ = Describe("rename-org command", func() {
 	})
 
 	var callRenameOrg = func(args []string) bool {
-		cmd := organization.NewRenameOrg(ui, configRepo, orgRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("rename-org", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails with usage when given less than two args", func() {
 		callRenameOrg([]string{})
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 
 		callRenameOrg([]string{"foo"})
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 	})
 
 	It("fails requirements when not logged in", func() {

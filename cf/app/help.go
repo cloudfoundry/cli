@@ -188,7 +188,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				}, {
 					presentNonCodegangstaCommand("create-org"),
 					presentNonCodegangstaCommand("delete-org"),
-					presentCommand("rename-org"),
+					presentNonCodegangstaCommand("rename-org"),
 				},
 			},
 		}, {
@@ -207,11 +207,11 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("DOMAINS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("domains"),
-					presentCommand("create-domain"),
-					presentCommand("delete-domain"),
-					presentCommand("create-shared-domain"),
-					presentCommand("delete-shared-domain"),
+					presentNonCodegangstaCommand("domains"),
+					presentNonCodegangstaCommand("create-domain"),
+					presentNonCodegangstaCommand("delete-domain"),
+					presentNonCodegangstaCommand("create-shared-domain"),
+					presentNonCodegangstaCommand("delete-shared-domain"),
 				},
 			},
 		}, {

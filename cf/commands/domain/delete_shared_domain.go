@@ -2,13 +2,14 @@ package domain
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DeleteSharedDomain struct {
@@ -18,28 +19,25 @@ type DeleteSharedDomain struct {
 	domainRepo api.DomainRepository
 }
 
-func NewDeleteSharedDomain(ui terminal.UI, config core_config.Reader, repo api.DomainRepository) (cmd *DeleteSharedDomain) {
-	cmd = new(DeleteSharedDomain)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.domainRepo = repo
-	return
+func init() {
+	command_registry.Register(&DeleteSharedDomain{})
 }
 
-func (cmd *DeleteSharedDomain) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *DeleteSharedDomain) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
+
+	return command_registry.CommandMetadata{
 		Name:        "delete-shared-domain",
 		Description: T("Delete a shared domain"),
 		Usage:       T("CF_NAME delete-shared-domain DOMAIN [-f]"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *DeleteSharedDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *DeleteSharedDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-shared-domain"))
 	}
 
 	loginReq := requirementsFactory.NewLoginRequirement()
@@ -53,7 +51,14 @@ func (cmd *DeleteSharedDomain) GetRequirements(requirementsFactory requirements.
 	return
 }
 
-func (cmd *DeleteSharedDomain) Run(c *cli.Context) {
+func (cmd *DeleteSharedDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
+	return cmd
+}
+
+func (cmd *DeleteSharedDomain) Execute(c flags.FlagContext) {
 	domainName := c.Args()[0]
 	force := c.Bool("f")
 

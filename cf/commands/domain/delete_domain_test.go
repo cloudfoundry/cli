@@ -2,7 +2,7 @@ package domain_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/domain"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,12 +18,19 @@ import (
 
 var _ = Describe("delete-domain command", func() {
 	var (
-		cmd                 *DeleteDomain
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		domainRepo          *testapi.FakeDomainRepository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-domain").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{
@@ -39,8 +46,7 @@ var _ = Describe("delete-domain command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd = NewDeleteDomain(ui, configRepo, domainRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete-domain", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
