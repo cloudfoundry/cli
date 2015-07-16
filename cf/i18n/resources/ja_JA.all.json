@@ -2645,6 +2645,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
+      "translation": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires arguments\n\n",
       "translation": "Incorrect Usage. Requires arguments\n\n",
       "modified": false
