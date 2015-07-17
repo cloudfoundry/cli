@@ -2,16 +2,17 @@ package quota
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strconv"
 
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type showQuota struct {
@@ -20,25 +21,21 @@ type showQuota struct {
 	quotaRepo quotas.QuotaRepository
 }
 
-func NewShowQuota(ui terminal.UI, config core_config.Reader, quotaRepo quotas.QuotaRepository) *showQuota {
-	return &showQuota{
-		ui:        ui,
-		config:    config,
-		quotaRepo: quotaRepo,
-	}
+func init() {
+	command_registry.Register(&showQuota{})
 }
 
-func (cmd *showQuota) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *showQuota) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "quota",
 		Usage:       T("CF_NAME quota QUOTA"),
 		Description: T("Show quota info"),
 	}
 }
 
-func (cmd *showQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *showQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("quota"))
 	}
 
 	return []requirements.Requirement{
@@ -46,8 +43,15 @@ func (cmd *showQuota) GetRequirements(requirementsFactory requirements.Factory, 
 	}, nil
 }
 
-func (cmd *showQuota) Run(context *cli.Context) {
-	quotaName := context.Args()[0]
+func (cmd *showQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
+	return cmd
+}
+
+func (cmd *showQuota) Execute(c flags.FlagContext) {
+	quotaName := c.Args()[0]
 	cmd.ui.Say(T("Getting quota {{.QuotaName}} info as {{.Username}}...", map[string]interface{}{"QuotaName": quotaName, "Username": cmd.config.Username()}))
 
 	quota, err := cmd.quotaRepo.FindByName(quotaName)

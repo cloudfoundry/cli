@@ -2,7 +2,7 @@ package buildpack_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/buildpack"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,7 +19,14 @@ var _ = Describe("delete-buildpack command", func() {
 		ui                  *testterm.FakeUI
 		buildpackRepo       *testapi.FakeBuildpackRepository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(buildpackRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-buildpack").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -28,8 +35,7 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewDeleteBuildpack(ui, buildpackRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete-buildpack", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when the user is not logged in", func() {

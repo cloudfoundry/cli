@@ -2,7 +2,7 @@ package buildpack_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/buildpack"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -16,26 +16,33 @@ import (
 
 var _ = Describe("rename-buildpack command", func() {
 	var (
-		cmd                 *RenameBuildpack
 		fakeRepo            *testapi.FakeBuildpackRepository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(fakeRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("rename-buildpack").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		ui = new(testterm.FakeUI)
 		fakeRepo = &testapi.FakeBuildpackRepository{}
-		cmd = NewRenameBuildpack(ui, fakeRepo)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("rename-buildpack", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails requirements when called without the current name and the new name to use", func() {
 		passed := runCommand("my-buildpack-name")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 		Expect(passed).To(BeFalse())
 	})
 

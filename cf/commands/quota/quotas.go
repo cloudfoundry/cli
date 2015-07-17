@@ -2,16 +2,17 @@ package quota
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strconv"
 
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type ListQuotas struct {
@@ -20,33 +21,37 @@ type ListQuotas struct {
 	quotaRepo quotas.QuotaRepository
 }
 
-func NewListQuotas(ui terminal.UI, config core_config.Reader, quotaRepo quotas.QuotaRepository) (cmd *ListQuotas) {
-	return &ListQuotas{
-		ui:        ui,
-		config:    config,
-		quotaRepo: quotaRepo,
-	}
+func init() {
+	command_registry.Register(&ListQuotas{})
 }
 
-func (cmd *ListQuotas) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ListQuotas) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "quotas",
 		Description: T("List available usage quotas"),
 		Usage:       T("CF_NAME quotas"),
 	}
 }
 
-func (cmd *ListQuotas) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ListQuotas) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("quotas"))
 	}
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }
 
-func (cmd *ListQuotas) Run(c *cli.Context) {
+func (cmd *ListQuotas) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
+	return cmd
+}
+
+func (cmd *ListQuotas) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Getting quotas as {{.Username}}...", map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	quotas, apiErr := cmd.quotaRepo.FindAll()
