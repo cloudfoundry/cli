@@ -2,16 +2,43 @@ package buildpack
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type RenameBuildpack struct {
 	ui            terminal.UI
 	buildpackRepo api.BuildpackRepository
+}
+
+func init() {
+	command_registry.Register(&RenameBuildpack{})
+}
+
+func (cmd *RenameBuildpack) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
+		Name:        "rename-buildpack",
+		Description: T("Rename a buildpack"),
+		Usage:       T("CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"),
+	}
+}
+
+func (cmd *RenameBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n") + command_registry.Commands.CommandUsage("rename-buildpack"))
+	}
+
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
+	return
+}
+
+func (cmd *RenameBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
+	return cmd
 }
 
 func NewRenameBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *RenameBuildpack) {
@@ -21,24 +48,7 @@ func NewRenameBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *Rena
 	return
 }
 
-func (cmd *RenameBuildpack) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
-		Name:        "rename-buildpack",
-		Description: T("Rename a buildpack"),
-		Usage:       T("CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"),
-	}
-}
-
-func (cmd *RenameBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
-	}
-
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	return
-}
-
-func (cmd *RenameBuildpack) Run(c *cli.Context) {
+func (cmd *RenameBuildpack) Execute(c flags.FlagContext) {
 	buildpackName := c.Args()[0]
 	newBuildpackName := c.Args()[1]
 

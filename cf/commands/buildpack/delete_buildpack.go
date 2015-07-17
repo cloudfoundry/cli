@@ -2,12 +2,13 @@ package buildpack
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DeleteBuildpack struct {
@@ -15,27 +16,31 @@ type DeleteBuildpack struct {
 	buildpackRepo api.BuildpackRepository
 }
 
-func NewDeleteBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *DeleteBuildpack) {
-	cmd = new(DeleteBuildpack)
-	cmd.ui = ui
-	cmd.buildpackRepo = repo
-	return
+func init() {
+	command_registry.Register(&DeleteBuildpack{})
 }
 
-func (cmd *DeleteBuildpack) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *DeleteBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
+	return cmd
+}
+
+func (cmd *DeleteBuildpack) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
+
+	return command_registry.CommandMetadata{
 		Name:        "delete-buildpack",
 		Description: T("Delete a buildpack"),
 		Usage:       T("CF_NAME delete-buildpack BUILDPACK [-f]"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *DeleteBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *DeleteBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage.\n\n") + command_registry.Commands.CommandUsage("delete-buildpack"))
 	}
 
 	loginReq := requirementsFactory.NewLoginRequirement()
@@ -47,7 +52,7 @@ func (cmd *DeleteBuildpack) GetRequirements(requirementsFactory requirements.Fac
 	return
 }
 
-func (cmd *DeleteBuildpack) Run(c *cli.Context) {
+func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) {
 	buildpackName := c.Args()[0]
 
 	force := c.Bool("f")

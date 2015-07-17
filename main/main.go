@@ -13,6 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/command_runner"
+	"github.com/cloudfoundry/cli/cf/commands/buildpack"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
@@ -46,6 +47,7 @@ type cliDependencies struct {
 func main() {
 	//make a reference to something in cf/commands/domain, so all init() in the directory will run
 	_ = domain.CreateDomain{}
+	_ = buildpack.ListBuildpacks{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()

@@ -2610,6 +2610,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage.\n\n",
+      "translation": "Incorrect Usage.\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
       "translation": "Utilização incorreta. Sinalizadores da linha de comando (com exceção de -f) não podem ser utilizados quando enviando multiplos apps através de um arquivo de manifesto.",
       "modified": false
@@ -2632,6 +2637,11 @@
    {
       "id": "Incorrect Usage. Requires 'username password' as arguments\n\n",
       "translation": "Incorrect Usage. Requires 'username password' as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
+      "translation": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
       "modified": false
    },
    {

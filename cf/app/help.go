@@ -234,8 +234,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("buildpacks"),
 					presentNonCodegangstaCommand("create-buildpack"),
 					presentNonCodegangstaCommand("update-buildpack"),
-					presentCommand("rename-buildpack"),
-					presentCommand("delete-buildpack"),
+					presentNonCodegangstaCommand("rename-buildpack"),
+					presentNonCodegangstaCommand("delete-buildpack"),
 				},
 			},
 		}, {
@@ -258,8 +258,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("ORG ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("quotas"),
-					presentCommand("quota"),
+					presentNonCodegangstaCommand("quotas"),
+					presentNonCodegangstaCommand("quota"),
 					presentCommand("set-quota"),
 				}, {
 					presentCommand("create-quota"),
