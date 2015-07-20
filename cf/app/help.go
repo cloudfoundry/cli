@@ -262,9 +262,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("quota"),
 					presentNonCodegangstaCommand("set-quota"),
 				}, {
-					presentCommand("create-quota"),
-					presentCommand("delete-quota"),
-					presentCommand("update-quota"),
+					presentNonCodegangstaCommand("create-quota"),
+					presentNonCodegangstaCommand("delete-quota"),
+					presentNonCodegangstaCommand("update-quota"),
 				},
 				{
 					presentCommand("share-private-domain"),
