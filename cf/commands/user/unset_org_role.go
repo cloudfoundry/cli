@@ -2,13 +2,13 @@ package user
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type UnsetOrgRole struct {
@@ -19,17 +19,12 @@ type UnsetOrgRole struct {
 	orgReq   requirements.OrganizationRequirement
 }
 
-func NewUnsetOrgRole(ui terminal.UI, config core_config.Reader, userRepo api.UserRepository) (cmd *UnsetOrgRole) {
-	cmd = new(UnsetOrgRole)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.userRepo = userRepo
-
-	return
+func init() {
+	command_registry.Register(&UnsetOrgRole{})
 }
 
-func (cmd *UnsetOrgRole) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *UnsetOrgRole) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "unset-org-role",
 		Description: T("Remove an org role from a user"),
 		Usage: T("CF_NAME unset-org-role USERNAME ORG ROLE\n\n") +
@@ -40,17 +35,13 @@ func (cmd *UnsetOrgRole) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *UnsetOrgRole) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 3 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 3 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("unset-org-role"))
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(c.Args()[0])
-	if cmd.orgReq == nil {
-		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[1])
-	} else {
-		cmd.orgReq.SetOrganizationName(c.Args()[1])
-	}
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -61,7 +52,14 @@ func (cmd *UnsetOrgRole) GetRequirements(requirementsFactory requirements.Factor
 	return
 }
 
-func (cmd *UnsetOrgRole) Run(c *cli.Context) {
+func (cmd *UnsetOrgRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	return cmd
+}
+
+func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
 	role := models.UserInputToOrgRole[c.Args()[2]]
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()

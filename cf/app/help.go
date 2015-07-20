@@ -243,15 +243,15 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentCommand("create-user"),
-					presentCommand("delete-user"),
+					presentNonCodegangstaCommand("delete-user"),
 				}, {
 					presentNonCodegangstaCommand("org-users"),
-					presentCommand("set-org-role"),
-					presentCommand("unset-org-role"),
+					presentNonCodegangstaCommand("set-org-role"),
+					presentNonCodegangstaCommand("unset-org-role"),
 				}, {
 					presentNonCodegangstaCommand("space-users"),
 					presentCommand("set-space-role"),
-					presentCommand("unset-space-role"),
+					presentNonCodegangstaCommand("unset-space-role"),
 				},
 			},
 		}, {

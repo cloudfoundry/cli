@@ -2650,6 +2650,16 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires an argument\n\n",
       "translation": "Incorrect Usage. Requires an argument\n\n",
       "modified": false
@@ -2832,11 +2842,6 @@
    {
       "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
       "translation": "Invalid délai param: {{.Timeout}}\n{{.Err}}",
-      "modified": false
-   },
-   {
-      "id": "Invalid usage",
-      "translation": "Utilisation non valide",
       "modified": false
    },
    {
