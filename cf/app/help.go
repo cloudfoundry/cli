@@ -199,8 +199,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("space"),
 				}, {
 					presentCommand("create-space"),
-					presentCommand("delete-space"),
-					presentCommand("rename-space"),
+					presentNonCodegangstaCommand("delete-space"),
+					presentNonCodegangstaCommand("rename-space"),
 				},
 			},
 		}, {
