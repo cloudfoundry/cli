@@ -2,7 +2,7 @@ package space_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/space"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -18,10 +18,18 @@ import (
 var _ = Describe("rename-space command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		spaceRepo           *testapi.FakeSpaceRepository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("rename-space").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
@@ -31,8 +39,7 @@ var _ = Describe("rename-space command", func() {
 	})
 
 	var callRenameSpace = func(args []string) bool {
-		cmd := NewRenameSpace(ui, configRepo, spaceRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("rename-space", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("when the user is not logged in", func() {
@@ -54,7 +61,9 @@ var _ = Describe("rename-space command", func() {
 	Describe("when the user provides fewer than two args", func() {
 		It("fails with usage", func() {
 			callRenameSpace([]string{"foo"})
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 	})
 

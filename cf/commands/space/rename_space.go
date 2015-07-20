@@ -2,12 +2,12 @@ package space
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type RenameSpace struct {
@@ -17,32 +17,24 @@ type RenameSpace struct {
 	spaceReq  requirements.SpaceRequirement
 }
 
-func NewRenameSpace(ui terminal.UI, config core_config.ReadWriter, spaceRepo spaces.SpaceRepository) (cmd *RenameSpace) {
-	cmd = new(RenameSpace)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.spaceRepo = spaceRepo
-	return
+func init() {
+	command_registry.Register(&RenameSpace{})
 }
 
-func (cmd *RenameSpace) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *RenameSpace) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "rename-space",
 		Description: T("Rename a space"),
 		Usage:       T("CF_NAME rename-space SPACE NEW_SPACE"),
 	}
 }
 
-func (cmd *RenameSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *RenameSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n") + command_registry.Commands.CommandUsage("rename-space"))
 	}
 
-	if cmd.spaceReq == nil {
-		cmd.spaceReq = requirementsFactory.NewSpaceRequirement(c.Args()[0])
-	} else {
-		cmd.spaceReq.SetSpaceName(c.Args()[0])
-	}
+	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
@@ -51,7 +43,14 @@ func (cmd *RenameSpace) GetRequirements(requirementsFactory requirements.Factory
 	return
 }
 
-func (cmd *RenameSpace) Run(c *cli.Context) {
+func (cmd *RenameSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	return cmd
+}
+
+func (cmd *RenameSpace) Execute(c flags.FlagContext) {
 	space := cmd.spaceReq.GetSpace()
 	newName := c.Args()[1]
 	cmd.ui.Say(T("Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
