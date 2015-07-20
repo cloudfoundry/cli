@@ -2,13 +2,14 @@ package quota
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DeleteQuota struct {
@@ -18,30 +19,25 @@ type DeleteQuota struct {
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewDeleteQuota(ui terminal.UI, config core_config.Reader, quotaRepo quotas.QuotaRepository) (cmd *DeleteQuota) {
-	return &DeleteQuota{
-		ui:        ui,
-		config:    config,
-		quotaRepo: quotaRepo,
-	}
+func init() {
+	command_registry.Register(&DeleteQuota{})
 }
 
-func (cmd *DeleteQuota) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *DeleteQuota) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Can provision instances of paid service plans")}
+
+	return command_registry.CommandMetadata{
 		Name:        "delete-quota",
 		Description: T("Delete a quota"),
 		Usage:       T("CF_NAME delete-quota QUOTA [-f]"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *DeleteQuota) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		err = errors.New(T("Incorrect Usage"))
-		cmd.ui.FailWithUsage(c)
-		return
+func (cmd *DeleteQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-quota"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -50,7 +46,14 @@ func (cmd *DeleteQuota) GetRequirements(requirementsFactory requirements.Factory
 	return
 }
 
-func (cmd *DeleteQuota) Run(c *cli.Context) {
+func (cmd *DeleteQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
+	return cmd
+}
+
+func (cmd *DeleteQuota) Execute(c flags.FlagContext) {
 	quotaName := c.Args()[0]
 
 	if !c.Bool("f") {

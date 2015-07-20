@@ -2,7 +2,8 @@ package quota_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,17 +22,26 @@ var _ = Describe("app Command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		quotaRepo           *fakes.FakeQuotaRepository
 		quota               models.QuotaFields
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-quota").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		quotaRepo = &fakes.FakeQuotaRepository{}
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewUpdateQuota(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("update-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -43,7 +53,9 @@ var _ = Describe("app Command", func() {
 
 		It("fails with usage when no arguments are given", func() {
 			passed := runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 			Expect(passed).To(BeFalse())
 		})
 	})
@@ -78,7 +90,9 @@ var _ = Describe("app Command", func() {
 
 			It("fails with usage when the value cannot be parsed", func() {
 				runCommand("-m", "blasé", "le-tired")
-				Expect(ui.FailedWithUsage).To(BeTrue())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage"},
+				))
 			})
 		})
 
@@ -91,7 +105,9 @@ var _ = Describe("app Command", func() {
 
 			It("fails with usage when the value cannot be parsed", func() {
 				runCommand("-m", "blasé", "le-tired")
-				Expect(ui.FailedWithUsage).To(BeTrue())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage"},
+				))
 			})
 		})
 

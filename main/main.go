@@ -15,6 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_runner"
 	"github.com/cloudfoundry/cli/cf/commands/buildpack"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
+	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -48,6 +49,7 @@ func main() {
 	//make a reference to something in cf/commands/domain, so all init() in the directory will run
 	_ = domain.CreateDomain{}
 	_ = buildpack.ListBuildpacks{}
+	_ = quota.CreateQuota{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
