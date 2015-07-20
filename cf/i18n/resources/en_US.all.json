@@ -2645,6 +2645,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires an argument\n\n",
       "translation": "Incorrect Usage. Requires an argument\n\n",
       "modified": false
