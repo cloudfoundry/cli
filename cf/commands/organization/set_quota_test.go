@@ -2,13 +2,14 @@ package organization_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/organization"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,29 +17,42 @@ import (
 
 var _ = Describe("set-quota command", func() {
 	var (
-		cmd                 *SetQuota
 		ui                  *testterm.FakeUI
 		quotaRepo           *fakes.FakeQuotaRepository
 		requirementsFactory *testreq.FakeReqFactory
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("set-quota").SetDependency(deps, pluginCall))
+	}
+
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("set-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
 		quotaRepo = &fakes.FakeQuotaRepository{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		cmd = NewSetQuota(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
 	})
 
 	It("fails with usage when provided too many or two few args", func() {
 		runCommand("org")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 
 		runCommand("org", "quota", "extra-stuff")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
+
 	})
 
 	It("fails requirements when not logged in", func() {

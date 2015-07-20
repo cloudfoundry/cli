@@ -260,7 +260,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentNonCodegangstaCommand("quotas"),
 					presentNonCodegangstaCommand("quota"),
-					presentCommand("set-quota"),
+					presentNonCodegangstaCommand("set-quota"),
 				}, {
 					presentCommand("create-quota"),
 					presentCommand("delete-quota"),

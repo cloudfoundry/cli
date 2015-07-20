@@ -115,7 +115,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["service-key"] = servicekey.NewGetServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["migrate-service-instances"] = service.NewMigrateServiceInstances(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["set-org-role"] = user.NewSetOrgRole(ui, config, repoLocator.GetUserRepository())
-	factory.cmdsByName["set-quota"] = organization.NewSetQuota(ui, config, repoLocator.GetQuotaRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["unset-org-role"] = user.NewUnsetOrgRole(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["unset-space-role"] = user.NewUnsetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
