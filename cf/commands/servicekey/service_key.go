@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -20,8 +21,8 @@ type ServiceKey struct {
 	serviceKeyRepo api.ServiceKeyRepository
 }
 
-func NewGetServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd ServiceKey) {
-	return ServiceKey{
+func NewGetServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd *ServiceKey) {
+	return &ServiceKey{
 		ui:             ui,
 		config:         config,
 		serviceRepo:    serviceRepo,
@@ -29,7 +30,7 @@ func NewGetServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api
 	}
 }
 
-func (cmd ServiceKey) Metadata() command_metadata.CommandMetadata {
+func (cmd *ServiceKey) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "service-key",
 		Description: T("Show service key info"),
@@ -43,7 +44,7 @@ EXAMPLE:
 	}
 }
 
-func (cmd ServiceKey) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *ServiceKey) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		cmd.ui.FailWithUsage(c)
 	}
@@ -57,7 +58,7 @@ func (cmd ServiceKey) GetRequirements(requirementsFactory requirements.Factory, 
 	return reqs, nil
 }
 
-func (cmd ServiceKey) Run(c *cli.Context) {
+func (cmd *ServiceKey) Run(c *cli.Context) {
 	serviceInstanceName := c.Args()[0]
 	serviceKeyName := c.Args()[1]
 
@@ -67,22 +68,33 @@ func (cmd ServiceKey) Run(c *cli.Context) {
 		return
 	}
 
-	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.Guid, serviceKeyName)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
-	}
-
-	if c.Bool("guid") {
-		cmd.ui.Say(serviceKey.Fields.Guid)
-	} else {
+	if !c.Bool("guid") {
 		cmd.ui.Say(T("Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
 			map[string]interface{}{
 				"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
 				"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName),
 				"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 			}))
+	}
 
+	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.Guid, serviceKeyName)
+	if err != nil {
+		switch err.(type) {
+		case *errors.NotAuthorizedError:
+			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+				map[string]interface{}{
+					"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
+					"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName)}))
+			return
+		default:
+			cmd.ui.Failed(err.Error())
+			return
+		}
+	}
+
+	if c.Bool("guid") {
+		cmd.ui.Say(serviceKey.Fields.Guid)
+	} else {
 		if serviceKey.Fields.Name == "" {
 			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
 				map[string]interface{}{
