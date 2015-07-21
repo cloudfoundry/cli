@@ -3,13 +3,13 @@ package service
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type RenameService struct {
@@ -19,29 +19,24 @@ type RenameService struct {
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewRenameService(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository) (cmd *RenameService) {
-	cmd = new(RenameService)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.serviceRepo = serviceRepo
-	return
+func init() {
+	command_registry.Register(&RenameService{})
 }
 
-func (cmd *RenameService) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *RenameService) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "rename-service",
 		Description: T("Rename a service instance"),
 		Usage:       T("CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"),
 	}
 }
 
-func (cmd *RenameService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
-		return
+func (cmd *RenameService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("rename-service"))
 	}
 
-	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
+	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -52,7 +47,14 @@ func (cmd *RenameService) GetRequirements(requirementsFactory requirements.Facto
 	return
 }
 
-func (cmd *RenameService) Run(c *cli.Context) {
+func (cmd *RenameService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
+	return cmd
+}
+
+func (cmd *RenameService) Execute(c flags.FlagContext) {
 	newName := c.Args()[1]
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
