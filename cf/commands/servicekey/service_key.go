@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -59,25 +60,42 @@ func (cmd *ServiceKey) GetRequirements(requirementsFactory requirements.Factory,
 }
 
 func (cmd *ServiceKey) Run(c *cli.Context) {
-	serviceInstance := cmd.serviceInstanceRequirement.GetServiceInstance()
+	serviceInstanceName := c.Args()[0]
 	serviceKeyName := c.Args()[1]
 
-	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.Guid, serviceKeyName)
+	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	if c.Bool("guid") {
-		cmd.ui.Say(serviceKey.Fields.Guid)
-	} else {
+	if !c.Bool("guid") {
 		cmd.ui.Say(T("Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
 			map[string]interface{}{
 				"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
 				"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name),
 				"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 			}))
+	}
 
+	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.Guid, serviceKeyName)
+	if err != nil {
+		switch err.(type) {
+		case *errors.NotAuthorizedError:
+			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+				map[string]interface{}{
+					"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
+					"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName)}))
+			return
+		default:
+			cmd.ui.Failed(err.Error())
+			return
+		}
+	}
+
+	if c.Bool("guid") {
+		cmd.ui.Say(serviceKey.Fields.Guid)
+	} else {
 		if serviceKey.Fields.Name == "" {
 			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
 				map[string]interface{}{
