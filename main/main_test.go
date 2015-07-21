@@ -49,6 +49,12 @@ var _ = Describe("main", func() {
 			Consistently(result.Out).ShouldNot(Say("Invalid flag: --h"))
 		})
 
+		It("accepts `cf help <command>` for non-codegangsta commands", func() {
+			output := Cf("help", "api")
+			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS"))
+		})
+
 		It("runs requirement of the non-codegangsta command", func() {
 			dir, err := os.Getwd()
 			Expect(err).ToNot(HaveOccurred())
