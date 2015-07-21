@@ -23,7 +23,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
 	"github.com/cloudfoundry/cli/cf/commands/featureflag"
-	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/route"
@@ -255,8 +254,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		repoLocator.GetCopyApplicationSourceRepository(),
 		restart, //note this is built up above.
 	)
-
-	factory.cmdsByName["unshare-private-domain"] = organization.NewUnsharePrivateDomain(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetDomainRepository())
 
 	return
 }

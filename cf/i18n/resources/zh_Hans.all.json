@@ -2640,6 +2640,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
+      "translation": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires ORG and DOMAIN as arguments\n\n",
       "translation": "Incorrect Usage. Requires ORG and DOMAIN as arguments\n\n",
       "modified": false
@@ -3922,6 +3927,11 @@
    {
       "id": "Select an org (or press enter to skip):",
       "translation": "选择一个组织（或按回车继续）:",
+      "modified": false
+   },
+   {
+      "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
+      "translation": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
       "modified": false
    },
    {
@@ -5447,11 +5457,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} 乘以 {{.InstanceCount}}实例数",
-      "modified": false
-   },
-   {
-      "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
-      "translation": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
       "modified": false
    }
 ]

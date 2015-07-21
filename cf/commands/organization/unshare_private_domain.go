@@ -3,12 +3,12 @@ package organization
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type UnsharePrivateDomain struct {
@@ -19,30 +19,24 @@ type UnsharePrivateDomain struct {
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewUnsharePrivateDomain(ui terminal.UI, config core_config.Reader,
-	orgRepo organizations.OrganizationRepository, domainRepo api.DomainRepository) *UnsharePrivateDomain {
-	return &UnsharePrivateDomain{
-		ui:         ui,
-		config:     config,
-		orgRepo:    orgRepo,
-		domainRepo: domainRepo,
-	}
+func init() {
+	command_registry.Register(&UnsharePrivateDomain{})
 }
 
-func (cmd *UnsharePrivateDomain) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *UnsharePrivateDomain) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "unshare-private-domain",
 		Description: T("Unshare a private domain with an org"),
 		Usage:       T("CF_NAME unshare-private-domain ORG DOMAIN"),
 	}
 }
 
-func (cmd *UnsharePrivateDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UnsharePrivateDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires ORG and DOMAIN arguments\n\n") + command_registry.Commands.CommandUsage("unshare-private-domain"))
 	}
 
-	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[0])
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
 
 	return []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -50,7 +44,15 @@ func (cmd *UnsharePrivateDomain) GetRequirements(requirementsFactory requirement
 	}, nil
 }
 
-func (cmd *UnsharePrivateDomain) Run(c *cli.Context) {
+func (cmd *UnsharePrivateDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
+	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
+	return cmd
+}
+
+func (cmd *UnsharePrivateDomain) Execute(c flags.FlagContext) {
 	org := cmd.orgReq.GetOrganization()
 	domainName := c.Args()[1]
 	domain, err := cmd.domainRepo.FindPrivateByName(domainName)

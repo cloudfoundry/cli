@@ -268,7 +268,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				},
 				{
 					presentNonCodegangstaCommand("share-private-domain"),
-					presentCommand("unshare-private-domain"),
+					presentNonCodegangstaCommand("unshare-private-domain"),
 				},
 			},
 		}, {
