@@ -57,8 +57,17 @@ func main() {
 	//////////////// non-codegangsta path  ///////////////////////
 	if len(os.Args) > 1 {
 		cmd := os.Args[1]
-		if cmdRegistry.CommandExists(cmd) {
 
+		//handles 'cf help <command>'
+		if cmd == "help" && len(os.Args) > 2 {
+			cmd = os.Args[2]
+			if cmdRegistry.CommandExists(cmd) {
+				deps.Ui.Say(cmdRegistry.CommandUsage(cmd))
+				os.Exit(0)
+			}
+		}
+
+		if cmdRegistry.CommandExists(cmd) {
 			meta := cmdRegistry.FindCommand(os.Args[1]).MetaData()
 			fc := flags.NewFlagContext(meta.Flags)
 			fc.SkipFlagParsing(meta.SkipFlagParsing)
