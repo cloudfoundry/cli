@@ -18,8 +18,8 @@ type DeleteServiceKey struct {
 	serviceKeyRepo api.ServiceKeyRepository
 }
 
-func NewDeleteServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd DeleteServiceKey) {
-	return DeleteServiceKey{
+func NewDeleteServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd *DeleteServiceKey) {
+	return &DeleteServiceKey{
 		ui:             ui,
 		config:         config,
 		serviceRepo:    serviceRepo,
@@ -27,7 +27,7 @@ func NewDeleteServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo 
 	}
 }
 
-func (cmd DeleteServiceKey) Metadata() command_metadata.CommandMetadata {
+func (cmd *DeleteServiceKey) Metadata() command_metadata.CommandMetadata {
 	return command_metadata.CommandMetadata{
 		Name:        "delete-service-key",
 		ShortName:   "dsk",
@@ -42,21 +42,20 @@ EXAMPLE:
 	}
 }
 
-func (cmd DeleteServiceKey) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteServiceKey) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		cmd.ui.FailWithUsage(c)
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
-	serviceInstanceRequirement := requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
 	targetSpaceRequirement := requirementsFactory.NewTargetedSpaceRequirement()
 
-	reqs = []requirements.Requirement{loginRequirement, serviceInstanceRequirement, targetSpaceRequirement}
+	reqs = []requirements.Requirement{loginRequirement, targetSpaceRequirement}
 
 	return reqs, nil
 }
 
-func (cmd DeleteServiceKey) Run(c *cli.Context) {
+func (cmd *DeleteServiceKey) Run(c *cli.Context) {
 	serviceInstanceName := c.Args()[0]
 	serviceKeyName := c.Args()[1]
 
