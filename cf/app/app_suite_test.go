@@ -3,6 +3,7 @@ package app_test
 import (
 	"github.com/cloudfoundry/cli/cf/commands/buildpack"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
+	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -22,6 +23,7 @@ func TestApp(t *testing.T) {
 	//make a reference to something in cf/commands/domain, so all init() in the directory will run
 	_ = domain.CreateDomain{}
 	_ = buildpack.ListBuildpacks{}
+	_ = organization.ListOrgs{}
 
 	RegisterFailHandler(Fail)
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "fixtures", "plugins"), "test_1")

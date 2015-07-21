@@ -7,15 +7,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/commands/buildpack"
+	"github.com/cloudfoundry/cli/cf/commands/domain"
+	"github.com/cloudfoundry/cli/cf/commands/organization"
+	"github.com/cloudfoundry/cli/cf/commands/quota"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/command_runner"
-	"github.com/cloudfoundry/cli/cf/commands/buildpack"
-	"github.com/cloudfoundry/cli/cf/commands/domain"
-	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -50,6 +52,7 @@ func main() {
 	_ = domain.CreateDomain{}
 	_ = buildpack.ListBuildpacks{}
 	_ = quota.CreateQuota{}
+	_ = organization.ListOrgs{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
