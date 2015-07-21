@@ -4,6 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/codegangsta/cli"
@@ -75,26 +76,31 @@ func (cmd *DeleteServiceKey) Run(c *cli.Context) {
 	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
 	if err != nil {
 		cmd.ui.Ok()
-
 		cmd.ui.Warn(T("Service instance {{.ServiceInstanceName}} does not exist.",
 			map[string]interface{}{
 				"ServiceInstanceName": serviceInstanceName,
 			}))
-
 		return
 	}
 
 	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.Guid, serviceKeyName)
 	if err != nil || serviceKey.Fields.Guid == "" {
-		cmd.ui.Ok()
-
-		cmd.ui.Warn(T("Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
-			map[string]interface{}{
-				"ServiceKeyName":      serviceKeyName,
-				"ServiceInstanceName": serviceInstanceName,
-			}))
-
-		return
+		switch err.(type) {
+		case *errors.NotAuthorizedError:
+			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+				map[string]interface{}{
+					"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
+					"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName)}))
+			return
+		default:
+			cmd.ui.Ok()
+			cmd.ui.Warn(T("Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
+				map[string]interface{}{
+					"ServiceKeyName":      serviceKeyName,
+					"ServiceInstanceName": serviceInstanceName,
+				}))
+			return
+		}
 	}
 
 	err = cmd.serviceKeyRepo.DeleteServiceKey(serviceKey.Fields.Guid)
