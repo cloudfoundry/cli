@@ -3,16 +3,16 @@ package spacequota
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CreateSpaceQuota struct {
@@ -22,33 +22,29 @@ type CreateSpaceQuota struct {
 	orgRepo   organizations.OrganizationRepository
 }
 
-func NewCreateSpaceQuota(ui terminal.UI, config core_config.Reader, quotaRepo space_quotas.SpaceQuotaRepository, orgRepo organizations.OrganizationRepository) CreateSpaceQuota {
-	return CreateSpaceQuota{
-		ui:        ui,
-		config:    config,
-		quotaRepo: quotaRepo,
-		orgRepo:   orgRepo,
-	}
+func init() {
+	command_registry.Register(&CreateSpaceQuota{})
 }
 
-func (cmd CreateSpaceQuota) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateSpaceQuota) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["allow-paid-service-plans"] = &cliFlags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans (Default: disallowed)")}
+	fs["i"] = &cliFlags.StringFlag{Name: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)")}
+	fs["m"] = &cliFlags.StringFlag{Name: "m", Usage: T("Total amount of memory a space can have (e.g. 1024M, 1G, 10G)")}
+	fs["r"] = &cliFlags.IntFlag{Name: "r", Usage: T("Total number of routes")}
+	fs["s"] = &cliFlags.IntFlag{Name: "s", Usage: T("Total number of service instances")}
+
+	return command_registry.CommandMetadata{
 		Name:        "create-space-quota",
 		Description: T("Define a new space resource quota"),
 		Usage:       T("CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)")),
-			flag_helpers.NewStringFlag("m", T("Total amount of memory a space can have (e.g. 1024M, 1G, 10G)")),
-			flag_helpers.NewIntFlag("r", T("Total number of routes")),
-			flag_helpers.NewIntFlag("s", T("Total number of service instances")),
-			cli.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans (Default: disallowed)")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd CreateSpaceQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-space-quota"))
 	}
 
 	return []requirements.Requirement{
@@ -57,7 +53,15 @@ func (cmd CreateSpaceQuota) GetRequirements(requirementsFactory requirements.Fac
 	}, nil
 }
 
-func (cmd CreateSpaceQuota) Run(context *cli.Context) {
+func (cmd *CreateSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.quotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
+	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
+	return cmd
+}
+
+func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 	name := context.Args()[0]
 	org := cmd.config.OrganizationFields()
 
