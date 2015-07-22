@@ -279,17 +279,17 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("space-quota"),
 					presentNonCodegangstaCommand("create-space-quota"),
 					presentNonCodegangstaCommand("update-space-quota"),
-					presentCommand("delete-space-quota"),
-					presentCommand("set-space-quota"),
-					presentCommand("unset-space-quota"),
+					presentNonCodegangstaCommand("delete-space-quota"),
+					presentNonCodegangstaCommand("set-space-quota"),
+					presentNonCodegangstaCommand("unset-space-quota"),
 				},
 			},
 		}, {
 			Name: T("SERVICE ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("service-auth-tokens"),
-					presentCommand("create-service-auth-token"),
+					presentNonCodegangstaCommand("service-auth-tokens"),
+					presentNonCodegangstaCommand("create-service-auth-token"),
 					presentCommand("update-service-auth-token"),
 					presentCommand("delete-service-auth-token"),
 				}, {

@@ -2,12 +2,13 @@ package spacequota
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -18,27 +19,25 @@ type DeleteSpaceQuota struct {
 	spaceQuotaRepo space_quotas.SpaceQuotaRepository
 }
 
-func NewDeleteSpaceQuota(ui terminal.UI, config core_config.Reader, spaceQuotaRepo space_quotas.SpaceQuotaRepository) DeleteSpaceQuota {
-	return DeleteSpaceQuota{
-		ui:             ui,
-		config:         config,
-		spaceQuotaRepo: spaceQuotaRepo,
-	}
+func init() {
+	command_registry.Register(&DeleteSpaceQuota{})
 }
-func (cmd DeleteSpaceQuota) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+
+func (cmd *DeleteSpaceQuota) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force delete (do not prompt for confirmation)")}
+
+	return command_registry.CommandMetadata{
 		Name:        "delete-space-quota",
 		Description: T("Delete a space quota definition and unassign the space quota from all spaces"),
 		Usage:       T("CF_NAME delete-space-quota SPACE-QUOTA-NAME"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force delete (do not prompt for confirmation)")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd DeleteSpaceQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *DeleteSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-space-quota"))
 	}
 
 	return []requirements.Requirement{
@@ -46,10 +45,17 @@ func (cmd DeleteSpaceQuota) GetRequirements(requirementsFactory requirements.Fac
 	}, nil
 }
 
-func (cmd DeleteSpaceQuota) Run(context *cli.Context) {
-	quotaName := context.Args()[0]
+func (cmd *DeleteSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
+	return cmd
+}
 
-	if !context.Bool("f") {
+func (cmd *DeleteSpaceQuota) Execute(c flags.FlagContext) {
+	quotaName := c.Args()[0]
+
+	if !c.Bool("f") {
 		response := cmd.ui.ConfirmDelete("quota", quotaName)
 		if !response {
 			return

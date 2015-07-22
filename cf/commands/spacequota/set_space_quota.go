@@ -3,12 +3,12 @@ package spacequota
 import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type SetSpaceQuota struct {
@@ -18,26 +18,21 @@ type SetSpaceQuota struct {
 	quotaRepo space_quotas.SpaceQuotaRepository
 }
 
-func NewSetSpaceQuota(ui terminal.UI, config core_config.Reader, spaceRepo spaces.SpaceRepository, quotaRepo space_quotas.SpaceQuotaRepository) SetSpaceQuota {
-	return SetSpaceQuota{
-		ui:        ui,
-		config:    config,
-		quotaRepo: quotaRepo,
-		spaceRepo: spaceRepo,
-	}
+func init() {
+	command_registry.Register(&SetSpaceQuota{})
 }
 
-func (cmd SetSpaceQuota) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *SetSpaceQuota) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "set-space-quota",
 		Description: T("Assign a space quota definition to a space"),
 		Usage:       T("CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME"),
 	}
 }
 
-func (cmd SetSpaceQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 2 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *SetSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n") + command_registry.Commands.CommandUsage("set-space-quota"))
 	}
 
 	return []requirements.Requirement{
@@ -46,10 +41,18 @@ func (cmd SetSpaceQuota) GetRequirements(requirementsFactory requirements.Factor
 	}, nil
 }
 
-func (cmd SetSpaceQuota) Run(context *cli.Context) {
+func (cmd *SetSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	cmd.quotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
+	return cmd
+}
 
-	spaceName := context.Args()[0]
-	quotaName := context.Args()[1]
+func (cmd *SetSpaceQuota) Execute(c flags.FlagContext) {
+
+	spaceName := c.Args()[0]
+	quotaName := c.Args()[1]
 
 	cmd.ui.Say(T("Assigning space quota {{.QuotaName}} to space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"QuotaName": terminal.EntityNameColor(quotaName),

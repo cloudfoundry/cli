@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/trace"
@@ -54,6 +55,7 @@ var _ = Describe("App", func() {
 	//make a reference to something in cf/commands/domain, so all init() in the directory will run
 	_ = domain.CreateDomain{}
 	_ = quota.CreateQuota{}
+	_ = spacequota.SpaceQuota{}
 
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}

@@ -2,6 +2,7 @@ package serviceauthtoken_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -9,30 +10,26 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-func callListServiceAuthTokens(requirementsFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-
-	config := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewListServiceAuthTokens(ui, config, authTokenRepo)
-	testcmd.RunCommand(cmd, []string{}, requirementsFactory)
-
-	return
-}
-
 var _ = Describe("service-auth-tokens command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		authTokenRepo       *testapi.FakeAuthTokenRepo
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceAuthTokenRepository(authTokenRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("service-auth-tokens").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
@@ -42,7 +39,7 @@ var _ = Describe("service-auth-tokens command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewListServiceAuthTokens(ui, configRepo, authTokenRepo), args, requirementsFactory)
+		return testcmd.RunCliCommand("service-auth-tokens", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -52,7 +49,9 @@ var _ = Describe("service-auth-tokens command", func() {
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument"},
+			))
 		})
 	})
 

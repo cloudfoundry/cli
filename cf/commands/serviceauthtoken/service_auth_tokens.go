@@ -2,12 +2,12 @@ package serviceauthtoken
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type ListServiceAuthTokens struct {
@@ -16,32 +16,37 @@ type ListServiceAuthTokens struct {
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewListServiceAuthTokens(ui terminal.UI, config core_config.Reader, authTokenRepo api.ServiceAuthTokenRepository) (cmd ListServiceAuthTokens) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.authTokenRepo = authTokenRepo
-	return
+func init() {
+	command_registry.Register(&ListServiceAuthTokens{})
 }
 
-func (cmd ListServiceAuthTokens) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ListServiceAuthTokens) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "service-auth-tokens",
 		Description: T("List service auth tokens"),
 		Usage:       T("CF_NAME service-auth-tokens"),
 	}
 }
 
-func (cmd ListServiceAuthTokens) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("service-auth-tokens"))
 	}
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }
 
-func (cmd ListServiceAuthTokens) Run(c *cli.Context) {
+func (cmd *ListServiceAuthTokens) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.authTokenRepo = deps.RepoLocator.GetServiceAuthTokenRepository()
+	return cmd
+}
+
+func (cmd *ListServiceAuthTokens) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Getting service auth tokens as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),

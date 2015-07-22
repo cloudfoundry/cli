@@ -57,7 +57,7 @@ type RepositoryLocator struct {
 	passwordRepo                    password.PasswordRepository
 	logsNoaaRepo                    LogsNoaaRepository
 	oldLogsRepo                     OldLogsRepository
-	authTokenRepo                   CloudControllerServiceAuthTokenRepository
+	authTokenRepo                   ServiceAuthTokenRepository
 	serviceBrokerRepo               CloudControllerServiceBrokerRepository
 	servicePlanRepo                 CloudControllerServicePlanRepository
 	servicePlanVisibilityRepo       ServicePlanVisibilityRepository
@@ -318,6 +318,11 @@ func (locator RepositoryLocator) SetLogsNoaaRepository(repo LogsNoaaRepository) 
 
 func (locator RepositoryLocator) GetLogsNoaaRepository() LogsNoaaRepository {
 	return locator.logsNoaaRepo
+}
+
+func (locator RepositoryLocator) SetServiceAuthTokenRepository(repo ServiceAuthTokenRepository) RepositoryLocator {
+	locator.authTokenRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetServiceAuthTokenRepository() ServiceAuthTokenRepository {
