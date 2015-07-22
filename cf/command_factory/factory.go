@@ -217,12 +217,8 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		repoLocator.GetAuthenticationRepository(),
 	)
 
-	factory.cmdsByName["create-space-quota"] = spacequota.NewCreateSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository(), repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["delete-space-quota"] = spacequota.NewDeleteSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository())
 
-	factory.cmdsByName["space-quotas"] = spacequota.NewListSpaceQuotas(ui, config, repoLocator.GetSpaceQuotaRepository())
-	factory.cmdsByName["space-quota"] = spacequota.NewSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository())
-	factory.cmdsByName["update-space-quota"] = spacequota.NewUpdateSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository())
 	factory.cmdsByName["set-space-quota"] = spacequota.NewSetSpaceQuota(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetSpaceQuotaRepository())
 	factory.cmdsByName["unset-space-quota"] = spacequota.NewUnsetSpaceQuota(ui, config, repoLocator.GetSpaceQuotaRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["feature-flags"] = featureflag.NewListFeatureFlags(ui, config, repoLocator.GetFeatureFlagRepository())

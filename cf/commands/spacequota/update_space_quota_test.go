@@ -2,11 +2,12 @@ package spacequota_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/spacequota"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	"github.com/cloudfoundry/cli/testhelpers/configuration"
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -22,15 +23,24 @@ var _ = Describe("update-space-quota command", func() {
 
 		quota            models.SpaceQuota
 		quotaPaidService models.SpaceQuota
+		configRepo       core_config.Repository
+		deps             command_registry.Dependency
 	)
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-space-quota").SetDependency(deps, pluginCall))
+	}
+
 	runCommand := func(args ...string) bool {
-		cmd := NewUpdateSpaceQuota(ui, configuration.NewRepositoryWithDefaults(), quotaRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("update-space-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
@@ -54,7 +64,9 @@ var _ = Describe("update-space-quota command", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
 
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 		})
 	})
 

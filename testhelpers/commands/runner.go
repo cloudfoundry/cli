@@ -48,7 +48,7 @@ func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq
 	return
 }
 
-func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) bool {
+func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (passedRequirements bool) {
 	updateFunc(pluginCall)
 	cmd := command_registry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
@@ -77,9 +77,11 @@ func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.F
 		}
 	}
 
+	passedRequirements = true
+
 	cmd.Execute(context)
 
-	return true
+	return
 }
 
 func RunCommandMoreBetter(cmd command.Command, requirementsFactory *testreq.FakeReqFactory, args ...string) (result RunCommandResult) {
