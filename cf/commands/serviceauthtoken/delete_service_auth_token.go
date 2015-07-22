@@ -2,15 +2,17 @@ package serviceauthtoken
 
 import (
 	"fmt"
+
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type DeleteServiceAuthTokenFields struct {
@@ -19,35 +21,39 @@ type DeleteServiceAuthTokenFields struct {
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewDeleteServiceAuthToken(ui terminal.UI, config core_config.Reader, authTokenRepo api.ServiceAuthTokenRepository) (cmd DeleteServiceAuthTokenFields) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.authTokenRepo = authTokenRepo
-	return
+func init() {
+	command_registry.Register(&DeleteServiceAuthTokenFields{})
 }
 
-func (cmd DeleteServiceAuthTokenFields) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *DeleteServiceAuthTokenFields) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
+
+	return command_registry.CommandMetadata{
 		Name:        "delete-service-auth-token",
 		Description: T("Delete a service auth token"),
 		Usage:       T("CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd DeleteServiceAuthTokenFields) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
-		return
+func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n") + command_registry.Commands.CommandUsage("delete-service-auth-token"))
 	}
 
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	return
 }
 
-func (cmd DeleteServiceAuthTokenFields) Run(c *cli.Context) {
+func (cmd *DeleteServiceAuthTokenFields) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.authTokenRepo = deps.RepoLocator.GetServiceAuthTokenRepository()
+	return cmd
+}
+
+func (cmd *DeleteServiceAuthTokenFields) Execute(c flags.FlagContext) {
 	tokenLabel := c.Args()[0]
 	tokenProvider := c.Args()[1]
 

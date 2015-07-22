@@ -10,6 +10,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
+	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -56,6 +58,8 @@ var _ = Describe("App", func() {
 	_ = domain.CreateDomain{}
 	_ = quota.CreateQuota{}
 	_ = spacequota.SpaceQuota{}
+	_ = servicebroker.ListServiceBrokers{}
+	_ = serviceauthtoken.ListServiceAuthTokens{}
 
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}

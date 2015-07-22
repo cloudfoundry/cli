@@ -2645,6 +2645,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n",
+      "translation": "Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
       "translation": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
       "modified": false
@@ -2657,6 +2662,16 @@
    {
       "id": "Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n",
       "translation": "Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n",
       "modified": false
    },
    {
@@ -2737,6 +2752,11 @@
    {
       "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
       "translation": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n",
       "modified": false
    },
    {

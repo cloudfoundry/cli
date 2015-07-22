@@ -8,7 +8,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,9 +18,17 @@ var _ = Describe("create-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		serviceBrokerRepo   *testapi.FakeServiceBrokerRepo
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceBrokerRepository(serviceBrokerRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-service-broker").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -31,14 +39,16 @@ var _ = Describe("create-service-broker command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewCreateServiceBroker(ui, configRepo, serviceBrokerRepo), args, requirementsFactory)
+		return testcmd.RunCliCommand("create-service-broker", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
 		It("fails with usage when called without exactly four args", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("whoops", "not-enough", "args")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 
 		It("fails when not logged in", func() {

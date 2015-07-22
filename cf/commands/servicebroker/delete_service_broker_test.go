@@ -2,7 +2,7 @@ package servicebroker_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -17,10 +17,18 @@ import (
 var _ = Describe("delete-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		brokerRepo          *testapi.FakeServiceBrokerRepo
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceBrokerRepository(brokerRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-service-broker").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
@@ -30,14 +38,15 @@ var _ = Describe("delete-service-broker command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewDeleteServiceBroker(ui, configRepo, brokerRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete-service-broker", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
 		It("fails with usage when called without a broker's name", func() {
 			runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 		})
 
 		It("fails requirements when not logged in", func() {
