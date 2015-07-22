@@ -1405,7 +1405,7 @@ var serviceOfferingReq = testapi.NewCloudControllerTestRequest(testnet.TestReque
 		  "entity": {
 			"label": "mysql",
 			"provider": "mysql",
-			"documentation_url": "http://info.example.com",
+		    "extra": "{\"documentationUrl\":\"http://info.example.com\"}",
 			"description": "MySQL database"
 		  }
 		}`,
@@ -1422,7 +1422,7 @@ var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestR
           },
           "entity": {
             "name": "my-service",
-						"dashboard_url":"my-dashboard-url",
+			"dashboard_url":"my-dashboard-url",
             "service_bindings": [
               {
                 "metadata": {
