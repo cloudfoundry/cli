@@ -290,16 +290,16 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentNonCodegangstaCommand("service-auth-tokens"),
 					presentNonCodegangstaCommand("create-service-auth-token"),
-					presentCommand("update-service-auth-token"),
-					presentCommand("delete-service-auth-token"),
+					presentNonCodegangstaCommand("update-service-auth-token"),
+					presentNonCodegangstaCommand("delete-service-auth-token"),
 				}, {
-					presentCommand("service-brokers"),
-					presentCommand("create-service-broker"),
-					presentCommand("update-service-broker"),
-					presentCommand("delete-service-broker"),
-					presentCommand("rename-service-broker"),
+					presentNonCodegangstaCommand("service-brokers"),
+					presentNonCodegangstaCommand("create-service-broker"),
+					presentNonCodegangstaCommand("update-service-broker"),
+					presentNonCodegangstaCommand("delete-service-broker"),
+					presentNonCodegangstaCommand("rename-service-broker"),
 				}, {
-					presentCommand("migrate-service-instances"),
+					presentNonCodegangstaCommand("migrate-service-instances"),
 					presentCommand("purge-service-offering"),
 				}, {
 					presentCommand("service-access"),

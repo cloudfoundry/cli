@@ -2,7 +2,7 @@ package servicebroker_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,20 +19,27 @@ var _ = Describe("update-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		serviceBrokerRepo   *testapi.FakeServiceBrokerRepo
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceBrokerRepository(serviceBrokerRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-service-broker").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		serviceBrokerRepo = &testapi.FakeServiceBrokerRepo{}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewUpdateServiceBroker(ui, configRepo, serviceBrokerRepo), args, requirementsFactory)
+		return testcmd.RunCliCommand("update-service-broker", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -40,7 +47,9 @@ var _ = Describe("update-service-broker command", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand("arg1", "arg2", "arg3")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 
 		It("fails when not logged in", func() {

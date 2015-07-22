@@ -11,6 +11,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
+	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 
 	"github.com/cloudfoundry/cli/cf/api"
@@ -55,6 +57,8 @@ func main() {
 	_ = quota.CreateQuota{}
 	_ = organization.ListOrgs{}
 	_ = spacequota.SpaceQuota{}
+	_ = servicebroker.ListServiceBrokers{}
+	_ = serviceauthtoken.ListServiceAuthTokens{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
