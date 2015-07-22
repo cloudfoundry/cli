@@ -2640,6 +2640,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
       "translation": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
       "modified": false
@@ -2657,6 +2662,16 @@
    {
       "id": "Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n",
       "translation": "Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SPACE and QUOTA as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SPACE and QUOTA as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n",
       "modified": false
    },
    {

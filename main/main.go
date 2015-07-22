@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
@@ -53,6 +54,7 @@ func main() {
 	_ = buildpack.ListBuildpacks{}
 	_ = quota.CreateQuota{}
 	_ = organization.ListOrgs{}
+	_ = spacequota.SpaceQuota{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()

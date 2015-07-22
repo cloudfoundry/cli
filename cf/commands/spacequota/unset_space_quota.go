@@ -3,12 +3,12 @@ package spacequota
 import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type UnsetSpaceQuota struct {
@@ -18,26 +18,21 @@ type UnsetSpaceQuota struct {
 	spaceRepo spaces.SpaceRepository
 }
 
-func NewUnsetSpaceQuota(ui terminal.UI, config core_config.Reader, quotaRepo space_quotas.SpaceQuotaRepository, spaceRepo spaces.SpaceRepository) UnsetSpaceQuota {
-	return UnsetSpaceQuota{
-		ui:        ui,
-		config:    config,
-		quotaRepo: quotaRepo,
-		spaceRepo: spaceRepo,
-	}
+func init() {
+	command_registry.Register(&UnsetSpaceQuota{})
 }
 
-func (cmd UnsetSpaceQuota) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *UnsetSpaceQuota) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "unset-space-quota",
 		Description: T("Unassign a quota from a space"),
 		Usage:       T("CF_NAME unset-space-quota SPACE QUOTA\n\n"),
 	}
 }
 
-func (cmd UnsetSpaceQuota) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UnsetSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE and QUOTA as arguments\n\n") + command_registry.Commands.CommandUsage("unset-space-quota"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -47,7 +42,15 @@ func (cmd UnsetSpaceQuota) GetRequirements(requirementsFactory requirements.Fact
 	return
 }
 
-func (cmd UnsetSpaceQuota) Run(c *cli.Context) {
+func (cmd *UnsetSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	cmd.quotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
+	return cmd
+}
+
+func (cmd *UnsetSpaceQuota) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[0]
 	quotaName := c.Args()[1]
 
