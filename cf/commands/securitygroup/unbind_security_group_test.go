@@ -4,15 +4,13 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
 	fakeBinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces/fakes"
-
-	. "github.com/cloudfoundry/cli/cf/commands/securitygroup"
-
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -30,8 +28,19 @@ var _ = Describe("unbind-security-group command", func() {
 		spaceRepo           *fakes.FakeSpaceRepository
 		secBinder           *fakeBinder.FakeSecurityGroupSpaceBinder
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
+		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(securityGroupRepo)
+		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupSpaceBinder(secBinder)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unbind-security-group").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -44,8 +53,7 @@ var _ = Describe("unbind-security-group command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewUnbindSecurityGroup(ui, configRepo, securityGroupRepo, orgRepo, spaceRepo, secBinder)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("unbind-security-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -56,17 +64,25 @@ var _ = Describe("unbind-security-group command", func() {
 		It("should fail with usage when not provided with any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 
 		It("should fail with usage when provided with a number of arguments that is either 2 or 4 or a number larger than 4", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("I", "like")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 			runCommand("Turn", "down", "for", "what")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 			runCommand("My", "Very", "Excellent", "Mother", "Just", "Sat", "Under", "Nine", "ThingsThatArentPlanets")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 	})
 

@@ -373,12 +373,22 @@ func (locator RepositoryLocator) GetSecurityGroupRepository() security_groups.Se
 	return locator.securityGroupRepo
 }
 
+func (locator RepositoryLocator) SetStagingSecurityGroupRepository(repo staging.StagingSecurityGroupsRepo) RepositoryLocator {
+	locator.stagingSecurityGroupRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetStagingSecurityGroupsRepository() staging.StagingSecurityGroupsRepo {
 	return locator.stagingSecurityGroupRepo
 }
 
 func (locator RepositoryLocator) GetRunningSecurityGroupsRepository() running.RunningSecurityGroupsRepo {
 	return locator.runningSecurityGroupRepo
+}
+
+func (locator RepositoryLocator) SetSecurityGroupSpaceBinder(repo securitygroupspaces.SecurityGroupSpaceBinder) RepositoryLocator {
+	locator.securityGroupSpaceBinder = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetSecurityGroupSpaceBinder() securitygroupspaces.SecurityGroupSpaceBinder {
