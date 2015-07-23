@@ -3,14 +3,15 @@ package securitygroup
 import (
 	"encoding/json"
 	"fmt"
+
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type ShowSecurityGroup struct {
@@ -19,33 +20,35 @@ type ShowSecurityGroup struct {
 	configRepo        core_config.Reader
 }
 
-func NewShowSecurityGroup(ui terminal.UI, configRepo core_config.Reader, securityGroupRepo security_groups.SecurityGroupRepo) ShowSecurityGroup {
-	return ShowSecurityGroup{
-		ui:                ui,
-		configRepo:        configRepo,
-		securityGroupRepo: securityGroupRepo,
-	}
+func init() {
+	command_registry.Register(&ShowSecurityGroup{})
 }
 
-func (cmd ShowSecurityGroup) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ShowSecurityGroup) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "security-group",
 		Description: T("Show a single security group"),
 		Usage:       T("CF_NAME security-group SECURITY_GROUP"),
 	}
 }
 
-func (cmd ShowSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *ShowSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("security-group"))
 	}
 
-	requirements := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	return requirements, nil
+	return []requirements.Requirement{requirementsFactory.NewLoginRequirement()}, nil
 }
 
-func (cmd ShowSecurityGroup) Run(context *cli.Context) {
-	name := context.Args()[0]
+func (cmd *ShowSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.configRepo = deps.Config
+	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()
+	return cmd
+}
+
+func (cmd *ShowSecurityGroup) Execute(c flags.FlagContext) {
+	name := c.Args()[0]
 
 	cmd.ui.Say(T("Getting info for security group {{.security_group}} as {{.username}}",
 		map[string]interface{}{

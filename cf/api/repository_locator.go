@@ -364,6 +364,11 @@ func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepos
 	return locator.buildpackBitsRepo
 }
 
+func (locator RepositoryLocator) SetSecurityGroupRepository(repo security_groups.SecurityGroupRepo) RepositoryLocator {
+	locator.securityGroupRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetSecurityGroupRepository() security_groups.SecurityGroupRepo {
 	return locator.securityGroupRepo
 }
