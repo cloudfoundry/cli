@@ -2,6 +2,7 @@ package securitygroup_test
 
 import (
 	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -10,7 +11,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,8 +21,16 @@ var _ = Describe("list-security-groups command", func() {
 		ui                  *testterm.FakeUI
 		repo                *fakeSecurityGroup.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(repo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("security-groups").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -32,8 +40,7 @@ var _ = Describe("list-security-groups command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewSecurityGroups(ui, configRepo, repo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("security-groups", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -44,7 +51,9 @@ var _ = Describe("list-security-groups command", func() {
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("why am I typing here")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument"},
+			))
 		})
 	})
 

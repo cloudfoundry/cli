@@ -2,14 +2,13 @@ package service
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type PurgeServiceOffering struct {
@@ -17,32 +16,43 @@ type PurgeServiceOffering struct {
 	serviceRepo api.ServiceRepository
 }
 
-func (cmd PurgeServiceOffering) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func init() {
+	command_registry.Register(&PurgeServiceOffering{})
+}
+
+func (cmd *PurgeServiceOffering) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Provider")}
+
+	return command_registry.CommandMetadata{
+		Name:        "purge-service-offering",
+		Description: T("Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"),
+		Usage:       T("CF_NAME purge-service-offering SERVICE [-p PROVIDER]") + "\n\n" + scaryWarningMessage(),
+		Flags:       fs,
+	}
+}
+
+func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("purge-service-offering"))
 	}
 
 	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return
 }
 
+func (cmd *PurgeServiceOffering) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
+	return cmd
+}
+
 func scaryWarningMessage() string {
 	return T(`WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.`)
 }
 
-func (cmd PurgeServiceOffering) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
-		Name:        "purge-service-offering",
-		Description: T("Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"),
-		Usage:       T("CF_NAME purge-service-offering SERVICE [-p PROVIDER]") + "\n\n" + scaryWarningMessage(),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Provider")),
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
-		},
-	}
-}
-
-func (cmd PurgeServiceOffering) Run(c *cli.Context) {
+func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) {
 	serviceName := c.Args()[0]
 
 	offering, apiErr := cmd.serviceRepo.FindServiceOfferingByLabelAndProvider(serviceName, c.String("p"))
@@ -74,10 +84,4 @@ func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-}
-
-func NewPurgeServiceOffering(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository) (cmd PurgeServiceOffering) {
-	cmd.ui = ui
-	cmd.serviceRepo = serviceRepo
-	return
 }

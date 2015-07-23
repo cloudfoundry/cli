@@ -300,7 +300,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("rename-service-broker"),
 				}, {
 					presentNonCodegangstaCommand("migrate-service-instances"),
-					presentCommand("purge-service-offering"),
+					presentNonCodegangstaCommand("purge-service-offering"),
 				}, {
 					presentCommand("service-access"),
 					presentCommand("enable-service-access"),
@@ -311,8 +311,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("SECURITY GROUP"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("security-group"),
-					presentCommand("security-groups"),
+					presentNonCodegangstaCommand("security-group"),
+					presentNonCodegangstaCommand("security-groups"),
 					presentCommand("create-security-group"),
 					presentCommand("update-security-group"),
 					presentCommand("delete-security-group"),

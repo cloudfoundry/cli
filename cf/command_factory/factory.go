@@ -90,7 +90,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["curl"] = commands.NewCurl(ui, config, repoLocator.GetCurlRepository())
 	factory.cmdsByName["delete-service-key"] = servicekey.NewDeleteServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["oauth-token"] = commands.NewOAuthToken(ui, config, repoLocator.GetAuthenticationRepository())
-	factory.cmdsByName["purge-service-offering"] = service.NewPurgeServiceOffering(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["service-keys"] = servicekey.NewListServiceKeys(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["service-key"] = servicekey.NewGetServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
@@ -98,8 +97,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["create-security-group"] = securitygroup.NewCreateSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["update-security-group"] = securitygroup.NewUpdateSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["delete-security-group"] = securitygroup.NewDeleteSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
-	factory.cmdsByName["security-group"] = securitygroup.NewShowSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository())
-	factory.cmdsByName["security-groups"] = securitygroup.NewSecurityGroups(ui, config, repoLocator.GetSecurityGroupRepository())
 	factory.cmdsByName["bind-staging-security-group"] = securitygroup.NewBindToStagingGroup(
 		ui,
 		config,
