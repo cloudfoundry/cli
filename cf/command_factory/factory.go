@@ -94,19 +94,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["service-key"] = servicekey.NewGetServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
-	factory.cmdsByName["bind-staging-security-group"] = securitygroup.NewBindToStagingGroup(
-		ui,
-		config,
-		repoLocator.GetSecurityGroupRepository(),
-		repoLocator.GetStagingSecurityGroupsRepository(),
-	)
-	factory.cmdsByName["staging-security-groups"] = securitygroup.NewListStagingSecurityGroups(ui, config, repoLocator.GetStagingSecurityGroupsRepository())
-	factory.cmdsByName["unbind-staging-security-group"] = securitygroup.NewUnbindFromStagingGroup(
-		ui,
-		config,
-		repoLocator.GetSecurityGroupRepository(),
-		repoLocator.GetStagingSecurityGroupsRepository(),
-	)
 	factory.cmdsByName["bind-running-security-group"] = securitygroup.NewBindToRunningGroup(
 		ui,
 		config,
@@ -120,15 +107,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		repoLocator.GetRunningSecurityGroupsRepository(),
 	)
 	factory.cmdsByName["running-security-groups"] = securitygroup.NewListRunningSecurityGroups(ui, config, repoLocator.GetRunningSecurityGroupsRepository())
-	factory.cmdsByName["bind-security-group"] = securitygroup.NewBindSecurityGroup(
-		ui,
-		config,
-		repoLocator.GetSecurityGroupRepository(),
-		repoLocator.GetSpaceRepository(),
-		repoLocator.GetOrganizationRepository(),
-		repoLocator.GetSecurityGroupSpaceBinder(),
-	)
-	factory.cmdsByName["unbind-security-group"] = securitygroup.NewUnbindSecurityGroup(ui, config, repoLocator.GetSecurityGroupRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository(), repoLocator.GetSecurityGroupSpaceBinder())
 
 	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["create-route"] = createRoute

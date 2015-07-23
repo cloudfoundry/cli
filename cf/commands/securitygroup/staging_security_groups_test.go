@@ -1,7 +1,7 @@
 package securitygroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -12,7 +12,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,22 +20,28 @@ import (
 var _ = Describe("staging-security-groups command", func() {
 	var (
 		ui                           *testterm.FakeUI
-		configRepo                   core_config.ReadWriter
+		configRepo                   core_config.Repository
 		fakeStagingSecurityGroupRepo *testapi.FakeStagingSecurityGroupsRepo
-		cmd                          command.Command
 		requirementsFactory          *testreq.FakeReqFactory
+		deps                         command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetStagingSecurityGroupRepository(fakeStagingSecurityGroupRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("staging-security-groups").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		fakeStagingSecurityGroupRepo = &testapi.FakeStagingSecurityGroupsRepo{}
-		cmd = NewListStagingSecurityGroups(ui, configRepo, fakeStagingSecurityGroupRepo)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) testcmd.RunCommandResult {
-		return testcmd.RunCommandMoreBetter(cmd, requirementsFactory, args...)
+	runCommand := func(args ...string) bool {
+		return testcmd.RunCliCommand("staging-security-groups", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -60,7 +65,7 @@ var _ = Describe("staging-security-groups command", func() {
 			})
 
 			It("shows the user the name of the security groups for staging", func() {
-				Expect(runCommand()).To(HaveSucceeded())
+				Expect(runCommand()).To(BeTrue())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Acquiring", "staging security group", "my-user"},
 					[]string{"hiphopopotamus"},

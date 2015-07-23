@@ -2,12 +2,12 @@ package securitygroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type listStagingSecurityGroups struct {
@@ -16,32 +16,35 @@ type listStagingSecurityGroups struct {
 	configRepo               core_config.Reader
 }
 
-func NewListStagingSecurityGroups(ui terminal.UI, configRepo core_config.Reader, stagingSecurityGroupRepo staging.StagingSecurityGroupsRepo) listStagingSecurityGroups {
-	return listStagingSecurityGroups{
-		ui:                       ui,
-		configRepo:               configRepo,
-		stagingSecurityGroupRepo: stagingSecurityGroupRepo,
-	}
+func init() {
+	command_registry.Register(&listStagingSecurityGroups{})
 }
 
-func (cmd listStagingSecurityGroups) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *listStagingSecurityGroups) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "staging-security-groups",
 		Description: T("List security groups in the staging set for applications"),
 		Usage:       "CF_NAME staging-security-groups",
 	}
 }
 
-func (cmd listStagingSecurityGroups) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 0 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *listStagingSecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("staging-security-groups"))
 	}
 
 	requirements := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return requirements, nil
 }
 
-func (cmd listStagingSecurityGroups) Run(context *cli.Context) {
+func (cmd *listStagingSecurityGroups) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.configRepo = deps.Config
+	cmd.stagingSecurityGroupRepo = deps.RepoLocator.GetStagingSecurityGroupsRepository()
+	return cmd
+}
+
+func (cmd *listStagingSecurityGroups) Execute(context flags.FlagContext) {
 	cmd.ui.Say(T("Acquiring staging security group as {{.username}}",
 		map[string]interface{}{
 			"username": terminal.EntityNameColor(cmd.configRepo.Username()),
