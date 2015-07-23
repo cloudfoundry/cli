@@ -3976,8 +3976,8 @@
    },
    {
       "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
-      "translation": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
-      "modified": false
+      "translation": "Erreur, code: 403, code de l'erreur: 10003, méssage: Vous n'êtes pas autorisé pour effectuer l'action demandée",
+      "modified": true
    },
    {
       "id": "Server error, status code: 403: Access is denied.  You do not have privileges to execute this command.",
