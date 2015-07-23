@@ -313,9 +313,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentNonCodegangstaCommand("security-group"),
 					presentNonCodegangstaCommand("security-groups"),
-					presentCommand("create-security-group"),
-					presentCommand("update-security-group"),
-					presentCommand("delete-security-group"),
+					presentNonCodegangstaCommand("create-security-group"),
+					presentNonCodegangstaCommand("update-security-group"),
+					presentNonCodegangstaCommand("delete-security-group"),
 					presentCommand("bind-security-group"),
 					presentCommand("unbind-security-group"),
 				}, {
