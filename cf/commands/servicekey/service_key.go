@@ -60,14 +60,8 @@ func (cmd *ServiceKey) GetRequirements(requirementsFactory requirements.Factory,
 }
 
 func (cmd *ServiceKey) Run(c *cli.Context) {
-	serviceInstanceName := c.Args()[0]
+	serviceInstance := cmd.serviceInstanceRequirement.GetServiceInstance()
 	serviceKeyName := c.Args()[1]
-
-	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
-	}
 
 	if !c.Bool("guid") {
 		cmd.ui.Say(T("Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
@@ -85,7 +79,7 @@ func (cmd *ServiceKey) Run(c *cli.Context) {
 			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
 				map[string]interface{}{
 					"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
-					"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName)}))
+					"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name)}))
 			return
 		default:
 			cmd.ui.Failed(err.Error())
