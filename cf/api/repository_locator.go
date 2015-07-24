@@ -413,6 +413,11 @@ func (locator RepositoryLocator) SetSpaceQuotaRepository(repo space_quotas.Space
 	return locator
 }
 
+func (locator RepositoryLocator) SetFeatureFlagRepository(repo feature_flags.FeatureFlagRepository) RepositoryLocator {
+	locator.featureFlagRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetFeatureFlagRepository() feature_flags.FeatureFlagRepository {
 	return locator.featureFlagRepo
 }

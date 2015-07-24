@@ -337,10 +337,10 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("FEATURE FLAGS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("feature-flags"),
-					presentCommand("feature-flag"),
-					presentCommand("enable-feature-flag"),
-					presentCommand("disable-feature-flag"),
+					presentNonCodegangstaCommand("feature-flags"),
+					presentNonCodegangstaCommand("feature-flag"),
+					presentNonCodegangstaCommand("enable-feature-flag"),
+					presentNonCodegangstaCommand("disable-feature-flag"),
 				},
 			},
 		}, {

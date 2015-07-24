@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	Version     = "BUILT_FROM_SOURCE"
+	Version     = "6.10.1"
 	BuiltOnDate = "BUILT_AT_UNKNOWN_TIME"
 )
 

@@ -21,7 +21,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/commands/featureflag"
 	"github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/route"
@@ -160,11 +159,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		),
 		repoLocator.GetAuthenticationRepository(),
 	)
-
-	factory.cmdsByName["feature-flags"] = featureflag.NewListFeatureFlags(ui, config, repoLocator.GetFeatureFlagRepository())
-	factory.cmdsByName["feature-flag"] = featureflag.NewShowFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
-	factory.cmdsByName["enable-feature-flag"] = featureflag.NewEnableFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
-	factory.cmdsByName["disable-feature-flag"] = featureflag.NewDisableFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
 
 	factory.cmdsByName["uninstall-plugin"] = plugin.NewPluginUninstall(ui, pluginConfig, rpcService)
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config, pluginConfig, factory.cmdsByName, actor_plugin_repo.NewPluginRepo(), utils.NewSha1Checksum(""), rpcService)

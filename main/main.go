@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/buildpack"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
+	"github.com/cloudfoundry/cli/cf/commands/featureflag"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
@@ -63,6 +64,7 @@ func main() {
 	_ = serviceauthtoken.ListServiceAuthTokens{}
 	_ = securitygroup.ShowSecurityGroup{}
 	_ = environmentvariablegroup.RunningEnvironmentVariableGroup{}
+	_ = featureflag.ShowFeatureFlag{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
