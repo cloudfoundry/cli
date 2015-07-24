@@ -323,16 +323,16 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("staging-security-groups"),
 					presentNonCodegangstaCommand("unbind-staging-security-group"),
 				}, {
-					presentCommand("bind-running-security-group"),
-					presentCommand("running-security-groups"),
-					presentCommand("unbind-running-security-group"),
+					presentNonCodegangstaCommand("bind-running-security-group"),
+					presentNonCodegangstaCommand("running-security-groups"),
+					presentNonCodegangstaCommand("unbind-running-security-group"),
 				},
 			},
 		}, {
 			Name: T("ENVIRONMENT VARIABLE GROUPS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("running-environment-variable-group"),
+					presentNonCodegangstaCommand("running-environment-variable-group"),
 					presentCommand("staging-environment-variable-group"),
 					presentCommand("set-staging-environment-variable-group"),
 					presentCommand("set-running-environment-variable-group"),

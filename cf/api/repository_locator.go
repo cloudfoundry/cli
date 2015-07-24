@@ -382,6 +382,11 @@ func (locator RepositoryLocator) GetStagingSecurityGroupsRepository() staging.St
 	return locator.stagingSecurityGroupRepo
 }
 
+func (locator RepositoryLocator) SetRunningSecurityGroupRepository(repo running.RunningSecurityGroupsRepo) RepositoryLocator {
+	locator.runningSecurityGroupRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetRunningSecurityGroupsRepository() running.RunningSecurityGroupsRepo {
 	return locator.runningSecurityGroupRepo
 }
@@ -410,6 +415,11 @@ func (locator RepositoryLocator) SetSpaceQuotaRepository(repo space_quotas.Space
 
 func (locator RepositoryLocator) GetFeatureFlagRepository() feature_flags.FeatureFlagRepository {
 	return locator.featureFlagRepo
+}
+
+func (locator RepositoryLocator) SetEnvironmentVariableGroupsRepository(repo environment_variable_groups.EnvironmentVariableGroupsRepository) RepositoryLocator {
+	locator.environmentVariableGroupRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetEnvironmentVariableGroupsRepository() environment_variable_groups.EnvironmentVariableGroupsRepository {

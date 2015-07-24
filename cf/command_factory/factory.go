@@ -26,7 +26,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	"github.com/cloudfoundry/cli/cf/commands/servicekey"
@@ -94,19 +93,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["service-key"] = servicekey.NewGetServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
-	factory.cmdsByName["bind-running-security-group"] = securitygroup.NewBindToRunningGroup(
-		ui,
-		config,
-		repoLocator.GetSecurityGroupRepository(),
-		repoLocator.GetRunningSecurityGroupsRepository(),
-	)
-	factory.cmdsByName["unbind-running-security-group"] = securitygroup.NewUnbindFromRunningGroup(
-		ui,
-		config,
-		repoLocator.GetSecurityGroupRepository(),
-		repoLocator.GetRunningSecurityGroupsRepository(),
-	)
-	factory.cmdsByName["running-security-groups"] = securitygroup.NewListRunningSecurityGroups(ui, config, repoLocator.GetRunningSecurityGroupsRepository())
 
 	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["create-route"] = createRoute
@@ -180,7 +166,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["feature-flag"] = featureflag.NewShowFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
 	factory.cmdsByName["enable-feature-flag"] = featureflag.NewEnableFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
 	factory.cmdsByName["disable-feature-flag"] = featureflag.NewDisableFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
-	factory.cmdsByName["running-environment-variable-group"] = environmentvariablegroup.NewRunningEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["staging-environment-variable-group"] = environmentvariablegroup.NewStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-staging-environment-variable-group"] = environmentvariablegroup.NewSetStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-running-environment-variable-group"] = environmentvariablegroup.NewSetRunningEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
