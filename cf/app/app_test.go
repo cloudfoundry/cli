@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
@@ -60,6 +61,7 @@ var _ = Describe("App", func() {
 	_ = spacequota.SpaceQuota{}
 	_ = servicebroker.ListServiceBrokers{}
 	_ = serviceauthtoken.ListServiceAuthTokens{}
+	_ = securitygroup.ShowSecurityGroup{}
 
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}

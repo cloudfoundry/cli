@@ -5,14 +5,13 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
-	"github.com/cloudfoundry/cli/cf/command"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type unbindFromRunningGroup struct {
@@ -22,28 +21,23 @@ type unbindFromRunningGroup struct {
 	runningGroupRepo  running.RunningSecurityGroupsRepo
 }
 
-func NewUnbindFromRunningGroup(ui terminal.UI, configRepo core_config.Reader, securityGroupRepo security_groups.SecurityGroupRepo, runningGroupRepo running.RunningSecurityGroupsRepo) command.Command {
-	return &unbindFromRunningGroup{
-		ui:                ui,
-		configRepo:        configRepo,
-		securityGroupRepo: securityGroupRepo,
-		runningGroupRepo:  runningGroupRepo,
-	}
+func init() {
+	command_registry.Register(&unbindFromRunningGroup{})
 }
 
-func (cmd *unbindFromRunningGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd *unbindFromRunningGroup) MetaData() command_registry.CommandMetadata {
 	primaryUsage := T("CF_NAME unbind-running-security-group SECURITY_GROUP")
 	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
-	return command_metadata.CommandMetadata{
+	return command_registry.CommandMetadata{
 		Name:        "unbind-running-security-group",
 		Description: T("Unbind a security group from the set of security groups for running applications"),
 		Usage:       strings.Join([]string{primaryUsage, tipUsage}, "\n\n"),
 	}
 }
 
-func (cmd *unbindFromRunningGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *unbindFromRunningGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("unbind-running-security-group"))
 	}
 
 	return []requirements.Requirement{
@@ -51,7 +45,15 @@ func (cmd *unbindFromRunningGroup) GetRequirements(requirementsFactory requireme
 	}, nil
 }
 
-func (cmd *unbindFromRunningGroup) Run(context *cli.Context) {
+func (cmd *unbindFromRunningGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.configRepo = deps.Config
+	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()
+	cmd.runningGroupRepo = deps.RepoLocator.GetRunningSecurityGroupsRepository()
+	return cmd
+}
+
+func (cmd *unbindFromRunningGroup) Execute(context flags.FlagContext) {
 	name := context.Args()[0]
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
