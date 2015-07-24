@@ -74,6 +74,13 @@ var _ = Describe("CommandRegistry", func() {
 			})
 		})
 
+		Context("MaxCommandNameLength()", func() {
+			It("returns the length of the longest command name", func() {
+				maxLen := Commands.MaxCommandNameLength()
+				Ω(maxLen).To(Equal(len("this-is-a-really-long-command-name-123123123123123123123")))
+			})
+		})
+
 		Context("CommandUsage()", func() {
 			It("prints the name, description and usage of a command", func() {
 				o := Commands.CommandUsage("fake-command")

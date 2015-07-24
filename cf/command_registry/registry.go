@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -74,6 +75,16 @@ func (r *registry) CommandExists(name string) bool {
 
 func (r *registry) SetCommand(cmd Command) {
 	r.cmd[cmd.MetaData().Name] = cmd
+}
+
+func (r *registry) MaxCommandNameLength() int {
+	maxNameLen := 0
+	for name, _ := range r.cmd {
+		if utf8.RuneCountInString(name) > maxNameLen {
+			maxNameLen = len(name)
+		}
+	}
+	return maxNameLen
 }
 
 func (r *registry) CommandUsage(cmdName string) string {
