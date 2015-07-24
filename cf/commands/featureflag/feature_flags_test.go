@@ -4,7 +4,8 @@ import (
 	"errors"
 
 	fakeflag "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/featureflag"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,18 +20,27 @@ var _ = Describe("feature-flags command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
+		configRepo          core_config.Repository
 		flagRepo            *fakeflag.FakeFeatureFlagRepository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("feature-flags").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		flagRepo = &fakeflag.FakeFeatureFlagRepository{}
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewListFeatureFlags(ui, testconfig.NewRepositoryWithDefaults(), flagRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("feature-flags", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -41,7 +51,9 @@ var _ = Describe("feature-flags command", func() {
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument"},
+			))
 		})
 	})
 
