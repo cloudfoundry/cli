@@ -166,7 +166,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["feature-flag"] = featureflag.NewShowFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
 	factory.cmdsByName["enable-feature-flag"] = featureflag.NewEnableFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
 	factory.cmdsByName["disable-feature-flag"] = featureflag.NewDisableFeatureFlag(ui, config, repoLocator.GetFeatureFlagRepository())
-	factory.cmdsByName["staging-environment-variable-group"] = environmentvariablegroup.NewStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-staging-environment-variable-group"] = environmentvariablegroup.NewSetStagingEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 	factory.cmdsByName["set-running-environment-variable-group"] = environmentvariablegroup.NewSetRunningEnvironmentVariableGroup(ui, config, repoLocator.GetEnvironmentVariableGroupsRepository())
 
