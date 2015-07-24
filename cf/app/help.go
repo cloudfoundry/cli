@@ -48,13 +48,7 @@ func (p appPresenter) Title(name string) string {
 }
 
 func newAppPresenter(app *cli.App) (presenter appPresenter) {
-	maxNameLen := 0
-	for _, cmd := range app.Commands {
-		name := presentCmdName(cmd)
-		if utf8.RuneCountInString(name) > maxNameLen {
-			maxNameLen = len(name)
-		}
-	}
+	maxNameLen := command_registry.Commands.MaxCommandNameLength()
 
 	presentCommand := func(commandName string) (presenter cmdPresenter) {
 		cmd := app.Command(commandName)
@@ -334,8 +328,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					presentNonCodegangstaCommand("running-environment-variable-group"),
 					presentNonCodegangstaCommand("staging-environment-variable-group"),
-					presentCommand("set-staging-environment-variable-group"),
-					presentCommand("set-running-environment-variable-group"),
+					presentNonCodegangstaCommand("set-staging-environment-variable-group"),
+					presentNonCodegangstaCommand("set-running-environment-variable-group"),
 				},
 			},
 		},

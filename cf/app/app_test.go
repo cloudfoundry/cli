@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
+	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
@@ -62,6 +63,7 @@ var _ = Describe("App", func() {
 	_ = servicebroker.ListServiceBrokers{}
 	_ = serviceauthtoken.ListServiceAuthTokens{}
 	_ = securitygroup.ShowSecurityGroup{}
+	_ = environmentvariablegroup.RunningEnvironmentVariableGroup{}
 
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}

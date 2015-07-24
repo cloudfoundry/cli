@@ -2,13 +2,13 @@ package environmentvariablegroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	cf_errors "github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type SetRunningEnvironmentVariableGroup struct {
@@ -17,15 +17,12 @@ type SetRunningEnvironmentVariableGroup struct {
 	environmentVariableGroupRepo environment_variable_groups.EnvironmentVariableGroupsRepository
 }
 
-func NewSetRunningEnvironmentVariableGroup(ui terminal.UI, config core_config.ReadWriter, environmentVariableGroupRepo environment_variable_groups.EnvironmentVariableGroupsRepository) (cmd SetRunningEnvironmentVariableGroup) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.environmentVariableGroupRepo = environmentVariableGroupRepo
-	return
+func init() {
+	command_registry.Register(&SetRunningEnvironmentVariableGroup{})
 }
 
-func (cmd SetRunningEnvironmentVariableGroup) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *SetRunningEnvironmentVariableGroup) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "set-running-environment-variable-group",
 		Description: T("Pass parameters as JSON to create a running environment variable group"),
 		ShortName:   "srevg",
@@ -33,9 +30,9 @@ func (cmd SetRunningEnvironmentVariableGroup) Metadata() command_metadata.Comman
 	}
 }
 
-func (cmd SetRunningEnvironmentVariableGroup) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) ([]requirements.Requirement, error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *SetRunningEnvironmentVariableGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("set-running-environment-variable-group"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -44,7 +41,14 @@ func (cmd SetRunningEnvironmentVariableGroup) GetRequirements(requirementsFactor
 	return reqs, nil
 }
 
-func (cmd SetRunningEnvironmentVariableGroup) Run(c *cli.Context) {
+func (cmd *SetRunningEnvironmentVariableGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.environmentVariableGroupRepo = deps.RepoLocator.GetEnvironmentVariableGroupsRepository()
+	return cmd
+}
+
+func (cmd *SetRunningEnvironmentVariableGroup) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Setting the contents of the running environment variable group as {{.Username}}...", map[string]interface{}{
 		"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
