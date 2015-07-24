@@ -333,7 +333,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentNonCodegangstaCommand("running-environment-variable-group"),
-					presentCommand("staging-environment-variable-group"),
+					presentNonCodegangstaCommand("staging-environment-variable-group"),
 					presentCommand("set-staging-environment-variable-group"),
 					presentCommand("set-running-environment-variable-group"),
 				},
