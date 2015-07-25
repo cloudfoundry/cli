@@ -33,6 +33,7 @@ type FlagContext interface {
 	Int(string) int
 	Bool(string) bool
 	String(string) string
+	StringSlice(string) []string
 	IsSet(string) bool
 	SkipFlagParsing(bool)
 }
@@ -93,6 +94,15 @@ func (c *flagContext) Parse(args ...string) error {
 					return err
 				}
 				c.flagsets[flg] = &cliFlags.StringFlag{Name: flg, Value: v}
+			case []string:
+				if v, err = c.getFlagValue(args); err != nil {
+					return err
+				}
+				if _, ok = c.flagsets[flg]; !ok {
+					c.flagsets[flg] = &cliFlags.StringSliceFlag{Name: flg, Value: []string{v}}
+				} else {
+					c.flagsets[flg].Set(v)
+				}
 			}
 		} else {
 			c.args = append(c.args, args[c.cursor])
@@ -166,6 +176,17 @@ func (c *flagContext) Bool(k string) bool {
 		}
 	}
 	return false
+}
+
+func (c *flagContext) StringSlice(k string) []string {
+	if _, ok := c.flagsets[k]; ok {
+		v := c.flagsets[k].GetValue()
+		switch v.(type) {
+		case []string:
+			return v.([]string)
+		}
+	}
+	return []string{}
 }
 
 func (c *flagContext) SkipFlagParsing(skip bool) {
