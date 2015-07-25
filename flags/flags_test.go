@@ -25,6 +25,7 @@ var _ = Describe("Flags", func() {
 				cmdFlagMap["skip"] = &cliFlags.BoolFlag{Name: "skip", Value: false, Usage: "test bool flag"}
 				cmdFlagMap["instance"] = &cliFlags.IntFlag{Name: "instance", Value: 0, Usage: "test int flag"}
 				cmdFlagMap["skip2"] = &cliFlags.BoolFlag{Name: "skip2", Value: false, Usage: "test bool flag"}
+				cmdFlagMap["slice"] = &cliFlags.StringSliceFlag{Name: "slice", Value: []string{}, Usage: "test stringSlice flag"}
 
 				fCtx = NewFlagContext(cmdFlagMap)
 			})
@@ -81,6 +82,14 @@ var _ = Describe("Flags", func() {
 
 				Ω(fCtx.String("name")).To(Equal("doe"))
 				Ω(fCtx.Bool("skip")).To(Equal(true), "skip should be true")
+			})
+
+			It("sets StringSlice(<flag>) to return provided value when a stringSlice flag is provided", func() {
+				err := fCtx.Parse("-slice", "value1", "-slice", "value2")
+				Ω(err).ToNot(HaveOccurred())
+
+				Ω(fCtx.StringSlice("slice")[0]).To(Equal("value1"), "slice[0] should be 'value1'")
+				Ω(fCtx.StringSlice("slice")[1]).To(Equal("value2"), "slice[1] should be 'value2'")
 			})
 
 			It("errors when a non-boolean flag is provided without a value", func() {
