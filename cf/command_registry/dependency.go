@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
+	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
@@ -29,6 +30,7 @@ type Dependency struct {
 	AppManifest    manifest.AppManifest
 	Gateways       map[string]net.Gateway
 	TeePrinter     *terminal.TeePrinter
+	PluginRepo     plugin_repo.PluginRepo
 	PluginModels   *pluginModels
 	ServiceBuilder service_builder.ServiceBuilder
 }
@@ -89,6 +91,8 @@ func NewDependency() Dependency {
 		deps.RepoLocator.GetServiceRepository(),
 		planBuilder,
 	)
+
+	deps.PluginRepo = plugin_repo.NewPluginRepo()
 
 	return deps
 }
