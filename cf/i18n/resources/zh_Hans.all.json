@@ -1586,7 +1586,7 @@
    },
    {
       "id": "Custom headers to include in the request, flag can be specified multiple times",
-      "translation": "在请求中自定义HTTP报头， 可以多次使用",
+      "translation": "Custom headers to include in the request, flag can be specified multiple times",
       "modified": false
    },
    {
@@ -1906,7 +1906,7 @@
    },
    {
       "id": "Enable CF_TRACE output for all requests and responses",
-      "translation": "启动CF_TRACE输出所有请求和响应",
+      "translation": "Enable CF_TRACE output for all requests and responses",
       "modified": false
    },
    {
@@ -2196,7 +2196,7 @@
    },
    {
       "id": "Executes a raw request, content-type set to application/json by default",
-      "translation": "执行原始请求，content-type默认设置为application / json",
+      "translation": "Executes a raw request, content-type set to application/json by default",
       "modified": false
    },
    {
@@ -2566,7 +2566,7 @@
    },
    {
       "id": "HTTP data to include in the request body",
-      "translation": "包含到请求语句中的HTTP数据",
+      "translation": "HTTP data to include in the request body",
       "modified": false
    },
    {
@@ -2596,7 +2596,12 @@
    },
    {
       "id": "Include response headers in the output",
-      "translation": "输出包含HTTP响应头",
+      "translation": "Include response headers in the output",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage\n\n",
+      "translation": "Incorrect Usage\n\n",
       "modified": false
    },
    {
@@ -2715,6 +2720,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "translation": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires an argument\n\n",
       "translation": "Incorrect Usage. Requires an argument\n\n",
       "modified": false
@@ -2772,11 +2782,6 @@
    {
       "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
       "translation": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
-      "modified": false
-   },
-   {
-      "id": "Incorrect number of arguments",
-      "translation": "参数个数错误",
       "modified": false
    },
    {
@@ -4057,6 +4062,11 @@
    {
       "id": "Set an env variable for an app",
       "translation": "为一个应用程序设置环境变量",
+      "modified": false
+   },
+   {
+      "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+      "translation": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
       "modified": false
    },
    {

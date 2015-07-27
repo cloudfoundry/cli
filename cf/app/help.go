@@ -347,19 +347,19 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("ADVANCED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("curl"),
-					presentCommand("config"),
-					presentCommand("oauth-token"),
+					presentNonCodegangstaCommand("curl"),
+					presentNonCodegangstaCommand("config"),
+					presentNonCodegangstaCommand("oauth-token"),
 				},
 			},
 		}, {
 			Name: T("ADD/REMOVE PLUGIN REPOSITORY"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("add-plugin-repo"),
-					presentCommand("remove-plugin-repo"),
-					presentCommand("list-plugin-repos"),
-					presentCommand("repo-plugins"),
+					presentNonCodegangstaCommand("add-plugin-repo"),
+					presentNonCodegangstaCommand("remove-plugin-repo"),
+					presentNonCodegangstaCommand("list-plugin-repos"),
+					presentNonCodegangstaCommand("repo-plugins"),
 				},
 			},
 		}, {

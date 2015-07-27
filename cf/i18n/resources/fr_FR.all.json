@@ -1586,7 +1586,7 @@
    },
    {
       "id": "Custom headers to include in the request, flag can be specified multiple times",
-      "translation": "Headers personnalisés à inclure dans la requête, la fonction peut être spécifiée plusieurs fois",
+      "translation": "Custom headers to include in the request, flag can be specified multiple times",
       "modified": false
    },
    {
@@ -1906,7 +1906,7 @@
    },
    {
       "id": "Enable CF_TRACE output for all requests and responses",
-      "translation": "Activer la sortie de CF_TRACE pour toutes les demandes et les réponses",
+      "translation": "Enable CF_TRACE output for all requests and responses",
       "modified": false
    },
    {
@@ -2196,7 +2196,7 @@
    },
    {
       "id": "Executes a raw request, content-type set to application/json by default",
-      "translation": "Exécute une requête, le content-type mis à application/json par défaut",
+      "translation": "Executes a raw request, content-type set to application/json by default",
       "modified": false
    },
    {
@@ -2566,12 +2566,12 @@
    },
    {
       "id": "HTTP data to include in the request body",
-      "translation": "données HTTP pour inclure dans le corps de la demande",
+      "translation": "HTTP data to include in the request body",
       "modified": false
    },
    {
       "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
-      "translation": "méthode HTTP (GET, POST, PUT, DELETE, etc)",
+      "translation": "HTTP method (GET,POST,PUT,DELETE,etc)",
       "modified": false
    },
    {
@@ -2596,7 +2596,12 @@
    },
    {
       "id": "Include response headers in the output",
-      "translation": "En-têtes de réponse dans la sortie",
+      "translation": "Include response headers in the output",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage\n\n",
+      "translation": "Incorrect Usage\n\n",
       "modified": false
    },
    {
@@ -2715,6 +2720,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "translation": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires an argument\n\n",
       "translation": "Incorrect Usage. Requires an argument\n\n",
       "modified": false
@@ -2772,11 +2782,6 @@
    {
       "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
       "translation": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
-      "modified": false
-   },
-   {
-      "id": "Incorrect number of arguments",
-      "translation": "Nombre d'arguments incorrect",
       "modified": false
    },
    {
@@ -4057,6 +4062,11 @@
    {
       "id": "Set an env variable for an app",
       "translation": "Définir une variable d'environnement pour une application",
+      "modified": false
+   },
+   {
+      "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+      "translation": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
       "modified": false
    },
    {

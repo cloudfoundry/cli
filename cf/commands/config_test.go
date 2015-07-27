@@ -1,13 +1,13 @@
 package commands_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,9 +16,16 @@ import (
 var _ = Describe("config command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("config").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -27,12 +34,13 @@ var _ = Describe("config command", func() {
 	})
 
 	runCommand := func(args ...string) {
-		cmd := NewConfig(ui, configRepo)
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		testcmd.RunCliCommand("config", args, requirementsFactory, updateCommandDependency, false)
 	}
 	It("fails requirements when no flags are provided", func() {
 		runCommand()
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage"},
+		))
 	})
 
 	Context("--async-timeout flag", func() {
@@ -44,12 +52,16 @@ var _ = Describe("config command", func() {
 
 		It("fails with usage when a invalid async timeout value is passed", func() {
 			runCommand("--async-timeout", "-1")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage"},
+			))
 		})
 
 		It("fails with usage when a negative timout is passed", func() {
 			runCommand("--async-timeout", "-555")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage"},
+			))
 			Expect(configRepo.AsyncTimeout()).To(Equal(uint(0)))
 		})
 	})
@@ -78,7 +90,9 @@ var _ = Describe("config command", func() {
 
 		It("fails with usage when a non-bool value is provided", func() {
 			runCommand("--color", "plaid")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage"},
+			))
 		})
 	})
 

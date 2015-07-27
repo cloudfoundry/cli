@@ -8,9 +8,12 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_factory"
+	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
 	"github.com/cloudfoundry/cli/cf/commands/featureflag"
+	"github.com/cloudfoundry/cli/cf/commands/plugin"
+	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
@@ -66,6 +69,9 @@ var _ = Describe("App", func() {
 	_ = securitygroup.ShowSecurityGroup{}
 	_ = environmentvariablegroup.RunningEnvironmentVariableGroup{}
 	_ = featureflag.ShowFeatureFlag{}
+	_ = commands.Api{}
+	_ = plugin_repo.RepoPlugins{}
+	_ = plugin.Plugins{}
 
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}

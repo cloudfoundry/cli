@@ -4,13 +4,13 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
@@ -23,16 +23,15 @@ type RepoPlugins struct {
 	pluginRepo plugin_repo.PluginRepo
 }
 
-func NewRepoPlugins(ui terminal.UI, config core_config.Reader, pluginRepo plugin_repo.PluginRepo) RepoPlugins {
-	return RepoPlugins{
-		ui:         ui,
-		config:     config,
-		pluginRepo: pluginRepo,
-	}
+func init() {
+	command_registry.Register(&RepoPlugins{})
 }
 
-func (cmd RepoPlugins) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *RepoPlugins) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["r"] = &cliFlags.StringFlag{Name: "r", Usage: T("Repo Name - List plugins from just this repository")}
+
+	return command_registry.CommandMetadata{
 		Name:        T("repo-plugins"),
 		Description: T("List all available plugins in all added repositories"),
 		Usage: T(`CF_NAME repo-plugins
@@ -40,17 +39,22 @@ func (cmd RepoPlugins) Metadata() command_metadata.CommandMetadata {
 EXAMPLE:
    cf repo-plugins [-r REPO_NAME]
 `),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("r", T("Repo Name - List plugins from just this repository")),
-		},
+		Flags: fs,
 	}
 }
 
-func (cmd RepoPlugins) GetRequirements(_ requirements.Factory, c *cli.Context) (req []requirements.Requirement, err error) {
+func (cmd *RepoPlugins) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (cmd RepoPlugins) Run(c *cli.Context) {
+func (cmd *RepoPlugins) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.pluginRepo = deps.PluginRepo
+	return cmd
+}
+
+func (cmd *RepoPlugins) Execute(c flags.FlagContext) {
 	var repos []models.PluginRepo
 	repoName := c.String("r")
 
