@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
@@ -23,15 +23,12 @@ type AddPluginRepo struct {
 	config core_config.ReadWriter
 }
 
-func NewAddPluginRepo(ui terminal.UI, config core_config.ReadWriter) AddPluginRepo {
-	return AddPluginRepo{
-		ui:     ui,
-		config: config,
-	}
+func init() {
+	command_registry.Register(&AddPluginRepo{})
 }
 
-func (cmd AddPluginRepo) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *AddPluginRepo) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "add-plugin-repo",
 		Description: T("Add a new plugin repository"),
 		Usage: T(`CF_NAME add-plugin-repo [REPO_NAME] [URL]
@@ -43,14 +40,21 @@ EXAMPLE:
 	}
 }
 
-func (cmd AddPluginRepo) GetRequirements(_ requirements.Factory, c *cli.Context) (req []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *AddPluginRepo) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n") + command_registry.Commands.CommandUsage("add-plugin-repo"))
 	}
+
 	return
 }
 
-func (cmd AddPluginRepo) Run(c *cli.Context) {
+func (cmd *AddPluginRepo) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	return cmd
+}
+
+func (cmd *AddPluginRepo) Execute(c flags.FlagContext) {
 
 	cmd.ui.Say("")
 	repoUrl := strings.ToLower(c.Args()[1])

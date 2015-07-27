@@ -143,6 +143,11 @@ func (locator RepositoryLocator) GetAuthenticationRepository() authentication.Au
 	return locator.authRepo
 }
 
+func (locator RepositoryLocator) SetCurlRepository(repo CurlRepository) RepositoryLocator {
+	locator.curlRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetCurlRepository() CurlRepository {
 	return locator.curlRepo
 }

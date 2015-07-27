@@ -19,10 +19,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/commands/plugin"
-	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
@@ -68,8 +66,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		serviceBuilder,
 	)
 
-	factory.cmdsByName["config"] = commands.NewConfig(ui, config)
-
 	factory.cmdsByName["update-service"] = service.NewUpdateService(
 		ui,
 		config,
@@ -84,9 +80,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["create-service-key"] = servicekey.NewCreateServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["create-user"] = user.NewCreateUser(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["create-user-provided-service"] = service.NewCreateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
-	factory.cmdsByName["curl"] = commands.NewCurl(ui, config, repoLocator.GetCurlRepository())
 	factory.cmdsByName["delete-service-key"] = servicekey.NewDeleteServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
-	factory.cmdsByName["oauth-token"] = commands.NewOAuthToken(ui, config, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["service-keys"] = servicekey.NewListServiceKeys(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["service-key"] = servicekey.NewGetServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
@@ -163,11 +157,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	factory.cmdsByName["uninstall-plugin"] = plugin.NewPluginUninstall(ui, pluginConfig, rpcService)
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config, pluginConfig, factory.cmdsByName, actor_plugin_repo.NewPluginRepo(), utils.NewSha1Checksum(""), rpcService)
 	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, pluginConfig)
-
-	factory.cmdsByName["add-plugin-repo"] = plugin_repo.NewAddPluginRepo(ui, config)
-	factory.cmdsByName["list-plugin-repos"] = plugin_repo.NewListPluginRepos(ui, config)
-	factory.cmdsByName["remove-plugin-repo"] = plugin_repo.NewRemovePluginRepo(ui, config)
-	factory.cmdsByName["repo-plugins"] = plugin_repo.NewRepoPlugins(ui, config, actor_plugin_repo.NewPluginRepo())
 
 	factory.cmdsByName["copy-source"] = application.NewCopySource(
 		ui,

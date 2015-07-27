@@ -1,6 +1,7 @@
 package plugin_repo_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -9,7 +10,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
@@ -19,9 +19,16 @@ import (
 var _ = Describe("list-plugin-repo", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.ReadWriter
+		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("list-plugin-repos").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -30,8 +37,7 @@ var _ = Describe("list-plugin-repo", func() {
 	})
 
 	var callListPluginRepos = func(args ...string) bool {
-		cmd := NewListPluginRepos(ui, config)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("list-plugin-repos", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("lists all added plugin repo in a table", func() {

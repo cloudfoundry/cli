@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	. "github.com/cloudfoundry/cli/cf/commands/plugin_repo"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	fakes "github.com/cloudfoundry/cli/cf/actors/plugin_repo/fakes"
@@ -22,10 +22,18 @@ import (
 var _ = Describe("repo-plugins", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.ReadWriter
+		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		fakePluginRepo      *fakes.FakePluginRepo
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.PluginRepo = fakePluginRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("repo-plugins").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		fakePluginRepo = &fakes.FakePluginRepo{}
@@ -45,8 +53,7 @@ var _ = Describe("repo-plugins", func() {
 	})
 
 	var callRepoPlugins = func(args ...string) bool {
-		cmd := NewRepoPlugins(ui, config, fakePluginRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("repo-plugins", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("If repo name is provided by '-r'", func() {

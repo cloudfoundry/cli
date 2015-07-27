@@ -7,11 +7,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/commands/buildpack"
 	"github.com/cloudfoundry/cli/cf/commands/domain"
 	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
 	"github.com/cloudfoundry/cli/cf/commands/featureflag"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
+	"github.com/cloudfoundry/cli/cf/commands/plugin"
+	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
@@ -65,6 +68,9 @@ func main() {
 	_ = securitygroup.ShowSecurityGroup{}
 	_ = environmentvariablegroup.RunningEnvironmentVariableGroup{}
 	_ = featureflag.ShowFeatureFlag{}
+	_ = commands.Api{}
+	_ = plugin_repo.RepoPlugins{}
+	_ = plugin.Plugins{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()

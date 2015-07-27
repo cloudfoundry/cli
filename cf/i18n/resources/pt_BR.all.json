@@ -706,7 +706,7 @@
    },
    {
       "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
-      "translation": "CF_NAME curl PATH [-iv] [-X MÉTODO] [-H CABEÇALHO] [-d DATA] [--output ARQUIVO]",
+      "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
       "modified": false
    },
    {
@@ -1586,7 +1586,7 @@
    },
    {
       "id": "Custom headers to include in the request, flag can be specified multiple times",
-      "translation": "Cabeçalhos personalizados para incluir no pedido. Sinalizador pode ser utilizado múltiplas vezes.",
+      "translation": "Custom headers to include in the request, flag can be specified multiple times",
       "modified": false
    },
    {
@@ -1906,7 +1906,7 @@
    },
    {
       "id": "Enable CF_TRACE output for all requests and responses",
-      "translation": "Habilitar informações de diagnóstico CF_TRACE para todos os pedidos e respostas",
+      "translation": "Enable CF_TRACE output for all requests and responses",
       "modified": false
    },
    {
@@ -2196,7 +2196,7 @@
    },
    {
       "id": "Executes a raw request, content-type set to application/json by default",
-      "translation": "Executar um pedido diretamente contra a API, o content-type é definido como application/json por padrão",
+      "translation": "Executes a raw request, content-type set to application/json by default",
       "modified": false
    },
    {
@@ -2566,12 +2566,12 @@
    },
    {
       "id": "HTTP data to include in the request body",
-      "translation": "Dados HTTP para inclusão no corpo do pedido",
+      "translation": "HTTP data to include in the request body",
       "modified": false
    },
    {
       "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
-      "translation": "Método HTTP (GET,POST,PUT,DELETE,etc)",
+      "translation": "HTTP method (GET,POST,PUT,DELETE,etc)",
       "modified": false
    },
    {
@@ -2596,7 +2596,12 @@
    },
    {
       "id": "Include response headers in the output",
-      "translation": "Incluir cabeçalhos de resposta na saída",
+      "translation": "Include response headers in the output",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage\n\n",
+      "translation": "Incorrect Usage\n\n",
       "modified": false
    },
    {
@@ -2715,6 +2720,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "translation": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires an argument\n\n",
       "translation": "Incorrect Usage. Requires an argument\n\n",
       "modified": false
@@ -2772,11 +2782,6 @@
    {
       "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
       "translation": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
-      "modified": false
-   },
-   {
-      "id": "Incorrect number of arguments",
-      "translation": "Número de argumentos incorreto",
       "modified": false
    },
    {
@@ -4060,6 +4065,11 @@
       "modified": false
    },
    {
+      "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+      "translation": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+      "modified": false
+   },
+   {
       "id": "Set or view target api url",
       "translation": "Set or view target api url",
       "modified": false
@@ -4831,7 +4841,7 @@
    },
    {
       "id": "Write curl body to FILE instead of stdout",
-      "translation": "Gravar corpo de resposta curl em arquivo ao invés de stdout",
+      "translation": "Write curl body to FILE instead of stdout",
       "modified": false
    },
    {

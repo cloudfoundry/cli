@@ -2600,6 +2600,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage\n\n",
+      "translation": "Incorrect Usage\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage.\n",
       "translation": "Incorrect Usage.\n",
       "modified": false
@@ -2715,6 +2720,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "translation": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires an argument\n\n",
       "translation": "Incorrect Usage. Requires an argument\n\n",
       "modified": false
@@ -2772,11 +2782,6 @@
    {
       "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
       "translation": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
-      "modified": false
-   },
-   {
-      "id": "Incorrect number of arguments",
-      "translation": "Incorrect number of arguments",
       "modified": false
    },
    {
@@ -4057,6 +4062,11 @@
    {
       "id": "Set an env variable for an app",
       "translation": "Set an env variable for an app",
+      "modified": false
+   },
+   {
+      "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+      "translation": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
       "modified": false
    },
    {
