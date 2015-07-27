@@ -224,6 +224,8 @@ func (f concreteFactory) GetCommandFlags(command string) []string {
 			flags = append(flags, t.Name)
 		case flag_helpers.StringFlagWithNoDefault:
 			flags = append(flags, t.Name)
+		case cli.StringFlag:
+			flags = append(flags, t.Name)	
 		case cli.BoolFlag:
 			flags = append(flags, t.Name)
 		}
