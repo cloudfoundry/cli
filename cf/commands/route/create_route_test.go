@@ -9,6 +9,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/commands/route"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
@@ -20,8 +21,16 @@ var _ = Describe("create-route command", func() {
 		ui                  *testterm.FakeUI
 		routeRepo           *testapi.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.ReadWriter
+		config              core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-route").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -31,7 +40,7 @@ var _ = Describe("create-route command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewCreateRoute(ui, config, routeRepo), args, requirementsFactory)
+		return testcmd.RunCliCommand("create-route", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -52,7 +61,9 @@ var _ = Describe("create-route command", func() {
 			requirementsFactory.TargetedOrgSuccess = true
 
 			runCommand("my-space")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 	})
 
@@ -110,11 +121,13 @@ var _ = Describe("create-route command", func() {
 				createdRoute := models.Route{}
 				createdRoute.Host = "my-host"
 				createdRoute.Guid = "my-route-guid"
-				routeRepo := &testapi.FakeRouteRepository{
+				routeRepo = &testapi.FakeRouteRepository{
 					CreateInSpaceCreatedRoute: createdRoute,
 				}
 
-				cmd := NewCreateRoute(ui, config, routeRepo)
+				updateCommandDependency(false)
+				c := command_registry.Commands.FindCommand("create-route")
+				cmd := c.(RouteCreator)
 				route, apiErr := cmd.CreateRoute("my-host", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
 
 				Expect(apiErr).NotTo(HaveOccurred())
