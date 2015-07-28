@@ -126,7 +126,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("delete"),
 					presentNonCodegangstaCommand("rename"),
 				}, {
-					presentCommand("start"),
+					presentNonCodegangstaCommand("start"), //needs app
 					presentCommand("stop"),
 					presentCommand("restart"), //needs start
 					presentCommand("restage"),

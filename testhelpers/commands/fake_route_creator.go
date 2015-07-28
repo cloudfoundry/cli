@@ -23,7 +23,7 @@ func (cmd *FakeRouteCreator) CreateRoute(hostName string, domain models.DomainFi
 }
 
 func (cmd *FakeRouteCreator) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{Name: "create-route", Usage: "blahblah"}
+	return command_registry.CommandMetadata{Name: "create-route"}
 }
 
 func (cmd *FakeRouteCreator) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {

@@ -21,6 +21,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
 )
 
+type ApplicationDisplayer interface {
+	ShowApp(app models.Application, orgName string, spaceName string)
+}
+
 type ShowApp struct {
 	ui               terminal.UI
 	config           core_config.Reader
@@ -30,10 +34,6 @@ type ShowApp struct {
 	appReq           requirements.ApplicationRequirement
 	pluginAppModel   *plugin_models.GetAppModel
 	pluginCall       bool
-}
-
-type ApplicationDisplayer interface {
-	ShowApp(app models.Application, orgName string, spaceName string)
 }
 
 func NewShowApp(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo app_instances.AppInstancesRepository, appLogsNoaaRepo api.LogsNoaaRepository) (cmd *ShowApp) {

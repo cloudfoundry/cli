@@ -10,6 +10,7 @@ import (
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/cloudfoundry/sonde-go/events"
 
@@ -17,12 +18,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 const (
@@ -49,13 +49,77 @@ type Start struct {
 	PingerThrottle             time.Duration
 }
 
+type ApplicationStagingWatcher interface {
+	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
+}
+
 type ApplicationStarter interface {
 	SetStartTimeoutInSeconds(timeout int)
 	ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
 
-type ApplicationStagingWatcher interface {
-	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
+func init() {
+	command_registry.Register(&Start{})
+}
+
+func (cmd *Start) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
+		Name:        "start",
+		ShortName:   "st",
+		Description: T("Start an app"),
+		Usage:       T("CF_NAME start APP_NAME"),
+	}
+}
+
+func (cmd *Start) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("start"))
+	}
+
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
+
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(), requirementsFactory.NewTargetedSpaceRequirement(), cmd.appReq}
+	return
+}
+
+func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
+	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
+	cmd.logRepo = deps.RepoLocator.GetLogsNoaaRepository()
+	cmd.oldLogsRepo = deps.RepoLocator.GetOldLogsRepository()
+	cmd.LogServerConnectionTimeout = 20 * time.Second
+	cmd.PingerThrottle = DefaultPingerThrottle
+
+	if os.Getenv("CF_STAGING_TIMEOUT") != "" {
+		duration, err := strconv.ParseInt(os.Getenv("CF_STAGING_TIMEOUT"), 10, 64)
+		if err != nil {
+			cmd.ui.Failed(T("invalid value for env var CF_STAGING_TIMEOUT\n{{.Err}}",
+				map[string]interface{}{"Err": err}))
+		}
+		cmd.StagingTimeout = time.Duration(duration) * time.Minute
+	} else {
+		cmd.StagingTimeout = DefaultStagingTimeout
+	}
+
+	if os.Getenv("CF_STARTUP_TIMEOUT") != "" {
+		duration, err := strconv.ParseInt(os.Getenv("CF_STARTUP_TIMEOUT"), 10, 64)
+		if err != nil {
+			cmd.ui.Failed(T("invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
+				map[string]interface{}{"Err": err}))
+		}
+		cmd.StartupTimeout = time.Duration(duration) * time.Minute
+	} else {
+		cmd.StartupTimeout = DefaultStartupTimeout
+	}
+
+	//set appDisplayer
+	appCommand := command_registry.Commands.FindCommand("app")
+	appCommand = appCommand.SetDependency(deps, false)
+	cmd.appDisplayer = appCommand.(ApplicationDisplayer)
+
+	return cmd
 }
 
 func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsNoaaRepository, oldLogsRepo api.OldLogsRepository) (cmd *Start) {
@@ -96,32 +160,7 @@ func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer Applicatio
 	return
 }
 
-func (cmd *Start) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
-		Name:        "start",
-		ShortName:   "st",
-		Description: T("Start an app"),
-		Usage:       T("CF_NAME start APP_NAME"),
-	}
-}
-
-func (cmd *Start) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
-	}
-
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
-
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewTargetedSpaceRequirement(), cmd.appReq}
-	return
-}
-
-func (cmd *Start) Run(c *cli.Context) {
+func (cmd *Start) Execute(c flags.FlagContext) {
 	cmd.ApplicationStart(cmd.appReq.GetApplication(), cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 }
 
@@ -239,7 +278,7 @@ func simpleLogMessageOutput(logMsg *events.LogMessage) (msgText string) {
 	return
 }
 
-func (cmd Start) tailStagingLogs(app models.Application, startChan, doneChan chan bool) {
+func (cmd *Start) tailStagingLogs(app models.Application, startChan, doneChan chan bool) {
 	onConnect := func() {
 		startChan <- true
 	}
@@ -264,7 +303,7 @@ func (cmd Start) tailStagingLogs(app models.Application, startChan, doneChan cha
 	close(doneChan)
 }
 
-func (cmd Start) waitForInstancesToStage(app models.Application) bool {
+func (cmd *Start) waitForInstancesToStage(app models.Application) bool {
 	stagingStartTime := time.Now()
 
 	var err error
@@ -300,7 +339,7 @@ func (cmd Start) waitForInstancesToStage(app models.Application) bool {
 	return true
 }
 
-func (cmd Start) waitForOneRunningInstance(app models.Application) {
+func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 	startupStartTime := time.Now()
 
 	for {
