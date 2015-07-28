@@ -213,9 +213,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentNonCodegangstaCommand("routes"),
-					presentCommand("create-route"),
+					presentNonCodegangstaCommand("create-route"),
 					presentNonCodegangstaCommand("check-route"),
-					presentCommand("map-route"),
+					presentNonCodegangstaCommand("map-route"),
 					presentNonCodegangstaCommand("unmap-route"),
 					presentNonCodegangstaCommand("delete-route"),
 					presentNonCodegangstaCommand("delete-orphaned-routes"),

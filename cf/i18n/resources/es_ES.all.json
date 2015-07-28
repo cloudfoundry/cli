@@ -2640,6 +2640,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
       "translation": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
       "modified": false
@@ -2692,6 +2697,11 @@
    {
       "id": "Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n",
       "translation": "Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
       "modified": false
    },
    {

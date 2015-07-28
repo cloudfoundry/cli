@@ -15,6 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
@@ -72,6 +73,7 @@ var _ = Describe("App", func() {
 	_ = commands.Api{}
 	_ = plugin_repo.RepoPlugins{}
 	_ = plugin.Plugins{}
+	_ = route.CreateRoute{}
 
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}

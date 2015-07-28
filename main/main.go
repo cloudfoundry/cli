@@ -16,6 +16,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
@@ -71,6 +72,7 @@ func main() {
 	_ = commands.Api{}
 	_ = plugin_repo.RepoPlugins{}
 	_ = plugin.Plugins{}
+	_ = route.CreateRoute{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
