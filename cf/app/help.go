@@ -366,9 +366,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			Name: T("ADD/REMOVE PLUGIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentCommand("plugins"),
+					presentNonCodegangstaCommand("plugins"),
 					presentCommand("install-plugin"),
-					presentCommand("uninstall-plugin"),
+					presentNonCodegangstaCommand("uninstall-plugin"),
 				},
 			},
 		}, {

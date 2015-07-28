@@ -2,50 +2,65 @@ package plugin
 
 import (
 	"fmt"
+	"net/rpc"
 	"os"
 	"os/exec"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/plugin/rpc"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	rpcService "github.com/cloudfoundry/cli/plugin/rpc"
 )
 
 type PluginUninstall struct {
 	ui         terminal.UI
 	config     plugin_config.PluginConfiguration
-	rpcService *rpc.CliRpcService
+	rpcService *rpcService.CliRpcService
 }
 
-func NewPluginUninstall(ui terminal.UI, config plugin_config.PluginConfiguration, rpcService *rpc.CliRpcService) *PluginUninstall {
-	return &PluginUninstall{
-		ui:         ui,
-		config:     config,
-		rpcService: rpcService,
-	}
+func init() {
+	command_registry.Register(&PluginUninstall{})
 }
 
-func (cmd *PluginUninstall) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *PluginUninstall) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "uninstall-plugin",
 		Description: T("Uninstall the plugin defined in command argument"),
 		Usage:       T("CF_NAME uninstall-plugin PLUGIN-NAME"),
 	}
 }
 
-func (cmd *PluginUninstall) GetRequirements(_ requirements.Factory, c *cli.Context) (req []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *PluginUninstall) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("uninstall-plugin"))
 	}
 
 	return
 }
 
-func (cmd *PluginUninstall) Run(c *cli.Context) {
+func (cmd *PluginUninstall) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.PluginConfig
+
+	//reset rpc registration in case there is other running instance,
+	//each service can only be registered once
+	rpc.DefaultServer = rpc.NewServer()
+
+	rpcService, err := rpcService.NewRpcService(nil, deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewNonCodegangstaRunner())
+	if err != nil {
+		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
+	}
+
+	cmd.rpcService = rpcService
+
+	return cmd
+}
+
+func (cmd *PluginUninstall) Execute(c flags.FlagContext) {
 	pluginName := c.Args()[0]
 	pluginNameMap := map[string]interface{}{"PluginName": pluginName}
 
