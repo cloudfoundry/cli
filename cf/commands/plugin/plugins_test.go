@@ -3,7 +3,7 @@ package plugin_test
 import (
 	"net/rpc"
 
-	. "github.com/cloudfoundry/cli/cf/commands/plugin"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/plugin"
@@ -21,7 +21,14 @@ var _ = Describe("Plugins", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              *testconfig.FakePluginConfiguration
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.PluginConfig = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("plugins").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -32,8 +39,7 @@ var _ = Describe("Plugins", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewPlugins(ui, config)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("plugins", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("If --checksum flag is provided", func() {
@@ -59,7 +65,9 @@ var _ = Describe("Plugins", func() {
 	It("should fail with usage when provided any arguments", func() {
 		requirementsFactory.LoginSuccess = true
 		Expect(runCommand("blahblah")).To(BeFalse())
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "No argument"},
+		))
 	})
 
 	It("returns a list of available methods of a plugin", func() {

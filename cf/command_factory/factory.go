@@ -154,9 +154,7 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		repoLocator.GetAuthenticationRepository(),
 	)
 
-	factory.cmdsByName["uninstall-plugin"] = plugin.NewPluginUninstall(ui, pluginConfig, rpcService)
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config, pluginConfig, factory.cmdsByName, actor_plugin_repo.NewPluginRepo(), utils.NewSha1Checksum(""), rpcService)
-	factory.cmdsByName["plugins"] = plugin.NewPlugins(ui, pluginConfig)
 
 	factory.cmdsByName["copy-source"] = application.NewCopySource(
 		ui,
