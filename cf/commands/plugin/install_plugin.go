@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
@@ -188,14 +189,15 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 	shortNames := cmd.getShortNames()
 
 	for _, pluginCmd := range pluginMetadata.Commands {
+
 		//check for command conflicting core commands/alias
-		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists || shortNames[pluginCmd.Name] || pluginCmd.Name == "help" {
+		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists || shortNames[pluginCmd.Name] || pluginCmd.Name == "help" || command_registry.Commands.CommandExists(pluginCmd.Name) {
 			cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Name})))
 		}
 
 		//check for alias conflicting core command/alias
-		if _, exists := cmd.coreCmds[pluginCmd.Alias]; exists || shortNames[pluginCmd.Alias] || pluginCmd.Alias == "help" {
+		if _, exists := cmd.coreCmds[pluginCmd.Alias]; exists || shortNames[pluginCmd.Alias] || pluginCmd.Alias == "help" || command_registry.Commands.CommandExists(pluginCmd.Alias) {
 			cmd.ui.Failed(fmt.Sprintf(T("Alias `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Alias})))
 		}
