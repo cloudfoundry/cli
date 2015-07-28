@@ -60,6 +60,10 @@ func (r *registry) FindCommand(name string) Command {
 }
 
 func (r *registry) CommandExists(name string) bool {
+	if strings.TrimSpace(name) == "" {
+		return false
+	}
+
 	var ok bool
 
 	if _, ok = r.cmd[name]; !ok {

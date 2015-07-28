@@ -46,6 +46,10 @@ var _ = Describe("CommandRegistry", func() {
 			It("returns true if the alias exists", func() {
 				Ω(Commands.CommandExists("fc1")).To(BeTrue())
 			})
+
+			It("returns false if the command name is an empty string", func() {
+				Ω(Commands.CommandExists("")).To(BeFalse())
+			})
 		})
 
 		Context("FindCommand()", func() {
