@@ -15,10 +15,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/command"
 	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
 	cliRpc "github.com/cloudfoundry/cli/plugin/rpc"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -54,6 +57,8 @@ var _ = Describe("Install", func() {
 		test_2                    string
 		test_curDir               string
 		test_with_help            string
+		test_with_orgs            string
+		test_with_orgs_short_name string
 		test_with_push            string
 		test_with_push_short_name string
 		aliasConflicts            string
@@ -76,6 +81,8 @@ var _ = Describe("Install", func() {
 		test_2 = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_2.exe")
 		test_curDir = filepath.Join("test_1.exe")
 		test_with_help = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.exe")
+		test_with_orgs = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_orgs.exe")
+		test_with_orgs_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_orgs_short_name.exe")
 		test_with_push = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push.exe")
 		test_with_push_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push_short_name.exe")
 		aliasConflicts = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "alias_conflicts.exe")
@@ -357,6 +364,28 @@ var _ = Describe("Install", func() {
 			})
 		})
 
+		Context("when the plugin's command conflicts with a non-codegangsta core command", func() {
+			command_registry.Register(testOrgsCmd{})
+
+			It("fails if is shares a command name", func() {
+				runCommand(test_with_orgs)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Command `orgs` in the plugin being installed is a native CF command/alias.  Rename the `orgs` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"FAILED"},
+				))
+			})
+
+			It("fails if it shares a command short name", func() {
+				runCommand(test_with_orgs_short_name)
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Command `o` in the plugin being installed is a native CF command/alias.  Rename the `o` command in the plugin being installed in order to enable its installation and use."},
+					[]string{"FAILED"},
+				))
+			})
+		})
+
 		Context("when the plugin's alias conflicts with a core command/alias", func() {
 			It("fails if is shares a command name", func() {
 				coreCmds["conflict-alias"] = &testCommand.FakeCommand{}
@@ -572,3 +601,20 @@ var _ = Describe("Install", func() {
 		})
 	})
 })
+
+type testOrgsCmd struct{}
+
+func (t testOrgsCmd) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
+		Name:      "orgs",
+		ShortName: "o",
+	}
+}
+func (cmd testOrgsCmd) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	return
+}
+func (cmd testOrgsCmd) SetDependency(deps command_registry.Dependency, pluginCall bool) (c command_registry.Command) {
+	return
+}
+func (cmd testOrgsCmd) Execute(c flags.FlagContext) {
+}

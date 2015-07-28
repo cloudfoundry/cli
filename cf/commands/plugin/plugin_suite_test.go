@@ -23,6 +23,8 @@ func TestPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
 
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_help")
+	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_orgs")
+	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_orgs_short_name")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_push")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_with_push_short_name")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "..", "fixtures", "plugins"), "test_1")
