@@ -2,7 +2,7 @@ package service_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -17,33 +17,39 @@ import (
 var _ = Describe("create-user-provided-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.ReadWriter
+		config              core_config.Repository
 		repo                *testapi.FakeUserProvidedServiceInstanceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		cmd                 CreateUserProvidedService
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetUserProvidedServiceInstanceRepository(repo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-user-provided-service").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		repo = &testapi.FakeUserProvidedServiceInstanceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-		cmd = NewCreateUserProvidedService(ui, config, repo)
 	})
 
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			Expect(testcmd.RunCommand(cmd, []string{"my-service"}, requirementsFactory)).To(BeFalse())
+			Expect(testcmd.RunCliCommand("create-user-provided-service", []string{"my-service"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
-			Expect(testcmd.RunCommand(cmd, []string{"my-service"}, requirementsFactory)).To(BeFalse())
+			Expect(testcmd.RunCliCommand("create-user-provided-service", []string{"my-service"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 	})
 
 	It("creates a new user provided service given just a name", func() {
-		testcmd.RunCommand(cmd, []string{"my-custom-service"}, requirementsFactory)
+		testcmd.RunCliCommand("create-user-provided-service", []string{"my-custom-service"}, requirementsFactory, updateCommandDependency, false)
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating user provided service"},
 			[]string{"OK"},
@@ -52,7 +58,7 @@ var _ = Describe("create-user-provided-service command", func() {
 
 	It("accepts service parameters interactively", func() {
 		ui.Inputs = []string{"foo value", "bar value", "baz value"}
-		testcmd.RunCommand(cmd, []string{"-p", `"foo, bar, baz"`, "my-custom-service"}, requirementsFactory)
+		testcmd.RunCliCommand("create-user-provided-service", []string{"-p", `"foo, bar, baz"`, "my-custom-service"}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Prompts).To(ContainSubstrings(
 			[]string{"foo"},
@@ -76,7 +82,7 @@ var _ = Describe("create-user-provided-service command", func() {
 
 	It("accepts service parameters as JSON without prompting", func() {
 		args := []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": 4}`, "my-custom-service"}
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
 
 		name, _, params := repo.CreateArgsForCall(0)
 		Expect(name).To(Equal("my-custom-service"))
@@ -96,7 +102,7 @@ var _ = Describe("create-user-provided-service command", func() {
 
 	It("creates a user provided service with a syslog drain url", func() {
 		args := []string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"}
-		testcmd.RunCommand(cmd, args, requirementsFactory)
+		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
 
 		_, drainUrl, _ := repo.CreateArgsForCall(0)
 		Expect(drainUrl).To(Equal("syslog://example.com"))

@@ -50,7 +50,7 @@ type RepositoryLocator struct {
 	routeRepo                       RouteRepository
 	stackRepo                       stacks.StackRepository
 	serviceRepo                     ServiceRepository
-	serviceKeyRepo                  CloudControllerServiceKeyRepository
+	serviceKeyRepo                  ServiceKeyRepository
 	serviceBindingRepo              CloudControllerServiceBindingRepository
 	serviceSummaryRepo              ServiceSummaryRepository
 	userRepo                        UserRepository
@@ -61,7 +61,7 @@ type RepositoryLocator struct {
 	serviceBrokerRepo               ServiceBrokerRepository
 	servicePlanRepo                 CloudControllerServicePlanRepository
 	servicePlanVisibilityRepo       ServicePlanVisibilityRepository
-	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
+	userProvidedServiceInstanceRepo UserProvidedServiceInstanceRepository
 	buildpackRepo                   BuildpackRepository
 	buildpackBitsRepo               BuildpackBitsRepository
 	securityGroupRepo               security_groups.SecurityGroupRepo
@@ -278,6 +278,11 @@ func (locator RepositoryLocator) GetServiceRepository() ServiceRepository {
 	return locator.serviceRepo
 }
 
+func (locator RepositoryLocator) SetServiceKeyRepository(repo ServiceKeyRepository) RepositoryLocator {
+	locator.serviceKeyRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetServiceKeyRepository() ServiceKeyRepository {
 	return locator.serviceKeyRepo
 }
@@ -345,6 +350,11 @@ func (locator RepositoryLocator) GetServiceBrokerRepository() ServiceBrokerRepos
 
 func (locator RepositoryLocator) GetServicePlanRepository() ServicePlanRepository {
 	return locator.servicePlanRepo
+}
+
+func (locator RepositoryLocator) SetUserProvidedServiceInstanceRepository(repo UserProvidedServiceInstanceRepository) RepositoryLocator {
+	locator.userProvidedServiceInstanceRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetUserProvidedServiceInstanceRepository() UserProvidedServiceInstanceRepository {
