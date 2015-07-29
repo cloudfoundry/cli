@@ -162,11 +162,11 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("rename-service"),
 				}, {
 					presentNonCodegangstaCommand("create-service-key"),
-					presentCommand("service-keys"),
+					presentNonCodegangstaCommand("service-keys"),
 					presentCommand("service-key"),
 					presentCommand("delete-service-key"),
 				}, {
-					presentCommand("bind-service"),
+					presentNonCodegangstaCommand("bind-service"),
 					presentCommand("unbind-service"),
 				}, {
 					presentNonCodegangstaCommand("create-user-provided-service"),
@@ -244,7 +244,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("unset-org-role"),
 				}, {
 					presentNonCodegangstaCommand("space-users"),
-					presentCommand("set-space-role"),
+					presentNonCodegangstaCommand("set-space-role"),
 					presentNonCodegangstaCommand("unset-space-role"),
 				},
 			},
