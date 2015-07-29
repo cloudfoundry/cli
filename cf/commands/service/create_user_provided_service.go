@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type CreateUserProvidedService struct {
@@ -21,15 +21,16 @@ type CreateUserProvidedService struct {
 	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
 }
 
-func NewCreateUserProvidedService(ui terminal.UI, config core_config.Reader, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd CreateUserProvidedService) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
-	return
+func init() {
+	command_registry.Register(&CreateUserProvidedService{})
 }
 
-func (cmd CreateUserProvidedService) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Credentials")}
+	fs["l"] = &cliFlags.StringFlag{Name: "l", Usage: T("Syslog Drain Url")}
+
+	return command_registry.CommandMetadata{
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",
 		Description: T("Make a user-provided service instance available to cf apps"),
@@ -54,16 +55,13 @@ EXAMPLE
    Windows PowerShell
       CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'
 `),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Credentials")),
-			flag_helpers.NewStringFlag("l", T("Syslog Drain Url")),
-		},
+		Flags: fs,
 	}
 }
 
-func (cmd CreateUserProvidedService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *CreateUserProvidedService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-user-provided-service"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -73,7 +71,14 @@ func (cmd CreateUserProvidedService) GetRequirements(requirementsFactory require
 	return
 }
 
-func (cmd CreateUserProvidedService) Run(c *cli.Context) {
+func (cmd *CreateUserProvidedService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.userProvidedServiceInstanceRepo = deps.RepoLocator.GetUserProvidedServiceInstanceRepository()
+	return cmd
+}
+
+func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 	name := c.Args()[0]
 	drainUrl := c.String("l")
 

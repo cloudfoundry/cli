@@ -2700,6 +2700,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
       "translation": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
       "modified": false
