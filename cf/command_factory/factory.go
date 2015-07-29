@@ -93,8 +93,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
 
 	factory.cmdsByName["bind-service"] = bind
-	factory.cmdsByName["stop"] = stop
-	factory.cmdsByName["restart"] = restart
 	factory.cmdsByName["restart-app-instance"] = application.NewRestartAppInstance(ui, config, repoLocator.GetAppInstancesRepository())
 	factory.cmdsByName["restage"] = restage
 	factory.cmdsByName["push"] = application.NewPush(

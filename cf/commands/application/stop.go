@@ -4,17 +4,19 @@ import (
 	"errors"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
+//go:generate counterfeiter -o ../../../testhelpers/commands/fake_application_stopper.go . ApplicationStopper
 type ApplicationStopper interface {
+	command_registry.Command
 	ApplicationStop(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
 
@@ -25,17 +27,12 @@ type Stop struct {
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewStop(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) (cmd *Stop) {
-	cmd = new(Stop)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appRepo = appRepo
-
-	return
+func init() {
+	command_registry.Register(&Stop{})
 }
 
-func (cmd *Stop) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Stop) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "stop",
 		ShortName:   "sp",
 		Description: T("Stop an app"),
@@ -43,19 +40,32 @@ func (cmd *Stop) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *Stop) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *Stop) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("stop"))
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(), cmd.appReq}
+
+	return
+}
+
+func (cmd *Stop) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
+	return cmd
+}
+
+func NewStop(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) (cmd *Stop) {
+	cmd = new(Stop)
+	cmd.ui = ui
+	cmd.config = config
+	cmd.appRepo = appRepo
+
 	return
 }
 
@@ -84,7 +94,7 @@ func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName stri
 	return
 }
 
-func (cmd *Stop) Run(c *cli.Context) {
+func (cmd *Stop) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 	if app.State == "stopped" {
 		cmd.ui.Say(terminal.WarningColor(T("App ") + app.Name + T(" is already stopped")))
