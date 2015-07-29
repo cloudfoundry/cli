@@ -2645,6 +2645,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
       "translation": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
       "modified": false

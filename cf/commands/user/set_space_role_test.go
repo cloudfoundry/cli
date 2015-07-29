@@ -2,7 +2,7 @@ package user_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/user"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,8 +21,17 @@ var _ = Describe("set-space-role command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		spaceRepo           *testapi.FakeSpaceRepository
 		userRepo            *testapi.FakeUserRepository
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("set-space-role").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -37,17 +46,21 @@ var _ = Describe("set-space-role command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo), args, requirementsFactory)
+		return testcmd.RunCliCommand("set-space-role", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails with usage when not provided exactly four args", func() {
 		runCommand("foo", "bar", "baz")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 	})
 
 	It("does not fail with usage when provided four args", func() {
 		runCommand("whatever", "these", "are", "args")
-		Expect(ui.FailedWithUsage).To(BeFalse())
+		Expect(ui.Outputs).ToNot(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 	})
 
 	Describe("requirements", func() {
