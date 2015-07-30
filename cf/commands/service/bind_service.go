@@ -29,14 +29,6 @@ type BindService struct {
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewBindService(ui terminal.UI, config core_config.Reader, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
-	cmd = new(BindService)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.serviceBindingRepo = serviceBindingRepo
-	return
-}
-
 func init() {
 	command_registry.Register(&BindService{})
 }

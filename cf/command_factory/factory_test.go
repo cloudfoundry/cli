@@ -90,7 +90,8 @@ var _ = Describe("factory", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 	})
-	Describe("GetByCmdName", func() {
+
+	XDescribe("GetByCmdName", func() {
 		It("returns the cmd if it exists", func() {
 			cmd, err := factory.GetByCmdName("push")
 			Expect(cmd).ToNot(BeNil())
@@ -110,7 +111,7 @@ var _ = Describe("factory", func() {
 		})
 	})
 
-	Describe("CheckIfCoreCmdExists", func() {
+	XDescribe("CheckIfCoreCmdExists", func() {
 		It("returns true if the cmd exists", func() {
 			exists := factory.CheckIfCoreCmdExists("push")
 			Expect(exists).To(BeTrue())
@@ -127,7 +128,7 @@ var _ = Describe("factory", func() {
 		})
 	})
 
-	Describe("GetCommandFlags", func() {
+	XDescribe("GetCommandFlags", func() {
 		It("returns a list of flags for the command", func() {
 			flags := factory.GetCommandFlags("push")
 			Expect(contains(flags, "b")).To(Equal(true))
@@ -136,7 +137,7 @@ var _ = Describe("factory", func() {
 		})
 	})
 
-	Describe("GetCommandTotalArgs", func() {
+	XDescribe("GetCommandTotalArgs", func() {
 		It("returns the total number of argument required by the command ", func() {
 			totalArgs, err := factory.GetCommandTotalArgs("install-plugin")
 			Expect(err).ToNot(HaveOccurred())

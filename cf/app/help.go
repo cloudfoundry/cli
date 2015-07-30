@@ -121,14 +121,14 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("apps"),
 					presentNonCodegangstaCommand("app"),
 				}, {
-					presentCommand("push"),                //needs start/restart ...
-					presentNonCodegangstaCommand("scale"), //needs stop/restart
+					presentNonCodegangstaCommand("push"),
+					presentNonCodegangstaCommand("scale"),
 					presentNonCodegangstaCommand("delete"),
 					presentNonCodegangstaCommand("rename"),
 				}, {
-					presentNonCodegangstaCommand("start"), //needs app
+					presentNonCodegangstaCommand("start"),
 					presentNonCodegangstaCommand("stop"),
-					presentNonCodegangstaCommand("restart"), //needs start
+					presentNonCodegangstaCommand("restart"),
 					presentNonCodegangstaCommand("restage"),
 					presentCommand("restart-app-instance"),
 				}, {
@@ -297,8 +297,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("purge-service-offering"),
 				}, {
 					presentNonCodegangstaCommand("service-access"),
-					presentCommand("enable-service-access"),
-					presentCommand("disable-service-access"),
+					presentNonCodegangstaCommand("enable-service-access"),
+					presentNonCodegangstaCommand("disable-service-access"),
 				},
 			},
 		}, {

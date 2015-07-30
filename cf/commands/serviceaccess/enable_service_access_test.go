@@ -6,12 +6,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,19 +23,29 @@ var _ = Describe("enable-service-access command", func() {
 		ui                  *testterm.FakeUI
 		actor               *testactor.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
+		configRepo          core_config.Repository
 		tokenRefresher      *testapi.FakeAuthenticationRepository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(tokenRefresher)
+		deps.ServicePlanHandler = actor
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("enable-service-access").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		actor = &testactor.FakeServicePlanActor{}
+		configRepo = configuration.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		tokenRefresher = &testapi.FakeAuthenticationRepository{}
 	})
 
 	runCommand := func(args []string) bool {
-		cmd := NewEnableServiceAccess(ui, configuration.NewRepositoryWithDefaults(), actor, tokenRefresher)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("enable-service-access", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -45,7 +56,9 @@ var _ = Describe("enable-service-access command", func() {
 		It("fails with usage when it does not recieve any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand(nil)
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "argument"},
+			))
 		})
 	})
 

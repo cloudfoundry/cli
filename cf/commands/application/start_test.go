@@ -54,8 +54,6 @@ var _ = Describe("start command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
 
-		//save original create-route and restore later
-		OriginalAppCommand = command_registry.Commands.FindCommand("app")
 		//inject fake 'CreateRoute' into registry
 		command_registry.Register(displayApp)
 
@@ -98,6 +96,9 @@ var _ = Describe("start command", func() {
 		appRepo = &testApplication.FakeApplicationRepository{}
 
 		displayApp = &testcmd.FakeAppDisplayer{}
+
+		//save original command dependency and restore later
+		OriginalAppCommand = command_registry.Commands.FindCommand("app")
 
 		defaultAppForStart.Name = "my-app"
 		defaultAppForStart.Guid = "my-app-guid"

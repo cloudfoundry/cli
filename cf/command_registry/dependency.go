@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
@@ -20,6 +21,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/plugin/models"
+	"github.com/cloudfoundry/cli/words/generator"
 )
 
 type Dependency struct {
@@ -39,6 +41,10 @@ type Dependency struct {
 	PlanBuilder        plan_builder.Builder
 	ServiceHandler     actors.ServiceActor
 	ServicePlanHandler actors.ServicePlanActor
+	WordGenerator      generator.WordGenerator
+	AppZipper          app_files.Zipper
+	AppFiles           app_files.AppFiles
+	PushActor          actors.PushActor
 }
 
 type pluginModels struct {
@@ -118,6 +124,13 @@ func NewDependency() Dependency {
 		deps.PlanBuilder,
 		deps.ServiceBuilder,
 	)
+
+	deps.WordGenerator = generator.NewWordGenerator()
+
+	deps.AppZipper = app_files.ApplicationZipper{}
+	deps.AppFiles = app_files.ApplicationFiles{}
+
+	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles)
 
 	return deps
 }
