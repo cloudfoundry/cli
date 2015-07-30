@@ -20,6 +20,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 
 	"github.com/cloudfoundry/cli/cf/api"
@@ -73,6 +74,7 @@ func main() {
 	_ = plugin_repo.RepoPlugins{}
 	_ = plugin.Plugins{}
 	_ = route.CreateRoute{}
+	_ = space.CreateSpace{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()

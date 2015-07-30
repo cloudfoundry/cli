@@ -6,6 +6,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -15,7 +16,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/space"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,17 +27,32 @@ var _ = Describe("create-space command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		configSpace         models.SpaceFields
 		configOrg           models.OrganizationFields
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		spaceRepo           *testapi.FakeSpaceRepository
 		orgRepo             *fake_org.FakeOrganizationRepository
 		userRepo            *testapi.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
 		spaceQuotaRepo      *fakes.FakeSpaceQuotaRepository
+		OriginalCommand     command_registry.Command
+		deps                command_registry.Dependency
 	)
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(spaceQuotaRepo)
+		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
+		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
+		deps.Config = configRepo
+
+		//inject fake 'command dependency' into registry
+		command_registry.Register(spaceRoleSetter)
+
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-space").SetDependency(deps, pluginCall))
+	}
+
 	runCommand := func(args ...string) bool {
-		cmd := NewCreateSpace(ui, configRepo, spaceRoleSetter, spaceRepo, orgRepo, userRepo, spaceQuotaRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("create-space", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
@@ -46,7 +61,7 @@ var _ = Describe("create-space command", func() {
 
 		orgRepo = &fake_org.FakeOrganizationRepository{}
 		userRepo = &testapi.FakeUserRepository{}
-		spaceRoleSetter = user.NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
+		spaceRoleSetter = command_registry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
 		spaceQuotaRepo = &fakes.FakeSpaceQuotaRepository{}
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
@@ -60,16 +75,25 @@ var _ = Describe("create-space command", func() {
 			Guid: "config-space-guid",
 		}
 
+		//save original command and restore later
+		OriginalCommand = command_registry.Commands.FindCommand("set-space-role")
+
 		spaceRepo = &testapi.FakeSpaceRepository{
 			CreateSpaceSpace: maker.NewSpace(maker.Overrides{"name": "my-space", "guid": "my-space-guid", "organization": configOrg}),
 		}
 		Expect(spaceRepo.CreateSpaceSpace.Name).To(Equal("my-space"))
 	})
 
+	AfterEach(func() {
+		command_registry.Register(OriginalCommand)
+	})
+
 	Describe("Requirements", func() {
 		It("fails with usage when not provided exactly one argument", func() {
 			runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "argument"},
+			))
 		})
 
 		Context("when not logged in", func() {

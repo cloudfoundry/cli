@@ -19,6 +19,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -74,6 +75,7 @@ var _ = Describe("App", func() {
 	_ = plugin_repo.RepoPlugins{}
 	_ = plugin.Plugins{}
 	_ = route.CreateRoute{}
+	_ = space.CreateSpace{}
 
 	JustBeforeEach(func() {
 		ui := &testterm.FakeUI{}

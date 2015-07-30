@@ -16,6 +16,7 @@ import (
 )
 
 type SpaceRoleSetter interface {
+	command_registry.Command
 	SetSpaceRole(space models.Space, role, userGuid, userName string) (err error)
 }
 
@@ -26,15 +27,6 @@ type SetSpaceRole struct {
 	userRepo  api.UserRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
-}
-
-func NewSetSpaceRole(ui terminal.UI, config core_config.Reader, spaceRepo spaces.SpaceRepository, userRepo api.UserRepository) (cmd *SetSpaceRole) {
-	cmd = new(SetSpaceRole)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.spaceRepo = spaceRepo
-	cmd.userRepo = userRepo
-	return
 }
 
 func init() {
