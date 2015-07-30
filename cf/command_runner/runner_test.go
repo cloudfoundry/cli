@@ -71,7 +71,7 @@ func (r *TestRequirement) Execute() (success bool) {
 	return true
 }
 
-var _ = Describe("Requirements runner", func() {
+var _ = XDescribe("Requirements runner", func() {
 	It("runs", func() {
 		passingReq := TestRequirement{Passes: true}
 		failingReq := TestRequirement{Passes: false}

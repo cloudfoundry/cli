@@ -18,6 +18,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
+	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
 	"github.com/cloudfoundry/cli/cf/commands/space"
@@ -75,6 +76,7 @@ func main() {
 	_ = plugin.Plugins{}
 	_ = route.CreateRoute{}
 	_ = space.CreateSpace{}
+	_ = serviceaccess.ServiceAccess{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()

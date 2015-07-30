@@ -84,7 +84,7 @@ var _ = Describe("main", func() {
 		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 	})
 
-	Describe("Flag verification", func() {
+	XDescribe("Flag verification", func() {
 		It("informs user for any incorrect provided flags", func() {
 			result := Cf("push", "--no-hostname", "--bad-flag")
 			Eventually(result.Out).Should(Say("\"--bad-flag\""))

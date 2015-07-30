@@ -33,6 +33,17 @@ const (
 
 const LogMessageTypeStaging = "STG"
 
+type ApplicationStagingWatcher interface {
+	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
+}
+
+//go:generate counterfeiter -o ../../../testhelpers/commands/fake_application_starter.go . ApplicationStarter
+type ApplicationStarter interface {
+	command_registry.Command
+	SetStartTimeoutInSeconds(timeout int)
+	ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
+}
+
 type Start struct {
 	ui               terminal.UI
 	config           core_config.Reader
@@ -47,17 +58,6 @@ type Start struct {
 	StartupTimeout             time.Duration
 	StagingTimeout             time.Duration
 	PingerThrottle             time.Duration
-}
-
-type ApplicationStagingWatcher interface {
-	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
-}
-
-//go:generate counterfeiter -o ../../../testhelpers/commands/fake_application_starter.go . ApplicationStarter
-type ApplicationStarter interface {
-	command_registry.Command
-	SetStartTimeoutInSeconds(timeout int)
-	ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
 
 func init() {
