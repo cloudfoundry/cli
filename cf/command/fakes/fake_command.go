@@ -4,115 +4,156 @@ package fakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/command"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type FakeCommand struct {
-	MetadataStub        func() command_metadata.CommandMetadata
-	metadataMutex       sync.RWMutex
-	metadataArgsForCall []struct{}
-	metadataReturns     struct {
-		result1 command_metadata.CommandMetadata
+	MetaDataStub        func() command_registry.CommandMetadata
+	metaDataMutex       sync.RWMutex
+	metaDataArgsForCall []struct{}
+	metaDataReturns     struct {
+		result1 command_registry.CommandMetadata
 	}
-	GetRequirementsStub        func(requirementsFactory requirements.Factory, context *cli.Context) (reqs []requirements.Requirement, err error)
-	getRequirementsMutex       sync.RWMutex
-	getRequirementsArgsForCall []struct {
+	SetDependencyStub        func(deps command_registry.Dependency, pluginCall bool) command_registry.Command
+	setDependencyMutex       sync.RWMutex
+	setDependencyArgsForCall []struct {
+		deps       command_registry.Dependency
+		pluginCall bool
+	}
+	setDependencyReturns struct {
+		result1 command_registry.Command
+	}
+	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) (reqs []requirements.Requirement, err error)
+	requirementsMutex       sync.RWMutex
+	requirementsArgsForCall []struct {
 		requirementsFactory requirements.Factory
-		context             *cli.Context
+		context             flags.FlagContext
 	}
-	getRequirementsReturns struct {
+	requirementsReturns struct {
 		result1 []requirements.Requirement
 		result2 error
 	}
-	RunStub        func(context *cli.Context)
-	runMutex       sync.RWMutex
-	runArgsForCall []struct {
-		context *cli.Context
+	ExecuteStub        func(context flags.FlagContext)
+	executeMutex       sync.RWMutex
+	executeArgsForCall []struct {
+		context flags.FlagContext
 	}
 }
 
-func (fake *FakeCommand) Metadata() command_metadata.CommandMetadata {
-	fake.metadataMutex.Lock()
-	defer fake.metadataMutex.Unlock()
-	fake.metadataArgsForCall = append(fake.metadataArgsForCall, struct{}{})
-	if fake.MetadataStub != nil {
-		return fake.MetadataStub()
+func (fake *FakeCommand) MetaData() command_registry.CommandMetadata {
+	fake.metaDataMutex.Lock()
+	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
+	fake.metaDataMutex.Unlock()
+	if fake.MetaDataStub != nil {
+		return fake.MetaDataStub()
 	} else {
-		return fake.metadataReturns.result1
+		return fake.metaDataReturns.result1
 	}
 }
 
-func (fake *FakeCommand) MetadataCallCount() int {
-	fake.metadataMutex.RLock()
-	defer fake.metadataMutex.RUnlock()
-	return len(fake.metadataArgsForCall)
+func (fake *FakeCommand) MetaDataCallCount() int {
+	fake.metaDataMutex.RLock()
+	defer fake.metaDataMutex.RUnlock()
+	return len(fake.metaDataArgsForCall)
 }
 
-func (fake *FakeCommand) MetadataReturns(result1 command_metadata.CommandMetadata) {
-	fake.MetadataStub = nil
-	fake.metadataReturns = struct {
-		result1 command_metadata.CommandMetadata
+func (fake *FakeCommand) MetaDataReturns(result1 command_registry.CommandMetadata) {
+	fake.MetaDataStub = nil
+	fake.metaDataReturns = struct {
+		result1 command_registry.CommandMetadata
 	}{result1}
 }
 
-func (fake *FakeCommand) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) (reqs []requirements.Requirement, err error) {
-	fake.getRequirementsMutex.Lock()
-	defer fake.getRequirementsMutex.Unlock()
-	fake.getRequirementsArgsForCall = append(fake.getRequirementsArgsForCall, struct {
-		requirementsFactory requirements.Factory
-		context             *cli.Context
-	}{requirementsFactory, context})
-	if fake.GetRequirementsStub != nil {
-		return fake.GetRequirementsStub(requirementsFactory, context)
+func (fake *FakeCommand) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	fake.setDependencyMutex.Lock()
+	fake.setDependencyArgsForCall = append(fake.setDependencyArgsForCall, struct {
+		deps       command_registry.Dependency
+		pluginCall bool
+	}{deps, pluginCall})
+	fake.setDependencyMutex.Unlock()
+	if fake.SetDependencyStub != nil {
+		return fake.SetDependencyStub(deps, pluginCall)
 	} else {
-		return fake.getRequirementsReturns.result1, fake.getRequirementsReturns.result2
+		return fake.setDependencyReturns.result1
 	}
 }
 
-func (fake *FakeCommand) GetRequirementsCallCount() int {
-	fake.getRequirementsMutex.RLock()
-	defer fake.getRequirementsMutex.RUnlock()
-	return len(fake.getRequirementsArgsForCall)
+func (fake *FakeCommand) SetDependencyCallCount() int {
+	fake.setDependencyMutex.RLock()
+	defer fake.setDependencyMutex.RUnlock()
+	return len(fake.setDependencyArgsForCall)
 }
 
-func (fake *FakeCommand) GetRequirementsArgsForCall(i int) (requirements.Factory, *cli.Context) {
-	fake.getRequirementsMutex.RLock()
-	defer fake.getRequirementsMutex.RUnlock()
-	return fake.getRequirementsArgsForCall[i].requirementsFactory, fake.getRequirementsArgsForCall[i].context
+func (fake *FakeCommand) SetDependencyArgsForCall(i int) (command_registry.Dependency, bool) {
+	fake.setDependencyMutex.RLock()
+	defer fake.setDependencyMutex.RUnlock()
+	return fake.setDependencyArgsForCall[i].deps, fake.setDependencyArgsForCall[i].pluginCall
 }
 
-func (fake *FakeCommand) GetRequirementsReturns(result1 []requirements.Requirement, result2 error) {
-	fake.GetRequirementsStub = nil
-	fake.getRequirementsReturns = struct {
+func (fake *FakeCommand) SetDependencyReturns(result1 command_registry.Command) {
+	fake.SetDependencyStub = nil
+	fake.setDependencyReturns = struct {
+		result1 command_registry.Command
+	}{result1}
+}
+
+func (fake *FakeCommand) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	fake.requirementsMutex.Lock()
+	fake.requirementsArgsForCall = append(fake.requirementsArgsForCall, struct {
+		requirementsFactory requirements.Factory
+		context             flags.FlagContext
+	}{requirementsFactory, context})
+	fake.requirementsMutex.Unlock()
+	if fake.RequirementsStub != nil {
+		return fake.RequirementsStub(requirementsFactory, context)
+	} else {
+		return fake.requirementsReturns.result1, fake.requirementsReturns.result2
+	}
+}
+
+func (fake *FakeCommand) RequirementsCallCount() int {
+	fake.requirementsMutex.RLock()
+	defer fake.requirementsMutex.RUnlock()
+	return len(fake.requirementsArgsForCall)
+}
+
+func (fake *FakeCommand) RequirementsArgsForCall(i int) (requirements.Factory, flags.FlagContext) {
+	fake.requirementsMutex.RLock()
+	defer fake.requirementsMutex.RUnlock()
+	return fake.requirementsArgsForCall[i].requirementsFactory, fake.requirementsArgsForCall[i].context
+}
+
+func (fake *FakeCommand) RequirementsReturns(result1 []requirements.Requirement, result2 error) {
+	fake.RequirementsStub = nil
+	fake.requirementsReturns = struct {
 		result1 []requirements.Requirement
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeCommand) Run(context *cli.Context) {
-	fake.runMutex.Lock()
-	defer fake.runMutex.Unlock()
-	fake.runArgsForCall = append(fake.runArgsForCall, struct {
-		context *cli.Context
+func (fake *FakeCommand) Execute(context flags.FlagContext) {
+	fake.executeMutex.Lock()
+	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
+		context flags.FlagContext
 	}{context})
-	if fake.RunStub != nil {
-		fake.RunStub(context)
+	fake.executeMutex.Unlock()
+	if fake.ExecuteStub != nil {
+		fake.ExecuteStub(context)
 	}
 }
 
-func (fake *FakeCommand) RunCallCount() int {
-	fake.runMutex.RLock()
-	defer fake.runMutex.RUnlock()
-	return len(fake.runArgsForCall)
+func (fake *FakeCommand) ExecuteCallCount() int {
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeCommand) RunArgsForCall(i int) *cli.Context {
-	fake.runMutex.RLock()
-	defer fake.runMutex.RUnlock()
-	return fake.runArgsForCall[i].context
+func (fake *FakeCommand) ExecuteArgsForCall(i int) flags.FlagContext {
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	return fake.executeArgsForCall[i].context
 }
 
-var _ command.Command = new(FakeCommand)
+var _ command_registry.Command = new(FakeCommand)

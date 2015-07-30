@@ -5,16 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/rpc"
 	"os"
 	"path/filepath"
 	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/fakes"
-	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command"
 	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
@@ -23,7 +19,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
-	cliRpc "github.com/cloudfoundry/cli/plugin/rpc"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -32,7 +27,6 @@ import (
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
-	. "github.com/cloudfoundry/cli/cf/commands/plugin"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -42,12 +36,11 @@ var _ = Describe("Install", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.ReadWriter
+		config              core_config.Repository
 		pluginConfig        *testPluginConfig.FakePluginConfiguration
 		fakePluginRepo      *fakes.FakePluginRepo
 		fakeChecksum        *testChecksum.FakeSha1Checksum
 
-		coreCmds   map[string]command.Command
 		pluginFile *os.File
 		homeDir    string
 		pluginDir  string
@@ -62,7 +55,17 @@ var _ = Describe("Install", func() {
 		test_with_push            string
 		test_with_push_short_name string
 		aliasConflicts            string
+		deps                      command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.PluginConfig = pluginConfig
+		deps.PluginRepo = fakePluginRepo
+		deps.ChecksumUtil = fakeChecksum
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("install-plugin").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -71,7 +74,6 @@ var _ = Describe("Install", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		fakePluginRepo = &fakes.FakePluginRepo{}
 		fakeChecksum = &testChecksum.FakeSha1Checksum{}
-		coreCmds = make(map[string]command.Command)
 
 		dir, err := os.Getwd()
 		if err != nil {
@@ -110,11 +112,7 @@ var _ = Describe("Install", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		//reset rpc registration, each service can only be registered once
-		rpc.DefaultServer = rpc.NewServer()
-		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
-		cmd := NewPluginInstall(ui, config, pluginConfig, coreCmds, fakePluginRepo, fakeChecksum, rpcService)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("install-plugin", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -337,35 +335,20 @@ var _ = Describe("Install", func() {
 			})
 		})
 
-		Context("when the plugin's command conflicts with a core command", func() {
-			It("fails if is shares a command name", func() {
-				coreCmds["push"] = &testCommand.FakeCommand{}
-				runCommand(test_with_push)
+		Context("when the plugin's command conflicts with a core command/alias", func() {
+			var originalCommand command_registry.Command
 
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Command `push` in the plugin being installed is a native CF command/alias.  Rename the `push` command in the plugin being installed in order to enable its installation and use."},
-					[]string{"FAILED"},
-				))
+			BeforeEach(func() {
+				originalCommand = command_registry.Commands.FindCommand("org")
+
+				command_registry.Register(testOrgsCmd{})
 			})
 
-			It("fails if it shares a command short name", func() {
-				push := &testCommand.FakeCommand{}
-				push.MetadataReturns(command_metadata.CommandMetadata{
-					ShortName: "p",
-				})
-
-				coreCmds["push"] = push
-				runCommand(test_with_push_short_name)
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Command `p` in the plugin being installed is a native CF command/alias.  Rename the `p` command in the plugin being installed in order to enable its installation and use."},
-					[]string{"FAILED"},
-				))
+			AfterEach(func() {
+				if originalCommand != nil {
+					command_registry.Register(originalCommand)
+				}
 			})
-		})
-
-		Context("when the plugin's command conflicts with a non-codegangsta core command", func() {
-			command_registry.Register(testOrgsCmd{})
 
 			It("fails if is shares a command name", func() {
 				runCommand(test_with_orgs)
@@ -387,8 +370,18 @@ var _ = Describe("Install", func() {
 		})
 
 		Context("when the plugin's alias conflicts with a core command/alias", func() {
-			It("fails if is shares a command name", func() {
-				coreCmds["conflict-alias"] = &testCommand.FakeCommand{}
+			var fakeCmd *testCommand.FakeCommand
+
+			AfterEach(func() {
+				command_registry.Commands.RemoveCommand("non-conflict-cmd")
+				command_registry.Commands.RemoveCommand("conflict-alias")
+			})
+
+			It("fails if it shares a command name", func() {
+				fakeCmd = &testCommand.FakeCommand{}
+				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "conflict-alias"})
+				command_registry.Register(fakeCmd)
+
 				runCommand(aliasConflicts)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -398,12 +391,10 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command short name", func() {
-				push := &testCommand.FakeCommand{}
-				push.MetadataReturns(command_metadata.CommandMetadata{
-					ShortName: "conflict-alias",
-				})
+				fakeCmd = &testCommand.FakeCommand{}
+				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "non-conflict-cmd", ShortName: "conflict-alias"})
+				command_registry.Register(fakeCmd)
 
-				coreCmds["push"] = push
 				runCommand(aliasConflicts)
 
 				Expect(ui.Outputs).To(ContainSubstrings(

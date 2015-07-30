@@ -3,11 +3,8 @@ package command_factory
 import (
 	"errors"
 
-	actor_plugin_repo "github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/plugin/rpc"
-	"github.com/cloudfoundry/cli/utils"
 
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/codegangsta/cli"
@@ -16,7 +13,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/commands/servicekey"
 	"github.com/cloudfoundry/cli/cf/commands/user"
@@ -41,44 +37,12 @@ type concreteFactory struct {
 func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator, pluginConfig plugin_config.PluginConfiguration, rpcService *rpc.CliRpcService) (factory concreteFactory) {
 	factory.cmdsByName = make(map[string]command.Command)
 
-	factory.cmdsByName["update-service"] = service.NewUpdateService(
-		ui,
-		config,
-		repoLocator.GetServiceRepository(),
-		plan_builder.NewBuilder(
-			repoLocator.GetServicePlanRepository(),
-			repoLocator.GetServicePlanVisibilityRepository(),
-			repoLocator.GetOrganizationRepository(),
-		),
-	)
-
 	factory.cmdsByName["create-user"] = user.NewCreateUser(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["delete-service-key"] = servicekey.NewDeleteServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["service-key"] = servicekey.NewGetServiceKey(ui, config, repoLocator.GetServiceRepository(), repoLocator.GetServiceKeyRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
-
-	// displayApp := application.NewShowApp(ui, config, repoLocator.GetAppSummaryRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository())
-	// start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository(), repoLocator.GetOldLogsRepository())
-	// stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
-	// bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
-
 	factory.cmdsByName["restart-app-instance"] = application.NewRestartAppInstance(ui, config, repoLocator.GetAppInstancesRepository())
-
-	// factory.cmdsByName["push"] = application.NewPush(
-	// 	ui, config, manifestRepo, start, stop, bind,
-	// 	repoLocator.GetApplicationRepository(),
-	// 	repoLocator.GetDomainRepository(),
-	// 	repoLocator.GetRouteRepository(),
-	// 	repoLocator.GetStackRepository(),
-	// 	repoLocator.GetServiceRepository(),
-	// 	repoLocator.GetAuthenticationRepository(),
-	// 	generator.NewWordGenerator(),
-	// 	actors.NewPushActor(repoLocator.GetApplicationBitsRepository(), app_files.ApplicationZipper{}, app_files.ApplicationFiles{}),
-	// 	app_files.ApplicationZipper{},
-	// 	app_files.ApplicationFiles{})
-
-	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config, pluginConfig, factory.cmdsByName, actor_plugin_repo.NewPluginRepo(), utils.NewSha1Checksum(""), rpcService)
 
 	return
 }

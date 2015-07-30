@@ -157,7 +157,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("service"),
 				}, {
 					presentNonCodegangstaCommand("create-service"),
-					presentCommand("update-service"),
+					presentNonCodegangstaCommand("update-service"),
 					presentNonCodegangstaCommand("delete-service"),
 					presentNonCodegangstaCommand("rename-service"),
 				}, {
@@ -367,7 +367,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentNonCodegangstaCommand("plugins"),
-					presentCommand("install-plugin"),
+					presentNonCodegangstaCommand("install-plugin"),
 					presentNonCodegangstaCommand("uninstall-plugin"),
 				},
 			},

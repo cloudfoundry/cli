@@ -7,16 +7,16 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/cli/json"
-	"github.com/codegangsta/cli"
 )
 
 type UpdateService struct {
@@ -26,16 +26,11 @@ type UpdateService struct {
 	planBuilder plan_builder.PlanBuilder
 }
 
-func NewUpdateService(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, planBuilder plan_builder.PlanBuilder) (cmd *UpdateService) {
-	return &UpdateService{
-		ui:          ui,
-		config:      config,
-		serviceRepo: serviceRepo,
-		planBuilder: planBuilder,
-	}
+func init() {
+	command_registry.Register(&UpdateService{})
 }
 
-func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
+func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
 	baseUsage := T("CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]")
 	paramsUsage := T(`   Optionally provide service-specific configuration parameters in a valid JSON object in-line.
    CF_NAME update-service -c '{"name":"value","name":"value"}'
@@ -58,21 +53,22 @@ func (cmd *UpdateService) Metadata() command_metadata.CommandMetadata {
    CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json
    CF_NAME update-service mydb -t "list,of, tags"`)
 
-	return command_metadata.CommandMetadata{
+	fs := make(map[string]flags.FlagSet)
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Change service plan for a service instance")}
+	fs["c"] = &cliFlags.StringFlag{Name: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
+	fs["t"] = &cliFlags.StringFlag{Name: "t", Usage: T("User provided tags")}
+
+	return command_registry.CommandMetadata{
 		Name:        "update-service",
 		Description: T("Update a service instance"),
 		Usage:       T(strings.Join([]string{baseUsage, paramsUsage, tagsUsage, exampleUsage}, "\n\n")),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Change service plan for a service instance")),
-			flag_helpers.NewStringFlag("c", T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")),
-			flag_helpers.NewStringFlag("t", T("User provided tags")),
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *UpdateService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("update-service"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -83,7 +79,15 @@ func (cmd *UpdateService) GetRequirements(requirementsFactory requirements.Facto
 	return
 }
 
-func (cmd *UpdateService) Run(c *cli.Context) {
+func (cmd *UpdateService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
+	cmd.planBuilder = deps.PlanBuilder
+	return cmd
+}
+
+func (cmd *UpdateService) Execute(c flags.FlagContext) {
 	planName := c.String("p")
 	params := c.String("c")
 
