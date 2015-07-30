@@ -12,7 +12,8 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/serviceaccess"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,18 +27,28 @@ var _ = Describe("service-access command", func() {
 		serviceBroker1      models.ServiceBroker
 		serviceBroker2      models.ServiceBroker
 		tokenRefresher      *testapi.FakeAuthenticationRepository
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(tokenRefresher)
+		deps.ServiceHandler = actor
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("service-access").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		actor = &testactor.FakeServiceActor{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		tokenRefresher = &testapi.FakeAuthenticationRepository{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewServiceAccess(ui, testconfig.NewRepositoryWithDefaults(), actor, tokenRefresher)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("service-access", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -48,7 +59,9 @@ var _ = Describe("service-access command", func() {
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument"},
+			))
 		})
 	})
 

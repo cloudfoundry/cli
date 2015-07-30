@@ -8,14 +8,14 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/copy_application_source"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CopySource struct {
@@ -29,45 +29,27 @@ type CopySource struct {
 	appRestart        ApplicationRestarter
 }
 
-func NewCopySource(
-	ui terminal.UI,
-	config core_config.Reader,
-	authRepo authentication.AuthenticationRepository,
-	appRepo applications.ApplicationRepository,
-	orgRepo organizations.OrganizationRepository,
-	spaceRepo spaces.SpaceRepository,
-	copyAppSourceRepo copy_application_source.CopyApplicationSourceRepository,
-	appRestart ApplicationRestarter,
-) *CopySource {
-
-	return &CopySource{
-		ui:                ui,
-		config:            config,
-		authRepo:          authRepo,
-		appRepo:           appRepo,
-		orgRepo:           orgRepo,
-		spaceRepo:         spaceRepo,
-		copyAppSourceRepo: copyAppSourceRepo,
-		appRestart:        appRestart,
-	}
+func init() {
+	command_registry.Register(&CopySource{})
 }
 
-func (cmd *CopySource) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CopySource) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["no-restart"] = &cliFlags.BoolFlag{Name: "no-restart", Usage: T("Override restart of the application in target environment after copy-source completes")}
+	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Org that contains the target application")}
+	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Space that contains the target application")}
+
+	return command_registry.CommandMetadata{
 		Name:        "copy-source",
 		Description: T("Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application."),
 		Usage:       T("   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("o", T("Org that contains the target application")),
-			flag_helpers.NewStringFlag("s", T("Space that contains the target application")),
-			cli.BoolFlag{Name: "no-restart", Usage: T("Override restart of the application in target environment after copy-source completes")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *CopySource) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *CopySource) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n") + command_registry.Commands.CommandUsage("copy-source"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -77,7 +59,24 @@ func (cmd *CopySource) GetRequirements(requirementsFactory requirements.Factory,
 	return
 }
 
-func (cmd *CopySource) Run(c *cli.Context) {
+func (cmd *CopySource) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
+	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	cmd.copyAppSourceRepo = deps.RepoLocator.GetCopyApplicationSourceRepository()
+
+	//get command from registry for dependency
+	commandDep := command_registry.Commands.FindCommand("restart")
+	commandDep = commandDep.SetDependency(deps, false)
+	cmd.appRestart = commandDep.(ApplicationRestarter)
+
+	return cmd
+}
+
+func (cmd *CopySource) Execute(c flags.FlagContext) {
 	sourceAppName := c.Args()[0]
 	targetAppName := c.Args()[1]
 

@@ -451,6 +451,11 @@ func (locator RepositoryLocator) GetEnvironmentVariableGroupsRepository() enviro
 	return locator.environmentVariableGroupRepo
 }
 
+func (locator RepositoryLocator) SetCopyApplicationSourceRepository(repo copy_application_source.CopyApplicationSourceRepository) RepositoryLocator {
+	locator.copyAppSourceRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetCopyApplicationSourceRepository() copy_application_source.CopyApplicationSourceRepository {
 	return locator.copyAppSourceRepo
 }
