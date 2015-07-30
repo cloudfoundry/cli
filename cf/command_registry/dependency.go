@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/broker_builder"
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
@@ -22,20 +23,22 @@ import (
 )
 
 type Dependency struct {
-	Ui             terminal.UI
-	Config         core_config.Repository
-	RepoLocator    api.RepositoryLocator
-	Detector       detection.Detector
-	PluginConfig   plugin_config.PluginConfiguration
-	ManifestRepo   manifest.ManifestRepository
-	AppManifest    manifest.AppManifest
-	Gateways       map[string]net.Gateway
-	TeePrinter     *terminal.TeePrinter
-	PluginRepo     plugin_repo.PluginRepo
-	PluginModels   *pluginModels
-	ServiceBuilder service_builder.ServiceBuilder
-	BrokerBuilder  broker_builder.Builder
-	PlanBuilder    plan_builder.Builder
+	Ui                 terminal.UI
+	Config             core_config.Repository
+	RepoLocator        api.RepositoryLocator
+	Detector           detection.Detector
+	PluginConfig       plugin_config.PluginConfiguration
+	ManifestRepo       manifest.ManifestRepository
+	AppManifest        manifest.AppManifest
+	Gateways           map[string]net.Gateway
+	TeePrinter         *terminal.TeePrinter
+	PluginRepo         plugin_repo.PluginRepo
+	PluginModels       *pluginModels
+	ServiceBuilder     service_builder.ServiceBuilder
+	BrokerBuilder      broker_builder.Builder
+	PlanBuilder        plan_builder.Builder
+	ServiceHandler     actors.ServiceActor
+	ServicePlanHandler actors.ServicePlanActor
 }
 
 type pluginModels struct {
@@ -99,7 +102,22 @@ func NewDependency() Dependency {
 		deps.RepoLocator.GetServiceBrokerRepository(),
 		deps.ServiceBuilder,
 	)
+
 	deps.PluginRepo = plugin_repo.NewPluginRepo()
+
+	deps.ServiceHandler = actors.NewServiceHandler(
+		deps.RepoLocator.GetOrganizationRepository(),
+		deps.BrokerBuilder,
+		deps.ServiceBuilder,
+	)
+
+	deps.ServicePlanHandler = actors.NewServicePlanHandler(
+		deps.RepoLocator.GetServicePlanRepository(),
+		deps.RepoLocator.GetServicePlanVisibilityRepository(),
+		deps.RepoLocator.GetOrganizationRepository(),
+		deps.PlanBuilder,
+		deps.ServiceBuilder,
+	)
 
 	return deps
 }

@@ -69,15 +69,6 @@ func (cmd *Restart) SetDependency(deps command_registry.Dependency, pluginCall b
 	return cmd
 }
 
-func NewRestart(ui terminal.UI, config core_config.Reader, starter ApplicationStarter, stopper ApplicationStopper) (cmd *Restart) {
-	cmd = new(Restart)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.starter = starter
-	cmd.stopper = stopper
-	return
-}
-
 func (cmd *Restart) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 	cmd.ApplicationRestart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)

@@ -14,7 +14,6 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/actors/broker_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/command"
@@ -59,11 +58,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		planBuilder,
 	)
 
-	brokerBuilder := broker_builder.NewBuilder(
-		repoLocator.GetServiceBrokerRepository(),
-		serviceBuilder,
-	)
-
 	factory.cmdsByName["update-service"] = service.NewUpdateService(
 		ui,
 		config,
@@ -84,7 +78,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	displayApp := application.NewShowApp(ui, config, repoLocator.GetAppSummaryRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository())
 	start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository(), repoLocator.GetOldLogsRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
-	restart := application.NewRestart(ui, config, start, stop)
 	bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
 
 	factory.cmdsByName["restart-app-instance"] = application.NewRestartAppInstance(ui, config, repoLocator.GetAppInstancesRepository())
@@ -101,15 +94,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		app_files.ApplicationZipper{},
 		app_files.ApplicationFiles{})
 
-	factory.cmdsByName["service-access"] = serviceaccess.NewServiceAccess(
-		ui, config,
-		actors.NewServiceHandler(
-			repoLocator.GetOrganizationRepository(),
-			brokerBuilder,
-			serviceBuilder,
-		),
-		repoLocator.GetAuthenticationRepository(),
-	)
 	factory.cmdsByName["enable-service-access"] = serviceaccess.NewEnableServiceAccess(
 		ui, config,
 		actors.NewServicePlanHandler(
@@ -134,17 +118,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	)
 
 	factory.cmdsByName["install-plugin"] = plugin.NewPluginInstall(ui, config, pluginConfig, factory.cmdsByName, actor_plugin_repo.NewPluginRepo(), utils.NewSha1Checksum(""), rpcService)
-
-	factory.cmdsByName["copy-source"] = application.NewCopySource(
-		ui,
-		config,
-		repoLocator.GetAuthenticationRepository(),
-		repoLocator.GetApplicationRepository(),
-		repoLocator.GetOrganizationRepository(),
-		repoLocator.GetSpaceRepository(),
-		repoLocator.GetCopyApplicationSourceRepository(),
-		restart, //note this is built up above.
-	)
 
 	return
 }

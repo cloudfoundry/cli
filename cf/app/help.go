@@ -143,7 +143,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("stacks"),
 					presentNonCodegangstaCommand("stack"),
 				}, {
-					presentCommand("copy-source"),
+					presentNonCodegangstaCommand("copy-source"),
 				}, {
 					presentNonCodegangstaCommand("create-app-manifest"),
 				},
@@ -296,7 +296,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("migrate-service-instances"),
 					presentNonCodegangstaCommand("purge-service-offering"),
 				}, {
-					presentCommand("service-access"),
+					presentNonCodegangstaCommand("service-access"),
 					presentCommand("enable-service-access"),
 					presentCommand("disable-service-access"),
 				},
