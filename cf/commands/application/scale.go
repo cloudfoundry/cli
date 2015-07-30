@@ -2,15 +2,15 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type Scale struct {
@@ -21,39 +21,31 @@ type Scale struct {
 	appRepo   applications.ApplicationRepository
 }
 
-func NewScale(ui terminal.UI, config core_config.Reader, restarter ApplicationRestarter, appRepo applications.ApplicationRepository) (cmd *Scale) {
-	cmd = new(Scale)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.restarter = restarter
-	cmd.appRepo = appRepo
-	return
+func init() {
+	command_registry.Register(&Scale{})
 }
 
-func (cmd *Scale) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Scale) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["i"] = &cliFlags.IntFlag{Name: "i", Usage: T("Number of instances")}
+	fs["k"] = &cliFlags.StringFlag{Name: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
+	fs["m"] = &cliFlags.StringFlag{Name: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force restart of app without prompt")}
+
+	return command_registry.CommandMetadata{
 		Name:        "scale",
 		Description: T("Change or view the instance count, disk space limit, and memory limit for an app"),
 		Usage:       T("CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewIntFlag("i", T("Number of instances")),
-			flag_helpers.NewStringFlag("k", T("Disk limit (e.g. 256M, 1024M, 1G)")),
-			flag_helpers.NewStringFlag("m", T("Memory limit (e.g. 256M, 1024M, 1G)")),
-			cli.BoolFlag{Name: "f", Usage: T("Force restart of app without prompt")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *Scale) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *Scale) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("scale"))
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -63,9 +55,22 @@ func (cmd *Scale) GetRequirements(requirementsFactory requirements.Factory, c *c
 	return
 }
 
+func (cmd *Scale) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
+
+	//get command from registry for dependency
+	commandDep := command_registry.Commands.FindCommand("restart")
+	commandDep = commandDep.SetDependency(deps, false)
+	cmd.restarter = commandDep.(ApplicationRestarter)
+
+	return cmd
+}
+
 var bytesInAMegabyte int64 = 1024 * 1024
 
-func (cmd *Scale) Run(c *cli.Context) {
+func (cmd *Scale) Execute(c flags.FlagContext) {
 	currentApp := cmd.appReq.GetApplication()
 	if !anyFlagsSet(c) {
 		cmd.ui.Say(T("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -151,7 +156,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *Scale) confirmRestart(context *cli.Context, appName string) bool {
+func (cmd *Scale) confirmRestart(context flags.FlagContext, appName string) bool {
 	if context.Bool("f") {
 		return true
 	} else {
@@ -162,6 +167,6 @@ func (cmd *Scale) confirmRestart(context *cli.Context, appName string) bool {
 	}
 }
 
-func anyFlagsSet(context *cli.Context) bool {
+func anyFlagsSet(context flags.FlagContext) bool {
 	return context.IsSet("m") || context.IsSet("k") || context.IsSet("i")
 }

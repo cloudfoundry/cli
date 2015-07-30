@@ -121,15 +121,15 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("apps"),
 					presentNonCodegangstaCommand("app"),
 				}, {
-					presentCommand("push"),  //needs start/restart ...
-					presentCommand("scale"), //needs stop/restart
+					presentCommand("push"),                //needs start/restart ...
+					presentNonCodegangstaCommand("scale"), //needs stop/restart
 					presentNonCodegangstaCommand("delete"),
 					presentNonCodegangstaCommand("rename"),
 				}, {
 					presentNonCodegangstaCommand("start"), //needs app
 					presentNonCodegangstaCommand("stop"),
 					presentNonCodegangstaCommand("restart"), //needs start
-					presentCommand("restage"),
+					presentNonCodegangstaCommand("restage"),
 					presentCommand("restart-app-instance"),
 				}, {
 					presentNonCodegangstaCommand("events"),
@@ -192,7 +192,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					presentNonCodegangstaCommand("spaces"),
 					presentNonCodegangstaCommand("space"),
 				}, {
-					presentCommand("create-space"),
+					presentNonCodegangstaCommand("create-space"),
 					presentNonCodegangstaCommand("delete-space"),
 					presentNonCodegangstaCommand("rename-space"),
 				},

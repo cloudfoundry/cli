@@ -24,7 +24,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	"github.com/cloudfoundry/cli/cf/commands/servicekey"
-	"github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
@@ -86,11 +85,9 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 	start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsNoaaRepository(), repoLocator.GetOldLogsRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
 	restart := application.NewRestart(ui, config, start, stop)
-	restage := application.NewRestage(ui, config, repoLocator.GetApplicationRepository(), start)
 	bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
 
 	factory.cmdsByName["restart-app-instance"] = application.NewRestartAppInstance(ui, config, repoLocator.GetAppInstancesRepository())
-	factory.cmdsByName["restage"] = restage
 	factory.cmdsByName["push"] = application.NewPush(
 		ui, config, manifestRepo, start, stop, bind,
 		repoLocator.GetApplicationRepository(),
@@ -103,11 +100,6 @@ func NewFactory(ui terminal.UI, config core_config.ReadWriter, manifestRepo mani
 		actors.NewPushActor(repoLocator.GetApplicationBitsRepository(), app_files.ApplicationZipper{}, app_files.ApplicationFiles{}),
 		app_files.ApplicationZipper{},
 		app_files.ApplicationFiles{})
-
-	factory.cmdsByName["scale"] = application.NewScale(ui, config, restart, repoLocator.GetApplicationRepository())
-
-	spaceRoleSetter := user.NewSetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
-	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, config, spaceRoleSetter, repoLocator.GetSpaceRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetUserRepository(), repoLocator.GetSpaceQuotaRepository())
 
 	factory.cmdsByName["service-access"] = serviceaccess.NewServiceAccess(
 		ui, config,

@@ -6,16 +6,16 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CreateSpace struct {
@@ -28,43 +28,65 @@ type CreateSpace struct {
 	spaceQuotaRepo  space_quotas.SpaceQuotaRepository
 }
 
-func NewCreateSpace(ui terminal.UI, config core_config.Reader, spaceRoleSetter user.SpaceRoleSetter, spaceRepo spaces.SpaceRepository, orgRepo organizations.OrganizationRepository, userRepo api.UserRepository, spaceQuotaRepo space_quotas.SpaceQuotaRepository) (cmd CreateSpace) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.spaceRoleSetter = spaceRoleSetter
-	cmd.spaceRepo = spaceRepo
-	cmd.orgRepo = orgRepo
-	cmd.userRepo = userRepo
-	cmd.spaceQuotaRepo = spaceQuotaRepo
-	return
+func init() {
+	command_registry.Register(&CreateSpace{})
 }
 
-func (cmd CreateSpace) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Organization")}
+	fs["q"] = &cliFlags.StringFlag{Name: "q", Usage: T("Quota to assign to the newly created space (excluding this option results in assignment of default quota)")}
+
+	return command_registry.CommandMetadata{
 		Name:        "create-space",
 		Description: T("Create a space"),
 		Usage:       T("CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("o", T("Organization")),
-			flag_helpers.NewStringFlag("q", T("Quota to assign to the newly created space (excluding this option results in assignment of default quota)")),
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd CreateSpace) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-space"))
 	}
 
 	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	if c.String("o") == "" {
+	if fc.String("o") == "" {
 		reqs = append(reqs, requirementsFactory.NewTargetedOrgRequirement())
 	}
 
 	return
 }
 
-func (cmd CreateSpace) Run(c *cli.Context) {
+func (cmd *CreateSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
+	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
+
+	//get command from registry for dependency
+	commandDep := command_registry.Commands.FindCommand("set-space-role")
+	commandDep = commandDep.SetDependency(deps, false)
+	cmd.spaceRoleSetter = commandDep.(user.SpaceRoleSetter)
+
+	return cmd
+}
+
+func NewCreateSpace(ui terminal.UI, config core_config.Reader, spaceRoleSetter user.SpaceRoleSetter, spaceRepo spaces.SpaceRepository, orgRepo organizations.OrganizationRepository, userRepo api.UserRepository, spaceQuotaRepo space_quotas.SpaceQuotaRepository) (cmd CreateSpace) {
+	cmd.ui = ui
+	cmd.config = config
+	cmd.spaceRepo = spaceRepo
+	cmd.orgRepo = orgRepo
+	cmd.userRepo = userRepo
+	cmd.spaceQuotaRepo = spaceQuotaRepo
+
+	cmd.spaceRoleSetter = spaceRoleSetter
+	return
+}
+
+func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[0]
 	orgName := c.String("o")
 	spaceQuotaName := c.String("q")
