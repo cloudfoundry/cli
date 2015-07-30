@@ -81,6 +81,10 @@ func (r *registry) SetCommand(cmd Command) {
 	r.cmd[cmd.MetaData().Name] = cmd
 }
 
+func (r *registry) RemoveCommand(cmdName string) {
+	delete(r.cmd, cmdName)
+}
+
 func (r *registry) MaxCommandNameLength() int {
 	maxNameLen := 0
 	for name, _ := range r.cmd {

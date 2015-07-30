@@ -15,6 +15,10 @@ import (
 
 var _ = Describe("CommandRegistry", func() {
 
+	BeforeEach(func() {
+		Register(FakeCommand1{})
+	})
+
 	Context("i18n", func() {
 		It("initialize i18n T() func", func() {
 			Ω(T).ToNot(BeNil())
@@ -75,6 +79,15 @@ var _ = Describe("CommandRegistry", func() {
 				Commands.SetCommand(updatedCmd)
 				oldCmd = Commands.FindCommand("fake-command")
 				Ω(oldCmd).To(Equal(updatedCmd))
+			})
+		})
+
+		Context("RemoveCommand()", func() {
+			It("removes the command in registry with command name provided", func() {
+				Ω(Commands.CommandExists("fake-command")).To(BeTrue())
+
+				Commands.RemoveCommand("fake-command")
+				Ω(Commands.CommandExists("fake-command")).To(BeFalse())
 			})
 		})
 
