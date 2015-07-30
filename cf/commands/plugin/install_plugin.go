@@ -3,6 +3,7 @@ package plugin
 import (
 	"errors"
 	"fmt"
+	"net/rpc"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,49 +11,41 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
-	"github.com/cloudfoundry/cli/cf/command"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/fileutils"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/cli/plugin"
-	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/cloudfoundry/cli/utils"
-	"github.com/codegangsta/cli"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
+	rpcService "github.com/cloudfoundry/cli/plugin/rpc"
 )
 
 type PluginInstall struct {
 	ui           terminal.UI
 	config       core_config.Reader
 	pluginConfig plugin_config.PluginConfiguration
-	coreCmds     map[string]command.Command
 	pluginRepo   plugin_repo.PluginRepo
 	checksum     utils.Sha1Checksum
-	rpcService   *rpc.CliRpcService
+	rpcService   *rpcService.CliRpcService
 }
 
-func NewPluginInstall(ui terminal.UI, config core_config.Reader, pluginConfig plugin_config.PluginConfiguration, coreCmds map[string]command.Command, pluginRepo plugin_repo.PluginRepo, checksum utils.Sha1Checksum, rpcService *rpc.CliRpcService) *PluginInstall {
-	return &PluginInstall{
-		ui:           ui,
-		config:       config,
-		pluginConfig: pluginConfig,
-		coreCmds:     coreCmds,
-		pluginRepo:   pluginRepo,
-		checksum:     checksum,
-		rpcService:   rpcService,
-	}
+func init() {
+	command_registry.Register(&PluginInstall{})
 }
 
-func (cmd *PluginInstall) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["r"] = &cliFlags.StringFlag{Name: "r", Usage: T("repo name where the plugin binary is located")}
+
+	return command_registry.CommandMetadata{
 		Name:        "install-plugin",
 		Description: T("Install the plugin defined in command argument"),
 		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]
@@ -64,22 +57,41 @@ EXAMPLE:
    cf install-plugin ~/Downloads/plugin-foobar
    cf install-plugin plugin-echo -r My-Repo 
 `),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("r", T("repo name where the plugin binary is located")),
-		},
+		Flags:     fs,
 		TotalArgs: 1,
 	}
 }
 
-func (cmd *PluginInstall) GetRequirements(_ requirements.Factory, c *cli.Context) (req []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *PluginInstall) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("install-plugin"))
 	}
 
 	return
 }
 
-func (cmd *PluginInstall) Run(c *cli.Context) {
+func (cmd *PluginInstall) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.pluginConfig = deps.PluginConfig
+	cmd.pluginRepo = deps.PluginRepo
+	cmd.checksum = deps.ChecksumUtil
+
+	//reset rpc registration in case there is other running instance,
+	//each service can only be registered once
+	rpc.DefaultServer = rpc.NewServer()
+
+	rpcService, err := rpcService.NewRpcService(nil, deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewNonCodegangstaRunner())
+	if err != nil {
+		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
+	}
+
+	cmd.rpcService = rpcService
+
+	return cmd
+}
+
+func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 	downloader := fileutils.NewDownloader(os.TempDir())
 
 	removeTmpFile := func() {
@@ -186,18 +198,16 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 		cmd.ui.Failed(fmt.Sprintf(T("Error getting command list from plugin {{.FilePath}}", map[string]interface{}{"FilePath": pluginSourceFilepath})))
 	}
 
-	shortNames := cmd.getShortNames()
-
 	for _, pluginCmd := range pluginMetadata.Commands {
 
 		//check for command conflicting core commands/alias
-		if _, exists := cmd.coreCmds[pluginCmd.Name]; exists || shortNames[pluginCmd.Name] || pluginCmd.Name == "help" || command_registry.Commands.CommandExists(pluginCmd.Name) {
+		if pluginCmd.Name == "help" || command_registry.Commands.CommandExists(pluginCmd.Name) {
 			cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Name})))
 		}
 
 		//check for alias conflicting core command/alias
-		if _, exists := cmd.coreCmds[pluginCmd.Alias]; exists || shortNames[pluginCmd.Alias] || pluginCmd.Alias == "help" || command_registry.Commands.CommandExists(pluginCmd.Alias) {
+		if pluginCmd.Alias == "help" || command_registry.Commands.CommandExists(pluginCmd.Alias) {
 			cmd.ui.Failed(fmt.Sprintf(T("Alias `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Alias})))
 		}
@@ -270,17 +280,6 @@ func (cmd *PluginInstall) tryDownloadPluginBinaryfromGivenPath(pluginSourceFilep
 	os.Chmod(executablePath, 0700)
 
 	return executablePath
-}
-
-func (cmd *PluginInstall) getShortNames() map[string]bool {
-	shortNames := make(map[string]bool)
-	for _, singleCmd := range cmd.coreCmds {
-		metaData := singleCmd.Metadata()
-		if metaData.ShortName != "" {
-			shortNames[metaData.ShortName] = true
-		}
-	}
-	return shortNames
 }
 
 func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {

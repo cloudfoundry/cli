@@ -21,6 +21,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/plugin/models"
+	"github.com/cloudfoundry/cli/utils"
 	"github.com/cloudfoundry/cli/words/generator"
 )
 
@@ -38,13 +39,14 @@ type Dependency struct {
 	PluginModels       *pluginModels
 	ServiceBuilder     service_builder.ServiceBuilder
 	BrokerBuilder      broker_builder.Builder
-	PlanBuilder        plan_builder.Builder
+	PlanBuilder        plan_builder.PlanBuilder
 	ServiceHandler     actors.ServiceActor
 	ServicePlanHandler actors.ServicePlanActor
 	WordGenerator      generator.WordGenerator
 	AppZipper          app_files.Zipper
 	AppFiles           app_files.AppFiles
 	PushActor          actors.PushActor
+	ChecksumUtil       utils.Sha1Checksum
 }
 
 type pluginModels struct {
@@ -131,6 +133,8 @@ func NewDependency() Dependency {
 	deps.AppFiles = app_files.ApplicationFiles{}
 
 	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles)
+
+	deps.ChecksumUtil = utils.NewSha1Checksum("")
 
 	return deps
 }
