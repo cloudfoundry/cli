@@ -2,12 +2,12 @@ package service
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type UnbindService struct {
@@ -18,16 +18,12 @@ type UnbindService struct {
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewUnbindService(ui terminal.UI, config core_config.Reader, serviceBindingRepo api.ServiceBindingRepository) (cmd *UnbindService) {
-	cmd = new(UnbindService)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.serviceBindingRepo = serviceBindingRepo
-	return
+func init() {
+	command_registry.Register(&UnbindService{})
 }
 
-func (cmd *UnbindService) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *UnbindService) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "unbind-service",
 		ShortName:   "us",
 		Description: T("Unbind a service instance from an app"),
@@ -35,30 +31,32 @@ func (cmd *UnbindService) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *UnbindService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("unbind-service"))
 	}
 
-	serviceName := c.Args()[1]
+	serviceName := fc.Args()[1]
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
-
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.appReq,
 		cmd.serviceInstanceReq,
 	}
-	return
+	return reqs, nil
 }
 
-func (cmd *UnbindService) Run(c *cli.Context) {
+func (cmd *UnbindService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.serviceBindingRepo = deps.RepoLocator.GetServiceBindingRepository()
+	return cmd
+}
+
+func (cmd *UnbindService) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 

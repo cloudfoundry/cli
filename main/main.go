@@ -21,6 +21,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/commands/servicekey"
 	"github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 
@@ -77,6 +78,7 @@ func main() {
 	_ = route.CreateRoute{}
 	_ = space.CreateSpace{}
 	_ = serviceaccess.ServiceAccess{}
+	_ = servicekey.ServiceKey{}
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()

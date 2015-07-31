@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -22,44 +23,47 @@ type ServiceKey struct {
 	serviceInstanceRequirement requirements.ServiceInstanceRequirement
 }
 
-func NewGetServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd *ServiceKey) {
-	return &ServiceKey{
-		ui:             ui,
-		config:         config,
-		serviceRepo:    serviceRepo,
-		serviceKeyRepo: serviceKeyRepo,
-	}
+func init() {
+	command_registry.Register(&ServiceKey{})
 }
 
-func (cmd *ServiceKey) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ServiceKey) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given service-key's guid.  All other output for the service is suppressed.")}
+
+	return command_registry.CommandMetadata{
 		Name:        "service-key",
 		Description: T("Show service key info"),
 		Usage: T(`CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY
 
 EXAMPLE:
    CF_NAME service-key mydb mykey`),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given service-key's guid.  All other output for the service is suppressed.")},
-		},
+		Flags: fs,
 	}
 }
 
-func (cmd *ServiceKey) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n") + command_registry.Commands.CommandUsage("service-key"))
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
-	cmd.serviceInstanceRequirement = requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
+	cmd.serviceInstanceRequirement = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
 	targetSpaceRequirement := requirementsFactory.NewTargetedSpaceRequirement()
 
-	reqs = []requirements.Requirement{loginRequirement, cmd.serviceInstanceRequirement, targetSpaceRequirement}
-
+	reqs := []requirements.Requirement{loginRequirement, cmd.serviceInstanceRequirement, targetSpaceRequirement}
 	return reqs, nil
 }
 
-func (cmd *ServiceKey) Run(c *cli.Context) {
+func (cmd *ServiceKey) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
+	cmd.serviceKeyRepo = deps.RepoLocator.GetServiceKeyRepository()
+	return cmd
+}
+
+func (cmd *ServiceKey) Execute(c flags.FlagContext) {
 	serviceInstance := cmd.serviceInstanceRequirement.GetServiceInstance()
 	serviceKeyName := c.Args()[1]
 
