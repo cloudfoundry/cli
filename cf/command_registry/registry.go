@@ -85,6 +85,10 @@ func (r *registry) RemoveCommand(cmdName string) {
 	delete(r.cmd, cmdName)
 }
 
+func (r *registry) TotalCommands() int {
+	return len(r.cmd)
+}
+
 func (r *registry) MaxCommandNameLength() int {
 	maxNameLen := 0
 	for name, _ := range r.cmd {

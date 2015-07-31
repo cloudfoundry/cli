@@ -7,24 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/commands/buildpack"
-	"github.com/cloudfoundry/cli/cf/commands/domain"
-	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
-	"github.com/cloudfoundry/cli/cf/commands/featureflag"
-	"github.com/cloudfoundry/cli/cf/commands/organization"
-	"github.com/cloudfoundry/cli/cf/commands/plugin"
-	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
-	"github.com/cloudfoundry/cli/cf/commands/quota"
-	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
-	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
-	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
-	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
-	"github.com/cloudfoundry/cli/cf/commands/servicekey"
-	"github.com/cloudfoundry/cli/cf/commands/space"
-	"github.com/cloudfoundry/cli/cf/commands/spacequota"
-
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
@@ -40,6 +22,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/panic_printer"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/commands_loader"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/codegangsta/cli"
@@ -61,24 +44,7 @@ type cliDependencies struct {
 }
 
 func main() {
-	//make a reference to something in cf/commands/domain, so all init() in the directory will run
-	_ = domain.CreateDomain{}
-	_ = buildpack.ListBuildpacks{}
-	_ = quota.CreateQuota{}
-	_ = organization.ListOrgs{}
-	_ = spacequota.SpaceQuota{}
-	_ = servicebroker.ListServiceBrokers{}
-	_ = serviceauthtoken.ListServiceAuthTokens{}
-	_ = securitygroup.ShowSecurityGroup{}
-	_ = environmentvariablegroup.RunningEnvironmentVariableGroup{}
-	_ = featureflag.ShowFeatureFlag{}
-	_ = commands.Api{}
-	_ = plugin_repo.RepoPlugins{}
-	_ = plugin.Plugins{}
-	_ = route.CreateRoute{}
-	_ = space.CreateSpace{}
-	_ = serviceaccess.ServiceAccess{}
-	_ = servicekey.ServiceKey{}
+	commands_loader.Load()
 
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
