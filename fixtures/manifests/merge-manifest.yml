@@ -1,0 +1,14 @@
+---
+app_types:
+  app_a: &APP_A
+    memory: 256mb
+    instances: 1
+
+applications:
+- name: blue
+  <<: *APP_A
+- name: green
+  <<: *APP_A
+- name: big-blue
+  <<: *APP_A
+  instances: 3

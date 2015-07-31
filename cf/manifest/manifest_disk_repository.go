@@ -1,13 +1,15 @@
 package manifest
 
 import (
-	"github.com/cloudfoundry-incubator/candiedyaml"
+	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/generic"
-	"io"
-	"os"
-	"path/filepath"
+	"gopkg.in/yaml.v2"
 )
 
 type ManifestRepository interface {
@@ -77,17 +79,23 @@ func (repo ManifestDiskRepository) readAllYAMLFiles(path string) (mergedMap gene
 }
 
 func parseManifest(file io.Reader) (yamlMap generic.Map, err error) {
-	decoder := candiedyaml.NewDecoder(file)
-	yamlMap = generic.NewMap()
-	err = decoder.Decode(yamlMap)
+	manifest, err := ioutil.ReadAll(file)
 	if err != nil {
 		return
 	}
 
-	if !generic.IsMappable(yamlMap) {
+	mmap := make(map[interface{}]interface{})
+	err = yaml.Unmarshal(manifest, &mmap)
+	if err != nil {
+		return
+	}
+
+	if !generic.IsMappable(mmap) || len(mmap) == 0 {
 		err = errors.New(T("Invalid manifest. Expected a map"))
 		return
 	}
+
+	yamlMap = generic.NewMap(mmap)
 
 	return
 }
