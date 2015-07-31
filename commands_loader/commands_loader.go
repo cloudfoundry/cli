@@ -13,12 +13,14 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
+	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
 	"github.com/cloudfoundry/cli/cf/commands/servicekey"
 	"github.com/cloudfoundry/cli/cf/commands/space"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
+	"github.com/cloudfoundry/cli/cf/commands/user"
 )
 
 /*******************
@@ -30,22 +32,24 @@ get initialized
 ********************/
 
 func Load() {
+	_ = commands.Api{}
 	_ = application.ListApps{}
-	_ = domain.CreateDomain{}
 	_ = buildpack.ListBuildpacks{}
-	_ = quota.CreateQuota{}
-	_ = organization.ListOrgs{}
-	_ = spacequota.SpaceQuota{}
-	_ = servicebroker.ListServiceBrokers{}
-	_ = serviceauthtoken.ListServiceAuthTokens{}
-	_ = securitygroup.ShowSecurityGroup{}
+	_ = domain.CreateDomain{}
 	_ = environmentvariablegroup.RunningEnvironmentVariableGroup{}
 	_ = featureflag.ShowFeatureFlag{}
-	_ = commands.Api{}
-	_ = plugin_repo.RepoPlugins{}
+	_ = organization.ListOrgs{}
 	_ = plugin.Plugins{}
+	_ = plugin_repo.RepoPlugins{}
+	_ = quota.CreateQuota{}
 	_ = route.CreateRoute{}
-	_ = space.CreateSpace{}
+	_ = securitygroup.ShowSecurityGroup{}
+	_ = service.ShowService{}
+	_ = serviceauthtoken.ListServiceAuthTokens{}
 	_ = serviceaccess.ServiceAccess{}
+	_ = servicebroker.ListServiceBrokers{}
 	_ = servicekey.ServiceKey{}
+	_ = space.CreateSpace{}
+	_ = spacequota.SpaceQuota{}
+	_ = user.CreateUser{}
 }
