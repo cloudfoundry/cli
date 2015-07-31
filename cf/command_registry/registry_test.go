@@ -84,6 +84,18 @@ var _ = Describe("CommandRegistry", func() {
 
 		Context("RemoveCommand()", func() {
 			It("removes the command in registry with command name provided", func() {
+				Commands = NewRegistry()
+
+				Register(FakeCommand1{})
+				Register(FakeCommand2{})
+				Register(FakeCommand3{})
+
+				Ω(Commands.TotalCommands()).To(Equal(3))
+			})
+		})
+
+		Context("TotalCommands()", func() {
+			It("returns the total number of commands in the registry", func() {
 				Ω(Commands.CommandExists("fake-command")).To(BeTrue())
 
 				Commands.RemoveCommand("fake-command")
