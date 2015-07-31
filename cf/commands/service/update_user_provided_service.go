@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type UpdateUserProvidedService struct {
@@ -22,16 +22,16 @@ type UpdateUserProvidedService struct {
 	serviceInstanceReq              requirements.ServiceInstanceRequirement
 }
 
-func NewUpdateUserProvidedService(ui terminal.UI, config core_config.Reader, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd *UpdateUserProvidedService) {
-	cmd = new(UpdateUserProvidedService)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
-	return
+func init() {
+	command_registry.Register(&UpdateUserProvidedService{})
 }
 
-func (cmd *UpdateUserProvidedService) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *UpdateUserProvidedService) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Credentials")}
+	fs["l"] = &cliFlags.StringFlag{Name: "l", Usage: T("Syslog Drain Url")}
+
+	return command_registry.CommandMetadata{
 		Name:        "update-user-provided-service",
 		ShortName:   "uups",
 		Description: T("Update user-provided service instance name value pairs"),
@@ -40,30 +40,32 @@ func (cmd *UpdateUserProvidedService) Metadata() command_metadata.CommandMetadat
 EXAMPLE:
    CF_NAME update-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
    CF_NAME update-user-provided-service my-drain-service -l syslog://example.com`),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Credentials")),
-			flag_helpers.NewStringFlag("l", T("Syslog Drain Url")),
-		},
+		Flags: fs,
 	}
 }
 
-func (cmd *UpdateUserProvidedService) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UpdateUserProvidedService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("update-user-provided-service"))
 	}
 
-	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
+	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.serviceInstanceReq,
 	}
-
-	return
+	return reqs, nil
 }
 
-func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
+func (cmd *UpdateUserProvidedService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.userProvidedServiceInstanceRepo = deps.RepoLocator.GetUserProvidedServiceInstanceRepository()
+	return cmd
+}
 
+func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 	if !serviceInstance.IsUserProvided() {
 		cmd.ui.Failed(T("Service Instance is not user provided"))

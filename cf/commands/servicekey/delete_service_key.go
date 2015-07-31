@@ -2,12 +2,13 @@ package servicekey
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -19,17 +20,15 @@ type DeleteServiceKey struct {
 	serviceKeyRepo api.ServiceKeyRepository
 }
 
-func NewDeleteServiceKey(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd *DeleteServiceKey) {
-	return &DeleteServiceKey{
-		ui:             ui,
-		config:         config,
-		serviceRepo:    serviceRepo,
-		serviceKeyRepo: serviceKeyRepo,
-	}
+func init() {
+	command_registry.Register(&DeleteServiceKey{})
 }
 
-func (cmd *DeleteServiceKey) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *DeleteServiceKey) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
+
+	return command_registry.CommandMetadata{
 		Name:        "delete-service-key",
 		ShortName:   "dsk",
 		Description: T("Delete a service key"),
@@ -37,26 +36,31 @@ func (cmd *DeleteServiceKey) Metadata() command_metadata.CommandMetadata {
 
 EXAMPLE:
    CF_NAME delete-service-key mydb mykey`),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
-		},
+		Flags: fs,
 	}
 }
 
-func (cmd *DeleteServiceKey) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *DeleteServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n") + command_registry.Commands.CommandUsage("delete-service-key"))
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
 	targetSpaceRequirement := requirementsFactory.NewTargetedSpaceRequirement()
 
-	reqs = []requirements.Requirement{loginRequirement, targetSpaceRequirement}
-
+	reqs := []requirements.Requirement{loginRequirement, targetSpaceRequirement}
 	return reqs, nil
 }
 
-func (cmd *DeleteServiceKey) Run(c *cli.Context) {
+func (cmd *DeleteServiceKey) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
+	cmd.serviceKeyRepo = deps.RepoLocator.GetServiceKeyRepository()
+	return cmd
+}
+
+func (cmd *DeleteServiceKey) Execute(c flags.FlagContext) {
 	serviceInstanceName := c.Args()[0]
 	serviceKeyName := c.Args()[1]
 

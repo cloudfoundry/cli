@@ -12,7 +12,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/servicekey"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
@@ -23,11 +23,19 @@ var _ = Describe("delete-service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		cmd                 *DeleteServiceKey
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceKeyRepo      *testapi.FakeServiceKeyRepo
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetServiceKeyRepository(serviceKeyRepo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-service-key").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -38,12 +46,11 @@ var _ = Describe("delete-service-key command", func() {
 		serviceRepo.FindInstanceByNameMap = generic.NewMap()
 		serviceRepo.FindInstanceByNameMap.Set("fake-service-instance", serviceInstance)
 		serviceKeyRepo = testapi.NewFakeServiceKeyRepo()
-		cmd = NewDeleteServiceKey(ui, config, serviceRepo, serviceKeyRepo)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	})
 
 	var callDeleteServiceKey = func(args []string) bool {
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete-service-key", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements are not satisfied", func() {

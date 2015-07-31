@@ -163,14 +163,14 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				}, {
 					presentNonCodegangstaCommand("create-service-key"),
 					presentNonCodegangstaCommand("service-keys"),
-					presentCommand("service-key"),
-					presentCommand("delete-service-key"),
+					presentNonCodegangstaCommand("service-key"),
+					presentNonCodegangstaCommand("delete-service-key"),
 				}, {
 					presentNonCodegangstaCommand("bind-service"),
-					presentCommand("unbind-service"),
+					presentNonCodegangstaCommand("unbind-service"),
 				}, {
 					presentNonCodegangstaCommand("create-user-provided-service"),
-					presentCommand("update-user-provided-service"),
+					presentNonCodegangstaCommand("update-user-provided-service"),
 				},
 			},
 		}, {
