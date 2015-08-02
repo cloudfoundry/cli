@@ -95,23 +95,6 @@ var _ = Describe("App", func() {
 		})
 	})
 
-	Context("when running 'cf --help'", func() {
-		It("should output the help in our custom format", func() {
-
-			output := io_helpers.CaptureOutput(func() {
-				app.Run([]string{"", "--help"})
-			})
-
-			mergedOutput := strings.Join(output, "\n")
-			Expect(mergedOutput).To(ContainSubstring("CF_TRACE=true"), "CF_TRACE=true not in help")
-			Expect(mergedOutput).To(ContainSubstring("CF_PLUGIN_HOME=path/to/dir/"))
-
-			for _, name := range expectedCommandNames {
-				Expect(mergedOutput).To(ContainSubstring(name), name+" not in help")
-			}
-		})
-	})
-
 	Context("when the user provides an unknown command name", func() {
 		It("should complain loudly and then panic", func() {
 			Expect(func() {
