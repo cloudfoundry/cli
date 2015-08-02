@@ -43,7 +43,7 @@ var _ = Describe("list-apps command", func() {
 
 		app1Routes := []models.RouteSummary{
 			models.RouteSummary{
-				Host: "app1",
+				Host: "app2",
 				Domain: models.DomainFields{
 					Name:                   "cfapps.io",
 					Shared:                 true,
@@ -52,7 +52,7 @@ var _ = Describe("list-apps command", func() {
 				},
 			},
 			models.RouteSummary{
-				Host: "app1",
+				Host: "app2",
 				Domain: models.DomainFields{
 					Name: "example.com",
 				},
@@ -60,12 +60,12 @@ var _ = Describe("list-apps command", func() {
 
 		app2Routes := []models.RouteSummary{
 			models.RouteSummary{
-				Host:   "app2",
+				Host:   "app1",
 				Domain: models.DomainFields{Name: "cfapps.io"},
 			}}
 
 		app := models.Application{}
-		app.Name = "Application-1"
+		app.Name = "Application-2"
 		app.State = "started"
 		app.RunningInstances = 1
 		app.InstanceCount = 1
@@ -74,7 +74,7 @@ var _ = Describe("list-apps command", func() {
 		app.Routes = app1Routes
 
 		app2 := models.Application{}
-		app2.Name = "Application-2"
+		app2.Name = "Application-1"
 		app2.State = "started"
 		app2.RunningInstances = 1
 		app2.InstanceCount = 2
