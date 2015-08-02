@@ -99,6 +99,16 @@ func (r *registry) MaxCommandNameLength() int {
 	return maxNameLen
 }
 
+func (r *registry) Metadatas() []CommandMetadata {
+	var m []CommandMetadata
+
+	for _, c := range r.cmd {
+		m = append(m, c.MetaData())
+	}
+
+	return m
+}
+
 func (r *registry) CommandUsage(cmdName string) string {
 	output := ""
 	cmd := r.FindCommand(cmdName)
