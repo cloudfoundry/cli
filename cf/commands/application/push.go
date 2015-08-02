@@ -9,6 +9,8 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/fileutils"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -16,18 +18,16 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/words/generator"
-	"github.com/codegangsta/cli"
 )
 
 type Push struct {
@@ -49,64 +49,43 @@ type Push struct {
 	app_files     app_files.AppFiles
 }
 
-func NewPush(ui terminal.UI, config core_config.Reader, manifestRepo manifest.ManifestRepository,
-	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
-	appRepo applications.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
-	stackRepo stacks.StackRepository, serviceRepo api.ServiceRepository,
-	authRepo authentication.AuthenticationRepository, wordGenerator generator.WordGenerator,
-	actor actors.PushActor, zipper app_files.Zipper, app_files app_files.AppFiles) *Push {
-	return &Push{
-		ui:            ui,
-		config:        config,
-		manifestRepo:  manifestRepo,
-		appStarter:    starter,
-		appStopper:    stopper,
-		serviceBinder: binder,
-		appRepo:       appRepo,
-		domainRepo:    domainRepo,
-		routeRepo:     routeRepo,
-		serviceRepo:   serviceRepo,
-		stackRepo:     stackRepo,
-		authRepo:      authRepo,
-		wordGenerator: wordGenerator,
-		actor:         actor,
-		zipper:        zipper,
-		app_files:     app_files,
-	}
+func init() {
+	command_registry.Register(&Push{})
 }
 
-func (cmd *Push) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Push) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["b"] = &cliFlags.StringFlag{Name: "b", Usage: T("Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch). Use built-in buildpacks only by setting value to 'null' or 'default'")}
+	fs["c"] = &cliFlags.StringFlag{Name: "c", Usage: T("Startup command, set to null to reset to default start command")}
+	fs["d"] = &cliFlags.StringFlag{Name: "d", Usage: T("Domain (e.g. example.com)")}
+	fs["f"] = &cliFlags.StringFlag{Name: "f", Usage: T("Path to manifest")}
+	fs["i"] = &cliFlags.IntFlag{Name: "i", Usage: T("Number of instances")}
+	fs["k"] = &cliFlags.StringFlag{Name: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
+	fs["m"] = &cliFlags.StringFlag{Name: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
+	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname (e.g. my-subdomain)")}
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Path to app directory or to a zip file of the contents of the app directory")}
+	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
+	fs["t"] = &cliFlags.StringFlag{Name: "t", Usage: T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")}
+	fs["no-hostname"] = &cliFlags.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")}
+	fs["no-manifest"] = &cliFlags.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")}
+	fs["no-route"] = &cliFlags.BoolFlag{Name: "no-route", Usage: T("Do not map a route to this app and remove routes from previous pushes of this app.")}
+	fs["no-start"] = &cliFlags.BoolFlag{Name: "no-start", Usage: T("Do not start an app after pushing")}
+	fs["random-route"] = &cliFlags.BoolFlag{Name: "random-route", Usage: T("Create a random route for this app")}
+
+	return command_registry.CommandMetadata{
 		Name:        "push",
 		ShortName:   "p",
 		Description: T("Push a new app or sync changes to an existing app"),
 		Usage: T("Push a single app (with or without a manifest):\n") + T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n") + T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n") +
 			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n" +
 			"\n" + T("   Push multiple apps with a manifest:\n") + T("   CF_NAME push [-f MANIFEST_PATH]\n"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("b", T("Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch). Use built-in buildpacks only by setting value to 'null' or 'default'")),
-			flag_helpers.NewStringFlag("c", T("Startup command, set to null to reset to default start command")),
-			flag_helpers.NewStringFlag("d", T("Domain (e.g. example.com)")),
-			flag_helpers.NewStringFlag("f", T("Path to manifest")),
-			flag_helpers.NewIntFlag("i", T("Number of instances")),
-			flag_helpers.NewStringFlag("k", T("Disk limit (e.g. 256M, 1024M, 1G)")),
-			flag_helpers.NewStringFlag("m", T("Memory limit (e.g. 256M, 1024M, 1G)")),
-			flag_helpers.NewStringFlag("n", T("Hostname (e.g. my-subdomain)")),
-			flag_helpers.NewStringFlag("p", T("Path to app directory or to a zip file of the contents of the app directory")),
-			flag_helpers.NewStringFlag("s", T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")),
-			flag_helpers.NewStringFlag("t", T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")),
-			cli.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")},
-			cli.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")},
-			cli.BoolFlag{Name: "no-route", Usage: T("Do not map a route to this app and remove routes from previous pushes of this app.")},
-			cli.BoolFlag{Name: "no-start", Usage: T("Do not start an app after pushing")},
-			cli.BoolFlag{Name: "random-route", Usage: T("Create a random route for this app")},
-		},
+		Flags: fs,
 	}
 }
 
-func (cmd *Push) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) > 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) > 1 {
+		cmd.ui.Failed(T("Incorrect Usage.\n\n") + command_registry.Commands.CommandUsage("push"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -116,7 +95,41 @@ func (cmd *Push) GetRequirements(requirementsFactory requirements.Factory, c *cl
 	return
 }
 
-func (cmd *Push) Run(c *cli.Context) {
+func (cmd *Push) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.manifestRepo = deps.ManifestRepo
+
+	//set appStarter
+	appCommand := command_registry.Commands.FindCommand("start")
+	appCommand = appCommand.SetDependency(deps, false)
+	cmd.appStarter = appCommand.(ApplicationStarter)
+
+	//set appStopper
+	appCommand = command_registry.Commands.FindCommand("stop")
+	appCommand = appCommand.SetDependency(deps, false)
+	cmd.appStopper = appCommand.(ApplicationStopper)
+
+	//set serviceBinder
+	appCommand = command_registry.Commands.FindCommand("bind-service")
+	appCommand = appCommand.SetDependency(deps, false)
+	cmd.serviceBinder = appCommand.(service.ServiceBinder)
+
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
+	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
+	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
+	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
+	cmd.stackRepo = deps.RepoLocator.GetStackRepository()
+	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()
+	cmd.wordGenerator = deps.WordGenerator
+	cmd.actor = deps.PushActor
+	cmd.zipper = deps.AppZipper
+	cmd.app_files = deps.AppFiles
+
+	return cmd
+}
+
+func (cmd *Push) Execute(c flags.FlagContext) {
 	appSet := cmd.findAndValidateAppsToPush(c)
 	_, apiErr := cmd.authRepo.RefreshAuthToken()
 	if apiErr != nil {
@@ -284,7 +297,7 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 	appParams.StackGuid = &stack.Guid
 }
 
-func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli.Context) {
+func (cmd *Push) restart(app models.Application, params models.AppParams, c flags.FlagContext) {
 	if app.State != T("stopped") {
 		cmd.ui.Say("")
 		app, _ = cmd.appStopper.ApplicationStop(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
@@ -372,13 +385,13 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 	return
 }
 
-func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) []models.AppParams {
+func (cmd *Push) findAndValidateAppsToPush(c flags.FlagContext) []models.AppParams {
 	appsFromManifest := cmd.getAppParamsFromManifest(c)
 	appFromContext := cmd.getAppParamsFromContext(c)
 	return cmd.createAppSetFromContextAndManifest(appFromContext, appsFromManifest)
 }
 
-func (cmd *Push) getAppParamsFromManifest(c *cli.Context) []models.AppParams {
+func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) []models.AppParams {
 	if c.Bool("no-manifest") {
 		return []models.AppParams{}
 	}
@@ -480,7 +493,7 @@ func findAppWithNameInManifest(name string, manifestApps []models.AppParams) (ap
 	return
 }
 
-func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppParams) {
+func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (appParams models.AppParams) {
 	if len(c.Args()) > 0 {
 		appParams.Name = &c.Args()[0]
 	}

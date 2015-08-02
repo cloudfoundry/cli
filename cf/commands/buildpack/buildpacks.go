@@ -1,15 +1,16 @@
 package buildpack
 
 import (
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strconv"
 
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type ListBuildpacks struct {
@@ -17,31 +18,36 @@ type ListBuildpacks struct {
 	buildpackRepo api.BuildpackRepository
 }
 
-func NewListBuildpacks(ui terminal.UI, buildpackRepo api.BuildpackRepository) (cmd ListBuildpacks) {
-	cmd.ui = ui
-	cmd.buildpackRepo = buildpackRepo
-	return
+func init() {
+	command_registry.Register(&ListBuildpacks{})
 }
 
-func (cmd ListBuildpacks) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ListBuildpacks) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "buildpacks",
 		Description: T("List all buildpacks"),
 		Usage:       T("CF_NAME buildpacks"),
 	}
 }
 
-func (cmd ListBuildpacks) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ListBuildpacks) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("buildpacks"))
 	}
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }
 
-func (cmd ListBuildpacks) Run(c *cli.Context) {
+func (cmd *ListBuildpacks) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
+	return cmd
+}
+
+func (cmd *ListBuildpacks) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Getting buildpacks...\n"))
 
 	table := cmd.ui.Table([]string{"buildpack", T("position"), T("enabled"), T("locked"), T("filename")})

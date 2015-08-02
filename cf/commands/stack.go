@@ -2,12 +2,13 @@ package commands
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/stacks"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type ListStack struct {
@@ -16,35 +17,40 @@ type ListStack struct {
 	stacksRepo stacks.StackRepository
 }
 
-func NewListStack(ui terminal.UI, config core_config.Reader, stacksRepo stacks.StackRepository) (cmd ListStack) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.stacksRepo = stacksRepo
-	return
+func init() {
+	command_registry.Register(&ListStack{})
 }
 
-func (cmd ListStack) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ListStack) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given stack's guid. All other output for the stack is suppressed.")}
+
+	return command_registry.CommandMetadata{
 		Name:        "stack",
 		Description: T("Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"),
 		Usage:       T("CF_NAME stack STACK_NAME"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given stack's guid. All other output for the stack is suppressed.")},
-		},
-		TotalArgs: 1,
+		Flags:       fs,
+		TotalArgs:   1,
 	}
 }
 
-func (cmd ListStack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires app name as argument\n\n") + command_registry.Commands.CommandUsage("auth"))
 	}
 
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	return
 }
 
-func (cmd ListStack) Run(c *cli.Context) {
+func (cmd *ListStack) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.stacksRepo = deps.RepoLocator.GetStackRepository()
+	return cmd
+}
+
+func (cmd *ListStack) Execute(c flags.FlagContext) {
 	stackName := c.Args()[0]
 
 	stack, apiErr := cmd.stacksRepo.FindByName(stackName)

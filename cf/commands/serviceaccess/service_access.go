@@ -6,14 +6,14 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type ServiceAccess struct {
@@ -23,39 +23,44 @@ type ServiceAccess struct {
 	tokenRefresher authentication.TokenRefresher
 }
 
-func NewServiceAccess(ui terminal.UI, config core_config.Reader, actor actors.ServiceActor, tokenRefresher authentication.TokenRefresher) (cmd *ServiceAccess) {
-	return &ServiceAccess{
-		ui:             ui,
-		config:         config,
-		actor:          actor,
-		tokenRefresher: tokenRefresher,
-	}
+func init() {
+	command_registry.Register(&ServiceAccess{})
 }
 
-func (cmd *ServiceAccess) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ServiceAccess) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["b"] = &cliFlags.StringFlag{Name: "b", Usage: T("access for plans of a particular broker")}
+	fs["e"] = &cliFlags.StringFlag{Name: "e", Usage: T("access for plans of a particular service offering")}
+	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("plans accessible by a particular organization")}
+
+	return command_registry.CommandMetadata{
 		Name:        "service-access",
 		Description: T("List service access settings"),
 		Usage:       "CF_NAME service-access [-b BROKER] [-e SERVICE] [-o ORG]",
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("b", T("access for plans of a particular broker")),
-			flag_helpers.NewStringFlag("e", T("access for plans of a particular service offering")),
-			flag_helpers.NewStringFlag("o", T("plans accessible by a particular organization")),
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *ServiceAccess) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ServiceAccess) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("service-access"))
 	}
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 	return
 }
 
-func (cmd *ServiceAccess) Run(c *cli.Context) {
+func (cmd *ServiceAccess) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.actor = deps.ServiceHandler
+	cmd.tokenRefresher = deps.RepoLocator.GetAuthenticationRepository()
+	return cmd
+}
+
+func (cmd *ServiceAccess) Execute(c flags.FlagContext) {
 	_, err := cmd.tokenRefresher.RefreshAuthToken()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -105,7 +110,7 @@ func (cmd *ServiceAccess) Run(c *cli.Context) {
 
 	brokers, err := cmd.actor.FilterBrokers(brokerName, serviceName, orgName)
 	if err != nil {
-		cmd.ui.Failed(T("Failed fetching service brokers.\n{{.Error}}", map[string]interface{}{"Error": err}))
+		cmd.ui.Failed(err.Error())
 		return
 	}
 	cmd.printTable(brokers)

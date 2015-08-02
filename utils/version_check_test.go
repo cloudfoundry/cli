@@ -1,53 +1,41 @@
 package utils_test
 
 import (
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/utils"
-
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-var _ = Describe("NotifyUpdateIfNeeded", func() {
+var _ = Describe("Version Check", func() {
+	Context("GreaterThanOrEqual", func() {
+		var (
+			curVersion Version
+		)
 
-	var (
-		ui     *testterm.FakeUI
-		config core_config.ReadWriter
-	)
+		It("returns true if current version is greater or equal to targeted version", func() {
+			curVersion = NewVersion("6.12.0")
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("6.7.0"))).To(BeTrue())
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("6.12.0"))).To(BeTrue())
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("5.9.0"))).To(BeTrue())
+		})
 
-	BeforeEach(func() {
-		ui = new(testterm.FakeUI)
-		config = testconfig.NewRepository()
+		It("returns false if current version is less than targeted version", func() {
+			curVersion = NewVersion("6.12.0")
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("7.5.0"))).To(BeFalse())
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("6.15.0"))).To(BeFalse())
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("6.12.0.1"))).To(BeFalse())
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("6.12.0.0.1"))).To(BeFalse())
+		})
+
+		It("returns false if current version has less digits than targeted version", func() {
+			curVersion = NewVersion("6.12.0")
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("6.12.0.0"))).To(BeTrue())
+		})
+
+		It("returns true if current version has more digits than targeted version", func() {
+			curVersion = NewVersion("6.12.0.0")
+			Ω(curVersion.GreaterThanOrEqual(NewVersion("6.12.0"))).To(BeTrue())
+		})
 	})
-
-	It("Prints a notification to user if current version < min cli version", func() {
-		config.SetMinCliVersion("6.0.0")
-		config.SetMinRecommendedCliVersion("6.5.0")
-		config.SetApiVersion("2.15.1")
-		cf.Version = "5.0.0"
-		NotifyUpdateIfNeeded(ui, config)
-
-		Ω(ui.Outputs).To(ContainSubstrings([]string{"Cloud Foundry API version",
-			"requires CLI version 6.0.0",
-			"You are currently on version 5.0.0",
-			"To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-		}))
-	})
-
-	It("Doesn't print a notification to user if current version >= min cli version", func() {
-		config.SetMinCliVersion("6.0.0")
-		config.SetMinRecommendedCliVersion("6.5.0")
-		config.SetApiVersion("2.15.1")
-		cf.Version = "6.0.0"
-		NotifyUpdateIfNeeded(ui, config)
-
-		Ω(ui.Outputs).To(BeNil())
-	})
-
 })

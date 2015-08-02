@@ -1,14 +1,20 @@
 package application
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
+
+//go:generate counterfeiter -o ../../../testhelpers/commands/fake_application_restarter.go . ApplicationRestarter
+type ApplicationRestarter interface {
+	command_registry.Command
+	ApplicationRestart(app models.Application, orgName string, spaceName string)
+}
 
 type Restart struct {
 	ui      terminal.UI
@@ -18,21 +24,12 @@ type Restart struct {
 	appReq  requirements.ApplicationRequirement
 }
 
-type ApplicationRestarter interface {
-	ApplicationRestart(app models.Application, orgName string, spaceName string)
+func init() {
+	command_registry.Register(&Restart{})
 }
 
-func NewRestart(ui terminal.UI, config core_config.Reader, starter ApplicationStarter, stopper ApplicationStopper) (cmd *Restart) {
-	cmd = new(Restart)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.starter = starter
-	cmd.stopper = stopper
-	return
-}
-
-func (cmd *Restart) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Restart) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "restart",
 		ShortName:   "rs",
 		Description: T("Restart an app"),
@@ -40,16 +37,12 @@ func (cmd *Restart) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *Restart) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *Restart) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("restart"))
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -59,7 +52,24 @@ func (cmd *Restart) GetRequirements(requirementsFactory requirements.Factory, c 
 	return
 }
 
-func (cmd *Restart) Run(c *cli.Context) {
+func (cmd *Restart) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+
+	//get start for dependency
+	starter := command_registry.Commands.FindCommand("start")
+	starter = starter.SetDependency(deps, false)
+	cmd.starter = starter.(ApplicationStarter)
+
+	//get stop for dependency
+	stopper := command_registry.Commands.FindCommand("stop")
+	stopper = stopper.SetDependency(deps, false)
+	cmd.stopper = stopper.(ApplicationStopper)
+
+	return cmd
+}
+
+func (cmd *Restart) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 	cmd.ApplicationRestart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 }

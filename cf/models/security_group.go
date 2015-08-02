@@ -2,9 +2,10 @@ package models
 
 // represents just the attributes for an security group
 type SecurityGroupFields struct {
-	Name  string
-	Guid  string
-	Rules []map[string]interface{}
+	Name     string
+	Guid     string
+	SpaceUrl string `json:"spaces_url,omitempty"`
+	Rules    []map[string]interface{}
 }
 
 // represents the JSON that we send up to CC when the user creates / updates a record

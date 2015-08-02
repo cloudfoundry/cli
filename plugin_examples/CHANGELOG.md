@@ -1,5 +1,36 @@
+[Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
+
+# Changes in v6.12.0
+- New API:
+```go
+GetApp(string) (plugin_models.GetAppModel, error)
+GetApps() ([]plugin_models.GetAppsModel, error)
+GetOrgs() ([]plugin_models.GetOrgs_Model, error)
+GetSpaces() ([]plugin_models.GetSpaces_Model, error)
+GetOrgUsers(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
+GetSpaceUsers(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
+GetServices() ([]plugin_models.GetServices_Model, error)
+GetService(string) (plugin_models.GetService_Model, error)
+GetOrg(string) (plugin_models.GetOrg_Model, error)
+GetSpace(string) (plugin_models.GetSpace_Model, error)
+```
+- Allow minimum CLI version required to be specified in plugin. Example:
+```go
+func (c *cmd) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "Test1",
+		MinCliVersion: plugin.VersionType{
+			Major: 6,
+			Minor: 12,
+			Build: 0,
+		},
+	}
+}
+```
+
 # Changes in v6.11.2
 Added the following commands to cli_connection.go:
+```go
   - GetCurrentOrg()  
   - GetCurrentSpace()  
   - Username()  
@@ -15,6 +46,7 @@ Added the following commands to cli_connection.go:
   - LoggregatorEndpoint()  
   - DopplerEndpoint()  
   - AccessToken()  
+```
 
 # Changes in v6.11.0
 -Plugins now have a hook-in that is called when the plugin is uninstalled, allowing cleanup of files.

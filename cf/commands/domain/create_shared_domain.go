@@ -2,12 +2,12 @@ package domain
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type CreateSharedDomain struct {
@@ -17,25 +17,21 @@ type CreateSharedDomain struct {
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewCreateSharedDomain(ui terminal.UI, config core_config.Reader, domainRepo api.DomainRepository) (cmd *CreateSharedDomain) {
-	cmd = new(CreateSharedDomain)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.domainRepo = domainRepo
-	return
+func init() {
+	command_registry.Register(&CreateSharedDomain{})
 }
 
-func (cmd *CreateSharedDomain) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateSharedDomain) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "create-shared-domain",
 		Description: T("Create a domain that can be used by all orgs (admin-only)"),
 		Usage:       T("CF_NAME create-shared-domain DOMAIN"),
 	}
 }
 
-func (cmd *CreateSharedDomain) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *CreateSharedDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-shared-domain"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -44,7 +40,14 @@ func (cmd *CreateSharedDomain) GetRequirements(requirementsFactory requirements.
 	return
 }
 
-func (cmd *CreateSharedDomain) Run(c *cli.Context) {
+func (cmd *CreateSharedDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
+	return cmd
+}
+
+func (cmd *CreateSharedDomain) Execute(c flags.FlagContext) {
 	domainName := c.Args()[0]
 
 	cmd.ui.Say(T("Creating shared domain {{.DomainName}} as {{.Username}}...",

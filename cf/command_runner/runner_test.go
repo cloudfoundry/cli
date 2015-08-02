@@ -71,7 +71,7 @@ func (r *TestRequirement) Execute() (success bool) {
 	return true
 }
 
-var _ = Describe("Requirements runner", func() {
+var _ = XDescribe("Requirements runner", func() {
 	It("runs", func() {
 		passingReq := TestRequirement{Passes: true}
 		failingReq := TestRequirement{Passes: false}
@@ -84,7 +84,7 @@ var _ = Describe("Requirements runner", func() {
 		cmdFactory := &TestCommandFactory{Cmd: &cmd}
 		runner := NewRunner(cmdFactory, nil, nil)
 
-		ctxt := testcmd.NewContext("login", []string{})
+		ctxt := testcmd.NewContext("push", []string{})
 		err := runner.RunCmdByName("some-cmd", ctxt)
 
 		Expect(cmdFactory.CmdName).To(Equal("some-cmd"))

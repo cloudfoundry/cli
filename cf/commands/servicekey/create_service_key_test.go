@@ -15,7 +15,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/servicekey"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
@@ -26,11 +26,19 @@ var _ = Describe("create-service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		cmd                 CreateServiceKey
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceKeyRepo      *testapi.FakeServiceKeyRepo
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetServiceKeyRepository(serviceKeyRepo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-service-key").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -38,15 +46,16 @@ var _ = Describe("create-service-key command", func() {
 		serviceRepo = &testapi.FakeServiceRepo{}
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "fake-instance-guid"
+		serviceInstance.Name = "fake-service-instance"
 		serviceRepo.FindInstanceByNameMap = generic.NewMap()
 		serviceRepo.FindInstanceByNameMap.Set("fake-service-instance", serviceInstance)
 		serviceKeyRepo = testapi.NewFakeServiceKeyRepo()
-		cmd = NewCreateServiceKey(ui, config, serviceRepo, serviceKeyRepo)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstanceNotFound: false}
+		requirementsFactory.ServiceInstance = serviceInstance
 	})
 
 	var callCreateService = func(args []string) bool {
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("create-service-key", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

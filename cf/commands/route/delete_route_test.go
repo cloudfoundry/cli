@@ -2,7 +2,8 @@ package route_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/route"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,7 +21,16 @@ var _ = Describe("delete-route command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		routeRepo           *testapi.FakeRouteRepository
+		deps                command_registry.Dependency
+		configRepo          core_config.Repository
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-route").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"yes"}}
@@ -32,9 +42,8 @@ var _ = Describe("delete-route command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		configRepo := testconfig.NewRepositoryWithDefaults()
-		cmd := NewDeleteRoute(ui, configRepo, routeRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		return testcmd.RunCliCommand("delete-route", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when not logged in", func() {
@@ -60,7 +69,9 @@ var _ = Describe("delete-route command", func() {
 
 		It("fails with usage when given zero args", func() {
 			runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 		})
 
 		It("does not fail with usage when provided with a domain", func() {

@@ -38,32 +38,32 @@ type RepositoryLocator struct {
 	curlRepo                        CurlRepository
 	endpointRepo                    EndpointRepository
 	organizationRepo                organizations.OrganizationRepository
-	quotaRepo                       quotas.CloudControllerQuotaRepository
+	quotaRepo                       quotas.QuotaRepository
 	spaceRepo                       spaces.SpaceRepository
-	appRepo                         applications.CloudControllerApplicationRepository
+	appRepo                         applications.ApplicationRepository
 	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  AppSummaryRepository
 	appInstancesRepo                app_instances.AppInstancesRepository
-	appEventsRepo                   app_events.CloudControllerAppEventsRepository
-	appFilesRepo                    api_app_files.CloudControllerAppFilesRepository
-	domainRepo                      CloudControllerDomainRepository
-	routeRepo                       CloudControllerRouteRepository
-	stackRepo                       stacks.CloudControllerStackRepository
-	serviceRepo                     CloudControllerServiceRepository
-	serviceKeyRepo                  CloudControllerServiceKeyRepository
-	serviceBindingRepo              CloudControllerServiceBindingRepository
-	serviceSummaryRepo              CloudControllerServiceSummaryRepository
+	appEventsRepo                   app_events.AppEventsRepository
+	appFilesRepo                    api_app_files.AppFilesRepository
+	domainRepo                      DomainRepository
+	routeRepo                       RouteRepository
+	stackRepo                       stacks.StackRepository
+	serviceRepo                     ServiceRepository
+	serviceKeyRepo                  ServiceKeyRepository
+	serviceBindingRepo              ServiceBindingRepository
+	serviceSummaryRepo              ServiceSummaryRepository
 	userRepo                        UserRepository
-	passwordRepo                    password.CloudControllerPasswordRepository
+	passwordRepo                    password.PasswordRepository
 	logsNoaaRepo                    LogsNoaaRepository
 	oldLogsRepo                     OldLogsRepository
-	authTokenRepo                   CloudControllerServiceAuthTokenRepository
-	serviceBrokerRepo               CloudControllerServiceBrokerRepository
+	authTokenRepo                   ServiceAuthTokenRepository
+	serviceBrokerRepo               ServiceBrokerRepository
 	servicePlanRepo                 CloudControllerServicePlanRepository
 	servicePlanVisibilityRepo       ServicePlanVisibilityRepository
-	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
-	buildpackRepo                   CloudControllerBuildpackRepository
-	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
+	userProvidedServiceInstanceRepo UserProvidedServiceInstanceRepository
+	buildpackRepo                   BuildpackRepository
+	buildpackBitsRepo               BuildpackBitsRepository
 	securityGroupRepo               security_groups.SecurityGroupRepo
 	stagingSecurityGroupRepo        staging.StagingSecurityGroupsRepo
 	runningSecurityGroupRepo        running.RunningSecurityGroupsRepo
@@ -134,8 +134,18 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	return
 }
 
+func (locator RepositoryLocator) SetAuthenticationRepository(repo authentication.AuthenticationRepository) RepositoryLocator {
+	locator.authRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetAuthenticationRepository() authentication.AuthenticationRepository {
 	return locator.authRepo
+}
+
+func (locator RepositoryLocator) SetCurlRepository(repo CurlRepository) RepositoryLocator {
+	locator.curlRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetCurlRepository() CurlRepository {
@@ -160,6 +170,11 @@ func (locator RepositoryLocator) GetOrganizationRepository() organizations.Organ
 	return locator.organizationRepo
 }
 
+func (locator RepositoryLocator) SetQuotaRepository(repo quotas.QuotaRepository) RepositoryLocator {
+	locator.quotaRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetQuotaRepository() quotas.QuotaRepository {
 	return locator.quotaRepo
 }
@@ -171,6 +186,11 @@ func (locator RepositoryLocator) SetSpaceRepository(repo spaces.SpaceRepository)
 
 func (locator RepositoryLocator) GetSpaceRepository() spaces.SpaceRepository {
 	return locator.spaceRepo
+}
+
+func (locator RepositoryLocator) SetApplicationRepository(repo applications.ApplicationRepository) RepositoryLocator {
+	locator.appRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetApplicationRepository() applications.ApplicationRepository {
@@ -204,32 +224,72 @@ func (locator RepositoryLocator) GetAppInstancesRepository() app_instances.AppIn
 	return locator.appInstancesRepo
 }
 
+func (locator RepositoryLocator) SetAppEventsRepository(repo app_events.AppEventsRepository) RepositoryLocator {
+	locator.appEventsRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetAppEventsRepository() app_events.AppEventsRepository {
 	return locator.appEventsRepo
+}
+
+func (locator RepositoryLocator) SetAppFileRepository(repo api_app_files.AppFilesRepository) RepositoryLocator {
+	locator.appFilesRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetAppFilesRepository() api_app_files.AppFilesRepository {
 	return locator.appFilesRepo
 }
 
+func (locator RepositoryLocator) SetDomainRepository(repo DomainRepository) RepositoryLocator {
+	locator.domainRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetDomainRepository() DomainRepository {
 	return locator.domainRepo
+}
+
+func (locator RepositoryLocator) SetRouteRepository(repo RouteRepository) RepositoryLocator {
+	locator.routeRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetRouteRepository() RouteRepository {
 	return locator.routeRepo
 }
 
+func (locator RepositoryLocator) SetStackRepository(repo stacks.StackRepository) RepositoryLocator {
+	locator.stackRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetStackRepository() stacks.StackRepository {
 	return locator.stackRepo
+}
+
+func (locator RepositoryLocator) SetServiceRepository(repo ServiceRepository) RepositoryLocator {
+	locator.serviceRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetServiceRepository() ServiceRepository {
 	return locator.serviceRepo
 }
 
+func (locator RepositoryLocator) SetServiceKeyRepository(repo ServiceKeyRepository) RepositoryLocator {
+	locator.serviceKeyRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetServiceKeyRepository() ServiceKeyRepository {
 	return locator.serviceKeyRepo
+}
+
+func (locator RepositoryLocator) SetServiceBindingRepository(repo ServiceBindingRepository) RepositoryLocator {
+	locator.serviceBindingRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetServiceBindingRepository() ServiceBindingRepository {
@@ -239,13 +299,27 @@ func (locator RepositoryLocator) GetServiceBindingRepository() ServiceBindingRep
 func (locator RepositoryLocator) GetServiceSummaryRepository() ServiceSummaryRepository {
 	return locator.serviceSummaryRepo
 }
+func (locator RepositoryLocator) SetServiceSummaryRepository(repo ServiceSummaryRepository) RepositoryLocator {
+	locator.serviceSummaryRepo = repo
+	return locator
+}
 
 func (locator RepositoryLocator) GetUserRepository() UserRepository {
 	return locator.userRepo
 }
 
+func (locator RepositoryLocator) SetPasswordRepository(repo password.PasswordRepository) RepositoryLocator {
+	locator.passwordRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetPasswordRepository() password.PasswordRepository {
 	return locator.passwordRepo
+}
+
+func (locator RepositoryLocator) SetOldLogsRepository(repo OldLogsRepository) RepositoryLocator {
+	locator.oldLogsRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetOldLogsRepository() OldLogsRepository {
@@ -261,8 +335,18 @@ func (locator RepositoryLocator) GetLogsNoaaRepository() LogsNoaaRepository {
 	return locator.logsNoaaRepo
 }
 
+func (locator RepositoryLocator) SetServiceAuthTokenRepository(repo ServiceAuthTokenRepository) RepositoryLocator {
+	locator.authTokenRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetServiceAuthTokenRepository() ServiceAuthTokenRepository {
 	return locator.authTokenRepo
+}
+
+func (locator RepositoryLocator) SetServiceBrokerRepository(repo ServiceBrokerRepository) RepositoryLocator {
+	locator.serviceBrokerRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetServiceBrokerRepository() ServiceBrokerRepository {
@@ -273,28 +357,63 @@ func (locator RepositoryLocator) GetServicePlanRepository() ServicePlanRepositor
 	return locator.servicePlanRepo
 }
 
+func (locator RepositoryLocator) SetUserProvidedServiceInstanceRepository(repo UserProvidedServiceInstanceRepository) RepositoryLocator {
+	locator.userProvidedServiceInstanceRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetUserProvidedServiceInstanceRepository() UserProvidedServiceInstanceRepository {
 	return locator.userProvidedServiceInstanceRepo
+}
+
+func (locator RepositoryLocator) SetBuildpackRepository(repo BuildpackRepository) RepositoryLocator {
+	locator.buildpackRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetBuildpackRepository() BuildpackRepository {
 	return locator.buildpackRepo
 }
 
+func (locator RepositoryLocator) SetBuildpackBitsRepository(repo BuildpackBitsRepository) RepositoryLocator {
+	locator.buildpackBitsRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepository {
 	return locator.buildpackBitsRepo
+}
+
+func (locator RepositoryLocator) SetSecurityGroupRepository(repo security_groups.SecurityGroupRepo) RepositoryLocator {
+	locator.securityGroupRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetSecurityGroupRepository() security_groups.SecurityGroupRepo {
 	return locator.securityGroupRepo
 }
 
+func (locator RepositoryLocator) SetStagingSecurityGroupRepository(repo staging.StagingSecurityGroupsRepo) RepositoryLocator {
+	locator.stagingSecurityGroupRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetStagingSecurityGroupsRepository() staging.StagingSecurityGroupsRepo {
 	return locator.stagingSecurityGroupRepo
 }
 
+func (locator RepositoryLocator) SetRunningSecurityGroupRepository(repo running.RunningSecurityGroupsRepo) RepositoryLocator {
+	locator.runningSecurityGroupRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetRunningSecurityGroupsRepository() running.RunningSecurityGroupsRepo {
 	return locator.runningSecurityGroupRepo
+}
+
+func (locator RepositoryLocator) SetSecurityGroupSpaceBinder(repo securitygroupspaces.SecurityGroupSpaceBinder) RepositoryLocator {
+	locator.securityGroupSpaceBinder = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetSecurityGroupSpaceBinder() securitygroupspaces.SecurityGroupSpaceBinder {
@@ -309,12 +428,32 @@ func (locator RepositoryLocator) GetSpaceQuotaRepository() space_quotas.SpaceQuo
 	return locator.spaceQuotaRepo
 }
 
+func (locator RepositoryLocator) SetSpaceQuotaRepository(repo space_quotas.SpaceQuotaRepository) RepositoryLocator {
+	locator.spaceQuotaRepo = repo
+	return locator
+}
+
+func (locator RepositoryLocator) SetFeatureFlagRepository(repo feature_flags.FeatureFlagRepository) RepositoryLocator {
+	locator.featureFlagRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetFeatureFlagRepository() feature_flags.FeatureFlagRepository {
 	return locator.featureFlagRepo
 }
 
+func (locator RepositoryLocator) SetEnvironmentVariableGroupsRepository(repo environment_variable_groups.EnvironmentVariableGroupsRepository) RepositoryLocator {
+	locator.environmentVariableGroupRepo = repo
+	return locator
+}
+
 func (locator RepositoryLocator) GetEnvironmentVariableGroupsRepository() environment_variable_groups.EnvironmentVariableGroupsRepository {
 	return locator.environmentVariableGroupRepo
+}
+
+func (locator RepositoryLocator) SetCopyApplicationSourceRepository(repo copy_application_source.CopyApplicationSourceRepository) RepositoryLocator {
+	locator.copyAppSourceRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) GetCopyApplicationSourceRepository() copy_application_source.CopyApplicationSourceRepository {

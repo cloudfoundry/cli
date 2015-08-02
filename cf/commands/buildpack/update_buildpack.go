@@ -4,12 +4,12 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type UpdateBuildpack struct {
@@ -19,48 +19,51 @@ type UpdateBuildpack struct {
 	buildpackReq      requirements.BuildpackRequirement
 }
 
-func NewUpdateBuildpack(ui terminal.UI, repo api.BuildpackRepository, bitsRepo api.BuildpackBitsRepository) (cmd *UpdateBuildpack) {
-	cmd = new(UpdateBuildpack)
-	cmd.ui = ui
-	cmd.buildpackRepo = repo
-	cmd.buildpackBitsRepo = bitsRepo
-	return
+func init() {
+	command_registry.Register(&UpdateBuildpack{})
 }
 
-func (cmd *UpdateBuildpack) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *UpdateBuildpack) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["i"] = &cliFlags.IntFlag{Name: "i", Usage: T("The order in which the buildpacks are checked during buildpack auto-detection")}
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Path to directory or zip file")}
+	fs["enable"] = &cliFlags.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")}
+	fs["disable"] = &cliFlags.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")}
+	fs["lock"] = &cliFlags.BoolFlag{Name: "lock", Usage: T("Lock the buildpack to prevent updates")}
+	fs["unlock"] = &cliFlags.BoolFlag{Name: "disable", Usage: T("Unlock the buildpack to enable updates")}
+
+	return command_registry.CommandMetadata{
 		Name:        "update-buildpack",
 		Description: T("Update a buildpack"),
 		Usage: T("CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]") +
 			T("\n\nTIP:\n") + T("   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."),
-		Flags: []cli.Flag{
-			flag_helpers.NewIntFlag("i", T("The order in which the buildpacks are checked during buildpack auto-detection")),
-			flag_helpers.NewStringFlag("p", T("Path to directory or zip file")),
-			cli.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")},
-			cli.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")},
-			cli.BoolFlag{Name: "lock", Usage: T("Lock the buildpack to prevent updates")},
-			cli.BoolFlag{Name: "unlock", Usage: T("Unlock the buildpack to enable updates")},
-		},
+		Flags: fs,
 	}
 }
 
-func (cmd *UpdateBuildpack) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UpdateBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("update-buildpack"))
 	}
 
 	loginReq := requirementsFactory.NewLoginRequirement()
-	cmd.buildpackReq = requirementsFactory.NewBuildpackRequirement(c.Args()[0])
+	cmd.buildpackReq = requirementsFactory.NewBuildpackRequirement(fc.Args()[0])
 
 	reqs = []requirements.Requirement{
 		loginReq,
 		cmd.buildpackReq,
 	}
-
 	return
 }
 
-func (cmd *UpdateBuildpack) Run(c *cli.Context) {
+func (cmd *UpdateBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
+	cmd.buildpackBitsRepo = deps.RepoLocator.GetBuildpackBitsRepository()
+	return cmd
+}
+
+func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) {
 	buildpack := cmd.buildpackReq.GetBuildpack()
 
 	cmd.ui.Say(T("Updating buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpack.Name)}))

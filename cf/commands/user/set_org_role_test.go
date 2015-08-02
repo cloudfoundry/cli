@@ -2,7 +2,7 @@ package user_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/user"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -15,21 +15,21 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-func callSetOrgRole(args []string, requirementsFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	config := testconfig.NewRepositoryWithDefaults()
-	cmd := NewSetOrgRole(ui, config, userRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
-}
-
 var _ = Describe("set-org-role command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		userRepo            *testapi.FakeUserRepository
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("set-org-role").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -40,7 +40,7 @@ var _ = Describe("set-org-role command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewSetOrgRole(ui, configRepo, userRepo), args, requirementsFactory)
+		return testcmd.RunCliCommand("set-org-role", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -50,7 +50,9 @@ var _ = Describe("set-org-role command", func() {
 
 		It("fails with usage when not provided exactly three args", func() {
 			runCommand("one fish", "two fish") // red fish, blue fish
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 	})
 

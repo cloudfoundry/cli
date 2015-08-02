@@ -1,0 +1,420 @@
+---
+groups:
+- name: cli
+  jobs:
+  - rc
+  - linux64-unit
+  - linux32-unit
+  - darwin64-unit
+  - win64-unit
+  - win32-unit
+  - linux64-gats
+  - linux64-cats
+  - win64-cats
+  - win64-gats
+  - win64-gats-french
+  - publish
+- name: bosh-lite
+  jobs: [provision-linux, provision-windows]
+- name: concourse
+  jobs: [deploy-concourse]
+
+resources:
+- name: cf-cli
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+
+- name: cli-ci
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-ci.git
+    branch: concourse
+    private_key: {{ci-repo-private-key}}
+
+- name: cf-lite
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-lite.git
+    branch: master
+
+- name: cf-release
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-release.git
+    branch: master
+
+- name: bosh-lite
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/bosh-lite.git
+    branch: master
+
+- name: gats
+  type: git
+  source:
+    uri: https://github.com/pivotal-cf-experimental/GATS
+    branch: master
+
+- name: concourse-deployment
+  type: bosh-deployment
+  source:
+    target: {{concourse-bosh-target}}
+    username: {{concourse-bosh-username}}
+    password: {{concourse-bosh-password}}
+    deployment: concourse
+    ignore_ssl: true
+
+- name: concourse
+  type: github-release
+  source:
+    user: concourse
+    repository: concourse
+
+- name: aws-stemcell
+  type: bosh-io-stemcell
+  source:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+
+- name: version
+  type: semver
+  source:
+    bucket: cf-cli-pipeline-artifacts
+    key: current-version
+    initial_version: 6.11.1
+    access_key_id: {{pipeline-bucket-access-key-id}}
+    secret_access_key: {{pipeline-bucket-secret-access-key}}
+
+- name: linux64-binary
+  type: s3
+  source:
+    bucket: cf-cli-pipeline-artifacts
+    regexp: cf-linux64-(.*)
+    access_key_id: {{pipeline-bucket-access-key-id}}
+    secret_access_key: {{pipeline-bucket-secret-access-key}}
+
+- name: linux32-binary
+  type: s3
+  source:
+    bucket: cf-cli-pipeline-artifacts
+    regexp: cf-linux32-(.*)
+    access_key_id: {{pipeline-bucket-access-key-id}}
+    secret_access_key: {{pipeline-bucket-secret-access-key}}
+
+- name: windows64-binary
+  type: s3
+  source:
+    bucket: cf-cli-pipeline-artifacts
+    regexp: cf-windows64-(.*).exe
+    access_key_id: {{pipeline-bucket-access-key-id}}
+    secret_access_key: {{pipeline-bucket-secret-access-key}}
+
+- name: windows32-binary
+  type: s3
+  source:
+    bucket: cf-cli-pipeline-artifacts
+    regexp: cf-windows32-(.*).exe
+    access_key_id: {{pipeline-bucket-access-key-id}}
+    secret_access_key: {{pipeline-bucket-secret-access-key}}
+
+- name: darwin64-binary
+  type: s3
+  source:
+    bucket: cf-cli-pipeline-artifacts
+    regexp: cf-darwin64-(.*)
+    access_key_id: {{pipeline-bucket-access-key-id}}
+    secret_access_key: {{pipeline-bucket-secret-access-key}}
+
+jobs:
+- name: rc
+  serial: true
+  plan:
+  - aggregate:
+    - get: cf-cli
+      trigger: true
+    - get: version
+      params: {pre: plus}
+      trigger: false
+  - put: version
+    params: {file: version/number}
+
+- name: linux64-unit
+  public: true
+  plan:
+  - get: cf-cli
+    passed: [rc]
+    trigger: false
+  - get: version
+    passed: [rc]
+    trigger: true
+  - task: unit-tests
+    file: cf-cli/ci/unit.linux.yml
+  - put: linux64-binary
+    params: {from: unit-tests/cf-linux64-.*}
+
+- name: linux32-unit
+  public: true
+  plan:
+  - get: cf-cli
+    passed: [rc]
+    trigger: false
+  - get: version
+    passed: [rc]
+    trigger: true
+  - task: unit-tests
+    file: cf-cli/ci/unit.linux32.yml
+  - put: linux32-binary
+    params: {from: unit-tests/cf-linux32-.*}
+
+- name: darwin64-unit
+  public: true
+  plan:
+  - get: cf-cli
+    passed: [rc]
+    trigger: false
+  - get: version
+    passed: [rc]
+    trigger: true
+  - task: unit-tests
+    file: cf-cli/ci/unit.darwin.yml
+  - put: darwin64-binary
+    params: {from: unit-tests/cf-darwin64-.*}
+
+- name: win32-unit
+  public: true
+  plan:
+  - get: cf-cli
+    passed: [rc]
+    trigger: false
+  - get: version
+    passed: [rc]
+    trigger: true
+  - task: unit-tests
+    file: cf-cli/ci/unit.windows32.yml
+  - put: windows32-binary
+    params: {from: unit-tests/cf-windows32-.*}
+
+- name: win64-unit
+  public: true
+  plan:
+  - get: cf-cli
+    passed: [rc]
+    trigger: false
+  - get: version
+    passed: [rc]
+    trigger: true
+  - task: unit-tests
+    file: cf-cli/ci/unit.windows.yml
+  - put: windows64-binary
+    params: {from: unit-tests/cf-windows64-.*}
+
+- name: linux64-cats
+  public: true
+  serial_groups: [bosh-lite-linux]
+  plan:
+  - aggregate:
+    - get: cf-cli
+      passed: [linux64-unit]
+      trigger: true
+    - get: linux64-binary
+      passed: [linux64-unit]
+      trigger: false
+    - get: cf-release
+      trigger: false
+      passed: [provision-linux]
+      params:
+        submodules:
+          - src/acceptance-tests
+  - task: cats
+    file: cf-cli/ci/cats.linux.yml
+    config:
+      params:
+        BOSH_LITE_IP: {{bosh-lite-ip-linux}}
+
+- name: linux64-gats
+  public: true
+  serial_groups: [bosh-lite-linux]
+  plan:
+  - aggregate:
+    - get: cf-cli
+      passed: [linux64-unit]
+      trigger: true
+    - get: linux64-binary
+      passed: [linux64-unit]
+      trigger: false
+    - get: gats
+  - task: gats
+    file: cf-cli/ci/gats.linux.yml
+    config:
+      params:
+        BOSH_LITE_IP: {{bosh-lite-ip-linux}}
+
+- name: win64-cats
+  public: true
+  serial_groups: [bosh-lite-windows]
+  plan:
+  - aggregate:
+    - get: cf-cli
+      passed: [win64-unit]
+      trigger: true
+    - get: windows64-binary
+      passed: [win64-unit]
+      trigger: false
+    - get: cf-release
+      trigger: false
+      passed: [provision-windows]
+      params:
+        submodules:
+          - src/acceptance-tests
+  - task: cats
+    file: cf-cli/ci/cats.windows.yml
+    config:
+      params:
+        BOSH_LITE_IP: {{bosh-lite-ip-windows}}
+
+- name: win64-gats
+  public: true
+  serial_groups: [bosh-lite-windows]
+  plan:
+  - aggregate:
+    - get: cf-cli
+      passed: [win64-unit]
+      trigger: true
+    - get: windows64-binary
+      passed: [win64-unit]
+      trigger: false
+    - get: gats
+  - task: gats
+    file: cf-cli/ci/gats.windows.yml
+    config:
+      params:
+        BOSH_LITE_IP: {{bosh-lite-ip-windows}}
+
+- name: win64-gats-french
+  public: true
+  serial_groups: [bosh-lite-windows]
+  plan:
+  - aggregate:
+    - get: cf-cli
+      passed: [win64-unit]
+      trigger: true
+    - get: windows64-binary
+      passed: [win64-unit]
+      trigger: false
+    - get: gats
+  - task: gats
+    file: cf-cli/ci/gats.french.windows.yml
+    config:
+      params:
+        BOSH_LITE_IP: {{bosh-lite-ip-windows}}
+
+- name: publish
+  serial: true
+  plan:
+  - aggregate:
+    - get: cf-cli
+      trigger: true
+      passed:
+      - linux64-cats
+      - linux64-gats
+      - win64-cats
+      - win64-gats
+      - win64-gats-french
+      - darwin64-unit
+      - win32-unit
+      - linux32-unit
+    - get: linux64-binary
+      trigger: false
+      passed: [linux64-unit]
+    - get: linux32-binary
+      trigger: false
+      passed: [linux32-unit]
+    - get: windows64-binary
+      trigger: false
+      passed: [win64-unit]
+    - get: windows32-binary
+      trigger: false
+      passed: [win32-unit]
+    - get: darwin64-binary
+      trigger: false
+      passed: [darwin64-unit]
+    - get: cli-ci
+      trigger: false
+  - task: publish
+    file: cf-cli/ci/publish.yml
+    config:
+      params:
+        AWS_ACCESS_KEY_ID: {{publish-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{publish-secret-access-key}}
+
+- name: provision-linux
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-ci
+      trigger: false
+    - get: cf-release
+      trigger: false
+      params:
+        submodules: none
+    - get: bosh-lite
+      trigger: false
+  - task: provision
+    privileged: true
+    file: cli-ci/concourse/lite/provision-cf-lite.yml
+    config:
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_NAME: linux
+  - conditions: [success, failure]
+    put: cli-ci
+    params:
+      repository: provision/cli-ci
+      rebase: true
+
+- name: provision-windows
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-ci
+      trigger: false
+    - get: cf-release
+      trigger: false
+      params:
+        submodules: none
+    - get: bosh-lite
+      trigger: false
+  - task: provision
+    privileged: true
+    file: cli-ci/concourse/lite/provision-cf-lite.yml
+    config:
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_NAME: windows
+  - conditions: [success, failure]
+    put: cli-ci
+    params:
+      repository: provision/cli-ci
+      rebase: true
+
+- name: deploy-concourse
+  serial: true
+  plan:
+  - aggregate:
+    - get: concourse
+      trigger: false
+    - get: cli-ci
+      trigger: false
+    - get: aws-stemcell
+      trigger: false
+  - put: concourse-deployment
+    params:
+      manifest: cli-ci/ci/aws-vpc.yml
+      releases:
+      - concourse/concourse-*.tgz
+      - concourse/garden-linux-*.tgz
+      stemcells:
+      - aws-stemcell/*.tgz

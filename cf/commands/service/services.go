@@ -3,31 +3,31 @@ package service
 import (
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type ListServices struct {
 	ui                 terminal.UI
 	config             core_config.Reader
 	serviceSummaryRepo api.ServiceSummaryRepository
+	pluginModel        *[]plugin_models.GetServices_Model
+	pluginCall         bool
 }
 
-func NewListServices(ui terminal.UI, config core_config.Reader, serviceSummaryRepo api.ServiceSummaryRepository) (cmd ListServices) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.serviceSummaryRepo = serviceSummaryRepo
-	return
+func init() {
+	command_registry.Register(&ListServices{})
 }
 
-func (cmd ListServices) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd ListServices) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "services",
 		ShortName:   "s",
 		Description: T("List all service instances in the target space"),
@@ -35,9 +35,9 @@ func (cmd ListServices) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd ListServices) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
+func (cmd ListServices) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("services"))
 	}
 	reqs = append(reqs,
 		requirementsFactory.NewLoginRequirement(),
@@ -46,7 +46,16 @@ func (cmd ListServices) GetRequirements(requirementsFactory requirements.Factory
 	return
 }
 
-func (cmd ListServices) Run(c *cli.Context) {
+func (cmd *ListServices) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.serviceSummaryRepo = deps.RepoLocator.GetServiceSummaryRepository()
+	cmd.pluginModel = deps.PluginModels.Services
+	cmd.pluginCall = pluginCall
+	return cmd
+}
+
+func (cmd ListServices) Execute(fc flags.FlagContext) {
 	cmd.ui.Say(T("Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -89,6 +98,28 @@ func (cmd ListServices) Run(c *cli.Context) {
 			strings.Join(instance.ApplicationNames, ", "),
 			serviceStatus,
 		)
+		if cmd.pluginCall {
+			s := plugin_models.GetServices_Model{
+				Name: instance.Name,
+				Guid: instance.Guid,
+				ServicePlan: plugin_models.GetServices_ServicePlan{
+					Name: instance.ServicePlan.Name,
+					Guid: instance.ServicePlan.Guid,
+				},
+				Service: plugin_models.GetServices_ServiceFields{
+					Name: instance.ServiceOffering.Label,
+				},
+				ApplicationNames: instance.ApplicationNames,
+				LastOperation: plugin_models.GetServices_LastOperation{
+					Type:  instance.LastOperation.Type,
+					State: instance.LastOperation.State,
+				},
+				IsUserProvided: instance.IsUserProvided(),
+			}
+
+			*(cmd.pluginModel) = append(*(cmd.pluginModel), s)
+		}
+
 	}
 
 	table.Print()

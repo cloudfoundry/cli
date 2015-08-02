@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/api"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,17 +20,33 @@ import (
 
 var _ = Describe("bind-service command", func() {
 	var (
+		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
+		config              core_config.Repository
+		serviceBindingRepo  *testapi.FakeServiceBindingRepo
+		deps                command_registry.Dependency
 	)
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.RepoLocator = deps.RepoLocator.SetServiceBindingRepository(serviceBindingRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("bind-service").SetDependency(deps, pluginCall))
+	}
+
 	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
+		serviceBindingRepo = &testapi.FakeServiceBindingRepo{}
 	})
 
-	It("fails requirements when not logged in", func() {
-		cmd := NewBindService(&testterm.FakeUI{}, testconfig.NewRepository(), &testapi.FakeServiceBindingRepo{})
+	var callBindService = func(args []string) bool {
+		return testcmd.RunCliCommand("bind-service", args, requirementsFactory, updateCommandDependency, false)
+	}
 
-		Expect(testcmd.RunCommand(cmd, []string{"service", "app"}, requirementsFactory)).To(BeFalse())
+	It("fails requirements when not logged in", func() {
+		Expect(callBindService([]string{"service", "app"})).To(BeFalse())
 	})
 
 	Context("when logged in", func() {
@@ -47,8 +63,7 @@ var _ = Describe("bind-service command", func() {
 			serviceInstance.Guid = "my-service-guid"
 			requirementsFactory.Application = app
 			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
-			ui := callBindService([]string{"my-app", "my-service"}, requirementsFactory, serviceBindingRepo)
+			callBindService([]string{"my-app", "my-service"})
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
@@ -71,8 +86,8 @@ var _ = Describe("bind-service command", func() {
 			serviceInstance.Guid = "my-service-guid"
 			requirementsFactory.Application = app
 			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
-			ui := callBindService([]string{"my-app", "my-service"}, requirementsFactory, serviceBindingRepo)
+			serviceBindingRepo = &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
+			callBindService([]string{"my-app", "my-service"})
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Binding service"},
@@ -90,8 +105,8 @@ var _ = Describe("bind-service command", func() {
 			serviceInstance.Guid = "my-service1-guid1"
 			requirementsFactory.Application = app
 			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateNonHttpErrCode: "1001"}
-			ui := callBindService([]string{"my-app1", "my-service1"}, requirementsFactory, serviceBindingRepo)
+			serviceBindingRepo = &testapi.FakeServiceBindingRepo{CreateNonHttpErrCode: "1001"}
+			callBindService([]string{"my-app1", "my-service1"})
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"FAILED"},
@@ -100,16 +115,22 @@ var _ = Describe("bind-service command", func() {
 		})
 
 		It("fails with usage when called without a service instance and app", func() {
-			serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+			callBindService([]string{"my-service"})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 
-			ui := callBindService([]string{"my-service"}, requirementsFactory, serviceBindingRepo)
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			ui = &testterm.FakeUI{}
+			callBindService([]string{"my-app"})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 
-			ui = callBindService([]string{"my-app"}, requirementsFactory, serviceBindingRepo)
-			Expect(ui.FailedWithUsage).To(BeTrue())
-
-			ui = callBindService([]string{"my-app", "my-service"}, requirementsFactory, serviceBindingRepo)
-			Expect(ui.FailedWithUsage).To(BeFalse())
+			ui = &testterm.FakeUI{}
+			callBindService([]string{"my-app", "my-service"})
+			Expect(ui.Outputs).ToNot(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 
 		Context("when passing arbitrary params", func() {
@@ -133,8 +154,7 @@ var _ = Describe("bind-service command", func() {
 
 			Context("as a json string", func() {
 				It("successfully creates a service and passes the params as a json string", func() {
-					serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
-					ui := callBindService([]string{"my-app", "my-service", "-c", `{"foo": "bar"}`}, requirementsFactory, serviceBindingRepo)
+					callBindService([]string{"my-app", "my-service", "-c", `{"foo": "bar"}`})
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
@@ -148,8 +168,7 @@ var _ = Describe("bind-service command", func() {
 
 				Context("that are not valid json", func() {
 					It("returns an error to the UI", func() {
-						serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
-						ui := callBindService([]string{"my-app", "my-service", "-c", `bad-json`}, requirementsFactory, serviceBindingRepo)
+						callBindService([]string{"my-app", "my-service", "-c", `bad-json`})
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
@@ -184,8 +203,7 @@ var _ = Describe("bind-service command", func() {
 				})
 
 				It("successfully creates a service and passes the params as a json", func() {
-					serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
-					ui := callBindService([]string{"my-app", "my-service", "-c", jsonFile.Name()}, requirementsFactory, serviceBindingRepo)
+					callBindService([]string{"my-app", "my-service", "-c", jsonFile.Name()})
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
@@ -203,8 +221,7 @@ var _ = Describe("bind-service command", func() {
 					})
 
 					It("returns an error to the UI", func() {
-						serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
-						ui := callBindService([]string{"my-app", "my-service", "-c", jsonFile.Name()}, requirementsFactory, serviceBindingRepo)
+						callBindService([]string{"my-app", "my-service", "-c", jsonFile.Name()})
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
@@ -216,13 +233,3 @@ var _ = Describe("bind-service command", func() {
 		})
 	})
 })
-
-func callBindService(args []string, requirementsFactory *testreq.FakeReqFactory, serviceBindingRepo api.ServiceBindingRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = new(testterm.FakeUI)
-
-	config := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewBindService(fakeUI, config, serviceBindingRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
-}

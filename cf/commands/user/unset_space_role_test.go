@@ -2,7 +2,8 @@ package user_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/user"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -15,15 +16,41 @@ import (
 )
 
 var _ = Describe("unset-space-role command", func() {
+
+	var (
+		ui                  *testterm.FakeUI
+		configRepo          core_config.Repository
+		requirementsFactory *testreq.FakeReqFactory
+		userRepo            *testapi.FakeUserRepository
+		spaceRepo           *testapi.FakeSpaceRepository
+		deps                command_registry.Dependency
+	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unset-space-role").SetDependency(deps, pluginCall))
+	}
+
+	callUnsetSpaceRole := func(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, bool) {
+		ui = &testterm.FakeUI{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		passed := testcmd.RunCliCommand("unset-space-role", args, requirementsFactory, updateCommandDependency, false)
+		return ui, passed
+	}
 	It("fails with usage when not called with exactly four args", func() {
-		requirementsFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
+		requirementsFactory, spaceRepo, userRepo = getUnsetSpaceRoleDeps()
 
 		ui, _ := callUnsetSpaceRole([]string{"username", "org", "space"}, spaceRepo, userRepo, requirementsFactory)
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 	})
 
 	It("fails requirements when not logged in", func() {
-		requirementsFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
+		requirementsFactory, spaceRepo, userRepo = getUnsetSpaceRoleDeps()
 		args := []string{"username", "org", "space", "role"}
 
 		requirementsFactory.LoginSuccess = false
@@ -39,7 +66,7 @@ var _ = Describe("unset-space-role command", func() {
 		org.Name = "some-org"
 		org.Guid = "some-org-guid"
 
-		requirementsFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
+		requirementsFactory, spaceRepo, userRepo = getUnsetSpaceRoleDeps()
 		requirementsFactory.LoginSuccess = true
 		requirementsFactory.UserFields = user
 		requirementsFactory.Organization = org
@@ -69,12 +96,4 @@ func getUnsetSpaceRoleDeps() (requirementsFactory *testreq.FakeReqFactory, space
 	spaceRepo = &testapi.FakeSpaceRepository{}
 	userRepo = &testapi.FakeUserRepository{}
 	return
-}
-
-func callUnsetSpaceRole(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, bool) {
-	ui := &testterm.FakeUI{}
-	config := testconfig.NewRepositoryWithDefaults()
-	cmd := NewUnsetSpaceRole(ui, config, spaceRepo, userRepo)
-	passed := testcmd.RunCommand(cmd, args, requirementsFactory)
-	return ui, passed
 }

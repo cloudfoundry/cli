@@ -30,13 +30,20 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 
 		hasOrg, _ := cliConnection.HasOrganization()
 		fmt.Println("Has Organization Targeted:", hasOrg)
-		org, _ := cliConnection.GetCurrentOrg()
-		fmt.Println("Current Org:", org)
+		currentOrg, _ := cliConnection.GetCurrentOrg()
+		fmt.Println("Current Org:", currentOrg)
+		org, _ := cliConnection.GetOrg(currentOrg.Name)
+		fmt.Println(currentOrg.Name, " Org:", org)
+		orgs, _ := cliConnection.GetOrgs()
+		fmt.Println("Orgs:", orgs)
 		hasSpace, _ := cliConnection.HasSpace()
 		fmt.Println("Has Space Targeted:", hasSpace)
-		space, _ := cliConnection.GetCurrentSpace()
-		fmt.Println("Current space:", space)
-
+		currentSpace, _ := cliConnection.GetCurrentSpace()
+		fmt.Println("Current space:", currentSpace)
+		space, _ := cliConnection.GetSpace(currentSpace.Name)
+		fmt.Println("Space:", space)
+		spaces, _ := cliConnection.GetSpaces()
+		fmt.Println("Spaces:", spaces)
 		loggregator, _ := cliConnection.LoggregatorEndpoint()
 		fmt.Println("Loggregator Endpoint:", loggregator)
 		dopplerEndpoint, _ := cliConnection.DopplerEndpoint()
@@ -76,6 +83,11 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			Major: 1,
 			Minor: 2,
 			Build: 4,
+		},
+		MinCliVersion: plugin.VersionType{
+			Major: 5,
+			Minor: 0,
+			Build: 0,
 		},
 		Commands: []plugin.Command{
 			{

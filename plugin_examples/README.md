@@ -1,24 +1,36 @@
-# Changes in v6.11.2
-Added the following commands to cli_connection.go:
-  - GetCurrentOrg()  
-  - GetCurrentSpace()  
-  - Username()  
-  - UserEmail()  
-  - UserGuid()  
-  - HasOrganization()  
-  - HasSpace()  
-  - IsLoggedIn()  
-  - IsSSLDisabled()  
-  - ApiEndpoint()  
-  - HasAPIEndpoint()  
-  - ApiVersion()  
-  - LoggregatorEndpoint()  
-  - DopplerEndpoint()  
-  - AccessToken()  
+# Changes in v6.12.0
+- New API:
+```go
+GetApp(string) (plugin_models.GetAppModel, error)
+GetApps() ([]plugin_models.GetAppsModel, error)
+GetOrgs() ([]plugin_models.GetOrgs_Model, error)
+GetSpaces() ([]plugin_models.GetSpaces_Model, error)
+GetOrgUsers(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
+GetSpaceUsers(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
+GetServices() ([]plugin_models.GetServices_Model, error)
+GetService(string) (plugin_models.GetService_Model, error)
+GetOrg(string) (plugin_models.GetOrg_Model, error)
+GetSpace(string) (plugin_models.GetSpace_Model, error)
+```
+- Allow minimum CLI version required to be specified in plugin. Example:
+```go
+func (c *cmd) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "Test1",
+		MinCliVersion: plugin.VersionType{
+			Major: 6,
+			Minor: 12,
+			Build: 0,
+		},
+	}
+}
+```
+
 
 [Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md) 
 
-# Developing a Plugin
+# Developing a Plugin 
+[Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
 
 This README discusses how to develop a cf CLI plugin.
 For user-focused documentation, see [Using the cf CLI](http://docs.cloudfoundry.org/devguide/installcf/use-cli-plugins.html).
@@ -57,6 +69,8 @@ Here is an illustration of the workflow when a plugin command is being invoked.
 
 ## Writing a Plugin
 
+[Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
+
 To write a plugin for the cf CLI, implement the 
 [predefined plugin interface](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin.go).
 
@@ -66,8 +80,7 @@ and a plugin. This method receives the following arguments:
   - A struct `plugin.CliConnection` that contains methods for invoking cf CLI commands
   - A string array that contains the arguments passed from the `cf` process
 
-The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), the 
-commands it implements, and help text for each command that users can display 
+The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), minimum Cli version required (optional), the commands it implements, and help text for each command that users can display 
 with `cf help`.
 
   To initialize a plugin, call `plugin.Start(new(MyPluginStruct))` from within the `main()` method of your plugin. The `plugin.Start(...)` function requires a new reference to the struct that implements the defined interface. 
@@ -103,6 +116,25 @@ Because a plugin has access to stdin during a call to the `Run(...)` method, you
 ### Creating Plugins with multiple commands
 
 A single plugin binary can have more than one command, and each command can have it's own help text defined. For an example of multi-comamnd plugins, see the [multiple commands example](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/multiple_commands.go)
+
+### Notification upon uninstalling
+
+When a user calls the `cf uninstall-plugin` command, CLI notifies the plugin via a call with 'CLI-MESSAGE-UNINSTALL' as the first item in `[]args` from within the plugin's `Run(...)` method.
+
+### Enforcing a minimum CLI version required for the plugin.
+
+```go
+func (c *cmd) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "Test1",
+		MinCliVersion: plugin.VersionType{
+			Major: 6,
+			Minor: 12,
+			Build: 0,
+		},
+	}
+}
+```
 
 ## Compiling Plugin Source Code
 

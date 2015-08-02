@@ -2,7 +2,7 @@ package route_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/route"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,9 +19,17 @@ var _ = Describe("routes command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		routeRepo           *testapi.FakeRouteRepository
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("routes").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -34,8 +42,7 @@ var _ = Describe("routes command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewListRoutes(ui, configRepo, routeRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("routes", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("login requirements", func() {
@@ -53,7 +60,9 @@ var _ = Describe("routes command", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
 			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument required"},
+			))
 		})
 	})
 

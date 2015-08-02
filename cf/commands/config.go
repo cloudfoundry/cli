@@ -3,13 +3,13 @@ package commands
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type ConfigCommands struct {
@@ -17,38 +17,45 @@ type ConfigCommands struct {
 	config core_config.ReadWriter
 }
 
-func NewConfig(ui terminal.UI, config core_config.ReadWriter) ConfigCommands {
-	return ConfigCommands{ui: ui, config: config}
+func init() {
+	command_registry.Register(&ConfigCommands{})
 }
 
-func (cmd ConfigCommands) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ConfigCommands) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["async-timeout"] = &cliFlags.IntFlag{Name: "async-timeout", Usage: T("Timeout for async HTTP requests")}
+	fs["trace"] = &cliFlags.StringFlag{Name: "trace", Usage: T("Trace HTTP requests")}
+	fs["color"] = &cliFlags.StringFlag{Name: "color", Usage: T("Enable or disable color")}
+	fs["locale"] = &cliFlags.StringFlag{Name: "locale", Usage: T("Set default locale. If LOCALE is CLEAR, previous locale is deleted.")}
+
+	return command_registry.CommandMetadata{
 		Name:        "config",
 		Description: T("write default values to the config"),
 		Usage:       T("CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false] [--locale (LOCALE | CLEAR)]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewIntFlag("async-timeout", T("Timeout for async HTTP requests")),
-			flag_helpers.NewStringFlag("trace", T("Trace HTTP requests")),
-			flag_helpers.NewStringFlag("color", T("Enable or disable color")),
-			flag_helpers.NewStringFlag("locale", "Set default locale. If LOCALE is CLEAR, previous locale is deleted."),
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd ConfigCommands) GetRequirements(_ requirements.Factory, _ *cli.Context) ([]requirements.Requirement, error) {
+func (cmd *ConfigCommands) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	return nil, nil
 }
 
-func (cmd ConfigCommands) Run(context *cli.Context) {
+func (cmd *ConfigCommands) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	return cmd
+}
+
+func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 	if !context.IsSet("trace") && !context.IsSet("async-timeout") && !context.IsSet("color") && !context.IsSet("locale") {
-		cmd.ui.FailWithUsage(context)
+		cmd.ui.Failed(T("Incorrect Usage\n\n") + command_registry.Commands.CommandUsage("config"))
 		return
 	}
 
 	if context.IsSet("async-timeout") {
 		asyncTimeout := context.Int("async-timeout")
 		if asyncTimeout < 0 {
-			cmd.ui.FailWithUsage(context)
+			cmd.ui.Failed(T("Incorrect Usage\n\n") + command_registry.Commands.CommandUsage("config"))
 		}
 
 		cmd.config.SetAsyncTimeout(uint(asyncTimeout))
@@ -66,7 +73,7 @@ func (cmd ConfigCommands) Run(context *cli.Context) {
 		case "false":
 			cmd.config.SetColorEnabled("false")
 		default:
-			cmd.ui.FailWithUsage(context)
+			cmd.ui.Failed(T("Incorrect Usage\n\n") + command_registry.Commands.CommandUsage("config"))
 		}
 	}
 

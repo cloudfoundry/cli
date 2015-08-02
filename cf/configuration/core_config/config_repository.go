@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/utils"
 )
 
 type ConfigRepository struct {
@@ -289,7 +290,10 @@ func (c *ConfigRepository) IsMinApiVersion(v string) bool {
 	c.read(func() {
 		apiVersion = c.data.ApiVersion
 	})
-	return apiVersion >= v
+
+	requiredVersion := utils.NewVersion(v)
+	cliVersion := utils.NewVersion(apiVersion)
+	return cliVersion.GreaterThanOrEqual(requiredVersion)
 }
 
 func (c *ConfigRepository) IsMinCliVersion(version string) bool {
@@ -300,7 +304,15 @@ func (c *ConfigRepository) IsMinCliVersion(version string) bool {
 	c.read(func() {
 		minCliVersion = c.data.MinCliVersion
 	})
-	return version >= minCliVersion
+	if minCliVersion == "" {
+		return true
+	}
+
+	minCliVersion = strings.Split(minCliVersion, "-")[0]
+	requiredVersion := utils.NewVersion(version)
+	cliVersion := utils.NewVersion(minCliVersion)
+
+	return requiredVersion.GreaterThanOrEqual(cliVersion)
 }
 
 func (c *ConfigRepository) MinCliVersion() (minCliVersion string) {

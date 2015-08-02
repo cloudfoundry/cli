@@ -10,7 +10,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/plugin_repo"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -22,10 +22,17 @@ import (
 var _ = Describe("add-plugin-repo", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.ReadWriter
+		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		testServer          *httptest.Server
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("add-plugin-repo").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -34,8 +41,7 @@ var _ = Describe("add-plugin-repo", func() {
 	})
 
 	var callAddPluginRepo = func(args []string) bool {
-		cmd := NewAddPluginRepo(ui, config)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("add-plugin-repo", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("When repo server is valid", func() {

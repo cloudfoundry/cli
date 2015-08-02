@@ -3,13 +3,13 @@ package serviceaccess
 import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DisableServiceAccess struct {
@@ -19,36 +19,40 @@ type DisableServiceAccess struct {
 	tokenRefresher authentication.TokenRefresher
 }
 
-func NewDisableServiceAccess(ui terminal.UI, config core_config.Reader, actor actors.ServicePlanActor, tokenRefresher authentication.TokenRefresher) (cmd *DisableServiceAccess) {
-	return &DisableServiceAccess{
-		ui:             ui,
-		config:         config,
-		actor:          actor,
-		tokenRefresher: tokenRefresher,
+func init() {
+	command_registry.Register(&DisableServiceAccess{})
+}
+
+func (cmd *DisableServiceAccess) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Disable access to a specified service plan")}
+	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Disable access for a specified organization")}
+
+	return command_registry.CommandMetadata{
+		Name:        "disable-service-access",
+		Description: T("Disable access to a service or service plan for one or all orgs"),
+		Usage:       "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
+		Flags:       fs,
 	}
 }
 
-func (cmd *DisableServiceAccess) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *DisableServiceAccess) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("disable-service-access"))
 	}
 
 	return []requirements.Requirement{requirementsFactory.NewLoginRequirement()}, nil
 }
 
-func (cmd *DisableServiceAccess) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
-		Name:        "disable-service-access",
-		Description: T("Disable access to a service or service plan for one or all orgs"),
-		Usage:       "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Disable access to a specified service plan")),
-			flag_helpers.NewStringFlag("o", T("Disable access for a specified organization")),
-		},
-	}
+func (cmd *DisableServiceAccess) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.actor = deps.ServicePlanHandler
+	cmd.tokenRefresher = deps.RepoLocator.GetAuthenticationRepository()
+	return cmd
 }
 
-func (cmd *DisableServiceAccess) Run(c *cli.Context) {
+func (cmd *DisableServiceAccess) Execute(c flags.FlagContext) {
 	_, err := cmd.tokenRefresher.RefreshAuthToken()
 	if err != nil {
 		cmd.ui.Failed(err.Error())

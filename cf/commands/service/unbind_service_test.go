@@ -1,9 +1,9 @@
 package service_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,18 +18,30 @@ import (
 var _ = Describe("unbind-service command", func() {
 	var (
 		app                 models.Application
+		ui                  *testterm.FakeUI
+		config              core_config.Repository
 		serviceInstance     models.ServiceInstance
 		requirementsFactory *testreq.FakeReqFactory
 		serviceBindingRepo  *testapi.FakeServiceBindingRepo
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceBindingRepository(serviceBindingRepo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unbind-service").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 
+		ui = &testterm.FakeUI{}
 		serviceInstance.Name = "my-service"
 		serviceInstance.Guid = "my-service-guid"
 
+		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		requirementsFactory.Application = app
 		requirementsFactory.ServiceInstance = serviceInstance
@@ -37,10 +49,13 @@ var _ = Describe("unbind-service command", func() {
 		serviceBindingRepo = &testapi.FakeServiceBindingRepo{}
 	})
 
+	callUnbindService := func(args []string) bool {
+		return testcmd.RunCliCommand("unbind-service", args, requirementsFactory, updateCommandDependency, false)
+	}
+
 	Context("when not logged in", func() {
 		It("fails requirements when not logged in", func() {
-			cmd := NewUnbindService(&testterm.FakeUI{}, testconfig.NewRepository(), serviceBindingRepo)
-			Expect(testcmd.RunCommand(cmd, []string{"my-service", "my-app"}, requirementsFactory)).To(BeFalse())
+			Expect(testcmd.RunCliCommand("unbind-service", []string{"my-service", "my-app"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 	})
 
@@ -51,7 +66,7 @@ var _ = Describe("unbind-service command", func() {
 
 		Context("when the service instance exists", func() {
 			It("unbinds a service from an app", func() {
-				ui := callUnbindService([]string{"my-app", "my-service"}, requirementsFactory, serviceBindingRepo)
+				callUnbindService([]string{"my-app", "my-service"})
 
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
@@ -71,7 +86,7 @@ var _ = Describe("unbind-service command", func() {
 			})
 
 			It("warns the user the the service instance does not exist", func() {
-				ui := callUnbindService([]string{"my-app", "my-service"}, requirementsFactory, serviceBindingRepo)
+				callUnbindService([]string{"my-app", "my-service"})
 
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
@@ -87,24 +102,22 @@ var _ = Describe("unbind-service command", func() {
 		})
 
 		It("when no parameters are given the command fails with usage", func() {
-			ui := callUnbindService([]string{"my-service"}, requirementsFactory, serviceBindingRepo)
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			callUnbindService([]string{"my-service"})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "argument"},
+			))
 
-			ui = callUnbindService([]string{"my-app"}, requirementsFactory, serviceBindingRepo)
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			ui = &testterm.FakeUI{}
+			callUnbindService([]string{"my-app"})
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "argument"},
+			))
 
-			ui = callUnbindService([]string{"my-app", "my-service"}, requirementsFactory, serviceBindingRepo)
-			Expect(ui.FailedWithUsage).To(BeFalse())
+			ui = &testterm.FakeUI{}
+			callUnbindService([]string{"my-app", "my-service"})
+			Expect(ui.Outputs).ToNot(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "argument"},
+			))
 		})
 	})
 })
-
-func callUnbindService(args []string, requirementsFactory *testreq.FakeReqFactory, serviceBindingRepo api.ServiceBindingRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{}
-
-	config := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewUnbindService(fakeUI, config, serviceBindingRepo)
-	testcmd.RunCommand(cmd, args, requirementsFactory)
-	return
-}

@@ -2,7 +2,7 @@ package user_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/user"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,13 +19,20 @@ var _ = Describe("unset-org-role command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		userRepo            *testapi.FakeUserRepository
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unset-org-role").SetDependency(deps, pluginCall))
+	}
+
 	runCommand := func(args ...string) bool {
-		cmd := NewUnsetOrgRole(ui, configRepo, userRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("unset-org-role", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
@@ -37,10 +44,14 @@ var _ = Describe("unset-org-role command", func() {
 
 	It("fails with usage when invoked without exactly three args", func() {
 		runCommand("username", "org")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 
 		runCommand("woah", "too", "many", "args")
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
 	})
 
 	Describe("requirements", func() {

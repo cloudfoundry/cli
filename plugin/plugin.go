@@ -31,11 +31,16 @@ type CliConnection interface {
 	LoggregatorEndpoint() (string, error)
 	DopplerEndpoint() (string, error)
 	AccessToken() (string, error)
-	GetApp(string) (plugin_models.Application, error)
-	GetApps() ([]plugin_models.ApplicationSummary, error)
-	GetOrgs() ([]plugin_models.Organization, error)
-	GetSpaces() ([]plugin_models.Space, error)
-	GetOrgUsers() ([]plugin_models.User, error)
+	GetApp(string) (plugin_models.GetAppModel, error)
+	GetApps() ([]plugin_models.GetAppsModel, error)
+	GetOrgs() ([]plugin_models.GetOrgs_Model, error)
+	GetSpaces() ([]plugin_models.GetSpaces_Model, error)
+	GetOrgUsers(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
+	GetSpaceUsers(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
+	GetServices() ([]plugin_models.GetServices_Model, error)
+	GetService(string) (plugin_models.GetService_Model, error)
+	GetOrg(string) (plugin_models.GetOrg_Model, error)
+	GetSpace(string) (plugin_models.GetSpace_Model, error)
 }
 
 type VersionType struct {
@@ -45,9 +50,10 @@ type VersionType struct {
 }
 
 type PluginMetadata struct {
-	Name     string
-	Version  VersionType
-	Commands []Command
+	Name          string
+	Version       VersionType
+	MinCliVersion VersionType
+	Commands      []Command
 }
 
 type Usage struct {

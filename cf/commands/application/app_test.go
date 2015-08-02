@@ -57,12 +57,10 @@ var _ = Describe("app Command", func() {
 		appSummaryRepo.GetSummarySummary = app
 
 		deps = command_registry.NewDependency()
-		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := command_registry.Commands.FindCommand("app")
-		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("app", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -87,7 +85,7 @@ var _ = Describe("app Command", func() {
 
 	Describe("when invoked by a plugin", func() {
 		var (
-			pluginAppModel *plugin_models.Application
+			pluginAppModel *plugin_models.GetAppModel
 		)
 
 		BeforeEach(func() {
@@ -115,13 +113,12 @@ var _ = Describe("app Command", func() {
 			appSummaryRepo.GetSummarySummary = app
 			requirementsFactory.Application = app
 
-			pluginAppModel = &plugin_models.Application{}
+			pluginAppModel = &plugin_models.GetAppModel{}
 			deps.PluginModels.Application = pluginAppModel
-			updateCommandDependency(true)
 		})
 
 		It("populates the plugin model upon execution", func() {
-			runCommand("my-app")
+			testcmd.RunCliCommand("app", []string{"my-app"}, requirementsFactory, updateCommandDependency, true)
 			Ω(pluginAppModel.Name).To(Equal("my-app"))
 			Ω(pluginAppModel.State).To(Equal("started"))
 			Ω(pluginAppModel.Guid).To(Equal("app-guid"))
@@ -185,7 +182,6 @@ var _ = Describe("app Command", func() {
 			appSummaryRepo.GetSummarySummary = app
 			appInstancesRepo.GetInstancesReturns(instances, nil)
 			requirementsFactory.Application = app
-			updateCommandDependency(false)
 		})
 
 		Context("When app is a diego app", func() {
@@ -194,7 +190,6 @@ var _ = Describe("app Command", func() {
 				appSummaryRepo.GetSummarySummary = app
 				requirementsFactory.Application = app
 
-				updateCommandDependency(false)
 				runCommand("my-app")
 				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(1))
 			})
@@ -203,7 +198,6 @@ var _ = Describe("app Command", func() {
 				appSummaryRepo.GetSummarySummary = app
 				requirementsFactory.Application = app
 				appInstancesRepo.GetInstancesReturns([]models.AppInstanceFields{}, errors.New("danger will robinson"))
-				updateCommandDependency(false)
 
 				runCommand("my-app")
 				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(0))
@@ -217,7 +211,6 @@ var _ = Describe("app Command", func() {
 				appSummaryRepo.GetSummarySummary = app
 				requirementsFactory.Application = app
 
-				updateCommandDependency(false)
 				runCommand("my-app")
 				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(0))
 			})
@@ -231,7 +224,6 @@ var _ = Describe("app Command", func() {
 				appSummaryRepo.GetSummarySummary = app
 				requirementsFactory.Application = app
 
-				updateCommandDependency(false)
 				runCommand("my-app")
 
 				Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
@@ -247,7 +239,6 @@ var _ = Describe("app Command", func() {
 				appSummaryRepo.GetSummarySummary = app
 				requirementsFactory.Application = app
 
-				updateCommandDependency(false)
 				runCommand("my-app")
 
 				Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
@@ -262,7 +253,6 @@ var _ = Describe("app Command", func() {
 				appSummaryRepo.GetSummarySummary = app
 				requirementsFactory.Application = app
 
-				updateCommandDependency(false)
 				runCommand("my-app")
 
 				Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
@@ -279,7 +269,6 @@ var _ = Describe("app Command", func() {
 			appSummaryRepo.GetSummarySummary = app
 			requirementsFactory.Application = app
 
-			updateCommandDependency(false)
 			runCommand("my-app")
 
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("app-guid"))
@@ -300,7 +289,6 @@ var _ = Describe("app Command", func() {
 		Describe("when the package updated at is nil", func() {
 			BeforeEach(func() {
 				appSummaryRepo.GetSummarySummary.PackageUpdatedAt = nil
-				updateCommandDependency(false)
 			})
 
 			It("should output whatever greg sez", func() {
@@ -327,13 +315,11 @@ var _ = Describe("app Command", func() {
 			appSummaryRepo.GetSummarySummary = application
 			requirementsFactory.Application = application
 
-			updateCommandDependency(false)
 		})
 
 		It("displays nice output when the app is stopped", func() {
 			appSummaryRepo.GetSummaryErrorCode = errors.APP_STOPPED
 
-			updateCommandDependency(false)
 			runCommand("my-app")
 
 			Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
@@ -389,8 +375,6 @@ var _ = Describe("app Command", func() {
 			appSummaryRepo.GetSummarySummary = app
 			appInstancesRepo.GetInstancesReturns(instances, nil)
 			requirementsFactory.Application = app
-
-			updateCommandDependency(false)
 		})
 
 		It("displays a '?' for running instances", func() {

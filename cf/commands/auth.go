@@ -3,13 +3,12 @@ package commands
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/utils"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type Authenticate struct {
@@ -18,15 +17,12 @@ type Authenticate struct {
 	authenticator authentication.AuthenticationRepository
 }
 
-func NewAuthenticate(ui terminal.UI, config core_config.ReadWriter, authenticator authentication.AuthenticationRepository) (cmd Authenticate) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.authenticator = authenticator
-	return
+func init() {
+	command_registry.Register(&Authenticate{})
 }
 
-func (cmd Authenticate) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Authenticate) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "auth",
 		Description: T("Authenticate user non-interactively"),
 		Usage: T("CF_NAME auth USERNAME PASSWORD\n\n") +
@@ -34,16 +30,23 @@ func (cmd Authenticate) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd Authenticate) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *Authenticate) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires 'username password' as arguments\n\n") + command_registry.Commands.CommandUsage("auth"))
 	}
 
 	reqs = append(reqs, requirementsFactory.NewApiEndpointRequirement())
 	return
 }
 
-func (cmd Authenticate) Run(c *cli.Context) {
+func (cmd *Authenticate) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.authenticator = deps.RepoLocator.GetAuthenticationRepository()
+	return cmd
+}
+
+func (cmd *Authenticate) Execute(c flags.FlagContext) {
 	cmd.config.ClearSession()
 	cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 
@@ -61,7 +64,7 @@ func (cmd Authenticate) Run(c *cli.Context) {
 	cmd.ui.Say(T("Use '{{.Name}}' to view or set your target org and space",
 		map[string]interface{}{"Name": terminal.CommandColor(cf.Name() + " target")}))
 
-	utils.NotifyUpdateIfNeeded(cmd.ui, cmd.config)
+	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
 
 	return
 }

@@ -44,6 +44,25 @@ func (cliConnection *cliConnection) sendPluginMetadataToCliServer(metadata Plugi
 	os.Exit(0)
 }
 
+func (cliConnection *cliConnection) isMinCliVersion(version string) bool {
+	cliServerConn, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer cliServerConn.Close()
+
+	var result bool
+
+	err = cliServerConn.Call("CliRpcCmd.IsMinCliVersion", version, &result)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	return result
+}
+
 func (cliConnection *cliConnection) CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
 	return cliConnection.callCliCommand(true, args...)
 }
@@ -226,7 +245,7 @@ func (cliConnection *cliConnection) HasAPIEndpoint() (bool, error) {
 
 	var result bool
 
-	err = client.Call("CliRpcCmd.HasApiEndpoint", "", &result)
+	err = client.Call("CliRpcCmd.HasAPIEndpoint", "", &result)
 	return result, err
 }
 
@@ -278,62 +297,126 @@ func (cliConnection *cliConnection) AccessToken() (string, error) {
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetApp(appName string) (plugin_models.Application, error) {
+func (cliConnection *cliConnection) GetApp(appName string) (plugin_models.GetAppModel, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return plugin_models.Application{}, err
+		return plugin_models.GetAppModel{}, err
 	}
 
-	var result plugin_models.Application
+	var result plugin_models.GetAppModel
 
 	err = client.Call("CliRpcCmd.GetApp", appName, &result)
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetApps() ([]plugin_models.ApplicationSummary, error) {
+func (cliConnection *cliConnection) GetApps() ([]plugin_models.GetAppsModel, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.ApplicationSummary{}, err
+		return []plugin_models.GetAppsModel{}, err
 	}
 
-	var result []plugin_models.ApplicationSummary
+	var result []plugin_models.GetAppsModel
 
 	err = client.Call("CliRpcCmd.GetApps", "", &result)
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.Organization, error) {
+func (cliConnection *cliConnection) GetOrgs() ([]plugin_models.GetOrgs_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.Organization{}, err
+		return []plugin_models.GetOrgs_Model{}, err
 	}
 
-	var result []plugin_models.Organization
+	var result []plugin_models.GetOrgs_Model
 
 	err = client.Call("CliRpcCmd.GetOrgs", "", &result)
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetSpaces() ([]plugin_models.Space, error) {
+func (cliConnection *cliConnection) GetSpaces() ([]plugin_models.GetSpaces_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.Space{}, err
+		return []plugin_models.GetSpaces_Model{}, err
 	}
 
-	var result []plugin_models.Space
+	var result []plugin_models.GetSpaces_Model
 
 	err = client.Call("CliRpcCmd.GetSpaces", "", &result)
 	return result, err
 }
 
-func (cliConnection *cliConnection) GetOrgUsers() ([]plugin_models.User, error) {
+func (cliConnection *cliConnection) GetServices() ([]plugin_models.GetServices_Model, error) {
 	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
 	if err != nil {
-		return []plugin_models.User{}, err
+		return []plugin_models.GetServices_Model{}, err
 	}
 
-	var result []plugin_models.User
+	var result []plugin_models.GetServices_Model
 
-	err = client.Call("CliRpcCmd.GetOrgUsers", "", &result)
+	err = client.Call("CliRpcCmd.GetServices", "", &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) GetOrgUsers(orgName string, args ...string) ([]plugin_models.GetOrgUsers_Model, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return []plugin_models.GetOrgUsers_Model{}, err
+	}
+
+	var result []plugin_models.GetOrgUsers_Model
+
+	cmdArgs := append([]string{orgName}, args...)
+
+	err = client.Call("CliRpcCmd.GetOrgUsers", cmdArgs, &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) GetSpaceUsers(orgName string, spaceName string) ([]plugin_models.GetSpaceUsers_Model, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return []plugin_models.GetSpaceUsers_Model{}, err
+	}
+
+	var result []plugin_models.GetSpaceUsers_Model
+
+	cmdArgs := []string{orgName, spaceName}
+
+	err = client.Call("CliRpcCmd.GetSpaceUsers", cmdArgs, &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) GetOrg(orgName string) (plugin_models.GetOrg_Model, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return plugin_models.GetOrg_Model{}, err
+	}
+
+	var result plugin_models.GetOrg_Model
+
+	err = client.Call("CliRpcCmd.GetOrg", orgName, &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) GetSpace(spaceName string) (plugin_models.GetSpace_Model, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return plugin_models.GetSpace_Model{}, err
+	}
+
+	var result plugin_models.GetSpace_Model
+
+	err = client.Call("CliRpcCmd.GetSpace", spaceName, &result)
+	return result, err
+}
+
+func (cliConnection *cliConnection) GetService(serviceInstance string) (plugin_models.GetService_Model, error) {
+	client, err := rpc.Dial("tcp", "127.0.0.1:"+cliConnection.cliServerPort)
+	if err != nil {
+		return plugin_models.GetService_Model{}, err
+	}
+
+	var result plugin_models.GetService_Model
+
+	err = client.Call("CliRpcCmd.GetService", serviceInstance, &result)
 	return result, err
 }

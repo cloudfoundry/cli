@@ -3,14 +3,15 @@ package spacequota_test
 import (
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	"github.com/cloudfoundry/cli/testhelpers/configuration"
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/spacequota"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,12 +23,23 @@ var _ = Describe("delete-quota command", func() {
 		quotaRepo           *fakes.FakeSpaceQuotaRepository
 		orgRepo             *test_org.FakeOrganizationRepository
 		requirementsFactory *testreq.FakeReqFactory
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
+		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-space-quota").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
 		orgRepo = &test_org.FakeOrganizationRepository{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		org := models.Organization{}
@@ -38,8 +50,7 @@ var _ = Describe("delete-quota command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewDeleteSpaceQuota(ui, configuration.NewRepositoryWithDefaults(), quotaRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete-space-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when the user is not logged in", func() {
@@ -59,7 +70,9 @@ var _ = Describe("delete-quota command", func() {
 
 		It("fails requirements when called without a quota name", func() {
 			runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 		})
 
 		It("fails requirements when an org is not targeted", func() {

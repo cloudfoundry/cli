@@ -17,7 +17,7 @@ type ListSpaces struct {
 	config    core_config.Reader
 	spaceRepo spaces.SpaceRepository
 
-	pluginModel *[]plugin_models.Space
+	pluginModel *[]plugin_models.GetSpaces_Model
 	pluginCall  bool
 }
 
@@ -43,7 +43,7 @@ func (cmd *ListSpaces) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 0 {
-		cmd.ui.Failed("Incorrect Usage. No argument required\n\n" + command_registry.Commands.CommandUsage("spaces"))
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("spaces"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -76,7 +76,7 @@ func (cmd *ListSpaces) Execute(c flags.FlagContext) {
 		foundSpaces = true
 
 		if cmd.pluginCall {
-			s := plugin_models.Space{}
+			s := plugin_models.GetSpaces_Model{}
 			s.Name = space.Name
 			s.Guid = space.Guid
 			*(cmd.pluginModel) = append(*(cmd.pluginModel), s)

@@ -4,15 +4,15 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CreateOrg struct {
@@ -22,29 +22,26 @@ type CreateOrg struct {
 	quotaRepo quotas.QuotaRepository
 }
 
-func NewCreateOrg(ui terminal.UI, config core_config.Reader, orgRepo organizations.OrganizationRepository, quotaRepo quotas.QuotaRepository) (cmd CreateOrg) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.orgRepo = orgRepo
-	cmd.quotaRepo = quotaRepo
-	return
+func init() {
+	command_registry.Register(&CreateOrg{})
 }
 
-func (cmd CreateOrg) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateOrg) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["q"] = &cliFlags.StringFlag{Name: "q", Usage: T("Quota to assign to the newly created org (excluding this option results in assignment of default quota)")}
+
+	return command_registry.CommandMetadata{
 		Name:        "create-org",
 		ShortName:   "co",
 		Description: T("Create an org"),
 		Usage:       T("CF_NAME create-org ORG"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("q", T("Quota to assign to the newly created org (excluding this option results in assignment of default quota)")),
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd CreateOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *CreateOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-org"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -53,7 +50,15 @@ func (cmd CreateOrg) GetRequirements(requirementsFactory requirements.Factory, c
 	return
 }
 
-func (cmd CreateOrg) Run(c *cli.Context) {
+func (cmd *CreateOrg) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
+	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
+	return cmd
+}
+
+func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 	name := c.Args()[0]
 	cmd.ui.Say(T("Creating org {{.OrgName}} as {{.Username}}...",
 		map[string]interface{}{

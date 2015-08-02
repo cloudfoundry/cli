@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -99,6 +100,58 @@ var _ = Describe("Server", func() {
 		It("Start an Rpc server for communication", func() {
 			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
+		})
+	})
+
+	Describe(".IsMinCliVersion()", func() {
+		BeforeEach(func() {
+			rpcService, err = NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
+			Expect(err).ToNot(HaveOccurred())
+
+			err := rpcService.Start()
+			Expect(err).ToNot(HaveOccurred())
+
+			pingCli(rpcService.Port())
+
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			rpcService.Stop()
+
+			//give time for server to stop
+			time.Sleep(50 * time.Millisecond)
+		})
+
+		It("returns true if cli version is >= to required version", func() {
+			cf.Version = "2.0.0"
+
+			var result bool
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "1.0.0", &result)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(result).To(BeTrue())
+		})
+
+		It("returns true if cli version is >= to required version", func() {
+			cf.Version = "2.0.0"
+
+			var result bool
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "2.0.6", &result)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(result).To(BeFalse())
+		})
+
+		It("returns true if cli version is 'BUILT_FROM_SOURCE'", func() {
+			cf.Version = "BUILT_FROM_SOURCE"
+
+			var result bool
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "12.0.6", &result)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(result).To(BeTrue())
 		})
 	})
 
@@ -213,7 +266,8 @@ var _ = Describe("Server", func() {
 		})
 	})
 
-	Describe("GetApp()", func() {
+	Describe("Plugin API", func() {
+
 		var runner *fakeRunner.FakeNonCodegangstaRunner
 
 		BeforeEach(func() {
@@ -228,6 +282,9 @@ var _ = Describe("Server", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			pingCli(rpcService.Port())
+
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		AfterEach(func() {
@@ -238,10 +295,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("calls GetApp() with 'app' as argument", func() {
-			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-			Expect(err).ToNot(HaveOccurred())
-
-			result := plugin_models.Application{}
+			result := plugin_models.GetAppModel{}
 			err = client.Call("CliRpcCmd.GetApp", "fake-app", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -251,37 +305,33 @@ var _ = Describe("Server", func() {
 			Expect(arg1[1]).To(Equal("fake-app"))
 			Expect(pluginApiCall).To(BeTrue())
 		})
-	})
 
-	Describe("GetApps()", func() {
-		var runner *fakeRunner.FakeNonCodegangstaRunner
+		It("calls GetOrg() with 'my-org' as argument", func() {
+			result := plugin_models.GetOrg_Model{}
+			err = client.Call("CliRpcCmd.GetOrg", "my-org", &result)
 
-		BeforeEach(func() {
-			outputCapture := terminal.NewTeePrinter()
-			terminalOutputSwitch := terminal.NewTeePrinter()
-
-			runner = &fakeRunner.FakeNonCodegangstaRunner{}
-			rpcService, err = NewRpcService(nil, outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner)
 			Expect(err).ToNot(HaveOccurred())
-
-			err := rpcService.Start()
-			Expect(err).ToNot(HaveOccurred())
-
-			pingCli(rpcService.Port())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("org"))
+			Expect(arg1[1]).To(Equal("my-org"))
+			Expect(pluginApiCall).To(BeTrue())
 		})
 
-		AfterEach(func() {
-			rpcService.Stop()
+		It("calls GetSpace() with 'my-space' as argument", func() {
+			result := plugin_models.GetSpace_Model{}
+			err = client.Call("CliRpcCmd.GetSpace", "my-space", &result)
 
-			//give time for server to stop
-			time.Sleep(50 * time.Millisecond)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("space"))
+			Expect(arg1[1]).To(Equal("my-space"))
+			Expect(pluginApiCall).To(BeTrue())
 		})
 
 		It("calls GetApps() ", func() {
-			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-			Expect(err).ToNot(HaveOccurred())
-
-			result := []plugin_models.ApplicationSummary{}
+			result := []plugin_models.GetAppsModel{}
 			err = client.Call("CliRpcCmd.GetApps", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -291,37 +341,8 @@ var _ = Describe("Server", func() {
 			Expect(pluginApiCall).To(BeTrue())
 		})
 
-	})
-
-	Describe("GetOrgs()", func() {
-		var runner *fakeRunner.FakeNonCodegangstaRunner
-
-		BeforeEach(func() {
-			outputCapture := terminal.NewTeePrinter()
-			terminalOutputSwitch := terminal.NewTeePrinter()
-
-			runner = &fakeRunner.FakeNonCodegangstaRunner{}
-			rpcService, err = NewRpcService(nil, outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner)
-			Expect(err).ToNot(HaveOccurred())
-
-			err := rpcService.Start()
-			Expect(err).ToNot(HaveOccurred())
-
-			pingCli(rpcService.Port())
-		})
-
-		AfterEach(func() {
-			rpcService.Stop()
-
-			//give time for server to stop
-			time.Sleep(50 * time.Millisecond)
-		})
-
 		It("calls GetOrgs() ", func() {
-			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-			Expect(err).ToNot(HaveOccurred())
-
-			result := []plugin_models.Organization{}
+			result := []plugin_models.GetOrgs_Model{}
 			err = client.Call("CliRpcCmd.GetOrgs", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -331,37 +352,19 @@ var _ = Describe("Server", func() {
 			Expect(pluginApiCall).To(BeTrue())
 		})
 
-	})
+		It("calls GetServices() ", func() {
+			result := []plugin_models.GetServices_Model{}
+			err = client.Call("CliRpcCmd.GetServices", "", &result)
 
-	Describe("GetSpaces()", func() {
-		var runner *fakeRunner.FakeNonCodegangstaRunner
-
-		BeforeEach(func() {
-			outputCapture := terminal.NewTeePrinter()
-			terminalOutputSwitch := terminal.NewTeePrinter()
-
-			runner = &fakeRunner.FakeNonCodegangstaRunner{}
-			rpcService, err = NewRpcService(nil, outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner)
 			Expect(err).ToNot(HaveOccurred())
-
-			err := rpcService.Start()
-			Expect(err).ToNot(HaveOccurred())
-
-			pingCli(rpcService.Port())
-		})
-
-		AfterEach(func() {
-			rpcService.Stop()
-
-			//give time for server to stop
-			time.Sleep(50 * time.Millisecond)
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("services"))
+			Expect(pluginApiCall).To(BeTrue())
 		})
 
 		It("calls GetSpaces() ", func() {
-			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-			Expect(err).ToNot(HaveOccurred())
-
-			result := []plugin_models.Space{}
+			result := []plugin_models.GetSpaces_Model{}
 			err = client.Call("CliRpcCmd.GetSpaces", "", &result)
 
 			Expect(err).ToNot(HaveOccurred())
@@ -371,43 +374,39 @@ var _ = Describe("Server", func() {
 			Expect(pluginApiCall).To(BeTrue())
 		})
 
-	})
-
-	Describe("GetOrgUsers()", func() {
-		var runner *fakeRunner.FakeNonCodegangstaRunner
-
-		BeforeEach(func() {
-			outputCapture := terminal.NewTeePrinter()
-			terminalOutputSwitch := terminal.NewTeePrinter()
-
-			runner = &fakeRunner.FakeNonCodegangstaRunner{}
-			rpcService, err = NewRpcService(nil, outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner)
-			Expect(err).ToNot(HaveOccurred())
-
-			err := rpcService.Start()
-			Expect(err).ToNot(HaveOccurred())
-
-			pingCli(rpcService.Port())
-		})
-
-		AfterEach(func() {
-			rpcService.Stop()
-
-			//give time for server to stop
-			time.Sleep(50 * time.Millisecond)
-		})
-
 		It("calls GetOrgUsers() ", func() {
-			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-			Expect(err).ToNot(HaveOccurred())
-
-			result := []plugin_models.User{}
-			err = client.Call("CliRpcCmd.GetOrgUsers", "", &result)
+			result := []plugin_models.GetOrgUsers_Model{}
+			args := []string{"orgName1", "-a"}
+			err = client.Call("CliRpcCmd.GetOrgUsers", args, &result)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(runner.CommandCallCount()).To(Equal(1))
 			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
 			Expect(arg1[0]).To(Equal("org-users"))
+			Expect(pluginApiCall).To(BeTrue())
+		})
+
+		It("calls GetSpaceUsers() ", func() {
+			result := []plugin_models.GetSpaceUsers_Model{}
+			args := []string{"orgName1", "spaceName1"}
+			err = client.Call("CliRpcCmd.GetSpaceUsers", args, &result)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("space-users"))
+			Expect(pluginApiCall).To(BeTrue())
+		})
+
+		It("calls GetService() with 'serviceInstance' as argument", func() {
+			result := plugin_models.GetService_Model{}
+			err = client.Call("CliRpcCmd.GetService", "fake-service-instance", &result)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(runner.CommandCallCount()).To(Equal(1))
+			arg1, _, pluginApiCall := runner.CommandArgsForCall(0)
+			Expect(arg1[0]).To(Equal("service"))
+			Expect(arg1[1]).To(Equal("fake-service-instance"))
 			Expect(pluginApiCall).To(BeTrue())
 		})
 
@@ -525,13 +524,6 @@ var _ = Describe("Server", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(org.Name).To(Equal("test-org"))
 					Expect(org.Guid).To(Equal("test-guid"))
-					Expect(org.QuotaDefinition.Guid).To(Equal("guid123"))
-					Expect(org.QuotaDefinition.Name).To(Equal("quota123"))
-					Expect(org.QuotaDefinition.MemoryLimit).To(Equal(int64(128)))
-					Expect(org.QuotaDefinition.InstanceMemoryLimit).To(Equal(int64(16)))
-					Expect(org.QuotaDefinition.RoutesLimit).To(Equal(5))
-					Expect(org.QuotaDefinition.ServicesLimit).To(Equal(6))
-					Expect(org.QuotaDefinition.NonBasicServicesAllowed).To(BeTrue())
 				})
 			})
 

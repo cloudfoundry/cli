@@ -2,9 +2,10 @@
 package fakes
 
 import (
+	"sync"
+
 	. "github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/models"
-	"sync"
 )
 
 type FakeServiceBuilder struct {
@@ -80,6 +81,16 @@ type FakeServiceBuilder struct {
 		result1 models.ServiceOffering
 		result2 error
 	}
+	GetServicesForManyBrokersStub        func([]string) ([]models.ServiceOffering, error)
+	getServicesForManyBrokersMutex       sync.RWMutex
+	getServicesForManyBrokersArgsForCall []struct {
+		arg1 []string
+	}
+	getServicesForManyBrokersReturns struct {
+		result1 []models.ServiceOffering
+		result2 error
+	}
+
 	GetServicesForBrokerStub        func(string) ([]models.ServiceOffering, error)
 	getServicesForBrokerMutex       sync.RWMutex
 	getServicesForBrokerArgsForCall []struct {
@@ -372,6 +383,19 @@ func (fake *FakeServiceBuilder) GetServiceByNameForOrgReturns(result1 models.Ser
 	}{result1, result2}
 }
 
+func (fake *FakeServiceBuilder) GetServicesForManyBrokers(arg1 []string) ([]models.ServiceOffering, error) {
+	fake.getServicesForManyBrokersMutex.Lock()
+	defer fake.getServicesForManyBrokersMutex.Unlock()
+	fake.getServicesForManyBrokersArgsForCall = append(fake.getServicesForManyBrokersArgsForCall, struct {
+		arg1 []string
+	}{arg1})
+	if fake.GetServicesForManyBrokersStub != nil {
+		return fake.GetServicesForManyBrokersStub(arg1)
+	} else {
+		return fake.getServicesForManyBrokersReturns.result1, fake.getServicesForManyBrokersReturns.result2
+	}
+}
+
 func (fake *FakeServiceBuilder) GetServicesForBroker(arg1 string) ([]models.ServiceOffering, error) {
 	fake.getServicesForBrokerMutex.Lock()
 	defer fake.getServicesForBrokerMutex.Unlock()
@@ -395,6 +419,13 @@ func (fake *FakeServiceBuilder) GetServicesForBrokerArgsForCall(i int) string {
 	fake.getServicesForBrokerMutex.RLock()
 	defer fake.getServicesForBrokerMutex.RUnlock()
 	return fake.getServicesForBrokerArgsForCall[i].arg1
+}
+
+func (fake *FakeServiceBuilder) GetServicesForManyBrokersReturns(result1 []models.ServiceOffering, result2 error) {
+	fake.getServicesForManyBrokersReturns = struct {
+		result1 []models.ServiceOffering
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeServiceBuilder) GetServicesForBrokerReturns(result1 []models.ServiceOffering, result2 error) {

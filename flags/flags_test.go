@@ -21,10 +21,12 @@ var _ = Describe("Flags", func() {
 
 			BeforeEach(func() {
 				cmdFlagMap = make(map[string]FlagSet)
-				cmdFlagMap["name"] = &cliFlags.StringFlag{Name: "name", Value: "", Usage: "test string flag"}
-				cmdFlagMap["skip"] = &cliFlags.BoolFlag{Name: "skip", Value: false, Usage: "test bool flag"}
-				cmdFlagMap["instance"] = &cliFlags.IntFlag{Name: "instance", Value: 0, Usage: "test int flag"}
-				cmdFlagMap["skip2"] = &cliFlags.BoolFlag{Name: "skip2", Value: false, Usage: "test bool flag"}
+
+				cmdFlagMap["name"] = &cliFlags.StringFlag{Name: "name", Usage: "test string flag"}
+				cmdFlagMap["skip"] = &cliFlags.BoolFlag{Name: "skip", Usage: "test bool flag"}
+				cmdFlagMap["instance"] = &cliFlags.IntFlag{Name: "instance", Usage: "test int flag"}
+				cmdFlagMap["skip2"] = &cliFlags.BoolFlag{Name: "skip2", Usage: "test bool flag"}
+				cmdFlagMap["slice"] = &cliFlags.StringSliceFlag{Name: "slice", Usage: "test stringSlice flag"}
 
 				fCtx = NewFlagContext(cmdFlagMap)
 			})
@@ -49,12 +51,14 @@ var _ = Describe("Flags", func() {
 			})
 
 			It("sets Bool(<flag>) to return value if bool flag is provided with value true/false", func() {
-				err := fCtx.Parse("--skip=false", "-skip2", "true", "-name", "johndoe")
+				err := fCtx.Parse("--skip=false", "-skip2", "true", "-name=johndoe")
 				Ω(err).ToNot(HaveOccurred())
 
+				Ω(len(fCtx.Args())).To(Equal(0), "Length of Args() should be 0")
 				Ω(fCtx.Bool("skip")).To(Equal(false), "skip should be false")
 				Ω(fCtx.Bool("skip2")).To(Equal(true), "skip2 should be true")
 				Ω(fCtx.Bool("name")).To(Equal(false), "name should be false")
+				Ω(fCtx.String("name")).To(Equal("johndoe"), "name should be johndoe")
 				Ω(fCtx.Bool("non-exisit-flag")).To(Equal(false))
 			})
 
@@ -81,6 +85,14 @@ var _ = Describe("Flags", func() {
 
 				Ω(fCtx.String("name")).To(Equal("doe"))
 				Ω(fCtx.Bool("skip")).To(Equal(true), "skip should be true")
+			})
+
+			It("sets StringSlice(<flag>) to return provided value when a stringSlice flag is provided", func() {
+				err := fCtx.Parse("-slice", "value1", "-slice", "value2")
+				Ω(err).ToNot(HaveOccurred())
+
+				Ω(fCtx.StringSlice("slice")[0]).To(Equal("value1"), "slice[0] should be 'value1'")
+				Ω(fCtx.StringSlice("slice")[1]).To(Equal("value2"), "slice[1] should be 'value2'")
 			})
 
 			It("errors when a non-boolean flag is provided without a value", func() {
@@ -124,6 +136,82 @@ var _ = Describe("Flags", func() {
 
 				Ω(len(fCtx.Args())).To(Equal(1))
 				Ω(fCtx.Args()[0]).To(Equal("Arg-1"))
+			})
+
+			Context("Default Flag Value", func() {
+
+				BeforeEach(func() {
+					cmdFlagMap = make(map[string]FlagSet)
+
+					cmdFlagMap["defaultStringFlag"] = &cliFlags.StringFlag{Name: "defaultStringFlag", Value: "Set by default"}
+					cmdFlagMap["defaultBoolFlag"] = &cliFlags.BoolFlag{Name: "defaultBoolFlag", Value: true}
+					cmdFlagMap["defaultIntFlag"] = &cliFlags.IntFlag{Name: "defaultIntFlag", Value: 100}
+					cmdFlagMap["defaultStringAryFlag"] = &cliFlags.StringSliceFlag{Name: "defaultStringAryFlag", Value: []string{"abc", "def"}}
+					cmdFlagMap["noDefaultStringFlag"] = &cliFlags.StringFlag{Name: "noDefaultStringFlag"}
+
+					fCtx = NewFlagContext(cmdFlagMap)
+				})
+
+				It("sets flag with default value if 'Value' is provided", func() {
+					err := fCtx.Parse()
+					Ω(err).ToNot(HaveOccurred())
+
+					Ω(fCtx.String("defaultStringFlag")).To(Equal("Set by default"))
+					Ω(fCtx.IsSet("defaultStringFlag")).To(BeTrue())
+
+					Ω(fCtx.Bool("defaultBoolFlag")).To(BeTrue())
+					Ω(fCtx.IsSet("defaultBoolFlag")).To(BeTrue())
+
+					Ω(fCtx.Int("defaultIntFlag")).To(Equal(100))
+					Ω(fCtx.IsSet("defaultIntFlag")).To(BeTrue())
+
+					Ω(fCtx.StringSlice("defaultStringAryFlag")).To(Equal([]string{"abc", "def"}))
+					Ω(fCtx.IsSet("defaultStringAryFlag")).To(BeTrue())
+
+					Ω(fCtx.String("noDefaultStringFlag")).To(Equal(""))
+					Ω(fCtx.IsSet("noDefaultStringFlag")).To(BeFalse())
+				})
+
+				It("overrides default value if argument is provided, except StringSlice Flag", func() {
+					err := fCtx.Parse("-defaultStringFlag=foo", "-defaultBoolFlag=false", "-defaultIntFlag=200", "-defaultStringAryFlag=foo", "-defaultStringAryFlag=bar", "-noDefaultStringFlag=baz")
+					Ω(err).ToNot(HaveOccurred())
+
+					Ω(fCtx.String("defaultStringFlag")).To(Equal("foo"))
+					Ω(fCtx.IsSet("defaultStringFlag")).To(BeTrue())
+
+					Ω(fCtx.Bool("defaultBoolFlag")).To(BeFalse())
+					Ω(fCtx.IsSet("defaultBoolFlag")).To(BeTrue())
+
+					Ω(fCtx.Int("defaultIntFlag")).To(Equal(200))
+					Ω(fCtx.IsSet("defaultIntFlag")).To(BeTrue())
+
+					Ω(fCtx.String("noDefaultStringFlag")).To(Equal("baz"))
+					Ω(fCtx.IsSet("noDefaultStringFlag")).To(BeTrue())
+				})
+
+				It("appends argument value to StringSliceFlag to the default values", func() {
+					err := fCtx.Parse("-defaultStringAryFlag=foo", "-defaultStringAryFlag=bar")
+					Ω(err).ToNot(HaveOccurred())
+
+					Ω(fCtx.StringSlice("defaultStringAryFlag")).To(Equal([]string{"abc", "def", "foo", "bar"}))
+					Ω(fCtx.IsSet("defaultStringAryFlag")).To(BeTrue())
+				})
+
+			})
+
+			Context("SkipFlagParsing", func() {
+				It("skips flag parsing and treats all arguments as values", func() {
+					fCtx.SkipFlagParsing(true)
+					err := fCtx.Parse("value1", "--name", "foo")
+					Ω(err).ToNot(HaveOccurred())
+
+					Ω(fCtx.IsSet("name")).To(Equal(false))
+
+					Ω(len(fCtx.Args())).To(Equal(3))
+					Ω(fCtx.Args()[0]).To(Equal("value1"))
+					Ω(fCtx.Args()[1]).To(Equal("--name"))
+					Ω(fCtx.Args()[2]).To(Equal("foo"))
+				})
 			})
 
 		})

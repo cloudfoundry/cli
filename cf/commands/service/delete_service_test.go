@@ -2,7 +2,8 @@ package service_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,13 +21,23 @@ var _ = Describe("delete-service command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceInstance     models.ServiceInstance
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-service").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{
 			Inputs: []string{"yes"},
 		}
 
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		serviceRepo = &testapi.FakeServiceRepo{}
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess: true,
@@ -34,9 +45,7 @@ var _ = Describe("delete-service command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		configRepo := testconfig.NewRepositoryWithDefaults()
-		cmd := NewDeleteService(ui, configRepo, serviceRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when not logged in", func() {
@@ -56,7 +65,9 @@ var _ = Describe("delete-service command", func() {
 
 		It("fails with usage when not provided exactly one arg", func() {
 			runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires an argument"},
+			))
 		})
 
 		Context("when the service exists", func() {

@@ -3,6 +3,7 @@ package app_test
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/i18n/detection"
+	"github.com/cloudfoundry/cli/commands_loader"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/plugin_builder"
 	. "github.com/onsi/ginkgo"
@@ -16,6 +17,9 @@ import (
 func TestApp(t *testing.T) {
 	config := configuration.NewRepositoryWithDefaults()
 	i18n.T = i18n.Init(config, &detection.JibberJabberDetector{})
+
+	//init all commands
+	commands_loader.Load()
 
 	RegisterFailHandler(Fail)
 	plugin_builder.BuildTestBinary(filepath.Join("..", "..", "fixtures", "plugins"), "test_1")

@@ -5,13 +5,13 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type SpaceQuota struct {
@@ -20,25 +20,21 @@ type SpaceQuota struct {
 	spaceQuotaRepo space_quotas.SpaceQuotaRepository
 }
 
-func NewSpaceQuota(ui terminal.UI, config core_config.Reader, spaceQuotaRepo space_quotas.SpaceQuotaRepository) (cmd *SpaceQuota) {
-	return &SpaceQuota{
-		ui:             ui,
-		config:         config,
-		spaceQuotaRepo: spaceQuotaRepo,
-	}
+func init() {
+	command_registry.Register(&SpaceQuota{})
 }
 
-func (cmd *SpaceQuota) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *SpaceQuota) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "space-quota",
 		Description: T("Show space quota info"),
 		Usage:       T("CF_NAME space-quota SPACE_QUOTA_NAME"),
 	}
 }
 
-func (cmd *SpaceQuota) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *SpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("space-quota"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -48,7 +44,14 @@ func (cmd *SpaceQuota) GetRequirements(requirementsFactory requirements.Factory,
 	return
 }
 
-func (cmd *SpaceQuota) Run(c *cli.Context) {
+func (cmd *SpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
+	return cmd
+}
+
+func (cmd *SpaceQuota) Execute(c flags.FlagContext) {
 	name := c.Args()[0]
 
 	cmd.ui.Say(T("Getting space quota {{.Quota}} info as {{.Username}}...",

@@ -7,7 +7,7 @@ import (
 
 	testplanbuilder "github.com/cloudfoundry/cli/cf/actors/plan_builder/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -28,7 +28,16 @@ var _ = Describe("update-service command", func() {
 		serviceRepo         *testapi.FakeServiceRepo
 		planBuilder         *testplanbuilder.FakePlanBuilder
 		offering1           models.ServiceOffering
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
+		deps.Config = config
+		deps.PlanBuilder = planBuilder
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -52,8 +61,7 @@ var _ = Describe("update-service command", func() {
 	})
 
 	var callUpdateService = func(args []string) bool {
-		cmd := NewUpdateService(ui, config, serviceRepo, planBuilder)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("update-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -224,14 +232,14 @@ var _ = Describe("update-service command", func() {
 		})
 
 		Context("and the tags string is passed with an empty string", func() {
-
-			It("accepts an empty array of tags but doesn't update service", func() {
+			It("successfully updates the service", func() {
 				callUpdateService([]string{"-t", "", "my-service-instance"})
 
 				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating service instance", "my-service-instance"},
 					[]string{"OK"},
-					[]string{"No changes were made"},
 				))
+				Expect(serviceRepo.UpdateServiceInstanceArgs.Tags).To(Equal([]string{}))
 			})
 		})
 	})

@@ -194,6 +194,81 @@ var _ = Describe("Services Repo", func() {
 		})
 	})
 
+	Describe("returning services for many brokers", func() {
+		path1 := "/v2/services?q=service_broker_guid%20IN%20my-service-broker-guid,my-service-broker-guid2"
+		body1 := `
+{
+   "total_results": 2,
+   "total_pages": 2,
+   "prev_url": null,
+	 "next_url": "/v2/services?q=service_broker_guid%20IN%20my-service-broker-guid,my-service-broker-guid2&page=2",
+   "resources": [
+     {
+         "metadata": {
+            "guid": "my-service-guid"
+         },
+         "entity": {
+            "label": "my-service",
+            "provider": "androsterone-ensphere",
+            "description": "Dummy addon that is cool",
+            "version": "damageableness-preheat",
+            "documentation_url": "YESWECAN.com"
+         }
+			 }
+   ]
+}`
+		path2 := "/v2/services?q=service_broker_guid%20IN%20my-service-broker-guid,my-service-broker-guid2&page=2"
+		body2 := `
+{
+   "total_results": 2,
+   "total_pages": 2,
+   "prev_url": "/v2/services?q=service_broker_guid%20IN%20my-service-broker-guid,my-service-broker-guid2",
+	 "next_url": null,
+   "resources": [
+      {
+         "metadata": {
+            "guid": "my-service-guid2"
+         },
+         "entity": {
+            "label": "my-service2",
+            "provider": "androsterone-ensphere",
+            "description": "Dummy addon that is cool",
+            "version": "damageableness-preheat",
+            "documentation_url": "YESWECAN.com"
+         }
+      }
+   ]
+}`
+		BeforeEach(func() {
+			setupTestServer(
+				testapi.NewCloudControllerTestRequest(
+					testnet.TestRequest{
+						Method:   "GET",
+						Path:     path1,
+						Response: testnet.TestResponse{Status: http.StatusOK, Body: body1},
+					}),
+				testapi.NewCloudControllerTestRequest(
+					testnet.TestRequest{
+						Method:   "GET",
+						Path:     path2,
+						Response: testnet.TestResponse{Status: http.StatusOK, Body: body2},
+					}),
+			)
+		})
+
+		It("returns the service brokers services", func() {
+			brokerGuids := []string{"my-service-broker-guid", "my-service-broker-guid2"}
+			services, err := repo.ListServicesFromManyBrokers(brokerGuids)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(len(services)).To(Equal(2))
+
+			Expect(services[0].Guid).To(Equal("my-service-guid"))
+			Expect(services[1].Guid).To(Equal("my-service-guid2"))
+		})
+	})
+
 	Describe("creating a service instance", func() {
 		It("makes the right request", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -305,7 +380,7 @@ var _ = Describe("Services Repo", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
-				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid"}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid", "tags": null}`),
 				Response: testnet.TestResponse{Status: http.StatusOK},
 			}))
 
@@ -319,7 +394,7 @@ var _ = Describe("Services Repo", func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
-					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid"}`),
+					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid", "tags": null}`),
 					Response: testnet.TestResponse{Status: http.StatusNotFound},
 				}))
 
@@ -334,7 +409,7 @@ var _ = Describe("Services Repo", func() {
 				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
-					Matcher:  testnet.RequestBodyMatcher(`{"parameters": {"foo": "bar"}}`),
+					Matcher:  testnet.RequestBodyMatcher(`{"parameters": {"foo": "bar"}, "tags": null}`),
 					Response: testnet.TestResponse{Status: http.StatusOK},
 				}))
 
@@ -366,6 +441,21 @@ var _ = Describe("Services Repo", func() {
 				}))
 
 				tags := []string{"foo", "bar"}
+
+				err := repo.UpdateServiceInstance("instance-guid", "", nil, tags)
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("sends empty tags", func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
+					Matcher:  testnet.RequestBodyMatcher(`{"tags": []}`),
+					Response: testnet.TestResponse{Status: http.StatusOK},
+				}))
+
+				tags := []string{}
 
 				err := repo.UpdateServiceInstance("instance-guid", "", nil, tags)
 				Expect(testHandler).To(HaveAllRequestsCalled())

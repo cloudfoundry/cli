@@ -4,13 +4,13 @@ import (
 	"sort"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type ListServiceBrokers struct {
@@ -19,37 +19,42 @@ type ListServiceBrokers struct {
 	repo   api.ServiceBrokerRepository
 }
 
+type serviceBrokerTable []serviceBrokerRow
+
 type serviceBrokerRow struct {
 	name string
 	url  string
 }
 
-type serviceBrokerTable []serviceBrokerRow
-
-func NewListServiceBrokers(ui terminal.UI, config core_config.Reader, repo api.ServiceBrokerRepository) (cmd ListServiceBrokers) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.repo = repo
-	return
+func init() {
+	command_registry.Register(&ListServiceBrokers{})
 }
 
-func (cmd ListServiceBrokers) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ListServiceBrokers) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "service-brokers",
 		Description: T("List service brokers"),
 		Usage:       "CF_NAME service-brokers",
 	}
 }
 
-func (cmd ListServiceBrokers) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 0 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ListServiceBrokers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("service-brokers"))
 	}
+
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	return
 }
 
-func (cmd ListServiceBrokers) Run(c *cli.Context) {
+func (cmd *ListServiceBrokers) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.repo = deps.RepoLocator.GetServiceBrokerRepository()
+	return cmd
+}
+
+func (cmd *ListServiceBrokers) Execute(c flags.FlagContext) {
 	sbTable := serviceBrokerTable{}
 
 	cmd.ui.Say(T("Getting service brokers as {{.Username}}...\n",
@@ -77,7 +82,7 @@ func (cmd ListServiceBrokers) Run(c *cli.Context) {
 	table.Print()
 
 	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching service brokers.\n{{.Error}}", map[string]interface{}{"Error": apiErr}))
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

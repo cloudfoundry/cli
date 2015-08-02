@@ -1895,8 +1895,8 @@
       "modified": false
    },
    {
-      "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\u0009\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
-      "translation": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\u0009\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
+      "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
+      "translation": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
       "modified": false
    },
    {
@@ -2270,11 +2270,6 @@
       "modified": false
    },
    {
-      "id": "Failed fetching service brokers.\n{{.Error}}",
-      "translation": "Failed fetching service brokers.\n{{.Error}}",
-      "modified": false
-   },
-   {
       "id": "Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
       "translation": "Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
       "modified": false
@@ -2322,6 +2317,11 @@
    {
       "id": "File not found locally, make sure the file exists at given path {{.filepath}}",
       "translation": "File not found locally, make sure the file exists at given path {{.filepath}}",
+      "modified": false
+   },
+   {
+      "id": "For API documentation, please visit http://apidocs.cloudfoundry.org",
+      "translation": "For API documentation, please visit http://apidocs.cloudfoundry.org",
       "modified": false
    },
    {
@@ -2600,8 +2600,8 @@
       "modified": false
    },
    {
-      "id": "Incorrect Usage",
-      "translation": "Incorrect Usage",
+      "id": "Incorrect Usage\n\n",
+      "translation": "Incorrect Usage\n\n",
       "modified": false
    },
    {
@@ -2610,18 +2610,213 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage.\n\n",
+      "translation": "Incorrect Usage.\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
       "translation": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
       "modified": false
    },
    {
-      "id": "Incorrect json format: file: {{.JSONFile}}\n\u0009\u0009\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
-      "translation": "Incorrect json format: file: {{.JSONFile}}\n\u0009\u0009\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
+      "id": "Incorrect Usage. No argument required\n\n",
+      "translation": "Incorrect Usage. No argument required\n\n",
       "modified": false
    },
    {
-      "id": "Incorrect number of arguments",
-      "translation": "Incorrect number of arguments",
+      "id": "Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n",
+      "translation": "Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires 'app-name env-name' as arguments\n\n",
+      "translation": "Incorrect Usage. Requires 'app-name env-name' as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires 'username password' as arguments\n\n",
+      "translation": "Incorrect Usage. Requires 'username password' as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
+      "translation": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n",
+      "translation": "Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
+      "translation": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires ORG and DOMAIN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires ORG and DOMAIN as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n",
+      "translation": "Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SPACE and QUOTA as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SPACE and QUOTA as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n",
+      "translation": "Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "translation": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires an argument\n\n",
+      "translation": "Incorrect Usage. Requires an argument\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires app name as argument\n\n",
+      "translation": "Incorrect Usage. Requires app name as argument\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
+      "translation": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires arguments\n\n",
+      "translation": "Incorrect Usage. Requires arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n",
+      "translation": "Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires host and domain as arguments\n\n",
+      "translation": "Incorrect Usage. Requires host and domain as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires old app name and new app name as arguments\n\n",
+      "translation": "Incorrect Usage. Requires old app name and new app name as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires old org name, new org name as arguments\n\n",
+      "translation": "Incorrect Usage. Requires old org name, new org name as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires org_name, domain_name as arguments\n\n",
+      "translation": "Incorrect Usage. Requires org_name, domain_name as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
+      "translation": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
+      "translation": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
       "modified": false
    },
    {
@@ -2747,11 +2942,6 @@
    {
       "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
       "translation": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
-      "modified": false
-   },
-   {
-      "id": "Invalid usage",
-      "translation": "Invalid usage",
       "modified": false
    },
    {
@@ -3685,11 +3875,6 @@
       "modified": false
    },
    {
-      "id": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
-      "translation": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
-      "modified": false
-   },
-   {
       "id": "Retrieve and display the given stack's guid. All other output for the stack is suppressed.",
       "translation": "Retrieve and display the given stack's guid. All other output for the stack is suppressed.",
       "modified": false
@@ -3835,6 +4020,11 @@
       "modified": false
    },
    {
+      "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
+      "translation": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
+      "modified": false
+   },
+   {
       "id": "Server error, status code: 403: Access is denied.  You do not have privileges to execute this command.",
       "translation": "Server error, status code: 403: Access is denied.  You do not have privileges to execute this command.",
       "modified": false
@@ -3907,6 +4097,11 @@
    {
       "id": "Set an env variable for an app",
       "translation": "Set an env variable for an app",
+      "modified": false
+   },
+   {
+      "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+      "translation": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
       "modified": false
    },
    {
@@ -4877,11 +5072,6 @@
    {
       "id": "host",
       "translation": "host",
-      "modified": false
-   },
-   {
-      "id": "incorrect usage",
-      "translation": "incorrect usage",
       "modified": false
    },
    {

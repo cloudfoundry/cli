@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	testStacks "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/application"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -32,36 +32,80 @@ import (
 
 var _ = Describe("Push Command", func() {
 	var (
-		cmd                 *Push
-		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
-		manifestRepo        *testmanifest.FakeManifestRepository
-		starter             *testcmd.FakeApplicationStarter
-		stopper             *testcmd.FakeApplicationStopper
-		serviceBinder       *testcmd.FakeAppBinder
-		appRepo             *testApplication.FakeApplicationRepository
-		domainRepo          *testapi.FakeDomainRepository
-		routeRepo           *testapi.FakeRouteRepository
-		stackRepo           *testStacks.FakeStackRepository
-		serviceRepo         *testapi.FakeServiceRepo
-		wordGenerator       *testwords.FakeWordGenerator
-		requirementsFactory *testreq.FakeReqFactory
-		authRepo            *testapi.FakeAuthenticationRepository
-		actor               *fakeactors.FakePushActor
-		app_files           *fakeappfiles.FakeAppFiles
-		zipper              *fakeappfiles.FakeZipper
+		ui                         *testterm.FakeUI
+		configRepo                 core_config.Repository
+		manifestRepo               *testmanifest.FakeManifestRepository
+		starter                    *testcmd.FakeApplicationStarter
+		stopper                    *testcmd.FakeApplicationStopper
+		serviceBinder              *testcmd.FakeAppBinder
+		appRepo                    *testApplication.FakeApplicationRepository
+		domainRepo                 *testapi.FakeDomainRepository
+		routeRepo                  *testapi.FakeRouteRepository
+		stackRepo                  *testStacks.FakeStackRepository
+		serviceRepo                *testapi.FakeServiceRepo
+		wordGenerator              *testwords.FakeWordGenerator
+		requirementsFactory        *testreq.FakeReqFactory
+		authRepo                   *testapi.FakeAuthenticationRepository
+		actor                      *fakeactors.FakePushActor
+		app_files                  *fakeappfiles.FakeAppFiles
+		zipper                     *fakeappfiles.FakeZipper
+		OriginalCommandStart       command_registry.Command
+		OriginalCommandStop        command_registry.Command
+		OriginalCommandServiceBind command_registry.Command
+		deps                       command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = configRepo
+		deps.ManifestRepo = manifestRepo
+		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
+		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetStackRepository(stackRepo)
+		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
+		deps.WordGenerator = wordGenerator
+		deps.PushActor = actor
+		deps.AppZipper = zipper
+		deps.AppFiles = app_files
+
+		//inject fake commands dependencies into registry
+		command_registry.Register(starter)
+		command_registry.Register(stopper)
+		command_registry.Register(serviceBinder)
+
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("push").SetDependency(deps, false))
+	}
 
 	BeforeEach(func() {
 		manifestRepo = &testmanifest.FakeManifestRepository{}
+
 		starter = &testcmd.FakeApplicationStarter{}
 		stopper = &testcmd.FakeApplicationStopper{}
 		serviceBinder = &testcmd.FakeAppBinder{}
+
+		//setup fake commands (counterfeiter) to correctly interact with command_registry
+		starter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+			return starter
+		}
+		starter.MetaDataReturns(command_registry.CommandMetadata{Name: "start"})
+
+		stopper.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+			return stopper
+		}
+		stopper.MetaDataReturns(command_registry.CommandMetadata{Name: "stop"})
+
 		appRepo = &testApplication.FakeApplicationRepository{}
 
 		domainRepo = &testapi.FakeDomainRepository{}
 		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
 		domainRepo.ListDomainsForOrgDomains = []models.DomainFields{sharedDomain}
+
+		//save original command dependences and restore later
+		OriginalCommandStart = command_registry.Commands.FindCommand("start")
+		OriginalCommandStop = command_registry.Commands.FindCommand("stop")
+		OriginalCommandServiceBind = command_registry.Commands.FindCommand("bind-service")
 
 		routeRepo = &testapi.FakeRouteRepository{}
 		stackRepo = &testStacks.FakeStackRepository{}
@@ -79,21 +123,16 @@ var _ = Describe("Push Command", func() {
 		app_files = &fakeappfiles.FakeAppFiles{}
 		actor = &fakeactors.FakePushActor{}
 
-		cmd = NewPush(ui, configRepo, manifestRepo, starter, stopper, serviceBinder,
-			appRepo,
-			domainRepo,
-			routeRepo,
-			stackRepo,
-			serviceRepo,
-			authRepo,
-			wordGenerator,
-			actor,
-			zipper,
-			app_files)
+	})
+
+	AfterEach(func() {
+		command_registry.Register(OriginalCommandStart)
+		command_registry.Register(OriginalCommandStop)
+		command_registry.Register(OriginalCommandServiceBind)
 	})
 
 	callPush := func(args ...string) bool {
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("push", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

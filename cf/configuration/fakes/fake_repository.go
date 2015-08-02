@@ -2,10 +2,10 @@
 package fakes
 
 import (
-	. "github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/models"
-
 	"sync"
+
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/models"
 )
 
 type FakeRepository struct {
@@ -37,6 +37,12 @@ type FakeRepository struct {
 	loggregatorEndpointMutex       sync.RWMutex
 	loggregatorEndpointArgsForCall []struct{}
 	loggregatorEndpointReturns     struct {
+		result1 string
+	}
+	DopplerEndpointStub        func() string
+	dopplerEndpointMutex       sync.RWMutex
+	dopplerEndpointArgsForCall []struct{}
+	dopplerEndpointReturns     struct {
 		result1 string
 	}
 	UaaEndpointStub        func() string
@@ -111,6 +117,34 @@ type FakeRepository struct {
 	isSSLDisabledReturns     struct {
 		result1 bool
 	}
+	IsMinApiVersionStub        func(string) bool
+	isMinApiVersionMutex       sync.RWMutex
+	isMinApiVersionArgsForCall []struct {
+		arg1 string
+	}
+	isMinApiVersionReturns struct {
+		result1 bool
+	}
+	IsMinCliVersionStub        func(string) bool
+	isMinCliVersionMutex       sync.RWMutex
+	isMinCliVersionArgsForCall []struct {
+		arg1 string
+	}
+	isMinCliVersionReturns struct {
+		result1 bool
+	}
+	MinCliVersionStub        func() string
+	minCliVersionMutex       sync.RWMutex
+	minCliVersionArgsForCall []struct{}
+	minCliVersionReturns     struct {
+		result1 string
+	}
+	MinRecommendedCliVersionStub        func() string
+	minRecommendedCliVersionMutex       sync.RWMutex
+	minRecommendedCliVersionArgsForCall []struct{}
+	minRecommendedCliVersionReturns     struct {
+		result1 string
+	}
 	AsyncTimeoutStub        func() uint
 	asyncTimeoutMutex       sync.RWMutex
 	asyncTimeoutArgsForCall []struct{}
@@ -135,17 +169,11 @@ type FakeRepository struct {
 	localeReturns     struct {
 		result1 string
 	}
-	PluginsStub        func() map[string]string
-	pluginsMutex       sync.RWMutex
-	pluginsArgsForCall []struct{}
-	pluginsReturns     struct {
-		result1 map[string]string
-	}
-	UserHomePathStub        func() string
-	userHomePathMutex       sync.RWMutex
-	userHomePathArgsForCall []struct{}
-	userHomePathReturns     struct {
-		result1 string
+	PluginReposStub        func() []models.PluginRepo
+	pluginReposMutex       sync.RWMutex
+	pluginReposArgsForCall []struct{}
+	pluginReposReturns     struct {
+		result1 []models.PluginRepo
 	}
 	ClearSessionStub          func()
 	clearSessionMutex         sync.RWMutex
@@ -160,6 +188,16 @@ type FakeRepository struct {
 	setApiVersionArgsForCall []struct {
 		arg1 string
 	}
+	SetMinCliVersionStub        func(string)
+	setMinCliVersionMutex       sync.RWMutex
+	setMinCliVersionArgsForCall []struct {
+		arg1 string
+	}
+	SetMinRecommendedCliVersionStub        func(string)
+	setMinRecommendedCliVersionMutex       sync.RWMutex
+	setMinRecommendedCliVersionArgsForCall []struct {
+		arg1 string
+	}
 	SetAuthenticationEndpointStub        func(string)
 	setAuthenticationEndpointMutex       sync.RWMutex
 	setAuthenticationEndpointArgsForCall []struct {
@@ -168,6 +206,11 @@ type FakeRepository struct {
 	SetLoggregatorEndpointStub        func(string)
 	setLoggregatorEndpointMutex       sync.RWMutex
 	setLoggregatorEndpointArgsForCall []struct {
+		arg1 string
+	}
+	SetDopplerEndpointStub        func(string)
+	setDopplerEndpointMutex       sync.RWMutex
+	setDopplerEndpointArgsForCall []struct {
 		arg1 string
 	}
 	SetUaaEndpointStub        func(string)
@@ -220,11 +263,15 @@ type FakeRepository struct {
 	setLocaleArgsForCall []struct {
 		arg1 string
 	}
-	SetPluginStub        func(string, string)
-	setPluginMutex       sync.RWMutex
-	setPluginArgsForCall []struct {
-		arg1 string
-		arg2 string
+	SetPluginRepoStub        func(models.PluginRepo)
+	setPluginRepoMutex       sync.RWMutex
+	setPluginRepoArgsForCall []struct {
+		arg1 models.PluginRepo
+	}
+	UnSetPluginRepoStub        func(int)
+	unSetPluginRepoMutex       sync.RWMutex
+	unSetPluginRepoArgsForCall []struct {
+		arg1 int
 	}
 	CloseStub        func()
 	closeMutex       sync.RWMutex
@@ -233,8 +280,8 @@ type FakeRepository struct {
 
 func (fake *FakeRepository) ApiEndpoint() string {
 	fake.apiEndpointMutex.Lock()
-	defer fake.apiEndpointMutex.Unlock()
 	fake.apiEndpointArgsForCall = append(fake.apiEndpointArgsForCall, struct{}{})
+	fake.apiEndpointMutex.Unlock()
 	if fake.ApiEndpointStub != nil {
 		return fake.ApiEndpointStub()
 	} else {
@@ -249,6 +296,7 @@ func (fake *FakeRepository) ApiEndpointCallCount() int {
 }
 
 func (fake *FakeRepository) ApiEndpointReturns(result1 string) {
+	fake.ApiEndpointStub = nil
 	fake.apiEndpointReturns = struct {
 		result1 string
 	}{result1}
@@ -256,8 +304,8 @@ func (fake *FakeRepository) ApiEndpointReturns(result1 string) {
 
 func (fake *FakeRepository) ApiVersion() string {
 	fake.apiVersionMutex.Lock()
-	defer fake.apiVersionMutex.Unlock()
 	fake.apiVersionArgsForCall = append(fake.apiVersionArgsForCall, struct{}{})
+	fake.apiVersionMutex.Unlock()
 	if fake.ApiVersionStub != nil {
 		return fake.ApiVersionStub()
 	} else {
@@ -272,6 +320,7 @@ func (fake *FakeRepository) ApiVersionCallCount() int {
 }
 
 func (fake *FakeRepository) ApiVersionReturns(result1 string) {
+	fake.ApiVersionStub = nil
 	fake.apiVersionReturns = struct {
 		result1 string
 	}{result1}
@@ -279,8 +328,8 @@ func (fake *FakeRepository) ApiVersionReturns(result1 string) {
 
 func (fake *FakeRepository) HasAPIEndpoint() bool {
 	fake.hasAPIEndpointMutex.Lock()
-	defer fake.hasAPIEndpointMutex.Unlock()
 	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct{}{})
+	fake.hasAPIEndpointMutex.Unlock()
 	if fake.HasAPIEndpointStub != nil {
 		return fake.HasAPIEndpointStub()
 	} else {
@@ -295,6 +344,7 @@ func (fake *FakeRepository) HasAPIEndpointCallCount() int {
 }
 
 func (fake *FakeRepository) HasAPIEndpointReturns(result1 bool) {
+	fake.HasAPIEndpointStub = nil
 	fake.hasAPIEndpointReturns = struct {
 		result1 bool
 	}{result1}
@@ -302,8 +352,8 @@ func (fake *FakeRepository) HasAPIEndpointReturns(result1 bool) {
 
 func (fake *FakeRepository) AuthenticationEndpoint() string {
 	fake.authenticationEndpointMutex.Lock()
-	defer fake.authenticationEndpointMutex.Unlock()
 	fake.authenticationEndpointArgsForCall = append(fake.authenticationEndpointArgsForCall, struct{}{})
+	fake.authenticationEndpointMutex.Unlock()
 	if fake.AuthenticationEndpointStub != nil {
 		return fake.AuthenticationEndpointStub()
 	} else {
@@ -318,6 +368,7 @@ func (fake *FakeRepository) AuthenticationEndpointCallCount() int {
 }
 
 func (fake *FakeRepository) AuthenticationEndpointReturns(result1 string) {
+	fake.AuthenticationEndpointStub = nil
 	fake.authenticationEndpointReturns = struct {
 		result1 string
 	}{result1}
@@ -325,8 +376,8 @@ func (fake *FakeRepository) AuthenticationEndpointReturns(result1 string) {
 
 func (fake *FakeRepository) LoggregatorEndpoint() string {
 	fake.loggregatorEndpointMutex.Lock()
-	defer fake.loggregatorEndpointMutex.Unlock()
 	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct{}{})
+	fake.loggregatorEndpointMutex.Unlock()
 	if fake.LoggregatorEndpointStub != nil {
 		return fake.LoggregatorEndpointStub()
 	} else {
@@ -341,15 +392,40 @@ func (fake *FakeRepository) LoggregatorEndpointCallCount() int {
 }
 
 func (fake *FakeRepository) LoggregatorEndpointReturns(result1 string) {
+	fake.LoggregatorEndpointStub = nil
 	fake.loggregatorEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) DopplerEndpoint() string {
+	fake.dopplerEndpointMutex.Lock()
+	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct{}{})
+	fake.dopplerEndpointMutex.Unlock()
+	if fake.DopplerEndpointStub != nil {
+		return fake.DopplerEndpointStub()
+	} else {
+		return fake.dopplerEndpointReturns.result1
+	}
+}
+
+func (fake *FakeRepository) DopplerEndpointCallCount() int {
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	return len(fake.dopplerEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) DopplerEndpointReturns(result1 string) {
+	fake.DopplerEndpointStub = nil
+	fake.dopplerEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
 
 func (fake *FakeRepository) UaaEndpoint() string {
 	fake.uaaEndpointMutex.Lock()
-	defer fake.uaaEndpointMutex.Unlock()
 	fake.uaaEndpointArgsForCall = append(fake.uaaEndpointArgsForCall, struct{}{})
+	fake.uaaEndpointMutex.Unlock()
 	if fake.UaaEndpointStub != nil {
 		return fake.UaaEndpointStub()
 	} else {
@@ -364,6 +440,7 @@ func (fake *FakeRepository) UaaEndpointCallCount() int {
 }
 
 func (fake *FakeRepository) UaaEndpointReturns(result1 string) {
+	fake.UaaEndpointStub = nil
 	fake.uaaEndpointReturns = struct {
 		result1 string
 	}{result1}
@@ -371,8 +448,8 @@ func (fake *FakeRepository) UaaEndpointReturns(result1 string) {
 
 func (fake *FakeRepository) AccessToken() string {
 	fake.accessTokenMutex.Lock()
-	defer fake.accessTokenMutex.Unlock()
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
+	fake.accessTokenMutex.Unlock()
 	if fake.AccessTokenStub != nil {
 		return fake.AccessTokenStub()
 	} else {
@@ -387,6 +464,7 @@ func (fake *FakeRepository) AccessTokenCallCount() int {
 }
 
 func (fake *FakeRepository) AccessTokenReturns(result1 string) {
+	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
 		result1 string
 	}{result1}
@@ -394,8 +472,8 @@ func (fake *FakeRepository) AccessTokenReturns(result1 string) {
 
 func (fake *FakeRepository) RefreshToken() string {
 	fake.refreshTokenMutex.Lock()
-	defer fake.refreshTokenMutex.Unlock()
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
+	fake.refreshTokenMutex.Unlock()
 	if fake.RefreshTokenStub != nil {
 		return fake.RefreshTokenStub()
 	} else {
@@ -410,6 +488,7 @@ func (fake *FakeRepository) RefreshTokenCallCount() int {
 }
 
 func (fake *FakeRepository) RefreshTokenReturns(result1 string) {
+	fake.RefreshTokenStub = nil
 	fake.refreshTokenReturns = struct {
 		result1 string
 	}{result1}
@@ -417,8 +496,8 @@ func (fake *FakeRepository) RefreshTokenReturns(result1 string) {
 
 func (fake *FakeRepository) OrganizationFields() models.OrganizationFields {
 	fake.organizationFieldsMutex.Lock()
-	defer fake.organizationFieldsMutex.Unlock()
 	fake.organizationFieldsArgsForCall = append(fake.organizationFieldsArgsForCall, struct{}{})
+	fake.organizationFieldsMutex.Unlock()
 	if fake.OrganizationFieldsStub != nil {
 		return fake.OrganizationFieldsStub()
 	} else {
@@ -433,6 +512,7 @@ func (fake *FakeRepository) OrganizationFieldsCallCount() int {
 }
 
 func (fake *FakeRepository) OrganizationFieldsReturns(result1 models.OrganizationFields) {
+	fake.OrganizationFieldsStub = nil
 	fake.organizationFieldsReturns = struct {
 		result1 models.OrganizationFields
 	}{result1}
@@ -440,8 +520,8 @@ func (fake *FakeRepository) OrganizationFieldsReturns(result1 models.Organizatio
 
 func (fake *FakeRepository) HasOrganization() bool {
 	fake.hasOrganizationMutex.Lock()
-	defer fake.hasOrganizationMutex.Unlock()
 	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct{}{})
+	fake.hasOrganizationMutex.Unlock()
 	if fake.HasOrganizationStub != nil {
 		return fake.HasOrganizationStub()
 	} else {
@@ -456,6 +536,7 @@ func (fake *FakeRepository) HasOrganizationCallCount() int {
 }
 
 func (fake *FakeRepository) HasOrganizationReturns(result1 bool) {
+	fake.HasOrganizationStub = nil
 	fake.hasOrganizationReturns = struct {
 		result1 bool
 	}{result1}
@@ -463,8 +544,8 @@ func (fake *FakeRepository) HasOrganizationReturns(result1 bool) {
 
 func (fake *FakeRepository) SpaceFields() models.SpaceFields {
 	fake.spaceFieldsMutex.Lock()
-	defer fake.spaceFieldsMutex.Unlock()
 	fake.spaceFieldsArgsForCall = append(fake.spaceFieldsArgsForCall, struct{}{})
+	fake.spaceFieldsMutex.Unlock()
 	if fake.SpaceFieldsStub != nil {
 		return fake.SpaceFieldsStub()
 	} else {
@@ -479,6 +560,7 @@ func (fake *FakeRepository) SpaceFieldsCallCount() int {
 }
 
 func (fake *FakeRepository) SpaceFieldsReturns(result1 models.SpaceFields) {
+	fake.SpaceFieldsStub = nil
 	fake.spaceFieldsReturns = struct {
 		result1 models.SpaceFields
 	}{result1}
@@ -486,8 +568,8 @@ func (fake *FakeRepository) SpaceFieldsReturns(result1 models.SpaceFields) {
 
 func (fake *FakeRepository) HasSpace() bool {
 	fake.hasSpaceMutex.Lock()
-	defer fake.hasSpaceMutex.Unlock()
 	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct{}{})
+	fake.hasSpaceMutex.Unlock()
 	if fake.HasSpaceStub != nil {
 		return fake.HasSpaceStub()
 	} else {
@@ -502,6 +584,7 @@ func (fake *FakeRepository) HasSpaceCallCount() int {
 }
 
 func (fake *FakeRepository) HasSpaceReturns(result1 bool) {
+	fake.HasSpaceStub = nil
 	fake.hasSpaceReturns = struct {
 		result1 bool
 	}{result1}
@@ -509,8 +592,8 @@ func (fake *FakeRepository) HasSpaceReturns(result1 bool) {
 
 func (fake *FakeRepository) Username() string {
 	fake.usernameMutex.Lock()
-	defer fake.usernameMutex.Unlock()
 	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct{}{})
+	fake.usernameMutex.Unlock()
 	if fake.UsernameStub != nil {
 		return fake.UsernameStub()
 	} else {
@@ -525,6 +608,7 @@ func (fake *FakeRepository) UsernameCallCount() int {
 }
 
 func (fake *FakeRepository) UsernameReturns(result1 string) {
+	fake.UsernameStub = nil
 	fake.usernameReturns = struct {
 		result1 string
 	}{result1}
@@ -532,8 +616,8 @@ func (fake *FakeRepository) UsernameReturns(result1 string) {
 
 func (fake *FakeRepository) UserGuid() string {
 	fake.userGuidMutex.Lock()
-	defer fake.userGuidMutex.Unlock()
 	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct{}{})
+	fake.userGuidMutex.Unlock()
 	if fake.UserGuidStub != nil {
 		return fake.UserGuidStub()
 	} else {
@@ -548,6 +632,7 @@ func (fake *FakeRepository) UserGuidCallCount() int {
 }
 
 func (fake *FakeRepository) UserGuidReturns(result1 string) {
+	fake.UserGuidStub = nil
 	fake.userGuidReturns = struct {
 		result1 string
 	}{result1}
@@ -555,8 +640,8 @@ func (fake *FakeRepository) UserGuidReturns(result1 string) {
 
 func (fake *FakeRepository) UserEmail() string {
 	fake.userEmailMutex.Lock()
-	defer fake.userEmailMutex.Unlock()
 	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct{}{})
+	fake.userEmailMutex.Unlock()
 	if fake.UserEmailStub != nil {
 		return fake.UserEmailStub()
 	} else {
@@ -571,6 +656,7 @@ func (fake *FakeRepository) UserEmailCallCount() int {
 }
 
 func (fake *FakeRepository) UserEmailReturns(result1 string) {
+	fake.UserEmailStub = nil
 	fake.userEmailReturns = struct {
 		result1 string
 	}{result1}
@@ -578,8 +664,8 @@ func (fake *FakeRepository) UserEmailReturns(result1 string) {
 
 func (fake *FakeRepository) IsLoggedIn() bool {
 	fake.isLoggedInMutex.Lock()
-	defer fake.isLoggedInMutex.Unlock()
 	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct{}{})
+	fake.isLoggedInMutex.Unlock()
 	if fake.IsLoggedInStub != nil {
 		return fake.IsLoggedInStub()
 	} else {
@@ -594,6 +680,7 @@ func (fake *FakeRepository) IsLoggedInCallCount() int {
 }
 
 func (fake *FakeRepository) IsLoggedInReturns(result1 bool) {
+	fake.IsLoggedInStub = nil
 	fake.isLoggedInReturns = struct {
 		result1 bool
 	}{result1}
@@ -601,8 +688,8 @@ func (fake *FakeRepository) IsLoggedInReturns(result1 bool) {
 
 func (fake *FakeRepository) IsSSLDisabled() bool {
 	fake.isSSLDisabledMutex.Lock()
-	defer fake.isSSLDisabledMutex.Unlock()
 	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct{}{})
+	fake.isSSLDisabledMutex.Unlock()
 	if fake.IsSSLDisabledStub != nil {
 		return fake.IsSSLDisabledStub()
 	} else {
@@ -617,15 +704,128 @@ func (fake *FakeRepository) IsSSLDisabledCallCount() int {
 }
 
 func (fake *FakeRepository) IsSSLDisabledReturns(result1 bool) {
+	fake.IsSSLDisabledStub = nil
 	fake.isSSLDisabledReturns = struct {
 		result1 bool
 	}{result1}
 }
 
+func (fake *FakeRepository) IsMinApiVersion(arg1 string) bool {
+	fake.isMinApiVersionMutex.Lock()
+	fake.isMinApiVersionArgsForCall = append(fake.isMinApiVersionArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.isMinApiVersionMutex.Unlock()
+	if fake.IsMinApiVersionStub != nil {
+		return fake.IsMinApiVersionStub(arg1)
+	} else {
+		return fake.isMinApiVersionReturns.result1
+	}
+}
+
+func (fake *FakeRepository) IsMinApiVersionCallCount() int {
+	fake.isMinApiVersionMutex.RLock()
+	defer fake.isMinApiVersionMutex.RUnlock()
+	return len(fake.isMinApiVersionArgsForCall)
+}
+
+func (fake *FakeRepository) IsMinApiVersionArgsForCall(i int) string {
+	fake.isMinApiVersionMutex.RLock()
+	defer fake.isMinApiVersionMutex.RUnlock()
+	return fake.isMinApiVersionArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) IsMinApiVersionReturns(result1 bool) {
+	fake.IsMinApiVersionStub = nil
+	fake.isMinApiVersionReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeRepository) IsMinCliVersion(arg1 string) bool {
+	fake.isMinCliVersionMutex.Lock()
+	fake.isMinCliVersionArgsForCall = append(fake.isMinCliVersionArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.isMinCliVersionMutex.Unlock()
+	if fake.IsMinCliVersionStub != nil {
+		return fake.IsMinCliVersionStub(arg1)
+	} else {
+		return fake.isMinCliVersionReturns.result1
+	}
+}
+
+func (fake *FakeRepository) IsMinCliVersionCallCount() int {
+	fake.isMinCliVersionMutex.RLock()
+	defer fake.isMinCliVersionMutex.RUnlock()
+	return len(fake.isMinCliVersionArgsForCall)
+}
+
+func (fake *FakeRepository) IsMinCliVersionArgsForCall(i int) string {
+	fake.isMinCliVersionMutex.RLock()
+	defer fake.isMinCliVersionMutex.RUnlock()
+	return fake.isMinCliVersionArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) IsMinCliVersionReturns(result1 bool) {
+	fake.IsMinCliVersionStub = nil
+	fake.isMinCliVersionReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeRepository) MinCliVersion() string {
+	fake.minCliVersionMutex.Lock()
+	fake.minCliVersionArgsForCall = append(fake.minCliVersionArgsForCall, struct{}{})
+	fake.minCliVersionMutex.Unlock()
+	if fake.MinCliVersionStub != nil {
+		return fake.MinCliVersionStub()
+	} else {
+		return fake.minCliVersionReturns.result1
+	}
+}
+
+func (fake *FakeRepository) MinCliVersionCallCount() int {
+	fake.minCliVersionMutex.RLock()
+	defer fake.minCliVersionMutex.RUnlock()
+	return len(fake.minCliVersionArgsForCall)
+}
+
+func (fake *FakeRepository) MinCliVersionReturns(result1 string) {
+	fake.MinCliVersionStub = nil
+	fake.minCliVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) MinRecommendedCliVersion() string {
+	fake.minRecommendedCliVersionMutex.Lock()
+	fake.minRecommendedCliVersionArgsForCall = append(fake.minRecommendedCliVersionArgsForCall, struct{}{})
+	fake.minRecommendedCliVersionMutex.Unlock()
+	if fake.MinRecommendedCliVersionStub != nil {
+		return fake.MinRecommendedCliVersionStub()
+	} else {
+		return fake.minRecommendedCliVersionReturns.result1
+	}
+}
+
+func (fake *FakeRepository) MinRecommendedCliVersionCallCount() int {
+	fake.minRecommendedCliVersionMutex.RLock()
+	defer fake.minRecommendedCliVersionMutex.RUnlock()
+	return len(fake.minRecommendedCliVersionArgsForCall)
+}
+
+func (fake *FakeRepository) MinRecommendedCliVersionReturns(result1 string) {
+	fake.MinRecommendedCliVersionStub = nil
+	fake.minRecommendedCliVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeRepository) AsyncTimeout() uint {
 	fake.asyncTimeoutMutex.Lock()
-	defer fake.asyncTimeoutMutex.Unlock()
 	fake.asyncTimeoutArgsForCall = append(fake.asyncTimeoutArgsForCall, struct{}{})
+	fake.asyncTimeoutMutex.Unlock()
 	if fake.AsyncTimeoutStub != nil {
 		return fake.AsyncTimeoutStub()
 	} else {
@@ -640,6 +840,7 @@ func (fake *FakeRepository) AsyncTimeoutCallCount() int {
 }
 
 func (fake *FakeRepository) AsyncTimeoutReturns(result1 uint) {
+	fake.AsyncTimeoutStub = nil
 	fake.asyncTimeoutReturns = struct {
 		result1 uint
 	}{result1}
@@ -647,8 +848,8 @@ func (fake *FakeRepository) AsyncTimeoutReturns(result1 uint) {
 
 func (fake *FakeRepository) Trace() string {
 	fake.traceMutex.Lock()
-	defer fake.traceMutex.Unlock()
 	fake.traceArgsForCall = append(fake.traceArgsForCall, struct{}{})
+	fake.traceMutex.Unlock()
 	if fake.TraceStub != nil {
 		return fake.TraceStub()
 	} else {
@@ -663,6 +864,7 @@ func (fake *FakeRepository) TraceCallCount() int {
 }
 
 func (fake *FakeRepository) TraceReturns(result1 string) {
+	fake.TraceStub = nil
 	fake.traceReturns = struct {
 		result1 string
 	}{result1}
@@ -670,8 +872,8 @@ func (fake *FakeRepository) TraceReturns(result1 string) {
 
 func (fake *FakeRepository) ColorEnabled() string {
 	fake.colorEnabledMutex.Lock()
-	defer fake.colorEnabledMutex.Unlock()
 	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct{}{})
+	fake.colorEnabledMutex.Unlock()
 	if fake.ColorEnabledStub != nil {
 		return fake.ColorEnabledStub()
 	} else {
@@ -686,6 +888,7 @@ func (fake *FakeRepository) ColorEnabledCallCount() int {
 }
 
 func (fake *FakeRepository) ColorEnabledReturns(result1 string) {
+	fake.ColorEnabledStub = nil
 	fake.colorEnabledReturns = struct {
 		result1 string
 	}{result1}
@@ -693,8 +896,8 @@ func (fake *FakeRepository) ColorEnabledReturns(result1 string) {
 
 func (fake *FakeRepository) Locale() string {
 	fake.localeMutex.Lock()
-	defer fake.localeMutex.Unlock()
 	fake.localeArgsForCall = append(fake.localeArgsForCall, struct{}{})
+	fake.localeMutex.Unlock()
 	if fake.LocaleStub != nil {
 		return fake.LocaleStub()
 	} else {
@@ -709,61 +912,40 @@ func (fake *FakeRepository) LocaleCallCount() int {
 }
 
 func (fake *FakeRepository) LocaleReturns(result1 string) {
+	fake.LocaleStub = nil
 	fake.localeReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeRepository) Plugins() map[string]string {
-	fake.pluginsMutex.Lock()
-	defer fake.pluginsMutex.Unlock()
-	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct{}{})
-	if fake.PluginsStub != nil {
-		return fake.PluginsStub()
+func (fake *FakeRepository) PluginRepos() []models.PluginRepo {
+	fake.pluginReposMutex.Lock()
+	fake.pluginReposArgsForCall = append(fake.pluginReposArgsForCall, struct{}{})
+	fake.pluginReposMutex.Unlock()
+	if fake.PluginReposStub != nil {
+		return fake.PluginReposStub()
 	} else {
-		return fake.pluginsReturns.result1
+		return fake.pluginReposReturns.result1
 	}
 }
 
-func (fake *FakeRepository) PluginsCallCount() int {
-	fake.pluginsMutex.RLock()
-	defer fake.pluginsMutex.RUnlock()
-	return len(fake.pluginsArgsForCall)
+func (fake *FakeRepository) PluginReposCallCount() int {
+	fake.pluginReposMutex.RLock()
+	defer fake.pluginReposMutex.RUnlock()
+	return len(fake.pluginReposArgsForCall)
 }
 
-func (fake *FakeRepository) PluginsReturns(result1 map[string]string) {
-	fake.pluginsReturns = struct {
-		result1 map[string]string
-	}{result1}
-}
-
-func (fake *FakeRepository) UserHomePath() string {
-	fake.userHomePathMutex.Lock()
-	defer fake.userHomePathMutex.Unlock()
-	fake.userHomePathArgsForCall = append(fake.userHomePathArgsForCall, struct{}{})
-	if fake.UserHomePathStub != nil {
-		return fake.UserHomePathStub()
-	} else {
-		return fake.userHomePathReturns.result1
-	}
-}
-
-func (fake *FakeRepository) UserHomePathCallCount() int {
-	fake.userHomePathMutex.RLock()
-	defer fake.userHomePathMutex.RUnlock()
-	return len(fake.userHomePathArgsForCall)
-}
-
-func (fake *FakeRepository) UserHomePathReturns(result1 string) {
-	fake.userHomePathReturns = struct {
-		result1 string
+func (fake *FakeRepository) PluginReposReturns(result1 []models.PluginRepo) {
+	fake.PluginReposStub = nil
+	fake.pluginReposReturns = struct {
+		result1 []models.PluginRepo
 	}{result1}
 }
 
 func (fake *FakeRepository) ClearSession() {
 	fake.clearSessionMutex.Lock()
-	defer fake.clearSessionMutex.Unlock()
 	fake.clearSessionArgsForCall = append(fake.clearSessionArgsForCall, struct{}{})
+	fake.clearSessionMutex.Unlock()
 	if fake.ClearSessionStub != nil {
 		fake.ClearSessionStub()
 	}
@@ -777,10 +959,10 @@ func (fake *FakeRepository) ClearSessionCallCount() int {
 
 func (fake *FakeRepository) SetApiEndpoint(arg1 string) {
 	fake.setApiEndpointMutex.Lock()
-	defer fake.setApiEndpointMutex.Unlock()
 	fake.setApiEndpointArgsForCall = append(fake.setApiEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setApiEndpointMutex.Unlock()
 	if fake.SetApiEndpointStub != nil {
 		fake.SetApiEndpointStub(arg1)
 	}
@@ -800,10 +982,10 @@ func (fake *FakeRepository) SetApiEndpointArgsForCall(i int) string {
 
 func (fake *FakeRepository) SetApiVersion(arg1 string) {
 	fake.setApiVersionMutex.Lock()
-	defer fake.setApiVersionMutex.Unlock()
 	fake.setApiVersionArgsForCall = append(fake.setApiVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setApiVersionMutex.Unlock()
 	if fake.SetApiVersionStub != nil {
 		fake.SetApiVersionStub(arg1)
 	}
@@ -821,12 +1003,58 @@ func (fake *FakeRepository) SetApiVersionArgsForCall(i int) string {
 	return fake.setApiVersionArgsForCall[i].arg1
 }
 
+func (fake *FakeRepository) SetMinCliVersion(arg1 string) {
+	fake.setMinCliVersionMutex.Lock()
+	fake.setMinCliVersionArgsForCall = append(fake.setMinCliVersionArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.setMinCliVersionMutex.Unlock()
+	if fake.SetMinCliVersionStub != nil {
+		fake.SetMinCliVersionStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetMinCliVersionCallCount() int {
+	fake.setMinCliVersionMutex.RLock()
+	defer fake.setMinCliVersionMutex.RUnlock()
+	return len(fake.setMinCliVersionArgsForCall)
+}
+
+func (fake *FakeRepository) SetMinCliVersionArgsForCall(i int) string {
+	fake.setMinCliVersionMutex.RLock()
+	defer fake.setMinCliVersionMutex.RUnlock()
+	return fake.setMinCliVersionArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetMinRecommendedCliVersion(arg1 string) {
+	fake.setMinRecommendedCliVersionMutex.Lock()
+	fake.setMinRecommendedCliVersionArgsForCall = append(fake.setMinRecommendedCliVersionArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.setMinRecommendedCliVersionMutex.Unlock()
+	if fake.SetMinRecommendedCliVersionStub != nil {
+		fake.SetMinRecommendedCliVersionStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetMinRecommendedCliVersionCallCount() int {
+	fake.setMinRecommendedCliVersionMutex.RLock()
+	defer fake.setMinRecommendedCliVersionMutex.RUnlock()
+	return len(fake.setMinRecommendedCliVersionArgsForCall)
+}
+
+func (fake *FakeRepository) SetMinRecommendedCliVersionArgsForCall(i int) string {
+	fake.setMinRecommendedCliVersionMutex.RLock()
+	defer fake.setMinRecommendedCliVersionMutex.RUnlock()
+	return fake.setMinRecommendedCliVersionArgsForCall[i].arg1
+}
+
 func (fake *FakeRepository) SetAuthenticationEndpoint(arg1 string) {
 	fake.setAuthenticationEndpointMutex.Lock()
-	defer fake.setAuthenticationEndpointMutex.Unlock()
 	fake.setAuthenticationEndpointArgsForCall = append(fake.setAuthenticationEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setAuthenticationEndpointMutex.Unlock()
 	if fake.SetAuthenticationEndpointStub != nil {
 		fake.SetAuthenticationEndpointStub(arg1)
 	}
@@ -846,10 +1074,10 @@ func (fake *FakeRepository) SetAuthenticationEndpointArgsForCall(i int) string {
 
 func (fake *FakeRepository) SetLoggregatorEndpoint(arg1 string) {
 	fake.setLoggregatorEndpointMutex.Lock()
-	defer fake.setLoggregatorEndpointMutex.Unlock()
 	fake.setLoggregatorEndpointArgsForCall = append(fake.setLoggregatorEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setLoggregatorEndpointMutex.Unlock()
 	if fake.SetLoggregatorEndpointStub != nil {
 		fake.SetLoggregatorEndpointStub(arg1)
 	}
@@ -867,12 +1095,35 @@ func (fake *FakeRepository) SetLoggregatorEndpointArgsForCall(i int) string {
 	return fake.setLoggregatorEndpointArgsForCall[i].arg1
 }
 
+func (fake *FakeRepository) SetDopplerEndpoint(arg1 string) {
+	fake.setDopplerEndpointMutex.Lock()
+	fake.setDopplerEndpointArgsForCall = append(fake.setDopplerEndpointArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.setDopplerEndpointMutex.Unlock()
+	if fake.SetDopplerEndpointStub != nil {
+		fake.SetDopplerEndpointStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetDopplerEndpointCallCount() int {
+	fake.setDopplerEndpointMutex.RLock()
+	defer fake.setDopplerEndpointMutex.RUnlock()
+	return len(fake.setDopplerEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) SetDopplerEndpointArgsForCall(i int) string {
+	fake.setDopplerEndpointMutex.RLock()
+	defer fake.setDopplerEndpointMutex.RUnlock()
+	return fake.setDopplerEndpointArgsForCall[i].arg1
+}
+
 func (fake *FakeRepository) SetUaaEndpoint(arg1 string) {
 	fake.setUaaEndpointMutex.Lock()
-	defer fake.setUaaEndpointMutex.Unlock()
 	fake.setUaaEndpointArgsForCall = append(fake.setUaaEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setUaaEndpointMutex.Unlock()
 	if fake.SetUaaEndpointStub != nil {
 		fake.SetUaaEndpointStub(arg1)
 	}
@@ -892,10 +1143,10 @@ func (fake *FakeRepository) SetUaaEndpointArgsForCall(i int) string {
 
 func (fake *FakeRepository) SetAccessToken(arg1 string) {
 	fake.setAccessTokenMutex.Lock()
-	defer fake.setAccessTokenMutex.Unlock()
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setAccessTokenMutex.Unlock()
 	if fake.SetAccessTokenStub != nil {
 		fake.SetAccessTokenStub(arg1)
 	}
@@ -915,10 +1166,10 @@ func (fake *FakeRepository) SetAccessTokenArgsForCall(i int) string {
 
 func (fake *FakeRepository) SetRefreshToken(arg1 string) {
 	fake.setRefreshTokenMutex.Lock()
-	defer fake.setRefreshTokenMutex.Unlock()
 	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setRefreshTokenMutex.Unlock()
 	if fake.SetRefreshTokenStub != nil {
 		fake.SetRefreshTokenStub(arg1)
 	}
@@ -938,10 +1189,10 @@ func (fake *FakeRepository) SetRefreshTokenArgsForCall(i int) string {
 
 func (fake *FakeRepository) SetOrganizationFields(arg1 models.OrganizationFields) {
 	fake.setOrganizationFieldsMutex.Lock()
-	defer fake.setOrganizationFieldsMutex.Unlock()
 	fake.setOrganizationFieldsArgsForCall = append(fake.setOrganizationFieldsArgsForCall, struct {
 		arg1 models.OrganizationFields
 	}{arg1})
+	fake.setOrganizationFieldsMutex.Unlock()
 	if fake.SetOrganizationFieldsStub != nil {
 		fake.SetOrganizationFieldsStub(arg1)
 	}
@@ -961,10 +1212,10 @@ func (fake *FakeRepository) SetOrganizationFieldsArgsForCall(i int) models.Organ
 
 func (fake *FakeRepository) SetSpaceFields(arg1 models.SpaceFields) {
 	fake.setSpaceFieldsMutex.Lock()
-	defer fake.setSpaceFieldsMutex.Unlock()
 	fake.setSpaceFieldsArgsForCall = append(fake.setSpaceFieldsArgsForCall, struct {
 		arg1 models.SpaceFields
 	}{arg1})
+	fake.setSpaceFieldsMutex.Unlock()
 	if fake.SetSpaceFieldsStub != nil {
 		fake.SetSpaceFieldsStub(arg1)
 	}
@@ -984,10 +1235,10 @@ func (fake *FakeRepository) SetSpaceFieldsArgsForCall(i int) models.SpaceFields 
 
 func (fake *FakeRepository) SetSSLDisabled(arg1 bool) {
 	fake.setSSLDisabledMutex.Lock()
-	defer fake.setSSLDisabledMutex.Unlock()
 	fake.setSSLDisabledArgsForCall = append(fake.setSSLDisabledArgsForCall, struct {
 		arg1 bool
 	}{arg1})
+	fake.setSSLDisabledMutex.Unlock()
 	if fake.SetSSLDisabledStub != nil {
 		fake.SetSSLDisabledStub(arg1)
 	}
@@ -1007,10 +1258,10 @@ func (fake *FakeRepository) SetSSLDisabledArgsForCall(i int) bool {
 
 func (fake *FakeRepository) SetAsyncTimeout(arg1 uint) {
 	fake.setAsyncTimeoutMutex.Lock()
-	defer fake.setAsyncTimeoutMutex.Unlock()
 	fake.setAsyncTimeoutArgsForCall = append(fake.setAsyncTimeoutArgsForCall, struct {
 		arg1 uint
 	}{arg1})
+	fake.setAsyncTimeoutMutex.Unlock()
 	if fake.SetAsyncTimeoutStub != nil {
 		fake.SetAsyncTimeoutStub(arg1)
 	}
@@ -1030,10 +1281,10 @@ func (fake *FakeRepository) SetAsyncTimeoutArgsForCall(i int) uint {
 
 func (fake *FakeRepository) SetTrace(arg1 string) {
 	fake.setTraceMutex.Lock()
-	defer fake.setTraceMutex.Unlock()
 	fake.setTraceArgsForCall = append(fake.setTraceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setTraceMutex.Unlock()
 	if fake.SetTraceStub != nil {
 		fake.SetTraceStub(arg1)
 	}
@@ -1053,10 +1304,10 @@ func (fake *FakeRepository) SetTraceArgsForCall(i int) string {
 
 func (fake *FakeRepository) SetColorEnabled(arg1 string) {
 	fake.setColorEnabledMutex.Lock()
-	defer fake.setColorEnabledMutex.Unlock()
 	fake.setColorEnabledArgsForCall = append(fake.setColorEnabledArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setColorEnabledMutex.Unlock()
 	if fake.SetColorEnabledStub != nil {
 		fake.SetColorEnabledStub(arg1)
 	}
@@ -1076,10 +1327,10 @@ func (fake *FakeRepository) SetColorEnabledArgsForCall(i int) string {
 
 func (fake *FakeRepository) SetLocale(arg1 string) {
 	fake.setLocaleMutex.Lock()
-	defer fake.setLocaleMutex.Unlock()
 	fake.setLocaleArgsForCall = append(fake.setLocaleArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.setLocaleMutex.Unlock()
 	if fake.SetLocaleStub != nil {
 		fake.SetLocaleStub(arg1)
 	}
@@ -1097,34 +1348,56 @@ func (fake *FakeRepository) SetLocaleArgsForCall(i int) string {
 	return fake.setLocaleArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) SetPlugin(arg1 string, arg2 string) {
-	fake.setPluginMutex.Lock()
-	defer fake.setPluginMutex.Unlock()
-	fake.setPluginArgsForCall = append(fake.setPluginArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	if fake.SetPluginStub != nil {
-		fake.SetPluginStub(arg1, arg2)
+func (fake *FakeRepository) SetPluginRepo(arg1 models.PluginRepo) {
+	fake.setPluginRepoMutex.Lock()
+	fake.setPluginRepoArgsForCall = append(fake.setPluginRepoArgsForCall, struct {
+		arg1 models.PluginRepo
+	}{arg1})
+	fake.setPluginRepoMutex.Unlock()
+	if fake.SetPluginRepoStub != nil {
+		fake.SetPluginRepoStub(arg1)
 	}
 }
 
-func (fake *FakeRepository) SetPluginCallCount() int {
-	fake.setPluginMutex.RLock()
-	defer fake.setPluginMutex.RUnlock()
-	return len(fake.setPluginArgsForCall)
+func (fake *FakeRepository) SetPluginRepoCallCount() int {
+	fake.setPluginRepoMutex.RLock()
+	defer fake.setPluginRepoMutex.RUnlock()
+	return len(fake.setPluginRepoArgsForCall)
 }
 
-func (fake *FakeRepository) SetPluginArgsForCall(i int) (string, string) {
-	fake.setPluginMutex.RLock()
-	defer fake.setPluginMutex.RUnlock()
-	return fake.setPluginArgsForCall[i].arg1, fake.setPluginArgsForCall[i].arg2
+func (fake *FakeRepository) SetPluginRepoArgsForCall(i int) models.PluginRepo {
+	fake.setPluginRepoMutex.RLock()
+	defer fake.setPluginRepoMutex.RUnlock()
+	return fake.setPluginRepoArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) UnSetPluginRepo(arg1 int) {
+	fake.unSetPluginRepoMutex.Lock()
+	fake.unSetPluginRepoArgsForCall = append(fake.unSetPluginRepoArgsForCall, struct {
+		arg1 int
+	}{arg1})
+	fake.unSetPluginRepoMutex.Unlock()
+	if fake.UnSetPluginRepoStub != nil {
+		fake.UnSetPluginRepoStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) UnSetPluginRepoCallCount() int {
+	fake.unSetPluginRepoMutex.RLock()
+	defer fake.unSetPluginRepoMutex.RUnlock()
+	return len(fake.unSetPluginRepoArgsForCall)
+}
+
+func (fake *FakeRepository) UnSetPluginRepoArgsForCall(i int) int {
+	fake.unSetPluginRepoMutex.RLock()
+	defer fake.unSetPluginRepoMutex.RUnlock()
+	return fake.unSetPluginRepoArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) Close() {
 	fake.closeMutex.Lock()
-	defer fake.closeMutex.Unlock()
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.closeMutex.Unlock()
 	if fake.CloseStub != nil {
 		fake.CloseStub()
 	}
@@ -1136,4 +1409,4 @@ func (fake *FakeRepository) CloseCallCount() int {
 	return len(fake.closeArgsForCall)
 }
 
-var _ Repository = new(FakeRepository)
+var _ core_config.Repository = new(FakeRepository)

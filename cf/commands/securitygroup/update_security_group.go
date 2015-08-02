@@ -1,16 +1,17 @@
 package securitygroup
 
 import (
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"strings"
 
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/json"
-	"github.com/codegangsta/cli"
 )
 
 type UpdateSecurityGroup struct {
@@ -19,35 +20,38 @@ type UpdateSecurityGroup struct {
 	configRepo        core_config.Reader
 }
 
-func NewUpdateSecurityGroup(ui terminal.UI, configRepo core_config.Reader, securityGroupRepo security_groups.SecurityGroupRepo) UpdateSecurityGroup {
-	return UpdateSecurityGroup{
-		ui:                ui,
-		configRepo:        configRepo,
-		securityGroupRepo: securityGroupRepo,
-	}
+func init() {
+	command_registry.Register(&UpdateSecurityGroup{})
 }
 
-func (cmd UpdateSecurityGroup) Metadata() command_metadata.CommandMetadata {
+func (cmd *UpdateSecurityGroup) MetaData() command_registry.CommandMetadata {
 	primaryUsage := T("CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE")
 	secondaryUsage := T("   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.")
 	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
-	return command_metadata.CommandMetadata{
+	return command_registry.CommandMetadata{
 		Name:        "update-security-group",
 		Description: T("Update a security group"),
 		Usage:       strings.Join([]string{primaryUsage, secondaryUsage, tipUsage}, "\n\n"),
 	}
 }
 
-func (cmd UpdateSecurityGroup) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 2 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *UpdateSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 2 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n") + command_registry.Commands.CommandUsage("update-security-group"))
 	}
 
 	requirements := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return requirements, nil
 }
 
-func (cmd UpdateSecurityGroup) Run(context *cli.Context) {
+func (cmd *UpdateSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.configRepo = deps.Config
+	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()
+	return cmd
+}
+
+func (cmd *UpdateSecurityGroup) Execute(context flags.FlagContext) {
 	name := context.Args()[0]
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {

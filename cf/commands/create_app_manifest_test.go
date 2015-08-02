@@ -5,7 +5,7 @@ import (
 
 	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	testManifest "github.com/cloudfoundry/cli/cf/manifest/fakes"
@@ -16,6 +16,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	testtime "github.com/cloudfoundry/cli/testhelpers/time"
 
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -23,12 +24,22 @@ import (
 var _ = Describe("create-app-manifest Command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		appSummaryRepo      *testapi.FakeAppSummaryRepo
 		appInstancesRepo    *testAppInstanaces.FakeAppInstancesRepository
 		requirementsFactory *testreq.FakeReqFactory
 		fakeManifest        *testManifest.FakeAppManifest
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
+		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
+		deps.Config = configRepo
+		deps.AppManifest = fakeManifest
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-app-manifest").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		fakeManifest = &testManifest.FakeAppManifest{}
@@ -43,8 +54,7 @@ var _ = Describe("create-app-manifest Command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewCreateAppManifest(ui, configRepo, appSummaryRepo, fakeManifest)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("create-app-manifest", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -60,7 +70,9 @@ var _ = Describe("create-app-manifest Command", func() {
 
 		It("fails with usage when not provided exactly one arg", func() {
 			passed := runCommand()
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "argument"},
+			))
 			Expect(passed).To(BeFalse())
 		})
 
@@ -106,7 +118,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				Ω(fakeManifest.EnvironmentVarsCallCount()).To(Equal(1))
 				Ω(fakeManifest.HealthCheckTimeoutCallCount()).To(Equal(1))
 				Ω(fakeManifest.InstancesCallCount()).To(Equal(1))
-				Ω(fakeManifest.DomainCallCount()).To(Equal(1))
+				Ω(fakeManifest.DomainCallCount()).To(Equal(2))
 				Ω(fakeManifest.ServiceCallCount()).To(Equal(1))
 				Ω(fakeManifest.StartCommandCallCount()).To(Equal(1))
 			})

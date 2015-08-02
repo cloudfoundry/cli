@@ -2,16 +2,18 @@ package service
 
 import (
 	"fmt"
+
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type MigrateServiceInstances struct {
@@ -20,33 +22,25 @@ type MigrateServiceInstances struct {
 	serviceRepo api.ServiceRepository
 }
 
-func NewMigrateServiceInstances(ui terminal.UI, configRepo core_config.Reader, serviceRepo api.ServiceRepository) (cmd *MigrateServiceInstances) {
-	cmd = new(MigrateServiceInstances)
-	cmd.ui = ui
-	cmd.configRepo = configRepo
-	cmd.serviceRepo = serviceRepo
-	return
+func init() {
+	command_registry.Register(&MigrateServiceInstances{})
 }
 
-func migrateServiceInstanceWarning() string {
-	return T("WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.")
-}
+func (cmd *MigrateServiceInstances) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force migration without confirmation")}
 
-func (cmd *MigrateServiceInstances) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+	return command_registry.CommandMetadata{
 		Name:        "migrate-service-instances",
 		Description: T("Migrate service instances from one service plan to another"),
 		Usage:       T("CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n") + migrateServiceInstanceWarning(),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force migration without confirmation")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd *MigrateServiceInstances) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 5 {
-		cmd.ui.FailWithUsage(c)
-		return
+func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 5 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n") + command_registry.Commands.CommandUsage("migrate-service-instances"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -55,7 +49,18 @@ func (cmd *MigrateServiceInstances) GetRequirements(requirementsFactory requirem
 	return
 }
 
-func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
+func (cmd *MigrateServiceInstances) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.configRepo = deps.Config
+	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
+	return cmd
+}
+
+func migrateServiceInstanceWarning() string {
+	return T("WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.")
+}
+
+func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) {
 	v1 := resources.ServicePlanDescription{
 		ServiceLabel:    c.Args()[0],
 		ServiceProvider: c.Args()[1],

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -59,6 +60,10 @@ func (r *registry) FindCommand(name string) Command {
 }
 
 func (r *registry) CommandExists(name string) bool {
+	if strings.TrimSpace(name) == "" {
+		return false
+	}
+
 	var ok bool
 
 	if _, ok = r.cmd[name]; !ok {
@@ -74,6 +79,34 @@ func (r *registry) CommandExists(name string) bool {
 
 func (r *registry) SetCommand(cmd Command) {
 	r.cmd[cmd.MetaData().Name] = cmd
+}
+
+func (r *registry) RemoveCommand(cmdName string) {
+	delete(r.cmd, cmdName)
+}
+
+func (r *registry) TotalCommands() int {
+	return len(r.cmd)
+}
+
+func (r *registry) MaxCommandNameLength() int {
+	maxNameLen := 0
+	for name, _ := range r.cmd {
+		if utf8.RuneCountInString(name) > maxNameLen {
+			maxNameLen = len(name)
+		}
+	}
+	return maxNameLen
+}
+
+func (r *registry) Metadatas() []CommandMetadata {
+	var m []CommandMetadata
+
+	for _, c := range r.cmd {
+		m = append(m, c.MetaData())
+	}
+
+	return m
 }
 
 func (r *registry) CommandUsage(cmdName string) string {

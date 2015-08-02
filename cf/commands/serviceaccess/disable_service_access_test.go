@@ -6,7 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/serviceaccess"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -22,20 +23,30 @@ var _ = Describe("disable-service-access command", func() {
 		actor               *testactor.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
 		tokenRefresher      *testapi.FakeAuthenticationRepository
+		configRepo          core_config.Repository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(tokenRefresher)
+		deps.ServicePlanHandler = actor
+		deps.Config = configRepo
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("disable-service-access").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{
 			Inputs: []string{"yes"},
 		}
+		configRepo = configuration.NewRepositoryWithDefaults()
 		actor = &testactor.FakeServicePlanActor{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		tokenRefresher = &testapi.FakeAuthenticationRepository{}
 	})
 
 	runCommand := func(args []string) bool {
-		cmd := NewDisableServiceAccess(ui, configuration.NewRepositoryWithDefaults(), actor, tokenRefresher)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("disable-service-access", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -46,7 +57,9 @@ var _ = Describe("disable-service-access command", func() {
 		It("fails with usage when it does not recieve any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand(nil)
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "argument"},
+			))
 		})
 	})
 

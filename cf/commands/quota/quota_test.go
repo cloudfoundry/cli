@@ -5,7 +5,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/quota"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,18 +21,27 @@ var _ = Describe("quota", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
+		config              core_config.Repository
 		quotaRepo           *fakes.FakeQuotaRepository
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("quota").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 		quotaRepo = &fakes.FakeQuotaRepository{}
+		config = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewShowQuota(ui, testconfig.NewRepositoryWithDefaults(), quotaRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("When not logged in", func() {
@@ -48,7 +58,9 @@ var _ = Describe("quota", func() {
 		Context("When not providing a quota name", func() {
 			It("fails with usage", func() {
 				runCommand()
-				Expect(ui.FailedWithUsage).To(BeTrue())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage", "Requires", "argument"},
+				))
 			})
 		})
 

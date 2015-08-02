@@ -12,7 +12,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/servicekey"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
@@ -23,11 +23,19 @@ var _ = Describe("delete-service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		cmd                 DeleteServiceKey
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceKeyRepo      *testapi.FakeServiceKeyRepo
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetServiceKeyRepository(serviceKeyRepo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-service-key").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -38,12 +46,11 @@ var _ = Describe("delete-service-key command", func() {
 		serviceRepo.FindInstanceByNameMap = generic.NewMap()
 		serviceRepo.FindInstanceByNameMap.Set("fake-service-instance", serviceInstance)
 		serviceKeyRepo = testapi.NewFakeServiceKeyRepo()
-		cmd = NewDeleteServiceKey(ui, config, serviceRepo, serviceKeyRepo)
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstanceNotFound: false}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	})
 
 	var callDeleteServiceKey = func(args []string) bool {
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete-service-key", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements are not satisfied", func() {
@@ -56,11 +63,6 @@ var _ = Describe("delete-service-key command", func() {
 			Expect(callDeleteServiceKey([]string{})).To(BeFalse())
 			Expect(callDeleteServiceKey([]string{"fake-arg-one"})).To(BeFalse())
 			Expect(callDeleteServiceKey([]string{"fake-arg-one", "fake-arg-two", "fake-arg-three"})).To(BeFalse())
-		})
-
-		It("fails when service instance is not found", func() {
-			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, ServiceInstanceNotFound: true}
-			Expect(callDeleteServiceKey([]string{"non-exist-service-instance"})).To(BeFalse())
 		})
 
 		It("fails when space is not targetted", func() {
@@ -92,7 +94,7 @@ var _ = Describe("delete-service-key command", func() {
 			})
 
 			It("deletes service key successfully when '-f' option is provided", func() {
-				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, ServiceInstanceNotFound: false, TargetedSpaceSuccess: true}
+				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key", "-f"})).To(BeTrue())
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -101,7 +103,7 @@ var _ = Describe("delete-service-key command", func() {
 			})
 
 			It("deletes service key successfully when '-f' option is not provided and confirmed 'yes'", func() {
-				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, ServiceInstanceNotFound: false, TargetedSpaceSuccess: true}
+				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 				ui.Inputs = append(ui.Inputs, "yes")
 
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key"})).To(BeTrue())
@@ -112,7 +114,7 @@ var _ = Describe("delete-service-key command", func() {
 			})
 
 			It("skips to delete service key when '-f' option is not provided and confirmed 'no'", func() {
-				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, ServiceInstanceNotFound: false, TargetedSpaceSuccess: true}
+				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 				ui.Inputs = append(ui.Inputs, "no")
 
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key"})).To(BeTrue())
@@ -153,6 +155,17 @@ var _ = Describe("delete-service-key command", func() {
 					[]string{"Deleting key", "non-exist-service-key", "for service instance", "fake-service-instance", "as", "my-user..."},
 					[]string{"OK"},
 					[]string{"Service key", "non-exist-service-key", "does not exist for service instance", "fake-service-instance"},
+				))
+			})
+
+			It("shows no service key is found", func() {
+				serviceKeyRepo.GetServiceKeyMethod.ServiceKey = models.ServiceKey{}
+				serviceKeyRepo.GetServiceKeyMethod.Error = &errors.NotAuthorizedError{}
+				callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key", "-f"})
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Deleting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
+					[]string{"No service key", "fake-service-key", "found for service instance", "fake-service-instance"},
 				))
 			})
 		})

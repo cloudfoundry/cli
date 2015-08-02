@@ -15,6 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_runner"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/help"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -22,6 +23,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/panic_printer"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/commands_loader"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/codegangsta/cli"
@@ -43,15 +45,35 @@ type cliDependencies struct {
 }
 
 func main() {
+	commands_loader.Load()
+
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
 
 	//////////////// non-codegangsta path  ///////////////////////
+	if len(os.Args) == 1 || (len(os.Args) == 2 && os.Args[1] == "help") ||
+		(len(os.Args) >= 2 && (os.Args[1] == "--help" || os.Args[1] == "-help")) ||
+		(len(os.Args) >= 2 && (os.Args[1] == "--h" || os.Args[1] == "-h")) {
+		help.ShowHelp(help.GetHelpTemplate())
+		os.Exit(0)
+	}
+
 	if len(os.Args) > 1 {
 		cmd := os.Args[1]
-		if cmdRegistry.CommandExists(cmd) {
 
-			fc := flags.NewFlagContext(cmdRegistry.FindCommand(os.Args[1]).MetaData().Flags)
+		//handles 'cf help <command>'
+		if cmd == "help" && len(os.Args) > 2 {
+			cmd = os.Args[2]
+			if cmdRegistry.CommandExists(cmd) {
+				deps.Ui.Say(cmdRegistry.CommandUsage(cmd))
+				os.Exit(0)
+			}
+		}
+
+		if cmdRegistry.CommandExists(cmd) {
+			meta := cmdRegistry.FindCommand(os.Args[1]).MetaData()
+			fc := flags.NewFlagContext(meta.Flags)
+			fc.SkipFlagParsing(meta.SkipFlagParsing)
 
 			if requestHelp(os.Args[2:]) {
 				deps.Ui.Say(cmdRegistry.CommandUsage(cmd))

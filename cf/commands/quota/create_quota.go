@@ -2,16 +2,16 @@ package quota
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CreateQuota struct {
@@ -20,32 +20,29 @@ type CreateQuota struct {
 	quotaRepo quotas.QuotaRepository
 }
 
-func NewCreateQuota(ui terminal.UI, config core_config.Reader, quotaRepo quotas.QuotaRepository) CreateQuota {
-	return CreateQuota{
-		ui:        ui,
-		config:    config,
-		quotaRepo: quotaRepo,
-	}
+func init() {
+	command_registry.Register(&CreateQuota{})
 }
 
-func (cmd CreateQuota) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateQuota) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["allow-paid-service-plans"] = &cliFlags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
+	fs["i"] = &cliFlags.StringFlag{Name: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.")}
+	fs["m"] = &cliFlags.StringFlag{Name: "m", Usage: T("Total amount of memory (e.g. 1024M, 1G, 10G)")}
+	fs["r"] = &cliFlags.IntFlag{Name: "r", Usage: T("Total number of routes")}
+	fs["s"] = &cliFlags.IntFlag{Name: "s", Usage: T("Total number of service instances")}
+
+	return command_registry.CommandMetadata{
 		Name:        "create-quota",
 		Description: T("Define a new resource quota"),
 		Usage:       T("CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("i", T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.")),
-			flag_helpers.NewStringFlag("m", T("Total amount of memory (e.g. 1024M, 1G, 10G)")),
-			flag_helpers.NewIntFlag("r", T("Total number of routes")),
-			flag_helpers.NewIntFlag("s", T("Total number of service instances")),
-			cli.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd CreateQuota) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *CreateQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-quota"))
 	}
 
 	return []requirements.Requirement{
@@ -53,7 +50,14 @@ func (cmd CreateQuota) GetRequirements(requirementsFactory requirements.Factory,
 	}, nil
 }
 
-func (cmd CreateQuota) Run(context *cli.Context) {
+func (cmd *CreateQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
+	return cmd
+}
+
+func (cmd *CreateQuota) Execute(context flags.FlagContext) {
 	name := context.Args()[0]
 
 	cmd.ui.Say(T("Creating quota {{.QuotaName}} as {{.Username}}...", map[string]interface{}{

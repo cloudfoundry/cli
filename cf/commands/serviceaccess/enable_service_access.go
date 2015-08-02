@@ -3,12 +3,12 @@ package serviceaccess
 import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -20,36 +20,40 @@ type EnableServiceAccess struct {
 	tokenRefresher authentication.TokenRefresher
 }
 
-func NewEnableServiceAccess(ui terminal.UI, config core_config.Reader, actor actors.ServicePlanActor, tokenRefresher authentication.TokenRefresher) (cmd *EnableServiceAccess) {
-	return &EnableServiceAccess{
-		ui:             ui,
-		config:         config,
-		actor:          actor,
-		tokenRefresher: tokenRefresher,
+func init() {
+	command_registry.Register(&EnableServiceAccess{})
+}
+
+func (cmd *EnableServiceAccess) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Enable access to a specified service plan")}
+	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Enable access for a specified organization")}
+
+	return command_registry.CommandMetadata{
+		Name:        "enable-service-access",
+		Description: T("Enable access to a service or service plan for one or all orgs"),
+		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
+		Flags:       fs,
 	}
 }
 
-func (cmd *EnableServiceAccess) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 1 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *EnableServiceAccess) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("enable-service-access"))
 	}
 
 	return []requirements.Requirement{requirementsFactory.NewLoginRequirement()}, nil
 }
 
-func (cmd *EnableServiceAccess) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
-		Name:        "enable-service-access",
-		Description: T("Enable access to a service or service plan for one or all orgs"),
-		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("p", T("Enable access to a specified service plan")),
-			flag_helpers.NewStringFlag("o", T("Enable access for a specified organization")),
-		},
-	}
+func (cmd *EnableServiceAccess) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.actor = deps.ServicePlanHandler
+	cmd.tokenRefresher = deps.RepoLocator.GetAuthenticationRepository()
+	return cmd
 }
 
-func (cmd *EnableServiceAccess) Run(c *cli.Context) {
+func (cmd *EnableServiceAccess) Execute(c flags.FlagContext) {
 	_, err := cmd.tokenRefresher.RefreshAuthToken()
 	if err != nil {
 		cmd.ui.Failed(err.Error())

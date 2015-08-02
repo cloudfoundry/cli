@@ -15,6 +15,10 @@ import (
 
 var _ = Describe("CommandRegistry", func() {
 
+	BeforeEach(func() {
+		Register(FakeCommand1{})
+	})
+
 	Context("i18n", func() {
 		It("initialize i18n T() func", func() {
 			Ω(T).ToNot(BeNil())
@@ -46,6 +50,10 @@ var _ = Describe("CommandRegistry", func() {
 			It("returns true if the alias exists", func() {
 				Ω(Commands.CommandExists("fc1")).To(BeTrue())
 			})
+
+			It("returns false if the command name is an empty string", func() {
+				Ω(Commands.CommandExists("")).To(BeFalse())
+			})
 		})
 
 		Context("FindCommand()", func() {
@@ -71,6 +79,46 @@ var _ = Describe("CommandRegistry", func() {
 				Commands.SetCommand(updatedCmd)
 				oldCmd = Commands.FindCommand("fake-command")
 				Ω(oldCmd).To(Equal(updatedCmd))
+			})
+		})
+
+		Context("RemoveCommand()", func() {
+			It("removes the command in registry with command name provided", func() {
+				Commands = NewRegistry()
+
+				Register(FakeCommand1{})
+				Register(FakeCommand2{})
+				Register(FakeCommand3{})
+
+				Ω(Commands.TotalCommands()).To(Equal(3))
+			})
+		})
+
+		Context("Metadatas()", func() {
+			It("returns all the command's metadata", func() {
+				Commands = NewRegistry()
+
+				Register(FakeCommand1{})
+				Register(FakeCommand2{})
+				Register(FakeCommand3{})
+
+				Ω(len(Commands.Metadatas())).To(Equal(3))
+			})
+		})
+
+		Context("TotalCommands()", func() {
+			It("returns the total number of commands in the registry", func() {
+				Ω(Commands.CommandExists("fake-command")).To(BeTrue())
+
+				Commands.RemoveCommand("fake-command")
+				Ω(Commands.CommandExists("fake-command")).To(BeFalse())
+			})
+		})
+
+		Context("MaxCommandNameLength()", func() {
+			It("returns the length of the longest command name", func() {
+				maxLen := Commands.MaxCommandNameLength()
+				Ω(maxLen).To(Equal(len("this-is-a-really-long-command-name-123123123123123123123")))
 			})
 		})
 

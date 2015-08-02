@@ -3,21 +3,21 @@ package commands
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
+	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
+
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
-	"github.com/codegangsta/cli"
 )
 
 type Curl struct {
@@ -26,35 +26,30 @@ type Curl struct {
 	curlRepo api.CurlRepository
 }
 
-func NewCurl(ui terminal.UI, config core_config.Reader, curlRepo api.CurlRepository) (cmd *Curl) {
-	cmd = new(Curl)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.curlRepo = curlRepo
-	return
+func init() {
+	command_registry.Register(&Curl{})
 }
 
-func (cmd *Curl) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Curl) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["i"] = &cliFlags.BoolFlag{Name: "i", Usage: T("Include response headers in the output")}
+	fs["v"] = &cliFlags.BoolFlag{Name: "v", Usage: T("Enable CF_TRACE output for all requests and responses")}
+	fs["X"] = &cliFlags.StringFlag{Name: "X", Value: "GET", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")}
+	fs["H"] = &cliFlags.StringSliceFlag{Name: "H", Usage: T("Custom headers to include in the request, flag can be specified multiple times")}
+	fs["d"] = &cliFlags.StringFlag{Name: "d", Usage: T("HTTP data to include in the request body")}
+	fs["output"] = &cliFlags.StringFlag{Name: "output", Usage: T("Write curl body to FILE instead of stdout")}
+
+	return command_registry.CommandMetadata{
 		Name:        "curl",
 		Description: T("Executes a raw request, content-type set to application/json by default"),
-		Usage:       T("CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "i", Usage: T("Include response headers in the output")},
-			cli.BoolFlag{Name: "v", Usage: T("Enable CF_TRACE output for all requests and responses")},
-			cli.StringFlag{Name: "X", Value: "GET", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")},
-			flag_helpers.NewStringSliceFlag("H", T("Custom headers to include in the request, flag can be specified multiple times")),
-			flag_helpers.NewStringFlag("d", T("HTTP data to include in the request body")),
-			flag_helpers.NewStringFlag("output", T("Write curl body to FILE instead of stdout")),
-		},
+		Usage:       T("CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]") + "\n   " + T("For API documentation, please visit http://apidocs.cloudfoundry.org"),
+		Flags:       fs,
 	}
 }
 
-func (cmd *Curl) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		err = errors.New(T("Incorrect number of arguments"))
-		cmd.ui.FailWithUsage(c)
-		return
+func (cmd *Curl) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("curl"))
 	}
 
 	reqs = []requirements.Requirement{
@@ -63,7 +58,14 @@ func (cmd *Curl) GetRequirements(requirementsFactory requirements.Factory, c *cl
 	return
 }
 
-func (cmd *Curl) Run(c *cli.Context) {
+func (cmd *Curl) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.curlRepo = deps.RepoLocator.GetCurlRepository()
+	return cmd
+}
+
+func (cmd *Curl) Execute(c flags.FlagContext) {
 	path := c.Args()[0]
 	method := c.String("X")
 	headers := c.StringSlice("H")

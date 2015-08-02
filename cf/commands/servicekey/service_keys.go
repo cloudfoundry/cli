@@ -2,33 +2,29 @@ package servicekey
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type ServiceKeys struct {
-	ui             terminal.UI
-	config         core_config.Reader
-	serviceRepo    api.ServiceRepository
-	serviceKeyRepo api.ServiceKeyRepository
+	ui                         terminal.UI
+	config                     core_config.Reader
+	serviceRepo                api.ServiceRepository
+	serviceKeyRepo             api.ServiceKeyRepository
+	serviceInstanceRequirement requirements.ServiceInstanceRequirement
 }
 
-func NewListServiceKeys(ui terminal.UI, config core_config.Reader, serviceRepo api.ServiceRepository, serviceKeyRepo api.ServiceKeyRepository) (cmd ServiceKeys) {
-	return ServiceKeys{
-		ui:             ui,
-		config:         config,
-		serviceRepo:    serviceRepo,
-		serviceKeyRepo: serviceKeyRepo,
-	}
+func init() {
+	command_registry.Register(&ServiceKeys{})
 }
 
-func (cmd ServiceKeys) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *ServiceKeys) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "service-keys",
 		ShortName:   "sk",
 		Description: T("List keys for a service instance"),
@@ -39,34 +35,36 @@ EXAMPLE:
 	}
 }
 
-func (cmd ServiceKeys) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *ServiceKeys) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("service-keys"))
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
-	serviceInstanceRequirement := requirementsFactory.NewServiceInstanceRequirement(c.Args()[0])
+	cmd.serviceInstanceRequirement = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
 	targetSpaceRequirement := requirementsFactory.NewTargetedSpaceRequirement()
 
-	reqs = []requirements.Requirement{loginRequirement, serviceInstanceRequirement, targetSpaceRequirement}
+	reqs := []requirements.Requirement{loginRequirement, cmd.serviceInstanceRequirement, targetSpaceRequirement}
 
 	return reqs, nil
 }
 
-func (cmd ServiceKeys) Run(c *cli.Context) {
-	serviceInstanceName := c.Args()[0]
+func (cmd *ServiceKeys) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
+	cmd.serviceKeyRepo = deps.RepoLocator.GetServiceKeyRepository()
+	return cmd
+}
+
+func (cmd *ServiceKeys) Execute(c flags.FlagContext) {
+	serviceInstance := cmd.serviceInstanceRequirement.GetServiceInstance()
 
 	cmd.ui.Say(T("Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName),
+			"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name),
 			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
-
-	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
-	}
 
 	serviceKeys, err := cmd.serviceKeyRepo.ListServiceKeys(serviceInstance.Guid)
 	if err != nil {
@@ -82,7 +80,7 @@ func (cmd ServiceKeys) Run(c *cli.Context) {
 
 	if len(serviceKeys) == 0 {
 		cmd.ui.Say(T("No service key for service instance {{.ServiceInstanceName}}",
-			map[string]interface{}{"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName)}))
+			map[string]interface{}{"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name)}))
 		return
 	} else {
 		cmd.ui.Say("")

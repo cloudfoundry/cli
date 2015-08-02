@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
+//go:generate counterfeiter -o ../command/fakes/fake_registry_command.go . Command
 type Command interface {
 	MetaData() CommandMetadata
 	SetDependency(deps Dependency, pluginCall bool) Command

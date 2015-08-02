@@ -2,13 +2,14 @@ package user
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DeleteUser struct {
@@ -17,37 +18,39 @@ type DeleteUser struct {
 	userRepo api.UserRepository
 }
 
-func NewDeleteUser(ui terminal.UI, config core_config.Reader, userRepo api.UserRepository) (cmd DeleteUser) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.userRepo = userRepo
-	return
+func init() {
+	command_registry.Register(&DeleteUser{})
 }
 
-func (cmd DeleteUser) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *DeleteUser) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
+
+	return command_registry.CommandMetadata{
 		Name:        "delete-user",
 		Description: T("Delete a user"),
 		Usage:       T("CF_NAME delete-user USERNAME [-f]"),
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")},
-		},
+		Flags:       fs,
 	}
 }
 
-func (cmd DeleteUser) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
-		err = errors.New(T("Invalid usage"))
-		cmd.ui.FailWithUsage(c)
-		return
+func (cmd *DeleteUser) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 1 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-user"))
 	}
 
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
-
 	return
 }
 
-func (cmd DeleteUser) Run(c *cli.Context) {
+func (cmd *DeleteUser) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	return cmd
+}
+
+func (cmd *DeleteUser) Execute(c flags.FlagContext) {
 	username := c.Args()[0]
 	force := c.Bool("f")
 

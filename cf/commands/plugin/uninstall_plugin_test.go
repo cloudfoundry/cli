@@ -2,19 +2,16 @@ package plugin_test
 
 import (
 	"io/ioutil"
-	"net/rpc"
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	cliRpc "github.com/cloudfoundry/cli/plugin/rpc"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/plugin"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/fileutils"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
@@ -28,7 +25,14 @@ var _ = Describe("Uninstall", func() {
 		fakePluginRepoDir   string
 		pluginDir           string
 		pluginConfig        *plugin_config.PluginConfig
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.PluginConfig = pluginConfig
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("uninstall-plugin").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
@@ -58,20 +62,21 @@ var _ = Describe("Uninstall", func() {
 	})
 
 	AfterEach(func() {
-		os.Remove(fakePluginRepoDir)
+		err := os.RemoveAll(fakePluginRepoDir)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	runCommand := func(args ...string) bool {
-		//reset rpc registration, each service can only be registered once
-		rpc.DefaultServer = rpc.NewServer()
-		rpcService, _ := cliRpc.NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
-		cmd := NewPluginUninstall(ui, pluginConfig, rpcService)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("uninstall-plugin", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
 		It("fails with usage when not provided a path to the plugin executable", func() {
-			Expect(runCommand()).ToNot(HavePassedRequirements())
+			runCommand()
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage."},
+			))
+
 		})
 	})
 

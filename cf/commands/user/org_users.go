@@ -20,7 +20,7 @@ type OrgUsers struct {
 	config      core_config.Reader
 	orgReq      requirements.OrganizationRequirement
 	userRepo    api.UserRepository
-	pluginModel *[]plugin_models.User
+	pluginModel *[]plugin_models.GetOrgUsers_Model
 	pluginCall  bool
 }
 
@@ -50,7 +50,7 @@ func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
 
 func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed("Incorrect Usage. Requires an argument\n\n" + command_registry.Commands.CommandUsage("org-users"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("org-users"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -67,7 +67,7 @@ func (cmd *OrgUsers) SetDependency(deps command_registry.Dependency, pluginCall 
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	cmd.pluginCall = pluginCall
-	cmd.pluginModel = deps.PluginModels.Users
+	cmd.pluginModel = deps.PluginModels.OrgUsers
 	return cmd
 }
 
@@ -93,7 +93,7 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 		models.ORG_AUDITOR:     T("ORG AUDITOR"),
 	}
 
-	var usersMap = make(map[string]plugin_models.User)
+	var usersMap = make(map[string]plugin_models.GetOrgUsers_Model)
 	var users []models.UserFields
 	var apiErr error
 
@@ -115,9 +115,10 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 			if cmd.pluginCall {
 				u, found := usersMap[user.Username]
 				if !found {
-					u = plugin_models.User{}
+					u = plugin_models.GetOrgUsers_Model{}
 					u.Username = user.Username
 					u.Guid = user.Guid
+					u.IsAdmin = user.IsAdmin
 					u.Roles = make([]string, 1)
 					u.Roles[0] = role
 					usersMap[user.Username] = u

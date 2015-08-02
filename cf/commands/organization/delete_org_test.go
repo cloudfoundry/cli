@@ -4,6 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -11,7 +12,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/organization"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,12 +19,20 @@ import (
 
 var _ = Describe("delete-org command", func() {
 	var (
-		config              core_config.ReadWriter
+		config              core_config.Repository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		orgRepo             *test_org.FakeOrganizationRepository
 		org                 models.Organization
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-org").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{
@@ -43,8 +51,7 @@ var _ = Describe("delete-org command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		cmd := NewDeleteOrg(ui, config, orgRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("delete-org", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails requirements when not logged in", func() {
@@ -53,7 +60,9 @@ var _ = Describe("delete-org command", func() {
 
 	It("fails with usage if no arguments are given", func() {
 		runCommand()
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires an argument"},
+		))
 	})
 
 	Context("when logged in", func() {

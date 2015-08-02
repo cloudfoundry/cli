@@ -41,7 +41,7 @@ func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[str
 }
 
 func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityGroup, error) {
-	path := fmt.Sprintf("/v2/security_groups?q=%s&inline-relations-depth=2", url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("/v2/security_groups?q=%s", url.QueryEscape("name:"+name))
 	group := models.SecurityGroup{}
 	foundGroup := false
 
@@ -63,8 +63,21 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 	}
 
 	if !foundGroup {
-		err = errors.NewModelNotFoundError("security group", name)
+		return group, errors.NewModelNotFoundError("security group", name)
 	}
+
+	err = repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		group.SpaceUrl,
+		resources.SpaceResource{},
+		func(resource interface{}) bool {
+			if asgr, ok := resource.(resources.SpaceResource); ok {
+				group.Spaces = append(group.Spaces, asgr.ToModel())
+				return true
+			}
+			return false
+		},
+	)
 
 	return group, err
 }
@@ -75,7 +88,7 @@ func (repo cloudControllerSecurityGroupRepo) Update(guid string, rules []map[str
 }
 
 func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, error) {
-	path := "/v2/security_groups?inline-relations-depth=2"
+	path := "/v2/security_groups"
 	securityGroups := []models.SecurityGroup{}
 
 	err := repo.gateway.ListPaginatedResources(
@@ -93,6 +106,21 @@ func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, 
 
 	if err != nil {
 		return nil, err
+	}
+
+	for i, _ := range securityGroups {
+		err = repo.gateway.ListPaginatedResources(
+			repo.config.ApiEndpoint(),
+			securityGroups[i].SpaceUrl,
+			resources.SpaceResource{},
+			func(resource interface{}) bool {
+				if asgr, ok := resource.(resources.SpaceResource); ok {
+					securityGroups[i].Spaces = append(securityGroups[i].Spaces, asgr.ToModel())
+					return true
+				}
+				return false
+			},
+		)
 	}
 
 	return securityGroups, err

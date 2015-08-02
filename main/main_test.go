@@ -34,6 +34,26 @@ var _ = Describe("main", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
+	Describe("Help menu", func() {
+		It("prints the help output with our custom template when run with 'cf -h'", func() {
+			output := Cf("-h").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
+		})
+
+		It("prints the help output with our custom template when run with 'cf --help'", func() {
+			output := Cf("--help").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
+		})
+
+		It("prints the help output with our custom template when run with 'cf help'", func() {
+			output := Cf("help").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
+		})
+	})
+
 	Describe("Commands /w new non-codegangsta structure", func() {
 		It("prints usage help for all non-codegangsta commands by providing `help` flag", func() {
 			output := Cf("api", "-h").Wait(1 * time.Second)
@@ -47,6 +67,12 @@ var _ = Describe("main", func() {
 
 			result = Cf("api", "--h")
 			Consistently(result.Out).ShouldNot(Say("Invalid flag: --h"))
+		})
+
+		It("accepts `cf help <command>` for non-codegangsta commands", func() {
+			output := Cf("help", "api")
+			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS"))
 		})
 
 		It("runs requirement of the non-codegangsta command", func() {
@@ -78,7 +104,7 @@ var _ = Describe("main", func() {
 		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 	})
 
-	Describe("Flag verification", func() {
+	XDescribe("Flag verification", func() {
 		It("informs user for any incorrect provided flags", func() {
 			result := Cf("push", "--no-hostname", "--bad-flag")
 			Eventually(result.Out).Should(Say("\"--bad-flag\""))
@@ -123,13 +149,13 @@ var _ = Describe("main", func() {
 
 		Context("When TotalArgs is set in the metadata for a command", func() {
 			It("will only validate flags in the argument position after position <TotalArgs>", func() {
-				result := Cf("create-buildpack", "buildpack_name", "location/to/nowhere", "-100", "-bad_flag")
+				result := Cf("install-plugin", "-100", "-bad_flag")
 				Eventually(result.Out).ShouldNot(Say("\"-100\""))
 				Eventually(result.Out).Should(Say("\"-bad_flag\""))
 			})
 
 			It("will not validate arguments before the position <TotalArgs>", func() {
-				result := Cf("create-buildpack", "-bad-flag", "--bad-flag2")
+				result := Cf("add-plugin-repo", "-bad-flag", "--bad-flag2")
 				Eventually(result.Out).ShouldNot(Say("\"-bad-flag\""))
 				Eventually(result.Out).ShouldNot(Say("\"--bad_flag2\""))
 			})
@@ -144,7 +170,7 @@ var _ = Describe("main", func() {
 
 		Context("When a negative integer is preceeded by a invalid flag", func() {
 			It("validates the negative integer as a flag", func() {
-				result := Cf("update-space-quota", "-badflag", "-10")
+				result := Cf("push", "-badflag", "-10")
 				Eventually(result.Out).Should(Say("\"-badflag\""))
 				Eventually(result.Out).Should(Say("\"-10\""))
 			})

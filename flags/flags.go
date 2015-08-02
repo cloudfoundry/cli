@@ -9,17 +9,6 @@ import (
 	"github.com/cloudfoundry/cli/flags/flag"
 )
 
-/**
- * In main:
- *		- get os args
- *		- new cmdContext obj
- *		- range over os.Args, look for '-'/'--', call flags.Parse() on each of them
- *		- cmdContext obj populated with flags, cmd now has c.Bool(),c.Int(),c.String() etc...
- *		- now populate cmdContext with args, anything w/o '-'/'--', now cmd has c.Args()
- *
- *		now run cmd, pass Context obj over
- * **/
-
 type FlagSet interface {
 	fmt.Stringer
 	GetName() string
@@ -33,14 +22,17 @@ type FlagContext interface {
 	Int(string) int
 	Bool(string) bool
 	String(string) string
+	StringSlice(string) []string
 	IsSet(string) bool
+	SkipFlagParsing(bool)
 }
 
 type flagContext struct {
-	flagsets map[string]FlagSet
-	args     []string
-	cmdFlags map[string]FlagSet //valid flags for command
-	cursor   int
+	flagsets        map[string]FlagSet
+	args            []string
+	cmdFlags        map[string]FlagSet //valid flags for command
+	cursor          int
+	skipFlagParsing bool
 }
 
 func NewFlagContext(cmdFlags map[string]FlagSet) FlagContext {
@@ -57,18 +49,15 @@ func (c *flagContext) Parse(args ...string) error {
 	var v string
 	var err error
 
+	c.setDefaultFlagValueIfAny()
+
 	for c.cursor <= len(args)-1 {
 		arg := args[c.cursor]
 
-		if strings.HasPrefix(arg, "-") || strings.HasPrefix(arg, "--") {
+		if !c.skipFlagParsing && (strings.HasPrefix(arg, "-") || strings.HasPrefix(arg, "--")) {
 			flg := strings.TrimLeft(strings.TrimLeft(arg, "-"), "-")
 
-			if strings.Contains(flg, "=") {
-				tmpAry := strings.SplitN(flg, "=", 2)
-				flg = tmpAry[0]
-				tmpArg := append(args[:c.cursor], tmpAry[1])
-				args = append(tmpArg, args[c.cursor:]...)
-			}
+			c.extractEqualSignIfAny(&flg, &args)
 
 			if flagset, ok = c.cmdFlags[flg]; !ok {
 				return errors.New("Invalid flag: " + arg)
@@ -91,6 +80,15 @@ func (c *flagContext) Parse(args ...string) error {
 					return err
 				}
 				c.flagsets[flg] = &cliFlags.StringFlag{Name: flg, Value: v}
+			case []string:
+				if v, err = c.getFlagValue(args); err != nil {
+					return err
+				}
+				if _, ok = c.flagsets[flg]; !ok {
+					c.flagsets[flg] = &cliFlags.StringSliceFlag{Name: flg, Value: []string{v}}
+				} else {
+					c.flagsets[flg].Set(v)
+				}
 			}
 		} else {
 			c.args = append(c.args, args[c.cursor])
@@ -164,4 +162,55 @@ func (c *flagContext) Bool(k string) bool {
 		}
 	}
 	return false
+}
+
+func (c *flagContext) StringSlice(k string) []string {
+	if _, ok := c.flagsets[k]; ok {
+		v := c.flagsets[k].GetValue()
+		switch v.(type) {
+		case []string:
+			return v.([]string)
+		}
+	}
+	return []string{}
+}
+
+func (c *flagContext) SkipFlagParsing(skip bool) {
+	c.skipFlagParsing = skip
+}
+
+func (c *flagContext) extractEqualSignIfAny(flg *string, args *[]string) {
+	if strings.Contains(*flg, "=") {
+		tmpAry := strings.SplitN(*flg, "=", 2)
+		*flg = tmpAry[0]
+		tmpArg := append((*args)[:c.cursor], tmpAry[1])
+		*args = append(tmpArg, (*args)[c.cursor:]...)
+	}
+}
+
+func (c *flagContext) setDefaultFlagValueIfAny() {
+	var v interface{}
+
+	for flgName, flg := range c.cmdFlags {
+		v = flg.GetValue()
+		switch v.(type) {
+		case bool:
+			if v.(bool) != false {
+				c.flagsets[flgName] = &cliFlags.BoolFlag{Name: flgName, Value: v.(bool)}
+			}
+		case int:
+			if v.(int) != 0 {
+				c.flagsets[flgName] = &cliFlags.IntFlag{Name: flgName, Value: v.(int)}
+			}
+		case string:
+			if len(v.(string)) != 0 {
+				c.flagsets[flgName] = &cliFlags.StringFlag{Name: flgName, Value: v.(string)}
+			}
+		case []string:
+			if len(v.([]string)) != 0 {
+				c.flagsets[flgName] = &cliFlags.StringSliceFlag{Name: flgName, Value: v.([]string)}
+			}
+		}
+	}
+
 }

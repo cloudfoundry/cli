@@ -112,6 +112,111 @@ var _ = Describe("generate_manifest", func() {
 			[]string{"  buildpack: ruby-buildpack"},
 		))
 	})
+	Context("When there are multiple hosts and domains", func() {
+
+		It("generates a manifest containing two hosts two domains", func() {
+			m.Memory("app1", 128)
+			m.StartCommand("app1", "run main.go")
+			m.Service("app1", "service1")
+			m.EnvironmentVars("app1", "foo", "boo")
+			m.HealthCheckTimeout("app1", 100)
+			m.Instances("app1", 3)
+			m.Domain("app1", "foo1", "test1.com")
+			m.Domain("app1", "foo1", "test2.com")
+			m.Domain("app1", "foo2", "test1.com")
+			m.Domain("app1", "foo2", "test2.com")
+			m.BuildpackUrl("app1", "ruby-buildpack")
+			err := m.Save()
+			Ω(err).NotTo(HaveOccurred())
+
+			Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
+				[]string{"- name: app1"},
+				[]string{"  memory: 128M"},
+				[]string{"  command: run main.go"},
+				[]string{"  services:"},
+				[]string{"  - service1"},
+				[]string{"  env:"},
+				[]string{"    foo: boo"},
+				[]string{"  timeout: 100"},
+				[]string{"  instances: 3"},
+				[]string{"  hosts:"},
+				[]string{"  - foo1"},
+				[]string{"  - foo2"},
+				[]string{"  domains:"},
+				[]string{"  - test1.com"},
+				[]string{"  - test2.com"},
+				[]string{"  buildpack: ruby-buildpack"},
+			))
+		})
+	})
+
+	Context("When there are multiple hosts and single domain", func() {
+
+		It("generates a manifest containing two hosts one domain", func() {
+			m.Memory("app1", 128)
+			m.StartCommand("app1", "run main.go")
+			m.Service("app1", "service1")
+			m.EnvironmentVars("app1", "foo", "boo")
+			m.HealthCheckTimeout("app1", 100)
+			m.Instances("app1", 3)
+			m.Domain("app1", "foo1", "test.com")
+			m.Domain("app1", "foo2", "test.com")
+			m.BuildpackUrl("app1", "ruby-buildpack")
+			err := m.Save()
+			Ω(err).NotTo(HaveOccurred())
+
+			Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
+				[]string{"- name: app1"},
+				[]string{"  memory: 128M"},
+				[]string{"  command: run main.go"},
+				[]string{"  services:"},
+				[]string{"  - service1"},
+				[]string{"  env:"},
+				[]string{"    foo: boo"},
+				[]string{"  timeout: 100"},
+				[]string{"  instances: 3"},
+				[]string{"  hosts:"},
+				[]string{"  - foo1"},
+				[]string{"  - foo2"},
+				[]string{"  domain: test.com"},
+				[]string{"  buildpack: ruby-buildpack"},
+			))
+		})
+	})
+
+	Context("When there is single host and multiple domains", func() {
+
+		It("generates a manifest containing one host two domains", func() {
+			m.Memory("app1", 128)
+			m.StartCommand("app1", "run main.go")
+			m.Service("app1", "service1")
+			m.EnvironmentVars("app1", "foo", "boo")
+			m.HealthCheckTimeout("app1", 100)
+			m.Instances("app1", 3)
+			m.Domain("app1", "foo", "test1.com")
+			m.Domain("app1", "foo", "test2.com")
+			m.BuildpackUrl("app1", "ruby-buildpack")
+			err := m.Save()
+			Ω(err).NotTo(HaveOccurred())
+
+			Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
+				[]string{"- name: app1"},
+				[]string{"  memory: 128M"},
+				[]string{"  command: run main.go"},
+				[]string{"  services:"},
+				[]string{"  - service1"},
+				[]string{"  env:"},
+				[]string{"    foo: boo"},
+				[]string{"  timeout: 100"},
+				[]string{"  instances: 3"},
+				[]string{"  host: foo"},
+				[]string{"  domains:"},
+				[]string{"  - test1.com"},
+				[]string{"  - test2.com"},
+				[]string{"  buildpack: ruby-buildpack"},
+			))
+		})
+	})
 
 })
 

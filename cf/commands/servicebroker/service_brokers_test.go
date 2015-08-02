@@ -2,7 +2,7 @@ package servicebroker_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/servicebroker"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -12,44 +12,45 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"strings"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
-
-func callListServiceBrokers(args []string, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-	config := testconfig.NewRepositoryWithDefaults()
-	cmd := NewListServiceBrokers(ui, config, serviceBrokerRepo)
-	testcmd.RunCommand(cmd, args, &testreq.FakeReqFactory{})
-
-	return
-}
 
 var _ = Describe("service-brokers command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		cmd                 ListServiceBrokers
 		repo                *testapi.FakeServiceBrokerRepo
 		requirementsFactory *testreq.FakeReqFactory
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetServiceBrokerRepository(repo)
+		deps.Config = config
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("service-brokers").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		repo = &testapi.FakeServiceBrokerRepo{}
-		cmd = NewListServiceBrokers(ui, config, repo)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			Expect(testcmd.RunCommand(cmd, []string{}, requirementsFactory)).To(BeFalse())
+			Expect(testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
-			Expect(testcmd.RunCommand(cmd, []string{"blahblah"}, requirementsFactory)).To(BeFalse())
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(testcmd.RunCliCommand("service-brokers", []string{"blahblah"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "No argument"},
+			))
 		})
 	})
 
@@ -68,7 +69,7 @@ var _ = Describe("service-brokers command", func() {
 			Url:  "http://service-c-url.com",
 		}}
 
-		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting service brokers as", "my-user"},
@@ -98,7 +99,7 @@ var _ = Describe("service-brokers command", func() {
 			Url:  "http://service-d-url.com",
 		}}
 
-		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(BeInDisplayOrder(
 			[]string{"Getting service brokers as", "my-user"},
@@ -111,7 +112,7 @@ var _ = Describe("service-brokers command", func() {
 	})
 
 	It("says when no service brokers were found", func() {
-		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting service brokers as", "my-user"},
@@ -121,11 +122,11 @@ var _ = Describe("service-brokers command", func() {
 
 	It("reports errors when listing service brokers", func() {
 		repo.ListErr = true
-		testcmd.RunCommand(cmd, []string{}, requirementsFactory)
+		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting service brokers as ", "my-user"},
-			[]string{"FAILED"},
 		))
+		Expect(strings.Join(ui.Outputs, "\n")).To(MatchRegexp(`FAILED\nError finding service brokers`))
 	})
 })

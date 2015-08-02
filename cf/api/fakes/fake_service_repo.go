@@ -1,6 +1,8 @@
 package fakes
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -81,6 +83,9 @@ type FakeServiceRepo struct {
 	FindServiceOfferingsByLabelServiceOfferings models.ServiceOfferings
 	FindServiceOfferingsByLabelApiResponse      error
 	FindServiceOfferingsByLabelCalled           bool
+
+	ListServicesFromManyBrokersReturns map[string][]models.ServiceOffering
+	ListServicesFromManyBrokersErr     error
 
 	ListServicesFromBrokerReturns map[string][]models.ServiceOffering
 	ListServicesFromBrokerErr     error
@@ -211,6 +216,19 @@ func (repo *FakeServiceRepo) FindServicePlanByDescription(planDescription resour
 	}
 	repo.findServicePlanByDescriptionCallCount += 1
 	return
+}
+
+func (repo *FakeServiceRepo) ListServicesFromManyBrokers(brokerGuids []string) ([]models.ServiceOffering, error) {
+	if repo.ListServicesFromManyBrokersErr != nil {
+		return nil, repo.ListServicesFromManyBrokersErr
+	}
+
+	key := strings.Join(brokerGuids, ",")
+	if repo.ListServicesFromManyBrokersReturns[key] != nil {
+		return repo.ListServicesFromManyBrokersReturns[key], nil
+	}
+
+	return []models.ServiceOffering{}, nil
 }
 
 func (repo *FakeServiceRepo) ListServicesFromBroker(brokerGuid string) ([]models.ServiceOffering, error) {

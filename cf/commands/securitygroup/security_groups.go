@@ -2,15 +2,16 @@ package securitygroup
 
 import (
 	"fmt"
+
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 type SecurityGroups struct {
@@ -19,32 +20,35 @@ type SecurityGroups struct {
 	configRepo        core_config.Reader
 }
 
-func NewSecurityGroups(ui terminal.UI, configRepo core_config.Reader, securityGroupRepo security_groups.SecurityGroupRepo) SecurityGroups {
-	return SecurityGroups{
-		ui:                ui,
-		configRepo:        configRepo,
-		securityGroupRepo: securityGroupRepo,
-	}
+func init() {
+	command_registry.Register(&SecurityGroups{})
 }
 
-func (cmd SecurityGroups) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *SecurityGroups) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "security-groups",
 		Description: T("List all security groups"),
 		Usage:       "CF_NAME security-groups",
 	}
 }
 
-func (cmd SecurityGroups) GetRequirements(requirementsFactory requirements.Factory, context *cli.Context) ([]requirements.Requirement, error) {
-	if len(context.Args()) != 0 {
-		cmd.ui.FailWithUsage(context)
+func (cmd *SecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(fc.Args()) != 0 {
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("security-groups"))
 	}
 
 	requirements := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return requirements, nil
 }
 
-func (cmd SecurityGroups) Run(context *cli.Context) {
+func (cmd *SecurityGroups) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.configRepo = deps.Config
+	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()
+	return cmd
+}
+
+func (cmd *SecurityGroups) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Getting security groups as {{.username}}",
 		map[string]interface{}{
 			"username": terminal.EntityNameColor(cmd.configRepo.Username()),

@@ -3,13 +3,13 @@ package user
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type UnsetSpaceRole struct {
@@ -21,17 +21,12 @@ type UnsetSpaceRole struct {
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewUnsetSpaceRole(ui terminal.UI, config core_config.Reader, spaceRepo spaces.SpaceRepository, userRepo api.UserRepository) (cmd *UnsetSpaceRole) {
-	cmd = new(UnsetSpaceRole)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.spaceRepo = spaceRepo
-	cmd.userRepo = userRepo
-	return
+func init() {
+	command_registry.Register(&UnsetSpaceRole{})
 }
 
-func (cmd *UnsetSpaceRole) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *UnsetSpaceRole) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "unset-space-role",
 		Description: T("Remove a space role from a user"),
 		Usage: T("CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n") +
@@ -42,17 +37,14 @@ func (cmd *UnsetSpaceRole) Metadata() command_metadata.CommandMetadata {
 	}
 }
 
-func (cmd *UnsetSpaceRole) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 4 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 4 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("unset-space-role"))
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(c.Args()[0])
-	if cmd.orgReq == nil {
-		cmd.orgReq = requirementsFactory.NewOrganizationRequirement(c.Args()[1])
-	} else {
-		cmd.orgReq.SetOrganizationName(c.Args()[1])
-	}
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
+	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
+
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.userReq,
@@ -62,7 +54,15 @@ func (cmd *UnsetSpaceRole) GetRequirements(requirementsFactory requirements.Fact
 	return
 }
 
-func (cmd *UnsetSpaceRole) Run(c *cli.Context) {
+func (cmd *UnsetSpaceRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	return cmd
+}
+
+func (cmd *UnsetSpaceRole) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[2]
 	role := models.UserInputToSpaceRole[c.Args()[3]]
 

@@ -1,0 +1,26 @@
+---
+platform: darwin
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+  - name: cf-cli
+    path: gopath/src/github.com/cloudfoundry/cli
+  - name: version
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e -x
+
+    export VERSION=$(cat version/number)
+
+    export GOPATH=$PWD/gopath
+    export PATH=$GOPATH/bin:$PATH
+
+    OUT=$PWD/cf-darwin64-$VERSION
+
+    cd $GOPATH/src/github.com/cloudfoundry/cli
+
+    bin/unix_test_and_build $OUT

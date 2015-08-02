@@ -3,20 +3,19 @@ package commands
 import (
 	"strconv"
 
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/utils"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/flag_helpers"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 const maxLoginTries = 3
@@ -31,46 +30,45 @@ type Login struct {
 	spaceRepo     spaces.SpaceRepository
 }
 
-func NewLogin(ui terminal.UI,
-	config core_config.ReadWriter,
-	authenticator authentication.AuthenticationRepository,
-	endpointRepo api.EndpointRepository,
-	orgRepo organizations.OrganizationRepository,
-	spaceRepo spaces.SpaceRepository) (cmd Login) {
-	return Login{
-		ui:            ui,
-		config:        config,
-		authenticator: authenticator,
-		endpointRepo:  endpointRepo,
-		orgRepo:       orgRepo,
-		spaceRepo:     spaceRepo,
-	}
+func init() {
+	command_registry.Register(&Login{})
 }
 
-func (cmd Login) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *Login) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["a"] = &cliFlags.StringFlag{Name: "a", Usage: T("API endpoint (e.g. https://api.example.com)")}
+	fs["u"] = &cliFlags.StringFlag{Name: "u", Usage: T("Username")}
+	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Password")}
+	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Org")}
+	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Space")}
+	fs["sso"] = &cliFlags.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")}
+	fs["skip-ssl-validation"] = &cliFlags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")}
+
+	return command_registry.CommandMetadata{
 		Name:        "login",
 		ShortName:   "l",
 		Description: T("Log user in"),
 		Usage: T("CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n") +
 			terminal.WarningColor(T("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n")) + T("EXAMPLE:\n") + T("   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n") + T("   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n") + T("   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n") + T("   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)\n") + T("   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"),
-		Flags: []cli.Flag{
-			flag_helpers.NewStringFlag("a", T("API endpoint (e.g. https://api.example.com)")),
-			flag_helpers.NewStringFlag("u", T("Username")),
-			flag_helpers.NewStringFlag("p", T("Password")),
-			flag_helpers.NewStringFlag("o", T("Org")),
-			flag_helpers.NewStringFlag("s", T("Space")),
-			cli.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")},
-			cli.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")},
-		},
+		Flags: fs,
 	}
 }
 
-func (cmd Login) GetRequirements(_ requirements.Factory, _ *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Login) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (cmd Login) Run(c *cli.Context) {
+func (cmd *Login) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.authenticator = deps.RepoLocator.GetAuthenticationRepository()
+	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()
+	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	return cmd
+}
+
+func (cmd *Login) Execute(c flags.FlagContext) {
 	cmd.config.ClearSession()
 
 	endpoint, skipSSL := cmd.decideEndpoint(c)
@@ -79,7 +77,7 @@ func (cmd Login) Run(c *cli.Context) {
 		ui:           cmd.ui,
 		config:       cmd.config,
 		endpointRepo: cmd.endpointRepo,
-	}.setApiEndpoint(endpoint, skipSSL, cmd.Metadata().Name)
+	}.setApiEndpoint(endpoint, skipSSL, cmd.MetaData().Name)
 
 	defer func() {
 		cmd.ui.Say("")
@@ -107,10 +105,10 @@ func (cmd Login) Run(c *cli.Context) {
 	if orgIsSet {
 		cmd.setSpace(c)
 	}
-	utils.NotifyUpdateIfNeeded(cmd.ui, cmd.config)
+	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
 }
 
-func (cmd Login) decideEndpoint(c *cli.Context) (string, bool) {
+func (cmd Login) decideEndpoint(c flags.FlagContext) (string, bool) {
 	endpoint := c.String("a")
 	skipSSL := c.Bool("skip-ssl-validation")
 	if endpoint == "" {
@@ -127,7 +125,7 @@ func (cmd Login) decideEndpoint(c *cli.Context) (string, bool) {
 	return endpoint, skipSSL
 }
 
-func (cmd Login) authenticateSSO(c *cli.Context) {
+func (cmd Login) authenticateSSO(c flags.FlagContext) {
 	prompts, err := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -156,7 +154,7 @@ func (cmd Login) authenticateSSO(c *cli.Context) {
 	}
 }
 
-func (cmd Login) authenticate(c *cli.Context) {
+func (cmd Login) authenticate(c flags.FlagContext) {
 	usernameFlagValue := c.String("u")
 	passwordFlagValue := c.String("p")
 
@@ -216,7 +214,7 @@ func (cmd Login) authenticate(c *cli.Context) {
 	}
 }
 
-func (cmd Login) setOrganization(c *cli.Context) (isOrgSet bool) {
+func (cmd Login) setOrganization(c flags.FlagContext) (isOrgSet bool) {
 	orgName := c.String("o")
 
 	if orgName == "" {
@@ -271,7 +269,7 @@ func (cmd Login) targetOrganization(org models.Organization) {
 		map[string]interface{}{"OrgName": terminal.EntityNameColor(org.Name)}))
 }
 
-func (cmd Login) setSpace(c *cli.Context) {
+func (cmd Login) setSpace(c flags.FlagContext) {
 	spaceName := c.String("s")
 
 	if spaceName == "" {

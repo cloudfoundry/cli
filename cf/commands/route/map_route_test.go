@@ -8,7 +8,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/route"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
@@ -18,11 +18,26 @@ import (
 var _ = Describe("map-route command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		configRepo          core_config.Repository
 		routeRepo           *testapi.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
 		routeCreator        *testcmd.FakeRouteCreator
+		OriginalCreateRoute command_registry.Command
+		deps                command_registry.Dependency
 	)
+
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.Config = configRepo
+
+		//save original create-route and restore later
+		OriginalCreateRoute = command_registry.Commands.FindCommand("create-route")
+		//inject fake 'CreateRoute' into registry
+		command_registry.Register(routeCreator)
+
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("map-route").SetDependency(deps, pluginCall))
+	}
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
@@ -32,14 +47,20 @@ var _ = Describe("map-route command", func() {
 		requirementsFactory = new(testreq.FakeReqFactory)
 	})
 
+	AfterEach(func() {
+		command_registry.Register(OriginalCreateRoute)
+	})
+
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCommand(NewMapRoute(ui, configRepo, routeRepo, routeCreator), args, requirementsFactory)
+		return testcmd.RunCliCommand("map-route", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
 		It("fails when not invoked with exactly two args", func() {
 			runCommand("whoops-all-crunchberries")
-			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Incorrect Usage", "Requires", "arguments"},
+			))
 		})
 
 		It("fails when not logged in", func() {
