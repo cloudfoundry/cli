@@ -34,6 +34,26 @@ var _ = Describe("main", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
+	Describe("Help menu", func() {
+		It("prints the help output with our custom template when run with 'cf -h'", func() {
+			output := Cf("-h").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
+		})
+
+		It("prints the help output with our custom template when run with 'cf --help'", func() {
+			output := Cf("--help").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
+		})
+
+		It("prints the help output with our custom template when run with 'cf help'", func() {
+			output := Cf("help").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
+		})
+	})
+
 	Describe("Commands /w new non-codegangsta structure", func() {
 		It("prints usage help for all non-codegangsta commands by providing `help` flag", func() {
 			output := Cf("api", "-h").Wait(1 * time.Second)
