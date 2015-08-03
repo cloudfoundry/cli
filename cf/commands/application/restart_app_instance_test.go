@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	testApplication "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
-	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -12,6 +11,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,10 +20,11 @@ import (
 var _ = Describe("restart-app-instance", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.ReadWriter
+		config              core_config.Repository
 		appInstancesRepo    *testApplication.FakeAppInstancesRepository
 		requirementsFactory *testreq.FakeReqFactory
 		application         models.Application
+		deps                command_registry.Dependency
 	)
 
 	BeforeEach(func() {
@@ -34,18 +35,23 @@ var _ = Describe("restart-app-instance", func() {
 
 		ui = &testterm.FakeUI{}
 		appInstancesRepo = &testApplication.FakeAppInstancesRepository{}
-		configRepo = testconfig.NewRepositoryWithDefaults()
+		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 			Application:          application,
 		}
-
 	})
 
+	updateCommandDependency := func(pluginCall bool) {
+		deps.Ui = ui
+		deps.Config = config
+		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("restart-app-instance").SetDependency(deps, pluginCall))
+	}
+
 	runCommand := func(args ...string) bool {
-		cmd := NewRestartAppInstance(ui, configRepo, appInstancesRepo)
-		return testcmd.RunCommand(cmd, args, requirementsFactory)
+		return testcmd.RunCliCommand("restart-app-instance", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
