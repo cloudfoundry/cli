@@ -134,7 +134,7 @@ func newAppPresenter() (presenter appPresenter) {
 					presentNonCodegangstaCommand("stop"),
 					presentNonCodegangstaCommand("restart"),
 					presentNonCodegangstaCommand("restage"),
-					// presentNonCodegangstaCommand("restart-app-instance"),
+					presentNonCodegangstaCommand("restart-app-instance"),
 				}, {
 					presentNonCodegangstaCommand("events"),
 					presentNonCodegangstaCommand("files"),
@@ -240,7 +240,7 @@ func newAppPresenter() (presenter appPresenter) {
 			Name: T("USER ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					// presentNonCodegangstaCommand("create-user"),
+					presentNonCodegangstaCommand("create-user"),
 					presentNonCodegangstaCommand("delete-user"),
 				}, {
 					presentNonCodegangstaCommand("org-users"),
