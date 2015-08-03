@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
@@ -55,6 +56,12 @@ func main() {
 	if len(os.Args) == 1 || os.Args[1] == "--help" || os.Args[1] == "-help" ||
 		os.Args[1] == "--h" || os.Args[1] == "-h" {
 		help.ShowHelp(help.GetHelpTemplate())
+		os.Exit(0)
+	}
+
+	//handle `cf -v` for cf version
+	if len(os.Args) == 2 && os.Args[1] == "-v" {
+		deps.Ui.Say(os.Args[0] + " version " + cf.Version + "-" + cf.BuiltOnDate)
 		os.Exit(0)
 	}
 
