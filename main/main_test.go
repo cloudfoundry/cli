@@ -48,6 +48,20 @@ var _ = Describe("main", func() {
 		})
 	})
 
+	Describe("Shows version with -v", func() {
+		It("prints the cf version if '-v' flag is provided", func() {
+			output := Cf("-v").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("version"))
+			Ω(output.ExitCode()).To(Equal(0))
+		})
+
+		It("prints the help output with our custom template when run with 'cf --help'", func() {
+			output := Cf("--help").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
+		})
+	})
+
 	Describe("Commands /w new non-codegangsta structure", func() {
 		It("prints usage help for all non-codegangsta commands by providing `help` flag", func() {
 			output := Cf("api", "-h").Wait(1 * time.Second)
