@@ -108,6 +108,7 @@ func newAppPresenter() (presenter appPresenter) {
 			Name: T("GETTING STARTED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
+					presentNonCodegangstaCommand("help"),
 					presentNonCodegangstaCommand("login"),
 					presentNonCodegangstaCommand("logout"),
 					presentNonCodegangstaCommand("passwd"),
