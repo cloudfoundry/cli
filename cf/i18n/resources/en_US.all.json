@@ -3850,6 +3850,11 @@
       "modified": false
    },
    {
+      "id": "Retreive the rules for all the security groups associated with the space",
+      "translation": "Retreive the rules for all the security groups associated with the space",
+      "modified": false
+   },
+   {
       "id": "Retrieve an individual feature flag with status",
       "translation": "Retrieve an individual feature flag with status",
       "modified": false
@@ -3877,6 +3882,11 @@
    {
       "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
       "translation": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
+      "modified": false
+   },
+   {
+      "id": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
+      "translation": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
       "modified": false
    },
    {
@@ -3917,11 +3927,6 @@
    {
       "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
       "translation": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "Retrive the rules for all the security groups associated with the space",
-      "translation": "Retrive the rules for all the security groups associated with the space",
       "modified": false
    },
    {
