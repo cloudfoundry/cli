@@ -1,13 +1,3 @@
-/*
-* to port command over to new architecture
-* Unit test:
-* short cutting all codegangsta func (NewApi(), Medadata(),GetRequirements(),Run()) w/
-* return, then fix all unit tests
-*
-* bin/test
-* Take out the short cutting and run test
- */
-
 package commands
 
 import (

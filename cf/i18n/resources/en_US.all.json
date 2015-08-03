@@ -825,6 +825,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME help [COMMAND]",
+      "translation": "CF_NAME help [COMMAND]",
+      "modified": false
+   },
+   {
       "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]\n\nThe command will download the plugin binary from repository if '-r' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
       "translation": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]\n\nThe command will download the plugin binary from repository if '-r' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
       "modified": false
