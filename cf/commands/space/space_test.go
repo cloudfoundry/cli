@@ -90,7 +90,7 @@ var _ = Describe("space command", func() {
 			services := []models.ServiceInstanceFields{serviceInstance}
 
 			securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security", Rules: []map[string]interface{}{
-				{"protocol": "all", "destination": "0.0.0.0-9.255.255.255"},
+				{"protocol": "all", "destination": "0.0.0.0-9.255.255.255", "log": true, "IntTest": 1000},
 			}}
 			securityGroup2 := models.SecurityGroupFields{Name: "Nacho Prime", Rules: []map[string]interface{}{
 				{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
@@ -147,6 +147,8 @@ var _ = Describe("space command", func() {
 					[]string{"destination", "0.0.0.0-9.255.255.255"},
 					[]string{"Getting rules for the security group", "Nacho Prime"},
 					[]string{"protocol", "udp"},
+					[]string{"log", "true"},
+					[]string{"IntTest", "1000"},
 					[]string{"ports", "8080-9090"},
 					[]string{"destination", "198.41.191.47/1"},
 				))
@@ -222,7 +224,7 @@ var _ = Describe("space command", func() {
 				Ω(pluginModel.SecurityGroups).To(HaveLen(2))
 				Ω(pluginModel.SecurityGroups[0].Name).To(Equal("Nacho Security"))
 				Ω(pluginModel.SecurityGroups[0].Rules).To(HaveLen(1))
-				Ω(pluginModel.SecurityGroups[0].Rules[0]).To(HaveLen(2))
+				Ω(pluginModel.SecurityGroups[0].Rules[0]).To(HaveLen(4))
 				val := pluginModel.SecurityGroups[0].Rules[0]["protocol"]
 				Ω(val).To(Equal("all"))
 				val = pluginModel.SecurityGroups[0].Rules[0]["destination"]

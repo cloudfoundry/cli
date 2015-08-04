@@ -132,7 +132,7 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 			table := terminal.NewTable(cmd.ui, []string{"", "", "", ""})
 			for _, rules := range group.Rules {
 				for ruleName, ruleValue := range rules {
-					table.Add("", ruleName, ":", ruleValue.(string))
+					table.Add("", ruleName, ":", fmt.Sprintf("%v", ruleValue))
 				}
 				table.Add("", "", "", "")
 			}
