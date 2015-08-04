@@ -41,8 +41,8 @@ func NewShowSpace(ui terminal.UI, config core_config.Reader, quotaRepo space_quo
 
 func (cmd *ShowSpace) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given org's guid.  All other output for the org is suppressed.")}
-	fs["security-group-rules"] = &cliFlags.BoolFlag{Name: "security-group-rules", Usage: T("Retrive the rules for all the security groups associated with the space")}
+	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given space's guid.  All other output for the space is suppressed.")}
+	fs["security-group-rules"] = &cliFlags.BoolFlag{Name: "security-group-rules", Usage: T("Retreive the rules for all the security groups associated with the space")}
 	return command_registry.CommandMetadata{
 		Name:        "space",
 		Description: T("Show space info"),
@@ -132,7 +132,7 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 			table := terminal.NewTable(cmd.ui, []string{"", "", "", ""})
 			for _, rules := range group.Rules {
 				for ruleName, ruleValue := range rules {
-					table.Add("", ruleName, ":", ruleValue.(string))
+					table.Add("", ruleName, ":", fmt.Sprintf("%v", ruleValue))
 				}
 				table.Add("", "", "", "")
 			}

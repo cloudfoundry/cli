@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app"
 	"github.com/cloudfoundry/cli/cf/command_factory"
@@ -51,24 +52,28 @@ func main() {
 	defer deps.Config.Close()
 
 	//////////////// non-codegangsta path  ///////////////////////
-	if len(os.Args) == 1 || (len(os.Args) == 2 && os.Args[1] == "help") ||
-		(len(os.Args) >= 2 && (os.Args[1] == "--help" || os.Args[1] == "-help")) ||
-		(len(os.Args) >= 2 && (os.Args[1] == "--h" || os.Args[1] == "-h")) {
+	//handles `cf` | `cf -h` || `cf -help`
+	if len(os.Args) == 1 || os.Args[1] == "--help" || os.Args[1] == "-help" ||
+		os.Args[1] == "--h" || os.Args[1] == "-h" {
 		help.ShowHelp(help.GetHelpTemplate())
 		os.Exit(0)
 	}
 
+	//handle `cf -v` for cf version
+	if len(os.Args) == 2 && os.Args[1] == "-v" {
+		deps.Ui.Say(os.Args[0] + " version " + cf.Version + "-" + cf.BuiltOnDate)
+		os.Exit(0)
+	}
+
+	//handles `cf [COMMAND] -h ...`
+	//rearrage args to `cf help COMMAND` and let `command help` to print out usage
+	if requestHelp(os.Args[2:]) {
+		os.Args[2] = os.Args[1]
+		os.Args[1] = "help"
+	}
+
 	if len(os.Args) > 1 {
 		cmd := os.Args[1]
-
-		//handles 'cf help <command>'
-		if cmd == "help" && len(os.Args) > 2 {
-			cmd = os.Args[2]
-			if cmdRegistry.CommandExists(cmd) {
-				deps.Ui.Say(cmdRegistry.CommandUsage(cmd))
-				os.Exit(0)
-			}
-		}
 
 		if cmdRegistry.CommandExists(cmd) {
 			meta := cmdRegistry.FindCommand(os.Args[1]).MetaData()
@@ -135,17 +140,15 @@ func main() {
 	theApp := app.NewApp(cmdRunner, metaDatas...)
 	rpcService.SetTheApp(theApp)
 
-	//command `cf` without argument
-	if len(os.Args) == 1 || os.Args[1] == "help" || requestHelp(os.Args[2:]) {
-		theApp.Run(os.Args)
-	} else if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
+	if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
 		callCoreCommand(os.Args[0:], theApp)
 	} else {
 		// run each plugin and find the method/
 		// run method if exist
 		ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
 		if !ran {
-			theApp.Run(os.Args)
+			deps.Ui.Say("'" + os.Args[1] + "' is not a registered command. See 'cf help'")
+			os.Exit(1)
 		}
 	}
 }

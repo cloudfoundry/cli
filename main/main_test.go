@@ -34,7 +34,7 @@ var _ = Describe("main", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	Describe("Help menu", func() {
+	Describe("Help menu with -h/--help", func() {
 		It("prints the help output with our custom template when run with 'cf -h'", func() {
 			output := Cf("-h").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
@@ -46,9 +46,17 @@ var _ = Describe("main", func() {
 			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
 		})
+	})
 
-		It("prints the help output with our custom template when run with 'cf help'", func() {
-			output := Cf("help").Wait(1 * time.Second)
+	Describe("Shows version with -v", func() {
+		It("prints the cf version if '-v' flag is provided", func() {
+			output := Cf("-v").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("version"))
+			Ω(output.ExitCode()).To(Equal(0))
+		})
+
+		It("prints the help output with our custom template when run with 'cf --help'", func() {
+			output := Cf("--help").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
 		})
@@ -64,15 +72,11 @@ var _ = Describe("main", func() {
 		It("accepts -h and --h flags for non-codegangsta commands", func() {
 			result := Cf("api", "-h")
 			Consistently(result.Out).ShouldNot(Say("Invalid flag: -h"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("api - Set or view target api url"))
 
 			result = Cf("api", "--h")
 			Consistently(result.Out).ShouldNot(Say("Invalid flag: --h"))
-		})
-
-		It("accepts `cf help <command>` for non-codegangsta commands", func() {
-			output := Cf("help", "api")
-			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE"))
-			Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("api - Set or view target api url"))
 		})
 
 		It("runs requirement of the non-codegangsta command", func() {
@@ -99,7 +103,7 @@ var _ = Describe("main", func() {
 		})
 	})
 
-	It("can print help for all core commands by executing only the command `cf`", func() {
+	It("can print help menu by executing only the command `cf`", func() {
 		output := Cf().Wait(3 * time.Second)
 		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 	})
@@ -201,15 +205,6 @@ var _ = Describe("main", func() {
 		It("Calls help if the plugin shares the same name", func() {
 			output := Cf("help")
 			Consistently(output.Out, 1).ShouldNot(Say("You called help in test_with_help"))
-		})
-
-		It("Can call help for a plugin command", func() {
-			output := Cf("help", "test_1_cmd1").Wait(3 * time.Second)
-			Eventually(output.Out).ShouldNot(Say("You called cmd1 in test_1"))
-			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE:"))
-			Eventually(output.Out.Contents).Should(ContainSubstring("cf test_1_cmd1 [-a] [-b] [--no-ouput]"))
-			Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS:"))
-			Eventually(output.Out.Contents).Should(ContainSubstring("----no-output	example option with no use"))
 		})
 
 		It("shows help with a '-h' or '--help' flag in plugin command", func() {

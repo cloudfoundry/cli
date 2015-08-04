@@ -6,6 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -117,7 +118,7 @@ func (r *registry) CommandUsage(cmdName string) string {
 	output += "   " + cmd.MetaData().Name + " - " + cmd.MetaData().Description + "\n\n"
 
 	output += T("USAGE") + ":" + "\n"
-	output += "   " + cmd.MetaData().Usage + "\n"
+	output += "   " + strings.Replace(cmd.MetaData().Usage, "CF_NAME", cf.Name(), -1) + "\n"
 
 	if cmd.MetaData().ShortName != "" {
 		output += "\n" + T("ALIAS") + ":" + "\n"

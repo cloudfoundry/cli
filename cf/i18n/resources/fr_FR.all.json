@@ -825,6 +825,11 @@
       "modified": true
    },
    {
+      "id": "CF_NAME help [COMMAND]",
+      "translation": "CF_NAME help [COMMAND]",
+      "modified": false
+   },
+   {
       "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]\n\nThe command will download the plugin binary from repository if '-r' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
       "translation": "CF_NAME install-plugin CHEMIN/VERS/PLUGIN",
       "modified": true
@@ -3845,6 +3850,11 @@
       "modified": false
    },
    {
+      "id": "Retreive the rules for all the security groups associated with the space",
+      "translation": "Retrive the rules for all the security groups associated with the space",
+      "modified": true
+   },
+   {
       "id": "Retrieve an individual feature flag with status",
       "translation": "Retrieve an individual feature flag with status",
       "modified": false
@@ -3872,6 +3882,11 @@
    {
       "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
       "translation": "Récupérer et montrer le guid d'un clef the service.  Tout autre information pour la clef de service a été suprimer.",
+      "modified": false
+   },
+   {
+      "id": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
+      "translation": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
       "modified": false
    },
    {
@@ -3912,11 +3927,6 @@
    {
       "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
       "translation": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
-      "modified": false
-   },
-   {
-      "id": "Retrive the rules for all the security groups associated with the space",
-      "translation": "Retrive the rules for all the security groups associated with the space",
       "modified": false
    },
    {

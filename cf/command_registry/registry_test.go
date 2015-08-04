@@ -59,13 +59,13 @@ var _ = Describe("CommandRegistry", func() {
 		Context("FindCommand()", func() {
 			It("returns the command interface when found", func() {
 				cmd := Commands.FindCommand("fake-command")
-				Ω(cmd.MetaData().Usage).To(Equal("Usage of fake-command"))
+				Ω(cmd.MetaData().Usage).To(ContainSubstring("Usage of fake-command"))
 				Ω(cmd.MetaData().Description).To(Equal("Description for fake-command"))
 			})
 
 			It("returns the command interface if an command alias is provided", func() {
 				cmd := Commands.FindCommand("fc1")
-				Ω(cmd.MetaData().Usage).To(Equal("Usage of fake-command"))
+				Ω(cmd.MetaData().Usage).To(ContainSubstring("Usage of fake-command"))
 				Ω(cmd.MetaData().Description).To(Equal("Description for fake-command"))
 			})
 		})
@@ -152,6 +152,16 @@ var _ = Describe("CommandRegistry", func() {
 					[]string{"OPTIONS:"},
 					[]string{"-intFlag", "Usage for"},
 				))
+			})
+
+			It("replaces 'CF_NAME' with executable name from os.Arg[0]", func() {
+				o := Commands.CommandUsage("fake-command")
+				outputs := strings.Split(o, "\n")
+				Ω(outputs).To(BeInDisplayOrder(
+					[]string{"USAGE:"},
+					[]string{"command_registry.test", "Usage of"},
+				))
+				Consistently(outputs).ShouldNot(ContainSubstrings([]string{"CF_NAME"}))
 			})
 
 			It("prefixes the bool flag with '--'", func() {
