@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/help"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/panic_printer"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -48,53 +49,47 @@ func main() {
 		os.Args[1] = "help"
 	}
 
-	//run command
-	if len(os.Args) > 1 {
-		cmd := os.Args[1]
+	//run core command
+	cmd := os.Args[1]
 
-		if cmdRegistry.CommandExists(cmd) {
-			meta := cmdRegistry.FindCommand(os.Args[1]).MetaData()
-			fc := flags.NewFlagContext(meta.Flags)
-			fc.SkipFlagParsing(meta.SkipFlagParsing)
+	if cmdRegistry.CommandExists(cmd) {
+		meta := cmdRegistry.FindCommand(os.Args[1]).MetaData()
+		fc := flags.NewFlagContext(meta.Flags)
+		fc.SkipFlagParsing(meta.SkipFlagParsing)
 
-			if requestHelp(os.Args[2:]) {
-				deps.Ui.Say(cmdRegistry.CommandUsage(cmd))
-				os.Exit(0)
-			} else {
-				err := fc.Parse(os.Args[2:]...)
-				if err != nil {
-					deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + cmdRegistry.CommandUsage(cmd))
-				}
-			}
-			cmdRegistry.SetCommand(cmdRegistry.FindCommand(cmd).SetDependency(deps, false))
-
-			cfCmd := cmdRegistry.FindCommand(cmd)
-			reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)
-			if err != nil {
-				deps.Ui.Failed(err.Error())
-			}
-
-			for _, r := range reqs {
-				if !r.Execute() {
-					os.Exit(1)
-				}
-			}
-
-			cfCmd.Execute(fc)
-			os.Exit(0)
+		err := fc.Parse(os.Args[2:]...)
+		if err != nil {
+			deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + cmdRegistry.CommandUsage(cmd))
 		}
+
+		cmdRegistry.SetCommand(cmdRegistry.FindCommand(cmd).SetDependency(deps, false))
+		cfCmd := cmdRegistry.FindCommand(cmd)
+
+		reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)
+		if err != nil {
+			deps.Ui.Failed(err.Error())
+		}
+
+		for _, r := range reqs {
+			if !r.Execute() {
+				os.Exit(1)
+			}
+		}
+
+		cfCmd.Execute(fc)
+		os.Exit(0)
 	}
 
+	//non core command, try plugin command
 	rpcService := newCliRpcServer(deps.TeePrinter, deps.TeePrinter)
 
 	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error())) })
 	pluginList := pluginsConfig.Plugins()
 
-	// run each plugin and find the method
-	// run method if exist
 	ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
+
 	if !ran {
-		deps.Ui.Say("'" + os.Args[1] + "' is not a registered command. See 'cf help'")
+		deps.Ui.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
 		os.Exit(1)
 	}
 }
@@ -138,7 +133,7 @@ func requestHelp(args []string) bool {
 func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {
 	cliServer, err := rpc.NewRpcService(outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator, rpc.NewNonCodegangstaRunner())
 	if err != nil {
-		fmt.Println("Error initializing RPC service: ", err)
+		deps.Ui.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)
 	}
 

@@ -250,6 +250,11 @@
       "modified": false
    },
    {
+      "id": "' is not a registered command. See 'cf help'",
+      "translation": "' is not a registered command. See 'cf help'",
+      "modified": false
+   },
+   {
       "id": ") already exists.",
       "translation": ") already exists.",
       "modified": false
@@ -2087,6 +2092,11 @@
    {
       "id": "Error in requirement",
       "translation": "Error in requirement",
+      "modified": false
+   },
+   {
+      "id": "Error initializing RPC service: ",
+      "translation": "Error initializing RPC service: ",
       "modified": false
    },
    {
