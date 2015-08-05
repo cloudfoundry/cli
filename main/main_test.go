@@ -50,11 +50,11 @@ var _ = Describe("main", func() {
 		It("accepts -h and --h flags for all commands", func() {
 			result := Cf("push", "-h")
 			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
-			Consistently(result.Out).Should(Say("USAGE"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
 
 			result = Cf("target", "--h")
 			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
-			Consistently(result.Out).Should(Say("USAGE"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
 		})
 
 	})
