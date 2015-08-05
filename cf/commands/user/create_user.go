@@ -3,13 +3,13 @@ package user
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type CreateUser struct {
@@ -18,24 +18,22 @@ type CreateUser struct {
 	userRepo api.UserRepository
 }
 
-func NewCreateUser(ui terminal.UI, config core_config.Reader, userRepo api.UserRepository) (cmd CreateUser) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.userRepo = userRepo
-	return
+func init() {
+	command_registry.Register(&CreateUser{})
 }
 
-func (cmd CreateUser) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *CreateUser) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "create-user",
 		Description: T("Create a new user"),
 		Usage:       T("CF_NAME create-user USERNAME PASSWORD"),
 	}
 }
 
-func (cmd CreateUser) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *CreateUser) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		usage := command_registry.Commands.CommandUsage("create-user")
+		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + usage)
 	}
 
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
@@ -43,7 +41,14 @@ func (cmd CreateUser) GetRequirements(requirementsFactory requirements.Factory, 
 	return
 }
 
-func (cmd CreateUser) Run(c *cli.Context) {
+func (cmd *CreateUser) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	return cmd
+}
+
+func (cmd *CreateUser) Execute(c flags.FlagContext) {
 	username := c.Args()[0]
 	password := c.Args()[1]
 
