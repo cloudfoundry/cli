@@ -4640,16 +4640,6 @@
       "modified": false
    },
    {
-      "id": "Unknown flag",
-      "translation": "Unknown flag",
-      "modified": false
-   },
-   {
-      "id": "Unknown flags:",
-      "translation": "Unknown flags:",
-      "modified": false
-   },
-   {
       "id": "Unlock the buildpack to enable updates",
       "translation": "解锁buildpack",
       "modified": true
