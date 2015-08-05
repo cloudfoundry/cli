@@ -3,6 +3,7 @@ package main_test
 import (
 	"path/filepath"
 
+	"github.com/cloudfoundry/cli/commands_loader"
 	"github.com/cloudfoundry/cli/testhelpers/plugin_builder"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,6 +13,9 @@ import (
 
 func TestMain(t *testing.T) {
 	RegisterFailHandler(Fail)
+
+	commands_loader.Load()
+
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "test_1")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "test_2")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "test_with_push")
