@@ -39,12 +39,7 @@ func (cmd *RestartAppInstance) Requirements(requirementsFactory requirements.Fac
 
 	appName := fc.Args()[0]
 
-	if cmd.appReq == nil {
-		// FIXME: This is an orphan now - was here for concurrent use.
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
-	} else {
-		cmd.appReq.SetApplicationName(appName)
-	}
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),

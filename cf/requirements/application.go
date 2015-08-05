@@ -8,7 +8,6 @@ import (
 
 type ApplicationRequirement interface {
 	Requirement
-	SetApplicationName(string)
 	GetApplication() models.Application
 }
 
@@ -25,10 +24,6 @@ func NewApplicationRequirement(name string, ui terminal.UI, aR applications.Appl
 	req.ui = ui
 	req.appRepo = aR
 	return req
-}
-
-func (req *applicationApiRequirement) SetApplicationName(name string) {
-	req.name = name
 }
 
 func (req *applicationApiRequirement) Execute() (success bool) {
