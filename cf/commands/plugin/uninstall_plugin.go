@@ -50,7 +50,7 @@ func (cmd *PluginUninstall) SetDependency(deps command_registry.Dependency, plug
 	//each service can only be registered once
 	rpc.DefaultServer = rpc.NewServer()
 
-	rpcService, err := rpcService.NewRpcService(nil, deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewNonCodegangstaRunner())
+	rpcService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewNonCodegangstaRunner())
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}

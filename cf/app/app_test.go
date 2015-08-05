@@ -61,7 +61,7 @@ var _ = Describe("App", func() {
 			"uaa":              net.NewUAAGateway(config, ui),
 		})
 
-		rpcService, _ := rpc.NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
+		rpcService, _ := rpc.NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil)
 		cmdFactory := command_factory.NewFactory(ui, config, manifestRepo, repoLocator, pluginConfig, rpcService)
 		cmdRunner = &FakeRunner{cmdFactory: cmdFactory}
 		app = NewApp(cmdRunner, cmdFactory.CommandMetadatas()...)
