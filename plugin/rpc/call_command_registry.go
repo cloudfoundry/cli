@@ -22,8 +22,8 @@ func (c *nonCodegangstaRunner) Command(args []string, deps command_registry.Depe
 	var err error
 
 	cmdRegistry := command_registry.Commands
-	if cmdRegistry.CommandExists(args[0]) {
 
+	if cmdRegistry.CommandExists(args[0]) {
 		fc := flags.NewFlagContext(cmdRegistry.FindCommand(args[0]).MetaData().Flags)
 		err = fc.Parse(args[1:]...)
 		if err != nil {

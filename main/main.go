@@ -138,7 +138,6 @@ func main() {
 	injectHelpTemplate(badFlags)
 
 	theApp := app.NewApp(cmdRunner, metaDatas...)
-	rpcService.SetTheApp(theApp)
 
 	if cmdFactory.CheckIfCoreCmdExists(os.Args[1]) {
 		callCoreCommand(os.Args[0:], theApp)
@@ -305,7 +304,7 @@ func requestHelp(args []string) bool {
 }
 
 func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {
-	cliServer, err := rpc.NewRpcService(nil, outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator, rpc.NewNonCodegangstaRunner())
+	cliServer, err := rpc.NewRpcService(outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator, rpc.NewNonCodegangstaRunner())
 	if err != nil {
 		fmt.Println("Error initializing RPC service: ", err)
 		os.Exit(1)

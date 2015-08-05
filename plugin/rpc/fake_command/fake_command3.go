@@ -31,4 +31,5 @@ func (cmd FakeCommand3) SetDependency(deps command_registry.Dependency, pluginCa
 }
 
 func (cmd FakeCommand3) Execute(c flags.FlagContext) {
+	panic("this is a test panic for cli_rpc_server_test (panic recovery)")
 }
