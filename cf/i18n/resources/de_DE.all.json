@@ -1295,11 +1295,6 @@
       "modified": true
    },
    {
-      "id": "Command not found",
-      "translation": "Command not found",
-      "modified": false
-   },
-   {
       "id": "Compute and show the sha1 value of the plugin binary file",
       "translation": "Compute and show the sha1 value of the plugin binary file",
       "modified": false
@@ -2040,11 +2035,6 @@
       "modified": false
    },
    {
-      "id": "Error finding command {{.CmdName}}\n",
-      "translation": "Error finding command {{.CmdName}}\n",
-      "modified": false
-   },
-   {
       "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
       "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
       "modified": false
@@ -2087,11 +2077,6 @@
    {
       "id": "Error getting plugin metadata from repo: ",
       "translation": "Error getting plugin metadata from repo: ",
-      "modified": false
-   },
-   {
-      "id": "Error in requirement",
-      "translation": "Error in requirement",
       "modified": false
    },
    {
@@ -5447,11 +5432,6 @@
    {
       "id": "{{.CFName}} login",
       "translation": "{{.CFName}} login",
-      "modified": false
-   },
-   {
-      "id": "{{.Command}} help [COMMAND]",
-      "translation": "{{.Command}} help [COMMAND]",
       "modified": false
    },
    {

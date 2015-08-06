@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = XDescribe("CommandsLoader", func() {
+var _ = Describe("CommandsLoader", func() {
 	It("references all command packages so all commands can be registered in command_registry", func() {
 
 		commands_loader.Load()
