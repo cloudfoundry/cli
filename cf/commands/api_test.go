@@ -74,7 +74,6 @@ var _ = Describe("api command", func() {
 			})
 
 			It("prints out the api endpoint and appropriately sets the config", func() {
-				// testcmd.RunCommand(NewApi(ui, config, endpointRepo), []string{}, requirementsFactory)
 				callApi([]string{}, config, endpointRepo)
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"https://api.run.pivotal.io", "2.0"}))
@@ -83,7 +82,6 @@ var _ = Describe("api command", func() {
 
 			Context("when the --unset flag is passed", func() {
 				It("unsets the ApiEndpoint", func() {
-					// testcmd.RunCommand(NewApi(ui, config, endpointRepo), []string{"--unset"}, requirementsFactory)
 					callApi([]string{"--unset"}, config, endpointRepo)
 
 					Expect(ui.Outputs).To(ContainSubstrings(

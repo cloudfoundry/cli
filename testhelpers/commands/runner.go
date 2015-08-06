@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/command"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/flags"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -18,35 +17,6 @@ const (
 	RunCommandResultFailed             = iota
 	RunCommandResultRequirementsFailed = iota
 )
-
-func RunCommand(cmd command.Command, args []string, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
-	context := NewContext(cmd.Metadata().Name, args)
-
-	defer func() {
-		errMsg := recover()
-
-		if errMsg != nil && errMsg != testterm.QuietPanic {
-			panic(errMsg)
-		}
-	}()
-
-	requirements, err := cmd.GetRequirements(requirementsFactory, context)
-	if err != nil {
-		return
-	}
-
-	for _, requirement := range requirements {
-		success := requirement.Execute()
-		if !success {
-			return
-		}
-	}
-
-	passedRequirements = true
-	cmd.Run(context)
-
-	return
-}
 
 func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (passedRequirements bool) {
 	updateFunc(pluginCall)
@@ -119,12 +89,19 @@ func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsF
 	return
 }
 
-func RunCommandMoreBetter(cmd command.Command, requirementsFactory *testreq.FakeReqFactory, args ...string) (result RunCommandResult) {
+func RunCommandMoreBetter(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (result RunCommandResult) {
+	updateFunc(pluginCall)
+	cmd := command_registry.Commands.FindCommand(cmdName)
+	context := flags.NewFlagContext(cmd.MetaData().Flags)
+	context.SkipFlagParsing(cmd.MetaData().SkipFlagParsing)
+	err := context.Parse(args...)
+	if err != nil {
+		fmt.Println("ERROR:", err)
+		return RunCommandResultFailed
+	}
+
 	defer func() {
 		errMsg := recover()
-		if errMsg == nil {
-			return
-		}
 
 		if errMsg != nil && errMsg != testterm.QuietPanic {
 			panic(errMsg)
@@ -132,21 +109,18 @@ func RunCommandMoreBetter(cmd command.Command, requirementsFactory *testreq.Fake
 
 		result = RunCommandResultFailed
 	}()
-
-	context := NewContext(cmd.Metadata().Name, args)
-	requirements, err := cmd.GetRequirements(requirementsFactory, context)
+	requirements, err := cmd.Requirements(requirementsFactory, context)
 	if err != nil {
 		return RunCommandResultRequirementsFailed
 	}
 
 	for _, requirement := range requirements {
-		success := requirement.Execute()
-		if !success {
+		if !requirement.Execute() {
 			return RunCommandResultRequirementsFailed
 		}
 	}
 
-	cmd.Run(context)
+	cmd.Execute(context)
 
 	return RunCommandResultSuccess
 }
