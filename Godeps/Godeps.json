@@ -52,11 +52,6 @@
 			"Rev": "32dccbbdfb14f855abd7b909bb2efe24c0b2ecff"
 		},
 		{
-			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "1.2.0-24-g7381bc4",
-			"Rev": "7381bc4e62942763475703c7edd405f1e42adf4f"
-		},
-		{
 			"ImportPath": "github.com/gogo/protobuf/proto",
 			"Rev": "b9e369e8ffb6773efc654ea13594566404314ee1"
 		},
