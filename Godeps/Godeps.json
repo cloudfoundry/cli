@@ -20,10 +20,6 @@
 			"Rev": "6c980277330804e94257ac7ef70a3adbe1641059"
 		},
 		{
-			"ImportPath": "github.com/cloudfoundry-incubator/candiedyaml",
-			"Rev": "5f3b3579b3dc360c8ad3f86fe9e59e58c5652d10"
-		},
-		{
 			"ImportPath": "github.com/cloudfoundry-incubator/cli-plugin-repo/models",
 			"Rev": "c64e8e215dcfea2aa16451f9fa266523029fc39c"
 		},
@@ -76,6 +72,10 @@
 		{
 			"ImportPath": "github.com/pivotal-cf-experimental/jibber_jabber",
 			"Rev": "66b05988ee1e223bf019acdeeb3e2132c2249942"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "7ad95dd0798a40da1ccdff6dff35fd177b5edf40"
 		}
 	]
 }
