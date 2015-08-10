@@ -4,12 +4,12 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
-	"github.com/cloudfoundry/cli/cf/command_metadata"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type RestartAppInstance struct {
@@ -19,32 +19,27 @@ type RestartAppInstance struct {
 	appInstancesRepo app_instances.AppInstancesRepository
 }
 
-func NewRestartAppInstance(ui terminal.UI, config core_config.Reader, appInstancesRepo app_instances.AppInstancesRepository) (cmd *RestartAppInstance) {
-	cmd = new(RestartAppInstance)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appInstancesRepo = appInstancesRepo
-	return
+func init() {
+	command_registry.Register(&RestartAppInstance{})
 }
 
-func (cmd *RestartAppInstance) Metadata() command_metadata.CommandMetadata {
-	return command_metadata.CommandMetadata{
+func (cmd *RestartAppInstance) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{
 		Name:        "restart-app-instance",
 		Description: T("Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"),
 		Usage:       T("CF_NAME restart-app-instance APP_NAME INDEX"),
 	}
 }
 
-func (cmd *RestartAppInstance) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
-		cmd.ui.FailWithUsage(c)
+func (cmd *RestartAppInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	if len(fc.Args()) != 2 {
+		usage := command_registry.Commands.CommandUsage("restart-app-instance")
+		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + usage)
 	}
 
-	if cmd.appReq == nil {
-		cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
-	} else {
-		cmd.appReq.SetApplicationName(c.Args()[0])
-	}
+	appName := fc.Args()[0]
+
+	cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
@@ -55,10 +50,17 @@ func (cmd *RestartAppInstance) GetRequirements(requirementsFactory requirements.
 	return
 }
 
-func (cmd *RestartAppInstance) Run(c *cli.Context) {
+func (cmd *RestartAppInstance) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+	cmd.ui = deps.Ui
+	cmd.config = deps.Config
+	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
+	return cmd
+}
+
+func (cmd *RestartAppInstance) Execute(fc flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
-	instance, err := strconv.Atoi(c.Args()[1])
+	instance, err := strconv.Atoi(fc.Args()[1])
 
 	if err != nil {
 		cmd.ui.Failed(T("Instance must be a non-negative integer"))
@@ -78,5 +80,4 @@ func (cmd *RestartAppInstance) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-
 }

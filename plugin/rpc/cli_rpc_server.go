@@ -11,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
 	"github.com/cloudfoundry/cli/utils"
-	"github.com/codegangsta/cli"
 
 	"fmt"
 	"net"
@@ -28,7 +27,6 @@ type CliRpcService struct {
 
 type CliRpcCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
-	coreCommandRunner    *cli.App
 	outputCapture        terminal.OutputCapture
 	terminalOutputSwitch terminal.TerminalOutputSwitch
 	cliConfig            core_config.Repository
@@ -37,11 +35,10 @@ type CliRpcCmd struct {
 	outputBucket         *[]string
 }
 
-func NewRpcService(commandRunner *cli.App, outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator, newCmdRunner NonCodegangstaRunner) (*CliRpcService, error) {
+func NewRpcService(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator, newCmdRunner NonCodegangstaRunner) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
 			PluginMetadata:       &plugin.PluginMetadata{},
-			coreCommandRunner:    commandRunner,
 			outputCapture:        outputCapture,
 			terminalOutputSwitch: terminalOutputSwitch,
 			cliConfig:            cliConfig,
@@ -96,10 +93,6 @@ func (cli *CliRpcService) Start() error {
 	return nil
 }
 
-func (cmd *CliRpcService) SetTheApp(app *cli.App) {
-	cmd.RpcCmd.coreCommandRunner = app
-}
-
 func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
 	if cf.Version == "BUILT_FROM_SOURCE" {
 		*retVal = true
@@ -142,12 +135,14 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		//once all commands are converted, we can make fresh deps for each command run
 		deps.Config = cmd.cliConfig
 		deps.RepoLocator = cmd.repoLocator
+
+		//set command ui's TeePrinter to be the one used by RpcService, for output to be captured
 		deps.Ui = terminal.NewUI(os.Stdin, cmd.outputCapture.(*terminal.TeePrinter))
 
 		err = cmd.newCmdRunner.Command(args, deps, false)
 	} else {
-		//call codegangsta command
-		err = cmd.coreCommandRunner.Run(append([]string{"CF_NAME"}, args...))
+		*retVal = false
+		return nil
 	}
 
 	if err != nil {

@@ -250,6 +250,11 @@
       "modified": false
    },
    {
+      "id": "' is not a registered command. See 'cf help'",
+      "translation": "' is not a registered command. See 'cf help'",
+      "modified": false
+   },
+   {
       "id": ") already exists.",
       "translation": ") already exists.",
       "modified": false
@@ -1290,11 +1295,6 @@
       "modified": true
    },
    {
-      "id": "Command not found",
-      "translation": "Comando no encontrado",
-      "modified": false
-   },
-   {
       "id": "Compute and show the sha1 value of the plugin binary file",
       "translation": "Compute and show the sha1 value of the plugin binary file",
       "modified": false
@@ -2035,11 +2035,6 @@
       "modified": false
    },
    {
-      "id": "Error finding command {{.CmdName}}\n",
-      "translation": "Error al encontrar comando {{.CmdName}}\n",
-      "modified": false
-   },
-   {
       "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
       "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
       "modified": false
@@ -2085,8 +2080,8 @@
       "modified": false
    },
    {
-      "id": "Error in requirement",
-      "translation": "Error en el requerimiento",
+      "id": "Error initializing RPC service: ",
+      "translation": "Error initializing RPC service: ",
       "modified": false
    },
    {
@@ -2607,11 +2602,6 @@
    {
       "id": "Incorrect Usage\n\n",
       "translation": "Incorrect Usage\n\n",
-      "modified": false
-   },
-   {
-      "id": "Incorrect Usage.\n",
-      "translation": "Uso Incorrecto.\n",
       "modified": false
    },
    {
@@ -4640,16 +4630,6 @@
       "modified": false
    },
    {
-      "id": "Unknown flag",
-      "translation": "Unknown flag",
-      "modified": false
-   },
-   {
-      "id": "Unknown flags:",
-      "translation": "Unknown flags:",
-      "modified": false
-   },
-   {
       "id": "Unlock the buildpack to enable updates",
       "translation": "Desbloquea el buildpack",
       "modified": true
@@ -5452,11 +5432,6 @@
    {
       "id": "{{.CFName}} login",
       "translation": "{{.CFName}} login",
-      "modified": false
-   },
-   {
-      "id": "{{.Command}} help [COMMAND]",
-      "translation": "{{.Command}} help [COMMAND]",
       "modified": false
    },
    {

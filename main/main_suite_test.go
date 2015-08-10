@@ -12,6 +12,7 @@ import (
 
 func TestMain(t *testing.T) {
 	RegisterFailHandler(Fail)
+
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "test_1")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "test_2")
 	plugin_builder.BuildTestBinary(filepath.Join("..", "fixtures", "plugins"), "test_with_push")

@@ -46,6 +46,17 @@ var _ = Describe("main", func() {
 			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
 		})
+
+		It("accepts -h and --h flags for all commands", func() {
+			result := Cf("push", "-h")
+			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
+
+			result = Cf("target", "--h")
+			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
+		})
+
 	})
 
 	Describe("Shows version with -v", func() {
@@ -53,12 +64,6 @@ var _ = Describe("main", func() {
 			output := Cf("-v").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("version"))
 			Ω(output.ExitCode()).To(Equal(0))
-		})
-
-		It("prints the help output with our custom template when run with 'cf --help'", func() {
-			output := Cf("--help").Wait(1 * time.Second)
-			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
-			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
 		})
 	})
 
@@ -106,79 +111,6 @@ var _ = Describe("main", func() {
 	It("can print help menu by executing only the command `cf`", func() {
 		output := Cf().Wait(3 * time.Second)
 		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
-	})
-
-	XDescribe("Flag verification", func() {
-		It("informs user for any incorrect provided flags", func() {
-			result := Cf("push", "--no-hostname", "--bad-flag")
-			Eventually(result.Out).Should(Say("\"--bad-flag\""))
-			Consistently(result.Out).ShouldNot(Say("\"--no-hostname\""))
-		})
-
-		It("checks flags with prefix '--'", func() {
-			result := Cf("push", "not-a-flag", "--invalid-flag")
-			Eventually(result.Out).Should(Say("Unknown flag \"--invalid-flag\""))
-			Consistently(result.Out).ShouldNot(Say("Unknown flag \"not-a-flag\""))
-		})
-
-		It("checks flags with prefix '-'", func() {
-			result := Cf("push", "not-a-flag", "-invalid-flag")
-			Eventually(result.Out).Should(Say("\"-invalid-flag\""))
-			Consistently(result.Out).ShouldNot(Say("\"not-a-flag\""))
-		})
-
-		It("checks flags but ignores the value after '=' ", func() {
-			result := Cf("push", "-p=./", "-invalid-flag=blarg")
-			Eventually(result.Out).Should(Say("\"-invalid-flag\""))
-			Consistently(result.Out).ShouldNot(Say("Unknown flag \"-p\""))
-		})
-
-		It("outputs all unknown flags in single sentence", func() {
-			result := Cf("push", "--bad-flag1", "--bad-flag2", "--bad-flag3")
-			Eventually(result.Out).Should(Say("\"--bad-flag1\", \"--bad-flag2\", \"--bad-flag3\""))
-		})
-
-		It("only checks input flags against flags from the provided command", func() {
-			result := Cf("push", "--no-hostname", "--skip-ssl-validation")
-			Eventually(result.Out).Should(Say("\"--skip-ssl-validation\""))
-		})
-
-		It("accepts -h and --h flags for all commands", func() {
-			result := Cf("push", "-h")
-			Consistently(result.Out).ShouldNot(Say("Unknown flag \"-h\""))
-
-			result = Cf("target", "--h")
-			Consistently(result.Out).ShouldNot(Say("Unknown flag \"--h\""))
-		})
-
-		Context("When TotalArgs is set in the metadata for a command", func() {
-			It("will only validate flags in the argument position after position <TotalArgs>", func() {
-				result := Cf("install-plugin", "-100", "-bad_flag")
-				Eventually(result.Out).ShouldNot(Say("\"-100\""))
-				Eventually(result.Out).Should(Say("\"-bad_flag\""))
-			})
-
-			It("will not validate arguments before the position <TotalArgs>", func() {
-				result := Cf("add-plugin-repo", "-bad-flag", "--bad-flag2")
-				Eventually(result.Out).ShouldNot(Say("\"-bad-flag\""))
-				Eventually(result.Out).ShouldNot(Say("\"--bad_flag2\""))
-			})
-		})
-
-		Context("When a negative integer is preceeded by a valid flag", func() {
-			It("skips validation for negative integer flag values", func() {
-				result := Cf("update-space-quota", "-i", "-10")
-				Eventually(result.Out).ShouldNot(Say("\"-10\""))
-			})
-		})
-
-		Context("When a negative integer is preceeded by a invalid flag", func() {
-			It("validates the negative integer as a flag", func() {
-				result := Cf("push", "-badflag", "-10")
-				Eventually(result.Out).Should(Say("\"-badflag\""))
-				Eventually(result.Out).Should(Say("\"-10\""))
-			})
-		})
 	})
 
 	Describe("Plugins", func() {

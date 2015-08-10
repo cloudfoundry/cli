@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 	"time"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/trace"
-	"github.com/codegangsta/cli"
 )
 
 type ColoringFunction func(value string, row int, col int) string
@@ -34,7 +32,6 @@ type UI interface {
 	ConfirmDeleteWithAssociations(modelType, modelName string) bool
 	Ok()
 	Failed(message string, args ...interface{})
-	FailWithUsage(context *cli.Context)
 	PanicQuietly()
 	ShowConfiguration(core_config.Reader)
 	LoadingIndication()
@@ -163,14 +160,6 @@ func (c *terminalUI) Failed(message string, args ...interface{}) {
 
 func (c *terminalUI) PanicQuietly() {
 	panic(QuietPanic)
-}
-
-func (c *terminalUI) FailWithUsage(context *cli.Context) {
-	c.Say(FailureColor(T("FAILED")))
-	c.Say(T("Incorrect Usage.\n"))
-	cli.ShowCommandHelp(context, context.Command.Name)
-	c.Say("")
-	os.Exit(1)
 }
 
 func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {

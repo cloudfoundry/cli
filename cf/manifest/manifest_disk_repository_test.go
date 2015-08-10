@@ -23,6 +23,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 			Expect(m.Path).To(Equal(filepath.Clean("../../fixtures/manifests/manifest.yml")))
 
 			applications, err := m.Applications()
+
 			Expect(err).NotTo(HaveOccurred())
 			Expect(*applications[0].Name).To(Equal("from-default-manifest"))
 		})
@@ -107,7 +108,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 		})
 	})
 
-	Describe("when the manifest is not valid", func() {
+	Describe("when the manifest is empty", func() {
 		It("returns an error", func() {
 			_, err := repo.ReadManifest("../../fixtures/manifests/empty-manifest.yml")
 			Expect(err).To(HaveOccurred())
@@ -152,5 +153,25 @@ var _ = Describe("ManifestDiskRepository", func() {
 
 		services := *applications[1].ServicesToBind
 		Expect(services).To(Equal([]string{"base-service", "foo-service"}))
+	})
+
+	It("supports yml merges", func() {
+		m, err := repo.ReadManifest("../../fixtures/manifests/merge-manifest.yml")
+		Expect(err).NotTo(HaveOccurred())
+
+		applications, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(*applications[0].Name).To(Equal("blue"))
+		Expect(*applications[0].InstanceCount).To(Equal(1))
+		Expect(*applications[0].Memory).To(Equal(int64(256)))
+
+		Expect(*applications[1].Name).To(Equal("green"))
+		Expect(*applications[1].InstanceCount).To(Equal(1))
+		Expect(*applications[1].Memory).To(Equal(int64(256)))
+
+		Expect(*applications[2].Name).To(Equal("big-blue"))
+		Expect(*applications[2].InstanceCount).To(Equal(3))
+		Expect(*applications[2].Memory).To(Equal(int64(256)))
 	})
 })

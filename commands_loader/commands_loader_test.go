@@ -12,8 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-//run this test once the last 2 commands (`create-user`, `restart-app-instance`) are converted into non-condegangsta structure
-var _ = XDescribe("CommandsLoader", func() {
+var _ = Describe("CommandsLoader", func() {
 	It("references all command packages so all commands can be registered in command_registry", func() {
 
 		commands_loader.Load()

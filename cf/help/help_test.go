@@ -3,21 +3,12 @@ package help_test
 import (
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_factory"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/help"
-	"github.com/cloudfoundry/cli/cf/manifest"
-	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/plugin/rpc"
 
-	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -77,22 +68,6 @@ var _ = Describe("Help", func() {
 	})
 
 })
-
-func createCommandFactory() command_factory.Factory {
-	fakeUI := &testterm.FakeUI{}
-	configRepo := testconfig.NewRepository()
-	pluginConfig := &testPluginConfig.FakePluginConfiguration{}
-
-	manifestRepo := manifest.NewManifestDiskRepository()
-	apiRepoLocator := api.NewRepositoryLocator(configRepo, map[string]net.Gateway{
-		"auth":             net.NewUAAGateway(configRepo, fakeUI),
-		"cloud-controller": net.NewCloudControllerGateway(configRepo, time.Now, fakeUI),
-		"uaa":              net.NewUAAGateway(configRepo, fakeUI),
-	})
-
-	rpcService, _ := rpc.NewRpcService(nil, nil, nil, nil, api.RepositoryLocator{}, nil)
-	return command_factory.NewFactory(fakeUI, configRepo, manifestRepo, apiRepoLocator, pluginConfig, rpcService)
-}
 
 func commandInOutput(cmdName string, output []string) bool {
 	for _, line := range output {

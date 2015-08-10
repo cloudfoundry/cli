@@ -9,7 +9,6 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	term "github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/codegangsta/cli"
 )
 
 const QuietPanic = "I should not print anything"
@@ -121,13 +120,6 @@ func (ui *FakeUI) Failed(message string, args ...interface{}) {
 	ui.Say(message, args...)
 	panic(QuietPanic)
 	return
-}
-
-func (ui *FakeUI) FailWithUsage(context *cli.Context) {
-	ui.FailedWithUsage = true
-	ui.FailedWithUsageCommandName = context.Command.Name
-	ui.Failed("Incorrect Usage.")
-	ui.PanickedQuietly = true
 }
 
 func (ui *FakeUI) PanicQuietly() {

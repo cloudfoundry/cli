@@ -10,7 +10,6 @@ import (
 	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/fakes"
-	testCommand "github.com/cloudfoundry/cli/cf/command/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
@@ -19,6 +18,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
+	testCommand "github.com/cloudfoundry/cli/testhelpers/commands"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
