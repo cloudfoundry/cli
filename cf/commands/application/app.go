@@ -175,7 +175,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 
 	//temp solution, diego app metrics only come from noaa, not CC
-	if application.Diego {
+	if application.Diego && len(instances) > 0 {
 		instances, apiErr = cmd.appLogsNoaaRepo.GetContainerMetrics(app.Guid, instances)
 
 		for i := 0; i < len(instances); i++ {
