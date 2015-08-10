@@ -193,6 +193,18 @@ var _ = Describe("app Command", func() {
 				runCommand("my-app")
 				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(1))
 			})
+
+			It("does not gather metrics when instance count is 0", func() {
+				app.Diego = true
+				appSummaryRepo.GetSummarySummary = app
+				requirementsFactory.Application = app
+
+				appInstancesRepo.GetInstancesReturns([]models.AppInstanceFields{}, nil)
+
+				runCommand("my-app")
+				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(0))
+			})
+
 			It("gracefully handles when /instances is down but /noaa is not", func() {
 				app.Diego = true
 				appSummaryRepo.GetSummarySummary = app
