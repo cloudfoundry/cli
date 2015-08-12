@@ -21,7 +21,8 @@ var SUPPORTED_LOCALES = map[uintptr]string{
 	0x0416: "pt-BR",
 	//0x0419: "ru_RU", - Will add support for Russian when nicksnyder/go-i18n supports Russian
 	0x0804: "zh-CN",
-	0x0c04: "zh-CK",
+	0x0c04: "zh-HK",
+	0x0404: "zh-TW",
 }
 
 func getWindowsLocaleFrom(sysCall string) (locale string, err error) {

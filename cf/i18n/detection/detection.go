@@ -1,6 +1,6 @@
 package detection
 
-import "github.com/pivotal-cf-experimental/jibber_jabber"
+import "github.com/cloudfoundry/jibber_jabber"
 
 type Detector interface {
 	DetectIETF() (string, error)
