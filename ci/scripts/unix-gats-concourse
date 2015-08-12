@@ -32,7 +32,7 @@ ADMIN_USER="admin" ADMIN_PASSWORD="admin" \
   CF_ORG="cli-cats-org" CF_SPACE="cli-cats-space" \
   ${CLI_DIR}/ci/scripts/create-cats-config
 
-GATSPATH=$PWD/gopath/src/github.com/pivotal-cf-experimental/GATS
+GATSPATH=$PWD/gopath/src/github.com/cloudfoundry/GATS
 GATS_GOPATH=${GATSPATH}/Godeps/_workspace
 
 export GOPATH=${GATS_GOPATH}:$GOPATH

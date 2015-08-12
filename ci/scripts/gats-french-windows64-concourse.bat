@@ -33,7 +33,7 @@ echo "long_curl_timeout": 210,>> %CONFIG%
 echo "broker_start_timeout": 330>> %CONFIG%
 echo }>> %CONFIG%
 
-set GATSPATH=%CD%\gopath\src\github.com\pivotal-cf-experimental\GATS
+set GATSPATH=%CD%\gopath\src\github.com\cloudfoundry\GATS
 
 mkdir %BASE_GOPATH%\bin
 move .\windows64-binary\cf* %BASE_GOPATH%\bin\cf.exe || exit /b 1
