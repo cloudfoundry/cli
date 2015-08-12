@@ -54,7 +54,7 @@ resources:
 - name: gats
   type: git
   source:
-    uri: https://github.com/pivotal-cf-experimental/GATS
+    uri: https://github.com/cloudfoundry/GATS
     branch: master
 
 - name: concourse-deployment
