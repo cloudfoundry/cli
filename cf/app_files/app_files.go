@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/models"
-	cffileutils "github.com/cloudfoundry/cli/fileutils"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
@@ -93,7 +92,7 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 			return
 		}
 
-		if !cffileutils.IsRegular(f) && !f.IsDir() {
+		if !f.Mode().IsRegular() && !f.IsDir() {
 			return
 		}
 
