@@ -1,4 +1,4 @@
-# Jibber Jabber [![Build Status](https://travis-ci.org/pivotal-cf-experimental/jibber_jabber.svg?branch=master)](https://travis-ci.org/pivotal-cf-experimental/jibber_jabber)
+# Jibber Jabber [![Build Status](https://travis-ci.org/cloudfoundry/jibber_jabber.svg?branch=master)](https://travis-ci.org/cloudfoundry/jibber_jabber)
 Jibber Jabber is a GoLang Library that can be used to detect an operating system's current language.
 
 ### OS Support
@@ -11,7 +11,7 @@ Windows via [GetUserDefaultLocaleName](http://msdn.microsoft.com/en-us/library/w
 Add the following line to your go `import`:
 
 ```
-	"github.com/pivotal-cf-experimental/jibber_jabber"
+	"github.com/cloudfoundry/jibber_jabber"
 ```
 
 ### DetectIETF
