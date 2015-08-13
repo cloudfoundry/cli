@@ -21,13 +21,6 @@ type ListSpaces struct {
 	pluginCall  bool
 }
 
-func NewListSpaces(ui terminal.UI, config core_config.Reader, spaceRepo spaces.SpaceRepository) (cmd ListSpaces) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.spaceRepo = spaceRepo
-	return
-}
-
 func init() {
 	command_registry.Register(&ListSpaces{})
 }

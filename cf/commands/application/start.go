@@ -12,7 +12,6 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/cloudfoundry/sonde-go/events"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -116,50 +115,11 @@ func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall boo
 		cmd.StartupTimeout = DefaultStartupTimeout
 	}
 
-	//set appDisplayer
 	appCommand := command_registry.Commands.FindCommand("app")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appDisplayer = appCommand.(ApplicationDisplayer)
 
 	return cmd
-}
-
-func NewStart(ui terminal.UI, config core_config.Reader, appDisplayer ApplicationDisplayer, appRepo applications.ApplicationRepository, appInstancesRepo app_instances.AppInstancesRepository, logRepo api.LogsNoaaRepository, oldLogsRepo api.OldLogsRepository) (cmd *Start) {
-	cmd = new(Start)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appDisplayer = appDisplayer
-	cmd.appRepo = appRepo
-	cmd.appInstancesRepo = appInstancesRepo
-	cmd.logRepo = logRepo
-	cmd.oldLogsRepo = oldLogsRepo
-	cmd.LogServerConnectionTimeout = 20 * time.Second
-
-	cmd.PingerThrottle = DefaultPingerThrottle
-
-	if os.Getenv("CF_STAGING_TIMEOUT") != "" {
-		duration, err := strconv.ParseInt(os.Getenv("CF_STAGING_TIMEOUT"), 10, 64)
-		if err != nil {
-			cmd.ui.Failed(T("invalid value for env var CF_STAGING_TIMEOUT\n{{.Err}}",
-				map[string]interface{}{"Err": err}))
-		}
-		cmd.StagingTimeout = time.Duration(duration) * time.Minute
-	} else {
-		cmd.StagingTimeout = DefaultStagingTimeout
-	}
-
-	if os.Getenv("CF_STARTUP_TIMEOUT") != "" {
-		duration, err := strconv.ParseInt(os.Getenv("CF_STARTUP_TIMEOUT"), 10, 64)
-		if err != nil {
-			cmd.ui.Failed(T("invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
-				map[string]interface{}{"Err": err}))
-		}
-		cmd.StartupTimeout = time.Duration(duration) * time.Minute
-	} else {
-		cmd.StartupTimeout = DefaultStartupTimeout
-	}
-
-	return
 }
 
 func (cmd *Start) Execute(c flags.FlagContext) {
@@ -260,17 +220,7 @@ func (cmd *Start) SetStartTimeoutInSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
-func simpleOldLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
-	msgText = string(logMsg.GetMessage())
-	reg, err := regexp.Compile("[\n\r]+$")
-	if err != nil {
-		return
-	}
-	msgText = reg.ReplaceAllString(msgText, "")
-	return
-}
-
-func simpleLogMessageOutput(logMsg *events.LogMessage) (msgText string) {
+func simpleLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
 	msgText = string(logMsg.GetMessage())
 	reg, err := regexp.Compile("[\n\r]+$")
 	if err != nil {
@@ -287,7 +237,7 @@ func (cmd *Start) tailStagingLogs(app models.Application, startChan, doneChan ch
 
 	err := cmd.oldLogsRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
 		if msg.GetSourceName() == LogMessageTypeStaging {
-			cmd.ui.Say(simpleOldLogMessageOutput(msg))
+			cmd.ui.Say(simpleLogMessageOutput(msg))
 		}
 	})
 	// err := cmd.logRepo.TailNoaaLogsFor(app.Guid, onConnect, func(msg *events.LogMessage) {

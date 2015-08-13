@@ -103,13 +103,6 @@ func (cmd RepoPlugins) printErrors(repoError []string) {
 	}
 }
 
-func getListEndpoint(url string) string {
-	if strings.HasSuffix(url, "/") {
-		return url + "list"
-	}
-	return url + "/list"
-}
-
 func (cmd RepoPlugins) findRepoIndex(repoName string) int {
 	repos := cmd.config.PluginRepos()
 	for i, repo := range repos {
