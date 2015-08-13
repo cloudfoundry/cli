@@ -13,37 +13,38 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 )
 
+//go:generate counterfeiter -o fakes/fake_handlers.go . Handlers
 type Handlers interface {
 	IsMinCliVersion(args string, retVal *bool) error
-	SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool)
-
-	CliCommandWithoutTerminalOutput(args ...string) ([]string, error)
-	CliCommand(args ...string) ([]string, error)
-	GetCurrentOrg() (plugin_models.Organization, error)
-	GetCurrentSpace() (plugin_models.Space, error)
-	Username() (string, error)
-	UserGuid() (string, error)
-	UserEmail() (string, error)
-	IsLoggedIn() (bool, error)
-	IsSSLDisabled() (bool, error)
-	HasOrganization() (bool, error)
-	HasSpace() (bool, error)
-	ApiEndpoint() (string, error)
-	ApiVersion() (string, error)
-	HasAPIEndpoint() (bool, error)
-	LoggregatorEndpoint() (string, error)
-	DopplerEndpoint() (string, error)
-	AccessToken() (string, error)
-	GetApp(string) (plugin_models.GetAppModel, error)
-	GetApps() ([]plugin_models.GetAppsModel, error)
-	GetOrgs() ([]plugin_models.GetOrgs_Model, error)
-	GetSpaces() ([]plugin_models.GetSpaces_Model, error)
-	GetOrgUsers(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
-	GetSpaceUsers(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
-	GetServices() ([]plugin_models.GetServices_Model, error)
-	GetService(string) (plugin_models.GetService_Model, error)
-	GetOrg(string) (plugin_models.GetOrg_Model, error)
-	GetSpace(string) (plugin_models.GetSpace_Model, error)
+	SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error
+	DisableTerminalOutput(disable bool, retVal *bool) error
+	CallCoreCommand(args []string, retVal *bool) error
+	GetOutputAndReset(args bool, retVal *[]string) error
+	GetCurrentOrg(args string, retVal *plugin_models.Organization) error
+	GetCurrentSpace(args string, retVal *plugin_models.Space) error
+	Username(args string, retVal *string) error
+	UserGuid(args string, retVal *string) error
+	UserEmail(args string, retVal *string) error
+	IsLoggedIn(args string, retVal *bool) error
+	IsSSLDisabled(args string, retVal *bool) error
+	HasOrganization(args string, retVal *bool) error
+	HasSpace(args string, retVal *bool) error
+	ApiEndpoint(args string, retVal *string) error
+	HasAPIEndpoint(args string, retVal *bool) error
+	ApiVersion(args string, retVal *string) error
+	LoggregatorEndpoint(args string, retVal *string) error
+	DopplerEndpoint(args string, retVal *string) error
+	AccessToken(args string, retVal *string) error
+	GetApp(appName string, retVal *plugin_models.GetAppModel) error
+	GetApps(string, retVal *[]plugin_models.GetAppsModel) error
+	GetOrgs(string, retVal *[]plugin_models.GetOrgs_Model) error
+	GetSpaces(string, retVal *[]plugin_models.GetSpaces_Model) error
+	GetServices(string, retVal *[]plugin_models.GetServices_Model) error
+	GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error
+	GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error
+	GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error
+	GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error
+	GetService(serviceInstance string, retVal *plugin_models.GetService_Model) error
 }
 
 type TestServer struct {
