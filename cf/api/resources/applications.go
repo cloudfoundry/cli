@@ -54,6 +54,7 @@ type ApplicationEntity struct {
 	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
 	PackageState         *string                 `json:"package_state,omitempty"`
 	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
+	Diego                bool                    `json:"diego,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
@@ -135,6 +136,9 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.DetectedBuildpack != nil {
 		app.DetectedBuildpack = *entity.DetectedBuildpack
 	}
+
+	app.Diego = entity.Diego
+
 	return
 }
 
