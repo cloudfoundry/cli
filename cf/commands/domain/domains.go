@@ -50,14 +50,6 @@ func (cmd *ListDomains) SetDependency(deps command_registry.Dependency, pluginCa
 	return cmd
 }
 
-func NewListDomains(ui terminal.UI, config core_config.Reader, domainRepo api.DomainRepository) (cmd *ListDomains) {
-	cmd = new(ListDomains)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.domainRepo = domainRepo
-	return
-}
-
 func (cmd *ListDomains) Execute(c flags.FlagContext) {
 	org := cmd.orgReq.GetOrganizationFields()
 

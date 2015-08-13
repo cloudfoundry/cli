@@ -74,18 +74,6 @@ func (cmd *CreateSpace) SetDependency(deps command_registry.Dependency, pluginCa
 	return cmd
 }
 
-func NewCreateSpace(ui terminal.UI, config core_config.Reader, spaceRoleSetter user.SpaceRoleSetter, spaceRepo spaces.SpaceRepository, orgRepo organizations.OrganizationRepository, userRepo api.UserRepository, spaceQuotaRepo space_quotas.SpaceQuotaRepository) (cmd CreateSpace) {
-	cmd.ui = ui
-	cmd.config = config
-	cmd.spaceRepo = spaceRepo
-	cmd.orgRepo = orgRepo
-	cmd.userRepo = userRepo
-	cmd.spaceQuotaRepo = spaceQuotaRepo
-
-	cmd.spaceRoleSetter = spaceRoleSetter
-	return
-}
-
 func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[0]
 	orgName := c.String("o")

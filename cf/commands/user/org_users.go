@@ -28,14 +28,6 @@ func init() {
 	command_registry.Register(&OrgUsers{})
 }
 
-func NewOrgUsers(ui terminal.UI, config core_config.Reader, userRepo api.UserRepository) (cmd *OrgUsers) {
-	cmd = &OrgUsers{}
-	cmd.ui = ui
-	cmd.config = config
-	cmd.userRepo = userRepo
-	return
-}
-
 func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["a"] = &cliFlags.BoolFlag{Name: "a", Usage: T("List all users in the org")}

@@ -29,15 +29,6 @@ func init() {
 	command_registry.Register(&SpaceUsers{})
 }
 
-func NewSpaceUsers(ui terminal.UI, config core_config.Reader, spaceRepo spaces.SpaceRepository, userRepo api.UserRepository) (cmd *SpaceUsers) {
-	cmd = &SpaceUsers{}
-	cmd.ui = ui
-	cmd.config = config
-	cmd.spaceRepo = spaceRepo
-	cmd.userRepo = userRepo
-	return
-}
-
 func (cmd *SpaceUsers) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "space-users",
