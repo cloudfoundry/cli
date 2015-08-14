@@ -135,7 +135,6 @@ func (r *registry) CommandUsage(cmdName string) string {
 				l = len(n)
 			}
 		}
-
 		//print non-bool flags first
 		for n, f := range cmd.MetaData().Flags {
 			switch f.GetValue().(type) {
@@ -149,7 +148,11 @@ func (r *registry) CommandUsage(cmdName string) string {
 		for n, f := range cmd.MetaData().Flags {
 			switch f.GetValue().(type) {
 			case bool:
-				output += "   --" + n + strings.Repeat(" ", 6+(l-len(n))) + f.String() + "\n"
+				if len(f.GetName()) == 1 {
+					output += "   -" + n + strings.Repeat(" ", 7+(l-len(n))) + f.String() + "\n"
+				} else {
+					output += "   --" + n + strings.Repeat(" ", 6+(l-len(n))) + f.String() + "\n"
+				}
 			}
 		}
 	}

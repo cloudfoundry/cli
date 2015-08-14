@@ -164,13 +164,22 @@ var _ = Describe("CommandRegistry", func() {
 				Consistently(outputs).ShouldNot(ContainSubstrings([]string{"CF_NAME"}))
 			})
 
-			It("prefixes the bool flag with '--'", func() {
+			It("prefixes single character bool flags with '-'", func() {
 				o := Commands.CommandUsage("fake-command")
 				outputs := strings.Split(o, "\n")
 				Ω(outputs).To(BeInDisplayOrder(
 					[]string{"OPTIONS:"},
-					[]string{"-intFlag", "Usage for"},
-					[]string{"--boolFlag", "Usage for"},
+					[]string{"  -f", "Usage for"},
+				))
+			})
+
+			It("prefixes multi-character bool flags with '--'", func() {
+				o := Commands.CommandUsage("fake-command")
+				outputs := strings.Split(o, "\n")
+				Ω(outputs).To(BeInDisplayOrder(
+					[]string{"OPTIONS:"},
+					[]string{" -intFlag", "Usage for"},
+					[]string{" --boolFlag", "Usage for"},
 				))
 			})
 		})
