@@ -32,6 +32,7 @@ func (model Application) ToParams() (params AppParams) {
 		DiskQuota:       &model.DiskQuota,
 		InstanceCount:   &model.InstanceCount,
 		Memory:          &model.Memory,
+		Diego:           &model.Diego,
 		State:           &state,
 		SpaceGuid:       &model.SpaceGuid,
 		EnvironmentVars: &model.EnvironmentVars,
@@ -77,6 +78,7 @@ type AppParams struct {
 	Hosts              *[]string
 	InstanceCount      *int
 	Memory             *int64
+	Diego              *bool
 	Name               *string
 	NoHostname         bool
 	NoRoute            bool
@@ -143,6 +145,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.State != nil {
 		app.State = other.State
+	}
+	if other.Diego != nil {
+		app.Diego = other.Diego
 	}
 
 	app.NoRoute = app.NoRoute || other.NoRoute

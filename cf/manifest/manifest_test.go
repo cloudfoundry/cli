@@ -256,6 +256,7 @@ var _ = Describe("Manifests", func() {
 					"no-route":     true,
 					"no-hostname":  true,
 					"random-route": true,
+					"diego":        true,
 				},
 			},
 		}))
@@ -276,6 +277,7 @@ var _ = Describe("Manifests", func() {
 		Expect(apps[0].NoRoute).To(BeTrue())
 		Expect(apps[0].NoHostname).To(BeTrue())
 		Expect(apps[0].UseRandomHostname).To(BeTrue())
+		Expect(*apps[0].Diego).To(BeTrue())
 	})
 
 	It("removes duplicated values in 'hosts' and 'domains'", func() {
@@ -383,6 +385,18 @@ var _ = Describe("Manifests", func() {
 		apps, err := m.Applications()
 		Expect(err).NotTo(HaveOccurred())
 		Expect(apps[0].Command).To(BeNil())
+	})
+
+	It("does not set diego when the manifest doesn't have the 'diego' key", func() {
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				map[interface{}]interface{}{},
+			},
+		}))
+
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(apps[0].Diego).To(BeNil())
 	})
 
 	It("can build the applications multiple times", func() {

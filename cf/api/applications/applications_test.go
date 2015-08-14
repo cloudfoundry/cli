@@ -261,6 +261,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			app.SpaceGuid = "some-space-guid"
 			app.State = "started"
 			app.DiskQuota = 512
+			app.Diego = true
 			Expect(app.EnvironmentVars).To(BeNil())
 
 			updatedApp, apiErr := repo.Update(app.Guid, app.ToParams())
@@ -271,6 +272,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			Expect(updatedApp.DetectedStartCommand).To(Equal("detected command"))
 			Expect(updatedApp.Name).To(Equal("my-cool-app"))
 			Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
+			Expect(updatedApp.Diego).To(Equal(true))
 		})
 
 		It("sets environment variables", func() {
@@ -491,14 +493,15 @@ var updateApplicationResponse = `
     "entity": {
         "name": "my-cool-app",
 				"command": "some-command",
-				"detected_start_command": "detected command"
+				"detected_start_command": "detected command",
+				"diego": true
     }
 }`
 
 var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "PUT",
 	Path:    "/v2/apps/my-app-guid?inline-relations-depth=1",
-	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"disk_quota":512,"space_guid":"some-space-guid","state":"STARTED","stack_guid":"some-stack-guid","command":"some-command"}`),
+	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"disk_quota":512,"space_guid":"some-space-guid","state":"STARTED","stack_guid":"some-stack-guid","command":"some-command","diego":true}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body:   updateApplicationResponse},

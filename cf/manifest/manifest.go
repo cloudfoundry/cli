@@ -155,11 +155,12 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	appParams.Memory = bytesVal(yamlMap, "memory", &errs)
 	appParams.InstanceCount = intVal(yamlMap, "instances", &errs)
 	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
-	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
-	appParams.NoHostname = boolVal(yamlMap, "no-hostname", &errs)
-	appParams.UseRandomHostname = boolVal(yamlMap, "random-route", &errs)
+	appParams.NoRoute = nilFalse(boolVal(yamlMap, "no-route", &errs))
+	appParams.NoHostname = nilFalse(boolVal(yamlMap, "no-hostname", &errs))
+	appParams.UseRandomHostname = nilFalse(boolVal(yamlMap, "random-route", &errs))
 	appParams.ServicesToBind = sliceOrEmptyVal(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
+	appParams.Diego = boolVal(yamlMap, "diego", &errs)
 
 	if appParams.Path != nil {
 		path := *appParams.Path
@@ -172,6 +173,14 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	}
 
 	return
+}
+
+func nilFalse(boolVal *bool) bool {
+	if boolVal == nil {
+		return false
+	}
+
+	return *boolVal
 }
 
 func removeDuplicatedValue(ary []string) *[]string {
@@ -289,17 +298,26 @@ func coerceToString(value interface{}) string {
 	return fmt.Sprintf("%v", value)
 }
 
-func boolVal(yamlMap generic.Map, key string, errs *[]error) bool {
+func boolVal(yamlMap generic.Map, key string, errs *[]error) (boolVal *bool) {
 	switch val := yamlMap.Get(key).(type) {
 	case nil:
-		return false
+		return
 	case bool:
-		return val
+		boolVal = &val
+		return
 	case string:
-		return val == "true"
+		value, err := strconv.ParseBool(val)
+		if err != nil {
+			*errs = append(*errs, errors.NewWithFmt(T("Expected {{.PropertyName}} to be a boolean.", map[string]interface{}{"PropertyName": key})))
+			*boolVal = false
+			return
+		}
+		boolVal = &value
+		return
 	default:
 		*errs = append(*errs, errors.NewWithFmt(T("Expected {{.PropertyName}} to be a boolean.", map[string]interface{}{"PropertyName": key})))
-		return false
+		*boolVal = false
+		return
 	}
 }
 

@@ -54,7 +54,7 @@ type ApplicationEntity struct {
 	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
 	PackageState         *string                 `json:"package_state,omitempty"`
 	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
-	Diego                bool                    `json:"diego,omitempty"`
+	Diego                *bool                   `json:"diego,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
@@ -78,6 +78,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		SpaceGuid:          app.SpaceGuid,
 		Instances:          app.InstanceCount,
 		Memory:             app.Memory,
+		Diego:              app.Diego,
 		DiskQuota:          app.DiskQuota,
 		StackGuid:          app.StackGuid,
 		Command:            app.Command,
@@ -136,8 +137,9 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.DetectedBuildpack != nil {
 		app.DetectedBuildpack = *entity.DetectedBuildpack
 	}
-
-	app.Diego = entity.Diego
+	if entity.Diego != nil {
+		app.Diego = *entity.Diego
+	}
 
 	return
 }
