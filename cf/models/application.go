@@ -31,6 +31,7 @@ func (model Application) ToParams() (params AppParams) {
 		Command:         &model.Command,
 		DiskQuota:       &model.DiskQuota,
 		InstanceCount:   &model.InstanceCount,
+		HealthCheckType: &model.HealthCheckType,
 		Memory:          &model.Memory,
 		State:           &state,
 		SpaceGuid:       &model.SpaceGuid,
@@ -56,6 +57,7 @@ type ApplicationFields struct {
 	InstanceCount        int
 	Memory               int64 // in Megabytes
 	RunningInstances     int
+	HealthCheckType      string
 	HealthCheckTimeout   int
 	State                string
 	SpaceGuid            string
@@ -73,6 +75,7 @@ type AppParams struct {
 	Domains            *[]string
 	EnvironmentVars    *map[string]interface{}
 	Guid               *string
+	HealthCheckType    *string
 	HealthCheckTimeout *int
 	Hosts              *[]string
 	InstanceCount      *int
@@ -107,6 +110,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.Guid != nil {
 		app.Guid = other.Guid
+	}
+	if other.HealthCheckType != nil {
+		app.HealthCheckType = other.HealthCheckType
 	}
 	if other.HealthCheckTimeout != nil {
 		app.HealthCheckTimeout = other.HealthCheckTimeout

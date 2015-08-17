@@ -255,6 +255,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			app.Name = "my-cool-app"
 			app.BuildpackUrl = "buildpack-url"
 			app.Command = "some-command"
+			app.HealthCheckType = "none"
 			app.Memory = 2048
 			app.InstanceCount = 3
 			app.Stack = &models.Stack{Guid: "some-stack-guid"}
@@ -496,9 +497,20 @@ var updateApplicationResponse = `
 }`
 
 var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method:  "PUT",
-	Path:    "/v2/apps/my-app-guid?inline-relations-depth=1",
-	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"disk_quota":512,"space_guid":"some-space-guid","state":"STARTED","stack_guid":"some-stack-guid","command":"some-command"}`),
+	Method: "PUT",
+	Path:   "/v2/apps/my-app-guid?inline-relations-depth=1",
+	Matcher: testnet.RequestBodyMatcher(`{
+		"name":"my-cool-app",
+		"instances":3,
+		"buildpack":"buildpack-url",
+		"memory":2048,
+		"health_check_type":"none",
+		"disk_quota":512,
+		"space_guid":"some-space-guid",
+		"state":"STARTED",
+		"stack_guid":"some-stack-guid",
+		"command":"some-command"
+	}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body:   updateApplicationResponse},

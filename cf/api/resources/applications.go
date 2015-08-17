@@ -51,6 +51,7 @@ type ApplicationEntity struct {
 	Buildpack            *string                 `json:"buildpack,omitempty"`
 	DetectedBuildpack    *string                 `json:"detected_buildpack,omitempty"`
 	EnvironmentJson      *map[string]interface{} `json:"environment_json,omitempty"`
+	HealthCheckType      *string                 `json:"health_check_type,omitempty"`
 	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
 	PackageState         *string                 `json:"package_state,omitempty"`
 	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
@@ -81,6 +82,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		DiskQuota:          app.DiskQuota,
 		StackGuid:          app.StackGuid,
 		Command:            app.Command,
+		HealthCheckType:    app.HealthCheckType,
 		HealthCheckTimeout: app.HealthCheckTimeout,
 	}
 	if app.State != nil {
@@ -135,6 +137,9 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	}
 	if entity.DetectedBuildpack != nil {
 		app.DetectedBuildpack = *entity.DetectedBuildpack
+	}
+	if entity.HealthCheckType != nil {
+		app.HealthCheckType = *entity.HealthCheckType
 	}
 
 	app.Diego = entity.Diego
