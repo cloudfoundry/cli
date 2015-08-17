@@ -71,6 +71,7 @@ var _ = Describe("create-app-manifest Command", func() {
 		It("fails with usage when not provided exactly one arg", func() {
 			passed := runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"create-app-manifest", "APP_NAME"},
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 			Expect(passed).To(BeFalse())

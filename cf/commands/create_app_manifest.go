@@ -38,14 +38,14 @@ func (cmd *CreateAppManifest) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-app-manifest",
 		Description: T("Create an app manifest for an app that has been pushed successfully."),
-		Usage:       T("CF_NAME create-app-manifest APP [-p /path/to/<app-name>-manifest.yml ]"),
+		Usage:       T("CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>-manifest.yml ]"),
 		Flags:       fs,
 	}
 }
 
 func (cmd *CreateAppManifest) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires app name as argument\n\n") + command_registry.Commands.CommandUsage("logs"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + command_registry.Commands.CommandUsage("create-app-manifest"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
