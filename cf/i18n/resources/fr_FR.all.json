@@ -630,7 +630,7 @@
       "modified": true
    },
    {
-      "id": "CF_NAME create-app-manifest APP [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
+      "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
       "translation": "CF_NAME create-app-manifest [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
       "modified": true
    },
@@ -2647,6 +2647,11 @@
    {
       "id": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
       "translation": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires APP_NAME as argument\n\n",
+      "translation": "Incorrect Usage. Requires APP_NAME as argument\n\n",
       "modified": false
    },
    {
