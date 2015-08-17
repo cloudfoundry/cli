@@ -205,6 +205,11 @@
       "modified": false
    },
    {
+      "id": " for ",
+      "translation": " for ",
+      "modified": false
+   },
+   {
       "id": " is already started",
       "translation": " Ya ha comenzado",
       "modified": false
@@ -1008,6 +1013,11 @@
       "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
       "translation": "CF_NAME set-env APP NOMBRE VALOR",
       "modified": true
+   },
+   {
+      "id": "CF_NAME set-health-check APP_NAME 'port'|'none'",
+      "translation": "CF_NAME set-health-check APP_NAME 'port'|'none'",
+      "modified": false
    },
    {
       "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
@@ -2160,6 +2170,11 @@
       "modified": false
    },
    {
+      "id": "Error updating health_check_type for ",
+      "translation": "Error updating health_check_type for ",
+      "modified": false
+   },
+   {
       "id": "Error uploading application.\n{{.ApiErr}}",
       "translation": "Error subiendo aplicacion.\n{{.ApiErr}}",
       "modified": false
@@ -2630,6 +2645,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. HEALTH_CHECK_TYPE must be \"port\" or \"none\"\\n\\n",
+      "translation": "Incorrect Usage. HEALTH_CHECK_TYPE must be \"port\" or \"none\"\\n\\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. No argument required\n\n",
       "translation": "Incorrect Usage. No argument required\n\n",
       "modified": false
@@ -2657,6 +2677,11 @@
    {
       "id": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
       "translation": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n",
       "modified": false
    },
    {
@@ -4710,6 +4735,11 @@
       "modified": false
    },
    {
+      "id": "Updating %s health_check_type to '%s'",
+      "translation": "Updating %s health_check_type to '%s'",
+      "modified": false
+   },
+   {
       "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
       "translation": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
       "modified": false
@@ -5090,6 +5120,16 @@
       "modified": false
    },
    {
+      "id": "health_check_type is already set",
+      "translation": "health_check_type is already set",
+      "modified": false
+   },
+   {
+      "id": "health_check_type is not set to ",
+      "translation": "health_check_type is not set to ",
+      "modified": false
+   },
+   {
       "id": "host",
       "translation": "host",
       "modified": false
@@ -5322,6 +5362,11 @@
    {
       "id": "services",
       "translation": "services",
+      "modified": false
+   },
+   {
+      "id": "set health_check_type flag to either 'port' or 'none'",
+      "translation": "set health_check_type flag to either 'port' or 'none'",
       "modified": false
    },
    {

@@ -22,6 +22,7 @@ type FakeApplicationRepository struct {
 
 	CreateAppParams []models.AppParams
 
+	UpdateCalls     int
 	UpdateParams    models.AppParams
 	UpdateAppGuid   string
 	UpdateAppResult models.Application
@@ -217,6 +218,7 @@ func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultAp
 }
 
 func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error) {
+	repo.UpdateCalls++
 	repo.UpdateAppGuid = appGuid
 	repo.UpdateParams = params
 	updatedApp = repo.UpdateAppResult
