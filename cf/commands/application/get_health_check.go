@@ -32,7 +32,7 @@ func (cmd *GetHealthCheck) MetaData() command_registry.CommandMetadata {
 
 func (cmd *GetHealthCheck) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as arguments\n\n") + command_registry.Commands.CommandUsage("get-health-check"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + command_registry.Commands.CommandUsage("get-health-check"))
 	}
 
 	cmd.ui.Say(T("Getting health_check_type value for ") + terminal.EntityNameColor(fc.Args()[0]))
