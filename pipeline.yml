@@ -225,7 +225,7 @@ jobs:
       passed: [deploy-linux-cf]
       params:
         submodules:
-          - src/acceptance-tests
+          - src/github.com/cloudfoundry/cf-acceptance-tests
   - task: cats
     file: cli/ci/cats.linux.yml
     config:
@@ -266,7 +266,7 @@ jobs:
       passed: [deploy-windows-cf]
       params:
         submodules:
-          - src/acceptance-tests
+          - src/github.com/cloudfoundry/cf-acceptance-tests
   - task: cats
     file: cli/ci/cats.windows.yml
     config:
