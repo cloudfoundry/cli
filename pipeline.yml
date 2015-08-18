@@ -20,7 +20,7 @@ groups:
   jobs: [deploy-concourse]
 
 resources:
-- name: cf-cli
+- name: cli
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
@@ -131,7 +131,7 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cf-cli
+    - get: cli
       trigger: true
     - get: version
       params: {pre: plus}
@@ -142,70 +142,70 @@ jobs:
 - name: linux64-unit
   public: true
   plan:
-  - get: cf-cli
+  - get: cli
     passed: [rc]
     trigger: false
   - get: version
     passed: [rc]
     trigger: true
   - task: unit-tests
-    file: cf-cli/ci/unit.linux.yml
+    file: cli/ci/unit.linux.yml
   - put: linux64-binary
     params: {from: unit-tests/cf-linux64-.*}
 
 - name: linux32-unit
   public: true
   plan:
-  - get: cf-cli
+  - get: cli
     passed: [rc]
     trigger: false
   - get: version
     passed: [rc]
     trigger: true
   - task: unit-tests
-    file: cf-cli/ci/unit.linux32.yml
+    file: cli/ci/unit.linux32.yml
   - put: linux32-binary
     params: {from: unit-tests/cf-linux32-.*}
 
 - name: darwin64-unit
   public: true
   plan:
-  - get: cf-cli
+  - get: cli
     passed: [rc]
     trigger: false
   - get: version
     passed: [rc]
     trigger: true
   - task: unit-tests
-    file: cf-cli/ci/unit.darwin.yml
+    file: cli/ci/unit.darwin.yml
   - put: darwin64-binary
     params: {from: unit-tests/cf-darwin64-.*}
 
 - name: win32-unit
   public: true
   plan:
-  - get: cf-cli
+  - get: cli
     passed: [rc]
     trigger: false
   - get: version
     passed: [rc]
     trigger: true
   - task: unit-tests
-    file: cf-cli/ci/unit.windows32.yml
+    file: cli/ci/unit.windows32.yml
   - put: windows32-binary
     params: {from: unit-tests/cf-windows32-.*}
 
 - name: win64-unit
   public: true
   plan:
-  - get: cf-cli
+  - get: cli
     passed: [rc]
     trigger: false
   - get: version
     passed: [rc]
     trigger: true
   - task: unit-tests
-    file: cf-cli/ci/unit.windows.yml
+    file: cli/ci/unit.windows.yml
   - put: windows64-binary
     params: {from: unit-tests/cf-windows64-.*}
 
@@ -214,7 +214,7 @@ jobs:
   serial_groups: [bosh-lite-linux]
   plan:
   - aggregate:
-    - get: cf-cli
+    - get: cli
       passed: [linux64-unit]
       trigger: true
     - get: linux64-binary
@@ -227,7 +227,7 @@ jobs:
         submodules:
           - src/acceptance-tests
   - task: cats
-    file: cf-cli/ci/cats.linux.yml
+    file: cli/ci/cats.linux.yml
     config:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-linux}}
@@ -237,7 +237,7 @@ jobs:
   serial_groups: [bosh-lite-linux]
   plan:
   - aggregate:
-    - get: cf-cli
+    - get: cli
       passed: [linux64-unit]
       trigger: true
     - get: linux64-binary
@@ -245,7 +245,7 @@ jobs:
       trigger: false
     - get: gats
   - task: gats
-    file: cf-cli/ci/gats.linux.yml
+    file: cli/ci/gats.linux.yml
     config:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-linux}}
@@ -255,7 +255,7 @@ jobs:
   serial_groups: [bosh-lite-windows]
   plan:
   - aggregate:
-    - get: cf-cli
+    - get: cli
       passed: [win64-unit]
       trigger: true
     - get: windows64-binary
@@ -268,7 +268,7 @@ jobs:
         submodules:
           - src/acceptance-tests
   - task: cats
-    file: cf-cli/ci/cats.windows.yml
+    file: cli/ci/cats.windows.yml
     config:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-windows}}
@@ -278,7 +278,7 @@ jobs:
   serial_groups: [bosh-lite-windows]
   plan:
   - aggregate:
-    - get: cf-cli
+    - get: cli
       passed: [win64-unit]
       trigger: true
     - get: windows64-binary
@@ -286,7 +286,7 @@ jobs:
       trigger: false
     - get: gats
   - task: gats
-    file: cf-cli/ci/gats.windows.yml
+    file: cli/ci/gats.windows.yml
     config:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-windows}}
@@ -296,7 +296,7 @@ jobs:
   serial_groups: [bosh-lite-windows]
   plan:
   - aggregate:
-    - get: cf-cli
+    - get: cli
       passed: [win64-unit]
       trigger: true
     - get: windows64-binary
@@ -304,7 +304,7 @@ jobs:
       trigger: false
     - get: gats
   - task: gats
-    file: cf-cli/ci/gats.french.windows.yml
+    file: cli/ci/gats.french.windows.yml
     config:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-windows}}
@@ -313,7 +313,7 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cf-cli
+    - get: cli
       trigger: true
       passed:
       - linux64-cats
@@ -342,7 +342,7 @@ jobs:
     - get: cli-ci
       trigger: false
   - task: publish
-    file: cf-cli/ci/publish.yml
+    file: cli/ci/publish.yml
     config:
       params:
         AWS_ACCESS_KEY_ID: {{publish-access-key-id}}
