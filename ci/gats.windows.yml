@@ -6,9 +6,9 @@ params:
 
 inputs:
   - name: windows64-binary
-  - name: cf-cli
+  - name: cli
   - name: gats
     path: gopath/src/github.com/cloudfoundry/GATS
 
 run:
-  path: cf-cli/ci/scripts/gats-windows64-concourse.bat
+  path: cli/ci/scripts/gats-windows64-concourse.bat
