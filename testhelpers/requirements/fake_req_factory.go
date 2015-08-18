@@ -12,6 +12,7 @@ type FakeReqFactory struct {
 	ServiceInstanceName string
 	ServiceInstance     models.ServiceInstance
 
+	ApplicationFails        bool
 	LoginSuccess            bool
 	ApiEndpointSuccess      bool
 	ValidAccessTokenSuccess bool
@@ -48,7 +49,7 @@ type FakeReqFactory struct {
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
 	f.ApplicationName = name
-	return FakeRequirement{f, true}
+	return FakeRequirement{f, !f.ApplicationFails}
 }
 
 func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements.ServiceInstanceRequirement {

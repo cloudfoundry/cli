@@ -840,6 +840,11 @@
       "modified": true
    },
    {
+      "id": "CF_NAME get-health-check APP_NAME",
+      "translation": "CF_NAME get-health-check APP_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME help [COMMAND]",
       "translation": "CF_NAME help [COMMAND]",
       "modified": false
@@ -2420,6 +2425,11 @@
       "modified": false
    },
    {
+      "id": "Getting health_check_type value for ",
+      "translation": "Getting health_check_type value for ",
+      "modified": false
+   },
+   {
       "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
       "translation": "用户{{.Username}}请求组织{{.OrgName}}的信息...",
       "modified": false
@@ -2692,6 +2702,11 @@
    {
       "id": "Incorrect Usage. Requires APP_NAME as argument\n\n",
       "translation": "Incorrect Usage. Requires APP_NAME as argument\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires APP_NAME as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP_NAME as arguments\n\n",
       "modified": false
    },
    {
@@ -5117,6 +5132,16 @@
    {
       "id": "free or paid",
       "translation": "free or paid",
+      "modified": false
+   },
+   {
+      "id": "get the health_check_type value of an app",
+      "translation": "get the health_check_type value of an app",
+      "modified": false
+   },
+   {
+      "id": "health_check_type is ",
+      "translation": "health_check_type is ",
       "modified": false
    },
    {
