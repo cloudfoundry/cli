@@ -14,8 +14,8 @@ groups:
   - win64-gats
   - win64-gats-french
   - publish
-- name: bosh-lite
-  jobs: [provision-linux, provision-windows]
+- name: deployments
+  jobs: [deploy-linux-cf, deploy-windows-cf]
 - name: concourse
   jobs: [deploy-concourse]
 
@@ -211,7 +211,7 @@ jobs:
 
 - name: linux64-cats
   public: true
-  serial_groups: [bosh-lite-linux]
+  serial_groups: [cf-linux]
   plan:
   - aggregate:
     - get: cli
@@ -222,7 +222,7 @@ jobs:
       trigger: false
     - get: cf-release
       trigger: false
-      passed: [provision-linux]
+      passed: [deploy-linux-cf]
       params:
         submodules:
           - src/acceptance-tests
@@ -234,7 +234,7 @@ jobs:
 
 - name: linux64-gats
   public: true
-  serial_groups: [bosh-lite-linux]
+  serial_groups: [cf-linux]
   plan:
   - aggregate:
     - get: cli
@@ -252,7 +252,7 @@ jobs:
 
 - name: win64-cats
   public: true
-  serial_groups: [bosh-lite-windows]
+  serial_groups: [cf-windows]
   plan:
   - aggregate:
     - get: cli
@@ -263,7 +263,7 @@ jobs:
       trigger: false
     - get: cf-release
       trigger: false
-      passed: [provision-windows]
+      passed: [deploy-windows-cf]
       params:
         submodules:
           - src/acceptance-tests
@@ -275,7 +275,7 @@ jobs:
 
 - name: win64-gats
   public: true
-  serial_groups: [bosh-lite-windows]
+  serial_groups: [cf-windows]
   plan:
   - aggregate:
     - get: cli
@@ -293,7 +293,7 @@ jobs:
 
 - name: win64-gats-french
   public: true
-  serial_groups: [bosh-lite-windows]
+  serial_groups: [cf-windows]
   plan:
   - aggregate:
     - get: cli
@@ -348,7 +348,7 @@ jobs:
         AWS_ACCESS_KEY_ID: {{publish-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{publish-secret-access-key}}
 
-- name: provision-linux
+- name: deploy-linux-cf
   serial: true
   plan:
   - aggregate:
@@ -374,7 +374,7 @@ jobs:
       repository: provision/cli-ci
       rebase: true
 
-- name: provision-windows
+- name: deploy-windows-cf
   serial: true
   plan:
   - aggregate:
