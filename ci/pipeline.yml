@@ -3,16 +3,16 @@ groups:
 - name: cli
   jobs:
   - rc
-  - linux64-unit
-  - linux32-unit
-  - darwin64-unit
-  - win64-unit
-  - win32-unit
-  - linux64-gats
-  - linux64-cats
-  - win64-cats
-  - win64-gats
-  - win64-gats-french
+  - unit-linux64
+  - unit-linux32
+  - unit-darwin64
+  - unit-win64
+  - unit-win32
+  - cats-linux64
+  - cats-win64
+  - gats-linux64
+  - gats-win64
+  - gats-win64-french
   - publish
 - name: deployments
   jobs: [deploy-linux-cf, deploy-windows-cf]
@@ -139,7 +139,7 @@ jobs:
   - put: version
     params: {file: version/number}
 
-- name: linux64-unit
+- name: unit-linux64
   public: true
   plan:
   - get: cli
@@ -153,7 +153,7 @@ jobs:
   - put: linux64-binary
     params: {from: unit-tests/cf-linux64-.*}
 
-- name: linux32-unit
+- name: unit-linux32
   public: true
   plan:
   - get: cli
@@ -167,7 +167,7 @@ jobs:
   - put: linux32-binary
     params: {from: unit-tests/cf-linux32-.*}
 
-- name: darwin64-unit
+- name: unit-darwin64
   public: true
   plan:
   - get: cli
@@ -181,7 +181,7 @@ jobs:
   - put: darwin64-binary
     params: {from: unit-tests/cf-darwin64-.*}
 
-- name: win32-unit
+- name: unit-win32
   public: true
   plan:
   - get: cli
@@ -195,7 +195,7 @@ jobs:
   - put: windows32-binary
     params: {from: unit-tests/cf-windows32-.*}
 
-- name: win64-unit
+- name: unit-win64
   public: true
   plan:
   - get: cli
@@ -209,16 +209,16 @@ jobs:
   - put: windows64-binary
     params: {from: unit-tests/cf-windows64-.*}
 
-- name: linux64-cats
+- name: cats-linux64
   public: true
   serial_groups: [cf-linux]
   plan:
   - aggregate:
     - get: cli
-      passed: [linux64-unit]
+      passed: [unit-linux64]
       trigger: true
     - get: linux64-binary
-      passed: [linux64-unit]
+      passed: [unit-linux64]
       trigger: false
     - get: cf-release
       trigger: false
@@ -232,16 +232,16 @@ jobs:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-linux}}
 
-- name: linux64-gats
+- name: gats-linux64
   public: true
   serial_groups: [cf-linux]
   plan:
   - aggregate:
     - get: cli
-      passed: [linux64-unit]
+      passed: [unit-linux64]
       trigger: true
     - get: linux64-binary
-      passed: [linux64-unit]
+      passed: [unit-linux64]
       trigger: false
     - get: gats
   - task: gats
@@ -250,16 +250,16 @@ jobs:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-linux}}
 
-- name: win64-cats
+- name: cats-win64
   public: true
   serial_groups: [cf-windows]
   plan:
   - aggregate:
     - get: cli
-      passed: [win64-unit]
+      passed: [unit-win64]
       trigger: true
     - get: windows64-binary
-      passed: [win64-unit]
+      passed: [unit-win64]
       trigger: false
     - get: cf-release
       trigger: false
@@ -273,16 +273,16 @@ jobs:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-windows}}
 
-- name: win64-gats
+- name: gats-win64
   public: true
   serial_groups: [cf-windows]
   plan:
   - aggregate:
     - get: cli
-      passed: [win64-unit]
+      passed: [unit-win64]
       trigger: true
     - get: windows64-binary
-      passed: [win64-unit]
+      passed: [unit-win64]
       trigger: false
     - get: gats
   - task: gats
@@ -291,16 +291,16 @@ jobs:
       params:
         BOSH_LITE_IP: {{bosh-lite-ip-windows}}
 
-- name: win64-gats-french
+- name: gats-win64-french
   public: true
   serial_groups: [cf-windows]
   plan:
   - aggregate:
     - get: cli
-      passed: [win64-unit]
+      passed: [unit-win64]
       trigger: true
     - get: windows64-binary
-      passed: [win64-unit]
+      passed: [unit-win64]
       trigger: false
     - get: gats
   - task: gats
@@ -316,29 +316,31 @@ jobs:
     - get: cli
       trigger: true
       passed:
-      - linux64-cats
-      - linux64-gats
-      - win64-cats
-      - win64-gats
-      - win64-gats-french
-      - darwin64-unit
-      - win32-unit
-      - linux32-unit
+        - unit-linux64
+        - unit-linux32
+        - unit-darwin64
+        - unit-win64
+        - unit-win32
+        - cats-linux64
+        - cats-win64
+        - gats-linux64
+        - gats-win64
+        - gats-win64-french
     - get: linux64-binary
       trigger: false
-      passed: [linux64-unit]
+      passed: [unit-linux64]
     - get: linux32-binary
       trigger: false
-      passed: [linux32-unit]
+      passed: [unit-linux32]
     - get: windows64-binary
       trigger: false
-      passed: [win64-unit]
+      passed: [unit-win64]
     - get: windows32-binary
       trigger: false
-      passed: [win32-unit]
+      passed: [unit-win32]
     - get: darwin64-binary
       trigger: false
-      passed: [darwin64-unit]
+      passed: [unit-darwin64]
     - get: cli-ci
       trigger: false
   - task: publish
