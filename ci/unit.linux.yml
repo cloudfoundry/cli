@@ -3,7 +3,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-ci
 
 inputs:
-  - name: cf-cli
+  - name: cli
     path: gopath/src/github.com/cloudfoundry/cli
   - name: version
 

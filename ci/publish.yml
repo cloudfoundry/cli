@@ -8,7 +8,7 @@ params:
   AWS_SECRET_ACCESS_KEY:
 
 inputs:
-- name: cf-cli
+- name: cli
 - name: cli-ci
 - name: darwin64-binary
 - name: linux64-binary
@@ -17,4 +17,4 @@ inputs:
 - name: windows32-binary
 
 run:
-  path: cf-cli/ci/scripts/build-and-release-concourse
+  path: cli/ci/scripts/build-and-release-concourse
