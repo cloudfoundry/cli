@@ -6,10 +6,10 @@ params:
   BOSH_LITE_IP:
 
 inputs:
-  - name: cf-cli
+  - name: cli
   - name: gats
     path: gopath/src/github.com/cloudfoundry/GATS
   - name: linux64-binary
 
 run:
-  path: cf-cli/ci/scripts/unix-gats-concourse
+  path: cli/ci/scripts/unix-gats-concourse
