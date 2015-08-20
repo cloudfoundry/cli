@@ -1,15 +1,5 @@
 package models
 
-func NewSpaceQuota(name string, memory int64, routes int, services int, nonbasicservices bool, orgGuid string) (q SpaceQuota) {
-	q.Name = name
-	q.MemoryLimit = memory
-	q.RoutesLimit = routes
-	q.ServicesLimit = services
-	q.NonBasicServicesAllowed = nonbasicservices
-	q.OrgGuid = orgGuid
-	return
-}
-
 type SpaceQuota struct {
 	Guid                    string `json:"guid,omitempty"`
 	Name                    string `json:"name"`

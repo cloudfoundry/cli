@@ -60,15 +60,6 @@ func (cmd *Stop) SetDependency(deps command_registry.Dependency, pluginCall bool
 	return cmd
 }
 
-func NewStop(ui terminal.UI, config core_config.Reader, appRepo applications.ApplicationRepository) (cmd *Stop) {
-	cmd = new(Stop)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appRepo = appRepo
-
-	return
-}
-
 func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName string) (updatedApp models.Application, err error) {
 	if app.State == "stopped" {
 		updatedApp = app

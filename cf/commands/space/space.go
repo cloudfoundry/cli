@@ -31,14 +31,6 @@ func init() {
 	command_registry.Register(&ShowSpace{})
 }
 
-func NewShowSpace(ui terminal.UI, config core_config.Reader, quotaRepo space_quotas.SpaceQuotaRepository) (cmd *ShowSpace) {
-	cmd = new(ShowSpace)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.quotaRepo = quotaRepo
-	return
-}
-
 func (cmd *ShowSpace) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given space's guid.  All other output for the space is suppressed.")}

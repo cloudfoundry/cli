@@ -58,14 +58,6 @@ func (cmd *DeleteDomain) SetDependency(deps command_registry.Dependency, pluginC
 	return cmd
 }
 
-func NewDeleteDomain(ui terminal.UI, config core_config.Reader, repo api.DomainRepository) (cmd *DeleteDomain) {
-	cmd = new(DeleteDomain)
-	cmd.ui = ui
-	cmd.config = config
-	cmd.domainRepo = repo
-	return
-}
-
 func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 	domainName := c.Args()[0]
 	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)

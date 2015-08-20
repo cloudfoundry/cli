@@ -168,11 +168,10 @@ var _ = Describe("AuthenticationRepository", func() {
 	})
 
 	Describe("refreshing the auth token", func() {
-		var refreshedToken string
 		var apiErr error
 
 		JustBeforeEach(func() {
-			refreshedToken, apiErr = auth.RefreshAuthToken()
+			_, apiErr = auth.RefreshAuthToken()
 		})
 
 		Context("when the refresh token has expired", func() {
