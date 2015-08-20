@@ -36,16 +36,6 @@ type ShowApp struct {
 	pluginCall       bool
 }
 
-func NewShowApp(ui terminal.UI, config core_config.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo app_instances.AppInstancesRepository, appLogsNoaaRepo api.LogsNoaaRepository) (cmd *ShowApp) {
-	cmd = &ShowApp{}
-	cmd.ui = ui
-	cmd.config = config
-	cmd.appSummaryRepo = appSummaryRepo
-	cmd.appInstancesRepo = appInstancesRepo
-	cmd.appLogsNoaaRepo = appLogsNoaaRepo
-	return
-}
-
 func init() {
 	command_registry.Register(&ShowApp{})
 }

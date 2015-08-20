@@ -234,9 +234,9 @@ func hostNameForString(name string) string {
 }
 
 func (cmd *Push) findDomain(domainName *string) (domain models.DomainFields) {
-	domain, error := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().Guid, domainName)
-	if error != nil {
-		cmd.ui.Failed(error.Error())
+	domain, err := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().Guid, domainName)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 
 	return

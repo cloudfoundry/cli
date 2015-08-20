@@ -56,14 +56,6 @@ func (cmd *MarketplaceServices) SetDependency(deps command_registry.Dependency, 
 	return cmd
 }
 
-func NewMarketplaceServices(ui terminal.UI, config core_config.Reader, serviceBuilder service_builder.ServiceBuilder) MarketplaceServices {
-	return MarketplaceServices{
-		ui:             ui,
-		config:         config,
-		serviceBuilder: serviceBuilder,
-	}
-}
-
 func (cmd *MarketplaceServices) Execute(c flags.FlagContext) {
 	serviceName := c.String("s")
 

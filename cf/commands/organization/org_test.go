@@ -15,24 +15,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func callShowOrg(args []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-
-	token := core_config.TokenInfo{Username: "my-user"}
-
-	spaceFields := models.SpaceFields{}
-	spaceFields.Name = "my-space"
-
-	orgFields := models.OrganizationFields{}
-	orgFields.Name = "my-org"
-
-	configRepo := testconfig.NewRepositoryWithAccessToken(token)
-	configRepo.SetSpaceFields(spaceFields)
-	configRepo.SetOrganizationFields(orgFields)
-
-	return
-}
-
 var _ = Describe("org command", func() {
 	var (
 		ui                  *testterm.FakeUI
