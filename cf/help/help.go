@@ -149,6 +149,9 @@ func newAppPresenter() (presenter appPresenter) {
 					presentNonCodegangstaCommand("copy-source"),
 				}, {
 					presentNonCodegangstaCommand("create-app-manifest"),
+				}, {
+					presentNonCodegangstaCommand("get-health-check"),
+					presentNonCodegangstaCommand("set-health-check"),
 				},
 			},
 		}, {
