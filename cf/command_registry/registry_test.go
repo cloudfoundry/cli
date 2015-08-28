@@ -145,15 +145,6 @@ var _ = Describe("CommandRegistry", func() {
 				))
 			})
 
-			It("prefixes the non-bool flag with '-'", func() {
-				o := Commands.CommandUsage("fake-command")
-				outputs := strings.Split(o, "\n")
-				Ω(outputs).To(BeInDisplayOrder(
-					[]string{"OPTIONS:"},
-					[]string{"-intFlag", "Usage for"},
-				))
-			})
-
 			It("replaces 'CF_NAME' with executable name from os.Arg[0]", func() {
 				o := Commands.CommandUsage("fake-command")
 				outputs := strings.Split(o, "\n")
@@ -164,24 +155,6 @@ var _ = Describe("CommandRegistry", func() {
 				Consistently(outputs).ShouldNot(ContainSubstrings([]string{"CF_NAME"}))
 			})
 
-			It("prefixes single character bool flags with '-'", func() {
-				o := Commands.CommandUsage("fake-command")
-				outputs := strings.Split(o, "\n")
-				Ω(outputs).To(BeInDisplayOrder(
-					[]string{"OPTIONS:"},
-					[]string{"  -f", "Usage for"},
-				))
-			})
-
-			It("prefixes multi-character bool flags with '--'", func() {
-				o := Commands.CommandUsage("fake-command")
-				outputs := strings.Split(o, "\n")
-				Ω(outputs).To(BeInDisplayOrder(
-					[]string{"OPTIONS:"},
-					[]string{" -intFlag", "Usage for"},
-					[]string{" --boolFlag", "Usage for"},
-				))
-			})
 		})
 	})
 

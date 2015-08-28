@@ -15,8 +15,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/commands_loader"
-	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
+	"github.com/simonleung8/flags"
 )
 
 var deps = command_registry.NewDependency()

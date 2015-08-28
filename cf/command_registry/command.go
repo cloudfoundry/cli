@@ -2,7 +2,7 @@ package command_registry
 
 import (
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/flags"
+	"github.com/simonleung8/flags"
 )
 
 //go:generate counterfeiter -o ../../testhelpers/commands/fake_registry_command.go . Command

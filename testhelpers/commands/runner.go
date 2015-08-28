@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/flags"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	"github.com/simonleung8/flags"
 )
 
 type RunCommandResult int

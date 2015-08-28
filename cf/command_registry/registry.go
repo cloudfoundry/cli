@@ -12,6 +12,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	. "github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/simonleung8/flags"
 )
 
 var _ = initI18nFunc()
@@ -127,34 +128,7 @@ func (r *registry) CommandUsage(cmdName string) string {
 
 	if cmd.MetaData().Flags != nil {
 		output += "\n" + T("OPTIONS") + ":" + "\n"
-
-		//find longest name length
-		l := 0
-		for n, _ := range cmd.MetaData().Flags {
-			if len(n) > l {
-				l = len(n)
-			}
-		}
-		//print non-bool flags first
-		for n, f := range cmd.MetaData().Flags {
-			switch f.GetValue().(type) {
-			case bool:
-			default:
-				output += "   -" + n + strings.Repeat(" ", 7+(l-len(n))) + f.String() + "\n"
-			}
-		}
-
-		//then bool flags
-		for n, f := range cmd.MetaData().Flags {
-			switch f.GetValue().(type) {
-			case bool:
-				if len(f.GetName()) == 1 {
-					output += "   -" + n + strings.Repeat(" ", 7+(l-len(n))) + f.String() + "\n"
-				} else {
-					output += "   --" + n + strings.Repeat(" ", 6+(l-len(n))) + f.String() + "\n"
-				}
-			}
-		}
+		output += flags.NewFlagContext(cmd.MetaData().Flags).ShowUsage(3)
 	}
 
 	return output
