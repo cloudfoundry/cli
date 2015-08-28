@@ -190,9 +190,9 @@
       "modified": false
    },
    {
-      "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
+      "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n",
       "translation": "   [-i 实例数] [-k 磁盘配额] [-m 内存配额] [-n 主机] [-p 应用本地包所在路径] [-s 栈深度] [-t 超时时间]\n",
-      "modified": false
+      "modified": true
    },
    {
       "id": " added as '",

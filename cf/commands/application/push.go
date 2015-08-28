@@ -66,7 +66,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Path to app directory or to a zip file of the contents of the app directory")}
 	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
 	fs["t"] = &cliFlags.StringFlag{Name: "t", Usage: T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")}
-	fs["u"] = &cliFlags.StringFlag{Name: "u", Usage: T("Application health check type (e.g. port or none)")}
+	fs["health-check-type"] = &cliFlags.StringFlag{Name: "health-check-type", ShortName: "u", Usage: T("Application health check type (e.g. port or none)")}
 	fs["no-hostname"] = &cliFlags.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")}
 	fs["no-manifest"] = &cliFlags.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")}
 	fs["no-route"] = &cliFlags.BoolFlag{Name: "no-route", Usage: T("Do not map a route to this app and remove routes from previous pushes of this app.")}
@@ -77,7 +77,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 		Name:        "push",
 		ShortName:   "p",
 		Description: T("Push a new app or sync changes to an existing app"),
-		Usage: T("Push a single app (with or without a manifest):\n") + T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n") + T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n") +
+		Usage: T("Push a single app (with or without a manifest):\n") + T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n") + T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n") +
 			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n" +
 			"\n" + T("   Push multiple apps with a manifest:\n") + T("   CF_NAME push [-f MANIFEST_PATH]\n"),
 		Flags: fs,
