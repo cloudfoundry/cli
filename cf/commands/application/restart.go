@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/flags"
+	"github.com/simonleung8/flags"
 )
 
 //go:generate counterfeiter -o ../../../testhelpers/commands/fake_application_restarter.go . ApplicationRestarter

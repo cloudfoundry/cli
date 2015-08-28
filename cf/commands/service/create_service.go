@@ -13,9 +13,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
-	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/cli/json"
+	"github.com/simonleung8/flags"
+	"github.com/simonleung8/flags/flag"
 )
 
 type CreateService struct {

@@ -16,10 +16,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/fileutils"
-	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/utils"
+	"github.com/simonleung8/flags"
+	"github.com/simonleung8/flags/flag"
 
 	rpcService "github.com/cloudfoundry/cli/plugin/rpc"
 )
