@@ -425,6 +425,11 @@
       "modified": false
    },
    {
+      "id": "Application health check type (e.g. port or none)",
+      "translation": "Application health check type (e.g. port or none)",
+      "modified": false
+   },
+   {
       "id": "Apps:",
       "translation": "Apps:",
       "modified": false
@@ -2942,6 +2947,11 @@
    {
       "id": "Invalid disk quota: {{.DiskQuota}}\n{{.Err}}",
       "translation": "Cuota de disco invalida: {{.DiskQuota}}\n{{.Err}}",
+      "modified": false
+   },
+   {
+      "id": "Invalid health-check-type param: {{.healthCheckType}}",
+      "translation": "Invalid health-check-type param: {{.healthCheckType}}",
       "modified": false
    },
    {

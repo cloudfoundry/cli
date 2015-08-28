@@ -361,6 +361,7 @@ var _ = Describe("Push Command", func() {
 					"-b", "https://github.com/heroku/heroku-buildpack-play.git",
 					"-s", "customLinux",
 					"-t", "1",
+					"-u", "port",
 					"--no-start",
 					"my-new-app",
 				)
@@ -386,6 +387,7 @@ var _ = Describe("Push Command", func() {
 				Expect(*appRepo.CreatedAppParams().Memory).To(Equal(int64(2048)))
 				Expect(*appRepo.CreatedAppParams().StackGuid).To(Equal("custom-linux-guid"))
 				Expect(*appRepo.CreatedAppParams().HealthCheckTimeout).To(Equal(1))
+				Expect(*appRepo.CreatedAppParams().HealthCheckType).To(Equal("port"))
 				Expect(*appRepo.CreatedAppParams().BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
 
 				Expect(domainRepo.FindByNameInOrgName).To(Equal("bar.cf-app.com"))
@@ -400,6 +402,14 @@ var _ = Describe("Push Command", func() {
 				Expect(appGuid).To(Equal("my-new-app-guid"))
 
 				Expect(starter.ApplicationStartCallCount()).To(Equal(0))
+			})
+
+			Context("when health-check-type '-u' is supplied", func() {
+				It("shows error if value is not 'port' or none'", func() {
+					callPush("-u", "bad-value")
+
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
+				})
 			})
 
 			Context("when there is a shared domain", func() {
