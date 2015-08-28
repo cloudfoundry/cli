@@ -477,6 +477,19 @@ var _ = Describe("start command", func() {
 			))
 		})
 
+		It("displays an TIP about needing to push from source directory when staging fails with NoAppDetectedError", func() {
+			defaultAppForStart.PackageState = "FAILED"
+			defaultAppForStart.StagingFailedReason = "NoAppDetectedError"
+
+			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"my-app"},
+				[]string{"FAILED"},
+				[]string{"is executed from within the directory"},
+			))
+		})
+
 		Context("when an app instance is flapping", func() {
 			It("fails and alerts the user", func() {
 				appInstance := models.AppInstanceFields{}
