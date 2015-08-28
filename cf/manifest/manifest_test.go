@@ -242,20 +242,21 @@ var _ = Describe("Manifests", func() {
 		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
-					"buildpack":    "my-buildpack",
-					"disk_quota":   "512M",
-					"domain":       "my-domain",
-					"domains":      []interface{}{"domain1.test", "domain2.test"},
-					"host":         "my-hostname",
-					"hosts":        []interface{}{"host-1", "host-2"},
-					"name":         "my-app-name",
-					"stack":        "my-stack",
-					"memory":       "256M",
-					"instances":    1,
-					"timeout":      11,
-					"no-route":     true,
-					"no-hostname":  true,
-					"random-route": true,
+					"buildpack":         "my-buildpack",
+					"disk_quota":        "512M",
+					"domain":            "my-domain",
+					"domains":           []interface{}{"domain1.test", "domain2.test"},
+					"host":              "my-hostname",
+					"hosts":             []interface{}{"host-1", "host-2"},
+					"name":              "my-app-name",
+					"stack":             "my-stack",
+					"memory":            "256M",
+					"health-check-type": "none",
+					"instances":         1,
+					"timeout":           11,
+					"no-route":          true,
+					"no-hostname":       true,
+					"random-route":      true,
 				},
 			},
 		}))
@@ -270,6 +271,7 @@ var _ = Describe("Manifests", func() {
 		Expect(*apps[0].Hosts).To(ConsistOf([]string{"host-1", "host-2", "my-hostname"}))
 		Expect(*apps[0].Name).To(Equal("my-app-name"))
 		Expect(*apps[0].StackName).To(Equal("my-stack"))
+		Expect(*apps[0].HealthCheckType).To(Equal("none"))
 		Expect(*apps[0].Memory).To(Equal(int64(256)))
 		Expect(*apps[0].InstanceCount).To(Equal(1))
 		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
