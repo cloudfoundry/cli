@@ -1,3 +1,120 @@
+##6.12.3
+* Insert debug messages into CI script
+* Merge pull request #544 from cloudfoundry/code-tidy Code tidy
+* Merge pull request #523 from zachgersh/master Unmarshal the extra field, get documentation url
+* Point to CATS in their new submodule for concourse [#100838442]
+* Put job type ahead of architecture in concourse [#100838442]
+* Clearer names for cf deployments [#100838442]
+* Consistant name for the cli repo Makes it more obvious when you see a path: cli/...[#100838442]
+* Unmarshal the extra field, get documentation url 
+* add Diego to application model
+* Code cleanup: remove unused variables
+* Code cleanup: remove orphan functions
+* Code cleanup: shadowing reserved word
+* update GATS new repo path [#98861144]
+* update jibber_jabber repo path [#98861144]
+* use go 1.4 to detect symlink file in windows [#75245040]
+* do not call GetContainerMetrics() when a diego app is stopped [#98672332]
+* Merge pull request #540 from cloudfoundry/use_go_yaml Support yaml '<<' merge type
+* remove CodeGangsta dependencies
+* complete removal of codegangsta related tests/packages [finishes #97061610 #97061532]
+* remove codegangsta from terminal/ui package [#97061610]
+* remove orphaned SetApplicationName() in requirements factory
+  - func was there to partially support concourrent command calls from plugin. Currently we don't support concurrent calls.
+* improve main package's readability [#97061610]
+* Clear out codegangsta reference and unused tests in main package [#97061610]
+* remove codegangsta from plugin/rpc package - remove deprecated SetTheApp() [#97061610]
+* Merge pull request #534 from cloudfoundry/feature/commands-restart-and-create Move commands to new command pattern.
+* Move commands to new command pattern. create-user, restart-app-instance [#97061558]
+* correct usage text in command space [finishes ##100470938]
+* update command_registry test to pass windows
+* show executable name instead of CF_NAME in usage help [finishes #100453848]
+* handles -v for cf version
+* handles usage help without codegangsta
+* help command for cmd usage
+* handle help menu printing without codegangsta - move cf/app/help into cf/help
+  - handles `cf help` / `cf --help` / `cf -h`
+* new func Metadatas() in command_registry for returning all metas
+* include additional command package in commands_loader
+* commands_loader package
+* convert commands to non-codegangsta [#97061558]
+  - service-key - delete-service-key - update-user-provided-service - unbind-service
+* convert commands to non-codegangsta [#97061558] - install-plugin - update-service
+* RemoveCommand() in command_registry
+* convert commands to non-codegangsta [#97061558]
+  - push - disable-service-access - enable-service-access
+* convert commands to non-codegangsta [#97061558]
+  - copy-source - service-access
+* convert commands to non-codegangsta [#97061558]
+  - restage - restart - scale - create-space - set-space-role
+* convert commands to non-codegangsta [#97061558]
+  - bind-service - service-keys - set-space-role
+* convert commands to non-codegangsta [#97061558]
+  - create-user-provided-service - create-service-key
+* BrokerBuilder and PlanBuilder in command_registry.Dependency
+* convert commands to non-codegangsta [#97061558]
+  - stop - restart
+* convert start commands to non-codegangsta [#97061558]
+* convert commands to non-codegangsta [#97061558]
+  - map-route - create-route
+* convert commands to non-codegangsta [#97061558]
+  - plugins - uninstall-plugin
+* update install-plugin to check conflicts with non-codegangsta commands
+* command_registry.CommandExists() returns false for empty string command name
+* convert commands to non-codegangsta [#97061558]
+  - config - curl - oauth-token - add-plugin-repo - list-plugin-repo - remove-plugin-repo - repo-plugins - update-space-quota
+* add plugin_repo.PluginRepo to command_registry dependency
+* remove hardcoded version number
+* add StringSlice flag feature
+* convert commands to non-codegangsta [#97061558]
+  - feature-flags - feature-flag - enable-feature-flag - disable-feature-flag
+* convert commands to non-codegangsta [#97061558]
+  - set-running-environment-variable-group - set-staging-environment-variable-group
+* add MaxCommandNameLength() to command_registry
+* convert commands to non-codegangsta [#97061558]
+  - staging-environment-variable-group
+* convert commands to non-codegangsta [#97061558]
+  - running-environment-variable-group - bind-running-security=group - running-security-groups - unbind-running-secuirty-group
+* convert commands to non-codegangsta [#97061558]
+  - bind-security-group - unbind-security-group - staging-seucirty-groups - unbind-staging-security-group - bind-staging-security-group
+* update french translation
+* convert commands to non-codegangsta [#97061558]
+  - create-security-group - delete-security-group - update-security-group
+* convert commands to non-codegangsta [#97061558]
+  - security-group - security-groups - purge-service-offering
+* convert commands to non-codegangsta [#97061558]
+  - delete-service-auth-token - update-service-auth-token - create-service-broker - delete-service-broker - rename-service-broker - service-brokers - update-service-broker - migrate-service-instances
+* convert commands to non-codegangsta [#97061558]
+  - create-service-auth-token - service-auth-tokens - delete-space-quota - set-space-quota - unset-space-quota
+* convert space-quotas, space-quota, create-space-quota, update-space-quota to non-codegangsta [#97061558]
+* convert rename-service to non-codegangsta [#97061558]
+* convert unshare-private-domain to non-codegangsta [#97061558]
+* convert share-private-domain to non-codegangsta [#97061558]
+* Merge pull request #505 from zhang-hua/bug-93578300 Reduce API calls when CRU operations of service keys
+* Merge branch 'story-87481016' of https://github.com/zhang-hua/cli into zhang-hua-story-87481016
+* convert share-private-domain to non-codegangsta [#97061558]
+* handles 'cf help <command>' for non-codegangsta command
+* convert delete-user, set-org-role, unset-org-role to non-codegangsta [#97061558]
+* convert delete-service to non-codegangsta [#97061558]
+* convert delete-space, rename-space to non-codegangsta [#97061558]
+* convert create-quota, delete-quota, update-quota to non-codegangsta [#97061558]
+* convert set-quota to non-codegangsta [#97061558]
+* convert delete-buildpack, rename-buildpack, quota, quotas to non-codegangsta [#97061558] 
+* convert buildpacks, create-buildpack, update-buildpack to non-codegangsta
+* Merge pull request #514 from HuaweiTech/hwcf-issue-34 Fix create-app-manifest only includes one host [92530254]
+* both godep and travis should use golang v.1.4.2
+* make reference to domain test suite for commands to self registered 
+  - Godep golang 1.4
+* use go v1.4.2 in travis
+* convert all check-route, delete-route and delete-orphaned-routes to non-codegangsta [#97061558]
+* convert map-route and unmap-route to non-codegangsta
+* convert all commands in domain/, rename-org to non-codegangsta [#97061558] 
+* convert delete-org to non-codegangsta [#97061558]
+* convert create-org to non-codegangsta [#97061558]
+* Fix create-app-manifest only includes one host [92530254] 
+* SpaceManager and SpaceAuditor should receive 403 [#87481016]
+* Reduce API calls when CRU operations of service keys [#93578300]
+
 ##6.12.2
 * convert create-service to non-codegangsta [#97061558]
 * remove used constructor in cmd logs 
