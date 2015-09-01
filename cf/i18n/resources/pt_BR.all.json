@@ -110,7 +110,7 @@
       "modified": false
    },
    {
-      "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n",
+      "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
       "translation": "   CF_NAME push APP [-b BUILDPACK_NAME] [-c COMANDO] [-d DOMÍNIO] [-f CAMINHO-DO-MANIFESTO]\n",
       "modified": true
    },
