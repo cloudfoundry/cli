@@ -55,7 +55,8 @@ type ApplicationEntity struct {
 	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
 	PackageState         *string                 `json:"package_state,omitempty"`
 	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
-	Diego                bool                    `json:"diego,omitempty"`
+	Diego                *bool                   `json:"diego,omitempty"`
+	DockerImage          *string                 `json:"docker_image,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
@@ -84,7 +85,10 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		Command:            app.Command,
 		HealthCheckType:    app.HealthCheckType,
 		HealthCheckTimeout: app.HealthCheckTimeout,
+		DockerImage:        app.DockerImage,
+		Diego:              app.Diego,
 	}
+
 	if app.State != nil {
 		state := strings.ToUpper(*app.State)
 		entity.State = &state
@@ -132,6 +136,9 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.StagingFailedReason != nil {
 		app.StagingFailedReason = *entity.StagingFailedReason
 	}
+	if entity.DockerImage != nil {
+		app.DockerImage = *entity.DockerImage
+	}
 	if entity.Buildpack != nil {
 		app.Buildpack = *entity.Buildpack
 	}
@@ -141,8 +148,9 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.HealthCheckType != nil {
 		app.HealthCheckType = *entity.HealthCheckType
 	}
-
-	app.Diego = entity.Diego
+	if entity.Diego != nil {
+		app.Diego = *entity.Diego
+	}
 
 	return
 }

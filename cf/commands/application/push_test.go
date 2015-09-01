@@ -404,6 +404,30 @@ var _ = Describe("Push Command", func() {
 				Expect(starter.ApplicationStartCallCount()).To(Equal(0))
 			})
 
+			Context("when pushing a docker image with --docker-image or -o", func() {
+				It("sets diego to true", func() {
+					callPush("testApp", "--docker-image", "sample/dockerImage")
+
+					Expect(len(appRepo.CreateAppParams)).To(Equal(1))
+					Expect(*appRepo.CreatedAppParams().Diego).To(BeTrue())
+				})
+
+				It("sets docker_image", func() {
+					callPush("testApp", "-o", "sample/dockerImage")
+
+					Expect(*appRepo.CreatedAppParams().DockerImage).To(Equal("sample/dockerImage"))
+				})
+
+				It("does not upload appbits", func() {
+					callPush("testApp", "--docker-image", "sample/dockerImage")
+
+					Expect(actor.UploadAppCallCount()).To(Equal(0))
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Uploading testApp"},
+					))
+				})
+			})
+
 			Context("when health-check-type '-u' or '--health-check-type' is supplied", func() {
 				It("shows error if value is not 'port' or none'", func() {
 					callPush("app-name", "-u", "bad-value")
@@ -740,6 +764,7 @@ var _ = Describe("Push Command", func() {
 					Expect(len(appRepo.CreateAppParams)).To(Equal(0))
 				})
 			})
+
 		})
 	})
 
