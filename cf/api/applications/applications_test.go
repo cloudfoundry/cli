@@ -503,6 +503,7 @@ var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 		"name":"my-cool-app",
 		"instances":3,
 		"buildpack":"buildpack-url",
+		"docker_image":"",
 		"memory":2048,
 		"health_check_type":"none",
 		"disk_quota":512,

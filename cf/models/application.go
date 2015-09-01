@@ -36,6 +36,7 @@ func (model Application) ToParams() (params AppParams) {
 		State:           &state,
 		SpaceGuid:       &model.SpaceGuid,
 		EnvironmentVars: &model.EnvironmentVars,
+		DockerImage:     &model.DockerImage,
 	}
 
 	if model.Stack != nil {
@@ -66,6 +67,7 @@ type ApplicationFields struct {
 	StagingFailedReason  string
 	Buildpack            string
 	DetectedBuildpack    string
+	DockerImage          string
 }
 
 type AppParams struct {
@@ -77,6 +79,8 @@ type AppParams struct {
 	Guid               *string
 	HealthCheckType    *string
 	HealthCheckTimeout *int
+	DockerImage        *string
+	Diego              *bool
 	Hosts              *[]string
 	InstanceCount      *int
 	Memory             *int64
@@ -128,6 +132,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.Memory != nil {
 		app.Memory = other.Memory
+	}
+	if other.DockerImage != nil {
+		app.DockerImage = other.DockerImage
 	}
 	if other.Name != nil {
 		app.Name = other.Name

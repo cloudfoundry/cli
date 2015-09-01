@@ -5085,6 +5085,11 @@
       "modified": false
    },
    {
+      "id": "docker-image to be used (e.g. user/docker-image-name)",
+      "translation": "docker-image to be used (e.g. user/docker-image-name)",
+      "modified": false
+   },
+   {
       "id": "does not exist.",
       "translation": "n'existe pas.",
       "modified": false

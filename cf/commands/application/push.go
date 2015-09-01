@@ -66,6 +66,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Path to app directory or to a zip file of the contents of the app directory")}
 	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
 	fs["t"] = &cliFlags.StringFlag{Name: "t", Usage: T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")}
+	fs["docker-image"] = &cliFlags.StringFlag{Name: "docker-image", ShortName: "o", Usage: T("docker-image to be used (e.g. user/docker-image-name)")}
 	fs["health-check-type"] = &cliFlags.StringFlag{Name: "health-check-type", ShortName: "u", Usage: T("Application health check type (e.g. port or none)")}
 	fs["no-hostname"] = &cliFlags.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")}
 	fs["no-manifest"] = &cliFlags.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")}
@@ -142,20 +143,28 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 
 	for _, appParams := range appSet {
 		cmd.fetchStackGuid(&appParams)
+
+		if c.IsSet("docker-image") {
+			diego := true
+			appParams.Diego = &diego
+		}
+
 		app := cmd.createOrUpdateApp(appParams)
 
 		cmd.updateRoutes(routeActor, app, appParams)
 
-		cmd.ui.Say(T("Uploading {{.AppName}}...",
-			map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
+		if c.String("docker-image") == "" {
+			cmd.ui.Say(T("Uploading {{.AppName}}...",
+				map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
 
-		apiErr := cmd.uploadApp(app.Guid, *appParams.Path)
-		if apiErr != nil {
-			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
-				map[string]interface{}{"ApiErr": apiErr.Error()})))
-			return
+			apiErr := cmd.uploadApp(app.Guid, *appParams.Path)
+			if apiErr != nil {
+				cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
+					map[string]interface{}{"ApiErr": apiErr.Error()})))
+				return
+			}
+			cmd.ui.Ok()
 		}
-		cmd.ui.Ok()
 
 		if appParams.ServicesToBind != nil {
 			cmd.bindAppToServices(*appParams.ServicesToBind, app)
@@ -556,6 +565,11 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (appParams models.
 				map[string]interface{}{"MemLimit": c.String("m"), "Err": err.Error()}))
 		}
 		appParams.Memory = &memory
+	}
+
+	if c.String("docker-image") != "" {
+		dockerImage := c.String("docker-image")
+		appParams.DockerImage = &dockerImage
 	}
 
 	if c.String("p") != "" {
