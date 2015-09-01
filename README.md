@@ -139,57 +139,65 @@ Architecture overview
 
 A command is a struct that implements this interface:
 
-```
+```Go
 type Command interface {
-	Metadata() command_metadata.CommandMetadata
-	GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error)
-	Run(c *cli.Context)
+	MetaData() CommandMetadata
+	SetDependency(deps Dependency, pluginCall bool) Command
+	Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) (reqs []requirements.Requirement, err error)
+	Execute(context flags.FlagContext)
 }
 ```
+[Source code](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/command.go#L9)
 
 `Metadata()` is just a description of the command name, usage and flags:
-```
+```Go
 type CommandMetadata struct {
 	Name            string
 	ShortName       string
 	Usage           string
 	Description     string
-	Flags           []cli.Flag
+	Flags           map[string]flags.FlagSet
 	SkipFlagParsing bool
+	TotalArgs       int
 }
 ```
+[Source code](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/command.go#L16)
 
-`GetRequirements()` returns a list of requirements that need to be met before a command can be invoked.
+`Requirements()` returns a list of requirements that need to be met before a command can be invoked.
 
-`Run()` is the method that your command implements to do whatever it's supposed to do. The `context` object
+`Execute()` is the method that your command implements to do whatever it's supposed to do. The `context` object
 provides flags and arguments.
 
-When the command is run, it communicates with api using repositories (they are in `cf/api`).
+When the command is run, it communicates with api using repositories (they are in [`cf/api`](https://github.com/cloudfoundry/cli/blob/master/cf/api)).
+
+`SetDependency()` is where a command obtains it's dependencies. Dependencies are typically declared as an interface type, and not a concrete type, so tests can inject a fake.
+The bool argument `pluginCall` indicates whether the command is invoked by one of the CLI's plugin API methods.
 
 Dependencies are injected into each command, so tests can inject a fake. This means that dependencies are
-typically declared as an interface type, and not a concrete type. (see `cf/commands/factory.go`)
+typically declared as an interface type, and not a concrete type. (see [`cf/command_registry/dependency.go`](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/dependency.go))
 
-Some dependencies are managed by a repository locator in `cf/api/repository_locator.go`.
+Some dependencies are managed by a repository locator in [`cf/api/repository_locator.go`](https://github.com/cloudfoundry/cli/blob/master/cf/api/repository_locator.go).
 
-Repositories communicate with the api endpoints through a Gateway (see `cf/net`).
+Repositories communicate with the api endpoints through a Gateway (see [`cf/net`](https://github.com/cloudfoundry/cli/tree/master/cf/net)).
 
-Models are data structures related to Cloud Foundry (see `cf/models`). For example, some models are
+Models are data structures related to Cloud Foundry (see [`cf/models`](https://github.com/cloudfoundry/cli/tree/master/cf/models)). For example, some models are
 apps, buildpacks, domains, etc.
 
 
 Managing dependencies
 ---------------------
 
-Command dependencies are managed by the commands factory. The app uses the command factory (in `cf/commands/factory.go`)
-to instantiate them, this allows not sharing the knowledge of their dependencies with the app itself.
+Command dependencies are managed by the command registry package. The app uses the package (in [`cf/command_registry/dependency.go`](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/dependency.go))to instantiate them, this allows not sharing the knowledge of their dependencies with the app itself.
 
-As for repositories, we use the repository locator to handle their dependencies. You can find it in `cf/api/repository_locator.go`.
+For commands that use another command as dependency, `command_registry` is used for retrieving the command dependency. For example, the command `restart` has a dependency on command `start` and `stop`, and this is how the command dependency is retrieved: [`restart.go`](https://github.com/cloudfoundry/cli/blob/master/cf/commands/application/restart.go#L59)
+
+As for repositories, we use the repository locator to handle their dependencies. You can find it in [`cf/api/repository_locator.go`](https://github.com/cloudfoundry/cli/blob/master/cf/api/repository_locator.go).
 
 Example command
 ---------------
 
 Create Space is a good example of a command. Its tests include checking arguments, requiring the user
-to be logged in, and the actual behavior of the command itself. You can find it in `cf/commands/space/create_space.go`.
+to be logged in, and the actual behavior of the command itself. You can find it in [`cf/commands/space/create_space.go`](https://github.com/cloudfoundry/cli/blob/master/cf/commands/space/create_space.go).
 
 i18n
 ----
@@ -204,11 +212,9 @@ Current conventions
 Creating Commands
 -----------------
 
-Resources that include several commands have been broken out into their own sub-package using the Resource name. An example
-of this convention is the Space resource and package (see `cf/commands/space`)
+Resources that include several commands have been broken out into their own sub-package using the Resource name. An example of this convention is the Space resource and package (see `cf/commands/space`)
 
-In addition, command file and methods naming follows a CRUD like convention. For example, the Space resource includes commands
-such a CreateSpace, ListSpaces, DeleteSpace, etc.
+In addition, command file and methods naming follows a CRUD like convention. For example, the Space resource includes commands such a CreateSpace, ListSpaces, DeleteSpace, etc.
 
 Creating Repositories
 ---------------------
