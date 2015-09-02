@@ -67,6 +67,7 @@ func NewDependency() Dependency {
 	deps.TeePrinter = terminal.NewTeePrinter()
 	deps.Ui = terminal.NewUI(os.Stdin, deps.TeePrinter)
 	deps.ManifestRepo = manifest.NewManifestDiskRepository()
+	deps.AppManifest = manifest.NewGenerator()
 
 	errorHandler := func(err error) {
 		if err != nil {
