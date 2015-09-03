@@ -68,6 +68,7 @@ type ApplicationFields struct {
 	Buildpack            string
 	DetectedBuildpack    string
 	DockerImage          string
+	EnableSsh            bool
 }
 
 type AppParams struct {
@@ -81,6 +82,7 @@ type AppParams struct {
 	HealthCheckTimeout *int
 	DockerImage        *string
 	Diego              *bool
+	EnableSsh          *bool
 	Hosts              *[]string
 	InstanceCount      *int
 	Memory             *int64
@@ -156,6 +158,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.State != nil {
 		app.State = other.State
+	}
+	if other.EnableSsh != nil {
+		app.EnableSsh = other.EnableSsh
 	}
 
 	app.NoRoute = app.NoRoute || other.NoRoute
