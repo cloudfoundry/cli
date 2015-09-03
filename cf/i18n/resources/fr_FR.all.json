@@ -815,6 +815,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME disable-ssh APP_NAME",
+      "translation": "CF_NAME disable-ssh APP_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME enable-feature-flag FEATURE_NAME",
       "translation": "CF_NAME enable-feature-flag FEATURE_NAME",
       "modified": false
@@ -1855,6 +1860,11 @@
       "modified": false
    },
    {
+      "id": "Disabling ssh support for '%s'...",
+      "translation": "Disabling ssh support for '%s'...",
+      "modified": false
+   },
+   {
       "id": "Disk limit (e.g. 256M, 1024M, 1G)",
       "translation": "Limites de disque (par exemple, 256M, 1024M, 1g)",
       "modified": false
@@ -2047,6 +2057,11 @@
    {
       "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
       "translation": "Erreur domaine suppression {{.DomainName}}\n{{.ApiErr}}",
+      "modified": false
+   },
+   {
+      "id": "Error disabling ssh support for ",
+      "translation": "Error disabling ssh support for ",
       "modified": false
    },
    {
@@ -5085,6 +5100,11 @@
       "modified": false
    },
    {
+      "id": "disable ssh for the application",
+      "translation": "disable ssh for the application",
+      "modified": false
+   },
+   {
       "id": "disallowed",
       "translation": "refusé",
       "modified": false
@@ -5455,8 +5475,18 @@
       "modified": false
    },
    {
+      "id": "ssh support is already disabled",
+      "translation": "ssh support is already disabled",
+      "modified": false
+   },
+   {
       "id": "ssh support is already enabled",
       "translation": "ssh support is already enabled",
+      "modified": false
+   },
+   {
+      "id": "ssh support is not disabled for ",
+      "translation": "ssh support is not disabled for ",
       "modified": false
    },
    {
