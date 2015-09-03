@@ -1100,6 +1100,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME ssh-enabled APP_NAME",
+      "translation": "CF_NAME ssh-enabled APP_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME stack STACK_NAME",
       "translation": "CF_NAME stack STACK_NAME",
       "modified": false
@@ -5380,6 +5385,11 @@
       "modified": false
    },
    {
+      "id": "reports whether SSH is enabled on an application container instance",
+      "translation": "reports whether SSH is enabled on an application container instance",
+      "modified": false
+   },
+   {
       "id": "requested state",
       "translation": "requested state",
       "modified": false
@@ -5482,6 +5492,16 @@
    {
       "id": "ssh support is already enabled",
       "translation": "ssh support is already enabled",
+      "modified": false
+   },
+   {
+      "id": "ssh support is disabled for",
+      "translation": "ssh support is disabled for",
+      "modified": false
+   },
+   {
+      "id": "ssh support is enabled for",
+      "translation": "ssh support is enabled for",
       "modified": false
    },
    {
