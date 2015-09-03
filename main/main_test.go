@@ -59,8 +59,14 @@ var _ = Describe("main", func() {
 
 	})
 
-	Describe("Shows version with -v", func() {
+	Describe("Shows version with -v or --version", func() {
 		It("prints the cf version if '-v' flag is provided", func() {
+			output := Cf("-v").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("version"))
+			Ω(output.ExitCode()).To(Equal(0))
+		})
+
+		It("prints the cf version if '--version' flag is provided", func() {
 			output := Cf("-v").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("version"))
 			Ω(output.ExitCode()).To(Equal(0))
