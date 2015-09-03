@@ -57,6 +57,7 @@ type ApplicationEntity struct {
 	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
 	Diego                *bool                   `json:"diego,omitempty"`
 	DockerImage          *string                 `json:"docker_image,omitempty"`
+	EnableSsh            *bool                   `json:"enable_ssh,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
@@ -87,6 +88,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		HealthCheckTimeout: app.HealthCheckTimeout,
 		DockerImage:        app.DockerImage,
 		Diego:              app.Diego,
+		EnableSsh:          app.EnableSsh,
 	}
 
 	if app.State != nil {
@@ -150,6 +152,9 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	}
 	if entity.Diego != nil {
 		app.Diego = *entity.Diego
+	}
+	if entity.EnableSsh != nil {
+		app.EnableSsh = *entity.EnableSsh
 	}
 
 	return
