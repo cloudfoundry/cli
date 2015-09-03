@@ -820,6 +820,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME enable-ssh APP_NAME",
+      "translation": "CF_NAME enable-ssh APP_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME env APP_NAME",
       "translation": "CF_NAME env APP",
       "modified": true
@@ -1995,6 +2000,11 @@
       "modified": false
    },
    {
+      "id": "Enabling ssh support for '%s'...",
+      "translation": "Enabling ssh support for '%s'...",
+      "modified": false
+   },
+   {
       "id": "Env variable {{.VarName}} was not set.",
       "translation": "Env variable {{.VarName}} was not set.",
       "modified": false
@@ -2047,6 +2057,11 @@
    {
       "id": "Error dumping response\n{{.Err}}\n",
       "translation": "Error dumping response\n{{.Err}}\n",
+      "modified": false
+   },
+   {
+      "id": "Error enabling ssh support for ",
+      "translation": "Error enabling ssh support for ",
       "modified": false
    },
    {
@@ -5120,6 +5135,11 @@
       "modified": false
    },
    {
+      "id": "enable ssh for the application",
+      "translation": "enable ssh for the application",
+      "modified": false
+   },
+   {
       "id": "enabled",
       "translation": "enabled",
       "modified": false
@@ -5433,6 +5453,16 @@
       "id": "spaces:",
       "translation": "spaces:",
       "modified": true
+   },
+   {
+      "id": "ssh support is already enabled",
+      "translation": "ssh support is already enabled",
+      "modified": false
+   },
+   {
+      "id": "ssh support is not enabled for ",
+      "translation": "ssh support is not enabled for ",
+      "modified": false
    },
    {
       "id": "stack:",
