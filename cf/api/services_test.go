@@ -544,7 +544,7 @@ var _ = Describe("Services Repo", func() {
 			Expect(binding.AppGuid).To(Equal("app-1-guid"))
 		})
 
-		It("it returns a failure response when the instance doesn't exist", func() {
+		It("returns a failure response when the instance doesn't exist", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
@@ -555,6 +555,15 @@ var _ = Describe("Services Repo", func() {
 
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
+		})
+
+		It("should not fail to parse when extra is null", func() {
+			setupTestServer(findServiceInstanceReq, serviceOfferingNullExtraReq)
+
+			_, err := repo.FindInstanceByName("my-service")
+
+			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 
@@ -1406,6 +1415,23 @@ var serviceOfferingReq = testapi.NewCloudControllerTestRequest(testnet.TestReque
 			"label": "mysql",
 			"provider": "mysql",
 		    "extra": "{\"documentationUrl\":\"http://info.example.com\"}",
+			"description": "MySQL database"
+		  }
+		}`,
+	}})
+
+var serviceOfferingNullExtraReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/services/the-service-guid",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+		{
+		  "metadata": {
+			"guid": "15790581-a293-489b-9efc-847ecf1b1339"
+		  },
+		  "entity": {
+			"label": "mysql",
+			"provider": "mysql",
+		    "extra": null,
 			"description": "MySQL database"
 		  }
 		}`,
