@@ -36,6 +36,7 @@ type ApplicationFromSummary struct {
 	HealthCheckTimeout int                    `json:"health_check_timeout"`
 	State              string
 	SpaceGuid          string     `json:"space_guid"`
+	Command            string     `json:"command"`
 	PackageUpdatedAt   *time.Time `json:"package_updated_at"`
 	Buildpack          string
 }
@@ -54,6 +55,7 @@ func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields)
 	app.PackageUpdatedAt = resource.PackageUpdatedAt
 	app.HealthCheckTimeout = resource.HealthCheckTimeout
 	app.BuildpackUrl = resource.Buildpack
+	app.Command = resource.Command
 
 	return
 }
