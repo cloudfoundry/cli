@@ -96,7 +96,7 @@ var _ = Describe("app security group api", func() {
 
 			req2 := testnet.TestRequest{
 				Method: "GET",
-				Path:   "/v2/security_groups/guid-id/spaces",
+				Path:   "/v2/security_groups/guid-id/spaces?inline-relations-depth=1",
 				Response: testnet.TestResponse{
 					Status: http.StatusOK,
 					Body: `
@@ -221,7 +221,7 @@ var _ = Describe("app security group api", func() {
 				}),
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/security_groups/cd186158-b356-474d-9861-724f34f48502/spaces",
+					Path:   "/v2/security_groups/cd186158-b356-474d-9861-724f34f48502/spaces?inline-relations-depth=1",
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
 						Body:   spacesItems(),
@@ -229,7 +229,7 @@ var _ = Describe("app security group api", func() {
 				}),
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces",
+					Path:   "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces?inline-relations-depth=1",
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
 						Body:   spacesItems(),
@@ -240,6 +240,7 @@ var _ = Describe("app security group api", func() {
 			groups, err := repo.FindAll()
 
 			Expect(err).ToNot(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(groups[0]).To(Equal(models.SecurityGroup{
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name:     "name-71",

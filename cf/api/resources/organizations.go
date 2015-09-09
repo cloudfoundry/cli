@@ -8,7 +8,7 @@ type OrganizationResource struct {
 }
 
 type OrganizationEntity struct {
-	Name            string
+	Name            string        `json:"name"`
 	QuotaDefinition QuotaResource `json:"quota_definition"`
 	Spaces          []SpaceResource
 	Domains         []DomainResource
