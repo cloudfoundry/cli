@@ -56,6 +56,10 @@ func (resource ServiceOfferingResource) ToModel() (offering models.ServiceOfferi
 type serviceOfferingExtra ServiceOfferingExtra
 
 func (resource *ServiceOfferingExtra) UnmarshalJSON(rawData []byte) error {
+	if string(rawData) == "null" {
+		return nil
+	}
+
 	extra := serviceOfferingExtra{}
 
 	unquoted, err := strconv.Unquote(string(rawData))
