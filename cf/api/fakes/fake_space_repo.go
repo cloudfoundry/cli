@@ -32,6 +32,11 @@ type FakeSpaceRepository struct {
 	RenameNewName   string
 
 	DeletedSpaceGuid string
+
+	SetAllowSSHCalls     int
+	SetAllowBoolValue    bool
+	SetAllowSSHSpaceGuid string
+	SetAllowSSHError     error
 }
 
 func (repo FakeSpaceRepository) GetCurrentSpace() (space models.Space) {
@@ -101,8 +106,11 @@ func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiErr error
 	return
 }
 
-func (repo *FakeSpaceRepository) SetAllowSSH(spaceGuid string, allow bool) (apiErr error) {
-	return
+func (repo *FakeSpaceRepository) SetAllowSSH(spaceGuid string, allow bool) error {
+	repo.SetAllowSSHCalls += 1
+	repo.SetAllowBoolValue = allow
+	repo.SetAllowSSHSpaceGuid = spaceGuid
+	return repo.SetAllowSSHError
 }
 
 func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiErr error) {
