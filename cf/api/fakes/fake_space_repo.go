@@ -101,6 +101,10 @@ func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiErr error
 	return
 }
 
+func (repo *FakeSpaceRepository) SetAllowSSH(spaceGuid string, allow bool) (apiErr error) {
+	return
+}
+
 func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiErr error) {
 	repo.DeletedSpaceGuid = spaceGuid
 	return

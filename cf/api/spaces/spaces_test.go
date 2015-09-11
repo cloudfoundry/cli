@@ -178,6 +178,22 @@ var _ = Describe("Space Repository", func() {
 		Expect(space.SpaceQuotaGuid).To(Equal("space-quota-guid"))
 	})
 
+	It("sets allow_ssh field", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "PUT",
+			Path:     "/v2/spaces/my-space-guid",
+			Matcher:  testnet.RequestBodyMatcher(`{"allow_ssh":true}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated},
+		})
+
+		ts, handler, repo := createSpacesRepo(request)
+		defer ts.Close()
+
+		apiErr := repo.SetAllowSSH("my-space-guid", true)
+		Expect(handler).To(HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+	})
+
 	It("renames spaces", func() {
 		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
