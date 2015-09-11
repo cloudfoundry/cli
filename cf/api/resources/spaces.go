@@ -15,11 +15,13 @@ type SpaceEntity struct {
 	ServiceInstances []ServiceInstanceResource `json:"service_instances"`
 	SecurityGroups   []SecurityGroupResource   `json:"security_groups"`
 	SpaceQuotaGuid   string                    `json:"space_quota_definition_guid"`
+	AllowSSH         bool                      `json:"allow_ssh"`
 }
 
 func (resource SpaceResource) ToFields() (fields models.SpaceFields) {
 	fields.Guid = resource.Metadata.Guid
 	fields.Name = resource.Entity.Name
+	fields.AllowSSH = resource.Entity.AllowSSH
 	return
 }
 

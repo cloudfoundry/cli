@@ -1,8 +1,9 @@
 package models
 
 type SpaceFields struct {
-	Guid string
-	Name string
+	Guid     string
+	Name     string
+	AllowSSH bool
 }
 
 type Space struct {
