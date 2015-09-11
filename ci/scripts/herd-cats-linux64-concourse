@@ -45,13 +45,12 @@ export PATH=${CATS_GOPATH}/bin:${PATH}
 mkdir ${CATS_GOPATH}/bin
 install linux64-binary/cf-* ${CATS_GOPATH}/bin/cf
 
+set +x
 echo "************ DEBUG"
 echo "ENV:"
 echo
 env
-echo
-echo "CONFIG"
-cat $CONFIG
+set -x
 
 # run cats
 pushd ${CATSPATH}
