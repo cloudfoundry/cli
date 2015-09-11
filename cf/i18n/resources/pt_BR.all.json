@@ -5465,6 +5465,11 @@
       "modified": false
    },
    {
+      "id": "{{.Err}}\n\t\t\t\nTIP: Buildpacks are detected when the \"{{.PushCommand}}\" is executed from within the directory that contains the app source code.\n\nUse '{{.BuildpackCommand}}' to see a list of supported buildpacks.\n\nUse '{{.Command}}' for more in depth log information.",
+      "translation": "{{.Err}}\n\t\t\t\nTIP: Buildpacks are detected when the \"{{.PushCommand}}\" is executed from within the directory that contains the app source code.\n\nUse '{{.BuildpackCommand}}' to see a list of supported buildpacks.\n\nUse '{{.Command}}' for more in depth log information.",
+      "modified": false
+   },
+   {
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
       "translation": "{{.Err}}\n\nDICA: utilize '{{.Command}}' para maiores informações",
       "modified": false
