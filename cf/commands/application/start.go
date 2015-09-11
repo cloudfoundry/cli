@@ -278,10 +278,25 @@ func (cmd *Start) waitForInstancesToStage(app models.Application) bool {
 
 	if app.PackageState == "FAILED" {
 		cmd.ui.Say("")
-		cmd.ui.Failed(T("{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
-			map[string]interface{}{
-				"Err":     app.StagingFailedReason,
-				"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))}))
+		if app.StagingFailedReason == "NoAppDetectedError" {
+			cmd.ui.Failed(T(`{{.Err}}
+			
+TIP: Buildpacks are detected when the "{{.PushCommand}}" is executed from within the directory that contains the app source code.
+
+Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.
+
+Use '{{.Command}}' for more in depth log information.`,
+				map[string]interface{}{
+					"Err":              app.StagingFailedReason,
+					"PushCommand":      terminal.CommandColor(fmt.Sprintf("%s push", cf.Name())),
+					"BuildpackCommand": terminal.CommandColor(fmt.Sprintf("%s buildpacks", cf.Name())),
+					"Command":          terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))}))
+		} else {
+			cmd.ui.Failed(T("{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
+				map[string]interface{}{
+					"Err":     app.StagingFailedReason,
+					"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))}))
+		}
 	}
 
 	if time.Since(stagingStartTime) >= cmd.StagingTimeout {
