@@ -37,6 +37,7 @@ var _ = Describe("Space Repository", func() {
 							},
 							"entity": {
 								"name": "acceptance",
+								"allow_ssh": true,
 		            "security_groups": [
 		               {
 		                  "metadata": {
@@ -83,6 +84,7 @@ var _ = Describe("Space Repository", func() {
 
 		Expect(len(spaces)).To(Equal(2))
 		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
+		Expect(spaces[0].AllowSSH).To(BeTrue())
 		Expect(spaces[0].SecurityGroups[0].Name).To(Equal("imma-security-group"))
 		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
 		Expect(apiErr).NotTo(HaveOccurred())
