@@ -595,6 +595,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME allow-space-ssh SPACE_NAME",
+      "translation": "CF_NAME allow-space-ssh SPACE_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME api [URL]",
       "translation": "CF_NAME api [URL]",
       "modified": false
@@ -2020,6 +2025,11 @@
       "modified": false
    },
    {
+      "id": "Enabling ssh support for space '%s'...",
+      "translation": "Enabling ssh support for space '%s'...",
+      "modified": false
+   },
+   {
       "id": "Env variable {{.VarName}} was not set.",
       "translation": "Env variable {{.VarName}} was not set.",
       "modified": false
@@ -2082,6 +2092,11 @@
    {
       "id": "Error enabling ssh support for ",
       "translation": "Error enabling ssh support for ",
+      "modified": false
+   },
+   {
+      "id": "Error enabling ssh support for space ",
+      "translation": "Error enabling ssh support for space ",
       "modified": false
    },
    {
@@ -2837,6 +2852,11 @@
    {
       "id": "Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n",
       "translation": "Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires SPACE_NAME as argument\n\n",
+      "translation": "Incorrect Usage. Requires SPACE_NAME as argument\n\n",
       "modified": false
    },
    {
@@ -5030,6 +5050,11 @@
       "modified": false
    },
    {
+      "id": "allow SSH access for the space",
+      "translation": "allow SSH access for the space",
+      "modified": false
+   },
+   {
       "id": "allowed",
       "translation": "allowed",
       "modified": false
@@ -5492,6 +5517,11 @@
    {
       "id": "ssh support is already enabled",
       "translation": "ssh support is already enabled",
+      "modified": false
+   },
+   {
+      "id": "ssh support is already enabled in space ",
+      "translation": "ssh support is already enabled in space ",
       "modified": false
    },
    {
