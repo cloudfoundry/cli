@@ -34,7 +34,8 @@ var exampleJSON = `
 	},
 	"SpaceFields": {
 		"Guid": "the-space-guid",
-		"Name": "the-space"
+		"Name": "the-space",
+		"AllowSSH": false
 	},
 	"SSLDisabled": true,
 	"AsyncTimeout": 1000,

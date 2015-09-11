@@ -19,6 +19,7 @@ type SpaceRepository interface {
 	FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr error)
 	Create(name string, orgGuid string, spaceQuotaGuid string) (space models.Space, apiErr error)
 	Rename(spaceGuid, newName string) (apiErr error)
+	SetAllowSSH(spaceGuid string, allow bool) (apiErr error)
 	Delete(spaceGuid string) (apiErr error)
 }
 
@@ -91,6 +92,12 @@ func (repo CloudControllerSpaceRepository) Create(name, orgGuid, spaceQuotaGuid 
 func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiErr error) {
 	path := fmt.Sprintf("/v2/spaces/%s", spaceGuid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
+	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
+}
+
+func (repo CloudControllerSpaceRepository) SetAllowSSH(spaceGuid string, allow bool) (apiErr error) {
+	path := fmt.Sprintf("/v2/spaces/%s", spaceGuid)
+	body := fmt.Sprintf(`{"allow_ssh":%t}`, allow)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
