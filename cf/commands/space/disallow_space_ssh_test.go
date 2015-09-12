@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("allow-space-ssh command", func() {
+var _ = Describe("disallow-space-ssh command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
@@ -37,11 +37,11 @@ var _ = Describe("allow-space-ssh command", func() {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("allow-space-ssh").SetDependency(deps, pluginCall))
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("disallow-space-ssh").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("allow-space-ssh", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCliCommand("disallow-space-ssh", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -65,7 +65,7 @@ var _ = Describe("allow-space-ssh command", func() {
 		})
 	})
 
-	Describe("allow-space-ssh", func() {
+	Describe("disallow-space-ssh", func() {
 		var space models.Space
 
 		BeforeEach(func() {
@@ -77,23 +77,23 @@ var _ = Describe("allow-space-ssh command", func() {
 			space.Guid = "the-space-guid"
 		})
 
-		Context("when allow_ssh is already set to the true", func() {
+		Context("when allow_ssh is already set to the false", func() {
 			BeforeEach(func() {
-				space.AllowSSH = true
+				space.AllowSSH = false
 				requirementsFactory.Space = space
 			})
 
 			It("notifies the user", func() {
 				runCommand("the-space-name")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"ssh support is already enabled in space 'the-space-name'"}))
+				Ω(ui.Outputs).To(ContainSubstrings([]string{"ssh support is already disabled in space 'the-space-name'"}))
 			})
 		})
 
-		Context("Updating allow_ssh when not already set to true", func() {
+		Context("Updating allow_ssh when not already set to false", func() {
 			Context("Update successfully", func() {
 				BeforeEach(func() {
-					space.AllowSSH = false
+					space.AllowSSH = true
 					requirementsFactory.Space = space
 				})
 
@@ -102,13 +102,18 @@ var _ = Describe("allow-space-ssh command", func() {
 
 					Ω(spaceRepo.SetAllowSSHCalls).To(Equal(1))
 					Ω(spaceRepo.SetAllowSSHSpaceGuid).To(Equal("the-space-guid"))
-					Ω(spaceRepo.SetAllowBoolValue).To(Equal(true))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"Enabling ssh support for space 'the-space-name'"}))
+					Ω(spaceRepo.SetAllowBoolValue).To(Equal(false))
+					Ω(ui.Outputs).To(ContainSubstrings([]string{"Disabling ssh support for space 'the-space-name'"}))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
 			})
 
 			Context("Update fails", func() {
+				BeforeEach(func() {
+					space.AllowSSH = true
+					requirementsFactory.Space = space
+				})
+
 				It("notifies user of any api error", func() {
 					spaceRepo.SetAllowSSHError = errors.New("api error")
 					runCommand("the-space-name")
