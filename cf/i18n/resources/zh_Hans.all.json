@@ -825,6 +825,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME disallow-space-ssh SPACE_NAME",
+      "translation": "CF_NAME disallow-space-ssh SPACE_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME enable-feature-flag FEATURE_NAME",
       "translation": "CF_NAME enable-feature-flag FEATURE_NAME",
       "modified": false
@@ -1875,6 +1880,11 @@
       "modified": false
    },
    {
+      "id": "Disabling ssh support for space '%s'...",
+      "translation": "Disabling ssh support for space '%s'...",
+      "modified": false
+   },
+   {
       "id": "Disk limit (e.g. 256M, 1024M, 1G)",
       "translation": "磁盘限额（例如256M，1024M，1G）",
       "modified": false
@@ -2077,6 +2087,11 @@
    {
       "id": "Error disabling ssh support for ",
       "translation": "Error disabling ssh support for ",
+      "modified": false
+   },
+   {
+      "id": "Error disabling ssh support for space ",
+      "translation": "Error disabling ssh support for space ",
       "modified": false
    },
    {
@@ -5135,6 +5150,11 @@
       "modified": false
    },
    {
+      "id": "disallow SSH access for the space",
+      "translation": "disallow SSH access for the space",
+      "modified": false
+   },
+   {
       "id": "disallowed",
       "translation": "禁止",
       "modified": false
@@ -5512,6 +5532,11 @@
    {
       "id": "ssh support is already disabled",
       "translation": "ssh support is already disabled",
+      "modified": false
+   },
+   {
+      "id": "ssh support is already disabled in space ",
+      "translation": "ssh support is already disabled in space ",
       "modified": false
    },
    {
