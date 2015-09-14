@@ -62,16 +62,16 @@
 			"Rev": "6331bf5a5b5e7a832348789eb3cedff7a6917103"
 		},
 		{
+			"ImportPath": "github.com/simonleung8/flags",
+			"Rev": "4304da028804a934cf49cd9a574692d80abd13c7"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto/ssh/terminal",
 			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
 		},
 		{
 			"ImportPath": "golang.org/x/net/websocket",
 			"Rev": "d9558e5c97f85372afee28cf2b6059d7d3818919"
-		},
-		{
-			"ImportPath": "github.com/simonleung8/flags",
-			"Rev": "cd0cc00ad7c59b1e3d8c0e0a6318131da1ea4ea2"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
