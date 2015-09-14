@@ -28,7 +28,6 @@ var _ = Describe("app Command", func() {
 		configRepo          core_config.Repository
 		appSummaryRepo      *testapi.FakeAppSummaryRepo
 		appInstancesRepo    *testAppInstanaces.FakeAppInstancesRepository
-		appLogsNoaaRepo     *testapi.FakeLogsNoaaRepository
 		requirementsFactory *testreq.FakeReqFactory
 		app                 models.Application
 		deps                command_registry.Dependency
@@ -36,7 +35,6 @@ var _ = Describe("app Command", func() {
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetLogsNoaaRepository(appLogsNoaaRepo)
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
@@ -46,7 +44,6 @@ var _ = Describe("app Command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
-		appLogsNoaaRepo = &testapi.FakeLogsNoaaRepository{}
 		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
@@ -182,50 +179,6 @@ var _ = Describe("app Command", func() {
 			appSummaryRepo.GetSummarySummary = app
 			appInstancesRepo.GetInstancesReturns(instances, nil)
 			requirementsFactory.Application = app
-		})
-
-		Context("When app is a diego app", func() {
-			It("uses noaa log library to gather metrics", func() {
-				app.Diego = true
-				appSummaryRepo.GetSummarySummary = app
-				requirementsFactory.Application = app
-
-				runCommand("my-app")
-				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(1))
-			})
-
-			It("does not gather metrics when instance count is 0", func() {
-				app.Diego = true
-				appSummaryRepo.GetSummarySummary = app
-				requirementsFactory.Application = app
-
-				appInstancesRepo.GetInstancesReturns([]models.AppInstanceFields{}, nil)
-
-				runCommand("my-app")
-				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(0))
-			})
-
-			It("gracefully handles when /instances is down but /noaa is not", func() {
-				app.Diego = true
-				appSummaryRepo.GetSummarySummary = app
-				requirementsFactory.Application = app
-				appInstancesRepo.GetInstancesReturns([]models.AppInstanceFields{}, errors.New("danger will robinson"))
-
-				runCommand("my-app")
-				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(0))
-
-			})
-		})
-
-		Context("When app is not a diego app", func() {
-			It("does not use noaa log library to gather metrics", func() {
-				app.Diego = false
-				appSummaryRepo.GetSummarySummary = app
-				requirementsFactory.Application = app
-
-				runCommand("my-app")
-				Ω(appLogsNoaaRepo.GetContainerMetricsCallCount()).To(Equal(0))
-			})
 		})
 
 		Context("Displaying buildpack info", func() {
