@@ -1,8 +1,8 @@
 # flags - Golang command-line flag parser
 [![GoDoc](https://godoc.org/github.com/simonleung8/flags?status.svg)](https://godoc.org/github.com/simonleung8/flags) [![Build Status](https://travis-ci.org/simonleung8/flags.png?branch=master)](https://travis-ci.org/simonleung8/flags)
 
-- Simple to use, little learning curve
 - Fully tested, reliable
+- Support flag ShortName (Alias)
 - Catches any non-defined flags, and any invalid flag values
 - Flags can come before or after the arguments. The followings are all valid inputs:
 ```bash
