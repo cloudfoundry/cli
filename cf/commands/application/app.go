@@ -29,7 +29,6 @@ type ShowApp struct {
 	ui               terminal.UI
 	config           core_config.Reader
 	appSummaryRepo   api.AppSummaryRepository
-	appLogsNoaaRepo  api.LogsNoaaRepository
 	appInstancesRepo app_instances.AppInstancesRepository
 	appReq           requirements.ApplicationRequirement
 	pluginAppModel   *plugin_models.GetAppModel
@@ -71,7 +70,6 @@ func (cmd *ShowApp) SetDependency(deps command_registry.Dependency, pluginCall b
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
-	cmd.appLogsNoaaRepo = deps.RepoLocator.GetLogsNoaaRepository()
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
 
 	cmd.pluginAppModel = deps.PluginModels.Application
@@ -84,48 +82,7 @@ func (cmd *ShowApp) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	if cmd.pluginCall {
-		cmd.pluginAppModel.Name = app.Name
-		cmd.pluginAppModel.State = app.State
-		cmd.pluginAppModel.Guid = app.Guid
-		cmd.pluginAppModel.BuildpackUrl = app.BuildpackUrl
-		cmd.pluginAppModel.Command = app.Command
-		cmd.pluginAppModel.Diego = app.Diego
-		cmd.pluginAppModel.DetectedStartCommand = app.DetectedStartCommand
-		cmd.pluginAppModel.DiskQuota = app.DiskQuota
-		cmd.pluginAppModel.EnvironmentVars = app.EnvironmentVars
-		cmd.pluginAppModel.InstanceCount = app.InstanceCount
-		cmd.pluginAppModel.Memory = app.Memory
-		cmd.pluginAppModel.RunningInstances = app.RunningInstances
-		cmd.pluginAppModel.HealthCheckTimeout = app.HealthCheckTimeout
-		cmd.pluginAppModel.SpaceGuid = app.SpaceGuid
-		cmd.pluginAppModel.PackageUpdatedAt = app.PackageUpdatedAt
-		cmd.pluginAppModel.PackageState = app.PackageState
-		cmd.pluginAppModel.StagingFailedReason = app.StagingFailedReason
-
-		cmd.pluginAppModel.Stack = &plugin_models.GetApp_Stack{
-			Name: app.Stack.Name,
-			Guid: app.Stack.Guid,
-		}
-
-		for i, _ := range app.Routes {
-			cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, plugin_models.GetApp_RouteSummary{
-				Host: app.Routes[i].Host,
-				Guid: app.Routes[i].Guid,
-				Domain: plugin_models.GetApp_DomainFields{
-					Name:                   app.Routes[i].Domain.Name,
-					Guid:                   app.Routes[i].Domain.Guid,
-					Shared:                 app.Routes[i].Domain.Shared,
-					OwningOrganizationGuid: app.Routes[i].Domain.OwningOrganizationGuid,
-				},
-			})
-		}
-
-		for i, _ := range app.Services {
-			cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, plugin_models.GetApp_ServiceSummary{
-				Name: app.Services[i].Name,
-				Guid: app.Services[i].Guid,
-			})
-		}
+		cmd.populatePluginModel(app)
 	}
 
 	if c.Bool("guid") {
@@ -162,16 +119,6 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	if apiErr != nil && !appIsStopped {
 		cmd.ui.Failed(apiErr.Error())
 		return
-	}
-
-	//temp solution, diego app metrics only come from noaa, not CC
-	if application.Diego && len(instances) > 0 {
-		instances, apiErr = cmd.appLogsNoaaRepo.GetContainerMetrics(app.Guid, instances)
-
-		for i := 0; i < len(instances); i++ {
-			instances[i].MemQuota = application.Memory * 1024 * 1024
-			instances[i].DiskQuota = application.DiskQuota * 1024 * 1024
-		}
 	}
 
 	if apiErr != nil && !appIsStopped {
@@ -254,4 +201,49 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 
 	table.Print()
+}
+
+func (cmd *ShowApp) populatePluginModel(app models.Application) {
+	cmd.pluginAppModel.Name = app.Name
+	cmd.pluginAppModel.State = app.State
+	cmd.pluginAppModel.Guid = app.Guid
+	cmd.pluginAppModel.BuildpackUrl = app.BuildpackUrl
+	cmd.pluginAppModel.Command = app.Command
+	cmd.pluginAppModel.Diego = app.Diego
+	cmd.pluginAppModel.DetectedStartCommand = app.DetectedStartCommand
+	cmd.pluginAppModel.DiskQuota = app.DiskQuota
+	cmd.pluginAppModel.EnvironmentVars = app.EnvironmentVars
+	cmd.pluginAppModel.InstanceCount = app.InstanceCount
+	cmd.pluginAppModel.Memory = app.Memory
+	cmd.pluginAppModel.RunningInstances = app.RunningInstances
+	cmd.pluginAppModel.HealthCheckTimeout = app.HealthCheckTimeout
+	cmd.pluginAppModel.SpaceGuid = app.SpaceGuid
+	cmd.pluginAppModel.PackageUpdatedAt = app.PackageUpdatedAt
+	cmd.pluginAppModel.PackageState = app.PackageState
+	cmd.pluginAppModel.StagingFailedReason = app.StagingFailedReason
+
+	cmd.pluginAppModel.Stack = &plugin_models.GetApp_Stack{
+		Name: app.Stack.Name,
+		Guid: app.Stack.Guid,
+	}
+
+	for i, _ := range app.Routes {
+		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, plugin_models.GetApp_RouteSummary{
+			Host: app.Routes[i].Host,
+			Guid: app.Routes[i].Guid,
+			Domain: plugin_models.GetApp_DomainFields{
+				Name:                   app.Routes[i].Domain.Name,
+				Guid:                   app.Routes[i].Domain.Guid,
+				Shared:                 app.Routes[i].Domain.Shared,
+				OwningOrganizationGuid: app.Routes[i].Domain.OwningOrganizationGuid,
+			},
+		})
+	}
+
+	for i, _ := range app.Services {
+		cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, plugin_models.GetApp_ServiceSummary{
+			Name: app.Services[i].Name,
+			Guid: app.Services[i].Guid,
+		})
+	}
 }
