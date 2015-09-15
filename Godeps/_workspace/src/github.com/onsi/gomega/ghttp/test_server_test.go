@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"regexp"
+
+	"github.com/onsi/gomega/gbytes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -191,6 +194,69 @@ var _ = Describe("TestServer", func() {
 		})
 	})
 
+	Describe("When a handler fails", func() {
+		BeforeEach(func() {
+			s.UnhandledRequestStatusCode = http.StatusForbidden //just to be clear that 500s aren't coming from unhandled requests
+		})
+
+		Context("because the handler has panicked", func() {
+			BeforeEach(func() {
+				s.AppendHandlers(func(w http.ResponseWriter, req *http.Request) {
+					panic("bam")
+				})
+			})
+
+			It("should respond with a 500 and make a failing assertion", func() {
+				var resp *http.Response
+				var err error
+
+				failures := InterceptGomegaFailures(func() {
+					resp, err = http.Get(s.URL())
+				})
+
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(resp.StatusCode).Should(Equal(http.StatusInternalServerError))
+				Ω(failures).Should(ConsistOf(ContainSubstring("Handler Panicked")))
+			})
+		})
+
+		Context("because an assertion has failed", func() {
+			BeforeEach(func() {
+				s.AppendHandlers(func(w http.ResponseWriter, req *http.Request) {
+					// Ω(true).Should(BeFalse()) <-- would be nice to do it this way, but the test just can't be written this way
+
+					By("We're cheating a bit here -- we're throwing a GINKGO_PANIC which simulates a failed assertion")
+					panic(GINKGO_PANIC)
+				})
+			})
+
+			It("should respond with a 500 and *not* make a failing assertion, instead relying on Ginkgo to have already been notified of the error", func() {
+				resp, err := http.Get(s.URL())
+
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(resp.StatusCode).Should(Equal(http.StatusInternalServerError))
+			})
+		})
+	})
+
+	Describe("Logging to the Writer", func() {
+		var buf *gbytes.Buffer
+		BeforeEach(func() {
+			buf = gbytes.NewBuffer()
+			s.Writer = buf
+			s.AppendHandlers(func(w http.ResponseWriter, req *http.Request) {})
+			s.AppendHandlers(func(w http.ResponseWriter, req *http.Request) {})
+		})
+
+		It("should write to the buffer when a request comes in", func() {
+			http.Get(s.URL() + "/foo")
+			Ω(buf).Should(gbytes.Say("GHTTP Received Request: GET - /foo\n"))
+
+			http.Post(s.URL()+"/bar", "", nil)
+			Ω(buf).Should(gbytes.Say("GHTTP Received Request: POST - /bar\n"))
+		})
+	})
+
 	Describe("Request Handlers", func() {
 		Describe("VerifyRequest", func() {
 			BeforeEach(func() {
@@ -220,6 +286,18 @@ var _ = Describe("TestServer", func() {
 				It("should also be possible to verify the rawQuery", func() {
 					s.SetHandler(0, VerifyRequest("GET", "/foo", "baz=bar"))
 					resp, err = http.Get(s.URL() + "/foo?baz=bar")
+					Ω(err).ShouldNot(HaveOccurred())
+				})
+
+				It("should match irregardless of query parameter ordering", func() {
+					s.SetHandler(0, VerifyRequest("GET", "/foo", "type=get&name=money"))
+					u, _ := url.Parse(s.URL() + "/foo")
+					u.RawQuery = url.Values{
+						"type": []string{"get"},
+						"name": []string{"money"},
+					}.Encode()
+
+					resp, err = http.Get(u.String())
 					Ω(err).ShouldNot(HaveOccurred())
 				})
 			})
@@ -290,6 +368,15 @@ var _ = Describe("TestServer", func() {
 				Ω(failures).Should(HaveLen(1))
 			})
 
+			It("should require basic auth header", func() {
+				req, err := http.NewRequest("GET", s.URL()+"/foo", nil)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				failures := InterceptGomegaFailures(func() {
+					http.DefaultClient.Do(req)
+				})
+				Ω(failures).Should(ContainElement(ContainSubstring("Authorization header must be specified")))
+			})
 		})
 
 		Describe("VerifyHeader", func() {
@@ -416,6 +503,139 @@ var _ = Describe("TestServer", func() {
 			})
 		})
 
+		Describe("VerifyForm", func() {
+			var formValues url.Values
+
+			BeforeEach(func() {
+				formValues = make(url.Values)
+				formValues.Add("users", "user1")
+				formValues.Add("users", "user2")
+				formValues.Add("group", "users")
+			})
+
+			Context("when encoded in the URL", func() {
+				BeforeEach(func() {
+					s.AppendHandlers(CombineHandlers(
+						VerifyRequest("GET", "/foo"),
+						VerifyForm(url.Values{
+							"users": []string{"user1", "user2"},
+							"group": []string{"users"},
+						}),
+					))
+				})
+
+				It("should verify form values", func() {
+					resp, err = http.Get(s.URL() + "/foo?" + formValues.Encode())
+					Ω(err).ShouldNot(HaveOccurred())
+				})
+
+				It("should ignore extra values", func() {
+					formValues.Add("extra", "value")
+					resp, err = http.Get(s.URL() + "/foo?" + formValues.Encode())
+					Ω(err).ShouldNot(HaveOccurred())
+				})
+
+				It("fail on missing values", func() {
+					formValues.Del("group")
+					failures := InterceptGomegaFailures(func() {
+						resp, err = http.Get(s.URL() + "/foo?" + formValues.Encode())
+					})
+					Ω(failures).Should(HaveLen(1))
+				})
+
+				It("fail on incorrect values", func() {
+					formValues.Set("group", "wheel")
+					failures := InterceptGomegaFailures(func() {
+						resp, err = http.Get(s.URL() + "/foo?" + formValues.Encode())
+					})
+					Ω(failures).Should(HaveLen(1))
+				})
+			})
+
+			Context("when present in the body", func() {
+				BeforeEach(func() {
+					s.AppendHandlers(CombineHandlers(
+						VerifyRequest("POST", "/foo"),
+						VerifyForm(url.Values{
+							"users": []string{"user1", "user2"},
+							"group": []string{"users"},
+						}),
+					))
+				})
+
+				It("should verify form values", func() {
+					resp, err = http.PostForm(s.URL()+"/foo", formValues)
+					Ω(err).ShouldNot(HaveOccurred())
+				})
+
+				It("should ignore extra values", func() {
+					formValues.Add("extra", "value")
+					resp, err = http.PostForm(s.URL()+"/foo", formValues)
+					Ω(err).ShouldNot(HaveOccurred())
+				})
+
+				It("fail on missing values", func() {
+					formValues.Del("group")
+					failures := InterceptGomegaFailures(func() {
+						resp, err = http.PostForm(s.URL()+"/foo", formValues)
+					})
+					Ω(failures).Should(HaveLen(1))
+				})
+
+				It("fail on incorrect values", func() {
+					formValues.Set("group", "wheel")
+					failures := InterceptGomegaFailures(func() {
+						resp, err = http.PostForm(s.URL()+"/foo", formValues)
+					})
+					Ω(failures).Should(HaveLen(1))
+				})
+			})
+		})
+
+		Describe("VerifyFormKV", func() {
+			Context("when encoded in the URL", func() {
+				BeforeEach(func() {
+					s.AppendHandlers(CombineHandlers(
+						VerifyRequest("GET", "/foo"),
+						VerifyFormKV("users", "user1", "user2"),
+					))
+				})
+
+				It("verifies the form value", func() {
+					resp, err = http.Get(s.URL() + "/foo?users=user1&users=user2")
+					Ω(err).ShouldNot(HaveOccurred())
+				})
+
+				It("verifies the form value", func() {
+					failures := InterceptGomegaFailures(func() {
+						resp, err = http.Get(s.URL() + "/foo?users=user1")
+					})
+					Ω(failures).Should(HaveLen(1))
+				})
+			})
+
+			Context("when present in the body", func() {
+				BeforeEach(func() {
+					s.AppendHandlers(CombineHandlers(
+						VerifyRequest("POST", "/foo"),
+						VerifyFormKV("users", "user1", "user2"),
+					))
+				})
+
+				It("verifies the form value", func() {
+					resp, err = http.PostForm(s.URL()+"/foo", url.Values{"users": []string{"user1", "user2"}})
+					Ω(err).ShouldNot(HaveOccurred())
+				})
+
+				It("verifies the form value", func() {
+					failures := InterceptGomegaFailures(func() {
+						resp, err = http.PostForm(s.URL()+"/foo", url.Values{"users": []string{"user1"}})
+					})
+					Ω(failures).Should(HaveLen(1))
+				})
+			})
+		})
+
 		Describe("RespondWith", func() {
 			Context("without headers", func() {
 				BeforeEach(func() {
@@ -533,49 +753,159 @@ var _ = Describe("TestServer", func() {
 		})
 
 		Describe("RespondWithJSON", func() {
-			BeforeEach(func() {
-				s.AppendHandlers(CombineHandlers(
-					VerifyRequest("POST", "/foo"),
-					RespondWithJSONEncoded(http.StatusCreated, []int{1, 2, 3}),
-				))
+			Context("when no optional headers are set", func() {
+				BeforeEach(func() {
+					s.AppendHandlers(CombineHandlers(
+						VerifyRequest("POST", "/foo"),
+						RespondWithJSONEncoded(http.StatusCreated, []int{1, 2, 3}),
+					))
+				})
+
+				It("should return the response", func() {
+					resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(resp.StatusCode).Should(Equal(http.StatusCreated))
+
+					body, err := ioutil.ReadAll(resp.Body)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(body).Should(MatchJSON("[1,2,3]"))
+				})
+
+				It("should set the Content-Type header to application/json", func() {
+					resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(resp.Header["Content-Type"]).Should(Equal([]string{"application/json"}))
+				})
 			})
 
-			It("should return the response", func() {
-				resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
-				Ω(err).ShouldNot(HaveOccurred())
+			Context("when optional headers are set", func() {
+				var headers http.Header
+				BeforeEach(func() {
+					headers = http.Header{"Stuff": []string{"things"}}
+				})
 
-				Ω(resp.StatusCode).Should(Equal(http.StatusCreated))
+				JustBeforeEach(func() {
+					s.AppendHandlers(CombineHandlers(
+						VerifyRequest("POST", "/foo"),
+						RespondWithJSONEncoded(http.StatusCreated, []int{1, 2, 3}, headers),
+					))
+				})
 
-				body, err := ioutil.ReadAll(resp.Body)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(body).Should(MatchJSON("[1,2,3]"))
+				It("should preserve those headers", func() {
+					resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(resp.Header["Stuff"]).Should(Equal([]string{"things"}))
+				})
+
+				It("should set the Content-Type header to application/json", func() {
+					resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(resp.Header["Content-Type"]).Should(Equal([]string{"application/json"}))
+				})
+
+				Context("when setting the Content-Type explicitly", func() {
+					BeforeEach(func() {
+						headers["Content-Type"] = []string{"not-json"}
+					})
+
+					It("should use the Content-Type header that was explicitly set", func() {
+						resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+						Ω(err).ShouldNot(HaveOccurred())
+
+						Ω(resp.Header["Content-Type"]).Should(Equal([]string{"not-json"}))
+					})
+				})
 			})
 		})
 
 		Describe("RespondWithJSONPtr", func() {
-			var code int
-			var object interface{}
-			BeforeEach(func() {
-				code = http.StatusOK
-				object = []int{1, 2, 3}
+			type testObject struct {
+				Key   string
+				Value string
+			}
 
-				s.AppendHandlers(CombineHandlers(
-					VerifyRequest("POST", "/foo"),
-					RespondWithJSONEncodedPtr(&code, &object),
-				))
+			var code int
+			var object testObject
+
+			Context("when no optional headers are set", func() {
+				BeforeEach(func() {
+					code = http.StatusOK
+					object = testObject{}
+					s.AppendHandlers(CombineHandlers(
+						VerifyRequest("POST", "/foo"),
+						RespondWithJSONEncodedPtr(&code, &object),
+					))
+				})
+
+				It("should return the response", func() {
+					code = http.StatusCreated
+					object = testObject{
+						Key:   "Jim",
+						Value: "Codes",
+					}
+					resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(resp.StatusCode).Should(Equal(http.StatusCreated))
+
+					body, err := ioutil.ReadAll(resp.Body)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(body).Should(MatchJSON(`{"Key": "Jim", "Value": "Codes"}`))
+				})
+
+				It("should set the Content-Type header to application/json", func() {
+					resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(resp.Header["Content-Type"]).Should(Equal([]string{"application/json"}))
+				})
 			})
 
-			It("should return the response", func() {
-				code = http.StatusCreated
-				object = []int{4, 5, 6}
-				resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
-				Ω(err).ShouldNot(HaveOccurred())
+			Context("when optional headers are set", func() {
+				var headers http.Header
+				BeforeEach(func() {
+					headers = http.Header{"Stuff": []string{"things"}}
+				})
 
-				Ω(resp.StatusCode).Should(Equal(http.StatusCreated))
+				JustBeforeEach(func() {
+					code = http.StatusOK
+					object = testObject{}
+					s.AppendHandlers(CombineHandlers(
+						VerifyRequest("POST", "/foo"),
+						RespondWithJSONEncodedPtr(&code, &object, headers),
+					))
+				})
 
-				body, err := ioutil.ReadAll(resp.Body)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(body).Should(MatchJSON("[4,5,6]"))
+				It("should preserve those headers", func() {
+					resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(resp.Header["Stuff"]).Should(Equal([]string{"things"}))
+				})
+
+				It("should set the Content-Type header to application/json", func() {
+					resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+					Ω(err).ShouldNot(HaveOccurred())
+
+					Ω(resp.Header["Content-Type"]).Should(Equal([]string{"application/json"}))
+				})
+
+				Context("when setting the Content-Type explicitly", func() {
+					BeforeEach(func() {
+						headers["Content-Type"] = []string{"not-json"}
+					})
+
+					It("should use the Content-Type header that was explicitly set", func() {
+						resp, err = http.Post(s.URL()+"/foo", "application/json", nil)
+						Ω(err).ShouldNot(HaveOccurred())
+
+						Ω(resp.Header["Content-Type"]).Should(Equal([]string{"not-json"}))
+					})
+				})
 			})
 		})
 	})

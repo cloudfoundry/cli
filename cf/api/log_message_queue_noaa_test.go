@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"code.google.com/p/gogoprotobuf/proto"
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/sonde-go/events"
+	"github.com/gogo/protobuf/proto"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/onsi/ginkgo/config"
+	"github.com/onsi/ginkgo/ginkgo/interrupthandler"
 	"github.com/onsi/ginkgo/ginkgo/testrunner"
 	"github.com/onsi/ginkgo/types"
 )
@@ -15,7 +16,7 @@ import (
 func BuildRunCommand() *Command {
 	commandFlags := NewRunCommandFlags(flag.NewFlagSet("ginkgo", flag.ExitOnError))
 	notifier := NewNotifier(commandFlags)
-	interruptHandler := NewInterruptHandler()
+	interruptHandler := interrupthandler.NewInterruptHandler()
 	runner := &SpecRunner{
 		commandFlags:     commandFlags,
 		notifier:         notifier,
@@ -39,7 +40,7 @@ func BuildRunCommand() *Command {
 type SpecRunner struct {
 	commandFlags     *RunWatchAndBuildCommandFlags
 	notifier         *Notifier
-	interruptHandler *InterruptHandler
+	interruptHandler *interrupthandler.InterruptHandler
 	suiteRunner      *SuiteRunner
 }
 
@@ -70,7 +71,7 @@ func (r *SpecRunner) RunSpecs(args []string, additionalArgs []string) {
 
 	runners := []*testrunner.TestRunner{}
 	for _, suite := range suites {
-		runners = append(runners, testrunner.New(suite, r.commandFlags.NumCPU, r.commandFlags.ParallelStream, r.commandFlags.Race, r.commandFlags.Cover, r.commandFlags.Tags, additionalArgs))
+		runners = append(runners, testrunner.New(suite, r.commandFlags.NumCPU, r.commandFlags.ParallelStream, r.commandFlags.Race, r.commandFlags.Cover, r.commandFlags.CoverPkg, r.commandFlags.Tags, additionalArgs))
 	}
 
 	numSuites := 0

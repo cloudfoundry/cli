@@ -2,9 +2,10 @@ package logmessage
 
 import (
 	"errors"
+	"time"
+
 	"github.com/cloudfoundry/loggregatorlib/signature"
 	"github.com/gogo/protobuf/proto"
-	"time"
 )
 
 type Message struct {

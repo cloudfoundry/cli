@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 )
@@ -35,7 +37,10 @@ func VerifyRequest(method string, path interface{}, rawQuery ...string) http.Han
 			Ω(req.URL.Path).Should(Equal(path), "Path mismatch")
 		}
 		if len(rawQuery) > 0 {
-			Ω(req.URL.RawQuery).Should(Equal(rawQuery[0]), "RawQuery mismatch")
+			values, err := url.ParseQuery(rawQuery[0])
+			Ω(err).ShouldNot(HaveOccurred(), "Expected RawQuery is malformed")
+
+			Ω(req.URL.Query()).Should(Equal(values), "RawQuery mismatch")
 		}
 	}
 }
@@ -53,6 +58,8 @@ func VerifyContentType(contentType string) http.HandlerFunc {
 func VerifyBasicAuth(username string, password string) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		auth := req.Header.Get("Authorization")
+		Ω(auth).ShouldNot(Equal(""), "Authorization header must be specified")
+
 		decoded, err := base64.StdEncoding.DecodeString(auth[6:])
 		Ω(err).ShouldNot(HaveOccurred())
 
@@ -107,6 +114,27 @@ func VerifyJSONRepresenting(object interface{}) http.HandlerFunc {
 		VerifyContentType("application/json"),
 		VerifyJSON(string(data)),
 	)
+}
+
+//VerifyForm returns a handler that verifies a request contains the specified form values.
+//
+//The request must contain *all* of the specified values, but it is allowed to have additional
+//form values beyond the passed in set.
+func VerifyForm(values url.Values) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		Ω(err).ShouldNot(HaveOccurred())
+		for key, vals := range values {
+			Ω(r.Form[key]).Should(Equal(vals), "Form mismatch for key: %s", key)
+		}
+	}
+}
+
+//VerifyFormKV returns a handler that verifies a request contains a form key with the specified values.
+//
+//It is a convenience wrapper around `VerifyForm` that lets you avoid having to create a `url.Values` object.
+func VerifyFormKV(key string, values ...string) http.HandlerFunc {
+	return VerifyForm(url.Values{key: values})
 }
 
 func copyHeader(src http.Header, dst http.Header) {
@@ -176,7 +204,17 @@ Also, RespondWithJSONEncoded can be given an optional http.Header.  The headers 
 func RespondWithJSONEncoded(statusCode int, object interface{}, optionalHeader ...http.Header) http.HandlerFunc {
 	data, err := json.Marshal(object)
 	Ω(err).ShouldNot(HaveOccurred())
-	return RespondWith(statusCode, string(data), optionalHeader...)
+
+	var headers http.Header
+	if len(optionalHeader) == 1 {
+		headers = optionalHeader[0]
+	} else {
+		headers = make(http.Header)
+	}
+	if _, found := headers["Content-Type"]; !found {
+		headers["Content-Type"] = []string{"application/json"}
+	}
+	return RespondWith(statusCode, string(data), headers)
 }
 
 /*
@@ -189,13 +227,20 @@ objects.
 Also, RespondWithJSONEncodedPtr can be given an optional http.Header.  The headers defined therein will be added to the response headers.
 Since the http.Header can be mutated after the fact you don't need to pass in a pointer.
 */
-func RespondWithJSONEncodedPtr(statusCode *int, object *interface{}, optionalHeader ...http.Header) http.HandlerFunc {
+func RespondWithJSONEncodedPtr(statusCode *int, object interface{}, optionalHeader ...http.Header) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		data, err := json.Marshal(*object)
+		data, err := json.Marshal(object)
 		Ω(err).ShouldNot(HaveOccurred())
+		var headers http.Header
 		if len(optionalHeader) == 1 {
-			copyHeader(optionalHeader[0], w.Header())
+			headers = optionalHeader[0]
+		} else {
+			headers = make(http.Header)
 		}
+		if _, found := headers["Content-Type"]; !found {
+			headers["Content-Type"] = []string{"application/json"}
+		}
+		copyHeader(headers, w.Header())
 		w.WriteHeader(*statusCode)
 		w.Write(data)
 	}

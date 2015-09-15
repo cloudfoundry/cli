@@ -9,7 +9,7 @@ type HaveOccurredMatcher struct {
 }
 
 func (matcher *HaveOccurredMatcher) Match(actual interface{}) (success bool, err error) {
-	if actual == nil {
+	if isNil(actual) {
 		return false, nil
 	}
 
@@ -21,7 +21,7 @@ func (matcher *HaveOccurredMatcher) Match(actual interface{}) (success bool, err
 }
 
 func (matcher *HaveOccurredMatcher) FailureMessage(actual interface{}) (message string) {
-	return fmt.Sprintf("Expected an error to have occured.  Got:\n%s", format.Object(actual, 1))
+	return fmt.Sprintf("Expected an error to have occurred.  Got:\n%s", format.Object(actual, 1))
 }
 
 func (matcher *HaveOccurredMatcher) NegatedFailureMessage(actual interface{}) (message string) {
