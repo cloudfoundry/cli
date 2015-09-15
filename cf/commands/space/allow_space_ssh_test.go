@@ -59,7 +59,16 @@ var _ = Describe("allow-space-ssh command", func() {
 		})
 
 		It("does not pass requirements if org is not targeted", func() {
+			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = false
+
+			Expect(runCommand("my-space")).To(BeFalse())
+		})
+
+		It("does not pass requirements if space does not exist", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.SpaceRequirementFails = true
 
 			Expect(runCommand("my-space")).To(BeFalse())
 		})

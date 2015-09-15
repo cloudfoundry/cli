@@ -1100,6 +1100,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME space-ssh-allowed SPACE_NAME",
+      "translation": "CF_NAME space-ssh-allowed SPACE_NAME",
+      "modified": false
+   },
+   {
       "id": "CF_NAME space-users ORG SPACE",
       "translation": "CF_NAME space-users ORG ESPACE",
       "modified": false
@@ -2767,11 +2772,6 @@
    {
       "id": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
       "translation": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
-      "modified": false
-   },
-   {
-      "id": "Incorrect Usage. Requires APP_NAME as argument\n\n",
-      "translation": "Incorrect Usage. Requires APP_NAME as argument\n\n",
       "modified": false
    },
    {
@@ -5430,6 +5430,11 @@
       "modified": false
    },
    {
+      "id": "reports whether SSH is allowed in a space",
+      "translation": "reports whether SSH is allowed in a space",
+      "modified": false
+   },
+   {
       "id": "reports whether SSH is enabled on an application container instance",
       "translation": "reports whether SSH is enabled on an application container instance",
       "modified": false
@@ -5555,8 +5560,18 @@
       "modified": false
    },
    {
+      "id": "ssh support is disabled in space ",
+      "translation": "ssh support is disabled in space ",
+      "modified": false
+   },
+   {
       "id": "ssh support is enabled for",
       "translation": "ssh support is enabled for",
+      "modified": false
+   },
+   {
+      "id": "ssh support is enabled in space ",
+      "translation": "ssh support is enabled in space ",
       "modified": false
    },
    {
