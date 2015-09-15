@@ -7,11 +7,11 @@ import (
 	"net/url"
 	"syscall"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"golang.org/x/net/websocket"
 )
 
 var _ = Describe("HTTP Client", func() {

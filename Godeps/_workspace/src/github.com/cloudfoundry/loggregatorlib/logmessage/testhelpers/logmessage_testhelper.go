@@ -1,11 +1,12 @@
 package testhelpers
 
 import (
+	"testing"
+	"time"
+
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func MarshalledErrorLogMessage(t *testing.T, messageString string, appId, sourceId string) []byte {

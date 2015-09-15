@@ -1,13 +1,13 @@
 package api_test
 
 import (
-	"code.google.com/p/gogoprotobuf/proto"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
+	"github.com/gogo/protobuf/proto"
 
 	"time"
 

@@ -51,21 +51,21 @@ import (
 
 	{{if .IncludeImports}}. "github.com/onsi/ginkgo"{{end}}
 	{{if .IncludeImports}}. "github.com/onsi/gomega"{{end}}
-	. "github.com/sclevine/agouti/core"
 	. "github.com/sclevine/agouti/matchers"
+	"github.com/sclevine/agouti"
 )
 
 var _ = Describe("{{.Subject}}", func() {
-	var page Page
+	var page *agouti.Page
 
 	BeforeEach(func() {
 		var err error
-		page, err = agoutiDriver.Page()
+		page, err = agoutiDriver.NewPage()
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		page.Destroy()
+		Expect(page.Destroy()).To(Succeed())
 	})
 })
 `
@@ -104,24 +104,22 @@ func generateSpec(args []string, agouti, noDot bool) {
 }
 
 func generateSpecForSubject(subject string, agouti, noDot bool) error {
-	packageName := getPackage()
-	if subject == "" {
-		subject = packageName
-	} else {
+	packageName, specFilePrefix, formattedName := getPackageAndFormattedName()
+	if subject != "" {
 		subject = strings.Split(subject, ".go")[0]
 		subject = strings.Split(subject, "_test")[0]
+		specFilePrefix = subject
+		formattedName = prettifyPackageName(subject)
 	}
-
-	formattedSubject := strings.Replace(strings.Title(strings.Replace(subject, "_", " ", -1)), " ", "", -1)
 
 	data := specData{
 		Package:           packageName,
-		Subject:           formattedSubject,
+		Subject:           formattedName,
 		PackageImportPath: getPackageImportPath(),
 		IncludeImports:    !noDot,
 	}
 
-	targetFile := fmt.Sprintf("%s_test.go", subject)
+	targetFile := fmt.Sprintf("%s_test.go", specFilePrefix)
 	if fileExists(targetFile) {
 		return fmt.Errorf("%s already exists.", targetFile)
 	} else {

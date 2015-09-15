@@ -7,11 +7,12 @@ package events
 import proto "github.com/gogo/protobuf/proto"
 import math "math"
 
-// discarding unused import gogoproto "github.com/gogo/protobuf/gogoproto/gogo.pb"
+// discarding unused import gogoproto "github.com/gogo/protobuf/gogoproto"
+
+import github_com_gogo_protobuf_proto "github.com/gogo/protobuf/proto"
 
 import io "io"
 import fmt "fmt"
-import github_com_gogo_protobuf_proto "github.com/gogo/protobuf/proto"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -111,231 +112,6 @@ func (m *LogMessage) GetSourceInstance() string {
 func init() {
 	proto.RegisterEnum("events.LogMessage_MessageType", LogMessage_MessageType_name, LogMessage_MessageType_value)
 }
-func (m *LogMessage) Unmarshal(data []byte) error {
-	var hasFields [1]uint64
-	l := len(data)
-	index := 0
-	for index < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if index >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[index]
-			index++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if index >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[index]
-				index++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			postIndex := index + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = append([]byte{}, data[index:postIndex]...)
-			index = postIndex
-			hasFields[0] |= uint64(0x00000001)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MessageType", wireType)
-			}
-			var v LogMessage_MessageType
-			for shift := uint(0); ; shift += 7 {
-				if index >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[index]
-				index++
-				v |= (LogMessage_MessageType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.MessageType = &v
-			hasFields[0] |= uint64(0x00000002)
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if index >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[index]
-				index++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Timestamp = &v
-			hasFields[0] |= uint64(0x00000004)
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AppId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if index >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[index]
-				index++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			postIndex := index + int(stringLen)
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[index:postIndex])
-			m.AppId = &s
-			index = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SourceType", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if index >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[index]
-				index++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			postIndex := index + int(stringLen)
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[index:postIndex])
-			m.SourceType = &s
-			index = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SourceInstance", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if index >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[index]
-				index++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			postIndex := index + int(stringLen)
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[index:postIndex])
-			m.SourceInstance = &s
-			index = postIndex
-		default:
-			var sizeOfWire int
-			for {
-				sizeOfWire++
-				wire >>= 7
-				if wire == 0 {
-					break
-				}
-			}
-			index -= sizeOfWire
-			skippy, err := github_com_gogo_protobuf_proto.Skip(data[index:])
-			if err != nil {
-				return err
-			}
-			if (index + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, data[index:index+skippy]...)
-			index += skippy
-		}
-	}
-	if hasFields[0]&uint64(0x00000001) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("message")
-	}
-	if hasFields[0]&uint64(0x00000002) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("message_type")
-	}
-	if hasFields[0]&uint64(0x00000004) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
-	}
-
-	return nil
-}
-func (m *LogMessage) Size() (n int) {
-	var l int
-	_ = l
-	if m.Message != nil {
-		l = len(m.Message)
-		n += 1 + l + sovLog(uint64(l))
-	}
-	if m.MessageType != nil {
-		n += 1 + sovLog(uint64(*m.MessageType))
-	}
-	if m.Timestamp != nil {
-		n += 1 + sovLog(uint64(*m.Timestamp))
-	}
-	if m.AppId != nil {
-		l = len(*m.AppId)
-		n += 1 + l + sovLog(uint64(l))
-	}
-	if m.SourceType != nil {
-		l = len(*m.SourceType)
-		n += 1 + l + sovLog(uint64(l))
-	}
-	if m.SourceInstance != nil {
-		l = len(*m.SourceInstance)
-		n += 1 + l + sovLog(uint64(l))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func sovLog(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
-}
-func sozLog(x uint64) (n int) {
-	return sovLog(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
 func (m *LogMessage) Marshal() (data []byte, err error) {
 	size := m.Size()
 	data = make([]byte, size)
@@ -346,7 +122,7 @@ func (m *LogMessage) Marshal() (data []byte, err error) {
 	return data[:n], nil
 }
 
-func (m *LogMessage) MarshalTo(data []byte) (n int, err error) {
+func (m *LogMessage) MarshalTo(data []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -424,3 +200,337 @@ func encodeVarintLog(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	return offset + 1
 }
+func (m *LogMessage) Size() (n int) {
+	var l int
+	_ = l
+	if m.Message != nil {
+		l = len(m.Message)
+		n += 1 + l + sovLog(uint64(l))
+	}
+	if m.MessageType != nil {
+		n += 1 + sovLog(uint64(*m.MessageType))
+	}
+	if m.Timestamp != nil {
+		n += 1 + sovLog(uint64(*m.Timestamp))
+	}
+	if m.AppId != nil {
+		l = len(*m.AppId)
+		n += 1 + l + sovLog(uint64(l))
+	}
+	if m.SourceType != nil {
+		l = len(*m.SourceType)
+		n += 1 + l + sovLog(uint64(l))
+	}
+	if m.SourceInstance != nil {
+		l = len(*m.SourceInstance)
+		n += 1 + l + sovLog(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func sovLog(x uint64) (n int) {
+	for {
+		n++
+		x >>= 7
+		if x == 0 {
+			break
+		}
+	}
+	return n
+}
+func sozLog(x uint64) (n int) {
+	return sovLog(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *LogMessage) Unmarshal(data []byte) error {
+	var hasFields [1]uint64
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthLog
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = append([]byte{}, data[iNdEx:postIndex]...)
+			iNdEx = postIndex
+			hasFields[0] |= uint64(0x00000001)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MessageType", wireType)
+			}
+			var v LogMessage_MessageType
+			for shift := uint(0); ; shift += 7 {
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (LogMessage_MessageType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.MessageType = &v
+			hasFields[0] |= uint64(0x00000002)
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Timestamp = &v
+			hasFields[0] |= uint64(0x00000004)
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLog
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[iNdEx:postIndex])
+			m.AppId = &s
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SourceType", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLog
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[iNdEx:postIndex])
+			m.SourceType = &s
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SourceInstance", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLog
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[iNdEx:postIndex])
+			m.SourceInstance = &s
+			iNdEx = postIndex
+		default:
+			var sizeOfWire int
+			for {
+				sizeOfWire++
+				wire >>= 7
+				if wire == 0 {
+					break
+				}
+			}
+			iNdEx -= sizeOfWire
+			skippy, err := skipLog(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthLog
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, data[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+	if hasFields[0]&uint64(0x00000001) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("message")
+	}
+	if hasFields[0]&uint64(0x00000002) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("message_type")
+	}
+	if hasFields[0]&uint64(0x00000004) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
+	}
+
+	return nil
+}
+func skipLog(data []byte) (n int, err error) {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if iNdEx >= l {
+				return 0, io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		wireType := int(wire & 0x7)
+		switch wireType {
+		case 0:
+			for {
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				iNdEx++
+				if data[iNdEx-1] < 0x80 {
+					break
+				}
+			}
+			return iNdEx, nil
+		case 1:
+			iNdEx += 8
+			return iNdEx, nil
+		case 2:
+			var length int
+			for shift := uint(0); ; shift += 7 {
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				length |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			iNdEx += length
+			if length < 0 {
+				return 0, ErrInvalidLengthLog
+			}
+			return iNdEx, nil
+		case 3:
+			for {
+				var innerWire uint64
+				var start int = iNdEx
+				for shift := uint(0); ; shift += 7 {
+					if iNdEx >= l {
+						return 0, io.ErrUnexpectedEOF
+					}
+					b := data[iNdEx]
+					iNdEx++
+					innerWire |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				innerWireType := int(innerWire & 0x7)
+				if innerWireType == 4 {
+					break
+				}
+				next, err := skipLog(data[start:])
+				if err != nil {
+					return 0, err
+				}
+				iNdEx = start + next
+			}
+			return iNdEx, nil
+		case 4:
+			return iNdEx, nil
+		case 5:
+			iNdEx += 4
+			return iNdEx, nil
+		default:
+			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
+		}
+	}
+	panic("unreachable")
+}
+
+var (
+	ErrInvalidLengthLog = fmt.Errorf("proto: negative length found during unmarshaling")
+)

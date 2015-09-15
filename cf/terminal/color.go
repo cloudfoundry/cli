@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"runtime"
 
-	"code.google.com/p/go.crypto/ssh/terminal"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 type Color uint
