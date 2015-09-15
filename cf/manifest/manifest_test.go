@@ -429,21 +429,6 @@ var _ = Describe("Manifests", func() {
 			Expect((*app[0].EnvironmentVars)["int-key"]).To(Equal(1))
 			Expect((*app[0].EnvironmentVars)["float-key"]).To(Equal(11.1))
 		})
-
-		XIt("handles values that cannot be converted to strings", func() {
-			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
-				"applications": []interface{}{
-					generic.NewMap(map[interface{}]interface{}{
-						"env": map[interface{}]interface{}{
-							"bad-key": map[interface{}]interface{}{},
-						},
-					}),
-				},
-			}))
-
-			_, err := m.Applications()
-			Expect(err).To(HaveOccurred())
-		})
 	})
 
 	Describe("parsing services", func() {

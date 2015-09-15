@@ -70,7 +70,6 @@ func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
-	fmt.Println("app cmd field", application.Command)
 
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error getting application summary: ") + apiErr.Error())
