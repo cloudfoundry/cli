@@ -19,6 +19,7 @@ type FakeReqFactory struct {
 	TargetedSpaceSuccess    bool
 	TargetedOrgSuccess      bool
 	BuildpackSuccess        bool
+	SpaceRequirementFails   bool
 
 	ServiceInstanceNotFound bool
 
@@ -71,7 +72,7 @@ func (f *FakeReqFactory) NewTargetedOrgRequirement() requirements.TargetedOrgReq
 
 func (f *FakeReqFactory) NewSpaceRequirement(name string) requirements.SpaceRequirement {
 	f.SpaceName = name
-	return FakeRequirement{f, true}
+	return FakeRequirement{f, !f.SpaceRequirementFails}
 }
 
 func (f *FakeReqFactory) NewOrganizationRequirement(name string) requirements.OrganizationRequirement {
