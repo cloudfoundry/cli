@@ -20,7 +20,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/simonleung8/flags"
 )
 
