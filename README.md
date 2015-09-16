@@ -94,13 +94,17 @@ Forking the repository for development
 ======================================
 
 1. Install [Go](https://golang.org)
-1. [Ensure your $GOPATH is set correctly](http://golang.org/cmd/go/#hdr-GOPATH_environment_variable)
-1. Install [godep](https://github.com/tools/godep)
+  * on Mac OS X this could be `brew install go` if you have [Homebrew](http://brew.sh/) installed.
+1. Create a directory for your source & dependencies ex. `mkdir ~/dev/cli && cd ~/dev/cli`
+1. [Ensure your $GOPATH is set correctly](http://golang.org/cmd/go/#hdr-GOPATH_environment_variable).  ex. `export $GOPATH=~/dev/cli`
+1. Install [godep](https://github.com/tools/godep) (usually `go get github.com/tools/godep`)
 1. Get the cli source code: `go get github.com/cloudfoundry/cli`
   * (Ignore any warnings about "no buildable Go source files")
 1. Run `godep restore` (note: this will modify the dependencies in your $GOPATH)
-1. Fork the repository
+1. Fork the repository on GitHub
 1. Add your fork as a remote: `cd $GOPATH/src/github.com/cloudfoundry/cli && git remote add your_name https://github.com/your_name/cli`
+1. Optionally add build output location to your path: ex. `export PATH=$GOPATH/src/github.com/cloudfoundry/cli/out/:$PATH`
+
 
 Building
 ========
@@ -201,7 +205,7 @@ to be logged in, and the actual behavior of the command itself. You can find it 
 
 i18n
 ----
-All pull requests which include user-facing strings should include updated translation files. These files are generated/ maintained using [i18n4go](https://github.com/maximilien/i18n4go). 
+All pull requests which include user-facing strings should include updated translation files. These files are generated/ maintained using [i18n4go](https://github.com/maximilien/i18n4go).
 
 To add/ update translation strings run the command `i18n4go -c fixup`. For each change or update, you will be presented with the choices `new` or `upd`. Type in the appropriate choice. If `upd` is chosen, you will be asked to confirm which string is being updated using a numbered list.
 
