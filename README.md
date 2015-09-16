@@ -95,8 +95,8 @@ Forking the repository for development
 
 1. Install [Go](https://golang.org)
   * on Mac OS X this could be `brew install go` if you have [Homebrew](http://brew.sh/) installed.
-1. Create a directory for your source & dependencies ex. `mkdir ~/dev/cli && cd ~/dev/cli`
-1. [Ensure your $GOPATH is set correctly](http://golang.org/cmd/go/#hdr-GOPATH_environment_variable).  ex. `export $GOPATH=~/dev/cli`
+1. Create a directory for your source & dependencies ex. `mkdir ~/dev/cloudfoundry-dev && cd ~/dev/cloudfoundry-dev`
+1. [Ensure your $GOPATH is set correctly](http://golang.org/cmd/go/#hdr-GOPATH_environment_variable).  ex. `export GOPATH=~/dev/cloudfoundry-dev`
 1. Install [godep](https://github.com/tools/godep) (usually `go get github.com/tools/godep`)
 1. Get the cli source code: `go get github.com/cloudfoundry/cli`
   * (Ignore any warnings about "no buildable Go source files")
@@ -104,7 +104,6 @@ Forking the repository for development
 1. Fork the repository on GitHub
 1. Add your fork as a remote: `cd $GOPATH/src/github.com/cloudfoundry/cli && git remote add your_name https://github.com/your_name/cli`
 1. Optionally add build output location to your path: ex. `export PATH=$GOPATH/src/github.com/cloudfoundry/cli/out/:$PATH`
-
 
 Building
 ========
