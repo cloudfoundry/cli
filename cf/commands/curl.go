@@ -42,14 +42,14 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "curl",
 		Description: T("Executes a raw request, content-type set to application/json by default"),
-		Usage:       T("CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]") + "\n   " + T("For API documentation, please visit http://apidocs.cloudfoundry.org"),
+		Usage:       T("CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d \"DATA\"] [--output FILE]") + "\n   " + T("For API documentation, please visit http://apidocs.cloudfoundry.org"),
 		Flags:       fs,
 	}
 }
 
 func (cmd *Curl) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("curl"))
+		cmd.ui.Failed(T("Incorrect Usage. An Argument is missing or not correctly enclosed.\n\n") + command_registry.Commands.CommandUsage("curl"))
 	}
 
 	reqs = []requirements.Requirement{
