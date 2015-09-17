@@ -1132,6 +1132,7 @@ var _ = Describe("Push Command", func() {
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"FAILED"},
 			[]string{"Manifest file is not found"},
+			[]string{"USAGE:"},
 		))
 	})
 })
