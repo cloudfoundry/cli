@@ -143,6 +143,24 @@ PUT /Users/user-guid-goes-here/password HTTP/1.1
 				Expect(Sanitize(request)).To(Equal(expected))
 			})
 
+			It("hides pasword containing \" in the JSON-formatted request body", func() {
+				request := `
+REQUEST: [2014-03-07T10:53:36-08:00]
+PUT /Users/user-guid-goes-here/password HTTP/1.1
+
+{"password":"stanleys"PasswordIsCool","oldPassword":"stanleypassword!"}
+`
+
+				expected := `
+REQUEST: [2014-03-07T10:53:36-08:00]
+PUT /Users/user-guid-goes-here/password HTTP/1.1
+
+{"password":"[PRIVATE DATA HIDDEN]","oldPassword":"[PRIVATE DATA HIDDEN]"}
+`
+
+				Expect(Sanitize(request)).To(Equal(expected))
+			})
+
 			It("hides create-user passwords", func() {
 				request := `
 REQUEST: [2014-03-07T12:15:08-08:00]
