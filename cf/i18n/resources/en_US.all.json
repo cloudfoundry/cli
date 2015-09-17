@@ -5066,7 +5066,7 @@
    },
    {
       "id": "allow SSH access for the space",
-      "translation": "allow SSH access for the space",
+      "translation": "Allow SSH access for the space",
       "modified": false
    },
    {
@@ -5151,7 +5151,7 @@
    },
    {
       "id": "disallow SSH access for the space",
-      "translation": "disallow SSH access for the space",
+      "translation": "Disallow SSH access for the space",
       "modified": false
    },
    {
@@ -5431,12 +5431,12 @@
    },
    {
       "id": "reports whether SSH is allowed in a space",
-      "translation": "reports whether SSH is allowed in a space",
+      "translation": "Reports whether SSH is allowed in a space",
       "modified": false
    },
    {
       "id": "reports whether SSH is enabled on an application container instance",
-      "translation": "reports whether SSH is enabled on an application container instance",
+      "translation": "Reports whether SSH is enabled on an application container instance",
       "modified": false
    },
    {

@@ -207,7 +207,6 @@ func newAppPresenter() (presenter appPresenter) {
 				}, {
 					presentNonCodegangstaCommand("allow-space-ssh"),
 					presentNonCodegangstaCommand("disallow-space-ssh"),
-				}, {
 					presentNonCodegangstaCommand("space-ssh-allowed"),
 				},
 			},
