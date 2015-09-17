@@ -61,7 +61,7 @@ var _ = Describe("curl command", func() {
 		It("fails with usage when not given enough input", func() {
 			runCurlWithInputs([]string{})
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires an argument"},
+				[]string{"Incorrect Usage", "An argument is missing or not correctly enclosed"},
 			))
 		})
 
