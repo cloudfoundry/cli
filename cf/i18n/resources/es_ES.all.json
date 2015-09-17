@@ -2780,6 +2780,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
+      "translation": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n",
       "translation": "Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n",
       "modified": false
