@@ -67,7 +67,7 @@ var _ = Describe("main", func() {
 		})
 
 		It("prints the cf version if '--version' flag is provided", func() {
-			output := Cf("-v").Wait(1 * time.Second)
+			output := Cf("--version").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("version"))
 			Ω(output.ExitCode()).To(Equal(0))
 		})
