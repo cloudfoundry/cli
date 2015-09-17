@@ -102,7 +102,7 @@ func mustLoadDefaultLocale() string {
 
 	err := loadFromAsset(DEFAULT_LOCALE)
 	if err != nil {
-		panic("Could not load en_US language files. God save the queen. \n" + err.Error() + "\n\n")
+		panic("Could not load en_US language files. \n" + err.Error() + "\n\n")
 	}
 
 	return userLocale
