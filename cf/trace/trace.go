@@ -75,7 +75,7 @@ func newFileLogger(path string) Printer {
 
 func Sanitize(input string) (sanitized string) {
 	var sanitizeJson = func(propertyName string, json string) string {
-		regex := regexp.MustCompile(fmt.Sprintf(`"%s":\s*"[^"]*"`, propertyName))
+		regex := regexp.MustCompile(fmt.Sprintf(`"%s":\s*"[^\,]*"`, propertyName))
 		return regex.ReplaceAllString(json, fmt.Sprintf(`"%s":"%s"`, propertyName, PRIVATE_DATA_PLACEHOLDER()))
 	}
 
