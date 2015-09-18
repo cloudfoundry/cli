@@ -13,6 +13,9 @@
 * handles cf --version [#102641456]
 * Update README.md
 * Improve error message when app fail to start with "NoAppDetectedError"
+* fix panic in cf marketplace with v1 services
+* fix panic in create-app-manifest [#101367528]
+* remove inappropriate error message
 
 ##6.12.3
 * Insert debug messages into CI script
