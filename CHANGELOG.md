@@ -1,3 +1,19 @@
+##6.12.4
+* Merge pull request #589 from cloudfoundry/usage-on-unadorned-push Provide usage on unadorned push
+* Provide usage on unadorned push [#103419480]
+* Update dependencies away from code.google.com [#103336616]
+* diego app not to use noaa for metrics [#103051454]
+* Merge pull request #562 from cloudfoundry/BuildpackErrorImprovement Improve error message when app fail to start with "NoAppDetectedError"
+* Fix hanging in herd-cats -linux ci script
+* Rename the concourse bosh manifest to something revealing aws-vpc.yml has very little meaning or discoverability.
+* populate organization name in security-group and security-groups [#102282206]
+* create-app-manifest includes command attribute [#102135048]
+* Merge pull request #572 from zachgersh/fix-extra-parsing Account for null being passed in extra
+* Account for null being passed in extra - fixes #570
+* handles cf --version [#102641456]
+* Update README.md
+* Improve error message when app fail to start with "NoAppDetectedError"
+
 ##6.12.3
 * Insert debug messages into CI script
 * Merge pull request #544 from cloudfoundry/code-tidy Code tidy
