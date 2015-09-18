@@ -2890,11 +2890,6 @@
       "modified": false
    },
    {
-      "id": "Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer",
-      "translation": "无效的实例数: {{.InstanceCount}}\n实例数必须是正整数",
-      "modified": false
-   },
-   {
       "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
       "translation": "无效的实例数: {{.InstancesCount}}\n实例数量必须是个正整数",
       "modified": false

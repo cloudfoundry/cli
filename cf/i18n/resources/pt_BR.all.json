@@ -2890,11 +2890,6 @@
       "modified": false
    },
    {
-      "id": "Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer",
-      "translation": "Quantidade de instâncias inválida: {{.InstanceCount}}\nA quantidade de instâncias deve ser um número inteiro positivo",
-      "modified": false
-   },
-   {
       "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
       "translation": "Quantidade de instâncias inválida: {{.InstancesCount}}\nA quantidade de instâncias deve ser um número inteiro positivo",
       "modified": false

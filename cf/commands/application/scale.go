@@ -121,14 +121,7 @@ func (cmd *Scale) Execute(c flags.FlagContext) {
 
 	if c.IsSet("i") {
 		instances := c.Int("i")
-		if instances > 0 {
-			params.InstanceCount = &instances
-		} else {
-			cmd.ui.Failed(T("Invalid instance count: {{.InstanceCount}}\nInstance count must be a positive integer",
-				map[string]interface{}{
-					"InstanceCount": instances,
-				}))
-		}
+		params.InstanceCount = &instances
 	}
 
 	if shouldRestart && !cmd.confirmRestart(c, currentApp.Name) {
