@@ -2,7 +2,6 @@ package application
 
 import (
 	"strings"
-
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -10,11 +9,13 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type ListApps struct {
@@ -24,6 +25,7 @@ type ListApps struct {
 
 	pluginAppModels *[]plugin_models.GetAppsModel
 	pluginCall      bool
+	spaceRepo       spaces.SpaceRepository
 }
 
 func init() {
@@ -31,11 +33,17 @@ func init() {
 }
 
 func (cmd *ListApps) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Space name (list all apps in a specified space of current organization)") +
+		T("\n\nTIP:\n") +
+		T("By default it will list all apps of current targeted space if '-s' flag is not provided.")}
+
 	return command_registry.CommandMetadata{
 		Name:        "apps",
 		ShortName:   "a",
-		Description: T("List all apps in the target space"),
+		Description: T("List all apps in a space of targeted organization"),
 		Usage:       "CF_NAME apps",
+		Flags:       fs,
 	}
 }
 
@@ -57,17 +65,39 @@ func (cmd *ListApps) SetDependency(deps command_registry.Dependency, pluginCall 
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
 	cmd.pluginAppModels = deps.PluginModels.AppsSummary
 	cmd.pluginCall = pluginCall
+	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	return cmd
 }
 
 func (cmd *ListApps) Execute(c flags.FlagContext) {
-	cmd.ui.Say(T("Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-		map[string]interface{}{
-			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	apps, apiErr := cmd.appSummaryRepo.GetSummariesInCurrentSpace()
+	spaceName := c.String("s")
+	var apps []models.Application
+	var apiErr error
+	var space models.Space
+	if spaceName != "" {
+		space, apiErr = cmd.spaceRepo.FindByName(spaceName)
+		if apiErr != nil {
+			cmd.ui.Failed(T("Error finding space {{.SpaceName}}\n{{.Err}}",
+				map[string]interface{}{"SpaceName": (spaceName), "Err": apiErr.Error()}))
+			return
+		}
+		cmd.ui.Say(T("Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+			map[string]interface{}{
+				"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName": terminal.EntityNameColor(space.Name),
+				"Username":  terminal.EntityNameColor(cmd.config.Username())}))
+
+		apps, apiErr = cmd.appSummaryRepo.GetSpaceSummaries(space.Guid)
+	} else {
+		cmd.ui.Say(T("Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+			map[string]interface{}{
+				"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"Username":  terminal.EntityNameColor(cmd.config.Username())}))
+
+		apps, apiErr = cmd.appSummaryRepo.GetSummariesInCurrentSpace()
+	}
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

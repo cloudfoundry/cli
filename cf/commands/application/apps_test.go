@@ -21,20 +21,25 @@ var _ = Describe("list-apps command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		appSummaryRepo      *testapi.FakeAppSummaryRepo
+		spaceRepo           *testapi.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
+		app                 models.Application
+		app2                models.Application
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
+		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("apps").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
+		spaceRepo = &testapi.FakeSpaceRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
@@ -64,7 +69,6 @@ var _ = Describe("list-apps command", func() {
 				Domain: models.DomainFields{Name: "cfapps.io"},
 			}}
 
-		app := models.Application{}
 		app.Name = "Application-1"
 		app.Guid = "Application-1-guid"
 		app.State = "started"
@@ -74,7 +78,6 @@ var _ = Describe("list-apps command", func() {
 		app.DiskQuota = 1024
 		app.Routes = app1Routes
 
-		app2 := models.Application{}
 		app2.Name = "Application-2"
 		app2.Guid = "Application-2-guid"
 		app2.State = "started"
@@ -200,4 +203,68 @@ var _ = Describe("list-apps command", func() {
 			})
 		})
 	})
+
+	Context("when space flag is provided", func() {
+		BeforeEach(func() {
+			space := models.Space{}
+			space.Name = "my-space"
+			space.Guid = "my-space-guid"
+			spaceRepo.Spaces = []models.Space{space}
+			appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{}
+		})
+
+		It("lists apps in a table", func() {
+			appSummaryRepo.GetSpaceSummariesApps = []models.Application{app, app2}
+
+			runCommand("-s", "my-space")
+
+			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting apps in", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+				[]string{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
+				[]string{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
+			))
+		})
+
+		It("fails when the space is not found", func() {
+			spaceRepo.FindByNameNotFound = true
+
+			runCommand("-s", "my-space")
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"my-space", "not found"},
+			))
+		})
+
+		It("should not list apps in the current space", func() {
+			appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app}
+			appSummaryRepo.GetSpaceSummariesApps = []models.Application{app2}
+
+			runCommand("-s", "my-space")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting apps in", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+				[]string{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
+			))
+			Expect(ui.Outputs).NotTo(ContainSubstrings(
+				[]string{"Application-1", "started", "1/1", "512M", "1G", "app2.cfapps.io"},
+			))
+		})
+
+		It("should list apps even if the space name is current space", func() {
+			appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app}
+			appSummaryRepo.GetSpaceSummariesApps = []models.Application{app}
+
+			runCommand("-s", "my-space")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting apps in", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+				[]string{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io"},
+			))
+		})
+	})
+
 })

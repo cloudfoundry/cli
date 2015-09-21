@@ -129,6 +129,66 @@ var _ = Describe("AppSummaryRepository", func() {
 		})
 	})
 
+	Describe("GetSpaceSummaries()", func() {
+		BeforeEach(func() {
+			getAppSummariesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/spaces/my-space-guid/summary",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body:   getAppSummariesResponseBody,
+				},
+			})
+
+			testServer, handler = testnet.NewServer([]testnet.TestRequest{getAppSummariesRequest})
+			configRepo := testconfig.NewRepositoryWithDefaults()
+			configRepo.SetApiEndpoint(testServer.URL)
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+			repo = NewCloudControllerAppSummaryRepository(configRepo, gateway)
+
+		})
+
+		AfterEach(func() {
+			testServer.Close()
+		})
+
+		It("returns a slice of app summaries for each instance in a given space guid", func() {
+			apps, apiErr := repo.GetSpaceSummaries("my-space-guid")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(3).To(Equal(len(apps)))
+
+			app1 := apps[0]
+			Expect(app1.Name).To(Equal("app1"))
+			Expect(app1.Guid).To(Equal("app-1-guid"))
+			Expect(app1.BuildpackUrl).To(Equal("go_buildpack"))
+			Expect(len(app1.Routes)).To(Equal(1))
+			Expect(app1.Routes[0].URL()).To(Equal("app1.cfapps.io"))
+			Expect(app1.State).To(Equal("started"))
+			Expect(app1.Command).To(Equal("start_command"))
+			Expect(app1.InstanceCount).To(Equal(1))
+			Expect(app1.RunningInstances).To(Equal(1))
+			Expect(app1.Memory).To(Equal(int64(128)))
+			Expect(app1.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2014-10-24T19:54:00Z"))
+
+			app2 := apps[1]
+			Expect(app2.Name).To(Equal("app2"))
+			Expect(app2.Command).To(Equal(""))
+			Expect(app2.Guid).To(Equal("app-2-guid"))
+			Expect(len(app2.Routes)).To(Equal(2))
+			Expect(app2.Routes[0].URL()).To(Equal("app2.cfapps.io"))
+			Expect(app2.Routes[1].URL()).To(Equal("foo.cfapps.io"))
+			Expect(app2.State).To(Equal("started"))
+			Expect(app2.InstanceCount).To(Equal(3))
+			Expect(app2.RunningInstances).To(Equal(1))
+			Expect(app2.Memory).To(Equal(int64(512)))
+			Expect(app2.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2012-10-24T19:55:00Z"))
+
+			nullUpdateAtApp := apps[2]
+			Expect(nullUpdateAtApp.PackageUpdatedAt).To(BeNil())
+		})
+	})
+
 })
 
 const getAppSummariesResponseBody string = `

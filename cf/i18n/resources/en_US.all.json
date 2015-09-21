@@ -2960,8 +2960,18 @@
       "modified": false
    },
    {
-      "id": "List all apps in the target space",
-      "translation": "List all apps in the target space",
+      "id": "List all apps in a space of targeted organization",
+      "translation": "List all apps in a space of targeted organization",
+      "modified": false
+   },
+   {
+      "id": "Space name (list all apps in a specified space of current organization)",
+      "translation": "Space name (list all apps in a specified space of current organization)",
+      "modified": false
+   },
+   {
+      "id": "By default it will list all apps of current targeted space if '-s' flag is not provided.",
+      "translation": "By default it will list all apps of current targeted space if '-s' flag is not provided.",
       "modified": false
    },
    {

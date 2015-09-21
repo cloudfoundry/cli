@@ -8,9 +8,11 @@ import (
 type FakeAppSummaryRepo struct {
 	GetSummariesInCurrentSpaceApps []models.Application
 
-	GetSummaryErrorCode string
-	GetSummaryAppGuid   string
-	GetSummarySummary   models.Application
+	GetSummaryErrorCode   string
+	GetSummaryAppGuid     string
+	GetSummarySummary     models.Application
+	GetSpaceGuid          string
+	GetSpaceSummariesApps []models.Application
 }
 
 func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.Application, apiErr error) {
@@ -26,5 +28,10 @@ func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.Appli
 		apiErr = errors.NewHttpError(400, repo.GetSummaryErrorCode, "Error")
 	}
 
+	return
+}
+func (repo *FakeAppSummaryRepo) GetSpaceSummaries(spaceGuid string) (apps []models.Application, apiErr error) {
+	repo.GetSpaceGuid = spaceGuid
+	apps = repo.GetSpaceSummariesApps
 	return
 }
