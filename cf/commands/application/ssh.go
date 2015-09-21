@@ -47,7 +47,7 @@ func (cmd *SSH) MetaData() command_registry.CommandMetadata {
 	fs["app-instance-index"] = &cliFlags.IntFlag{Name: "app-instance-index", ShortName: "i", Usage: T("Application instance index")}
 	fs["skip-host-validation"] = &cliFlags.BoolFlag{Name: "skip-host-validation", ShortName: "k", Usage: T("Skip host key validation")}
 	fs["skip-remote-execution"] = &cliFlags.BoolFlag{Name: "skip-remote-execution", ShortName: "N", Usage: T("Do not execute a remote command")}
-	fs["request-pseudo-tty"] = &cliFlags.BoolFlag{Name: "request-pseudo-tty", ShortName: "t", Usage: T("Force pseudo-tty allocation")}
+	fs["request-pseudo-tty"] = &cliFlags.BoolFlag{Name: "request-pseudo-tty", ShortName: "t", Usage: T("Request pseudo-tty allocation")}
 	fs["force-pseudo-tty"] = &cliFlags.BoolFlag{Name: "force-pseudo-tty", ShortName: "tt", Usage: T("Force pseudo-tty allocation")}
 	fs["disable-pseudo-tty"] = &cliFlags.BoolFlag{Name: "disable-pseudo-tty", ShortName: "T", Usage: T("Disable pseudo-tty allocation")}
 

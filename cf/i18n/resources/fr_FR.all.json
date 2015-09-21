@@ -3995,6 +3995,11 @@
       "modified": false
    },
    {
+      "id": "Request pseudo-tty allocation",
+      "translation": "Request pseudo-tty allocation",
+      "modified": false
+   },
+   {
       "id": "Restage an app",
       "translation": "Recharger une application",
       "modified": false
