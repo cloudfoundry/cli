@@ -47,6 +47,7 @@ type Dependency struct {
 	AppFiles           app_files.AppFiles
 	PushActor          actors.PushActor
 	ChecksumUtil       utils.Sha1Checksum
+	WilecardDependency interface{} //use for injecting fakes
 }
 
 type pluginModels struct {
