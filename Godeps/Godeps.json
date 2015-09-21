@@ -10,6 +10,51 @@
 			"Rev": "c9a41626ac65459003d7ded6a187b9316d9421b3"
 		},
 		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/cmd",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/models",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/options",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/sigwinch",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/terminal",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/helpers",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/keys",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/server",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/test_helpers",
+			"Comment": "plugin-0.1.2-20-g9c52952",
+			"Rev": "9c5295294a8cadcf30e9fa3a9a0032f1489053ff"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
 			"Rev": "c53c86fd9621d83f5d6d33a8e41499c4c9df95ce"
 		},
@@ -38,6 +83,11 @@
 			"Rev": "3d364d9ed49fee2f9fdcba278199127462cae3c4"
 		},
 		{
+			"ImportPath": "github.com/docker/docker/pkg/term",
+			"Comment": "v1.4.1-6271-g52d7542",
+			"Rev": "52d7542195e301cb45be9b5ff210a39c975cde02"
+		},
+		{
 			"ImportPath": "github.com/gogo/protobuf/proto",
 			"Comment": "v0.1-52-g43ab7f0",
 			"Rev": "43ab7f0ec7b6d072e0368bd537ffefe74ed30198"
@@ -45,6 +95,11 @@
 		{
 			"ImportPath": "github.com/gorilla/websocket",
 			"Rev": "b6ab76f1fe9803ee1d59e7e5b2a797c1fe897ce5"
+		},
+		{
+			"ImportPath": "github.com/kr/pty",
+			"Comment": "release.r56-28-g5cf931e",
+			"Rev": "5cf931ef8f76dccd0910001d74a58a7fca84a83d"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
@@ -62,11 +117,23 @@
 			"Rev": "6331bf5a5b5e7a832348789eb3cedff7a6917103"
 		},
 		{
+			"ImportPath": "github.com/pborman/getopt",
+			"Rev": "3b137f113d82e0851ddf701b7c6dde5e58d417f2"
+		},
+		{
+			"ImportPath": "github.com/pivotal-golang/lager",
+			"Rev": "c88fa6d6c4d2f8a21a4599785211e41777750d34"
+		},
+		{
 			"ImportPath": "github.com/simonleung8/flags",
 			"Rev": "4304da028804a934cf49cd9a574692d80abd13c7"
 		},
 		{
-			"ImportPath": "golang.org/x/crypto/ssh/terminal",
+			"ImportPath": "golang.org/x/crypto/curve25519",
+			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ssh",
 			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
 		},
 		{

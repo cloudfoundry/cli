@@ -430,6 +430,11 @@
       "modified": false
    },
    {
+      "id": "Application instance index",
+      "translation": "Application instance index",
+      "modified": false
+   },
+   {
       "id": "Apps:",
       "translation": "Apps:",
       "modified": false
@@ -1115,6 +1120,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]",
+      "translation": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]",
+      "modified": false
+   },
+   {
       "id": "CF_NAME ssh-enabled APP_NAME",
       "translation": "CF_NAME ssh-enabled APP_NAME",
       "modified": false
@@ -1348,6 +1358,11 @@
       "id": "Command `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
       "translation": "`{{.Command}}` is a command in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
       "modified": true
+   },
+   {
+      "id": "Command to run. This flag can be defined more than once.",
+      "translation": "Command to run. This flag can be defined more than once.",
+      "modified": false
    },
    {
       "id": "Compute and show the sha1 value of the plugin binary file",
@@ -1850,6 +1865,11 @@
       "modified": false
    },
    {
+      "id": "Disable pseudo-tty allocation",
+      "translation": "Disable pseudo-tty allocation",
+      "modified": false
+   },
+   {
       "id": "Disable the buildpack from being used for staging",
       "translation": "Desabilitar um buildpack",
       "modified": true
@@ -1902,6 +1922,11 @@
    {
       "id": "Do not colorize output",
       "translation": "Não colorir saída",
+      "modified": false
+   },
+   {
+      "id": "Do not execute a remote command",
+      "translation": "Do not execute a remote command",
       "modified": false
    },
    {
@@ -2442,6 +2467,11 @@
    {
       "id": "Force migration without confirmation",
       "translation": "Forçar migração sem confirmação",
+      "modified": false
+   },
+   {
+      "id": "Force pseudo-tty allocation",
+      "translation": "Force pseudo-tty allocation",
       "modified": false
    },
    {
@@ -3197,6 +3227,11 @@
    {
       "id": "Listing Installed Plugins...",
       "translation": "Listing Installed Plugins...",
+      "modified": false
+   },
+   {
+      "id": "Local port forward specification. This flag can be defined more than once.",
+      "translation": "Local port forward specification. This flag can be defined more than once.",
       "modified": false
    },
    {
@@ -4130,6 +4165,11 @@
       "modified": false
    },
    {
+      "id": "SSH to an application container instance",
+      "translation": "SSH to an application container instance",
+      "modified": false
+   },
+   {
       "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "Escalando app {{.AppName}} na org {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}...",
       "modified": false
@@ -4372,6 +4412,11 @@
    {
       "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "translation": "Mostrando status da app {{.AppName}} na org {{.OrgName}} / espaço {{.SpaceName}} como {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Skip host key validation",
+      "translation": "Skip host key validation",
       "modified": false
    },
    {
