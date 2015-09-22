@@ -5548,5 +5548,15 @@
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instâncias",
       "modified": false
+   },
+   {
+      "id": "domain {{.DomainName}} is not an owned domain",
+      "translation": "domain {{.DomainName}} is not an owned domain",
+      "modified": false
+   },
+  {
+      "id": "domain {{.DomainName}} is not a shared domain",
+      "translation": "domain {{.DomainName}} is not a shared domain",
+      "modified": false
    }
 ]
