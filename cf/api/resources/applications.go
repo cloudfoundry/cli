@@ -29,6 +29,7 @@ type AppFileResource struct {
 	Path string `json:"fn"`
 	Sha1 string `json:"sha1"`
 	Size int64  `json:"size"`
+	Mode string `json:"mode"`
 }
 
 type ApplicationResource struct {
