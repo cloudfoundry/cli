@@ -53,8 +53,8 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		file1 = resources.AppFileResource{Path: "app.rb", Sha1: "2474735f5163ba7612ef641f438f4b5bee00127b", Size: 51}
 		file2 = resources.AppFileResource{Path: "config.ru", Sha1: "f097424ce1fa66c6cb9f5e8a18c317376ec12e05", Size: 70}
-		file3 = resources.AppFileResource{Path: "Gemfile", Sha1: "d9c3a51de5c89c11331d3b90b972789f1a14699a", Size: 59}
-		file4 = resources.AppFileResource{Path: "Gemfile.lock", Sha1: "345f999aef9070fb9a608e65cf221b7038156b6d", Size: 229}
+		file3 = resources.AppFileResource{Path: "Gemfile", Sha1: "d9c3a51de5c89c11331d3b90b972789f1a14699a", Size: 59, Mode: "0750"}
+		file4 = resources.AppFileResource{Path: "Gemfile.lock", Sha1: "345f999aef9070fb9a608e65cf221b7038156b6d", Size: 229, Mode: "0600"}
 	})
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
@@ -214,12 +214,14 @@ var matchedResources = testnet.RemoveWhiteSpaceFromBody(`[
 	{
         "fn": "Gemfile",
         "sha1": "d9c3a51de5c89c11331d3b90b972789f1a14699a",
-        "size": 59
+        "size": 59,
+				"mode": "0750"
     },
     {
         "fn": "Gemfile.lock",
         "sha1": "345f999aef9070fb9a608e65cf221b7038156b6d",
-        "size": 229
+        "size": 229,
+				"mode": "0600"
     }
 ]`)
 
@@ -227,12 +229,14 @@ var unmatchedResources = testnet.RemoveWhiteSpaceFromBody(`[
 	{
         "fn": "app.rb",
         "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
-        "size": 51
+        "size": 51,
+				"mode":""
     },
     {
         "fn": "config.ru",
         "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
-        "size": 70
+        "size": 70,
+				"mode":""
     }
 ]`)
 
@@ -261,22 +265,26 @@ var matchResourceRequest = testnet.TestRequest{
 	{
         "fn": "app.rb",
         "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
-        "size": 51
+        "size": 51,
+				"mode":""
     },
     {
         "fn": "config.ru",
         "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
-        "size": 70
+        "size": 70,
+				"mode":""
     },
     {
         "fn": "Gemfile",
         "sha1": "d9c3a51de5c89c11331d3b90b972789f1a14699a",
-        "size": 59
+        "size": 59,
+				"mode":"0750"
     },
     {
         "fn": "Gemfile.lock",
         "sha1": "345f999aef9070fb9a608e65cf221b7038156b6d",
-        "size": 229
+        "size": 229,
+				"mode":"0600"
     }
 ]`)),
 	Response: testnet.TestResponse{

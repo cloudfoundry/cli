@@ -35,6 +35,7 @@ func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.Ap
 		appFile := models.AppFileFields{
 			Path: filepath.ToSlash(fileName),
 			Size: fileInfo.Size(),
+			Mode: fmt.Sprintf("%#o", fileInfo.Mode()),
 		}
 
 		if fileInfo.IsDir() {

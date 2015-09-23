@@ -209,7 +209,7 @@ var _ = Describe("SSH command", func() {
 			})
 		})
 
-		FDescribe("Connecting to ssh server", func() {
+		Describe("Connecting to ssh server", func() {
 			var (
 				testServer *httptest.Server
 				handler    *testnet.TestHandler

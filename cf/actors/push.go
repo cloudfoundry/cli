@@ -85,6 +85,7 @@ func (actor PushActorImpl) getFilesToUpload(allAppFiles []models.AppFileFields) 
 			Path: file.Path,
 			Sha1: file.Sha1,
 			Size: file.Size,
+			Mode: file.Mode,
 		})
 	}
 
