@@ -155,6 +155,7 @@ func newAppPresenter() (presenter appPresenter) {
 					presentNonCodegangstaCommand("enable-ssh"),
 					presentNonCodegangstaCommand("disable-ssh"),
 					presentNonCodegangstaCommand("ssh-enabled"),
+					presentNonCodegangstaCommand("ssh"),
 				},
 			},
 		}, {
