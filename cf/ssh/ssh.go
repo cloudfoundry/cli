@@ -191,6 +191,8 @@ func copyAndClose(wg *sync.WaitGroup, dest io.WriteCloser, src io.Reader) {
 }
 
 func (c *secureShell) InteractiveSession() error {
+	var err error
+
 	secureClient := c.secureClient
 	opts := c.opts
 
@@ -234,7 +236,8 @@ func (c *secureShell) InteractiveSession() error {
 			return err
 		}
 
-		state, err := c.terminalHelper.SetRawTerminal(stdinFd)
+		var state *term.State
+		state, err = c.terminalHelper.SetRawTerminal(stdinFd)
 		if err == nil {
 			defer c.terminalHelper.RestoreTerminal(stdinFd, state)
 		}
