@@ -1,13 +1,13 @@
 package application
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
+	"sort"
+	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -51,6 +51,12 @@ func (cmd *ListApps) Requirements(requirementsFactory requirements.Factory, fc f
 	return
 }
 
+type ByName []models.Application
+
+func (a ByName) Len() int           { return len(a) }
+func (a ByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
 func (cmd *ListApps) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
@@ -81,6 +87,8 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 		cmd.ui.Say(T("No apps found"))
 		return
 	}
+
+	sort.Sort(ByName(apps))
 
 	table := terminal.NewTable(cmd.ui, []string{T("name"), T("requested state"), T("instances"), T("memory"), T("disk"), T("urls")})
 

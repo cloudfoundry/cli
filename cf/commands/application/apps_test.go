@@ -43,7 +43,7 @@ var _ = Describe("list-apps command", func() {
 
 		app1Routes := []models.RouteSummary{
 			models.RouteSummary{
-				Host: "app1",
+				Host: "app2",
 				Domain: models.DomainFields{
 					Name:                   "cfapps.io",
 					Shared:                 true,
@@ -52,7 +52,7 @@ var _ = Describe("list-apps command", func() {
 				},
 			},
 			models.RouteSummary{
-				Host: "app1",
+				Host: "app2",
 				Domain: models.DomainFields{
 					Name: "example.com",
 				},
@@ -60,13 +60,12 @@ var _ = Describe("list-apps command", func() {
 
 		app2Routes := []models.RouteSummary{
 			models.RouteSummary{
-				Host:   "app2",
+				Host:   "app1",
 				Domain: models.DomainFields{Name: "cfapps.io"},
 			}}
 
 		app := models.Application{}
-		app.Name = "Application-1"
-		app.Guid = "Application-1-guid"
+		app.Name = "Application-2"
 		app.State = "started"
 		app.RunningInstances = 1
 		app.InstanceCount = 1
@@ -75,8 +74,7 @@ var _ = Describe("list-apps command", func() {
 		app.Routes = app1Routes
 
 		app2 := models.Application{}
-		app2.Name = "Application-2"
-		app2.Guid = "Application-2-guid"
+		app2.Name = "Application-1"
 		app2.State = "started"
 		app2.RunningInstances = 1
 		app2.InstanceCount = 2
@@ -87,10 +85,12 @@ var _ = Describe("list-apps command", func() {
 		appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app, app2}
 
 		deps = command_registry.NewDependency()
+		updateCommandDependency(false)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("apps", args, requirementsFactory, updateCommandDependency, false)
+		cmd := command_registry.Commands.FindCommand("apps")
+		return testcmd.RunCliCommand(cmd, args, requirementsFactory)
 	}
 
 	Describe("requirements", func() {
@@ -117,21 +117,20 @@ var _ = Describe("list-apps command", func() {
 
 	Describe("when invoked by a plugin", func() {
 		var (
-			pluginAppModels []plugin_models.GetAppsModel
+			pluginAppModels []plugin_models.ApplicationSummary
 		)
 
 		BeforeEach(func() {
-			pluginAppModels = []plugin_models.GetAppsModel{}
+			pluginAppModels = []plugin_models.ApplicationSummary{}
 			deps.PluginModels.AppsSummary = &pluginAppModels
+			updateCommandDependency(true)
 		})
 
 		It("populates the plugin models upon execution", func() {
-			testcmd.RunCliCommand("apps", []string{}, requirementsFactory, updateCommandDependency, true)
+			runCommand()
 
 			Ω(pluginAppModels[0].Name).To(Equal("Application-1"))
-			Ω(pluginAppModels[0].Guid).To(Equal("Application-1-guid"))
 			Ω(pluginAppModels[1].Name).To(Equal("Application-2"))
-			Ω(pluginAppModels[1].Guid).To(Equal("Application-2-guid"))
 			Ω(pluginAppModels[0].State).To(Equal("started"))
 			Ω(pluginAppModels[0].TotalInstances).To(Equal(1))
 			Ω(pluginAppModels[0].RunningInstances).To(Equal(1))
@@ -167,7 +166,6 @@ var _ = Describe("list-apps command", func() {
 					}}
 				app := models.Application{}
 				app.Name = "Application-1"
-				app.Guid = "Application-1-guid"
 				app.State = "started"
 				app.RunningInstances = -1
 				app.InstanceCount = 2
@@ -190,6 +188,7 @@ var _ = Describe("list-apps command", func() {
 		Context("when there are no apps", func() {
 			It("tells the user that there are no apps", func() {
 				appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{}
+				updateCommandDependency(false)
 
 				runCommand()
 				Expect(ui.Outputs).To(ContainSubstrings(
