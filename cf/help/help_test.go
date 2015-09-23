@@ -25,6 +25,7 @@ var _ = Describe("Help", func() {
 			help.ShowHelp(dummyTemplate)
 		})
 
+		Expect(strings.Count(strings.Join(output, ""), "login")).To(Equal(1))
 		for _, metadata := range command_registry.Commands.Metadatas() {
 			Expect(commandInOutput(metadata.Name, output)).To(BeTrue(), metadata.Name+" not in help")
 		}

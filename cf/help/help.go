@@ -46,7 +46,6 @@ func showAppHelp(helpTemplate string) {
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
 	t := template.Must(template.New("help").Parse(helpTemplate))
-	t.Execute(w, presenter)
 	err := t.Execute(w, presenter)
 	if err != nil {
 		fmt.Println("error", err)
