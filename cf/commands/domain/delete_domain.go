@@ -63,7 +63,13 @@ func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
 
 	switch apiErr.(type) {
-	case nil: //do nothing
+	case nil:
+		if domain.Shared {
+			cmd.ui.Failed(T("domain {{.DomainName}} is not an owned domain",
+				map[string]interface{}{
+					"DomainName": domainName}))
+			return
+		}
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(apiErr.Error())

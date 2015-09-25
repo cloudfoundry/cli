@@ -57,6 +57,30 @@ var _ = Describe("delete-shared-domain command", func() {
 		})
 	})
 
+	Context("when the domain is owned", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedOrgSuccess = true
+			domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+				models.DomainFields{
+					Name:   "foo1.com",
+					Guid:   "foo1-guid",
+					Shared: false,
+				},
+			}
+		})
+		It("informs the user that the domain is not shared", func() {
+			runCommand("foo1.com")
+
+			Expect(domainRepo.DeleteSharedDomainGuid).To(Equal(""))
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+				[]string{"domain"},
+				[]string{"foo1.com"},
+				[]string{"is not a shared domain"},
+			))
+		})
+	})
 	Context("when logged in and targeted an organiztion", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
