@@ -58,6 +58,21 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 				models.EnvironmentVariable{Name: "do-re-mi", Value: "fa-sol-la-ti"},
 			}))
 		})
+
+		Context("With invalid response", func() {
+			BeforeEach(func() {
+				setupTestServer(listRunningReqRspBodyNil)
+			})
+
+			It("fails on null running environment group", func() {
+				envVars, err := repo.ListRunning()
+
+				Expect(err).To(HaveOccurred())
+				Expect(envVars).To(BeNil())
+				Expect(err).To(MatchError("Response body is not valid"))
+
+			})
+		})
 	})
 
 	Describe("ListStaging", func() {
@@ -74,6 +89,21 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 				models.EnvironmentVariable{Name: "abc", Value: "123"},
 				models.EnvironmentVariable{Name: "do-re-mi", Value: "fa-sol-la-ti"},
 			}))
+		})
+
+		Context("With invalid response", func() {
+			BeforeEach(func() {
+				setupTestServer(listStagingReqRspBodyNil)
+			})
+
+			It("fails on null staging environment group", func() {
+				envVars, err := repo.ListStaging()
+
+				Expect(err).To(HaveOccurred())
+				Expect(envVars).To(BeNil())
+				Expect(err).To(MatchError("Response body is not valid"))
+
+			})
 		})
 	})
 
@@ -125,6 +155,24 @@ var listStagingRequest = testapi.NewCloudControllerTestRequest(testnet.TestReque
   "abc": 123,
   "do-re-mi": "fa-sol-la-ti"
 }`,
+	},
+})
+
+var listRunningReqRspBodyNil = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/config/environment_variable_groups/running",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body:   `null`,
+	},
+})
+
+var listStagingReqRspBodyNil = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/config/environment_variable_groups/staging",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body:   `null`,
 	},
 })
 
