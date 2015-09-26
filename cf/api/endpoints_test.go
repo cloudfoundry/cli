@@ -32,6 +32,7 @@ func validApiInfoEndpoint(w http.ResponseWriter, r *http.Request) {
   "support": "http://support.cloudfoundry.com",
   "version": 2,
   "description": "Cloud Foundry sponsored by Pivotal",
+	"app_ssh_oauth_client": "ssh-client-id",
   "authorization_endpoint": "https://login.example.com",
   "logging_endpoint": "wss://loggregator.foo.example.org:4443",
   "api_version": "42.0.0",
@@ -107,6 +108,7 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.LoggregatorEndpoint()).To(Equal("wss://loggregator.foo.example.org:4443"))
 				Expect(config.DopplerEndpoint()).To(Equal("wss://doppler.foo.example.org:4443"))
 				Expect(config.ApiEndpoint()).To(Equal(testServer.URL))
+				Expect(config.SSHOAuthClient()).To(Equal("ssh-client-id"))
 				Expect(config.ApiVersion()).To(Equal("42.0.0"))
 				Expect(config.HasOrganization()).To(BeFalse())
 				Expect(config.HasSpace()).To(BeFalse())

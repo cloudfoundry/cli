@@ -19,6 +19,7 @@ var exampleJSON = `
 	"DopplerEndPoint": "doppler.example.com",
 	"UaaEndpoint": "uaa.example.com",
 	"AccessToken": "the-access-token",
+	"SSHOAuthClient": "ssh-oauth-client-id",
 	"RefreshToken": "the-refresh-token",
 	"OrganizationFields": {
 		"Guid": "the-org-guid",
@@ -61,6 +62,7 @@ var exampleData = &Data{
 	UaaEndpoint:              "uaa.example.com",
 	AccessToken:              "the-access-token",
 	RefreshToken:             "the-refresh-token",
+	SSHOAuthClient:           "ssh-oauth-client-id",
 	MinCliVersion:            "6.0.0",
 	MinRecommendedCliVersion: "6.9.0",
 	OrganizationFields: models.OrganizationFields{

@@ -53,6 +53,7 @@ type Reader interface {
 	DopplerEndpoint() string
 	UaaEndpoint() string
 	AccessToken() string
+	SSHOAuthClient() string
 	RefreshToken() string
 
 	OrganizationFields() models.OrganizationFields
@@ -93,6 +94,7 @@ type ReadWriter interface {
 	SetDopplerEndpoint(string)
 	SetUaaEndpoint(string)
 	SetAccessToken(string)
+	SetSSHOAuthClient(string)
 	SetRefreshToken(string)
 	SetOrganizationFields(models.OrganizationFields)
 	SetSpaceFields(models.SpaceFields)
@@ -211,6 +213,13 @@ func (c *ConfigRepository) HasAPIEndpoint() (hasEndpoint bool) {
 func (c *ConfigRepository) AccessToken() (accessToken string) {
 	c.read(func() {
 		accessToken = c.data.AccessToken
+	})
+	return
+}
+
+func (c *ConfigRepository) SSHOAuthClient() (clientID string) {
+	c.read(func() {
+		clientID = c.data.SSHOAuthClient
 	})
 	return
 }
@@ -426,6 +435,12 @@ func (c *ConfigRepository) SetUaaEndpoint(uaaEndpoint string) {
 func (c *ConfigRepository) SetAccessToken(token string) {
 	c.write(func() {
 		c.data.AccessToken = token
+	})
+}
+
+func (c *ConfigRepository) SetSSHOAuthClient(clientID string) {
+	c.write(func() {
+		c.data.SSHOAuthClient = clientID
 	})
 }
 
