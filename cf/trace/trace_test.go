@@ -2,10 +2,11 @@ package trace_test
 
 import (
 	"bytes"
-	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io/ioutil"
 	"os"
 	"runtime"
+
+	"github.com/cloudfoundry/gofileutils/fileutils"
 
 	. "github.com/cloudfoundry/cli/cf/trace"
 	. "github.com/onsi/ginkgo"
