@@ -364,6 +364,7 @@ func newAppPresenter() (presenter appPresenter) {
 					presentNonCodegangstaCommand("curl"),
 					presentNonCodegangstaCommand("config"),
 					presentNonCodegangstaCommand("oauth-token"),
+					presentNonCodegangstaCommand("get-ssh-code"),
 				},
 			},
 		}, {

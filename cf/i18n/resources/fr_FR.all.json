@@ -515,6 +515,11 @@
       "modified": false
    },
    {
+      "id": "Authorization server did not redirect with one time code",
+      "translation": "Authorization server did not redirect with one time code",
+      "modified": false
+   },
+   {
       "id": "BILLING MANAGER",
       "translation": "RESPONSABLE DE FACTURATION",
       "modified": false
@@ -872,6 +877,11 @@
    {
       "id": "CF_NAME get-health-check APP_NAME",
       "translation": "CF_NAME get-health-check APP_NAME",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME get-ssh-code",
+      "translation": "CF_NAME get-ssh-code",
       "modified": false
    },
    {
@@ -2180,6 +2190,11 @@
       "modified": false
    },
    {
+      "id": "Error getting AuthenticationEndpoint() ",
+      "translation": "Error getting AuthenticationEndpoint() ",
+      "modified": false
+   },
+   {
       "id": "Error getting application summary: ",
       "translation": "Error getting application summary: ",
       "modified": false
@@ -2192,6 +2207,11 @@
    {
       "id": "Error getting file info",
       "translation": "Error getting file info",
+      "modified": false
+   },
+   {
+      "id": "Error getting info from v2/info: ",
+      "translation": "Error getting info from v2/info: ",
       "modified": false
    },
    {
@@ -2252,6 +2272,11 @@
    {
       "id": "Error reading response from server: ",
       "translation": "Error reading response from server: ",
+      "modified": false
+   },
+   {
+      "id": "Error refreshing oauth token: ",
+      "translation": "Error refreshing oauth token: ",
       "modified": false
    },
    {
@@ -2488,6 +2513,11 @@
       "id": "GLOBAL OPTIONS:",
       "translation": "OPTIONS GLOBALES:",
       "modified": true
+   },
+   {
+      "id": "Get a one time password for ssh clients",
+      "translation": "Get a one time password for ssh clients",
+      "modified": false
    },
    {
       "id": "Getting OAuth token...",
@@ -4205,6 +4235,11 @@
       "modified": false
    },
    {
+      "id": "Server did not response with auth code",
+      "translation": "Server did not response with auth code",
+      "modified": false
+   },
+   {
       "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
       "translation": "Erreur, code: 403, code de l'erreur: 10003, méssage: Vous n'êtes pas autorisé pour effectuer l'action demandée",
       "modified": true
@@ -4737,6 +4772,11 @@
    {
       "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
       "translation": "Impossible d'accéder à l'espace {{.SpaceName}}.\n{{.ApiErr}}",
+      "modified": false
+   },
+   {
+      "id": "Unable to acquire one time code from authorization response",
+      "translation": "Unable to acquire one time code from authorization response",
       "modified": false
    },
    {
