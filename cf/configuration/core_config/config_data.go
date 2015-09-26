@@ -27,6 +27,7 @@ type Data struct {
 	DopplerEndPoint          string
 	UaaEndpoint              string
 	AccessToken              string
+	SSHOAuthClient           string
 	RefreshToken             string
 	OrganizationFields       models.OrganizationFields
 	SpaceFields              models.SpaceFields
