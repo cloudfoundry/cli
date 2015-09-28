@@ -2190,8 +2190,18 @@
       "modified": false
    },
    {
+      "id": "Error forwarding port: ",
+      "translation": "Error forwarding port: ",
+      "modified": false
+   },
+   {
       "id": "Error getting AuthenticationEndpoint() ",
       "translation": "Error getting AuthenticationEndpoint() ",
+      "modified": false
+   },
+   {
+      "id": "Error getting SSH info:",
+      "translation": "Error getting SSH info:",
       "modified": false
    },
    {
@@ -2215,6 +2225,11 @@
       "modified": false
    },
    {
+      "id": "Error getting one time auth code: ",
+      "translation": "Error getting one time auth code: ",
+      "modified": false
+   },
+   {
       "id": "Error getting plugin metadata from repo: ",
       "translation": "Error getting plugin metadata from repo: ",
       "modified": false
@@ -2227,6 +2242,11 @@
    {
       "id": "Error marshaling JSON",
       "translation": "Error marshaling JSON",
+      "modified": false
+   },
+   {
+      "id": "Error opening SSH connection: ",
+      "translation": "Error opening SSH connection: ",
       "modified": false
    },
    {
@@ -2327,6 +2347,11 @@
    {
       "id": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
       "translation": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
+      "modified": false
+   },
+   {
+      "id": "Error: ",
+      "translation": "Error: ",
       "modified": false
    },
    {
@@ -2835,6 +2860,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires APP_NAME as argument",
+      "translation": "Incorrect Usage. Requires APP_NAME as argument",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires APP_NAME as argument\n\n",
       "translation": "Incorrect Usage. Requires APP_NAME as arguments\n\n",
       "modified": true
@@ -3002,6 +3032,11 @@
    {
       "id": "Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n",
       "translation": "Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage:",
+      "translation": "Incorrect Usage:",
       "modified": false
    },
    {
@@ -3792,6 +3827,11 @@
    {
       "id": "Problem removing downloaded binary in temp directory: ",
       "translation": "Problem removing downloaded binary in temp directory: ",
+      "modified": false
+   },
+   {
+      "id": "Process terminated by signal: %s. Exited with",
+      "translation": "Process terminated by signal: %s. Exited with",
       "modified": false
    },
    {
@@ -5057,6 +5097,11 @@
    {
       "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
       "translation": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
+      "modified": false
+   },
+   {
+      "id": "Value for flag 'app-instance-index' cannot be negative",
+      "translation": "Value for flag 'app-instance-index' cannot be negative",
       "modified": false
    },
    {

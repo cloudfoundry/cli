@@ -25,8 +25,11 @@ import (
 
 var _ = Describe("SSH command", func() {
 	var (
-		ui                  *testterm.FakeUI
-		authRepo            *testapi.FakeAuthenticationRepository
+		ui *testterm.FakeUI
+
+		sshCodeGetter         *testcmd.FakeSSHCodeGetter
+		originalSSHCodeGetter command_registry.Command
+
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -37,16 +40,34 @@ var _ = Describe("SSH command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		authRepo = &testapi.FakeAuthenticationRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		deps.Gateways = make(map[string]net.Gateway)
+
+		//save original command and restore later
+		originalSSHCodeGetter = command_registry.Commands.FindCommand("get-ssh-code")
+
+		sshCodeGetter = &testcmd.FakeSSHCodeGetter{}
+
+		//setup fakes to correctly interact with command_registry
+		sshCodeGetter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+			return sshCodeGetter
+		}
+		sshCodeGetter.MetaDataReturns(command_registry.CommandMetadata{Name: "get-ssh-code"})
+	})
+
+	AfterEach(func() {
+		//restore original command
+		command_registry.Register(originalSSHCodeGetter)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
-		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
+
+		//inject fake 'sshCodeGetter' into registry
+		command_registry.Register(sshCodeGetter)
+
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("ssh").SetDependency(deps, pluginCall))
 	}
 
@@ -181,7 +202,7 @@ var _ = Describe("SSH command", func() {
 
 			Context("error when getting oauth token", func() {
 				BeforeEach(func() {
-					authRepo.RefreshTokenError = errors.New("auth api error")
+					sshCodeGetter.GetReturns("", errors.New("auth api error"))
 
 					getRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
@@ -203,7 +224,7 @@ var _ = Describe("SSH command", func() {
 
 					Expect(handler).To(HaveAllRequestsCalled())
 					Ω(ui.Outputs).To(ContainSubstrings(
-						[]string{"Failed getting oauth token", "auth api error"},
+						[]string{"Error getting one time auth code", "auth api error"},
 					))
 				})
 			})

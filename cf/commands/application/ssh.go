@@ -7,8 +7,8 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -22,13 +22,13 @@ import (
 )
 
 type SSH struct {
-	ui          terminal.UI
-	config      core_config.Reader
-	gateway     net.Gateway
-	appReq      requirements.ApplicationRequirement
-	authRepo    authentication.AuthenticationRepository
-	opts        *options.SSHOptions
-	secureShell sshCmd.SecureShell
+	ui            terminal.UI
+	config        core_config.Reader
+	gateway       net.Gateway
+	appReq        requirements.ApplicationRequirement
+	sshCodeGetter commands.SSHCodeGetter
+	opts          *options.SSHOptions
+	secureShell   sshCmd.SecureShell
 }
 
 type sshInfo struct {
@@ -61,16 +61,16 @@ func (cmd *SSH) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) == 0 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + command_registry.Commands.CommandUsage("ssh"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument") + "\n\n" + command_registry.Commands.CommandUsage("ssh"))
 	}
 
 	if fc.IsSet("i") && fc.Int("i") < 0 {
-		cmd.ui.Failed(fmt.Sprintf("Incorrect Usage: %s\n\n%s", "Value for flag 'app-instance-index' cannot be negative", command_registry.Commands.CommandUsage("ssh")))
+		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", T("Value for flag 'app-instance-index' cannot be negative"), command_registry.Commands.CommandUsage("ssh")))
 	}
 
 	cmd.opts, err = options.NewSSHOptions(fc)
 	if err != nil {
-		cmd.ui.Failed(fmt.Sprintf("Incorrect Usage: %s\n\n%s", err.Error(), command_registry.Commands.CommandUsage("ssh")))
+		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", err.Error(), command_registry.Commands.CommandUsage("ssh")))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(cmd.opts.AppName)
@@ -86,12 +86,16 @@ func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.
 func (cmd *SSH) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
-	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()
 	cmd.gateway = deps.Gateways["cloud-controller"]
 
 	if deps.WilecardDependency != nil {
 		cmd.secureShell = deps.WilecardDependency.(sshCmd.SecureShell)
 	}
+
+	//get get-ssh-code for dependency
+	sshCodeGetter := command_registry.Commands.FindCommand("get-ssh-code")
+	sshCodeGetter = sshCodeGetter.SetDependency(deps, false)
+	cmd.sshCodeGetter = sshCodeGetter.(commands.SSHCodeGetter)
 
 	return cmd
 }
@@ -100,12 +104,12 @@ func (cmd *SSH) Execute(fc flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 	info, err := cmd.getSSHEndpointInfo()
 	if err != nil {
-		cmd.ui.Failed("Error getting SSH info:" + err.Error())
+		cmd.ui.Failed(T("Error getting SSH info:") + err.Error())
 	}
 
-	token, err := cmd.authRepo.RefreshAuthToken()
+	sshAuthCode, err := cmd.sshCodeGetter.Get()
 	if err != nil {
-		cmd.ui.Failed("Failed getting oauth token: " + err.Error())
+		cmd.ui.Failed(T("Error getting one time auth code: ") + err.Error())
 	}
 
 	//init secureShell if it is not already set by SetDependency() with fakes
@@ -118,19 +122,19 @@ func (cmd *SSH) Execute(fc flags.FlagContext) {
 			app,
 			info.SSHEndpointFingerprint,
 			info.SSHEndpoint,
-			token,
+			sshAuthCode,
 		)
 	}
 
 	err = cmd.secureShell.Connect(cmd.opts)
 	if err != nil {
-		cmd.ui.Failed("Error opening SSH connection: " + err.Error())
+		cmd.ui.Failed(T("Error opening SSH connection: ") + err.Error())
 	}
 	defer cmd.secureShell.Close()
 
 	err = cmd.secureShell.LocalPortForward()
 	if err != nil {
-		cmd.ui.Failed("Error forwarding port: " + err.Error())
+		cmd.ui.Failed(T("Error forwarding port: ") + err.Error())
 	}
 
 	if cmd.opts.SkipRemoteExecution {
@@ -146,11 +150,11 @@ func (cmd *SSH) Execute(fc flags.FlagContext) {
 	if exitError, ok := err.(*ssh.ExitError); ok {
 		exitStatus := exitError.ExitStatus()
 		if sig := exitError.Signal(); sig != "" {
-			cmd.ui.Say(fmt.Sprintf("Process terminated by signal: %s. Exited with %d.\n", sig, exitStatus))
+			cmd.ui.Say(fmt.Sprintf(T("Process terminated by signal: %s. Exited with")+" %d.\n", sig, exitStatus))
 		}
 		os.Exit(exitStatus)
 	} else {
-		cmd.ui.Failed("Error: " + err.Error())
+		cmd.ui.Failed(T("Error: ") + err.Error())
 	}
 }
 
