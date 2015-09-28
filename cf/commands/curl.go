@@ -49,7 +49,7 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Curl) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("curl"))
+		cmd.ui.Failed(T("Incorrect Usage. An argument is missing or not correctly enclosed.\n\n") + command_registry.Commands.CommandUsage("curl"))
 	}
 
 	reqs = []requirements.Requirement{
