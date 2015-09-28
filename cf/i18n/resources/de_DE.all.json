@@ -2765,6 +2765,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
+      "translation": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires app name as argument\n\n",
       "translation": "Incorrect Usage. Requires app name as argument\n\n",
       "modified": false
