@@ -96,62 +96,71 @@ type Installer interface {
 }
 
 type PluginInstallerWithRepo struct {
+	Command              *PluginInstall
+	PluginSourceFilepath string
+	Downloader           fileutils.Downloader
+	RepoName             string
 }
 
 type PluginInstallerWithoutRepo struct {
+	Command              *PluginInstall
+	PluginSourceFilepath string
+	Downloader           fileutils.Downloader
 }
 
-func (installer *PluginInstallerWithoutRepo) Install(cmd *PluginInstall, pluginSourceFilepath string, downloader fileutils.Downloader) string {
-	if filepath.Dir(pluginSourceFilepath) == "." {
-		pluginSourceFilepath = "./" + filepath.Clean(pluginSourceFilepath)
+func (installer *PluginInstallerWithoutRepo) Install() (newPluginSourceFilepath string) {
+	newPluginSourceFilepath = installer.PluginSourceFilepath
+	if filepath.Dir(newPluginSourceFilepath) == "." {
+		newPluginSourceFilepath = "./" + filepath.Clean(newPluginSourceFilepath)
 	}
 
-	cmd.ui.Say("")
-	if strings.HasPrefix(pluginSourceFilepath, "https://") || strings.HasPrefix(pluginSourceFilepath, "http://") ||
-		strings.HasPrefix(pluginSourceFilepath, "ftp://") || strings.HasPrefix(pluginSourceFilepath, "ftps://") {
-		cmd.ui.Say(T("Attempting to download binary file from internet address..."))
-		pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
-	} else if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
-		cmd.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": pluginSourceFilepath}))
+	installer.Command.ui.Say("")
+	if strings.HasPrefix(newPluginSourceFilepath, "https://") || strings.HasPrefix(newPluginSourceFilepath, "http://") ||
+		strings.HasPrefix(newPluginSourceFilepath, "ftp://") || strings.HasPrefix(newPluginSourceFilepath, "ftps://") {
+		installer.Command.ui.Say(T("Attempting to download binary file from internet address..."))
+		newPluginSourceFilepath = installer.Command.tryDownloadPluginBinaryfromGivenPath(newPluginSourceFilepath, installer.Downloader)
+	} else if !installer.Command.ensureCandidatePluginBinaryExistsAtGivenPath(newPluginSourceFilepath) {
+		installer.Command.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": newPluginSourceFilepath}))
 	}
 
-	return pluginSourceFilepath
+	return newPluginSourceFilepath
 }
 
-func (installer *PluginInstallerWithRepo) Install(cmd *PluginInstall, pluginSourceFilepath string, downloader fileutils.Downloader, repoName string) string {
-	targetPluginName := strings.ToLower(pluginSourceFilepath)
+func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath string) {
+	newPluginSourceFilepath = installer.PluginSourceFilepath
+	targetPluginName := strings.ToLower(newPluginSourceFilepath)
 
-	cmd.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": pluginSourceFilepath, "repoName": repoName}))
+	installer.Command.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": newPluginSourceFilepath, "repoName": installer.RepoName}))
 
-	repoModel, err := cmd.getRepoFromConfig(repoName)
+	repoModel, err := installer.Command.getRepoFromConfig(installer.RepoName)
 	if err != nil {
-		cmd.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
+		installer.Command.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
 	}
 
-	pluginList, repoAry := cmd.pluginRepo.GetPlugins([]models.PluginRepo{repoModel})
+	pluginList, repoAry := installer.Command.pluginRepo.GetPlugins([]models.PluginRepo{repoModel})
 	if len(repoAry) != 0 {
-		cmd.ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
+		installer.Command.ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
 	}
 
 	found := false
 	sha1 := ""
-	for _, plugin := range findRepoCaseInsensity(pluginList, repoName) {
+	for _, plugin := range findRepoCaseInsensity(pluginList, installer.RepoName) {
 		if strings.ToLower(plugin.Name) == targetPluginName {
 			found = true
-			pluginSourceFilepath, sha1 = cmd.downloadBinary(plugin, downloader)
+			newPluginSourceFilepath, sha1 = installer.Command.downloadBinary(plugin, installer.Downloader)
 
-			cmd.checksum.SetFilePath(pluginSourceFilepath)
-			if !cmd.checksum.CheckSha1(sha1) {
-				cmd.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
+			installer.Command.checksum.SetFilePath(newPluginSourceFilepath)
+			if !installer.Command.checksum.CheckSha1(sha1) {
+				installer.Command.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
 			}
 		}
 
 	}
 	if !found {
-		cmd.ui.Failed(pluginSourceFilepath + T(" is not available in repo '") + repoName + "'")
+		installer.Command.ui.Failed(newPluginSourceFilepath + T(" is not available in repo '") + installer.RepoName + "'")
 	}
 
-	return pluginSourceFilepath
+	return newPluginSourceFilepath
 }
 
 func (cmd *PluginInstall) Execute(c flags.FlagContext) {
@@ -169,12 +178,24 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 
 	repoName := c.String("r")
 
+	// installer := CreateInstaller(deps)
+	// pluginSourceFilepath := installer.Install()
+
 	if repoName == "" {
-		installer := &PluginInstallerWithoutRepo{}
-		pluginSourceFilepath = installer.Install(cmd, pluginSourceFilepath, downloader)
+		installer := &PluginInstallerWithoutRepo{
+			Command:              cmd,
+			PluginSourceFilepath: pluginSourceFilepath,
+			Downloader:           downloader,
+		}
+		pluginSourceFilepath = installer.Install()
 	} else {
-		installer := &PluginInstallerWithRepo{}
-		pluginSourceFilepath = installer.Install(cmd, pluginSourceFilepath, downloader, repoName)
+		installer := &PluginInstallerWithRepo{
+			Command:              cmd,
+			PluginSourceFilepath: pluginSourceFilepath,
+			Downloader:           downloader,
+			RepoName:             repoName,
+		}
+		pluginSourceFilepath = installer.Install()
 	}
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
