@@ -1,6 +1,7 @@
 package actors
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -12,8 +13,10 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
+//go:generate counterfeiter -o fakes/fake_push_actor.go . PushActor
 type PushActor interface {
 	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
+	PopulateFileMode(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error)
 	GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 }
 
@@ -29,6 +32,18 @@ func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper
 		appfiles:    appfiles,
 		zipper:      zipper,
 	}
+}
+
+func (actor PushActorImpl) PopulateFileMode(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error) {
+	for i, _ := range presentFiles {
+		fileInfo, err := os.Lstat(filepath.Join(appDir, presentFiles[i].Path))
+		if err != nil {
+			return presentFiles, err
+		}
+		presentFiles[i].Mode = fmt.Sprintf("%#o", fileInfo.Mode())
+	}
+
+	return presentFiles, nil
 }
 
 func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) (presentFiles []resources.AppFileResource, hasFileToUpload bool, apiErr error) {
@@ -85,7 +100,6 @@ func (actor PushActorImpl) getFilesToUpload(allAppFiles []models.AppFileFields) 
 			Path: file.Path,
 			Sha1: file.Sha1,
 			Size: file.Size,
-			Mode: file.Mode,
 		})
 	}
 

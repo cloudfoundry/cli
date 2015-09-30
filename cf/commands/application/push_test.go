@@ -185,6 +185,22 @@ var _ = Describe("Push Command", func() {
 				routeRepo.FindByHostAndDomainReturns.Route = route
 			})
 
+			It("calls actor.PopulateFileMode() to get file mdoes", func() {
+				callPush("my-new-app")
+
+				Expect(actor.PopulateFileModeCallCount()).To(Equal(1))
+			})
+
+			It("notifies users about the error actor.PopulateFileMode() returns", func() {
+				actor.PopulateFileModeReturns([]resources.AppFileResource{}, errors.New("failed to get file mode"))
+
+				callPush("my-new-app")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"failed to get file mode"},
+				))
+			})
+
 			It("binds to existing routes", func() {
 				callPush("my-new-app")
 
@@ -816,6 +832,22 @@ var _ = Describe("Push Command", func() {
 			Expect(updatedAppEnvVars["FOO"]).To(Equal("baz"))
 			Expect(updatedAppEnvVars["foo"]).To(Equal("manchu"))
 			Expect(updatedAppEnvVars["PATH"]).To(Equal("/u/apps/my-app/bin"))
+		})
+
+		It("calls actor.PopulateFileMode() to get file mdoes", func() {
+			callPush("my-new-app")
+
+			Expect(actor.PopulateFileModeCallCount()).To(Equal(1))
+		})
+
+		It("notifies users about the error actor.PopulateFileMode() returns", func() {
+			actor.PopulateFileModeReturns([]resources.AppFileResource{}, errors.New("failed to get file mode"))
+
+			callPush("my-new-app")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"failed to get file mode"},
+			))
 		})
 
 		It("stops the app, achieving a full-downtime deploy!", func() {
