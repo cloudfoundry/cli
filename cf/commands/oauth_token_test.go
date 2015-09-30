@@ -45,13 +45,13 @@ var _ = Describe("OauthToken", func() {
 		return testcmd.RunCliCommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, false)
 	}
 
-	Describe("requirments", func() {
+	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 	})
 
-	Describe("When logged in", func() {
+	Describe("when logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 		})
