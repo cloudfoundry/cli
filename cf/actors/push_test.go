@@ -137,6 +137,22 @@ var _ = Describe("Push Actor", func() {
 		})
 	})
 
+	Describe(".PopulateFileMode()", func() {
+		It("returns []resources.AppFileResource with file mode populated", func() {
+			files := []resources.AppFileResource{
+				resources.AppFileResource{Path: "example-app/.cfignore"},
+				resources.AppFileResource{Path: "example-app/app.rb"},
+				resources.AppFileResource{Path: "example-app/config.ru"},
+			}
+
+			files, err := actor.PopulateFileMode(fixturesDir, files)
+			Ω(err).NotTo(HaveOccurred())
+			Ω(files[0].Mode).To(Equal("0644"))
+			Ω(files[1].Mode).To(Equal("0755"))
+			Ω(files[2].Mode).To(Equal("0644"))
+		})
+	})
+
 	Describe(".UploadApp", func() {
 		It("Simply delegates to the UploadApp function on the app bits repo, which is not worth testing", func() {})
 	})

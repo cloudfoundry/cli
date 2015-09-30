@@ -20,6 +20,16 @@ type FakePushActor struct {
 	uploadAppReturns struct {
 		result1 error
 	}
+	PopulateFileModeStub        func(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error)
+	populateFileModeMutex       sync.RWMutex
+	populateFileModeArgsForCall []struct {
+		appDir       string
+		presentFiles []resources.AppFileResource
+	}
+	populateFileModeReturns struct {
+		result1 []resources.AppFileResource
+		result2 error
+	}
 	GatherFilesStub        func(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 	gatherFilesMutex       sync.RWMutex
 	gatherFilesArgsForCall []struct {
@@ -65,6 +75,40 @@ func (fake *FakePushActor) UploadAppReturns(result1 error) {
 	fake.uploadAppReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakePushActor) PopulateFileMode(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error) {
+	fake.populateFileModeMutex.Lock()
+	fake.populateFileModeArgsForCall = append(fake.populateFileModeArgsForCall, struct {
+		appDir       string
+		presentFiles []resources.AppFileResource
+	}{appDir, presentFiles})
+	fake.populateFileModeMutex.Unlock()
+	if fake.PopulateFileModeStub != nil {
+		return fake.PopulateFileModeStub(appDir, presentFiles)
+	} else {
+		return fake.populateFileModeReturns.result1, fake.populateFileModeReturns.result2
+	}
+}
+
+func (fake *FakePushActor) PopulateFileModeCallCount() int {
+	fake.populateFileModeMutex.RLock()
+	defer fake.populateFileModeMutex.RUnlock()
+	return len(fake.populateFileModeArgsForCall)
+}
+
+func (fake *FakePushActor) PopulateFileModeArgsForCall(i int) (string, []resources.AppFileResource) {
+	fake.populateFileModeMutex.RLock()
+	defer fake.populateFileModeMutex.RUnlock()
+	return fake.populateFileModeArgsForCall[i].appDir, fake.populateFileModeArgsForCall[i].presentFiles
+}
+
+func (fake *FakePushActor) PopulateFileModeReturns(result1 []resources.AppFileResource, result2 error) {
+	fake.PopulateFileModeStub = nil
+	fake.populateFileModeReturns = struct {
+		result1 []resources.AppFileResource
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakePushActor) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {

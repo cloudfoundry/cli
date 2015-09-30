@@ -626,6 +626,12 @@ func (cmd *Push) uploadApp(appGuid string, appDir string) (apiErr error) {
 				}
 			}
 
+			presentFiles, err = cmd.actor.PopulateFileMode(appDir, presentFiles)
+			if err != nil {
+				apiErr = err
+				return
+			}
+
 			err = cmd.actor.UploadApp(appGuid, zipFile, presentFiles)
 			if err != nil {
 				apiErr = err
