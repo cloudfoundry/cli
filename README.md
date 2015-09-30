@@ -111,6 +111,8 @@ To prepare your build environment, run `go get github.com/jteeuwen/go-bindata/..
 
 Optionally, you can use `bin/run` to compile and run the executable in one step.
 
+If you want to run the tests with `ginkgo`, or build with `go build` you should first run `bin/generate-language-resources`. `bin/build` and `bin/test` generate language files automatically.
+
 Developing
 ==========
 
