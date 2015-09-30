@@ -92,75 +92,86 @@ func (cmd *PluginInstall) SetDependency(deps command_registry.Dependency, plugin
 }
 
 type Installer interface {
-	Install()
+	Install() string
+}
+
+type PluginInstallerWithoutRepo struct {
+	Context *InstallerContext
+}
+
+func (installer *PluginInstallerWithoutRepo) Install() (newPluginSourceFilepath string) {
+	newPluginSourceFilepath = installer.Context.PluginSourceFilepath
+	if filepath.Dir(newPluginSourceFilepath) == "." {
+		newPluginSourceFilepath = "./" + filepath.Clean(newPluginSourceFilepath)
+	}
+
+	installer.Context.Command.ui.Say("")
+	if strings.HasPrefix(newPluginSourceFilepath, "https://") || strings.HasPrefix(newPluginSourceFilepath, "http://") ||
+		strings.HasPrefix(newPluginSourceFilepath, "ftp://") || strings.HasPrefix(newPluginSourceFilepath, "ftps://") {
+		installer.Context.Command.ui.Say(T("Attempting to download binary file from internet address..."))
+		newPluginSourceFilepath = installer.Context.Command.tryDownloadPluginBinaryfromGivenPath(newPluginSourceFilepath, installer.Context.Downloader)
+	} else if !installer.Context.Command.ensureCandidatePluginBinaryExistsAtGivenPath(newPluginSourceFilepath) {
+		installer.Context.Command.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": newPluginSourceFilepath}))
+	}
+
+	return newPluginSourceFilepath
 }
 
 type PluginInstallerWithRepo struct {
+	Context *InstallerContext
+}
+
+func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath string) {
+	newPluginSourceFilepath = installer.Context.PluginSourceFilepath
+	targetPluginName := strings.ToLower(newPluginSourceFilepath)
+
+	installer.Context.Command.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": newPluginSourceFilepath, "repoName": installer.Context.RepoName}))
+
+	repoModel, err := installer.Context.Command.getRepoFromConfig(installer.Context.RepoName)
+	if err != nil {
+		installer.Context.Command.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
+	}
+
+	pluginList, repoAry := installer.Context.Command.pluginRepo.GetPlugins([]models.PluginRepo{repoModel})
+	if len(repoAry) != 0 {
+		installer.Context.Command.ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
+	}
+
+	found := false
+	sha1 := ""
+	for _, plugin := range findRepoCaseInsensity(pluginList, installer.Context.RepoName) {
+		if strings.ToLower(plugin.Name) == targetPluginName {
+			found = true
+			newPluginSourceFilepath, sha1 = installer.Context.Command.downloadBinary(plugin, installer.Context.Downloader)
+
+			installer.Context.Command.checksum.SetFilePath(newPluginSourceFilepath)
+			if !installer.Context.Command.checksum.CheckSha1(sha1) {
+				installer.Context.Command.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
+			}
+		}
+
+	}
+	if !found {
+		installer.Context.Command.ui.Failed(newPluginSourceFilepath + T(" is not available in repo '") + installer.Context.RepoName + "'")
+	}
+
+	return newPluginSourceFilepath
+}
+
+type InstallerContext struct {
 	Command              *PluginInstall
 	PluginSourceFilepath string
 	Downloader           fileutils.Downloader
 	RepoName             string
 }
 
-type PluginInstallerWithoutRepo struct {
-	Command              *PluginInstall
-	PluginSourceFilepath string
-	Downloader           fileutils.Downloader
-}
-
-func (installer *PluginInstallerWithoutRepo) Install() (newPluginSourceFilepath string) {
-	newPluginSourceFilepath = installer.PluginSourceFilepath
-	if filepath.Dir(newPluginSourceFilepath) == "." {
-		newPluginSourceFilepath = "./" + filepath.Clean(newPluginSourceFilepath)
+func CreateInstaller(context *InstallerContext) (installer Installer) {
+	if context.RepoName == "" {
+		installer = &PluginInstallerWithoutRepo{context}
+	} else {
+		installer = &PluginInstallerWithRepo{context}
 	}
-
-	installer.Command.ui.Say("")
-	if strings.HasPrefix(newPluginSourceFilepath, "https://") || strings.HasPrefix(newPluginSourceFilepath, "http://") ||
-		strings.HasPrefix(newPluginSourceFilepath, "ftp://") || strings.HasPrefix(newPluginSourceFilepath, "ftps://") {
-		installer.Command.ui.Say(T("Attempting to download binary file from internet address..."))
-		newPluginSourceFilepath = installer.Command.tryDownloadPluginBinaryfromGivenPath(newPluginSourceFilepath, installer.Downloader)
-	} else if !installer.Command.ensureCandidatePluginBinaryExistsAtGivenPath(newPluginSourceFilepath) {
-		installer.Command.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": newPluginSourceFilepath}))
-	}
-
-	return newPluginSourceFilepath
-}
-
-func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath string) {
-	newPluginSourceFilepath = installer.PluginSourceFilepath
-	targetPluginName := strings.ToLower(newPluginSourceFilepath)
-
-	installer.Command.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": newPluginSourceFilepath, "repoName": installer.RepoName}))
-
-	repoModel, err := installer.Command.getRepoFromConfig(installer.RepoName)
-	if err != nil {
-		installer.Command.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
-	}
-
-	pluginList, repoAry := installer.Command.pluginRepo.GetPlugins([]models.PluginRepo{repoModel})
-	if len(repoAry) != 0 {
-		installer.Command.ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
-	}
-
-	found := false
-	sha1 := ""
-	for _, plugin := range findRepoCaseInsensity(pluginList, installer.RepoName) {
-		if strings.ToLower(plugin.Name) == targetPluginName {
-			found = true
-			newPluginSourceFilepath, sha1 = installer.Command.downloadBinary(plugin, installer.Downloader)
-
-			installer.Command.checksum.SetFilePath(newPluginSourceFilepath)
-			if !installer.Command.checksum.CheckSha1(sha1) {
-				installer.Command.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
-			}
-		}
-
-	}
-	if !found {
-		installer.Command.ui.Failed(newPluginSourceFilepath + T(" is not available in repo '") + installer.RepoName + "'")
-	}
-
-	return newPluginSourceFilepath
+	return installer
 }
 
 func (cmd *PluginInstall) Execute(c flags.FlagContext) {
@@ -176,27 +187,14 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 
 	pluginSourceFilepath := c.Args()[0]
 
-	repoName := c.String("r")
-
-	// installer := CreateInstaller(deps)
-	// pluginSourceFilepath := installer.Install()
-
-	if repoName == "" {
-		installer := &PluginInstallerWithoutRepo{
-			Command:              cmd,
-			PluginSourceFilepath: pluginSourceFilepath,
-			Downloader:           downloader,
-		}
-		pluginSourceFilepath = installer.Install()
-	} else {
-		installer := &PluginInstallerWithRepo{
-			Command:              cmd,
-			PluginSourceFilepath: pluginSourceFilepath,
-			Downloader:           downloader,
-			RepoName:             repoName,
-		}
-		pluginSourceFilepath = installer.Install()
+	deps := &InstallerContext{
+		Command:              cmd,
+		PluginSourceFilepath: pluginSourceFilepath,
+		Downloader:           downloader,
+		RepoName:             c.String("r"),
 	}
+	installer := CreateInstaller(deps)
+	pluginSourceFilepath = installer.Install()
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
 
