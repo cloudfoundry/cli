@@ -5550,8 +5550,8 @@
       "modified": false
    },
    {
-      "id": "domain {{.DomainName}} is not an owned domain",
-      "translation": "domain {{.DomainName}} is not an owned domain",
+      "id": "domain {{.DomainName}} is a shared domain, not an owned domain.",
+      "translation": "domain {{.DomainName}} is a shared domain, not an owned domain.\n\nTIP:\n\nUse `cf delete-shared-domain` to delete shared domains.",
       "modified": false
    },
   {

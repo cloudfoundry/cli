@@ -65,7 +65,7 @@ func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 	switch apiErr.(type) {
 	case nil:
 		if domain.Shared {
-			cmd.ui.Failed(T("domain {{.DomainName}} is not an owned domain",
+			cmd.ui.Failed(T("domain {{.DomainName}} is a shared domain, not an owned domain.",
 				map[string]interface{}{
 					"DomainName": domainName}))
 			return
