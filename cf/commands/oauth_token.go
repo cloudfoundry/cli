@@ -8,12 +8,15 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/plugin/models"
 )
 
 type OAuthToken struct {
-	ui       terminal.UI
-	config   core_config.ReadWriter
-	authRepo authentication.AuthenticationRepository
+	ui          terminal.UI
+	config      core_config.ReadWriter
+	authRepo    authentication.AuthenticationRepository
+	pluginModel *plugin_models.GetOauthToken_Model
+	pluginCall  bool
 }
 
 func init() {
@@ -39,6 +42,8 @@ func (cmd *OAuthToken) SetDependency(deps command_registry.Dependency, pluginCal
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()
+	cmd.pluginCall = pluginCall
+	cmd.pluginModel = deps.PluginModels.OauthToken
 	return cmd
 }
 
@@ -50,7 +55,11 @@ func (cmd *OAuthToken) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-	cmd.ui.Say(token)
+	if cmd.pluginCall {
+		cmd.pluginModel.Token = token
+	} else {
+		cmd.ui.Ok()
+		cmd.ui.Say("")
+		cmd.ui.Say(token)
+	}
 }

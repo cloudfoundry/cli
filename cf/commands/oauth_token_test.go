@@ -6,6 +6,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -37,6 +38,7 @@ var _ = Describe("OauthToken", func() {
 		authRepo = &testapi.FakeAuthenticationRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
+		deps = command_registry.NewDependency()
 	})
 
 	runCommand := func() bool {
@@ -74,6 +76,22 @@ var _ = Describe("OauthToken", func() {
 				[]string{"1234567890"},
 			))
 		})
-	})
 
+		Context("when invoked by a plugin", func() {
+			var (
+				pluginModel plugin_models.GetOauthToken_Model
+			)
+
+			BeforeEach(func() {
+				pluginModel = plugin_models.GetOauthToken_Model{}
+				deps.PluginModels.OauthToken = &pluginModel
+			})
+
+			It("populates the plugin model upon execution", func() {
+				authRepo.RefreshToken = "911999111"
+				testcmd.RunCliCommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, true)
+				Expect(pluginModel.Token).To(Equal("911999111"))
+			})
+		})
+	})
 })

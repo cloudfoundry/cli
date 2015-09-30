@@ -60,6 +60,7 @@ type pluginModels struct {
 	SpaceUsers    *[]plugin_models.GetSpaceUsers_Model
 	Services      *[]plugin_models.GetServices_Model
 	Service       *plugin_models.GetService_Model
+	OauthToken    *plugin_models.GetOauthToken_Model
 }
 
 func NewDependency() Dependency {
