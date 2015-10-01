@@ -26,6 +26,7 @@ type Data struct {
 	LoggregatorEndPoint      string
 	DopplerEndPoint          string
 	UaaEndpoint              string
+	RoutingApiEndpoint       string
 	AccessToken              string
 	SSHOAuthClient           string
 	RefreshToken             string
