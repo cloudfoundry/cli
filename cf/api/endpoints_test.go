@@ -35,6 +35,7 @@ func validApiInfoEndpoint(w http.ResponseWriter, r *http.Request) {
 	"app_ssh_oauth_client": "ssh-client-id",
   "authorization_endpoint": "https://login.example.com",
   "logging_endpoint": "wss://loggregator.foo.example.org:4443",
+  "routing_endpoint": "http://api.example.com/routing",
   "api_version": "42.0.0",
 	"min_cli_version": "6.5.0",
 	"min_recommended_cli_version": "6.7.0"
@@ -52,6 +53,7 @@ func apiInfoEndpointWithoutLogURL(w http.ResponseWriter, r *http.Request) {
   "name": "vcap",
   "build": "2222",
   "support": "http://support.cloudfoundry.com",
+  "routing_endpoint": "http://api.example.com/routing",
   "version": 2,
   "description": "Cloud Foundry sponsored by Pivotal",
   "authorization_endpoint": "https://login.example.com",
@@ -114,6 +116,7 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.HasSpace()).To(BeFalse())
 				Expect(config.MinCliVersion()).To(Equal("6.5.0"))
 				Expect(config.MinRecommendedCliVersion()).To(Equal("6.7.0"))
+				Expect(config.RoutingApiEndpoint()).To(Equal("http://api.example.com/routing"))
 			})
 
 			Context("when the api endpoint does not change", func() {

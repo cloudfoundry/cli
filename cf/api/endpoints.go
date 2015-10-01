@@ -26,6 +26,7 @@ type endpointResource struct {
 	MinCliVersion            string `json:"min_cli_version"`
 	MinRecommendedCliVersion string `json:"min_recommended_cli_version"`
 	SSHOAuthClient           string `json:"app_ssh_oauth_client"`
+	RoutingApiEndpoint       string `json:"routing_endpoint"`
 }
 
 func NewEndpointRepository(config core_config.ReadWriter, gateway net.Gateway) EndpointRepository {
@@ -92,6 +93,7 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) error {
 	//* 3/5/15: loggregator endpoint will be renamed to doppler eventually,
 	//          we just have to use the loggregator endpoint as doppler for now
 	repo.config.SetDopplerEndpoint(strings.Replace(repo.config.LoggregatorEndpoint(), "loggregator", "doppler", 1))
+	repo.config.SetRoutingApiEndpoint(serverResponse.RoutingApiEndpoint)
 
 	return nil
 }

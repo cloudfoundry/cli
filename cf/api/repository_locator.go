@@ -48,6 +48,7 @@ type RepositoryLocator struct {
 	appFilesRepo                    api_app_files.AppFilesRepository
 	domainRepo                      DomainRepository
 	routeRepo                       RouteRepository
+	routingApiRepo                  RoutingApiRepository
 	stackRepo                       stacks.StackRepository
 	serviceRepo                     ServiceRepository
 	serviceKeyRepo                  ServiceKeyRepository
@@ -110,6 +111,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
 	loc.routeRepo = NewCloudControllerRouteRepository(config, cloudControllerGateway)
+	loc.routingApiRepo = NewRoutingApiRepository(config, cloudControllerGateway)
 	loc.stackRepo = stacks.NewCloudControllerStackRepository(config, cloudControllerGateway)
 	loc.serviceRepo = NewCloudControllerServiceRepository(config, cloudControllerGateway)
 	loc.serviceKeyRepo = NewCloudControllerServiceKeyRepository(config, cloudControllerGateway)
@@ -253,6 +255,15 @@ func (locator RepositoryLocator) GetDomainRepository() DomainRepository {
 
 func (locator RepositoryLocator) SetRouteRepository(repo RouteRepository) RepositoryLocator {
 	locator.routeRepo = repo
+	return locator
+}
+
+func (locator RepositoryLocator) GetRoutingApiRepository() RoutingApiRepository {
+	return locator.routingApiRepo
+}
+
+func (locator RepositoryLocator) SetRoutingApiRepository(repo RoutingApiRepository) RepositoryLocator {
+	locator.routingApiRepo = repo
 	return locator
 }
 
