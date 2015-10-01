@@ -1,21 +1,18 @@
 package plugin
 
 import (
-	"errors"
 	"fmt"
 	"net/rpc"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
-	"strings"
 
+	"github.com/cloudfoundry/cli/cf/actors/plugin_installer"
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/fileutils"
@@ -24,7 +21,6 @@ import (
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/utils"
 
-	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 	rpcService "github.com/cloudfoundry/cli/plugin/rpc"
 )
 
@@ -44,13 +40,15 @@ func init() {
 func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["r"] = &cliFlags.StringFlag{Name: "r", Usage: T("repo name where the plugin binary is located")}
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force install of plugin without prompt")}
 
 	return command_registry.CommandMetadata{
 		Name:        "install-plugin",
 		Description: T("Install the plugin defined in command argument"),
-		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]
+		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]
 
 The command will download the plugin binary from repository if '-r' is provided
+Prompts for confirmation unless '-f' is provided
 
 EXAMPLE:
    cf install-plugin https://github.com/cf-experimental/plugin-foobar
@@ -92,67 +90,33 @@ func (cmd *PluginInstall) SetDependency(deps command_registry.Dependency, plugin
 }
 
 func (cmd *PluginInstall) Execute(c flags.FlagContext) {
-	downloader := fileutils.NewDownloader(os.TempDir())
+	if !cmd.confirmWithUser(
+		c,
+		T("**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)", map[string]interface{}{"Plugin": c.Args()[0]}),
+	) {
+		cmd.ui.Failed(T("Plugin installation cancelled"))
+	}
+
+	fileDownloader := fileutils.NewDownloader(os.TempDir())
 
 	removeTmpFile := func() {
-		err := downloader.RemoveFile()
+		err := fileDownloader.RemoveFile()
 		if err != nil {
 			cmd.ui.Say(T("Problem removing downloaded binary in temp directory: ") + err.Error())
 		}
 	}
 	defer removeTmpFile()
 
-	pluginSourceFilepath := c.Args()[0]
-
-	repoName := c.String("r")
-
-	if repoName != "" {
-		targetPluginName := strings.ToLower(c.Args()[0])
-
-		cmd.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": pluginSourceFilepath, "repoName": repoName}))
-
-		repoModel, err := cmd.getRepoFromConfig(repoName)
-		if err != nil {
-			cmd.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
-		}
-
-		pluginList, repoAry := cmd.pluginRepo.GetPlugins([]models.PluginRepo{repoModel})
-		if len(repoAry) != 0 {
-			cmd.ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
-		}
-
-		found := false
-		sha1 := ""
-		for _, plugin := range findRepoCaseInsensity(pluginList, repoName) {
-			if strings.ToLower(plugin.Name) == targetPluginName {
-				found = true
-				pluginSourceFilepath, sha1 = cmd.downloadBinary(plugin, downloader)
-
-				cmd.checksum.SetFilePath(pluginSourceFilepath)
-				if !cmd.checksum.CheckSha1(sha1) {
-					cmd.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
-				}
-			}
-
-		}
-		if !found {
-			cmd.ui.Failed(pluginSourceFilepath + T(" is not available in repo '") + repoName + "'")
-		}
-	} else {
-		if filepath.Dir(pluginSourceFilepath) == "." {
-			pluginSourceFilepath = "./" + filepath.Clean(pluginSourceFilepath)
-		}
-
-		cmd.ui.Say("")
-		if strings.HasPrefix(pluginSourceFilepath, "https://") || strings.HasPrefix(pluginSourceFilepath, "http://") ||
-			strings.HasPrefix(pluginSourceFilepath, "ftp://") || strings.HasPrefix(pluginSourceFilepath, "ftps://") {
-			cmd.ui.Say(T("Attempting to download binary file from internet address..."))
-			pluginSourceFilepath = cmd.tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath, downloader)
-		} else if !cmd.ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath) {
-			cmd.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": pluginSourceFilepath}))
-		}
-
+	deps := &plugin_installer.PluginInstallerContext{
+		Checksummer:    cmd.checksum,
+		GetPluginRepos: cmd.config.PluginRepos,
+		FileDownloader: fileDownloader,
+		PluginRepo:     cmd.pluginRepo,
+		RepoName:       c.String("r"),
+		Ui:             cmd.ui,
 	}
+	installer := plugin_installer.NewPluginInstaller(deps)
+	pluginSourceFilepath := installer.Install(c.Args()[0])
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
 
@@ -170,6 +134,10 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} v{{.Version}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name, "Version": fmt.Sprintf("%d.%d.%d", pluginMetadata.Version.Major, pluginMetadata.Version.Minor, pluginMetadata.Version.Build)})))
+}
+
+func (cmd *PluginInstall) confirmWithUser(c flags.FlagContext, prompt string) bool {
+	return c.Bool("f") || cmd.ui.Confirm(prompt)
 }
 
 func (cmd *PluginInstall) ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName string) {
@@ -259,29 +227,6 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 	return cmd.rpcService.RpcCmd.PluginMetadata
 }
 
-func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
-	_, err := os.Stat(pluginSourceFilepath)
-	if err != nil && os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
-
-func (cmd *PluginInstall) tryDownloadPluginBinaryfromGivenPath(pluginSourceFilepath string, downloader fileutils.Downloader) string {
-	size, filename, err := downloader.DownloadFile(pluginSourceFilepath)
-
-	if err != nil {
-		cmd.ui.Failed(fmt.Sprintf(T("Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from the given url.", map[string]interface{}{"Error": err.Error()})))
-	}
-
-	cmd.ui.Say(fmt.Sprintf("%d "+T("bytes downloaded")+"...", size))
-
-	executablePath := filepath.Join(downloader.SavePath(), filename)
-	os.Chmod(executablePath, 0700)
-
-	return executablePath
-}
-
 func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
 	pluginInvocation := exec.Command(location, servicePort, "SendMetadata")
 
@@ -289,74 +234,4 @@ func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
-}
-
-func (cmd *PluginInstall) getRepoFromConfig(repoName string) (models.PluginRepo, error) {
-	targetRepo := strings.ToLower(repoName)
-	list := cmd.config.PluginRepos()
-
-	for i, repo := range list {
-		if strings.ToLower(repo.Name) == targetRepo {
-			return list[i], nil
-		}
-	}
-
-	return models.PluginRepo{}, errors.New(repoName + T(" not found"))
-}
-
-func (cmd *PluginInstall) downloadBinary(plugin clipr.Plugin, downloader fileutils.Downloader) (string, string) {
-	arch := runtime.GOARCH
-
-	switch runtime.GOOS {
-	case "darwin":
-		return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "osx"), downloader), cmd.getBinaryChecksum(plugin, "osx")
-	case "linux":
-		if arch == "386" {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux32"), downloader), cmd.getBinaryChecksum(plugin, "linux32")
-		} else {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux64"), downloader), cmd.getBinaryChecksum(plugin, "linux64")
-		}
-	case "windows":
-		if arch == "386" {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win32"), downloader), cmd.getBinaryChecksum(plugin, "win32")
-		} else {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win64"), downloader), cmd.getBinaryChecksum(plugin, "win64")
-		}
-	default:
-		cmd.binaryNotAvailable()
-	}
-	return "", ""
-}
-
-func (cmd *PluginInstall) getBinaryUrl(plugin clipr.Plugin, os string) string {
-	for _, binary := range plugin.Binaries {
-		if binary.Platform == os {
-			return binary.Url
-		}
-	}
-	cmd.binaryNotAvailable()
-	return ""
-}
-
-func (cmd *PluginInstall) getBinaryChecksum(plugin clipr.Plugin, os string) string {
-	for _, binary := range plugin.Binaries {
-		if binary.Platform == os {
-			return binary.Checksum
-		}
-	}
-	return ""
-}
-
-func (cmd *PluginInstall) binaryNotAvailable() {
-	cmd.ui.Failed(T("Plugin requested has no binary available for your OS: ") + runtime.GOOS + ", " + runtime.GOARCH)
-}
-
-func findRepoCaseInsensity(repoList map[string][]clipr.Plugin, repoName string) []clipr.Plugin {
-	target := strings.ToLower(repoName)
-	for k, repo := range repoList {
-		if strings.ToLower(k) == target {
-			return repo
-		}
-	}
-	return nil
 }
