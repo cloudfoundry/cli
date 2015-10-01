@@ -136,7 +136,6 @@ type PluginInstallerWithRepo struct {
 }
 
 func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
-	outputSourceFilepath = inputSourceFilepath
 	targetPluginName := strings.ToLower(inputSourceFilepath)
 
 	installer.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": inputSourceFilepath, "repoName": installer.repoName}))
@@ -166,7 +165,7 @@ func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) (o
 
 	}
 	if !found {
-		installer.ui.Failed(outputSourceFilepath + T(" is not available in repo '") + installer.repoName + "'")
+		installer.ui.Failed(inputSourceFilepath + T(" is not available in repo '") + installer.repoName + "'")
 	}
 
 	return outputSourceFilepath
