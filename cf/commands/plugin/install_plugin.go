@@ -228,21 +228,21 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 		downloadFromPath:     cmd.downloadFromPath,
 	}
 	installer := CreateInstaller(deps)
-	pluginSourceFilepath = installer.Install()
+	newPluginSourceFilepath := installer.Install()
 
-	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
+	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": newPluginSourceFilepath})))
 
-	_, pluginExecutableName := filepath.Split(pluginSourceFilepath)
+	_, pluginExecutableName := filepath.Split(newPluginSourceFilepath)
 
 	pluginDestinationFilepath := filepath.Join(cmd.pluginConfig.GetPluginPath(), pluginExecutableName)
 
 	cmd.ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName)
 
-	pluginMetadata := cmd.runBinaryAndObtainPluginMetadata(pluginSourceFilepath)
+	pluginMetadata := cmd.runBinaryAndObtainPluginMetadata(newPluginSourceFilepath)
 
-	cmd.ensurePluginIsSafeForInstallation(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
+	cmd.ensurePluginIsSafeForInstallation(pluginMetadata, pluginDestinationFilepath, newPluginSourceFilepath)
 
-	cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
+	cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, newPluginSourceFilepath)
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} v{{.Version}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name, "Version": fmt.Sprintf("%d.%d.%d", pluginMetadata.Version.Major, pluginMetadata.Version.Minor, pluginMetadata.Version.Build)})))
