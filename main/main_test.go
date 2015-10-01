@@ -73,6 +73,28 @@ var _ = Describe("main", func() {
 		})
 	})
 
+	Describe("Shows debug information with -b or --build", func() {
+		It("prints the golang version if '--build' flag is provided", func() {
+			output := Cf("--build").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("was built with Go version:"))
+			Ω(output.ExitCode()).To(Equal(0))
+		})
+
+		It("prints the golang version if '-b' flag is provided", func() {
+			output := Cf("-b").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("was built with Go version:"))
+			Ω(output.ExitCode()).To(Equal(0))
+		})
+	})
+
+	Describe("Staying abreast of Security Vulerabilities", func() {
+		It("uses Go 1.5.1 as the most up to date Go compiler", func() {
+			output := Cf("--build").Wait(1 * time.Second)
+			Eventually(output.Out.Contents).Should(ContainSubstring("go1.5.1"))
+			Ω(output.ExitCode()).To(Equal(0))
+		})
+	})
+
 	Describe("Commands /w new non-codegangsta structure", func() {
 		It("prints usage help for all non-codegangsta commands by providing `help` flag", func() {
 			output := Cf("api", "-h").Wait(1 * time.Second)

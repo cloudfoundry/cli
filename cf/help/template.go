@@ -30,6 +30,7 @@ func GetHelpTemplate() string {
 
 {{.Title "` + T("GLOBAL OPTIONS:") + `"}}
    --version, -v                      ` + T("Print the version") + `
+   --build, -b                        ` + T("Print the version of Go the CLI was built against") + `
    --help, -h                         ` + T("Show help") + `
 
 `

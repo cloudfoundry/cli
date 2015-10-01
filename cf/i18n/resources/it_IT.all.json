@@ -3605,6 +3605,11 @@
       "modified": false
    },
    {
+      "id": "Print the version of Go the CLI was built against",
+      "translation": "Print the version of Go the CLI was built against",
+      "modified": false
+   },
+   {
       "id": "Problem removing downloaded binary in temp directory: ",
       "translation": "Problem removing downloaded binary in temp directory: ",
       "modified": false
@@ -5462,6 +5467,11 @@
    {
       "id": "{{.CFName}} login",
       "translation": "{{.CFName}} login",
+      "modified": false
+   },
+   {
+      "id": "{{.CFName}} was built with Go version: {{.GoVersion}}",
+      "translation": "{{.CFName}} was built with Go version: {{.GoVersion}}",
       "modified": false
    },
    {
