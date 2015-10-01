@@ -99,12 +99,12 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 	defer removeTmpFile()
 
 	deps := &plugin_installer.PluginInstallerContext{
-		Checksummer:      cmd.checksum,
-		GetPluginRepos:   cmd.config.PluginRepos,
-		PluginDownloader: &plugin_installer.PluginDownloader{Ui: cmd.ui, FileDownloader: fileDownloader},
-		PluginRepo:       cmd.pluginRepo,
-		RepoName:         c.String("r"),
-		Ui:               cmd.ui,
+		Checksummer:    cmd.checksum,
+		GetPluginRepos: cmd.config.PluginRepos,
+		FileDownloader: fileDownloader,
+		PluginRepo:     cmd.pluginRepo,
+		RepoName:       c.String("r"),
+		Ui:             cmd.ui,
 	}
 	installer := plugin_installer.NewPluginInstaller(deps)
 	pluginSourceFilepath := installer.Install(c.Args()[0])
