@@ -92,7 +92,7 @@ func (cmd *PluginInstall) SetDependency(deps command_registry.Dependency, plugin
 }
 
 type Installer interface {
-	Install() string
+	Install(inputSourceFilepath string) string
 }
 
 type PluginInstallerWithoutRepo struct {
@@ -103,22 +103,22 @@ type PluginInstallerWithoutRepo struct {
 	Context          *InstallerContext
 }
 
-func (installer *PluginInstallerWithoutRepo) Install() (newPluginSourceFilepath string) {
-	newPluginSourceFilepath = installer.Context.PluginSourceFilepath
-	if filepath.Dir(newPluginSourceFilepath) == "." {
-		newPluginSourceFilepath = "./" + filepath.Clean(newPluginSourceFilepath)
+func (installer *PluginInstallerWithoutRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
+	outputSourceFilepath = inputSourceFilepath
+	if filepath.Dir(outputSourceFilepath) == "." {
+		outputSourceFilepath = "./" + filepath.Clean(outputSourceFilepath)
 	}
 
 	installer.ui.Say("")
-	if strings.HasPrefix(newPluginSourceFilepath, "https://") || strings.HasPrefix(newPluginSourceFilepath, "http://") ||
-		strings.HasPrefix(newPluginSourceFilepath, "ftp://") || strings.HasPrefix(newPluginSourceFilepath, "ftps://") {
+	if strings.HasPrefix(outputSourceFilepath, "https://") || strings.HasPrefix(outputSourceFilepath, "http://") ||
+		strings.HasPrefix(outputSourceFilepath, "ftp://") || strings.HasPrefix(outputSourceFilepath, "ftps://") {
 		installer.ui.Say(T("Attempting to download binary file from internet address..."))
-		newPluginSourceFilepath = installer.pluginDownloader.downloadFromPath(newPluginSourceFilepath)
-	} else if !installer.Context.Command.ensureCandidatePluginBinaryExistsAtGivenPath(newPluginSourceFilepath) {
-		installer.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": newPluginSourceFilepath}))
+		outputSourceFilepath = installer.pluginDownloader.downloadFromPath(outputSourceFilepath)
+	} else if !installer.ensureCandidatePluginBinaryExistsAtGivenPath(outputSourceFilepath) {
+		installer.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": outputSourceFilepath}))
 	}
 
-	return newPluginSourceFilepath
+	return outputSourceFilepath
 }
 
 type pluginReposFetcher func() []models.PluginRepo
@@ -134,11 +134,11 @@ type PluginInstallerWithRepo struct {
 	Context          *InstallerContext
 }
 
-func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath string) {
-	newPluginSourceFilepath = installer.Context.PluginSourceFilepath
-	targetPluginName := strings.ToLower(newPluginSourceFilepath)
+func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
+	outputSourceFilepath = inputSourceFilepath
+	targetPluginName := strings.ToLower(inputSourceFilepath)
 
-	installer.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": newPluginSourceFilepath, "repoName": installer.repoName}))
+	installer.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": inputSourceFilepath, "repoName": installer.repoName}))
 
 	repoModel, err := installer.getRepoFromConfig(installer.repoName)
 	if err != nil {
@@ -155,9 +155,9 @@ func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath str
 	for _, plugin := range findRepoCaseInsensity(pluginList, installer.repoName) {
 		if strings.ToLower(plugin.Name) == targetPluginName {
 			found = true
-			newPluginSourceFilepath, sha1 = installer.pluginDownloader.downloadFromPlugin(plugin)
+			outputSourceFilepath, sha1 = installer.pluginDownloader.downloadFromPlugin(plugin)
 
-			installer.checksummer.SetFilePath(newPluginSourceFilepath)
+			installer.checksummer.SetFilePath(outputSourceFilepath)
 			if !installer.checksummer.CheckSha1(sha1) {
 				installer.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
 			}
@@ -165,40 +165,39 @@ func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath str
 
 	}
 	if !found {
-		installer.ui.Failed(newPluginSourceFilepath + T(" is not available in repo '") + installer.repoName + "'")
+		installer.ui.Failed(outputSourceFilepath + T(" is not available in repo '") + installer.repoName + "'")
 	}
 
-	return newPluginSourceFilepath
+	return outputSourceFilepath
 }
 
 type InstallerContext struct {
-	Command              *PluginInstall
-	pluginDownloader     *PluginDownloader
-	PluginSourceFilepath string
-	RepoName             string
-	checksummer          utils.Sha1Checksum
-	pluginRepo           plugin_repo.PluginRepo
-	ui                   terminal.UI
+	pluginDownloader *PluginDownloader
+	repoName         string
+	checksummer      utils.Sha1Checksum
+	pluginRepo       plugin_repo.PluginRepo
+	ui               terminal.UI
+	getPluginRepos   pluginReposFetcher
 }
 
 type downloadFromPath func(pluginSourceFilepath string, downloader fileutils.Downloader) string
 
 func CreateInstaller(context *InstallerContext) (installer Installer) {
-	if context.RepoName == "" {
+	if context.repoName == "" {
 		installer = &PluginInstallerWithoutRepo{
 			ui:               context.ui,
 			pluginDownloader: context.pluginDownloader,
-			repoName:         context.RepoName,
+			repoName:         context.repoName,
 			Context:          context,
 		}
 	} else {
 		installer = &PluginInstallerWithRepo{
 			ui:               context.ui,
 			pluginDownloader: context.pluginDownloader,
-			repoName:         context.RepoName,
+			repoName:         context.repoName,
 			checksummer:      context.checksummer,
 			pluginRepo:       context.pluginRepo,
-			getPluginRepos:   context.Command.config.PluginRepos,
+			getPluginRepos:   context.getPluginRepos,
 			Context:          context,
 		}
 	}
@@ -222,30 +221,29 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 	defer removeTmpFile()
 
 	deps := &InstallerContext{
-		Command:              cmd,
-		pluginDownloader:     &PluginDownloader{cmd.ui, fileDownloader},
-		PluginSourceFilepath: c.Args()[0],
-		RepoName:             c.String("r"),
-		checksummer:          cmd.checksum,
-		pluginRepo:           cmd.pluginRepo,
-		ui:                   cmd.ui,
+		checksummer:      cmd.checksum,
+		getPluginRepos:   cmd.config.PluginRepos,
+		pluginDownloader: &PluginDownloader{cmd.ui, fileDownloader},
+		pluginRepo:       cmd.pluginRepo,
+		repoName:         c.String("r"),
+		ui:               cmd.ui,
 	}
 	installer := CreateInstaller(deps)
-	newPluginSourceFilepath := installer.Install()
+	pluginSourceFilepath := installer.Install(c.Args()[0])
 
-	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": newPluginSourceFilepath})))
+	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
 
-	_, pluginExecutableName := filepath.Split(newPluginSourceFilepath)
+	_, pluginExecutableName := filepath.Split(pluginSourceFilepath)
 
 	pluginDestinationFilepath := filepath.Join(cmd.pluginConfig.GetPluginPath(), pluginExecutableName)
 
 	cmd.ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName)
 
-	pluginMetadata := cmd.runBinaryAndObtainPluginMetadata(newPluginSourceFilepath)
+	pluginMetadata := cmd.runBinaryAndObtainPluginMetadata(pluginSourceFilepath)
 
-	cmd.ensurePluginIsSafeForInstallation(pluginMetadata, pluginDestinationFilepath, newPluginSourceFilepath)
+	cmd.ensurePluginIsSafeForInstallation(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
 
-	cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, newPluginSourceFilepath)
+	cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} v{{.Version}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name, "Version": fmt.Sprintf("%d.%d.%d", pluginMetadata.Version.Major, pluginMetadata.Version.Minor, pluginMetadata.Version.Build)})))
@@ -338,7 +336,7 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 	return cmd.rpcService.RpcCmd.PluginMetadata
 }
 
-func (cmd *PluginInstall) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
+func (installer *PluginInstallerWithoutRepo) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
 	_, err := os.Stat(pluginSourceFilepath)
 	if err != nil && os.IsNotExist(err) {
 		return false
