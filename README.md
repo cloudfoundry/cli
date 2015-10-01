@@ -1,6 +1,8 @@
 Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
 =================
 
+[![Join the chat at https://gitter.im/cloudfoundry/cli](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cloudfoundry/cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is the official command line client for Cloud Foundry.
 
 You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
