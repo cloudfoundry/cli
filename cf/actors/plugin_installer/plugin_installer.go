@@ -11,7 +11,7 @@ type PluginInstaller interface {
 	Install(inputSourceFilepath string) string
 }
 
-type InstallerContext struct {
+type PluginInstallerContext struct {
 	PluginDownloader *PluginDownloader
 	RepoName         string
 	Checksummer      utils.Sha1Checksum
@@ -22,7 +22,7 @@ type InstallerContext struct {
 
 type pluginReposFetcher func() []models.PluginRepo
 
-func NewPluginInstaller(context *InstallerContext) (installer PluginInstaller) {
+func NewPluginInstaller(context *PluginInstallerContext) (installer PluginInstaller) {
 	if context.RepoName == "" {
 		installer = &PluginInstallerWithoutRepo{
 			Ui:               context.Ui,
