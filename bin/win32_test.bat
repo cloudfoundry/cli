@@ -4,7 +4,7 @@ SET PATH=%PATH%;%CD%\gopath\bin
 cd gopath\src\github.com\cloudfoundry\cli
 
 SET GODEPSPATH=%CD%\Godeps\_workspace
-SET GOPATH=%GODEPSPATH%;%GOPATH%;
+SET GOPATH=%GODEPSPATH%;%GOPATH%
 SET PATH=%PATH%;%GODEPSPATH%\bin
 
 go get github.com/jteeuwen/go-bindata/... || exit /b 1
