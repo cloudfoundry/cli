@@ -120,12 +120,15 @@ func (installer *PluginInstallerWithoutRepo) Install() (newPluginSourceFilepath 
 	return newPluginSourceFilepath
 }
 
+type pluginReposFetcher func() []models.PluginRepo
+
 type PluginInstallerWithRepo struct {
 	ui               terminal.UI
 	downloadFromPath downloadFromPath
 	repoName         string
 	checksummer      utils.Sha1Checksum
 	pluginRepo       plugin_repo.PluginRepo
+	getPluginRepos   pluginReposFetcher
 	Context          *InstallerContext
 }
 
@@ -135,7 +138,7 @@ func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath str
 
 	installer.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": newPluginSourceFilepath, "repoName": installer.repoName}))
 
-	repoModel, err := installer.Context.Command.getRepoFromConfig(installer.repoName)
+	repoModel, err := installer.getRepoFromConfig(installer.repoName)
 	if err != nil {
 		installer.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
 	}
@@ -168,28 +171,33 @@ func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath str
 
 type InstallerContext struct {
 	Command              *PluginInstall
-	PluginSourceFilepath string
 	Downloader           fileutils.Downloader
+	PluginSourceFilepath string
 	RepoName             string
+	checksummer          utils.Sha1Checksum
+	downloadFromPath     downloadFromPath
+	pluginRepo           plugin_repo.PluginRepo
+	ui                   terminal.UI
 }
 
 type downloadFromPath func(pluginSourceFilepath string, downloader fileutils.Downloader) string
 
-func CreateInstaller(ui terminal.UI, pluginRepo plugin_repo.PluginRepo, checksummer utils.Sha1Checksum, downloadFromPath downloadFromPath, context *InstallerContext) (installer Installer) {
+func CreateInstaller(context *InstallerContext) (installer Installer) {
 	if context.RepoName == "" {
 		installer = &PluginInstallerWithoutRepo{
-			ui:               ui,
-			downloadFromPath: downloadFromPath,
+			ui:               context.ui,
+			downloadFromPath: context.downloadFromPath,
 			repoName:         context.RepoName,
 			Context:          context,
 		}
 	} else {
 		installer = &PluginInstallerWithRepo{
-			ui:               ui,
-			downloadFromPath: downloadFromPath,
+			ui:               context.ui,
+			downloadFromPath: context.downloadFromPath,
 			repoName:         context.RepoName,
-			checksummer:      checksummer,
-			pluginRepo:       pluginRepo,
+			checksummer:      context.checksummer,
+			pluginRepo:       context.pluginRepo,
+			getPluginRepos:   context.Command.config.PluginRepos,
 			Context:          context,
 		}
 	}
@@ -214,14 +222,12 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 		PluginSourceFilepath: pluginSourceFilepath,
 		Downloader:           downloader,
 		RepoName:             c.String("r"),
+		ui:                   cmd.ui,
+		pluginRepo:           cmd.pluginRepo,
+		checksummer:          cmd.checksum,
+		downloadFromPath:     cmd.downloadFromPath,
 	}
-	installer := CreateInstaller(
-		cmd.ui,
-		cmd.pluginRepo,
-		cmd.checksum,
-		cmd.downloadFromPath,
-		deps,
-	)
+	installer := CreateInstaller(deps)
 	pluginSourceFilepath = installer.Install()
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
@@ -361,9 +367,9 @@ func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
 	}
 }
 
-func (cmd *PluginInstall) getRepoFromConfig(repoName string) (models.PluginRepo, error) {
+func (installer *PluginInstallerWithRepo) getRepoFromConfig(repoName string) (models.PluginRepo, error) {
 	targetRepo := strings.ToLower(repoName)
-	list := cmd.config.PluginRepos()
+	list := installer.getPluginRepos()
 
 	for i, repo := range list {
 		if strings.ToLower(repo.Name) == targetRepo {
