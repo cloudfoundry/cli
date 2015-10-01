@@ -37,6 +37,44 @@ type PluginInstall struct {
 	rpcService   *rpcService.CliRpcService
 }
 
+type PluginInstaller interface {
+	Install(inputSourceFilepath string) string
+}
+
+type PluginDownloader struct {
+	ui             terminal.UI
+	fileDownloader fileutils.Downloader
+}
+
+type InstallerContext struct {
+	pluginDownloader *PluginDownloader
+	repoName         string
+	checksummer      utils.Sha1Checksum
+	pluginRepo       plugin_repo.PluginRepo
+	ui               terminal.UI
+	getPluginRepos   pluginReposFetcher
+}
+
+type pluginReposFetcher func() []models.PluginRepo
+type downloadFromPath func(pluginSourceFilepath string, downloader fileutils.Downloader) string
+
+type PluginInstallerWithRepo struct {
+	ui               terminal.UI
+	pluginDownloader *PluginDownloader
+	downloadFromPath downloadFromPath
+	repoName         string
+	checksummer      utils.Sha1Checksum
+	pluginRepo       plugin_repo.PluginRepo
+	getPluginRepos   pluginReposFetcher
+}
+
+type PluginInstallerWithoutRepo struct {
+	ui               terminal.UI
+	pluginDownloader *PluginDownloader
+	downloadFromPath downloadFromPath
+	repoName         string
+}
+
 func init() {
 	command_registry.Register(&PluginInstall{})
 }
@@ -91,18 +129,6 @@ func (cmd *PluginInstall) SetDependency(deps command_registry.Dependency, plugin
 	return cmd
 }
 
-type Installer interface {
-	Install(inputSourceFilepath string) string
-}
-
-type PluginInstallerWithoutRepo struct {
-	ui               terminal.UI
-	pluginDownloader *PluginDownloader
-	downloadFromPath downloadFromPath
-	repoName         string
-	Context          *InstallerContext
-}
-
 func (installer *PluginInstallerWithoutRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
 	if filepath.Dir(inputSourceFilepath) == "." {
 		outputSourceFilepath = "./" + filepath.Clean(inputSourceFilepath)
@@ -120,19 +146,6 @@ func (installer *PluginInstallerWithoutRepo) Install(inputSourceFilepath string)
 	}
 
 	return outputSourceFilepath
-}
-
-type pluginReposFetcher func() []models.PluginRepo
-
-type PluginInstallerWithRepo struct {
-	ui               terminal.UI
-	pluginDownloader *PluginDownloader
-	downloadFromPath downloadFromPath
-	repoName         string
-	checksummer      utils.Sha1Checksum
-	pluginRepo       plugin_repo.PluginRepo
-	getPluginRepos   pluginReposFetcher
-	Context          *InstallerContext
 }
 
 func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
@@ -171,24 +184,12 @@ func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) (o
 	return outputSourceFilepath
 }
 
-type InstallerContext struct {
-	pluginDownloader *PluginDownloader
-	repoName         string
-	checksummer      utils.Sha1Checksum
-	pluginRepo       plugin_repo.PluginRepo
-	ui               terminal.UI
-	getPluginRepos   pluginReposFetcher
-}
-
-type downloadFromPath func(pluginSourceFilepath string, downloader fileutils.Downloader) string
-
-func CreateInstaller(context *InstallerContext) (installer Installer) {
+func NewPluginInstaller(context *InstallerContext) (installer PluginInstaller) {
 	if context.repoName == "" {
 		installer = &PluginInstallerWithoutRepo{
 			ui:               context.ui,
 			pluginDownloader: context.pluginDownloader,
 			repoName:         context.repoName,
-			Context:          context,
 		}
 	} else {
 		installer = &PluginInstallerWithRepo{
@@ -198,15 +199,9 @@ func CreateInstaller(context *InstallerContext) (installer Installer) {
 			checksummer:      context.checksummer,
 			pluginRepo:       context.pluginRepo,
 			getPluginRepos:   context.getPluginRepos,
-			Context:          context,
 		}
 	}
 	return installer
-}
-
-type PluginDownloader struct {
-	ui             terminal.UI
-	fileDownloader fileutils.Downloader
 }
 
 func (cmd *PluginInstall) Execute(c flags.FlagContext) {
@@ -228,7 +223,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 		repoName:         c.String("r"),
 		ui:               cmd.ui,
 	}
-	installer := CreateInstaller(deps)
+	installer := NewPluginInstaller(deps)
 	pluginSourceFilepath := installer.Install(c.Args()[0])
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
@@ -324,18 +319,6 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, p
 	cmd.pluginConfig.SetPlugin(pluginMetadata.Name, configMetadata)
 }
 
-func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) *plugin.PluginMetadata {
-	err := cmd.rpcService.Start()
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-	}
-	defer cmd.rpcService.Stop()
-
-	cmd.runPluginBinary(pluginSourceFilepath, cmd.rpcService.Port())
-
-	return cmd.rpcService.RpcCmd.PluginMetadata
-}
-
 func (installer *PluginInstallerWithoutRepo) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
 	_, err := os.Stat(pluginSourceFilepath)
 	if err != nil && os.IsNotExist(err) {
@@ -357,15 +340,6 @@ func (downloader *PluginDownloader) downloadFromPath(pluginSourceFilepath string
 	os.Chmod(executablePath, 0700)
 
 	return executablePath
-}
-
-func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
-	pluginInvocation := exec.Command(location, servicePort, "SendMetadata")
-
-	err := pluginInvocation.Run()
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-	}
 }
 
 func (installer *PluginInstallerWithRepo) getRepoFromConfig(repoName string) (models.PluginRepo, error) {
@@ -426,6 +400,27 @@ func (downloader *PluginDownloader) getBinaryChecksum(plugin clipr.Plugin, os st
 
 func (downloader *PluginDownloader) binaryNotAvailable() {
 	downloader.ui.Failed(T("Plugin requested has no binary available for your OS: ") + runtime.GOOS + ", " + runtime.GOARCH)
+}
+
+func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) *plugin.PluginMetadata {
+	err := cmd.rpcService.Start()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+	defer cmd.rpcService.Stop()
+
+	cmd.runPluginBinary(pluginSourceFilepath, cmd.rpcService.Port())
+
+	return cmd.rpcService.RpcCmd.PluginMetadata
+}
+
+func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
+	pluginInvocation := exec.Command(location, servicePort, "SendMetadata")
+
+	err := pluginInvocation.Run()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 }
 
 func findRepoCaseInsensity(repoList map[string][]clipr.Plugin, repoName string) []clipr.Plugin {
