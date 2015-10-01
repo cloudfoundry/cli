@@ -104,16 +104,17 @@ type PluginInstallerWithoutRepo struct {
 }
 
 func (installer *PluginInstallerWithoutRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
-	outputSourceFilepath = inputSourceFilepath
-	if filepath.Dir(outputSourceFilepath) == "." {
-		outputSourceFilepath = "./" + filepath.Clean(outputSourceFilepath)
+	if filepath.Dir(inputSourceFilepath) == "." {
+		outputSourceFilepath = "./" + filepath.Clean(inputSourceFilepath)
+	} else {
+		outputSourceFilepath = inputSourceFilepath
 	}
 
 	installer.ui.Say("")
 	if strings.HasPrefix(outputSourceFilepath, "https://") || strings.HasPrefix(outputSourceFilepath, "http://") ||
 		strings.HasPrefix(outputSourceFilepath, "ftp://") || strings.HasPrefix(outputSourceFilepath, "ftps://") {
 		installer.ui.Say(T("Attempting to download binary file from internet address..."))
-		outputSourceFilepath = installer.pluginDownloader.downloadFromPath(outputSourceFilepath)
+		return installer.pluginDownloader.downloadFromPath(outputSourceFilepath)
 	} else if !installer.ensureCandidatePluginBinaryExistsAtGivenPath(outputSourceFilepath) {
 		installer.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": outputSourceFilepath}))
 	}
