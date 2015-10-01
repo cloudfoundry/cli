@@ -121,13 +121,31 @@ var _ = Describe("Install", func() {
 		})
 	})
 
+	Context("when the -f flag is not provided", func() {
+		Context("and the user responds with 'y'", func() {
+			It("continues to install the plugin", func() {
+				ui.Inputs = []string{"y"}
+				runCommand("pluggy", "-r", "somerepo")
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Looking up 'pluggy' from repository 'somerepo'"}))
+			})
+		})
+
+		Context("but the user responds with 'n'", func() {
+			It("quits with a message", func() {
+				ui.Inputs = []string{"n"}
+				runCommand("pluggy", "-r", "somerepo")
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Plugin installation cancelled"}))
+			})
+		})
+	})
+
 	Describe("Locating binary file", func() {
 
 		Describe("install from plugin repository when '-r' provided", func() {
 			Context("gets metadata of the plugin from repo", func() {
 				Context("when repo is not found in config", func() {
 					It("informs user repo is not found", func() {
-						runCommand("plugin1", "-r", "repo1")
+						runCommand("plugin1", "-r", "repo1", "-f")
 						Ω(ui.Outputs).To(ContainSubstrings([]string{"Looking up 'plugin1' from repository 'repo1'"}))
 						Ω(ui.Outputs).To(ContainSubstrings([]string{"repo1 not found"}))
 					})
@@ -138,7 +156,7 @@ var _ = Describe("Install", func() {
 						It("informs user about the error", func() {
 							config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
 							fakePluginRepo.GetPluginsReturns(nil, []string{"repo error1"})
-							runCommand("plugin1", "-r", "repo1")
+							runCommand("plugin1", "-r", "repo1", "-f")
 
 							Ω(ui.Outputs).To(ContainSubstrings([]string{"Error getting plugin metadata from repo"}))
 							Ω(ui.Outputs).To(ContainSubstrings([]string{"repo error1"}))
@@ -149,7 +167,7 @@ var _ = Describe("Install", func() {
 						It("informs user about the error", func() {
 							config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
 							fakePluginRepo.GetPluginsReturns(nil, nil)
-							runCommand("plugin1", "-r", "repo1")
+							runCommand("plugin1", "-r", "repo1", "-f")
 
 							Ω(ui.Outputs).To(ContainSubstrings([]string{"plugin1 is not available in repo 'repo1'"}))
 						})
@@ -158,7 +176,7 @@ var _ = Describe("Install", func() {
 					It("ignore cases in repo name", func() {
 						config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
 						fakePluginRepo.GetPluginsReturns(nil, nil)
-						runCommand("plugin1", "-r", "REPO1")
+						runCommand("plugin1", "-r", "REPO1", "-f")
 
 						Ω(ui.Outputs).NotTo(ContainSubstrings([]string{"REPO1 not found"}))
 					})
@@ -176,7 +194,7 @@ var _ = Describe("Install", func() {
 
 						config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
 						fakePluginRepo.GetPluginsReturns(result, nil)
-						runCommand("plugin1", "-r", "repo1")
+						runCommand("plugin1", "-r", "repo1", "-f")
 
 						Ω(ui.Outputs).To(ContainSubstrings([]string{"Plugin requested has no binary available"}))
 					})
@@ -233,14 +251,14 @@ var _ = Describe("Install", func() {
 					})
 
 					It("performs sha1 checksum validation on the downloaded binary", func() {
-						runCommand("plugin1", "-r", "repo1")
+						runCommand("plugin1", "-r", "repo1", "-f")
 						Ω(fakeChecksum.CheckSha1CallCount()).To(Equal(1))
 					})
 
 					It("reports error downloaded file's sha1 does not match the sha1 in metadata", func() {
 						fakeChecksum.CheckSha1Returns(false)
 
-						runCommand("plugin1", "-r", "repo1")
+						runCommand("plugin1", "-r", "repo1", "-f")
 						Ω(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
 							[]string{"checksum does not match"},
@@ -248,7 +266,7 @@ var _ = Describe("Install", func() {
 					})
 
 					It("downloads and installs binary when it is available and checksum matches", func() {
-						runCommand("plugin1", "-r", "repo1")
+						runCommand("plugin1", "-r", "repo1", "-f")
 
 						Ω(ui.Outputs).To(ContainSubstrings([]string{"4 bytes downloaded..."}))
 						Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
@@ -261,7 +279,7 @@ var _ = Describe("Install", func() {
 		Describe("install from plugin repository with no '-r' provided", func() {
 			Context("downloads file from internet if path prefix with 'http','ftp' etc...", func() {
 				It("will not try locate file locally", func() {
-					runCommand("http://127.0.0.1/plugin.exe")
+					runCommand("http://127.0.0.1/plugin.exe", "-f")
 
 					Expect(ui.Outputs).ToNot(ContainSubstrings(
 						[]string{"File not found locally"},
@@ -272,7 +290,7 @@ var _ = Describe("Install", func() {
 				})
 
 				It("informs users when binary is not downloadable from net", func() {
-					runCommand("http://path/to/not/a/thing.exe")
+					runCommand("http://path/to/not/a/thing.exe", "-f")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Download attempt failed"},
@@ -289,7 +307,7 @@ var _ = Describe("Install", func() {
 					testServer := httptest.NewServer(h)
 					defer testServer.Close()
 
-					runCommand(testServer.URL + "/testfile.exe")
+					runCommand(testServer.URL+"/testfile.exe", "-f")
 
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"3 bytes downloaded..."}))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
@@ -299,7 +317,7 @@ var _ = Describe("Install", func() {
 
 			Context("tries to locate binary file at local path if path has no internet prefix", func() {
 				It("installs the plugin from a local file if found", func() {
-					runCommand("./install_plugin.go")
+					runCommand("./install_plugin.go", "-f")
 
 					Expect(ui.Outputs).ToNot(ContainSubstrings(
 						[]string{"download binary file from internet"},
@@ -310,7 +328,7 @@ var _ = Describe("Install", func() {
 				})
 
 				It("reports error if local file is not found at given path", func() {
-					runCommand("./no/file/is/here.exe")
+					runCommand("./no/file/is/here.exe", "-f")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"File not found locally",
@@ -326,7 +344,7 @@ var _ = Describe("Install", func() {
 	Describe("install failures", func() {
 		Context("when the plugin contains a 'help' command", func() {
 			It("fails", func() {
-				runCommand(test_with_help)
+				runCommand(test_with_help, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Command `help` in the plugin being installed is a native CF command/alias.  Rename the `help` command in the plugin being installed in order to enable its installation and use."},
@@ -351,7 +369,7 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if is shares a command name", func() {
-				runCommand(test_with_orgs)
+				runCommand(test_with_orgs, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Command `orgs` in the plugin being installed is a native CF command/alias.  Rename the `orgs` command in the plugin being installed in order to enable its installation and use."},
@@ -360,7 +378,7 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command short name", func() {
-				runCommand(test_with_orgs_short_name)
+				runCommand(test_with_orgs_short_name, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Command `o` in the plugin being installed is a native CF command/alias.  Rename the `o` command in the plugin being installed in order to enable its installation and use."},
@@ -382,7 +400,7 @@ var _ = Describe("Install", func() {
 				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "conflict-alias"})
 				command_registry.Register(fakeCmd)
 
-				runCommand(aliasConflicts)
+				runCommand(aliasConflicts, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Alias `conflict-alias` in the plugin being installed is a native CF command/alias.  Rename the `conflict-alias` command in the plugin being installed in order to enable its installation and use."},
@@ -395,7 +413,7 @@ var _ = Describe("Install", func() {
 				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "non-conflict-cmd", ShortName: "conflict-alias"})
 				command_registry.Register(fakeCmd)
 
-				runCommand(aliasConflicts)
+				runCommand(aliasConflicts, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Alias `conflict-alias` in the plugin being installed is a native CF command/alias.  Rename the `conflict-alias` command in the plugin being installed in order to enable its installation and use."},
@@ -418,7 +436,7 @@ var _ = Describe("Install", func() {
 				}
 				pluginConfig.PluginsReturns(pluginsMap)
 
-				runCommand(aliasConflicts)
+				runCommand(aliasConflicts, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Alias `conflict-alias` is a command/alias in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-alias` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
@@ -440,7 +458,7 @@ var _ = Describe("Install", func() {
 				}
 				pluginConfig.PluginsReturns(pluginsMap)
 
-				runCommand(aliasConflicts)
+				runCommand(aliasConflicts, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Alias `conflict-alias` is a command/alias in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-alias` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
@@ -463,7 +481,7 @@ var _ = Describe("Install", func() {
 				}
 				pluginConfig.PluginsReturns(pluginsMap)
 
-				runCommand(test_1)
+				runCommand(test_1, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Command `test_1_cmd1` is a command/alias in plugin 'Test1Collision'.  You could try uninstalling plugin 'Test1Collision' and then install this plugin in order to invoke the `test_1_cmd1` command.  However, you should first fully understand the impact of uninstalling the existing 'Test1Collision' plugin."},
@@ -485,7 +503,7 @@ var _ = Describe("Install", func() {
 				}
 				pluginConfig.PluginsReturns(pluginsMap)
 
-				runCommand(aliasConflicts)
+				runCommand(aliasConflicts, "-f")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Command `conflict-cmd` is a command/alias in plugin 'AliasCollision'.  You could try uninstalling plugin 'AliasCollision' and then install this plugin in order to invoke the `conflict-cmd` command.  However, you should first fully understand the impact of uninstalling the existing 'AliasCollision' plugin."},
@@ -496,7 +514,7 @@ var _ = Describe("Install", func() {
 
 		It("if plugin name is already taken", func() {
 			pluginConfig.PluginsReturns(map[string]plugin_config.PluginMetadata{"Test1": plugin_config.PluginMetadata{}})
-			runCommand(test_1)
+			runCommand(test_1, "-f")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Plugin name", "Test1", "is already taken"},
@@ -514,7 +532,7 @@ var _ = Describe("Install", func() {
 				pluginConfig.PluginsReturns(map[string]plugin_config.PluginMetadata{"useless": plugin_config.PluginMetadata{}})
 				pluginConfig.GetPluginPathReturns(curDir)
 
-				runCommand(filepath.Join(curDir, pluginFile.Name()))
+				runCommand(filepath.Join(curDir, pluginFile.Name()), "-f")
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Installing plugin"},
 					[]string{"The file", pluginFile.Name(), "already exists"},
@@ -538,7 +556,7 @@ var _ = Describe("Install", func() {
 			err = os.Chdir("../../../fixtures/plugins")
 			Expect(err).ToNot(HaveOccurred())
 
-			runCommand(test_curDir)
+			runCommand(test_curDir, "-f")
 			_, err = os.Stat(filepath.Join(pluginDir, "test_1.exe"))
 			Expect(err).ToNot(HaveOccurred())
 
@@ -547,7 +565,7 @@ var _ = Describe("Install", func() {
 		})
 
 		It("copies the plugin into directory <FAKE_HOME_DIR>/.cf/plugins/PLUGIN_FILE_NAME", func() {
-			runCommand(test_1)
+			runCommand(test_1, "-f")
 
 			_, err := os.Stat(test_1)
 			Expect(err).ToNot(HaveOccurred())
@@ -557,7 +575,7 @@ var _ = Describe("Install", func() {
 
 		if runtime.GOOS != "windows" {
 			It("Chmods the plugin so it is executable", func() {
-				runCommand(test_1)
+				runCommand(test_1, "-f")
 
 				fileInfo, err := os.Stat(filepath.Join(pluginDir, "test_1.exe"))
 				Expect(err).ToNot(HaveOccurred())
@@ -566,7 +584,7 @@ var _ = Describe("Install", func() {
 		}
 
 		It("populate the configuration with plugin metadata", func() {
-			runCommand(test_1)
+			runCommand(test_1, "-f")
 
 			pluginName, pluginMetadata := pluginConfig.SetPluginArgsForCall(0)
 
@@ -587,8 +605,8 @@ var _ = Describe("Install", func() {
 		})
 
 		It("installs multiple plugins with no aliases", func() {
-			Expect(runCommand(test_1)).To(Equal(true))
-			Expect(runCommand(test_2)).To(Equal(true))
+			Expect(runCommand(test_1, "-f")).To(Equal(true))
+			Expect(runCommand(test_2, "-f")).To(Equal(true))
 		})
 	})
 })

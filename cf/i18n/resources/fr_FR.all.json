@@ -835,9 +835,24 @@
       "modified": false
    },
    {
-      "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]\n\nThe command will download the plugin binary from repository if '-r' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
-      "translation": "CF_NAME install-plugin CHEMIN/VERS/PLUGIN",
-      "modified": true
+      "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nThe command will download the plugin binary from repository if '-r' is provided\nPrompts for confirmation unless '-f' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
+      "translation": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nThe command will download the plugin binary from repository if '-r' is provided\nPrompts for confirmation unless '-f' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
+      "modified": false
+   },
+   {
+      "id": "Force install of plugin without prompt",
+      "translation": "Force install of plugin without prompt",
+      "modified": false
+   },
+   {
+      "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
+      "translation": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
+      "modified": false
+   },
+   {
+      "id": "Plugin installation cancelled",
+      "translation": "Plugin installation cancelled",
+      "modified": false
    },
    {
       "id": "CF_NAME list-plugin-repos",

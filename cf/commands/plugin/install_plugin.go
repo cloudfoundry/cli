@@ -40,13 +40,15 @@ func init() {
 func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["r"] = &cliFlags.StringFlag{Name: "r", Usage: T("repo name where the plugin binary is located")}
+	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force install of plugin without prompt")}
 
 	return command_registry.CommandMetadata{
 		Name:        "install-plugin",
 		Description: T("Install the plugin defined in command argument"),
-		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME]
+		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]
 
 The command will download the plugin binary from repository if '-r' is provided
+Prompts for confirmation unless '-f' is provided
 
 EXAMPLE:
    cf install-plugin https://github.com/cf-experimental/plugin-foobar
@@ -88,6 +90,13 @@ func (cmd *PluginInstall) SetDependency(deps command_registry.Dependency, plugin
 }
 
 func (cmd *PluginInstall) Execute(c flags.FlagContext) {
+	if !cmd.confirmWithUser(
+		c,
+		T("**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)", map[string]interface{}{"Plugin": c.Args()[0]}),
+	) {
+		cmd.ui.Failed(T("Plugin installation cancelled"))
+	}
+
 	fileDownloader := fileutils.NewDownloader(os.TempDir())
 
 	removeTmpFile := func() {
@@ -125,6 +134,10 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} v{{.Version}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name, "Version": fmt.Sprintf("%d.%d.%d", pluginMetadata.Version.Major, pluginMetadata.Version.Minor, pluginMetadata.Version.Build)})))
+}
+
+func (cmd *PluginInstall) confirmWithUser(c flags.FlagContext, prompt string) bool {
+	return c.Bool("f") || cmd.ui.Confirm(prompt)
 }
 
 func (cmd *PluginInstall) ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName string) {
