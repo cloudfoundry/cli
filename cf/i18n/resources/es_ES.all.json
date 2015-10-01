@@ -5320,7 +5320,6 @@
       "modified": false
    },
    {
-<<<<<<< HEAD
       "id": "domain {{.DomainName}} is a shared domain, not an owned domain.",
       "translation": "domain {{.DomainName}} is a shared domain, not an owned domain.\n\nTIP:\nUse `cf delete-shared-domain` to delete shared domains.",
       "modified": false
@@ -5328,15 +5327,6 @@
    {
       "id": "domain {{.DomainName}} is an owned domain, not a shared domain.",
       "translation": "domain {{.DomainName}} is an owned domain, not a shared domain.\n\nTIP:\nUse `cf delete-domain` to delete owned domains.",
-=======
-      "id": "domain {{.DomainName}} is not a shared domain",
-      "translation": "domain {{.DomainName}} is not a shared domain",
-      "modified": false
-   },
-   {
-      "id": "domain {{.DomainName}} is not an owned domain",
-      "translation": "domain {{.DomainName}} is not an owned domain",
->>>>>>> command ssh uses one time auth code
       "modified": false
    },
    {
