@@ -96,7 +96,9 @@ type Installer interface {
 }
 
 type PluginInstallerWithoutRepo struct {
-	Context *InstallerContext
+	ui                                   terminal.UI
+	tryDownloadPluginBinaryfromGivenPath downloadFromPath
+	Context                              *InstallerContext
 }
 
 func (installer *PluginInstallerWithoutRepo) Install() (newPluginSourceFilepath string) {
@@ -105,36 +107,39 @@ func (installer *PluginInstallerWithoutRepo) Install() (newPluginSourceFilepath 
 		newPluginSourceFilepath = "./" + filepath.Clean(newPluginSourceFilepath)
 	}
 
-	installer.Context.Command.ui.Say("")
+	installer.ui.Say("")
 	if strings.HasPrefix(newPluginSourceFilepath, "https://") || strings.HasPrefix(newPluginSourceFilepath, "http://") ||
 		strings.HasPrefix(newPluginSourceFilepath, "ftp://") || strings.HasPrefix(newPluginSourceFilepath, "ftps://") {
-		installer.Context.Command.ui.Say(T("Attempting to download binary file from internet address..."))
+		installer.ui.Say(T("Attempting to download binary file from internet address..."))
 		newPluginSourceFilepath = installer.Context.Command.tryDownloadPluginBinaryfromGivenPath(newPluginSourceFilepath, installer.Context.Downloader)
 	} else if !installer.Context.Command.ensureCandidatePluginBinaryExistsAtGivenPath(newPluginSourceFilepath) {
-		installer.Context.Command.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": newPluginSourceFilepath}))
+		installer.ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": newPluginSourceFilepath}))
 	}
 
 	return newPluginSourceFilepath
 }
 
 type PluginInstallerWithRepo struct {
-	Context *InstallerContext
+	ui                                   terminal.UI
+	tryDownloadPluginBinaryfromGivenPath downloadFromPath
+	checksummer                          utils.Sha1Checksum
+	Context                              *InstallerContext
 }
 
 func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath string) {
 	newPluginSourceFilepath = installer.Context.PluginSourceFilepath
 	targetPluginName := strings.ToLower(newPluginSourceFilepath)
 
-	installer.Context.Command.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": newPluginSourceFilepath, "repoName": installer.Context.RepoName}))
+	installer.ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": newPluginSourceFilepath, "repoName": installer.Context.RepoName}))
 
 	repoModel, err := installer.Context.Command.getRepoFromConfig(installer.Context.RepoName)
 	if err != nil {
-		installer.Context.Command.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
+		installer.ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
 	}
 
 	pluginList, repoAry := installer.Context.Command.pluginRepo.GetPlugins([]models.PluginRepo{repoModel})
 	if len(repoAry) != 0 {
-		installer.Context.Command.ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
+		installer.ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
 	}
 
 	found := false
@@ -142,17 +147,17 @@ func (installer *PluginInstallerWithRepo) Install() (newPluginSourceFilepath str
 	for _, plugin := range findRepoCaseInsensity(pluginList, installer.Context.RepoName) {
 		if strings.ToLower(plugin.Name) == targetPluginName {
 			found = true
-			newPluginSourceFilepath, sha1 = installer.Context.Command.downloadBinary(plugin, installer.Context.Downloader)
+			newPluginSourceFilepath, sha1 = installer.downloadBinary(plugin, installer.Context.Downloader)
 
-			installer.Context.Command.checksum.SetFilePath(newPluginSourceFilepath)
-			if !installer.Context.Command.checksum.CheckSha1(sha1) {
-				installer.Context.Command.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
+			installer.checksummer.SetFilePath(newPluginSourceFilepath)
+			if !installer.checksummer.CheckSha1(sha1) {
+				installer.ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
 			}
 		}
 
 	}
 	if !found {
-		installer.Context.Command.ui.Failed(newPluginSourceFilepath + T(" is not available in repo '") + installer.Context.RepoName + "'")
+		installer.ui.Failed(newPluginSourceFilepath + T(" is not available in repo '") + installer.Context.RepoName + "'")
 	}
 
 	return newPluginSourceFilepath
@@ -165,11 +170,13 @@ type InstallerContext struct {
 	RepoName             string
 }
 
-func CreateInstaller(context *InstallerContext) (installer Installer) {
+type downloadFromPath func(pluginSourceFilepath string, downloader fileutils.Downloader) string
+
+func CreateInstaller(ui terminal.UI, checksummer utils.Sha1Checksum, tryDownloadPluginBinaryfromGivenPath downloadFromPath, context *InstallerContext) (installer Installer) {
 	if context.RepoName == "" {
-		installer = &PluginInstallerWithoutRepo{context}
+		installer = &PluginInstallerWithoutRepo{ui, tryDownloadPluginBinaryfromGivenPath, context}
 	} else {
-		installer = &PluginInstallerWithRepo{context}
+		installer = &PluginInstallerWithRepo{ui, tryDownloadPluginBinaryfromGivenPath, checksummer, context}
 	}
 	return installer
 }
@@ -193,7 +200,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 		Downloader:           downloader,
 		RepoName:             c.String("r"),
 	}
-	installer := CreateInstaller(deps)
+	installer := CreateInstaller(cmd.ui, cmd.checksum, cmd.tryDownloadPluginBinaryfromGivenPath, deps)
 	pluginSourceFilepath = installer.Install()
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
@@ -346,41 +353,41 @@ func (cmd *PluginInstall) getRepoFromConfig(repoName string) (models.PluginRepo,
 	return models.PluginRepo{}, errors.New(repoName + T(" not found"))
 }
 
-func (cmd *PluginInstall) downloadBinary(plugin clipr.Plugin, downloader fileutils.Downloader) (string, string) {
+func (installer *PluginInstallerWithRepo) downloadBinary(plugin clipr.Plugin, downloader fileutils.Downloader) (string, string) {
 	arch := runtime.GOARCH
 
 	switch runtime.GOOS {
 	case "darwin":
-		return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "osx"), downloader), cmd.getBinaryChecksum(plugin, "osx")
+		return installer.tryDownloadPluginBinaryfromGivenPath(installer.getBinaryUrl(plugin, "osx"), downloader), installer.getBinaryChecksum(plugin, "osx")
 	case "linux":
 		if arch == "386" {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux32"), downloader), cmd.getBinaryChecksum(plugin, "linux32")
+			return installer.tryDownloadPluginBinaryfromGivenPath(installer.getBinaryUrl(plugin, "linux32"), downloader), installer.getBinaryChecksum(plugin, "linux32")
 		} else {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "linux64"), downloader), cmd.getBinaryChecksum(plugin, "linux64")
+			return installer.tryDownloadPluginBinaryfromGivenPath(installer.getBinaryUrl(plugin, "linux64"), downloader), installer.getBinaryChecksum(plugin, "linux64")
 		}
 	case "windows":
 		if arch == "386" {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win32"), downloader), cmd.getBinaryChecksum(plugin, "win32")
+			return installer.tryDownloadPluginBinaryfromGivenPath(installer.getBinaryUrl(plugin, "win32"), downloader), installer.getBinaryChecksum(plugin, "win32")
 		} else {
-			return cmd.tryDownloadPluginBinaryfromGivenPath(cmd.getBinaryUrl(plugin, "win64"), downloader), cmd.getBinaryChecksum(plugin, "win64")
+			return installer.tryDownloadPluginBinaryfromGivenPath(installer.getBinaryUrl(plugin, "win64"), downloader), installer.getBinaryChecksum(plugin, "win64")
 		}
 	default:
-		cmd.binaryNotAvailable()
+		installer.binaryNotAvailable()
 	}
 	return "", ""
 }
 
-func (cmd *PluginInstall) getBinaryUrl(plugin clipr.Plugin, os string) string {
+func (installer *PluginInstallerWithRepo) getBinaryUrl(plugin clipr.Plugin, os string) string {
 	for _, binary := range plugin.Binaries {
 		if binary.Platform == os {
 			return binary.Url
 		}
 	}
-	cmd.binaryNotAvailable()
+	installer.binaryNotAvailable()
 	return ""
 }
 
-func (cmd *PluginInstall) getBinaryChecksum(plugin clipr.Plugin, os string) string {
+func (installer *PluginInstallerWithRepo) getBinaryChecksum(plugin clipr.Plugin, os string) string {
 	for _, binary := range plugin.Binaries {
 		if binary.Platform == os {
 			return binary.Checksum
@@ -389,8 +396,8 @@ func (cmd *PluginInstall) getBinaryChecksum(plugin clipr.Plugin, os string) stri
 	return ""
 }
 
-func (cmd *PluginInstall) binaryNotAvailable() {
-	cmd.ui.Failed(T("Plugin requested has no binary available for your OS: ") + runtime.GOOS + ", " + runtime.GOARCH)
+func (installer *PluginInstallerWithRepo) binaryNotAvailable() {
+	installer.ui.Failed(T("Plugin requested has no binary available for your OS: ") + runtime.GOOS + ", " + runtime.GOARCH)
 }
 
 func findRepoCaseInsensity(repoList map[string][]clipr.Plugin, repoName string) []clipr.Plugin {
