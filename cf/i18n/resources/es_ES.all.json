@@ -260,6 +260,11 @@
       "modified": false
    },
    {
+      "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
+      "translation": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
+      "modified": false
+   },
+   {
       "id": "A command line tool to interact with Cloud Foundry",
       "translation": "Una aplicacion de línea de comando para interactuar con Cloud Foundry",
       "modified": false
@@ -837,21 +842,6 @@
    {
       "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nThe command will download the plugin binary from repository if '-r' is provided\nPrompts for confirmation unless '-f' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
       "translation": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nThe command will download the plugin binary from repository if '-r' is provided\nPrompts for confirmation unless '-f' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
-      "modified": false
-   },
-   {
-      "id": "Force install of plugin without prompt",
-      "translation": "Force install of plugin without prompt",
-      "modified": false
-   },
-   {
-      "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
-      "translation": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
-      "modified": false
-   },
-   {
-      "id": "Plugin installation cancelled",
-      "translation": "Plugin installation cancelled",
       "modified": false
    },
    {
@@ -2350,6 +2340,11 @@
       "modified": false
    },
    {
+      "id": "Force install of plugin without prompt",
+      "translation": "Force install of plugin without prompt",
+      "modified": false
+   },
+   {
       "id": "Force migration without confirmation",
       "translation": "Forza migracion sin confirmacion",
       "modified": false
@@ -2625,6 +2620,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
+      "translation": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
       "translation": "Uso incorrecto. Banderas de línea de comando (excepto -f) no pudieron ser aplicadas subiendo multiples apps de un archivo de manifiesto.",
       "modified": false
@@ -2792,11 +2792,6 @@
    {
       "id": "Incorrect Usage. Requires arguments\n\n",
       "translation": "Incorrect Usage. Requires arguments\n\n",
-      "modified": false
-   },
-   {
-      "id": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
-      "translation": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
       "modified": false
    },
    {
@@ -3558,6 +3553,11 @@
       "id": "Plugin Name",
       "translation": "Plugin name",
       "modified": true
+   },
+   {
+      "id": "Plugin installation cancelled",
+      "translation": "Plugin installation cancelled",
+      "modified": false
    },
    {
       "id": "Plugin name {{.PluginName}} does not exist",
@@ -5040,6 +5040,16 @@
       "modified": false
    },
    {
+      "id": "domain {{.DomainName}} is a shared domain, not an owned domain.",
+      "translation": "domain {{.DomainName}} is a shared domain, not an owned domain.\n\nTIP:\nUse `cf delete-shared-domain` to delete shared domains.",
+      "modified": false
+   },
+   {
+      "id": "domain {{.DomainName}} is an owned domain, not a shared domain.",
+      "translation": "domain {{.DomainName}} is an owned domain, not a shared domain.\n\nTIP:\nUse `cf delete-domain` to delete owned domains.",
+      "modified": false
+   },
+   {
       "id": "domains:",
       "translation": "dominios:",
       "modified": false
@@ -5562,16 +5572,6 @@
    {
       "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
       "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instancias",
-      "modified": false
-   },
-   {
-      "id": "domain {{.DomainName}} is a shared domain, not an owned domain.",
-      "translation": "domain {{.DomainName}} is a shared domain, not an owned domain.\n\nTIP:\nUse `cf delete-shared-domain` to delete shared domains.",
-      "modified": false
-   },
-   {
-      "id": "domain {{.DomainName}} is an owned domain, not a shared domain.",
-      "translation": "domain {{.DomainName}} is an owned domain, not a shared domain.\n\nTIP:\nUse `cf delete-domain` to delete owned domains.",
       "modified": false
    }
 ]
