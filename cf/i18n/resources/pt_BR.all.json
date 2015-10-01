@@ -2270,6 +2270,11 @@
       "modified": false
    },
    {
+      "id": "Failed fetching router groups.\n{{.Err}}",
+      "translation": "Failed fetching router groups.\n{{.Err}}",
+      "modified": false
+   },
+   {
       "id": "Failed fetching routes.\n{{.Err}}",
       "translation": "Falha ao obter rotas.\n{{.Err}}",
       "modified": false
@@ -2452,6 +2457,11 @@
    {
       "id": "Getting quotas as {{.Username}}...",
       "translation": "Obtendo cotas como {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Getting router groups as {{.Username}} ...\n",
+      "translation": "Getting router groups as {{.Username}} ...\n",
       "modified": false
    },
    {
@@ -3050,6 +3060,11 @@
       "modified": false
    },
    {
+      "id": "List router-groups",
+      "translation": "List router-groups",
+      "modified": false
+   },
+   {
       "id": "List security groups in the set of security groups for running applications",
       "translation": "Exibir grupos de segurança nos padões de execução",
       "modified": false
@@ -3282,6 +3297,11 @@
    {
       "id": "No orgs found",
       "translation": "Nenhuma organização encontrada",
+      "modified": false
+   },
+   {
+      "id": "No router groups found",
+      "translation": "No router groups found",
       "modified": false
    },
    {
@@ -3667,6 +3687,11 @@
    {
       "id": "ROLES:\n",
       "translation": "FUNÇÕES:\n",
+      "modified": false
+   },
+   {
+      "id": "ROUTER GROUPS",
+      "translation": "ROUTER GROUPS",
       "modified": false
    },
    {
@@ -5387,6 +5412,11 @@
    {
       "id": "total memory limit",
       "translation": "total memory limit",
+      "modified": false
+   },
+   {
+      "id": "type",
+      "translation": "type",
       "modified": false
    },
    {
