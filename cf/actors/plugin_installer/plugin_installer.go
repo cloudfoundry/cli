@@ -4,6 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/fileutils"
 	"github.com/cloudfoundry/cli/utils"
 )
 
@@ -12,27 +13,28 @@ type PluginInstaller interface {
 }
 
 type PluginInstallerContext struct {
-	PluginDownloader *PluginDownloader
-	RepoName         string
-	Checksummer      utils.Sha1Checksum
-	PluginRepo       plugin_repo.PluginRepo
-	Ui               terminal.UI
-	GetPluginRepos   pluginReposFetcher
+	Checksummer    utils.Sha1Checksum
+	FileDownloader fileutils.Downloader
+	GetPluginRepos pluginReposFetcher
+	PluginRepo     plugin_repo.PluginRepo
+	RepoName       string
+	Ui             terminal.UI
 }
 
 type pluginReposFetcher func() []models.PluginRepo
 
 func NewPluginInstaller(context *PluginInstallerContext) (installer PluginInstaller) {
+	pluginDownloader := &PluginDownloader{Ui: context.Ui, FileDownloader: context.FileDownloader}
 	if context.RepoName == "" {
 		installer = &PluginInstallerWithoutRepo{
 			Ui:               context.Ui,
-			PluginDownloader: context.PluginDownloader,
+			PluginDownloader: pluginDownloader,
 			RepoName:         context.RepoName,
 		}
 	} else {
 		installer = &PluginInstallerWithRepo{
 			Ui:               context.Ui,
-			PluginDownloader: context.PluginDownloader,
+			PluginDownloader: pluginDownloader,
 			RepoName:         context.RepoName,
 			Checksummer:      context.Checksummer,
 			PluginRepo:       context.PluginRepo,
