@@ -309,6 +309,7 @@ func newAppPresenter() (presenter appPresenter) {
 				}, {
 					presentNonCodegangstaCommand("migrate-service-instances"),
 					presentNonCodegangstaCommand("purge-service-offering"),
+					presentNonCodegangstaCommand("purge-service-instance"),
 				}, {
 					presentNonCodegangstaCommand("service-access"),
 					presentNonCodegangstaCommand("enable-service-access"),

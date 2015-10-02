@@ -18,7 +18,7 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-var _ = Describe("purge-service command", func() {
+var _ = Describe("purge-service-offering command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
