@@ -945,6 +945,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME purge-service-instance SERVICE_INSTANCE",
+      "translation": "CF_NAME purge-service-instance SERVICE_INSTANCE",
+      "modified": false
+   },
+   {
       "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]",
       "translation": "CF_NAME purge-service-offering SERVICE [-p PROVEDOR]",
       "modified": false
@@ -3855,6 +3860,11 @@
       "modified": false
    },
    {
+      "id": "Purging service {{.InstanceName}}...",
+      "translation": "Purging service {{.InstanceName}}...",
+      "modified": false
+   },
+   {
       "id": "Purging service {{.ServiceName}}...",
       "translation": "Removendo serviço {{.ServiceName}}...",
       "modified": false
@@ -3930,6 +3940,11 @@
       "modified": false
    },
    {
+      "id": "Really purge service instance {{.InstanceName}} from Cloud Foundry?",
+      "translation": "Really purge service instance {{.InstanceName}} from Cloud Foundry?",
+      "modified": false
+   },
+   {
       "id": "Really purge service offering {{.ServiceName}} from Cloud Foundry?",
       "translation": "Deseja realmente remover oferta de serviço {{.ServiceName}} de Cloud Foundry?",
       "modified": false
@@ -3942,6 +3957,11 @@
    {
       "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
       "translation": "Remover recursivamente um serviço e seus objetos filhos do banco de dados do Cloud Foundry, sem fazer contato com o corretor de serviços",
+      "modified": false
+   },
+   {
+      "id": "Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker",
+      "translation": "Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker",
       "modified": false
    },
    {
@@ -4317,6 +4337,11 @@
    {
       "id": "Service Instance is not user provided",
       "translation": "Instância de serviço não é fornecida pelo usuário",
+      "modified": false
+   },
+   {
+      "id": "Service instance {{.InstanceName}} not found",
+      "translation": "Service instance {{.InstanceName}} not found",
       "modified": false
    },
    {
@@ -5137,6 +5162,11 @@
    {
       "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
       "translation": "ATENÇÃO:\n   Fornecendo sua senha através da linha de comando é altamente desaconselhável\n   Sua senha poderá ficar visível para outros usuários do sistema, e pode ser salva como parte do seu histórico de shell\n\n",
+      "modified": false
+   },
+   {
+      "id": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",
+      "translation": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",
       "modified": false
    },
    {

@@ -913,6 +913,24 @@ var _ = Describe("Services Repo", func() {
 		})
 	})
 
+	Describe("PurgeServiceInstance", func() {
+		It("purges service instances", func() {
+			setupTestServer(testnet.TestRequest{
+				Method: "DELETE",
+				Path:   "/v2/service_instances/instance-guid?purge=true",
+				Response: testnet.TestResponse{
+					Status: 204,
+				}})
+
+			instance := maker.NewServiceInstance("schrodinger")
+			instance.Guid = "instance-guid"
+
+			err := repo.PurgeServiceInstance(instance)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+		})
+	})
+
 	Describe("getting the count of service instances for a service plan", func() {
 		var planGuid = "abc123"
 
