@@ -56,7 +56,6 @@ var _ = Describe("Configuration Repository", func() {
 		Expect(config).To(BeNil())
 	})
 
-	// TODO - test ClearTokens et al
 	It("has acccessor methods for all config fields", func() {
 		config.SetApiEndpoint("http://api.the-endpoint")
 		Expect(config.ApiEndpoint()).To(Equal("http://api.the-endpoint"))
