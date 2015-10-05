@@ -46,7 +46,7 @@ func main() {
 	if len(os.Args) == 2 && (os.Args[1] == "--build" || os.Args[1] == "-b") {
 		deps.Ui.Say(T("{{.CFName}} was built with Go version: {{.GoVersion}}",
 			map[string]interface{}{
-				"CFName": os.Args[0],
+				"CFName":    os.Args[0],
 				"GoVersion": runtime.Version(),
 			}))
 		os.Exit(0)
