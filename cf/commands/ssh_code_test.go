@@ -22,7 +22,7 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("get-ssh-code command", func() {
+var _ = Describe("ssh-code command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
@@ -37,7 +37,7 @@ var _ = Describe("get-ssh-code command", func() {
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		deps.RepoLocator = deps.RepoLocator.SetEndpointRepository(endpointRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("get-ssh-code").SetDependency(deps, pluginCall))
+		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("ssh-code").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -51,7 +51,7 @@ var _ = Describe("get-ssh-code command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("get-ssh-code", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCliCommand("ssh-code", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -69,7 +69,7 @@ var _ = Describe("get-ssh-code command", func() {
 		})
 	})
 
-	Describe("get-ssh-code", func() {
+	Describe("ssh-code", func() {
 		BeforeEach(func() {
 			requirementsFactory.ApiEndpointSuccess = true
 		})

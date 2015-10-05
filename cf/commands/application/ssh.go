@@ -92,8 +92,8 @@ func (cmd *SSH) SetDependency(deps command_registry.Dependency, pluginCall bool)
 		cmd.secureShell = deps.WilecardDependency.(sshCmd.SecureShell)
 	}
 
-	//get get-ssh-code for dependency
-	sshCodeGetter := command_registry.Commands.FindCommand("get-ssh-code")
+	//get ssh-code for dependency
+	sshCodeGetter := command_registry.Commands.FindCommand("ssh-code")
 	sshCodeGetter = sshCodeGetter.SetDependency(deps, false)
 	cmd.sshCodeGetter = sshCodeGetter.(commands.SSHCodeGetter)
 

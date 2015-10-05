@@ -42,15 +42,15 @@ func init() {
 
 func (cmd OneTimeSSHCode) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
-		Name:        "get-ssh-code",
+		Name:        "ssh-code",
 		Description: T("Get a one time password for ssh clients"),
-		Usage:       T("CF_NAME get-ssh-code"),
+		Usage:       T("CF_NAME ssh-code"),
 	}
 }
 
 func (cmd OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 0 {
-		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("get-ssh-code"))
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("ssh-code"))
 	}
 
 	reqs := append([]requirements.Requirement{}, requirementsFactory.NewApiEndpointRequirement())

@@ -45,7 +45,7 @@ var _ = Describe("SSH command", func() {
 		deps.Gateways = make(map[string]net.Gateway)
 
 		//save original command and restore later
-		originalSSHCodeGetter = command_registry.Commands.FindCommand("get-ssh-code")
+		originalSSHCodeGetter = command_registry.Commands.FindCommand("ssh-code")
 
 		sshCodeGetter = &testcmd.FakeSSHCodeGetter{}
 
@@ -53,7 +53,7 @@ var _ = Describe("SSH command", func() {
 		sshCodeGetter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
 			return sshCodeGetter
 		}
-		sshCodeGetter.MetaDataReturns(command_registry.CommandMetadata{Name: "get-ssh-code"})
+		sshCodeGetter.MetaDataReturns(command_registry.CommandMetadata{Name: "ssh-code"})
 	})
 
 	AfterEach(func() {
