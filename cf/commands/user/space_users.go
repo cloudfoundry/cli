@@ -29,17 +29,18 @@ type userPrinter interface {
 
 type pluginPrinter struct {
 	userPrinter
-	usersMap               map[string]plugin_models.GetSpaceUsers_Model
-	userLister             func(spaceGuid string, role string) ([]models.UserFields, error)
-	spaceRoleToDisplayName map[string]string
-	pluginModel            *[]plugin_models.GetSpaceUsers_Model
+	usersMap    map[string]plugin_models.GetSpaceUsers_Model
+	userLister  func(spaceGuid string, role string) ([]models.UserFields, error)
+	roles       []string
+	pluginModel *[]plugin_models.GetSpaceUsers_Model
 }
 
 type uiPrinter struct {
 	userPrinter
-	ui                     terminal.UI
-	userLister             func(spaceGuid string, role string) ([]models.UserFields, error)
-	spaceRoleToDisplayName map[string]string
+	ui               terminal.UI
+	userLister       func(spaceGuid string, role string) ([]models.UserFields, error)
+	roles            []string
+	roleDisplayNames map[string]string
 }
 
 func init() {
@@ -93,24 +94,26 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 }
 
 func (cmd *SpaceUsers) getPrinter() userPrinter {
-	var spaceRoleToDisplayName = map[string]string{
+	var roleDisplayNames = map[string]string{
 		models.SPACE_MANAGER:   T("SPACE MANAGER"),
 		models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
 		models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
 	}
+	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 	if cmd.pluginCall {
 		return &pluginPrinter{
-			pluginModel:            cmd.pluginModel,
-			usersMap:               make(map[string]plugin_models.GetSpaceUsers_Model),
-			userLister:             cmd.getUserLister(),
-			spaceRoleToDisplayName: spaceRoleToDisplayName,
+			pluginModel: cmd.pluginModel,
+			usersMap:    make(map[string]plugin_models.GetSpaceUsers_Model),
+			userLister:  cmd.getUserLister(),
+			roles:       roles,
 		}
 	}
 	return &uiPrinter{
-		ui:                     cmd.ui,
-		userLister:             cmd.getUserLister(),
-		spaceRoleToDisplayName: spaceRoleToDisplayName,
+		ui:               cmd.ui,
+		userLister:       cmd.getUserLister(),
+		roles:            roles,
+		roleDisplayNames: roleDisplayNames,
 	}
 }
 
@@ -122,7 +125,7 @@ func (cmd *SpaceUsers) getUserLister() func(spaceGuid string, role string) ([]mo
 }
 
 func (p *pluginPrinter) printUsers(_ models.Organization, space models.Space, _ string) {
-	for role, _ := range p.spaceRoleToDisplayName {
+	for _, role := range p.roles {
 		users, _ := p.userLister(space.Guid, role)
 		for _, user := range users {
 			u, found := p.usersMap[user.Username]
@@ -152,7 +155,8 @@ func (p *uiPrinter) printUsers(org models.Organization, space models.Space, user
 			"CurrentUser": terminal.EntityNameColor(username),
 		}))
 
-	for role, displayName := range p.spaceRoleToDisplayName {
+	for _, role := range p.roles {
+		displayName := p.roleDisplayNames[role]
 		users, err := p.userLister(space.Guid, role)
 		if err != nil {
 			p.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
