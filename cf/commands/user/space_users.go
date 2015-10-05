@@ -99,22 +99,26 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
 
-		for _, user := range users {
-			cmd.ui.Say("  %s", user.Username)
+		if len(users) == 0 {
+			cmd.ui.Say("none")
+		} else {
+			for _, user := range users {
+				cmd.ui.Say("  %s", user.Username)
 
-			if cmd.pluginCall {
-				u, found := usersMap[user.Username]
-				if !found {
-					u = plugin_models.GetSpaceUsers_Model{}
-					u.Username = user.Username
-					u.Guid = user.Guid
-					u.IsAdmin = user.IsAdmin
-					u.Roles = make([]string, 1)
-					u.Roles[0] = role
-					usersMap[user.Username] = u
-				} else {
-					u.Roles = append(u.Roles, role)
-					usersMap[user.Username] = u
+				if cmd.pluginCall {
+					u, found := usersMap[user.Username]
+					if !found {
+						u = plugin_models.GetSpaceUsers_Model{}
+						u.Username = user.Username
+						u.Guid = user.Guid
+						u.IsAdmin = user.IsAdmin
+						u.Roles = make([]string, 1)
+						u.Roles[0] = role
+						usersMap[user.Username] = u
+					} else {
+						u.Roles = append(u.Roles, role)
+						usersMap[user.Username] = u
+					}
 				}
 			}
 		}

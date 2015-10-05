@@ -143,6 +143,44 @@ var _ = Describe("space-users command", func() {
 		})
 	})
 
+	Context("when logged in and there are no non-managers in the space", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+
+			org := models.Organization{}
+			org.Name = "Org1"
+			org.Guid = "org1-guid"
+			space := models.Space{}
+			space.Name = "Space1"
+			space.Guid = "space1-guid"
+
+			requirementsFactory.Organization = org
+			spaceRepo.FindByNameInOrgSpace = space
+
+			user := models.UserFields{}
+			user.Username = "mr-pointy-hair"
+			userRepo.ListUsersByRole = map[string][]models.UserFields{
+				models.SPACE_MANAGER:   []models.UserFields{user},
+				models.SPACE_DEVELOPER: []models.UserFields{},
+				models.SPACE_AUDITOR:   []models.UserFields{},
+			}
+		})
+
+		It("shows 'none' instead of an empty list", func() {
+			runCommand("my-org", "my-space")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting users in org", "Org1", "Space1", "my-user"},
+				[]string{"SPACE MANAGER"},
+				[]string{"mr-pointy-hair"},
+				[]string{"SPACE DEVELOPER"},
+				[]string{"none"},
+				[]string{"SPACE AUDITOR"},
+				[]string{"none"},
+			))
+		})
+	})
+
 	Describe("when invoked by a plugin", func() {
 		var (
 			pluginUserModel []plugin_models.GetSpaceUsers_Model
