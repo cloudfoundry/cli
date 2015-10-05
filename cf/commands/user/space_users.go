@@ -137,20 +137,18 @@ func (p *pluginPrinter) printUsers() {
 		users, _ := p.userLister(p.space.Guid, role)
 		for _, user := range users {
 			u, found := p.usersMap[user.Username]
-			if !found {
+			if found {
+				u.Roles = append(u.Roles, role)
+			} else {
 				u = plugin_models.GetSpaceUsers_Model{}
 				u.Username = user.Username
 				u.Guid = user.Guid
 				u.IsAdmin = user.IsAdmin
 				u.Roles = make([]string, 1)
 				u.Roles[0] = role
-				p.usersMap[user.Username] = u
-			} else {
-				u.Roles = append(u.Roles, role)
-				p.usersMap[user.Username] = u
 			}
+			p.usersMap[user.Username] = u
 		}
-
 	}
 	for _, v := range p.usersMap {
 		*(p.pluginModel) = append(*(p.pluginModel), v)
