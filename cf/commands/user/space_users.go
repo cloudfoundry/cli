@@ -24,7 +24,7 @@ type SpaceUsers struct {
 }
 
 type userPrinter interface {
-	printUsers()
+	printUsers(org models.Organization, space models.Space, username string)
 }
 
 type pluginPrinter struct {
@@ -32,7 +32,6 @@ type pluginPrinter struct {
 	usersMap               map[string]plugin_models.GetSpaceUsers_Model
 	userLister             func(spaceGuid string, role string) ([]models.UserFields, error)
 	spaceRoleToDisplayName map[string]string
-	space                  models.Space
 	pluginModel            *[]plugin_models.GetSpaceUsers_Model
 }
 
@@ -41,7 +40,6 @@ type uiPrinter struct {
 	ui                     terminal.UI
 	userLister             func(spaceGuid string, role string) ([]models.UserFields, error)
 	spaceRoleToDisplayName map[string]string
-	space                  models.Space
 }
 
 func init() {
@@ -90,18 +88,11 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
-		map[string]interface{}{
-			"TargetOrg":   terminal.EntityNameColor(org.Name),
-			"TargetSpace": terminal.EntityNameColor(space.Name),
-			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
-		}))
-
-	printer := cmd.getPrinter(space)
-	printer.printUsers()
+	printer := cmd.getPrinter()
+	printer.printUsers(org, space, cmd.config.Username())
 }
 
-func (cmd *SpaceUsers) getPrinter(space models.Space) userPrinter {
+func (cmd *SpaceUsers) getPrinter() userPrinter {
 	var spaceRoleToDisplayName = map[string]string{
 		models.SPACE_MANAGER:   T("SPACE MANAGER"),
 		models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
@@ -110,7 +101,6 @@ func (cmd *SpaceUsers) getPrinter(space models.Space) userPrinter {
 
 	if cmd.pluginCall {
 		return &pluginPrinter{
-			space:                  space,
 			pluginModel:            cmd.pluginModel,
 			usersMap:               make(map[string]plugin_models.GetSpaceUsers_Model),
 			userLister:             cmd.getUserLister(),
@@ -119,7 +109,6 @@ func (cmd *SpaceUsers) getPrinter(space models.Space) userPrinter {
 	}
 	return &uiPrinter{
 		ui:                     cmd.ui,
-		space:                  space,
 		userLister:             cmd.getUserLister(),
 		spaceRoleToDisplayName: spaceRoleToDisplayName,
 	}
@@ -132,9 +121,9 @@ func (cmd *SpaceUsers) getUserLister() func(spaceGuid string, role string) ([]mo
 	return cmd.userRepo.ListUsersInSpaceForRole
 }
 
-func (p *pluginPrinter) printUsers() {
+func (p *pluginPrinter) printUsers(_ models.Organization, space models.Space, _ string) {
 	for role, _ := range p.spaceRoleToDisplayName {
-		users, _ := p.userLister(p.space.Guid, role)
+		users, _ := p.userLister(space.Guid, role)
 		for _, user := range users {
 			u, found := p.usersMap[user.Username]
 			if found {
@@ -155,9 +144,16 @@ func (p *pluginPrinter) printUsers() {
 	}
 }
 
-func (p *uiPrinter) printUsers() {
+func (p *uiPrinter) printUsers(org models.Organization, space models.Space, username string) {
+	p.ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
+		map[string]interface{}{
+			"TargetOrg":   terminal.EntityNameColor(org.Name),
+			"TargetSpace": terminal.EntityNameColor(space.Name),
+			"CurrentUser": terminal.EntityNameColor(username),
+		}))
+
 	for role, displayName := range p.spaceRoleToDisplayName {
-		users, err := p.userLister(p.space.Guid, role)
+		users, err := p.userLister(space.Guid, role)
 		if err != nil {
 			p.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
 				map[string]interface{}{
