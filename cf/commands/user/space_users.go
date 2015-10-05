@@ -13,8 +13,6 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 )
 
-var spaceRoles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
-
 type SpaceUsers struct {
 	ui          terminal.UI
 	config      core_config.Reader
@@ -87,9 +85,7 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 	var usersMap = make(map[string]plugin_models.GetSpaceUsers_Model)
 
 	var users []models.UserFields
-	for _, role := range spaceRoles {
-		displayName := spaceRoleToDisplayName[role]
-
+	for role, displayName := range spaceRoleToDisplayName {
 		if cmd.config.IsMinApiVersion("2.21.0") {
 			users, apiErr = cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA(space.Guid, role)
 		} else {
