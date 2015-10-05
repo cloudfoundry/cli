@@ -880,11 +880,6 @@
       "modified": false
    },
    {
-      "id": "CF_NAME get-ssh-code",
-      "translation": "CF_NAME get-ssh-code",
-      "modified": false
-   },
-   {
       "id": "CF_NAME help [COMMAND]",
       "translation": "CF_NAME help [COMMAND]",
       "modified": false
@@ -1132,6 +1127,11 @@
    {
       "id": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]",
       "translation": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME ssh-code",
+      "translation": "CF_NAME ssh-code",
       "modified": false
    },
    {
