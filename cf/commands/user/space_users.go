@@ -23,6 +23,27 @@ type SpaceUsers struct {
 	pluginCall  bool
 }
 
+type userPrinter interface {
+	printUsers()
+}
+
+type pluginPrinter struct {
+	userPrinter
+	usersMap               map[string]plugin_models.GetSpaceUsers_Model
+	userLister             func(spaceGuid string, role string) ([]models.UserFields, error)
+	spaceRoleToDisplayName map[string]string
+	space                  models.Space
+	pluginModel            *[]plugin_models.GetSpaceUsers_Model
+}
+
+type uiPrinter struct {
+	userPrinter
+	ui                     terminal.UI
+	userLister             func(spaceGuid string, role string) ([]models.UserFields, error)
+	spaceRoleToDisplayName map[string]string
+	space                  models.Space
+}
+
 func init() {
 	command_registry.Register(&SpaceUsers{})
 }
@@ -76,59 +97,31 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
+	printer := cmd.getPrinter(space)
+	printer.printUsers()
+}
+
+func (cmd *SpaceUsers) getPrinter(space models.Space) userPrinter {
 	var spaceRoleToDisplayName = map[string]string{
 		models.SPACE_MANAGER:   T("SPACE MANAGER"),
 		models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
 		models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
 	}
 
-	var usersMap = make(map[string]plugin_models.GetSpaceUsers_Model)
-
-	listUsers := cmd.getUserLister()
-
-	for role, displayName := range spaceRoleToDisplayName {
-		users, err := listUsers(space.Guid, role)
-		if err != nil {
-			cmd.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
-				map[string]interface{}{
-					"Error":                  err.Error(),
-					"SpaceRoleToDisplayName": displayName,
-				}))
-			return
-		}
-
-		cmd.ui.Say("")
-		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
-
-		if len(users) == 0 {
-			cmd.ui.Say("none")
-		} else {
-			for _, user := range users {
-				if cmd.pluginCall {
-					u, found := usersMap[user.Username]
-					if !found {
-						u = plugin_models.GetSpaceUsers_Model{}
-						u.Username = user.Username
-						u.Guid = user.Guid
-						u.IsAdmin = user.IsAdmin
-						u.Roles = make([]string, 1)
-						u.Roles[0] = role
-						usersMap[user.Username] = u
-					} else {
-						u.Roles = append(u.Roles, role)
-						usersMap[user.Username] = u
-					}
-				} else {
-					cmd.ui.Say("  %s", user.Username)
-				}
-			}
+	if cmd.pluginCall {
+		return &pluginPrinter{
+			space:                  space,
+			pluginModel:            cmd.pluginModel,
+			usersMap:               make(map[string]plugin_models.GetSpaceUsers_Model),
+			userLister:             cmd.getUserLister(),
+			spaceRoleToDisplayName: spaceRoleToDisplayName,
 		}
 	}
-
-	if cmd.pluginCall {
-		for _, v := range usersMap {
-			*(cmd.pluginModel) = append(*(cmd.pluginModel), v)
-		}
+	return &uiPrinter{
+		ui:                     cmd.ui,
+		space:                  space,
+		userLister:             cmd.getUserLister(),
+		spaceRoleToDisplayName: spaceRoleToDisplayName,
 	}
 }
 
@@ -137,4 +130,53 @@ func (cmd *SpaceUsers) getUserLister() func(spaceGuid string, role string) ([]mo
 		return cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA
 	}
 	return cmd.userRepo.ListUsersInSpaceForRole
+}
+
+func (p *pluginPrinter) printUsers() {
+	for role, _ := range p.spaceRoleToDisplayName {
+		users, _ := p.userLister(p.space.Guid, role)
+		for _, user := range users {
+			u, found := p.usersMap[user.Username]
+			if !found {
+				u = plugin_models.GetSpaceUsers_Model{}
+				u.Username = user.Username
+				u.Guid = user.Guid
+				u.IsAdmin = user.IsAdmin
+				u.Roles = make([]string, 1)
+				u.Roles[0] = role
+				p.usersMap[user.Username] = u
+			} else {
+				u.Roles = append(u.Roles, role)
+				p.usersMap[user.Username] = u
+			}
+		}
+
+	}
+	for _, v := range p.usersMap {
+		*(p.pluginModel) = append(*(p.pluginModel), v)
+	}
+}
+
+func (p *uiPrinter) printUsers() {
+	for role, displayName := range p.spaceRoleToDisplayName {
+		users, err := p.userLister(p.space.Guid, role)
+		if err != nil {
+			p.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
+				map[string]interface{}{
+					"Error":                  err.Error(),
+					"SpaceRoleToDisplayName": displayName,
+				}))
+			return
+		}
+		p.ui.Say("")
+		p.ui.Say("%s", terminal.HeaderColor(displayName))
+
+		if len(users) == 0 {
+			p.ui.Say("none")
+		} else {
+			for _, user := range users {
+				p.ui.Say("  %s", user.Username)
+			}
+		}
+	}
 }
