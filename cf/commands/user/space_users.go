@@ -64,9 +64,9 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[1]
 	org := cmd.orgReq.GetOrganization()
 
-	space, apiErr := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 
 	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
@@ -86,9 +86,16 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 
 	listUsers := cmd.getUserLister()
 
-	var users []models.UserFields
 	for role, displayName := range spaceRoleToDisplayName {
-		users, apiErr = listUsers(space.Guid, role)
+		users, err := listUsers(space.Guid, role)
+		if err != nil {
+			cmd.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
+				map[string]interface{}{
+					"Error":                  err.Error(),
+					"SpaceRoleToDisplayName": displayName,
+				}))
+			return
+		}
 
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
@@ -97,8 +104,6 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 			cmd.ui.Say("none")
 		} else {
 			for _, user := range users {
-				cmd.ui.Say("  %s", user.Username)
-
 				if cmd.pluginCall {
 					u, found := usersMap[user.Username]
 					if !found {
@@ -113,17 +118,10 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 						u.Roles = append(u.Roles, role)
 						usersMap[user.Username] = u
 					}
+				} else {
+					cmd.ui.Say("  %s", user.Username)
 				}
 			}
-		}
-
-		if apiErr != nil {
-			cmd.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
-				map[string]interface{}{
-					"Error":                  apiErr.Error(),
-					"SpaceRoleToDisplayName": displayName,
-				}))
-			return
 		}
 	}
 
