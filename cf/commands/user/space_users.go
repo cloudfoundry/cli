@@ -84,13 +84,11 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 
 	var usersMap = make(map[string]plugin_models.GetSpaceUsers_Model)
 
+	listUsers := cmd.getUserLister()
+
 	var users []models.UserFields
 	for role, displayName := range spaceRoleToDisplayName {
-		if cmd.config.IsMinApiVersion("2.21.0") {
-			users, apiErr = cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA(space.Guid, role)
-		} else {
-			users, apiErr = cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role)
-		}
+		users, apiErr = listUsers(space.Guid, role)
 
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
@@ -134,4 +132,11 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 			*(cmd.pluginModel) = append(*(cmd.pluginModel), v)
 		}
 	}
+}
+
+func (cmd *SpaceUsers) getUserLister() func(spaceGuid string, role string) ([]models.UserFields, error) {
+	if cmd.config.IsMinApiVersion("2.21.0") {
+		return cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA
+	}
+	return cmd.userRepo.ListUsersInSpaceForRole
 }
