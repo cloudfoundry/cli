@@ -134,9 +134,17 @@ var _ = Describe("space-users command", func() {
 			})
 
 			It("fails with an error when user network call fails", func() {
-				userRepo.StubbedError = errors.New("internet badness occurred")
+				userRepo.StubbedError = func(string, role string) error {
+					if role == "SpaceManager" {
+						return errors.New("internet badness occurred")
+					}
+					return nil
+				}
 				runCommand("my-org", "my-space")
-				Expect(ui.Outputs[len(ui.Outputs)-1]).To(Equal("internet badness occurred"))
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"Getting users in org", "Org1"},
+					[]string{"internet badness occurred"},
+				))
 			})
 		})
 
