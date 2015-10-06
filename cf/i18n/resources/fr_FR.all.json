@@ -3210,6 +3210,11 @@
       "modified": false
    },
    {
+      "id": "No %s found",
+      "translation": "No %s found",
+      "modified": false
+   },
+   {
       "id": "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
       "translation": "Aucun API endpoint ciblé. Utiliser '{{.LoginTip}}' ou '{{.APITip}}' pour ciblé un endpoint.",
       "modified": true
