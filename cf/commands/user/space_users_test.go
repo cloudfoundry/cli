@@ -188,9 +188,7 @@ var _ = Describe("space-users command", func() {
 		)
 
 		Context("single roles", func() {
-
 			BeforeEach(func() {
-
 				org := models.Organization{}
 				org.Name = "the-org"
 				org.Guid = "the-org-guid"
@@ -253,15 +251,11 @@ var _ = Describe("space-users command", func() {
 						Fail("unexpected user: " + u.Username)
 					}
 				}
-
 			})
-
 		})
 
 		Context("multiple roles", func() {
-
 			BeforeEach(func() {
-
 				org := models.Organization{}
 				org.Name = "the-org"
 				org.Guid = "the-org-guid"
@@ -324,11 +318,7 @@ var _ = Describe("space-users command", func() {
 						Fail("unexpected user: " + u.Username)
 					}
 				}
-
 			})
-
 		})
-
 	})
-
 })
