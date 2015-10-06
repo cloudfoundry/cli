@@ -1,6 +1,8 @@
 package user_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -121,14 +123,20 @@ var _ = Describe("space-users command", func() {
 			BeforeEach(func() {
 				userRepo.ListUsersInSpaceForRole_CallCount = 0
 				userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount = 0
+				configRepo.SetApiVersion("2.22.0")
 			})
 
 			It("calls ListUsersInSpaceForRoleWithNoUAA()", func() {
-				configRepo.SetApiVersion("2.22.0")
 				runCommand("my-org", "my-sapce")
 
 				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount).To(BeNumerically(">=", 1))
 				Expect(userRepo.ListUsersInSpaceForRole_CallCount).To(Equal(0))
+			})
+
+			It("fails with an error when user network call fails", func() {
+				userRepo.StubbedError = errors.New("internet badness occurred")
+				runCommand("my-org", "my-space")
+				Expect(ui.Outputs[len(ui.Outputs)-1]).To(Equal("internet badness occurred"))
 			})
 		})
 
@@ -169,16 +177,15 @@ var _ = Describe("space-users command", func() {
 		It("shows 'none' instead of an empty list", func() {
 			runCommand("my-org", "my-space")
 
-			Expect(ui.Outputs[0]).To(ContainSubstring("Getting users in org"))
-			Expect(ui.Outputs[1]).To(Equal(""))
-			Expect(ui.Outputs[2]).To(ContainSubstring("SPACE MANAGER"))
-			Expect(ui.Outputs[3]).To(ContainSubstring("mr-pointy-hair"))
-			Expect(ui.Outputs[4]).To(Equal(""))
-			Expect(ui.Outputs[5]).To(ContainSubstring("SPACE DEVELOPER"))
-			Expect(ui.Outputs[6]).To(Equal("none"))
-			Expect(ui.Outputs[7]).To(Equal(""))
-			Expect(ui.Outputs[8]).To(ContainSubstring("SPACE AUDITOR"))
-			Expect(ui.Outputs[9]).To(Equal("none"))
+			Expect(ui.Outputs).To(BeInDisplayOrder(
+				[]string{"Getting users in org"},
+				[]string{"SPACE MANAGER"},
+				[]string{"mr-pointy-hair"},
+				[]string{"SPACE DEVELOPER"},
+				[]string{"none"},
+				[]string{"SPACE AUDITOR"},
+				[]string{"none"},
+			))
 		})
 	})
 
@@ -186,6 +193,10 @@ var _ = Describe("space-users command", func() {
 		var (
 			pluginUserModel []plugin_models.GetSpaceUsers_Model
 		)
+
+		BeforeEach(func() {
+			configRepo.SetApiVersion("2.22.0")
+		})
 
 		Context("single roles", func() {
 			BeforeEach(func() {

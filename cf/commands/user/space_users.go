@@ -94,11 +94,6 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 }
 
 func (cmd *SpaceUsers) getPrinter() userPrinter {
-	var roleDisplayNames = map[string]string{
-		models.SPACE_MANAGER:   T("SPACE MANAGER"),
-		models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
-		models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
-	}
 	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 	if cmd.pluginCall {
@@ -110,10 +105,14 @@ func (cmd *SpaceUsers) getPrinter() userPrinter {
 		}
 	}
 	return &uiPrinter{
-		ui:               cmd.ui,
-		userLister:       cmd.getUserLister(),
-		roles:            roles,
-		roleDisplayNames: roleDisplayNames,
+		ui:         cmd.ui,
+		userLister: cmd.getUserLister(),
+		roles:      roles,
+		roleDisplayNames: map[string]string{
+			models.SPACE_MANAGER:   T("SPACE MANAGER"),
+			models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
+			models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
+		},
 	}
 }
 
