@@ -6,7 +6,7 @@ import (
 )
 
 type FakeUserRepository struct {
-	StubbedError error
+	StubbedError func(string, string) error
 
 	FindByUsernameUsername   string
 	FindByUsernameUserFields models.UserFields
@@ -60,25 +60,25 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user models.Use
 func (repo *FakeUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersOrganizationGuid = orgGuid
 	repo.ListUsersInOrgForRoleWithNoUAA_CallCount++
-	return repo.ListUsersByRole[roleName], repo.StubbedError
+	return repo.ListUsersByRole[roleName], repo.invokeStubbedError(orgGuid, roleName)
 }
 
 func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersOrganizationGuid = orgGuid
 	repo.ListUsersInOrgForRole_CallCount++
-	return repo.ListUsersByRole[roleName], repo.StubbedError
+	return repo.ListUsersByRole[roleName], repo.invokeStubbedError(orgGuid, roleName)
 }
 
 func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersSpaceGuid = spaceGuid
 	repo.ListUsersInSpaceForRole_CallCount++
-	return repo.ListUsersByRole[roleName], repo.StubbedError
+	return repo.ListUsersByRole[roleName], repo.invokeStubbedError(spaceGuid, roleName)
 }
 
 func (repo *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersSpaceGuid = spaceGuid
 	repo.ListUsersInSpaceForRoleWithNoUAA_CallCount++
-	return repo.ListUsersByRole[roleName], repo.StubbedError
+	return repo.ListUsersByRole[roleName], repo.invokeStubbedError(spaceGuid, roleName)
 }
 
 func (repo *FakeUserRepository) Create(username, password string) (apiErr error) {
@@ -127,4 +127,11 @@ func (repo *FakeUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string)
 	repo.UnsetSpaceRoleSpaceGuid = spaceGuid
 	repo.UnsetSpaceRoleRole = role
 	return
+}
+
+func (repo *FakeUserRepository) invokeStubbedError(guid string, role string) error {
+	if repo.StubbedError != nil {
+		return repo.StubbedError(guid, role)
+	}
+	return nil
 }
