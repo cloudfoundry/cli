@@ -1,6 +1,8 @@
 package user
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -101,23 +103,16 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
 
-		for _, user := range users {
-			cmd.ui.Say("  %s", user.Username)
+		if len(users) == 0 {
+			cmd.ui.Say(fmt.Sprintf("  "+T("No %s found"), displayName))
+			continue
+		}
 
+		for _, user := range users {
 			if cmd.pluginCall {
-				u, found := usersMap[user.Username]
-				if !found {
-					u = plugin_models.GetOrgUsers_Model{}
-					u.Username = user.Username
-					u.Guid = user.Guid
-					u.IsAdmin = user.IsAdmin
-					u.Roles = make([]string, 1)
-					u.Roles[0] = role
-					usersMap[user.Username] = u
-				} else {
-					u.Roles = append(u.Roles, role)
-					usersMap[user.Username] = u
-				}
+				fillInUsersMapDetail(user, usersMap, role)
+			} else {
+				cmd.ui.Say("  %s", user.Username)
 			}
 		}
 
@@ -135,5 +130,21 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 		for _, v := range usersMap {
 			*(cmd.pluginModel) = append(*(cmd.pluginModel), v)
 		}
+	}
+}
+
+func fillInUsersMapDetail(user models.UserFields, usersMap map[string]plugin_models.GetOrgUsers_Model, role string) {
+	u, found := usersMap[user.Username]
+	if !found {
+		u = plugin_models.GetOrgUsers_Model{}
+		u.Username = user.Username
+		u.Guid = user.Guid
+		u.IsAdmin = user.IsAdmin
+		u.Roles = make([]string, 1)
+		u.Roles[0] = role
+		usersMap[user.Username] = u
+	} else {
+		u.Roles = append(u.Roles, role)
+		usersMap[user.Username] = u
 	}
 }

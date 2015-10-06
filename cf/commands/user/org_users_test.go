@@ -59,6 +59,96 @@ var _ = Describe("org-users command", func() {
 		})
 	})
 
+	Context("when logged in and given an org with no users in a particular role", func() {
+		var (
+			user1, user2 models.UserFields
+		)
+
+		BeforeEach(func() {
+			org := models.Organization{}
+			org.Name = "the-org"
+			org.Guid = "the-org-guid"
+
+			user1 = models.UserFields{}
+			user1.Username = "user1"
+			user2 = models.UserFields{}
+			user2.Username = "user2"
+
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.Organization = org
+		})
+
+		Context("shows friendly messaage when no users in ORG_MANAGER role", func() {
+			It("shows the special users in the given org", func() {
+				userRepo.ListUsersByRole = map[string][]models.UserFields{
+					models.ORG_MANAGER:     []models.UserFields{},
+					models.BILLING_MANAGER: []models.UserFields{user1},
+					models.ORG_AUDITOR:     []models.UserFields{user2},
+				}
+
+				runCommand("the-org")
+
+				Expect(userRepo.ListUsersOrganizationGuid).To(Equal("the-org-guid"))
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"Getting users in org", "the-org", "my-user"},
+					[]string{"ORG MANAGER"},
+					[]string{"  No ORG MANAGER found"},
+					[]string{"BILLING MANAGER"},
+					[]string{"  user1"},
+					[]string{"ORG AUDITOR"},
+					[]string{"  user2"},
+				))
+			})
+		})
+
+		Context("shows friendly messaage when no users in BILLING_MANAGER role", func() {
+			It("shows the special users in the given org", func() {
+				userRepo.ListUsersByRole = map[string][]models.UserFields{
+					models.ORG_MANAGER:     []models.UserFields{user1},
+					models.BILLING_MANAGER: []models.UserFields{},
+					models.ORG_AUDITOR:     []models.UserFields{user2},
+				}
+
+				runCommand("the-org")
+
+				Expect(userRepo.ListUsersOrganizationGuid).To(Equal("the-org-guid"))
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"Getting users in org", "the-org", "my-user"},
+					[]string{"ORG MANAGER"},
+					[]string{"  user1"},
+					[]string{"BILLING MANAGER"},
+					[]string{"  No BILLING MANAGER found"},
+					[]string{"ORG AUDITOR"},
+					[]string{"  user2"},
+				))
+			})
+		})
+
+		Context("shows friendly messaage when no users in ORG_AUDITOR role", func() {
+			It("shows the special users in the given org", func() {
+				userRepo.ListUsersByRole = map[string][]models.UserFields{
+					models.ORG_MANAGER:     []models.UserFields{user1},
+					models.BILLING_MANAGER: []models.UserFields{user2},
+					models.ORG_AUDITOR:     []models.UserFields{},
+				}
+
+				runCommand("the-org")
+
+				Expect(userRepo.ListUsersOrganizationGuid).To(Equal("the-org-guid"))
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"Getting users in org", "the-org", "my-user"},
+					[]string{"ORG MANAGER"},
+					[]string{"  user1"},
+					[]string{"BILLING MANAGER"},
+					[]string{"  user2"},
+					[]string{"ORG AUDITOR"},
+					[]string{"  No ORG AUDITOR found"},
+				))
+			})
+		})
+
+	})
+
 	Context("when logged in and given an org with users", func() {
 		BeforeEach(func() {
 			org := models.Organization{}
