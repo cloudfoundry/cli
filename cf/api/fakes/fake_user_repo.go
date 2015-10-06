@@ -6,6 +6,8 @@ import (
 )
 
 type FakeUserRepository struct {
+	StubbedError error
+
 	FindByUsernameUsername   string
 	FindByUsernameUserFields models.UserFields
 	FindByUsernameNotFound   bool
@@ -58,25 +60,25 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user models.Use
 func (repo *FakeUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersOrganizationGuid = orgGuid
 	repo.ListUsersInOrgForRoleWithNoUAA_CallCount++
-	return repo.ListUsersByRole[roleName], nil
+	return repo.ListUsersByRole[roleName], repo.StubbedError
 }
 
 func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersOrganizationGuid = orgGuid
 	repo.ListUsersInOrgForRole_CallCount++
-	return repo.ListUsersByRole[roleName], nil
+	return repo.ListUsersByRole[roleName], repo.StubbedError
 }
 
 func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersSpaceGuid = spaceGuid
 	repo.ListUsersInSpaceForRole_CallCount++
-	return repo.ListUsersByRole[roleName], nil
+	return repo.ListUsersByRole[roleName], repo.StubbedError
 }
 
 func (repo *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGuid string, roleName string) ([]models.UserFields, error) {
 	repo.ListUsersSpaceGuid = spaceGuid
 	repo.ListUsersInSpaceForRoleWithNoUAA_CallCount++
-	return repo.ListUsersByRole[roleName], nil
+	return repo.ListUsersByRole[roleName], repo.StubbedError
 }
 
 func (repo *FakeUserRepository) Create(username, password string) (apiErr error) {
