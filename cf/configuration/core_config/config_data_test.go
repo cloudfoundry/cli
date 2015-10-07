@@ -18,6 +18,7 @@ var exampleJSON = `
 	"LoggregatorEndPoint": "loggregator.example.com",
 	"DopplerEndPoint": "doppler.example.com",
 	"UaaEndpoint": "uaa.example.com",
+	"RoutingApiEndpoint": "routing-api.example.com",
 	"AccessToken": "the-access-token",
 	"RefreshToken": "the-refresh-token",
 	"OrganizationFields": {
@@ -56,6 +57,7 @@ var exampleData = &Data{
 	ApiVersion:               "3",
 	AuthorizationEndpoint:    "auth.example.com",
 	LoggregatorEndPoint:      "loggregator.example.com",
+	RoutingApiEndpoint:       "routing-api.example.com",
 	DopplerEndPoint:          "doppler.example.com",
 	UaaEndpoint:              "uaa.example.com",
 	AccessToken:              "the-access-token",
