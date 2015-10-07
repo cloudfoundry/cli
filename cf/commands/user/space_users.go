@@ -78,14 +78,14 @@ func (cmd *SpaceUsers) getPrinter() user_printer.UserPrinter {
 	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 	if cmd.pluginCall {
-		return &user_printer.PluginPrinter{
+		return &user_printer.SpaceUsersPluginPrinter{
 			PluginModel: cmd.pluginModel,
 			UsersMap:    make(map[string]plugin_models.GetSpaceUsers_Model),
 			UserLister:  cmd.getUserLister(),
 			Roles:       roles,
 		}
 	}
-	return &user_printer.UiPrinter{
+	return &user_printer.SpaceUsersUiPrinter{
 		Ui:         cmd.ui,
 		UserLister: cmd.getUserLister(),
 		Roles:      roles,
