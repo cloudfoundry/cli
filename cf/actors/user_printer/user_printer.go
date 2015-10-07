@@ -52,7 +52,6 @@ func (p *OrgUsersPluginPrinter) PrintUsers(org models.Organization, _ models.Spa
 			u, found := p.UsersMap[user.Username]
 			if found {
 				u.Roles = append(u.Roles, role)
-				p.UsersMap[user.Username] = u
 			} else {
 				u = plugin_models.GetOrgUsers_Model{}
 				u.Username = user.Username
@@ -60,8 +59,8 @@ func (p *OrgUsersPluginPrinter) PrintUsers(org models.Organization, _ models.Spa
 				u.IsAdmin = user.IsAdmin
 				u.Roles = make([]string, 1)
 				u.Roles[0] = role
-				p.UsersMap[user.Username] = u
 			}
+			p.UsersMap[user.Username] = u
 		}
 	}
 	for _, v := range p.UsersMap {
