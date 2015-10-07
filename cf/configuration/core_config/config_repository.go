@@ -82,6 +82,7 @@ type Reader interface {
 	PluginRepos() []models.PluginRepo
 }
 
+//go:generate counterfeiter -o ../fakes/fake_repository.go . ReadWriter
 type ReadWriter interface {
 	Reader
 	ClearSession()
