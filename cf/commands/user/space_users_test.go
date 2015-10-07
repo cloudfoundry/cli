@@ -107,7 +107,7 @@ var _ = Describe("space-users command", func() {
 			Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("org1-guid"))
 			Expect(userRepo.ListUsersSpaceGuid).To(Equal("space1-guid"))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs).To(BeInDisplayOrder(
 				[]string{"Getting users in org", "Org1", "Space1", "my-user"},
 				[]string{"SPACE MANAGER"},
 				[]string{"user1"},
@@ -182,7 +182,7 @@ var _ = Describe("space-users command", func() {
 			}
 		})
 
-		It("shows 'none' instead of an empty list", func() {
+		It("shows a friendly message when there are no users in a role", func() {
 			runCommand("my-org", "my-space")
 
 			Expect(ui.Outputs).To(BeInDisplayOrder(
@@ -190,9 +190,9 @@ var _ = Describe("space-users command", func() {
 				[]string{"SPACE MANAGER"},
 				[]string{"mr-pointy-hair"},
 				[]string{"SPACE DEVELOPER"},
-				[]string{"none"},
+				[]string{"No SPACE DEVELOPER found"},
 				[]string{"SPACE AUDITOR"},
-				[]string{"none"},
+				[]string{"No SPACE AUDITOR found"},
 			))
 		})
 	})
