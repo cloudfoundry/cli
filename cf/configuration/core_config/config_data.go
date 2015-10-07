@@ -26,6 +26,7 @@ type Data struct {
 	LoggregatorEndPoint      string
 	DopplerEndPoint          string
 	UaaEndpoint              string
+	RoutingApiEndpoint       string
 	AccessToken              string
 	RefreshToken             string
 	OrganizationFields       models.OrganizationFields
