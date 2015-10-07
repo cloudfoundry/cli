@@ -10,7 +10,7 @@ import (
 )
 
 type UserPrinter interface {
-	PrintUsers(org models.Organization, space models.Space, username string)
+	PrintUsers(guid string, username string)
 }
 
 type SpaceUsersPluginPrinter struct {
@@ -45,9 +45,9 @@ type OrgUsersUiPrinter struct {
 	Ui               terminal.UI
 }
 
-func (p *OrgUsersPluginPrinter) PrintUsers(org models.Organization, _ models.Space, username string) {
+func (p *OrgUsersPluginPrinter) PrintUsers(guid string, username string) {
 	for _, role := range p.Roles {
-		users, _ := p.UserLister(org.Guid, role)
+		users, _ := p.UserLister(guid, role)
 		for _, user := range users {
 			u, found := p.UsersMap[user.Username]
 			if found {
@@ -68,10 +68,10 @@ func (p *OrgUsersPluginPrinter) PrintUsers(org models.Organization, _ models.Spa
 	}
 }
 
-func (p *OrgUsersUiPrinter) PrintUsers(org models.Organization, _ models.Space, username string) {
+func (p *OrgUsersUiPrinter) PrintUsers(guid string, username string) {
 	for _, role := range p.Roles {
 		displayName := p.RoleDisplayNames[role]
-		users, apiErr := p.UserLister(org.Guid, role)
+		users, apiErr := p.UserLister(guid, role)
 
 		p.Ui.Say("")
 		p.Ui.Say("%s", terminal.HeaderColor(displayName))
@@ -96,9 +96,9 @@ func (p *OrgUsersUiPrinter) PrintUsers(org models.Organization, _ models.Space, 
 	}
 }
 
-func (p *SpaceUsersPluginPrinter) PrintUsers(_ models.Organization, space models.Space, _ string) {
+func (p *SpaceUsersPluginPrinter) PrintUsers(guid string, _ string) {
 	for _, role := range p.Roles {
-		users, _ := p.UserLister(space.Guid, role)
+		users, _ := p.UserLister(guid, role)
 		for _, user := range users {
 			u, found := p.UsersMap[user.Username]
 			if found {
@@ -119,17 +119,10 @@ func (p *SpaceUsersPluginPrinter) PrintUsers(_ models.Organization, space models
 	}
 }
 
-func (p *SpaceUsersUiPrinter) PrintUsers(org models.Organization, space models.Space, username string) {
-	p.Ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
-		map[string]interface{}{
-			"TargetOrg":   terminal.EntityNameColor(org.Name),
-			"TargetSpace": terminal.EntityNameColor(space.Name),
-			"CurrentUser": terminal.EntityNameColor(username),
-		}))
-
+func (p *SpaceUsersUiPrinter) PrintUsers(guid string, username string) {
 	for _, role := range p.Roles {
 		displayName := p.RoleDisplayNames[role]
-		users, err := p.UserLister(space.Guid, role)
+		users, err := p.UserLister(guid, role)
 		if err != nil {
 			p.Ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
 				map[string]interface{}{
