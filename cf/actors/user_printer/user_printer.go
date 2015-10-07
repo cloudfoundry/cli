@@ -13,7 +13,7 @@ type UserPrinter interface {
 	PrintUsers(org models.Organization, space models.Space, username string)
 }
 
-type PluginPrinter struct {
+type SpaceUsersPluginPrinter struct {
 	UserPrinter
 	UsersMap    map[string]plugin_models.GetSpaceUsers_Model
 	UserLister  func(spaceGuid string, role string) ([]models.UserFields, error)
@@ -21,7 +21,7 @@ type PluginPrinter struct {
 	PluginModel *[]plugin_models.GetSpaceUsers_Model
 }
 
-type UiPrinter struct {
+type SpaceUsersUiPrinter struct {
 	UserPrinter
 	Ui               terminal.UI
 	UserLister       func(spaceGuid string, role string) ([]models.UserFields, error)
@@ -29,7 +29,7 @@ type UiPrinter struct {
 	RoleDisplayNames map[string]string
 }
 
-func (p *PluginPrinter) PrintUsers(_ models.Organization, space models.Space, _ string) {
+func (p *SpaceUsersPluginPrinter) PrintUsers(_ models.Organization, space models.Space, _ string) {
 	for _, role := range p.Roles {
 		users, _ := p.UserLister(space.Guid, role)
 		for _, user := range users {
@@ -52,7 +52,7 @@ func (p *PluginPrinter) PrintUsers(_ models.Organization, space models.Space, _ 
 	}
 }
 
-func (p *UiPrinter) PrintUsers(org models.Organization, space models.Space, username string) {
+func (p *SpaceUsersUiPrinter) PrintUsers(org models.Organization, space models.Space, username string) {
 	p.Ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
 		map[string]interface{}{
 			"TargetOrg":   terminal.EntityNameColor(org.Name),
