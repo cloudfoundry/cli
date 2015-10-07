@@ -1,6 +1,8 @@
 package user
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -169,7 +171,7 @@ func (p *uiPrinter) printUsers(org models.Organization, space models.Space, user
 		p.ui.Say("%s", terminal.HeaderColor(displayName))
 
 		if len(users) == 0 {
-			p.ui.Say("none")
+			p.ui.Say(fmt.Sprintf("  "+T("No %s found"), displayName))
 		} else {
 			for _, user := range users {
 				p.ui.Say("  %s", user.Username)
