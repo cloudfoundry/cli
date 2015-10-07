@@ -70,11 +70,11 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	printer := cmd.getPrinter()
-	printer.PrintUsers(org, space, cmd.config.Username())
+	printer := cmd.getPrinter(org, space, cmd.config.Username())
+	printer.PrintUsers(space.Guid, cmd.config.Username())
 }
 
-func (cmd *SpaceUsers) getPrinter() user_printer.UserPrinter {
+func (cmd *SpaceUsers) getPrinter(org models.Organization, space models.Space, username string) user_printer.UserPrinter {
 	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 	if cmd.pluginCall {
@@ -85,6 +85,14 @@ func (cmd *SpaceUsers) getPrinter() user_printer.UserPrinter {
 			Roles:       roles,
 		}
 	}
+
+	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
+		map[string]interface{}{
+			"TargetOrg":   terminal.EntityNameColor(org.Name),
+			"TargetSpace": terminal.EntityNameColor(space.Name),
+			"CurrentUser": terminal.EntityNameColor(username),
+		}))
+
 	return &user_printer.SpaceUsersUiPrinter{
 		Ui:         cmd.ui,
 		UserLister: cmd.getUserLister(),

@@ -72,7 +72,7 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 		}))
 
 	printer := cmd.getPrinter(c)
-	printer.PrintUsers(org, models.Space{}, cmd.config.Username())
+	printer.PrintUsers(org.Guid, cmd.config.Username())
 }
 
 func (cmd *OrgUsers) getPrinter(c flags.FlagContext) user_printer.UserPrinter {
