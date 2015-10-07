@@ -1,8 +1,7 @@
 package user
 
 import (
-	"fmt"
-
+	"github.com/cloudfoundry/cli/cf/actors/user_printer"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -23,26 +22,6 @@ type SpaceUsers struct {
 	orgReq      requirements.OrganizationRequirement
 	pluginModel *[]plugin_models.GetSpaceUsers_Model
 	pluginCall  bool
-}
-
-type userPrinter interface {
-	printUsers(org models.Organization, space models.Space, username string)
-}
-
-type pluginPrinter struct {
-	userPrinter
-	usersMap    map[string]plugin_models.GetSpaceUsers_Model
-	userLister  func(spaceGuid string, role string) ([]models.UserFields, error)
-	roles       []string
-	pluginModel *[]plugin_models.GetSpaceUsers_Model
-}
-
-type uiPrinter struct {
-	userPrinter
-	ui               terminal.UI
-	userLister       func(spaceGuid string, role string) ([]models.UserFields, error)
-	roles            []string
-	roleDisplayNames map[string]string
 }
 
 func init() {
@@ -92,25 +71,25 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 	}
 
 	printer := cmd.getPrinter()
-	printer.printUsers(org, space, cmd.config.Username())
+	printer.PrintUsers(org, space, cmd.config.Username())
 }
 
-func (cmd *SpaceUsers) getPrinter() userPrinter {
+func (cmd *SpaceUsers) getPrinter() user_printer.UserPrinter {
 	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 	if cmd.pluginCall {
-		return &pluginPrinter{
-			pluginModel: cmd.pluginModel,
-			usersMap:    make(map[string]plugin_models.GetSpaceUsers_Model),
-			userLister:  cmd.getUserLister(),
-			roles:       roles,
+		return &user_printer.PluginPrinter{
+			PluginModel: cmd.pluginModel,
+			UsersMap:    make(map[string]plugin_models.GetSpaceUsers_Model),
+			UserLister:  cmd.getUserLister(),
+			Roles:       roles,
 		}
 	}
-	return &uiPrinter{
-		ui:         cmd.ui,
-		userLister: cmd.getUserLister(),
-		roles:      roles,
-		roleDisplayNames: map[string]string{
+	return &user_printer.UiPrinter{
+		Ui:         cmd.ui,
+		UserLister: cmd.getUserLister(),
+		Roles:      roles,
+		RoleDisplayNames: map[string]string{
 			models.SPACE_MANAGER:   T("SPACE MANAGER"),
 			models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
 			models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
@@ -123,59 +102,4 @@ func (cmd *SpaceUsers) getUserLister() func(spaceGuid string, role string) ([]mo
 		return cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA
 	}
 	return cmd.userRepo.ListUsersInSpaceForRole
-}
-
-func (p *pluginPrinter) printUsers(_ models.Organization, space models.Space, _ string) {
-	for _, role := range p.roles {
-		users, _ := p.userLister(space.Guid, role)
-		for _, user := range users {
-			u, found := p.usersMap[user.Username]
-			if found {
-				u.Roles = append(u.Roles, role)
-			} else {
-				u = plugin_models.GetSpaceUsers_Model{}
-				u.Username = user.Username
-				u.Guid = user.Guid
-				u.IsAdmin = user.IsAdmin
-				u.Roles = make([]string, 1)
-				u.Roles[0] = role
-			}
-			p.usersMap[user.Username] = u
-		}
-	}
-	for _, v := range p.usersMap {
-		*(p.pluginModel) = append(*(p.pluginModel), v)
-	}
-}
-
-func (p *uiPrinter) printUsers(org models.Organization, space models.Space, username string) {
-	p.ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
-		map[string]interface{}{
-			"TargetOrg":   terminal.EntityNameColor(org.Name),
-			"TargetSpace": terminal.EntityNameColor(space.Name),
-			"CurrentUser": terminal.EntityNameColor(username),
-		}))
-
-	for _, role := range p.roles {
-		displayName := p.roleDisplayNames[role]
-		users, err := p.userLister(space.Guid, role)
-		if err != nil {
-			p.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
-				map[string]interface{}{
-					"Error":                  err.Error(),
-					"SpaceRoleToDisplayName": displayName,
-				}))
-			return
-		}
-		p.ui.Say("")
-		p.ui.Say("%s", terminal.HeaderColor(displayName))
-
-		if len(users) == 0 {
-			p.ui.Say(fmt.Sprintf("  "+T("No %s found"), displayName))
-		} else {
-			for _, user := range users {
-				p.ui.Say("  %s", user.Username)
-			}
-		}
-	}
 }
