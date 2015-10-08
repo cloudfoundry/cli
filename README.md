@@ -172,7 +172,7 @@ provides flags and arguments.
 
 When the command is run, it communicates with api using repositories (they are in [`cf/api`](https://github.com/cloudfoundry/cli/blob/master/cf/api)).
 
-`SetDependency()` is where a command obtains it's dependencies. Dependencies are typically declared as an interface type, and not a concrete type, so tests can inject a fake.
+`SetDependency()` is where a command obtains its dependencies. Dependencies are typically declared as an interface type, and not a concrete type, so tests can inject a fake.
 The bool argument `pluginCall` indicates whether the command is invoked by one of the CLI's plugin API methods.
 
 Dependencies are injected into each command, so tests can inject a fake. This means that dependencies are

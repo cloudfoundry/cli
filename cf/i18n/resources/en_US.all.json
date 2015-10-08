@@ -2440,6 +2440,11 @@
       "modified": false
    },
    {
+      "id": "Failed fetching router groups.\n{{.Err}}",
+      "translation": "Failed fetching router groups.\n{{.Err}}",
+      "modified": false
+   },
+   {
       "id": "Failed fetching routes.\n{{.Err}}",
       "translation": "Failed fetching routes.\n{{.Err}}",
       "modified": false
@@ -2637,6 +2642,11 @@
    {
       "id": "Getting quotas as {{.Username}}...",
       "translation": "Getting quotas as {{.Username}}...",
+      "modified": false
+   },
+   {
+      "id": "Getting router groups as {{.Username}} ...\n",
+      "translation": "Getting router groups as {{.Username}} ...\n",
       "modified": false
    },
    {
@@ -3265,6 +3275,11 @@
       "modified": false
    },
    {
+      "id": "List router-groups",
+      "translation": "List router-groups",
+      "modified": false
+   },
+   {
       "id": "List security groups in the set of security groups for running applications",
       "translation": "List security groups in the set of security groups for running applications",
       "modified": false
@@ -3430,6 +3445,11 @@
       "modified": false
    },
    {
+      "id": "No %s found",
+      "translation": "No %s found",
+      "modified": false
+   },
+   {
       "id": "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
       "translation": "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
       "modified": false
@@ -3502,6 +3522,11 @@
    {
       "id": "No orgs found",
       "translation": "No orgs found",
+      "modified": false
+   },
+   {
+      "id": "No router groups found",
+      "translation": "No router groups found",
       "modified": false
    },
    {
@@ -3825,6 +3850,11 @@
       "modified": false
    },
    {
+      "id": "Print the version of Go the CLI was built against",
+      "translation": "Print the version of Go the CLI was built against",
+      "modified": false
+   },
+   {
       "id": "Problem removing downloaded binary in temp directory: ",
       "translation": "Problem removing downloaded binary in temp directory: ",
       "modified": false
@@ -3892,6 +3922,11 @@
    {
       "id": "ROLES:\n",
       "translation": "ROLES:\n",
+      "modified": false
+   },
+   {
+      "id": "ROUTER GROUPS",
+      "translation": "ROUTER GROUPS",
       "modified": false
    },
    {
@@ -5760,6 +5795,11 @@
       "modified": false
    },
    {
+      "id": "type",
+      "translation": "type",
+      "modified": false
+   },
+   {
       "id": "unknown authority",
       "translation": "unknown authority",
       "modified": false
@@ -5832,6 +5872,11 @@
    {
       "id": "{{.CFName}} login",
       "translation": "{{.CFName}} login",
+      "modified": false
+   },
+   {
+      "id": "{{.CFName}} was built with Go version: {{.GoVersion}}",
+      "translation": "{{.CFName}} was built with Go version: {{.GoVersion}}",
       "modified": false
    },
    {

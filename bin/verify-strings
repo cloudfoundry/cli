@@ -10,10 +10,10 @@ def split_locale(locale)
   return locale.split('_')
 end
 
-def install_gi18n
-  output = `go get -u github.com/maximilien/i18n4go/gi18n`
+def install_i18n
+  output = `go get -u go get github.com/maximilien/i18n4go/i18n4go`
   unless $?.exitstatus == 0
-    puts "Cannot install latest gi18n tool to verify strings:\n#{output}"
+    puts "Cannot install latest i18n tool to verify strings:\n#{output}"
     exit 1
   end
 end
@@ -28,7 +28,7 @@ def verify_strings(english_reference_file, locale_to_verify)
     puts "Verifying: \n\t #{english_reference_file} \n\t #{file_to_verify}"
   end
 
-  result = system("gi18n -c verify-strings -source-language en_US -f #{english_reference_file} -languages #{locale_to_verify} -language-files #{file_to_verify}")
+  result = system("i18n4go -c verify-strings -source-language en_US -f #{english_reference_file} -languages #{locale_to_verify} -language-files #{file_to_verify}")
   unless result
     puts "failed verification:"
     unless File.exist?(file_to_verify)
@@ -59,5 +59,5 @@ def run
 end
 
 @verbose = ARGV.include?("-v")
-install_gi18n
+install_i18n
 run

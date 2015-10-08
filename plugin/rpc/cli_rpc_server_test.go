@@ -692,7 +692,7 @@ var _ = Describe("Server", func() {
 					pingCli(rpcService.Port())
 				})
 
-				It("returns the LoggregatorEndpoint() and DopplerEndpoint() setting in config", func() {
+				It("returns the access token from the config", func() {
 					config.SetAccessToken("fake-access-token")
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())

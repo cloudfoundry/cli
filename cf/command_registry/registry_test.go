@@ -26,7 +26,7 @@ var _ = Describe("CommandRegistry", func() {
 	})
 
 	Context("Register()", func() {
-		It("registers a command and it's alias into the Command Registry map", func() {
+		It("registers a command and its alias into the Command Registry map", func() {
 			Ω(Commands.CommandExists("fake-command2")).To(BeFalse())
 			Ω(Commands.CommandExists("fc2")).To(BeFalse())
 

@@ -7,7 +7,7 @@
    "\n\t",
    "extract_strings",
    "excluded.json",
-   "gi18n",
+   "i18n4go",
    ".en.json",
    ".extracted.json",
    "recursive:",
