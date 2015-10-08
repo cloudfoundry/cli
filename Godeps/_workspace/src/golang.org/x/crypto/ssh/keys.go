@@ -422,19 +422,14 @@ func ecHash(curve elliptic.Curve) crypto.Hash {
 
 // parseECDSA parses an ECDSA key according to RFC 5656, section 3.1.
 func parseECDSA(in []byte) (out PublicKey, rest []byte, err error) {
-	var w struct {
-		Curve    string
-		KeyBytes []byte
-		Rest     []byte `ssh:"rest"`
-	}
-
-	if err := Unmarshal(in, &w); err != nil {
-		return nil, nil, err
+	identifier, in, ok := parseString(in)
+	if !ok {
+		return nil, nil, errShortRead
 	}
 
 	key := new(ecdsa.PublicKey)
 
-	switch w.Curve {
+	switch string(identifier) {
 	case "nistp256":
 		key.Curve = elliptic.P256()
 	case "nistp384":
@@ -445,11 +440,16 @@ func parseECDSA(in []byte) (out PublicKey, rest []byte, err error) {
 		return nil, nil, errors.New("ssh: unsupported curve")
 	}
 
-	key.X, key.Y = elliptic.Unmarshal(key.Curve, w.KeyBytes)
+	var keyBytes []byte
+	if keyBytes, in, ok = parseString(in); !ok {
+		return nil, nil, errShortRead
+	}
+
+	key.X, key.Y = elliptic.Unmarshal(key.Curve, keyBytes)
 	if key.X == nil || key.Y == nil {
 		return nil, nil, errors.New("ssh: invalid curve point")
 	}
-	return (*ecdsaPublicKey)(key), w.Rest, nil
+	return (*ecdsaPublicKey)(key), in, nil
 }
 
 func (key *ecdsaPublicKey) Marshal() []byte {

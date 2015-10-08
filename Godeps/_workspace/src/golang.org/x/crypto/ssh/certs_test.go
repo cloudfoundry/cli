@@ -57,7 +57,7 @@ const exampleSSHCertWithOptions = `ssh-rsa-cert-v01@openssh.com AAAAHHNzaC1yc2Et
 func TestParseCertWithOptions(t *testing.T) {
 	opts := map[string]string{
 		"source-address": "192.168.1.0/24",
-		"force-command":  "/bin/sleep",
+		"force-command": "/bin/sleep",
 	}
 	exts := map[string]string{
 		"permit-X11-forwarding":   "",
@@ -186,15 +186,15 @@ func TestHostKeyCert(t *testing.T) {
 		defer c1.Close()
 		defer c2.Close()
 
-		errc := make(chan error)
-
 		go func() {
 			conf := ServerConfig{
 				NoClientAuth: true,
 			}
 			conf.AddHostKey(certSigner)
 			_, _, _, err := NewServerConn(c1, &conf)
-			errc <- err
+			if err != nil {
+				t.Fatalf("NewServerConn: %v", err)
+			}
 		}()
 
 		config := &ClientConfig{
@@ -206,11 +206,6 @@ func TestHostKeyCert(t *testing.T) {
 		succeed := name == "hostname"
 		if (err == nil) != succeed {
 			t.Fatalf("NewClientConn(%q): %v", name, err)
-		}
-
-		err = <-errc
-		if (err == nil) != succeed {
-			t.Fatalf("NewServerConn(%q): %v", name, err)
 		}
 	}
 }

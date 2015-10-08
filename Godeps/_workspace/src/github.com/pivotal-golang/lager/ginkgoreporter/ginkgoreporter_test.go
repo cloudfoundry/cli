@@ -41,10 +41,10 @@ var _ = Describe("Ginkgoreporter", func() {
 
 	jsonRoundTrip := func(object interface{}) interface{} {
 		jsonEncoded, err := json.Marshal(object)
-		Expect(err).NotTo(HaveOccurred())
+		Ω(err).ShouldNot(HaveOccurred())
 		var out interface{}
 		err = json.Unmarshal(jsonEncoded, &out)
-		Expect(err).NotTo(HaveOccurred())
+		Ω(err).ShouldNot(HaveOccurred())
 		return out
 	}
 
@@ -85,14 +85,14 @@ var _ = Describe("Ginkgoreporter", func() {
 				reporter.SpecDidComplete(summary)
 
 				logs := fetchLogs()
-				Expect(logs[0].Session).To(Equal("2.1"))
-				Expect(logs[0].Message).To(Equal("ginkgo.node-2.spec.start"))
-				Expect(logs[1].Session).To(Equal("2.1"))
-				Expect(logs[1].Message).To(Equal("ginkgo.node-2.spec.end"))
-				Expect(logs[2].Session).To(Equal("2.2"))
-				Expect(logs[0].Message).To(Equal("ginkgo.node-2.spec.start"))
-				Expect(logs[3].Session).To(Equal("2.2"))
-				Expect(logs[1].Message).To(Equal("ginkgo.node-2.spec.end"))
+				Ω(logs[0].Session).Should(Equal("2.1"))
+				Ω(logs[0].Message).Should(Equal("node-2.spec.start"))
+				Ω(logs[1].Session).Should(Equal("2.1"))
+				Ω(logs[1].Message).Should(Equal("node-2.spec.end"))
+				Ω(logs[2].Session).Should(Equal("2.2"))
+				Ω(logs[0].Message).Should(Equal("node-2.spec.start"))
+				Ω(logs[3].Session).Should(Equal("2.2"))
+				Ω(logs[1].Message).Should(Equal("node-2.spec.end"))
 			})
 		})
 
@@ -104,10 +104,10 @@ var _ = Describe("Ginkgoreporter", func() {
 				reporter.SpecDidComplete(summary)
 
 				logs := fetchLogs()
-				Expect(logs[0].Session).To(Equal("1"))
-				Expect(logs[1].Session).To(Equal("1"))
-				Expect(logs[2].Session).To(Equal("2"))
-				Expect(logs[3].Session).To(Equal("2"))
+				Ω(logs[0].Session).Should(Equal("1"))
+				Ω(logs[1].Session).Should(Equal("1"))
+				Ω(logs[2].Session).Should(Equal("2"))
+				Ω(logs[3].Session).Should(Equal("2"))
 			})
 		})
 
@@ -118,33 +118,31 @@ var _ = Describe("Ginkgoreporter", func() {
 
 			It("should log about the spec starting", func() {
 				log := fetchLogs()[0]
-				Expect(log.LogLevel).To(Equal(lager.INFO))
-				Expect(log.Source).To(Equal("ginkgo"))
-				Expect(log.Message).To(Equal("ginkgo.spec.start"))
-				Expect(log.Session).To(Equal("1"))
-				Expect(log.Data["summary"]).To(Equal(jsonRoundTrip(SpecSummary{
+				Ω(log.LogLevel).Should(Equal(lager.INFO))
+				Ω(log.Source).Should(Equal("ginkgo"))
+				Ω(log.Message).Should(Equal("spec.start"))
+				Ω(log.Session).Should(Equal("1"))
+				Ω(log.Data["summary"]).Should(Equal(jsonRoundTrip(SpecSummary{
 					Name:     []string{"A", "B"},
 					Location: "file/b:4",
 				})))
-
 			})
 
 			Context("when the spec succeeds", func() {
 				It("should info", func() {
 					reporter.SpecDidComplete(summary)
 					log := fetchLogs()[1]
-					Expect(log.LogLevel).To(Equal(lager.INFO))
-					Expect(log.Source).To(Equal("ginkgo"))
-					Expect(log.Message).To(Equal("ginkgo.spec.end"))
-					Expect(log.Session).To(Equal("1"))
-					Expect(log.Data["summary"]).To(Equal(jsonRoundTrip(SpecSummary{
+					Ω(log.LogLevel).Should(Equal(lager.INFO))
+					Ω(log.Source).Should(Equal("ginkgo"))
+					Ω(log.Message).Should(Equal("spec.end"))
+					Ω(log.Session).Should(Equal("1"))
+					Ω(log.Data["summary"]).Should(Equal(jsonRoundTrip(SpecSummary{
 						Name:     []string{"A", "B"},
 						Location: "file/b:4",
 						State:    "PASSED",
 						Passed:   true,
 						RunTime:  time.Minute,
 					})))
-
 				})
 			})
 
@@ -164,12 +162,12 @@ var _ = Describe("Ginkgoreporter", func() {
 				It("should error", func() {
 					reporter.SpecDidComplete(summary)
 					log := fetchLogs()[1]
-					Expect(log.LogLevel).To(Equal(lager.ERROR))
-					Expect(log.Source).To(Equal("ginkgo"))
-					Expect(log.Message).To(Equal("ginkgo.spec.end"))
-					Expect(log.Session).To(Equal("1"))
-					Expect(log.Error.Error()).To(Equal("something failed!\nsome/file:3"))
-					Expect(log.Data["summary"]).To(Equal(jsonRoundTrip(SpecSummary{
+					Ω(log.LogLevel).Should(Equal(lager.ERROR))
+					Ω(log.Source).Should(Equal("ginkgo"))
+					Ω(log.Message).Should(Equal("spec.end"))
+					Ω(log.Session).Should(Equal("1"))
+					Ω(log.Error.Error()).Should(Equal("something failed!\nsome/file:3"))
+					Ω(log.Data["summary"]).Should(Equal(jsonRoundTrip(SpecSummary{
 						Name:       []string{"A", "B"},
 						Location:   "file/b:4",
 						State:      "FAILED",
@@ -177,7 +175,6 @@ var _ = Describe("Ginkgoreporter", func() {
 						RunTime:    time.Minute,
 						StackTrace: "some-stack-trace",
 					})))
-
 				})
 			})
 		})

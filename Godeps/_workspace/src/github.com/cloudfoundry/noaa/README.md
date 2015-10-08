@@ -10,37 +10,9 @@ NOAA is a client library to consume metric and log messages from Doppler.
 
 This library does not work with Go 1.3 through 1.3.3, due to a bug in the standard libraries.
 
-##Get the Code
+##Usage
 
-This Go project is designed to be imported into `$GOPATH`, rather than being cloned into any working directory. There are two ways to do this.
-
-- The easiest way with with `go get`. This will import the project, along with all dependencies, into your `$ GOPATH`.
-  ```
-  $ echo $GOPATH
-  /Users/myuser/go
-  
-  $ go get github.com/cloudfoundry/noaa
-  
-  $ ls ~/go/src/github.com/cloudfoundry/
-  noaa/         sonde-go/
-  ```
-
-- You can also manually clone the repo into your `$GOPATH`, but you then have to manually import dependencies.
-  ```
-  $ echo $GOPATH
-  /Users/myuser/go
-  
-  $ cd /Users/myuser/go/src/github.com/cloudfoundry
-  $ git clone git@github.com:cloudfoundry/noaa.git
-  $ cd noaa
-  $ go get ./...
-  ```
-
-## Sample Applications
-
-### Prerequisites
-
-In order to use the sample applications below, you will have to export the following environment variables:
+See the included sample applications. In order to use the samples, you will have to export the following environment variable:
 
 * `CF_ACCESS_TOKEN` - You can get this value by executing (`$ cf oauth-token`). Example: 
 
@@ -53,7 +25,6 @@ export CF_ACCESS_TOKEN="bearer eyJhbGciOiJSUzI1NiJ9.eyJqdGkiOiI3YmM2MzllOC0wZGM0
 ```bash
 export DOPPLER_ADDR="wss://doppler.10.244.0.34.xip.io:443"
 ```
-
 
 ###Application logs
 

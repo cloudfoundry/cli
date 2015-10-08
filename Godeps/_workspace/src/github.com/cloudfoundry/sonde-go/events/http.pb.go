@@ -7,12 +7,11 @@ package events
 import proto "github.com/gogo/protobuf/proto"
 import math "math"
 
-// discarding unused import gogoproto "github.com/gogo/protobuf/gogoproto"
-
-import github_com_gogo_protobuf_proto "github.com/gogo/protobuf/proto"
+// discarding unused import gogoproto "github.com/gogo/protobuf/gogoproto/gogo.pb"
 
 import io "io"
 import fmt "fmt"
+import github_com_gogo_protobuf_proto "github.com/gogo/protobuf/proto"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -56,143 +55,26 @@ func (x *PeerType) UnmarshalJSON(data []byte) error {
 type Method int32
 
 const (
-	Method_GET               Method = 1
-	Method_POST              Method = 2
-	Method_PUT               Method = 3
-	Method_DELETE            Method = 4
-	Method_HEAD              Method = 5
-	Method_ACL               Method = 6
-	Method_BASELINE_CONTROL  Method = 7
-	Method_BIND              Method = 8
-	Method_CHECKIN           Method = 9
-	Method_CHECKOUT          Method = 10
-	Method_CONNECT           Method = 11
-	Method_COPY              Method = 12
-	Method_DEBUG             Method = 13
-	Method_LABEL             Method = 14
-	Method_LINK              Method = 15
-	Method_LOCK              Method = 16
-	Method_MERGE             Method = 17
-	Method_MKACTIVITY        Method = 18
-	Method_MKCALENDAR        Method = 19
-	Method_MKCOL             Method = 20
-	Method_MKREDIRECTREF     Method = 21
-	Method_MKWORKSPACE       Method = 22
-	Method_MOVE              Method = 23
-	Method_OPTIONS           Method = 24
-	Method_ORDERPATCH        Method = 25
-	Method_PATCH             Method = 26
-	Method_PRI               Method = 27
-	Method_PROPFIND          Method = 28
-	Method_PROPPATCH         Method = 29
-	Method_REBIND            Method = 30
-	Method_REPORT            Method = 31
-	Method_SEARCH            Method = 32
-	Method_SHOWMETHOD        Method = 33
-	Method_SPACEJUMP         Method = 34
-	Method_TEXTSEARCH        Method = 35
-	Method_TRACE             Method = 36
-	Method_TRACK             Method = 37
-	Method_UNBIND            Method = 38
-	Method_UNCHECKOUT        Method = 39
-	Method_UNLINK            Method = 40
-	Method_UNLOCK            Method = 41
-	Method_UPDATE            Method = 42
-	Method_UPDATEREDIRECTREF Method = 43
-	Method_VERSION_CONTROL   Method = 44
+	Method_GET    Method = 1
+	Method_POST   Method = 2
+	Method_PUT    Method = 3
+	Method_DELETE Method = 4
+	Method_HEAD   Method = 5
 )
 
 var Method_name = map[int32]string{
-	1:  "GET",
-	2:  "POST",
-	3:  "PUT",
-	4:  "DELETE",
-	5:  "HEAD",
-	6:  "ACL",
-	7:  "BASELINE_CONTROL",
-	8:  "BIND",
-	9:  "CHECKIN",
-	10: "CHECKOUT",
-	11: "CONNECT",
-	12: "COPY",
-	13: "DEBUG",
-	14: "LABEL",
-	15: "LINK",
-	16: "LOCK",
-	17: "MERGE",
-	18: "MKACTIVITY",
-	19: "MKCALENDAR",
-	20: "MKCOL",
-	21: "MKREDIRECTREF",
-	22: "MKWORKSPACE",
-	23: "MOVE",
-	24: "OPTIONS",
-	25: "ORDERPATCH",
-	26: "PATCH",
-	27: "PRI",
-	28: "PROPFIND",
-	29: "PROPPATCH",
-	30: "REBIND",
-	31: "REPORT",
-	32: "SEARCH",
-	33: "SHOWMETHOD",
-	34: "SPACEJUMP",
-	35: "TEXTSEARCH",
-	36: "TRACE",
-	37: "TRACK",
-	38: "UNBIND",
-	39: "UNCHECKOUT",
-	40: "UNLINK",
-	41: "UNLOCK",
-	42: "UPDATE",
-	43: "UPDATEREDIRECTREF",
-	44: "VERSION_CONTROL",
+	1: "GET",
+	2: "POST",
+	3: "PUT",
+	4: "DELETE",
+	5: "HEAD",
 }
 var Method_value = map[string]int32{
-	"GET":               1,
-	"POST":              2,
-	"PUT":               3,
-	"DELETE":            4,
-	"HEAD":              5,
-	"ACL":               6,
-	"BASELINE_CONTROL":  7,
-	"BIND":              8,
-	"CHECKIN":           9,
-	"CHECKOUT":          10,
-	"CONNECT":           11,
-	"COPY":              12,
-	"DEBUG":             13,
-	"LABEL":             14,
-	"LINK":              15,
-	"LOCK":              16,
-	"MERGE":             17,
-	"MKACTIVITY":        18,
-	"MKCALENDAR":        19,
-	"MKCOL":             20,
-	"MKREDIRECTREF":     21,
-	"MKWORKSPACE":       22,
-	"MOVE":              23,
-	"OPTIONS":           24,
-	"ORDERPATCH":        25,
-	"PATCH":             26,
-	"PRI":               27,
-	"PROPFIND":          28,
-	"PROPPATCH":         29,
-	"REBIND":            30,
-	"REPORT":            31,
-	"SEARCH":            32,
-	"SHOWMETHOD":        33,
-	"SPACEJUMP":         34,
-	"TEXTSEARCH":        35,
-	"TRACE":             36,
-	"TRACK":             37,
-	"UNBIND":            38,
-	"UNCHECKOUT":        39,
-	"UNLINK":            40,
-	"UNLOCK":            41,
-	"UPDATE":            42,
-	"UPDATEREDIRECTREF": 43,
-	"VERSION_CONTROL":   44,
+	"GET":    1,
+	"POST":   2,
+	"PUT":    3,
+	"DELETE": 4,
+	"HEAD":   5,
 }
 
 func (x Method) Enum() *Method {
@@ -499,350 +381,907 @@ func init() {
 	proto.RegisterEnum("events.PeerType", PeerType_name, PeerType_value)
 	proto.RegisterEnum("events.Method", Method_name, Method_value)
 }
-func (m *HttpStart) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
+func (m *HttpStart) Unmarshal(data []byte) error {
+	var hasFields [1]uint64
+	l := len(data)
+	index := 0
+	for index < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if index >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[index]
+			index++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Timestamp = &v
+			hasFields[0] |= uint64(0x00000001)
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RequestId", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RequestId == nil {
+				m.RequestId = &UUID{}
+			}
+			if err := m.RequestId.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+			hasFields[0] |= uint64(0x00000002)
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PeerType", wireType)
+			}
+			var v PeerType
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (PeerType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.PeerType = &v
+			hasFields[0] |= uint64(0x00000004)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Method", wireType)
+			}
+			var v Method
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (Method(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Method = &v
+			hasFields[0] |= uint64(0x00000008)
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.Uri = &s
+			index = postIndex
+			hasFields[0] |= uint64(0x00000010)
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RemoteAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.RemoteAddress = &s
+			index = postIndex
+			hasFields[0] |= uint64(0x00000020)
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserAgent", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.UserAgent = &s
+			index = postIndex
+			hasFields[0] |= uint64(0x00000040)
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ParentRequestId", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ParentRequestId == nil {
+				m.ParentRequestId = &UUID{}
+			}
+			if err := m.ParentRequestId.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationId", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ApplicationId == nil {
+				m.ApplicationId = &UUID{}
+			}
+			if err := m.ApplicationId.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InstanceIndex", wireType)
+			}
+			var v int32
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.InstanceIndex = &v
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InstanceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.InstanceId = &s
+			index = postIndex
+		default:
+			var sizeOfWire int
+			for {
+				sizeOfWire++
+				wire >>= 7
+				if wire == 0 {
+					break
+				}
+			}
+			index -= sizeOfWire
+			skippy, err := github_com_gogo_protobuf_proto.Skip(data[index:])
+			if err != nil {
+				return err
+			}
+			if (index + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, data[index:index+skippy]...)
+			index += skippy
+		}
 	}
-	return data[:n], nil
-}
+	if hasFields[0]&uint64(0x00000001) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
+	}
+	if hasFields[0]&uint64(0x00000002) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
+	}
+	if hasFields[0]&uint64(0x00000004) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
+	}
+	if hasFields[0]&uint64(0x00000008) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("method")
+	}
+	if hasFields[0]&uint64(0x00000010) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
+	}
+	if hasFields[0]&uint64(0x00000020) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("remoteAddress")
+	}
+	if hasFields[0]&uint64(0x00000040) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("userAgent")
+	}
 
-func (m *HttpStart) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Timestamp == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
-	} else {
-		data[i] = 0x8
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.Timestamp))
-	}
-	if m.RequestId == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
-	} else {
-		data[i] = 0x12
-		i++
-		i = encodeVarintHttp(data, i, uint64(m.RequestId.Size()))
-		n1, err := m.RequestId.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	if m.PeerType == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
-	} else {
-		data[i] = 0x18
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.PeerType))
-	}
-	if m.Method == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("method")
-	} else {
-		data[i] = 0x20
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.Method))
-	}
-	if m.Uri == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
-	} else {
-		data[i] = 0x2a
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.Uri)))
-		i += copy(data[i:], *m.Uri)
-	}
-	if m.RemoteAddress == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("remoteAddress")
-	} else {
-		data[i] = 0x32
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.RemoteAddress)))
-		i += copy(data[i:], *m.RemoteAddress)
-	}
-	if m.UserAgent == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("userAgent")
-	} else {
-		data[i] = 0x3a
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.UserAgent)))
-		i += copy(data[i:], *m.UserAgent)
-	}
-	if m.ParentRequestId != nil {
-		data[i] = 0x42
-		i++
-		i = encodeVarintHttp(data, i, uint64(m.ParentRequestId.Size()))
-		n2, err := m.ParentRequestId.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
-	if m.ApplicationId != nil {
-		data[i] = 0x4a
-		i++
-		i = encodeVarintHttp(data, i, uint64(m.ApplicationId.Size()))
-		n3, err := m.ApplicationId.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	if m.InstanceIndex != nil {
-		data[i] = 0x50
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.InstanceIndex))
-	}
-	if m.InstanceId != nil {
-		data[i] = 0x5a
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.InstanceId)))
-		i += copy(data[i:], *m.InstanceId)
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(data[i:], m.XXX_unrecognized)
-	}
-	return i, nil
+	return nil
 }
+func (m *HttpStop) Unmarshal(data []byte) error {
+	var hasFields [1]uint64
+	l := len(data)
+	index := 0
+	for index < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if index >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[index]
+			index++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Timestamp = &v
+			hasFields[0] |= uint64(0x00000001)
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.Uri = &s
+			index = postIndex
+			hasFields[0] |= uint64(0x00000002)
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RequestId", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RequestId == nil {
+				m.RequestId = &UUID{}
+			}
+			if err := m.RequestId.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+			hasFields[0] |= uint64(0x00000004)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PeerType", wireType)
+			}
+			var v PeerType
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (PeerType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.PeerType = &v
+			hasFields[0] |= uint64(0x00000008)
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StatusCode", wireType)
+			}
+			var v int32
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.StatusCode = &v
+			hasFields[0] |= uint64(0x00000010)
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ContentLength", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ContentLength = &v
+			hasFields[0] |= uint64(0x00000020)
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationId", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ApplicationId == nil {
+				m.ApplicationId = &UUID{}
+			}
+			if err := m.ApplicationId.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		default:
+			var sizeOfWire int
+			for {
+				sizeOfWire++
+				wire >>= 7
+				if wire == 0 {
+					break
+				}
+			}
+			index -= sizeOfWire
+			skippy, err := github_com_gogo_protobuf_proto.Skip(data[index:])
+			if err != nil {
+				return err
+			}
+			if (index + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, data[index:index+skippy]...)
+			index += skippy
+		}
+	}
+	if hasFields[0]&uint64(0x00000001) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
+	}
+	if hasFields[0]&uint64(0x00000002) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
+	}
+	if hasFields[0]&uint64(0x00000004) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
+	}
+	if hasFields[0]&uint64(0x00000008) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
+	}
+	if hasFields[0]&uint64(0x00000010) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("statusCode")
+	}
+	if hasFields[0]&uint64(0x00000020) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("contentLength")
+	}
 
-func (m *HttpStop) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
+	return nil
 }
+func (m *HttpStartStop) Unmarshal(data []byte) error {
+	var hasFields [1]uint64
+	l := len(data)
+	index := 0
+	for index < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if index >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[index]
+			index++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartTimestamp", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.StartTimestamp = &v
+			hasFields[0] |= uint64(0x00000001)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StopTimestamp", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.StopTimestamp = &v
+			hasFields[0] |= uint64(0x00000002)
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RequestId", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RequestId == nil {
+				m.RequestId = &UUID{}
+			}
+			if err := m.RequestId.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+			hasFields[0] |= uint64(0x00000004)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PeerType", wireType)
+			}
+			var v PeerType
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (PeerType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.PeerType = &v
+			hasFields[0] |= uint64(0x00000008)
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Method", wireType)
+			}
+			var v Method
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (Method(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Method = &v
+			hasFields[0] |= uint64(0x00000010)
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.Uri = &s
+			index = postIndex
+			hasFields[0] |= uint64(0x00000020)
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RemoteAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.RemoteAddress = &s
+			index = postIndex
+			hasFields[0] |= uint64(0x00000040)
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserAgent", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.UserAgent = &s
+			index = postIndex
+			hasFields[0] |= uint64(0x00000080)
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StatusCode", wireType)
+			}
+			var v int32
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.StatusCode = &v
+			hasFields[0] |= uint64(0x00000100)
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ContentLength", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ContentLength = &v
+			hasFields[0] |= uint64(0x00000200)
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ParentRequestId", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ParentRequestId == nil {
+				m.ParentRequestId = &UUID{}
+			}
+			if err := m.ParentRequestId.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationId", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ApplicationId == nil {
+				m.ApplicationId = &UUID{}
+			}
+			if err := m.ApplicationId.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 13:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InstanceIndex", wireType)
+			}
+			var v int32
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.InstanceIndex = &v
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InstanceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.InstanceId = &s
+			index = postIndex
+		default:
+			var sizeOfWire int
+			for {
+				sizeOfWire++
+				wire >>= 7
+				if wire == 0 {
+					break
+				}
+			}
+			index -= sizeOfWire
+			skippy, err := github_com_gogo_protobuf_proto.Skip(data[index:])
+			if err != nil {
+				return err
+			}
+			if (index + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, data[index:index+skippy]...)
+			index += skippy
+		}
+	}
+	if hasFields[0]&uint64(0x00000001) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("startTimestamp")
+	}
+	if hasFields[0]&uint64(0x00000002) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("stopTimestamp")
+	}
+	if hasFields[0]&uint64(0x00000004) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
+	}
+	if hasFields[0]&uint64(0x00000008) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
+	}
+	if hasFields[0]&uint64(0x00000010) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("method")
+	}
+	if hasFields[0]&uint64(0x00000020) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
+	}
+	if hasFields[0]&uint64(0x00000040) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("remoteAddress")
+	}
+	if hasFields[0]&uint64(0x00000080) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("userAgent")
+	}
+	if hasFields[0]&uint64(0x00000100) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("statusCode")
+	}
+	if hasFields[0]&uint64(0x00000200) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("contentLength")
+	}
 
-func (m *HttpStop) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Timestamp == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
-	} else {
-		data[i] = 0x8
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.Timestamp))
-	}
-	if m.Uri == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
-	} else {
-		data[i] = 0x12
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.Uri)))
-		i += copy(data[i:], *m.Uri)
-	}
-	if m.RequestId == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
-	} else {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintHttp(data, i, uint64(m.RequestId.Size()))
-		n4, err := m.RequestId.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
-	}
-	if m.PeerType == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
-	} else {
-		data[i] = 0x20
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.PeerType))
-	}
-	if m.StatusCode == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("statusCode")
-	} else {
-		data[i] = 0x28
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.StatusCode))
-	}
-	if m.ContentLength == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("contentLength")
-	} else {
-		data[i] = 0x30
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.ContentLength))
-	}
-	if m.ApplicationId != nil {
-		data[i] = 0x3a
-		i++
-		i = encodeVarintHttp(data, i, uint64(m.ApplicationId.Size()))
-		n5, err := m.ApplicationId.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(data[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *HttpStartStop) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *HttpStartStop) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.StartTimestamp == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("startTimestamp")
-	} else {
-		data[i] = 0x8
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.StartTimestamp))
-	}
-	if m.StopTimestamp == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("stopTimestamp")
-	} else {
-		data[i] = 0x10
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.StopTimestamp))
-	}
-	if m.RequestId == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
-	} else {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintHttp(data, i, uint64(m.RequestId.Size()))
-		n6, err := m.RequestId.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n6
-	}
-	if m.PeerType == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
-	} else {
-		data[i] = 0x20
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.PeerType))
-	}
-	if m.Method == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("method")
-	} else {
-		data[i] = 0x28
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.Method))
-	}
-	if m.Uri == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
-	} else {
-		data[i] = 0x32
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.Uri)))
-		i += copy(data[i:], *m.Uri)
-	}
-	if m.RemoteAddress == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("remoteAddress")
-	} else {
-		data[i] = 0x3a
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.RemoteAddress)))
-		i += copy(data[i:], *m.RemoteAddress)
-	}
-	if m.UserAgent == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("userAgent")
-	} else {
-		data[i] = 0x42
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.UserAgent)))
-		i += copy(data[i:], *m.UserAgent)
-	}
-	if m.StatusCode == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("statusCode")
-	} else {
-		data[i] = 0x48
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.StatusCode))
-	}
-	if m.ContentLength == nil {
-		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("contentLength")
-	} else {
-		data[i] = 0x50
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.ContentLength))
-	}
-	if m.ParentRequestId != nil {
-		data[i] = 0x5a
-		i++
-		i = encodeVarintHttp(data, i, uint64(m.ParentRequestId.Size()))
-		n7, err := m.ParentRequestId.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	if m.ApplicationId != nil {
-		data[i] = 0x62
-		i++
-		i = encodeVarintHttp(data, i, uint64(m.ApplicationId.Size()))
-		n8, err := m.ApplicationId.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n8
-	}
-	if m.InstanceIndex != nil {
-		data[i] = 0x68
-		i++
-		i = encodeVarintHttp(data, i, uint64(*m.InstanceIndex))
-	}
-	if m.InstanceId != nil {
-		data[i] = 0x72
-		i++
-		i = encodeVarintHttp(data, i, uint64(len(*m.InstanceId)))
-		i += copy(data[i:], *m.InstanceId)
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(data[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func encodeFixed64Http(data []byte, offset int, v uint64) int {
-	data[offset] = uint8(v)
-	data[offset+1] = uint8(v >> 8)
-	data[offset+2] = uint8(v >> 16)
-	data[offset+3] = uint8(v >> 24)
-	data[offset+4] = uint8(v >> 32)
-	data[offset+5] = uint8(v >> 40)
-	data[offset+6] = uint8(v >> 48)
-	data[offset+7] = uint8(v >> 56)
-	return offset + 8
-}
-func encodeFixed32Http(data []byte, offset int, v uint32) int {
-	data[offset] = uint8(v)
-	data[offset+1] = uint8(v >> 8)
-	data[offset+2] = uint8(v >> 16)
-	data[offset+3] = uint8(v >> 24)
-	return offset + 4
-}
-func encodeVarintHttp(data []byte, offset int, v uint64) int {
-	for v >= 1<<7 {
-		data[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	data[offset] = uint8(v)
-	return offset + 1
+	return nil
 }
 func (m *HttpStart) Size() (n int) {
 	var l int
@@ -997,1065 +1436,348 @@ func sovHttp(x uint64) (n int) {
 func sozHttp(x uint64) (n int) {
 	return sovHttp(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *HttpStart) Unmarshal(data []byte) error {
-	var hasFields [1]uint64
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Timestamp = &v
-			hasFields[0] |= uint64(0x00000001)
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RequestId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.RequestId == nil {
-				m.RequestId = &UUID{}
-			}
-			if err := m.RequestId.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000002)
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PeerType", wireType)
-			}
-			var v PeerType
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (PeerType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.PeerType = &v
-			hasFields[0] |= uint64(0x00000004)
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Method", wireType)
-			}
-			var v Method
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (Method(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Method = &v
-			hasFields[0] |= uint64(0x00000008)
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Uri = &s
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000010)
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RemoteAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.RemoteAddress = &s
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000020)
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UserAgent", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.UserAgent = &s
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000040)
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ParentRequestId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ParentRequestId == nil {
-				m.ParentRequestId = &UUID{}
-			}
-			if err := m.ParentRequestId.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ApplicationId == nil {
-				m.ApplicationId = &UUID{}
-			}
-			if err := m.ApplicationId.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InstanceIndex", wireType)
-			}
-			var v int32
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.InstanceIndex = &v
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InstanceId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.InstanceId = &s
-			iNdEx = postIndex
-		default:
-			var sizeOfWire int
-			for {
-				sizeOfWire++
-				wire >>= 7
-				if wire == 0 {
-					break
-				}
-			}
-			iNdEx -= sizeOfWire
-			skippy, err := skipHttp(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthHttp
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, data[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
+func (m *HttpStart) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
 	}
-	if hasFields[0]&uint64(0x00000001) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
-	}
-	if hasFields[0]&uint64(0x00000002) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
-	}
-	if hasFields[0]&uint64(0x00000004) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
-	}
-	if hasFields[0]&uint64(0x00000008) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("method")
-	}
-	if hasFields[0]&uint64(0x00000010) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
-	}
-	if hasFields[0]&uint64(0x00000020) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("remoteAddress")
-	}
-	if hasFields[0]&uint64(0x00000040) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("userAgent")
-	}
-
-	return nil
-}
-func (m *HttpStop) Unmarshal(data []byte) error {
-	var hasFields [1]uint64
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Timestamp = &v
-			hasFields[0] |= uint64(0x00000001)
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Uri = &s
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000002)
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RequestId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.RequestId == nil {
-				m.RequestId = &UUID{}
-			}
-			if err := m.RequestId.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000004)
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PeerType", wireType)
-			}
-			var v PeerType
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (PeerType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.PeerType = &v
-			hasFields[0] |= uint64(0x00000008)
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StatusCode", wireType)
-			}
-			var v int32
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.StatusCode = &v
-			hasFields[0] |= uint64(0x00000010)
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContentLength", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ContentLength = &v
-			hasFields[0] |= uint64(0x00000020)
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ApplicationId == nil {
-				m.ApplicationId = &UUID{}
-			}
-			if err := m.ApplicationId.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			var sizeOfWire int
-			for {
-				sizeOfWire++
-				wire >>= 7
-				if wire == 0 {
-					break
-				}
-			}
-			iNdEx -= sizeOfWire
-			skippy, err := skipHttp(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthHttp
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, data[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-	if hasFields[0]&uint64(0x00000001) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
-	}
-	if hasFields[0]&uint64(0x00000002) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
-	}
-	if hasFields[0]&uint64(0x00000004) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
-	}
-	if hasFields[0]&uint64(0x00000008) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
-	}
-	if hasFields[0]&uint64(0x00000010) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("statusCode")
-	}
-	if hasFields[0]&uint64(0x00000020) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("contentLength")
-	}
-
-	return nil
-}
-func (m *HttpStartStop) Unmarshal(data []byte) error {
-	var hasFields [1]uint64
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StartTimestamp", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.StartTimestamp = &v
-			hasFields[0] |= uint64(0x00000001)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StopTimestamp", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.StopTimestamp = &v
-			hasFields[0] |= uint64(0x00000002)
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RequestId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.RequestId == nil {
-				m.RequestId = &UUID{}
-			}
-			if err := m.RequestId.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000004)
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PeerType", wireType)
-			}
-			var v PeerType
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (PeerType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.PeerType = &v
-			hasFields[0] |= uint64(0x00000008)
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Method", wireType)
-			}
-			var v Method
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (Method(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Method = &v
-			hasFields[0] |= uint64(0x00000010)
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Uri = &s
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000020)
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RemoteAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.RemoteAddress = &s
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000040)
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UserAgent", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.UserAgent = &s
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000080)
-		case 9:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StatusCode", wireType)
-			}
-			var v int32
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.StatusCode = &v
-			hasFields[0] |= uint64(0x00000100)
-		case 10:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContentLength", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ContentLength = &v
-			hasFields[0] |= uint64(0x00000200)
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ParentRequestId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ParentRequestId == nil {
-				m.ParentRequestId = &UUID{}
-			}
-			if err := m.ParentRequestId.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ApplicationId == nil {
-				m.ApplicationId = &UUID{}
-			}
-			if err := m.ApplicationId.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InstanceIndex", wireType)
-			}
-			var v int32
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.InstanceIndex = &v
-		case 14:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InstanceId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHttp
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.InstanceId = &s
-			iNdEx = postIndex
-		default:
-			var sizeOfWire int
-			for {
-				sizeOfWire++
-				wire >>= 7
-				if wire == 0 {
-					break
-				}
-			}
-			iNdEx -= sizeOfWire
-			skippy, err := skipHttp(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthHttp
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, data[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-	if hasFields[0]&uint64(0x00000001) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("startTimestamp")
-	}
-	if hasFields[0]&uint64(0x00000002) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("stopTimestamp")
-	}
-	if hasFields[0]&uint64(0x00000004) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
-	}
-	if hasFields[0]&uint64(0x00000008) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
-	}
-	if hasFields[0]&uint64(0x00000010) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("method")
-	}
-	if hasFields[0]&uint64(0x00000020) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
-	}
-	if hasFields[0]&uint64(0x00000040) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("remoteAddress")
-	}
-	if hasFields[0]&uint64(0x00000080) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("userAgent")
-	}
-	if hasFields[0]&uint64(0x00000100) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("statusCode")
-	}
-	if hasFields[0]&uint64(0x00000200) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("contentLength")
-	}
-
-	return nil
-}
-func skipHttp(data []byte) (n int, err error) {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for {
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if data[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-			return iNdEx, nil
-		case 1:
-			iNdEx += 8
-			return iNdEx, nil
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			iNdEx += length
-			if length < 0 {
-				return 0, ErrInvalidLengthHttp
-			}
-			return iNdEx, nil
-		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := data[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipHttp(data[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-			}
-			return iNdEx, nil
-		case 4:
-			return iNdEx, nil
-		case 5:
-			iNdEx += 4
-			return iNdEx, nil
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-	}
-	panic("unreachable")
+	return data[:n], nil
 }
 
-var (
-	ErrInvalidLengthHttp = fmt.Errorf("proto: negative length found during unmarshaling")
-)
+func (m *HttpStart) MarshalTo(data []byte) (n int, err error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Timestamp == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
+	} else {
+		data[i] = 0x8
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.Timestamp))
+	}
+	if m.RequestId == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
+	} else {
+		data[i] = 0x12
+		i++
+		i = encodeVarintHttp(data, i, uint64(m.RequestId.Size()))
+		n1, err := m.RequestId.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n1
+	}
+	if m.PeerType == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
+	} else {
+		data[i] = 0x18
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.PeerType))
+	}
+	if m.Method == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("method")
+	} else {
+		data[i] = 0x20
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.Method))
+	}
+	if m.Uri == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
+	} else {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.Uri)))
+		i += copy(data[i:], *m.Uri)
+	}
+	if m.RemoteAddress == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("remoteAddress")
+	} else {
+		data[i] = 0x32
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.RemoteAddress)))
+		i += copy(data[i:], *m.RemoteAddress)
+	}
+	if m.UserAgent == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("userAgent")
+	} else {
+		data[i] = 0x3a
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.UserAgent)))
+		i += copy(data[i:], *m.UserAgent)
+	}
+	if m.ParentRequestId != nil {
+		data[i] = 0x42
+		i++
+		i = encodeVarintHttp(data, i, uint64(m.ParentRequestId.Size()))
+		n2, err := m.ParentRequestId.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if m.ApplicationId != nil {
+		data[i] = 0x4a
+		i++
+		i = encodeVarintHttp(data, i, uint64(m.ApplicationId.Size()))
+		n3, err := m.ApplicationId.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	if m.InstanceIndex != nil {
+		data[i] = 0x50
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.InstanceIndex))
+	}
+	if m.InstanceId != nil {
+		data[i] = 0x5a
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.InstanceId)))
+		i += copy(data[i:], *m.InstanceId)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(data[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *HttpStop) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *HttpStop) MarshalTo(data []byte) (n int, err error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Timestamp == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("timestamp")
+	} else {
+		data[i] = 0x8
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.Timestamp))
+	}
+	if m.Uri == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
+	} else {
+		data[i] = 0x12
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.Uri)))
+		i += copy(data[i:], *m.Uri)
+	}
+	if m.RequestId == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
+	} else {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintHttp(data, i, uint64(m.RequestId.Size()))
+		n4, err := m.RequestId.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	if m.PeerType == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
+	} else {
+		data[i] = 0x20
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.PeerType))
+	}
+	if m.StatusCode == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("statusCode")
+	} else {
+		data[i] = 0x28
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.StatusCode))
+	}
+	if m.ContentLength == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("contentLength")
+	} else {
+		data[i] = 0x30
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.ContentLength))
+	}
+	if m.ApplicationId != nil {
+		data[i] = 0x3a
+		i++
+		i = encodeVarintHttp(data, i, uint64(m.ApplicationId.Size()))
+		n5, err := m.ApplicationId.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(data[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *HttpStartStop) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *HttpStartStop) MarshalTo(data []byte) (n int, err error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.StartTimestamp == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("startTimestamp")
+	} else {
+		data[i] = 0x8
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.StartTimestamp))
+	}
+	if m.StopTimestamp == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("stopTimestamp")
+	} else {
+		data[i] = 0x10
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.StopTimestamp))
+	}
+	if m.RequestId == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("requestId")
+	} else {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintHttp(data, i, uint64(m.RequestId.Size()))
+		n6, err := m.RequestId.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	if m.PeerType == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("peerType")
+	} else {
+		data[i] = 0x20
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.PeerType))
+	}
+	if m.Method == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("method")
+	} else {
+		data[i] = 0x28
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.Method))
+	}
+	if m.Uri == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("uri")
+	} else {
+		data[i] = 0x32
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.Uri)))
+		i += copy(data[i:], *m.Uri)
+	}
+	if m.RemoteAddress == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("remoteAddress")
+	} else {
+		data[i] = 0x3a
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.RemoteAddress)))
+		i += copy(data[i:], *m.RemoteAddress)
+	}
+	if m.UserAgent == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("userAgent")
+	} else {
+		data[i] = 0x42
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.UserAgent)))
+		i += copy(data[i:], *m.UserAgent)
+	}
+	if m.StatusCode == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("statusCode")
+	} else {
+		data[i] = 0x48
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.StatusCode))
+	}
+	if m.ContentLength == nil {
+		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("contentLength")
+	} else {
+		data[i] = 0x50
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.ContentLength))
+	}
+	if m.ParentRequestId != nil {
+		data[i] = 0x5a
+		i++
+		i = encodeVarintHttp(data, i, uint64(m.ParentRequestId.Size()))
+		n7, err := m.ParentRequestId.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	if m.ApplicationId != nil {
+		data[i] = 0x62
+		i++
+		i = encodeVarintHttp(data, i, uint64(m.ApplicationId.Size()))
+		n8, err := m.ApplicationId.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n8
+	}
+	if m.InstanceIndex != nil {
+		data[i] = 0x68
+		i++
+		i = encodeVarintHttp(data, i, uint64(*m.InstanceIndex))
+	}
+	if m.InstanceId != nil {
+		data[i] = 0x72
+		i++
+		i = encodeVarintHttp(data, i, uint64(len(*m.InstanceId)))
+		i += copy(data[i:], *m.InstanceId)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(data[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func encodeFixed64Http(data []byte, offset int, v uint64) int {
+	data[offset] = uint8(v)
+	data[offset+1] = uint8(v >> 8)
+	data[offset+2] = uint8(v >> 16)
+	data[offset+3] = uint8(v >> 24)
+	data[offset+4] = uint8(v >> 32)
+	data[offset+5] = uint8(v >> 40)
+	data[offset+6] = uint8(v >> 48)
+	data[offset+7] = uint8(v >> 56)
+	return offset + 8
+}
+func encodeFixed32Http(data []byte, offset int, v uint32) int {
+	data[offset] = uint8(v)
+	data[offset+1] = uint8(v >> 8)
+	data[offset+2] = uint8(v >> 16)
+	data[offset+3] = uint8(v >> 24)
+	return offset + 4
+}
+func encodeVarintHttp(data []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
+		data[offset] = uint8(v&0x7f | 0x80)
+		v >>= 7
+		offset++
+	}
+	data[offset] = uint8(v)
+	return offset + 1
+}

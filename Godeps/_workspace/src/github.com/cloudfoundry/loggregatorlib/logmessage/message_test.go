@@ -1,11 +1,10 @@
 package logmessage
 
 import (
-	"testing"
-	"time"
-
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
 )
 
 func TestGenerateMessageReturnsMessage(t *testing.T) {

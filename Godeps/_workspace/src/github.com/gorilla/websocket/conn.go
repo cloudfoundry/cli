@@ -88,23 +88,19 @@ func (e *netError) Error() string   { return e.msg }
 func (e *netError) Temporary() bool { return e.temporary }
 func (e *netError) Timeout() bool   { return e.timeout }
 
-// CloseError represents close frame.
-type CloseError struct {
-
-	// Code is defined in RFC 6455, section 11.7.
-	Code int
-
-	// Text is the optional text payload.
-	Text string
+// closeError represents close frame.
+type closeError struct {
+	code int
+	text string
 }
 
-func (e *CloseError) Error() string {
-	return "websocket: close " + strconv.Itoa(e.Code) + " " + e.Text
+func (e *closeError) Error() string {
+	return "websocket: close " + strconv.Itoa(e.code) + " " + e.text
 }
 
 var (
 	errWriteTimeout        = &netError{msg: "websocket: write timeout", timeout: true}
-	errUnexpectedEOF       = &CloseError{Code: CloseAbnormalClosure, Text: io.ErrUnexpectedEOF.Error()}
+	errUnexpectedEOF       = &closeError{code: CloseAbnormalClosure, text: io.ErrUnexpectedEOF.Error()}
 	errBadWriteOpCode      = errors.New("websocket: bad write message type")
 	errWriteClosed         = errors.New("websocket: write closed")
 	errInvalidControlFrame = errors.New("websocket: invalid control frame")
@@ -677,7 +673,12 @@ func (c *Conn) advanceFrame() (int, error) {
 			closeCode = int(binary.BigEndian.Uint16(payload))
 			closeText = string(payload[2:])
 		}
-		return noFrame, &CloseError{Code: closeCode, Text: closeText}
+		switch closeCode {
+		case CloseNormalClosure, CloseGoingAway:
+			return noFrame, io.EOF
+		default:
+			return noFrame, &closeError{code: closeCode, text: closeText}
+		}
 	}
 
 	return frameType, nil
@@ -800,7 +801,7 @@ func (c *Conn) SetPingHandler(h func(string) error) {
 	c.handlePing = h
 }
 
-// SetPongHandler sets the handler for pong messages received from the peer.
+// SetPongHandler sets then handler for pong messages received from the peer.
 // The default pong handler does nothing.
 func (c *Conn) SetPongHandler(h func(string) error) {
 	if h == nil {

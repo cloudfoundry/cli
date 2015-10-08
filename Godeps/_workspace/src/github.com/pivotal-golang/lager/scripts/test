@@ -1,0 +1,14 @@
+#!/bin/bash
+# vim: set ft=sh
+
+set -e -x
+
+FIRST_GOPATH=`echo $GOPATH | cut -d':' -f1`
+
+mkdir -p $FIRST_GOPATH/bin
+export PATH=$FIRST_GOPATH/bin:$PATH
+
+go get -t ./...
+
+go install github.com/onsi/ginkgo/ginkgo
+ginkgo -r -skipMeasurements -randomizeAllSpecs -race "$@"
