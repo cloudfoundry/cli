@@ -124,10 +124,10 @@ var _ = Describe("add-plugin-repo", func() {
 		Context("server does not has a '/list' endpoint", func() {
 			It("informs user of invalid repo server", func() {
 
-				callAddPluginRepo([]string{"repo", "http://google.com"})
+				callAddPluginRepo([]string{"repo", "https://google.com"})
 
 				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"http://google.com/list", "is not responding."},
+					[]string{"https://google.com/list", "is not responding."},
 				))
 			})
 		})
