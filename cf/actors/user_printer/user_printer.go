@@ -77,27 +77,24 @@ func (p *SpaceUsersPluginPrinter) PrintUsers(guid string, username string) {
 func (p *OrgUsersUiPrinter) PrintUsers(guid string, username string) {
 	for _, role := range p.Roles {
 		displayName := p.RoleDisplayNames[role]
-		users, apiErr := p.UserLister(guid, role)
-
+		users, err := p.UserLister(guid, role)
+		if err != nil {
+			p.Ui.Failed(T("Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
+				map[string]interface{}{
+					"Error":                err.Error(),
+					"OrgRoleToDisplayName": displayName,
+				}))
+			return
+		}
 		p.Ui.Say("")
 		p.Ui.Say("%s", terminal.HeaderColor(displayName))
 
 		if len(users) == 0 {
 			p.Ui.Say(fmt.Sprintf("  "+T("No %s found"), displayName))
-			continue
-		}
-
-		for _, user := range users {
-			p.Ui.Say("  %s", user.Username)
-		}
-
-		if apiErr != nil {
-			p.Ui.Failed(T("Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
-				map[string]interface{}{
-					"Error":                apiErr.Error(),
-					"OrgRoleToDisplayName": displayName,
-				}))
-			return
+		} else {
+			for _, user := range users {
+				p.Ui.Say("  %s", user.Username)
+			}
 		}
 	}
 }
