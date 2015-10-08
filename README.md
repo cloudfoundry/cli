@@ -48,7 +48,7 @@ Downloads
 | [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&source=github)
 | [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&source=github)
 
-**Note** When downloading from the command line, you may need to rename the file before untarring as the above urls are redirected. 
+**Note** When downloading from the command line, you may need to rename the file before untarring as the above links are redirected. 
 
 ```
 $ wget 'https://cli.run.pivotal.io/stable?release=linux64-binary&source=github' -O cf-darwin-amd64.tgz
