@@ -84,12 +84,11 @@ func (cmd *OrgUsers) getPrinter(c flags.FlagContext) user_printer.UserPrinter {
 	}
 
 	if cmd.pluginCall {
-		return &user_printer.OrgUsersPluginPrinter{
-			PluginModel: cmd.pluginModel,
-			Users:       user_printer.Users{Db: make(map[string]user_printer.UserWithRoles)},
-			UserLister:  cmd.getUserLister(),
-			Roles:       roles,
-		}
+		return user_printer.NewOrgUsersPluginPrinter(
+			cmd.pluginModel,
+			cmd.getUserLister(),
+			roles,
+		)
 	}
 	return &user_printer.OrgUsersUiPrinter{
 		Ui:         cmd.ui,
