@@ -8,7 +8,7 @@ export PATH=$PATH:$GOPATH/bin
 go get -u github.com/maximilien/i18n4go/i18n4go
 OUTPUT=$?
 if [ $OUTPUT -ne 0 ]; then
-  printf "Cannot install latest gi18n tool to verify strings:\n${OUTPUT}"
+  printf "Cannot install latest i18n tool to verify strings:\n${OUTPUT}"
   exit 1
 fi
 

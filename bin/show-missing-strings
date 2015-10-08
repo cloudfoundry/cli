@@ -6,10 +6,10 @@ CLI_ROOT = File.expand_path(File.join(File.dirname(__FILE__), ".."))
 
 @exit_code = 0
 
-def install_gi18n
-  output = `go get -u github.com/maximilien/i18n4go/gi18n`
+def install_i18n
+  output = `go get -u github.com/maximilien/i18n4go/i18n4go`
   unless $?.exitstatus == 0
-    puts "Cannot install latest gi18n tool to verify strings:\n#{output}"
+    puts "Cannot install latest i18n tool to verify strings:\n#{output}"
     exit 1
   end
 end
@@ -17,7 +17,7 @@ end
 def show_missing_strings(english_reference_file, directory_to_verify)
   puts "\nVerifying: \n\t #{english_reference_file} \n\t #{directory_to_verify}\n\n"
 
-  result = system("gi18n -c show-missing-strings -d #{directory_to_verify} --i18n-strings-filename #{english_reference_file}")
+  result = system("i18n4go -c show-missing-strings -d #{directory_to_verify} --i18n-strings-filename #{english_reference_file}")
   unless result
     puts "===> Failed Verification!"
     unless File.exist?(english_reference_file)
@@ -42,6 +42,6 @@ def run
   end
 end
 
-install_gi18n
+install_i18n
 run
 exit(@exit_code)

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/cloudfoundry/cli/cf/actors/user_printer"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -12,8 +13,6 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 	"github.com/simonleung8/flags"
 )
-
-var spaceRoles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 type SpaceUsers struct {
 	ui          terminal.UI
@@ -66,72 +65,48 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[1]
 	org := cmd.orgReq.GetOrganization()
 
-	space, apiErr := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	printer := cmd.getPrinter(org, space, cmd.config.Username())
+	printer.PrintUsers(space.Guid, cmd.config.Username())
+}
+
+func (cmd *SpaceUsers) getPrinter(org models.Organization, space models.Space, username string) user_printer.UserPrinter {
+	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
+
+	if cmd.pluginCall {
+		return user_printer.NewSpaceUsersPluginPrinter(
+			cmd.pluginModel,
+			cmd.getUserLister(),
+			roles,
+		)
 	}
 
 	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
 		map[string]interface{}{
 			"TargetOrg":   terminal.EntityNameColor(org.Name),
 			"TargetSpace": terminal.EntityNameColor(space.Name),
-			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			"CurrentUser": terminal.EntityNameColor(username),
 		}))
 
-	var spaceRoleToDisplayName = map[string]string{
-		models.SPACE_MANAGER:   T("SPACE MANAGER"),
-		models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
-		models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
+	return &user_printer.SpaceUsersUiPrinter{
+		Ui:         cmd.ui,
+		UserLister: cmd.getUserLister(),
+		Roles:      roles,
+		RoleDisplayNames: map[string]string{
+			models.SPACE_MANAGER:   T("SPACE MANAGER"),
+			models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
+			models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
+		},
 	}
+}
 
-	var usersMap = make(map[string]plugin_models.GetSpaceUsers_Model)
-
-	var users []models.UserFields
-	for _, role := range spaceRoles {
-		displayName := spaceRoleToDisplayName[role]
-
-		if cmd.config.IsMinApiVersion("2.21.0") {
-			users, apiErr = cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA(space.Guid, role)
-		} else {
-			users, apiErr = cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role)
-		}
-
-		cmd.ui.Say("")
-		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
-
-		for _, user := range users {
-			cmd.ui.Say("  %s", user.Username)
-
-			if cmd.pluginCall {
-				u, found := usersMap[user.Username]
-				if !found {
-					u = plugin_models.GetSpaceUsers_Model{}
-					u.Username = user.Username
-					u.Guid = user.Guid
-					u.IsAdmin = user.IsAdmin
-					u.Roles = make([]string, 1)
-					u.Roles[0] = role
-					usersMap[user.Username] = u
-				} else {
-					u.Roles = append(u.Roles, role)
-					usersMap[user.Username] = u
-				}
-			}
-		}
-
-		if apiErr != nil {
-			cmd.ui.Failed(T("Failed fetching space-users for role {{.SpaceRoleToDisplayName}}.\n{{.Error}}",
-				map[string]interface{}{
-					"Error":                  apiErr.Error(),
-					"SpaceRoleToDisplayName": displayName,
-				}))
-			return
-		}
+func (cmd *SpaceUsers) getUserLister() func(spaceGuid string, role string) ([]models.UserFields, error) {
+	if cmd.config.IsMinApiVersion("2.21.0") {
+		return cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA
 	}
-
-	if cmd.pluginCall {
-		for _, v := range usersMap {
-			*(cmd.pluginModel) = append(*(cmd.pluginModel), v)
-		}
-	}
+	return cmd.userRepo.ListUsersInSpaceForRole
 }
