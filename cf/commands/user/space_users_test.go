@@ -1,6 +1,8 @@
 package user_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -105,7 +107,7 @@ var _ = Describe("space-users command", func() {
 			Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("org1-guid"))
 			Expect(userRepo.ListUsersSpaceGuid).To(Equal("space1-guid"))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs).To(BeInDisplayOrder(
 				[]string{"Getting users in org", "Org1", "Space1", "my-user"},
 				[]string{"SPACE MANAGER"},
 				[]string{"user1"},
@@ -121,14 +123,28 @@ var _ = Describe("space-users command", func() {
 			BeforeEach(func() {
 				userRepo.ListUsersInSpaceForRole_CallCount = 0
 				userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount = 0
+				configRepo.SetApiVersion("2.22.0")
 			})
 
 			It("calls ListUsersInSpaceForRoleWithNoUAA()", func() {
-				configRepo.SetApiVersion("2.22.0")
 				runCommand("my-org", "my-sapce")
 
 				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount).To(BeNumerically(">=", 1))
 				Expect(userRepo.ListUsersInSpaceForRole_CallCount).To(Equal(0))
+			})
+
+			It("fails with an error when user network call fails", func() {
+				userRepo.StubbedError = func(string, role string) error {
+					if role == "SpaceManager" {
+						return errors.New("internet badness occurred")
+					}
+					return nil
+				}
+				runCommand("my-org", "my-space")
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"Getting users in org", "Org1"},
+					[]string{"internet badness occurred"},
+				))
 			})
 		})
 
@@ -143,15 +159,55 @@ var _ = Describe("space-users command", func() {
 		})
 	})
 
+	Context("when logged in and there are no non-managers in the space", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+
+			org := models.Organization{}
+			org.Name = "Org1"
+			org.Guid = "org1-guid"
+			space := models.Space{}
+			space.Name = "Space1"
+			space.Guid = "space1-guid"
+
+			requirementsFactory.Organization = org
+			spaceRepo.FindByNameInOrgSpace = space
+
+			user := models.UserFields{}
+			user.Username = "mr-pointy-hair"
+			userRepo.ListUsersByRole = map[string][]models.UserFields{
+				models.SPACE_MANAGER:   []models.UserFields{user},
+				models.SPACE_DEVELOPER: []models.UserFields{},
+				models.SPACE_AUDITOR:   []models.UserFields{},
+			}
+		})
+
+		It("shows a friendly message when there are no users in a role", func() {
+			runCommand("my-org", "my-space")
+
+			Expect(ui.Outputs).To(BeInDisplayOrder(
+				[]string{"Getting users in org"},
+				[]string{"SPACE MANAGER"},
+				[]string{"mr-pointy-hair"},
+				[]string{"SPACE DEVELOPER"},
+				[]string{"No SPACE DEVELOPER found"},
+				[]string{"SPACE AUDITOR"},
+				[]string{"No SPACE AUDITOR found"},
+			))
+		})
+	})
+
 	Describe("when invoked by a plugin", func() {
 		var (
 			pluginUserModel []plugin_models.GetSpaceUsers_Model
 		)
 
+		BeforeEach(func() {
+			configRepo.SetApiVersion("2.22.0")
+		})
+
 		Context("single roles", func() {
-
 			BeforeEach(func() {
-
 				org := models.Organization{}
 				org.Name = "the-org"
 				org.Guid = "the-org-guid"
@@ -214,15 +270,11 @@ var _ = Describe("space-users command", func() {
 						Fail("unexpected user: " + u.Username)
 					}
 				}
-
 			})
-
 		})
 
 		Context("multiple roles", func() {
-
 			BeforeEach(func() {
-
 				org := models.Organization{}
 				org.Name = "the-org"
 				org.Guid = "the-org-guid"
@@ -285,11 +337,7 @@ var _ = Describe("space-users command", func() {
 						Fail("unexpected user: " + u.Username)
 					}
 				}
-
 			})
-
 		})
-
 	})
-
 })
