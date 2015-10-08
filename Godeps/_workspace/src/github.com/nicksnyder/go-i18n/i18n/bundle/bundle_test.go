@@ -1,7 +1,6 @@
 package bundle
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/nicksnyder/go-i18n/i18n/language"
@@ -13,10 +12,6 @@ func TestMustLoadTranslationFile(t *testing.T) {
 }
 
 func TestLoadTranslationFile(t *testing.T) {
-	t.Skipf("not implemented")
-}
-
-func TestParseTranslationFileBytes(t *testing.T) {
 	t.Skipf("not implemented")
 }
 
@@ -33,116 +28,79 @@ func TestMustTfunc(t *testing.T) {
 	New().MustTfunc("invalid")
 }
 
-func TestTfuncAndLanguage(t *testing.T) {
+func TestTfunc(t *testing.T) {
 	b := New()
 	translationID := "translation_id"
-	englishLanguage := languageWithTag("en-US")
-	frenchLanguage := languageWithTag("fr-FR")
-	spanishLanguage := languageWithTag("es")
-	chineseLanguage := languageWithTag("zh-hans-cn")
-	englishTranslation := addFakeTranslation(t, b, englishLanguage, translationID)
-	frenchTranslation := addFakeTranslation(t, b, frenchLanguage, translationID)
-	spanishTranslation := addFakeTranslation(t, b, spanishLanguage, translationID)
-	chineseTranslation := addFakeTranslation(t, b, chineseLanguage, translationID)
+	englishTranslation := "en-US(translation_id)"
+	b.AddTranslation(language.MustParse("en-US")[0], testNewTranslation(t, map[string]interface{}{
+		"id":          translationID,
+		"translation": englishTranslation,
+	}))
+	frenchTranslation := "fr-FR(translation_id)"
+	b.AddTranslation(language.MustParse("fr-FR")[0], testNewTranslation(t, map[string]interface{}{
+		"id":          translationID,
+		"translation": frenchTranslation,
+	}))
+	spanishTranslation := "es(translation_id)"
+	b.AddTranslation(language.MustParse("es")[0], testNewTranslation(t, map[string]interface{}{
+		"id":          translationID,
+		"translation": spanishTranslation,
+	}))
 
 	tests := []struct {
-		languageIDs      []string
-		result           string
-		expectedLanguage *language.Language
+		languageIDs []string
+		valid       bool
+		result      string
 	}{
 		{
 			[]string{"invalid"},
+			false,
 			translationID,
-			nil,
 		},
 		{
 			[]string{"invalid", "invalid2"},
+			false,
 			translationID,
-			nil,
 		},
 		{
 			[]string{"invalid", "en-US"},
+			true,
 			englishTranslation,
-			englishLanguage,
 		},
 		{
 			[]string{"en-US", "invalid"},
+			true,
 			englishTranslation,
-			englishLanguage,
 		},
 		{
 			[]string{"en-US", "fr-FR"},
+			true,
 			englishTranslation,
-			englishLanguage,
 		},
 		{
 			[]string{"invalid", "es"},
+			true,
 			spanishTranslation,
-			spanishLanguage,
 		},
 		{
 			[]string{"zh-CN,fr-XX,es"},
+			true,
 			spanishTranslation,
-			spanishLanguage,
-		},
-		{
-			[]string{"fr"},
-			frenchTranslation,
-
-			// The language is still "fr" even though the translation is provided by "fr-FR"
-			languageWithTag("fr"),
-		},
-		{
-			[]string{"zh"},
-			chineseTranslation,
-
-			// The language is still "zh" even though the translation is provided by "zh-hans-cn"
-			languageWithTag("zh"),
-		},
-		{
-			[]string{"zh-hans"},
-			chineseTranslation,
-
-			// The language is still "zh-hans" even though the translation is provided by "zh-hans-cn"
-			languageWithTag("zh-hans"),
-		},
-		{
-			[]string{"zh-hans-cn"},
-			chineseTranslation,
-			languageWithTag("zh-hans-cn"),
 		},
 	}
 
 	for i, test := range tests {
-		tf, lang, err := b.TfuncAndLanguage(test.languageIDs[0], test.languageIDs[1:]...)
-		if err != nil && test.expectedLanguage != nil {
+		tf, err := b.Tfunc(test.languageIDs[0], test.languageIDs[1:]...)
+		if err != nil && test.valid {
 			t.Errorf("Tfunc(%v) = error{%q}; expected no error", test.languageIDs, err)
 		}
-		if err == nil && test.expectedLanguage == nil {
+		if err == nil && !test.valid {
 			t.Errorf("Tfunc(%v) = nil error; expected error", test.languageIDs)
 		}
 		if result := tf(translationID); result != test.result {
 			t.Errorf("translation %d was %s; expected %s", i, result, test.result)
 		}
-		if (lang == nil && test.expectedLanguage != nil) ||
-			(lang != nil && test.expectedLanguage == nil) ||
-			(lang != nil && test.expectedLanguage != nil && lang.String() != test.expectedLanguage.String()) {
-			t.Errorf("lang %d was %s; expected %s", i, lang, test.expectedLanguage)
-		}
 	}
-}
-
-func addFakeTranslation(t *testing.T, b *Bundle, lang *language.Language, translationID string) string {
-	translation := fakeTranslation(lang, translationID)
-	b.AddTranslation(lang, testNewTranslation(t, map[string]interface{}{
-		"id":          translationID,
-		"translation": translation,
-	}))
-	return translation
-}
-
-func fakeTranslation(lang *language.Language, translationID string) string {
-	return fmt.Sprintf("%s(%s)", lang.Tag, translationID)
 }
 
 func testNewTranslation(t *testing.T, data map[string]interface{}) translation.Translation {
@@ -153,109 +111,42 @@ func testNewTranslation(t *testing.T, data map[string]interface{}) translation.T
 	return translation
 }
 
-func languageWithTag(tag string) *language.Language {
-	return language.MustParse(tag)[0]
-}
+/*
 
-func createBenchmarkTranslateFunc(b *testing.B, translationTemplate interface{}, count interface{}, expected string) func(data interface{}) {
-	bundle := New()
-	lang := "en-US"
-	translationID := "translation_id"
-	translation, err := translation.NewTranslation(map[string]interface{}{
-		"id":          translationID,
-		"translation": translationTemplate,
-	})
+func bundleFixture(t *testing.T) *Bundle {
+	l, err := NewLocaleFromString("ar-EG")
 	if err != nil {
-		b.Fatal(err)
+		t.Errorf(err.Error())
 	}
-	bundle.AddTranslation(languageWithTag(lang), translation)
-	tf, err := bundle.Tfunc(lang)
-	if err != nil {
-		b.Fatal(err)
-	}
-	return func(data interface{}) {
-		var result string
-		if count == nil {
-			result = tf(translationID, data)
-		} else {
-			result = tf(translationID, count, data)
-		}
-		if result != expected {
-			b.Fatalf("expected %q, got %q", expected, result)
-		}
-	}
-}
-
-func createBenchmarkPluralTranslateFunc(b *testing.B) func(data interface{}) {
-	translationTemplate := map[string]interface{}{
-		"one":   "{{.Person}} is {{.Count}} year old.",
-		"other": "{{.Person}} is {{.Count}} years old.",
-	}
-	count := 26
-	expected := "Bob is 26 years old."
-	return createBenchmarkTranslateFunc(b, translationTemplate, count, expected)
-}
-
-func createBenchmarkNonPluralTranslateFunc(b *testing.B) func(data interface{}) {
-	translationTemplate := "Hi {{.Person}}!"
-	expected := "Hi Bob!"
-	return createBenchmarkTranslateFunc(b, translationTemplate, nil, expected)
-}
-
-func BenchmarkTranslateNonPluralWithMap(b *testing.B) {
-	data := map[string]interface{}{
-		"Person": "Bob",
-	}
-	tf := createBenchmarkNonPluralTranslateFunc(b)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		tf(data)
+	return &Bundle{
+		Locale: l,
+		localizedStrings: map[string]*LocalizedString{
+			"a": &LocalizedString{
+				ID: "a",
+			},
+			"b": &LocalizedString{
+				ID:          "b",
+				Translation: "translation(b)",
+			},
+			"c": &LocalizedString{
+				ID: "c",
+				Translations: map[PluralCategory]*PluralTranslation{
+					Zero:  NewPluralTranslation("zero(c)"),
+					One:   NewPluralTranslation("one(c)"),
+					Two:   NewPluralTranslation("two(c)"),
+					Few:   NewPluralTranslation("few(c)"),
+					Many:  NewPluralTranslation("many(c)"),
+					Other: NewPluralTranslation("other(c)"),
+				},
+			},
+			"d": &LocalizedString{
+				ID: "d",
+				Translations: map[PluralCategory]*PluralTranslation{
+					Zero: NewPluralTranslation("zero(d)"),
+					One:  NewPluralTranslation("one(d)"),
+				},
+			},
+		},
 	}
 }
-
-func BenchmarkTranslateNonPluralWithStruct(b *testing.B) {
-	data := struct{ Person string }{Person: "Bob"}
-	tf := createBenchmarkNonPluralTranslateFunc(b)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		tf(data)
-	}
-}
-
-func BenchmarkTranslateNonPluralWithStructPointer(b *testing.B) {
-	data := &struct{ Person string }{Person: "Bob"}
-	tf := createBenchmarkNonPluralTranslateFunc(b)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		tf(data)
-	}
-}
-
-func BenchmarkTranslatePluralWithMap(b *testing.B) {
-	data := map[string]interface{}{
-		"Person": "Bob",
-	}
-	tf := createBenchmarkPluralTranslateFunc(b)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		tf(data)
-	}
-}
-
-func BenchmarkTranslatePluralWithStruct(b *testing.B) {
-	data := struct{ Person string }{Person: "Bob"}
-	tf := createBenchmarkPluralTranslateFunc(b)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		tf(data)
-	}
-}
-
-func BenchmarkTranslatePluralWithStructPointer(b *testing.B) {
-	data := &struct{ Person string }{Person: "Bob"}
-	tf := createBenchmarkPluralTranslateFunc(b)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		tf(data)
-	}
-}
+*/

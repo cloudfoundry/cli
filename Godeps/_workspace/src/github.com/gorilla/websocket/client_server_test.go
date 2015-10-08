@@ -8,13 +8,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
-	"strings"
 	"testing"
 	"time"
 )
@@ -36,22 +34,22 @@ var cstDialer = Dialer{
 
 type cstHandler struct{ *testing.T }
 
-type cstServer struct {
+type Server struct {
 	*httptest.Server
 	URL string
 }
 
-func newServer(t *testing.T) *cstServer {
-	var s cstServer
+func newServer(t *testing.T) *Server {
+	var s Server
 	s.Server = httptest.NewServer(cstHandler{t})
-	s.URL = makeWsProto(s.Server.URL)
+	s.URL = "ws" + s.Server.URL[len("http"):]
 	return &s
 }
 
-func newTLSServer(t *testing.T) *cstServer {
-	var s cstServer
+func newTLSServer(t *testing.T) *Server {
+	var s Server
 	s.Server = httptest.NewTLSServer(cstHandler{t})
-	s.URL = makeWsProto(s.Server.URL)
+	s.URL = "ws" + s.Server.URL[len("http"):]
 	return &s
 }
 
@@ -97,10 +95,6 @@ func (t cstHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		t.Logf("Close: %v", err)
 		return
 	}
-}
-
-func makeWsProto(s string) string {
-	return "ws" + strings.TrimPrefix(s, "http")
 }
 
 func sendRecv(t *testing.T, ws *Conn) {
@@ -163,7 +157,6 @@ func TestDialTLS(t *testing.T) {
 }
 
 func xTestDialTLSBadCert(t *testing.T) {
-	// This test is deactivated because of noisy logging from the net/http package.
 	s := newTLSServer(t)
 	defer s.Close()
 
@@ -252,72 +245,5 @@ func TestHandshake(t *testing.T) {
 	if ws.Subprotocol() != "p1" {
 		t.Errorf("ws.Subprotocol() = %s, want p1", ws.Subprotocol())
 	}
-	sendRecv(t, ws)
-}
-
-func TestRespOnBadHandshake(t *testing.T) {
-	const expectedStatus = http.StatusGone
-	const expectedBody = "This is the response body."
-
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(expectedStatus)
-		io.WriteString(w, expectedBody)
-	}))
-	defer s.Close()
-
-	ws, resp, err := cstDialer.Dial(makeWsProto(s.URL), nil)
-	if err == nil {
-		ws.Close()
-		t.Fatalf("Dial: nil")
-	}
-
-	if resp == nil {
-		t.Fatalf("resp=nil, err=%v", err)
-	}
-
-	if resp.StatusCode != expectedStatus {
-		t.Errorf("resp.StatusCode=%d, want %d", resp.StatusCode, expectedStatus)
-	}
-
-	p, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("ReadFull(resp.Body) returned error %v", err)
-	}
-
-	if string(p) != expectedBody {
-		t.Errorf("resp.Body=%s, want %s", p, expectedBody)
-	}
-}
-
-// If the Host header is specified in `Dial()`, the server must receive it as
-// the `Host:` header.
-func TestHostHeader(t *testing.T) {
-	s := newServer(t)
-	defer s.Close()
-
-	specifiedHost := make(chan string, 1)
-	origHandler := s.Server.Config.Handler
-
-	// Capture the request Host header.
-	s.Server.Config.Handler = http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			specifiedHost <- r.Host
-			origHandler.ServeHTTP(w, r)
-		})
-
-	ws, resp, err := cstDialer.Dial(s.URL, http.Header{"Host": {"testhost"}})
-	if err != nil {
-		t.Fatalf("Dial: %v", err)
-	}
-	defer ws.Close()
-
-	if resp.StatusCode != http.StatusSwitchingProtocols {
-		t.Fatalf("resp.StatusCode = %v, want http.StatusSwitchingProtocols", resp.StatusCode)
-	}
-
-	if gotHost := <-specifiedHost; gotHost != "testhost" {
-		t.Fatalf("gotHost = %q, want \"testhost\"", gotHost)
-	}
-
 	sendRecv(t, ws)
 }

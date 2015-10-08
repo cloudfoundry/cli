@@ -21,12 +21,11 @@ package events
 import proto "github.com/gogo/protobuf/proto"
 import math "math"
 
-// discarding unused import gogoproto "github.com/gogo/protobuf/gogoproto"
-
-import github_com_gogo_protobuf_proto "github.com/gogo/protobuf/proto"
+// discarding unused import gogoproto "github.com/gogo/protobuf/gogoproto/gogo.pb"
 
 import io "io"
 import fmt "fmt"
+import github_com_gogo_protobuf_proto "github.com/gogo/protobuf/proto"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -218,6 +217,503 @@ func (m *Envelope) GetContainerMetric() *ContainerMetric {
 func init() {
 	proto.RegisterEnum("events.Envelope_EventType", Envelope_EventType_name, Envelope_EventType_value)
 }
+func (m *Envelope) Unmarshal(data []byte) error {
+	var hasFields [1]uint64
+	l := len(data)
+	index := 0
+	for index < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if index >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[index]
+			index++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Origin", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.Origin = &s
+			index = postIndex
+			hasFields[0] |= uint64(0x00000001)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EventType", wireType)
+			}
+			var v Envelope_EventType
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (Envelope_EventType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.EventType = &v
+			hasFields[0] |= uint64(0x00000002)
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Timestamp = &v
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deployment", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.Deployment = &s
+			index = postIndex
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Job", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.Job = &s
+			index = postIndex
+		case 15:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Index", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.Index = &s
+			index = postIndex
+		case 16:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ip", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + int(stringLen)
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[index:postIndex])
+			m.Ip = &s
+			index = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HttpStart", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.HttpStart == nil {
+				m.HttpStart = &HttpStart{}
+			}
+			if err := m.HttpStart.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HttpStop", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.HttpStop == nil {
+				m.HttpStop = &HttpStop{}
+			}
+			if err := m.HttpStop.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HttpStartStop", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.HttpStartStop == nil {
+				m.HttpStartStop = &HttpStartStop{}
+			}
+			if err := m.HttpStartStop.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LogMessage", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LogMessage == nil {
+				m.LogMessage = &LogMessage{}
+			}
+			if err := m.LogMessage.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValueMetric", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ValueMetric == nil {
+				m.ValueMetric = &ValueMetric{}
+			}
+			if err := m.ValueMetric.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CounterEvent", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CounterEvent == nil {
+				m.CounterEvent = &CounterEvent{}
+			}
+			if err := m.CounterEvent.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Error == nil {
+				m.Error = &Error{}
+			}
+			if err := m.Error.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ContainerMetric", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if index >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[index]
+				index++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			postIndex := index + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ContainerMetric == nil {
+				m.ContainerMetric = &ContainerMetric{}
+			}
+			if err := m.ContainerMetric.Unmarshal(data[index:postIndex]); err != nil {
+				return err
+			}
+			index = postIndex
+		default:
+			var sizeOfWire int
+			for {
+				sizeOfWire++
+				wire >>= 7
+				if wire == 0 {
+					break
+				}
+			}
+			index -= sizeOfWire
+			skippy, err := github_com_gogo_protobuf_proto.Skip(data[index:])
+			if err != nil {
+				return err
+			}
+			if (index + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, data[index:index+skippy]...)
+			index += skippy
+		}
+	}
+	if hasFields[0]&uint64(0x00000001) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("origin")
+	}
+	if hasFields[0]&uint64(0x00000002) == 0 {
+		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("eventType")
+	}
+
+	return nil
+}
+func (m *Envelope) Size() (n int) {
+	var l int
+	_ = l
+	if m.Origin != nil {
+		l = len(*m.Origin)
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.EventType != nil {
+		n += 1 + sovEnvelope(uint64(*m.EventType))
+	}
+	if m.Timestamp != nil {
+		n += 1 + sovEnvelope(uint64(*m.Timestamp))
+	}
+	if m.Deployment != nil {
+		l = len(*m.Deployment)
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.Job != nil {
+		l = len(*m.Job)
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.Index != nil {
+		l = len(*m.Index)
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.Ip != nil {
+		l = len(*m.Ip)
+		n += 2 + l + sovEnvelope(uint64(l))
+	}
+	if m.HttpStart != nil {
+		l = m.HttpStart.Size()
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.HttpStop != nil {
+		l = m.HttpStop.Size()
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.HttpStartStop != nil {
+		l = m.HttpStartStop.Size()
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.LogMessage != nil {
+		l = m.LogMessage.Size()
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.ValueMetric != nil {
+		l = m.ValueMetric.Size()
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.CounterEvent != nil {
+		l = m.CounterEvent.Size()
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.Error != nil {
+		l = m.Error.Size()
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.ContainerMetric != nil {
+		l = m.ContainerMetric.Size()
+		n += 1 + l + sovEnvelope(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func sovEnvelope(x uint64) (n int) {
+	for {
+		n++
+		x >>= 7
+		if x == 0 {
+			break
+		}
+	}
+	return n
+}
+func sozEnvelope(x uint64) (n int) {
+	return sovEnvelope(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
 func (m *Envelope) Marshal() (data []byte, err error) {
 	size := m.Size()
 	data = make([]byte, size)
@@ -228,7 +724,7 @@ func (m *Envelope) Marshal() (data []byte, err error) {
 	return data[:n], nil
 }
 
-func (m *Envelope) MarshalTo(data []byte) (int, error) {
+func (m *Envelope) MarshalTo(data []byte) (n int, err error) {
 	var i int
 	_ = i
 	var l int
@@ -247,6 +743,37 @@ func (m *Envelope) MarshalTo(data []byte) (int, error) {
 		data[i] = 0x10
 		i++
 		i = encodeVarintEnvelope(data, i, uint64(*m.EventType))
+	}
+	if m.Timestamp != nil {
+		data[i] = 0x30
+		i++
+		i = encodeVarintEnvelope(data, i, uint64(*m.Timestamp))
+	}
+	if m.Deployment != nil {
+		data[i] = 0x6a
+		i++
+		i = encodeVarintEnvelope(data, i, uint64(len(*m.Deployment)))
+		i += copy(data[i:], *m.Deployment)
+	}
+	if m.Job != nil {
+		data[i] = 0x72
+		i++
+		i = encodeVarintEnvelope(data, i, uint64(len(*m.Job)))
+		i += copy(data[i:], *m.Job)
+	}
+	if m.Index != nil {
+		data[i] = 0x7a
+		i++
+		i = encodeVarintEnvelope(data, i, uint64(len(*m.Index)))
+		i += copy(data[i:], *m.Index)
+	}
+	if m.Ip != nil {
+		data[i] = 0x82
+		i++
+		data[i] = 0x1
+		i++
+		i = encodeVarintEnvelope(data, i, uint64(len(*m.Ip)))
+		i += copy(data[i:], *m.Ip)
 	}
 	if m.HttpStart != nil {
 		data[i] = 0x22
@@ -267,11 +794,6 @@ func (m *Envelope) MarshalTo(data []byte) (int, error) {
 			return 0, err
 		}
 		i += n2
-	}
-	if m.Timestamp != nil {
-		data[i] = 0x30
-		i++
-		i = encodeVarintEnvelope(data, i, uint64(*m.Timestamp))
 	}
 	if m.HttpStartStop != nil {
 		data[i] = 0x3a
@@ -333,32 +855,6 @@ func (m *Envelope) MarshalTo(data []byte) (int, error) {
 		}
 		i += n8
 	}
-	if m.Deployment != nil {
-		data[i] = 0x6a
-		i++
-		i = encodeVarintEnvelope(data, i, uint64(len(*m.Deployment)))
-		i += copy(data[i:], *m.Deployment)
-	}
-	if m.Job != nil {
-		data[i] = 0x72
-		i++
-		i = encodeVarintEnvelope(data, i, uint64(len(*m.Job)))
-		i += copy(data[i:], *m.Job)
-	}
-	if m.Index != nil {
-		data[i] = 0x7a
-		i++
-		i = encodeVarintEnvelope(data, i, uint64(len(*m.Index)))
-		i += copy(data[i:], *m.Index)
-	}
-	if m.Ip != nil {
-		data[i] = 0x82
-		i++
-		data[i] = 0x1
-		i++
-		i = encodeVarintEnvelope(data, i, uint64(len(*m.Ip)))
-		i += copy(data[i:], *m.Ip)
-	}
 	if m.XXX_unrecognized != nil {
 		i += copy(data[i:], m.XXX_unrecognized)
 	}
@@ -392,638 +888,3 @@ func encodeVarintEnvelope(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	return offset + 1
 }
-func (m *Envelope) Size() (n int) {
-	var l int
-	_ = l
-	if m.Origin != nil {
-		l = len(*m.Origin)
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.EventType != nil {
-		n += 1 + sovEnvelope(uint64(*m.EventType))
-	}
-	if m.HttpStart != nil {
-		l = m.HttpStart.Size()
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.HttpStop != nil {
-		l = m.HttpStop.Size()
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.Timestamp != nil {
-		n += 1 + sovEnvelope(uint64(*m.Timestamp))
-	}
-	if m.HttpStartStop != nil {
-		l = m.HttpStartStop.Size()
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.LogMessage != nil {
-		l = m.LogMessage.Size()
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.ValueMetric != nil {
-		l = m.ValueMetric.Size()
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.CounterEvent != nil {
-		l = m.CounterEvent.Size()
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.Error != nil {
-		l = m.Error.Size()
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.ContainerMetric != nil {
-		l = m.ContainerMetric.Size()
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.Deployment != nil {
-		l = len(*m.Deployment)
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.Job != nil {
-		l = len(*m.Job)
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.Index != nil {
-		l = len(*m.Index)
-		n += 1 + l + sovEnvelope(uint64(l))
-	}
-	if m.Ip != nil {
-		l = len(*m.Ip)
-		n += 2 + l + sovEnvelope(uint64(l))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func sovEnvelope(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
-}
-func sozEnvelope(x uint64) (n int) {
-	return sovEnvelope(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *Envelope) Unmarshal(data []byte) error {
-	var hasFields [1]uint64
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Origin", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Origin = &s
-			iNdEx = postIndex
-			hasFields[0] |= uint64(0x00000001)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EventType", wireType)
-			}
-			var v Envelope_EventType
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (Envelope_EventType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.EventType = &v
-			hasFields[0] |= uint64(0x00000002)
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HttpStart", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.HttpStart == nil {
-				m.HttpStart = &HttpStart{}
-			}
-			if err := m.HttpStart.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HttpStop", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.HttpStop == nil {
-				m.HttpStop = &HttpStop{}
-			}
-			if err := m.HttpStop.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Timestamp = &v
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HttpStartStop", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.HttpStartStop == nil {
-				m.HttpStartStop = &HttpStartStop{}
-			}
-			if err := m.HttpStartStop.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LogMessage", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.LogMessage == nil {
-				m.LogMessage = &LogMessage{}
-			}
-			if err := m.LogMessage.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ValueMetric", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ValueMetric == nil {
-				m.ValueMetric = &ValueMetric{}
-			}
-			if err := m.ValueMetric.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CounterEvent", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CounterEvent == nil {
-				m.CounterEvent = &CounterEvent{}
-			}
-			if err := m.CounterEvent.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Error == nil {
-				m.Error = &Error{}
-			}
-			if err := m.Error.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContainerMetric", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ContainerMetric == nil {
-				m.ContainerMetric = &ContainerMetric{}
-			}
-			if err := m.ContainerMetric.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Deployment", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Deployment = &s
-			iNdEx = postIndex
-		case 14:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Job", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Job = &s
-			iNdEx = postIndex
-		case 15:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Index", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Index = &s
-			iNdEx = postIndex
-		case 16:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Ip", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Ip = &s
-			iNdEx = postIndex
-		default:
-			var sizeOfWire int
-			for {
-				sizeOfWire++
-				wire >>= 7
-				if wire == 0 {
-					break
-				}
-			}
-			iNdEx -= sizeOfWire
-			skippy, err := skipEnvelope(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthEnvelope
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, data[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-	if hasFields[0]&uint64(0x00000001) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("origin")
-	}
-	if hasFields[0]&uint64(0x00000002) == 0 {
-		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("eventType")
-	}
-
-	return nil
-}
-func skipEnvelope(data []byte) (n int, err error) {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for {
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if data[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-			return iNdEx, nil
-		case 1:
-			iNdEx += 8
-			return iNdEx, nil
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			iNdEx += length
-			if length < 0 {
-				return 0, ErrInvalidLengthEnvelope
-			}
-			return iNdEx, nil
-		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := data[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipEnvelope(data[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-			}
-			return iNdEx, nil
-		case 4:
-			return iNdEx, nil
-		case 5:
-			iNdEx += 4
-			return iNdEx, nil
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-	}
-	panic("unreachable")
-}
-
-var (
-	ErrInvalidLengthEnvelope = fmt.Errorf("proto: negative length found during unmarshaling")
-)

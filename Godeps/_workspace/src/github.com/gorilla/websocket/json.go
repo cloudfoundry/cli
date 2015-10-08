@@ -6,7 +6,6 @@ package websocket
 
 import (
 	"encoding/json"
-	"io"
 )
 
 // WriteJSON is deprecated, use c.WriteJSON instead.
@@ -46,10 +45,5 @@ func (c *Conn) ReadJSON(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = json.NewDecoder(r).Decode(v)
-	if err == io.EOF {
-		// One value is expected in the message.
-		err = io.ErrUnexpectedEOF
-	}
-	return err
+	return json.NewDecoder(r).Decode(v)
 }

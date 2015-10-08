@@ -12,17 +12,17 @@ after_success:
 - PATH=$HOME/gopath/bin:$PATH goveralls -coverprofile=all.coverprofile -repotoken=$COVERALLS_TOKEN
 install:
 - go get -d -v -t ./...
+- SHA=$(curl -s https://api.github.com/repos/cloudfoundry/loggregator/contents/src/github.com/gogo/protobuf | grep sha | cut -f4 -d\")
+- pushd $HOME/gopath/src/github.com/gogo/protobuf && git checkout $SHA && popd
 
 script: PATH=$HOME/gopath/bin:$PATH bin/test
 
 go:
 - 1.4
-- 1.5
 - tip
 
 matrix:
   allow_failures:
-    - go: 1.5
     - go: tip
 
 env:

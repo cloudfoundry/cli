@@ -147,7 +147,7 @@ func passed(state types.SpecState) bool {
 
 func errorForFailure(failure types.SpecFailure) error {
 	message := failure.Message
-	if failure.ForwardedPanic != "" {
+	if failure.ForwardedPanic != nil {
 		message += fmt.Sprintf("%s", failure.ForwardedPanic)
 	}
 

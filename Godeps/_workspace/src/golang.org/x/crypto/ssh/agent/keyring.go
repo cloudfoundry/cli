@@ -125,28 +125,27 @@ func (r *keyring) List() ([]*Key, error) {
 }
 
 // Insert adds a private key to the keyring. If a certificate
-// is given, that certificate is added as public key. Note that
-// any constraints given are ignored.
-func (r *keyring) Add(key AddedKey) error {
+// is given, that certificate is added as public key.
+func (r *keyring) Add(priv interface{}, cert *ssh.Certificate, comment string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.locked {
 		return errLocked
 	}
-	signer, err := ssh.NewSignerFromKey(key.PrivateKey)
+	signer, err := ssh.NewSignerFromKey(priv)
 
 	if err != nil {
 		return err
 	}
 
-	if cert := key.Certificate; cert != nil {
+	if cert != nil {
 		signer, err = ssh.NewCertSigner(cert, signer)
 		if err != nil {
 			return err
 		}
 	}
 
-	r.keys = append(r.keys, privKey{signer, key.Comment})
+	r.keys = append(r.keys, privKey{signer, comment})
 
 	return nil
 }

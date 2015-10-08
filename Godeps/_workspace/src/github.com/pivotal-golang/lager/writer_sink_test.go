@@ -31,7 +31,7 @@ var _ = Describe("WriterSink", func() {
 		})
 
 		It("writes to the given writer", func() {
-			Expect(writer.Copy()).To(Equal([]byte("hello world\n")))
+			Ω(writer.Copy()).Should(Equal([]byte("hello world\n")))
 		})
 	})
 
@@ -41,7 +41,7 @@ var _ = Describe("WriterSink", func() {
 		})
 
 		It("does not write to the given writer", func() {
-			Expect(writer.Copy()).To(Equal([]byte{}))
+			Ω(writer.Copy()).Should(Equal([]byte{}))
 		})
 	})
 
@@ -66,7 +66,7 @@ var _ = Describe("WriterSink", func() {
 				expectedBytes = append(expectedBytes, []byte(content)...)
 				expectedBytes = append(expectedBytes, []byte("\n")...)
 			}
-			Expect(writer.Copy()).To(Equal(expectedBytes))
+			Ω(writer.Copy()).Should(Equal(expectedBytes))
 		})
 	})
 })
