@@ -244,6 +244,10 @@ var _ = Describe("org-users command", func() {
 			pluginUserModel []plugin_models.GetOrgUsers_Model
 		)
 
+		BeforeEach(func() {
+			configRepo.SetApiVersion("2.22.0")
+		})
+
 		Context("single roles", func() {
 
 			BeforeEach(func() {
