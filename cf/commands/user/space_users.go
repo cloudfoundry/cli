@@ -78,12 +78,11 @@ func (cmd *SpaceUsers) getPrinter(org models.Organization, space models.Space, u
 	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 	if cmd.pluginCall {
-		return &user_printer.SpaceUsersPluginPrinter{
-			PluginModel: cmd.pluginModel,
-			Users:       user_printer.Users{Db: make(map[string]user_printer.UserWithRoles)},
-			UserLister:  cmd.getUserLister(),
-			Roles:       roles,
-		}
+		return user_printer.NewSpaceUsersPluginPrinter(
+			cmd.pluginModel,
+			cmd.getUserLister(),
+			roles,
+		)
 	}
 
 	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
