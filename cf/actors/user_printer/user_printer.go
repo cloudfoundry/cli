@@ -13,19 +13,19 @@ type UserPrinter interface {
 	PrintUsers(guid string, username string)
 }
 
-type SpaceUsersPluginPrinter struct {
+type spaceUsersPluginPrinter struct {
 	UserPrinter
-	Roles       []string
-	UserLister  func(spaceGuid string, role string) ([]models.UserFields, error)
-	PluginModel *[]plugin_models.GetSpaceUsers_Model
+	roles       []string
+	userLister  func(spaceGuid string, role string) ([]models.UserFields, error)
+	pluginModel *[]plugin_models.GetSpaceUsers_Model
 	users       users
 }
 
-type OrgUsersPluginPrinter struct {
+type orgUsersPluginPrinter struct {
 	UserPrinter
-	Roles       []string
-	UserLister  func(orgGuid string, role string) ([]models.UserFields, error)
-	PluginModel *[]plugin_models.GetOrgUsers_Model
+	roles       []string
+	userLister  func(orgGuid string, role string) ([]models.UserFields, error)
+	pluginModel *[]plugin_models.GetOrgUsers_Model
 	users       users
 }
 
@@ -47,7 +47,7 @@ type OrgUsersUiPrinter struct {
 
 type userWithRoles struct {
 	models.UserFields
-	Roles []string
+	roles []string
 }
 
 type users struct {
@@ -58,12 +58,12 @@ func NewOrgUsersPluginPrinter(
 	pluginModel *[]plugin_models.GetOrgUsers_Model,
 	userLister func(guid string, role string) ([]models.UserFields, error),
 	roles []string,
-) (printer *OrgUsersPluginPrinter) {
-	return &OrgUsersPluginPrinter{
-		PluginModel: pluginModel,
+) (printer *orgUsersPluginPrinter) {
+	return &orgUsersPluginPrinter{
+		pluginModel: pluginModel,
 		users:       users{db: make(map[string]userWithRoles)},
-		UserLister:  userLister,
-		Roles:       roles,
+		userLister:  userLister,
+		roles:       roles,
 	}
 }
 
@@ -71,33 +71,33 @@ func NewSpaceUsersPluginPrinter(
 	pluginModel *[]plugin_models.GetSpaceUsers_Model,
 	userLister func(guid string, role string) ([]models.UserFields, error),
 	roles []string,
-) (printer *SpaceUsersPluginPrinter) {
-	return &SpaceUsersPluginPrinter{
-		PluginModel: pluginModel,
+) (printer *spaceUsersPluginPrinter) {
+	return &spaceUsersPluginPrinter{
+		pluginModel: pluginModel,
 		users:       users{db: make(map[string]userWithRoles)},
-		UserLister:  userLister,
-		Roles:       roles,
+		userLister:  userLister,
+		roles:       roles,
 	}
 }
 
-func (p *OrgUsersPluginPrinter) PrintUsers(guid string, username string) {
-	for _, role := range p.Roles {
-		users, _ := p.UserLister(guid, role)
+func (p *orgUsersPluginPrinter) PrintUsers(guid string, username string) {
+	for _, role := range p.roles {
+		users, _ := p.userLister(guid, role)
 		for _, user := range users {
-			p.users.StoreAppendingRole(role, user.Username, user.Guid, user.IsAdmin)
+			p.users.storeAppendingRole(role, user.Username, user.Guid, user.IsAdmin)
 		}
 	}
-	*(p.PluginModel) = p.users.AsOrgUsers()
+	*(p.pluginModel) = p.users.asOrgUsers()
 }
 
-func (p *SpaceUsersPluginPrinter) PrintUsers(guid string, username string) {
-	for _, role := range p.Roles {
-		users, _ := p.UserLister(guid, role)
+func (p *spaceUsersPluginPrinter) PrintUsers(guid string, username string) {
+	for _, role := range p.roles {
+		users, _ := p.userLister(guid, role)
 		for _, user := range users {
-			p.users.StoreAppendingRole(role, user.Username, user.Guid, user.IsAdmin)
+			p.users.storeAppendingRole(role, user.Username, user.Guid, user.IsAdmin)
 		}
 	}
-	*(p.PluginModel) = p.users.AsSpaceUsers()
+	*(p.pluginModel) = p.users.asSpaceUsers()
 }
 
 func (p *OrgUsersUiPrinter) PrintUsers(guid string, username string) {
@@ -150,34 +150,34 @@ func (p *SpaceUsersUiPrinter) PrintUsers(guid string, username string) {
 	}
 }
 
-func (c *users) StoreAppendingRole(role string, username string, guid string, isAdmin bool) {
+func (c *users) storeAppendingRole(role string, username string, guid string, isAdmin bool) {
 	u := c.db[username]
-	u.Roles = append(u.Roles, role)
+	u.roles = append(u.roles, role)
 	u.Username = username
 	u.Guid = guid
 	u.IsAdmin = isAdmin
 	c.db[username] = u
 }
 
-func (c *users) AsOrgUsers() (coll []plugin_models.GetOrgUsers_Model) {
+func (c *users) asOrgUsers() (coll []plugin_models.GetOrgUsers_Model) {
 	for _, u := range c.db {
 		coll = append(coll, plugin_models.GetOrgUsers_Model{
 			Guid:     u.Guid,
 			Username: u.Username,
 			IsAdmin:  u.IsAdmin,
-			Roles:    u.Roles,
+			Roles:    u.roles,
 		})
 	}
 	return coll
 }
 
-func (c *users) AsSpaceUsers() (coll []plugin_models.GetSpaceUsers_Model) {
+func (c *users) asSpaceUsers() (coll []plugin_models.GetSpaceUsers_Model) {
 	for _, u := range c.db {
 		coll = append(coll, plugin_models.GetSpaceUsers_Model{
 			Guid:     u.Guid,
 			Username: u.Username,
 			IsAdmin:  u.IsAdmin,
-			Roles:    u.Roles,
+			Roles:    u.roles,
 		})
 	}
 	return coll
