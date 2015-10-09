@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"errors"
 	"os"
 
 	"github.com/cloudfoundry/cli/cf"
@@ -162,6 +163,10 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
 	retVal.Name = cmd.cliConfig.OrganizationFields().Name
 	retVal.Guid = cmd.cliConfig.OrganizationFields().Guid
+
+	if retVal.Name == "" || retVal.Guid == "" {
+		return errors.New("No organization currently targeted")
+	}
 	return nil
 }
 
@@ -169,6 +174,9 @@ func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) 
 	retVal.Name = cmd.cliConfig.SpaceFields().Name
 	retVal.Guid = cmd.cliConfig.SpaceFields().Guid
 
+	if retVal.Name == "" || retVal.Guid == "" {
+		return errors.New("No space currently targeted")
+	}
 	return nil
 }
 

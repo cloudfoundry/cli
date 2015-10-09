@@ -467,65 +467,121 @@ var _ = Describe("Server", func() {
 			})
 
 			Context(".GetCurrentOrg", func() {
-				BeforeEach(func() {
-					config.SetOrganizationFields(models.OrganizationFields{
-						Guid: "test-guid",
-						Name: "test-org",
-						QuotaDefinition: models.QuotaFields{
-							Guid:                    "guid123",
-							Name:                    "quota123",
-							MemoryLimit:             128,
-							InstanceMemoryLimit:     16,
-							RoutesLimit:             5,
-							ServicesLimit:           6,
-							NonBasicServicesAllowed: true,
-						},
+				Describe("When an organization is targeted", func() {
+					BeforeEach(func() {
+						config.SetOrganizationFields(models.OrganizationFields{
+							Guid: "test-guid",
+							Name: "test-org",
+							QuotaDefinition: models.QuotaFields{
+								Guid:                    "guid123",
+								Name:                    "quota123",
+								MemoryLimit:             128,
+								InstanceMemoryLimit:     16,
+								RoutesLimit:             5,
+								ServicesLimit:           6,
+								NonBasicServicesAllowed: true,
+							},
+						})
+
+						rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil)
+						err := rpcService.Start()
+						Expect(err).ToNot(HaveOccurred())
+
+						pingCli(rpcService.Port())
 					})
 
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil)
-					err := rpcService.Start()
-					Expect(err).ToNot(HaveOccurred())
+					It("populates the plugin Organization object with the current org settings in config", func() {
+						client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+						Expect(err).ToNot(HaveOccurred())
 
-					pingCli(rpcService.Port())
+						var org plugin_models.Organization
+						err = client.Call("CliRpcCmd.GetCurrentOrg", "", &org)
+
+						Expect(err).ToNot(HaveOccurred())
+						Expect(org.Name).To(Equal("test-org"))
+						Expect(org.Guid).To(Equal("test-guid"))
+					})
 				})
 
-				It("populates the plugin Organization object with the current org settings in config", func() {
-					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-					Expect(err).ToNot(HaveOccurred())
+				Describe("When no organization is targeted", func() {
+					BeforeEach(func() {
+						config.SetOrganizationFields(models.OrganizationFields{
+							Guid: "",
+							Name: "",
+						})
 
-					var org plugin_models.Organization
-					err = client.Call("CliRpcCmd.GetCurrentOrg", "", &org)
+						rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil)
+						err := rpcService.Start()
+						Expect(err).ToNot(HaveOccurred())
 
-					Expect(err).ToNot(HaveOccurred())
-					Expect(org.Name).To(Equal("test-org"))
-					Expect(org.Guid).To(Equal("test-guid"))
+						pingCli(rpcService.Port())
+					})
+
+					It("returns an error", func() {
+						client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+						Expect(err).ToNot(HaveOccurred())
+
+						var org plugin_models.Organization
+						err = client.Call("CliRpcCmd.GetCurrentOrg", "", &org)
+
+						Ω(err).To(HaveOccurred())
+						Ω(err.Error()).To(ContainSubstring("No organization currently targeted"))
+					})
 				})
 			})
 
 			Context(".GetCurrentSpace", func() {
-				BeforeEach(func() {
-					config.SetSpaceFields(models.SpaceFields{
-						Guid: "space-guid",
-						Name: "space-name",
+				Describe("when a space is targeted", func() {
+					BeforeEach(func() {
+						config.SetSpaceFields(models.SpaceFields{
+							Guid: "space-guid",
+							Name: "space-name",
+						})
+
+						rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil)
+						err := rpcService.Start()
+						Expect(err).ToNot(HaveOccurred())
+
+						pingCli(rpcService.Port())
 					})
 
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil)
-					err := rpcService.Start()
-					Expect(err).ToNot(HaveOccurred())
+					It("populates the plugin Space object with the current space settings in config", func() {
+						client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+						Expect(err).ToNot(HaveOccurred())
 
-					pingCli(rpcService.Port())
+						var space plugin_models.Space
+						err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
+
+						Expect(err).ToNot(HaveOccurred())
+						Expect(space.Name).To(Equal("space-name"))
+						Expect(space.Guid).To(Equal("space-guid"))
+					})
 				})
 
-				It("populates the plugin Space object with the current space settings in config", func() {
-					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-					Expect(err).ToNot(HaveOccurred())
+				Describe("when no space is targeted", func() {
+					BeforeEach(func() {
+						config.SetSpaceFields(models.SpaceFields{
+							Guid: "",
+							Name: "",
+						})
 
-					var space plugin_models.Space
-					err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
+						rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil)
+						err := rpcService.Start()
+						Expect(err).ToNot(HaveOccurred())
 
-					Expect(err).ToNot(HaveOccurred())
-					Expect(space.Name).To(Equal("space-name"))
-					Expect(space.Guid).To(Equal("space-guid"))
+						pingCli(rpcService.Port())
+					})
+
+					It("returns an error", func() {
+						client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+						Expect(err).ToNot(HaveOccurred())
+
+						var space plugin_models.Space
+						err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
+
+						Ω(err).To(HaveOccurred())
+						Ω(err.Error()).To(ContainSubstring("No space currently targeted"))
+					})
 				})
 			})
 
