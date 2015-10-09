@@ -12,115 +12,121 @@ type FakeReadWriter struct {
 	ApiEndpointStub        func() string
 	apiEndpointMutex       sync.RWMutex
 	apiEndpointArgsForCall []struct{}
-	apiEndpointReturns     struct {
+	apiEndpointReturns struct {
 		result1 string
 	}
 	ApiVersionStub        func() string
 	apiVersionMutex       sync.RWMutex
 	apiVersionArgsForCall []struct{}
-	apiVersionReturns     struct {
+	apiVersionReturns struct {
 		result1 string
 	}
 	HasAPIEndpointStub        func() bool
 	hasAPIEndpointMutex       sync.RWMutex
 	hasAPIEndpointArgsForCall []struct{}
-	hasAPIEndpointReturns     struct {
+	hasAPIEndpointReturns struct {
 		result1 bool
 	}
 	AuthenticationEndpointStub        func() string
 	authenticationEndpointMutex       sync.RWMutex
 	authenticationEndpointArgsForCall []struct{}
-	authenticationEndpointReturns     struct {
+	authenticationEndpointReturns struct {
 		result1 string
 	}
 	LoggregatorEndpointStub        func() string
 	loggregatorEndpointMutex       sync.RWMutex
 	loggregatorEndpointArgsForCall []struct{}
-	loggregatorEndpointReturns     struct {
+	loggregatorEndpointReturns struct {
 		result1 string
 	}
 	DopplerEndpointStub        func() string
 	dopplerEndpointMutex       sync.RWMutex
 	dopplerEndpointArgsForCall []struct{}
-	dopplerEndpointReturns     struct {
+	dopplerEndpointReturns struct {
 		result1 string
 	}
 	UaaEndpointStub        func() string
 	uaaEndpointMutex       sync.RWMutex
 	uaaEndpointArgsForCall []struct{}
-	uaaEndpointReturns     struct {
+	uaaEndpointReturns struct {
 		result1 string
 	}
 	RoutingApiEndpointStub        func() string
 	routingApiEndpointMutex       sync.RWMutex
 	routingApiEndpointArgsForCall []struct{}
-	routingApiEndpointReturns     struct {
+	routingApiEndpointReturns struct {
 		result1 string
 	}
 	AccessTokenStub        func() string
 	accessTokenMutex       sync.RWMutex
 	accessTokenArgsForCall []struct{}
-	accessTokenReturns     struct {
+	accessTokenReturns struct {
+		result1 string
+	}
+	SSHOAuthClientStub        func() string
+	sSHOAuthClientMutex       sync.RWMutex
+	sSHOAuthClientArgsForCall []struct{}
+	sSHOAuthClientReturns struct {
 		result1 string
 	}
 	RefreshTokenStub        func() string
 	refreshTokenMutex       sync.RWMutex
 	refreshTokenArgsForCall []struct{}
-	refreshTokenReturns     struct {
+	refreshTokenReturns struct {
 		result1 string
 	}
 	OrganizationFieldsStub        func() models.OrganizationFields
 	organizationFieldsMutex       sync.RWMutex
 	organizationFieldsArgsForCall []struct{}
-	organizationFieldsReturns     struct {
+	organizationFieldsReturns struct {
 		result1 models.OrganizationFields
 	}
 	HasOrganizationStub        func() bool
 	hasOrganizationMutex       sync.RWMutex
 	hasOrganizationArgsForCall []struct{}
-	hasOrganizationReturns     struct {
+	hasOrganizationReturns struct {
 		result1 bool
 	}
 	SpaceFieldsStub        func() models.SpaceFields
 	spaceFieldsMutex       sync.RWMutex
 	spaceFieldsArgsForCall []struct{}
-	spaceFieldsReturns     struct {
+	spaceFieldsReturns struct {
 		result1 models.SpaceFields
 	}
 	HasSpaceStub        func() bool
 	hasSpaceMutex       sync.RWMutex
 	hasSpaceArgsForCall []struct{}
-	hasSpaceReturns     struct {
+	hasSpaceReturns struct {
 		result1 bool
 	}
 	UsernameStub        func() string
 	usernameMutex       sync.RWMutex
 	usernameArgsForCall []struct{}
-	usernameReturns     struct {
+	usernameReturns struct {
 		result1 string
 	}
 	UserGuidStub        func() string
 	userGuidMutex       sync.RWMutex
 	userGuidArgsForCall []struct{}
-	userGuidReturns     struct {
+	userGuidReturns struct {
 		result1 string
 	}
 	UserEmailStub        func() string
 	userEmailMutex       sync.RWMutex
 	userEmailArgsForCall []struct{}
-	userEmailReturns     struct {
+	userEmailReturns struct {
 		result1 string
 	}
 	IsLoggedInStub        func() bool
 	isLoggedInMutex       sync.RWMutex
 	isLoggedInArgsForCall []struct{}
-	isLoggedInReturns     struct {
+	isLoggedInReturns struct {
 		result1 bool
 	}
 	IsSSLDisabledStub        func() bool
 	isSSLDisabledMutex       sync.RWMutex
 	isSSLDisabledArgsForCall []struct{}
-	isSSLDisabledReturns     struct {
+	isSSLDisabledReturns struct {
 		result1 bool
 	}
 	IsMinApiVersionStub        func(string) bool
@@ -142,48 +148,48 @@ type FakeReadWriter struct {
 	MinCliVersionStub        func() string
 	minCliVersionMutex       sync.RWMutex
 	minCliVersionArgsForCall []struct{}
-	minCliVersionReturns     struct {
+	minCliVersionReturns struct {
 		result1 string
 	}
 	MinRecommendedCliVersionStub        func() string
 	minRecommendedCliVersionMutex       sync.RWMutex
 	minRecommendedCliVersionArgsForCall []struct{}
-	minRecommendedCliVersionReturns     struct {
+	minRecommendedCliVersionReturns struct {
 		result1 string
 	}
 	AsyncTimeoutStub        func() uint
 	asyncTimeoutMutex       sync.RWMutex
 	asyncTimeoutArgsForCall []struct{}
-	asyncTimeoutReturns     struct {
+	asyncTimeoutReturns struct {
 		result1 uint
 	}
 	TraceStub        func() string
 	traceMutex       sync.RWMutex
 	traceArgsForCall []struct{}
-	traceReturns     struct {
+	traceReturns struct {
 		result1 string
 	}
 	ColorEnabledStub        func() string
 	colorEnabledMutex       sync.RWMutex
 	colorEnabledArgsForCall []struct{}
-	colorEnabledReturns     struct {
+	colorEnabledReturns struct {
 		result1 string
 	}
 	LocaleStub        func() string
 	localeMutex       sync.RWMutex
 	localeArgsForCall []struct{}
-	localeReturns     struct {
+	localeReturns struct {
 		result1 string
 	}
 	PluginReposStub        func() []models.PluginRepo
 	pluginReposMutex       sync.RWMutex
 	pluginReposArgsForCall []struct{}
-	pluginReposReturns     struct {
+	pluginReposReturns struct {
 		result1 []models.PluginRepo
 	}
-	ClearSessionStub          func()
-	clearSessionMutex         sync.RWMutex
-	clearSessionArgsForCall   []struct{}
+	ClearSessionStub        func()
+	clearSessionMutex       sync.RWMutex
+	clearSessionArgsForCall []struct{}
 	SetApiEndpointStub        func(string)
 	setApiEndpointMutex       sync.RWMutex
 	setApiEndpointArgsForCall []struct {
@@ -232,6 +238,11 @@ type FakeReadWriter struct {
 	SetAccessTokenStub        func(string)
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
+		arg1 string
+	}
+	SetSSHOAuthClientStub        func(string)
+	setSSHOAuthClientMutex       sync.RWMutex
+	setSSHOAuthClientArgsForCall []struct {
 		arg1 string
 	}
 	SetRefreshTokenStub        func(string)
@@ -498,6 +509,30 @@ func (fake *FakeReadWriter) AccessTokenCallCount() int {
 func (fake *FakeReadWriter) AccessTokenReturns(result1 string) {
 	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeReadWriter) SSHOAuthClient() string {
+	fake.sSHOAuthClientMutex.Lock()
+	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct{}{})
+	fake.sSHOAuthClientMutex.Unlock()
+	if fake.SSHOAuthClientStub != nil {
+		return fake.SSHOAuthClientStub()
+	} else {
+		return fake.sSHOAuthClientReturns.result1
+	}
+}
+
+func (fake *FakeReadWriter) SSHOAuthClientCallCount() int {
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
+	return len(fake.sSHOAuthClientArgsForCall)
+}
+
+func (fake *FakeReadWriter) SSHOAuthClientReturns(result1 string) {
+	fake.SSHOAuthClientStub = nil
+	fake.sSHOAuthClientReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -1217,6 +1252,29 @@ func (fake *FakeReadWriter) SetAccessTokenArgsForCall(i int) string {
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
 	return fake.setAccessTokenArgsForCall[i].arg1
+}
+
+func (fake *FakeReadWriter) SetSSHOAuthClient(arg1 string) {
+	fake.setSSHOAuthClientMutex.Lock()
+	fake.setSSHOAuthClientArgsForCall = append(fake.setSSHOAuthClientArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.setSSHOAuthClientMutex.Unlock()
+	if fake.SetSSHOAuthClientStub != nil {
+		fake.SetSSHOAuthClientStub(arg1)
+	}
+}
+
+func (fake *FakeReadWriter) SetSSHOAuthClientCallCount() int {
+	fake.setSSHOAuthClientMutex.RLock()
+	defer fake.setSSHOAuthClientMutex.RUnlock()
+	return len(fake.setSSHOAuthClientArgsForCall)
+}
+
+func (fake *FakeReadWriter) SetSSHOAuthClientArgsForCall(i int) string {
+	fake.setSSHOAuthClientMutex.RLock()
+	defer fake.setSSHOAuthClientMutex.RUnlock()
+	return fake.setSSHOAuthClientArgsForCall[i].arg1
 }
 
 func (fake *FakeReadWriter) SetRefreshToken(arg1 string) {
