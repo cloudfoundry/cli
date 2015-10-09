@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	fakeBits "github.com/cloudfoundry/cli/cf/api/application_bits/fakes"
@@ -147,9 +148,19 @@ var _ = Describe("Push Actor", func() {
 
 			files, err := actor.PopulateFileMode(fixturesDir, files)
 			Ω(err).NotTo(HaveOccurred())
-			Ω(files[0].Mode).To(Equal("0644"))
-			Ω(files[1].Mode).To(Equal("0755"))
-			Ω(files[2].Mode).To(Equal("0644"))
+			if runtime.GOOS == "windows" { //windows filemode is different
+				Ω(files[0].Mode).ToNot(Equal(""))
+				Ω(files[1].Mode).ToNot(Equal(""))
+				Ω(files[2].Mode).ToNot(Equal(""))
+			} else if runtime.GOARCH == "386" { //32bit filemode is different
+				Ω(files[0].Mode).ToNot(Equal(""))
+				Ω(files[1].Mode).ToNot(Equal(""))
+				Ω(files[2].Mode).ToNot(Equal(""))
+			} else { //linux and osx 64bit
+				Ω(files[0].Mode).To(Equal("0644"))
+				Ω(files[1].Mode).To(Equal("0755"))
+				Ω(files[2].Mode).To(Equal("0644"))
+			}
 		})
 	})
 
