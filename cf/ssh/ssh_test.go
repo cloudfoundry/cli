@@ -1,4 +1,8 @@
-// +build !windows
+// +build !windows,!386
+
+// skipping 386 because lager uses UInt64 in Session()
+// skipping windows because Unix/Linux only syscall in test.
+// should refactor out the conflicts so we could test this package in multi platforms.
 
 package sshCmd_test
 
