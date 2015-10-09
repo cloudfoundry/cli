@@ -4960,8 +4960,8 @@
       "modified": true
    },
    {
-      "id": "access for plans of a particular service offering",
-      "translation": "settings for a specific broker",
+      "id": "access for service name of a particular service offering",
+      "translation": "access for service name of a particular service offering",
       "modified": true
    },
    {
