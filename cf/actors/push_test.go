@@ -139,20 +139,35 @@ var _ = Describe("Push Actor", func() {
 	})
 
 	Describe(".PopulateFileMode()", func() {
-		It("returns []resources.AppFileResource with file mode populated", func() {
-			files := []resources.AppFileResource{
+		var files []resources.AppFileResource
+
+		BeforeEach(func() {
+			files = []resources.AppFileResource{
 				resources.AppFileResource{Path: "example-app/.cfignore"},
 				resources.AppFileResource{Path: "example-app/app.rb"},
 				resources.AppFileResource{Path: "example-app/config.ru"},
 			}
+		})
+
+		It("does not populate file mode in Windows", func() {
+			files, err := actor.PopulateFileMode(fixturesDir, files)
+			Ω(err).NotTo(HaveOccurred())
+			if runtime.GOOS == "windows" {
+				Ω(files[0].Mode).To(Equal(""))
+				Ω(files[1].Mode).To(Equal(""))
+				Ω(files[2].Mode).To(Equal(""))
+			}
+		})
+
+		It("returns []resources.AppFileResource with file mode populated", func() {
+			//skip test under Windows
+			if runtime.GOOS == "windows" {
+				return
+			}
 
 			files, err := actor.PopulateFileMode(fixturesDir, files)
 			Ω(err).NotTo(HaveOccurred())
-			if runtime.GOOS == "windows" { //windows filemode is different
-				Ω(files[0].Mode).ToNot(Equal(""))
-				Ω(files[1].Mode).ToNot(Equal(""))
-				Ω(files[2].Mode).ToNot(Equal(""))
-			} else if runtime.GOARCH == "386" { //32bit filemode is different
+			if runtime.GOARCH == "386" { //32bit filemode is different
 				Ω(files[0].Mode).ToNot(Equal(""))
 				Ω(files[1].Mode).ToNot(Equal(""))
 				Ω(files[2].Mode).ToNot(Equal(""))

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	"github.com/cloudfoundry/cli/cf/api/resources"
@@ -35,6 +36,10 @@ func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper
 }
 
 func (actor PushActorImpl) PopulateFileMode(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error) {
+	if runtime.GOOS == "windows" {
+		return presentFiles, nil
+	}
+
 	for i, _ := range presentFiles {
 		fileInfo, err := os.Lstat(filepath.Join(appDir, presentFiles[i].Path))
 		if err != nil {
