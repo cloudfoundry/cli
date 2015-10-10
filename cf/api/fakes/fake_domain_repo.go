@@ -30,6 +30,8 @@ type FakeDomainRepository struct {
 
 	CreateSharedDomainName string
 
+	CreateSharedDomainRouterGroupGuid string
+
 	DeleteDomainGuid  string
 	DeleteApiResponse error
 
@@ -94,8 +96,9 @@ func (repo *FakeDomainRepository) Create(domainName string, owningOrgGuid string
 	return
 }
 
-func (repo *FakeDomainRepository) CreateSharedDomain(domainName string) (apiErr error) {
+func (repo *FakeDomainRepository) CreateSharedDomain(domainName string, routerGroupGuid string) (apiErr error) {
 	repo.CreateSharedDomainName = domainName
+	repo.CreateSharedDomainRouterGroupGuid = routerGroupGuid
 	return
 }
 

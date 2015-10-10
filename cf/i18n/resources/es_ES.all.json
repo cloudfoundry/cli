@@ -3990,8 +3990,18 @@
       "modified": false
    },
    {
+      "id": "Router group not found",
+      "translation": "Router group not found",
+      "modified": false
+   },
+   {
       "id": "Routes",
       "translation": "Rutas",
+      "modified": false
+   },
+   {
+      "id": "Routes for this domain will be configured only on the specified router group.",
+      "translation": "Routes for this domain will be configured only on the specified router group.",
       "modified": false
    },
    {
