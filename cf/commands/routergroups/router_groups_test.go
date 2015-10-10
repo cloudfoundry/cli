@@ -1,6 +1,8 @@
 package routergroups_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -67,12 +69,20 @@ var _ = Describe("RouterGroups", func() {
 
 	Context("when there are router groups", func() {
 		BeforeEach(func() {
-			routingApiRepo.RouterGroups = models.RouterGroups{
+			routerGroups := models.RouterGroups{
 				models.RouterGroup{
 					Guid: "guid-0001",
 					Name: "default-router-group",
 					Type: "tcp",
 				},
+			}
+			routingApiRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) (apiErr error) {
+				for _, r := range routerGroups {
+					if !cb(r) {
+						break
+					}
+				}
+				return nil
 			}
 		})
 
@@ -100,7 +110,7 @@ var _ = Describe("RouterGroups", func() {
 
 	Context("when there is an error listing router groups", func() {
 		BeforeEach(func() {
-			routingApiRepo.ListError = true
+			routingApiRepo.ListRouterGroupsReturns(errors.New("BOOM"))
 		})
 
 		It("returns an error to the user", func() {

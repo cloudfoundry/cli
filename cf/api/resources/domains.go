@@ -11,6 +11,7 @@ type DomainEntity struct {
 	Name                   string `json:"name"`
 	OwningOrganizationGuid string `json:"owning_organization_guid,omitempty"`
 	SharedOrganizationsUrl string `json:"shared_organizations_url,omitempty"`
+	RouterGroupGuid        string `json:"router_group_guid,omitempty"`
 	Wildcard               bool   `json:"wildcard"`
 }
 
