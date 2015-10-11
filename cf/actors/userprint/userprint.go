@@ -14,7 +14,6 @@ type UserPrinter interface {
 }
 
 type spaceUsersPluginPrinter struct {
-	UserPrinter
 	roles       []string
 	userLister  func(spaceGuid string, role string) ([]models.UserFields, error)
 	pluginModel *[]plugin_models.GetSpaceUsers_Model
@@ -22,7 +21,6 @@ type spaceUsersPluginPrinter struct {
 }
 
 type orgUsersPluginPrinter struct {
-	UserPrinter
 	roles       []string
 	userLister  func(orgGuid string, role string) ([]models.UserFields, error)
 	pluginModel *[]plugin_models.GetOrgUsers_Model
@@ -30,7 +28,6 @@ type orgUsersPluginPrinter struct {
 }
 
 type SpaceUsersUiPrinter struct {
-	UserPrinter
 	Ui               terminal.UI
 	UserLister       func(spaceGuid string, role string) ([]models.UserFields, error)
 	Roles            []string
@@ -38,7 +35,6 @@ type SpaceUsersUiPrinter struct {
 }
 
 type OrgUsersUiPrinter struct {
-	UserPrinter
 	Roles            []string
 	RoleDisplayNames map[string]string
 	UserLister       func(orgGuid string, role string) ([]models.UserFields, error)
