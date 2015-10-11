@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors/user_printer"
+	"github.com/cloudfoundry/cli/cf/actors/userprint"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -75,7 +75,7 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 	printer.PrintUsers(org.Guid, cmd.config.Username())
 }
 
-func (cmd *OrgUsers) getPrinter(c flags.FlagContext) user_printer.UserPrinter {
+func (cmd *OrgUsers) getPrinter(c flags.FlagContext) userprint.UserPrinter {
 	var roles []string
 	if c.Bool("a") {
 		roles = []string{models.ORG_USER}
@@ -84,13 +84,13 @@ func (cmd *OrgUsers) getPrinter(c flags.FlagContext) user_printer.UserPrinter {
 	}
 
 	if cmd.pluginCall {
-		return user_printer.NewOrgUsersPluginPrinter(
+		return userprint.NewOrgUsersPluginPrinter(
 			cmd.pluginModel,
 			cmd.getUserLister(),
 			roles,
 		)
 	}
-	return &user_printer.OrgUsersUiPrinter{
+	return &userprint.OrgUsersUiPrinter{
 		Ui:         cmd.ui,
 		UserLister: cmd.getUserLister(),
 		Roles:      roles,
