@@ -71,11 +71,11 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	printer := cmd.getPrinter(c)
+	printer := cmd.printer(c)
 	printer.PrintUsers(org.Guid, cmd.config.Username())
 }
 
-func (cmd *OrgUsers) getPrinter(c flags.FlagContext) userprint.UserPrinter {
+func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
 	var roles []string
 	if c.Bool("a") {
 		roles = []string{models.ORG_USER}
@@ -86,13 +86,13 @@ func (cmd *OrgUsers) getPrinter(c flags.FlagContext) userprint.UserPrinter {
 	if cmd.pluginCall {
 		return userprint.NewOrgUsersPluginPrinter(
 			cmd.pluginModel,
-			cmd.getUserLister(),
+			cmd.userLister(),
 			roles,
 		)
 	}
 	return &userprint.OrgUsersUiPrinter{
 		Ui:         cmd.ui,
-		UserLister: cmd.getUserLister(),
+		UserLister: cmd.userLister(),
 		Roles:      roles,
 		RoleDisplayNames: map[string]string{
 			models.ORG_USER:        T("USERS"),
@@ -103,7 +103,7 @@ func (cmd *OrgUsers) getPrinter(c flags.FlagContext) userprint.UserPrinter {
 	}
 }
 
-func (cmd *OrgUsers) getUserLister() func(orgGuid string, role string) ([]models.UserFields, error) {
+func (cmd *OrgUsers) userLister() func(orgGuid string, role string) ([]models.UserFields, error) {
 	if cmd.config.IsMinApiVersion("2.21.0") {
 		return cmd.userRepo.ListUsersInOrgForRoleWithNoUAA
 	}
