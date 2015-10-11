@@ -1,4 +1,4 @@
-package user_printer
+package userprint
 
 import (
 	"fmt"

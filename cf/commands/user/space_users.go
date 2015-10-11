@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors/user_printer"
+	"github.com/cloudfoundry/cli/cf/actors/userprint"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -74,11 +74,11 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 	printer.PrintUsers(space.Guid, cmd.config.Username())
 }
 
-func (cmd *SpaceUsers) getPrinter(org models.Organization, space models.Space, username string) user_printer.UserPrinter {
+func (cmd *SpaceUsers) getPrinter(org models.Organization, space models.Space, username string) userprint.UserPrinter {
 	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 	if cmd.pluginCall {
-		return user_printer.NewSpaceUsersPluginPrinter(
+		return userprint.NewSpaceUsersPluginPrinter(
 			cmd.pluginModel,
 			cmd.getUserLister(),
 			roles,
@@ -92,7 +92,7 @@ func (cmd *SpaceUsers) getPrinter(org models.Organization, space models.Space, u
 			"CurrentUser": terminal.EntityNameColor(username),
 		}))
 
-	return &user_printer.SpaceUsersUiPrinter{
+	return &userprint.SpaceUsersUiPrinter{
 		Ui:         cmd.ui,
 		UserLister: cmd.getUserLister(),
 		Roles:      roles,
