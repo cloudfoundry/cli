@@ -35,7 +35,13 @@ type CliRpcCmd struct {
 	outputBucket         *[]string
 }
 
-func NewRpcService(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator, newCmdRunner NonCodegangstaRunner) (*CliRpcService, error) {
+func NewRpcService(
+	outputCapture terminal.OutputCapture,
+	terminalOutputSwitch terminal.TerminalOutputSwitch,
+	cliConfig core_config.Repository,
+	repoLocator api.RepositoryLocator,
+	newCmdRunner NonCodegangstaRunner,
+) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
 			PluginMetadata:       &plugin.PluginMetadata{},
