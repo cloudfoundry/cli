@@ -155,14 +155,6 @@ func (cmd *ShowSpace) quotaString(space models.Space) string {
 	memory := formatters.ByteSize(quota.MemoryLimit * formatters.MEGABYTE)
 
 	spaceQuota := fmt.Sprintf("%s (%s memory limit, %s instance memory limit, %d routes, %d services, paid services %s)", quota.Name, memory, instance_memory, quota.RoutesLimit, quota.ServicesLimit, formatters.Allowed(quota.NonBasicServicesAllowed))
-	//	spaceQuota := fmt.Sprintf(T("{{.QuotaName}} ({{.MemoryLimit}} memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
-	//		map[string]interface{}{
-	//			"QuotaName":               quota.Name,
-	//			"MemoryLimit":             memory,
-	//			"InstanceMemoryLimit":     instance_memory,
-	//			"RoutesLimit":             quota.RoutesLimit,
-	//			"ServicesLimit":           quota.ServicesLimit,
-	//			"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
 
 	return spaceQuota
 }

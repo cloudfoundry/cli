@@ -13,6 +13,7 @@ type routingApiRepository struct {
 	gateway net.Gateway
 }
 
+//go:generate counterfeiter -o fakes/fake_routing_api.go . RoutingApiRepository
 type RoutingApiRepository interface {
 	ListRouterGroups(cb func(models.RouterGroup) bool) (apiErr error)
 }

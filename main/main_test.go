@@ -87,7 +87,7 @@ var _ = Describe("main", func() {
 		})
 	})
 
-	Describe("Staying abreast of Security Vulerabilities", func() {
+	Describe("Staying abreast of Security Vulnerabilities", func() {
 		It("uses Go 1.5.1 as the most up to date Go compiler", func() {
 			output := Cf("--build").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("go1.5.1"))
