@@ -83,12 +83,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, 
 }
 
 func (repo CloudControllerApplicationBitsRepository) GetApplicationFiles(appFilesToCheck []resources.AppFileResource) ([]resources.AppFileResource, error) {
-	var integrityFieldsToCheck []resources.IntegrityFields
-	for _, appFile := range appFilesToCheck {
-		integrityFieldsToCheck = append(integrityFieldsToCheck, appFile.ToIntegrityFields())
-	}
-
-	integrityFieldsJson, err := json.Marshal(integrityFieldsToCheck)
+	integrityFieldsJson, err := json.Marshal(mapAppFilesToIntegrityFields(appFilesToCheck))
 	if err != nil {
 		apiErr := errors.NewWithError(T("Failed to create json for resource_match request"), err)
 		return nil, apiErr
@@ -105,18 +100,36 @@ func (repo CloudControllerApplicationBitsRepository) GetApplicationFiles(appFile
 		return nil, apiErr
 	}
 
-	inputFiles := map[string]resources.AppFileResource{}
-	for _, inputFileResource := range appFilesToCheck {
-		inputFiles[inputFileResource.Sha1] = inputFileResource
-	}
+	return intersectAppFilesIntegrityFields(appFilesToCheck, responseFieldsColl), nil
+}
 
-	var presentAppFiles []resources.AppFileResource
-	for _, responseFields := range responseFieldsColl {
-		presentAppFile := inputFiles[responseFields.Sha1]
-		presentAppFiles = append(presentAppFiles, presentAppFile)
+func mapAppFilesToIntegrityFields(in []resources.AppFileResource) (out []resources.IntegrityFields) {
+	for _, appFile := range in {
+		out = append(out, appFile.ToIntegrityFields())
 	}
+	return out
+}
 
-	return presentAppFiles, nil
+func intersectAppFilesIntegrityFields(
+	appFiles []resources.AppFileResource,
+	integrityFields []resources.IntegrityFields,
+) (out []resources.AppFileResource) {
+	inputFiles := appFilesBySha(appFiles)
+	for _, responseFields := range integrityFields {
+		item, found := inputFiles[responseFields.Sha1]
+		if found {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
+func appFilesBySha(in []resources.AppFileResource) (out map[string]resources.AppFileResource) {
+	out = map[string]resources.AppFileResource{}
+	for _, inputFileResource := range in {
+		out[inputFileResource.Sha1] = inputFileResource
+	}
+	return out
 }
 
 func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os.File, body *os.File, presentResourcesJson []byte) (boundary string, err error) {
