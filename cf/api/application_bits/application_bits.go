@@ -83,24 +83,40 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, 
 }
 
 func (repo CloudControllerApplicationBitsRepository) GetApplicationFiles(appFilesToCheck []resources.AppFileResource) ([]resources.AppFileResource, error) {
-	allAppFilesJson, err := json.Marshal(appFilesToCheck)
+	var integrityFieldsToCheck []resources.IntegrityFields
+	for _, appFile := range appFilesToCheck {
+		integrityFieldsToCheck = append(integrityFieldsToCheck, appFile.ToIntegrityFields())
+	}
+
+	integrityFieldsJson, err := json.Marshal(integrityFieldsToCheck)
 	if err != nil {
 		apiErr := errors.NewWithError(T("Failed to create json for resource_match request"), err)
 		return nil, apiErr
 	}
 
-	presentFiles := []resources.AppFileResource{}
+	responseFieldsColl := []resources.IntegrityFields{}
 	apiErr := repo.gateway.UpdateResourceSync(
 		repo.config.ApiEndpoint(),
 		"/v2/resource_match",
-		bytes.NewReader(allAppFilesJson),
-		&presentFiles)
+		bytes.NewReader(integrityFieldsJson),
+		&responseFieldsColl)
 
 	if apiErr != nil {
 		return nil, apiErr
 	}
 
-	return presentFiles, nil
+	inputFiles := map[string]resources.AppFileResource{}
+	for _, inputFileResource := range appFilesToCheck {
+		inputFiles[inputFileResource.Sha1] = inputFileResource
+	}
+
+	var presentAppFiles []resources.AppFileResource
+	for _, responseFields := range responseFieldsColl {
+		presentAppFile := inputFiles[responseFields.Sha1]
+		presentAppFiles = append(presentAppFiles, presentAppFile)
+	}
+
+	return presentAppFiles, nil
 }
 
 func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os.File, body *os.File, presentResourcesJson []byte) (boundary string, err error) {
