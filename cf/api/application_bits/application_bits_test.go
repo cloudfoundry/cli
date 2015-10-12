@@ -207,6 +207,13 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 			Expect(matchedFiles).To(Equal([]resources.AppFileResource{file3, file4}))
 			Expect(err).NotTo(HaveOccurred())
 		})
+
+		It("excludes files that were in the response but not in the request", func() {
+			setupTestServer(matchResourceRequestImbalanced)
+			matchedFiles, err := repo.GetApplicationFiles([]resources.AppFileResource{file1, file4})
+			Expect(matchedFiles).To(Equal([]resources.AppFileResource{file4}))
+			Expect(err).NotTo(HaveOccurred())
+		})
 	})
 })
 
@@ -269,6 +276,25 @@ var matchResourceRequest = testnet.TestRequest{
     {
         "sha1": "d9c3a51de5c89c11331d3b90b972789f1a14699a",
         "size": 59
+    },
+    {
+        "sha1": "345f999aef9070fb9a608e65cf221b7038156b6d",
+        "size": 229
+    }
+]`)),
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body:   matchedResources,
+	},
+}
+
+var matchResourceRequestImbalanced = testnet.TestRequest{
+	Method: "PUT",
+	Path:   "/v2/resource_match",
+	Matcher: testnet.RequestBodyMatcher(testnet.RemoveWhiteSpaceFromBody(`[
+	{
+        "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
+        "size": 51
     },
     {
         "sha1": "345f999aef9070fb9a608e65cf221b7038156b6d",
