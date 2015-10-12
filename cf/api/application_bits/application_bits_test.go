@@ -207,35 +207,38 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 			Expect(matchedFiles).To(Equal([]resources.AppFileResource{file3, file4}))
 			Expect(err).NotTo(HaveOccurred())
 		})
+
+		It("excludes files that were in the response but not in the request", func() {
+			setupTestServer(matchResourceRequestImbalanced)
+			matchedFiles, err := repo.GetApplicationFiles([]resources.AppFileResource{file1, file4})
+			Expect(matchedFiles).To(Equal([]resources.AppFileResource{file4}))
+			Expect(err).NotTo(HaveOccurred())
+		})
 	})
 })
 
 var matchedResources = testnet.RemoveWhiteSpaceFromBody(`[
 	{
-        "fn": "Gemfile",
         "sha1": "d9c3a51de5c89c11331d3b90b972789f1a14699a",
-        "size": 59,
-				"mode": "0750"
+        "size": 59
     },
     {
-        "fn": "Gemfile.lock",
         "sha1": "345f999aef9070fb9a608e65cf221b7038156b6d",
-        "size": 229,
-				"mode": "0600"
+        "size": 229
     }
 ]`)
 
 var unmatchedResources = testnet.RemoveWhiteSpaceFromBody(`[
 	{
-        "fn": "app.rb",
         "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
         "size": 51,
+        "fn": "app.rb",
 				"mode":""
     },
     {
-        "fn": "config.ru",
         "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
         "size": 70,
+        "fn": "config.ru",
 				"mode":""
     }
 ]`)
@@ -263,28 +266,39 @@ var matchResourceRequest = testnet.TestRequest{
 	Path:   "/v2/resource_match",
 	Matcher: testnet.RequestBodyMatcher(testnet.RemoveWhiteSpaceFromBody(`[
 	{
-        "fn": "app.rb",
         "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
-        "size": 51,
-				"mode":""
+        "size": 51
     },
     {
-        "fn": "config.ru",
         "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
-        "size": 70,
-				"mode":""
+        "size": 70
     },
     {
-        "fn": "Gemfile",
         "sha1": "d9c3a51de5c89c11331d3b90b972789f1a14699a",
-        "size": 59,
-				"mode":"0750"
+        "size": 59
     },
     {
-        "fn": "Gemfile.lock",
         "sha1": "345f999aef9070fb9a608e65cf221b7038156b6d",
-        "size": 229,
-				"mode":"0600"
+        "size": 229
+    }
+]`)),
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body:   matchedResources,
+	},
+}
+
+var matchResourceRequestImbalanced = testnet.TestRequest{
+	Method: "PUT",
+	Path:   "/v2/resource_match",
+	Matcher: testnet.RequestBodyMatcher(testnet.RemoveWhiteSpaceFromBody(`[
+	{
+        "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
+        "size": 51
+    },
+    {
+        "sha1": "345f999aef9070fb9a608e65cf221b7038156b6d",
+        "size": 229
     }
 ]`)),
 	Response: testnet.TestResponse{

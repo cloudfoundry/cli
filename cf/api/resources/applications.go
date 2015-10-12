@@ -25,10 +25,15 @@ type AppRouteResource struct {
 	Entity AppRouteEntity
 }
 
-type AppFileResource struct {
-	Path string `json:"fn"`
+type IntegrityFields struct {
 	Sha1 string `json:"sha1"`
 	Size int64  `json:"size"`
+}
+
+type AppFileResource struct {
+	Sha1 string `json:"sha1"`
+	Size int64  `json:"size"`
+	Path string `json:"fn"`
 	Mode string `json:"mode"`
 }
 
@@ -73,6 +78,13 @@ func (resource AppRouteResource) ToModel() (route models.RouteSummary) {
 	route.Domain.Guid = resource.Entity.Domain.Metadata.Guid
 	route.Domain.Name = resource.Entity.Domain.Entity.Name
 	return
+}
+
+func (resource AppFileResource) ToIntegrityFields() IntegrityFields {
+	return IntegrityFields{
+		Sha1: resource.Sha1,
+		Size: resource.Size,
+	}
 }
 
 func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
