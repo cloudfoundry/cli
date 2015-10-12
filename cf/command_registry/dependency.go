@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -47,6 +48,7 @@ type Dependency struct {
 	AppFiles           app_files.AppFiles
 	PushActor          actors.PushActor
 	ChecksumUtil       utils.Sha1Checksum
+	TokenRefresher     authentication.TokenRefresher
 }
 
 type pluginModels struct {
@@ -137,6 +139,8 @@ func NewDependency() Dependency {
 	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles)
 
 	deps.ChecksumUtil = utils.NewSha1Checksum("")
+
+	deps.TokenRefresher = deps.RepoLocator.GetAuthenticationRepository()
 
 	return deps
 }

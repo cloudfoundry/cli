@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -33,6 +34,7 @@ type CliRpcCmd struct {
 	repoLocator          api.RepositoryLocator
 	newCmdRunner         NonCodegangstaRunner
 	outputBucket         *[]string
+	tokenRefresher       authentication.TokenRefresher
 }
 
 func NewRpcService(
@@ -41,6 +43,7 @@ func NewRpcService(
 	cliConfig core_config.Repository,
 	repoLocator api.RepositoryLocator,
 	newCmdRunner NonCodegangstaRunner,
+	tokenRefresher authentication.TokenRefresher,
 ) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
@@ -50,6 +53,7 @@ func NewRpcService(
 			cliConfig:            cliConfig,
 			repoLocator:          repoLocator,
 			newCmdRunner:         newCmdRunner,
+			tokenRefresher:       tokenRefresher,
 		},
 	}
 
@@ -251,9 +255,10 @@ func (cmd *CliRpcCmd) DopplerEndpoint(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
+	_, err := cmd.tokenRefresher.RefreshAuthToken()
 	*retVal = cmd.cliConfig.AccessToken()
 
-	return nil
+	return err
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
