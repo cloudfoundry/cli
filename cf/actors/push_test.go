@@ -2,6 +2,7 @@ package actors_test
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -160,21 +161,14 @@ var _ = Describe("Push Actor", func() {
 		})
 
 		It("returns []resources.AppFileResource with file mode populated", func() {
-			//skip test under Windows
-			if runtime.GOOS == "windows" {
-				return
-			}
-
-			files, err := actor.PopulateFileMode(fixturesDir, files)
+			actualFiles, err := actor.PopulateFileMode(fixturesDir, files)
 			Ω(err).NotTo(HaveOccurred())
-			if runtime.GOARCH == "386" { //32bit filemode is different
-				Ω(files[0].Mode).ToNot(Equal(""))
-				Ω(files[1].Mode).ToNot(Equal(""))
-				Ω(files[2].Mode).ToNot(Equal(""))
-			} else { //linux and osx 64bit
-				Ω(files[0].Mode).To(Equal("0644"))
-				Ω(files[1].Mode).To(Equal("0755"))
-				Ω(files[2].Mode).To(Equal("0644"))
+
+			for i, _ := range files {
+				fileInfo, err := os.Lstat(filepath.Join(fixturesDir, files[i].Path))
+				Ω(err).NotTo(HaveOccurred())
+				mode := fileInfo.Mode()
+				Ω(actualFiles[i].Mode).To(Equal(fmt.Sprintf("%#o", mode)))
 			}
 		})
 	})
