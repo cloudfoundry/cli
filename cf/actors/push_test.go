@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	fakeBits "github.com/cloudfoundry/cli/cf/api/application_bits/fakes"
@@ -147,16 +146,6 @@ var _ = Describe("Push Actor", func() {
 				resources.AppFileResource{Path: "example-app/.cfignore"},
 				resources.AppFileResource{Path: "example-app/app.rb"},
 				resources.AppFileResource{Path: "example-app/config.ru"},
-			}
-		})
-
-		It("does not populate file mode in Windows", func() {
-			files, err := actor.PopulateFileMode(fixturesDir, files)
-			Ω(err).NotTo(HaveOccurred())
-			if runtime.GOOS == "windows" {
-				Ω(files[0].Mode).To(Equal(""))
-				Ω(files[1].Mode).To(Equal(""))
-				Ω(files[2].Mode).To(Equal(""))
 			}
 		})
 
