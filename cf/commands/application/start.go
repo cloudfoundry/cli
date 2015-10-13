@@ -239,11 +239,6 @@ func (cmd *Start) tailStagingLogs(app models.Application, startChan, doneChan ch
 			cmd.ui.Say(simpleLogMessageOutput(msg))
 		}
 	})
-	// err := cmd.logRepo.TailNoaaLogsFor(app.Guid, onConnect, func(msg *events.LogMessage) {
-	// 	if msg.GetSourceType() == LogMessageTypeStaging {
-	// 		cmd.ui.Say(simpleLogMessageOutput(msg))
-	// 	}
-	// })
 
 	if err != nil {
 		cmd.ui.Warn(T("Warning: error tailing logs"))
