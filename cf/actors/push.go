@@ -69,7 +69,8 @@ func (actor PushActorImpl) UploadApp(appGuid string, zipFile *os.File, presentFi
 
 func (actor PushActorImpl) copyUploadableFiles(appDir string, uploadDir string) (presentFiles []resources.AppFileResource, hasFileToUpload bool, err error) {
 	// Find which files need to be uploaded
-	allAppFiles, err := actor.appfiles.AppFilesInDir(appDir)
+	var allAppFiles []models.AppFileFields
+	allAppFiles, err = actor.appfiles.AppFilesInDir(appDir)
 	if err != nil {
 		return
 	}
