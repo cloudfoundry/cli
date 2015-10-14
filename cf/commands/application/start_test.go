@@ -168,7 +168,7 @@ var _ = Describe("start command", func() {
 		return testcmd.RunCliCommandWithoutDependency("start", args, requirementsFactory)
 	}
 
-	callStartWithTimeout := func(args []string) (ui *testterm.FakeUI) {
+	callStartWithLoggingTimeout := func(args []string) (ui *testterm.FakeUI) {
 
 		oldLogsRepoWithTimeout := &testapi.FakeOldLogsRepositoryWithTimeout{}
 
@@ -362,7 +362,7 @@ var _ = Describe("start command", func() {
 			}
 			appRepo.ReadReturns.App = defaultAppForStart
 
-			callStartWithTimeout([]string{"my-app"})
+			callStartWithLoggingTimeout([]string{"my-app"})
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"timeout connecting to log server"},
 			))
@@ -487,6 +487,29 @@ var _ = Describe("start command", func() {
 				[]string{"my-app"},
 				[]string{"FAILED"},
 				[]string{"is executed from within the directory"},
+			))
+		})
+
+		It("Display a TIP when starting the app timeout", func() {
+			appInstance := models.AppInstanceFields{}
+			appInstance.State = models.InstanceStarting
+			appInstance2 := models.AppInstanceFields{}
+			appInstance2.State = models.InstanceStarting
+			appInstance3 := models.AppInstanceFields{}
+			appInstance3.State = models.InstanceStarting
+			appInstance4 := models.AppInstanceFields{}
+			appInstance4.State = models.InstanceStarting
+			defaultInstanceResponses = [][]models.AppInstanceFields{
+				[]models.AppInstanceFields{appInstance, appInstance2},
+				[]models.AppInstanceFields{appInstance3, appInstance4},
+			}
+
+			defaultInstanceErrorCodes = []string{"", ""}
+
+			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"TIP: Application must be listening on the right port."},
 			))
 		})
 

@@ -4585,8 +4585,8 @@
       "modified": false
    },
    {
-      "id": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
+      "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.",
+      "translation": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.",
       "modified": false
    },
    {
@@ -5072,6 +5072,11 @@
    {
       "id": "Url",
       "translation": "Url",
+      "modified": false
+   },
+   {
+      "id": "Use '{{.Command}}' for more information",
+      "translation": "Use '{{.Command}}' for more information",
       "modified": false
    },
    {
