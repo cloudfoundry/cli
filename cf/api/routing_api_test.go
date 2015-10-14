@@ -8,6 +8,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -27,7 +28,7 @@ var _ = Describe("RoutingApi", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+		gateway := net.NewRoutingApiGateway(configRepo, time.Now, &testterm.FakeUI{})
 
 		repo = api.NewRoutingApiRepository(configRepo, gateway)
 	})
@@ -100,18 +101,23 @@ var _ = Describe("RoutingApi", func() {
 				routingApiServer = ghttp.NewServer()
 				routingApiServer.RouteToHandler("GET", "/v1/router_groups",
 					func(w http.ResponseWriter, req *http.Request) {
-						w.WriteHeader(http.StatusInternalServerError)
+						w.WriteHeader(http.StatusUnauthorized)
+						w.Write([]byte(`{"name":"UnauthorizedError","message":"token is expired"}`))
 					})
 				configRepo.SetRoutingApiEndpoint(routingApiServer.URL())
 			})
 
-			It("doesn't list any router groups", func() {
+			It("doesn't list any router groups and displays error message", func() {
 				cb := func(grp models.RouterGroup) bool {
 					Fail(fmt.Sprintf("Not expected to receive callback for router group:%#v", grp))
 					return false
 				}
+
 				err := repo.ListRouterGroups(cb)
 				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("token is expired"))
+				Expect(err.(errors.HttpError).ErrorCode()).To(ContainSubstring("UnauthorizedError"))
+				Expect(err.(errors.HttpError).StatusCode()).To(Equal(http.StatusUnauthorized))
 			})
 		})
 	})
