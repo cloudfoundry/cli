@@ -168,13 +168,6 @@ var _ = Describe("Push Command", func() {
 			actor.UploadAppReturns(nil)
 		})
 
-		It("does not call Zip() when there is no file to be uploaded", func() {
-			actor.GatherFilesReturns(nil, false, nil)
-			callPush("my-new-app")
-
-			Expect(zipper.ZipCallCount()).To(Equal(0))
-		})
-
 		Context("when the default route for the app already exists", func() {
 			BeforeEach(func() {
 				route := models.Route{}
@@ -185,14 +178,8 @@ var _ = Describe("Push Command", func() {
 				routeRepo.FindByHostAndDomainReturns.Route = route
 			})
 
-			It("calls actor.PopulateFileMode() to get file mdoes", func() {
-				callPush("my-new-app")
-
-				Expect(actor.PopulateFileModeCallCount()).To(Equal(1))
-			})
-
-			It("notifies users about the error actor.PopulateFileMode() returns", func() {
-				actor.PopulateFileModeReturns([]resources.AppFileResource{}, errors.New("failed to get file mode"))
+			It("notifies users about the error actor.GatherFiles() returns", func() {
+				actor.GatherFilesReturns([]resources.AppFileResource{}, false, errors.New("failed to get file mode"))
 
 				callPush("my-new-app")
 
@@ -832,22 +819,6 @@ var _ = Describe("Push Command", func() {
 			Expect(updatedAppEnvVars["FOO"]).To(Equal("baz"))
 			Expect(updatedAppEnvVars["foo"]).To(Equal("manchu"))
 			Expect(updatedAppEnvVars["PATH"]).To(Equal("/u/apps/my-app/bin"))
-		})
-
-		It("calls actor.PopulateFileMode() to get file mdoes", func() {
-			callPush("my-new-app")
-
-			Expect(actor.PopulateFileModeCallCount()).To(Equal(1))
-		})
-
-		It("notifies users about the error actor.PopulateFileMode() returns", func() {
-			actor.PopulateFileModeReturns([]resources.AppFileResource{}, errors.New("failed to get file mode"))
-
-			callPush("my-new-app")
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"failed to get file mode"},
-			))
 		})
 
 		It("stops the app, achieving a full-downtime deploy!", func() {
