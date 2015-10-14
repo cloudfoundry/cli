@@ -4585,9 +4585,9 @@
       "modified": false
    },
    {
-      "id": "Start app timeout\n\nTIP: use '{{.Command}}' for more information",
-      "translation": "启动应用程序超时\n\n小贴士: 使用'{{.Command}}'以获取更多信息",
-      "modified": false
+      "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.",
+      "translation": "Start app timeout\n\nTIP: Application must be listening on the right port.\n     Instead of hard coding the port, use the $PORT environment variable.",
+      "modified": true
    },
    {
       "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
@@ -5073,6 +5073,11 @@
       "id": "Url",
       "translation": "Url",
       "modified": false
+   },
+   {
+      "id": "Use '{{.Command}}' for more information",
+      "translation": "启动应用程序超时\n\n小贴士: 使用'{{.Command}}'以获取更多信息",
+      "modified": true
    },
    {
       "id": "Use '{{.Name}}' to view or set your target org and space",

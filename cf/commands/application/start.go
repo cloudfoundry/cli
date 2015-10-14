@@ -305,9 +305,10 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 
 	for {
 		if time.Since(startupStartTime) > cmd.StartupTimeout {
-			cmd.ui.Failed(fmt.Sprintf(T("Start app timeout\n\nTIP: use '{{.Command}}' for more information",
-				map[string]interface{}{
-					"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))})))
+			tipMsg := T("Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.") + "\n\n"
+			tipMsg += T("Use '{{.Command}}' for more information", map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))})
+
+			cmd.ui.Failed(tipMsg)
 			return
 		}
 
