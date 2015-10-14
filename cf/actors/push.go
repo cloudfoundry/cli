@@ -46,21 +46,52 @@ func (actor PushActorImpl) PopulateFileMode(appDir string, presentFiles []resour
 	return presentFiles, nil
 }
 
-func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) (presentFiles []resources.AppFileResource, hasFileToUpload bool, apiErr error) {
+func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
+	var processAppDir = func(source string) ([]resources.AppFileResource, bool, error) {
+		files, hasFileToUpload, err := actor.copyUploadableFiles(source, uploadDir)
+		if err != nil {
+			return []resources.AppFileResource{}, false, err
+		}
+
+		files, err = actor.PopulateFileMode(source, files)
+		if err != nil {
+			return []resources.AppFileResource{}, false, err
+		}
+
+		return files, hasFileToUpload, nil
+	}
+
+	var (
+		processAppDirErr error
+		presentFiles     []resources.AppFileResource
+		hasFileToUpload  bool
+	)
+
 	if actor.zipper.IsZipFile(appDir) {
+		var handleZipErr error
 		fileutils.TempDir("unzipped-app", func(tmpDir string, err error) {
-			err = actor.zipper.Unzip(appDir, tmpDir)
 			if err != nil {
-				presentFiles = nil
-				apiErr = err
+				handleZipErr = err
 				return
 			}
-			presentFiles, hasFileToUpload, apiErr = actor.copyUploadableFiles(tmpDir, uploadDir)
+
+			err = actor.zipper.Unzip(appDir, tmpDir)
+			if err != nil {
+				handleZipErr = err
+				return
+			}
+
+			presentFiles, hasFileToUpload, processAppDirErr = processAppDir(tmpDir)
 		})
+
+		if handleZipErr != nil {
+			return []resources.AppFileResource{}, false, handleZipErr
+		}
 	} else {
-		presentFiles, hasFileToUpload, apiErr = actor.copyUploadableFiles(appDir, uploadDir)
+		presentFiles, hasFileToUpload, processAppDirErr = processAppDir(appDir)
 	}
-	return presentFiles, hasFileToUpload, apiErr
+
+	return presentFiles, hasFileToUpload, processAppDirErr
 }
 
 func (actor PushActorImpl) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
