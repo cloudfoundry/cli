@@ -28,7 +28,7 @@ func (cmd *ListStack) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "stack",
 		Description: T("Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"),
-		Usage:       T("CF_NAME stack STACK_NAME"),
+		Usage:       T("CF_NAME stack APP_NAME"),
 		Flags:       fs,
 		TotalArgs:   1,
 	}
@@ -36,7 +36,7 @@ func (cmd *ListStack) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires app name as argument\n\n") + command_registry.Commands.CommandUsage("stack"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires stack name as argument\n\n") + command_registry.Commands.CommandUsage("stack"))
 	}
 
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
