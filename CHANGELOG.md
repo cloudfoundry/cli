@@ -1,3 +1,103 @@
+## 6.13.0
+* Populate file mode correctly for zip file [#105471590]
+* Do not shadow named return value
+* Upload file mode under Windows 
+* Remove comments related to Noaa [#105524354]
+* Update file mode test for multi platform [#105490454]
+* Merge pull request #624 from cloudfoundry/integrity-fields-only 
+* Merge pull request #622 from cloudfoundry/refactor_user_printing 
+* Exclude resource_matches we didn't request [#104364496]
+* resource_match requests use only sha1 and size [#104364496]
+* Some formatting our build tools wanted
+* Tidy and organise userprint package
+* Rename package user_printer => userprint 
+* not to upload file mode during push under Windows
+* skip testing ssh feature in windows
+* not to build unix only modules on Windows
+* fix filemode test for different platforms
+* deps
+* Merge pull request #614 from cloudfoundry/zero-users-message-improvement 
+* More privatisation. [#63224944]
+* Shuffle and correct stuff [#63224944]
+* Only pass guid and username to PrintUsers [#63224944]
+* Make plugin PrintUsers almost identical [#63224944]
+* Strengthen space-users network failure test [#63224944]
+* Test error handling for standard space-users call
+* Tidy whitespace [#63224944]
+* Deterministic ordering from space-users [#63224944]
+* Deduplicate call from either side of a branch [#63224944]
+* Split space printing into separate types [#63224944]
+* Move versioning decision outside of loop [#63224944]
+* Iterate over map instead of slice, then map lookup [#63224944]
+* Update to use renamed i18n4go binary name [#105200174]
+* Merge pull request #610 from atulkc/router_group_cli 
+* remove debugging message in create-app-manifest
+* better message in 'org-users' when no users found in role [#63224896]
+* Rename get-ssh-code to ssh-code [#104476010]
+* Merge pull request #609 from cloudfoundry/update-go [#104131294]
+* Move to go 1.5.1 [#104131294] 
+* Add cf router-groups command [#100975070]
+* Remove trailing semicolon in GOPATH [#104131294]
+* include file mode during upload file app bits
+* command ssh uses one time auth code
+* command get-ssh-code
+* includes SSHOAuthClient in .cf/config.json
+* add command ssh to cf help
+* includes file mode during push
+* update -t flag usage in ssh command
+* SSH command
+* add Wildcard in dependency for injecting fakes
+* Fix space SSH grouping and capitalisation strings [#102295832]
+* Add space-ssh-allowed query [#102295832]
+* remove debugging code and unused test 
+* remove unused import
+* Update dependencies away from code.google.com [#103336616]
+* command disallow-space-ssh [#102295832]
+* command allow-space-ssh [#102295832]
+* allow_ssh field in space model [#102295832]
+* ssh-enabled command [#102394414]
+* disable-ssh command [#102394414]
+* enable-ssh command [#102394414]
+* enable_ssh field in models [#102394414]
+* push --docker-image help text [#102218860]
+* --docker-image for cf push [#102218860]
+* adding --health-check-type as full name flag to -u [#101729532]
+* godep flags package [#101729532]
+* use external flags parsing package with improved features [#101729532]
+* add -u to push for health-check-type [#101729532]
+* help test for get-health-check and set-health-check [#100320472]
+* new get-health-check command [#100320472]
+* add HealthCheckType to applicaiton model [#100597578]
+* Run i18n4go fixup, which reordered things. [#97265950]
+* Merge pull request #607 from cloudfoundry/interactive_plugin_install
+* Installer factory constructs the plugin downloader [#97265950]
+* Separate files for installers/downloader [#97265950]
+* Reshuffles and renames [#97265950]
+* Add PluginDownloader abstraction [#97265950]
+* Use different var for result of installer.Install [#97265950]
+* Go back to context object passing Collapse a dependency into the installer [#97265950]
+* More dependency balancing [#97265950]
+* Move some deps to specific types [#97265950]
+* Pass context bag to plugin installers [#97265950]
+* Move payload to structs [#97265950]
+* Remove one newline after domain TIPs [#104341944]
+* Add more detail to delete-shared-domain error [#104341944]
+* Add more detail to delete-domain error [#104341944]
+* Add note about generating language resources Fix #529 [#100446378]
+* Prepare oauth-token command for plugin execution [#104431292]
+* Merge pull request #588 from pishro-cc/master 
+* Merge pull request #596 from SrinivasChilveri/Issue_68736518 [#103895494]
+* better error reporting with feeded curl data is not enclosed.
+* Fix to the delete-domain to fail early if domain is shared delete-domain [#68736518]
+* Merge pull request #590 from Zouuup/bug/555 Handles [#103621532] [#101509044]
+* Merge pull request #581 from mcowger/master [#103453474] [#103453190]
+* Can scale an app to 0 instances [#97749342]
+* Update CHANGELOG.md
+* typo fixed json test for password containing double quote is now standard
+* new test added to test for passwords containing double quotes
+* Sanitize now works on passwords containing double quotes
+* Change how space tip is presented to user - add quotes. 
+
 ##6.12.4
 * Merge pull request #589 from cloudfoundry/usage-on-unadorned-push Provide usage on unadorned push
 * Provide usage on unadorned push [#103419480]
