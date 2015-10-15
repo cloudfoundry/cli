@@ -236,13 +236,6 @@ func newAppPresenter() (presenter appPresenter) {
 				},
 			},
 		}, {
-			Name: T("ROUTER GROUPS"),
-			CommandSubGroups: [][]cmdPresenter{
-				{
-					presentNonCodegangstaCommand("router-groups"),
-				},
-			},
-		}, {
 			Name: T("BUILDPACKS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{

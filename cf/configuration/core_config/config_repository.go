@@ -52,7 +52,6 @@ type Reader interface {
 	LoggregatorEndpoint() string
 	DopplerEndpoint() string
 	UaaEndpoint() string
-	RoutingApiEndpoint() string
 	AccessToken() string
 	SSHOAuthClient() string
 	RefreshToken() string
@@ -95,7 +94,6 @@ type ReadWriter interface {
 	SetLoggregatorEndpoint(string)
 	SetDopplerEndpoint(string)
 	SetUaaEndpoint(string)
-	SetRoutingApiEndpoint(string)
 	SetAccessToken(string)
 	SetSSHOAuthClient(string)
 	SetRefreshToken(string)
@@ -195,13 +193,6 @@ func (c *ConfigRepository) DopplerEndpoint() (logEndpoint string) {
 func (c *ConfigRepository) UaaEndpoint() (uaaEndpoint string) {
 	c.read(func() {
 		uaaEndpoint = c.data.UaaEndpoint
-	})
-	return
-}
-
-func (c *ConfigRepository) RoutingApiEndpoint() (routingApiEndpoint string) {
-	c.read(func() {
-		routingApiEndpoint = c.data.RoutingApiEndpoint
 	})
 	return
 }
@@ -439,12 +430,6 @@ func (c *ConfigRepository) SetDopplerEndpoint(endpoint string) {
 func (c *ConfigRepository) SetUaaEndpoint(uaaEndpoint string) {
 	c.write(func() {
 		c.data.UaaEndpoint = uaaEndpoint
-	})
-}
-
-func (c *ConfigRepository) SetRoutingApiEndpoint(routingApiEndpoint string) {
-	c.write(func() {
-		c.data.RoutingApiEndpoint = routingApiEndpoint
 	})
 }
 

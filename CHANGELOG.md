@@ -1,4 +1,5 @@
 ## 6.13.0
+* Revert "Merge pull request #610 from atulkc/router_group_cli"
 * Populate file mode correctly for zip file [#105471590]
 * Do not shadow named return value
 * Upload file mode under Windows 
