@@ -60,7 +60,7 @@ func (cmd *SSH) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	if len(fc.Args()) == 0 {
+	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument") + "\n\n" + command_registry.Commands.CommandUsage("ssh"))
 	}
 
