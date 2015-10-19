@@ -76,7 +76,7 @@ var _ = Describe("SSH command", func() {
 	}
 
 	Describe("Requirements", func() {
-		It("fails with usage when called without enough arguments", func() {
+		It("fails with usage when not provided exactly one arg", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand()
