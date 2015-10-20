@@ -12,9 +12,8 @@ if [ $OUTPUT -ne 0 ]; then
   exit 1
 fi
 
-OUTPUT=`i18n4go -c checkup`
-
-if [ "$OUTPUT" != "OK" ]; then
+OUTPUT=`i18n4go -c checkup -v`
+if [ $? -ne 0 ]; then
   echo "Error:"
   echo "$OUTPUT"
   exit 1
