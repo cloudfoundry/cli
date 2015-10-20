@@ -245,7 +245,12 @@ func (cmd *CliRpcCmd) DopplerEndpoint(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.AccessToken()
+	token, err := cmd.repoLocator.GetAuthenticationRepository().RefreshAuthToken()
+	if err != nil {
+		return err
+	}
+
+	*retVal = token
 
 	return nil
 }

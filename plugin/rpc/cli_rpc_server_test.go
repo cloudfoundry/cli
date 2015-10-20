@@ -1,6 +1,7 @@
 package rpc_test
 
 import (
+	"errors"
 	"net"
 	"net/rpc"
 	"os"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
+	fakeAPI "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -684,16 +686,33 @@ var _ = Describe("Server", func() {
 			})
 
 			Context(".AccessToken", func() {
+				var fakeAuthenticator *fakeAPI.FakeAuthenticationRepository
+
 				BeforeEach(func() {
-					rpcService, err = NewRpcService(nil, nil, config, api.RepositoryLocator{}, nil)
+					fakeAuthenticator = &fakeAPI.FakeAuthenticationRepository{}
+					locator := api.RepositoryLocator{}
+					locator = locator.SetAuthenticationRepository(fakeAuthenticator)
+
+					rpcService, err = NewRpcService(nil, nil, config, locator, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
 					pingCli(rpcService.Port())
 				})
 
-				It("returns the access token from the config", func() {
-					config.SetAccessToken("fake-access-token")
+				It("refreshes the token", func() {
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result string
+					err = client.Call("CliRpcCmd.AccessToken", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(fakeAuthenticator.RefreshTokenCalled).To(BeTrue())
+				})
+
+				It("returns the access token", func() {
+					fakeAuthenticator.RefreshToken = "fake-access-token"
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
@@ -702,6 +721,17 @@ var _ = Describe("Server", func() {
 					err = client.Call("CliRpcCmd.AccessToken", "", &result)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(result).To(Equal("fake-access-token"))
+				})
+
+				It("returns the error from refreshing the access token", func() {
+					fakeAuthenticator.RefreshTokenError = errors.New("refresh error")
+
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result string
+					err = client.Call("CliRpcCmd.AccessToken", "", &result)
+					Expect(err.Error()).To(Equal("refresh error"))
 				})
 			})
 
