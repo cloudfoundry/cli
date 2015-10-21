@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 if [ -z "$AWS_ACCESS_KEY_ID" ]; then
   echo "Need to set AWS_ACCESS_KEY_ID"
@@ -13,35 +13,42 @@ if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
 fi
 
 s3_config_file=$(pwd)/../../../../cli-ci/ci/s3cfg
+filename_regex="cf-cli(-installer)?([_0-9a-z]+)?\.([a-z]+)"
 
-function upload_artifacts {
-  s3_path_prefix=$1
+ls release
 
-  for file in $(ls release)
-  do
-    echo s3cmd --config=$s3_config_file put release/$file s3://go-cli/$s3_path_prefix/$file
-    s3cmd --config=$s3_config_file put release/$file s3://go-cli/$s3_path_prefix/$file
-  done
-}
-
-release_tags=$(git show-ref --tags -d | grep $(git rev-parse HEAD) | cut -d'/' -f3 | egrep 'v[0-9]'; exit 0)
+# Upload HEAD to master if HEAD is later than the latest release
 latest_release_tag=$(git tag | egrep 'v[0-9]' | sort | tail -n 1; exit 0)
-
-for tag in $release_tags
-do
-  echo "Uploading artifacts for release" $tag
-  upload_artifacts "releases/$tag"
-done
-
-# Only upload to the 'latest' bucket if we're building some
-# commit *after* the latest release
-
-# this tries to avoid uploading a release to the "latest" bucket if we're
-# actually building an older tag, which would result in us overwriting the
-# edge build with an older version.
 git merge-base --is-ancestor $latest_release_tag HEAD
-if [ $? -eq 0 ]
-then
-  echo "Uploading master artifacts"
-  upload_artifacts "master"
+if [ $? -eq 0 ]; then
+  echo "Uploading edge releases"
+
+  for f in $(ls release/cf-cli*);do
+    [[ $f =~ $filename_regex ]]
+    installer="${BASH_REMATCH[1]}"
+    os_arch="${BASH_REMATCH[2]}"
+    extension="${BASH_REMATCH[3]}"
+    if [ -z "${installer}" ]; then # don't upload edge installers
+      s3cmd --config=$s3_config_file put release/$f s3://go-cli/master/cf-cli_edge${os_arch}.${extension}
+    fi
+  done
+fi
+
+# Upload HEAD to releases
+match=$(git show-ref --tags -d | grep $(git rev-parse HEAD))
+if [ $? -eq 0 ]; then # head is tagged as a release
+  echo "Uploading stable" $release_tag "releases"
+
+  release_tag=$( echo $match | cut -d'/' -f3 | egrep 'v[0-9]' )
+  for f in $(ls release/cf-cli*);do
+    [[ $f =~ $filename_regex ]]
+    installer="${BASH_REMATCH[1]}"
+    os_arch="${BASH_REMATCH[2]}"
+    extension="${BASH_REMATCH[3]}"
+    if [ -z "${installer}" ]; then
+      s3cmd --config=$s3_config_file put release/$f s3://go-cli/releases/${release_tag}/cf-cli-installer_${release_tag}${os_arch}.${extension}
+    else
+      s3cmd --config=$s3_config_file put release/$f s3://go-cli/releases/${release_tag}/cf_cli-${release_tag}-${os}-${arch}.${extension}
+    fi
+  done
 fi
