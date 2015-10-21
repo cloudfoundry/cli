@@ -36,18 +36,23 @@ $ cf push
 
 Downloads
 =========
-**WARNING:** Edge binaries are published with each new 'push' that passes though CI. These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed.
+**Latest stable:** Download the installer or compressed binary for your platform:
 
-| Stable Installers | Stable Binaries | Edge Binaries |
-| :---------------: |:---------------:| :------------:|
-| [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64&source=github) | [Mac OS X 64 bit](https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github) | [Mac OS X 64 bit](https://cli.run.pivotal.io/edge?arch=macosx64&source=github) |
-| [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32&source=github) | [Windows 32 bit](https://cli.run.pivotal.io/stable?release=windows32-exe&source=github) | [Windows 32 bit](https://cli.run.pivotal.io/edge?arch=windows32&source=github) |
-| [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64&source=github) | [Windows 64 bit](https://cli.run.pivotal.io/stable?release=windows64-exe&source=github) | [Windows 64 bit](https://cli.run.pivotal.io/edge?arch=windows64&source=github) |
-| [Redhat 32 bit](https://cli.run.pivotal.io/stable?release=redhat32&source=github) | [Linux 32 bit](https://cli.run.pivotal.io/stable?release=linux32-binary&source=github) | [Linux 32 bit](https://cli.run.pivotal.io/edge?arch=linux32&source=github) |
-| [Redhat 64 bit](https://cli.run.pivotal.io/stable?release=redhat64&source=github) | [Linux 64 bit](https://cli.run.pivotal.io/stable?release=linux64-binary&source=github) | [Linux 64 bit](https://cli.run.pivotal.io/edge?arch=linux64&source=github) |
-| [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&source=github)
-| [Debian 64 bit](https://cli.run.pivotal.io/stable?release=debian64&source=github)
+| | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
+| :---------------: | :---------------: |:---------------:| :------------:|
+| Installers | [pkg](https://cli.run.pivotal.io/stable?release=macosx64&source=github) | [zip](https://cli.run.pivotal.io/stable?release=windows64&source=github) | [rpm](https://cli.run.pivotal.io/stable?release=redhat64&source=github) / [deb](https://cli.run.pivotal.io/stable?release=debian64&source=github) |
+| Binaries | [tgz](https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github) | [zip](https://cli.run.pivotal.io/stable?release=windows64-exe&source=github) | [tgz](https://cli.run.pivotal.io/stable?release=linux64-binary&source=github) |
 
+**From the command line:** Download examples with curl for Mac OS X and Linux
+```
+# ...download & extract Mac OS X binary
+$ curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github" | tar -zx
+# ...or Linux binary
+$ curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
+# ...and confirm you got the version you expected
+$ ./cf --version
+cf version x.y.z-...
+```
 
 **Experimental:** Install CF for OSX through [Homebrew](http://brew.sh/) via the [pivotal's homebrew-tap](https://github.com/pivotal/homebrew-tap):
 
@@ -56,7 +61,10 @@ $ brew tap pivotal/tap
 $ brew install cloudfoundry-cli
 ```
 
-**Releases:** Information about our releases can be found [here](https://github.com/cloudfoundry/cli/releases)
+Also, edge binaries are published for [Mac OS X 64 bit](https://cli.run.pivotal.io/edge?arch=macosx64&source=github), [Windows 64 bit](https://cli.run.pivotal.io/edge?arch=windows64&source=github) and [Linux 64 bit](https://cli.run.pivotal.io/edge?arch=linux64&source=github) with each new 'push' that passes though CI.
+These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed.
+
+**Releases:** 32 bit releases and information about all our releases can be found [here](https://github.com/cloudfoundry/cli/releases)
 
 Troubleshooting / FAQs
 ======================
