@@ -25,6 +25,7 @@ type ServiceRepository interface {
 	GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr error)
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
+	PurgeServiceInstance(instance models.ServiceInstance) error
 	CreateServiceInstance(name, planGuid string, params map[string]interface{}, tags []string) (apiErr error)
 	UpdateServiceInstance(instanceGuid, planGuid string, params map[string]interface{}, tags []string) (apiErr error)
 	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
@@ -201,6 +202,11 @@ func (repo CloudControllerServiceRepository) DeleteService(instance models.Servi
 
 func (repo CloudControllerServiceRepository) PurgeServiceOffering(offering models.ServiceOffering) error {
 	url := fmt.Sprintf("/v2/services/%s?purge=true", offering.Guid)
+	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
+}
+
+func (repo CloudControllerServiceRepository) PurgeServiceInstance(instance models.ServiceInstance) error {
+	url := fmt.Sprintf("/v2/service_instances/%s?purge=true", instance.Guid)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
 }
 

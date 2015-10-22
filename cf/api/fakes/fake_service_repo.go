@@ -60,9 +60,14 @@ type FakeServiceRepo struct {
 	FindInstanceByNameName            string
 	FindInstanceByNameServiceInstance models.ServiceInstance
 	FindInstanceByNameErr             bool
+	FindInstanceByNameCalled          bool
 	FindInstanceByNameNotFound        bool
 
 	FindInstanceByNameMap generic.Map
+
+	PurgedServiceInstance           models.ServiceInstance
+	PurgeServiceInstanceCalled      bool
+	PurgeServiceInstanceApiResponse error
 
 	DeleteServiceServiceInstance models.ServiceInstance
 
@@ -132,6 +137,12 @@ func (repo *FakeServiceRepo) PurgeServiceOffering(offering models.ServiceOfferin
 	return repo.PurgeServiceOfferingApiResponse
 }
 
+func (repo *FakeServiceRepo) PurgeServiceInstance(instance models.ServiceInstance) (apiErr error) {
+	repo.PurgedServiceInstance = instance
+	repo.PurgeServiceInstanceCalled = true
+	return repo.PurgeServiceInstanceApiResponse
+}
+
 func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiErr error) {
 	repo.FindServiceOfferingByLabelAndProviderCalled = true
 	repo.FindServiceOfferingByLabelAndProviderName = name
@@ -174,6 +185,7 @@ func (repo *FakeServiceRepo) UpdateServiceInstance(instanceGuid, planGuid string
 
 func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error) {
 	repo.FindInstanceByNameName = name
+	repo.FindInstanceByNameCalled = true
 
 	if repo.FindInstanceByNameMap != nil && repo.FindInstanceByNameMap.Has(name) {
 		instance = repo.FindInstanceByNameMap.Get(name).(models.ServiceInstance)
