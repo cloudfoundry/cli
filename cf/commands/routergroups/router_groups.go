@@ -24,7 +24,7 @@ func init() {
 func (cmd *RouterGroups) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "router-groups",
-		Description: T("List router-groups"),
+		Description: T("List router groups"),
 		Usage:       "CF_NAME router-groups",
 	}
 }
