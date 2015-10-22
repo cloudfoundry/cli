@@ -9,7 +9,8 @@ func init() {
 }
 
 func NewServiceInstance(name string) (service models.ServiceInstance) {
-	service.Name = name
-	service.Guid = serviceInstanceGuid()
-	return
+	return models.ServiceInstance{ServiceInstanceFields: models.ServiceInstanceFields{
+		Name: name,
+		Guid: serviceInstanceGuid(),
+	}}
 }
