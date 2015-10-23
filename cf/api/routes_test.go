@@ -150,7 +150,7 @@ var _ = Describe("route repository", func() {
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 						{
 							"metadata": { "guid": "my-route-guid" },
@@ -161,11 +161,35 @@ var _ = Describe("route repository", func() {
 			})
 			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
+			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "", "my-domain-guid", "my-space-guid")
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
+		})
+
+		It("creates routes with a path in a given space", func() {
+			ts, handler = testnet.NewServer([]testnet.TestRequest{
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:  "POST",
+					Path:    "/v2/routes?inline-relations-depth=1",
+					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"/this-is-a-path","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+						{
+							"metadata": { "guid": "my-route-guid" },
+							"entity": { "host": "my-cool-app", "path": "/this-is-a-path" }
+						}
+					`},
+				}),
+			})
+			configRepo.SetApiEndpoint(ts.URL)
+
+			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "/this-is-a-path", "my-domain-guid", "my-space-guid")
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
+			Expect(createdRoute.Path).To(Equal("/this-is-a-path"))
 		})
 
 		It("creates routes", func() {
@@ -173,7 +197,7 @@ var _ = Describe("route repository", func() {
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"the-space-guid"}`),
+					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"","domain_guid":"my-domain-guid","space_guid":"the-space-guid"}`),
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 						{
 							"metadata": { "guid": "my-route-guid" },
