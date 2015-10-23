@@ -18,7 +18,7 @@ type RouteRepository interface {
 	FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error)
 	Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error)
-	CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
+	CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
 	Unbind(routeGuid, appGuid string) (apiErr error)
 	Delete(routeGuid string) (apiErr error)
@@ -74,7 +74,7 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host string, doma
 }
 
 func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error) {
-	return repo.CreateInSpace(host, domain.Guid, repo.config.SpaceFields().Guid)
+	return repo.CreateInSpace(host, "", domain.Guid, repo.config.SpaceFields().Guid)
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error) {
@@ -93,8 +93,8 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 	return
 }
 
-func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
-	data := fmt.Sprintf(`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`, host, domainGuid, spaceGuid)
+func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
+	data := fmt.Sprintf(`{"host":"%s","path":"%s","domain_guid":"%s","space_guid":"%s"}`, host, path, domainGuid, spaceGuid)
 
 	resource := new(resources.RouteResource)
 	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/routes?inline-relations-depth=1", strings.NewReader(data), resource)
