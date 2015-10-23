@@ -685,9 +685,9 @@
       "modified": true
    },
    {
-      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]",
       "translation": "CF_NAME create-route SPACE DOMINIO [-n HOSTNAME]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
@@ -1575,13 +1575,13 @@
       "modified": false
    },
    {
-      "id": "Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Creando ruta {{.Hostname}} en org {{.OrgName}} / space {{.SpaceName}} como {{.Username}}...",
+      "id": "Creating route {{.Hostname}}...",
+      "translation": "Creando ruta {{.Hostname}}...",
       "modified": false
    },
    {
-      "id": "Creating route {{.Hostname}}...",
-      "translation": "Creando ruta {{.Hostname}}...",
+      "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "modified": false
    },
    {
@@ -3678,6 +3678,16 @@
       "id": "ORGS",
       "translation": "ORGS",
       "modified": false
+   },
+   {
+      "id": "Optional context path. Path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match.",
+      "translation": "Optional context path. Path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped. Requests received with a trailing slash will match.",
+      "modified": true
+   },
+   {
+      "id": "Optional hostname",
+      "translation": "Optional hostname",
+      "modified": true
    },
    {
       "id": "Org",

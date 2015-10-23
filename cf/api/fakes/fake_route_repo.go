@@ -21,6 +21,7 @@ type FakeRouteRepository struct {
 	CreatedRoute      models.Route
 
 	CreateInSpaceHost         string
+	CreateInSpacePath         string
 	CreateInSpaceDomainGuid   string
 	CreateInSpaceSpaceGuid    string
 	CreateInSpaceCreatedRoute models.Route
@@ -104,10 +105,11 @@ func (repo *FakeRouteRepository) CheckIfExists(host string, domain models.Domain
 	}
 	return
 }
-func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
+func (repo *FakeRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
 	repo.CreateInSpaceHost = host
 	repo.CreateInSpaceDomainGuid = domainGuid
 	repo.CreateInSpaceSpaceGuid = spaceGuid
+	repo.CreateInSpacePath = path
 
 	if repo.CreateInSpaceErr {
 		apiErr = errors.New("Error")
