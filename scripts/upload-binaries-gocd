@@ -13,7 +13,7 @@ if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
 fi
 
 s3_config_file=$(pwd)/../../../../cli-ci/ci/s3cfg
-filename_regex="cf-cli(-installer)?([_0-9a-z]+)?\.([a-z]+)"
+filename_regex="cf-cli(-installer)?([-_0-9a-z]+)?\.([a-z]+)"
 
 ls release
 
