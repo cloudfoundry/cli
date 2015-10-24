@@ -2830,6 +2830,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Does not require an argument\n\n",
+      "translation": "Incorrect Usage. Does not require an argument\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. HEALTH_CHECK_TYPE must be \"port\" or \"none\"\\n\\n",
       "translation": "Incorrect Usage. HEALTH_CHECK_TYPE must be \"port\" or \"none\"\\n\\n",
       "modified": false
@@ -3042,6 +3047,11 @@
    {
       "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
       "translation": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires stack name as argument\n\n",
+      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
       "modified": false
    },
    {
