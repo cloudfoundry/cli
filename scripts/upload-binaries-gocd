@@ -19,8 +19,10 @@ ls release
 
 # Upload HEAD to master if HEAD is later than the latest release
 latest_release_tag=$(git tag | egrep 'v[0-9]' | sort | tail -n 1; exit 0)
+set +e
 git merge-base --is-ancestor $latest_release_tag HEAD
 if [ $? -eq 0 ]; then
+  set -e
   echo "Uploading edge releases"
 
   for f in $(ls release/cf-cli*);do
@@ -35,8 +37,10 @@ if [ $? -eq 0 ]; then
 fi
 
 # Upload HEAD to releases
+set +e
 match=$(git show-ref --tags -d | grep $(git rev-parse HEAD))
 if [ $? -eq 0 ]; then # head is tagged as a release
+  set -e
   echo "Uploading stable" $release_tag "releases"
 
   release_tag=$( echo $match | cut -d'/' -f3 | egrep 'v[0-9]' )
