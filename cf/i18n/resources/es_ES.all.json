@@ -3005,6 +3005,11 @@
       "modified": false
    },
    {
+      "id": "Incorrect Usage. Requires stack name as argument\n\n",
+      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
+      "modified": false
+   },
+   {
       "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "translation": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "modified": false

@@ -53,7 +53,7 @@ var _ = Describe("stack command", func() {
 			Expect(testcmd.RunCliCommand("stack", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"FAILED"},
-				[]string{"Incorrect Usage."},
+				[]string{"Incorrect Usage.", "Requires stack name as argument"},
 			))
 		})
 	})
