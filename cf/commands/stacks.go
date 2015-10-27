@@ -30,7 +30,7 @@ func (cmd *ListStacks) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ListStacks) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 0 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires app name as argument\n\n") + command_registry.Commands.CommandUsage("stacks"))
+		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("stacks"))
 	}
 
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
