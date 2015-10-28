@@ -250,8 +250,11 @@ func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, 
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.ApiEndpoint(), orgGuid, rolePath)
 	request, _ := repo.ccGateway.NewRequest("PUT", path, repo.config.AccessToken(), strings.NewReader(`{"username": "`+username+`"}`))
 
-	_, _ = repo.ccGateway.PerformRequest(request)
-	apiErr = repo.addOrgUserRoleByUsername(username, orgGuid)
+	_, apiErr = repo.ccGateway.PerformRequest(request)
+	if apiErr != nil {
+		return
+	}
+	apiErr = repo.assocUserWithOrgByUsername(username, orgGuid)
 	return
 }
 
@@ -317,7 +320,7 @@ func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, ro
 	return apiPath, apiErr
 }
 
-func (repo CloudControllerUserRepository) addOrgUserRoleByUsername(username, orgGuid string) (apiErr error) {
+func (repo CloudControllerUserRepository) assocUserWithOrgByUsername(username, orgGuid string) (apiErr error) {
 	path := fmt.Sprintf("/v2/organizations/%s/users", orgGuid)
 	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(`{"username": "`+username+`"}`))
 }
