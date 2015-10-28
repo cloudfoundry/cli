@@ -530,6 +530,41 @@ var _ = Describe("User Repository", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Invalid Role"))
 		})
+
+		It("returns an error when the role request fails", func() {
+			setupCCServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/organizations/org-guid/managers",
+					Response: testnet.TestResponse{Status: http.StatusBadRequest},
+				}),
+			)
+
+			err := repo.SetOrgRoleByUsername("user@example.com", "org-guid", "OrgManager")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("status code: 400"))
+		})
+
+		It("returns an error when the user-org association fails", func() {
+			setupCCServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/organizations/org-guid/managers",
+					Response: testnet.TestResponse{Status: http.StatusOK},
+				}),
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/organizations/org-guid/users",
+					Response: testnet.TestResponse{Status: http.StatusBadRequest},
+				}),
+			)
+
+			err := repo.SetOrgRoleByUsername("user@example.com", "org-guid", "OrgManager")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("status code: 400"))
+		})
 	})
 
 	Describe("assigning space roles", func() {
