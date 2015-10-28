@@ -38,6 +38,7 @@ type FakeUserRepository struct {
 	SetSpaceRoleOrgGuid   string
 	SetSpaceRoleSpaceGuid string
 	SetSpaceRoleRole      string
+	SetSpaceRoleCalled    bool
 
 	UnsetSpaceRoleUserGuid  string
 	UnsetSpaceRoleSpaceGuid string
@@ -132,6 +133,11 @@ func (repo *FakeUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role 
 	repo.SetSpaceRoleOrgGuid = orgGuid
 	repo.SetSpaceRoleSpaceGuid = spaceGuid
 	repo.SetSpaceRoleRole = role
+	repo.SetSpaceRoleCalled = true
+	return
+}
+
+func (repo *FakeUserRepository) SetSpaceRoleByUsername(username, spaceGuid, orgGuid, role string) (apiErr error) {
 	return
 }
 
