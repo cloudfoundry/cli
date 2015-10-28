@@ -567,6 +567,88 @@ var _ = Describe("User Repository", func() {
 		})
 	})
 
+	Describe("assigning users space roles by username", func() {
+		spaceRoleURLs := map[string]string{
+			"SpaceManager":   "/v2/spaces/my-space-guid/managers",
+			"SpaceDeveloper": "/v2/spaces/my-space-guid/developers",
+			"SpaceAuditor":   "/v2/spaces/my-space-guid/auditors",
+		}
+
+		for role, roleURL := range spaceRoleURLs {
+			It("gives users the "+role+" role", func() {
+				setupCCServer(
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "PUT",
+						Path:     "/v2/organizations/my-org-guid/users",
+						Response: testnet.TestResponse{Status: http.StatusOK},
+						Matcher:  testnet.RequestBodyMatcher(`{"username": "user@example.com"}`),
+					}),
+
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "PUT",
+						Path:     roleURL,
+						Response: testnet.TestResponse{Status: http.StatusOK},
+						Matcher:  testnet.RequestBodyMatcher(`{"username": "user@example.com"}`),
+					}))
+
+				err := repo.SetSpaceRoleByUsername("user@example.com", "my-space-guid", "my-org-guid", role)
+
+				Expect(ccHandler).To(HaveAllRequestsCalled())
+				Expect(err).NotTo(HaveOccurred())
+			})
+		}
+
+		It("returns an error when given an invalid role to set", func() {
+			err := repo.SetSpaceRoleByUsername("thenameoftheuser", "space-guid", "my-org-guid", "foo")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Invalid Role"))
+		})
+
+		It("returns an error when the role request fails", func() {
+			setupCCServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/organizations/my-org-guid/users",
+					Response: testnet.TestResponse{Status: http.StatusOK},
+					Matcher:  testnet.RequestBodyMatcher(`{"username": "user@example.com"}`),
+				}),
+
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/spaces/space-guid/managers",
+					Response: testnet.TestResponse{Status: http.StatusBadRequest},
+				}),
+			)
+
+			err := repo.SetSpaceRoleByUsername("user@example.com", "space-guid", "my-org-guid", "SpaceManager")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("status code: 400"))
+		})
+
+		It("returns an error when the user-org association fails", func() {
+			setupCCServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/organizations/org-guid/users",
+					Response: testnet.TestResponse{Status: http.StatusBadRequest},
+				}),
+
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/spaces/space-guid/managers",
+					Response: testnet.TestResponse{Status: http.StatusOK},
+				}),
+			)
+
+			err := repo.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", "SpaceManager")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("status code: 400"))
+		})
+	})
+
 	Describe("assigning space roles", func() {
 		spaceRoleURLS := map[string]string{
 			"SpaceManager":   "/v2/spaces/my-space-guid/managers/my-user-guid",
