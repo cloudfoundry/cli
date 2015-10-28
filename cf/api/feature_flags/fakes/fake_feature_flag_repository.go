@@ -81,6 +81,9 @@ func (fake *FakeFeatureFlagRepository) FindByNameCallCount() int {
 func (fake *FakeFeatureFlagRepository) FindByNameArgsForCall(i int) string {
 	fake.findByNameMutex.RLock()
 	defer fake.findByNameMutex.RUnlock()
+	if len(fake.findByNameArgsForCall) == 0 {
+		panic("No call to FindByName yet")
+	}
 	return fake.findByNameArgsForCall[i].arg1
 }
 

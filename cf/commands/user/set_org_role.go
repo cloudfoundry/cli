@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -14,6 +15,7 @@ import (
 type SetOrgRole struct {
 	ui       terminal.UI
 	config   core_config.Reader
+	flagRepo feature_flags.FeatureFlagRepository
 	userRepo api.UserRepository
 	userReq  requirements.UserRequirement
 	orgReq   requirements.OrganizationRequirement
@@ -55,6 +57,7 @@ func (cmd *SetOrgRole) SetDependency(deps command_registry.Dependency, pluginCal
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
 	return cmd
 }
 
@@ -62,6 +65,10 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 	role := models.UserInputToOrgRole[c.Args()[2]]
+	setRolesByUsername, err := cmd.flagRepo.FindByName("set_roles_by_username")
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
@@ -71,10 +78,14 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr := cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)
+	var apiErr error
+	if setRolesByUsername.Enabled {
+		apiErr = cmd.userRepo.SetOrgRoleByUsername(user.Username, org.Guid, role)
+	} else {
+		apiErr = cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)
+	}
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	cmd.ui.Ok()

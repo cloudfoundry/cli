@@ -435,7 +435,7 @@ var _ = Describe("User Repository", func() {
 		})
 	})
 
-	Describe("assigning users organization roles", func() {
+	Describe("assigning users organization roles by GUID", func() {
 		orgRoleURLS := map[string]string{
 			"OrgManager":     "/v2/organizations/my-org-guid/managers/my-user-guid",
 			"BillingManager": "/v2/organizations/my-org-guid/billing_managers/my-user-guid",
@@ -487,6 +487,45 @@ var _ = Describe("User Repository", func() {
 
 		It("returns an error when given an invalid role to unset", func() {
 			err := repo.UnsetOrgRole("user-guid", "org-guid", "foo")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Invalid Role"))
+		})
+	})
+
+	Describe("assigning users organization roles by username", func() {
+		orgRoleURLS := map[string]string{
+			"OrgManager":     "/v2/organizations/my-org-guid/managers",
+			"BillingManager": "/v2/organizations/my-org-guid/billing_managers",
+			"OrgAuditor":     "/v2/organizations/my-org-guid/auditors",
+		}
+
+		for role, roleURL := range orgRoleURLS {
+			It("gives users the "+role+" role", func() {
+				setupCCServer(
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "PUT",
+						Path:     roleURL,
+						Response: testnet.TestResponse{Status: http.StatusOK},
+						Matcher:  testnet.RequestBodyMatcher(`{"username": "user@example.com"}`),
+					}),
+
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "PUT",
+						Path:     "/v2/organizations/my-org-guid/users",
+						Response: testnet.TestResponse{Status: http.StatusOK},
+						Matcher:  testnet.RequestBodyMatcher(`{"username": "user@example.com"}`),
+					}))
+
+				err := repo.SetOrgRoleByUsername("user@example.com", "my-org-guid", role)
+
+				Expect(ccHandler).To(HaveAllRequestsCalled())
+				Expect(err).NotTo(HaveOccurred())
+			})
+		}
+
+		It("returns an error when given an invalid role to set", func() {
+			err := repo.SetOrgRoleByUsername("thenameoftheuser", "org-guid", "foo")
 
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Invalid Role"))
