@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"errors"
-
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -14,12 +12,11 @@ import (
 )
 
 type ListDomains struct {
-	ui              terminal.UI
-	config          core_config.Reader
-	orgReq          requirements.TargetedOrgRequirement
-	domainRepo      api.DomainRepository
-	routingApiRepo  api.RoutingApiRepository
-	routerGroupsMap map[string]models.RouterGroup
+	ui             terminal.UI
+	config         core_config.Reader
+	orgReq         requirements.TargetedOrgRequirement
+	domainRepo     api.DomainRepository
+	routingApiRepo api.RoutingApiRepository
 }
 
 func init() {
@@ -83,44 +80,30 @@ func (cmd *ListDomains) fetchAllDomains(orgGuid string) (domains []models.Domain
 	return
 }
 
-func (cmd *ListDomains) getRouterGroupTypeFromGuid(guid string) (string, error) {
-	if cmd.routerGroupsMap == nil {
-		cmd.routerGroupsMap = map[string]models.RouterGroup{}
-		cb := func(routerGroup models.RouterGroup) bool {
-			cmd.routerGroupsMap[routerGroup.Guid] = routerGroup
-			return true
-		}
-
-		apiErr := cmd.routingApiRepo.ListRouterGroups(cb)
-		if apiErr != nil {
-			return "", apiErr
-		}
-	}
-
-	routerGroup, ok := cmd.routerGroupsMap[guid]
-	if ok == false {
-		return "", errors.New(T("Invalid router group guid"))
-	}
-
-	return routerGroup.Type, nil
-}
-
 func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields) {
 	table := cmd.ui.Table([]string{T("name"), T("status"), T("routing")})
 
-	cmd.routerGroupsMap = nil
+	var routerGroupsMap map[string]models.RouterGroup
+	var err error
 
 	for _, domain := range domains {
 		if domain.Shared {
 			if domain.RouterGroupGuid == "" {
 				table.Add(domain.Name, T("shared"))
 			} else {
-				routerGroupType, err := cmd.getRouterGroupTypeFromGuid(domain.RouterGroupGuid)
-				if err != nil {
-					cmd.ui.Failed(T("Failed fetching router groups.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
+				if routerGroupsMap == nil {
+					routerGroupsMap, err = cmd.initializeRouterGroups()
+					if err != nil {
+						cmd.ui.Failed(T("Failed fetching router groups.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
+					}
 				}
 
-				table.Add(domain.Name, T("shared"), routerGroupType)
+				routerGroup, ok := routerGroupsMap[domain.RouterGroupGuid]
+				if !ok {
+					cmd.ui.Failed(T("Invalid router group guid: {{.Guid}}", map[string]interface{}{"Guid": domain.RouterGroupGuid}))
+				}
+
+				table.Add(domain.Name, T("shared"), routerGroup.Type)
 			}
 		}
 	}
@@ -131,4 +114,19 @@ func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields) {
 		}
 	}
 	table.Print()
+}
+
+func (cmd *ListDomains) initializeRouterGroups() (map[string]models.RouterGroup, error) {
+	routerGroupsMap := map[string]models.RouterGroup{}
+	cb := func(routerGroup models.RouterGroup) bool {
+		routerGroupsMap[routerGroup.Guid] = routerGroup
+		return true
+	}
+
+	apiErr := cmd.routingApiRepo.ListRouterGroups(cb)
+	if apiErr != nil {
+		return nil, apiErr
+	}
+
+	return routerGroupsMap, nil
 }

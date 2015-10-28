@@ -3185,8 +3185,8 @@
       "modified": false
    },
    {
-      "id": "Invalid router group guid",
-      "translation": "Invalid router group guid",
+      "id": "Invalid router group guid: {{.Guid}}",
+      "translation": "Invalid router group guid: {{.Guid}}",
       "modified": false
    },
    {
