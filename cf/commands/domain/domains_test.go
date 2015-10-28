@@ -21,6 +21,7 @@ var _ = Describe("domains command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		domainRepo          *testapi.FakeDomainRepository
+		routingApiRepo      *testapi.FakeRoutingApiRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -28,6 +29,7 @@ var _ = Describe("domains command", func() {
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
+		deps.RepoLocator = deps.RepoLocator.SetRoutingApiRepository(routingApiRepo)
 		deps.Config = configRepo
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("domains").SetDependency(deps, pluginCall))
 	}
@@ -36,6 +38,7 @@ var _ = Describe("domains command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		domainRepo = &testapi.FakeDomainRepository{}
+		routingApiRepo = &testapi.FakeRoutingApiRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
@@ -78,34 +81,91 @@ var _ = Describe("domains command", func() {
 		})
 
 		Context("when there is at least one domain", func() {
-			BeforeEach(func() {
-				domainRepo.ListDomainsForOrgDomains = []models.DomainFields{
-					models.DomainFields{
-						Shared: false,
-						Name:   "Private-domain1",
-					},
-					models.DomainFields{
-						Shared: true,
-						Name:   "The-shared-domain",
-					},
-					models.DomainFields{
-						Shared: false,
-						Name:   "Private-domain2",
-					},
-				}
+			Context("when a domain has router group guid which is not found in routing api", func() {
+				BeforeEach(func() {
+					domainRepo.ListDomainsForOrgDomains = []models.DomainFields{
+						models.DomainFields{
+							Shared:          true,
+							Name:            "The-shared-domain1",
+							RouterGroupGuid: "valid_guid",
+						},
+						models.DomainFields{
+							Shared:          true,
+							Name:            "The-shared-domain2",
+							RouterGroupGuid: "invalid_guid",
+						},
+					}
+
+					routingApiRepo.RouterGroups = models.RouterGroups{
+						models.RouterGroup{
+							Guid: "valid_guid",
+							Name: "default-router-group",
+							Type: "tcp",
+						},
+					}
+				})
+
+				It("fails with error", func() {
+					runCommand()
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting domains in org", "my-org", "my-user"},
+						[]string{"FAILED"},
+						[]string{"Failed fetching router groups"},
+					))
+				})
 			})
 
-			It("lists domains", func() {
-				runCommand()
+			Context("when all the domains' router group guids could be found", func() {
+				BeforeEach(func() {
+					domainRepo.ListDomainsForOrgDomains = []models.DomainFields{
+						models.DomainFields{
+							Shared: false,
+							Name:   "Private-domain1",
+						},
+						models.DomainFields{
+							Shared:          true,
+							Name:            "The-shared-domain1",
+							RouterGroupGuid: "tcp-router-group",
+						},
+						models.DomainFields{
+							Shared:          true,
+							Name:            "The-shared-domain2",
+							RouterGroupGuid: "no-type-router-group",
+						},
+						models.DomainFields{
+							Shared: false,
+							Name:   "Private-domain2",
+						},
+					}
 
-				Expect(domainRepo.ListDomainsForOrgGuid).To(Equal("my-org-guid"))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Getting domains in org", "my-org", "my-user"},
-					[]string{"name", "status"},
-					[]string{"The-shared-domain", "shared"},
-					[]string{"Private-domain1", "owned"},
-					[]string{"Private-domain2", "owned"},
-				))
+					routingApiRepo.RouterGroups = models.RouterGroups{
+						models.RouterGroup{
+							Guid: "tcp-router-group",
+							Name: "default-router-group",
+							Type: "tcp",
+						},
+						models.RouterGroup{
+							Guid: "no-type-router-group",
+							Name: "router-group-2",
+							Type: "",
+						},
+					}
+				})
+
+				It("lists domains", func() {
+					runCommand()
+
+					Expect(domainRepo.ListDomainsForOrgGuid).To(Equal("my-org-guid"))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting domains in org", "my-org", "my-user"},
+						[]string{"name", "status", "routing"},
+						[]string{"The-shared-domain1", "shared", "tcp"},
+						[]string{"The-shared-domain2", "shared"},
+						[]string{"Private-domain1", "owned"},
+						[]string{"Private-domain2", "owned"},
+					))
+				})
 			})
 		})
 
@@ -126,6 +186,25 @@ var _ = Describe("domains command", func() {
 				[]string{"FAILED"},
 				[]string{"Failed fetching domains"},
 				[]string{"borked!"},
+			))
+		})
+
+		It("fails with error when the routing api returns an error", func() {
+			domainRepo.ListDomainsForOrgDomains = []models.DomainFields{
+				models.DomainFields{
+					Shared:          true,
+					Name:            "Shared-domain",
+					RouterGroupGuid: "router-group-guid",
+				},
+			}
+
+			routingApiRepo.ListError = true
+			runCommand()
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Getting domains in org", "my-org", "my-user"},
+				[]string{"FAILED"},
+				[]string{"Failed fetching router groups"},
 			))
 		})
 	})
