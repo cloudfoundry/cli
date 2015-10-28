@@ -137,7 +137,7 @@ Developing
 Contributing
 ============
 
-Major new feature proposals are given as a publically viewable google document with commenting allowed and discussed on the [vcap-dev](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev) mailing list.
+Major new feature proposals are given as a publically viewable google document with commenting allowed and discussed on the [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) mailing list.
 
 Pull Requests
 ---------------------
