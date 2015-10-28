@@ -38,6 +38,7 @@ type UserRepository interface {
 	Create(username, password string) (apiErr error)
 	Delete(userGuid string) (apiErr error)
 	SetOrgRole(userGuid, orgGuid, role string) (apiErr error)
+	SetOrgRoleByUsername(username, orgGuid, role string) (apiErr error)
 	UnsetOrgRole(userGuid, orgGuid, role string) (apiErr error)
 	SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiErr error)
 	UnsetSpaceRole(userGuid, spaceGuid, role string) (apiErr error)
@@ -237,6 +238,23 @@ func (repo CloudControllerUserRepository) SetOrgRole(userGuid string, orgGuid st
 	return repo.addOrgUserRole(userGuid, orgGuid)
 }
 
+func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, orgGuid string, role string) (apiErr error) {
+	rolePath, found := orgRoleToPathMap[role]
+
+	if !found {
+		apiErr = errors.NewWithFmt(T("Invalid Role {{.Role}}",
+			map[string]interface{}{"Role": role}))
+		return
+	}
+
+	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.ApiEndpoint(), orgGuid, rolePath)
+	request, _ := repo.ccGateway.NewRequest("PUT", path, repo.config.AccessToken(), strings.NewReader(`{"username": "`+username+`"}`))
+
+	_, _ = repo.ccGateway.PerformRequest(request)
+	apiErr = repo.addOrgUserRoleByUsername(username, orgGuid)
+	return
+}
+
 func (repo CloudControllerUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (apiErr error) {
 	return repo.setOrUnsetOrgRole("DELETE", userGuid, orgGuid, role)
 }
@@ -297,6 +315,11 @@ func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, ro
 
 	apiPath := fmt.Sprintf("/v2/spaces/%s/%s/%s", spaceGuid, rolePath, userGuid)
 	return apiPath, apiErr
+}
+
+func (repo CloudControllerUserRepository) addOrgUserRoleByUsername(username, orgGuid string) (apiErr error) {
+	path := fmt.Sprintf("/v2/organizations/%s/users", orgGuid)
+	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(`{"username": "`+username+`"}`))
 }
 
 func (repo CloudControllerUserRepository) addOrgUserRole(userGuid, orgGuid string) (apiErr error) {

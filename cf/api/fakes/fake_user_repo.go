@@ -26,6 +26,9 @@ type FakeUserRepository struct {
 	SetOrgRoleUserGuid         string
 	SetOrgRoleOrganizationGuid string
 	SetOrgRoleRole             string
+	SetOrgRoleCalled           bool
+	SetOrgRoleUsername         string
+	SetOrgRoleByUsernameError  error
 
 	UnsetOrgRoleUserGuid         string
 	UnsetOrgRoleOrganizationGuid string
@@ -104,7 +107,17 @@ func (repo *FakeUserRepository) SetOrgRole(userGuid, orgGuid, role string) (apiE
 	repo.SetOrgRoleUserGuid = userGuid
 	repo.SetOrgRoleOrganizationGuid = orgGuid
 	repo.SetOrgRoleRole = role
+	repo.SetOrgRoleCalled = true
 	return
+}
+
+func (repo *FakeUserRepository) SetOrgRoleByUsername(username, orgGuid, role string) (apiErr error) {
+	if repo.SetOrgRoleByUsernameError != nil {
+		return repo.SetOrgRoleByUsernameError
+	} else {
+		repo.SetOrgRoleUsername = username
+		return
+	}
 }
 
 func (repo *FakeUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (apiErr error) {
