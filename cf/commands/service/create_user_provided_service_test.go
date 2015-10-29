@@ -67,7 +67,7 @@ var _ = Describe("create-user-provided-service command", func() {
 		))
 
 		Expect(repo.CreateCallCount()).To(Equal(1))
-		name, drainUrl, params := repo.CreateArgsForCall(0)
+		name, drainUrl, _, params := repo.CreateArgsForCall(0)
 		Expect(name).To(Equal("my-custom-service"))
 		Expect(drainUrl).To(Equal(""))
 		Expect(params["foo"]).To(Equal("foo value"))
@@ -84,7 +84,7 @@ var _ = Describe("create-user-provided-service command", func() {
 		args := []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": 4}`, "my-custom-service"}
 		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
 
-		name, _, params := repo.CreateArgsForCall(0)
+		name, _, _, params := repo.CreateArgsForCall(0)
 		Expect(name).To(Equal("my-custom-service"))
 
 		Expect(ui.Prompts).To(BeEmpty())
@@ -104,8 +104,20 @@ var _ = Describe("create-user-provided-service command", func() {
 		args := []string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"}
 		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
 
-		_, drainUrl, _ := repo.CreateArgsForCall(0)
+		_, drainUrl, _, _ := repo.CreateArgsForCall(0)
 		Expect(drainUrl).To(Equal("syslog://example.com"))
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user provided service"},
+			[]string{"OK"},
+		))
+	})
+
+	It("creates a user provided service with a route service url", func() {
+		args := []string{"-r", "https://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"}
+		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+
+		_, _, routeServiceUrl, _ := repo.CreateArgsForCall(0)
+		Expect(routeServiceUrl).To(Equal("https://example.com"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating user provided service"},
 			[]string{"OK"},

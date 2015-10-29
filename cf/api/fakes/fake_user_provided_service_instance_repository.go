@@ -2,18 +2,20 @@
 package fakes
 
 import (
+	"sync"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
-	"sync"
 )
 
 type FakeUserProvidedServiceInstanceRepository struct {
-	CreateStub        func(name, drainUrl string, params map[string]interface{}) (apiErr error)
+	CreateStub        func(name, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
-		name     string
-		drainUrl string
-		params   map[string]interface{}
+		name            string
+		drainUrl        string
+		routeServiceUrl string
+		params          map[string]interface{}
 	}
 	createReturns struct {
 		result1 error
@@ -35,16 +37,17 @@ type FakeUserProvidedServiceInstanceRepository struct {
 	}
 }
 
-func (fake *FakeUserProvidedServiceInstanceRepository) Create(name string, drainUrl string, params map[string]interface{}) (apiErr error) {
+func (fake *FakeUserProvidedServiceInstanceRepository) Create(name string, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error) {
 	fake.createMutex.Lock()
-	defer fake.createMutex.Unlock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		name     string
-		drainUrl string
-		params   map[string]interface{}
-	}{name, drainUrl, params})
+		name            string
+		drainUrl        string
+		routeServiceUrl string
+		params          map[string]interface{}
+	}{name, drainUrl, routeServiceUrl, params})
+	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(name, drainUrl, params)
+		return fake.CreateStub(name, drainUrl, routeServiceUrl, params)
 	} else {
 		return fake.createReturns.result1
 	}
@@ -56,10 +59,10 @@ func (fake *FakeUserProvidedServiceInstanceRepository) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeUserProvidedServiceInstanceRepository) CreateArgsForCall(i int) (string, string, map[string]interface{}) {
+func (fake *FakeUserProvidedServiceInstanceRepository) CreateArgsForCall(i int) (string, string, string, map[string]interface{}) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].name, fake.createArgsForCall[i].drainUrl, fake.createArgsForCall[i].params
+	return fake.createArgsForCall[i].name, fake.createArgsForCall[i].drainUrl, fake.createArgsForCall[i].routeServiceUrl, fake.createArgsForCall[i].params
 }
 
 func (fake *FakeUserProvidedServiceInstanceRepository) CreateReturns(result1 error) {
@@ -71,10 +74,10 @@ func (fake *FakeUserProvidedServiceInstanceRepository) CreateReturns(result1 err
 
 func (fake *FakeUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {
 	fake.updateMutex.Lock()
-	defer fake.updateMutex.Unlock()
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		serviceInstanceFields models.ServiceInstanceFields
 	}{serviceInstanceFields})
+	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(serviceInstanceFields)
 	} else {
@@ -103,8 +106,8 @@ func (fake *FakeUserProvidedServiceInstanceRepository) UpdateReturns(result1 err
 
 func (fake *FakeUserProvidedServiceInstanceRepository) GetSummaries() (models.UserProvidedServiceSummary, error) {
 	fake.getSummariesMutex.Lock()
-	defer fake.getSummariesMutex.Unlock()
 	fake.getSummariesArgsForCall = append(fake.getSummariesArgsForCall, struct{}{})
+	fake.getSummariesMutex.Unlock()
 	if fake.GetSummariesStub != nil {
 		return fake.GetSummariesStub()
 	} else {
