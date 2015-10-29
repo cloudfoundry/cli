@@ -27,14 +27,15 @@ func init() {
 
 func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials")}
-	fs["l"] = &cliFlags.StringFlag{ShortName: "l", Usage: T("Syslog Drain Url")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials exposed in the VCAP_SERVICES environment variable for bound applications")}
+	fs["l"] = &cliFlags.StringFlag{ShortName: "l", Usage: T("URL to which logs for bound applications will be streamed")}
+	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("URL to which requests for bound routes will be forwarded. Scheme for this URL must be https")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",
 		Description: T("Make a user-provided service instance available to cf apps"),
-		Usage: T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]
+		Usage: T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
 
    Pass comma separated credential parameter names to enable interactive mode:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
@@ -45,6 +46,7 @@ func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadat
 EXAMPLE 
       CF_NAME create-user-provided-service my-db-mine -p "username, password"
       CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
+      CF_NAME create-user-provided-service my-route-service -r https://example.com
 
    Linux/Mac:
       CF_NAME create-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
@@ -81,6 +83,7 @@ func (cmd *CreateUserProvidedService) SetDependency(deps command_registry.Depend
 func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 	name := c.Args()[0]
 	drainUrl := c.String("l")
+	routeServiceUrl := c.String("r")
 
 	params := c.String("p")
 	params = strings.Trim(params, `"`)
@@ -99,7 +102,7 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr := cmd.userProvidedServiceInstanceRepo.Create(name, drainUrl, paramsMap)
+	apiErr := cmd.userProvidedServiceInstanceRepo.Create(name, drainUrl, routeServiceUrl, paramsMap)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
