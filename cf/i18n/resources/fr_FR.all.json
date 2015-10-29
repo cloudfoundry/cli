@@ -735,8 +735,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE \n      CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n      CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n\n   Linux/Mac:\n      CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n      CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\n",
-      "translation": "CF_NAME create-user-provided-service INSTANCE_SERVICE [-p DONNEES_IDENTIFICATION] [-l URL_ENVOI_SYSLOG]\n\n   Transmettez des noms de paramètre de données d'identification séparés par une virgule afin d'activer le mode interactif :\n   CF_NAME create-user-provided-service INSTANCE_SERVICE -p \"noms, de, paramètre, séparés, par, une, virgule\"\n\n   Transmettez des paramètres de données d'identification sous forme d'objets JSON afin de créer un service de façon non interactive :\n   CF_NAME create-user-provided-service INSTANCE_SERVICE -p '{\"nom\":\"valeur\",\"nom\":\"valeur\"}'\n\nEXEMPLE \n      CF_NAME create-user-provided-service my-db-mine -p \"nomutilisateur, motdepasse\"\n      CF_NAME create-user-provided-service my-drain-service -l syslog://exemple.com\n\n Linux/Mac :\n CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Ligne de commande Windows\n CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\n",
+      "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE \n      CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n      CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n      CF_NAME create-user-provided-service my-route-service -r https://example.com\n\n   Linux/Mac:\n      CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n      CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\n",
+      "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE \n      CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n      CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n      CF_NAME create-user-provided-service my-route-service -r https://example.com\n\n   Linux/Mac:\n      CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n      CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\n",
       "modified": false
    },
    {
@@ -1637,6 +1637,11 @@
    {
       "id": "Credentials",
       "translation": "Données d'identification ",
+      "modified": false
+   },
+   {
+      "id": "Credentials exposed in the VCAP_SERVICES environment variable for bound applications",
+      "translation": "Credentials exposed in the VCAP_SERVICES environment variable for bound applications",
       "modified": false
    },
    {
@@ -4902,6 +4907,16 @@
    {
       "id": "UAA endpoint missing from config file",
       "translation": "Noeud final UUA manquant dans le fichier de configuration ",
+      "modified": false
+   },
+   {
+      "id": "URL to which logs for bound applications will be streamed",
+      "translation": "URL to which logs for bound applications will be streamed",
+      "modified": false
+   },
+   {
+      "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
+      "translation": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
       "modified": false
    },
    {

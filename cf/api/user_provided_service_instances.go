@@ -11,7 +11,7 @@ import (
 )
 
 type UserProvidedServiceInstanceRepository interface {
-	Create(name, drainUrl string, params map[string]interface{}) (apiErr error)
+	Create(name, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error)
 	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error)
 	GetSummaries() (models.UserProvidedServiceSummary, error)
 }
@@ -27,14 +27,15 @@ func NewCCUserProvidedServiceInstanceRepository(config core_config.Reader, gatew
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]interface{}) (apiErr error) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error) {
 	path := "/v2/user_provided_service_instances"
 
 	jsonBytes, err := json.Marshal(models.UserProvidedService{
-		Name:           name,
-		Credentials:    params,
-		SpaceGuid:      repo.config.SpaceFields().Guid,
-		SysLogDrainUrl: drainUrl,
+		Name:            name,
+		Credentials:     params,
+		SpaceGuid:       repo.config.SpaceFields().Guid,
+		SysLogDrainUrl:  drainUrl,
+		RouteServiceUrl: routeServiceUrl,
 	})
 
 	if err != nil {
@@ -49,8 +50,9 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 	path := fmt.Sprintf("/v2/user_provided_service_instances/%s", serviceInstanceFields.Guid)
 
 	reqBody := models.UserProvidedService{
-		Credentials:    serviceInstanceFields.Params,
-		SysLogDrainUrl: serviceInstanceFields.SysLogDrainUrl,
+		Credentials:     serviceInstanceFields.Params,
+		SysLogDrainUrl:  serviceInstanceFields.SysLogDrainUrl,
+		RouteServiceUrl: serviceInstanceFields.RouteServiceUrl,
 	}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {

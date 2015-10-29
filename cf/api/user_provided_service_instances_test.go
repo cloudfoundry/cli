@@ -25,14 +25,14 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/user_provided_service_instances",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":""}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":"","route_service_url":""}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
 			ts, handler, repo := createUserProvidedServiceInstanceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			apiErr := repo.Create("my-custom-service", "", map[string]interface{}{
+			apiErr := repo.Create("my-custom-service", "", "", map[string]interface{}{
 				"host":     "example.com",
 				"user":     "me",
 				"password": "secret",
@@ -45,14 +45,34 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/user_provided_service_instances",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":"syslog://example.com"}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":"syslog://example.com","route_service_url":""}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
 			ts, handler, repo := createUserProvidedServiceInstanceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			apiErr := repo.Create("my-custom-service", "syslog://example.com", map[string]interface{}{
+			apiErr := repo.Create("my-custom-service", "syslog://example.com", "", map[string]interface{}{
+				"host":     "example.com",
+				"user":     "me",
+				"password": "secret",
+			})
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("creates user provided service instances with route service url", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/user_provided_service_instances",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":"","route_service_url":"https://example.com"}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			})
+
+			ts, handler, repo := createUserProvidedServiceInstanceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			apiErr := repo.Create("my-custom-service", "", "https://example.com", map[string]interface{}{
 				"host":     "example.com",
 				"user":     "me",
 				"password": "secret",
@@ -67,7 +87,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/user_provided_service_instances/my-instance-guid",
-				Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"},"syslog_drain_url":"syslog://example.com"}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"},"syslog_drain_url":"syslog://example.com","route_service_url":""}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
@@ -83,6 +103,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			serviceInstance.Guid = "my-instance-guid"
 			serviceInstance.Params = params
 			serviceInstance.SysLogDrainUrl = "syslog://example.com"
+			serviceInstance.RouteServiceUrl = ""
 
 			apiErr := repo.Update(serviceInstance)
 			Expect(handler).To(HaveAllRequestsCalled())

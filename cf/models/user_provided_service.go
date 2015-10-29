@@ -6,10 +6,11 @@ type UserProvidedServiceSummary struct {
 }
 
 type UserProvidedService struct {
-	Name           string                 `json:"name,omitempty"`
-	Credentials    map[string]interface{} `json:"credentials"`
-	SpaceGuid      string                 `json:"space_guid,omitempty"`
-	SysLogDrainUrl string                 `json:"syslog_drain_url"`
+	Name            string                 `json:"name,omitempty"`
+	Credentials     map[string]interface{} `json:"credentials"`
+	SpaceGuid       string                 `json:"space_guid,omitempty"`
+	SysLogDrainUrl  string                 `json:"syslog_drain_url"`
+	RouteServiceUrl string                 `json:"route_service_url"`
 }
 
 type UserProvidedServiceEntity struct {
