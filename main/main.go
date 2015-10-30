@@ -60,44 +60,46 @@ func main() {
 	}
 
 	//run core command
-	cmd := os.Args[1]
+	cmdName := os.Args[1]
+	cmd := cmdRegistry.FindCommand(cmdName)
+	if cmd != nil {
+		meta := cmd.MetaData()
+		flagContext := flags.NewFlagContext(meta.Flags)
+		flagContext.SkipFlagParsing(meta.SkipFlagParsing)
 
-	if cmdRegistry.CommandExists(cmd) {
-		meta := cmdRegistry.FindCommand(os.Args[1]).MetaData()
-		fc := flags.NewFlagContext(meta.Flags)
-		fc.SkipFlagParsing(meta.SkipFlagParsing)
-
-		err := fc.Parse(os.Args[2:]...)
+		cmdArgs := os.Args[2:]
+		err := flagContext.Parse(cmdArgs...)
 		if err != nil {
-			deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + cmdRegistry.CommandUsage(cmd))
+			usage := cmdRegistry.CommandUsage(cmdName)
+			deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + usage)
 		}
 
-		cmdRegistry.SetCommand(cmdRegistry.FindCommand(cmd).SetDependency(deps, false))
-		cfCmd := cmdRegistry.FindCommand(cmd)
+		cmd = cmd.SetDependency(deps, false)
+		cmdRegistry.SetCommand(cmd)
 
-		reqs, err := cfCmd.Requirements(requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator), fc)
+		requirementsFactory := requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator)
+		reqs, err := cmd.Requirements(requirementsFactory, flagContext)
 		if err != nil {
 			deps.Ui.Failed(err.Error())
 		}
 
-		for _, r := range reqs {
-			if !r.Execute() {
-				os.Exit(1)
-			}
+		for _, req := range reqs {
+			req.Execute()
 		}
 
-		cfCmd.Execute(fc)
+		cmd.Execute(flagContext)
 		os.Exit(0)
 	}
 
 	//non core command, try plugin command
 	rpcService := newCliRpcServer(deps.TeePrinter, deps.TeePrinter)
 
-	pluginsConfig := plugin_config.NewPluginConfig(func(err error) { deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error())) })
-	pluginList := pluginsConfig.Plugins()
+	pluginConfig := plugin_config.NewPluginConfig(func(err error) {
+		deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
+	})
+	pluginList := pluginConfig.Plugins()
 
 	ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
-
 	if !ran {
 		deps.Ui.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
 		os.Exit(1)
