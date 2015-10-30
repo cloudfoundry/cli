@@ -34,11 +34,13 @@ type FakeUserRepository struct {
 	UnsetOrgRoleOrganizationGuid string
 	UnsetOrgRoleRole             string
 
-	SetSpaceRoleUserGuid  string
-	SetSpaceRoleOrgGuid   string
-	SetSpaceRoleSpaceGuid string
-	SetSpaceRoleRole      string
-	SetSpaceRoleCalled    bool
+	SetSpaceRoleUserGuid         string
+	SetSpaceRoleOrgGuid          string
+	SetSpaceRoleSpaceGuid        string
+	SetSpaceRoleRole             string
+	SetSpaceRoleCalled           bool
+	SetSpaceRoleByUsernameCalled bool
+	SetSpaceRoleByUsernameError  error
 
 	UnsetSpaceRoleUserGuid  string
 	UnsetSpaceRoleSpaceGuid string
@@ -138,7 +140,8 @@ func (repo *FakeUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role 
 }
 
 func (repo *FakeUserRepository) SetSpaceRoleByUsername(username, spaceGuid, orgGuid, role string) (apiErr error) {
-	return
+	repo.SetSpaceRoleByUsernameCalled = true
+	return repo.SetSpaceRoleByUsernameError
 }
 
 func (repo *FakeUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string) (apiErr error) {

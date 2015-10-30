@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakeflag "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
 	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -32,6 +33,7 @@ var _ = Describe("create-space command", func() {
 		orgRepo             *fake_org.FakeOrganizationRepository
 		userRepo            *testapi.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
+		flagRepo            *fakeflag.FakeFeatureFlagRepository
 		spaceQuotaRepo      *fakes.FakeSpaceQuotaRepository
 		OriginalCommand     command_registry.Command
 		deps                command_registry.Dependency
@@ -42,6 +44,7 @@ var _ = Describe("create-space command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(spaceQuotaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
+		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
 		deps.Config = configRepo
 
@@ -63,6 +66,7 @@ var _ = Describe("create-space command", func() {
 		userRepo = &testapi.FakeUserRepository{}
 		spaceRoleSetter = command_registry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
 		spaceQuotaRepo = &fakes.FakeSpaceQuotaRepository{}
+		flagRepo = &fakeflag.FakeFeatureFlagRepository{}
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		configOrg = models.OrganizationFields{
