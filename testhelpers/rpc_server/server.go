@@ -36,10 +36,10 @@ type Handlers interface {
 	DopplerEndpoint(args string, retVal *string) error
 	AccessToken(args string, retVal *string) error
 	GetApp(appName string, retVal *plugin_models.GetAppModel) error
-	GetApps(string, retVal *[]plugin_models.GetAppsModel) error
-	GetOrgs(string, retVal *[]plugin_models.GetOrgs_Model) error
-	GetSpaces(string, retVal *[]plugin_models.GetSpaces_Model) error
-	GetServices(string, retVal *[]plugin_models.GetServices_Model) error
+	GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error
+	GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error
+	GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error
+	GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error
 	GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error
 	GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error
 	GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error
