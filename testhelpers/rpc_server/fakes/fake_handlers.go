@@ -199,37 +199,37 @@ type FakeHandlers struct {
 	getAppReturns struct {
 		result1 error
 	}
-	GetAppsStub        func(string, retVal *[]plugin_models.GetAppsModel) error
+	GetAppsStub        func(_ string, retVal *[]plugin_models.GetAppsModel) error
 	getAppsMutex       sync.RWMutex
 	getAppsArgsForCall []struct {
-		string *[]plugin_models.GetAppsModel
+		_      string
 		retVal *[]plugin_models.GetAppsModel
 	}
 	getAppsReturns struct {
 		result1 error
 	}
-	GetOrgsStub        func(string, retVal *[]plugin_models.GetOrgs_Model) error
+	GetOrgsStub        func(_ string, retVal *[]plugin_models.GetOrgs_Model) error
 	getOrgsMutex       sync.RWMutex
 	getOrgsArgsForCall []struct {
-		string *[]plugin_models.GetOrgs_Model
+		_      string
 		retVal *[]plugin_models.GetOrgs_Model
 	}
 	getOrgsReturns struct {
 		result1 error
 	}
-	GetSpacesStub        func(string, retVal *[]plugin_models.GetSpaces_Model) error
+	GetSpacesStub        func(_ string, retVal *[]plugin_models.GetSpaces_Model) error
 	getSpacesMutex       sync.RWMutex
 	getSpacesArgsForCall []struct {
-		string *[]plugin_models.GetSpaces_Model
+		_      string
 		retVal *[]plugin_models.GetSpaces_Model
 	}
 	getSpacesReturns struct {
 		result1 error
 	}
-	GetServicesStub        func(string, retVal *[]plugin_models.GetServices_Model) error
+	GetServicesStub        func(_ string, retVal *[]plugin_models.GetServices_Model) error
 	getServicesMutex       sync.RWMutex
 	getServicesArgsForCall []struct {
-		string *[]plugin_models.GetServices_Model
+		_      string
 		retVal *[]plugin_models.GetServices_Model
 	}
 	getServicesReturns struct {
@@ -975,15 +975,15 @@ func (fake *FakeHandlers) GetAppReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetApps(string *[]plugin_models.GetAppsModel, retVal *[]plugin_models.GetAppsModel) error {
+func (fake *FakeHandlers) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
 	fake.getAppsMutex.Lock()
 	fake.getAppsArgsForCall = append(fake.getAppsArgsForCall, struct {
-		string *[]plugin_models.GetAppsModel
+		_      string
 		retVal *[]plugin_models.GetAppsModel
-	}{string, retVal})
+	}{_, retVal})
 	fake.getAppsMutex.Unlock()
 	if fake.GetAppsStub != nil {
-		return fake.GetAppsStub(string, retVal)
+		return fake.GetAppsStub(_, retVal)
 	} else {
 		return fake.getAppsReturns.result1
 	}
@@ -995,10 +995,10 @@ func (fake *FakeHandlers) GetAppsCallCount() int {
 	return len(fake.getAppsArgsForCall)
 }
 
-func (fake *FakeHandlers) GetAppsArgsForCall(i int) (*[]plugin_models.GetAppsModel, *[]plugin_models.GetAppsModel) {
+func (fake *FakeHandlers) GetAppsArgsForCall(i int) (string, *[]plugin_models.GetAppsModel) {
 	fake.getAppsMutex.RLock()
 	defer fake.getAppsMutex.RUnlock()
-	return fake.getAppsArgsForCall[i].string, fake.getAppsArgsForCall[i].retVal
+	return fake.getAppsArgsForCall[i]._, fake.getAppsArgsForCall[i].retVal
 }
 
 func (fake *FakeHandlers) GetAppsReturns(result1 error) {
@@ -1008,15 +1008,15 @@ func (fake *FakeHandlers) GetAppsReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetOrgs(string *[]plugin_models.GetOrgs_Model, retVal *[]plugin_models.GetOrgs_Model) error {
+func (fake *FakeHandlers) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
 	fake.getOrgsMutex.Lock()
 	fake.getOrgsArgsForCall = append(fake.getOrgsArgsForCall, struct {
-		string *[]plugin_models.GetOrgs_Model
+		_      string
 		retVal *[]plugin_models.GetOrgs_Model
-	}{string, retVal})
+	}{_, retVal})
 	fake.getOrgsMutex.Unlock()
 	if fake.GetOrgsStub != nil {
-		return fake.GetOrgsStub(string, retVal)
+		return fake.GetOrgsStub(_, retVal)
 	} else {
 		return fake.getOrgsReturns.result1
 	}
@@ -1028,10 +1028,10 @@ func (fake *FakeHandlers) GetOrgsCallCount() int {
 	return len(fake.getOrgsArgsForCall)
 }
 
-func (fake *FakeHandlers) GetOrgsArgsForCall(i int) (*[]plugin_models.GetOrgs_Model, *[]plugin_models.GetOrgs_Model) {
+func (fake *FakeHandlers) GetOrgsArgsForCall(i int) (string, *[]plugin_models.GetOrgs_Model) {
 	fake.getOrgsMutex.RLock()
 	defer fake.getOrgsMutex.RUnlock()
-	return fake.getOrgsArgsForCall[i].string, fake.getOrgsArgsForCall[i].retVal
+	return fake.getOrgsArgsForCall[i]._, fake.getOrgsArgsForCall[i].retVal
 }
 
 func (fake *FakeHandlers) GetOrgsReturns(result1 error) {
@@ -1041,15 +1041,15 @@ func (fake *FakeHandlers) GetOrgsReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetSpaces(string *[]plugin_models.GetSpaces_Model, retVal *[]plugin_models.GetSpaces_Model) error {
+func (fake *FakeHandlers) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
 	fake.getSpacesMutex.Lock()
 	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
-		string *[]plugin_models.GetSpaces_Model
+		_      string
 		retVal *[]plugin_models.GetSpaces_Model
-	}{string, retVal})
+	}{_, retVal})
 	fake.getSpacesMutex.Unlock()
 	if fake.GetSpacesStub != nil {
-		return fake.GetSpacesStub(string, retVal)
+		return fake.GetSpacesStub(_, retVal)
 	} else {
 		return fake.getSpacesReturns.result1
 	}
@@ -1061,10 +1061,10 @@ func (fake *FakeHandlers) GetSpacesCallCount() int {
 	return len(fake.getSpacesArgsForCall)
 }
 
-func (fake *FakeHandlers) GetSpacesArgsForCall(i int) (*[]plugin_models.GetSpaces_Model, *[]plugin_models.GetSpaces_Model) {
+func (fake *FakeHandlers) GetSpacesArgsForCall(i int) (string, *[]plugin_models.GetSpaces_Model) {
 	fake.getSpacesMutex.RLock()
 	defer fake.getSpacesMutex.RUnlock()
-	return fake.getSpacesArgsForCall[i].string, fake.getSpacesArgsForCall[i].retVal
+	return fake.getSpacesArgsForCall[i]._, fake.getSpacesArgsForCall[i].retVal
 }
 
 func (fake *FakeHandlers) GetSpacesReturns(result1 error) {
@@ -1074,15 +1074,15 @@ func (fake *FakeHandlers) GetSpacesReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetServices(string *[]plugin_models.GetServices_Model, retVal *[]plugin_models.GetServices_Model) error {
+func (fake *FakeHandlers) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
 	fake.getServicesMutex.Lock()
 	fake.getServicesArgsForCall = append(fake.getServicesArgsForCall, struct {
-		string *[]plugin_models.GetServices_Model
+		_      string
 		retVal *[]plugin_models.GetServices_Model
-	}{string, retVal})
+	}{_, retVal})
 	fake.getServicesMutex.Unlock()
 	if fake.GetServicesStub != nil {
-		return fake.GetServicesStub(string, retVal)
+		return fake.GetServicesStub(_, retVal)
 	} else {
 		return fake.getServicesReturns.result1
 	}
@@ -1094,10 +1094,10 @@ func (fake *FakeHandlers) GetServicesCallCount() int {
 	return len(fake.getServicesArgsForCall)
 }
 
-func (fake *FakeHandlers) GetServicesArgsForCall(i int) (*[]plugin_models.GetServices_Model, *[]plugin_models.GetServices_Model) {
+func (fake *FakeHandlers) GetServicesArgsForCall(i int) (string, *[]plugin_models.GetServices_Model) {
 	fake.getServicesMutex.RLock()
 	defer fake.getServicesMutex.RUnlock()
-	return fake.getServicesArgsForCall[i].string, fake.getServicesArgsForCall[i].retVal
+	return fake.getServicesArgsForCall[i]._, fake.getServicesArgsForCall[i].retVal
 }
 
 func (fake *FakeHandlers) GetServicesReturns(result1 error) {
