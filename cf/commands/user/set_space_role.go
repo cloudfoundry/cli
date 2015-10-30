@@ -1,12 +1,11 @@
 package user
 
 import (
-	"errors"
-
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/simonleung8/flags"
 
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -24,6 +23,7 @@ type SetSpaceRole struct {
 	ui        terminal.UI
 	config    core_config.Reader
 	spaceRepo spaces.SpaceRepository
+	flagRepo  feature_flags.FeatureFlagRepository
 	userRepo  api.UserRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
@@ -66,6 +66,7 @@ func (cmd *SetSpaceRole) SetDependency(deps command_registry.Dependency, pluginC
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
 	return cmd
 }
 
@@ -88,7 +89,7 @@ func (cmd *SetSpaceRole) Execute(c flags.FlagContext) {
 	}
 }
 
-func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userName string) (err error) {
+func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userName string) error {
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"Role":        terminal.EntityNameColor(role),
@@ -98,12 +99,21 @@ func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userNa
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr := cmd.userRepo.SetSpaceRole(userGuid, space.Guid, space.Organization.Guid, role)
-	if apiErr != nil {
-		err = errors.New(apiErr.Error())
-		return
+	setRolesByUsername, err := cmd.flagRepo.FindByName("set_roles_by_username")
+	if err != nil {
+		return err
+	}
+
+	if cmd.config.IsMinApiVersion("2.37.0") && setRolesByUsername.Enabled {
+		err = cmd.userRepo.SetSpaceRoleByUsername(userName, space.Guid, space.Organization.Guid, role)
+	} else {
+		err = cmd.userRepo.SetSpaceRole(userGuid, space.Guid, space.Organization.Guid, role)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
-	return
+	return nil
 }
