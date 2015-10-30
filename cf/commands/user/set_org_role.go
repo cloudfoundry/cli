@@ -79,7 +79,7 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 		}))
 
 	var apiErr error
-	if setRolesByUsername.Enabled {
+	if cmd.config.IsMinApiVersion("2.37.0") && setRolesByUsername.Enabled {
 		apiErr = cmd.userRepo.SetOrgRoleByUsername(user.Username, org.Guid, role)
 	} else {
 		apiErr = cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)

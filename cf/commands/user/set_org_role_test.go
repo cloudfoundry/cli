@@ -133,6 +133,11 @@ var _ = Describe("set-org-role command", func() {
 		Context("when API doesn't support role-based auth management for org/space", func() {
 			BeforeEach(func() {
 				configRepo.SetApiVersion("2.36.939393")
+				flag := models.FeatureFlag{
+					Name:    "set_roles_by_username",
+					Enabled: true,
+				}
+				flagRepo.FindByNameReturns(flag, nil)
 			})
 
 			It("sets the role using a GUID", func() {
