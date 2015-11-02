@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -101,7 +103,7 @@ func (cmd Target) setOrganization(orgName string) error {
 
 	org, apiErr := cmd.orgRepo.FindByName(orgName)
 	if apiErr != nil {
-		return errors.NewWithFmt(T("Could not target org.\n{{.ApiErr}}",
+		return fmt.Errorf(T("Could not target org.\n{{.ApiErr}}",
 			map[string]interface{}{"ApiErr": apiErr.Error()}))
 	}
 
@@ -118,7 +120,7 @@ func (cmd Target) setSpace(spaceName string) error {
 
 	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
 	if apiErr != nil {
-		return errors.NewWithFmt(T("Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
+		return fmt.Errorf(T("Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
 			map[string]interface{}{"SpaceName": spaceName, "ApiErr": apiErr.Error()}))
 	}
 

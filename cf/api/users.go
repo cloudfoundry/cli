@@ -336,7 +336,7 @@ func (repo CloudControllerUserRepository) checkSpaceRoleByGuid(userGuid, spaceGu
 	rolePath, found := spaceRoleToPathMap[role]
 
 	if !found {
-		apiErr = errors.NewWithFmt(T("Invalid Role {{.Role}}",
+		apiErr = fmt.Errorf(T("Invalid Role {{.Role}}",
 			map[string]interface{}{"Role": role}))
 	}
 
@@ -350,7 +350,7 @@ func (repo CloudControllerUserRepository) checkSpaceRole(spaceGuid, role string)
 	rolePath, found := spaceRoleToPathMap[role]
 
 	if !found {
-		apiErr = errors.NewWithFmt(T("Invalid Role {{.Role}}",
+		apiErr = fmt.Errorf(T("Invalid Role {{.Role}}",
 			map[string]interface{}{"Role": role}))
 	}
 
@@ -380,7 +380,7 @@ func rolePath(role string) (string, error) {
 	path, found := orgRoleToPathMap[role]
 
 	if !found {
-		return "", errors.NewWithFmt(T("Invalid Role {{.Role}}",
+		return "", fmt.Errorf(T("Invalid Role {{.Role}}",
 			map[string]interface{}{"Role": role}))
 	}
 	return path, nil

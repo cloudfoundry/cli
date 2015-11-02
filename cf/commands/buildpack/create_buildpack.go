@@ -1,6 +1,7 @@
 package buildpack
 
 import (
+	"fmt"
 	"path/filepath"
 	"strconv"
 
@@ -101,7 +102,7 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) {
 func (cmd CreateBuildpack) createBuildpack(buildpackName string, c flags.FlagContext) (buildpack models.Buildpack, apiErr error) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
-		apiErr = errors.NewWithFmt(T("Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.", map[string]interface{}{"ErrorDescription": c.Args()[2]}))
+		apiErr = fmt.Errorf(T("Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.", map[string]interface{}{"ErrorDescription": c.Args()[2]}))
 		return
 	}
 
