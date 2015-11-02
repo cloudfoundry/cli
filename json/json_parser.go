@@ -2,10 +2,9 @@ package json
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
-
-	"github.com/cloudfoundry/cli/cf/errors"
 )
 
 func ParseJsonArray(path string) ([]map[string]interface{}, error) {
@@ -21,7 +20,7 @@ func ParseJsonArray(path string) ([]map[string]interface{}, error) {
 	stringMaps := []map[string]interface{}{}
 	err = json.Unmarshal(bytes, &stringMaps)
 	if err != nil {
-		return nil, errors.NewWithFmt("Incorrect json format: %s", err.Error())
+		return nil, fmt.Errorf("Incorrect json format: %s", err.Error())
 	}
 
 	return stringMaps, nil
@@ -77,7 +76,7 @@ func parseJson(bytes []byte) (map[string]interface{}, error) {
 	stringMap := map[string]interface{}{}
 	err := json.Unmarshal(bytes, &stringMap)
 	if err != nil {
-		return nil, errors.NewWithFmt("Incorrect json format: %s", err.Error())
+		return nil, fmt.Errorf("Incorrect json format: %s", err.Error())
 	}
 
 	return stringMap, nil

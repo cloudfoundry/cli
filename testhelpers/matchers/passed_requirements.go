@@ -1,7 +1,8 @@
 package matchers
 
 import (
-	"github.com/cloudfoundry/cli/cf/errors"
+	"fmt"
+
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/onsi/gomega"
 )
@@ -21,7 +22,7 @@ func (matcher havePassedRequirementsMatcher) Match(actual interface{}) (bool, er
 		result := actual.(testcmd.RunCommandResult)
 		return result == testcmd.RunCommandResultSuccess, nil
 	default:
-		return false, errors.NewWithFmt("Expected actual value to be a bool or enum, but it was a %T", actual)
+		return false, fmt.Errorf("Expected actual value to be a bool or enum, but it was a %T", actual)
 	}
 }
 
