@@ -107,7 +107,7 @@ func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userNa
 	if cmd.config.IsMinApiVersion("2.37.0") && setRolesByUsername.Enabled {
 		err = cmd.userRepo.SetSpaceRoleByUsername(userName, space.Guid, space.Organization.Guid, role)
 	} else {
-		err = cmd.userRepo.SetSpaceRole(userGuid, space.Guid, space.Organization.Guid, role)
+		err = cmd.userRepo.SetSpaceRoleByGuid(userGuid, space.Guid, space.Organization.Guid, role)
 	}
 
 	if err != nil {
