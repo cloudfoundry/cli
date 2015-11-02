@@ -41,7 +41,7 @@ type UserRepository interface {
 	SetOrgRole(userGuid, orgGuid, role string) (apiErr error)
 	SetOrgRoleByUsername(username, orgGuid, role string) (apiErr error)
 	UnsetOrgRole(userGuid, orgGuid, role string) (apiErr error)
-	SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiErr error)
+	SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) (apiErr error)
 	SetSpaceRoleByUsername(username, spaceGuid, orgGuid, role string) (apiErr error)
 	UnsetSpaceRole(userGuid, spaceGuid, role string) (apiErr error)
 }
@@ -294,7 +294,7 @@ func orgRolesPath(apiEndpoint, username, orgGuid, role string) (string, error) {
 	return fmt.Sprintf("%s/v2/organizations/%s/%s", apiEndpoint, orgGuid, rolePath), nil
 }
 
-func (repo CloudControllerUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiErr error) {
+func (repo CloudControllerUserRepository) SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) (apiErr error) {
 	rolePath, apiErr := repo.checkSpaceRoleByGuid(userGuid, spaceGuid, role)
 	if apiErr != nil {
 		return

@@ -130,7 +130,7 @@ func (repo *FakeUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (ap
 	return
 }
 
-func (repo *FakeUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiErr error) {
+func (repo *FakeUserRepository) SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) (apiErr error) {
 	repo.SetSpaceRoleUserGuid = userGuid
 	repo.SetSpaceRoleOrgGuid = orgGuid
 	repo.SetSpaceRoleSpaceGuid = spaceGuid

@@ -671,7 +671,7 @@ var _ = Describe("User Repository", func() {
 						Response: testnet.TestResponse{Status: http.StatusOK},
 					}))
 
-				err := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
+				err := repo.SetSpaceRoleByGuid("my-user-guid", "my-space-guid", "my-org-guid", role)
 
 				Expect(ccHandler).To(HaveAllRequestsCalled())
 				Expect(err).NotTo(HaveOccurred())
@@ -679,7 +679,7 @@ var _ = Describe("User Repository", func() {
 		}
 
 		It("returns an error when given an invalid role to set", func() {
-			err := repo.SetSpaceRole("user-guid", "space-guid", "org-guid", "foo")
+			err := repo.SetSpaceRoleByGuid("user-guid", "space-guid", "org-guid", "foo")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Invalid Role"))
 		})
