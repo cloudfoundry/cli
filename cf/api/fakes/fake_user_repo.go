@@ -123,7 +123,7 @@ func (repo *FakeUserRepository) SetOrgRoleByUsername(username, orgGuid, role str
 	}
 }
 
-func (repo *FakeUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (apiErr error) {
+func (repo *FakeUserRepository) UnsetOrgRoleByGuid(userGuid, orgGuid, role string) (apiErr error) {
 	repo.UnsetOrgRoleUserGuid = userGuid
 	repo.UnsetOrgRoleOrganizationGuid = orgGuid
 	repo.UnsetOrgRoleRole = role

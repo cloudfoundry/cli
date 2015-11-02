@@ -40,7 +40,7 @@ type UserRepository interface {
 	Delete(userGuid string) (apiErr error)
 	SetOrgRole(userGuid, orgGuid, role string) (apiErr error)
 	SetOrgRoleByUsername(username, orgGuid, role string) (apiErr error)
-	UnsetOrgRole(userGuid, orgGuid, role string) (apiErr error)
+	UnsetOrgRoleByGuid(userGuid, orgGuid, role string) (apiErr error)
 	SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) (apiErr error)
 	SetSpaceRoleByUsername(username, spaceGuid, orgGuid, role string) (apiErr error)
 	UnsetSpaceRole(userGuid, spaceGuid, role string) (apiErr error)
@@ -244,7 +244,7 @@ func (repo CloudControllerUserRepository) SetOrgRole(userGuid string, orgGuid st
 	return repo.assocUserWithOrgByUserGuid(userGuid, orgGuid)
 }
 
-func (repo CloudControllerUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (err error) {
+func (repo CloudControllerUserRepository) UnsetOrgRoleByGuid(userGuid, orgGuid, role string) (err error) {
 	path, err := userGuidPath(repo.config.ApiEndpoint(), userGuid, orgGuid, role)
 	if err != nil {
 		return
