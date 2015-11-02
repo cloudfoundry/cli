@@ -72,7 +72,7 @@ func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr := cmd.userRepo.UnsetOrgRole(user.Guid, org.Guid, role)
+	apiErr := cmd.userRepo.UnsetOrgRoleByGuid(user.Guid, org.Guid, role)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

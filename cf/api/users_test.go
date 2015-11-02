@@ -471,7 +471,7 @@ var _ = Describe("User Repository", func() {
 						Response: testnet.TestResponse{Status: http.StatusOK},
 					}))
 
-				apiErr := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
+				apiErr := repo.UnsetOrgRoleByGuid("my-user-guid", "my-org-guid", role)
 
 				Expect(ccHandler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
@@ -486,7 +486,7 @@ var _ = Describe("User Repository", func() {
 		})
 
 		It("returns an error when given an invalid role to unset", func() {
-			err := repo.UnsetOrgRole("user-guid", "org-guid", "foo")
+			err := repo.UnsetOrgRoleByGuid("user-guid", "org-guid", "foo")
 
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Invalid Role"))
