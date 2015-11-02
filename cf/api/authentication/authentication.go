@@ -118,7 +118,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthenticationEndpoint())
 	request, err := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if err != nil {
-		return errors.NewWithError(T("Failed to start oauth request"), err)
+		return fmt.Errorf("%s: %s", T("Failed to start oauth request"), err.Error())
 	}
 	request.HttpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -132,7 +132,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	case *errors.InvalidTokenError:
 		return errors.New(T("Authentication has expired.  Please log back in to re-authenticate.\n\nTIP: Use `cf login -a <endpoint> -u <user> -o <org> -s <space>` to log back in and re-authenticate."))
 	default:
-		return errors.NewWithError(T("auth request failed"), err)
+		return fmt.Errorf("%s: %s", T("auth request failed"), err.Error())
 	}
 
 	// TODO: get the actual status code

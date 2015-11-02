@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"errors"
+	"fmt"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -120,7 +121,7 @@ var _ = Describe("purge-service-offering command", func() {
 	})
 
 	It("fails with an error message when the request fails", func() {
-		serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = cferrors.NewWithError("oh no!", errors.New("!"))
+		serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = fmt.Errorf("%s: %s", "oh no!", errors.New("!").Error())
 
 		runCommand(
 			[]string{"-f", "-p", "the-provider", "the-service-name"},
@@ -135,7 +136,7 @@ var _ = Describe("purge-service-offering command", func() {
 	})
 
 	It("fails with an error message when the purging request fails", func() {
-		serviceRepo.PurgeServiceOfferingApiResponse = cferrors.New("crumpets insufficiently buttered")
+		serviceRepo.PurgeServiceOfferingApiResponse = fmt.Errorf("crumpets insufficiently buttered")
 
 		runCommand(
 			[]string{"-f", "-p", "the-provider", "the-service-name"},

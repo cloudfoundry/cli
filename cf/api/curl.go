@@ -40,7 +40,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 
 	err = mergeHeaders(req.HttpReq.Header, headerString)
 	if err != nil {
-		err = errors.NewWithError(T("Error parsing headers"), err)
+		err = fmt.Errorf("%s: %s", T("Error parsing headers"), err.Error())
 		return
 	}
 
@@ -60,7 +60,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 
 	bytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		err = errors.NewWithError(T("Error reading response"), err)
+		err = fmt.Errorf("%s: %s", T("Error reading response"), err.Error())
 	}
 	resBody = string(bytes)
 

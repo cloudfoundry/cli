@@ -3,6 +3,7 @@ package net
 import (
 	_ "crypto/sha512"
 	"crypto/x509"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -90,7 +91,7 @@ func WrapNetworkErrors(host string, err error) error {
 		}
 	}
 
-	return errors.NewWithError(T("Error performing request"), err)
+	return fmt.Errorf("%s: %s", T("Error performing request"), err.Error())
 
 }
 

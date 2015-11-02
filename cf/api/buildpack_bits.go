@@ -45,7 +45,7 @@ func NewCloudControllerBuildpackBitsRepository(config core_config.Reader, gatewa
 func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackLocation string) (apiErr error) {
 	fileutils.TempFile("buildpack-upload", func(zipFileToUpload *os.File, err error) {
 		if err != nil {
-			apiErr = errors.NewWithError(T("Couldn't create temp file for upload"), err)
+			apiErr = fmt.Errorf("%s: %s", T("Couldn't create temp file for upload"), err.Error())
 			return
 		}
 
@@ -65,7 +65,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 
 			stats, statError := os.Stat(buildpackLocation)
 			if statError != nil {
-				apiErr = errors.NewWithError(T("Error opening buildpack file"), statError)
+				apiErr = fmt.Errorf("%s: %s", T("Error opening buildpack file"), statError.Error())
 				err = statError
 				return
 			}
@@ -76,7 +76,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 			} else {
 				specifiedFile, openError := os.Open(buildpackLocation)
 				if openError != nil {
-					apiErr = errors.NewWithError(T("Couldn't open buildpack file"), openError)
+					apiErr = fmt.Errorf("%s: %s", T("Couldn't open buildpack file"), openError.Error())
 					err = openError
 					return
 				}
@@ -85,7 +85,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 		}
 
 		if err != nil {
-			apiErr = errors.NewWithError(T("Couldn't write zip file"), err)
+			apiErr = fmt.Errorf("%s: %s", T("Couldn't write zip file"), err.Error())
 			return
 		}
 
@@ -238,7 +238,7 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 		writer.Close()
 
 		if err != nil {
-			apiErr = errors.NewWithError(T("Error creating upload"), err)
+			apiErr = fmt.Errorf("%s: %s", T("Error creating upload"), err.Error())
 			return
 		}
 

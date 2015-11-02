@@ -1,6 +1,8 @@
 package requirements_test
 
 import (
+	"fmt"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -45,7 +47,7 @@ var _ = Describe("DomainRequirement", func() {
 	})
 
 	It("fails when an error occurs fetching the domain", func() {
-		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: errors.NewWithError("", errors.New(""))}
+		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: fmt.Errorf("%s: %s", "", errors.New("").Error())}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
 		testassert.AssertPanic(testterm.QuietPanic, func() {

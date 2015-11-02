@@ -152,7 +152,7 @@ func (gateway Gateway) ListPaginatedResources(target string,
 
 		resources, err := pagination.Resources()
 		if err != nil {
-			return errors.NewWithError(T("Error parsing JSON"), err)
+			return fmt.Errorf("%s: %s", T("Error parsing JSON"), err.Error())
 		}
 
 		for _, resource := range resources {
@@ -210,13 +210,13 @@ func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, bo
 	fileStats, err := body.Stat()
 
 	if err != nil {
-		apiErr = errors.NewWithError(T("Error getting file info"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Error getting file info"), err.Error())
 		return
 	}
 
 	request, err := http.NewRequest(method, fullUrl, progressReader)
 	if err != nil {
-		apiErr = errors.NewWithError(T("Error building request"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Error building request"), err.Error())
 		return
 	}
 
@@ -225,7 +225,7 @@ func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, bo
 	request.ContentLength = fileSize
 
 	if err != nil {
-		apiErr = errors.NewWithError(T("Error building request"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Error building request"), err.Error())
 		return
 	}
 
@@ -235,7 +235,7 @@ func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, bo
 func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiErr error) {
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
-		apiErr = errors.NewWithError(T("Error building request"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Error building request"), err.Error())
 		return
 	}
 	return gateway.newRequest(request, accessToken, body)
@@ -254,7 +254,7 @@ func (gateway Gateway) performRequestForResponseBytes(request *Request) (bytes [
 
 	bytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		apiErr = errors.NewWithError(T("Error reading response"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Error reading response"), err.Error())
 	}
 
 	headers = rawResponse.Header
@@ -279,7 +279,7 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 
 	err := json.Unmarshal(bytes, &response)
 	if err != nil {
-		apiErr = errors.NewWithError(T("Invalid JSON response from server"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Invalid JSON response from server"), err.Error())
 	}
 	return
 }
@@ -301,14 +301,14 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(endpoint string, req
 
 	err := json.Unmarshal(bytes, &response)
 	if err != nil {
-		apiErr = errors.NewWithError(T("Invalid JSON response from server"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Invalid JSON response from server"), err.Error())
 		return
 	}
 
 	asyncResource := &AsyncResource{}
 	err = json.Unmarshal(bytes, &asyncResource)
 	if err != nil {
-		apiErr = errors.NewWithError(T("Invalid async response from server"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Invalid async response from server"), err.Error())
 		return
 	}
 
