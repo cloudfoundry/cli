@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -27,7 +28,7 @@ func (repo ManifestDiskRepository) ReadManifest(inputPath string) (*Manifest, er
 	manifestPath, err := repo.manifestPath(inputPath)
 
 	if err != nil {
-		return m, errors.NewWithError(T("Error finding manifest"), err)
+		return m, fmt.Errorf("%s: %s", T("Error finding manifest"), err.Error())
 	}
 
 	m.Path = manifestPath

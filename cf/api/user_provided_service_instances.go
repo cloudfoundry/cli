@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -39,7 +38,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 	})
 
 	if err != nil {
-		apiErr = errors.NewWithError("Error parsing response", err)
+		apiErr = fmt.Errorf("%s: %s", "Error parsing response", err.Error())
 		return
 	}
 
@@ -55,7 +54,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 	}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		apiErr = errors.NewWithError("Error parsing response", err)
+		apiErr = fmt.Errorf("%s: %s", "Error parsing response", err.Error())
 		return
 	}
 

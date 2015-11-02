@@ -40,7 +40,7 @@ func NewCloudControllerApplicationRepository(config core_config.Reader, gateway 
 func (repo CloudControllerApplicationRepository) Create(params models.AppParams) (createdApp models.Application, apiErr error) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
-		apiErr = errors.NewWithError(T("Failed to marshal JSON"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Failed to marshal JSON"), err.Error())
 		return
 	}
 
@@ -92,7 +92,7 @@ func (repo CloudControllerApplicationRepository) ReadFromSpace(name string, spac
 func (repo CloudControllerApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
-		apiErr = errors.NewWithError(T("Failed to marshal JSON"), err)
+		apiErr = fmt.Errorf("%s: %s", T("Failed to marshal JSON"), err.Error())
 		return
 	}
 

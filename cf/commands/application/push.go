@@ -663,7 +663,7 @@ func (cmd *Push) zipWithBetterErrors(uploadDir string, zipFile *os.File) error {
 		zipFile = nil
 		return zipError
 	default:
-		return errors.NewWithError(T("Error zipping application"), err)
+		return fmt.Errorf("%s: %s", T("Error zipping application"), err.Error())
 	}
 }
 

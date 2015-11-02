@@ -12,7 +12,6 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -42,7 +41,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, 
 	apiUrl := fmt.Sprintf("/v2/apps/%s/bits", appGuid)
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
-			apiErr = errors.NewWithError(T("Error creating tmp file: {{.Err}}", map[string]interface{}{"Err": err}), err)
+			apiErr = fmt.Errorf("%s: %s", T("Error creating tmp file: {{.Err}}", map[string]interface{}{"Err": err}), err.Error())
 			return
 		}
 
@@ -53,13 +52,13 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, 
 
 		presentFilesJSON, err := json.Marshal(presentFiles)
 		if err != nil {
-			apiErr = errors.NewWithError(T("Error marshaling JSON"), err)
+			apiErr = fmt.Errorf("%s: %s", T("Error marshaling JSON"), err.Error())
 			return
 		}
 
 		boundary, err := repo.writeUploadBody(zipFile, requestFile, presentFilesJSON)
 		if err != nil {
-			apiErr = errors.NewWithError(T("Error writing to tmp file: {{.Err}}", map[string]interface{}{"Err": err}), err)
+			apiErr = fmt.Errorf("%s: %s", T("Error writing to tmp file: {{.Err}}", map[string]interface{}{"Err": err}), err.Error())
 			return
 		}
 
@@ -85,7 +84,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, 
 func (repo CloudControllerApplicationBitsRepository) GetApplicationFiles(appFilesToCheck []resources.AppFileResource) ([]resources.AppFileResource, error) {
 	integrityFieldsJson, err := json.Marshal(mapAppFilesToIntegrityFields(appFilesToCheck))
 	if err != nil {
-		apiErr := errors.NewWithError(T("Failed to create json for resource_match request"), err)
+		apiErr := fmt.Errorf("%s: %s", T("Failed to create json for resource_match request"), err.Error())
 		return nil, apiErr
 	}
 
