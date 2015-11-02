@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -9,7 +10,6 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/generic"
@@ -25,41 +25,50 @@ func NewEmptyManifest() (m *Manifest) {
 	return &Manifest{Data: generic.NewMap()}
 }
 
-func (m Manifest) Applications() (apps []models.AppParams, err error) {
-	rawData, errs := expandProperties(m.Data, generator.NewWordGenerator())
-	if len(errs) > 0 {
-		err = errors.NewWithSlice(errs)
-		return
+func (m Manifest) Applications() ([]models.AppParams, error) {
+	rawData, err := expandProperties(m.Data, generator.NewWordGenerator())
+	if err != nil {
+		return []models.AppParams{}, err
 	}
 
 	data := generic.NewMap(rawData)
-	appMaps, errs := m.getAppMaps(data)
-	if len(errs) > 0 {
-		err = errors.NewWithSlice(errs)
-		return
+	appMaps, err := m.getAppMaps(data)
+	if err != nil {
+		return []models.AppParams{}, err
 	}
 
+	var apps []models.AppParams
+	var mapToAppErrs []error
 	for _, appMap := range appMaps {
-		app, errs := mapToAppParams(filepath.Dir(m.Path), appMap)
-		if len(errs) > 0 {
-			err = errors.NewWithSlice(errs)
+		app, err := mapToAppParams(filepath.Dir(m.Path), appMap)
+		if err != nil {
+			mapToAppErrs = append(mapToAppErrs, err)
 			continue
 		}
 
 		apps = append(apps, app)
 	}
 
-	return
+	if len(mapToAppErrs) > 0 {
+		message := ""
+		for i := range mapToAppErrs {
+			message = message + fmt.Sprintf("%s\n", mapToAppErrs[i].Error())
+		}
+		return []models.AppParams{}, errors.New(message)
+	}
+
+	return apps, nil
 }
 
-func (m Manifest) getAppMaps(data generic.Map) (apps []generic.Map, errs []error) {
+func (m Manifest) getAppMaps(data generic.Map) ([]generic.Map, error) {
 	globalProperties := data.Except([]interface{}{"applications"})
 
+	var apps []generic.Map
+	var errs []error
 	if data.Has("applications") {
 		appMaps, ok := data.Get("applications").([]interface{})
 		if !ok {
-			errs = append(errs, errors.New(T("Expected applications to be a list")))
-			return
+			return []generic.Map{}, errors.New(T("Expected applications to be a list"))
 		}
 
 		for _, appData := range appMaps {
@@ -76,12 +85,23 @@ func (m Manifest) getAppMaps(data generic.Map) (apps []generic.Map, errs []error
 		apps = append(apps, globalProperties)
 	}
 
-	return
+	if len(errs) > 0 {
+		message := ""
+		for i := range errs {
+			message = message + fmt.Sprintf("%s\n", errs[i].Error())
+		}
+		return []generic.Map{}, errors.New(message)
+	}
+
+	return apps, nil
 }
 
 var propertyRegex = regexp.MustCompile(`\${[\w-]+}`)
 
-func expandProperties(input interface{}, babbler generator.WordGenerator) (output interface{}, errs []error) {
+func expandProperties(input interface{}, babbler generator.WordGenerator) (interface{}, error) {
+	var errs []error
+	var output interface{}
+
 	switch input := input.(type) {
 	case string:
 		match := propertyRegex.FindStringSubmatch(input)
@@ -99,40 +119,59 @@ func expandProperties(input interface{}, babbler generator.WordGenerator) (outpu
 	case []interface{}:
 		outputSlice := make([]interface{}, len(input))
 		for index, item := range input {
-			itemOutput, itemErrs := expandProperties(item, babbler)
+			itemOutput, itemErr := expandProperties(item, babbler)
+			if itemErr != nil {
+				errs = append(errs, itemErr)
+				break
+			}
 			outputSlice[index] = itemOutput
-			errs = append(errs, itemErrs...)
 		}
 		output = outputSlice
 	case map[interface{}]interface{}:
 		outputMap := make(map[interface{}]interface{})
 		for key, value := range input {
-			itemOutput, itemErrs := expandProperties(value, babbler)
+			itemOutput, itemErr := expandProperties(value, babbler)
+			if itemErr != nil {
+				errs = append(errs, itemErr)
+				break
+			}
 			outputMap[key] = itemOutput
-			errs = append(errs, itemErrs...)
 		}
 		output = outputMap
 	case generic.Map:
 		outputMap := generic.NewMap()
 		generic.Each(input, func(key, value interface{}) {
-			itemOutput, itemErrs := expandProperties(value, babbler)
+			itemOutput, itemErr := expandProperties(value, babbler)
+			if itemErr != nil {
+				errs = append(errs, itemErr)
+				return
+			}
 			outputMap.Set(key, itemOutput)
-			errs = append(errs, itemErrs...)
 		})
 		output = outputMap
 	default:
 		output = input
 	}
 
-	return
-}
-
-func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppParams, errs []error) {
-	errs = checkForNulls(yamlMap)
 	if len(errs) > 0 {
-		return
+		message := ""
+		for _, err := range errs {
+			message = message + fmt.Sprintf("%s\n", err.Error())
+		}
+		return nil, errors.New(message)
 	}
 
+	return output, nil
+}
+
+func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, error) {
+	err := checkForNulls(yamlMap)
+	if err != nil {
+		return models.AppParams{}, err
+	}
+
+	var appParams models.AppParams
+	var errs []error
 	appParams.BuildpackUrl = stringValOrDefault(yamlMap, "buildpack", &errs)
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 
@@ -172,7 +211,15 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 		appParams.Path = &path
 	}
 
-	return
+	if len(errs) > 0 {
+		message := ""
+		for _, err := range errs {
+			message = message + fmt.Sprintf("%s\n", err.Error())
+		}
+		return models.AppParams{}, errors.New(message)
+	}
+
+	return appParams, nil
 }
 
 func removeDuplicatedValue(ary []string) *[]string {
@@ -192,7 +239,8 @@ func removeDuplicatedValue(ary []string) *[]string {
 	return &newAry
 }
 
-func checkForNulls(yamlMap generic.Map) (errs []error) {
+func checkForNulls(yamlMap generic.Map) error {
+	var errs []error
 	generic.Each(yamlMap, func(key interface{}, value interface{}) {
 		if key == "command" || key == "buildpack" {
 			return
@@ -202,7 +250,15 @@ func checkForNulls(yamlMap generic.Map) (errs []error) {
 		}
 	})
 
-	return
+	if len(errs) > 0 {
+		message := ""
+		for i := range errs {
+			message = message + fmt.Sprintf("%s\n", errs[i].Error())
+		}
+		return errors.New(message)
+	}
+
+	return nil
 }
 
 func stringVal(yamlMap generic.Map, key string, errs *[]error) *string {
