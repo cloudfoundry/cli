@@ -550,13 +550,33 @@
       "modified": false
    },
    {
+      "id": "Bind a service instance to a route",
+      "translation": "Bind a service instance to a route",
+      "modified": false
+   },
+   {
       "id": "Bind a service instance to an app",
       "translation": "サービス・インスタンスをアプリにバインドします",
       "modified": false
    },
    {
+      "id": "Bind cancelled",
+      "translation": "Bind cancelled",
+      "modified": false
+   },
+   {
       "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
       "translation": "{{.InstanceName}} と {{.AppName}} の間にバインディングが存在していませんでした",
+      "modified": false
+   },
+   {
+      "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
+      "translation": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
+      "modified": false
+   },
+   {
+      "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "modified": false
    },
    {
@@ -622,6 +642,11 @@
    {
       "id": "CF_NAME auth USERNAME PASSWORD\n\n",
       "translation": "CF_NAME auth USERNAME PASSWORD\n\n",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
+      "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
       "modified": false
    },
    {
@@ -1172,6 +1197,11 @@
    {
       "id": "CF_NAME target [-o ORG] [-s SPACE]",
       "translation": "CF_NAME target [-o ORG] [-s SPACE]",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
+      "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
       "modified": false
    },
    {
@@ -1985,6 +2015,16 @@
       "modified": false
    },
    {
+      "id": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "translation": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "modified": false
+   },
+   {
+      "id": "EXAMPLE:\n   CF_NAME bind-route-service example.com myratelimiter -n myapp",
+      "translation": "EXAMPLE:\n   CF_NAME bind-route-service example.com myratelimiter -n myapp",
+      "modified": false
+   },
+   {
       "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
       "translation": "例:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
       "modified": false
@@ -2510,6 +2550,11 @@
       "modified": false
    },
    {
+      "id": "Force binding without confirmation",
+      "translation": "Force binding without confirmation",
+      "modified": false
+   },
+   {
       "id": "Force delete (do not prompt for confirmation)",
       "translation": "削除を強制します (確認を求めるプロンプトは出しません)",
       "modified": false
@@ -2537,6 +2582,11 @@
    {
       "id": "Force restart of app without prompt",
       "translation": "プロンプトを出さずにアプリの再始動を強制します",
+      "modified": false
+   },
+   {
+      "id": "Force unbinding without confirmation",
+      "translation": "Force unbinding without confirmation",
       "modified": false
    },
    {
@@ -2795,6 +2845,16 @@
       "modified": true
    },
    {
+      "id": "Hostname used in combination with DOMAIN to specify the route to bind",
+      "translation": "Hostname used in combination with DOMAIN to specify the route to bind",
+      "modified": false
+   },
+   {
+      "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
+      "translation": "Hostname used in combination with DOMAIN to specify the route to unbind",
+      "modified": false
+   },
+   {
       "id": "Hostname used to identify the route",
       "translation": "Hostname for the route",
       "modified": true
@@ -2892,6 +2952,11 @@
    {
       "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
       "translation": "誤った使用法。引数として BUILDPACK_NAME、NEW_BUILDPACK_NAME が必要です\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
       "modified": false
    },
    {
@@ -4260,8 +4325,18 @@
       "modified": false
    },
    {
+      "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
+      "translation": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
+      "modified": false
+   },
+   {
       "id": "Route {{.URL}} already exists",
       "translation": "経路 {{.URL}} は既に存在しています",
+      "modified": false
+   },
+   {
+      "id": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
+      "translation": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
       "modified": false
    },
    {
@@ -4990,13 +5065,33 @@
       "modified": false
    },
    {
+      "id": "Unbind a service instance from a route",
+      "translation": "Unbind a service instance from a route",
+      "modified": false
+   },
+   {
       "id": "Unbind a service instance from an app",
       "translation": "アプリからサービス・インスタンスをアンバインドします",
       "modified": false
    },
    {
+      "id": "Unbind cancelled",
+      "translation": "Unbind cancelled",
+      "modified": false
+   },
+   {
       "id": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "{{.CurrentUser}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のサービス {{.ServiceName}} からアプリ {{.AppName}} をアンバインドしています...",
+      "modified": false
+   },
+   {
+      "id": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)",
+      "translation": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)",
+      "modified": false
+   },
+   {
+      "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "modified": false
    },
    {
