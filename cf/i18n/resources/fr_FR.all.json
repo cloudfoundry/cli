@@ -560,6 +560,16 @@
       "modified": false
    },
    {
+      "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
+      "translation": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
+      "modified": false
+   },
+   {
+      "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
       "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
       "translation": "Liaison du groupe de sécurité {{.security_group}} aux préférences par défaut pour l'éxécution en tant que {{.username}}",
       "modified": false
@@ -622,6 +632,11 @@
    {
       "id": "CF_NAME auth USERNAME PASSWORD\n\n",
       "translation": "CF_NAME auth NOM_UTILISATEUR MOT_DE_PASSE\n\n",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
+      "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
       "modified": false
    },
    {
@@ -2000,6 +2015,11 @@
       "modified": false
    },
    {
+      "id": "EXAMPLE:\n\t\tCF_NAME bind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "translation": "EXAMPLE:\n\t\tCF_NAME bind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "modified": false
+   },
+   {
       "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
       "translation": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n\t CF_NAME update-service mydb -t \"list,of, tags\"",
       "modified": true
@@ -2510,6 +2530,11 @@
       "modified": false
    },
    {
+      "id": "Force binding without confirmation",
+      "translation": "Force binding without confirmation",
+      "modified": false
+   },
+   {
       "id": "Force delete (do not prompt for confirmation)",
       "translation": "Force delete (do not prompt for confirmation)",
       "modified": false
@@ -2795,6 +2820,11 @@
       "modified": false
    },
    {
+      "id": "Hostname used in combination with DOMAIN to specify the route to bind",
+      "translation": "Hostname used in combination with DOMAIN to specify the route to bind",
+      "modified": false
+   },
+   {
       "id": "INSTALLED PLUGIN COMMANDS",
       "translation": "PLUGIN COMMANDS",
       "modified": true
@@ -2887,6 +2917,11 @@
    {
       "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
       "translation": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
       "modified": false
    },
    {
@@ -3005,11 +3040,6 @@
       "modified": false
    },
    {
-      "id": "Incorrect Usage. Requires stack name as argument\n\n",
-      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
-      "modified": false
-   },
-   {
       "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "translation": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "modified": false
@@ -3047,6 +3077,11 @@
    {
       "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
       "translation": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires stack name as argument\n\n",
+      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
       "modified": false
    },
    {
@@ -4130,6 +4165,11 @@
       "modified": false
    },
    {
+      "id": "Requests for the route will be forwarded to the service instance",
+      "translation": "Requests for the route will be forwarded to the service instance",
+      "modified": false
+   },
+   {
       "id": "Restage an app",
       "translation": "Recharger une application",
       "modified": false
@@ -4243,6 +4283,11 @@
       "id": "Route {{.URL}} already exists",
       "translation": "Route {{.URL}} existe déjà",
       "modified": false
+   },
+   {
+      "id": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
+      "translation": "Route {{.URL}} is already bound to service instance {{.ServiceName}}.",
+      "modified": true
    },
    {
       "id": "Routes",

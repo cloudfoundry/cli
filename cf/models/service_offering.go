@@ -8,6 +8,7 @@ type ServiceOfferingFields struct {
 	Version          string
 	Description      string
 	DocumentationUrl string
+	Requires         []string
 }
 
 type ServiceOffering struct {
