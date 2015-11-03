@@ -8,11 +8,12 @@ type RouteResource struct {
 }
 
 type RouteEntity struct {
-	Host   string
-	Path   string
-	Domain DomainResource
-	Space  SpaceResource
-	Apps   []ApplicationResource
+	Host            string                  `json:"host"`
+	Domain          DomainResource          `json:"domain"`
+	Path            string                  `json:"path"`
+	Space           SpaceResource           `json:"space"`
+	Apps            []ApplicationResource   `json:"apps"`
+	ServiceInstance ServiceInstanceResource `json:"service_instance"`
 }
 
 func (resource RouteResource) ToFields() (fields models.Route) {

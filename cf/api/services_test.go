@@ -479,6 +479,7 @@ var _ = Describe("Services Repo", func() {
 			Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
 			Expect(instance.ServiceOffering.DocumentationUrl).To(Equal("http://info.example.com"))
 			Expect(instance.ServiceOffering.Description).To(Equal("MySQL database"))
+			Expect(instance.ServiceOffering.Requires).To(ContainElement("route_forwarding"))
 			Expect(instance.ServicePlan.Name).To(Equal("plan-name"))
 			Expect(len(instance.ServiceBindings)).To(Equal(2))
 
@@ -1433,7 +1434,8 @@ var serviceOfferingReq = testapi.NewCloudControllerTestRequest(testnet.TestReque
 			"label": "mysql",
 			"provider": "mysql",
 		    "extra": "{\"documentationUrl\":\"http://info.example.com\"}",
-			"description": "MySQL database"
+			"description": "MySQL database",
+			"requires": ["route_forwarding"]
 		  }
 		}`,
 	}})

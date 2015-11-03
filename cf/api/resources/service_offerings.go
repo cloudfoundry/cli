@@ -22,6 +22,7 @@ type ServiceOfferingEntity struct {
 	Description  string                `json:"description"`
 	Provider     string                `json:"provider"`
 	BrokerGuid   string                `json:"service_broker_guid"`
+	Requires     []string              `json:"requires"`
 	ServicePlans []ServicePlanResource `json:"service_plans"`
 	Extra        ServiceOfferingExtra
 }
@@ -38,7 +39,7 @@ func (resource ServiceOfferingResource) ToFields() (fields models.ServiceOfferin
 	fields.BrokerGuid = resource.Entity.BrokerGuid
 	fields.Guid = resource.Metadata.Guid
 	fields.DocumentationUrl = resource.Entity.Extra.DocumentationURL
-
+	fields.Requires = resource.Entity.Requires
 	return
 }
 

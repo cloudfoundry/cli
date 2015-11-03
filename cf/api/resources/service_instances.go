@@ -21,7 +21,7 @@ type LastOperation struct {
 }
 
 type ServiceInstanceEntity struct {
-	Name            string
+	Name            string                   `json:"name"`
 	DashboardUrl    string                   `json:"dashboard_url"`
 	Tags            []string                 `json:"tags"`
 	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
