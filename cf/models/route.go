@@ -12,8 +12,9 @@ type Route struct {
 	Domain DomainFields
 	Path   string
 
-	Space SpaceFields
-	Apps  []ApplicationFields
+	Space           SpaceFields
+	Apps            []ApplicationFields
+	ServiceInstance ServiceInstanceFields
 }
 
 func (r Route) URL() string {
