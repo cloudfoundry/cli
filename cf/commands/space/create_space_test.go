@@ -133,9 +133,12 @@ var _ = Describe("create-space command", func() {
 
 		Expect(spaceRepo.CreateSpaceName).To(Equal("my-space"))
 		Expect(spaceRepo.CreateSpaceOrgGuid).To(Equal("my-org-guid"))
-		Expect(userRepo.SetSpaceRoleUserGuid).To(Equal("my-user-guid"))
-		Expect(userRepo.SetSpaceRoleSpaceGuid).To(Equal("my-space-guid"))
-		Expect(userRepo.SetSpaceRoleRole).To(Equal(models.SPACE_DEVELOPER))
+
+		userGuid, spaceGuid, orgGuid, role := userRepo.SetSpaceRoleByGuidArgsForCall(0)
+		Expect(userGuid).To(Equal("my-user-guid"))
+		Expect(spaceGuid).To(Equal("my-space-guid"))
+		Expect(orgGuid).To(Equal("my-org-guid"))
+		Expect(role).To(Equal(models.SPACE_MANAGER))
 	})
 
 	It("warns the user when a space with that name already exists", func() {
@@ -153,8 +156,8 @@ var _ = Describe("create-space command", func() {
 
 		Expect(spaceRepo.CreateSpaceName).To(Equal(""))
 		Expect(spaceRepo.CreateSpaceOrgGuid).To(Equal(""))
-		Expect(userRepo.SetSpaceRoleUserGuid).To(Equal(""))
-		Expect(userRepo.SetSpaceRoleSpaceGuid).To(Equal(""))
+
+		Expect(userRepo.SetSpaceRoleByGuidCallCount()).To(BeZero())
 	})
 
 	Context("when the -o flag is provided", func() {
@@ -178,9 +181,11 @@ var _ = Describe("create-space command", func() {
 
 			Expect(spaceRepo.CreateSpaceName).To(Equal("my-space"))
 			Expect(spaceRepo.CreateSpaceOrgGuid).To(Equal(org.Guid))
-			Expect(userRepo.SetSpaceRoleUserGuid).To(Equal("my-user-guid"))
-			Expect(userRepo.SetSpaceRoleSpaceGuid).To(Equal("my-space-guid"))
-			Expect(userRepo.SetSpaceRoleRole).To(Equal(models.SPACE_DEVELOPER))
+			userGuid, spaceGuid, orgGuid, role := userRepo.SetSpaceRoleByGuidArgsForCall(0)
+			Expect(userGuid).To(Equal("my-user-guid"))
+			Expect(spaceGuid).To(Equal("my-space-guid"))
+			Expect(orgGuid).To(Equal("my-org-guid"))
+			Expect(role).To(Equal(models.SPACE_MANAGER))
 		})
 
 		It("fails when the org provided does not exist", func() {

@@ -93,10 +93,13 @@ var _ = Describe("space-users command", func() {
 			user3.Username = "user3"
 			user4 := models.UserFields{}
 			user4.Username = "user4"
-			userRepo.ListUsersByRole = map[string][]models.UserFields{
-				models.SPACE_MANAGER:   []models.UserFields{user, user2},
-				models.SPACE_DEVELOPER: []models.UserFields{user4},
-				models.SPACE_AUDITOR:   []models.UserFields{user3},
+			userRepo.ListUsersInSpaceForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
+				userFields := map[string][]models.UserFields{
+					models.SPACE_MANAGER:   []models.UserFields{user, user2},
+					models.SPACE_DEVELOPER: []models.UserFields{user4},
+					models.SPACE_AUDITOR:   []models.UserFields{user3},
+				}[roleName]
+				return userFields, nil
 			}
 		})
 
@@ -105,7 +108,13 @@ var _ = Describe("space-users command", func() {
 
 			Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
 			Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("org1-guid"))
-			Expect(userRepo.ListUsersSpaceGuid).To(Equal("space1-guid"))
+
+			Expect(userRepo.ListUsersInSpaceForRoleCallCount()).To(Equal(3))
+			for i, expectedRole := range []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR} {
+				spaceGUID, actualRole := userRepo.ListUsersInSpaceForRoleArgsForCall(i)
+				Expect(spaceGUID).To(Equal("space1-guid"))
+				Expect(actualRole).To(Equal(expectedRole))
+			}
 
 			Expect(ui.Outputs).To(BeInDisplayOrder(
 				[]string{"Getting users in org", "Org1", "Space1", "my-user"},
@@ -121,24 +130,22 @@ var _ = Describe("space-users command", func() {
 
 		Context("when cc api verson is >= 2.21.0", func() {
 			BeforeEach(func() {
-				userRepo.ListUsersInSpaceForRole_CallCount = 0
-				userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount = 0
 				configRepo.SetApiVersion("2.22.0")
 			})
 
 			It("calls ListUsersInSpaceForRoleWithNoUAA()", func() {
 				runCommand("my-org", "my-sapce")
 
-				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount).To(BeNumerically(">=", 1))
-				Expect(userRepo.ListUsersInSpaceForRole_CallCount).To(Equal(0))
+				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAACallCount()).To(BeNumerically(">=", 1))
+				Expect(userRepo.ListUsersInSpaceForRoleCallCount()).To(Equal(0))
 			})
 
 			It("fails with an error when user network call fails", func() {
-				userRepo.StubbedError = func(string, role string) error {
+				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(string, role string) ([]models.UserFields, error) {
 					if role == "SpaceManager" {
-						return errors.New("internet badness occurred")
+						return []models.UserFields{}, errors.New("internet badness occurred")
 					}
-					return nil
+					return []models.UserFields{}, nil
 				}
 				runCommand("my-org", "my-space")
 				Expect(ui.Outputs).To(BeInDisplayOrder(
@@ -153,8 +160,8 @@ var _ = Describe("space-users command", func() {
 				configRepo.SetApiVersion("2.20.0")
 				runCommand("my-org", "my-space")
 
-				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAA_CallCount).To(Equal(0))
-				Expect(userRepo.ListUsersInSpaceForRole_CallCount).To(BeNumerically(">=", 1))
+				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAACallCount()).To(Equal(0))
+				Expect(userRepo.ListUsersInSpaceForRoleCallCount()).To(BeNumerically(">=", 1))
 			})
 		})
 	})
@@ -175,10 +182,13 @@ var _ = Describe("space-users command", func() {
 
 			user := models.UserFields{}
 			user.Username = "mr-pointy-hair"
-			userRepo.ListUsersByRole = map[string][]models.UserFields{
-				models.SPACE_MANAGER:   []models.UserFields{user},
-				models.SPACE_DEVELOPER: []models.UserFields{},
-				models.SPACE_AUDITOR:   []models.UserFields{},
+			userRepo.ListUsersInSpaceForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
+				userFields := map[string][]models.UserFields{
+					models.SPACE_MANAGER:   []models.UserFields{user},
+					models.SPACE_DEVELOPER: []models.UserFields{},
+					models.SPACE_AUDITOR:   []models.UserFields{},
+				}[roleName]
+				return userFields, nil
 			}
 		})
 
@@ -235,10 +245,13 @@ var _ = Describe("space-users command", func() {
 				user4.Username = "user4"
 				user4.Guid = "4444"
 
-				userRepo.ListUsersByRole = map[string][]models.UserFields{
-					models.SPACE_MANAGER:   []models.UserFields{user, user2},
-					models.SPACE_DEVELOPER: []models.UserFields{user4},
-					models.SPACE_AUDITOR:   []models.UserFields{user3},
+				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
+					userFields := map[string][]models.UserFields{
+						models.SPACE_MANAGER:   []models.UserFields{user, user2},
+						models.SPACE_DEVELOPER: []models.UserFields{user4},
+						models.SPACE_AUDITOR:   []models.UserFields{user3},
+					}[roleName]
+					return userFields, nil
 				}
 
 				requirementsFactory.LoginSuccess = true
@@ -302,10 +315,13 @@ var _ = Describe("space-users command", func() {
 				user4.Username = "user4"
 				user4.Guid = "4444"
 
-				userRepo.ListUsersByRole = map[string][]models.UserFields{
-					models.SPACE_MANAGER:   []models.UserFields{user, user2, user3, user4},
-					models.SPACE_DEVELOPER: []models.UserFields{user2, user4},
-					models.SPACE_AUDITOR:   []models.UserFields{user, user3},
+				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
+					userFields := map[string][]models.UserFields{
+						models.SPACE_MANAGER:   []models.UserFields{user, user2, user3, user4},
+						models.SPACE_DEVELOPER: []models.UserFields{user2, user4},
+						models.SPACE_AUDITOR:   []models.UserFields{user, user3},
+					}[roleName]
+					return userFields, nil
 				}
 
 				requirementsFactory.LoginSuccess = true

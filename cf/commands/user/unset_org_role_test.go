@@ -94,9 +94,10 @@ var _ = Describe("unset-org-role command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(userRepo.UnsetOrgRoleRole).To(Equal(models.ORG_MANAGER))
-			Expect(userRepo.UnsetOrgRoleUserGuid).To(Equal("some-user-guid"))
-			Expect(userRepo.UnsetOrgRoleOrganizationGuid).To(Equal("some-org-guid"))
+			userGUID, orgGUID, role := userRepo.UnsetOrgRoleByGuidArgsForCall(0)
+			Expect(userGUID).To(Equal("some-user-guid"))
+			Expect(role).To(Equal(models.ORG_MANAGER))
+			Expect(orgGUID).To(Equal("some-org-guid"))
 		})
 	})
 })

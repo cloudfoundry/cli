@@ -131,14 +131,14 @@ var _ = Describe("set-space-role command", func() {
 						It("uses the new endpoint to set space role by name", func() {
 							runCommand("my-user", "some-org", "some-space", "SpaceManager")
 
-							Expect(userRepo.SetSpaceRoleCalled).To(BeFalse())
-							Expect(userRepo.SetSpaceRoleByUsernameCalled).To(BeTrue())
+							Expect(userRepo.SetSpaceRoleByGuidCallCount()).To(BeZero())
+							Expect(userRepo.SetSpaceRoleByUsernameCallCount()).To(Equal(1))
 						})
 					})
 
 					Context("when setting role fails", func() {
 						It("returns the error to user", func() {
-							userRepo.SetSpaceRoleByUsernameError = errors.New("oh no, it is broken")
+							userRepo.SetSpaceRoleByUsernameReturns(errors.New("oh no, it is broken"))
 
 							runCommand("my-user", "some-org", "some-space", "SpaceManager")
 
@@ -159,8 +159,8 @@ var _ = Describe("set-space-role command", func() {
 					It("uses the old endpoint to set space role by user guid", func() {
 						runCommand("my-user", "some-org", "some-space", "SpaceManager")
 
-						Expect(userRepo.SetSpaceRoleCalled).To(BeTrue())
-						Expect(userRepo.SetSpaceRoleByUsernameCalled).To(BeFalse())
+						Expect(userRepo.SetSpaceRoleByGuidCallCount()).To(Equal(1))
+						Expect(userRepo.SetSpaceRoleByUsernameCallCount()).To(BeZero())
 					})
 				})
 			})
@@ -181,7 +181,7 @@ var _ = Describe("set-space-role command", func() {
 					Expect(spaceRepo.FindByNameInOrgName).To(Equal("some-space"))
 					Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("my-org-guid"))
 
-					Expect(userRepo.SetSpaceRoleCalled).To(BeTrue())
+					Expect(userRepo.SetSpaceRoleByGuidCallCount()).To(Equal(1))
 				})
 			})
 		})

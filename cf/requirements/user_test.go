@@ -1,6 +1,8 @@
 package requirements_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
@@ -19,21 +21,23 @@ var _ = Describe("UserRequirement", func() {
 			user.Username = "my-user"
 			user.Guid = "my-user-guid"
 
-			userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: user}
+			userRepo := &testapi.FakeUserRepository{}
+			userRepo.FindByUsernameReturns(user, nil)
 			ui := new(testterm.FakeUI)
 
 			userReq := NewUserRequirement("foo", ui, userRepo)
 			success := userReq.Execute()
 
 			Expect(success).To(BeTrue())
-			Expect(userRepo.FindByUsernameUsername).To(Equal("foo"))
+			Expect(userRepo.FindByUsernameArgsForCall(0)).To(Equal("foo"))
 			Expect(userReq.GetUser()).To(Equal(user))
 		})
 	})
 
 	Context("when a user with the given name cannot be found", func() {
 		It("panics and prints a failure message", func() {
-			userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
+			userRepo := &testapi.FakeUserRepository{}
+			userRepo.FindByUsernameReturns(models.UserFields{}, errors.New("not found"))
 			ui := new(testterm.FakeUI)
 
 			testassert.AssertPanic(testterm.QuietPanic, func() {
