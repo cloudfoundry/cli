@@ -3,6 +3,7 @@ package user_test
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -54,12 +55,14 @@ var _ = Describe("Create user command", func() {
 			[]string{"TIP"},
 		))
 
-		Expect(userRepo.CreateUserUsername).To(Equal("my-user"))
+		userName, password := userRepo.CreateArgsForCall(0)
+		Expect(userName).To(Equal("my-user"))
+		Expect(password).To(Equal("my-password"))
 	})
 
 	Context("when creating the user returns an error", func() {
 		It("prints a warning when the given user already exists", func() {
-			userRepo.CreateUserExists = true
+			userRepo.CreateReturns(errors.NewModelAlreadyExistsError("User", "my-user"))
 
 			runCommand("my-user", "my-password")
 
@@ -69,8 +72,9 @@ var _ = Describe("Create user command", func() {
 
 			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
+
 		It("fails when any error other than alreadyExists is returned", func() {
-			userRepo.CreateUserReturnsHttpError = true
+			userRepo.CreateReturns(errors.NewHttpError(403, "403", "Forbidden"))
 
 			runCommand("my-user", "my-password")
 

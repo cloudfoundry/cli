@@ -95,11 +95,14 @@ var _ = Describe("set-org-role command", func() {
 
 				It("sets the role using a username", func() {
 					runCommand("irrelevant-user", "some-org", "OrgManager")
-					Expect(userRepo.SetOrgRoleUsername).To(Equal("my-user"))
+					username, orgGuid, role := userRepo.SetOrgRoleByUsernameArgsForCall(0)
+					Expect(username).To(Equal("my-user"))
+					Expect(orgGuid).To(Equal("my-org-guid"))
+					Expect(role).To(Equal("OrgManager"))
 				})
 
 				It("copes with user repo failure", func() {
-					userRepo.SetOrgRoleByUsernameError = errors.New("TROUBLE AT CC")
+					userRepo.SetOrgRoleByUsernameReturns(errors.New("TROUBLE AT CC"))
 					runCommand("some-user", "some-org", "OrgManager")
 					Expect(ui.Outputs).To(BeInDisplayOrder(
 						[]string{"FAILED"},
@@ -116,7 +119,7 @@ var _ = Describe("set-org-role command", func() {
 						[]string{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
 						[]string{"OK"},
 					))
-					Expect(userRepo.SetOrgRoleCalled).To(BeTrue())
+					Expect(userRepo.SetOrgRoleCallCount()).To(Equal(1))
 				})
 			})
 
@@ -147,7 +150,7 @@ var _ = Describe("set-org-role command", func() {
 					[]string{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
 					[]string{"OK"},
 				))
-				Expect(userRepo.SetOrgRoleCalled).To(BeTrue())
+				Expect(userRepo.SetOrgRoleCallCount()).To(Equal(1))
 			})
 		})
 	})

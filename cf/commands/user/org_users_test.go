@@ -80,15 +80,24 @@ var _ = Describe("org-users command", func() {
 
 		Context("shows friendly messaage when no users in ORG_MANAGER role", func() {
 			It("shows the special users in the given org", func() {
-				userRepo.ListUsersByRole = map[string][]models.UserFields{
-					models.ORG_MANAGER:     []models.UserFields{},
-					models.BILLING_MANAGER: []models.UserFields{user1},
-					models.ORG_AUDITOR:     []models.UserFields{user2},
+				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
+					userFields := map[string][]models.UserFields{
+						models.ORG_MANAGER:     []models.UserFields{},
+						models.BILLING_MANAGER: []models.UserFields{user1},
+						models.ORG_AUDITOR:     []models.UserFields{user2},
+					}[roleName]
+					return userFields, nil
 				}
 
 				runCommand("the-org")
 
-				Expect(userRepo.ListUsersOrganizationGuid).To(Equal("the-org-guid"))
+				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
+				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
+					orgGuid, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
+					Expect(orgGuid).To(Equal("the-org-guid"))
+					Expect(actualRole).To(Equal(expectedRole))
+				}
+
 				Expect(ui.Outputs).To(BeInDisplayOrder(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"ORG MANAGER"},
@@ -103,15 +112,24 @@ var _ = Describe("org-users command", func() {
 
 		Context("shows friendly messaage when no users in BILLING_MANAGER role", func() {
 			It("shows the special users in the given org", func() {
-				userRepo.ListUsersByRole = map[string][]models.UserFields{
-					models.ORG_MANAGER:     []models.UserFields{user1},
-					models.BILLING_MANAGER: []models.UserFields{},
-					models.ORG_AUDITOR:     []models.UserFields{user2},
+				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
+					userFields := map[string][]models.UserFields{
+						models.ORG_MANAGER:     []models.UserFields{user1},
+						models.BILLING_MANAGER: []models.UserFields{},
+						models.ORG_AUDITOR:     []models.UserFields{user2},
+					}[roleName]
+					return userFields, nil
 				}
 
 				runCommand("the-org")
 
-				Expect(userRepo.ListUsersOrganizationGuid).To(Equal("the-org-guid"))
+				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
+				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
+					orgGuid, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
+					Expect(orgGuid).To(Equal("the-org-guid"))
+					Expect(actualRole).To(Equal(expectedRole))
+				}
+
 				Expect(ui.Outputs).To(BeInDisplayOrder(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"ORG MANAGER"},
@@ -126,15 +144,23 @@ var _ = Describe("org-users command", func() {
 
 		Context("shows friendly messaage when no users in ORG_AUDITOR role", func() {
 			It("shows the special users in the given org", func() {
-				userRepo.ListUsersByRole = map[string][]models.UserFields{
-					models.ORG_MANAGER:     []models.UserFields{user1},
-					models.BILLING_MANAGER: []models.UserFields{user2},
-					models.ORG_AUDITOR:     []models.UserFields{},
+				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
+					userFields := map[string][]models.UserFields{
+						models.ORG_MANAGER:     []models.UserFields{user1},
+						models.BILLING_MANAGER: []models.UserFields{user2},
+						models.ORG_AUDITOR:     []models.UserFields{},
+					}[roleName]
+					return userFields, nil
 				}
 
 				runCommand("the-org")
 
-				Expect(userRepo.ListUsersOrganizationGuid).To(Equal("the-org-guid"))
+				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
+				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
+					orgGuid, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
+					Expect(orgGuid).To(Equal("the-org-guid"))
+					Expect(actualRole).To(Equal(expectedRole))
+				}
 				Expect(ui.Outputs).To(BeInDisplayOrder(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"ORG MANAGER"},
@@ -155,18 +181,17 @@ var _ = Describe("org-users command", func() {
 			org.Name = "the-org"
 			org.Guid = "the-org-guid"
 
-			user := models.UserFields{}
-			user.Username = "user1"
-			user2 := models.UserFields{}
-			user2.Username = "user2"
-			user3 := models.UserFields{}
-			user3.Username = "user3"
-			user4 := models.UserFields{}
-			user4.Username = "user4"
-			userRepo.ListUsersByRole = map[string][]models.UserFields{
-				models.ORG_MANAGER:     []models.UserFields{user, user2},
-				models.BILLING_MANAGER: []models.UserFields{user4},
-				models.ORG_AUDITOR:     []models.UserFields{user3},
+			user := models.UserFields{Username: "user1"}
+			user2 := models.UserFields{Username: "user2"}
+			user3 := models.UserFields{Username: "user3"}
+			user4 := models.UserFields{Username: "user4"}
+			userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
+				userFields := map[string][]models.UserFields{
+					models.ORG_MANAGER:     []models.UserFields{user, user2},
+					models.BILLING_MANAGER: []models.UserFields{user4},
+					models.ORG_AUDITOR:     []models.UserFields{user3},
+				}[roleName]
+				return userFields, nil
 			}
 
 			requirementsFactory.LoginSuccess = true
@@ -176,7 +201,8 @@ var _ = Describe("org-users command", func() {
 		It("shows the special users in the given org", func() {
 			runCommand("the-org")
 
-			Expect(userRepo.ListUsersOrganizationGuid).To(Equal("the-org-guid"))
+			orgGuid, _ := userRepo.ListUsersInOrgForRoleArgsForCall(0)
+			Expect(orgGuid).To(Equal("the-org-guid"))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting users in org", "the-org", "my-user"},
 				[]string{"ORG MANAGER"},
@@ -191,19 +217,21 @@ var _ = Describe("org-users command", func() {
 
 		Context("when the -a flag is provided", func() {
 			BeforeEach(func() {
-				user := models.UserFields{}
-				user.Username = "user1"
-				user2 := models.UserFields{}
-				user2.Username = "user2"
-				userRepo.ListUsersByRole = map[string][]models.UserFields{
-					models.ORG_USER: []models.UserFields{user, user2},
+				user := models.UserFields{Username: "user1"}
+				user2 := models.UserFields{Username: "user2"}
+				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
+					userFields := map[string][]models.UserFields{
+						models.ORG_USER: []models.UserFields{user, user2},
+					}[roleName]
+					return userFields, nil
 				}
 			})
 
 			It("lists all org users, regardless of role", func() {
 				runCommand("-a", "the-org")
 
-				Expect(userRepo.ListUsersOrganizationGuid).To(Equal("the-org-guid"))
+				orgGuid, _ := userRepo.ListUsersInOrgForRoleArgsForCall(0)
+				Expect(orgGuid).To(Equal("the-org-guid"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"USERS"},
@@ -214,17 +242,12 @@ var _ = Describe("org-users command", func() {
 		})
 
 		Context("when cc api verson is >= 2.21.0", func() {
-			BeforeEach(func() {
-				userRepo.ListUsersInOrgForRole_CallCount = 0
-				userRepo.ListUsersInOrgForRoleWithNoUAA_CallCount = 0
-			})
-
 			It("calls ListUsersInOrgForRoleWithNoUAA()", func() {
 				configRepo.SetApiVersion("2.22.0")
 				runCommand("the-org")
 
-				Expect(userRepo.ListUsersInOrgForRoleWithNoUAA_CallCount).To(BeNumerically(">=", 1))
-				Expect(userRepo.ListUsersInOrgForRole_CallCount).To(Equal(0))
+				Expect(userRepo.ListUsersInOrgForRoleWithNoUAACallCount()).To(BeNumerically(">=", 1))
+				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(0))
 			})
 		})
 
@@ -233,8 +256,8 @@ var _ = Describe("org-users command", func() {
 				configRepo.SetApiVersion("2.20.0")
 				runCommand("the-org")
 
-				Expect(userRepo.ListUsersInOrgForRoleWithNoUAA_CallCount).To(Equal(0))
-				Expect(userRepo.ListUsersInOrgForRole_CallCount).To(BeNumerically(">=", 1))
+				Expect(userRepo.ListUsersInOrgForRoleWithNoUAACallCount()).To(Equal(0))
+				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(BeNumerically(">=", 1))
 			})
 		})
 	})
@@ -274,11 +297,14 @@ var _ = Describe("org-users command", func() {
 				user4.Username = "user4"
 				user4.Guid = "4444"
 
-				userRepo.ListUsersByRole = map[string][]models.UserFields{
-					models.ORG_MANAGER:     []models.UserFields{user, user2},
-					models.BILLING_MANAGER: []models.UserFields{user4},
-					models.ORG_AUDITOR:     []models.UserFields{user3},
-					models.ORG_USER:        []models.UserFields{user3},
+				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
+					userFields := map[string][]models.UserFields{
+						models.ORG_MANAGER:     []models.UserFields{user, user2},
+						models.BILLING_MANAGER: []models.UserFields{user4},
+						models.ORG_AUDITOR:     []models.UserFields{user3},
+						models.ORG_USER:        []models.UserFields{user3},
+					}[roleName]
+					return userFields, nil
 				}
 
 				requirementsFactory.LoginSuccess = true
@@ -349,11 +375,14 @@ var _ = Describe("org-users command", func() {
 				user4.Username = "user4"
 				user4.Guid = "4444"
 
-				userRepo.ListUsersByRole = map[string][]models.UserFields{
-					models.ORG_MANAGER:     []models.UserFields{user, user2, user3, user4},
-					models.BILLING_MANAGER: []models.UserFields{user2, user4},
-					models.ORG_AUDITOR:     []models.UserFields{user, user3},
-					models.ORG_USER:        []models.UserFields{user, user2, user3, user4},
+				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
+					userFields := map[string][]models.UserFields{
+						models.ORG_MANAGER:     []models.UserFields{user, user2, user3, user4},
+						models.BILLING_MANAGER: []models.UserFields{user2, user4},
+						models.ORG_AUDITOR:     []models.UserFields{user, user3},
+						models.ORG_USER:        []models.UserFields{user, user2, user3, user4},
+					}[roleName]
+					return userFields, nil
 				}
 
 				requirementsFactory.LoginSuccess = true

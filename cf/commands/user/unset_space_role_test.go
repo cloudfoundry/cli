@@ -85,9 +85,11 @@ var _ = Describe("unset-space-role command", func() {
 			[]string{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
 			[]string{"OK"},
 		))
-		Expect(userRepo.UnsetSpaceRoleRole).To(Equal(models.SPACE_MANAGER))
-		Expect(userRepo.UnsetSpaceRoleUserGuid).To(Equal("some-user-guid"))
-		Expect(userRepo.UnsetSpaceRoleSpaceGuid).To(Equal("some-space-guid"))
+
+		userGUID, spaceGUID, role := userRepo.UnsetSpaceRoleArgsForCall(0)
+		Expect(role).To(Equal(models.SPACE_MANAGER))
+		Expect(userGUID).To(Equal("some-user-guid"))
+		Expect(spaceGUID).To(Equal("some-space-guid"))
 	})
 })
 

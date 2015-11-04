@@ -30,6 +30,7 @@ var spaceRoleToPathMap = map[string]string{
 	models.SPACE_AUDITOR:   "auditors",
 }
 
+//go:generate counterfeiter -o fakes/fake_user_repo.go . UserRepository
 type UserRepository interface {
 	FindByUsername(username string) (user models.UserFields, apiErr error)
 	ListUsersInOrgForRole(orgGuid string, role string) ([]models.UserFields, error)
