@@ -2660,6 +2660,16 @@
       "modified": false
    },
    {
+      "id": "Getting routes for org {{.OrgName}}  as {{.Username}} ...\n",
+      "translation": "Getting routes for org {{.OrgName}}  as {{.Username}} ...\n",
+      "modified": false
+   },
+   {
+      "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
+      "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
+      "modified": false
+   },
+   {
       "id": "Getting rules for the security group  : {{.SecurityGroupName}}...",
       "translation": "Getting rules for the security group  : {{.SecurityGroupName}}...",
       "modified": false
@@ -3005,11 +3015,6 @@
       "modified": false
    },
    {
-      "id": "Incorrect Usage. Requires stack name as argument\n\n",
-      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
-      "modified": false
-   },
-   {
       "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "translation": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "modified": false
@@ -3047,6 +3052,11 @@
    {
       "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
       "translation": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires stack name as argument\n\n",
+      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
       "modified": false
    },
    {

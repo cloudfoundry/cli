@@ -8,10 +8,11 @@ type RouteResource struct {
 }
 
 type RouteEntity struct {
-	Host   string
-	Domain DomainResource
-	Space  SpaceResource
-	Apps   []ApplicationResource
+	Host            string                  `json:"host"`
+	Domain          DomainResource          `json:"domain"`
+	Space           SpaceResource           `json:"space"`
+	Apps            []ApplicationResource   `json:"apps"`
+	ServiceInstance ServiceInstanceResource `json:"service_instance"`
 }
 
 func (resource RouteResource) ToFields() (fields models.Route) {
@@ -24,6 +25,7 @@ func (resource RouteResource) ToModel() (route models.Route) {
 	route.Guid = resource.Metadata.Guid
 	route.Domain = resource.Entity.Domain.ToFields()
 	route.Space = resource.Entity.Space.ToFields()
+	route.ServiceInstance = resource.Entity.ServiceInstance.ToFields()
 	for _, appResource := range resource.Entity.Apps {
 		route.Apps = append(route.Apps, appResource.ToFields())
 	}
