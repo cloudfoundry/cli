@@ -2710,6 +2710,16 @@
       "modified": false
    },
    {
+      "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
+      "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
+      "modified": false
+   },
+   {
+      "id": "Getting routes for org {{.OrgName}} as {{.Username}} ...\n",
+      "translation": "Getting routes for org {{.OrgName}}  as {{.Username}} ...\n",
+      "modified": true
+   },
+   {
       "id": "Getting rules for the security group  : {{.SecurityGroupName}}...",
       "translation": "正在获取安全组 {{.SecurityGroupName}} 的规则...",
       "modified": false

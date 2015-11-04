@@ -57,14 +57,27 @@ func (cmd *ListRoutes) SetDependency(deps command_registry.Dependency, pluginCal
 }
 
 func (cmd *ListRoutes) Execute(c flags.FlagContext) {
-	cmd.ui.Say(T("Getting routes as {{.Username}} ...\n",
-		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
+	flag := c.Bool("orglevel")
 
-	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("path"), T("apps")})
+	if flag {
+		cmd.ui.Say(T("Getting routes for org {{.OrgName}} as {{.Username}} ...\n",
+			map[string]interface{}{
+				"Username": terminal.EntityNameColor(cmd.config.Username()),
+				"OrgName":  terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			}))
+	} else {
+		cmd.ui.Say(T("Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
+			map[string]interface{}{
+				"Username":  terminal.EntityNameColor(cmd.config.Username()),
+				"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			}))
+	}
+
+	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("path"), T("apps"), T("service")})
 
 	noRoutes := true
 	var apiErr error
-	flag := c.Bool("orglevel")
 
 	if flag {
 		apiErr = cmd.routeRepo.ListAllRoutes(func(route models.Route) bool {
@@ -74,7 +87,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 				appNames = append(appNames, app.Name)
 			}
 
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","))
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","), route.ServiceInstance.Name)
 			return true
 		})
 
@@ -87,7 +100,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 				appNames = append(appNames, app.Name)
 			}
 
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","))
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","), route.ServiceInstance.Name)
 			return true
 		})
 	}

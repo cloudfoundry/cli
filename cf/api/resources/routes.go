@@ -28,6 +28,7 @@ func (resource RouteResource) ToModel() (route models.Route) {
 	route.Guid = resource.Metadata.Guid
 	route.Domain = resource.Entity.Domain.ToFields()
 	route.Space = resource.Entity.Space.ToFields()
+	route.ServiceInstance = resource.Entity.ServiceInstance.ToFields()
 	for _, appResource := range resource.Entity.Apps {
 		route.Apps = append(route.Apps, appResource.ToFields())
 	}

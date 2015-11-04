@@ -71,6 +71,8 @@ var _ = Describe("route repository", func() {
 			Expect(len(routes)).To(Equal(2))
 			Expect(routes[0].Guid).To(Equal("route-1-guid"))
 			Expect(routes[0].Path).To(Equal(""))
+			Expect(routes[0].ServiceInstance.Guid).To(Equal("service-guid"))
+			Expect(routes[0].ServiceInstance.Name).To(Equal("test-service"))
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
 			Expect(routes[1].Path).To(Equal("/path-2"))
 			Expect(handler).To(HaveAllRequestsCalled())
@@ -101,8 +103,11 @@ var _ = Describe("route repository", func() {
 			Expect(len(routes)).To(Equal(2))
 			Expect(routes[0].Guid).To(Equal("route-1-guid"))
 			Expect(routes[0].Space.Guid).To(Equal("space-1-guid"))
+			Expect(routes[0].ServiceInstance.Guid).To(Equal("service-guid"))
+			Expect(routes[0].ServiceInstance.Name).To(Equal("test-service"))
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
 			Expect(routes[1].Space.Guid).To(Equal("space-2-guid"))
+
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -448,7 +453,24 @@ var firstPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: 
               "name": "app-1"
        	    }
        	  }
-        ]
+        ],
+         "service_instance_url": "/v2/service_instances/service-guid",
+        "service_instance": {
+           "metadata": {
+              "guid": "service-guid",
+              "url": "/v2/service_instances/service-guid"
+           },
+           "entity": {
+              "name": "test-service",
+              "credentials": {
+                 "username": "user",
+                 "password": "password"
+              },
+              "type": "managed_service_instance",
+              "route_service_url": "https://something.awesome.com",
+              "space_url": "/v2/spaces/space-1-guid"
+           }
+        }
       }
     }
   ]
@@ -556,7 +578,24 @@ var firstPageRoutesOrgLvlResponse = testnet.TestResponse{Status: http.StatusOK, 
               "name": "app-1"
             }
           }
-        ]
+        ],
+        "service_instance_url": "/v2/service_instances/service-guid",
+        "service_instance": {
+           "metadata": {
+              "guid": "service-guid",
+              "url": "/v2/service_instances/service-guid"
+           },
+           "entity": {
+              "name": "test-service",
+              "credentials": {
+                 "username": "user",
+                 "password": "password"
+              },
+              "type": "managed_service_instance",
+              "route_service_url": "https://something.awesome.com",
+              "space_url": "/v2/spaces/space-1-guid"
+           }
+        }
       }
     }
   ]
