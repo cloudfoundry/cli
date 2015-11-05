@@ -196,14 +196,10 @@ var _ = Describe("CopySource", func() {
 
 				Describe("when a space is provided, but not an org", func() {
 					It("send the correct target appplication for the current org and target space", func() {
-						spaceRepo.Spaces = []models.Space{
-							{
-								SpaceFields: models.SpaceFields{
-									Name: "space-name",
-									Guid: "model-space-guid",
-								},
-							},
-						}
+						space := models.Space{}
+						space.Name = "space-name"
+						space.Guid = "model-space-guid"
+						spaceRepo.FindByNameReturns(space, nil)
 
 						runCommand("-s", "space-name", "source-app", "target-app")
 
@@ -220,7 +216,7 @@ var _ = Describe("CopySource", func() {
 
 					Context("Failures", func() {
 						It("when we cannot find the provided space", func() {
-							spaceRepo.FindByNameErr = true
+							spaceRepo.FindByNameReturns(models.Space{}, errors.New("Error finding space by name."))
 
 							runCommand("-s", "space-name", "source-app", "target-app")
 							Expect(ui.Outputs).To(ContainSubstrings(

@@ -83,7 +83,7 @@ var _ = Describe("space-users command", func() {
 			space.Guid = "space1-guid"
 
 			requirementsFactory.Organization = org
-			spaceRepo.FindByNameInOrgSpace = space
+			spaceRepo.FindByNameInOrgReturns(space, nil)
 
 			user := models.UserFields{}
 			user.Username = "user1"
@@ -106,8 +106,9 @@ var _ = Describe("space-users command", func() {
 		It("tells you about the space users in the given space", func() {
 			runCommand("my-org", "my-space")
 
-			Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
-			Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("org1-guid"))
+			actualSpaceName, actualOrgGUID := spaceRepo.FindByNameInOrgArgsForCall(0)
+			Expect(actualSpaceName).To(Equal("my-space"))
+			Expect(actualOrgGUID).To(Equal("org1-guid"))
 
 			Expect(userRepo.ListUsersInSpaceForRoleCallCount()).To(Equal(3))
 			for i, expectedRole := range []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR} {
@@ -178,7 +179,7 @@ var _ = Describe("space-users command", func() {
 			space.Guid = "space1-guid"
 
 			requirementsFactory.Organization = org
-			spaceRepo.FindByNameInOrgSpace = space
+			spaceRepo.FindByNameInOrgReturns(space, nil)
 
 			user := models.UserFields{}
 			user.Username = "mr-pointy-hair"

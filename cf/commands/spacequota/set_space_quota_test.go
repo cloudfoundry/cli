@@ -89,15 +89,14 @@ var _ = Describe("set-space-quota command", func() {
 						OrgGuid:                 "my-org-guid",
 					}, nil)
 
-				spaceRepo.Spaces = []models.Space{
+				spaceRepo.FindByNameReturns(
 					models.Space{
 						SpaceFields: models.SpaceFields{
 							Name: "my-space",
 							Guid: "my-space-guid",
 						},
 						SpaceQuotaGuid: "",
-					},
-				}
+					}, nil)
 			})
 
 			Context("when the space quota was not previously assigned to a space", func() {
@@ -115,15 +114,14 @@ var _ = Describe("set-space-quota command", func() {
 
 			Context("when the space quota was previously assigned to a space", func() {
 				BeforeEach(func() {
-					spaceRepo.Spaces = []models.Space{
+					spaceRepo.FindByNameReturns(
 						models.Space{
 							SpaceFields: models.SpaceFields{
 								Name: "my-space",
 								Guid: "my-space-guid",
 							},
 							SpaceQuotaGuid: "another-quota",
-						},
-					}
+						}, nil)
 				})
 
 				It("warns the user that the operation was not performed", func() {
@@ -139,30 +137,29 @@ var _ = Describe("set-space-quota command", func() {
 
 		Context("when an error occurs fetching the space", func() {
 			BeforeEach(func() {
-				spaceRepo.FindByNameErr = true
+				spaceRepo.FindByNameReturns(models.Space{}, errors.New("space-repo-err"))
 			})
 
 			It("prints an error", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Assigning space quota", "to space", "my-user"},
 					[]string{"FAILED"},
-					[]string{"Error finding space by name"},
+					[]string{"space-repo-err"},
 				))
 			})
 		})
 
 		Context("when an error occurs fetching the quota", func() {
 			BeforeEach(func() {
-				spaceRepo.Spaces = []models.Space{
+				spaceRepo.FindByNameReturns(
 					models.Space{
 						SpaceFields: models.SpaceFields{
 							Name: "my-space",
 							Guid: "my-space-guid",
 						},
 						SpaceQuotaGuid: "",
-					},
-				}
-				spaceRepo.FindByNameErr = false
+					}, nil)
+
 				quotaRepo.FindByNameReturns(models.SpaceQuota{}, errors.New("I can't find my quota name!"))
 			})
 
