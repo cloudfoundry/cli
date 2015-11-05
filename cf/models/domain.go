@@ -7,6 +7,6 @@ type DomainFields struct {
 	Shared                 bool
 }
 
-func (model DomainFields) UrlForHostAndPath(host, path string) string {
-	return urlStringFromParts(host, model.Name, path)
+func (model DomainFields) UrlForHostAndPath(host string, port int, path string) string {
+	return urlStringFromParts(host, port, model.Name, path)
 }
