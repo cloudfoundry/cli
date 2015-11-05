@@ -120,14 +120,15 @@ var _ = Describe("bind-security-group command", func() {
 				org.Guid = "org-guid"
 				fakeOrgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 				fakeOrgRepo.FindByNameReturns(org, nil)
-				fakeSpaceRepo.FindByNameInOrgError = errors.NewModelNotFoundError("Space", "space-name")
+				fakeSpaceRepo.FindByNameInOrgReturns(models.Space{}, errors.NewModelNotFoundError("Space", "space-name"))
 			})
 
 			It("fails and tells the user", func() {
 				runCommand("sec group", "org-name", "space-name")
 
-				Expect(fakeSpaceRepo.FindByNameInOrgName).To(Equal("space-name"))
-				Expect(fakeSpaceRepo.FindByNameInOrgOrgGuid).To(Equal("org-guid"))
+				name, orgGUID := fakeSpaceRepo.FindByNameInOrgArgsForCall(0)
+				Expect(name).To(Equal("space-name"))
+				Expect(orgGUID).To(Equal("org-guid"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Space", "space-name", "not found"},
@@ -145,7 +146,7 @@ var _ = Describe("bind-security-group command", func() {
 				space := models.Space{}
 				space.Name = "space-name"
 				space.Guid = "space-guid"
-				fakeSpaceRepo.FindByNameInOrgSpace = space
+				fakeSpaceRepo.FindByNameInOrgReturns(space, nil)
 
 				securityGroup := models.SecurityGroup{}
 				securityGroup.Name = "security-group"

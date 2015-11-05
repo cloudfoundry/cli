@@ -67,6 +67,19 @@ var _ = Describe("spaces command", func() {
 		})
 	})
 
+	listSpacesStub := func(spaces []models.Space) func(func(models.Space) bool) error {
+		return func(cb func(models.Space) bool) error {
+			var keepGoing bool
+			for _, s := range spaces {
+				keepGoing = cb(s)
+				if !keepGoing {
+					return nil
+				}
+			}
+			return nil
+		}
+	}
+
 	Describe("when invoked by a plugin", func() {
 		var (
 			pluginModels []plugin_models.GetSpaces_Model
@@ -82,7 +95,7 @@ var _ = Describe("spaces command", func() {
 			space2 := models.Space{}
 			space2.Name = "space2"
 			space2.Guid = "456"
-			spaceRepo.Spaces = []models.Space{space, space2}
+			spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space, space2})
 
 			requirementsFactory.TargetedOrgSuccess = true
 			requirementsFactory.LoginSuccess = true
@@ -107,7 +120,7 @@ var _ = Describe("spaces command", func() {
 			space2.Name = "space2"
 			space3 := models.Space{}
 			space3.Name = "space3"
-			spaceRepo.Spaces = []models.Space{space, space2, space3}
+			spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space, space2, space3})
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
 		})
@@ -125,7 +138,7 @@ var _ = Describe("spaces command", func() {
 
 		Context("when there are no spaces", func() {
 			BeforeEach(func() {
-				spaceRepo.Spaces = []models.Space{}
+				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{})
 			})
 
 			It("politely tells the user", func() {

@@ -89,8 +89,7 @@ var _ = Describe("unset-space-quota command", func() {
 			quota := models.SpaceQuota{Name: "my-quota", Guid: "my-quota-guid"}
 
 			quotaRepo.FindByNameReturns(quota, nil)
-			spaceRepo.FindByNameName = space.Name
-			spaceRepo.Spaces = []models.Space{space}
+			spaceRepo.FindByNameReturns(space, nil)
 
 			runCommand("my-space", "my-quota")
 

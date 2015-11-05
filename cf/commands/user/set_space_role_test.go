@@ -96,10 +96,11 @@ var _ = Describe("set-space-role command", func() {
 				requirementsFactory.UserFields = models.UserFields{Guid: "my-user-guid", Username: "my-user"}
 				requirementsFactory.Organization = org
 
-				spaceRepo.FindByNameInOrgSpace = models.Space{}
-				spaceRepo.FindByNameInOrgSpace.Guid = "my-space-guid"
-				spaceRepo.FindByNameInOrgSpace.Name = "my-space"
-				spaceRepo.FindByNameInOrgSpace.Organization = org.OrganizationFields
+				space := models.Space{}
+				space.Guid = "my-space-guid"
+				space.Name = "my-space"
+				space.Organization = org.OrganizationFields
+				spaceRepo.FindByNameInOrgReturns(space, nil)
 			})
 
 			Context("when CC version allows space role set by username", func() {
@@ -178,8 +179,9 @@ var _ = Describe("set-space-role command", func() {
 						[]string{"OK"},
 					))
 
-					Expect(spaceRepo.FindByNameInOrgName).To(Equal("some-space"))
-					Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("my-org-guid"))
+					actualSpaceName, actualOrgGUID := spaceRepo.FindByNameInOrgArgsForCall(0)
+					Expect(actualSpaceName).To(Equal("some-space"))
+					Expect(actualOrgGUID).To(Equal("my-org-guid"))
 
 					Expect(userRepo.SetSpaceRoleByGuidCallCount()).To(Equal(1))
 				})

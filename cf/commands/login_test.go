@@ -43,6 +43,19 @@ var _ = Describe("Login Command", func() {
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("login").SetDependency(deps, pluginCall))
 	}
 
+	listSpacesStub := func(spaces []models.Space) func(func(models.Space) bool) error {
+		return func(cb func(models.Space) bool) error {
+			var keepGoing bool
+			for _, s := range spaces {
+				keepGoing = cb(s)
+				if !keepGoing {
+					return nil
+				}
+			}
+			return nil
+		}
+	}
+
 	BeforeEach(func() {
 		Flags = []string{}
 		Config = testconfig.NewRepository()
@@ -65,9 +78,8 @@ var _ = Describe("Login Command", func() {
 		space.Guid = "my-space-guid"
 		space.Name = "my-space"
 
-		spaceRepo = &testapi.FakeSpaceRepository{
-			Spaces: []models.Space{space},
-		}
+		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
 		authRepo.GetLoginPromptsReturns.Prompts = map[string]core_config.AuthPrompt{
 			"username": core_config.AuthPrompt{
@@ -104,7 +116,14 @@ var _ = Describe("Login Command", func() {
 				space2.Name = "some-space"
 
 				orgRepo.ListOrgsReturns([]models.Organization{org1, org2}, nil)
-				spaceRepo.Spaces = []models.Space{space1, space2}
+				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1, space2})
+				spaceRepo.FindByNameStub = func(name string) (models.Space, error) {
+					m := map[string]models.Space{
+						space1.Name: space1,
+						space2.Name: space2,
+					}
+					return m[name], nil
+				}
 			})
 
 			It("lets the user select an org and space by number", func() {
@@ -131,7 +150,7 @@ var _ = Describe("Login Command", func() {
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
-				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -159,7 +178,7 @@ var _ = Describe("Login Command", func() {
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
-				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -205,6 +224,7 @@ var _ = Describe("Login Command", func() {
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 		})
+
 		Describe("when the CLI version is below the minimum required", func() {
 			BeforeEach(func() {
 				Config.SetMinCliVersion("5.0.0")
@@ -245,7 +265,7 @@ var _ = Describe("Login Command", func() {
 				space2.Guid = "some-space-guid"
 				space2.Name = "some-space"
 
-				spaceRepo.Spaces = []models.Space{space1, space2}
+				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1, space2})
 			})
 
 			It("doesn't display a list of orgs (the user must type the name)", func() {
@@ -284,7 +304,7 @@ var _ = Describe("Login Command", func() {
 		Describe("where there are no available orgs", func() {
 			BeforeEach(func() {
 				orgRepo.ListOrgsReturns([]models.Organization{}, nil)
-				spaceRepo.Spaces = []models.Space{}
+				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{})
 			})
 
 			It("does not as the user to select an org", func() {
@@ -310,7 +330,7 @@ var _ = Describe("Login Command", func() {
 		Describe("when there is only a single org and no spaces", func() {
 			BeforeEach(func() {
 				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
-				spaceRepo.Spaces = []models.Space{}
+				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{})
 			})
 
 			It("does not ask the user to select a space", func() {
@@ -686,6 +706,7 @@ var _ = Describe("Login Command", func() {
 			BeforeEach(func() {
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "my-new-org", "-s", "nonexistent"}
 				orgRepo.FindByNameReturns(org, nil)
+				spaceRepo.FindByNameReturns(models.Space{}, errors.New("find-by-name-err"))
 
 				Config.SetSSLDisabled(true)
 			})
@@ -715,8 +736,13 @@ var _ = Describe("Login Command", func() {
 						Guid: "new-org-guid",
 					},
 				}, nil)
-				spaceRepo.Spaces[0].Name = "new-space"
-				spaceRepo.Spaces[0].Guid = "new-space-guid"
+
+				space1 := models.Space{}
+				space1.Guid = "new-space-guid"
+				space1.Name = "new-space-name"
+				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1})
+				spaceRepo.FindByNameReturns(space1, nil)
+
 				authRepo.AccessToken = "new_access_token"
 				authRepo.RefreshToken = "new_refresh_token"
 

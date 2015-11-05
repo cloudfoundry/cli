@@ -1,6 +1,8 @@
 package requirements_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
@@ -24,19 +26,21 @@ var _ = Describe("SpaceRequirement", func() {
 			space := models.Space{}
 			space.Name = "awesome-sauce-space"
 			space.Guid = "my-space-guid"
-			spaceRepo := &testapi.FakeSpaceRepository{Spaces: []models.Space{space}}
+			spaceRepo := &testapi.FakeSpaceRepository{}
+			spaceRepo.FindByNameReturns(space, nil)
 
 			spaceReq := NewSpaceRequirement("awesome-sauce-space", ui, spaceRepo)
 
 			Expect(spaceReq.Execute()).To(BeTrue())
-			Expect(spaceRepo.FindByNameName).To(Equal("awesome-sauce-space"))
 			Expect(spaceReq.GetSpace()).To(Equal(space))
+			Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("awesome-sauce-space"))
 		})
 	})
 
 	Context("when a space with the given name does not exist", func() {
 		It("fails", func() {
-			spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
+			spaceRepo := &testapi.FakeSpaceRepository{}
+			spaceRepo.FindByNameReturns(models.Space{}, errors.New("space-repo-err"))
 			testassert.AssertPanic(testterm.QuietPanic, func() {
 				NewSpaceRequirement("foo", ui, spaceRepo).Execute()
 			})

@@ -108,9 +108,10 @@ var _ = Describe("disallow-space-ssh command", func() {
 				It("updates the space's allow_ssh", func() {
 					runCommand("the-space-name")
 
-					Ω(spaceRepo.SetAllowSSHCalls).To(Equal(1))
-					Ω(spaceRepo.SetAllowSSHSpaceGuid).To(Equal("the-space-guid"))
-					Ω(spaceRepo.SetAllowBoolValue).To(Equal(false))
+					Expect(spaceRepo.SetAllowSSHCallCount()).To(Equal(1))
+					spaceGUID, allow := spaceRepo.SetAllowSSHArgsForCall(0)
+					Expect(spaceGUID).To(Equal("the-space-guid"))
+					Expect(allow).To(Equal(false))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"Disabling ssh support for space 'the-space-name'"}))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
@@ -123,7 +124,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 				})
 
 				It("notifies user of any api error", func() {
-					spaceRepo.SetAllowSSHError = errors.New("api error")
+					spaceRepo.SetAllowSSHReturns(errors.New("api error"))
 					runCommand("the-space-name")
 
 					Ω(ui.Outputs).To(ContainSubstrings(

@@ -84,8 +84,9 @@ var _ = Describe("rename-space command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(spaceRepo.RenameSpaceGuid).To(Equal("the-old-space-guid"))
-			Expect(spaceRepo.RenameNewName).To(Equal("my-new-space"))
+			spaceGUID, name := spaceRepo.RenameArgsForCall(0)
+			Expect(spaceGUID).To(Equal("the-old-space-guid"))
+			Expect(name).To(Equal("my-new-space"))
 			Expect(configRepo.SpaceFields().Name).To(Equal(originalSpaceName))
 		})
 

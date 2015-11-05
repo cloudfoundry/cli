@@ -80,7 +80,7 @@ var _ = Describe("delete-space command", func() {
 			[]string{"Deleting space", "space-to-delete", "my-org", "my-user"},
 			[]string{"OK"},
 		))
-		Expect(spaceRepo.DeletedSpaceGuid).To(Equal("space-to-delete-guid"))
+		Expect(spaceRepo.DeleteArgsForCall(0)).To(Equal("space-to-delete-guid"))
 		Expect(config.HasSpace()).To(Equal(true))
 	})
 
@@ -92,7 +92,7 @@ var _ = Describe("delete-space command", func() {
 			[]string{"Deleting", "space-to-delete"},
 			[]string{"OK"},
 		))
-		Expect(spaceRepo.DeletedSpaceGuid).To(Equal("space-to-delete-guid"))
+		Expect(spaceRepo.DeleteArgsForCall(0)).To(Equal("space-to-delete-guid"))
 	})
 
 	It("clears the space from the config, when deleting the space currently targeted", func() {

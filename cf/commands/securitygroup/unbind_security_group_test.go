@@ -110,7 +110,8 @@ var _ = Describe("unbind-security-group command", func() {
 					}},
 				}, nil)
 
-				spaceRepo.FindByNameInOrgSpace = models.Space{SpaceFields: models.SpaceFields{Name: "my-space", Guid: "my-space-guid"}}
+				space := models.Space{SpaceFields: models.SpaceFields{Name: "my-space", Guid: "my-space-guid"}}
+				spaceRepo.FindByNameInOrgReturns(space, nil)
 			})
 
 			It("removes the security group when we only pass the security group name (using the targeted org and space)", func() {

@@ -70,16 +70,19 @@ var _ = Describe("unset-space-role command", func() {
 		requirementsFactory.LoginSuccess = true
 		requirementsFactory.UserFields = user
 		requirementsFactory.Organization = org
-		spaceRepo.FindByNameInOrgSpace = models.Space{}
-		spaceRepo.FindByNameInOrgSpace.Name = "some-space"
-		spaceRepo.FindByNameInOrgSpace.Guid = "some-space-guid"
+
+		space := models.Space{}
+		space.Name = "some-space"
+		space.Guid = "some-space-guid"
+		spaceRepo.FindByNameInOrgReturns(space, nil)
 
 		args := []string{"my-username", "my-org", "my-space", "SpaceManager"}
 
 		ui, _ := callUnsetSpaceRole(args, spaceRepo, userRepo, requirementsFactory)
 
-		Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
-		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("some-org-guid"))
+		actualSpaceName, actualOrgGUID := spaceRepo.FindByNameInOrgArgsForCall(0)
+		Expect(actualSpaceName).To(Equal("my-space"))
+		Expect(actualOrgGUID).To(Equal("some-org-guid"))
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
