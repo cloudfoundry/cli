@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"net/url"
 	"strings"
@@ -16,10 +17,10 @@ import (
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
-	Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error)
+	Find(host string, port string, domain models.DomainFields, path string) (route models.Route, apiErr error)
 	Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error)
-	CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
+	CreateInSpace(host, port, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
 	Unbind(routeGuid, appGuid string) (apiErr error)
 	Delete(routeGuid string) (apiErr error)
@@ -56,15 +57,21 @@ func (repo CloudControllerRouteRepository) ListAllRoutes(cb func(models.Route) b
 		})
 }
 
-func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
+func (repo CloudControllerRouteRepository) Find(host string, port string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
 	if path != "" && !strings.HasPrefix(path, `/`) {
 		path = `/` + path
 	}
 
 	found := false
+	var endpointURL string
+	if port == "" {
+		endpointURL = fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid+";path:"+path))
+	} else {
+		endpointURL = fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid+";path:"+path+";port:"+port))
+	}
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid+";path:"+path)),
+		endpointURL,
 		resources.RouteResource{},
 		func(resource interface{}) bool {
 			route = resource.(resources.RouteResource).ToModel()
@@ -80,7 +87,7 @@ func (repo CloudControllerRouteRepository) Find(host string, domain models.Domai
 }
 
 func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error) {
-	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid)
+	return repo.CreateInSpace(host, "", path, domain.Guid, repo.config.SpaceFields().Guid)
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {
@@ -109,15 +116,24 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 	return true, nil
 }
 
-func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
+func (repo CloudControllerRouteRepository) CreateInSpace(host, port, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
 	if path != "" && !strings.HasPrefix(path, `/`) {
 		path = `/` + path
 	}
 
-	data := fmt.Sprintf(`{"host":"%s","path":"%s","domain_guid":"%s","space_guid":"%s"}`, host, path, domainGuid, spaceGuid)
+	var buffer bytes.Buffer
+
+	buffer.WriteString("{")
+	buffer.WriteString(fmt.Sprintf(`{"host":"%s","path":"%s","domain_guid":"%s","space_guid":"%s"}`, host, path, domainGuid, spaceGuid))
+	if port != "" {
+		buffer.WriteString(fmt.Sprintf(`,"port":%s`, port))
+	}
+	buffer.WriteString("}")
+
+	requestPayload := buffer.String()
 
 	resource := new(resources.RouteResource)
-	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/routes?inline-relations-depth=1", strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/routes?inline-relations-depth=1", strings.NewReader(requestPayload), resource)
 	if apiErr != nil {
 		return
 	}
