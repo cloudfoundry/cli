@@ -67,7 +67,9 @@ var _ = Describe("route repository", func() {
 
 			Expect(len(routes)).To(Equal(2))
 			Expect(routes[0].Guid).To(Equal("route-1-guid"))
+			Expect(routes[0].Port).To(Equal(9090))
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
+			Expect(routes[1].Port).To(Equal(0))
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -96,11 +98,14 @@ var _ = Describe("route repository", func() {
 			Expect(len(routes)).To(Equal(2))
 			Expect(routes[0].Guid).To(Equal("route-1-guid"))
 			Expect(routes[0].Space.Guid).To(Equal("space-1-guid"))
+			Expect(routes[0].Port).To(Equal(9090))
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
 			Expect(routes[1].Space.Guid).To(Equal("space-2-guid"))
+			Expect(routes[1].Port).To(Equal(0))
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
+
 		It("finds a route by host and domain", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -120,6 +125,30 @@ var _ = Describe("route repository", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(route.Host).To(Equal("my-cool-app"))
 			Expect(route.Guid).To(Equal("my-route-guid"))
+			Expect(route.Port).To(Equal(0))
+			Expect(route.Domain.Guid).To(Equal(domain.Guid))
+		})
+
+		It("finds a route by host, domain and port", func() {
+			ts, handler = testnet.NewServer([]testnet.TestRequest{
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid%3Bport%3A8080",
+					Response: findRouteByHostPortResponse,
+				}),
+			})
+			configRepo.SetApiEndpoint(ts.URL)
+
+			domain := models.DomainFields{}
+			domain.Guid = "my-domain-guid"
+
+			route, apiErr := repo.FindByHostDomainAndPort("my-cool-app", "8080", domain)
+
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(route.Host).To(Equal("my-cool-app"))
+			Expect(route.Guid).To(Equal("my-route-guid"))
+			Expect(route.Port).To(Equal(8080))
 			Expect(route.Domain.Guid).To(Equal(domain.Guid))
 		})
 
@@ -161,7 +190,7 @@ var _ = Describe("route repository", func() {
 			})
 			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
+			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "", "my-domain-guid", "my-space-guid")
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -319,6 +348,7 @@ var firstPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: 
       },
       "entity": {
         "host": "route-1-host",
+        "port": 9090,
         "domain": {
           "metadata": {
             "guid": "domain-1-guid"
@@ -359,6 +389,7 @@ var secondPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body:
       },
       "entity": {
         "host": "route-2-host",
+        "port": 0,
         "domain": {
           "metadata": {
             "guid": "domain-2-guid"
@@ -415,6 +446,24 @@ var findRouteByHostResponse = testnet.TestResponse{Status: http.StatusCreated, B
     }
 ]}`}
 
+var findRouteByHostPortResponse = testnet.TestResponse{Status: http.StatusCreated, Body: `
+{ "resources": [
+    {
+    	"metadata": {
+        	"guid": "my-route-guid"
+    	},
+    	"entity": {
+       	     "host": "my-cool-app",
+       	     "port": 8080,
+       	     "domain": {
+       	     	"metadata": {
+       	     		"guid": "my-domain-guid"
+       	     	}
+       	     }
+    	}
+    }
+]}`}
+
 var firstPageRoutesOrgLvlResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {
   "next_url": "/v2/routes?q=organization_guid:my-org-guid&inline-relations-depth=1&page=2",
@@ -425,6 +474,7 @@ var firstPageRoutesOrgLvlResponse = testnet.TestResponse{Status: http.StatusOK, 
       },
       "entity": {
         "host": "route-1-host",
+        "port": 9090,
         "domain": {
           "metadata": {
             "guid": "domain-1-guid"

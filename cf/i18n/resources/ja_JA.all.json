@@ -685,8 +685,8 @@
       "modified": true
    },
    {
-      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME | -p PORT]",
+      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME | -p PORT]",
       "modified": false
    },
    {
@@ -1587,6 +1587,11 @@
    {
       "id": "Creating route {{.Hostname}}...",
       "translation": "Creating route {{.Hostname}}...",
+      "modified": false
+   },
+   {
+      "id": "Creating route {{.Hostname}}:{{.Port}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Creating route {{.Hostname}}:{{.Port}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "modified": false
    },
    {
@@ -3005,11 +3010,6 @@
       "modified": false
    },
    {
-      "id": "Incorrect Usage. Requires stack name as argument\n\n",
-      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
-      "modified": false
-   },
-   {
       "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "translation": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "modified": false
@@ -3047,6 +3047,11 @@
    {
       "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
       "translation": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires stack name as argument\n\n",
+      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
       "modified": false
    },
    {
@@ -3842,6 +3847,11 @@
    {
       "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
       "translation": "Plugin {{.PluginName}} successfully installed.",
+      "modified": true
+   },
+   {
+      "id": "Port used to create a TCP route. E.g. where domain is example.com and port is 50000, the resulting route is example.com:50000.",
+      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
       "modified": true
    },
    {
