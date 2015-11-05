@@ -4250,8 +4250,8 @@
       "modified": false
    },
    {
-      "id": "Routing API not found. Please log in.",
-      "translation": "Routing API not found. Please log in.",
+      "id": "Routing API uri missing. Please log in again and retry.",
+      "translation": "Routing API uri missing. Please log in again and retry.",
       "modified": false
    },
    {

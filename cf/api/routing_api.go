@@ -31,7 +31,7 @@ func (r routingApiRepository) ListRouterGroups(cb func(models.RouterGroup) bool)
 
 	routingApiEndpoint := r.config.RoutingApiEndpoint()
 	if routingApiEndpoint == "" {
-		apiErr = errors.New(T("Routing API not found. Please log in."))
+		apiErr = errors.New(T("Routing API uri missing. Please log in again and retry."))
 		return
 	}
 

@@ -135,7 +135,7 @@ var _ = Describe("RoutingApi", func() {
 
 				err := repo.ListRouterGroups(cb)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("Routing API not found. Please log in."))
+				Expect(err.Error()).To(ContainSubstring("Routing API uri missing. Please log in again and retry."))
 			})
 		})
 	})
