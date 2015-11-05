@@ -102,6 +102,8 @@ func (f apiRequirementFactory) NewUserRequirement(username string) UserRequireme
 		username,
 		f.ui,
 		f.repoLocator.GetUserRepository(),
+		f.repoLocator.GetFeatureFlagRepository(),
+		f.config,
 	)
 }
 

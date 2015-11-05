@@ -37,7 +37,7 @@ func (cmd *SetOrgRole) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("set-org-role"))
 	}
@@ -45,12 +45,13 @@ func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc
 	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.userReq,
 		cmd.orgReq,
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *SetOrgRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -62,30 +63,28 @@ func (cmd *SetOrgRole) SetDependency(deps command_registry.Dependency, pluginCal
 }
 
 func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
+	username := c.Args()[0]
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 	role := models.UserInputToOrgRole[c.Args()[2]]
-	setRolesByUsername, err := cmd.flagRepo.FindByName("set_roles_by_username")
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-	}
 
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"Role":        terminal.EntityNameColor(role),
-			"TargetUser":  terminal.EntityNameColor(user.Username),
+			"TargetUser":  terminal.EntityNameColor(username),
 			"TargetOrg":   terminal.EntityNameColor(org.Name),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	var apiErr error
-	if cmd.config.IsMinApiVersion("2.37.0") && setRolesByUsername.Enabled {
-		apiErr = cmd.userRepo.SetOrgRoleByUsername(user.Username, org.Guid, role)
+	var err error
+	if len(user.Guid) > 0 {
+		err = cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)
 	} else {
-		apiErr = cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)
+		err = cmd.userRepo.SetOrgRoleByUsername(username, org.Guid, role)
 	}
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 
 	cmd.ui.Ok()
