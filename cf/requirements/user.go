@@ -2,6 +2,8 @@ package requirements
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
@@ -15,24 +17,44 @@ type userApiRequirement struct {
 	username string
 	ui       terminal.UI
 	userRepo api.UserRepository
-	user     models.UserFields
+	flagRepo feature_flags.FeatureFlagRepository
+	config   core_config.Reader
+
+	user models.UserFields
 }
 
-func NewUserRequirement(username string, ui terminal.UI, userRepo api.UserRepository) (req *userApiRequirement) {
-	req = new(userApiRequirement)
+func NewUserRequirement(
+	username string,
+	ui terminal.UI,
+	userRepo api.UserRepository,
+	flagRepo feature_flags.FeatureFlagRepository,
+	config core_config.Reader,
+) *userApiRequirement {
+	req := new(userApiRequirement)
 	req.username = username
 	req.ui = ui
 	req.userRepo = userRepo
-	return
+	req.config = config
+	req.flagRepo = flagRepo
+
+	return req
 }
 
-func (req *userApiRequirement) Execute() (success bool) {
-	var apiErr error
-	req.user, apiErr = req.userRepo.FindByUsername(req.username)
-
-	if apiErr != nil {
-		req.ui.Failed(apiErr.Error())
+func (req *userApiRequirement) Execute() bool {
+	setRolesByUsernameFlag, err := req.flagRepo.FindByName("set_roles_by_username")
+	if err != nil {
+		req.ui.Failed(err.Error())
 		return false
+	}
+
+	if req.config.IsMinApiVersion("2.37.0") && setRolesByUsernameFlag.Enabled {
+		req.user = models.UserFields{Username: req.username}
+	} else {
+		req.user, err = req.userRepo.FindByUsername(req.username)
+		if err != nil {
+			req.ui.Failed(err.Error())
+			return false
+		}
 	}
 
 	return true

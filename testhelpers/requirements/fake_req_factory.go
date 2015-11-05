@@ -12,14 +12,16 @@ type FakeReqFactory struct {
 	ServiceInstanceName string
 	ServiceInstance     models.ServiceInstance
 
-	ApplicationFails        bool
-	LoginSuccess            bool
-	ApiEndpointSuccess      bool
-	ValidAccessTokenSuccess bool
-	TargetedSpaceSuccess    bool
-	TargetedOrgSuccess      bool
-	BuildpackSuccess        bool
-	SpaceRequirementFails   bool
+	ApplicationFails             bool
+	LoginSuccess                 bool
+	ApiEndpointSuccess           bool
+	ValidAccessTokenSuccess      bool
+	TargetedSpaceSuccess         bool
+	TargetedOrgSuccess           bool
+	BuildpackSuccess             bool
+	SpaceRequirementFails        bool
+	UserRequirementFails         bool
+	OrganizationRequirementFails bool
 
 	ServiceInstanceNotFound bool
 
@@ -77,7 +79,7 @@ func (f *FakeReqFactory) NewSpaceRequirement(name string) requirements.SpaceRequ
 
 func (f *FakeReqFactory) NewOrganizationRequirement(name string) requirements.OrganizationRequirement {
 	f.OrganizationName = name
-	return FakeRequirement{f, true}
+	return FakeRequirement{f, !f.OrganizationRequirementFails}
 }
 
 func (f *FakeReqFactory) NewDomainRequirement(name string) requirements.DomainRequirement {
@@ -87,7 +89,7 @@ func (f *FakeReqFactory) NewDomainRequirement(name string) requirements.DomainRe
 
 func (f *FakeReqFactory) NewUserRequirement(username string) requirements.UserRequirement {
 	f.UserUsername = username
-	return FakeRequirement{f, true}
+	return FakeRequirement{f, !f.UserRequirementFails}
 }
 
 func (f *FakeReqFactory) NewBuildpackRequirement(buildpack string) requirements.BuildpackRequirement {
