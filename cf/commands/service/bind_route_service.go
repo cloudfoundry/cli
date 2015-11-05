@@ -91,7 +91,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 		requiresRouteForwarding := requiresRouteForwarding(serviceInstance)
 
 		if requiresRouteForwarding && !confirmed {
-			confirmed = cmd.ui.Confirm(T("Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
+			confirmed = cmd.ui.Confirm(T("Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
 				map[string]interface{}{
 					"URL": route.URL(),
 					"ServiceInstanceName": serviceInstance.Name,

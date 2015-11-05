@@ -560,9 +560,9 @@
       "modified": false
    },
    {
-      "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
+      "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
       "translation": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -1187,6 +1187,11 @@
    {
       "id": "CF_NAME target [-o ORG] [-s SPACE]",
       "translation": "CF_NAME target [-o ORG] [-s ESPACE]",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
+      "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
       "modified": false
    },
    {
@@ -2020,6 +2025,11 @@
       "modified": false
    },
    {
+      "id": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "translation": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "modified": false
+   },
+   {
       "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
       "translation": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n\t CF_NAME update-service mydb -t \"list,of, tags\"",
       "modified": true
@@ -2565,6 +2575,11 @@
       "modified": false
    },
    {
+      "id": "Force unbinding without confirmation",
+      "translation": "Force unbinding without confirmation",
+      "modified": false
+   },
+   {
       "id": "GETTING STARTED",
       "translation": "MISE EN ROUTE",
       "modified": false
@@ -2822,6 +2837,11 @@
    {
       "id": "Hostname used in combination with DOMAIN to specify the route to bind",
       "translation": "Hostname used in combination with DOMAIN to specify the route to bind",
+      "modified": false
+   },
+   {
+      "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
+      "translation": "Hostname used in combination with DOMAIN to specify the route to unbind",
       "modified": false
    },
    {
@@ -4970,6 +4990,11 @@
       "modified": false
    },
    {
+      "id": "Unbind a service instance from a route",
+      "translation": "Unbind a service instance from a route",
+      "modified": false
+   },
+   {
       "id": "Unbind a service instance from an app",
       "translation": "Délier une instance de service d'une application",
       "modified": false
@@ -4977,6 +5002,16 @@
    {
       "id": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "Libération App {{.AppName}} du service {{.ServiceName}} dans l'org {{.OrgName}} / espace {{.SpaceName}} en tant que {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)",
+      "translation": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed?",
+      "modified": true
+   },
+   {
+      "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "modified": false
    },
    {

@@ -122,4 +122,83 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 			})
 		})
 	})
+
+	Describe("Unbind", func() {
+		var (
+			serviceInstanceGuid string
+			routeGuid           string
+			upsi                bool
+		)
+
+		Context("when the service instance is managed", func() {
+			BeforeEach(func() {
+				serviceInstanceGuid = "service-instance-guid"
+				routeGuid = "route-guid"
+				upsi = false
+			})
+
+			JustBeforeEach(func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "DELETE",
+					Path:     fmt.Sprintf("/v2/service_instances/%s/routes/%s", serviceInstanceGuid, routeGuid),
+					Response: testnet.TestResponse{Status: http.StatusNoContent},
+				}))
+			})
+
+			It("deletes the service binding", func() {
+				apiErr := repo.Unbind(serviceInstanceGuid, routeGuid, upsi)
+
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when the service instance is user provided", func() {
+			BeforeEach(func() {
+				serviceInstanceGuid = "service-instance-guid"
+				routeGuid = "route-guid"
+				upsi = true
+			})
+
+			JustBeforeEach(func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "DELETE",
+					Path:     fmt.Sprintf("/v2/user_provided_service_instances/%s/routes/%s", serviceInstanceGuid, routeGuid),
+					Response: testnet.TestResponse{Status: http.StatusNoContent},
+				}))
+			})
+
+			It("deletes the service binding", func() {
+				apiErr := repo.Unbind(serviceInstanceGuid, routeGuid, upsi)
+
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when an API error occurs", func() {
+			BeforeEach(func() {
+				serviceInstanceGuid = "service-instance-guid"
+				routeGuid = "route-guid"
+				upsi = false
+
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "DELETE",
+					Path:   fmt.Sprintf("/v2/service_instances/%s/routes/%s", serviceInstanceGuid, routeGuid),
+					Response: testnet.TestResponse{
+						Status: http.StatusBadRequest,
+						Body:   `{"code":61003,"description":"Route does not exist"}`,
+					},
+				}))
+			})
+
+			It("returns an error", func() {
+				apiErr := repo.Unbind(serviceInstanceGuid, routeGuid, upsi)
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(apiErr).To(HaveOccurred())
+				Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("61003"))
+				Expect(apiErr.Error()).To(ContainSubstring("Route does not exist"))
+			})
+		})
+	})
 })

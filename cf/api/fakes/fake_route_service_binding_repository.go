@@ -18,6 +18,16 @@ type FakeRouteServiceBindingRepository struct {
 	bindReturns struct {
 		result1 error
 	}
+	UnbindStub        func(instanceGuid, routeGuid string, upsi bool) (apiErr error)
+	unbindMutex       sync.RWMutex
+	unbindArgsForCall []struct {
+		instanceGuid string
+		routeGuid    string
+		upsi         bool
+	}
+	unbindReturns struct {
+		result1 error
+	}
 }
 
 func (fake *FakeRouteServiceBindingRepository) Bind(instanceGuid string, routeGuid string, upsi bool) (apiErr error) {
@@ -50,6 +60,40 @@ func (fake *FakeRouteServiceBindingRepository) BindArgsForCall(i int) (string, s
 func (fake *FakeRouteServiceBindingRepository) BindReturns(result1 error) {
 	fake.BindStub = nil
 	fake.bindReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRouteServiceBindingRepository) Unbind(instanceGuid string, routeGuid string, upsi bool) (apiErr error) {
+	fake.unbindMutex.Lock()
+	fake.unbindArgsForCall = append(fake.unbindArgsForCall, struct {
+		instanceGuid string
+		routeGuid    string
+		upsi         bool
+	}{instanceGuid, routeGuid, upsi})
+	fake.unbindMutex.Unlock()
+	if fake.UnbindStub != nil {
+		return fake.UnbindStub(instanceGuid, routeGuid, upsi)
+	} else {
+		return fake.unbindReturns.result1
+	}
+}
+
+func (fake *FakeRouteServiceBindingRepository) UnbindCallCount() int {
+	fake.unbindMutex.RLock()
+	defer fake.unbindMutex.RUnlock()
+	return len(fake.unbindArgsForCall)
+}
+
+func (fake *FakeRouteServiceBindingRepository) UnbindArgsForCall(i int) (string, string, bool) {
+	fake.unbindMutex.RLock()
+	defer fake.unbindMutex.RUnlock()
+	return fake.unbindArgsForCall[i].instanceGuid, fake.unbindArgsForCall[i].routeGuid, fake.unbindArgsForCall[i].upsi
+}
+
+func (fake *FakeRouteServiceBindingRepository) UnbindReturns(result1 error) {
+	fake.UnbindStub = nil
+	fake.unbindReturns = struct {
 		result1 error
 	}{result1}
 }
