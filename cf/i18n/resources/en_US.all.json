@@ -685,8 +685,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME | -p PORT]",
+      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME | -p PORT]",
       "modified": false
    },
    {
@@ -1587,6 +1587,11 @@
    {
       "id": "Creating route {{.Hostname}}...",
       "translation": "Creating route {{.Hostname}}...",
+      "modified": false
+   },
+   {
+      "id": "Creating route {{.Hostname}}:{{.Port}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Creating route {{.Hostname}}:{{.Port}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "modified": false
    },
    {
@@ -3842,6 +3847,11 @@
    {
       "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
       "translation": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
+      "modified": false
+   },
+   {
+      "id": "Port used to create a TCP route. E.g. where domain is example.com and port is 50000, the resulting route is example.com:50000.",
+      "translation": "Port used to create a TCP route. E.g. where domain is example.com and port is 50000, the resulting route is example.com:50000.",
       "modified": false
    },
    {
