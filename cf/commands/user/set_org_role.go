@@ -63,7 +63,6 @@ func (cmd *SetOrgRole) SetDependency(deps command_registry.Dependency, pluginCal
 }
 
 func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
-	username := c.Args()[0]
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 	role := models.UserInputToOrgRole[c.Args()[2]]
@@ -71,7 +70,7 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"Role":        terminal.EntityNameColor(role),
-			"TargetUser":  terminal.EntityNameColor(username),
+			"TargetUser":  terminal.EntityNameColor(user.Username),
 			"TargetOrg":   terminal.EntityNameColor(org.Name),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
@@ -80,7 +79,7 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 	if len(user.Guid) > 0 {
 		err = cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)
 	} else {
-		err = cmd.userRepo.SetOrgRoleByUsername(username, org.Guid, role)
+		err = cmd.userRepo.SetOrgRoleByUsername(user.Username, org.Guid, role)
 	}
 
 	if err != nil {
