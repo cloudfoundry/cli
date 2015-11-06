@@ -14,6 +14,7 @@ type FakeReqFactory struct {
 
 	ApplicationFails             bool
 	LoginSuccess                 bool
+	RoutingAPIEndpointSuccess    bool
 	ApiEndpointSuccess           bool
 	ValidAccessTokenSuccess      bool
 	TargetedSpaceSuccess         bool
@@ -62,6 +63,10 @@ func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements
 
 func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
 	return FakeRequirement{f, f.LoginSuccess}
+}
+
+func (f *FakeReqFactory) NewRoutingAPIRequirement() requirements.Requirement {
+	return FakeRequirement{f, f.RoutingAPIEndpointSuccess}
 }
 
 func (f *FakeReqFactory) NewTargetedSpaceRequirement() requirements.Requirement {

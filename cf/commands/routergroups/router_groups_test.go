@@ -36,7 +36,8 @@ var _ = Describe("RouterGroups", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess: true,
+			LoginSuccess:              true,
+			RoutingAPIEndpointSuccess: true,
 		}
 		routingApiRepo = &testapi.FakeRoutingApiRepository{}
 	})
@@ -51,8 +52,12 @@ var _ = Describe("RouterGroups", func() {
 			Expect(runCommand()).To(BeFalse())
 		})
 
+		It("fails when the routing API endpoint is not set", func() {
+			requirementsFactory.RoutingAPIEndpointSuccess = false
+			Expect(runCommand()).To(BeFalse())
+		})
+
 		It("should fail with usage when provided any arguments", func() {
-			requirementsFactory.LoginSuccess = true
 			Expect(runCommand("notrequired-option")).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "No argument required"},
