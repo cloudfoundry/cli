@@ -36,6 +36,7 @@ func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, 
 
 	return []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewRoutingAPIRequirement(),
 	}, nil
 }
 
