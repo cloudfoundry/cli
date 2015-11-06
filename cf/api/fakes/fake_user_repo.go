@@ -105,6 +105,16 @@ type FakeUserRepository struct {
 	unsetOrgRoleByGuidReturns struct {
 		result1 error
 	}
+	UnsetOrgRoleByUsernameStub        func(username, orgGuid, role string) (apiErr error)
+	unsetOrgRoleByUsernameMutex       sync.RWMutex
+	unsetOrgRoleByUsernameArgsForCall []struct {
+		username string
+		orgGuid  string
+		role     string
+	}
+	unsetOrgRoleByUsernameReturns struct {
+		result1 error
+	}
 	SetSpaceRoleByGuidStub        func(userGuid, spaceGuid, orgGuid, role string) (apiErr error)
 	setSpaceRoleByGuidMutex       sync.RWMutex
 	setSpaceRoleByGuidArgsForCall []struct {
@@ -471,6 +481,40 @@ func (fake *FakeUserRepository) UnsetOrgRoleByGuidArgsForCall(i int) (string, st
 func (fake *FakeUserRepository) UnsetOrgRoleByGuidReturns(result1 error) {
 	fake.UnsetOrgRoleByGuidStub = nil
 	fake.unsetOrgRoleByGuidReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUserRepository) UnsetOrgRoleByUsername(username string, orgGuid string, role string) (apiErr error) {
+	fake.unsetOrgRoleByUsernameMutex.Lock()
+	fake.unsetOrgRoleByUsernameArgsForCall = append(fake.unsetOrgRoleByUsernameArgsForCall, struct {
+		username string
+		orgGuid  string
+		role     string
+	}{username, orgGuid, role})
+	fake.unsetOrgRoleByUsernameMutex.Unlock()
+	if fake.UnsetOrgRoleByUsernameStub != nil {
+		return fake.UnsetOrgRoleByUsernameStub(username, orgGuid, role)
+	} else {
+		return fake.unsetOrgRoleByUsernameReturns.result1
+	}
+}
+
+func (fake *FakeUserRepository) UnsetOrgRoleByUsernameCallCount() int {
+	fake.unsetOrgRoleByUsernameMutex.RLock()
+	defer fake.unsetOrgRoleByUsernameMutex.RUnlock()
+	return len(fake.unsetOrgRoleByUsernameArgsForCall)
+}
+
+func (fake *FakeUserRepository) UnsetOrgRoleByUsernameArgsForCall(i int) (string, string, string) {
+	fake.unsetOrgRoleByUsernameMutex.RLock()
+	defer fake.unsetOrgRoleByUsernameMutex.RUnlock()
+	return fake.unsetOrgRoleByUsernameArgsForCall[i].username, fake.unsetOrgRoleByUsernameArgsForCall[i].orgGuid, fake.unsetOrgRoleByUsernameArgsForCall[i].role
+}
+
+func (fake *FakeUserRepository) UnsetOrgRoleByUsernameReturns(result1 error) {
+	fake.UnsetOrgRoleByUsernameStub = nil
+	fake.unsetOrgRoleByUsernameReturns = struct {
 		result1 error
 	}{result1}
 }

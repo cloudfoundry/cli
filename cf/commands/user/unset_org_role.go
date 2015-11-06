@@ -35,7 +35,7 @@ func (cmd *UnsetOrgRole) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("unset-org-role"))
 	}
@@ -43,13 +43,13 @@ func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, 
 	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.userReq,
 		cmd.orgReq,
 	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *UnsetOrgRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -60,9 +60,9 @@ func (cmd *UnsetOrgRole) SetDependency(deps command_registry.Dependency, pluginC
 }
 
 func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
-	role := models.UserInputToOrgRole[c.Args()[2]]
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
+	role := models.UserInputToOrgRole[c.Args()[2]]
 
 	cmd.ui.Say(T("Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
@@ -72,11 +72,15 @@ func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr := cmd.userRepo.UnsetOrgRoleByGuid(user.Guid, org.Guid, role)
+	var err error
+	if len(user.Guid) > 0 {
+		err = cmd.userRepo.UnsetOrgRoleByGuid(user.Guid, org.Guid, role)
+	} else {
+		err = cmd.userRepo.UnsetOrgRoleByUsername(user.Username, org.Guid, role)
+	}
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 
 	cmd.ui.Ok()

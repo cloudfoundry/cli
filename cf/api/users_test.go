@@ -1075,6 +1075,75 @@ var _ = Describe("UserRepository", func() {
 		})
 	})
 
+	Describe("UnsetOrgRoleByUsername", func() {
+		Context("when given the OrgManager role", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("DELETE", "/v2/organizations/org-guid/managers"),
+						ghttp.VerifyJSON(`{"username":"the-user-name"}`),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+				)
+			})
+
+			It("makes a request to CC", func() {
+				err := client.UnsetOrgRoleByUsername("the-user-name", "org-guid", models.ORG_MANAGER)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+
+		Context("when given the BillingManager role", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("DELETE", "/v2/organizations/org-guid/billing_managers"),
+						ghttp.VerifyJSON(`{"username":"the-user-name"}`),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+				)
+			})
+
+			It("makes a request to CC", func() {
+				err := client.UnsetOrgRoleByUsername("the-user-name", "org-guid", models.BILLING_MANAGER)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+
+		Context("when given the OrgAuditor role", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("DELETE", "/v2/organizations/org-guid/auditors"),
+						ghttp.VerifyJSON(`{"username":"the-user-name"}`),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+				)
+			})
+
+			It("makes a request to CC", func() {
+				err := client.UnsetOrgRoleByUsername("the-user-name", "org-guid", models.ORG_AUDITOR)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+
+		Context("when given an invalid role", func() {
+			It("does not make a request to CC", func() {
+				client.UnsetOrgRoleByUsername("user-guid", "org-guid", "Wibble")
+				Expect(ccServer.ReceivedRequests()).To(BeZero())
+			})
+
+			It("returns an error", func() {
+				err := client.UnsetOrgRoleByUsername("user-guid", "org-guid", "Wibble")
+				Expect(err).To(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(BeZero())
+			})
+		})
+	})
+
 	Describe("SetOrgRoleByUsername", func() {
 		Context("when given the OrgManager role", func() {
 			BeforeEach(func() {
