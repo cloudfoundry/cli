@@ -83,7 +83,7 @@ func (cmd *UnsetSpaceRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr = cmd.userRepo.UnsetSpaceRole(user.Guid, space.Guid, role)
+	apiErr = cmd.userRepo.UnsetSpaceRoleByGuid(user.Guid, space.Guid, role)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

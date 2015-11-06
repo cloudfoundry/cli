@@ -45,7 +45,7 @@ type UserRepository interface {
 	UnsetOrgRoleByUsername(username, orgGuid, role string) (apiErr error)
 	SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) (apiErr error)
 	SetSpaceRoleByUsername(username, spaceGuid, orgGuid, role string) (apiErr error)
-	UnsetSpaceRole(userGuid, spaceGuid, role string) (apiErr error)
+	UnsetSpaceRoleByGuid(userGuid, spaceGuid, role string) (apiErr error)
 }
 
 type CloudControllerUserRepository struct {
@@ -332,7 +332,7 @@ func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, space
 	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), rolePath, usernamePayload(username))
 }
 
-func (repo CloudControllerUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string) (apiErr error) {
+func (repo CloudControllerUserRepository) UnsetSpaceRoleByGuid(userGuid, spaceGuid, role string) (apiErr error) {
 	rolePath, apiErr := repo.checkSpaceRoleByGuid(userGuid, spaceGuid, role)
 	if apiErr != nil {
 		return
