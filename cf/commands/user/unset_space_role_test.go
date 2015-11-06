@@ -89,7 +89,7 @@ var _ = Describe("unset-space-role command", func() {
 			[]string{"OK"},
 		))
 
-		userGUID, spaceGUID, role := userRepo.UnsetSpaceRoleArgsForCall(0)
+		userGUID, spaceGUID, role := userRepo.UnsetSpaceRoleByGuidArgsForCall(0)
 		Expect(role).To(Equal(models.SPACE_MANAGER))
 		Expect(userGUID).To(Equal("some-user-guid"))
 		Expect(spaceGUID).To(Equal("some-space-guid"))
