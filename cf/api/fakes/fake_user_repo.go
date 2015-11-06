@@ -75,14 +75,14 @@ type FakeUserRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
-	SetOrgRoleStub        func(userGuid, orgGuid, role string) (apiErr error)
-	setOrgRoleMutex       sync.RWMutex
-	setOrgRoleArgsForCall []struct {
+	SetOrgRoleByGuidStub        func(userGuid, orgGuid, role string) (apiErr error)
+	setOrgRoleByGuidMutex       sync.RWMutex
+	setOrgRoleByGuidArgsForCall []struct {
 		userGuid string
 		orgGuid  string
 		role     string
 	}
-	setOrgRoleReturns struct {
+	setOrgRoleByGuidReturns struct {
 		result1 error
 	}
 	SetOrgRoleByUsernameStub        func(username, orgGuid, role string) (apiErr error)
@@ -383,36 +383,36 @@ func (fake *FakeUserRepository) DeleteReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) SetOrgRole(userGuid string, orgGuid string, role string) (apiErr error) {
-	fake.setOrgRoleMutex.Lock()
-	fake.setOrgRoleArgsForCall = append(fake.setOrgRoleArgsForCall, struct {
+func (fake *FakeUserRepository) SetOrgRoleByGuid(userGuid string, orgGuid string, role string) (apiErr error) {
+	fake.setOrgRoleByGuidMutex.Lock()
+	fake.setOrgRoleByGuidArgsForCall = append(fake.setOrgRoleByGuidArgsForCall, struct {
 		userGuid string
 		orgGuid  string
 		role     string
 	}{userGuid, orgGuid, role})
-	fake.setOrgRoleMutex.Unlock()
-	if fake.SetOrgRoleStub != nil {
-		return fake.SetOrgRoleStub(userGuid, orgGuid, role)
+	fake.setOrgRoleByGuidMutex.Unlock()
+	if fake.SetOrgRoleByGuidStub != nil {
+		return fake.SetOrgRoleByGuidStub(userGuid, orgGuid, role)
 	} else {
-		return fake.setOrgRoleReturns.result1
+		return fake.setOrgRoleByGuidReturns.result1
 	}
 }
 
-func (fake *FakeUserRepository) SetOrgRoleCallCount() int {
-	fake.setOrgRoleMutex.RLock()
-	defer fake.setOrgRoleMutex.RUnlock()
-	return len(fake.setOrgRoleArgsForCall)
+func (fake *FakeUserRepository) SetOrgRoleByGuidCallCount() int {
+	fake.setOrgRoleByGuidMutex.RLock()
+	defer fake.setOrgRoleByGuidMutex.RUnlock()
+	return len(fake.setOrgRoleByGuidArgsForCall)
 }
 
-func (fake *FakeUserRepository) SetOrgRoleArgsForCall(i int) (string, string, string) {
-	fake.setOrgRoleMutex.RLock()
-	defer fake.setOrgRoleMutex.RUnlock()
-	return fake.setOrgRoleArgsForCall[i].userGuid, fake.setOrgRoleArgsForCall[i].orgGuid, fake.setOrgRoleArgsForCall[i].role
+func (fake *FakeUserRepository) SetOrgRoleByGuidArgsForCall(i int) (string, string, string) {
+	fake.setOrgRoleByGuidMutex.RLock()
+	defer fake.setOrgRoleByGuidMutex.RUnlock()
+	return fake.setOrgRoleByGuidArgsForCall[i].userGuid, fake.setOrgRoleByGuidArgsForCall[i].orgGuid, fake.setOrgRoleByGuidArgsForCall[i].role
 }
 
-func (fake *FakeUserRepository) SetOrgRoleReturns(result1 error) {
-	fake.SetOrgRoleStub = nil
-	fake.setOrgRoleReturns = struct {
+func (fake *FakeUserRepository) SetOrgRoleByGuidReturns(result1 error) {
+	fake.SetOrgRoleByGuidStub = nil
+	fake.setOrgRoleByGuidReturns = struct {
 		result1 error
 	}{result1}
 }

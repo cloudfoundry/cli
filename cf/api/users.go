@@ -39,7 +39,7 @@ type UserRepository interface {
 	ListUsersInSpaceForRoleWithNoUAA(spaceGuid string, role string) ([]models.UserFields, error)
 	Create(username, password string) (apiErr error)
 	Delete(userGuid string) (apiErr error)
-	SetOrgRole(userGuid, orgGuid, role string) (apiErr error)
+	SetOrgRoleByGuid(userGuid, orgGuid, role string) (apiErr error)
 	SetOrgRoleByUsername(username, orgGuid, role string) (apiErr error)
 	UnsetOrgRoleByGuid(userGuid, orgGuid, role string) (apiErr error)
 	UnsetOrgRoleByUsername(username, orgGuid, role string) (apiErr error)
@@ -234,7 +234,7 @@ func (repo CloudControllerUserRepository) Delete(userGuid string) (apiErr error)
 	return repo.uaaGateway.DeleteResource(uaaEndpoint, path)
 }
 
-func (repo CloudControllerUserRepository) SetOrgRole(userGuid string, orgGuid string, role string) (err error) {
+func (repo CloudControllerUserRepository) SetOrgRoleByGuid(userGuid string, orgGuid string, role string) (err error) {
 	path, err := userGuidPath(repo.config.ApiEndpoint(), userGuid, orgGuid, role)
 	if err != nil {
 		return

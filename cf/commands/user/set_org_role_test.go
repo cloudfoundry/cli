@@ -158,8 +158,8 @@ var _ = Describe("SetOrgRole", func() {
 
 			It("sets the role using the GUID", func() {
 				cmd.Execute(flagContext)
-				Expect(userRepo.SetOrgRoleCallCount()).To(Equal(1))
-				actualUserGUID, actualOrgGUID, actualRole := userRepo.SetOrgRoleArgsForCall(0)
+				Expect(userRepo.SetOrgRoleByGuidCallCount()).To(Equal(1))
+				actualUserGUID, actualOrgGUID, actualRole := userRepo.SetOrgRoleByGuidArgsForCall(0)
 				Expect(actualUserGUID).To(Equal("the-user-guid"))
 				Expect(actualOrgGUID).To(Equal("the-org-guid"))
 				Expect(actualRole).To(Equal("OrgManager"))
@@ -167,7 +167,7 @@ var _ = Describe("SetOrgRole", func() {
 
 			Context("when the call to CC fails", func() {
 				BeforeEach(func() {
-					userRepo.SetOrgRoleReturns(errors.New("user-repo-error"))
+					userRepo.SetOrgRoleByGuidReturns(errors.New("user-repo-error"))
 				})
 
 				It("panics and prints a failure message", func() {

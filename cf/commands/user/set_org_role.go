@@ -77,7 +77,7 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 
 	var err error
 	if len(user.Guid) > 0 {
-		err = cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)
+		err = cmd.userRepo.SetOrgRoleByGuid(user.Guid, org.Guid, role)
 	} else {
 		err = cmd.userRepo.SetOrgRoleByUsername(user.Username, org.Guid, role)
 	}

@@ -932,7 +932,7 @@ var _ = Describe("UserRepository", func() {
 		})
 	})
 
-	Describe("SetOrgRole", func() {
+	Describe("SetOrgRoleByGuid", func() {
 		Context("when given the OrgManager role", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
@@ -948,7 +948,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetOrgRole("user-guid", "org-guid", models.ORG_MANAGER)
+				err := client.SetOrgRoleByGuid("user-guid", "org-guid", models.ORG_MANAGER)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -969,7 +969,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetOrgRole("user-guid", "org-guid", models.BILLING_MANAGER)
+				err := client.SetOrgRoleByGuid("user-guid", "org-guid", models.BILLING_MANAGER)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -990,7 +990,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetOrgRole("user-guid", "org-guid", models.ORG_AUDITOR)
+				err := client.SetOrgRoleByGuid("user-guid", "org-guid", models.ORG_AUDITOR)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -998,12 +998,12 @@ var _ = Describe("UserRepository", func() {
 
 		Context("when given an invalid role", func() {
 			It("does not make a request to CC", func() {
-				client.SetOrgRole("user-guid", "org-guid", "Wibble")
+				client.SetOrgRoleByGuid("user-guid", "org-guid", "Wibble")
 				Expect(ccServer.ReceivedRequests()).To(BeZero())
 			})
 
 			It("returns an error", func() {
-				err := client.SetOrgRole("user-guid", "org-guid", "Wibble")
+				err := client.SetOrgRoleByGuid("user-guid", "org-guid", "Wibble")
 				Expect(err).To(HaveOccurred())
 			})
 		})
