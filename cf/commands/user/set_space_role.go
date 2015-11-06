@@ -45,7 +45,7 @@ func (cmd *SetSpaceRole) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *SetSpaceRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *SetSpaceRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 4 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("set-space-role"))
 	}
@@ -53,12 +53,13 @@ func (cmd *SetSpaceRole) Requirements(requirementsFactory requirements.Factory, 
 	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.userReq,
 		cmd.orgReq,
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *SetSpaceRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -76,16 +77,14 @@ func (cmd *SetSpaceRole) Execute(c flags.FlagContext) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 
-	space, apiErr := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
-	}
-
-	err := cmd.SetSpaceRole(space, role, user.Guid, user.Username)
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
-		return
+	}
+
+	err = cmd.SetSpaceRole(space, role, user.Guid, user.Username)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 }
 
@@ -99,17 +98,12 @@ func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userNa
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	setRolesByUsername, err := cmd.flagRepo.FindByName("set_roles_by_username")
-	if err != nil {
-		return err
-	}
-
-	if cmd.config.IsMinApiVersion("2.37.0") && setRolesByUsername.Enabled {
-		err = cmd.userRepo.SetSpaceRoleByUsername(userName, space.Guid, space.Organization.Guid, role)
-	} else {
+	var err error
+	if len(userGuid) > 0 {
 		err = cmd.userRepo.SetSpaceRoleByGuid(userGuid, space.Guid, space.Organization.Guid, role)
+	} else {
+		err = cmd.userRepo.SetSpaceRoleByUsername(userName, space.Guid, space.Organization.Guid, role)
 	}
-
 	if err != nil {
 		return err
 	}
