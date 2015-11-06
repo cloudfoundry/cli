@@ -3005,11 +3005,6 @@
       "modified": false
    },
    {
-      "id": "Incorrect Usage. Requires stack name as argument\n\n",
-      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
-      "modified": false
-   },
-   {
       "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "translation": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
       "modified": false
@@ -3047,6 +3042,11 @@
    {
       "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
       "translation": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires stack name as argument\n\n",
+      "translation": "Incorrect Usage. Requires stack name as argument\n\n",
       "modified": false
    },
    {
@@ -4247,6 +4247,11 @@
    {
       "id": "Routes",
       "translation": "Routes",
+      "modified": false
+   },
+   {
+      "id": "Routing API uri missing. Please log in again and retry.",
+      "translation": "Routing API uri missing. Please log in again and retry.",
       "modified": false
    },
    {

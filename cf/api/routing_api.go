@@ -1,9 +1,11 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -26,7 +28,15 @@ func NewRoutingApiRepository(config core_config.Reader, gateway net.Gateway) Rou
 
 func (r routingApiRepository) ListRouterGroups(cb func(models.RouterGroup) bool) (apiErr error) {
 	routerGroups := models.RouterGroups{}
-	endpoint := fmt.Sprintf("%s/v1/router_groups", r.config.RoutingApiEndpoint())
+
+	routingApiEndpoint := r.config.RoutingApiEndpoint()
+	if routingApiEndpoint == "" {
+		apiErr = errors.New(T("Routing API uri missing. Please log in again and retry."))
+		return
+	}
+
+	endpoint := fmt.Sprintf("%s/v1/router_groups", routingApiEndpoint)
+
 	apiErr = r.gateway.GetResource(endpoint, &routerGroups)
 	if apiErr != nil {
 		return apiErr

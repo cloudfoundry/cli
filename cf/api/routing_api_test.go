@@ -120,5 +120,23 @@ var _ = Describe("RoutingApi", func() {
 				Expect(err.(errors.HttpError).StatusCode()).To(Equal(http.StatusUnauthorized))
 			})
 		})
+
+		Context("when routing api endopoint is not configured", func() {
+			BeforeEach(func() {
+				routingApiServer = ghttp.NewServer()
+				configRepo.SetRoutingApiEndpoint("")
+			})
+
+			It("returns an error", func() {
+				cb := func(grp models.RouterGroup) bool {
+					Fail(fmt.Sprintf("Routing Api Endpoint Not defined. Not expected to receive callback for router group:%#v", grp))
+					return false
+				}
+
+				err := repo.ListRouterGroups(cb)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Routing API uri missing. Please log in again and retry."))
+			})
+		})
 	})
 })
