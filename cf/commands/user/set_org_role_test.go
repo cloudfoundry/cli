@@ -144,7 +144,7 @@ var _ = Describe("SetOrgRole", func() {
 
 		Context("when the UserRequirement returns a user with a GUID", func() {
 			BeforeEach(func() {
-				userFields := models.UserFields{Guid: "the-user-guid", Username: "user-user"}
+				userFields := models.UserFields{Guid: "the-user-guid", Username: "the-username"}
 				requirementsFactory.UserFields = userFields
 			})
 
