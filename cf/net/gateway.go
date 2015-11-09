@@ -242,7 +242,7 @@ func (gateway Gateway) ListPaginatedResources(target string,
 	return
 }
 
-func (gateway Gateway) newRequest(request *http.Request, accessToken string, body io.ReadSeeker) (*Request, error) {
+func (gateway Gateway) newRequest(request *http.Request, accessToken string, body io.ReadSeeker) *Request {
 	if accessToken != "" {
 		request.Header.Set("Authorization", accessToken)
 	}
@@ -250,23 +250,22 @@ func (gateway Gateway) newRequest(request *http.Request, accessToken string, bod
 	request.Header.Set("accept", "application/json")
 	request.Header.Set("content-type", "application/json")
 	request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
-	return &Request{HttpReq: request, SeekableBody: body}, nil
+
+	return &Request{HttpReq: request, SeekableBody: body}
 }
 
-func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, body *os.File) (req *Request, apiErr error) {
+func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, body *os.File) (*Request, error) {
 	progressReader := NewProgressReader(body, gateway.ui, 5*time.Second)
 	progressReader.Seek(0, 0)
 	fileStats, err := body.Stat()
 
 	if err != nil {
-		apiErr = fmt.Errorf("%s: %s", T("Error getting file info"), err.Error())
-		return
+		return nil, fmt.Errorf("%s: %s", T("Error getting file info"), err.Error())
 	}
 
 	request, err := http.NewRequest(method, fullUrl, progressReader)
 	if err != nil {
-		apiErr = fmt.Errorf("%s: %s", T("Error building request"), err.Error())
-		return
+		return nil, fmt.Errorf("%s: %s", T("Error building request"), err.Error())
 	}
 
 	fileSize := fileStats.Size()
@@ -274,20 +273,18 @@ func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, bo
 	request.ContentLength = fileSize
 
 	if err != nil {
-		apiErr = fmt.Errorf("%s: %s", T("Error building request"), err.Error())
-		return
+		return nil, fmt.Errorf("%s: %s", T("Error building request"), err.Error())
 	}
 
-	return gateway.newRequest(request, accessToken, progressReader)
+	return gateway.newRequest(request, accessToken, progressReader), nil
 }
 
-func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiErr error) {
+func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (*Request, error) {
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
-		apiErr = fmt.Errorf("%s: %s", T("Error building request"), err.Error())
-		return
+		return nil, fmt.Errorf("%s: %s", T("Error building request"), err.Error())
 	}
-	return gateway.newRequest(request, accessToken, body)
+	return gateway.newRequest(request, accessToken, body), nil
 }
 
 func (gateway Gateway) PerformRequest(request *Request) (rawResponse *http.Response, apiErr error) {
