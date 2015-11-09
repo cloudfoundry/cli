@@ -50,7 +50,15 @@ func (cmd *SetSpaceRole) Requirements(requirementsFactory requirements.Factory, 
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("set-space-role"))
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
+	var wantGuid bool
+	if cmd.config.IsMinApiVersion("2.37.0") {
+		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
+		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+	} else {
+		wantGuid = true
+	}
+
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{

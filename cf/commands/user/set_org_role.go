@@ -42,7 +42,15 @@ func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("set-org-role"))
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
+	var wantGuid bool
+	if cmd.config.IsMinApiVersion("2.37.0") {
+		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
+		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+	} else {
+		wantGuid = true
+	}
+
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{

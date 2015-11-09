@@ -92,7 +92,7 @@ func (f *FakeReqFactory) NewDomainRequirement(name string) requirements.DomainRe
 	return FakeRequirement{f, true}
 }
 
-func (f *FakeReqFactory) NewUserRequirement(username string) requirements.UserRequirement {
+func (f *FakeReqFactory) NewUserRequirement(username string, wantGuid bool) requirements.UserRequirement {
 	f.UserUsername = username
 	return FakeRequirement{f, !f.UserRequirementFails}
 }

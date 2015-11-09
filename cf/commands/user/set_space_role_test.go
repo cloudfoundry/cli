@@ -7,11 +7,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/simonleung8/flags"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakefeatureflagsapi "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -25,42 +27,61 @@ var _ = Describe("SetSpaceRole", func() {
 		configRepo core_config.Repository
 		userRepo   *testapi.FakeUserRepository
 		spaceRepo  *testapi.FakeSpaceRepository
+		flagRepo   *fakefeatureflagsapi.FakeFeatureFlagRepository
 
-		cmd                 command_registry.Command
-		requirementsFactory *testreq.FakeReqFactory
-		flagContext         flags.FlagContext
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement        requirements.Requirement
+		userRequirement         *fakerequirements.FakeUserRequirement
+		organizationRequirement *fakerequirements.FakeOrganizationRequirement
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		userRepo = &testapi.FakeUserRepository{}
+		repoLocator := deps.RepoLocator.SetUserRepository(userRepo)
 		spaceRepo = &testapi.FakeSpaceRepository{}
-
-		deps := command_registry.Dependency{}
-		repoLocator := deps.RepoLocator
-		repoLocator = repoLocator.SetUserRepository(userRepo)
 		repoLocator = repoLocator.SetSpaceRepository(spaceRepo)
+		flagRepo = &fakefeatureflagsapi.FakeFeatureFlagRepository{}
+		repoLocator = repoLocator.SetFeatureFlagRepository(flagRepo)
 
-		deps.Ui = ui
-		deps.Config = configRepo
-		deps.RepoLocator = repoLocator
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
 
 		cmd = &user.SetSpaceRole{}
 		cmd.SetDependency(deps, false)
 
-		requirementsFactory = &testreq.FakeReqFactory{}
 		flagContext = flags.NewFlagContext(map[string]flags.FlagSet{})
+
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{}
+		factory.NewLoginRequirementReturns(loginRequirement)
+
+		userRequirement = &fakerequirements.FakeUserRequirement{}
+		userRequirement.ExecuteReturns(true)
+		factory.NewUserRequirementReturns(userRequirement)
+
+		organizationRequirement = &fakerequirements.FakeOrganizationRequirement{}
+		organizationRequirement.ExecuteReturns(true)
+		factory.NewOrganizationRequirementReturns(organizationRequirement)
 	})
 
 	Describe("Requirements", func() {
 		Context("when not provided exactly four args", func() {
 			BeforeEach(func() {
-				flagContext.Parse("the-username", "the-org-name", "the-space-name")
+				flagContext.Parse("the-user-name", "the-org-name", "the-space-name")
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(requirementsFactory, flagContext) }).To(Panic())
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments"},
 					[]string{"NAME"},
@@ -69,84 +90,122 @@ var _ = Describe("SetSpaceRole", func() {
 			})
 		})
 
-		Context("when provided three args", func() {
+		Context("when provided four args", func() {
 			BeforeEach(func() {
-				flagContext.Parse("the-username", "the-org-name", "the-space-name", "SpaceManager")
+				flagContext.Parse("the-user-name", "the-org-name", "the-space-name", "SpaceManager")
 			})
 
 			It("returns a LoginRequirement", func() {
-				requirementsFactory.LoginSuccess = false
-				requirementsFactory.UserRequirementFails = false
-				requirementsFactory.SpaceRequirementFails = false
-				actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
-				var failures int
-				for _, req := range actualRequirements {
-					ok := req.Execute()
-					if !ok {
-						failures = failures + 1
-					}
-				}
-
-				Expect(failures).To(Equal(1))
-			})
-
-			It("returns a UserRequirement", func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.UserRequirementFails = true
-				requirementsFactory.SpaceRequirementFails = false
-				actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-
-				var failures int
-				for _, req := range actualRequirements {
-					ok := req.Execute()
-					if !ok {
-						failures = failures + 1
-					}
-				}
-
-				Expect(failures).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns an OrgRequirement", func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.UserRequirementFails = false
-				requirementsFactory.OrganizationRequirementFails = true
-				actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewOrganizationRequirementCallCount()).To(Equal(1))
+				Expect(factory.NewOrganizationRequirementArgsForCall(0)).To(Equal("the-org-name"))
 
-				var failures int
-				for _, req := range actualRequirements {
-					ok := req.Execute()
-					if !ok {
-						failures = failures + 1
-					}
-				}
+				Expect(actualRequirements).To(ContainElement(organizationRequirement))
+			})
 
-				Expect(failures).To(Equal(1))
+			Context("when the config version is >=2.37.0", func() {
+				BeforeEach(func() {
+					configRepo.SetApiVersion("2.37.0")
+				})
+
+				It("requests the set_roles_by_username flag", func() {
+					cmd.Requirements(factory, flagContext)
+					Expect(flagRepo.FindByNameCallCount()).To(Equal(1))
+					Expect(flagRepo.FindByNameArgsForCall(0)).To(Equal("set_roles_by_username"))
+				})
+
+				Context("when the set_roles_by_username flag exists and is enabled", func() {
+					BeforeEach(func() {
+						flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: true}, nil)
+					})
+
+					It("returns a UserRequirement", func() {
+						actualRequirements, err := cmd.Requirements(factory, flagContext)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
+						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						Expect(actualUsername).To(Equal("the-user-name"))
+						Expect(actualWantGuid).To(BeFalse())
+
+						Expect(actualRequirements).To(ContainElement(userRequirement))
+					})
+				})
+
+				Context("when the set_roles_by_username flag exists and is disabled", func() {
+					BeforeEach(func() {
+						flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: false}, nil)
+					})
+
+					It("returns a UserRequirement", func() {
+						actualRequirements, err := cmd.Requirements(factory, flagContext)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
+						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						Expect(actualUsername).To(Equal("the-user-name"))
+						Expect(actualWantGuid).To(BeTrue())
+
+						Expect(actualRequirements).To(ContainElement(userRequirement))
+					})
+				})
+
+				Context("when the set_roles_by_username flag cannot be retrieved", func() {
+					BeforeEach(func() {
+						flagRepo.FindByNameReturns(models.FeatureFlag{}, errors.New("some error"))
+					})
+
+					It("returns a UserRequirement", func() {
+						actualRequirements, err := cmd.Requirements(factory, flagContext)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
+						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						Expect(actualUsername).To(Equal("the-user-name"))
+						Expect(actualWantGuid).To(BeTrue())
+
+						Expect(actualRequirements).To(ContainElement(userRequirement))
+					})
+				})
+			})
+
+			Context("when the config version is <2.37.0", func() {
+				BeforeEach(func() {
+					configRepo.SetApiVersion("2.36.0")
+				})
+
+				It("returns a UserRequirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
+					actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+					Expect(actualUsername).To(Equal("the-user-name"))
+					Expect(actualWantGuid).To(BeTrue())
+
+					Expect(actualRequirements).To(ContainElement(userRequirement))
+				})
 			})
 		})
 	})
 
-	Context("Execute", func() {
+	Describe("Execute", func() {
 		var org models.Organization
 
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.UserRequirementFails = false
-			requirementsFactory.OrganizationRequirementFails = false
-
-			flagContext.Parse("the-username", "the-org-name", "the-space-name", "SpaceManager")
-			_, err := cmd.Requirements(requirementsFactory, flagContext)
+			flagContext.Parse("the-user-name", "the-org-name", "the-space-name", "SpaceManager")
+			_, err := cmd.Requirements(factory, flagContext)
 			Expect(err).NotTo(HaveOccurred())
 
 			org = models.Organization{}
 			org.Guid = "the-org-guid"
 			org.Name = "the-org-name"
-			requirementsFactory.Organization = org
-
+			organizationRequirement.GetOrganizationReturns(org)
 		})
 
 		Context("when the space is not found", func() {
@@ -179,14 +238,14 @@ var _ = Describe("SetSpaceRole", func() {
 
 			Context("when the UserRequirement returns a user with a GUID", func() {
 				BeforeEach(func() {
-					userFields := models.UserFields{Guid: "the-user-guid", Username: "the-username"}
-					requirementsFactory.UserFields = userFields
+					userFields := models.UserFields{Guid: "the-user-guid", Username: "the-user-name"}
+					userRequirement.GetUserReturns(userFields)
 				})
 
 				It("tells the user it is assigning the role", func() {
 					cmd.Execute(flagContext)
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Assigning role", "SpaceManager", "the-username", "the-org", "the-username"},
+						[]string{"Assigning role", "SpaceManager", "the-user-name", "the-org", "the-user-name"},
 						[]string{"OK"},
 					))
 				})
@@ -218,13 +277,13 @@ var _ = Describe("SetSpaceRole", func() {
 
 			Context("when the UserRequirement returns a user without a GUID", func() {
 				BeforeEach(func() {
-					requirementsFactory.UserFields = models.UserFields{Username: "the-username"}
+					userRequirement.GetUserReturns(models.UserFields{Username: "the-user-name"})
 				})
 
 				It("sets the role using the given username", func() {
 					cmd.Execute(flagContext)
 					username, spaceGUID, orgGUID, role := userRepo.SetSpaceRoleByUsernameArgsForCall(0)
-					Expect(username).To(Equal("the-username"))
+					Expect(username).To(Equal("the-user-name"))
 					Expect(spaceGUID).To(Equal("the-space-guid"))
 					Expect(orgGUID).To(Equal("the-org-guid"))
 					Expect(role).To(Equal("SpaceManager"))
@@ -233,7 +292,7 @@ var _ = Describe("SetSpaceRole", func() {
 				It("tells the user it assigned the role", func() {
 					cmd.Execute(flagContext)
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Assigning role", "SpaceManager", "the-username", "the-org", "the-username"},
+						[]string{"Assigning role", "SpaceManager", "the-user-name", "the-org", "the-user-name"},
 						[]string{"OK"},
 					))
 				})
@@ -253,6 +312,5 @@ var _ = Describe("SetSpaceRole", func() {
 				})
 			})
 		})
-
 	})
 })

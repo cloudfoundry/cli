@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -15,6 +16,7 @@ type UnsetOrgRole struct {
 	ui       terminal.UI
 	config   core_config.Reader
 	userRepo api.UserRepository
+	flagRepo feature_flags.FeatureFlagRepository
 	userReq  requirements.UserRequirement
 	orgReq   requirements.OrganizationRequirement
 }
@@ -40,7 +42,15 @@ func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, 
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("unset-org-role"))
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
+	var wantGuid bool
+	if cmd.config.IsMinApiVersion("2.37.0") {
+		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
+		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+	} else {
+		wantGuid = true
+	}
+
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{
@@ -56,6 +66,7 @@ func (cmd *UnsetOrgRole) SetDependency(deps command_registry.Dependency, pluginC
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
+	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
 	return cmd
 }
 
