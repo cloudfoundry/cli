@@ -20,7 +20,7 @@ func NewRoutingAPIRequirement(ui terminal.UI, config core_config.Reader) Routing
 
 func (req RoutingAPIRequirement) Execute() bool {
 	if len(req.config.RoutingApiEndpoint()) == 0 {
-		req.ui.Failed(T("Routing API URI missing. Please log in again to set the URI automatically."))
+		req.ui.Failed(T("Routing API uri missing. Please log in again and retry."))
 		return false
 	}
 

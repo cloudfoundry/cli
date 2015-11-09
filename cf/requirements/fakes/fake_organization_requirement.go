@@ -12,7 +12,7 @@ type FakeOrganizationRequirement struct {
 	ExecuteStub        func() (success bool)
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
-	executeReturns struct {
+	executeReturns     struct {
 		result1 bool
 	}
 	SetOrganizationNameStub        func(string)
@@ -23,7 +23,7 @@ type FakeOrganizationRequirement struct {
 	GetOrganizationStub        func() models.Organization
 	getOrganizationMutex       sync.RWMutex
 	getOrganizationArgsForCall []struct{}
-	getOrganizationReturns struct {
+	getOrganizationReturns     struct {
 		result1 models.Organization
 	}
 }

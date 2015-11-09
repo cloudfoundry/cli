@@ -12,13 +12,13 @@ type FakeUserRequirement struct {
 	ExecuteStub        func() (success bool)
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
-	executeReturns struct {
+	executeReturns     struct {
 		result1 bool
 	}
 	GetUserStub        func() models.UserFields
 	getUserMutex       sync.RWMutex
 	getUserArgsForCall []struct{}
-	getUserReturns struct {
+	getUserReturns     struct {
 		result1 models.UserFields
 	}
 }
