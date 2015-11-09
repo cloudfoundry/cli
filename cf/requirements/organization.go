@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
+//go:generate counterfeiter -o fakes/fake_organization_requirement.go . OrganizationRequirement
 type OrganizationRequirement interface {
 	Requirement
 	SetOrganizationName(string)

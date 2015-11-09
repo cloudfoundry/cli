@@ -42,7 +42,7 @@ func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("unset-space-role"))
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0])
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], true)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs = []requirements.Requirement{

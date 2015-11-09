@@ -21,7 +21,7 @@ type Factory interface {
 	NewTargetedOrgRequirement() TargetedOrgRequirement
 	NewOrganizationRequirement(name string) OrganizationRequirement
 	NewDomainRequirement(name string) DomainRequirement
-	NewUserRequirement(username string) UserRequirement
+	NewUserRequirement(username string, wantGuid bool) UserRequirement
 	NewBuildpackRequirement(buildpack string) BuildpackRequirement
 	NewApiEndpointRequirement() Requirement
 	NewMinCCApiVersionRequirement(commandName string, major, minor, patch int) Requirement
@@ -106,13 +106,12 @@ func (f apiRequirementFactory) NewDomainRequirement(name string) DomainRequireme
 	)
 }
 
-func (f apiRequirementFactory) NewUserRequirement(username string) UserRequirement {
+func (f apiRequirementFactory) NewUserRequirement(username string, wantGuid bool) UserRequirement {
 	return NewUserRequirement(
 		username,
 		f.ui,
 		f.repoLocator.GetUserRepository(),
-		f.repoLocator.GetFeatureFlagRepository(),
-		f.config,
+		wantGuid,
 	)
 }
 

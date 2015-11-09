@@ -72,10 +72,11 @@ type FakeFactory struct {
 	newDomainRequirementReturns struct {
 		result1 requirements.DomainRequirement
 	}
-	NewUserRequirementStub        func(username string) requirements.UserRequirement
+	NewUserRequirementStub        func(username string, wantGuid bool) requirements.UserRequirement
 	newUserRequirementMutex       sync.RWMutex
 	newUserRequirementArgsForCall []struct {
 		username string
+		wantGuid bool
 	}
 	newUserRequirementReturns struct {
 		result1 requirements.UserRequirement
@@ -363,14 +364,15 @@ func (fake *FakeFactory) NewDomainRequirementReturns(result1 requirements.Domain
 	}{result1}
 }
 
-func (fake *FakeFactory) NewUserRequirement(username string) requirements.UserRequirement {
+func (fake *FakeFactory) NewUserRequirement(username string, wantGuid bool) requirements.UserRequirement {
 	fake.newUserRequirementMutex.Lock()
 	fake.newUserRequirementArgsForCall = append(fake.newUserRequirementArgsForCall, struct {
 		username string
-	}{username})
+		wantGuid bool
+	}{username, wantGuid})
 	fake.newUserRequirementMutex.Unlock()
 	if fake.NewUserRequirementStub != nil {
-		return fake.NewUserRequirementStub(username)
+		return fake.NewUserRequirementStub(username, wantGuid)
 	} else {
 		return fake.newUserRequirementReturns.result1
 	}
@@ -382,10 +384,10 @@ func (fake *FakeFactory) NewUserRequirementCallCount() int {
 	return len(fake.newUserRequirementArgsForCall)
 }
 
-func (fake *FakeFactory) NewUserRequirementArgsForCall(i int) string {
+func (fake *FakeFactory) NewUserRequirementArgsForCall(i int) (string, bool) {
 	fake.newUserRequirementMutex.RLock()
 	defer fake.newUserRequirementMutex.RUnlock()
-	return fake.newUserRequirementArgsForCall[i].username
+	return fake.newUserRequirementArgsForCall[i].username, fake.newUserRequirementArgsForCall[i].wantGuid
 }
 
 func (fake *FakeFactory) NewUserRequirementReturns(result1 requirements.UserRequirement) {
