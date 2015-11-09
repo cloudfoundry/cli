@@ -300,18 +300,20 @@ func userGuidPath(apiEndpoint, userGuid, orgGuid, role string) (string, error) {
 	return fmt.Sprintf("%s/v2/organizations/%s/%s/%s", apiEndpoint, orgGuid, rolePath, userGuid), nil
 }
 
-func (repo CloudControllerUserRepository) SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) (apiErr error) {
-	rolePath, apiErr := repo.checkSpaceRoleByGuid(userGuid, spaceGuid, role)
-	if apiErr != nil {
-		return
+func (repo CloudControllerUserRepository) SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) error {
+	rolePath, found := spaceRoleToPathMap[role]
+	if !found {
+		return fmt.Errorf(T("Invalid Role {{.Role}}", map[string]interface{}{"Role": role}))
 	}
 
-	apiErr = repo.assocUserWithOrgByUserGuid(userGuid, orgGuid)
-	if apiErr != nil {
-		return
+	err := repo.assocUserWithOrgByUserGuid(userGuid, orgGuid)
+	if err != nil {
+		return err
 	}
 
-	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), rolePath, nil)
+	path := fmt.Sprintf("/v2/spaces/%s/%s/%s", spaceGuid, rolePath, userGuid)
+
+	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), path, nil)
 }
 
 func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, spaceGuid, orgGuid, role string) (apiErr error) {
@@ -328,26 +330,13 @@ func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, space
 	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), rolePath, usernamePayload(username))
 }
 
-func (repo CloudControllerUserRepository) UnsetSpaceRoleByGuid(userGuid, spaceGuid, role string) (apiErr error) {
-	rolePath, apiErr := repo.checkSpaceRoleByGuid(userGuid, spaceGuid, role)
-	if apiErr != nil {
-		return
-	}
-	return repo.ccGateway.DeleteResource(repo.config.ApiEndpoint(), rolePath)
-}
-
-func (repo CloudControllerUserRepository) checkSpaceRoleByGuid(userGuid, spaceGuid, role string) (string, error) {
-	var apiErr error
-
+func (repo CloudControllerUserRepository) UnsetSpaceRoleByGuid(userGuid, spaceGuid, role string) error {
 	rolePath, found := spaceRoleToPathMap[role]
-
 	if !found {
-		apiErr = fmt.Errorf(T("Invalid Role {{.Role}}",
-			map[string]interface{}{"Role": role}))
+		return fmt.Errorf(T("Invalid Role {{.Role}}", map[string]interface{}{"Role": role}))
 	}
 
-	apiPath := fmt.Sprintf("/v2/spaces/%s/%s/%s", spaceGuid, rolePath, userGuid)
-	return apiPath, apiErr
+	return repo.ccGateway.DeleteResource(repo.config.ApiEndpoint(), rolePath)
 }
 
 func (repo CloudControllerUserRepository) checkSpaceRole(spaceGuid, role string) (string, error) {
