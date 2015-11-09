@@ -254,22 +254,27 @@ func (repo CloudControllerUserRepository) UnsetOrgRoleByGuid(userGuid, orgGuid, 
 	return repo.callApi("DELETE", path, nil)
 }
 
-func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGuid, role string) (err error) {
-	path, err := orgRolesPath(repo.config.ApiEndpoint(), username, orgGuid, role)
+func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGuid, role string) error {
+	rolePath, err := rolePath(role)
 	if err != nil {
-		return
+		return err
 	}
+
+	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.ApiEndpoint(), orgGuid, rolePath)
+
 	return repo.callApi("DELETE", path, usernamePayload(username))
 }
 
-func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, orgGuid string, role string) (err error) {
-	path, err := orgRolesPath(repo.config.ApiEndpoint(), username, orgGuid, role)
+func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, orgGuid string, role string) error {
+	rolePath, err := rolePath(role)
 	if err != nil {
-		return
+		return err
 	}
+
+	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.ApiEndpoint(), orgGuid, rolePath)
 	err = repo.callApi("PUT", path, usernamePayload(username))
 	if err != nil {
-		return
+		return err
 	}
 	return repo.assocUserWithOrgByUsername(username, orgGuid)
 }
@@ -293,15 +298,6 @@ func userGuidPath(apiEndpoint, userGuid, orgGuid, role string) (string, error) {
 	}
 
 	return fmt.Sprintf("%s/v2/organizations/%s/%s/%s", apiEndpoint, orgGuid, rolePath, userGuid), nil
-}
-
-func orgRolesPath(apiEndpoint, username, orgGuid, role string) (string, error) {
-	rolePath, err := rolePath(role)
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%s/v2/organizations/%s/%s", apiEndpoint, orgGuid, rolePath), nil
 }
 
 func (repo CloudControllerUserRepository) SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) (apiErr error) {
