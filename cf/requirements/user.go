@@ -41,20 +41,19 @@ func NewUserRequirement(
 }
 
 func (req *userApiRequirement) Execute() bool {
-	setRolesByUsernameFlag, err := req.flagRepo.FindByName("set_roles_by_username")
+	if req.config.IsMinApiVersion("2.37.0") {
+		setRolesByUsernameFlag, err := req.flagRepo.FindByName("set_roles_by_username")
+		if err == nil && setRolesByUsernameFlag.Enabled {
+			req.user = models.UserFields{Username: req.username}
+			return true
+		}
+	}
+
+	var err error
+	req.user, err = req.userRepo.FindByUsername(req.username)
 	if err != nil {
 		req.ui.Failed(err.Error())
 		return false
-	}
-
-	if req.config.IsMinApiVersion("2.37.0") && setRolesByUsernameFlag.Enabled {
-		req.user = models.UserFields{Username: req.username}
-	} else {
-		req.user, err = req.userRepo.FindByUsername(req.username)
-		if err != nil {
-			req.ui.Failed(err.Error())
-			return false
-		}
 	}
 
 	return true

@@ -35,7 +35,7 @@ var _ = Describe("UserRequirement", func() {
 		userRequirement = requirements.NewUserRequirement("the-username", ui, userRepo, flagRepo, configRepo)
 	})
 
-	Context("when the set_roles_by_username flag is enabled", func() {
+	Context("when the set_roles_by_username flag exists and is enabled", func() {
 		BeforeEach(func() {
 			flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: true}, nil)
 		})
@@ -105,7 +105,7 @@ var _ = Describe("UserRequirement", func() {
 		})
 	})
 
-	Context("when the set_roles_by_username flag is disabled", func() {
+	Context("when the set_roles_by_username flag exists and is disabled", func() {
 		BeforeEach(func() {
 			flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: true}, nil)
 		})
@@ -151,9 +151,39 @@ var _ = Describe("UserRequirement", func() {
 			flagRepo.FindByNameReturns(models.FeatureFlag{}, errors.New("some error"))
 		})
 
-		It("panics and prints a failure message", func() {
-			Expect(func() { userRequirement.Execute() }).To(Panic())
-			Expect(ui.Outputs).To(ConsistOf([]string{"FAILED", "some error"}))
+		It("tries to find the user in CC", func() {
+			userRequirement.Execute()
+			Expect(userRepo.FindByUsernameCallCount()).To(Equal(1))
+			Expect(userRepo.FindByUsernameArgsForCall(0)).To(Equal("the-username"))
+		})
+
+		Context("when a user with the given username can be found", func() {
+			var user models.UserFields
+			BeforeEach(func() {
+				user = models.UserFields{Username: "the-username", Guid: "the-guid"}
+				userRepo.FindByUsernameReturns(user, nil)
+			})
+
+			It("returns true", func() {
+				ok := userRequirement.Execute()
+				Expect(ok).To(BeTrue())
+			})
+
+			It("stores the user that was found", func() {
+				userRequirement.Execute()
+				Expect(userRequirement.GetUser()).To(Equal(user))
+			})
+		})
+
+		Context("when call to find the user fails", func() {
+			BeforeEach(func() {
+				userRepo.FindByUsernameReturns(models.UserFields{}, errors.New("some error"))
+			})
+
+			It("panics and prints a failure message", func() {
+				Expect(func() { userRequirement.Execute() }).To(Panic())
+				Expect(ui.Outputs).To(ConsistOf([]string{"FAILED", "some error"}))
+			})
 		})
 	})
 })
