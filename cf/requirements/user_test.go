@@ -81,6 +81,11 @@ var _ = Describe("UserRequirement", func() {
 					userRepo.FindByUsernameReturns(user, nil)
 				})
 
+				It("returns true", func() {
+					ok := userRequirement.Execute()
+					Expect(ok).To(BeTrue())
+				})
+
 				It("stores the user that was found", func() {
 					userRequirement.Execute()
 					Expect(userRequirement.GetUser()).To(Equal(user))
@@ -116,6 +121,11 @@ var _ = Describe("UserRequirement", func() {
 			BeforeEach(func() {
 				user = models.UserFields{Username: "the-username", Guid: "the-guid"}
 				userRepo.FindByUsernameReturns(user, nil)
+			})
+
+			It("returns true", func() {
+				ok := userRequirement.Execute()
+				Expect(ok).To(BeTrue())
 			})
 
 			It("stores the user that was found", func() {
