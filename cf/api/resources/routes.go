@@ -9,6 +9,7 @@ type RouteResource struct {
 
 type RouteEntity struct {
 	Host   string
+	Port   int
 	Domain DomainResource
 	Space  SpaceResource
 	Apps   []ApplicationResource
@@ -21,6 +22,7 @@ func (resource RouteResource) ToFields() (fields models.Route) {
 }
 func (resource RouteResource) ToModel() (route models.Route) {
 	route.Host = resource.Entity.Host
+	route.Port = resource.Entity.Port
 	route.Guid = resource.Metadata.Guid
 	route.Domain = resource.Entity.Domain.ToFields()
 	route.Space = resource.Entity.Space.ToFields()

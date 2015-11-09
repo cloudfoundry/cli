@@ -16,11 +16,23 @@ type FakeRouteRepository struct {
 		Error error
 	}
 
+	FindByHostDomainAndPortCalledWith struct {
+		Host   string
+		Port   string
+		Domain models.DomainFields
+	}
+
+	FindByHostDomainAndPortReturns struct {
+		Route models.Route
+		Error error
+	}
+
 	CreatedHost       string
 	CreatedDomainGuid string
 	CreatedRoute      models.Route
 
 	CreateInSpaceHost         string
+	CreateInSpacePort         string
 	CreateInSpaceDomainGuid   string
 	CreateInSpaceSpaceGuid    string
 	CreateInSpaceCreatedRoute models.Route
@@ -69,6 +81,19 @@ func (repo *FakeRouteRepository) ListAllRoutes(cb func(models.Route) bool) (apiE
 	return
 }
 
+func (repo *FakeRouteRepository) FindByHostDomainAndPort(host, port string, domain models.DomainFields) (route models.Route, apiErr error) {
+	repo.FindByHostDomainAndPortCalledWith.Host = host
+	repo.FindByHostDomainAndPortCalledWith.Domain = domain
+	repo.FindByHostDomainAndPortCalledWith.Port = port
+
+	if repo.FindByHostDomainAndPortReturns.Error != nil {
+		apiErr = repo.FindByHostDomainAndPortReturns.Error
+	}
+
+	route = repo.FindByHostDomainAndPortReturns.Route
+	return
+}
+
 func (repo *FakeRouteRepository) FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error) {
 	repo.FindByHostAndDomainCalledWith.Host = host
 	repo.FindByHostAndDomainCalledWith.Domain = domain
@@ -104,10 +129,11 @@ func (repo *FakeRouteRepository) CheckIfExists(host string, domain models.Domain
 	}
 	return
 }
-func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
+func (repo *FakeRouteRepository) CreateInSpace(host, port, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
 	repo.CreateInSpaceHost = host
 	repo.CreateInSpaceDomainGuid = domainGuid
 	repo.CreateInSpaceSpaceGuid = spaceGuid
+	repo.CreateInSpacePort = port
 
 	if repo.CreateInSpaceErr {
 		apiErr = errors.New("Error")

@@ -1,6 +1,8 @@
 package route
 
 import (
+	"strconv"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -13,7 +15,7 @@ import (
 )
 
 type RouteCreator interface {
-	CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
+	CreateRoute(hostName, port string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
 }
 
 type CreateRoute struct {
@@ -31,11 +33,12 @@ func init() {
 func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname")}
+	fs["p"] = &cliFlags.IntFlag{Name: "p", Usage: T("Port used to create a TCP route. E.g. where domain is example.com and port is 50000, the resulting route is example.com:50000.")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-route",
 		Description: T("Create a url route in a space for later use"),
-		Usage:       T("CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]"),
+		Usage:       T("CF_NAME create-route SPACE DOMAIN [-n HOSTNAME | -p PORT]"),
 		Flags:       fs,
 	}
 }
@@ -68,30 +71,44 @@ func (cmd *CreateRoute) SetDependency(deps command_registry.Dependency, pluginCa
 
 func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	hostName := c.String("n")
+
+	portStr := ""
+	if c.IsSet("p") {
+		portStr = strconv.Itoa(c.Int("p"))
+	}
+
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
 
-	_, apiErr := cmd.CreateRoute(hostName, domain, space.SpaceFields)
+	_, apiErr := cmd.CreateRoute(hostName, portStr, domain, space.SpaceFields)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
-	cmd.ui.Say(T("Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+func (cmd *CreateRoute) CreateRoute(hostName, port string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
+	uiArgMap :=
 		map[string]interface{}{
 			"Hostname":  terminal.EntityNameColor(domain.UrlForHost(hostName)),
 			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			"SpaceName": terminal.EntityNameColor(space.Name),
-			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
+			"Username":  terminal.EntityNameColor(cmd.config.Username()),
+		}
 
-	route, apiErr = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
+	if port == "" {
+		cmd.ui.Say(T("Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", uiArgMap))
+	} else {
+		uiArgMap["Port"] = terminal.EntityNameColor(port)
+		cmd.ui.Say(T("Creating route {{.Hostname}}:{{.Port}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", uiArgMap))
+	}
+
+	route, apiErr = cmd.routeRepo.CreateInSpace(hostName, port, domain.Guid, space.Guid)
+
 	if apiErr != nil {
-		var findApiResponse error
-		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain)
-
-		if findApiResponse != nil ||
+		var err error
+		route, err = cmd.routeRepo.FindByHostDomainAndPort(hostName, port, domain)
+		if err != nil ||
 			route.Space.Guid != space.Guid ||
 			route.Domain.Guid != domain.Guid {
 			return

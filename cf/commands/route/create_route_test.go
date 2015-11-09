@@ -81,46 +81,141 @@ var _ = Describe("create-route command", func() {
 			}}
 		})
 
-		It("creates routes, obviously", func() {
-			runCommand("-n", "host", "my-space", "example.com")
+		Context("when creating http routes", func() {
+			It("creates routes, obviously", func() {
+				runCommand("-n", "host", "my-space", "example.com")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
-				[]string{"OK"},
-			))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+				))
 
-			Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
-			Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
-			Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+				Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
+				Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+				Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+			})
+
+			It("is idempotent", func() {
+				routeRepo.CreateInSpaceErr = true
+				routeRepo.FindByHostDomainAndPortReturns.Route = models.Route{
+					Space:  requirementsFactory.Space.SpaceFields,
+					Guid:   "my-route-guid",
+					Host:   "host",
+					Domain: requirementsFactory.Domain,
+				}
+
+				runCommand("-n", "host", "my-space", "example.com")
+
+				Expect(routeRepo.FindByHostDomainAndPortCalledWith.Host).To(Equal("host"))
+				Expect(routeRepo.FindByHostDomainAndPortCalledWith.Domain.Guid).To(Equal(requirementsFactory.Domain.Guid))
+				Expect(routeRepo.FindByHostDomainAndPortCalledWith.Port).To(Equal(""))
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route"},
+					[]string{"OK"},
+					[]string{"host.example.com", "already exists"},
+				))
+
+				Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
+				Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+				Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+			})
+
+			Context("when route repo returns error in createInSpace", func() {
+				It("displays that error", func() {
+					routeRepo.CreateInSpaceErr = true
+					routeRepo.FindByHostDomainAndPortReturns.Route = models.Route{
+						Space: requirementsFactory.Space.SpaceFields,
+						Guid:  "my-route-guid",
+						Host:  "host",
+						Domain: models.DomainFields{
+							Guid: "some-other-guid",
+						},
+					}
+
+					runCommand("-n", "host", "my-space", "example.com")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating route"},
+						[]string{"FAILED"},
+						[]string{"Error"},
+					))
+
+					Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
+					Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+					Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+				})
+			})
 		})
 
-		It("is idempotent", func() {
-			routeRepo.CreateInSpaceErr = true
-			routeRepo.FindByHostAndDomainReturns.Route = models.Route{
-				Space:  requirementsFactory.Space.SpaceFields,
-				Guid:   "my-route-guid",
-				Host:   "host",
-				Domain: requirementsFactory.Domain,
-			}
+		Context("when creating tcp routes", func() {
+			It("creates routes, obviously", func() {
+				runCommand("my-space", "example.com", "-p", "8080")
 
-			runCommand("-n", "host", "my-space", "example.com")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route", "example.com:8080", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+				))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating route"},
-				[]string{"OK"},
-				[]string{"host.example.com", "already exists"},
-			))
+				Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+				Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+				Expect(routeRepo.CreateInSpacePort).To(Equal("8080"))
+			})
 
-			Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
-			Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
-			Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+			It("is idempotent", func() {
+				routeRepo.CreateInSpaceErr = true
+				routeRepo.FindByHostDomainAndPortReturns.Route = models.Route{
+					Space:  requirementsFactory.Space.SpaceFields,
+					Guid:   "my-route-guid",
+					Port:   8080,
+					Domain: requirementsFactory.Domain,
+				}
+
+				runCommand("-p", "8080", "my-space", "example.com")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route"},
+					[]string{"OK"},
+					[]string{"example.com:8080", "already exists"},
+				))
+
+				Expect(routeRepo.CreateInSpaceHost).To(Equal(""))
+				Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+				Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+				Expect(routeRepo.CreateInSpacePort).To(Equal("8080"))
+			})
+
+			Context("when route repo returns error in createInSpace", func() {
+				It("displays that error", func() {
+					routeRepo.CreateInSpaceErr = true
+					routeRepo.FindByHostDomainAndPortReturns.Route = models.Route{
+						Space: requirementsFactory.Space.SpaceFields,
+						Guid:  "my-route-guid",
+						Port:  8080,
+						Domain: models.DomainFields{
+							Guid: "some-other-guid",
+						},
+					}
+
+					runCommand("-p", "8080", "my-space", "example.com")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating route"},
+						[]string{"FAILED"},
+						[]string{"Error"},
+					))
+
+					Expect(routeRepo.CreateInSpaceHost).To(Equal(""))
+					Expect(routeRepo.CreateInSpacePort).To(Equal("8080"))
+					Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+					Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+				})
+			})
 		})
 
 		Describe("RouteCreator interface", func() {
-			It("creates a route, given a domain and space", func() {
+			It("creates a HTTP route, given a domain and space, specify host", func() {
 				createdRoute := models.Route{}
-				createdRoute.Host = "my-host"
-				createdRoute.Guid = "my-route-guid"
 				routeRepo = &testapi.FakeRouteRepository{
 					CreateInSpaceCreatedRoute: createdRoute,
 				}
@@ -128,7 +223,7 @@ var _ = Describe("create-route command", func() {
 				updateCommandDependency(false)
 				c := command_registry.Commands.FindCommand("create-route")
 				cmd := c.(RouteCreator)
-				route, apiErr := cmd.CreateRoute("my-host", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
+				route, apiErr := cmd.CreateRoute("my-host", "", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
 
 				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(route.Guid).To(Equal(createdRoute.Guid))
@@ -138,6 +233,29 @@ var _ = Describe("create-route command", func() {
 				))
 
 				Expect(routeRepo.CreateInSpaceHost).To(Equal("my-host"))
+				Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+				Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+			})
+
+			It("creates a TCP route, given a domain and space, specify port", func() {
+				createdRoute := models.Route{}
+				routeRepo = &testapi.FakeRouteRepository{
+					CreateInSpaceCreatedRoute: createdRoute,
+				}
+
+				updateCommandDependency(false)
+				c := command_registry.Commands.FindCommand("create-route")
+				cmd := c.(RouteCreator)
+				route, apiErr := cmd.CreateRoute("", "10011", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
+
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(route.Guid).To(Equal(createdRoute.Guid))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating route", "example.com", "my-org", "my-space", "my-user", "10011"},
+					[]string{"OK"},
+				))
+
+				Expect(routeRepo.CreateInSpacePort).To(Equal("10011"))
 				Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
 				Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
 			})
