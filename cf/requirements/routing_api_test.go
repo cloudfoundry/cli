@@ -31,7 +31,7 @@ var _ = Describe("RoutingApi", func() {
 
 		It("panics and prints a failure message", func() {
 			Expect(func() { requirement.Execute() }).To(Panic())
-			Expect(ui.Outputs).To(ContainElement("Routing API URI missing. Please log in again to set the URI automatically."))
+			Expect(ui.Outputs).To(ContainElement("Routing API uri missing. Please log in again and retry."))
 		})
 	})
 

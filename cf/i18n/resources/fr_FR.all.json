@@ -4250,8 +4250,8 @@
       "modified": false
    },
    {
-      "id": "Routing API URI missing. Please log in again to set the URI automatically.",
-      "translation": "Routing API URI missing. Please log in again to set the URI automatically.",
+      "id": "Routing API uri missing. Please log in again and retry.",
+      "translation": "Routing API uri missing. Please log in again and retry.",
       "modified": false
    },
    {
