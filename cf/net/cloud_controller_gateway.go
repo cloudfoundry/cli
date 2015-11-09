@@ -15,15 +15,17 @@ type ccErrorResponse struct {
 	Description string
 }
 
+const invalidTokenCode = 1000
+
 func cloudControllerErrorHandler(statusCode int, body []byte) error {
 	response := ccErrorResponse{}
 	json.Unmarshal(body, &response)
 
-	if response.Code == 1000 { // MAGICKAL NUMBERS AHOY
+	if response.Code == invalidTokenCode {
 		return errors.NewInvalidTokenError(response.Description)
-	} else {
-		return errors.NewHttpError(statusCode, strconv.Itoa(response.Code), response.Description)
 	}
+
+	return errors.NewHttpError(statusCode, strconv.Itoa(response.Code), response.Description)
 }
 
 func NewCloudControllerGateway(config core_config.Reader, clock func() time.Time, ui terminal.UI) Gateway {
