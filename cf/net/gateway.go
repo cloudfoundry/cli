@@ -101,21 +101,21 @@ func (gateway Gateway) GetResource(url string, resource interface{}) (err error)
 }
 
 func (gateway Gateway) CreateResourceFromStruct(endpoint, url string, resource interface{}) error {
-	bytes, err := json.Marshal(resource)
+	data, err := json.Marshal(resource)
 	if err != nil {
 		return err
 	}
 
-	return gateway.CreateResource(endpoint, url, strings.NewReader(string(bytes)))
+	return gateway.CreateResource(endpoint, url, bytes.NewReader(data))
 }
 
 func (gateway Gateway) UpdateResourceFromStruct(endpoint, apiUrl string, resource interface{}) error {
-	bytes, err := json.Marshal(resource)
+	data, err := json.Marshal(resource)
 	if err != nil {
 		return err
 	}
 
-	return gateway.UpdateResource(endpoint, apiUrl, strings.NewReader(string(bytes)))
+	return gateway.UpdateResource(endpoint, apiUrl, bytes.NewReader(data))
 }
 
 func (gateway Gateway) CreateResource(endpoint, apiUrl string, body io.ReadSeeker, optionalResource ...interface{}) error {

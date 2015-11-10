@@ -1,8 +1,8 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
-	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
@@ -115,7 +115,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	err = repo.gateway.CreateResource(
 		repo.config.ApiEndpoint(),
 		repo.strategy.PrivateDomainsURL(),
-		strings.NewReader(string(data)),
+		bytes.NewReader(data),
 		resource)
 
 	if err != nil {
@@ -126,22 +126,20 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	return
 }
 
-func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiErr error) {
+func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) error {
 	data, err := json.Marshal(resources.DomainEntity{
 		Name:     domainName,
 		Wildcard: true,
 	})
-
 	if err != nil {
-		return
+		return err
 	}
 
-	apiErr = repo.gateway.CreateResource(
+	return repo.gateway.CreateResource(
 		repo.config.ApiEndpoint(),
 		repo.strategy.SharedDomainsURL(),
-		strings.NewReader(string(data)))
-
-	return
+		bytes.NewReader(data),
+	)
 }
 
 func (repo CloudControllerDomainRepository) Delete(domainGuid string) error {

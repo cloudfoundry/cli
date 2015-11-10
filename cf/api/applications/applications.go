@@ -1,6 +1,7 @@
 package applications
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -45,7 +46,7 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 	}
 
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/apps", strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/apps", bytes.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
@@ -98,7 +99,7 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params m
 
 	path := fmt.Sprintf("/v2/apps/%s?inline-relations-depth=1", appGuid)
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data), resource)
+	apiErr = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
@@ -107,11 +108,13 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params m
 	return
 }
 
-func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppParams) (data string, err error) {
+func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppParams) ([]byte, error) {
 	appResource := resources.NewApplicationEntityFromAppParams(input)
-	bytes, err := json.Marshal(appResource)
-	data = string(bytes)
-	return
+	data, err := json.Marshal(appResource)
+	if err != nil {
+		return []byte{}, err
+	}
+	return data, nil
 }
 
 func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiErr error) {
