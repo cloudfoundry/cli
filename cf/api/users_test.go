@@ -1498,6 +1498,61 @@ var _ = Describe("UserRepository", func() {
 		})
 	})
 
+	Describe("UnsetSpaceRoleByUsername", func() {
+		Context("when given the SpaceManager role", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("DELETE", "/v2/spaces/space-guid/managers"),
+						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+				)
+			})
+
+			It("makes one request to CC", func() {
+				err := client.UnsetSpaceRoleByUsername("user@example.com", "space-guid", models.SPACE_MANAGER)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+
+		Context("when given the SpaceDeveloper role", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("DELETE", "/v2/spaces/space-guid/developers"),
+						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+				)
+			})
+
+			It("makes one request to CC", func() {
+				err := client.UnsetSpaceRoleByUsername("user@example.com", "space-guid", models.SPACE_DEVELOPER)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+
+		Context("when given the SpaceAuditor role", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("DELETE", "/v2/spaces/space-guid/auditors"),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+				)
+			})
+
+			It("makes one requests to CC", func() {
+				err := client.UnsetSpaceRoleByUsername("user@example.com", "space-guid", models.SPACE_AUDITOR)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+	})
+
 	Describe("ListUsersInOrgForRole", func() {
 		Context("when there are users in the given org with the given role", func() {
 			BeforeEach(func() {

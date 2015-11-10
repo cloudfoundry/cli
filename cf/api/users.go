@@ -46,6 +46,7 @@ type UserRepository interface {
 	SetSpaceRoleByGuid(userGuid, spaceGuid, orgGuid, role string) (apiErr error)
 	SetSpaceRoleByUsername(username, spaceGuid, orgGuid, role string) (apiErr error)
 	UnsetSpaceRoleByGuid(userGuid, spaceGuid, role string) (apiErr error)
+	UnsetSpaceRoleByUsername(userGuid, spaceGuid, role string) (apiErr error)
 }
 
 type CloudControllerUserRepository struct {
@@ -261,6 +262,13 @@ func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGu
 	}
 
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.ApiEndpoint(), orgGuid, rolePath)
+
+	return repo.callApi("DELETE", path, usernamePayload(username))
+}
+
+func (repo CloudControllerUserRepository) UnsetSpaceRoleByUsername(username, spaceGuid, role string) error {
+	rolePath := spaceRoleToPathMap[role]
+	path := fmt.Sprintf("%s/v2/spaces/%s/%s", repo.config.ApiEndpoint(), spaceGuid, rolePath)
 
 	return repo.callApi("DELETE", path, usernamePayload(username))
 }
