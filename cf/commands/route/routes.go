@@ -74,7 +74,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 			}))
 	}
 
-	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("apps"), T("service")})
+	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("path"), T("apps"), T("service")})
 
 	noRoutes := true
 	var apiErr error
@@ -87,7 +87,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 				appNames = append(appNames, app.Name)
 			}
 
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","), route.ServiceInstance.Name)
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","), route.ServiceInstance.Name)
 			return true
 		})
 
@@ -100,7 +100,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 				appNames = append(appNames, app.Name)
 			}
 
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","), route.ServiceInstance.Name)
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","), route.ServiceInstance.Name)
 			return true
 		})
 	}
