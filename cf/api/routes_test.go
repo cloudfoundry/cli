@@ -67,7 +67,9 @@ var _ = Describe("route repository", func() {
 
 			Expect(len(routes)).To(Equal(2))
 			Expect(routes[0].Guid).To(Equal("route-1-guid"))
+			Expect(routes[0].Path).To(Equal(""))
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
+			Expect(routes[1].Path).To(Equal("/path-2"))
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -101,6 +103,7 @@ var _ = Describe("route repository", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
+
 		It("finds a route by host and domain", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -343,6 +346,7 @@ var firstPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: 
       },
       "entity": {
         "host": "route-1-host",
+        "path": "",
         "domain": {
           "metadata": {
             "guid": "domain-1-guid"
@@ -383,6 +387,7 @@ var secondPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body:
       },
       "entity": {
         "host": "route-2-host",
+        "path": "/path-2",
         "domain": {
           "metadata": {
             "guid": "domain-2-guid"

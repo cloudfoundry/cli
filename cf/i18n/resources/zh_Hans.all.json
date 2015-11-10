@@ -5645,6 +5645,11 @@
       "modified": false
    },
    {
+      "id": "path",
+      "translation": "path",
+      "modified": false
+   },
+   {
       "id": "plan",
       "translation": "服务计划",
       "modified": false

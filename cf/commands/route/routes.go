@@ -60,7 +60,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Getting routes as {{.Username}} ...\n",
 		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("apps")})
+	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("path"), T("apps")})
 
 	noRoutes := true
 	var apiErr error
@@ -74,7 +74,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 				appNames = append(appNames, app.Name)
 			}
 
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","))
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","))
 			return true
 		})
 
@@ -87,7 +87,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 				appNames = append(appNames, app.Name)
 			}
 
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","))
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","))
 			return true
 		})
 	}
