@@ -135,9 +135,9 @@
       "modified": true
    },
    {
-      "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object.\n   The path to the parameters file can be an absolute or relative path to a file:\n\n   CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
+      "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object.\n   The path to the parameters file can be an absolute or relative path to a file:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
       "translation": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object.\n   The path to the parameters file can be an absolute or relative path to a file:\n\n   CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
-      "modified": false
+      "modified": true
    },
    {
       "id": "   OrgAuditor - Read-only access to org info and reports\n",
@@ -2010,9 +2010,9 @@
       "modified": false
    },
    {
-      "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service dbaas silver mydb -t \"list, of, tags\"",
+      "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\"",
       "translation": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service dbaas silver mydb -t \"list, of, tags\"",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Enable CF_TRACE output for all requests and responses",
@@ -4150,11 +4150,6 @@
       "modified": false
    },
    {
-      "id": "Retrieve the rules for all the security groups associated with the space",
-      "translation": "Retrieve the rules for all the security groups associated with the space",
-      "modified": true
-   },
-   {
       "id": "Retrieve an individual feature flag with status",
       "translation": "Retrieve an individual feature flag with status",
       "modified": false
@@ -4208,6 +4203,11 @@
       "id": "Retrieve the contents of the staging environment variable group",
       "translation": "Retrieve the contents of the staging environment variable group",
       "modified": false
+   },
+   {
+      "id": "Retrieve the rules for all the security groups associated with the space",
+      "translation": "Retrieve the rules for all the security groups associated with the space",
+      "modified": true
    },
    {
       "id": "Retrieving status of all flagged features as {{.Username}}...",
