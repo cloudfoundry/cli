@@ -5,8 +5,8 @@ import "fmt"
 type Route struct {
 	Guid            string
 	Host            string
-	Domain          DomainFields
 	Path            string
+	Domain          DomainFields
 	Space           SpaceFields
 	Apps            []ApplicationFields
 	ServiceInstance ServiceInstanceFields

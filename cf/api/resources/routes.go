@@ -9,8 +9,8 @@ type RouteResource struct {
 
 type RouteEntity struct {
 	Host            string                  `json:"host"`
-	Path            string                  `json:"path"`
 	Domain          DomainResource          `json:"domain"`
+	Path            string                  `json:"path"`
 	Space           SpaceResource           `json:"space"`
 	Apps            []ApplicationResource   `json:"apps"`
 	ServiceInstance ServiceInstanceResource `json:"service_instance"`
