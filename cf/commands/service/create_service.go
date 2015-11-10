@@ -42,7 +42,7 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
    Optionally provide a file containing service-specific configuration parameters in a valid JSON object.
    The path to the parameters file can be an absolute or relative path to a file:
 
-   CF_NAME create-service SERVICE_INSTANCE -c PATH_TO_FILE
+   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE
 
    Example of valid JSON object:
    {
@@ -53,17 +53,17 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
    }`)
 	exampleUsage := T(`EXAMPLE:
    Linux/Mac:
-      CF_NAME create-service db-service silver -c '{"ram_gb":4}'
+      CF_NAME create-service db-service silver mydb -c '{"ram_gb":4}'
 
    Windows Command Line:
-      CF_NAME create-service db-service silver -c "{\"ram_gb\":4}"
+      CF_NAME create-service db-service silver mydb -c "{\"ram_gb\":4}"
 
    Windows PowerShell:
-      CF_NAME create-service db-service silver -c '{\"ram_gb\":4}'
+      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'
 
    CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json
 
-   CF_NAME create-service dbaas silver mydb -t "list, of, tags"`)
+   CF_NAME create-service db-service silver mydb -t "list, of, tags"`)
 	tipsUsage := T(`TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`)
 	return command_registry.CommandMetadata{
