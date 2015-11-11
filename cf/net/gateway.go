@@ -118,99 +118,24 @@ func (gateway Gateway) UpdateResourceFromStruct(endpoint, apiUrl string, resourc
 	return gateway.UpdateResource(endpoint, apiUrl, bytes.NewReader(data))
 }
 
-func (gateway Gateway) CreateResource(endpoint, apiUrl string, body io.ReadSeeker, optionalResource ...interface{}) error {
-	request, err := gateway.NewRequest("POST", endpoint+apiUrl, gateway.config.AccessToken(), body)
-	if err != nil {
-		return err
-	}
-
-	var resource interface{}
-	if len(optionalResource) > 0 {
-		resource = optionalResource[0]
-	}
-
-	if resource == nil {
-		_, err = gateway.PerformRequest(request)
-		return err
-	}
-
-	if gateway.PollingEnabled {
-		_, err = gateway.PerformPollingRequestForJSONResponse(endpoint, request, resource, gateway.AsyncTimeout())
-		return err
-	}
-
-	_, err = gateway.PerformRequestForJSONResponse(request, resource)
-	return err
+func (gateway Gateway) CreateResource(endpoint, apiUrl string, body io.ReadSeeker, resource ...interface{}) error {
+	return gateway.createUpdateOrDeleteResource("POST", endpoint, apiUrl, body, false, resource...)
 }
 
-func (gateway Gateway) UpdateResource(endpoint, apiUrl string, body io.ReadSeeker, optionalResource ...interface{}) error {
-	request, err := gateway.NewRequest("PUT", endpoint+apiUrl, gateway.config.AccessToken(), body)
-	if err != nil {
-		return err
-	}
-
-	var resource interface{}
-	if len(optionalResource) > 0 {
-		resource = optionalResource[0]
-	}
-
-	if resource == nil {
-		_, err = gateway.PerformRequest(request)
-		return err
-	}
-
-	if gateway.PollingEnabled {
-		_, err = gateway.PerformPollingRequestForJSONResponse(endpoint, request, resource, gateway.AsyncTimeout())
-		return err
-	}
-
-	_, err = gateway.PerformRequestForJSONResponse(request, resource)
-	return err
+func (gateway Gateway) UpdateResource(endpoint, apiUrl string, body io.ReadSeeker, resource ...interface{}) error {
+	return gateway.createUpdateOrDeleteResource("PUT", endpoint, apiUrl, body, false, resource...)
 }
 
-func (gateway Gateway) UpdateResourceSync(endpoint, apiUrl string, body io.ReadSeeker, optionalResource ...interface{}) error {
-	request, err := gateway.NewRequest("PUT", endpoint+apiUrl, gateway.config.AccessToken(), body)
-	if err != nil {
-		return err
-	}
-
-	var resource interface{}
-	if len(optionalResource) > 0 {
-		resource = optionalResource[0]
-	}
-
-	if resource == nil {
-		_, err = gateway.PerformRequest(request)
-		return err
-	}
-
-	_, err = gateway.PerformRequestForJSONResponse(request, resource)
-	return err
+func (gateway Gateway) UpdateResourceSync(endpoint, apiUrl string, body io.ReadSeeker, resource ...interface{}) error {
+	return gateway.createUpdateOrDeleteResource("PUT", endpoint, apiUrl, body, true, resource...)
 }
 
 func (gateway Gateway) DeleteResourceSynchronously(endpoint, apiUrl string) error {
-	request, err := gateway.NewRequest("DELETE", endpoint+apiUrl, gateway.config.AccessToken(), nil)
-	if err != nil {
-		return err
-	}
-
-	_, err = gateway.PerformRequestForJSONResponse(request, nil)
-	return err
+	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiUrl, nil, true, &AsyncResource{})
 }
 
-func (gateway Gateway) DeleteResource(endpoint, apiUrl string) (apiErr error) {
-	request, err := gateway.NewRequest("DELETE", endpoint+apiUrl, gateway.config.AccessToken(), nil)
-	if err != nil {
-		return err
-	}
-
-	if gateway.PollingEnabled {
-		_, err = gateway.PerformPollingRequestForJSONResponse(endpoint, request, nil, gateway.AsyncTimeout())
-		return err
-	}
-
-	_, err = gateway.PerformRequestForJSONResponse(request, nil)
-	return err
+func (gateway Gateway) DeleteResource(endpoint, apiUrl string) error {
+	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiUrl, nil, false, &AsyncResource{})
 }
 
 func (gateway Gateway) ListPaginatedResources(target string,
@@ -240,6 +165,32 @@ func (gateway Gateway) ListPaginatedResources(target string,
 	}
 
 	return
+}
+
+func (gateway Gateway) createUpdateOrDeleteResource(verb, endpoint, apiUrl string, body io.ReadSeeker, sync bool, optionalResource ...interface{}) (apiErr error) {
+	var resource interface{}
+	if len(optionalResource) > 0 {
+		resource = optionalResource[0]
+	}
+
+	request, apiErr := gateway.NewRequest(verb, endpoint+apiUrl, gateway.config.AccessToken(), body)
+	if apiErr != nil {
+		return
+	}
+
+	if resource == nil {
+		_, apiErr = gateway.PerformRequest(request)
+		return
+	}
+
+	if gateway.PollingEnabled && !sync {
+		_, apiErr = gateway.PerformPollingRequestForJSONResponse(endpoint, request, resource, gateway.AsyncTimeout())
+		return
+	} else {
+		_, apiErr = gateway.PerformRequestForJSONResponse(request, resource)
+		return
+	}
+
 }
 
 func (gateway Gateway) newRequest(request *http.Request, accessToken string, body io.ReadSeeker) *Request {
