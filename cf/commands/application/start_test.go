@@ -504,12 +504,23 @@ var _ = Describe("start command", func() {
 				[]models.AppInstanceFields{appInstance3, appInstance4},
 			}
 
-			defaultInstanceErrorCodes = []string{"", ""}
+			defaultInstanceErrorCodes = []string{"some error", ""}
 
 			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"TIP: Application must be listening on the right port."},
+			))
+		})
+
+		It("prints a warning when failing to fetch instance count", func() {
+			defaultInstanceResponses = [][]models.AppInstanceFields{}
+			defaultInstanceErrorCodes = []string{"an-error"}
+
+			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"an-error"},
 			))
 		})
 
