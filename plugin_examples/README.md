@@ -88,7 +88,10 @@ with `cf help`.
 This repo contains a basic plugin example [here](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/basic_plugin.go).<br>
 To see more examples, go [here](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/).
 
-If you wish to employ TDD in your plugin development, [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples/call_cli_cmd/main) is an example of a plugin that calls core cli command with the use of `FakeCliConnection` for testing.
+### Test Drive Development (TDD)
+2 libraries are available for TDD
+- `FakeCliConnection`: stub/mock the `cliConnection` object with this fake [See example](https://github.com/cloudfoundry/cli/tree/master/plugin_examples/call_cli_cmd/main)
+- `Test RPC server`: a RPC server to be used as a backend for the plugin. Allows plugin to be tested as a stand along binary without replying on CLI as a backend. [See example](https://github.com/cloudfoundry/cli/tree/master/plugin_examples/test_rpc_server_example)
 
 ### Using Command Line Arguments
 
