@@ -262,7 +262,8 @@ func (cmd *Start) waitForInstancesToStage(app models.Application) bool {
 			if err != nil {
 				break
 			}
-			cmd.ui.Wait(cmd.PingerThrottle)
+
+			time.Sleep(cmd.PingerThrottle)
 		}
 	}
 
@@ -315,7 +316,7 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 		count, err := cmd.fetchInstanceCount(app.Guid)
 		if err != nil {
 			cmd.ui.Warn("Could not fetch instance count: %s", err.Error())
-			cmd.ui.Wait(cmd.PingerThrottle)
+			time.Sleep(cmd.PingerThrottle)
 			continue
 		}
 
@@ -331,7 +332,7 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 			return
 		}
 
-		cmd.ui.Wait(cmd.PingerThrottle)
+		time.Sleep(cmd.PingerThrottle)
 	}
 }
 

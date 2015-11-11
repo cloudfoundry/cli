@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"time"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
@@ -35,7 +34,6 @@ type UI interface {
 	PanicQuietly()
 	ShowConfiguration(core_config.Reader)
 	LoadingIndication()
-	Wait(duration time.Duration)
 	Table(headers []string) Table
 	NotifyUpdateIfNeeded(core_config.Reader)
 }
@@ -231,10 +229,6 @@ func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
 
 func (c *terminalUI) LoadingIndication() {
 	c.printer.Print(".")
-}
-
-func (c *terminalUI) Wait(duration time.Duration) {
-	time.Sleep(duration)
 }
 
 func (ui *terminalUI) Table(headers []string) Table {
