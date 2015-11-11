@@ -12,6 +12,11 @@ import (
 	"github.com/simonleung8/flags"
 )
 
+type OrgRoleSetter interface {
+	command_registry.Command
+	SetOrgRole(orgGuid string, role, userGuid, userName string) error
+}
+
 type SetOrgRole struct {
 	ui       terminal.UI
 	config   core_config.Reader
@@ -83,16 +88,18 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	var err error
-	if len(user.Guid) > 0 {
-		err = cmd.userRepo.SetOrgRoleByGuid(user.Guid, org.Guid, role)
-	} else {
-		err = cmd.userRepo.SetOrgRoleByUsername(user.Username, org.Guid, role)
-	}
-
+	err := cmd.SetOrgRole(org.Guid, role, user.Guid, user.Username)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
 	cmd.ui.Ok()
+}
+
+func (cmd *SetOrgRole) SetOrgRole(orgGuid string, role, userGuid, userName string) error {
+	if len(userGuid) > 0 {
+		return cmd.userRepo.SetOrgRoleByGuid(userGuid, orgGuid, role)
+	}
+
+	return cmd.userRepo.SetOrgRoleByUsername(userName, orgGuid, role)
 }
