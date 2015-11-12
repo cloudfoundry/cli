@@ -4,9 +4,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
+	fakeflag "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	test_quota "github.com/cloudfoundry/cli/cf/api/quotas/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	fakeCommands "github.com/cloudfoundry/cli/testhelpers/commands"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -26,13 +28,21 @@ var _ = Describe("create-org command", func() {
 		orgRepo             *test_org.FakeOrganizationRepository
 		quotaRepo           *test_quota.FakeQuotaRepository
 		deps                command_registry.Dependency
+		orgRoleSetter       *fakeCommands.FakeOrgRoleSetter
+		flagRepo            *fakeflag.FakeFeatureFlagRepository
+		OriginalCommand     command_registry.Command
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
+		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)
 		deps.Config = config
+
+		//inject fake 'command dependency' into registry
+		command_registry.Register(orgRoleSetter)
+
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-org").SetDependency(deps, pluginCall))
 	}
 
@@ -42,6 +52,22 @@ var _ = Describe("create-org command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		orgRepo = &test_org.FakeOrganizationRepository{}
 		quotaRepo = &test_quota.FakeQuotaRepository{}
+		flagRepo = &fakeflag.FakeFeatureFlagRepository{}
+		config.SetApiVersion("2.36.9")
+
+		orgRoleSetter = &fakeCommands.FakeOrgRoleSetter{}
+		//setup fakes to correctly interact with command_registry
+		orgRoleSetter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+			return orgRoleSetter
+		}
+		orgRoleSetter.MetaDataReturns(command_registry.CommandMetadata{Name: "set-org-role"})
+
+		//save original command and restore later
+		OriginalCommand = command_registry.Commands.FindCommand("set-org-role")
+	})
+
+	AfterEach(func() {
+		command_registry.Register(OriginalCommand)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -88,6 +114,69 @@ var _ = Describe("create-org command", func() {
 				[]string{"OK"},
 				[]string{"my-org", "already exists"},
 			))
+		})
+
+		Context("when CC api version supports assigning orgRole by name, and feature-flag 'set_roles_by_username' is enabled", func() {
+			BeforeEach(func() {
+				config.SetApiVersion("2.37.0")
+				flagRepo.FindByNameReturns(models.FeatureFlag{
+					Name:    "set_roles_by_username",
+					Enabled: true,
+				}, nil)
+				orgRepo.FindByNameReturns(models.Organization{
+					OrganizationFields: models.OrganizationFields{
+						Guid: "my-org-guid",
+					},
+				}, nil)
+			})
+
+			It("assigns manager role to user", func() {
+				runCommand("my-org")
+
+				orgGuid, role, userGuid, userName := orgRoleSetter.SetOrgRoleArgsForCall(0)
+
+				Ω(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
+				Ω(orgGuid).To(Equal("my-org-guid"))
+				Ω(role).To(Equal("OrgManager"))
+				Ω(userGuid).To(Equal(""))
+				Ω(userName).To(Equal("my-user"))
+			})
+
+			It("warns user about problem accessing feature-flag", func() {
+				flagRepo.FindByNameReturns(models.FeatureFlag{}, errors.New("error error error"))
+
+				runCommand("my-org")
+
+				Ω(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(0))
+				Ω(ui.Outputs).To(ContainSubstrings(
+					[]string{"Warning", "error error error"},
+				))
+			})
+
+			It("fails on failing getting the guid of the newly created org", func() {
+				orgRepo.FindByNameReturns(models.Organization{}, errors.New("cannot get org guid"))
+
+				runCommand("my-org")
+
+				Ω(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(0))
+				Ω(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"cannot get org guid"},
+				))
+			})
+
+			It("fails on failing assigning org role to user", func() {
+				orgRoleSetter.SetOrgRoleReturns(errors.New("failed to assign role"))
+
+				runCommand("my-org")
+
+				Ω(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
+				Ω(ui.Outputs).To(ContainSubstrings(
+					[]string{"Assigning role OrgManager to user my-user in org my-org ..."},
+					[]string{"FAILED"},
+					[]string{"failed to assign role"},
+				))
+			})
 		})
 
 		Context("when allowing a non-defualt quota", func() {

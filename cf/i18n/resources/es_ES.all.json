@@ -465,6 +465,11 @@
       "modified": false
    },
    {
+      "id": "Assigning role {{.Role}} to user {{.CurrentUser}} in org {{.TargetOrg}} ...",
+      "translation": "Assigning role {{.Role}} to user {{.CurrentUser}} in org {{.TargetOrg}} ...",
+      "modified": false
+   },
+   {
       "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
       "translation": "Asignando rol {{.Role}} a usuario {{.TargetUser}} en org {{.TargetOrg}} / space {{.TargetSpace}} como {{.CurrentUser}}...",
       "modified": false
@@ -2090,6 +2095,11 @@
       "modified": false
    },
    {
+      "id": "Error accessing org {{.OrgName}} for GUID': ",
+      "translation": "Error accessing org {{.OrgName}} for GUID': ",
+      "modified": false
+   },
+   {
       "id": "Error building request",
       "translation": "Error construyendo solicitud",
       "modified": false
@@ -2417,6 +2427,11 @@
    {
       "id": "FEATURE FLAGS",
       "translation": "FEATURE FLAGS",
+      "modified": false
+   },
+   {
+      "id": "Failed assigning org role to user: ",
+      "translation": "Failed assigning org role to user: ",
       "modified": false
    },
    {
@@ -4565,6 +4580,11 @@
       "modified": false
    },
    {
+      "id": "Skip assigning org role to user",
+      "translation": "Skip assigning org role to user",
+      "modified": false
+   },
+   {
       "id": "Skip host key validation",
       "translation": "Skip host key validation",
       "modified": false
@@ -5217,6 +5237,11 @@
    {
       "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
       "translation": "Advertencia: endpoint inseguro de API http detectado: se recomienda usar https para API\n",
+      "modified": false
+   },
+   {
+      "id": "Warning: accessing feature flag 'set_roles_by_username'",
+      "translation": "Warning: accessing feature flag 'set_roles_by_username'",
       "modified": false
    },
    {

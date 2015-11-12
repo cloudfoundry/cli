@@ -2,9 +2,11 @@ package organization
 
 import (
 	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -16,10 +18,12 @@ import (
 )
 
 type CreateOrg struct {
-	ui        terminal.UI
-	config    core_config.Reader
-	orgRepo   organizations.OrganizationRepository
-	quotaRepo quotas.QuotaRepository
+	ui            terminal.UI
+	config        core_config.Reader
+	orgRepo       organizations.OrganizationRepository
+	quotaRepo     quotas.QuotaRepository
+	orgRoleSetter user.OrgRoleSetter
+	flagRepo      feature_flags.FeatureFlagRepository
 }
 
 func init() {
@@ -55,6 +59,13 @@ func (cmd *CreateOrg) SetDependency(deps command_registry.Dependency, pluginCall
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
 	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
+	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
+
+	//get command from registry for dependency
+	commandDep := command_registry.Commands.FindCommand("set-org-role")
+	commandDep = commandDep.SetDependency(deps, false)
+	cmd.orgRoleSetter = commandDep.(user.OrgRoleSetter)
+
 	return cmd
 }
 
@@ -90,6 +101,36 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 	}
 
 	cmd.ui.Ok()
+
+	if cmd.config.IsMinApiVersion("2.37.0") {
+		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
+		if err != nil {
+			cmd.ui.Warn(T("Warning: accessing feature flag 'set_roles_by_username'") + " - " + err.Error() + "\n" + T("Skip assigning org role to user"))
+		}
+
+		if setRolesByUsernameFlag.Enabled {
+			org, err := cmd.orgRepo.FindByName(name)
+			if err != nil {
+				cmd.ui.Failed(T("Error accessing org {{.OrgName}} for GUID': ", map[string]interface{}{"Orgname": name}) + err.Error() + "\n" + T("Skip assigning org role to user"))
+			}
+
+			cmd.ui.Say("")
+			cmd.ui.Say(T("Assigning role {{.Role}} to user {{.CurrentUser}} in org {{.TargetOrg}} ...",
+				map[string]interface{}{
+					"Role":        terminal.EntityNameColor("OrgManager"),
+					"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+					"TargetOrg":   terminal.EntityNameColor(name),
+				}))
+
+			err = cmd.orgRoleSetter.SetOrgRole(org.Guid, "OrgManager", "", cmd.config.Username())
+			if err != nil {
+				cmd.ui.Failed(T("Failed assigning org role to user: ") + err.Error())
+			}
+
+			cmd.ui.Ok()
+		}
+	}
+
 	cmd.ui.Say(T("\nTIP: Use '{{.Command}}' to target new org",
 		map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " target -o " + name)}))
 }

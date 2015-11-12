@@ -465,6 +465,11 @@
       "modified": false
    },
    {
+      "id": "Assigning role {{.Role}} to user {{.CurrentUser}} in org {{.TargetOrg}} ...",
+      "translation": "Assigning role {{.Role}} to user {{.CurrentUser}} in org {{.TargetOrg}} ...",
+      "modified": false
+   },
+   {
       "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
       "translation": "分配角色:{{.Role}}在组织{{.TargetOrg}}或空间{{.TargetSpace}}中分配权限给用户{{.TargetUser}} (作为用户{{.CurrentUser}}) ...",
       "modified": false
@@ -2090,6 +2095,11 @@
       "modified": false
    },
    {
+      "id": "Error accessing org {{.OrgName}} for GUID': ",
+      "translation": "Error accessing org {{.OrgName}} for GUID': ",
+      "modified": false
+   },
+   {
       "id": "Error building request",
       "translation": "生成请求错误",
       "modified": false
@@ -2417,6 +2427,11 @@
    {
       "id": "FEATURE FLAGS",
       "translation": "FEATURE FLAGS",
+      "modified": false
+   },
+   {
+      "id": "Failed assigning org role to user: ",
+      "translation": "Failed assigning org role to user: ",
       "modified": false
    },
    {
@@ -4565,6 +4580,11 @@
       "modified": false
    },
    {
+      "id": "Skip assigning org role to user",
+      "translation": "Skip assigning org role to user",
+      "modified": false
+   },
+   {
       "id": "Skip host key validation",
       "translation": "Skip host key validation",
       "modified": false
@@ -5217,6 +5237,11 @@
    {
       "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
       "translation": "警告: 检测到不安全的HTTP APT终端，建议使用HTTP安全版 API终端\n",
+      "modified": false
+   },
+   {
+      "id": "Warning: accessing feature flag 'set_roles_by_username'",
+      "translation": "Warning: accessing feature flag 'set_roles_by_username'",
       "modified": false
    },
    {
