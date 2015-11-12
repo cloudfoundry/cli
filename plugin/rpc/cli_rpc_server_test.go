@@ -124,21 +124,31 @@ var _ = Describe("Server", func() {
 			time.Sleep(50 * time.Millisecond)
 		})
 
-		It("returns true if cli version is >= to required version", func() {
-			cf.Version = "2.0.0"
+		It("returns true if cli version is greater than the required version", func() {
+			cf.Version = "1.2.3+abc123"
 
 			var result bool
-			err = client.Call("CliRpcCmd.IsMinCliVersion", "1.0.0", &result)
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "1.2.2", &result)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(result).To(BeTrue())
 		})
 
-		It("returns true if cli version is >= to required version", func() {
-			cf.Version = "2.0.0"
+		It("returns true if cli version is equal to the required version", func() {
+			cf.Version = "1.2.3+abc123"
 
 			var result bool
-			err = client.Call("CliRpcCmd.IsMinCliVersion", "2.0.6", &result)
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "1.2.3", &result)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(result).To(BeTrue())
+		})
+
+		It("returns false if cli version is less than the required version", func() {
+			cf.Version = "1.2.3+abc123"
+
+			var result bool
+			err = client.Call("CliRpcCmd.IsMinCliVersion", "1.2.4", &result)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(result).To(BeFalse())

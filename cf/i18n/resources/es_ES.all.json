@@ -1450,11 +1450,6 @@
       "modified": false
    },
    {
-      "id": "Could not parse version number: {{.Input}}",
-      "translation": "No se pudo parsear el numero de version: {{.Input}}",
-      "modified": false
-   },
-   {
       "id": "Could not serialize information",
       "translation": "No se pudo serializar la información",
       "modified": false

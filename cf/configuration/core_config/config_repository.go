@@ -4,9 +4,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/utils"
 )
 
 type ConfigRepository struct {
@@ -304,15 +304,21 @@ func (c *ConfigRepository) IsSSLDisabled() (isSSLDisabled bool) {
 	return
 }
 
-func (c *ConfigRepository) IsMinApiVersion(v string) bool {
+func (c *ConfigRepository) IsMinApiVersion(version string) bool {
 	var apiVersion string
 	c.read(func() {
 		apiVersion = c.data.ApiVersion
 	})
 
-	requiredVersion := utils.NewVersion(v)
-	cliVersion := utils.NewVersion(apiVersion)
-	return cliVersion.GreaterThanOrEqual(requiredVersion)
+	requiredVersion, err := semver.Make(version)
+	if err != nil {
+		return false
+	}
+	actualVersion, err := semver.Make(apiVersion)
+	if err != nil {
+		return false
+	}
+	return actualVersion.GTE(requiredVersion)
 }
 
 func (c *ConfigRepository) IsMinCliVersion(version string) bool {
@@ -327,11 +333,15 @@ func (c *ConfigRepository) IsMinCliVersion(version string) bool {
 		return true
 	}
 
-	minCliVersion = strings.Split(minCliVersion, "-")[0]
-	requiredVersion := utils.NewVersion(version)
-	cliVersion := utils.NewVersion(minCliVersion)
-
-	return requiredVersion.GreaterThanOrEqual(cliVersion)
+	actualVersion, err := semver.Make(version)
+	if err != nil {
+		return false
+	}
+	requiredVersion, err := semver.Make(minCliVersion)
+	if err != nil {
+		return false
+	}
+	return actualVersion.GTE(requiredVersion)
 }
 
 func (c *ConfigRepository) MinCliVersion() (minCliVersion string) {

@@ -1,14 +1,16 @@
 package strategy
 
+import "github.com/blang/semver"
+
 type EndpointStrategy struct {
 	EventsEndpointStrategy
 	DomainsEndpointStrategy
 }
 
 func NewEndpointStrategy(versionString string) EndpointStrategy {
-	version, err := ParseVersion(versionString)
+	version, err := semver.Make(versionString)
 	if err != nil {
-		version = Version{0, 0, 0}
+		version, _ = semver.Make("0.0.0")
 	}
 
 	strategy := EndpointStrategy{
@@ -16,7 +18,8 @@ func NewEndpointStrategy(versionString string) EndpointStrategy {
 		DomainsEndpointStrategy: domainsEndpointStrategy{},
 	}
 
-	if version.GreaterThanOrEqualTo(Version{2, 1, 0}) {
+	v210, _ := semver.Make("2.1.0")
+	if version.GTE(v210) {
 		strategy.EventsEndpointStrategy = globalEventsEndpointStrategy{}
 		strategy.DomainsEndpointStrategy = separatedDomainsEndpointStrategy{}
 	}

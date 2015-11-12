@@ -6,6 +6,11 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/blang/semver",
+			"Comment": "v3.0.1",
+			"Rev": "31b736133b98f26d5e078ec9eb591666edfd091f"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry-incubator/cli-plugin-repo/models",
 			"Rev": "6663a3e55747f83c5b5e855d75c845632cc3d59f"
 		},
