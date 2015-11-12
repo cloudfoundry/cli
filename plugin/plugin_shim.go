@@ -40,5 +40,5 @@ func MinCliVersionStr(version VersionType) string {
 		return ""
 	}
 
-	return strconv.FormatInt(int64(version.Major), 10) + "." + strconv.FormatInt(int64(version.Minor), 10) + "." + strconv.FormatInt(int64(version.Build), 10)
+	return strconv.Itoa(version.Major) + "." + strconv.Itoa(version.Minor) + "." + strconv.Itoa(version.Build)
 }
