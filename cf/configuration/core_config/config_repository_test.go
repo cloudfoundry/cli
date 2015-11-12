@@ -1,53 +1,64 @@
 package core_config_test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
 
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
 
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	fakeconfig "github.com/cloudfoundry/cli/cf/configuration/fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Configuration Repository", func() {
-	var config core_config.Repository
+	var (
+		config    core_config.Repository
+		persistor *fakeconfig.FakePersistor
+	)
 
 	BeforeEach(func() {
-		config = core_config.NewRepositoryFromPersistor(testconfig.NewFakePersistor(), func(err error) { panic(err) })
+		persistor = &fakeconfig.FakePersistor{}
+		persistor.ExistsReturns(true)
+		config = core_config.NewRepositoryFromPersistor(persistor, func(err error) { panic(err) })
 	})
 
-	It("is safe for concurrent reading and writing", func() {
-		swapValLoop := func(config core_config.Repository) {
-			for {
-				val := config.ApiEndpoint()
+	It("is threadsafe", func() {
+		performSaveCh := make(chan struct{})
+		beginSaveCh := make(chan struct{})
+		finishSaveCh := make(chan struct{})
+		finishReadCh := make(chan struct{})
 
-				switch val {
-				case "foo":
-					config.SetApiEndpoint("bar")
-				case "bar":
-					config.SetApiEndpoint("foo")
-				default:
-					panic(fmt.Sprintf("WAT: %s", val))
-				}
-			}
+		persistor.SaveStub = func(configuration.DataInterface) error {
+			close(beginSaveCh)
+			<-performSaveCh
+			close(finishSaveCh)
+
+			return nil
 		}
 
-		config.SetApiEndpoint("foo")
+		go func() {
+			config.SetApiEndpoint("foo")
+		}()
 
-		go swapValLoop(config)
-		go swapValLoop(config)
-		go swapValLoop(config)
-		go swapValLoop(config)
+		<-beginSaveCh
 
-		time.Sleep(10 * time.Millisecond)
+		go func() {
+			config.ApiEndpoint()
+			close(finishReadCh)
+		}()
+
+		Consistently(finishSaveCh).ShouldNot(BeClosed())
+		Consistently(finishReadCh).ShouldNot(BeClosed())
+
+		performSaveCh <- struct{}{}
+
+		Eventually(finishReadCh).Should(BeClosed())
 	})
 
 	It("has acccessor methods for all config fields", func() {
