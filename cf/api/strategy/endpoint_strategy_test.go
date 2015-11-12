@@ -11,7 +11,7 @@ var _ = Describe("EndpointStrategy", func() {
 	var strategy EndpointStrategy
 
 	Describe("events", func() {
-		Context("when the veresion string can't be parsed", func() {
+		Context("when the version string can't be parsed", func() {
 			BeforeEach(func() {
 				strategy = NewEndpointStrategy("")
 			})

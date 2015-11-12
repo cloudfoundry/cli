@@ -2,7 +2,7 @@ $APP_CONST_FILE = $(split-path $MyInvocation.MyCommand.Definition) + "\..\cf\app
 $APP_CONST_FILE_TMP = $APP_CONST_FILE + ".tmp"
 $CURRENT_SHA = $(git rev-parse --short HEAD)
 $CURRENT_VERSION = get-content VERSION
-$VERSION_STRING = $CURRENT_VERSION + "-" + $CURRENT_SHA
+$VERSION_STRING = $CURRENT_VERSION + "+" + $CURRENT_SHA
 $DATE = Get-Date -uformat "%Y-%m-%dT%H:%M:%S+00:00"
 
 get-content $APP_CONST_FILE | %{$_ -replace "BUILT_FROM_SOURCE", $VERSION_STRING} | Out-File -Encoding "UTF8" $APP_CONST_FILE_TMP

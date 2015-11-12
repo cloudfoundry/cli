@@ -3,6 +3,7 @@ package rpc
 import (
 	"os"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -10,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
-	"github.com/cloudfoundry/cli/utils"
 
 	"fmt"
 	"net"
@@ -96,11 +96,20 @@ func (cli *CliRpcService) Start() error {
 func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
 	if cf.Version == "BUILT_FROM_SOURCE" {
 		*retVal = true
-	} else {
-		curVersion := utils.NewVersion(cf.Version)
-		requiredVersion := utils.NewVersion(version)
-		*retVal = curVersion.GreaterThanOrEqual(requiredVersion)
+		return nil
 	}
+
+	actualVersion, err := semver.Make(cf.Version)
+	if err != nil {
+		return err
+	}
+
+	requiredVersion, err := semver.Make(version)
+	if err != nil {
+		return err
+	}
+
+	*retVal = actualVersion.GTE(requiredVersion)
 
 	return nil
 }

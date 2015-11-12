@@ -1450,11 +1450,6 @@
       "modified": false
    },
    {
-      "id": "Could not parse version number: {{.Input}}",
-      "translation": "无法解析版本号: {{.Input}}",
-      "modified": false
-   },
-   {
       "id": "Could not serialize information",
       "translation": "无法序列化信息",
       "modified": false
