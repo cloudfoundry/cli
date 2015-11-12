@@ -12,6 +12,7 @@ import (
 	"github.com/simonleung8/flags"
 )
 
+//go:generate counterfeiter -o ../../../testhelpers/commands/fake_org_role_setter.go . OrgRoleSetter
 type OrgRoleSetter interface {
 	command_registry.Command
 	SetOrgRole(orgGuid string, role, userGuid, userName string) error
