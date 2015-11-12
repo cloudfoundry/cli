@@ -11,6 +11,7 @@ const (
 	dirPermissions  = 0700
 )
 
+//go:generate counterfeiter -o fakes/fake_persistor.go . Persistor
 type Persistor interface {
 	Delete()
 	Exists() bool
