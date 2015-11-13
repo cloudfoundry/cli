@@ -47,12 +47,24 @@ var _ = Describe("Testing with ginkgo", func() {
 		return testcmd.RunCliCommand("create-shared-domain", args, requirementsFactory, updateCommandDependency, false)
 	}
 
+	expectBasicRequirements := func() {
+		Expect(requirementsFactory.NewLoginRequirementCallCount()).To(Equal(1))
+		Expect(requirementsFactory.NewRoutingAPIRequirementCallCount()).To(Equal(0))
+	}
+
+	expectRequirementsWithRoutingGroupFlag := func() {
+		Expect(requirementsFactory.NewLoginRequirementCallCount()).To(Equal(1))
+		Expect(requirementsFactory.NewRoutingAPIRequirementCallCount()).To(Equal(1))
+	}
+
 	It("TestShareDomainRequirements", func() {
 		Expect(runCommand("example.com")).To(BeTrue())
+		expectBasicRequirements()
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 
 		Expect(runCommand("example.com")).To(BeFalse())
+		expectBasicRequirements()
 	})
 
 	It("TestShareDomainFailsWithUsage", func() {
@@ -78,81 +90,108 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	Context("when the cli is passed -r", func() {
-		Context("when the router group exists", func() {
-			var (
-				routerGroupGuid string
-				routerGroupName string
-				routerGroupType string
-			)
+
+		var (
+			routerGroupGuid string
+			routerGroupName string
+			routerGroupType string
+		)
+
+		BeforeEach(func() {
+			routerGroupGuid = "router-group-guid"
+			routerGroupName = "router-group-name"
+			routerGroupType = "tcp"
+		})
+
+		Context("when Routing Api endpoint is defined", func() {
 
 			BeforeEach(func() {
-				routerGroupGuid = "router-group-guid"
-				routerGroupName = "router-group-name"
-				routerGroupType = "tcp"
-				routerGroups := models.RouterGroups{
-					models.RouterGroup{
-						Name: routerGroupName,
-						Guid: routerGroupGuid,
-						Type: routerGroupType,
-					},
-				}
+				requirementsFactory.RoutingAPIEndpointSuccess = true
+			})
 
-				routingApiRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) (apiErr error) {
-					for _, r := range routerGroups {
-						if !cb(r) {
-							break
-						}
+			Context("when the router group exists", func() {
+				BeforeEach(func() {
+					routerGroups := models.RouterGroups{
+						models.RouterGroup{
+							Name: routerGroupName,
+							Guid: routerGroupGuid,
+							Type: routerGroupType,
+						},
 					}
-					return nil
-				}
+
+					routingApiRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) (apiErr error) {
+						for _, r := range routerGroups {
+							if !cb(r) {
+								break
+							}
+						}
+						return nil
+					}
+				})
+
+				It("creates the domain", func() {
+					Expect(runCommand("example.com", "-r", routerGroupName)).To(BeTrue())
+					expectRequirementsWithRoutingGroupFlag()
+
+					Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(1))
+
+					Expect(domainRepo.CreateSharedDomainName).To(Equal("example.com"))
+					Expect(domainRepo.CreateSharedDomainRouterGroupGuid).To(Equal(routerGroupGuid))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating shared domain", "example.com", "my-user"},
+						[]string{"OK"},
+					))
+				})
 			})
 
-			It("creates the domain", func() {
-				runCommand("example.com", "-r", routerGroupName)
+			Context("when the router group does not exist", func() {
+				It("fails with not found message", func() {
+					Expect(runCommand("example.com", "-r", "does-not-exist")).To(BeTrue())
 
-				Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(1))
+					Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(1))
 
-				Expect(domainRepo.CreateSharedDomainName).To(Equal("example.com"))
-				Expect(domainRepo.CreateSharedDomainRouterGroupGuid).To(Equal(routerGroupGuid))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Creating shared domain", "example.com", "my-user"},
-					[]string{"OK"},
-				))
+					// Expect it does not call CC
+					Expect(domainRepo.CreateSharedDomainName).To(Equal(""))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"not found"},
+					))
+				})
+			})
+
+			Context("when an apiErr is received from ListRouterGroups", func() {
+				BeforeEach(func() {
+					routingApiRepo.ListRouterGroupsReturns(errors.New("BOOM"))
+				})
+
+				It("fails with the api err message", func() {
+					runCommand("example.com", "-r", "does-not-exist")
+
+					Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(1))
+
+					// Expect it does not call CC
+					Expect(domainRepo.CreateSharedDomainName).To(Equal(""))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"BOOM"},
+					))
+				})
 			})
 		})
 
-		Context("when the router group does not exist", func() {
-			It("fails with not found message", func() {
-				runCommand("example.com", "-r", "does-not-exist")
-
-				Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(1))
-
-				// Expect it does not call CC
-				Expect(domainRepo.CreateSharedDomainName).To(Equal(""))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"not found"},
-				))
-			})
-		})
-
-		Context("when an apiErr is received from ListRouterGroups", func() {
+		Context("when Routing Api endpoint is not defined", func() {
 			BeforeEach(func() {
-				routingApiRepo.ListRouterGroupsReturns(errors.New("BOOM"))
+				requirementsFactory.RoutingAPIEndpointSuccess = false
 			})
 
-			It("fails with the api err message", func() {
-				runCommand("example.com", "-r", "does-not-exist")
+			It("does not call the command", func() {
+				Expect(runCommand("example.com", "-r", routerGroupName)).To(BeFalse())
+				expectRequirementsWithRoutingGroupFlag()
 
-				Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(1))
-
-				// Expect it does not call CC
+				Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(0))
 				Expect(domainRepo.CreateSharedDomainName).To(Equal(""))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"BOOM"},
-				))
 			})
+
 		})
 	})
 })
