@@ -117,13 +117,13 @@ var _ = Describe("UnsetSpaceRole", func() {
 					configRepo.SetApiVersion("2.37.0")
 				})
 
-				It("requests the set_roles_by_username flag", func() {
+				It("requests the unset_roles_by_username flag", func() {
 					cmd.Requirements(factory, flagContext)
 					Expect(flagRepo.FindByNameCallCount()).To(Equal(1))
-					Expect(flagRepo.FindByNameArgsForCall(0)).To(Equal("set_roles_by_username"))
+					Expect(flagRepo.FindByNameArgsForCall(0)).To(Equal("unset_roles_by_username"))
 				})
 
-				Context("when the set_roles_by_username flag exists and is enabled", func() {
+				Context("when the unset_roles_by_username flag exists and is enabled", func() {
 					BeforeEach(func() {
 						flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: true}, nil)
 					})
@@ -140,7 +140,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 					})
 				})
 
-				Context("when the set_roles_by_username flag exists and is disabled", func() {
+				Context("when the unset_roles_by_username flag exists and is disabled", func() {
 					BeforeEach(func() {
 						flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: false}, nil)
 					})
@@ -157,7 +157,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 					})
 				})
 
-				Context("when the set_roles_by_username flag cannot be retrieved", func() {
+				Context("when the unset_roles_by_username flag cannot be retrieved", func() {
 					BeforeEach(func() {
 						flagRepo.FindByNameReturns(models.FeatureFlag{}, errors.New("some error"))
 					})

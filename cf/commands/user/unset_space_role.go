@@ -46,8 +46,8 @@ func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory
 
 	var wantGuid bool
 	if cmd.config.IsMinApiVersion("2.37.0") {
-		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
-		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+		unsetRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
+		wantGuid = (err != nil || !unsetRolesByUsernameFlag.Enabled)
 	} else {
 		wantGuid = true
 	}
