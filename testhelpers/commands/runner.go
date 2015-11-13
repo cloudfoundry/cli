@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -19,6 +20,9 @@ const (
 )
 
 func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (passedRequirements bool) {
+	if cf.Version == "" {
+		cf.Version = "6.13.0+abc123"
+	}
 	updateFunc(pluginCall)
 	cmd := command_registry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
@@ -55,6 +59,9 @@ func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.F
 }
 
 func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
+	if cf.Version == "" {
+		cf.Version = "6.13.0+abc123"
+	}
 	cmd := command_registry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
 	context.SkipFlagParsing(cmd.MetaData().SkipFlagParsing)
@@ -90,6 +97,9 @@ func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsF
 }
 
 func RunCommandMoreBetter(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (result RunCommandResult) {
+	if cf.Version == "" {
+		cf.Version = "6.13.0+abc123"
+	}
 	updateFunc(pluginCall)
 	cmd := command_registry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
