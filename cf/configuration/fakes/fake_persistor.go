@@ -14,7 +14,7 @@ type FakePersistor struct {
 	ExistsStub        func() bool
 	existsMutex       sync.RWMutex
 	existsArgsForCall []struct{}
-	existsReturns struct {
+	existsReturns     struct {
 		result1 bool
 	}
 	LoadStub        func(configuration.DataInterface) error

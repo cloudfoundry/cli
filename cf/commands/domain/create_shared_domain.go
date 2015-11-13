@@ -43,6 +43,10 @@ func (cmd *CreateSharedDomain) Requirements(requirementsFactory requirements.Fac
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
+	// Routing API endpoint only needed when specifying a router group
+	if fc.IsSet("r") {
+		reqs = append(reqs, requirementsFactory.NewRoutingAPIRequirement())
+	}
 	return
 }
 

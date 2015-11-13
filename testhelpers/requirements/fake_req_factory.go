@@ -3,6 +3,7 @@ package requirements
 import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"sync"
 )
 
 type FakeReqFactory struct {
@@ -49,6 +50,12 @@ type FakeReqFactory struct {
 	MinCCApiVersionMajor       int
 	MinCCApiVersionMinor       int
 	MinCCApiVersionPatch       int
+
+	newLoginRequirementMutex       sync.RWMutex
+	newLoginRequirementArgsForCall []struct{}
+
+	newRoutingAPIRequirementMutex       sync.RWMutex
+	newRoutingAPIRequirementArgsForCall []struct{}
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -62,11 +69,30 @@ func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements
 }
 
 func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
+	f.newLoginRequirementMutex.Lock()
+	f.newLoginRequirementArgsForCall = append(f.newLoginRequirementArgsForCall, struct{}{})
+	f.newLoginRequirementMutex.Unlock()
+
 	return FakeRequirement{f, f.LoginSuccess}
 }
 
+func (f *FakeReqFactory) NewLoginRequirementCallCount() int {
+	f.newLoginRequirementMutex.RLock()
+	defer f.newLoginRequirementMutex.RUnlock()
+	return len(f.newLoginRequirementArgsForCall)
+}
+
 func (f *FakeReqFactory) NewRoutingAPIRequirement() requirements.Requirement {
+	f.newRoutingAPIRequirementMutex.Lock()
+	f.newRoutingAPIRequirementArgsForCall = append(f.newRoutingAPIRequirementArgsForCall, struct{}{})
+	f.newRoutingAPIRequirementMutex.Unlock()
 	return FakeRequirement{f, f.RoutingAPIEndpointSuccess}
+}
+
+func (f *FakeReqFactory) NewRoutingAPIRequirementCallCount() int {
+	f.newRoutingAPIRequirementMutex.RLock()
+	defer f.newRoutingAPIRequirementMutex.RUnlock()
+	return len(f.newRoutingAPIRequirementArgsForCall)
 }
 
 func (f *FakeReqFactory) NewTargetedSpaceRequirement() requirements.Requirement {
