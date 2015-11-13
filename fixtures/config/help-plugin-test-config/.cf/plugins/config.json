@@ -10,8 +10,9 @@
     "Test2":{
       "Location":"../../fixtures/plugins/test_2.exe",
       "Commands":[
-        {"Name":"test2_cmd1","HelpText":"help text for test2 cmd1"},
-        {"Name":"test2_cmd2","HelpText":"help text for test2 cmd2"}
+        {"Name":"test2_cmd1","Alias":"tc1","HelpText":"help text for test2 cmd1"},
+        {"Name":"test2_cmd2","HelpText":"help text for test2 cmd2"},
+        {"Name":"test2_really_long_command_name","HelpText":"help text for test2 long command name"}
       ]
     }
   }

@@ -65,7 +65,22 @@ var _ = Describe("Help", func() {
 			help.ShowHelp(dummyTemplate)
 		})
 
-		Expect(commandInOutput("test1_cmd1, test1_cmd1_alias", output)).To(BeTrue(), "plugin command alias: test1_cmd1_alias not in help")
+
+	It("does not show command's alias in help for installed plugin", func() {
+		config_helpers.PluginRepoDir = func() string {
+			return filepath.Join("..", "..", "fixtures", "config", "help-plugin-test-config")
+		}
+
+		dummyTemplate := `
+{{range .Commands}}{{range .CommandSubGroups}}{{range .}}
+{{.Name}}%%%{{.Description}}
+{{end}}{{end}}{{end}}
+`
+		output := io_helpers.CaptureOutput(func() {
+			help.ShowHelp(dummyTemplate)
+		})
+
+		Expect(commandInOutput("test1_cmd1_alias", output)).To(BeFalse(), "plugin command alias: test1_cmd1_alias should not be in help")
 	})
 
 })
