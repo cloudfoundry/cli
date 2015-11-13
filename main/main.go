@@ -38,7 +38,7 @@ func main() {
 
 	//handle `cf -v` for cf version
 	if len(os.Args) == 2 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
-		deps.Ui.Say(os.Args[0] + " version " + cf.Version + "-" + cf.BuiltOnDate)
+		deps.Ui.Say(os.Args[0] + " version " + cf.Version + "." + cf.BuiltOnDate)
 		os.Exit(0)
 	}
 

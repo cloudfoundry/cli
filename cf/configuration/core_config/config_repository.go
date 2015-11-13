@@ -322,9 +322,6 @@ func (c *ConfigRepository) IsMinApiVersion(version string) bool {
 }
 
 func (c *ConfigRepository) IsMinCliVersion(version string) bool {
-	if version == "BUILT_FROM_SOURCE" {
-		return true
-	}
 	var minCliVersion string
 	c.read(func() {
 		minCliVersion = c.data.MinCliVersion

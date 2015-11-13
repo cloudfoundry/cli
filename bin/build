@@ -15,5 +15,10 @@ ln -s $ROOT_DIR $CLI_GOPATH/src/github.com/cloudfoundry/cli
 
 GODEP_GOPATH=$ROOT_DIR/Godeps/_workspace
 
-GOPATH=$CLI_GOPATH:$GODEP_GOPATH:$GOPATH go build -o $ROOT_DIR/out/cf ./main
+sha=`git rev-parse --short HEAD`
+version=`cat ${ROOT_DIR}/VERSION`
+date=`date -u +"%Y%m%dT%H%M"`
+ldflags="-X github.com/cloudfoundry/cli/cf.Version=${version}+${sha} -X github.com/cloudfoundry/cli/cf.BuiltOnDate=${date}"
+
+GOPATH=$CLI_GOPATH:$GODEP_GOPATH:$GOPATH go build -ldflags "${ldflags}" -o $ROOT_DIR/out/cf ./main
 rm -rf $CLI_GOPATH
