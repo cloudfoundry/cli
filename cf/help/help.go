@@ -54,7 +54,13 @@ func showAppHelp(helpTemplate string) {
 }
 
 func newAppPresenter() (presenter appPresenter) {
+	pluginConfig := plugin_config.NewPluginConfig(func(err error) {
+		//fail silently when running help
+	})
+	plugins := pluginConfig.Plugins()
+
 	maxNameLen := command_registry.Commands.MaxCommandNameLength()
+	maxNameLen = maxPluginCommandNameLength(plugins, maxNameLen)
 
 	presentNonCodegangstaCommand := func(commandName string) (presenter cmdPresenter) {
 		cmd := command_registry.Commands.FindCommand(commandName)
@@ -66,11 +72,6 @@ func newAppPresenter() (presenter appPresenter) {
 	}
 
 	presentPluginCommands := func() []cmdPresenter {
-		pluginConfig := plugin_config.NewPluginConfig(func(err error) {
-			//fail silently when running help?
-		})
-
-		plugins := pluginConfig.Plugins()
 		var presenters []cmdPresenter
 		var pluginPresenter cmdPresenter
 
@@ -406,4 +407,16 @@ func (p appPresenter) Title(name string) string {
 
 func (c groupedCommands) SubTitle(name string) string {
 	return terminal.HeaderColor(name + ":")
+}
+
+func maxPluginCommandNameLength(plugins map[string]plugin_config.PluginMetadata, maxNameLen int) int {
+	for _, pluginMetadata := range plugins {
+		for _, cmd := range pluginMetadata.Commands {
+			if nameLen := utf8.RuneCountInString(cmd.Name); nameLen > maxNameLen {
+				maxNameLen = nameLen
+			}
+		}
+	}
+
+	return maxNameLen
 }

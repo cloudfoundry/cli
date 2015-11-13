@@ -48,23 +48,35 @@ var _ = Describe("Help", func() {
 		Expect(commandInOutput("test1_cmd2", output)).To(BeTrue(), "plugin command: test1_cmd2 not in help")
 		Expect(commandInOutput("test2_cmd1", output)).To(BeTrue(), "plugin command: test2_cmd1 not in help")
 		Expect(commandInOutput("test2_cmd2", output)).To(BeTrue(), "plugin command: test2_cmd2 not in help")
-
+		Expect(commandInOutput("test2_really_long_really_long_really_long_command_name", output)).To(BeTrue(), "plugin command: test2_really_long_command_name not in help")
 	})
 
-	It("shows command's alias in help for installed plugin", func() {
+	It("adjusts the output format to the longest length of plugin command name", func() {
 		config_helpers.PluginRepoDir = func() string {
 			return filepath.Join("..", "..", "fixtures", "config", "help-plugin-test-config")
 		}
 
 		dummyTemplate := `
 {{range .Commands}}{{range .CommandSubGroups}}{{range .}}
-{{.Name}}
+{{.Name}}%%%{{.Description}}
 {{end}}{{end}}{{end}}
 `
 		output := io_helpers.CaptureOutput(func() {
 			help.ShowHelp(dummyTemplate)
 		})
 
+		cmdNameLen := len(strings.Split(output[2], "%%%")[0])
+
+		for _, line := range output {
+			if strings.TrimSpace(line) == "" {
+				continue
+			}
+
+			expectedLen := len(strings.Split(line, "%%%")[0])
+			Ω(cmdNameLen).To(Equal(expectedLen))
+		}
+
+	})
 
 	It("does not show command's alias in help for installed plugin", func() {
 		config_helpers.PluginRepoDir = func() string {
@@ -73,7 +85,7 @@ var _ = Describe("Help", func() {
 
 		dummyTemplate := `
 {{range .Commands}}{{range .CommandSubGroups}}{{range .}}
-{{.Name}}%%%{{.Description}}
+{{.Name}}
 {{end}}{{end}}{{end}}
 `
 		output := io_helpers.CaptureOutput(func() {
