@@ -94,11 +94,6 @@ func (cli *CliRpcService) Start() error {
 }
 
 func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
-	if cf.Version == "BUILT_FROM_SOURCE" {
-		*retVal = true
-		return nil
-	}
-
 	actualVersion, err := semver.Make(cf.Version)
 	if err != nil {
 		return err
