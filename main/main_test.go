@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/gexec"
 )
 
 var _ = Describe("main", func() {
@@ -127,12 +127,12 @@ var _ = Describe("main", func() {
 			result := Cf("some-command-that-should-never-actually-be-a-real-thing-i-can-use")
 
 			Eventually(result, 3*time.Second).Should(Say("not a registered command"))
-			Eventually(result).Should(gexec.Exit(1))
+			Eventually(result).Should(Exit(1))
 		})
 
 		It("exits non-zero when known command is invoked with invalid option", func() {
 			result := Cf("push", "--crazy")
-			Eventually(result).Should(gexec.Exit(1))
+			Eventually(result).Should(Exit(1))
 		})
 	})
 
@@ -216,29 +216,28 @@ var _ = Describe("main", func() {
 
 		It("exits 1 when a plugin panics", func() {
 			session := Cf("panic").Wait(5 * time.Second)
-			Eventually(session).Should(gexec.Exit(1))
+			Eventually(session).Should(Exit(1))
 		})
 
 		It("exits 1 when a plugin exits 1", func() {
 			session := Cf("exit1").Wait(5 * time.Second)
-			Eventually(session).Should(gexec.Exit(1))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 
 })
 
-func Cf(args ...string) *gexec.Session {
-	path, err := gexec.Build("github.com/cloudfoundry/cli/main", "-ldflags", "-X github.com/cloudfoundry/cli/cf.Version=6.13.0+abc123")
+func Cf(args ...string) *Session {
+	path, err := Build("github.com/cloudfoundry/cli/main")
 	Expect(err).NotTo(HaveOccurred())
 
-	session, err := gexec.Start(exec.Command(path, args...), GinkgoWriter, GinkgoWriter)
+	session, err := Start(exec.Command(path, args...), GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 
 	return session
 }
-
-func CfWithIo(command string, args string) *gexec.Session {
-	path, err := gexec.Build("github.com/cloudfoundry/cli/main", "-ldflags", "-X github.com/cloudfoundry/cli/cf.Version=6.13.0+abc123")
+func CfWithIo(command string, args string) *Session {
+	path, err := Build("github.com/cloudfoundry/cli/main")
 	Expect(err).NotTo(HaveOccurred())
 
 	cmd := exec.Command(path, command)
@@ -250,19 +249,18 @@ func CfWithIo(command string, args string) *gexec.Session {
 	buffer.WriteString(args)
 	buffer.Flush()
 
-	session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 
 	return session
 }
-
-func CfWith_CF_HOME(cfHome string, args ...string) *gexec.Session {
-	path, err := gexec.Build("github.com/cloudfoundry/cli/main", "-ldflags", "-X github.com/cloudfoundry/cli/cf.Version=6.13.0+abc123")
+func CfWith_CF_HOME(cfHome string, args ...string) *Session {
+	path, err := Build("github.com/cloudfoundry/cli/main")
 	Expect(err).NotTo(HaveOccurred())
 
 	cmd := exec.Command(path, args...)
 	cmd.Env = append(cmd.Env, "CF_HOME="+cfHome)
-	session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 
 	return session
@@ -270,5 +268,5 @@ func CfWith_CF_HOME(cfHome string, args ...string) *gexec.Session {
 
 // gexec.Build leaves a compiled binary behind in /tmp.
 var _ = AfterSuite(func() {
-	gexec.CleanupBuildArtifacts()
+	CleanupBuildArtifacts()
 })
