@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	Version     = "BUILT_FROM_SOURCE"
-	BuiltOnDate = "BUILT_AT_UNKNOWN_TIME"
+	Version     string
+	BuiltOnDate string
 )
 
 func Name() string {

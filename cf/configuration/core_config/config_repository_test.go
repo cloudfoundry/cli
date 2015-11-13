@@ -249,10 +249,6 @@ var _ = Describe("Configuration Repository", func() {
 	})
 
 	Describe("IsMinCLIVersion", func() {
-		It("returns true when the actual version is BUILT_FROM_SOURCE", func() {
-			Expect(config.IsMinCliVersion("BUILT_FROM_SOURCE")).To(BeTrue())
-		})
-
 		It("returns true when the MinCliVersion is empty", func() {
 			config.SetMinCliVersion("")
 			Expect(config.IsMinCliVersion("1.2.3")).To(BeTrue())

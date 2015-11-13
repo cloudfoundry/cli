@@ -153,16 +153,6 @@ var _ = Describe("Server", func() {
 
 			Expect(result).To(BeFalse())
 		})
-
-		It("returns true if cli version is 'BUILT_FROM_SOURCE'", func() {
-			cf.Version = "BUILT_FROM_SOURCE"
-
-			var result bool
-			err = client.Call("CliRpcCmd.IsMinCliVersion", "12.0.6", &result)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(result).To(BeTrue())
-		})
 	})
 
 	Describe(".SetPluginMetadata", func() {
