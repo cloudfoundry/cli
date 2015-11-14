@@ -306,23 +306,46 @@ var _ = Describe("DomainRepository", func() {
 				config.SetApiVersion("2.2.0")
 			})
 
-			It("uses the shared domains endpoint", func() {
-				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-						Method:  "POST",
-						Path:    "/v2/shared_domains",
-						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
-						Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+			Context("when router_group_guid is the empty string", func() {
+				It("uses the shared domains endpoint", func() {
+					setupTestServer(
+						testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+							Method:  "POST",
+							Path:    "/v2/shared_domains",
+							Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
+							Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 						{
 							"metadata": { "guid": "abc-123" },
 							"entity": { "name": "example.com" }
 						}`}}),
-				)
+					)
 
-				apiErr := repo.CreateSharedDomain("example.com")
+					apiErr := repo.CreateSharedDomain("example.com", "")
 
-				Expect(handler).To(HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(HaveOccurred())
+					Expect(handler).To(HaveAllRequestsCalled())
+					Expect(apiErr).NotTo(HaveOccurred())
+				})
+			})
+
+			Context("when router_group_guid is not the empty string", func() {
+				It("creates a shared domain with a router_group_guid", func() {
+					setupTestServer(
+						testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+							Method:  "POST",
+							Path:    "/v2/shared_domains",
+							Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "router_group_guid": "tcp-group", "wildcard": true}`),
+							Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+						{
+							"metadata": { "guid": "abc-123" },
+							"entity": { "name": "example.com", "router_group_guid":"tcp-group" }
+						}`}}),
+					)
+
+					apiErr := repo.CreateSharedDomain("example.com", "tcp-group")
+
+					Expect(handler).To(HaveAllRequestsCalled())
+					Expect(apiErr).NotTo(HaveOccurred())
+				})
 			})
 		})
 
@@ -341,7 +364,7 @@ var _ = Describe("DomainRepository", func() {
 					}),
 				)
 
-				apiErr := repo.CreateSharedDomain("example.com")
+				apiErr := repo.CreateSharedDomain("example.com", "")
 
 				Expect(handler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
