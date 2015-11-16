@@ -66,7 +66,7 @@ var _ = Describe("Panic Printer", func() {
 		)
 
 		It("returns crash dialog text", func() {
-			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(ContainSubstring(`
+			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(MatchRegexp(`
 	Please re-run the command that caused this exception with the environment
 	variable CF_TRACE set to true.
 
@@ -81,7 +81,7 @@ var _ = Describe("Panic Printer", func() {
 		command arg1 arg2
 
 		CLI Version
-		BUILT_FROM_SOURCE
+		.*
 
 		Error
 		the-error-message
