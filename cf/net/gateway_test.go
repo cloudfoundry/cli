@@ -24,10 +24,12 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Gateway", func() {
 	var (
+		ccServer    *ghttp.Server
 		ccGateway   Gateway
 		uaaGateway  Gateway
 		config      core_config.ReadWriter
@@ -133,6 +135,58 @@ var _ = Describe("Gateway", func() {
 
 			It("Uses a ProgressReader as the SeekableBody", func() {
 				Expect(reflect.TypeOf(request.SeekableBody).String()).To(ContainSubstring("ProgressReader"))
+			})
+
+		})
+
+	})
+
+	Describe("PerformRequestForJSONResponse()", func() {
+		BeforeEach(func() {
+			ccServer = ghttp.NewServer()
+			config.SetApiEndpoint(ccServer.URL())
+		})
+
+		AfterEach(func() {
+			ccServer.Close()
+		})
+
+		Context("When CC response with an api error", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/some-endpoint"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusUnauthorized, `{
+  "code": 10003,
+  "description": "You are not authorized to perform the requested action",
+  "error_code": "CF-NotAuthorized"
+}`),
+					),
+				)
+			})
+
+			It("tries to unmarshal error response into provided resource", func() {
+				type apiErrResponse struct {
+					Code        int    `json:"code,omitempty"`
+					Description string `json:"description,omitempty"`
+				}
+
+				errResponse := new(apiErrResponse)
+				request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/some-endpoint", config.AccessToken(), nil)
+				_, apiErr := ccGateway.PerformRequestForJSONResponse(request, errResponse)
+
+				Ω(apiErr).To(HaveOccurred())
+				Ω(errResponse.Code).To(Equal(10003))
+			})
+
+			It("ignores any unmarshal error and does not alter the api err response", func() {
+				request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/some-endpoint", config.AccessToken(), nil)
+				_, apiErr := ccGateway.PerformRequestForJSONResponse(request, nil)
+
+				Ω(apiErr.Error()).To(Equal("Server error, status code: 401, error code: 10003, message: You are not authorized to perform the requested action"))
 			})
 
 		})
