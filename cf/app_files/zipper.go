@@ -87,8 +87,8 @@ func (zipper ApplicationZipper) Unzip(appDir string, destDir string) (err error)
 
 	for _, f := range r.File {
 		func() {
-			// Don't try to extract directories
 			if f.FileInfo().IsDir() {
+				os.MkdirAll(filepath.Join(destDir, f.Name), os.ModeDir|os.ModePerm)
 				return
 			}
 
