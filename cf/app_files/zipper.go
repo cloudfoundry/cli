@@ -78,45 +78,50 @@ func writeZipFile(dir string, targetFile *os.File) error {
 	})
 }
 
-func (zipper ApplicationZipper) Unzip(appDir string, destDir string) (err error) {
+func (zipper ApplicationZipper) Unzip(appDir string, destDir string) error {
 	r, err := zip.OpenReader(appDir)
 	if err != nil {
-		return
+		return err
 	}
 	defer r.Close()
 
 	for _, f := range r.File {
-		func() {
+		// anonymous func allows the defer of rc.Close()
+		err = func() error {
 			if f.FileInfo().IsDir() {
 				os.MkdirAll(filepath.Join(destDir, f.Name), os.ModeDir|os.ModePerm)
-				return
+				return nil
 			}
 
 			var rc io.ReadCloser
 			rc, err = f.Open()
 			if err != nil {
-				return
+				return err
 			}
 
-			// functional scope from above is important
-			// otherwise this only closes the last file handle
 			defer rc.Close()
 
 			destFilePath := filepath.Join(destDir, f.Name)
 
 			err = fileutils.CopyReaderToPath(rc, destFilePath)
 			if err != nil {
-				return
+				return err
 			}
 
 			err = os.Chmod(destFilePath, f.FileInfo().Mode())
 			if err != nil {
-				return
+				return err
 			}
+
+			return nil
 		}()
+
+		if err != nil {
+			return err
+		}
 	}
 
-	return
+	return nil
 }
 
 func (zipper ApplicationZipper) GetZipSize(zipFile *os.File) (int64, error) {
