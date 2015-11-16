@@ -2,6 +2,7 @@ package actors
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -47,51 +48,35 @@ func (actor PushActorImpl) PopulateFileMode(appDir string, presentFiles []resour
 }
 
 func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
-	var processAppDir = func(source string) ([]resources.AppFileResource, bool, error) {
-		files, hasFileToUpload, err := actor.copyUploadableFiles(source, uploadDir)
-		if err != nil {
-			return []resources.AppFileResource{}, false, err
-		}
-
-		files, err = actor.PopulateFileMode(source, files)
-		if err != nil {
-			return []resources.AppFileResource{}, false, err
-		}
-
-		return files, hasFileToUpload, nil
-	}
-
-	var (
-		processAppDirErr error
-		presentFiles     []resources.AppFileResource
-		hasFileToUpload  bool
-	)
-
+	var finalDir string
 	if actor.zipper.IsZipFile(appDir) {
-		var handleZipErr error
-		fileutils.TempDir("unzipped-app", func(tmpDir string, err error) {
-			if err != nil {
-				handleZipErr = err
-				return
-			}
-
-			err = actor.zipper.Unzip(appDir, tmpDir)
-			if err != nil {
-				handleZipErr = err
-				return
-			}
-
-			presentFiles, hasFileToUpload, processAppDirErr = processAppDir(tmpDir)
-		})
-
-		if handleZipErr != nil {
-			return []resources.AppFileResource{}, false, handleZipErr
+		tmpDir, err := ioutil.TempDir("", "unzipped-app")
+		if err != nil {
+			return []resources.AppFileResource{}, false, err
 		}
+		defer os.RemoveAll(tmpDir)
+
+		err = actor.zipper.Unzip(appDir, tmpDir)
+		if err != nil {
+			return []resources.AppFileResource{}, false, err
+		}
+
+		finalDir = tmpDir
 	} else {
-		presentFiles, hasFileToUpload, processAppDirErr = processAppDir(appDir)
+		finalDir = appDir
 	}
 
-	return presentFiles, hasFileToUpload, processAppDirErr
+	files, hasFileToUpload, err := actor.copyUploadableFiles(finalDir, uploadDir)
+	if err != nil {
+		return []resources.AppFileResource{}, false, err
+	}
+
+	filesWithFileMode, err := actor.PopulateFileMode(finalDir, files)
+	if err != nil {
+		return []resources.AppFileResource{}, false, err
+	}
+
+	return filesWithFileMode, hasFileToUpload, nil
 }
 
 func (actor PushActorImpl) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
