@@ -3,20 +3,87 @@ package app_files_test
 import (
 	"archive/zip"
 	"bytes"
-	. "github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/gofileutils/fileutils"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/gofileutils/fileutils"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func readFile(file *os.File) []byte {
 	bytes, err := ioutil.ReadAll(file)
 	Expect(err).NotTo(HaveOccurred())
 	return bytes
+}
+
+// Thanks to Svett Ralchev
+// http://blog.ralch.com/tutorial/golang-working-with-zip/
+func zipit(source, target string) error {
+	zipfile, err := os.Create(target)
+	if err != nil {
+		return err
+	}
+	defer zipfile.Close()
+
+	archive := zip.NewWriter(zipfile)
+	defer archive.Close()
+
+	info, err := os.Stat(source)
+	if err != nil {
+		return nil
+	}
+
+	var baseDir string
+	if info.IsDir() {
+		baseDir = filepath.Base(source)
+	}
+
+	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		if baseDir != "" {
+			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
+		}
+
+		if info.IsDir() {
+			header.Name += string(os.PathSeparator)
+		} else {
+			header.Method = zip.Deflate
+		}
+
+		writer, err := archive.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		_, err = io.Copy(writer, file)
+		return err
+	})
+
+	return err
 }
 
 var _ = Describe("Zipper", func() {
@@ -118,28 +185,60 @@ var _ = Describe("Zipper", func() {
 	})
 
 	Describe(".Unzip", func() {
-		It("extracts the zip file", func() {
-			filez := []string{
-				"example-app/.cfignore",
-				"example-app/app.rb",
-				"example-app/config.ru",
-				"example-app/Gemfile",
-				"example-app/Gemfile.lock",
-				"example-app/ignore-me",
-				"example-app/manifest.yml",
-			}
+		Context("when the zipfile has an empty directory", func() {
+			var (
+				inDir, outDir, destDir string
+				zipper                 ApplicationZipper
+			)
 
-			dir, err := os.Getwd()
-			Expect(err).NotTo(HaveOccurred())
-			fileutils.TempDir("unzipped_app", func(tmpDir string, err error) {
-				zipper := ApplicationZipper{}
-
-				fixture := filepath.Join(dir, "../../fixtures/applications/example-app.zip")
-				err = zipper.Unzip(fixture, tmpDir)
+			BeforeEach(func() {
+				var err error
+				inDir, err = ioutil.TempDir("", "zipper-unzip-in")
 				Expect(err).NotTo(HaveOccurred())
-				for _, file := range filez {
-					_, err := os.Stat(filepath.Join(tmpDir, file))
-					Expect(os.IsNotExist(err)).To(BeFalse())
+
+				err = ioutil.WriteFile(path.Join(inDir, "file1"), []byte("file-1-contents"), 0664)
+				Expect(err).NotTo(HaveOccurred())
+
+				err = os.MkdirAll(path.Join(inDir, "dir1"), os.ModeDir|os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+
+				err = ioutil.WriteFile(path.Join(inDir, "dir1", "file2"), []byte("file-2-contents"), 0644)
+				Expect(err).NotTo(HaveOccurred())
+
+				err = os.MkdirAll(path.Join(inDir, "dir2"), os.ModeDir|os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+
+				outDir, err = ioutil.TempDir("", "zipper-unzip-out")
+				Expect(err).NotTo(HaveOccurred())
+
+				err = zipit(inDir, path.Join(outDir, "out.zip"))
+				Expect(err).NotTo(HaveOccurred())
+
+				destDir, err = ioutil.TempDir("", "dest-dir")
+				Expect(err).NotTo(HaveOccurred())
+
+				zipper = ApplicationZipper{}
+			})
+
+			AfterEach(func() {
+				os.RemoveAll(inDir)
+				os.RemoveAll(outDir)
+			})
+
+			It("includes all entries from the zip file in the destination", func() {
+				err := zipper.Unzip(path.Join(outDir, "out.zip"), destDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				expected := []string{
+					"file1",
+					"dir1/",
+					"dir1/file2",
+					"dir2",
+				}
+
+				for _, f := range expected {
+					_, err := os.Stat(filepath.Join(destDir, path.Base(inDir), f))
+					Expect(err).NotTo(HaveOccurred())
 				}
 			})
 		})
@@ -167,4 +266,5 @@ var _ = Describe("Zipper", func() {
 			Expect(sizeErr).To(HaveOccurred())
 		})
 	})
+
 })
