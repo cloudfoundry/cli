@@ -4355,6 +4355,11 @@
       "modified": false
    },
    {
+      "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
+      "translation": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
+      "modified": false
+   },
+   {
       "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
       "translation": "Erreur, code: 403, code de l'erreur: 10003, méssage: Vous n'êtes pas autorisé pour effectuer l'action demandée",
       "modified": true

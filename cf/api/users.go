@@ -30,6 +30,12 @@ var spaceRoleToPathMap = map[string]string{
 	models.SPACE_AUDITOR:   "auditors",
 }
 
+type apiErrResponse struct {
+	Code        int    `json:"code,omitempty"`
+	ErrorCode   string `json:"error_code,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
 //go:generate counterfeiter -o fakes/fake_user_repo.go . UserRepository
 type UserRepository interface {
 	FindByUsername(username string) (user models.UserFields, apiErr error)
@@ -284,7 +290,7 @@ func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, 
 	if err != nil {
 		return err
 	}
-	return repo.assocUserWithOrgByUsername(username, orgGuid)
+	return repo.assocUserWithOrgByUsername(username, orgGuid, nil)
 }
 
 func (repo CloudControllerUserRepository) callApi(verb, path string, body io.ReadSeeker) (err error) {
@@ -330,12 +336,22 @@ func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, space
 		return
 	}
 
-	apiErr = repo.assocUserWithOrgByUsername(username, orgGuid)
-	if apiErr != nil {
+	setOrgRoleErr := apiErrResponse{}
+	apiErr = repo.assocUserWithOrgByUsername(username, orgGuid, &setOrgRoleErr)
+	if setOrgRoleErr.Code == 10003 {
+		//operator lacking the privilege to set org role
+		//user might already be in org, so ignoring error and attempt to set space role
+	} else if apiErr != nil {
 		return
 	}
 
-	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), rolePath, usernamePayload(username))
+	setSpaceRoleErr := apiErrResponse{}
+	apiErr = repo.ccGateway.UpdateResourceSync(repo.config.ApiEndpoint(), rolePath, usernamePayload(username), &setSpaceRoleErr)
+	if setSpaceRoleErr.Code == 1002 {
+		return errors.New(T("Server error, error code: 1002, message: cannot set space role because user is not part of the org"))
+	}
+
+	return apiErr
 }
 
 func (repo CloudControllerUserRepository) UnsetSpaceRoleByGuid(userGuid, spaceGuid, role string) error {
@@ -361,9 +377,9 @@ func (repo CloudControllerUserRepository) checkSpaceRole(spaceGuid, role string)
 	return apiPath, apiErr
 }
 
-func (repo CloudControllerUserRepository) assocUserWithOrgByUsername(username, orgGuid string) (apiErr error) {
+func (repo CloudControllerUserRepository) assocUserWithOrgByUsername(username, orgGuid string, resource interface{}) (apiErr error) {
 	path := fmt.Sprintf("/v2/organizations/%s/users", orgGuid)
-	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), path, usernamePayload(username))
+	return repo.ccGateway.UpdateResourceSync(repo.config.ApiEndpoint(), path, usernamePayload(username), resource)
 }
 
 func (repo CloudControllerUserRepository) assocUserWithOrgByUserGuid(userGuid, orgGuid string) (apiErr error) {

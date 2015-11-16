@@ -1264,123 +1264,185 @@ var _ = Describe("UserRepository", func() {
 	})
 
 	Describe("SetSpaceRoleByUsername", func() {
-		Context("when given the SpaceManager role", func() {
-			BeforeEach(func() {
-				ccServer.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusOK, nil),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/managers"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusOK, nil),
-					),
-				)
-			})
+		Context("when operator does not have privilege to add user role to org", func() {
+			Context("and user is already part of the parent org", func() {
+				BeforeEach(func() {
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusUnauthorized, `{
+  "code": 10003,
+  "description": "You are not authorized to perform the requested action",
+  "error_code": "CF-NotAuthorized"
+}`),
+						),
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/managers"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusOK, nil),
+						),
+					)
+				})
 
-			It("makes two requests to CC", func() {
-				err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_MANAGER)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
-			})
-		})
+				It("sets space role and ignores the '10003' error for adding user to parent org", func() {
+					err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_MANAGER)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+				})
 
-		Context("when given the SpaceDeveloper role", func() {
-			BeforeEach(func() {
-				ccServer.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusOK, nil),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/developers"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusOK, nil),
-					),
-				)
-			})
+				Context("when setting space role returns an error", func() {
+					It("wraps '1002' error from set space role with friendly custom message", func() {
+						ccServer.SetHandler(1, ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/managers"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusBadRequest, `{"code":1002, "description":"invalid relation"}`),
+						))
 
-			It("makes two requests to CC", func() {
-				err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_DEVELOPER)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
-			})
-		})
+						err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_MANAGER)
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(ContainSubstring("1002"))
+						Expect(err.Error()).To(ContainSubstring("cannot set space role because user is not part of the org"))
+						Expect(err.Error()).ToNot(ContainSubstring("invalid relation"))
+						Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+					})
 
-		Context("when given the SpaceAuditor role", func() {
-			BeforeEach(func() {
-				ccServer.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusOK, nil),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/auditors"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusOK, nil),
-					),
-				)
-			})
+					It("returns any non '1002' error from set space role", func() {
+						ccServer.SetHandler(1, ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/managers"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusBadRequest, `{"code":1001, "description":"some error"}`),
+						))
 
-			It("makes two requests to CC", func() {
-				err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_AUDITOR)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+						err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_MANAGER)
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(ContainSubstring("1001"))
+						Expect(err.Error()).To(ContainSubstring("some error"))
+						Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+					})
+				})
 			})
 		})
 
-		Context("when given an invalid role", func() {
-			It("returns an error", func() {
-				err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", "Wibble")
-				Expect(err).To(HaveOccurred())
-				Expect(ccServer.ReceivedRequests()).To(BeZero())
-			})
-		})
+		Context("when operator does have privilege to add user role to parent org", func() {
+			Context("when given the SpaceManager role", func() {
+				BeforeEach(func() {
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusOK, nil),
+						),
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/managers"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusOK, nil),
+						),
+					)
+				})
 
-		Context("when assigning the user to the org fails", func() {
-			BeforeEach(func() {
-				ccServer.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusInternalServerError, nil),
-					),
-				)
-			})
-
-			It("returns an error", func() {
-				err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_AUDITOR)
-				Expect(err).To(HaveOccurred())
-				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
-				Expect(err.Error()).To(ContainSubstring("status code: 500"))
-			})
-		})
-
-		Context("when assigning the given role to the user fails", func() {
-			BeforeEach(func() {
-				ccServer.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusOK, nil),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/auditors"),
-						ghttp.VerifyJSON(`{"username":"user@example.com"}`),
-						ghttp.RespondWith(http.StatusInternalServerError, nil),
-					),
-				)
+				It("makes two requests to CC", func() {
+					err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_MANAGER)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+				})
 			})
 
-			It("returns an error", func() {
-				err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_AUDITOR)
-				Expect(err).To(HaveOccurred())
-				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
-				Expect(err.Error()).To(ContainSubstring("status code: 500"))
+			Context("when given the SpaceDeveloper role", func() {
+				BeforeEach(func() {
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusOK, nil),
+						),
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/developers"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusOK, nil),
+						),
+					)
+				})
+
+				It("makes two requests to CC", func() {
+					err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_DEVELOPER)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+				})
+			})
+
+			Context("when given the SpaceAuditor role", func() {
+				BeforeEach(func() {
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusOK, nil),
+						),
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/auditors"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusOK, nil),
+						),
+					)
+				})
+
+				It("makes two requests to CC", func() {
+					err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_AUDITOR)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+				})
+			})
+
+			Context("when given an invalid role", func() {
+				It("returns an error", func() {
+					err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", "Wibble")
+					Expect(err).To(HaveOccurred())
+					Expect(ccServer.ReceivedRequests()).To(BeZero())
+				})
+			})
+
+			Context("when assigning the user to the org fails with non '10003' error", func() {
+				BeforeEach(func() {
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusInternalServerError, nil),
+						),
+					)
+				})
+
+				It("returns an error", func() {
+					err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_AUDITOR)
+					Expect(err).To(HaveOccurred())
+					Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+					Expect(err.Error()).To(ContainSubstring("status code: 500"))
+				})
+			})
+
+			Context("when assigning the given role to the user fails", func() {
+				BeforeEach(func() {
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/organizations/org-guid/users"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusOK, nil),
+						),
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("PUT", "/v2/spaces/space-guid/auditors"),
+							ghttp.VerifyJSON(`{"username":"user@example.com"}`),
+							ghttp.RespondWith(http.StatusInternalServerError, nil),
+						),
+					)
+				})
+
+				It("returns an error", func() {
+					err := client.SetSpaceRoleByUsername("user@example.com", "space-guid", "org-guid", models.SPACE_AUDITOR)
+					Expect(err).To(HaveOccurred())
+					Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+					Expect(err.Error()).To(ContainSubstring("status code: 500"))
+				})
 			})
 		})
 	})
