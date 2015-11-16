@@ -267,6 +267,10 @@ func (gateway Gateway) PerformRequestForTextResponse(request *Request) (response
 func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response interface{}) (headers http.Header, apiErr error) {
 	bytes, headers, rawResponse, apiErr := gateway.performRequestForResponseBytes(request)
 	if apiErr != nil {
+		if rawResponse != nil && rawResponse.Body != nil {
+			b, _ := ioutil.ReadAll(rawResponse.Body)
+			json.Unmarshal(b, &response)
+		}
 		return
 	}
 
