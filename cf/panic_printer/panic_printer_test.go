@@ -1,7 +1,6 @@
 package panic_printer_test
 
 import (
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/panic_printer"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -60,32 +59,42 @@ var _ = Describe("Panic Printer", func() {
 	})
 
 	Describe("CrashDialog", func() {
-		var errMsg = "this is an error"
-		var commandArgs = "command line arguments"
-		var stackTrace = "1000 bottles of beer"
+		var (
+			errMsg      = "the-error-message"
+			commandArgs = "command arg1 arg2"
+			stackTrace  = "the-stack-trace"
+		)
 
-		It("should return a string containing the default error text", func() {
-			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(ContainSubstring("Please file this bug : https://github.com/cloudfoundry/cli/issues"))
-		})
+		It("returns crash dialog text", func() {
+			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(ContainSubstring(`
+	Please re-run the command that caused this exception with the environment
+	variable CF_TRACE set to true.
 
-		It("should return the command name", func() {
-			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(ContainSubstring(cf.Name()))
-		})
+	Also, please update to the latest cli and try the command again:
+	https://github.com/cloudfoundry/cli/releases
 
-		It("should return the inputted arguments", func() {
-			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(ContainSubstring("command line arguments"))
-		})
+	Please create an issue at: https://github.com/cloudfoundry/cli/issues
 
-		It("should return the specific error message", func() {
-			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(ContainSubstring("this is an error"))
-		})
+	Include the below information when creating the issue:
 
-		It("should return the stack trace", func() {
-			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(ContainSubstring("1000 bottles of beer"))
-		})
+		Command
+		command arg1 arg2
 
-		It("should print the cli version", func() {
-			Expect(panic_printer.CrashDialog(errMsg, commandArgs, stackTrace)).To(ContainSubstring(cf.Version))
+		CLI Version
+		BUILT_FROM_SOURCE
+
+		Error
+		the-error-message
+
+		Stack Trace
+		the-stack-trace
+
+		Your Platform Details
+		e.g. Mac OS X 10.11, Windows 8.1 64-bit, Ubuntu 14.04.3 64-bit
+
+		Shell
+		e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator
+`))
 		})
 	})
 })

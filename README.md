@@ -80,6 +80,22 @@ Linux
 Filing Bugs
 ===========
 
+First, update to the [latest cli](https://github.com/cloudfoundry/cli/releases)
+and try the command again.
+
+If the error remains, run the command that exposes the bug with the environment
+variable CF_TRACE set to true and [create an
+issue](https://github.com/cloudfoundry/cli/issues).
+
+Include the below information when creating the issue:
+
+* The error that occurred
+* The stack trace (if applicable)
+* The command you ran (e.g. `cf org-users`)
+* The CLI Version (e.g. 6.13.0-dfba612)
+* Your platform details (e.g. Mac OS X 10.11, Windows 8.1 64-bit, Ubuntu 14.04.3 64-bit)
+* The shell you used (e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator)
+
 ##### For simple bugs (eg: text formatting, help messages, etc), please provide
 
 - the command you ran

@@ -31,26 +31,35 @@ func DisplayCrashDialog(err interface{}, commandArgs string, stackTrace string) 
 
 func CrashDialog(errorMessage string, commandArgs string, stackTrace string) string {
 	formattedString := `
+	Something unexpected happened. This is a bug in %s.
 
-	Aww shucks.
+	Please re-run the command that caused this exception with the environment
+	variable CF_TRACE set to true.
 
-	Something completely unexpected happened. This is a bug in %s.
-	Please file this bug : https://github.com/cloudfoundry/cli/issues
-	Tell us that you ran this command:
+	Also, please update to the latest cli and try the command again:
+	https://github.com/cloudfoundry/cli/releases
 
+	Please create an issue at: https://github.com/cloudfoundry/cli/issues
+
+	Include the below information when creating the issue:
+
+		Command
 		%s
 
-	using this version of the CLI:
-
+		CLI Version
 		%s
 
-	and that this error occurred:
-
+		Error
 		%s
 
-	and this stack trace:
+		Stack Trace
+		%s
 
-	%s
+		Your Platform Details
+		e.g. Mac OS X 10.11, Windows 8.1 64-bit, Ubuntu 14.04.3 64-bit
+
+		Shell
+		e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator
 `
 
 	return fmt.Sprintf(formattedString, cf.Name(), commandArgs, cf.Version, errorMessage, stackTrace)
