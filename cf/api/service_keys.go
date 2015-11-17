@@ -47,12 +47,15 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid strin
 
 	err = c.gateway.CreateResource(c.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 
-	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SERVICE_KEY_NAME_TAKEN {
-		return errors.NewModelAlreadyExistsError("Service key", keyName)
-	} else if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.UNBINDABLE_SERVICE {
-		return errors.NewUnbindableServiceError()
-	} else if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() != "" {
-		return errors.New(httpErr.Error())
+	if httpErr, ok := err.(errors.HttpError); ok {
+		switch httpErr.ErrorCode() {
+		case errors.SERVICE_KEY_NAME_TAKEN:
+			return errors.NewModelAlreadyExistsError("Service key", keyName)
+		case errors.UNBINDABLE_SERVICE:
+			return errors.NewUnbindableServiceError()
+		default:
+			return errors.New(httpErr.Error())
+		}
 	}
 
 	return nil
