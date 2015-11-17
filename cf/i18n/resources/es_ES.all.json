@@ -3195,6 +3195,11 @@
       "modified": false
    },
    {
+      "id": "Invalid router group guid: {{.Guid}}",
+      "translation": "Invalid router group guid: {{.Guid}}",
+      "modified": false
+   },
+   {
       "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
       "translation": "Parametro de timeout invalido: {{.Timeout}}\n{{.Err}}",
       "modified": false
@@ -5692,6 +5697,11 @@
    {
       "id": "routes",
       "translation": "rutas",
+      "modified": false
+   },
+   {
+      "id": "routing",
+      "translation": "routing",
       "modified": false
    },
    {

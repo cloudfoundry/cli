@@ -1,8 +1,10 @@
 package requirements
 
 import (
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type FakeReqFactory struct {
@@ -15,6 +17,7 @@ type FakeReqFactory struct {
 	ApplicationFails             bool
 	LoginSuccess                 bool
 	RoutingAPIEndpointSuccess    bool
+	RoutingAPIEndpointPanic      bool
 	ApiEndpointSuccess           bool
 	ValidAccessTokenSuccess      bool
 	TargetedSpaceSuccess         bool
@@ -49,6 +52,8 @@ type FakeReqFactory struct {
 	MinCCApiVersionMajor       int
 	MinCCApiVersionMinor       int
 	MinCCApiVersionPatch       int
+
+	UI terminal.UI
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -66,7 +71,7 @@ func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
 }
 
 func (f *FakeReqFactory) NewRoutingAPIRequirement() requirements.Requirement {
-	return FakeRequirement{f, f.RoutingAPIEndpointSuccess}
+	return FakePanicRequirement{FakeRequirement{f, f.RoutingAPIEndpointSuccess}, f.RoutingAPIEndpointPanic, "Routing API URI missing. Please log in again to set the URI automatically.", f.UI}
 }
 
 func (f *FakeReqFactory) NewTargetedSpaceRequirement() requirements.Requirement {
@@ -119,7 +124,23 @@ type FakeRequirement struct {
 	success bool
 }
 
+type FakePanicRequirement struct {
+	FakeRequirement
+	panicFlag    bool
+	panicMessage string
+	ui           terminal.UI
+}
+
 func (r FakeRequirement) Execute() (success bool) {
+	return r.success
+}
+
+func (r FakePanicRequirement) Execute() (success bool) {
+	if r.panicFlag {
+		r.ui.Say(T("FAILED"))
+		r.ui.Say(T(r.panicMessage))
+		panic("")
+	}
 	return r.success
 }
 
