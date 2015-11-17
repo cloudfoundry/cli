@@ -1,7 +1,6 @@
 package environment_variable_groups
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -86,7 +85,7 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) convertValueToStr
 	if !ok {
 		floatvalue, ok := value.(float64)
 		if !ok {
-			return "", errors.New(fmt.Sprintf("Attempted to read environment variable value of unknown type: %#v", value))
+			return "", fmt.Errorf("Attempted to read environment variable value of unknown type: %#v", value)
 		}
 		stringvalue = fmt.Sprintf("%d", int(floatvalue))
 	}
