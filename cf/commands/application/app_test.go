@@ -245,7 +245,7 @@ var _ = Describe("app Command", func() {
 				[]string{"usage", "256M x 2 instances"},
 				[]string{"urls", "my-app.example.com", "foo.example.com"},
 				[]string{"last uploaded", "Tue Nov 10 15:00:00 UTC 2009"},
-				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
+				[]string{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13B of 64M", "32M of 1G"},
 				[]string{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0", "failure"},
 				[]string{"stack", "fake_stack"},
 			))
