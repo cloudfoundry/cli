@@ -7,9 +7,17 @@ import (
 )
 
 var _ = Describe("formatting bytes to / from strings", func() {
-	It("converts megabytes to a human readable description", func() {
-		Expect(ByteSize(100 * MEGABYTE)).To(Equal("100M"))
-		Expect(ByteSize(int64(100.5 * MEGABYTE))).To(Equal("100.5M"))
+	Describe("ByteSize()", func() {
+		It("converts bytes to a human readable description", func() {
+			Expect(ByteSize(100 * MEGABYTE)).To(Equal("100M"))
+			Expect(ByteSize(100 * GIGABYTE)).To(Equal("100G"))
+			Expect(ByteSize(int64(100.5 * MEGABYTE))).To(Equal("100.5M"))
+			Expect(ByteSize(int64(50))).To(Equal("50B"))
+		})
+
+		It("returns 0 byte as '0' without any unit", func() {
+			Expect(ByteSize(int64(0))).To(Equal("0"))
+		})
 	})
 
 	It("parses byte amounts with short units (e.g. M, G)", func() {

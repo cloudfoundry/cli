@@ -37,6 +37,8 @@ func ByteSize(bytes int64) string {
 		value = value / KILOBYTE
 	case bytes == 0:
 		return "0"
+	case bytes < KILOBYTE:
+		unit = "B"
 	}
 
 	stringValue := fmt.Sprintf("%.1f", value)
