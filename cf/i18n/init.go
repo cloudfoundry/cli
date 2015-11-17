@@ -118,7 +118,7 @@ func loadFromAsset(locale string) error {
 	}
 
 	if len(byteArray) == 0 {
-		return errors.New(fmt.Sprintf("Could not load i18n asset: %v", assetKey))
+		return fmt.Errorf("Could not load i18n asset: %v", assetKey)
 	}
 
 	_, err = os.Stat(os.TempDir())

@@ -1,7 +1,6 @@
 package actors
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/organizations"
@@ -132,7 +131,7 @@ func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName
 		}
 	}
 	if !found {
-		return PlanAccessError, errors.New(fmt.Sprintf("Service plan %s not found", planName))
+		return PlanAccessError, fmt.Errorf("Service plan %s not found", planName)
 	}
 
 	if !servicePlan.Public && setPlanVisibility {
@@ -178,7 +177,7 @@ func (actor ServicePlanHandler) updateSinglePlan(serviceOffering models.ServiceO
 	}
 
 	if planToUpdate == nil {
-		return PlanAccessError, errors.New(fmt.Sprintf("The plan %s could not be found for service %s", planName, serviceOffering.Label))
+		return PlanAccessError, fmt.Errorf("The plan %s could not be found for service %s", planName, serviceOffering.Label)
 	}
 
 	err := actor.updateServicePlanAvailability(serviceOffering.Guid, *planToUpdate, setPlanVisibility)

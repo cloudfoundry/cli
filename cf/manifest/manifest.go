@@ -429,8 +429,8 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]interface{
 func validateEnvVars(input generic.Map) (errs []error) {
 	generic.Each(input, func(key, value interface{}) {
 		if value == nil {
-			errs = append(errs, errors.New(fmt.Sprintf(T("env var '{{.PropertyName}}' should not be null",
-				map[string]interface{}{"PropertyName": key}))))
+			errs = append(errs, fmt.Errorf(T("env var '{{.PropertyName}}' should not be null",
+				map[string]interface{}{"PropertyName": key})))
 		}
 	})
 	return
