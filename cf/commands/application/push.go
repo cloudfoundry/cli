@@ -2,13 +2,13 @@ package application
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/fileutils"
 	"github.com/simonleung8/flags"
 	"github.com/simonleung8/flags/flag"
 
@@ -604,75 +604,59 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (appParams models.
 	return
 }
 
-func (cmd *Push) uploadApp(appGuid string, appDir string) (apiErr error) {
-	fileutils.TempDir("apps", func(uploadDir string, err error) {
-		if err != nil {
-			apiErr = err
-			return
-		}
+func (cmd *Push) uploadApp(appGuid string, appDir string) error {
+	uploadDir, err := ioutil.TempDir("", "apps")
+	defer os.RemoveAll(uploadDir)
 
-		presentFiles, hasFileToUpload, err := cmd.actor.GatherFiles(appDir, uploadDir)
-		if err != nil {
-			apiErr = err
-			return
-		}
-
-		fileutils.TempFile("uploads", func(zipFile *os.File, err error) {
-			if hasFileToUpload {
-				err = cmd.zipAppFiles(zipFile, appDir, uploadDir)
-				if err != nil {
-					apiErr = err
-					return
-				}
-			}
-
-			err = cmd.actor.UploadApp(appGuid, zipFile, presentFiles)
-			if err != nil {
-				apiErr = err
-				return
-			}
-		})
-		return
-	})
-	return
-}
-
-func (cmd *Push) zipAppFiles(zipFile *os.File, appDir string, uploadDir string) (zipErr error) {
-	zipErr = cmd.zipWithBetterErrors(uploadDir, zipFile)
-	if zipErr != nil {
-		return
+	presentFiles, hasFileToUpload, err := cmd.actor.GatherFiles(appDir, uploadDir)
+	if err != nil {
+		return err
 	}
 
-	zipFileSize, zipErr := cmd.zipper.GetZipSize(zipFile)
-	if zipErr != nil {
-		return
+	zipFile, err := ioutil.TempFile("", "uploads")
+	defer func() {
+		zipFile.Close()
+		os.Remove(zipFile.Name())
+	}()
+
+	if hasFileToUpload {
+		err = cmd.zipAppFiles(zipFile, appDir, uploadDir)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = cmd.actor.UploadApp(appGuid, zipFile, presentFiles)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cmd *Push) zipAppFiles(zipFile *os.File, appDir string, uploadDir string) error {
+	err := cmd.zipper.Zip(uploadDir, zipFile)
+	if err != nil {
+		if emptyDirErr, ok := err.(*errors.EmptyDirError); ok {
+			zipFile = nil
+			return emptyDirErr
+		}
+		return fmt.Errorf("%s: %s", T("Error zipping application"), err.Error())
+	}
+
+	zipFileSize, err := cmd.zipper.GetZipSize(zipFile)
+	if err != nil {
+		return err
 	}
 
 	zipFileCount := cmd.app_files.CountFiles(uploadDir)
-
-	cmd.describeUploadOperation(appDir, zipFileSize, zipFileCount)
-	return
-}
-
-func (cmd *Push) zipWithBetterErrors(uploadDir string, zipFile *os.File) error {
-	zipError := cmd.zipper.Zip(uploadDir, zipFile)
-	switch err := zipError.(type) {
-	case nil:
-		return nil
-	case *errors.EmptyDirError:
-		zipFile = nil
-		return zipError
-	default:
-		return fmt.Errorf("%s: %s", T("Error zipping application"), err.Error())
-	}
-}
-
-func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount int64) {
-	if fileCount > 0 {
-		cmd.ui.Say(T("Uploading app files from: {{.Path}}", map[string]interface{}{"Path": path}))
+	if zipFileCount > 0 {
+		cmd.ui.Say(T("Uploading app files from: {{.Path}}", map[string]interface{}{"Path": appDir}))
 		cmd.ui.Say(T("Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
 			map[string]interface{}{
-				"ZipFileBytes": formatters.ByteSize(zipFileBytes),
-				"FileCount":    fileCount}))
+				"ZipFileBytes": formatters.ByteSize(zipFileSize),
+				"FileCount":    zipFileCount}))
 	}
+
+	return nil
 }
