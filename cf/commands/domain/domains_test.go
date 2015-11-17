@@ -39,7 +39,7 @@ var _ = Describe("domains command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		domainRepo = &testapi.FakeDomainRepository{}
 		routingApiRepo = &testapi.FakeRoutingApiRepository{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = &testreq.FakeReqFactory{UI: ui}
 	})
 
 	runCommand := func(args ...string) bool {
@@ -112,6 +112,30 @@ var _ = Describe("domains command", func() {
 						[]string{"Getting domains in org", "my-org", "my-user"},
 						[]string{"FAILED"},
 						[]string{"Invalid router group guid"},
+					))
+				})
+			})
+
+			Context("when a domain has router group guid and the routing api is not configured", func() {
+				BeforeEach(func() {
+					requirementsFactory.RoutingAPIEndpointPanic = true
+
+					domainRepo.ListDomainsForOrgDomains = []models.DomainFields{
+						models.DomainFields{
+							Shared:          true,
+							Name:            "The-shared-domain1",
+							RouterGroupGuid: "valid_guid",
+						},
+					}
+
+				})
+
+				It("fails with error", func() {
+
+					Expect(func() { runCommand() }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Routing API URI missing. Please log in again to set the URI automatically."},
+						[]string{"FAILED"},
 					))
 				})
 			})
