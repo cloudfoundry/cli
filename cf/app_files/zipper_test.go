@@ -35,16 +35,6 @@ func zipit(source, target string) error {
 	archive := zip.NewWriter(zipfile)
 	defer archive.Close()
 
-	info, err := os.Stat(source)
-	if err != nil {
-		return nil
-	}
-
-	var baseDir string
-	if info.IsDir() {
-		baseDir = filepath.Base(source)
-	}
-
 	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -55,9 +45,7 @@ func zipit(source, target string) error {
 			return err
 		}
 
-		if baseDir != "" {
-			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
-		}
+		header.Name = strings.TrimPrefix(path, source)
 
 		if info.IsDir() {
 			header.Name += string(os.PathSeparator)
@@ -187,8 +175,8 @@ var _ = Describe("Zipper", func() {
 	Describe(".Unzip", func() {
 		Context("when the zipfile has an empty directory", func() {
 			var (
-				inDir, outDir, destDir string
-				zipper                 ApplicationZipper
+				inDir, outDir string
+				zipper        ApplicationZipper
 			)
 
 			BeforeEach(func() {
@@ -211,10 +199,7 @@ var _ = Describe("Zipper", func() {
 				outDir, err = ioutil.TempDir("", "zipper-unzip-out")
 				Expect(err).NotTo(HaveOccurred())
 
-				err = zipit(inDir, path.Join(outDir, "out.zip"))
-				Expect(err).NotTo(HaveOccurred())
-
-				destDir, err = ioutil.TempDir("", "dest-dir")
+				err = zipit(path.Join(inDir, "/"), path.Join(outDir, "out.zip"))
 				Expect(err).NotTo(HaveOccurred())
 
 				zipper = ApplicationZipper{}
@@ -226,7 +211,12 @@ var _ = Describe("Zipper", func() {
 			})
 
 			It("includes all entries from the zip file in the destination", func() {
-				err := zipper.Unzip(path.Join(outDir, "out.zip"), destDir)
+				destDir, err := ioutil.TempDir("", "dest-dir")
+				Expect(err).NotTo(HaveOccurred())
+
+				defer os.RemoveAll(destDir)
+
+				err = zipper.Unzip(path.Join(outDir, "out.zip"), destDir)
 				Expect(err).NotTo(HaveOccurred())
 
 				expected := []string{
@@ -237,7 +227,7 @@ var _ = Describe("Zipper", func() {
 				}
 
 				for _, f := range expected {
-					_, err := os.Stat(filepath.Join(destDir, path.Base(inDir), f))
+					_, err := os.Stat(filepath.Join(destDir, f))
 					Expect(err).NotTo(HaveOccurred())
 				}
 			})
