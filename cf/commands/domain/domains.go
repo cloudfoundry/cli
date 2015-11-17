@@ -12,10 +12,11 @@ import (
 )
 
 type ListDomains struct {
-	ui         terminal.UI
-	config     core_config.Reader
-	orgReq     requirements.TargetedOrgRequirement
-	domainRepo api.DomainRepository
+	ui             terminal.UI
+	config         core_config.Reader
+	orgReq         requirements.TargetedOrgRequirement
+	domainRepo     api.DomainRepository
+	routingApiRepo api.RoutingApiRepository
 }
 
 func init() {
@@ -47,6 +48,8 @@ func (cmd *ListDomains) SetDependency(deps command_registry.Dependency, pluginCa
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
+	cmd.routingApiRepo = deps.RepoLocator.GetRoutingApiRepository()
+
 	return cmd
 }
 
@@ -78,11 +81,30 @@ func (cmd *ListDomains) fetchAllDomains(orgGuid string) (domains []models.Domain
 }
 
 func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields) {
-	table := cmd.ui.Table([]string{T("name"), T("status")})
+	table := cmd.ui.Table([]string{T("name"), T("status"), T("routing")})
+
+	var routerGroupsMap map[string]models.RouterGroup
+	var err error
 
 	for _, domain := range domains {
 		if domain.Shared {
-			table.Add(domain.Name, T("shared"))
+			if domain.RouterGroupGuid == "" {
+				table.Add(domain.Name, T("shared"))
+			} else {
+				if routerGroupsMap == nil {
+					routerGroupsMap, err = cmd.initializeRouterGroups()
+					if err != nil {
+						cmd.ui.Failed(T("Failed fetching router groups.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
+					}
+				}
+
+				routerGroup, ok := routerGroupsMap[domain.RouterGroupGuid]
+				if !ok {
+					cmd.ui.Failed(T("Invalid router group guid: {{.Guid}}", map[string]interface{}{"Guid": domain.RouterGroupGuid}))
+				}
+
+				table.Add(domain.Name, T("shared"), routerGroup.Type)
+			}
 		}
 	}
 
@@ -92,4 +114,19 @@ func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields) {
 		}
 	}
 	table.Print()
+}
+
+func (cmd *ListDomains) initializeRouterGroups() (map[string]models.RouterGroup, error) {
+	routerGroupsMap := map[string]models.RouterGroup{}
+	cb := func(routerGroup models.RouterGroup) bool {
+		routerGroupsMap[routerGroup.Guid] = routerGroup
+		return true
+	}
+
+	apiErr := cmd.routingApiRepo.ListRouterGroups(cb)
+	if apiErr != nil {
+		return nil, apiErr
+	}
+
+	return routerGroupsMap, nil
 }
