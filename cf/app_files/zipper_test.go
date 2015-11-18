@@ -25,12 +25,19 @@ func readFile(file *os.File) []byte {
 
 // Thanks to Svett Ralchev
 // http://blog.ralch.com/tutorial/golang-working-with-zip/
-func zipit(source, target string) error {
+func zipit(source, target, prefix string) error {
 	zipfile, err := os.Create(target)
 	if err != nil {
 		return err
 	}
 	defer zipfile.Close()
+
+	if prefix != "" {
+		_, err = io.WriteString(zipfile, prefix)
+		if err != nil {
+			return err
+		}
+	}
 
 	archive := zip.NewWriter(zipfile)
 	defer archive.Close()
@@ -67,6 +74,7 @@ func zipit(source, target string) error {
 			return err
 		}
 		defer file.Close()
+
 		_, err = io.Copy(writer, file)
 		return err
 	})
@@ -172,13 +180,147 @@ var _ = Describe("Zipper", func() {
 		})
 	})
 
-	Describe(".Unzip", func() {
-		Context("when the zipfile has an empty directory", func() {
-			var (
-				inDir, outDir string
-				zipper        ApplicationZipper
-			)
+	Describe("IsZipFile", func() {
+		var (
+			inDir, outDir string
+			zipper        ApplicationZipper
+		)
 
+		AfterEach(func() {
+			os.RemoveAll(inDir)
+			os.RemoveAll(outDir)
+		})
+
+		Context("when given a zip without prefix bytes", func() {
+			BeforeEach(func() {
+				var err error
+				inDir, err = ioutil.TempDir("", "zipper-unzip-in")
+				Expect(err).NotTo(HaveOccurred())
+
+				err = ioutil.WriteFile(path.Join(inDir, "file1"), []byte("file-1-contents"), 0664)
+				Expect(err).NotTo(HaveOccurred())
+
+				outDir, err = ioutil.TempDir("", "zipper-unzip-out")
+				Expect(err).NotTo(HaveOccurred())
+
+				err = zipit(path.Join(inDir, "/"), path.Join(outDir, "out.zip"), "")
+				Expect(err).NotTo(HaveOccurred())
+
+				zipper = ApplicationZipper{}
+			})
+
+			It("returns true", func() {
+				Expect(zipper.IsZipFile(path.Join(outDir, "out.zip"))).To(BeTrue())
+			})
+		})
+
+		Context("when given a zip with prefix bytes", func() {
+			BeforeEach(func() {
+				var err error
+				inDir, err = ioutil.TempDir("", "zipper-unzip-in")
+				Expect(err).NotTo(HaveOccurred())
+
+				err = ioutil.WriteFile(path.Join(inDir, "file1"), []byte("file-1-contents"), 0664)
+				Expect(err).NotTo(HaveOccurred())
+
+				outDir, err = ioutil.TempDir("", "zipper-unzip-out")
+				Expect(err).NotTo(HaveOccurred())
+
+				err = zipit(path.Join(inDir, "/"), path.Join(outDir, "out.zip"), "prefix-bytes")
+				Expect(err).NotTo(HaveOccurred())
+
+				zipper = ApplicationZipper{}
+			})
+
+			It("returns true", func() {
+				Expect(zipper.IsZipFile(path.Join(outDir, "out.zip"))).To(BeTrue())
+			})
+		})
+
+		Context("when given a file that is not a zip", func() {
+			var fileName string
+
+			BeforeEach(func() {
+				f, err := ioutil.TempFile("", "zipper-test")
+				Expect(err).NotTo(HaveOccurred())
+
+				fi, err := f.Stat()
+				Expect(err).NotTo(HaveOccurred())
+				fileName = fi.Name()
+			})
+
+			AfterEach(func() {
+				defer os.RemoveAll(fileName)
+			})
+
+			It("returns false", func() {
+				Expect(zipper.IsZipFile(fileName)).To(BeFalse())
+			})
+		})
+
+		Context("when given a directory", func() {
+			var dirName string
+
+			BeforeEach(func() {
+				var err error
+				dirName, err = ioutil.TempDir("", "zipper-test")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				defer os.RemoveAll(dirName)
+			})
+
+			It("returns false", func() {
+				Expect(zipper.IsZipFile(dirName)).To(BeFalse())
+			})
+		})
+	})
+
+	Describe(".Unzip", func() {
+		var (
+			inDir, outDir string
+			zipper        ApplicationZipper
+		)
+
+		AfterEach(func() {
+			os.RemoveAll(inDir)
+			os.RemoveAll(outDir)
+		})
+
+		Context("when the zipfile has prefix bytes", func() {
+			BeforeEach(func() {
+				var err error
+				inDir, err = ioutil.TempDir("", "zipper-unzip-in")
+				Expect(err).NotTo(HaveOccurred())
+
+				err = ioutil.WriteFile(path.Join(inDir, "file1"), []byte("file-1-contents"), 0664)
+				Expect(err).NotTo(HaveOccurred())
+
+				outDir, err = ioutil.TempDir("", "zipper-unzip-out")
+				Expect(err).NotTo(HaveOccurred())
+
+				err = zipit(path.Join(inDir, "/"), path.Join(outDir, "out.zip"), "prefix-bytes")
+				Expect(err).NotTo(HaveOccurred())
+
+				zipper = ApplicationZipper{}
+			})
+
+			It("successfully extracts the zip", func() {
+				destDir, err := ioutil.TempDir("", "dest-dir")
+				Expect(err).NotTo(HaveOccurred())
+
+				defer os.RemoveAll(destDir)
+
+				err = zipper.Unzip(path.Join(outDir, "out.zip"), destDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = os.Stat(filepath.Join(destDir, "file1"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when the zipfile has an empty directory", func() {
 			BeforeEach(func() {
 				var err error
 				inDir, err = ioutil.TempDir("", "zipper-unzip-in")
@@ -199,15 +341,10 @@ var _ = Describe("Zipper", func() {
 				outDir, err = ioutil.TempDir("", "zipper-unzip-out")
 				Expect(err).NotTo(HaveOccurred())
 
-				err = zipit(path.Join(inDir, "/"), path.Join(outDir, "out.zip"))
+				err = zipit(path.Join(inDir, "/"), path.Join(outDir, "out.zip"), "")
 				Expect(err).NotTo(HaveOccurred())
 
 				zipper = ApplicationZipper{}
-			})
-
-			AfterEach(func() {
-				os.RemoveAll(inDir)
-				os.RemoveAll(outDir)
 			})
 
 			It("includes all entries from the zip file in the destination", func() {
