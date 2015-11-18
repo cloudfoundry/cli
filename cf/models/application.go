@@ -96,6 +96,7 @@ type AppParams struct {
 	StackGuid          *string
 	StackName          *string
 	State              *string
+	PackageUpdatedAt   *time.Time
 }
 
 func (app *AppParams) Merge(other *AppParams) {

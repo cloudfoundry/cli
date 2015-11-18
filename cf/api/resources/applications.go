@@ -2,6 +2,7 @@ package resources
 
 import (
 	"strings"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/models"
 )
@@ -64,6 +65,7 @@ type ApplicationEntity struct {
 	Diego                *bool                   `json:"diego,omitempty"`
 	DockerImage          *string                 `json:"docker_image,omitempty"`
 	EnableSsh            *bool                   `json:"enable_ssh,omitempty"`
+	PackageUpdatedAt     *time.Time              `json:"package_updated_at,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
@@ -102,6 +104,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		DockerImage:        app.DockerImage,
 		Diego:              app.Diego,
 		EnableSsh:          app.EnableSsh,
+		PackageUpdatedAt:   app.PackageUpdatedAt,
 	}
 
 	if app.State != nil {
@@ -168,6 +171,9 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	}
 	if entity.EnableSsh != nil {
 		app.EnableSsh = *entity.EnableSsh
+	}
+	if entity.PackageUpdatedAt != nil {
+		app.PackageUpdatedAt = entity.PackageUpdatedAt
 	}
 
 	return
