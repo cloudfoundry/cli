@@ -1,3 +1,98 @@
+## 6.14.0
+* Bump version to 6.14.0
+* Merge pull request #677 from aminjam/master
+* Don't use errors.New(fmt.Sprintf())
+* Remove fileutils.Tempdir/file from push command
+* Don't repeatedly do the same type assertion
+* Output unit 'B' during push when size is in byte size
+* Fix test of ApplicationZipper Unzip()
+* Add PackageUpdatedAt for cli plugins
+* Fix panic printer test
+* Update ApplicationZipper Unzip()
+* Include empty directories when unzipping archives
+* Remove fileutils usage from GatherFiles
+* Update crash dialog text and README
+* Backfill panic_printer tests
+* ignores 10003 error from attempt to add user to org in command 'set-space-role'
+* Calculate spacing for both core and plugin commands in 'cf' help
+* Do not show plugin command alias in 'cf' help
+* use RuneCountInString() instead of len()
+* Refactor cli_connection
+* Make date reported in --version semver compliant
+* Revert "Remove replace-sha"
+* Revert "Remove outdated homebrew installer"
+* Revert "Fix fallout from 'Remove replace-sha'"
+* Revert "Update date format for windows build"
+* Update date format for windows build
+* Remove outdated homebrew installer
+* Remove replace-sha
+* Remove strconv.FormatInt(int64(version.Major)
+* Replace non-test of config threadsafety with real test
+* Use blang/semver
+* Update config_data_test
+* Update config_repository_test
+* assign org role automatically during org creation
+* refactor set_org_role command into interface
+* Update README.md
+* Update README.md
+* Revert "Remove unnecessary interface arg"
+* Remove terminalUI.Wait()
+* Add warning to application start
+* Revert 29e491d0f399fe459819d4886ce759def5542963
+* Update create-service help text
+* Use bytes.NewReader instead of strings.NewReader
+* UnsetSpaceRole can unset via username
+* Add UnsetSpaceRoleByUsername
+* Remove checkSpaceRoleByGuid
+* Remove orgRolesPath from users api
+* Move api-switching logic into Requirements phase
+* Generate fake req. factory with counterfeiter
+* Add fallback to user requirement
+* Add missing tests for user requirement
+* Gateway's newRequest method doesn't return an error
+* Remove createUpdateOrDeleteResource
+* Remove unnecessary interface arg
+* Remove magic number
+* UnsetSpaceRole -> UnsetSpaceRoleByGuid
+* SetOrgRole -> SetOrgRoleByGuid
+* SetOrgRole uses the required user's username
+* router-groups command requires RoutingAPIEndpoint
+* Generate FakeUserRepository with counterfeiter
+* Rewrite api/users_test
+* UserRepository UnsetOrgRole -> UnsetOrgRoleByGuid
+* UserRepository SetSpaceRole -> SetSpaceRoleByGuid
+* Remove errors.NewWithError
+* Remove errors.NewWithSlice
+* Remove errors.NewWithFmt
+* Clean up main.go a bit
+* rename var '_' to arg
+* provide named argument in test rpc server interface
+* use new endpoint when CC support setting space role by name
+* Refactor users.go
+* Add some error handling to SetOrgRoleByUsername
+* Set org role by username
+* updated mailing list url from vcap google group to cf-dev
+* Document -u flag when go getting go-bindata
+* Update upload-binaries-gocd script
+* Merge pull request #635 from SrinivasChilveri/Issue_New
+* Update upload-binaries-gocd script
+* Update upload-binaries-gocd script
+* Include cli name and version in binary releases
+* Merge pull request #645 from cf-routing/wip-100975070-combined-PR610-PR632
+* Merge pull request #611 from utako/purge_service_instance_102318490
+* Add purge-service-instance command
+* Fix the typo in 'list router-groups' description
+* Fix router-group command error handling
+* Add cf router-groups command
+* Merge pull request #642 from cloudfoundry/multiple-rows-download
+* add file extensions, remove 32 bit entries and add reference for 32 bit releases to releases page
+* Refresh access token to avoid stale token
+* Use -v with i18n4go -c checkup
+* Merge pull request #638 from SrinivasChilveri/Isshe_sshcmd
+* Fix cf ssh with more than required args
+* Fix issues in stacks and stack commands
+* Fix the serviceaccess help
+
 ## 6.13.0
 * Revert "Merge pull request #610 from atulkc/router_group_cli"
 * Populate file mode correctly for zip file [#105471590]
