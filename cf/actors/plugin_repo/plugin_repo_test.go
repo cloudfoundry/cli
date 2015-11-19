@@ -22,9 +22,12 @@ var _ = Describe("PluginRepo", func() {
 		testServer2          *httptest.Server
 	)
 
+	BeforeEach(func() {
+		repoActor = NewPluginRepo()
+	})
+
 	Context("request data from all repos", func() {
 		BeforeEach(func() {
-			repoActor = NewPluginRepo()
 			testServer1CallCount = 0
 			h1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				testServer1CallCount++
