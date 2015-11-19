@@ -9,19 +9,19 @@ type EventsEndpointStrategy interface {
 
 type eventsEndpointStrategy struct{}
 
-func (_ eventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
+func (s eventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
 	return buildURL(v2("apps", appGuid, "events"), params{
 		resultsPerPage: limit,
 	})
 }
 
-func (_ eventsEndpointStrategy) EventsResource() resources.EventResource {
+func (s eventsEndpointStrategy) EventsResource() resources.EventResource {
 	return resources.EventResourceOldV2{}
 }
 
 type globalEventsEndpointStrategy struct{}
 
-func (strategy globalEventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
+func (s globalEventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
 	return buildURL(v2("events"), params{
 		resultsPerPage: limit,
 		orderDirection: "desc",
@@ -29,6 +29,6 @@ func (strategy globalEventsEndpointStrategy) EventsURL(appGuid string, limit int
 	})
 }
 
-func (_ globalEventsEndpointStrategy) EventsResource() resources.EventResource {
+func (s globalEventsEndpointStrategy) EventsResource() resources.EventResource {
 	return resources.EventResourceNewV2{}
 }
