@@ -72,7 +72,6 @@ func (cmd *ShowFeatureFlag) Execute(c flags.FlagContext) {
 func (cmd ShowFeatureFlag) flagBoolToString(enabled bool) string {
 	if enabled {
 		return "enabled"
-	} else {
-		return "disabled"
 	}
+	return "disabled"
 }

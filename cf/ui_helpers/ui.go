@@ -16,9 +16,8 @@ func ColoredAppState(app models.ApplicationFields) string {
 	if app.RunningInstances == 0 {
 		if appState == "stopped" {
 			return appState
-		} else {
-			return terminal.CrashedColor(appState)
 		}
+		return terminal.CrashedColor(appState)
 	}
 
 	if app.RunningInstances < app.InstanceCount {
@@ -38,9 +37,8 @@ func ColoredAppInstances(app models.ApplicationFields) string {
 	if app.RunningInstances == 0 {
 		if strings.ToLower(app.State) == "stopped" {
 			return healthString
-		} else {
-			return terminal.CrashedColor(healthString)
 		}
+		return terminal.CrashedColor(healthString)
 	}
 
 	if app.RunningInstances < app.InstanceCount {

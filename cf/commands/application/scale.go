@@ -152,12 +152,12 @@ func (cmd *Scale) Execute(c flags.FlagContext) {
 func (cmd *Scale) confirmRestart(context flags.FlagContext, appName string) bool {
 	if context.Bool("f") {
 		return true
-	} else {
-		result := cmd.ui.Confirm(T("This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
-			map[string]interface{}{"AppName": terminal.EntityNameColor(appName)}))
-		cmd.ui.Say("")
-		return result
 	}
+
+	result := cmd.ui.Confirm(T("This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
+		map[string]interface{}{"AppName": terminal.EntityNameColor(appName)}))
+	cmd.ui.Say("")
+	return result
 }
 
 func anyFlagsSet(context flags.FlagContext) bool {

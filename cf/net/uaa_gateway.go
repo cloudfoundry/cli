@@ -19,9 +19,9 @@ var uaaErrorHandler = func(statusCode int, body []byte) error {
 
 	if response.Code == "invalid_token" {
 		return errors.NewInvalidTokenError(response.Description)
-	} else {
-		return errors.NewHttpError(statusCode, response.Code, response.Description)
 	}
+
+	return errors.NewHttpError(statusCode, response.Code, response.Description)
 }
 
 func NewUAAGateway(config core_config.Reader, ui terminal.UI) Gateway {

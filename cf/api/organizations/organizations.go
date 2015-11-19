@@ -46,9 +46,8 @@ func (repo CloudControllerOrganizationRepository) ListOrgs() ([]models.Organizat
 			if ok {
 				orgs = append(orgs, orgResource.ToModel())
 				return true
-			} else {
-				return false
 			}
+			return false
 		})
 	return orgs, err
 }
@@ -60,9 +59,8 @@ func (repo CloudControllerOrganizationRepository) GetManyOrgsByGuid(orgGuids []s
 		err = repo.gateway.GetResource(url, &orgResource)
 		if err != nil {
 			return nil, err
-		} else {
-			orgs = append(orgs, orgResource.ToModel())
 		}
+		orgs = append(orgs, orgResource.ToModel())
 	}
 	return
 }

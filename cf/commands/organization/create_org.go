@@ -95,9 +95,9 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 			cmd.ui.Warn(T("Org {{.OrgName}} already exists",
 				map[string]interface{}{"OrgName": name}))
 			return
-		} else {
-			cmd.ui.Failed(err.Error())
 		}
+
+		cmd.ui.Failed(err.Error())
 	}
 
 	cmd.ui.Ok()

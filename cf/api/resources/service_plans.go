@@ -41,9 +41,8 @@ func (resource ServicePlanResource) ToFields() (fields models.ServicePlanFields)
 func (planDesc ServicePlanDescription) String() string {
 	if planDesc.ServiceProvider == "" {
 		return fmt.Sprintf("%s %s", planDesc.ServiceLabel, planDesc.ServicePlanName) // v2 plan
-	} else {
-		return fmt.Sprintf("%s %s %s", planDesc.ServiceLabel, planDesc.ServiceProvider, planDesc.ServicePlanName) // v1 plan
 	}
+	return fmt.Sprintf("%s %s %s", planDesc.ServiceLabel, planDesc.ServiceProvider, planDesc.ServicePlanName) // v1 plan
 }
 
 type ServiceMigrateV1ToV2Response struct {

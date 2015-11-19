@@ -119,7 +119,6 @@ func (repo ManifestDiskRepository) manifestPath(userSpecifiedPath string) (strin
 			}
 		}
 		return "", err
-	} else {
-		return userSpecifiedPath, nil
 	}
+	return userSpecifiedPath, nil
 }

@@ -60,10 +60,10 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpo
 		}
 
 		return finalEndpoint, apiErr
-	} else {
-		apiErr := repo.attemptUpdate(endpoint)
-		return endpoint, apiErr
 	}
+
+	apiErr := repo.attemptUpdate(endpoint)
+	return endpoint, apiErr
 }
 
 func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) error {
@@ -104,9 +104,8 @@ func defaultLoggregatorEndpoint(apiEndpoint string) string {
 	url := fmt.Sprintf("ws%s://loggregator.%s", matches[1], matches[2])
 	if url[0:3] == "wss" {
 		return url + ":443"
-	} else {
-		return url + ":80"
 	}
+	return url + ":80"
 }
 
 var endpointDomainRegex = regexp.MustCompile(`^http(s?)://[^\.]+\.([^:]+)`)

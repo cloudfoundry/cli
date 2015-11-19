@@ -178,12 +178,9 @@ func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
 		table.Print()
 		ui.Say(NotLoggedInText())
 		return
-	} else {
-		table.Add(
-			T("User:"),
-			EntityNameColor(config.UserEmail()),
-		)
 	}
+
+	table.Add(T("User:"), EntityNameColor(config.UserEmail()))
 
 	if !config.HasOrganization() && !config.HasSpace() {
 		table.Print()

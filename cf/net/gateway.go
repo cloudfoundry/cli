@@ -186,11 +186,10 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, endpoint, apiUrl strin
 	if gateway.PollingEnabled && !sync {
 		_, apiErr = gateway.PerformPollingRequestForJSONResponse(endpoint, request, resource, gateway.AsyncTimeout())
 		return
-	} else {
-		_, apiErr = gateway.PerformRequestForJSONResponse(request, resource)
-		return
 	}
 
+	_, apiErr = gateway.PerformRequestForJSONResponse(request, resource)
+	return
 }
 
 func (gateway Gateway) newRequest(request *http.Request, accessToken string, body io.ReadSeeker) *Request {

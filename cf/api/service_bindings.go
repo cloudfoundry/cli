@@ -53,9 +53,9 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance models.Servi
 
 	if path == "" {
 		return
-	} else {
-		found = true
 	}
+
+	found = true
 
 	apiErr = repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 	return
