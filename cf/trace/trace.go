@@ -11,8 +11,6 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
-const CF_TRACE = "CF_TRACE"
-
 type Printer interface {
 	Print(v ...interface{})
 	Printf(format string, v ...interface{})
