@@ -25,16 +25,16 @@ func (binder *FakeAppBinder) BindApplication(app models.Application, service mod
 	return binder.BindApplicationReturns.Error
 }
 
-func (cmd *FakeAppBinder) MetaData() command_registry.CommandMetadata {
+func (binder *FakeAppBinder) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{Name: "bind-service"}
 }
 
-func (cmd *FakeAppBinder) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
-	return cmd
+func (binder *FakeAppBinder) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+	return binder
 }
 
-func (cmd *FakeAppBinder) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (binder *FakeAppBinder) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (cmd *FakeAppBinder) Execute(_ flags.FlagContext) {}
+func (binder *FakeAppBinder) Execute(_ flags.FlagContext) {}
