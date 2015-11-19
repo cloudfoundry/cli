@@ -19,14 +19,13 @@ import (
 
 var _ = Describe("CopyApplicationSource", func() {
 	var (
-		repo        CopyApplicationSourceRepository
-		testServer  *httptest.Server
-		testHandler *testnet.TestHandler
-		configRepo  core_config.ReadWriter
+		repo       CopyApplicationSourceRepository
+		testServer *httptest.Server
+		configRepo core_config.ReadWriter
 	)
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
-		testServer, testHandler = testnet.NewServer(reqs)
+		testServer, _ = testnet.NewServer(reqs)
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 

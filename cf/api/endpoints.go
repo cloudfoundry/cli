@@ -62,7 +62,7 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpo
 		return finalEndpoint, apiErr
 	}
 
-	apiErr := repo.attemptUpdate(endpoint)
+	apiErr = repo.attemptUpdate(endpoint)
 	return endpoint, apiErr
 }
 

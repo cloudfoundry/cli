@@ -52,8 +52,6 @@ var _ = Describe("Install", func() {
 		test_with_help            string
 		test_with_orgs            string
 		test_with_orgs_short_name string
-		test_with_push            string
-		test_with_push_short_name string
 		aliasConflicts            string
 		deps                      command_registry.Dependency
 	)
@@ -85,8 +83,6 @@ var _ = Describe("Install", func() {
 		test_with_help = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_help.exe")
 		test_with_orgs = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_orgs.exe")
 		test_with_orgs_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_orgs_short_name.exe")
-		test_with_push = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push.exe")
-		test_with_push_short_name = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "test_with_push_short_name.exe")
 		aliasConflicts = filepath.Join(dir, "..", "..", "..", "fixtures", "plugins", "alias_conflicts.exe")
 
 		homeDir, err = ioutil.TempDir(os.TempDir(), "plugins")

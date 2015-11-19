@@ -231,10 +231,7 @@ var _ = Describe("SSH command", func() {
 		})
 
 		Describe("Connecting to ssh server", func() {
-			var (
-				testServer *httptest.Server
-				handler    *testnet.TestHandler
-			)
+			var testServer *httptest.Server
 
 			AfterEach(func() {
 				testServer.Close()
@@ -254,7 +251,7 @@ var _ = Describe("SSH command", func() {
 					},
 				})
 
-				testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
+				testServer, _ = testnet.NewServer([]testnet.TestRequest{getRequest})
 				configRepo.SetApiEndpoint(testServer.URL)
 				ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
 				deps.Gateways["cloud-controller"] = ccGateway
