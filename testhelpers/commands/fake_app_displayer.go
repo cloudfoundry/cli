@@ -17,16 +17,16 @@ func (displayer *FakeAppDisplayer) ShowApp(app models.Application, orgName, spac
 	displayer.AppToDisplay = app
 }
 
-func (cmd *FakeAppDisplayer) MetaData() command_registry.CommandMetadata {
+func (displayer *FakeAppDisplayer) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{Name: "app"}
 }
 
-func (cmd *FakeAppDisplayer) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
-	return cmd
+func (displayer *FakeAppDisplayer) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+	return displayer
 }
 
-func (cmd *FakeAppDisplayer) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (displayer *FakeAppDisplayer) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (cmd *FakeAppDisplayer) Execute(_ flags.FlagContext) {}
+func (displayer *FakeAppDisplayer) Execute(_ flags.FlagContext) {}

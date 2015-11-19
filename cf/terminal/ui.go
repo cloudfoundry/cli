@@ -50,18 +50,18 @@ func NewUI(r io.Reader, printer Printer) UI {
 	}
 }
 
-func (c *terminalUI) PrintPaginator(rows []string, err error) {
+func (ui *terminalUI) PrintPaginator(rows []string, err error) {
 	if err != nil {
-		c.Failed(err.Error())
+		ui.Failed(err.Error())
 		return
 	}
 
 	for _, row := range rows {
-		c.Say(row)
+		ui.Say(row)
 	}
 }
 
-func (c *terminalUI) PrintCapturingNoOutput(message string, args ...interface{}) {
+func (ui *terminalUI) PrintCapturingNoOutput(message string, args ...interface{}) {
 	if len(args) == 0 {
 		fmt.Printf("%s", message)
 	} else {
@@ -69,48 +69,48 @@ func (c *terminalUI) PrintCapturingNoOutput(message string, args ...interface{})
 	}
 }
 
-func (c *terminalUI) Say(message string, args ...interface{}) {
+func (ui *terminalUI) Say(message string, args ...interface{}) {
 	if len(args) == 0 {
-		c.printer.Printf("%s\n", message)
+		ui.printer.Printf("%s\n", message)
 	} else {
-		c.printer.Printf(message+"\n", args...)
+		ui.printer.Printf(message+"\n", args...)
 	}
 }
 
-func (c *terminalUI) Warn(message string, args ...interface{}) {
+func (ui *terminalUI) Warn(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
-	c.Say(WarningColor(message))
+	ui.Say(WarningColor(message))
 	return
 }
 
-func (c *terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
-	return c.confirmDelete(T("Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
+func (ui *terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
+	return ui.confirmDelete(T("Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
 		map[string]interface{}{
 			"ModelType": modelType,
 			"ModelName": EntityNameColor(modelName),
 		}))
 }
 
-func (c *terminalUI) ConfirmDelete(modelType, modelName string) bool {
-	return c.confirmDelete(T("Really delete the {{.ModelType}} {{.ModelName}}?",
+func (ui *terminalUI) ConfirmDelete(modelType, modelName string) bool {
+	return ui.confirmDelete(T("Really delete the {{.ModelType}} {{.ModelName}}?",
 		map[string]interface{}{
 			"ModelType": modelType,
 			"ModelName": EntityNameColor(modelName),
 		}))
 }
 
-func (c *terminalUI) confirmDelete(message string) bool {
-	result := c.Confirm(message)
+func (ui *terminalUI) confirmDelete(message string) bool {
+	result := ui.Confirm(message)
 
 	if !result {
-		c.Warn(T("Delete cancelled"))
+		ui.Warn(T("Delete cancelled"))
 	}
 
 	return result
 }
 
-func (c *terminalUI) Confirm(message string, args ...interface{}) bool {
-	response := c.Ask(message, args...)
+func (ui *terminalUI) Confirm(message string, args ...interface{}) bool {
+	response := ui.Ask(message, args...)
 	switch strings.ToLower(response) {
 	case "y", "yes", T("yes"):
 		return true
@@ -118,11 +118,11 @@ func (c *terminalUI) Confirm(message string, args ...interface{}) bool {
 	return false
 }
 
-func (c *terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
+func (ui *terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	fmt.Println("")
 	fmt.Printf(prompt+PromptColor(">")+" ", args...)
 
-	rd := bufio.NewReader(c.stdin)
+	rd := bufio.NewReader(ui.stdin)
 	line, err := rd.ReadString('\n')
 	if err == nil {
 		return strings.TrimSpace(line)
@@ -130,33 +130,33 @@ func (c *terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	return ""
 }
 
-func (c *terminalUI) Ok() {
-	c.Say(SuccessColor(T("OK")))
+func (ui *terminalUI) Ok() {
+	ui.Say(SuccessColor(T("OK")))
 }
 
 const QuietPanic = "This shouldn't print anything"
 
-func (c *terminalUI) Failed(message string, args ...interface{}) {
+func (ui *terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 
 	if T == nil {
-		c.Say(FailureColor("FAILED"))
-		c.Say(message)
+		ui.Say(FailureColor("FAILED"))
+		ui.Say(message)
 
 		trace.Logger.Print("FAILED")
 		trace.Logger.Print(message)
-		c.PanicQuietly()
+		ui.PanicQuietly()
 	} else {
-		c.Say(FailureColor(T("FAILED")))
-		c.Say(message)
+		ui.Say(FailureColor(T("FAILED")))
+		ui.Say(message)
 
 		trace.Logger.Print(T("FAILED"))
 		trace.Logger.Print(message)
-		c.PanicQuietly()
+		ui.PanicQuietly()
 	}
 }
 
-func (c *terminalUI) PanicQuietly() {
+func (ui *terminalUI) PanicQuietly() {
 	panic(QuietPanic)
 }
 
@@ -224,8 +224,8 @@ func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
 	table.Print()
 }
 
-func (c *terminalUI) LoadingIndication() {
-	c.printer.Print(".")
+func (ui *terminalUI) LoadingIndication() {
+	ui.printer.Print(".")
 }
 
 func (ui *terminalUI) Table(headers []string) Table {
