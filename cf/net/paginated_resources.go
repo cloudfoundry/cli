@@ -17,9 +17,9 @@ type PaginatedResources struct {
 	resourceType   reflect.Type
 }
 
-func (this PaginatedResources) Resources() ([]interface{}, error) {
-	slicePtr := reflect.New(reflect.SliceOf(this.resourceType))
-	err := json.Unmarshal([]byte(this.ResourcesBytes), slicePtr.Interface())
+func (pr PaginatedResources) Resources() ([]interface{}, error) {
+	slicePtr := reflect.New(reflect.SliceOf(pr.resourceType))
+	err := json.Unmarshal([]byte(pr.ResourcesBytes), slicePtr.Interface())
 	slice := reflect.Indirect(slicePtr)
 
 	contents := make([]interface{}, 0, slice.Len())
