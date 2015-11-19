@@ -14,11 +14,9 @@ import (
 
 var _ = Describe("CommandsLoader", func() {
 	It("references all command packages so all commands can be registered in command_registry", func() {
-
 		commands_loader.Load()
 
 		count := walkDirAndCountCommand("../cf/commands")
-		count = count
 		Ω(command_registry.Commands.TotalCommands()).To(Equal(count))
 	})
 })

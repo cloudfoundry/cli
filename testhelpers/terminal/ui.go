@@ -119,7 +119,6 @@ func (ui *FakeUI) Failed(message string, args ...interface{}) {
 	ui.Say("FAILED")
 	ui.Say(message, args...)
 	panic(QuietPanic)
-	return
 }
 
 func (ui *FakeUI) PanicQuietly() {
@@ -146,10 +145,10 @@ func (ui *FakeUI) ShowConfiguration(config core_config.Reader) {
 	ui.ShowConfigurationCalled = true
 }
 
-func (ui FakeUI) LoadingIndication() {
+func (ui *FakeUI) LoadingIndication() {
 }
 
-func (c FakeUI) Wait(duration time.Duration) {
+func (ui *FakeUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
 }
 
