@@ -40,7 +40,7 @@ func (builder Builder) AttachOrgToPlans(plans []models.ServicePlanFields, orgNam
 	if err != nil {
 		return nil, err
 	}
-	for planIndex, _ := range plans {
+	for planIndex := range plans {
 		plan := &plans[planIndex]
 		plan.OrgNames = visMap[plan.Guid]
 	}
@@ -53,7 +53,7 @@ func (builder Builder) AttachOrgsToPlans(plans []models.ServicePlanFields) ([]mo
 	if err != nil {
 		return nil, err
 	}
-	for planIndex, _ := range plans {
+	for planIndex := range plans {
 		plan := &plans[planIndex]
 		plan.OrgNames = visMap[plan.Guid]
 	}

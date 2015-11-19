@@ -227,7 +227,7 @@ func (cmd *ShowApp) populatePluginModel(app models.Application) {
 		Guid: app.Stack.Guid,
 	}
 
-	for i, _ := range app.Routes {
+	for i := range app.Routes {
 		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, plugin_models.GetApp_RouteSummary{
 			Host: app.Routes[i].Host,
 			Guid: app.Routes[i].Guid,
@@ -240,7 +240,7 @@ func (cmd *ShowApp) populatePluginModel(app models.Application) {
 		})
 	}
 
-	for i, _ := range app.Services {
+	for i := range app.Services {
 		cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, plugin_models.GetApp_ServiceSummary{
 			Name: app.Services[i].Name,
 			Guid: app.Services[i].Guid,

@@ -233,7 +233,7 @@ func removeDuplicatedValue(ary []string) *[]string {
 	}
 
 	newAry := []string{}
-	for k, _ := range m {
+	for k := range m {
 		newAry = append(newAry, k)
 	}
 	return &newAry

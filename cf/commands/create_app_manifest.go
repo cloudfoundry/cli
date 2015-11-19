@@ -147,7 +147,7 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 
 func sortEnvVar(vars map[string]interface{}) []string {
 	var varsAry []string
-	for k, _ := range vars {
+	for k := range vars {
 		varsAry = append(varsAry, k)
 	}
 	sort.Strings(varsAry)

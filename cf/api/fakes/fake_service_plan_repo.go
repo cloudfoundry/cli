@@ -62,7 +62,7 @@ func (fake *FakeServicePlanRepo) Search(queryParams map[string]string) ([]models
 
 func combineKeys(mapToCombine map[string]string) string {
 	keys := []string{}
-	for key, _ := range mapToCombine {
+	for key := range mapToCombine {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)

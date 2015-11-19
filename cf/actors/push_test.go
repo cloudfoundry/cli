@@ -215,7 +215,7 @@ var _ = Describe("Push Actor", func() {
 			actualFiles, err := actor.PopulateFileMode(fixturesDir, files)
 			Ω(err).NotTo(HaveOccurred())
 
-			for i, _ := range files {
+			for i := range files {
 				fileInfo, err := os.Lstat(filepath.Join(fixturesDir, files[i].Path))
 				Ω(err).NotTo(HaveOccurred())
 				mode := fileInfo.Mode()

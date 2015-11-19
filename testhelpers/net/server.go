@@ -44,7 +44,7 @@ func urlQueryContains(container, containee url.Values) bool {
 	//Therefore, we crack apart "q" params on their seperator (a colon) and compare the resulting
 	//substrings.  No other params seem to use semicolon separators AND are order-dependent, so we just
 	//run all params through the same process.
-	for key, _ := range containee {
+	for key := range containee {
 
 		containerValues := strings.Split(container.Get(key), ";")
 		containeeValues := strings.Split(containee.Get(key), ";")
