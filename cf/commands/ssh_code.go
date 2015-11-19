@@ -34,7 +34,7 @@ type OneTimeSSHCode struct {
 	endpointRepo api.EndpointRepository
 }
 
-var NoRedirectsErr = errors.New("No redirects")
+var ErrNoRedirects = errors.New("No redirects")
 
 func init() {
 	command_registry.Register(OneTimeSSHCode{})
@@ -91,7 +91,7 @@ func (cmd OneTimeSSHCode) Get() (string, error) {
 	httpClient := &http.Client{
 		CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 			dumpRequest(req)
-			return NoRedirectsErr
+			return ErrNoRedirects
 		},
 		Timeout: 30 * time.Second,
 		Transport: &http.Transport{
@@ -123,7 +123,7 @@ func (cmd OneTimeSSHCode) Get() (string, error) {
 		return "", errors.New(T("Authorization server did not redirect with one time code"))
 	}
 
-	if netErr, ok := err.(*url.Error); !ok || netErr.Err != NoRedirectsErr {
+	if netErr, ok := err.(*url.Error); !ok || netErr.Err != ErrNoRedirects {
 		return "", errors.New(T("Error requesting one time code from server:" + err.Error()))
 	}
 
