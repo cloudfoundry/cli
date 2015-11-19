@@ -7,11 +7,12 @@ package terminal
 import (
 	"bufio"
 	"fmt"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 const (

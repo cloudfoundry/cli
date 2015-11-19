@@ -2,9 +2,10 @@ package assert
 
 import (
 	"fmt"
-	"github.com/onsi/ginkgo"
 	"runtime"
 	"strings"
+
+	"github.com/onsi/ginkgo"
 )
 
 // Fail reports a failure through

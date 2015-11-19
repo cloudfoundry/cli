@@ -1,11 +1,12 @@
 package terminal_test
 
 import (
+	"os"
+	"runtime"
+
 	. "github.com/cloudfoundry/cli/cf/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
-	"runtime"
 )
 
 var _ = Describe("Terminal colors", func() {
