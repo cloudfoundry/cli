@@ -61,16 +61,10 @@ var _ = Describe("api command", func() {
 
 	Context("when the user does not provide an endpoint", func() {
 		Context("when the endpoint is set in the config", func() {
-			var (
-				requirementsFactory *testreq.FakeReqFactory
-			)
-
 			BeforeEach(func() {
 				config.SetApiEndpoint("https://api.run.pivotal.io")
 				config.SetApiVersion("2.0")
 				config.SetSSLDisabled(true)
-
-				requirementsFactory = &testreq.FakeReqFactory{}
 			})
 
 			It("prints out the api endpoint and appropriately sets the config", func() {

@@ -23,13 +23,11 @@ func NewFakePersistor() *FakePersistor {
 	return &FakePersistor{}
 }
 
-func (fp *FakePersistor) Load(data configuration.DataInterface) (err error) {
+func (fp *FakePersistor) Load(data configuration.DataInterface) error {
 	if fp.LoadReturns.Data == nil {
 		fp.LoadReturns.Data = core_config.NewData()
 	}
-	data = fp.LoadReturns.Data
-	err = fp.LoadReturns.Err
-	return
+	return fp.LoadReturns.Err
 }
 
 func (fp *FakePersistor) Delete() {}

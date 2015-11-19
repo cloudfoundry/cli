@@ -19,7 +19,6 @@ var _ = Describe("Services", func() {
 		serviceBuilder *service_builder.FakeServiceBuilder
 		orgRepo        *organization_fakes.FakeOrganizationRepository
 		serviceBroker1 models.ServiceBroker
-		serviceBroker2 models.ServiceBroker
 		service1       models.ServiceOffering
 	)
 
@@ -31,7 +30,6 @@ var _ = Describe("Services", func() {
 		actor = actors.NewServiceHandler(orgRepo, brokerBuilder, serviceBuilder)
 
 		serviceBroker1 = models.ServiceBroker{Guid: "my-service-broker-guid1", Name: "my-service-broker1"}
-		serviceBroker2 = models.ServiceBroker{Guid: "my-service-broker-guid2", Name: "my-service-broker2"}
 
 		service1 = models.ServiceOffering{ServiceOfferingFields: models.ServiceOfferingFields{
 			Label:      "my-service1",

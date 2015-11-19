@@ -34,7 +34,6 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 		file2       resources.AppFileResource
 		file3       resources.AppFileResource
 		file4       resources.AppFileResource
-		testHandler *testnet.TestHandler
 		testServer  *httptest.Server
 		configRepo  core_config.ReadWriter
 	)
@@ -58,7 +57,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 	})
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
-		testServer, testHandler = testnet.NewServer(reqs)
+		testServer, _ = testnet.NewServer(reqs)
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 

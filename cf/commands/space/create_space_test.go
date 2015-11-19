@@ -25,7 +25,6 @@ var _ = Describe("create-space command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configSpace         models.SpaceFields
 		configOrg           models.OrganizationFields
 		configRepo          core_config.Repository
 		spaceRepo           *testapi.FakeSpaceRepository
@@ -71,11 +70,6 @@ var _ = Describe("create-space command", func() {
 		configOrg = models.OrganizationFields{
 			Name: "my-org",
 			Guid: "my-org-guid",
-		}
-
-		configSpace = models.SpaceFields{
-			Name: "config-space",
-			Guid: "config-space-guid",
 		}
 
 		//save original command and restore later

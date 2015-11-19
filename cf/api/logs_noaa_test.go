@@ -262,7 +262,7 @@ var _ = Describe("logs with noaa repository", func() {
 				models.AppInstanceFields{},
 			}
 
-			instances, _ = repo.GetContainerMetrics("app-guid", instances)
+			repo.GetContainerMetrics("app-guid", instances)
 			Ω(fakeTokenRefresher.RefreshTokenCalled).To(Equal(true))
 			Ω(fakeNoaaConsumer.GetContainerMetricsCallCount()).To(Equal(2))
 		})

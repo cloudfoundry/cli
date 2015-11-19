@@ -87,6 +87,7 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err = matcher.Match(actual)
+		Expect(err).ToNot(HaveOccurred())
 		Ω(success).To(Equal(false))
 
 		msg = matcher.FailureMessage([]string{})
@@ -107,6 +108,7 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err = matcher.Match(actual)
+		Expect(err).ToNot(HaveOccurred())
 		Ω(success).To(Equal(false))
 
 		msg := matcher.FailureMessage([]string{})
