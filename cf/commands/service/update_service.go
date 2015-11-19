@@ -116,7 +116,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 	var plan models.ServicePlanFields
 	if planName != "" {
 		cmd.checkUpdateServicePlanApiVersion()
-		err, plan = cmd.findPlan(serviceInstance, planName)
+		plan, err = cmd.findPlan(serviceInstance, planName)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
@@ -134,7 +134,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 	}
 }
 
-func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planName string) (err error, plan models.ServicePlanFields) {
+func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planName string) (plan models.ServicePlanFields, err error) {
 	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.Guid, cmd.config.OrganizationFields().Name)
 	if err != nil {
 		return
