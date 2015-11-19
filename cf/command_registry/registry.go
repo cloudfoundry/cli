@@ -93,7 +93,7 @@ func (r *registry) TotalCommands() int {
 
 func (r *registry) MaxCommandNameLength() int {
 	maxNameLen := 0
-	for name, _ := range r.cmd {
+	for name := range r.cmd {
 		if nameLen := utf8.RuneCountInString(name); nameLen > maxNameLen {
 			maxNameLen = nameLen
 		}

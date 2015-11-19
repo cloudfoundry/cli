@@ -36,7 +36,7 @@ func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper
 }
 
 func (actor PushActorImpl) PopulateFileMode(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error) {
-	for i, _ := range presentFiles {
+	for i := range presentFiles {
 		fileInfo, err := os.Lstat(filepath.Join(appDir, presentFiles[i].Path))
 		if err != nil {
 			return presentFiles, err

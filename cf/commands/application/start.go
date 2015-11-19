@@ -389,7 +389,7 @@ func instancesDetails(count instanceCount) string {
 				map[string]interface{}{"StartingCount": count.starting})))
 		} else {
 			info := []string{}
-			for d, _ := range count.startingDetails {
+			for d := range count.startingDetails {
 				info = append(info, d)
 			}
 			sort.Strings(info)

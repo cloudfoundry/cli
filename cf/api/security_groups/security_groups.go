@@ -108,7 +108,7 @@ func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, 
 		return nil, err
 	}
 
-	for i, _ := range securityGroups {
+	for i := range securityGroups {
 		err = repo.gateway.ListPaginatedResources(
 			repo.config.ApiEndpoint(),
 			securityGroups[i].SpaceUrl+"?inline-relations-depth=1",

@@ -125,7 +125,7 @@ func (cmd *Env) displayUserProvidedEnvironment(envVars map[string]interface{}) {
 	}
 
 	keys := make([]string, 0, len(envVars))
-	for key, _ := range envVars {
+	for key := range envVars {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
@@ -143,7 +143,7 @@ func (cmd *Env) displayRunningEnvironment(envVars map[string]interface{}) {
 	}
 
 	keys := make([]string, 0, len(envVars))
-	for key, _ := range envVars {
+	for key := range envVars {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
@@ -161,7 +161,7 @@ func (cmd *Env) displayStagingEnvironment(envVars map[string]interface{}) {
 	}
 
 	keys := make([]string, 0, len(envVars))
-	for key, _ := range envVars {
+	for key := range envVars {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)

@@ -70,7 +70,7 @@ func (cmd *Help) Execute(c flags.FlagContext) {
 
 							//find longest name length
 							l := 0
-							for n, _ := range c.UsageDetails.Options {
+							for n := range c.UsageDetails.Options {
 								if len(n) > l {
 									l = len(n)
 								}
