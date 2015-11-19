@@ -1,9 +1,9 @@
 # Changes in v6.14.0
-API `AccessToken()` refreshes the o-auth token.
-[Examples](https://github.com/cloudfoundry/cli/tree/master/plugin_examples#test-driven-development-tdd) on how to use fake `CliConnection` and test RPC server for TDD development.
-Fix Plugin API file descriptors leakage.
-Fix bug where some CLI versions does not respect `PluginMetadata.MinCliVersion`.
-The field `PackageUpdatedAt` returned by `GetApp()` API is now populated.
+- API `AccessToken()` now provides a refreshed o-auth token.
+- [Examples](https://github.com/cloudfoundry/cli/tree/master/plugin_examples#test-driven-development-tdd) on how to use fake `CliConnection` and test RPC server for TDD development.
+- Fix Plugin API file descriptors leakage.
+- Fix bug where some CLI versions does not respect `PluginMetadata.MinCliVersion`.
+- The field `PackageUpdatedAt` returned by `GetApp()` API is now populated.
 
 [Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md) 
 
