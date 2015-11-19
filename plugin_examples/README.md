@@ -1,31 +1,9 @@
-# Changes in v6.12.0
-- New API:
-```go
-GetApp(string) (plugin_models.GetAppModel, error)
-GetApps() ([]plugin_models.GetAppsModel, error)
-GetOrgs() ([]plugin_models.GetOrgs_Model, error)
-GetSpaces() ([]plugin_models.GetSpaces_Model, error)
-GetOrgUsers(string, ...string) ([]plugin_models.GetOrgUsers_Model, error)
-GetSpaceUsers(string, string) ([]plugin_models.GetSpaceUsers_Model, error)
-GetServices() ([]plugin_models.GetServices_Model, error)
-GetService(string) (plugin_models.GetService_Model, error)
-GetOrg(string) (plugin_models.GetOrg_Model, error)
-GetSpace(string) (plugin_models.GetSpace_Model, error)
-```
-- Allow minimum CLI version required to be specified in plugin. Example:
-```go
-func (c *cmd) GetMetadata() plugin.PluginMetadata {
-	return plugin.PluginMetadata{
-		Name: "Test1",
-		MinCliVersion: plugin.VersionType{
-			Major: 6,
-			Minor: 12,
-			Build: 0,
-		},
-	}
-}
-```
-
+# Changes in v6.14.0
+API `AccessToken()` refreshes the o-auth token.
+[Examples](https://github.com/cloudfoundry/cli/tree/master/plugin_examples#test-driven-development-tdd) on how to use fake `CliConnection` and test RPC server for TDD development.
+Fix Plugin API file descriptors leakage.
+Fix bug where some CLI versions does not respect `PluginMetadata.MinCliVersion`.
+The field `PackageUpdatedAt` returned by `GetApp()` API is now populated.
 
 [Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md) 
 
