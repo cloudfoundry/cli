@@ -94,6 +94,9 @@ func (m *appManifest) Save() error {
 	defer f.Close()
 
 	_, err = fmt.Fprintln(f, "---\napplications:")
+	if err != nil {
+		return err
+	}
 
 	for _, app := range m.contents {
 		if _, err := fmt.Fprintf(f, "- name: %s\n", app.Name); err != nil {

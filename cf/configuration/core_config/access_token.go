@@ -14,13 +14,17 @@ type TokenInfo struct {
 
 func NewTokenInfo(accessToken string) (info TokenInfo) {
 	tokenJson, err := DecodeAccessToken(accessToken)
-
 	if err != nil {
-		return
+		return TokenInfo{}
 	}
+
 	info = TokenInfo{}
 	err = json.Unmarshal(tokenJson, &info)
-	return
+	if err != nil {
+		return TokenInfo{}
+	}
+
+	return info
 }
 
 func DecodeAccessToken(accessToken string) (tokenJson []byte, err error) {
