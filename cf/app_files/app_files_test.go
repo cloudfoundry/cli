@@ -1,9 +1,10 @@
 package app_files_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/app_files"
 	"os"
 	"path/filepath"
+
+	. "github.com/cloudfoundry/cli/cf/app_files"
 
 	"github.com/cloudfoundry/cli/cf/models"
 	cffileutils "github.com/cloudfoundry/cli/fileutils"

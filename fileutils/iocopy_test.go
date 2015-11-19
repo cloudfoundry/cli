@@ -3,10 +3,11 @@
 package fileutils_test
 
 import (
-	. "github.com/cloudfoundry/cli/fileutils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	. "github.com/cloudfoundry/cli/fileutils"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
