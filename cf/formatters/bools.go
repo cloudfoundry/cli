@@ -7,7 +7,6 @@ import (
 func Allowed(allowed bool) string {
 	if allowed {
 		return T("allowed")
-	} else {
-		return T("disallowed")
 	}
+	return T("disallowed")
 }

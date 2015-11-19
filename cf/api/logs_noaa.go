@@ -131,9 +131,8 @@ func (l *logNoaaRepository) TailNoaaLogsFor(appGuid string, onConnect func(), on
 			default:
 				if !l.tailing { //"use of closed network connection" is expected since we closed the websocket connection
 					return nil
-				} else {
-					return err
 				}
+				return err
 			}
 		case log := <-logChan:
 			l.messageQueue.PushMessage(log)

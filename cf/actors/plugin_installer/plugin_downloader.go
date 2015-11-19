@@ -42,15 +42,13 @@ func (downloader *PluginDownloader) downloadFromPlugin(plugin clipr.Plugin) (str
 	case "linux":
 		if arch == "386" {
 			return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "linux32")), downloader.getBinaryChecksum(plugin, "linux32")
-		} else {
-			return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "linux64")), downloader.getBinaryChecksum(plugin, "linux64")
 		}
+		return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "linux64")), downloader.getBinaryChecksum(plugin, "linux64")
 	case "windows":
 		if arch == "386" {
 			return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "win32")), downloader.getBinaryChecksum(plugin, "win32")
-		} else {
-			return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "win64")), downloader.getBinaryChecksum(plugin, "win64")
 		}
+		return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "win64")), downloader.getBinaryChecksum(plugin, "win64")
 	default:
 		downloader.binaryNotAvailable()
 	}

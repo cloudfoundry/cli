@@ -93,9 +93,8 @@ func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]mod
 	if err != nil {
 		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.NOT_AUTHORIZED {
 			return []models.ServiceKey{}, errors.NewNotAuthorizedError()
-		} else {
-			return []models.ServiceKey{}, err
 		}
+		return []models.ServiceKey{}, err
 	}
 
 	return serviceKeys, nil

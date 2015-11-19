@@ -122,9 +122,9 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 					"ServiceName": serviceInstance.Name,
 				}))
 			return
-		} else {
-			cmd.ui.Failed(err.Error())
 		}
+
+		cmd.ui.Failed(err.Error())
 	}
 
 	cmd.ui.Ok()

@@ -422,9 +422,8 @@ func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) []models.AppParam
 	if err != nil {
 		if m.Path == "" && c.String("f") == "" {
 			return []models.AppParams{}
-		} else {
-			cmd.ui.Failed(T("Error reading manifest file:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 		}
+		cmd.ui.Failed(T("Error reading manifest file:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 
 	apps, err := m.Applications()

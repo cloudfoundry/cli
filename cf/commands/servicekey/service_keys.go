@@ -82,8 +82,8 @@ func (cmd *ServiceKeys) Execute(c flags.FlagContext) {
 		cmd.ui.Say(T("No service key for service instance {{.ServiceInstanceName}}",
 			map[string]interface{}{"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name)}))
 		return
-	} else {
-		cmd.ui.Say("")
-		table.Print()
 	}
+
+	cmd.ui.Say("")
+	table.Print()
 }

@@ -98,9 +98,8 @@ func formatDescriptionPart(val interface{}) string {
 	case bool:
 		if val {
 			return "true"
-		} else {
-			return "false"
 		}
+		return "false"
 	default:
 		return fmt.Sprintf("%s", val)
 	}

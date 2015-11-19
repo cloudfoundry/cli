@@ -154,9 +154,9 @@ func writeZipFile(dir string, targetFile *os.File) error {
 
 		if fileInfo.IsDir() {
 			return nil
-		} else {
-			return fileutils.CopyPathToWriter(fullPath, zipFilePart)
 		}
+
+		return fileutils.CopyPathToWriter(fullPath, zipFilePart)
 	})
 }
 

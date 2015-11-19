@@ -138,9 +138,9 @@ func copyPathToPath(fromPath, toPath string) (err error) {
 
 func loadIgnoreFile(dir string) CfIgnore {
 	fileContents, err := ioutil.ReadFile(filepath.Join(dir, ".cfignore"))
-	if err == nil {
-		return NewCfIgnore(string(fileContents))
-	} else {
+	if err != nil {
 		return NewCfIgnore("")
 	}
+
+	return NewCfIgnore(string(fileContents))
 }

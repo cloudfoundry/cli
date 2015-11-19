@@ -125,9 +125,8 @@ func loadFromAsset(locale string) error {
 	if err != nil {
 		if !os.IsExist(err) {
 			return errors.New("Please make sure Temp dir exist - " + os.TempDir())
-		} else {
-			return err
 		}
+		return err
 	}
 
 	tmpDir, err := ioutil.TempDir("", "cloudfoundry_cli_i18n_res")

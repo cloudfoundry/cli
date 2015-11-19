@@ -283,9 +283,8 @@ func stringValOrDefault(yamlMap generic.Map, key string, errs *[]error) *string 
 	case string:
 		if val == "default" {
 			return &empty
-		} else {
-			return &val
 		}
+		return &val
 	case nil:
 		return &empty
 	default:
