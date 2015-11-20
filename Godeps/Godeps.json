@@ -45,7 +45,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/jibber_jabber",
-			"Rev": "3ebdd29971178ede5714008229e68fec7645d695"
+			"Rev": "bcc4c8345a21301bf47c032ff42dd1aae2fe3027"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
