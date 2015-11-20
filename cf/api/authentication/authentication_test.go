@@ -80,7 +80,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			})
 		})
 
-		Describe("when an error occurs during login", func() {
+		Context("when the authentication server returns status code 500", func() {
 			BeforeEach(func() {
 				setupTestServer(errorLoginRequest)
 			})
@@ -88,7 +88,29 @@ var _ = Describe("AuthenticationRepository", func() {
 			It("returns a failure response", func() {
 				Expect(handler).To(HaveAllRequestsCalled())
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("Server error, status code: 500, error code: , message: "))
+				Expect(err.Error()).To(Equal("The targeted API endpoint could not be reached."))
+				Expect(config.AccessToken()).To(BeEmpty())
+			})
+		})
+
+		Context("when the authentication server returns status code 502", func() {
+			var request testnet.TestRequest
+
+			BeforeEach(func() {
+				request = testnet.TestRequest{
+					Method: "POST",
+					Path:   "/oauth/token",
+					Response: testnet.TestResponse{
+						Status: http.StatusBadGateway,
+					},
+				}
+				setupTestServer(request)
+			})
+
+			It("returns a failure response", func() {
+				Expect(handler).To(HaveAllRequestsCalled())
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("The targeted API endpoint could not be reached."))
 				Expect(config.AccessToken()).To(BeEmpty())
 			})
 		})
