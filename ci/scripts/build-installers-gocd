@@ -93,7 +93,10 @@ echo "building 64-bit RedHat package"
 
 echo "building OS X installer"
 (
+    SIZE="$(BLOCKSIZE=1000 du ${OUT_DIR}/cf-cli_osx | cut -f 1)"
     cd ${INSTALLERS_DIR}/osx
+    sed -i -e "s/VERSION/${VERSION}/g" Distribution
+    sed -i -e "s/SIZE/${SIZE}/g" Distribution
     mkdir -p cf-cli/usr/local/bin
     mkdir -p cf-cli/usr/local/share/doc/cf-cli
     cp ${OUT_DIR}/cf-cli_osx cf-cli/usr/local/bin/cf
