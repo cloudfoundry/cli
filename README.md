@@ -114,51 +114,27 @@ Include the below information when creating the issue:
 - the stack trace generated (if any)
 - any other relevant information
 
-Forking the repository for development
-======================================
-
-1. Install [Go](https://golang.org)
-1. [Ensure your $GOPATH is set correctly](http://golang.org/cmd/go/#hdr-GOPATH_environment_variable)
-1. Install [godep](https://github.com/tools/godep)
-1. Get the cli source code: `go get github.com/cloudfoundry/cli`
-  * (Ignore any warnings about "no buildable Go source files")
-1. Run `godep restore` (note: this will modify the dependencies in your $GOPATH)
-1. Fork the repository
-1. Add your fork as a remote: `cd $GOPATH/src/github.com/cloudfoundry/cli && git remote add your_name https://github.com/your_name/cli`
-
-Building
-========
-To prepare your build environment, run `go get -u github.com/jteeuwen/go-bindata/...`
-
-1. Run `./bin/build`
-1. The binary will be built into the `./out` directory.
-
-Optionally, you can use `bin/run` to compile and run the executable in one step.
-
-If you want to run the tests with `ginkgo`, or build with `go build` you should first run `bin/generate-language-resources`. `bin/build` and `bin/test` generate language files automatically.
-
-Developing
-==========
-
-1. Install [Mercurial](http://mercurial.selenic.com/)
-1. Run `go get golang.org/x/tools/cmd/vet`
-1. Write a Ginkgo test.
-1. Run `bin/test` and watch the test fail.
-1. Make the test pass.
-1. Submit a pull request to the `master` branch.
-
-**_*_ For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples)**
-
-
 Contributing
 ============
 
 Major new feature proposals are given as a publically viewable google document with commenting allowed and discussed on the [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) mailing list.
 
-Pull Requests
----------------------
+1. Install [Go](https://golang.org)
+1. Create a directory where you would like to store the source for Go projects and their binaries (e.g. `$HOME/go`)
+1. Set an environment variable, `GOPATH`, pointing at the directory you created
+1. Get `godep`: `go get github.com/tools/godep`
+1. Install [Mercurial](http://mercurial.selenic.com/) (for go vet)
+1. Get `go vet`: `go get golang.org/x/tools/cmd/vet`
+1. Get the `cf` source: `go get github.com/cloudfoundry/cli`
+  * (Ignore any warnings about "no buildable Go source files")
+1. Run `godep restore` in $GOPATH/src/cloudfoundry/cli (note: this will modify the dependencies in your $GOPATH)
+1. [Fork this repository](https://help.github.com/articles/fork-a-repo/), adding your fork as a remote
+1. Write a new test, see it fail when running `bin/test` (or `ginkgo -p path/to/the/package/being/tested`)
+1. Write code to pass the test
+1. Repeat the above two steps until the feature is complete
+1. Submit a [pull request](https://help.github.com/articles/using-pull-requests/) to the `master` branch
 
-Pull Requests should be made against the `master` branch.
+**_*_ For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples)**
 
 Architecture overview
 ---------------------
