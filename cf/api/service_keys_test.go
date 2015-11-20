@@ -43,6 +43,10 @@ var _ = Describe("Service Keys Repo", func() {
 		repo = NewCloudControllerServiceKeyRepository(configRepo, gateway)
 	})
 
+	AfterEach(func() {
+		testServer.Close()
+	})
+
 	Describe("CreateServiceKey", func() {
 		It("makes the right request", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -107,6 +111,13 @@ var _ = Describe("Service Keys Repo", func() {
 
 			Context("and there is a failure during serialization", func() {
 				It("returns the serialization error", func() {
+					setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "POST",
+						Path:     "/v2/service_keys",
+						Matcher:  testnet.RequestBodyMatcher(`{"service_instance_guid":"fake-instance-guid","name":"fake-service-key","parameters": {"data": "hello"}}`),
+						Response: testnet.TestResponse{Status: http.StatusCreated},
+					}))
+
 					paramsMap := make(map[string]interface{})
 					paramsMap["data"] = make(chan bool)
 
@@ -246,10 +257,6 @@ var _ = Describe("Service Keys Repo", func() {
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err).NotTo(HaveOccurred())
 		})
-	})
-
-	AfterEach(func() {
-		testServer.Close()
 	})
 })
 
