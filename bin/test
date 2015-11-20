@@ -55,7 +55,7 @@
   ginkgo commands_loader 
   
   echo -e "\n Testing packages..."
-  CF_HOME=$(pwd)/fixtures ginkgo -r -p -nodes=4 -randomizeAllSpecs $@
+  CF_HOME=$(pwd)/fixtures ginkgo -r $@
 
   echo -e "\n Vetting packages for potential issues..."
   go tool vet cf/.
