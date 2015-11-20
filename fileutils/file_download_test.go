@@ -1,13 +1,14 @@
 package fileutils_test
 
 import (
-	"fmt"
+	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"os"
-	"strings"
+	"path"
 
-	. "github.com/cloudfoundry/cli/fileutils"
+	"github.com/cloudfoundry/cli/fileutils"
+
+	"github.com/onsi/gomega/ghttp"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,143 +16,188 @@ import (
 
 var _ = Describe("Downloader", func() {
 	var (
-		ts         *httptest.Server
-		downloader Downloader
+		downloader fileutils.Downloader
+		tempDir    string
 	)
 
-	Describe("DownloadFile", func() {
-		Context("URL contains filename", func() {
-			BeforeEach(func() {
-				ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					fmt.Fprintln(w, "abc123")
-				}))
-				downloader = NewDownloader("./")
-			})
-
-			AfterEach(func() {
-				ts.Close()
-
-				err := downloader.RemoveFile()
-				Ω(err).ToNot(HaveOccurred())
-			})
-
-			It("saves file with name found in URL in provided dir", func() {
-				_, name, err := downloader.DownloadFile(ts.URL + "/abc.zip")
-				Ω(err).ToNot(HaveOccurred())
-				Ω(name).To(Equal("abc.zip"))
-
-				_, err = os.Stat("./abc.zip")
-				Ω(err).ToNot(HaveOccurred())
-			})
-
-			It("returns the number of bytes written to the file", func() {
-				n, _, err := downloader.DownloadFile(ts.URL + "/abc.zip")
-				Ω(err).ToNot(HaveOccurred())
-				Ω(n).To(Equal(int64(len("abc123") + 1)))
-			})
-		})
-
-		Context("header contains filename", func() {
-			BeforeEach(func() {
-				ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.Header().Set("Content-Disposition", "attachment;filename=header.zip")
-					fmt.Fprintln(w, "abc123")
-				}))
-
-				downloader = NewDownloader("./")
-			})
-
-			AfterEach(func() {
-				ts.Close()
-
-				err := downloader.RemoveFile()
-				Ω(err).ToNot(HaveOccurred())
-			})
-
-			It("saves file with name found in header, ignore filename in url", func() {
-				_, name, err := downloader.DownloadFile(ts.URL + "/abc.zip")
-				Ω(err).ToNot(HaveOccurred())
-				Ω(name).To(Equal("header.zip"))
-
-				_, err = os.Stat("./abc.zip")
-				Ω(err).To(HaveOccurred())
-
-				_, err = os.Stat("./header.zip")
-				Ω(err).ToNot(HaveOccurred())
-			})
-
-		})
-
-		Context("When URL redirects", func() {
-			BeforeEach(func() {
-				ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-					if !strings.Contains(r.URL.String(), "redirect.zip") {
-						http.Redirect(w, r, ts.URL+"/redirect.zip", http.StatusMovedPermanently)
-					} else {
-						fmt.Fprintln(w, "abc123")
-					}
-				}))
-
-				downloader = NewDownloader("./")
-			})
-
-			AfterEach(func() {
-				ts.Close()
-
-				err := downloader.RemoveFile()
-				Ω(err).ToNot(HaveOccurred())
-			})
-
-			It("follows redirects and download file", func() {
-				downloader = NewDownloader("./")
-
-				_, _, err := downloader.DownloadFile(ts.URL)
-				Ω(err).ToNot(HaveOccurred())
-
-				_, err = os.Stat("./redirect.zip")
-				Ω(err).ToNot(HaveOccurred())
-			})
-
-		})
-
-		Context("When URL is invalid", func() {
-			It("returns an error message", func() {
-				downloader = NewDownloader("./")
-
-				_, name, err := downloader.DownloadFile("http://going.nowwhere/abc.zip")
-
-				Ω(err).To(HaveOccurred())
-				Ω(name).To(Equal(""))
-			})
-		})
-
+	BeforeEach(func() {
+		var err error
+		tempDir, err = ioutil.TempDir("", "file-download-test")
+		Expect(err).NotTo(HaveOccurred())
+		downloader = fileutils.NewDownloader(tempDir)
 	})
 
-	Describe("RemoveFile", func() {
+	AfterEach(func() {
+		os.RemoveAll(tempDir)
+	})
+
+	Describe("DownloadFile", func() {
+		var server *ghttp.Server
+
 		BeforeEach(func() {
-			ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				fmt.Fprintln(w, "abc123")
-			}))
+			server = ghttp.NewServer()
 		})
 
 		AfterEach(func() {
-			ts.Close()
+			server.Close()
+
+			err := downloader.RemoveFile()
+			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("removes the downloaded file", func() {
-			_, _, err := downloader.DownloadFile(ts.URL + "/abc.zip")
-			Ω(err).ToNot(HaveOccurred())
+		Context("when the server responds with the file", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/abc.zip"),
+						ghttp.RespondWith(http.StatusOK, "abc123"),
+					),
+				)
+			})
 
-			_, err = os.Stat("./abc.zip")
-			Ω(err).ToNot(HaveOccurred())
+			It("saves file with name found in URL in provided dir", func() {
+				_, _, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
 
-			err = downloader.RemoveFile()
-			Ω(err).ToNot(HaveOccurred())
+				_, err = os.Stat(path.Join(tempDir, "abc.zip"))
+				Expect(err).NotTo(HaveOccurred())
+			})
 
-			_, err = os.Stat("./abc.zip")
-			Ω(err).To(HaveOccurred())
+			It("returns the number of bytes written to the file", func() {
+				n, _, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(n).To(Equal(int64(len("abc123"))))
+			})
+
+			It("returns the name of the file that was downloaded", func() {
+				_, name, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(name).To(Equal("abc.zip"))
+			})
+		})
+
+		Context("when the server responds with the filename in the header", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/abc.zip"),
+						ghttp.RespondWith(http.StatusOK, "abc123", http.Header{
+							"Content-Disposition": []string{"attachment;filename=header.zip"},
+						}),
+					),
+				)
+			})
+
+			It("downloads the file named in the header to the provided dir", func() {
+				_, _, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = os.Stat(path.Join(tempDir, "header.zip"))
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = os.Stat(path.Join(tempDir, "abc.zip"))
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("returns the number of bytes written to the file", func() {
+				n, _, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(n).To(Equal(int64(len("abc123"))))
+			})
+
+			It("returns the name of the file that was downloaded", func() {
+				_, name, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(name).To(Equal("header.zip"))
+			})
+		})
+
+		Context("when the server returns a redirect to a file", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/abc.zip"),
+						ghttp.RespondWith(http.StatusFound, "", http.Header{
+							"Location": []string{server.URL() + "/redirect.zip"},
+						}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/redirect.zip"),
+						ghttp.RespondWith(http.StatusOK, "abc123"),
+					),
+				)
+			})
+
+			It("downloads the file from the redirect to the provided dir", func() {
+				_, _, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = os.Stat(path.Join(tempDir, "redirect.zip"))
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = os.Stat(path.Join(tempDir, "abc.zip"))
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("returns the number of bytes written to the file", func() {
+				n, _, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(n).To(Equal(int64(len("abc123"))))
+			})
+
+			It("returns the name of the file that was downloaded", func() {
+				_, name, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(name).To(Equal("redirect.zip"))
+			})
+		})
+
+		Context("when the URL is invalid", func() {
+			It("returns an error", func() {
+				_, _, err := downloader.DownloadFile("http://going.nowwhere/abc.zip")
+				Expect(err).To(HaveOccurred())
+			})
 		})
 	})
 
+	Describe("RemoveFile", func() {
+		var server *ghttp.Server
+
+		BeforeEach(func() {
+			server = ghttp.NewServer()
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/abc.zip"),
+					ghttp.RespondWith(http.StatusOK, "abc123"),
+				),
+			)
+		})
+
+		AfterEach(func() {
+			server.Close()
+		})
+
+		Context("when a file has been downloaded", func() {
+			BeforeEach(func() {
+				_, _, err := downloader.DownloadFile(server.URL() + "/abc.zip")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("removes the downloaded file", func() {
+				_, err := os.Stat(path.Join(tempDir, "abc.zip"))
+				Expect(err).NotTo(HaveOccurred())
+
+				err = downloader.RemoveFile()
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = os.Stat(path.Join(tempDir, "abc.zip"))
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		It("does not return an error when a file has not been downloaded", func() {
+			err := downloader.RemoveFile()
+			Expect(err).NotTo(HaveOccurred())
+		})
+	})
 })
