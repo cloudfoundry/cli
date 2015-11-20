@@ -4795,6 +4795,11 @@
       "modified": false
    },
    {
+      "id": "The targeted API endpoint could not be reached.",
+      "translation": "The targeted API endpoint could not be reached.",
+      "modified": false
+   },
+   {
       "id": "There are no running instances of this app.",
       "translation": "这个程序没有正在运行的实例",
       "modified": false
