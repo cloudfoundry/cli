@@ -43,10 +43,12 @@ echo "building 64-bit Windows installer"
 
 echo "building 32-bit Debian package"
 (
+    SIZE="$(BLOCKSIZE=1000 du ${OUT_DIR}/cf-cli_linux_i686 | cut -f 1)"
     cd ${INSTALLERS_DIR}/deb
     mkdir -p cf/usr/bin
     cp ${OUT_DIR}/cf-cli_linux_i686 cf/usr/bin/cf
     cp control.template cf/DEBIAN/control
+    echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
     echo "Version: ${VERSION}" >> cf/DEBIAN/control
     echo "Architecture: i386" >> cf/DEBIAN/control
     fakeroot dpkg --build cf cf-cli-installer_i686.deb
@@ -56,10 +58,12 @@ echo "building 32-bit Debian package"
 
 echo "building 64-bit Debian package"
 (
+    SIZE="$(BLOCKSIZE=1000 du ${OUT_DIR}/cf-cli_linux_x86-64 | cut -f 1)"
     cd ${INSTALLERS_DIR}/deb
     mkdir -p cf/usr/bin
     cp ${OUT_DIR}/cf-cli_linux_x86-64 cf/usr/bin/cf
     cp control.template cf/DEBIAN/control
+    echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
     echo "Version: ${VERSION}" >> cf/DEBIAN/control
     echo "Architecture: amd64" >> cf/DEBIAN/control
     fakeroot dpkg --build cf cf-cli-installer_x86-64.deb
