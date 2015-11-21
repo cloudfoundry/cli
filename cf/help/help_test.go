@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/help"
@@ -95,6 +96,13 @@ var _ = Describe("Help", func() {
 		Expect(commandInOutput("test1_cmd1_alias", output)).To(BeFalse(), "plugin command alias: test1_cmd1_alias should not be in help")
 	})
 
+	It("returns cf.BuiltOnDate as BUILD TIME when cf.BuiltOnDate is not a time", func() {
+		output := io_helpers.CaptureOutput(func() {
+			help.ShowHelp(`{{.Compiled}}`)
+		})
+
+		Expect(output).To(ContainElement(ContainSubstring(cf.BuiltOnDate)))
+	})
 })
 
 func commandInOutput(cmdName string, output []string) bool {
