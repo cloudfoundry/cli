@@ -20,7 +20,7 @@ type appPresenter struct {
 	Name     string
 	Usage    string
 	Version  string
-	Compiled time.Time
+	Compiled string
 	Commands []groupedCommands
 }
 
@@ -94,9 +94,9 @@ func newAppPresenter() (presenter appPresenter) {
 	presenter.Version = cf.Version + "-" + cf.BuiltOnDate
 	compiledAtTime, err := time.Parse("2006-01-02T03:04:05+00:00", cf.BuiltOnDate)
 	if err == nil {
-		presenter.Compiled = compiledAtTime
+		presenter.Compiled = compiledAtTime.String()
 	} else {
-		presenter.Compiled = time.Now()
+		presenter.Compiled = cf.BuiltOnDate
 	}
 	presenter.Commands = []groupedCommands{
 		{
