@@ -6,7 +6,6 @@ import (
 	"strings"
 	"text/tabwriter"
 	"text/template"
-	"time"
 	"unicode/utf8"
 
 	"github.com/cloudfoundry/cli/cf"
@@ -92,12 +91,6 @@ func newAppPresenter() (presenter appPresenter) {
 	presenter.Name = os.Args[0]
 	presenter.Usage = T("A command line tool to interact with Cloud Foundry")
 	presenter.Version = cf.Version + "-" + cf.BuiltOnDate
-	compiledAtTime, err := time.Parse("2006-01-02T03:04:05+00:00", cf.BuiltOnDate)
-	if err == nil {
-		presenter.Compiled = compiledAtTime.String()
-	} else {
-		presenter.Compiled = cf.BuiltOnDate
-	}
 	presenter.Commands = []groupedCommands{
 		{
 			Name: T("GETTING STARTED"),

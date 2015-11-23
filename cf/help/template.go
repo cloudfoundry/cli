@@ -11,9 +11,6 @@ func GetHelpTemplate() string {
 
 {{.Title "` + T("VERSION:") + `"}}
    {{.Version}}
-
-{{.Title "` + T("BUILD TIME:") + `"}}
-   {{.Compiled}}
    {{range .Commands}}
 {{.SubTitle .Name}}{{range .CommandSubGroups}}
 {{range .}}   {{.Name}} {{.Description}}
