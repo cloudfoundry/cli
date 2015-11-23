@@ -530,11 +530,6 @@
       "modified": false
    },
    {
-      "id": "BUILD TIME:",
-      "translation": "COMPILADO EM:",
-      "modified": false
-   },
-   {
       "id": "BUILDPACKS",
       "translation": "BUILDPACKS",
       "modified": false

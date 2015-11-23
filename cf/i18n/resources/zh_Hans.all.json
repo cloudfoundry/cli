@@ -530,11 +530,6 @@
       "modified": false
    },
    {
-      "id": "BUILD TIME:",
-      "translation": "构建时间:",
-      "modified": false
-   },
-   {
       "id": "BUILDPACKS",
       "translation": "BUILDPACKS",
       "modified": false
