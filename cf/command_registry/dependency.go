@@ -90,7 +90,6 @@ func NewDependency() Dependency {
 	}
 
 	deps.Gateways = map[string]net.Gateway{
-		"auth":             net.NewUAAGateway(deps.Config, deps.Ui),
 		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.Ui),
 		"uaa":              net.NewUAAGateway(deps.Config, deps.Ui),
 		"routing-api":      net.NewRoutingApiGateway(deps.Config, time.Now, deps.Ui),

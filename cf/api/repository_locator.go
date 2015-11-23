@@ -78,11 +78,10 @@ type RepositoryLocator struct {
 func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
 	strategy := strategy.NewEndpointStrategy(config.ApiVersion())
 
-	authGateway := gatewaysByName["auth"]
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	routingApiGateway := gatewaysByName["routing-api"]
 	uaaGateway := gatewaysByName["uaa"]
-	loc.authRepo = authentication.NewUAAAuthenticationRepository(authGateway, config)
+	loc.authRepo = authentication.NewUAAAuthenticationRepository(uaaGateway, config)
 
 	// ensure gateway refreshers are set before passing them by value to repositories
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
