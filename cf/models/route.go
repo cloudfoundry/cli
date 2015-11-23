@@ -5,6 +5,7 @@ import "fmt"
 type Route struct {
 	Guid   string
 	Host   string
+	Port   int
 	Domain DomainFields
 
 	Space SpaceFields
@@ -12,10 +13,16 @@ type Route struct {
 }
 
 func (route Route) URL() string {
-	if route.Host == "" {
+	if route.Host == "" && route.Port == 0 {
 		return route.Domain.Name
 	}
-	return fmt.Sprintf("%s.%s", route.Host, route.Domain.Name)
+	if route.Port == 0 {
+		return fmt.Sprintf("%s.%s", route.Host, route.Domain.Name)
+	}
+	if route.Host == "" {
+		return fmt.Sprintf("%s:%d", route.Domain.Name, route.Port)
+	}
+	return fmt.Sprintf("%s.%s:%d", route.Host, route.Domain.Name, route.Port)
 }
 
 type RouteSummary struct {

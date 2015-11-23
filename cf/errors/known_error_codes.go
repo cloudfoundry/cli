@@ -18,4 +18,6 @@ const (
 	SECURITY_GROUP_EXISTS       = "300005"
 	APP_ALREADY_BOUND           = "90003"
 	UNBINDABLE_SERVICE          = "90005"
+	PORT_TAKEN                  = "210005"
+	HOST_TAKEN                  = "210003"
 )
