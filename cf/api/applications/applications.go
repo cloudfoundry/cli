@@ -16,6 +16,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter -o fakes/fake_application_repository.go . ApplicationRepository
 type ApplicationRepository interface {
 	Create(params models.AppParams) (createdApp models.Application, apiErr error)
 	GetApp(appGuid string) (models.Application, error)

@@ -39,7 +39,7 @@ var _ = Describe("env command", func() {
 		app = models.Application{}
 		app.Name = "my-app"
 		appRepo = &testApplication.FakeApplicationRepository{}
-		appRepo.ReadReturns.App = app
+		appRepo.ReadReturns(app, nil)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -70,7 +70,7 @@ var _ = Describe("env command", func() {
 	})
 
 	It("fails with usage when the app cannot be found", func() {
-		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("app", "hocus-pocus")
+		appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("app", "hocus-pocus"))
 		runCommand("hocus-pocus")
 
 		Expect(ui.Outputs).To(ContainSubstrings(
@@ -85,7 +85,7 @@ var _ = Describe("env command", func() {
 			app.Name = "my-app"
 			app.Guid = "the-app-guid"
 
-			appRepo.ReadReturns.App = app
+			appRepo.ReadReturns(app, nil)
 			appRepo.ReadEnvReturns(&models.Environment{
 				Environment: map[string]interface{}{
 					"my-key":     "my-value",
@@ -175,7 +175,7 @@ var _ = Describe("env command", func() {
 			app.Name = "my-app"
 			app.Guid = "the-app-guid"
 
-			appRepo.ReadReturns.App = app
+			appRepo.ReadReturns(app, nil)
 			appRepo.ReadEnvReturns(&models.Environment{
 				Running: map[string]interface{}{
 					"running-key-1": "running-value-1",

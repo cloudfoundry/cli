@@ -70,8 +70,9 @@ var _ = Describe("Rename command", func() {
 		requirementsFactory.Application = app
 		runCommand("my-app", "my-new-app")
 
-		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
-		Expect(*appRepo.UpdateParams.Name).To(Equal("my-new-app"))
+		appGUID, params := appRepo.UpdateArgsForCall(0)
+		Expect(appGUID).To(Equal(app.Guid))
+		Expect(*params.Name).To(Equal("my-new-app"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
 			[]string{"OK"},

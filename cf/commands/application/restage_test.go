@@ -47,7 +47,7 @@ var _ = Describe("restage command", func() {
 		app.Name = "my-app"
 		app.PackageState = "STAGED"
 		appRepo = &testApplication.FakeApplicationRepository{}
-		appRepo.ReadReturns.App = app
+		appRepo.ReadReturns(app, nil)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -87,7 +87,7 @@ var _ = Describe("restage command", func() {
 	})
 
 	It("fails with usage when the app cannot be found", func() {
-		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("app", "hocus-pocus")
+		appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("app", "hocus-pocus"))
 		runCommand("hocus-pocus")
 
 		Expect(ui.Outputs).To(ContainSubstrings(
@@ -102,12 +102,12 @@ var _ = Describe("restage command", func() {
 			app.Name = "my-app"
 			app.Guid = "the-app-guid"
 
-			appRepo.ReadReturns.App = app
+			appRepo.ReadReturns(app, nil)
 		})
 
 		It("sends a restage request", func() {
 			runCommand("my-app")
-			Expect(appRepo.CreateRestageRequestArgs.AppGuid).To(Equal("the-app-guid"))
+			Expect(appRepo.CreateRestageRequestArgsForCall(0)).To(Equal("the-app-guid"))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Restaging app", "my-app", "my-org", "my-space", "my-user"},
 			))

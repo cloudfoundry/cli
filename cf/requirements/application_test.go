@@ -24,17 +24,17 @@ var _ = Describe("ApplicationRequirement", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
-		appRepo.ReadReturns.App = app
+		appRepo.ReadReturns(app, nil)
 
 		appReq := NewApplicationRequirement("foo", ui, appRepo)
 
 		Expect(appReq.Execute()).To(BeTrue())
-		Expect(appRepo.ReadArgs.Name).To(Equal("foo"))
+		Expect(appRepo.ReadArgsForCall(0)).To(Equal("foo"))
 		Expect(appReq.GetApplication()).To(Equal(app))
 	})
 
 	It("fails when an app with the given name cannot be found", func() {
-		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("app", "foo")
+		appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("app", "foo"))
 
 		testassert.AssertPanic(testterm.QuietPanic, func() {
 			NewApplicationRequirement("foo", ui, appRepo).Execute()

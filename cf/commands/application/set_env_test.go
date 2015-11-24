@@ -1,6 +1,8 @@
 package application_test
 
 import (
+	"errors"
+
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -100,8 +102,9 @@ var _ = Describe("set-env command", func() {
 				))
 
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-				Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
-				Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]interface{}{
+				appGUID, params := appRepo.UpdateArgsForCall(0)
+				Expect(appGUID).To(Equal(app.Guid))
+				Expect(*params.EnvironmentVars).To(Equal(map[string]interface{}{
 					"DATABASE_URL": "mysql://new-example.com/my-db",
 					"foo":          "bar",
 				}))
@@ -144,7 +147,8 @@ var _ = Describe("set-env command", func() {
 				[]string{"OK"},
 				[]string{"TIP"},
 			))
-			Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]interface{}{
+			_, params := appRepo.UpdateArgsForCall(0)
+			Expect(*params.EnvironmentVars).To(Equal(map[string]interface{}{
 				"MY_VAR": "--has-a-cool-value",
 				"foo":    "bar",
 			}))
@@ -152,7 +156,7 @@ var _ = Describe("set-env command", func() {
 
 		Context("when setting fails", func() {
 			BeforeEach(func() {
-				appRepo.UpdateErr = true
+				appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 			})
 
 			It("tells the user", func() {
