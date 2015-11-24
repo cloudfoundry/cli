@@ -53,7 +53,7 @@ func Init(config core_config.ReadWriter, detector detection.Detector) go_i18n.Tr
 		var userLocale string
 		userLocale, err = initWithUserLocale(detector)
 		if err != nil {
-			userLocale = mustLoadDefaultLocale()
+			userLocale = mustLoadDefaultLocale() // not tested
 		}
 
 		T, err = go_i18n.Tfunc(userLocale, DEFAULT_LOCALE)
@@ -69,12 +69,12 @@ func Init(config core_config.ReadWriter, detector detection.Detector) go_i18n.Tr
 func initWithUserLocale(detector detection.Detector) (string, error) {
 	userLocale, err := detector.DetectIETF()
 	if err != nil {
-		userLocale = DEFAULT_LOCALE
+		userLocale = DEFAULT_LOCALE // not tested
 	}
 
 	language, err := detector.DetectLanguage()
 	if err != nil {
-		language = DEFAULT_LANGUAGE
+		language = DEFAULT_LANGUAGE // not tested
 	}
 
 	userLocale = strings.Replace(userLocale, "-", "_", 1)
@@ -102,7 +102,7 @@ func mustLoadDefaultLocale() string {
 
 	err := loadFromAsset(DEFAULT_LOCALE)
 	if err != nil {
-		panic("Could not load en_US language files. \n" + err.Error() + "\n\n")
+		panic("Could not load en_US language files. \n" + err.Error() + "\n\n") // not tested
 	}
 
 	return userLocale
