@@ -133,18 +133,15 @@ func loadFromAsset(locale string) error {
 	if err != nil {
 		return err
 	}
-	defer func() {
-		os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
 
 	fileName, err := saveLanguageFileToDisk(tmpDir, assetName, byteArray)
 	if err != nil {
 		return err
 	}
+	defer os.RemoveAll(fileName)
 
 	go_i18n.MustLoadTranslationFile(fileName)
-
-	os.RemoveAll(fileName)
 
 	return nil
 }
