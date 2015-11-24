@@ -134,7 +134,7 @@ var _ = Describe("CopySource", func() {
 							Guid: "source-app-guid",
 						},
 					}
-					appRepo.ReadReturns.App = sourceApp
+					appRepo.ReadReturns(sourceApp, nil)
 
 					targetApp = models.Application{
 						ApplicationFields: models.ApplicationFields{
@@ -153,7 +153,7 @@ var _ = Describe("CopySource", func() {
 						Expect(targetAppName).To(Equal("target-app"))
 						Expect(spaceGuid).To(Equal("my-space-guid"))
 
-						Expect(appRepo.ReadArgs.Name).To(Equal("source-app"))
+						Expect(appRepo.ReadArgsForCall(0)).To(Equal("source-app"))
 
 						sourceAppGuid, targetAppGuid := copyAppSourceRepo.CopyApplicationArgsForCall(0)
 						Expect(sourceAppGuid).To(Equal("source-app-guid"))
@@ -173,7 +173,7 @@ var _ = Describe("CopySource", func() {
 
 					Context("Failures", func() {
 						It("if we cannot obtain the source application", func() {
-							appRepo.ReadReturns.Error = errors.New("could not find source app")
+							appRepo.ReadReturns(models.Application{}, errors.New("could not find source app"))
 							runCommand("source-app", "target-app")
 
 							Expect(ui.Outputs).To(ContainSubstrings(

@@ -1,6 +1,8 @@
 package application_test
 
 import (
+	"errors"
+
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -105,15 +107,16 @@ var _ = Describe("set-health-check command", func() {
 					app.Guid = "my-app-guid"
 					app.HealthCheckType = "port"
 
-					appRepo.UpdateAppResult = app
+					appRepo.UpdateReturns(app, nil)
 				})
 
 				It("updates the app's health_check_type", func() {
 					runCommand("my-app", "port")
 
-					Ω(appRepo.UpdateCalls).To(Equal(1))
-					Ω(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-					Ω(*appRepo.UpdateParams.HealthCheckType).To(Equal("port"))
+					Expect(appRepo.UpdateCallCount()).To(Equal(1))
+					appGUID, params := appRepo.UpdateArgsForCall(0)
+					Ω(appGUID).To(Equal("my-app-guid"))
+					Ω(*params.HealthCheckType).To(Equal("port"))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"Updating", "my-app", "port"}))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
@@ -121,10 +124,10 @@ var _ = Describe("set-health-check command", func() {
 
 			Context("Update fails", func() {
 				It("notifies user of any api error", func() {
-					appRepo.UpdateErr = true
+					appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 					runCommand("my-app", "port")
 
-					Ω(appRepo.UpdateCalls).To(Equal(1))
+					Ω(appRepo.UpdateCallCount()).To(Equal(1))
 					Ω(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Error updating app"},
@@ -136,11 +139,11 @@ var _ = Describe("set-health-check command", func() {
 					app.Name = "my-app"
 					app.Guid = "my-app-guid"
 					app.HealthCheckType = "none"
-					appRepo.UpdateAppResult = app
+					appRepo.UpdateReturns(app, nil)
 
 					runCommand("my-app", "port")
 
-					Ω(appRepo.UpdateCalls).To(Equal(1))
+					Ω(appRepo.UpdateCallCount()).To(Equal(1))
 					Ω(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"health_check_type", "not set"},

@@ -1,6 +1,8 @@
 package application_test
 
 import (
+	"errors"
+
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -101,15 +103,16 @@ var _ = Describe("enable-ssh command", func() {
 					app.Guid = "my-app-guid"
 					app.EnableSsh = true
 
-					appRepo.UpdateAppResult = app
+					appRepo.UpdateReturns(app, nil)
 				})
 
 				It("updates the app's enable_ssh", func() {
 					runCommand("my-app")
 
-					Ω(appRepo.UpdateCalls).To(Equal(1))
-					Ω(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-					Ω(*appRepo.UpdateParams.EnableSsh).To(Equal(true))
+					Expect(appRepo.UpdateCallCount()).To(Equal(1))
+					appGUID, params := appRepo.UpdateArgsForCall(0)
+					Ω(appGUID).To(Equal("my-app-guid"))
+					Ω(*params.EnableSsh).To(Equal(true))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"Enabling ssh support for 'my-app'"}))
 					Ω(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
@@ -117,10 +120,10 @@ var _ = Describe("enable-ssh command", func() {
 
 			Context("Update fails", func() {
 				It("notifies user of any api error", func() {
-					appRepo.UpdateErr = true
+					appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 					runCommand("my-app")
 
-					Ω(appRepo.UpdateCalls).To(Equal(1))
+					Ω(appRepo.UpdateCallCount()).To(Equal(1))
 					Ω(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Error enabling ssh support"},
@@ -132,11 +135,11 @@ var _ = Describe("enable-ssh command", func() {
 					app.Name = "my-app"
 					app.Guid = "my-app-guid"
 					app.EnableSsh = false
-					appRepo.UpdateAppResult = app
+					appRepo.UpdateReturns(app, nil)
 
 					runCommand("my-app")
 
-					Ω(appRepo.UpdateCalls).To(Equal(1))
+					Ω(appRepo.UpdateCallCount()).To(Equal(1))
 					Ω(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"ssh support is not enabled for my-app"},

@@ -1,6 +1,8 @@
 package application_test
 
 import (
+	"errors"
+
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -88,16 +90,17 @@ var _ = Describe("unset-env command", func() {
 			))
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-			Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]interface{}{
+			appGUID, params := appRepo.UpdateArgsForCall(0)
+			Expect(appGUID).To(Equal("my-app-guid"))
+			Expect(*params.EnvironmentVars).To(Equal(map[string]interface{}{
 				"foo": "bar",
 			}))
 		})
 
 		Context("when updating the app fails", func() {
 			BeforeEach(func() {
-				appRepo.UpdateErr = true
-				appRepo.ReadReturns.App = app
+				appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
+				appRepo.ReadReturns(app, nil)
 			})
 
 			It("fails and alerts the user", func() {

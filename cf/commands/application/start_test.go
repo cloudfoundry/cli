@@ -186,10 +186,9 @@ var _ = Describe("start command", func() {
 	}
 
 	startAppWithInstancesAndErrors := func(displayApp ApplicationDisplayer, app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *testApplication.FakeApplicationRepository, *testAppInstanaces.FakeAppInstancesRepository) {
-		appRepo = &testApplication.FakeApplicationRepository{
-			UpdateAppResult: app,
-		}
-		appRepo.ReadReturns.App = app
+		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo.UpdateReturns(app, nil)
+		appRepo.ReadReturns(app, nil)
 		appRepo.GetAppReturns(app, nil)
 		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 		appInstancesRepo.GetInstancesStub = getInstance
@@ -252,9 +251,8 @@ var _ = Describe("start command", func() {
 			BeforeEach(func() {
 				app = defaultAppForStart
 
-				appRepo = &testApplication.FakeApplicationRepository{
-					UpdateAppResult: app,
-				}
+				appRepo = &testApplication.FakeApplicationRepository{}
+				appRepo.UpdateReturns(app, nil)
 
 				app.PackageState = "FAILED"
 				app.StagingFailedReason = "BLAH, FAILED"
@@ -299,7 +297,7 @@ var _ = Describe("start command", func() {
 		})
 
 		It("uses proper org name and space name", func() {
-			appRepo.ReadReturns.App = defaultAppForStart
+			appRepo.ReadReturns(defaultAppForStart, nil)
 			appRepo.GetAppReturns(defaultAppForStart, nil)
 			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 			appInstancesRepo.GetInstancesStub = getInstance
@@ -328,7 +326,8 @@ var _ = Describe("start command", func() {
 			))
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+			appGUID, _ := appRepo.UpdateArgsForCall(0)
+			Expect(appGUID).To(Equal("my-app-guid"))
 			Expect(displayApp.AppToDisplay).To(Equal(defaultAppForStart))
 		})
 
@@ -338,7 +337,7 @@ var _ = Describe("start command", func() {
 			ui, appRepo, _ = startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
 			appRepo.GetAppReturns(defaultAppForStart, nil)
 
-			Expect(appRepo.ReadCalls).To(Equal(1))
+			Expect(appRepo.ReadCallCount()).To(Equal(1))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"App my-app was started using this command `command start command`"},
 			))
@@ -349,7 +348,7 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.Command = ""
 			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
 
-			Eventually(appRepo.ReadCalls).Should(Equal(1))
+			Expect(appRepo.ReadCallCount()).To(Equal(1))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"App my-app was started using this command `detected start command`"},
 			))
@@ -357,10 +356,9 @@ var _ = Describe("start command", func() {
 
 		It("handles timeouts gracefully", func() {
 			requirementsFactory.Application = defaultAppForStart
-			appRepo = &testApplication.FakeApplicationRepository{
-				UpdateAppResult: defaultAppForStart,
-			}
-			appRepo.ReadReturns.App = defaultAppForStart
+			appRepo = &testApplication.FakeApplicationRepository{}
+			appRepo.UpdateReturns(defaultAppForStart, nil)
+			appRepo.ReadReturns(defaultAppForStart, nil)
 
 			callStartWithLoggingTimeout([]string{"my-app"})
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -370,10 +368,9 @@ var _ = Describe("start command", func() {
 
 		It("only displays staging logs when an app is starting", func() {
 			requirementsFactory.Application = defaultAppForStart
-			appRepo = &testApplication.FakeApplicationRepository{
-				UpdateAppResult: defaultAppForStart,
-			}
-			appRepo.ReadReturns.App = defaultAppForStart
+			appRepo = &testApplication.FakeApplicationRepository{}
+			appRepo.UpdateReturns(defaultAppForStart, nil)
+			appRepo.ReadReturns(defaultAppForStart, nil)
 
 			currentTime := time.Now()
 			wrongSourceName := "DEA"
@@ -652,8 +649,9 @@ var _ = Describe("start command", func() {
 			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
-			appRepo = &testApplication.FakeApplicationRepository{UpdateErr: true}
-			appRepo.ReadReturns.App = app
+			appRepo = &testApplication.FakeApplicationRepository{}
+			appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
+			appRepo.ReadReturns(app, nil)
 			args := []string{"my-app"}
 			requirementsFactory.Application = app
 			callStart(args)
@@ -663,7 +661,8 @@ var _ = Describe("start command", func() {
 				[]string{"FAILED"},
 				[]string{"Error updating app."},
 			))
-			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+			appGUID, _ := appRepo.UpdateArgsForCall(0)
+			Expect(appGUID).To(Equal("my-app-guid"))
 		})
 
 		It("warns the user when the app is already running", func() {
@@ -672,7 +671,7 @@ var _ = Describe("start command", func() {
 			app.Guid = "my-app-guid"
 			app.State = "started"
 			appRepo := &testApplication.FakeApplicationRepository{}
-			appRepo.ReadReturns.App = app
+			appRepo.ReadReturns(app, nil)
 
 			requirementsFactory.Application = app
 
@@ -681,12 +680,12 @@ var _ = Describe("start command", func() {
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"my-app", "is already started"}))
 
-			Expect(appRepo.UpdateAppGuid).To(Equal(""))
+			Expect(appRepo.UpdateCallCount()).To(BeZero())
 		})
 
 		It("tells the user when connecting to the log server fails", func() {
 			appRepo = &testApplication.FakeApplicationRepository{}
-			appRepo.ReadReturns.App = defaultAppForStart
+			appRepo.ReadReturns(defaultAppForStart, nil)
 			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 
 			oldLogsRepo.TailLogsForReturns(errors.New("Ooops"))

@@ -101,7 +101,7 @@ var _ = Describe("scale command", func() {
 			app.Memory = 256
 
 			requirementsFactory.Application = app
-			appRepo.UpdateAppResult = app
+			appRepo.UpdateReturns(app, nil)
 		})
 
 		Context("when no flags are specified", func() {
@@ -160,10 +160,11 @@ var _ = Describe("scale command", func() {
 				Expect(orgName).To(Equal(config.OrganizationFields().Name))
 				Expect(spaceName).To(Equal(config.SpaceFields().Name))
 
-				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-				Expect(*appRepo.UpdateParams.Memory).To(Equal(int64(512)))
-				Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
-				Expect(*appRepo.UpdateParams.DiskQuota).To(Equal(int64(2048)))
+				appGUID, params := appRepo.UpdateArgsForCall(0)
+				Expect(appGUID).To(Equal("my-app-guid"))
+				Expect(*params.Memory).To(Equal(int64(512)))
+				Expect(*params.InstanceCount).To(Equal(5))
+				Expect(*params.DiskQuota).To(Equal(int64(2048)))
 			})
 
 			It("does not scale the memory and disk limits if they are not specified", func() {
@@ -171,10 +172,11 @@ var _ = Describe("scale command", func() {
 
 				Expect(restarter.ApplicationRestartCallCount()).To(Equal(0))
 
-				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-				Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
-				Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
-				Expect(appRepo.UpdateParams.Memory).To(BeNil())
+				appGUID, params := appRepo.UpdateArgsForCall(0)
+				Expect(appGUID).To(Equal("my-app-guid"))
+				Expect(*params.InstanceCount).To(Equal(5))
+				Expect(params.DiskQuota).To(BeNil())
+				Expect(params.Memory).To(BeNil())
 			})
 
 			It("does not scale the app's instance count if it is not specified", func() {
@@ -185,10 +187,11 @@ var _ = Describe("scale command", func() {
 				Expect(orgName).To(Equal(config.OrganizationFields().Name))
 				Expect(spaceName).To(Equal(config.SpaceFields().Name))
 
-				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-				Expect(*appRepo.UpdateParams.Memory).To(Equal(int64(512)))
-				Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
-				Expect(appRepo.UpdateParams.InstanceCount).To(BeNil())
+				appGUID, params := appRepo.UpdateArgsForCall(0)
+				Expect(appGUID).To(Equal("my-app-guid"))
+				Expect(*params.Memory).To(Equal(int64(512)))
+				Expect(params.DiskQuota).To(BeNil())
+				Expect(params.InstanceCount).To(BeNil())
 			})
 		})
 	})

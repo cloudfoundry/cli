@@ -1,6 +1,8 @@
 package application_test
 
 import (
+	"errors"
+
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -65,7 +67,7 @@ var _ = Describe("stop command", func() {
 		})
 
 		JustBeforeEach(func() {
-			appRepo.ReadReturns.App = app
+			appRepo.ReadReturns(app, nil)
 			requirementsFactory.Application = app
 		})
 
@@ -85,11 +87,12 @@ var _ = Describe("stop command", func() {
 			))
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+			appGUID, _ := appRepo.UpdateArgsForCall(0)
+			Expect(appGUID).To(Equal("my-app-guid"))
 		})
 
 		It("warns the user when stopping the app fails", func() {
-			appRepo.UpdateErr = true
+			appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 			runCommand("my-app")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -97,7 +100,8 @@ var _ = Describe("stop command", func() {
 				[]string{"FAILED"},
 				[]string{"Error updating app."},
 			))
-			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+			appGUID, _ := appRepo.UpdateArgsForCall(0)
+			Expect(appGUID).To(Equal("my-app-guid"))
 		})
 
 		Context("when the app is stopped", func() {
@@ -109,7 +113,7 @@ var _ = Describe("stop command", func() {
 				runCommand("my-app")
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"my-app", "is already stopped"}))
-				Expect(appRepo.UpdateAppGuid).To(Equal(""))
+				Expect(appRepo.UpdateCallCount()).To(BeZero())
 			})
 		})
 
@@ -118,7 +122,7 @@ var _ = Describe("stop command", func() {
 				expectedStoppedApp := app
 				expectedStoppedApp.State = "stopped"
 
-				appRepo.UpdateAppResult = expectedStoppedApp
+				appRepo.UpdateReturns(expectedStoppedApp, nil)
 				updateCommandDependency(false)
 				stopper := command_registry.Commands.FindCommand("stop").(*application.Stop)
 				actualStoppedApp, err := stopper.ApplicationStop(app, config.OrganizationFields().Name, config.SpaceFields().Name)
