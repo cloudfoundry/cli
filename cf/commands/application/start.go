@@ -49,8 +49,7 @@ type Start struct {
 	appReq           requirements.ApplicationRequirement
 	appRepo          applications.ApplicationRepository
 	appInstancesRepo app_instances.AppInstancesRepository
-	oldLogsRepo      api.OldLogsRepository
-	logRepo          api.LogsNoaaRepository
+	logRepo          api.OldLogsRepository
 
 	LogServerConnectionTimeout time.Duration
 	StartupTimeout             time.Duration
@@ -87,8 +86,7 @@ func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall boo
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
-	cmd.logRepo = deps.RepoLocator.GetLogsNoaaRepository()
-	cmd.oldLogsRepo = deps.RepoLocator.GetOldLogsRepository()
+	cmd.logRepo = deps.RepoLocator.GetOldLogsRepository()
 	cmd.LogServerConnectionTimeout = 20 * time.Second
 	cmd.PingerThrottle = DefaultPingerThrottle
 
@@ -174,8 +172,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	isStaged := cmd.waitForInstancesToStage(updatedApp)
 
 	if isConnected { //only close when actually connected, else CLI hangs at closing consumer connection
-		// cmd.logRepo.Close()
-		cmd.oldLogsRepo.Close()
+		cmd.logRepo.Close()
 	}
 
 	<-doneLoggingChan
@@ -234,7 +231,7 @@ func (cmd *Start) tailStagingLogs(app models.Application, startChan, doneChan ch
 		startChan <- true
 	}
 
-	err := cmd.oldLogsRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
+	err := cmd.logRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
 		if msg.GetSourceName() == LogMessageTypeStaging {
 			cmd.ui.Say(simpleLogMessageOutput(msg))
 		}
