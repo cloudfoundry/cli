@@ -91,7 +91,8 @@
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
-			"Rev": "fdd9ce0eff0447ddec6b10625512f49a726418c1"
+			"Comment": "v1.3.0-5-g37e5c2d",
+			"Rev": "37e5c2de3e03e4b82693e3fcb4a6aa2cc4eb07e3"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
