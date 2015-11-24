@@ -9,8 +9,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/i18n/detection"
+
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,209 +21,300 @@ var _ = Describe("i18n.Init() function", func() {
 		oldResourcesPath string
 		configRepo       core_config.ReadWriter
 		detector         detection.Detector
-
-		T go_i18n.TranslateFunc
 	)
 
 	BeforeEach(func() {
-		configRepo = testconfig.NewRepositoryWithDefaults()
 		oldResourcesPath = i18n.GetResourcesPath()
 		i18n.Resources_path = filepath.Join("cf", "i18n", "test_fixtures")
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		detector = &detection.JibberJabberDetector{}
 	})
 
-	JustBeforeEach(func() {
-		T = i18n.Init(configRepo, detector)
+	AfterEach(func() {
+		i18n.Resources_path = oldResourcesPath
 	})
 
-	Describe("When a user has a locale configuration set", func() {
-		It("panics when the translation files cannot be loaded", func() {
-			i18n.Resources_path = filepath.Join("should", "not", "be_valid")
-			configRepo.SetLocale("en_us")
-
-			init := func() { i18n.Init(configRepo, detector) }
-			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
-		})
-
-		It("Panics if the locale is not valid", func() {
-			configRepo.SetLocale("abc_def")
-
-			init := func() { i18n.Init(configRepo, detector) }
-			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
-		})
-
-		Context("when the locale is set to french", func() {
+	Describe("Init", func() {
+		Context("when the config contains a locale", func() {
 			BeforeEach(func() {
 				configRepo.SetLocale("fr_FR")
 			})
 
-			It("translates into french correctly", func() {
-				translation := T("No buildpacks found")
-				Ω(translation).Should(Equal("Pas buildpacks trouvés"))
+			Context("when the translations can be loaded", func() {
+				It("returns a translate func for that locale", func() {
+					translateFunc := i18n.Init(configRepo, detector)
+					Expect(translateFunc("No buildpacks found")).To(Equal("Pas buildpacks trouvés"))
+				})
+			})
+
+			Context("when the translations cannot be loaded", func() {
+				// no file exists for that locale
+				// file when loaded returned no bytes
+				// root tempdir could not be found
+				// os.Stat failed for a reason other than the dir does not exist
+				// creating the tempdir failed
+				// creating the tempfile failed
+				// writing the tempfile failed
+				// go_i18n could not load the tempfile
+
+				BeforeEach(func() {
+					configRepo.SetLocale("invalid")
+				})
+
+				It("panics", func() {
+					Expect(func() { i18n.Init(configRepo, detector) }).To(Panic())
+				})
 			})
 		})
 
-		Context("creates a valid T function", func() {
+		Context("when the config does not contain a locale", func() {
 			BeforeEach(func() {
-				configRepo.SetLocale("en_US")
+				configRepo.SetLocale("")
 			})
 
-			It("returns a usable T function for simple strings", func() {
-				Ω(T).ShouldNot(BeNil())
+			Context("when LANG and LC_ALL are not set", func() {
+				var origLANG, origLCALL string
 
-				translation := T("Hello world!")
-				Ω("Hello world!").Should(Equal(translation))
-			})
-
-			It("returns a usable T function for complex strings (interpolated)", func() {
-				Ω(T).ShouldNot(BeNil())
-
-				translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo.com", "Username": "Anand"})
-				Ω("Deleting domain foo.com as Anand...").Should(Equal(translation))
-			})
-		})
-	})
-
-	Describe("When the user does not have a locale configuration set", func() {
-		AfterEach(func() {
-			i18n.Resources_path = oldResourcesPath
-			os.Setenv("LC_ALL", "")
-			os.Setenv("LANG", "en_US.UTF-8")
-		})
-
-		It("panics when the translation files cannot be loaded", func() {
-			os.Setenv("LANG", "en")
-			i18n.Resources_path = filepath.Join("should", "not", "be_valid")
-
-			init := func() { i18n.Init(configRepo, detector) }
-			Ω(init).Should(Panic(), "loading translations from an invalid path should panic")
-		})
-
-		Context("loads correct locale", func() {
-			It("defaults to en_US when LC_ALL and LANG not set", func() {
-				os.Setenv("LC_ALL", "")
-				os.Setenv("LANG", "")
-
-				translation := T("Hello world!")
-				Ω("Hello world!").Should(Equal(translation))
-			})
-
-			Context("when there is no territory set", func() {
 				BeforeEach(func() {
-					os.Setenv("LANG", "en")
+					origLANG = os.Getenv("LANG")
+					origLCALL = os.Getenv("LC_ALL")
+					os.Setenv("LANG", "")
+					os.Setenv("LC_ALL", "")
 				})
 
-				It("still loads the english translation", func() {
-					translation := T("Hello world!")
-					Ω("Hello world!").Should(Equal(translation))
+				AfterEach(func() {
+					os.Setenv("LANG", origLANG)
+					os.Setenv("LC_ALL", origLCALL)
+				})
+
+				It("returns a translate func for the default locale", func() {
+					translateFunc := i18n.Init(configRepo, detector)
+					Expect(translateFunc("No buildpacks found")).To(Equal("No buildpacks found"))
 				})
 			})
 
-			Context("when the desired language is not supported", func() {
+			Context("when LANG is set to zh_TW", func() {
+				var origLANG, origLCALL string
+
 				BeforeEach(func() {
-					os.Setenv("LC_ALL", "zz_FF.UTF-8")
+					origLANG = os.Getenv("LANG")
+					origLCALL = os.Getenv("LC_ALL")
+					os.Setenv("LANG", "zh_TW")
+					os.Setenv("LC_ALL", "")
 				})
 
-				It("defaults to en_US when langauge is not supported", func() {
-					translation := T("Hello world!")
-					Ω("Hello world!").Should(Equal(translation))
-
-					translation = T("No buildpacks found")
-					Ω("No buildpacks found").Should(Equal(translation))
+				AfterEach(func() {
+					os.Setenv("LANG", origLANG)
+					os.Setenv("LC_ALL", origLCALL)
 				})
 
-				Context("because we don't have the territory", func() {
+				It("returns a translate func for zh_Hant", func() {
+					translateFunc := i18n.Init(configRepo, detector)
+					Expect(translateFunc("No buildpacks found")).To(Equal("(Hant)No buildpacks found"))
+				})
+			})
+
+			Context("when LANG is set to zh_HK", func() {
+				var origLANG, origLCALL string
+
+				BeforeEach(func() {
+					origLANG = os.Getenv("LANG")
+					origLCALL = os.Getenv("LC_ALL")
+					os.Setenv("LANG", "zh_HK")
+					os.Setenv("LC_ALL", "")
+				})
+
+				AfterEach(func() {
+					os.Setenv("LANG", origLANG)
+					os.Setenv("LC_ALL", origLCALL)
+				})
+
+				It("returns a translate func for zh_Hant", func() {
+					translateFunc := i18n.Init(configRepo, detector)
+					Expect(translateFunc("No buildpacks found")).To(Equal("(Hant)No buildpacks found"))
+				})
+			})
+
+			Context("when LANG is set to something other than zh_TW or zh_HK", func() {
+				Context("when the language can be loaded via locale", func() {
+					var origLANG, origLCALL string
+
 					BeforeEach(func() {
-						os.Setenv("LC_ALL", "fr_CA.UTF-8")
+						origLANG = os.Getenv("LANG")
+						origLCALL = os.Getenv("LC_ALL")
+						os.Setenv("LANG", "fr_FR")
+						os.Setenv("LC_ALL", "")
 					})
 
-					It("defaults to same language in supported territory", func() {
-						translation := T("No buildpacks found")
-						Ω("Pas buildpacks trouvés").Should(Equal(translation))
+					AfterEach(func() {
+						os.Setenv("LANG", origLANG)
+						os.Setenv("LC_ALL", origLCALL)
+					})
+
+					It("returns a translate func for that locale", func() {
+						translateFunc := i18n.Init(configRepo, detector)
+						Expect(translateFunc("No buildpacks found")).To(Equal("Pas buildpacks trouvés"))
+					})
+				})
+
+				Context("when the translations can be loaded via language", func() {
+					var origLANG, origLCALL string
+
+					BeforeEach(func() {
+						origLANG = os.Getenv("LANG")
+						origLCALL = os.Getenv("LC_ALL")
+						os.Setenv("LANG", "fr_ZZ")
+						os.Setenv("LC_ALL", "")
+					})
+
+					AfterEach(func() {
+						os.Setenv("LANG", origLANG)
+						os.Setenv("LC_ALL", origLCALL)
+					})
+
+					Context("when the translations can be loaded", func() {
+						It("returns a translate func for that locale", func() {
+							translateFunc := i18n.Init(configRepo, detector)
+							Expect(translateFunc("No buildpacks found")).To(Equal("Pas buildpacks trouvés"))
+						})
+					})
+
+					Context("when the translations cannot be loaded", func() {
+						It("returns a translate func for the default locale", func() {})
+					})
+				})
+
+				Context("when the translations cannot be found", func() {
+					var origLANG string
+
+					BeforeEach(func() {
+						origLANG = os.Getenv("LANG")
+						os.Setenv("LANG", "zz_ZZ")
+					})
+
+					AfterEach(func() {
+						os.Setenv("LANG", origLANG)
+					})
+
+					It("returns a translate func for the default locale", func() {
+						translateFunc := i18n.Init(configRepo, detector)
+						Expect(translateFunc("No buildpacks found")).To(Equal("No buildpacks found"))
 					})
 				})
 			})
 
-			Context("translates correctly", func() {
+			Context("when LC_ALL is set to zh_TW", func() {
+				var origLANG, origLCALL string
+
 				BeforeEach(func() {
-					os.Setenv("LC_ALL", "fr_FR.UTF-8")
+					origLANG = os.Getenv("LANG")
+					origLCALL = os.Getenv("LC_ALL")
+					os.Setenv("LANG", "")
+					os.Setenv("LC_ALL", "zh_TW")
 				})
 
-				It("T function should return translation if string key exists", func() {
-					translation := T("No buildpacks found")
-					Ω("Pas buildpacks trouvés").Should(Equal(translation))
+				AfterEach(func() {
+					os.Setenv("LANG", origLANG)
+					os.Setenv("LC_ALL", origLCALL)
+				})
+
+				It("returns a translate func for zh_Hant", func() {
+					translateFunc := i18n.Init(configRepo, detector)
+					Expect(translateFunc("No buildpacks found")).To(Equal("(Hant)No buildpacks found"))
 				})
 			})
 
-			Context("matches zh_CN to simplified Chinese", func() {
+			Context("when LC_ALL is set to zh_HK", func() {
+				var origLANG, origLCALL string
+
 				BeforeEach(func() {
-					os.Setenv("LC_ALL", "zh_CN.UTF-8")
+					origLANG = os.Getenv("LANG")
+					origLCALL = os.Getenv("LC_ALL")
+					os.Setenv("LANG", "")
+					os.Setenv("LC_ALL", "zh_HK")
 				})
 
-				It("matches to zh_Hans", func() {
-					translation := T("No buildpacks found")
-					Ω("buildpack未找到").Should(Equal(translation))
-				})
-			})
-
-			Context("matches zh_TW locale to traditional Chinese", func() {
-				BeforeEach(func() {
-					os.Setenv("LC_ALL", "zh_TW.UTF-8")
+				AfterEach(func() {
+					os.Setenv("LANG", origLANG)
+					os.Setenv("LC_ALL", origLCALL)
 				})
 
-				It("matches to zh_Hant", func() {
-					translation := T("No buildpacks found")
-					Ω("(Hant)No buildpacks found").Should(Equal(translation))
+				It("returns a translate func for zh_Hant", func() {
+					translateFunc := i18n.Init(configRepo, detector)
+					Expect(translateFunc("No buildpacks found")).To(Equal("(Hant)No buildpacks found"))
 				})
 			})
 
-			Context("matches zh_HK locale to traditional Chinese", func() {
-				BeforeEach(func() {
-					os.Setenv("LC_ALL", "zh_HK.UTF-8")
+			Context("when LC_ALL is set to something other than zh_TW or zh_HK", func() {
+				Context("when the language can be loaded via locale", func() {
+					var origLANG, origLCALL string
+
+					BeforeEach(func() {
+						origLANG = os.Getenv("LANG")
+						origLCALL = os.Getenv("LC_ALL")
+						os.Setenv("LANG", "")
+						os.Setenv("LC_ALL", "fr_FR")
+					})
+
+					AfterEach(func() {
+						os.Setenv("LANG", origLANG)
+						os.Setenv("LC_ALL", origLCALL)
+					})
+
+					It("returns a translate func for that locale", func() {
+						translateFunc := i18n.Init(configRepo, detector)
+						Expect(translateFunc("No buildpacks found")).To(Equal("Pas buildpacks trouvés"))
+					})
 				})
 
-				It("matches to zh_Hant", func() {
-					translation := T("No buildpacks found")
-					Ω("(Hant)No buildpacks found").Should(Equal(translation))
+				Context("when the translations can be loaded via language", func() {
+					var origLANG, origLCALL string
+
+					BeforeEach(func() {
+						origLANG = os.Getenv("LANG")
+						origLCALL = os.Getenv("LC_ALL")
+						os.Setenv("LANG", "")
+						os.Setenv("LC_ALL", "fr_ZZ")
+					})
+
+					AfterEach(func() {
+						os.Setenv("LANG", origLANG)
+						os.Setenv("LC_ALL", origLCALL)
+					})
+
+					Context("when the translations can be loaded", func() {
+						It("returns a translate func for that locale", func() {
+							translateFunc := i18n.Init(configRepo, detector)
+							Expect(translateFunc("No buildpacks found")).To(Equal("Pas buildpacks trouvés"))
+						})
+					})
+
+					Context("when the translations cannot be loaded", func() {
+						It("returns a translate func for the default locale", func() {})
+					})
+				})
+
+				Context("when the translations cannot be loaded via language", func() {
+					var origLANG, origLCALL string
+
+					BeforeEach(func() {
+						origLANG = os.Getenv("LANG")
+						origLCALL = os.Getenv("LC_ALL")
+						os.Setenv("LANG", "")
+						os.Setenv("LC_ALL", "zz_ZZ")
+					})
+
+					AfterEach(func() {
+						os.Setenv("LANG", origLANG)
+						os.Setenv("LC_ALL", origLCALL)
+					})
+
+					It("returns a translate func for the default locale", func() {
+						translateFunc := i18n.Init(configRepo, detector)
+						Expect(translateFunc("No buildpacks found")).To(Equal("No buildpacks found"))
+					})
 				})
 			})
-		})
-
-		Context("creates a valid T function", func() {
-			BeforeEach(func() {
-				os.Setenv("LC_ALL", "en_US.UTF-8")
-			})
-
-			It("returns a usable T function for simple strings", func() {
-				Ω(T).ShouldNot(BeNil())
-
-				translation := T("Hello world!")
-				Ω("Hello world!").Should(Equal(translation))
-			})
-
-			It("returns a usable T function for complex strings (interpolated)", func() {
-				Ω(T).ShouldNot(BeNil())
-
-				translation := T("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{"DomainName": "foo.com", "Username": "Anand"})
-				Ω("Deleting domain foo.com as Anand...").Should(Equal(translation))
-			})
-		})
-	})
-
-	Describe("when the config is set to a non-english language and the LANG environamnt variable is en_US", func() {
-		BeforeEach(func() {
-			configRepo.SetLocale("fr_FR")
-			os.Setenv("LANG", "en_US")
-		})
-
-		AfterEach(func() {
-			i18n.Resources_path = oldResourcesPath
-			os.Setenv("LANG", "en_US.UTF-8")
-		})
-
-		It("ignores the english LANG enviornmant variable", func() {
-			translation := T("No buildpacks found")
-			Ω(translation).Should(Equal("Pas buildpacks trouvés"))
 		})
 	})
 })
