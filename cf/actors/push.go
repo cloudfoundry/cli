@@ -48,7 +48,6 @@ func (actor PushActorImpl) PopulateFileMode(appDir string, presentFiles []resour
 }
 
 func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
-	var finalDir string
 	if actor.zipper.IsZipFile(appDir) {
 		tmpDir, err := ioutil.TempDir("", "unzipped-app")
 		if err != nil {
@@ -61,17 +60,19 @@ func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resou
 			return []resources.AppFileResource{}, false, err
 		}
 
-		finalDir = tmpDir
-	} else {
-		finalDir = appDir
+		appDir = tmpDir
 	}
-
-	files, hasFileToUpload, err := actor.copyUploadableFiles(finalDir, uploadDir)
+	appDir, err := filepath.EvalSymlinks(appDir)
 	if err != nil {
 		return []resources.AppFileResource{}, false, err
 	}
 
-	filesWithFileMode, err := actor.PopulateFileMode(finalDir, files)
+	files, hasFileToUpload, err := actor.copyUploadableFiles(appDir, uploadDir)
+	if err != nil {
+		return []resources.AppFileResource{}, false, err
+	}
+
+	filesWithFileMode, err := actor.PopulateFileMode(appDir, files)
 	if err != nil {
 		return []resources.AppFileResource{}, false, err
 	}
@@ -105,7 +106,8 @@ func (actor PushActorImpl) copyUploadableFiles(appDir string, uploadDir string) 
 	}
 
 	// copy cfignore if present
-	fileutils.CopyPathToPath(filepath.Join(appDir, ".cfignore"), filepath.Join(uploadDir, ".cfignore")) //error handling?
+	// TODO: move this into AppFiles, see: https://github.com/cloudfoundry/cli/commit/dcf7dfe5305a10b569e7a2bfb2ed3db25096065c
+	fileutils.CopyPathToPath(filepath.Join(appDir, ".cfignore"), filepath.Join(uploadDir, ".cfignore")) // error handling?
 
 	return
 }
