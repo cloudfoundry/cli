@@ -20,7 +20,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -35,10 +34,8 @@ var _ = Describe("start command", func() {
 		defaultInstanceResponses  = [][]models.AppInstanceFields{}
 		defaultInstanceErrorCodes = []string{"", ""}
 		requirementsFactory       *testreq.FakeReqFactory
-		logsForTail               []*events.LogMessage
-		logRepo                   *testapi.FakeLogsNoaaRepository
-		oldLogsForTail            []*logmessage.LogMessage
-		oldLogsRepo               *testapi.FakeOldLogsRepository
+		logMessages               []*logmessage.LogMessage
+		logRepo                   *testapi.FakeOldLogsRepository
 		appInstancesRepo          *testAppInstanaces.FakeAppInstancesRepository
 		appRepo                   *testApplication.FakeApplicationRepository
 		OriginalAppCommand        command_registry.Command
@@ -49,7 +46,6 @@ var _ = Describe("start command", func() {
 	updateCommandDependency := func(oldLogs api.OldLogsRepository) {
 		deps.Ui = ui
 		deps.Config = configRepo
-		deps.RepoLocator = deps.RepoLocator.SetLogsNoaaRepository(logRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOldLogsRepository(oldLogs)
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
@@ -132,34 +128,24 @@ var _ = Describe("start command", func() {
 			[]models.AppInstanceFields{instance3, instance4},
 		}
 
-		oldLogsRepo = &testapi.FakeOldLogsRepository{}
+		logRepo = &testapi.FakeOldLogsRepository{}
 		mutex.Lock()
-		oldLogsForTail = []*logmessage.LogMessage{}
+		logMessages = []*logmessage.LogMessage{}
 		mutex.Unlock()
-		oldLogsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+		logRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
 			onConnect()
 			mutex.Lock()
-			for _, log := range oldLogsForTail {
+			for _, log := range logMessages {
 				onMessage(log)
 			}
 			mutex.Unlock()
 			return nil
 		}
 
-		logsForTail = []*events.LogMessage{}
-		logRepo = new(testapi.FakeLogsNoaaRepository)
-		logRepo.TailNoaaLogsForStub = func(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error {
-			onConnect()
-			for _, log := range logsForTail {
-				onMessage(log)
-			}
-			return nil
-		}
-
 	})
 
 	callStart := func(args []string) bool {
-		updateCommandDependency(oldLogsRepo)
+		updateCommandDependency(logRepo)
 		cmd := command_registry.Commands.FindCommand("start").(*Start)
 		cmd.StagingTimeout = 100 * time.Millisecond
 		cmd.StartupTimeout = 200 * time.Millisecond
@@ -170,9 +156,9 @@ var _ = Describe("start command", func() {
 
 	callStartWithLoggingTimeout := func(args []string) (ui *testterm.FakeUI) {
 
-		oldLogsRepoWithTimeout := &testapi.FakeOldLogsRepositoryWithTimeout{}
+		logRepoWithTimeout := &testapi.FakeOldLogsRepositoryWithTimeout{}
 
-		updateCommandDependency(oldLogsRepoWithTimeout)
+		updateCommandDependency(logRepoWithTimeout)
 
 		cmd := command_registry.Commands.FindCommand("start").(*Start)
 		cmd.LogServerConnectionTimeout = 100 * time.Millisecond
@@ -192,11 +178,6 @@ var _ = Describe("start command", func() {
 		appRepo.GetAppReturns(app, nil)
 		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 		appInstancesRepo.GetInstancesStub = getInstance
-
-		logsForTail = []*events.LogMessage{
-			testlogs.NewNoaaLogMessage("Log Line 1", app.Guid, LogMessageTypeStaging, time.Now()),
-			testlogs.NewNoaaLogMessage("Log Line 2", app.Guid, LogMessageTypeStaging, time.Now()),
-		}
 
 		args := []string{"my-app"}
 
@@ -220,7 +201,7 @@ var _ = Describe("start command", func() {
 
 	Describe("timeouts", func() {
 		It("has sane default timeout values", func() {
-			updateCommandDependency(oldLogsRepo)
+			updateCommandDependency(logRepo)
 			cmd := command_registry.Commands.FindCommand("start").(*Start)
 			Expect(cmd.StagingTimeout).To(Equal(15 * time.Minute))
 			Expect(cmd.StartupTimeout).To(Equal(5 * time.Minute))
@@ -237,7 +218,7 @@ var _ = Describe("start command", func() {
 			os.Setenv("CF_STAGING_TIMEOUT", "6")
 			os.Setenv("CF_STARTUP_TIMEOUT", "3")
 
-			updateCommandDependency(oldLogsRepo)
+			updateCommandDependency(logRepo)
 			cmd := command_registry.Commands.FindCommand("start").(*Start)
 			Expect(cmd.StagingTimeout).To(Equal(6 * time.Minute))
 			Expect(cmd.StartupTimeout).To(Equal(3 * time.Minute))
@@ -262,7 +243,7 @@ var _ = Describe("start command", func() {
 				requirementsFactory.TargetedSpaceSuccess = true
 				requirementsFactory.Application = app
 
-				updateCommandDependency(oldLogsRepo)
+				updateCommandDependency(logRepo)
 				cmd := command_registry.Commands.FindCommand("start").(*Start)
 				cmd.StagingTimeout = 0
 				cmd.PingerThrottle = 1
@@ -302,7 +283,7 @@ var _ = Describe("start command", func() {
 			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 			appInstancesRepo.GetInstancesStub = getInstance
 
-			updateCommandDependency(oldLogsRepo)
+			updateCommandDependency(logRepo)
 			cmd := command_registry.Commands.FindCommand("start").(*Start)
 			cmd.StagingTimeout = 100 * time.Millisecond
 			cmd.StartupTimeout = 200 * time.Millisecond
@@ -376,18 +357,11 @@ var _ = Describe("start command", func() {
 			wrongSourceName := "DEA"
 			correctSourceName := "STG"
 
-			oldLogsForTail = []*logmessage.LogMessage{
+			logMessages = []*logmessage.LogMessage{
 				testlogs.NewOldLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
 				testlogs.NewOldLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
 				testlogs.NewOldLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
 				testlogs.NewOldLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
-			}
-
-			logsForTail = []*events.LogMessage{
-				testlogs.NewNoaaLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
-				testlogs.NewNoaaLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
-				testlogs.NewNoaaLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
-				testlogs.NewNoaaLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
 			}
 
 			callStart([]string{"my-app"})
@@ -405,7 +379,7 @@ var _ = Describe("start command", func() {
 		It("gracefully handles starting an app that is still staging", func() {
 			logRepoClosed := make(chan struct{})
 
-			oldLogsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+			logRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
 				onConnect()
 				onMessage(testlogs.NewOldLogMessage("Before close", appGuid, LogMessageTypeStaging, time.Now()))
 
@@ -416,23 +390,6 @@ var _ = Describe("start command", func() {
 				onMessage(testlogs.NewOldLogMessage("After close 2", appGuid, LogMessageTypeStaging, time.Now()))
 
 				return nil
-			}
-
-			logRepo.TailNoaaLogsForStub = func(appGuid string, onConnect func(), onMessage func(*events.LogMessage)) error {
-				onConnect()
-				onMessage(testlogs.NewNoaaLogMessage("Before close", appGuid, LogMessageTypeStaging, time.Now()))
-
-				<-logRepoClosed
-
-				time.Sleep(50 * time.Millisecond)
-				onMessage(testlogs.NewNoaaLogMessage("After close 1", appGuid, LogMessageTypeStaging, time.Now()))
-				onMessage(testlogs.NewNoaaLogMessage("After close 2", appGuid, LogMessageTypeStaging, time.Now()))
-
-				return nil
-			}
-
-			oldLogsRepo.CloseStub = func() {
-				close(logRepoClosed)
 			}
 
 			logRepo.CloseStub = func() {
@@ -688,8 +645,7 @@ var _ = Describe("start command", func() {
 			appRepo.ReadReturns(defaultAppForStart, nil)
 			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 
-			oldLogsRepo.TailLogsForReturns(errors.New("Ooops"))
-			logRepo.TailNoaaLogsForReturns(errors.New("Ooops"))
+			logRepo.TailLogsForReturns(errors.New("Ooops"))
 
 			requirementsFactory.Application = defaultAppForStart
 
