@@ -15,7 +15,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -29,7 +28,6 @@ type Dependency struct {
 	Ui                 terminal.UI
 	Config             core_config.Repository
 	RepoLocator        api.RepositoryLocator
-	Detector           detection.Detector
 	PluginConfig       plugin_config.PluginConfiguration
 	ManifestRepo       manifest.ManifestRepository
 	AppManifest        manifest.AppManifest
@@ -78,7 +76,6 @@ func NewDependency() Dependency {
 	}
 	deps.Config = core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler)
 	deps.PluginConfig = plugin_config.NewPluginConfig(errorHandler)
-	deps.Detector = &detection.JibberJabberDetector{}
 
 	terminal.UserAskedForColors = deps.Config.ColorEnabled()
 	terminal.InitColorSupport()

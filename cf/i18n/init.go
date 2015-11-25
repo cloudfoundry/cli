@@ -1,23 +1,15 @@
 package i18n
 
 import (
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	resources "github.com/cloudfoundry/cli/cf/resources"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 )
 
-const (
-	DEFAULT_LOCALE   = "en_US"
-	DEFAULT_LANGUAGE = "en"
-)
+const DEFAULT_LOCALE = "en_US"
 
 var T go_i18n.TranslateFunc
 
@@ -33,131 +25,23 @@ var SUPPORTED_LOCALES = map[string]string{
 	//"ru": "ru_RU", - Will add support for Russian when nicksnyder/go-i18n supports Russian
 	"zh": "zh_Hans",
 }
-var Resources_path = filepath.Join("cf", "i18n", "resources")
 
-func GetResourcesPath() string {
-	return Resources_path
-}
-
-func Init(config core_config.ReadWriter, detector detection.Detector) go_i18n.TranslateFunc {
-	var T go_i18n.TranslateFunc
-	var err error
-
-	locale := config.Locale()
-	if locale != "" {
-		err = loadFromAsset(locale)
-		if err == nil {
-			T, err = go_i18n.Tfunc(config.Locale(), DEFAULT_LOCALE)
-		}
-	} else {
-		var userLocale string
-		userLocale, err = initWithUserLocale(detector)
+func Init(config core_config.Reader) go_i18n.TranslateFunc {
+	for _, assetName := range resources.AssetNames() {
+		assetBytes, err := resources.Asset(assetName)
 		if err != nil {
-			userLocale = mustLoadDefaultLocale() // not tested
+			panic(fmt.Sprintf("Could not load asset '%s': %s", assetName, err.Error()))
 		}
-
-		T, err = go_i18n.Tfunc(userLocale, DEFAULT_LOCALE)
+		err = go_i18n.ParseTranslationFileBytes(assetName, assetBytes)
+		if err != nil {
+			panic(fmt.Sprintf("Could not load translations '%s': %s", assetName, err.Error()))
+		}
 	}
 
+	T, err := go_i18n.Tfunc(config.Locale(), os.Getenv("LC_ALL"), os.Getenv("LANG"), DEFAULT_LOCALE)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Failed to create translation func", err.Error()))
 	}
 
 	return T
-}
-
-func initWithUserLocale(detector detection.Detector) (string, error) {
-	userLocale, err := detector.DetectIETF()
-	if err != nil {
-		userLocale = DEFAULT_LOCALE // not tested
-	}
-
-	language, err := detector.DetectLanguage()
-	if err != nil {
-		language = DEFAULT_LANGUAGE // not tested
-	}
-
-	userLocale = strings.Replace(userLocale, "-", "_", 1)
-	if strings.HasPrefix(userLocale, "zh_TW") || strings.HasPrefix(userLocale, "zh_HK") {
-		userLocale = "zh_Hant"
-		language = "zh"
-	}
-
-	err = loadFromAsset(userLocale)
-	if err != nil {
-		locale := SUPPORTED_LOCALES[language]
-		if locale == "" {
-			userLocale = DEFAULT_LOCALE
-		} else {
-			userLocale = locale
-		}
-		err = loadFromAsset(userLocale)
-	}
-
-	return userLocale, err
-}
-
-func mustLoadDefaultLocale() string {
-	userLocale := DEFAULT_LOCALE
-
-	err := loadFromAsset(DEFAULT_LOCALE)
-	if err != nil {
-		panic("Could not load en_US language files. \n" + err.Error() + "\n\n") // not tested
-	}
-
-	return userLocale
-}
-
-func loadFromAsset(locale string) error {
-	assetName := locale + ".all.json"
-	assetKey := filepath.Join(GetResourcesPath(), assetName)
-
-	byteArray, err := resources.Asset(assetKey)
-	if err != nil {
-		return err
-	}
-
-	if len(byteArray) == 0 {
-		return fmt.Errorf("Could not load i18n asset: %v", assetKey)
-	}
-
-	_, err = os.Stat(os.TempDir())
-	if err != nil {
-		if !os.IsExist(err) {
-			return errors.New("Please make sure Temp dir exist - " + os.TempDir())
-		}
-		return err
-	}
-
-	tmpDir, err := ioutil.TempDir("", "cloudfoundry_cli_i18n_res")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tmpDir)
-
-	fileName, err := saveLanguageFileToDisk(tmpDir, assetName, byteArray)
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(fileName)
-
-	go_i18n.MustLoadTranslationFile(fileName)
-
-	return nil
-}
-
-func saveLanguageFileToDisk(tmpDir, assetName string, byteArray []byte) (fileName string, err error) {
-	fileName = filepath.Join(tmpDir, assetName)
-	file, err := os.Create(fileName)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	_, err = file.Write(byteArray)
-	if err != nil {
-		return
-	}
-
-	return
 }

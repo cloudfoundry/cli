@@ -16,7 +16,6 @@ var _ = Describe("Dependency", func() {
 		Ω(dependency.Ui).ToNot(BeNil())
 		Ω(dependency.Config).ToNot(BeNil())
 		Ω(dependency.RepoLocator).ToNot(BeNil())
-		Ω(dependency.Detector).ToNot(BeNil())
 		Ω(dependency.PluginConfig).ToNot(BeNil())
 		Ω(dependency.ManifestRepo).ToNot(BeNil())
 		Ω(dependency.AppManifest).ToNot(BeNil())
