@@ -3,10 +3,13 @@ package i18n
 import (
 	"fmt"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	resources "github.com/cloudfoundry/cli/cf/resources"
+	"github.com/cloudfoundry/cli/cf/resources"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
+	"github.com/nicksnyder/go-i18n/i18n/language"
 )
 
 const DEFAULT_LOCALE = "en_US"
@@ -27,21 +30,42 @@ var SUPPORTED_LOCALES = map[string]string{
 }
 
 func Init(config core_config.Reader) go_i18n.TranslateFunc {
-	for _, assetName := range resources.AssetNames() {
-		assetBytes, err := resources.Asset(assetName)
-		if err != nil {
-			panic(fmt.Sprintf("Could not load asset '%s': %s", assetName, err.Error()))
+	sources := []string{
+		config.Locale(),
+		os.Getenv("LC_ALL"),
+		os.Getenv("LANG"),
+		DEFAULT_LOCALE,
+	}
+
+	assetNames := resources.AssetNames()
+
+	for _, source := range sources {
+		if source == "" {
+			continue
 		}
-		err = go_i18n.ParseTranslationFileBytes(assetName, assetBytes)
-		if err != nil {
-			panic(fmt.Sprintf("Could not load translations '%s': %s", assetName, err.Error()))
+
+		for _, l := range language.Parse(source) {
+			for _, assetName := range assetNames {
+				assetLocale := strings.ToLower(strings.Replace(path.Base(assetName), "_", "-", -1))
+				if strings.HasPrefix(assetLocale, l.Tag) {
+					assetBytes, err := resources.Asset(assetName)
+					if err != nil {
+						panic(fmt.Sprintf("Could not load asset '%s': %s", assetName, err.Error()))
+					}
+
+					err = go_i18n.ParseTranslationFileBytes(assetName, assetBytes)
+					if err != nil {
+						panic(fmt.Sprintf("Could not load translations '%s': %s", assetName, err.Error()))
+					}
+
+					T, err := go_i18n.Tfunc(source)
+					if err == nil {
+						return T
+					}
+				}
+			}
 		}
 	}
 
-	T, err := go_i18n.Tfunc(config.Locale(), os.Getenv("LC_ALL"), os.Getenv("LANG"), DEFAULT_LOCALE)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to create translation func", err.Error()))
-	}
-
-	return T
+	panic("Unable to find suitable translation")
 }
