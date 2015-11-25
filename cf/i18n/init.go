@@ -45,6 +45,10 @@ func Init(config core_config.Reader) go_i18n.TranslateFunc {
 		}
 
 		for _, l := range language.Parse(source) {
+			if l.Tag == "zh-tw" || l.Tag == "zh-hk" {
+				l.Tag = "zh-hant"
+			}
+
 			for _, assetName := range assetNames {
 				assetLocale := strings.ToLower(strings.Replace(path.Base(assetName), "_", "-", -1))
 				if strings.HasPrefix(assetLocale, l.Tag) {
