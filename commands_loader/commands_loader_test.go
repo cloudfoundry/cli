@@ -30,7 +30,9 @@ func walkDirAndCountCommand(path string) int {
 			return err
 		}
 
-		if !info.IsDir() {
+		dir := filepath.Dir(p)
+
+		if !info.IsDir() && !strings.HasSuffix(dir, "fakes") {
 			if strings.HasSuffix(info.Name(), ".go") && !strings.HasSuffix(info.Name(), "_test.go") {
 				cmdCount += 1
 			}
