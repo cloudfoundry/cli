@@ -22,7 +22,7 @@ generate-language-resource:
 		-pkg resources \
 		-ignore ".go" \
 		-o cf/resources/i18n_resources.go \
-		cf/i18n/resources/... cf/i18n/test_fixtures/...
+		cf/i18n/resources/...
 	echo
 
 # target: fmt - Formats go code

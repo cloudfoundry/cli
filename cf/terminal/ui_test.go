@@ -8,7 +8,6 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/i18n/detection"
 	"github.com/cloudfoundry/cli/cf/models"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -131,7 +130,7 @@ var _ = Describe("UI", func() {
 			os.Setenv("LC_ALL", "fr_FR")
 
 			config := configuration.NewRepositoryWithDefaults()
-			i18n.T = i18n.Init(config, &detection.JibberJabberDetector{})
+			i18n.T = i18n.Init(config)
 
 			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
