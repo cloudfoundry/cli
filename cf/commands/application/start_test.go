@@ -11,6 +11,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
+	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -40,7 +41,7 @@ var _ = Describe("start command", func() {
 		appRepo                   *testApplication.FakeApplicationRepository
 		OriginalAppCommand        command_registry.Command
 		deps                      command_registry.Dependency
-		displayApp                *testcmd.FakeAppDisplayer
+		displayApp                *appCmdFakes.FakeAppDisplayer
 	)
 
 	updateCommandDependency := func(oldLogs api.OldLogsRepository) {
@@ -91,7 +92,7 @@ var _ = Describe("start command", func() {
 		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 		appRepo = &testApplication.FakeApplicationRepository{}
 
-		displayApp = &testcmd.FakeAppDisplayer{}
+		displayApp = &appCmdFakes.FakeAppDisplayer{}
 
 		//save original command dependency and restore later
 		OriginalAppCommand = command_registry.Commands.FindCommand("app")
