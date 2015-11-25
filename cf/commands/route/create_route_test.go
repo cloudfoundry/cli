@@ -63,6 +63,7 @@ var _ = Describe("create-route command", func() {
 			runCommand("my-space")
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
+				[]string{"create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]"},
 			))
 		})
 	})
@@ -94,12 +95,27 @@ var _ = Describe("create-route command", func() {
 			Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
 		})
 
+		It("creates routes with a context path", func() {
+			runCommand("-n", "host", "-c", "/path", "my-space", "example.com")
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Creating route", "host.example.com/path", "my-org", "my-space", "my-user"},
+				[]string{"OK"},
+			))
+
+			Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
+			Expect(routeRepo.CreateInSpacePath).To(Equal("/path"))
+			Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+			Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+		})
+
 		It("is idempotent", func() {
 			routeRepo.CreateInSpaceErr = true
 			routeRepo.FindByHostAndDomainReturns.Route = models.Route{
 				Space:  requirementsFactory.Space.SpaceFields,
 				Guid:   "my-route-guid",
 				Host:   "host",
+				Path:   "/path",
 				Domain: requirementsFactory.Domain,
 			}
 
@@ -108,7 +124,7 @@ var _ = Describe("create-route command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating route"},
 				[]string{"OK"},
-				[]string{"host.example.com", "already exists"},
+				[]string{"host.example.com/path", "already exists"},
 			))
 
 			Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
@@ -128,7 +144,7 @@ var _ = Describe("create-route command", func() {
 				updateCommandDependency(false)
 				c := command_registry.Commands.FindCommand("create-route")
 				cmd := c.(RouteCreator)
-				route, apiErr := cmd.CreateRoute("my-host", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
+				route, apiErr := cmd.CreateRoute("my-host", "", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
 
 				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(route.Guid).To(Equal(createdRoute.Guid))
