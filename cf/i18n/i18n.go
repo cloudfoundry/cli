@@ -16,19 +16,6 @@ const DEFAULT_LOCALE = "en_US"
 
 var T go_i18n.TranslateFunc
 
-var SUPPORTED_LOCALES = map[string]string{
-	"de": "de_DE",
-	"en": "en_US",
-	"es": "es_ES",
-	"fr": "fr_FR",
-	"it": "it_IT",
-	"ja": "ja_JA",
-	"ko": "ko_KR",
-	"pt": "pt_BR",
-	//"ru": "ru_RU", - Will add support for Russian when nicksnyder/go-i18n supports Russian
-	"zh": "zh_Hans",
-}
-
 func Init(config core_config.Reader) go_i18n.TranslateFunc {
 	sources := []string{
 		config.Locale(),
@@ -72,4 +59,38 @@ func Init(config core_config.Reader) go_i18n.TranslateFunc {
 	}
 
 	panic("Unable to find suitable translation")
+}
+
+func SupportedLocales() []string {
+	assetNames := resources.AssetNames()
+	locales := make([]string, len(assetNames))
+
+	for i := range assetNames {
+		locales[i] = strings.TrimSuffix(path.Base(assetNames[i]), ".all.json")
+	}
+
+	return locales
+}
+
+func NormalizedSupportedLocales() []string {
+	supportedLocales := SupportedLocales()
+	locales := make([]string, len(supportedLocales))
+
+	for i := range supportedLocales {
+		locales[i] = language.NormalizeTag(supportedLocales[i])
+	}
+
+	return locales
+}
+
+func IsSupportedLocale(locale string) bool {
+	for _, supportedLocale := range NormalizedSupportedLocales() {
+		for _, l := range language.Parse(locale) {
+			if supportedLocale == l.String() {
+				return true
+			}
+		}
+	}
+
+	return false
 }
