@@ -11,13 +11,13 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	registryCmdFakes "github.com/cloudfoundry/cli/cf/command_registry/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/plugin"
-	testCommand "github.com/cloudfoundry/cli/testhelpers/commands"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -384,7 +384,7 @@ var _ = Describe("Install", func() {
 		})
 
 		Context("when the plugin's alias conflicts with a core command/alias", func() {
-			var fakeCmd *testCommand.FakeCommand
+			var fakeCmd *registryCmdFakes.FakeCommand
 
 			AfterEach(func() {
 				command_registry.Commands.RemoveCommand("non-conflict-cmd")
@@ -392,7 +392,7 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command name", func() {
-				fakeCmd = &testCommand.FakeCommand{}
+				fakeCmd = &registryCmdFakes.FakeCommand{}
 				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "conflict-alias"})
 				command_registry.Register(fakeCmd)
 
@@ -405,7 +405,7 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command short name", func() {
-				fakeCmd = &testCommand.FakeCommand{}
+				fakeCmd = &registryCmdFakes.FakeCommand{}
 				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "non-conflict-cmd", ShortName: "conflict-alias"})
 				command_registry.Register(fakeCmd)
 
