@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -91,10 +92,12 @@ func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 			return
 		}
 
-		cmd.ui.Say(fmt.Sprintf("Could not find locale %s. The known locales are:", locale))
+		cmd.ui.Say(fmt.Sprintf("Could not find locale '%s'. The known locales are:", locale))
 		cmd.ui.Say("")
-		for _, supportedLocale := range SupportedLocales() {
-			cmd.ui.Say(supportedLocale)
+		supportedLocales := SupportedLocales()
+		sort.Strings(supportedLocales)
+		for i := range supportedLocales {
+			cmd.ui.Say(supportedLocales[i])
 		}
 	}
 }
