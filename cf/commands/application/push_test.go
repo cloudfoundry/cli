@@ -38,7 +38,7 @@ var _ = Describe("Push Command", func() {
 		configRepo                 core_config.Repository
 		manifestRepo               *testmanifest.FakeManifestRepository
 		starter                    *appCmdFakes.FakeApplicationStarter
-		stopper                    *testcmd.FakeApplicationStopper
+		stopper                    *appCmdFakes.FakeApplicationStopper
 		serviceBinder              *serviceCmdFakes.FakeAppBinder
 		appRepo                    *testApplication.FakeApplicationRepository
 		domainRepo                 *testapi.FakeDomainRepository
@@ -84,7 +84,7 @@ var _ = Describe("Push Command", func() {
 		manifestRepo = &testmanifest.FakeManifestRepository{}
 
 		starter = &appCmdFakes.FakeApplicationStarter{}
-		stopper = &testcmd.FakeApplicationStopper{}
+		stopper = &appCmdFakes.FakeApplicationStopper{}
 		serviceBinder = &serviceCmdFakes.FakeAppBinder{}
 
 		//setup fake commands (counterfeiter) to correctly interact with command_registry
