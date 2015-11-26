@@ -12,6 +12,7 @@ import (
 	testStacks "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	serviceCmdFakes "github.com/cloudfoundry/cli/cf/commands/service/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -36,7 +37,7 @@ var _ = Describe("Push Command", func() {
 		ui                         *testterm.FakeUI
 		configRepo                 core_config.Repository
 		manifestRepo               *testmanifest.FakeManifestRepository
-		starter                    *testcmd.FakeApplicationStarter
+		starter                    *appCmdFakes.FakeApplicationStarter
 		stopper                    *testcmd.FakeApplicationStopper
 		serviceBinder              *serviceCmdFakes.FakeAppBinder
 		appRepo                    *testApplication.FakeApplicationRepository
@@ -82,7 +83,7 @@ var _ = Describe("Push Command", func() {
 	BeforeEach(func() {
 		manifestRepo = &testmanifest.FakeManifestRepository{}
 
-		starter = &testcmd.FakeApplicationStarter{}
+		starter = &appCmdFakes.FakeApplicationStarter{}
 		stopper = &testcmd.FakeApplicationStopper{}
 		serviceBinder = &serviceCmdFakes.FakeAppBinder{}
 

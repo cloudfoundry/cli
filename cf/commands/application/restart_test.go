@@ -1,6 +1,7 @@
 package application_test
 
 import (
+	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,7 +19,7 @@ var _ = Describe("restart command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		starter             *testcmd.FakeApplicationStarter
+		starter             *appCmdFakes.FakeApplicationStarter
 		stopper             *testcmd.FakeApplicationStopper
 		config              core_config.Repository
 		app                 models.Application
@@ -46,7 +47,7 @@ var _ = Describe("restart command", func() {
 		ui = &testterm.FakeUI{}
 		deps = command_registry.NewDependency()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		starter = &testcmd.FakeApplicationStarter{}
+		starter = &appCmdFakes.FakeApplicationStarter{}
 		stopper = &testcmd.FakeApplicationStopper{}
 		config = testconfig.NewRepositoryWithDefaults()
 
