@@ -2,6 +2,7 @@ package route_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	routeCmdFakes "github.com/cloudfoundry/cli/cf/commands/route/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,7 +22,7 @@ var _ = Describe("map-route command", func() {
 		configRepo          core_config.Repository
 		routeRepo           *testapi.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
-		routeCreator        *testcmd.FakeRouteCreator
+		routeCreator        *routeCmdFakes.FakeRouteCreator
 		OriginalCreateRoute command_registry.Command
 		deps                command_registry.Dependency
 	)
@@ -43,7 +44,7 @@ var _ = Describe("map-route command", func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		routeRepo = new(testapi.FakeRouteRepository)
-		routeCreator = &testcmd.FakeRouteCreator{}
+		routeCreator = &routeCmdFakes.FakeRouteCreator{}
 		requirementsFactory = new(testreq.FakeReqFactory)
 	})
 
