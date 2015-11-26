@@ -20,7 +20,7 @@ var _ = Describe("restart command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		starter             *appCmdFakes.FakeApplicationStarter
-		stopper             *testcmd.FakeApplicationStopper
+		stopper             *appCmdFakes.FakeApplicationStopper
 		config              core_config.Repository
 		app                 models.Application
 		originalStop        command_registry.Command
@@ -48,7 +48,7 @@ var _ = Describe("restart command", func() {
 		deps = command_registry.NewDependency()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		starter = &appCmdFakes.FakeApplicationStarter{}
-		stopper = &testcmd.FakeApplicationStopper{}
+		stopper = &appCmdFakes.FakeApplicationStopper{}
 		config = testconfig.NewRepositoryWithDefaults()
 
 		app = models.Application{}
