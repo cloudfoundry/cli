@@ -5,11 +5,12 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/simonleung8/flags"
 	"github.com/simonleung8/flags/flag"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type ConfigCommands struct {
@@ -85,22 +86,15 @@ func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 			return
 		}
 
-		foundLocale := false
-
-		for _, value := range SUPPORTED_LOCALES {
-			if value == locale {
-				cmd.config.SetLocale(locale)
-				foundLocale = true
-				break
-			}
+		if IsSupportedLocale(locale) {
+			cmd.config.SetLocale(locale)
+			return
 		}
 
-		if !foundLocale {
-			cmd.ui.Say(fmt.Sprintf("Could not find locale %s. The known locales are:", locale))
-			cmd.ui.Say("")
-			for _, locale := range SUPPORTED_LOCALES {
-				cmd.ui.Say(locale)
-			}
+		cmd.ui.Say(fmt.Sprintf("Could not find locale %s. The known locales are:", locale))
+		cmd.ui.Say("")
+		for _, supportedLocale := range SupportedLocales() {
+			cmd.ui.Say(supportedLocale)
 		}
 	}
 }
