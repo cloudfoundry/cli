@@ -12,16 +12,26 @@ import (
 	"github.com/nicksnyder/go-i18n/i18n/language"
 )
 
-const DEFAULT_LOCALE = "en_US"
+const (
+	defaultLocale  = "en_US"
+	lang           = "LANG"
+	lcAll          = "LC_ALL"
+	resourceSuffix = ".all.json"
+	zhTW           = "zh-tw"
+	zhHK           = "zh-hk"
+	zhHant         = "zhHant"
+	hyphen         = "-"
+	underscore     = "_"
+)
 
 var T go_i18n.TranslateFunc
 
 func Init(config core_config.Reader) go_i18n.TranslateFunc {
 	sources := []string{
 		config.Locale(),
-		os.Getenv("LC_ALL"),
-		os.Getenv("LANG"),
-		DEFAULT_LOCALE,
+		os.Getenv(lcAll),
+		os.Getenv(lang),
+		defaultLocale,
 	}
 
 	assetNames := resources.AssetNames()
@@ -32,12 +42,12 @@ func Init(config core_config.Reader) go_i18n.TranslateFunc {
 		}
 
 		for _, l := range language.Parse(source) {
-			if l.Tag == "zh-tw" || l.Tag == "zh-hk" {
-				l.Tag = "zh-hant"
+			if l.Tag == zhTW || l.Tag == zhHK {
+				l.Tag = zhHant
 			}
 
 			for _, assetName := range assetNames {
-				assetLocale := strings.ToLower(strings.Replace(path.Base(assetName), "_", "-", -1))
+				assetLocale := strings.ToLower(strings.Replace(path.Base(assetName), underscore, hyphen, -1))
 				if strings.HasPrefix(assetLocale, l.Tag) {
 					assetBytes, err := resources.Asset(assetName)
 					if err != nil {
@@ -66,7 +76,7 @@ func SupportedLocales() []string {
 	locales := make([]string, len(assetNames))
 
 	for i := range assetNames {
-		locales[i] = strings.TrimSuffix(path.Base(assetNames[i]), ".all.json")
+		locales[i] = strings.TrimSuffix(path.Base(assetNames[i]), resourceSuffix)
 	}
 
 	return locales
