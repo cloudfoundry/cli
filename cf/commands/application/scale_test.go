@@ -3,6 +3,7 @@ package application_test
 import (
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,7 +20,7 @@ import (
 var _ = Describe("scale command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
-		restarter           *testcmd.FakeApplicationRestarter
+		restarter           *appCmdFakes.FakeApplicationRestarter
 		appRepo             *testApplication.FakeApplicationRepository
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
@@ -45,7 +46,7 @@ var _ = Describe("scale command", func() {
 		//save original command and restore later
 		OriginalCommand = command_registry.Commands.FindCommand("restart")
 
-		restarter = &testcmd.FakeApplicationRestarter{}
+		restarter = &appCmdFakes.FakeApplicationRestarter{}
 		//setup fakes to correctly interact with command_registry
 		restarter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
 			return restarter
