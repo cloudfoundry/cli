@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-//go:generate counterfeiter -o ../../../testhelpers/commands/fake_application_stopper.go . ApplicationStopper
+//go:generate counterfeiter -o fakes/fake_application_stopper.go . ApplicationStopper
 type ApplicationStopper interface {
 	command_registry.Command
 	ApplicationStop(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)

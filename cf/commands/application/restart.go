@@ -10,7 +10,7 @@ import (
 	"github.com/simonleung8/flags"
 )
 
-//go:generate counterfeiter -o ../../../testhelpers/commands/fake_application_restarter.go . ApplicationRestarter
+//go:generate counterfeiter -o fakes/fake_application_restarter.go . ApplicationRestarter
 type ApplicationRestarter interface {
 	command_registry.Command
 	ApplicationRestart(app models.Application, orgName string, spaceName string)

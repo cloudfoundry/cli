@@ -35,7 +35,7 @@ type ApplicationStagingWatcher interface {
 	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
-//go:generate counterfeiter -o ../../../testhelpers/commands/fake_application_starter.go . ApplicationStarter
+//go:generate counterfeiter -o fakes/fake_application_starter.go . ApplicationStarter
 type ApplicationStarter interface {
 	command_registry.Command
 	SetStartTimeoutInSeconds(timeout int)
