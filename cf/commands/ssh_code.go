@@ -21,7 +21,7 @@ import (
 	"github.com/simonleung8/flags"
 )
 
-//go:generate counterfeiter -o ../../testhelpers/commands/fake_ssh_code_getter.go . SSHCodeGetter
+//go:generate counterfeiter -o fakes/fake_ssh_code_getter.go . SSHCodeGetter
 type SSHCodeGetter interface {
 	command_registry.Command
 	Get() (string, error)
