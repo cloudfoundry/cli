@@ -20,6 +20,7 @@ For user-focused documentation, see [Using the cf CLI](http://docs.cloudfoundry.
 
 - Golang installed
 - Tagged version of CLI release source code that supports plugins; cf CLI v.6.7.0 and above
+- i18n resources generated (`$GOPATH/github.com/cloudfoundry/cli/bin/generate-language-resources`)
 
 ## Architecture Overview
 
