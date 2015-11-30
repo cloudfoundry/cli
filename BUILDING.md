@@ -3,8 +3,7 @@ Building Cloud Foundry CLI
 
 For developing on unix systems:
 
-1. Run `. URL: https://github.com/golang/net
-  Push  URL: https://github.com/golang/netbin/build`
+1. Run `bin/build`
 1. The binary will be built into the `./out` directory.
 
 Optionally, you can use `bin/run` to compile and run the executable in one step.
