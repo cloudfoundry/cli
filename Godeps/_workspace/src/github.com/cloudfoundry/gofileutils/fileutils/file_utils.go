@@ -59,33 +59,16 @@ func CopyPathToPath(fromPath, toPath string) (err error) {
 
 		dst.Chmod(srcFileInfo.Mode())
 
-		err = CopyPathToWriter(fromPath, dst)
+		src, err := os.Open(fromPath)
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		_, err = io.Copy(dst, src)
+		if err != nil {
+			return err
+		}
 	}
 	return err
-}
-
-func CopyPathToWriter(originalFilePath string, targetWriter io.Writer) (err error) {
-	originalFile, err := os.Open(originalFilePath)
-	if err != nil {
-		return
-	}
-	defer originalFile.Close()
-
-	_, err = io.Copy(targetWriter, originalFile)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
-	destFile, err := Create(targetPath)
-	if err != nil {
-		return
-	}
-	defer destFile.Close()
-
-	_, err = io.Copy(destFile, src)
-	return
 }

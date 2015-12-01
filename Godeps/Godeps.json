@@ -41,7 +41,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
-			"Rev": "74388e8083dc77ebfba108a8dd3e3af92b76ee04"
+			"Rev": "b9aba8bc5b91f0764131fcac8ea0ff2dd202c8c4"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/jibber_jabber",
