@@ -3,6 +3,7 @@ package app_files
 import (
 	"crypto/sha1"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
