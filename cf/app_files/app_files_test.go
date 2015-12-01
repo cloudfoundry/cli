@@ -7,7 +7,6 @@ import (
 	. "github.com/cloudfoundry/cli/cf/app_files"
 
 	"github.com/cloudfoundry/cli/cf/models"
-	cffileutils "github.com/cloudfoundry/cli/fileutils"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
 	. "github.com/onsi/ginkgo"
@@ -85,7 +84,7 @@ var _ = Describe("AppFiles", func() {
 
 			files := []string{}
 
-			cffileutils.TempDir("copyToDir", func(tmpDir string, err error) {
+			fileutils.TempDir("copyToDir", func(tmpDir string, err error) {
 				copyErr := appFiles.CopyFiles(filesToCopy, copyDir, tmpDir)
 				Expect(copyErr).ToNot(HaveOccurred())
 

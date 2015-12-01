@@ -1,4 +1,4 @@
-package fileutils_test
+package downloader_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestFileutils(t *testing.T) {
+func TestDownloader(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Fileutils Suite")
+	RunSpecs(t, "Downloader Suite")
 }

@@ -9,14 +9,14 @@ import (
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/fileutils"
+	"github.com/cloudfoundry/cli/downloader"
 )
 
 type PluginDownloader struct {
 	Ui             terminal.UI
-	FileDownloader fileutils.Downloader
+	FileDownloader downloader.Downloader
 }
-type downloadFromPath func(pluginSourceFilepath string, downloader fileutils.Downloader) string
+type downloadFromPath func(string, downloader.Downloader) string
 
 func (downloader *PluginDownloader) downloadFromPath(pluginSourceFilepath string) string {
 	size, filename, err := downloader.FileDownloader.DownloadFile(pluginSourceFilepath)
