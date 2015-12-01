@@ -237,17 +237,26 @@ func (zipper ApplicationZipper) extractFile(f *zip.File, destDir string) error {
 		return nil
 	}
 
-	var rc io.ReadCloser
-	rc, err := f.Open()
+	src, err := f.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	destFilePath := filepath.Join(destDir, f.Name)
+
+	err = os.MkdirAll(filepath.Dir(destFilePath), os.ModeDir|os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	defer rc.Close()
+	destFile, err := os.Create(destFilePath)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
 
-	destFilePath := filepath.Join(destDir, f.Name)
-
-	err = fileutils.CopyReaderToPath(rc, destFilePath)
+	_, err = io.Copy(destFile, src)
 	if err != nil {
 		return err
 	}
