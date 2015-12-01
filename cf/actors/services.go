@@ -29,16 +29,11 @@ func (actor ServiceHandler) FilterBrokers(brokerFlag string, serviceFlag string,
 	if orgFlag == "" {
 		return actor.getServiceBrokers(brokerFlag, serviceFlag)
 	}
-	err := actor.checkForOrgExistence(orgFlag)
+	_, err := actor.orgRepo.FindByName(orgFlag)
 	if err != nil {
 		return nil, err
 	}
 	return actor.buildBrokersVisibleFromOrg(brokerFlag, serviceFlag, orgFlag)
-}
-
-func (actor ServiceHandler) checkForOrgExistence(orgName string) error {
-	_, err := actor.orgRepo.FindByName(orgName)
-	return err
 }
 
 func (actor ServiceHandler) getServiceBrokers(brokerName string, serviceName string) ([]models.ServiceBroker, error) {
