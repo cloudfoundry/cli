@@ -6,10 +6,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-type Requirement interface {
-	Execute() (success bool)
-}
-
 //go:generate counterfeiter -o fakes/fake_factory.go . Factory
 type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement
