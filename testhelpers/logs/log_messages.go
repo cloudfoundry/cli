@@ -4,12 +4,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
-)
-
-const (
-	TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
 )
 
 func NewOldLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *logmessage.LogMessage {
@@ -20,18 +15,6 @@ func NewOldLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) 
 		AppId:       proto.String(appGuid),
 		MessageType: &messageType,
 		SourceName:  proto.String(sourceName),
-		Timestamp:   proto.Int64(timestamp.UnixNano()),
-	}
-}
-
-func NewNoaaLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *events.LogMessage {
-	messageType := events.LogMessage_ERR
-
-	return &events.LogMessage{
-		Message:     []byte(msgText),
-		AppId:       proto.String(appGuid),
-		MessageType: &messageType,
-		SourceType:  proto.String(sourceName),
 		Timestamp:   proto.Int64(timestamp.UnixNano()),
 	}
 }

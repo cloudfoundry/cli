@@ -14,7 +14,6 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
@@ -28,7 +27,6 @@ var _ = Describe("logs command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		oldLogsRepo         *testapi.FakeOldLogsRepository
-		noaaRepo            *testapi.FakeLogsNoaaRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -36,7 +34,6 @@ var _ = Describe("logs command", func() {
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetLogsNoaaRepository(noaaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOldLogsRepository(oldLogsRepo)
 		deps.Config = configRepo
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("logs").SetDependency(deps, pluginCall))
@@ -46,7 +43,6 @@ var _ = Describe("logs command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		oldLogsRepo = &testapi.FakeOldLogsRepository{}
-		noaaRepo = &testapi.FakeLogsNoaaRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
@@ -183,40 +179,40 @@ var _ = Describe("logs command", func() {
 		Describe("Helpers", func() {
 			date := time.Date(2014, 4, 4, 11, 39, 20, 5, time.UTC)
 
-			createMessage := func(sourceId string, sourceName string, msgType events.LogMessage_MessageType, date time.Time) *events.LogMessage {
+			createMessage := func(sourceId string, sourceName string, msgType logmessage.LogMessage_MessageType, date time.Time) *logmessage.LogMessage {
 				timestamp := date.UnixNano()
-				return &events.LogMessage{
-					Message:        []byte("Hello World!\n\r\n\r"),
-					AppId:          proto.String("my-app-guid"),
-					MessageType:    &msgType,
-					SourceInstance: &sourceId,
-					Timestamp:      &timestamp,
-					SourceType:     &sourceName,
+				return &logmessage.LogMessage{
+					Message:     []byte("Hello World!\n\r\n\r"),
+					AppId:       proto.String("my-app-guid"),
+					MessageType: &msgType,
+					SourceId:    &sourceId,
+					Timestamp:   &timestamp,
+					SourceName:  &sourceName,
 				}
 			}
 
 			Context("when the message comes", func() {
 				It("include the instance index", func() {
-					msg := createMessage("4", "DEA", events.LogMessage_OUT, date)
-					Expect(terminal.Decolorize(LogNoaaMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA/4]      OUT Hello World!"))
+					msg := createMessage("4", "DEA", logmessage.LogMessage_OUT, date)
+					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA/4]      OUT Hello World!"))
 				})
 
 				It("doesn't include the instance index if sourceID is empty", func() {
-					msg := createMessage("", "DEA", events.LogMessage_OUT, date)
-					Expect(terminal.Decolorize(LogNoaaMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA]        OUT Hello World!"))
+					msg := createMessage("", "DEA", logmessage.LogMessage_OUT, date)
+					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA]        OUT Hello World!"))
 				})
 			})
 
 			Context("when the message was written to stderr", func() {
 				It("shows the log type as 'ERR'", func() {
-					msg := createMessage("4", "STG", events.LogMessage_ERR, date)
-					Expect(terminal.Decolorize(LogNoaaMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [STG/4]      ERR Hello World!"))
+					msg := createMessage("4", "STG", logmessage.LogMessage_ERR, date)
+					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [STG/4]      ERR Hello World!"))
 				})
 			})
 
 			It("formats the time in the given time zone", func() {
-				msg := createMessage("4", "RTR", events.LogMessage_ERR, date)
-				Expect(terminal.Decolorize(LogNoaaMessageOutput(msg, time.FixedZone("the-zone", 3*60*60)))).To(Equal("2014-04-04T14:39:20.00+0300 [RTR/4]      ERR Hello World!"))
+				msg := createMessage("4", "RTR", logmessage.LogMessage_ERR, date)
+				Expect(terminal.Decolorize(LogMessageOutput(msg, time.FixedZone("the-zone", 3*60*60)))).To(Equal("2014-04-04T14:39:20.00+0300 [RTR/4]      ERR Hello World!"))
 			})
 		})
 	})

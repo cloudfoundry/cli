@@ -14,7 +14,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/simonleung8/flags"
 	"github.com/simonleung8/flags/flag"
 )
@@ -22,7 +21,6 @@ import (
 type Logs struct {
 	ui          terminal.UI
 	config      core_config.Reader
-	noaaRepo    api.LogsNoaaRepository
 	oldLogsRepo api.OldLogsRepository
 	appReq      requirements.ApplicationRequirement
 }
@@ -62,7 +60,6 @@ func (cmd *Logs) Requirements(requirementsFactory requirements.Factory, fc flags
 func (cmd *Logs) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
-	cmd.noaaRepo = deps.RepoLocator.GetLogsNoaaRepository()
 	cmd.oldLogsRepo = deps.RepoLocator.GetOldLogsRepository()
 	return cmd
 }
@@ -86,7 +83,6 @@ func (cmd *Logs) recentLogsFor(app models.Application) {
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
 	messages, err := cmd.oldLogsRepo.RecentLogsFor(app.Guid)
-	// messages, err := cmd.noaaRepo.RecentLogsFor(app.Guid)
 	if err != nil {
 		cmd.handleError(err)
 	}
@@ -128,13 +124,6 @@ func (cmd *Logs) handleError(err error) {
 func LogMessageOutput(msg *logmessage.LogMessage, loc *time.Location) string {
 	logHeader, coloredLogHeader := ui_helpers.ExtractLogHeader(msg, loc)
 	logContent := ui_helpers.ExtractLogContent(msg, logHeader)
-
-	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
-}
-
-func LogNoaaMessageOutput(msg *events.LogMessage, loc *time.Location) string {
-	logHeader, coloredLogHeader := ui_helpers.ExtractNoaaLogHeader(msg, loc)
-	logContent := ui_helpers.ExtractNoaaLogContent(msg, logHeader)
 
 	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }

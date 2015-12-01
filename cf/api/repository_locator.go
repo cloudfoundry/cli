@@ -30,7 +30,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
-	"github.com/cloudfoundry/noaa"
 )
 
 type RepositoryLocator struct {
@@ -56,7 +55,6 @@ type RepositoryLocator struct {
 	serviceSummaryRepo              ServiceSummaryRepository
 	userRepo                        UserRepository
 	passwordRepo                    password.PasswordRepository
-	logsNoaaRepo                    LogsNoaaRepository
 	oldLogsRepo                     OldLogsRepository
 	authTokenRepo                   ServiceAuthTokenRepository
 	serviceBrokerRepo               ServiceBrokerRepository
@@ -91,10 +89,6 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{})
 
-	noaaLib := noaa.NewConsumer(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	noaaLib.SetDebugPrinter(terminal.DebugPrinter{})
-	logNoaaConsumer := NewNoaaConsumer(noaaLib)
-
 	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = api_app_files.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
@@ -105,7 +99,6 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
-	loc.logsNoaaRepo = NewLogsNoaaRepository(config, logNoaaConsumer, loc.authRepo)
 	loc.oldLogsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
@@ -335,15 +328,6 @@ func (locator RepositoryLocator) SetOldLogsRepository(repo OldLogsRepository) Re
 
 func (locator RepositoryLocator) GetOldLogsRepository() OldLogsRepository {
 	return locator.oldLogsRepo
-}
-
-func (locator RepositoryLocator) SetLogsNoaaRepository(repo LogsNoaaRepository) RepositoryLocator {
-	locator.logsNoaaRepo = repo
-	return locator
-}
-
-func (locator RepositoryLocator) GetLogsNoaaRepository() LogsNoaaRepository {
-	return locator.logsNoaaRepo
 }
 
 func (locator RepositoryLocator) SetServiceAuthTokenRepository(repo ServiceAuthTokenRepository) RepositoryLocator {

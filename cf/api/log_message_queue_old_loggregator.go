@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
-// const MAX_INT64 int64 = 1<<63 - 1
+const MAX_INT64 int64 = 1<<63 - 1
 
 type loggregator_item struct {
 	message                  *logmessage.LogMessage
