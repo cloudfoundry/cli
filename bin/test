@@ -46,7 +46,11 @@
   export LC_ALL="en_US.UTF-8"
   export GOPATH=$($GODEP path):$GOPATH
   export PATH=$($GODEP path)/bin:$PATH
-  go install github.com/onsi/ginkgo/ginkgo
+
+  if [ ! $(which ginkgo) ];then
+    echo -e "\n Installing ginkgo..."
+    go install github.com/onsi/ginkgo/ginkgo
+  fi
 
   echo -e "\n Formatting packages..."
   go fmt ./...
