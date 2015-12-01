@@ -55,7 +55,7 @@ type RepositoryLocator struct {
 	serviceSummaryRepo              ServiceSummaryRepository
 	userRepo                        UserRepository
 	passwordRepo                    password.PasswordRepository
-	oldLogsRepo                     OldLogsRepository
+	logsRepo                        LogsRepository
 	authTokenRepo                   ServiceAuthTokenRepository
 	serviceBrokerRepo               ServiceBrokerRepository
 	servicePlanRepo                 CloudControllerServicePlanRepository
@@ -99,7 +99,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
-	loc.oldLogsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
+	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
@@ -321,13 +321,13 @@ func (locator RepositoryLocator) GetPasswordRepository() password.PasswordReposi
 	return locator.passwordRepo
 }
 
-func (locator RepositoryLocator) SetOldLogsRepository(repo OldLogsRepository) RepositoryLocator {
-	locator.oldLogsRepo = repo
+func (locator RepositoryLocator) SetLogsRepository(repo LogsRepository) RepositoryLocator {
+	locator.logsRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetOldLogsRepository() OldLogsRepository {
-	return locator.oldLogsRepo
+func (locator RepositoryLocator) GetLogsRepository() LogsRepository {
+	return locator.logsRepo
 }
 
 func (locator RepositoryLocator) SetServiceAuthTokenRepository(repo ServiceAuthTokenRepository) RepositoryLocator {

@@ -19,7 +19,7 @@ import (
 var _ = Describe("loggregator logs repository", func() {
 	var (
 		fakeConsumer       *testapi.FakeLoggregatorConsumer
-		logsRepo           OldLogsRepository
+		logsRepo           LogsRepository
 		configRepo         core_config.ReadWriter
 		fakeTokenRefresher *testapi.FakeAuthenticationRepository
 	)
@@ -67,8 +67,8 @@ var _ = Describe("loggregator logs repository", func() {
 		Context("when an error does not occur", func() {
 			BeforeEach(func() {
 				fakeConsumer.RecentReturns.Messages = []*logmessage.LogMessage{
-					makeOldLogMessage("My message 2", int64(2000)),
-					makeOldLogMessage("My message 1", int64(1000)),
+					makeLogMessage("My message 2", int64(2000)),
+					makeLogMessage("My message 1", int64(1000)),
 				}
 			})
 
@@ -166,9 +166,9 @@ var _ = Describe("loggregator logs repository", func() {
 					fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 						logChan := make(chan *logmessage.LogMessage)
 						go func() {
-							logChan <- makeOldLogMessage("hello3", 300)
-							logChan <- makeOldLogMessage("hello2", 200)
-							logChan <- makeOldLogMessage("hello1", 100)
+							logChan <- makeLogMessage("hello3", 300)
+							logChan <- makeLogMessage("hello2", 200)
+							logChan <- makeLogMessage("hello1", 100)
 							fakeConsumer.WaitForClose()
 							close(logChan)
 						}()
@@ -187,9 +187,9 @@ var _ = Describe("loggregator logs repository", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
-						makeOldLogMessage("hello1", 100),
-						makeOldLogMessage("hello2", 200),
-						makeOldLogMessage("hello3", 300),
+						makeLogMessage("hello1", 100),
+						makeLogMessage("hello2", 200),
+						makeLogMessage("hello3", 300),
 					}))
 
 					close(done)
@@ -208,7 +208,7 @@ var _ = Describe("loggregator logs repository", func() {
 						fakeConsumer.OnConnectCallback()
 						logChan := make(chan *logmessage.LogMessage)
 						go func() {
-							logChan <- makeOldLogMessage("One does not simply consume a log message", 1000)
+							logChan <- makeLogMessage("One does not simply consume a log message", 1000)
 							synchronizationChannel <- true
 							fakeConsumer.WaitForClose()
 							close(logChan)
@@ -242,7 +242,7 @@ var _ = Describe("loggregator logs repository", func() {
 	})
 })
 
-func makeOldLogMessage(message string, timestamp int64) *logmessage.LogMessage {
+func makeLogMessage(message string, timestamp int64) *logmessage.LogMessage {
 	messageType := logmessage.LogMessage_OUT
 	sourceName := "DEA"
 	return &logmessage.LogMessage{

@@ -13,7 +13,8 @@ import (
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 )
 
-type OldLogsRepository interface {
+//go:generate counterfeiter -o fakes/fake_logs_repository.go . LogsRepository
+type LogsRepository interface {
 	RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error)
 	TailLogsFor(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error
 	Close()
@@ -31,7 +32,7 @@ type LoggregatorLogsRepository struct {
 
 var BufferTime time.Duration = 5 * time.Second
 
-func NewLoggregatorLogsRepository(config core_config.Reader, consumer consumer.LoggregatorConsumer, refresher authentication.TokenRefresher) OldLogsRepository {
+func NewLoggregatorLogsRepository(config core_config.Reader, consumer consumer.LoggregatorConsumer, refresher authentication.TokenRefresher) LogsRepository {
 	return &LoggregatorLogsRepository{
 		config:         config,
 		consumer:       consumer,
