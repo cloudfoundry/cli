@@ -88,39 +88,3 @@ func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsF
 
 	return
 }
-
-func RunCommandMoreBetter(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (result RunCommandResult) {
-	updateFunc(pluginCall)
-	cmd := command_registry.Commands.FindCommand(cmdName)
-	context := flags.NewFlagContext(cmd.MetaData().Flags)
-	context.SkipFlagParsing(cmd.MetaData().SkipFlagParsing)
-	err := context.Parse(args...)
-	if err != nil {
-		fmt.Println("ERROR:", err)
-		return RunCommandResultFailed
-	}
-
-	defer func() {
-		errMsg := recover()
-
-		if errMsg != nil && errMsg != testterm.QuietPanic {
-			panic(errMsg)
-		}
-
-		result = RunCommandResultFailed
-	}()
-	requirements, err := cmd.Requirements(requirementsFactory, context)
-	if err != nil {
-		return RunCommandResultRequirementsFailed
-	}
-
-	for _, requirement := range requirements {
-		if !requirement.Execute() {
-			return RunCommandResultRequirementsFailed
-		}
-	}
-
-	cmd.Execute(context)
-
-	return RunCommandResultSuccess
-}
