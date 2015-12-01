@@ -15,9 +15,10 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/fileutils"
+	"github.com/cloudfoundry/cli/downloader"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/utils"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 	"github.com/simonleung8/flags"
 	"github.com/simonleung8/flags/flag"
 
@@ -97,7 +98,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(T("Plugin installation cancelled"))
 	}
 
-	fileDownloader := fileutils.NewDownloader(os.TempDir())
+	fileDownloader := downloader.NewDownloader(os.TempDir())
 
 	removeTmpFile := func() {
 		err := fileDownloader.RemoveFile()
@@ -201,7 +202,7 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 }
 
 func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath, pluginSourceFilepath string) {
-	err := fileutils.CopyFile(pluginDestinationFilepath, pluginSourceFilepath)
+	err := fileutils.CopyPathToPath(pluginSourceFilepath, pluginDestinationFilepath)
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}

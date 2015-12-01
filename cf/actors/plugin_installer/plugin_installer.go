@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/fileutils"
+	"github.com/cloudfoundry/cli/downloader"
 	"github.com/cloudfoundry/cli/utils"
 )
 
@@ -14,7 +14,7 @@ type PluginInstaller interface {
 
 type PluginInstallerContext struct {
 	Checksummer    utils.Sha1Checksum
-	FileDownloader fileutils.Downloader
+	FileDownloader downloader.Downloader
 	GetPluginRepos pluginReposFetcher
 	PluginRepo     plugin_repo.PluginRepo
 	RepoName       string
