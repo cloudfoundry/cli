@@ -7,14 +7,22 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
-func NewLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *logmessage.LogMessage {
-	messageType := logmessage.LogMessage_ERR
-
+func NewLogMessage(
+	text string,
+	appGUID string,
+	sourceName string,
+	sourceID string,
+	messageType logmessage.LogMessage_MessageType,
+	timestamp time.Time,
+	drainURLs ...string,
+) *logmessage.LogMessage {
 	return &logmessage.LogMessage{
-		Message:     []byte(msgText),
-		AppId:       proto.String(appGuid),
+		Message:     []byte(text),
 		MessageType: &messageType,
-		SourceName:  proto.String(sourceName),
 		Timestamp:   proto.Int64(timestamp.UnixNano()),
+		AppId:       proto.String(appGUID),
+		SourceId:    proto.String(sourceID),
+		DrainUrls:   drainURLs,
+		SourceName:  proto.String(sourceName),
 	}
 }
