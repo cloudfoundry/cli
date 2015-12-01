@@ -1,73 +1,71 @@
 #!/bin/bash
 
-(
-  set -e
+set -e
 
-  function printStatus {
-      if [ $? -eq 0 ]; then
-          echo -e "\nSWEET SUITE SUCCESS"
-      else
-          echo -e "\nSUITE FAILURE"
-      fi
-  }
-
-  trap printStatus EXIT
-
-  bin/generate-language-resources
-
-  echo -e "\n Running i18n checkup..."
-  bin/i18n-checkup
-
-  go get github.com/tools/godep
-
-  GODEP=$(which godep)
-
-  echo -e "\n Cleaning build artifacts..."
-
-  # Clean up old plugin binaries used in test
-
-  rm -f fixtures/plugins/*.exe
-  rm -f plugin_examples/*.exe
-
-  # Clean up old .a files in GOPATH
-  # It seems like `go clean` should do this but ... not so much
-  if [[ -d $GOPATH/pkg ]] ; then
-    pushd $GOPATH/pkg
-    rm -Rf *
-    popd
+function printStatus {
+  if [ $? -eq 0 ]; then
+    echo -e "\nSWEET SUITE SUCCESS"
+  else
+    echo -e "\nSUITE FAILURE"
   fi
+}
 
-  if [[ -d $($GODEP path)/pkg ]] ; then
-    pushd $($GODEP path)/pkg
-    rm -Rf *
-    popd
-  fi
+trap printStatus EXIT
 
-  export LC_ALL="en_US.UTF-8"
-  export GOPATH=$($GODEP path):$GOPATH
-  export PATH=$($GODEP path)/bin:$PATH
+bin/generate-language-resources
 
-  if [ ! $(which ginkgo) ];then
-    echo -e "\n Installing ginkgo..."
-    go install github.com/onsi/ginkgo/ginkgo
-  fi
+echo -e "\n Running i18n checkup..."
+bin/i18n-checkup
 
-  echo -e "\n Formatting packages..."
-  go fmt ./...
+go get github.com/tools/godep
 
-  echo -e "\n Vetting packages for potential issues..."
-  go tool vet cf/.
-  for file in $(find {cf,commands_loader,downloader,generic,glob,main,plugin,testhelpers,utils,words} \( -name "*.go" -not -iname "*test.go" \))
-  do
-    go tool vet -all -shadow=true $file
-  done
+GODEP=$(which godep)
 
-  echo -e "\n Verifying total commands registered..."
-  ginkgo commands_loader
+echo -e "\n Cleaning build artifacts..."
 
-  echo -e "\n Testing packages..."
-  CF_HOME=$(pwd)/fixtures ginkgo -r $@
+# Clean up old plugin binaries used in test
 
-  echo -e "\n Running build script to confirm everything compiles..."
-  bin/build
-)
+rm -f fixtures/plugins/*.exe
+rm -f plugin_examples/*.exe
+
+# Clean up old .a files in GOPATH
+# It seems like `go clean` should do this but ... not so much
+if [[ -d $GOPATH/pkg ]] ; then
+  pushd $GOPATH/pkg
+  rm -Rf *
+  popd
+fi
+
+if [[ -d $($GODEP path)/pkg ]] ; then
+  pushd $($GODEP path)/pkg
+  rm -Rf *
+  popd
+fi
+
+export LC_ALL="en_US.UTF-8"
+export GOPATH=$($GODEP path):$GOPATH
+export PATH=$($GODEP path)/bin:$PATH
+
+if [ ! $(which ginkgo) ];then
+  echo -e "\n Installing ginkgo..."
+  go install github.com/onsi/ginkgo/ginkgo
+fi
+
+echo -e "\n Formatting packages..."
+go fmt ./...
+
+echo -e "\n Vetting packages for potential issues..."
+go tool vet cf/.
+for file in $(find {cf,commands_loader,downloader,generic,glob,main,plugin,testhelpers,utils,words} \( -name "*.go" -not -iname "*test.go" \))
+do
+  go tool vet -all -shadow=true $file
+done
+
+echo -e "\n Verifying total commands registered..."
+ginkgo commands_loader
+
+echo -e "\n Testing packages..."
+CF_HOME=$(pwd)/fixtures ginkgo -r $@
+
+echo -e "\n Running build script to confirm everything compiles..."
+bin/build
