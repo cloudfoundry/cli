@@ -29,7 +29,7 @@ type LoggregatorLogsRepository struct {
 	onMessage func(*logmessage.LogMessage)
 }
 
-// var BufferTime time.Duration = 5 * time.Second
+var BufferTime time.Duration = 5 * time.Second
 
 func NewLoggregatorLogsRepository(config core_config.Reader, consumer consumer.LoggregatorConsumer, refresher authentication.TokenRefresher) OldLogsRepository {
 	return &LoggregatorLogsRepository{
