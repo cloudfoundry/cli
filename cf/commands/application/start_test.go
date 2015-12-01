@@ -36,7 +36,7 @@ var _ = Describe("start command", func() {
 		defaultInstanceErrorCodes = []string{"", ""}
 		requirementsFactory       *testreq.FakeReqFactory
 		logMessages               []*logmessage.LogMessage
-		logRepo                   *testapi.FakeOldLogsRepository
+		logRepo                   *testapi.FakeLogsRepository
 		appInstancesRepo          *testAppInstanaces.FakeAppInstancesRepository
 		appRepo                   *testApplication.FakeApplicationRepository
 		OriginalAppCommand        command_registry.Command
@@ -44,10 +44,10 @@ var _ = Describe("start command", func() {
 		displayApp                *appCmdFakes.FakeAppDisplayer
 	)
 
-	updateCommandDependency := func(oldLogs api.OldLogsRepository) {
+	updateCommandDependency := func(logsRepo api.LogsRepository) {
 		deps.Ui = ui
 		deps.Config = configRepo
-		deps.RepoLocator = deps.RepoLocator.SetOldLogsRepository(oldLogs)
+		deps.RepoLocator = deps.RepoLocator.SetLogsRepository(logsRepo)
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
 
@@ -129,7 +129,7 @@ var _ = Describe("start command", func() {
 			[]models.AppInstanceFields{instance3, instance4},
 		}
 
-		logRepo = &testapi.FakeOldLogsRepository{}
+		logRepo = &testapi.FakeLogsRepository{}
 		mutex.Lock()
 		logMessages = []*logmessage.LogMessage{}
 		mutex.Unlock()
@@ -157,7 +157,7 @@ var _ = Describe("start command", func() {
 
 	callStartWithLoggingTimeout := func(args []string) (ui *testterm.FakeUI) {
 
-		logRepoWithTimeout := &testapi.FakeOldLogsRepositoryWithTimeout{}
+		logRepoWithTimeout := &testapi.FakeLogsRepositoryWithTimeout{}
 
 		updateCommandDependency(logRepoWithTimeout)
 
@@ -359,10 +359,10 @@ var _ = Describe("start command", func() {
 			correctSourceName := "STG"
 
 			logMessages = []*logmessage.LogMessage{
-				testlogs.NewOldLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
-				testlogs.NewOldLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
-				testlogs.NewOldLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
-				testlogs.NewOldLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
+				testlogs.NewLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
+				testlogs.NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
+				testlogs.NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
+				testlogs.NewLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
 			}
 
 			callStart([]string{"my-app"})
@@ -382,13 +382,13 @@ var _ = Describe("start command", func() {
 
 			logRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
 				onConnect()
-				onMessage(testlogs.NewOldLogMessage("Before close", appGuid, LogMessageTypeStaging, time.Now()))
+				onMessage(testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, time.Now()))
 
 				<-logRepoClosed
 
 				time.Sleep(50 * time.Millisecond)
-				onMessage(testlogs.NewOldLogMessage("After close 1", appGuid, LogMessageTypeStaging, time.Now()))
-				onMessage(testlogs.NewOldLogMessage("After close 2", appGuid, LogMessageTypeStaging, time.Now()))
+				onMessage(testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, time.Now()))
+				onMessage(testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, time.Now()))
 
 				return nil
 			}

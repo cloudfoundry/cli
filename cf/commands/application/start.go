@@ -49,7 +49,7 @@ type Start struct {
 	appReq           requirements.ApplicationRequirement
 	appRepo          applications.ApplicationRepository
 	appInstancesRepo app_instances.AppInstancesRepository
-	logRepo          api.OldLogsRepository
+	logRepo          api.LogsRepository
 
 	LogServerConnectionTimeout time.Duration
 	StartupTimeout             time.Duration
@@ -86,7 +86,7 @@ func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall boo
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
-	cmd.logRepo = deps.RepoLocator.GetOldLogsRepository()
+	cmd.logRepo = deps.RepoLocator.GetLogsRepository()
 	cmd.LogServerConnectionTimeout = 20 * time.Second
 	cmd.PingerThrottle = DefaultPingerThrottle
 

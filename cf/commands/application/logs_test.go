@@ -26,7 +26,7 @@ import (
 var _ = Describe("logs command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		oldLogsRepo         *testapi.FakeOldLogsRepository
+		logsRepo            *testapi.FakeLogsRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -34,7 +34,7 @@ var _ = Describe("logs command", func() {
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetOldLogsRepository(oldLogsRepo)
+		deps.RepoLocator = deps.RepoLocator.SetLogsRepository(logsRepo)
 		deps.Config = configRepo
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("logs").SetDependency(deps, pluginCall))
 	}
@@ -42,7 +42,7 @@ var _ = Describe("logs command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		oldLogsRepo = &testapi.FakeOldLogsRepository{}
+		logsRepo = &testapi.FakeLogsRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
@@ -86,17 +86,17 @@ var _ = Describe("logs command", func() {
 
 			currentTime := time.Now()
 			recentLogs := []*logmessage.LogMessage{
-				testlogs.NewOldLogMessage("Log Line 1", app.Guid, "DEA", currentTime),
-				testlogs.NewOldLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
+				testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", currentTime),
+				testlogs.NewLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
 			}
 
 			appLogs := []*logmessage.LogMessage{
-				testlogs.NewOldLogMessage("Log Line 1", app.Guid, "DEA", time.Now()),
+				testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", time.Now()),
 			}
 
 			requirementsFactory.Application = app
-			oldLogsRepo.RecentLogsForReturns(recentLogs, nil)
-			oldLogsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+			logsRepo.RecentLogsForReturns(recentLogs, nil)
+			logsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
 				onConnect()
 				for _, log := range appLogs {
 					onMessage(log)
@@ -110,7 +110,7 @@ var _ = Describe("logs command", func() {
 			runCommand("--recent", "my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(app.Guid).To(Equal(oldLogsRepo.RecentLogsForArgsForCall(0)))
+			Expect(app.Guid).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
@@ -120,8 +120,8 @@ var _ = Describe("logs command", func() {
 
 		Context("when the log messages contain format string identifiers", func() {
 			BeforeEach(func() {
-				oldLogsRepo.RecentLogsForReturns([]*logmessage.LogMessage{
-					testlogs.NewOldLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
+				logsRepo.RecentLogsForReturns([]*logmessage.LogMessage{
+					testlogs.NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
 				}, nil)
 			})
 
@@ -135,7 +135,7 @@ var _ = Describe("logs command", func() {
 			runCommand("my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			appGuid, _, _ := oldLogsRepo.TailLogsForArgsForCall(0)
+			appGuid, _, _ := logsRepo.TailLogsForArgsForCall(0)
 			Expect(app.Guid).To(Equal(appGuid))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
@@ -146,7 +146,7 @@ var _ = Describe("logs command", func() {
 		Context("when the loggregator server has an invalid cert", func() {
 			Context("when the skip-ssl-validation flag is not set", func() {
 				It("fails and informs the user about the skip-ssl-validation flag", func() {
-					oldLogsRepo.TailLogsForReturns(errors.NewInvalidSSLCert("https://example.com", "it don't work good"))
+					logsRepo.TailLogsForReturns(errors.NewInvalidSSLCert("https://example.com", "it don't work good"))
 					runCommand("my-app")
 
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -156,7 +156,7 @@ var _ = Describe("logs command", func() {
 				})
 
 				It("informs the user of the error when they include the --recent flag", func() {
-					oldLogsRepo.RecentLogsForReturns(nil, errors.NewInvalidSSLCert("https://example.com", "how does SSL work???"))
+					logsRepo.RecentLogsForReturns(nil, errors.NewInvalidSSLCert("https://example.com", "how does SSL work???"))
 					runCommand("--recent", "my-app")
 
 					Expect(ui.Outputs).To(ContainSubstrings(

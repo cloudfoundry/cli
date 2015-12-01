@@ -7,7 +7,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
-func NewOldLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *logmessage.LogMessage {
+func NewLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *logmessage.LogMessage {
 	messageType := logmessage.LogMessage_ERR
 
 	return &logmessage.LogMessage{

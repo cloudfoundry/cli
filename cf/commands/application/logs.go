@@ -19,10 +19,10 @@ import (
 )
 
 type Logs struct {
-	ui          terminal.UI
-	config      core_config.Reader
-	oldLogsRepo api.OldLogsRepository
-	appReq      requirements.ApplicationRequirement
+	ui       terminal.UI
+	config   core_config.Reader
+	logsRepo api.LogsRepository
+	appReq   requirements.ApplicationRequirement
 }
 
 func init() {
@@ -60,7 +60,7 @@ func (cmd *Logs) Requirements(requirementsFactory requirements.Factory, fc flags
 func (cmd *Logs) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
-	cmd.oldLogsRepo = deps.RepoLocator.GetOldLogsRepository()
+	cmd.logsRepo = deps.RepoLocator.GetLogsRepository()
 	return cmd
 }
 
@@ -82,7 +82,7 @@ func (cmd *Logs) recentLogsFor(app models.Application) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	messages, err := cmd.oldLogsRepo.RecentLogsFor(app.Guid)
+	messages, err := cmd.logsRepo.RecentLogsFor(app.Guid)
 	if err != nil {
 		cmd.handleError(err)
 	}
@@ -102,7 +102,7 @@ func (cmd *Logs) tailLogsFor(app models.Application) {
 				"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 	}
 
-	err := cmd.oldLogsRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
+	err := cmd.logsRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
 		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
 	})
 
