@@ -27,10 +27,10 @@ func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.Ap
 		return
 	}
 
-	err = appfiles.WalkAppFiles(dir, func(fileName string, fullPath string) (err error) {
+	err = appfiles.WalkAppFiles(dir, func(fileName string, fullPath string) error {
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
-			return
+			return err
 		}
 
 		appFile := models.AppFileFields{
@@ -43,16 +43,25 @@ func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.Ap
 			appFile.Size = 0
 		} else {
 			hash := sha1.New()
-			err = fileutils.CopyPathToWriter(fullPath, hash)
+			file, err := os.Open(fullPath)
 			if err != nil {
-				return
+				return err
 			}
+			defer file.Close()
+
+			_, err = io.Copy(hash, file)
+			if err != nil {
+				return err
+			}
+
 			appFile.Sha1 = fmt.Sprintf("%x", hash.Sum(nil))
 		}
 
 		appFiles = append(appFiles, appFile)
-		return
+
+		return nil
 	})
+
 	return
 }
 
@@ -111,30 +120,40 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 	return
 }
 
-func copyPathToPath(fromPath, toPath string) (err error) {
+func copyPathToPath(fromPath, toPath string) error {
 	srcFileInfo, err := os.Stat(fromPath)
 	if err != nil {
-		return
+		return err
 	}
 
 	if srcFileInfo.IsDir() {
 		err = os.MkdirAll(toPath, srcFileInfo.Mode())
 		if err != nil {
-			return
+			return err
 		}
 	} else {
 		var dst *os.File
 		dst, err = fileutils.Create(toPath)
 		if err != nil {
-			return
+			return err
 		}
 		defer dst.Close()
 
 		dst.Chmod(srcFileInfo.Mode())
 
-		err = fileutils.CopyPathToWriter(fromPath, dst)
+		src, err := os.Open(fromPath)
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		_, err = io.Copy(dst, src)
+		if err != nil {
+			return err
+		}
 	}
-	return err
+
+	return nil
 }
 
 func loadIgnoreFile(dir string) CfIgnore {

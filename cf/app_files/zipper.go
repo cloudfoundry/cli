@@ -21,14 +21,28 @@ type Zipper interface {
 
 type ApplicationZipper struct{}
 
-func (zipper ApplicationZipper) Zip(dirOrZipFile string, targetFile *os.File) (err error) {
-	if zipper.IsZipFile(dirOrZipFile) {
-		err = fileutils.CopyPathToWriter(dirOrZipFile, targetFile)
+func (zipper ApplicationZipper) Zip(dirOrZipFilePath string, targetFile *os.File) error {
+	if zipper.IsZipFile(dirOrZipFilePath) {
+		zipFile, err := os.Open(dirOrZipFilePath)
+		if err != nil {
+			return err
+		}
+		defer zipFile.Close()
+
+		_, err = io.Copy(targetFile, zipFile)
+		if err != nil {
+			return err
+		}
 	} else {
-		err = writeZipFile(dirOrZipFile, targetFile)
+		err := writeZipFile(dirOrZipFilePath, targetFile)
+		if err != nil {
+			return err
+		}
 	}
+
 	targetFile.Seek(0, os.SEEK_SET)
-	return
+
+	return nil
 }
 
 func (zipper ApplicationZipper) IsZipFile(name string) bool {
@@ -156,7 +170,18 @@ func writeZipFile(dir string, targetFile *os.File) error {
 			return nil
 		}
 
-		return fileutils.CopyPathToWriter(fullPath, zipFilePart)
+		file, err := os.Open(fullPath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		_, err = io.Copy(zipFilePart, file)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	})
 }
 
