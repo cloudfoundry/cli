@@ -5,7 +5,7 @@ import (
 	"github.com/simonleung8/flags"
 )
 
-//go:generate counterfeiter -o fakes/fake_registry_command.go . Command
+//go:generate counterfeiter -o fakes/fake_command.go . Command
 type Command interface {
 	MetaData() CommandMetadata
 	SetDependency(deps Dependency, pluginCall bool) Command
