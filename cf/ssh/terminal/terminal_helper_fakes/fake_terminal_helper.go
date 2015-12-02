@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/terminal"
+	"github.com/cloudfoundry/cli/cf/ssh/terminal"
 	"github.com/docker/docker/pkg/term"
 )
 
@@ -13,7 +13,7 @@ type FakeTerminalHelper struct {
 	StdStreamsStub        func() (stdin io.ReadCloser, stdout io.Writer, stderr io.Writer)
 	stdStreamsMutex       sync.RWMutex
 	stdStreamsArgsForCall []struct{}
-	stdStreamsReturns     struct {
+	stdStreamsReturns struct {
 		result1 io.ReadCloser
 		result2 io.Writer
 		result3 io.Writer
@@ -254,4 +254,4 @@ func (fake *FakeTerminalHelper) GetWinsizeReturns(result1 *term.Winsize, result2
 	}{result1, result2}
 }
 
-var _ terminal.TerminalHelper = new(FakeTerminalHelper)
+var _ sshTerminal.TerminalHelper = new(FakeTerminalHelper)
