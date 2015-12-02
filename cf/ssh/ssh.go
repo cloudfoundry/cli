@@ -1,6 +1,8 @@
 package sshCmd
 
 import (
+	"crypto/md5"
+	"crypto/sha1"
 	"errors"
 	"fmt"
 	"io"
@@ -15,12 +17,16 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/cloudfoundry-incubator/diego-ssh/helpers"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/ssh/options"
 	"github.com/cloudfoundry/cli/cf/ssh/sigwinch"
 	"github.com/cloudfoundry/cli/cf/ssh/terminal"
 	"github.com/docker/docker/pkg/term"
+)
+
+const (
+	md5FingerprintLength  = 47 // inclusive of space between bytes
+	sha1FingerprintLength = 59 // inclusive of space between bytes
 )
 
 //go:generate counterfeiter -o fakes/fake_secure_shell.go . SecureShell
@@ -305,6 +311,16 @@ func (c *secureShell) validateTarget(opts *options.SSHOptions) error {
 	return nil
 }
 
+func md5Fingerprint(key ssh.PublicKey) string {
+	sum := md5.Sum(key.Marshal())
+	return strings.Replace(fmt.Sprintf("% x", sum), " ", ":", -1)
+}
+
+func sha1Fingerprint(key ssh.PublicKey) string {
+	sum := sha1.Sum(key.Marshal())
+	return strings.Replace(fmt.Sprintf("% x", sum), " ", ":", -1)
+}
+
 type hostKeyCallback func(hostname string, remote net.Addr, key ssh.PublicKey) error
 
 func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) hostKeyCallback {
@@ -314,18 +330,18 @@ func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) h
 
 	return func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 		switch len(expectedFingerprint) {
-		case helpers.SHA1_FINGERPRINT_LENGTH:
-			fingerprint := helpers.SHA1Fingerprint(key)
+		case sha1FingerprintLength:
+			fingerprint := sha1Fingerprint(key)
 			if fingerprint != expectedFingerprint {
 				return fmt.Errorf("Host key verification failed.\n\nThe fingerprint of the received key was %q.", fingerprint)
 			}
-		case helpers.MD5_FINGERPRINT_LENGTH:
-			fingerprint := helpers.MD5Fingerprint(key)
+		case md5FingerprintLength:
+			fingerprint := md5Fingerprint(key)
 			if fingerprint != expectedFingerprint {
 				return fmt.Errorf("Host key verification failed.\n\nThe fingerprint of the received key was %q.", fingerprint)
 			}
 		case 0:
-			fingerprint := helpers.MD5Fingerprint(key)
+			fingerprint := md5Fingerprint(key)
 			return fmt.Errorf("Unable to verify identity of host.\n\nThe fingerprint of the received key was %q.", fingerprint)
 		default:
 			return errors.New("Unsupported host key fingerprint format")
