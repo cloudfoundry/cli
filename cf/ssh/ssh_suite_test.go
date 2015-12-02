@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/cloudfoundry-incubator/diego-ssh/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/crypto/ssh"
@@ -13,9 +12,8 @@ import (
 )
 
 var (
-	TestHostKey            ssh.Signer
-	TestHostKeyFingerprint string
-	TestPrivateKey         ssh.Signer
+	TestHostKey    ssh.Signer
+	TestPrivateKey ssh.Signer
 )
 
 func TestCmd(t *testing.T) {
@@ -36,5 +34,4 @@ var _ = BeforeSuite(func() {
 
 	TestHostKey = hostKey
 	TestPrivateKey = privateKey
-	TestHostKeyFingerprint = helpers.SHA1Fingerprint(TestHostKey.PublicKey())
 })

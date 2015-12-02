@@ -177,7 +177,6 @@ var _ = Describe("SSH", func() {
 		var sessionError error
 
 		BeforeEach(func() {
-			sshEndpointFingerprint = TestHostKeyFingerprint
 			sshEndpoint = "ssh.example.com:22"
 
 			opts = &options.SSHOptions{
