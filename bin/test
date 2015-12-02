@@ -17,10 +17,6 @@ bin/generate-language-resources
 echo -e "\n Running i18n checkup..."
 bin/i18n-checkup
 
-go get github.com/tools/godep
-
-GODEP=$(which godep)
-
 echo -e "\n Cleaning build artifacts..."
 
 # Clean up old plugin binaries used in test
@@ -35,6 +31,12 @@ if [[ -d $GOPATH/pkg ]] ; then
   rm -Rf *
   popd
 fi
+
+if [ ! $(which godep) ];then
+  go get github.com/tools/godep
+fi
+
+GODEP=$(which godep)
 
 if [[ -d $($GODEP path)/pkg ]] ; then
   pushd $($GODEP path)/pkg
