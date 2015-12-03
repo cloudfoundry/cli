@@ -27,6 +27,7 @@ type ServiceInstanceFields struct {
 	Name             string
 	LastOperation    LastOperationFields
 	SysLogDrainUrl   string
+	RouteServiceUrl  string
 	ApplicationNames []string
 	Params           map[string]interface{}
 	DashboardUrl     string
