@@ -5630,6 +5630,11 @@
       "modified": false
    },
    {
+      "id": "path",
+      "translation": "path",
+      "modified": false
+   },
+   {
       "id": "plan",
       "translation": "plano",
       "modified": false

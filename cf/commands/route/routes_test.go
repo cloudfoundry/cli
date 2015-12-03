@@ -81,6 +81,7 @@ var _ = Describe("routes command", func() {
 
 			route2 := models.Route{}
 			route2.Host = "hostname-2"
+			route2.Path = "/foo"
 			route2.Domain = domain2
 			route2.Apps = []models.ApplicationFields{app1, app2}
 			routeRepo.Routes = []models.Route{route, route2}
@@ -93,7 +94,7 @@ var _ = Describe("routes command", func() {
 				[]string{"Getting routes", "my-user"},
 				[]string{"host", "domain", "apps"},
 				[]string{"hostname-1", "example.com", "dora"},
-				[]string{"hostname-2", "cookieclicker.co", "dora", "bora"},
+				[]string{"hostname-2", "cookieclicker.co", "/foo", "dora", "bora"},
 			))
 		})
 	})
@@ -117,6 +118,7 @@ var _ = Describe("routes command", func() {
 
 			route2 := models.Route{}
 			route2.Host = "hostname-2"
+			route2.Path = "/foo"
 			route2.Domain = domain2
 			route2.Apps = []models.ApplicationFields{app1, app2}
 			route2.Space = space2
@@ -130,7 +132,7 @@ var _ = Describe("routes command", func() {
 				[]string{"Getting routes", "my-user"},
 				[]string{"space", "host", "domain", "apps"},
 				[]string{"space-1", "hostname-1", "example.com", "dora"},
-				[]string{"space-2", "hostname-2", "cookieclicker.co", "dora", "bora"},
+				[]string{"space-2", "hostname-2", "cookieclicker.co", "/foo", "dora", "bora"},
 			))
 		})
 
