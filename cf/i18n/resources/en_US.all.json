@@ -560,6 +560,16 @@
       "modified": false
    },
    {
+      "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
+      "translation": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
+      "modified": false
+   },
+   {
+      "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
       "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
       "translation": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
       "modified": false
@@ -622,6 +632,11 @@
    {
       "id": "CF_NAME auth USERNAME PASSWORD\n\n",
       "translation": "CF_NAME auth USERNAME PASSWORD\n\n",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
+      "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
       "modified": false
    },
    {
@@ -1172,6 +1187,11 @@
    {
       "id": "CF_NAME target [-o ORG] [-s SPACE]",
       "translation": "CF_NAME target [-o ORG] [-s SPACE]",
+      "modified": false
+   },
+   {
+      "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
+      "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
       "modified": false
    },
    {
@@ -1995,6 +2015,16 @@
       "modified": false
    },
    {
+      "id": "EXAMPLE:\n\t\tCF_NAME bind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "translation": "EXAMPLE:\n\t\tCF_NAME bind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "modified": false
+   },
+   {
+      "id": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "translation": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
+      "modified": false
+   },
+   {
       "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
       "translation": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
       "modified": false
@@ -2515,6 +2545,11 @@
       "modified": false
    },
    {
+      "id": "Force binding without confirmation",
+      "translation": "Force binding without confirmation",
+      "modified": false
+   },
+   {
       "id": "Force delete (do not prompt for confirmation)",
       "translation": "Force delete (do not prompt for confirmation)",
       "modified": false
@@ -2542,6 +2577,11 @@
    {
       "id": "Force restart of app without prompt",
       "translation": "Force restart of app without prompt",
+      "modified": false
+   },
+   {
+      "id": "Force unbinding without confirmation",
+      "translation": "Force unbinding without confirmation",
       "modified": false
    },
    {
@@ -2800,6 +2840,16 @@
       "modified": false
    },
    {
+      "id": "Hostname used in combination with DOMAIN to specify the route to bind",
+      "translation": "Hostname used in combination with DOMAIN to specify the route to bind",
+      "modified": false
+   },
+   {
+      "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
+      "translation": "Hostname used in combination with DOMAIN to specify the route to unbind",
+      "modified": false
+   },
+   {
       "id": "INSTALLED PLUGIN COMMANDS",
       "translation": "INSTALLED PLUGIN COMMANDS",
       "modified": false
@@ -2892,6 +2942,11 @@
    {
       "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
       "translation": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
+      "modified": false
+   },
+   {
+      "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
+      "translation": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
       "modified": false
    },
    {
@@ -4135,6 +4190,11 @@
       "modified": false
    },
    {
+      "id": "Requests for the route will be forwarded to the service instance",
+      "translation": "Requests for the route will be forwarded to the service instance",
+      "modified": false
+   },
+   {
       "id": "Restage an app",
       "translation": "Restage an app",
       "modified": false
@@ -4247,6 +4307,11 @@
    {
       "id": "Route {{.URL}} already exists",
       "translation": "Route {{.URL}} already exists",
+      "modified": false
+   },
+   {
+      "id": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
+      "translation": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
       "modified": false
    },
    {
@@ -4950,6 +5015,11 @@
       "modified": false
    },
    {
+      "id": "Unbind a service instance from a route",
+      "translation": "Unbind a service instance from a route",
+      "modified": false
+   },
+   {
       "id": "Unbind a service instance from an app",
       "translation": "Unbind a service instance from an app",
       "modified": false
@@ -4957,6 +5027,16 @@
    {
       "id": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "translation": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "modified": false
+   },
+   {
+      "id": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)",
+      "translation": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)",
+      "modified": false
+   },
+   {
+      "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+      "translation": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
       "modified": false
    },
    {

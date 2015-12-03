@@ -168,6 +168,9 @@ func newAppPresenter() (presenter appPresenter) {
 					presentNonCodegangstaCommand("bind-service"),
 					presentNonCodegangstaCommand("unbind-service"),
 				}, {
+					presentNonCodegangstaCommand("bind-route-service"),
+					presentNonCodegangstaCommand("unbind-route-service"),
+				}, {
 					presentNonCodegangstaCommand("create-user-provided-service"),
 					presentNonCodegangstaCommand("update-user-provided-service"),
 				},
