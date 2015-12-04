@@ -19,6 +19,7 @@ type FakeUI struct {
 	WarnOutputs                []string
 	Prompts                    []string
 	PasswordPrompts            []string
+	InputsChan                 chan string
 	Inputs                     []string
 	FailedWithUsage            bool
 	FailedWithUsageCommandName string
@@ -64,15 +65,20 @@ func (ui *FakeUI) Warn(message string, args ...interface{}) {
 	return
 }
 
-func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
+func (ui *FakeUI) Ask(prompt string, args ...interface{}) string {
 	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
-	if len(ui.Inputs) == 0 {
-		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+
+	if ui.InputsChan == nil {
+		if len(ui.Inputs) == 0 {
+			panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+		}
+
+		answer := ui.Inputs[0]
+		ui.Inputs = ui.Inputs[1:]
+		return answer
 	}
 
-	answer = ui.Inputs[0]
-	ui.Inputs = ui.Inputs[1:]
-	return
+	return <-ui.InputsChan
 }
 
 func (ui *FakeUI) ConfirmDelete(modelType, modelName string) bool {
@@ -96,19 +102,19 @@ func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
 	return false
 }
 
-func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) (answer string) {
+func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) string {
 	ui.PasswordPrompts = append(ui.PasswordPrompts, fmt.Sprintf(prompt, args...))
-	if len(ui.Inputs) == 0 {
-		println("__________________PANIC__________________")
-		println(ui.DumpOutputs())
-		println(ui.DumpPrompts())
-		println("_________________________________________")
-		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+	if ui.InputsChan == nil {
+		if len(ui.Inputs) == 0 {
+			panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+		}
+
+		answer := ui.Inputs[0]
+		ui.Inputs = ui.Inputs[1:]
+		return answer
 	}
 
-	answer = ui.Inputs[0]
-	ui.Inputs = ui.Inputs[1:]
-	return
+	return <-ui.InputsChan
 }
 
 func (ui *FakeUI) Ok() {
