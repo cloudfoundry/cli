@@ -55,17 +55,14 @@ func (cmd *PurgeServiceInstance) scaryWarningMessage() string {
 func (cmd *PurgeServiceInstance) Execute(c flags.FlagContext) {
 	instanceName := c.Args()[0]
 
-	instance, apiErr := cmd.serviceRepo.FindInstanceByName(instanceName)
+	instance, err := cmd.serviceRepo.FindInstanceByName(instanceName)
+	if err != nil {
+		if _, ok := err.(*errors.ModelNotFoundError); ok {
+			cmd.ui.Warn(T("Service instance {{.InstanceName}} not found", map[string]interface{}{"InstanceName": instanceName}))
+			return
+		}
 
-	switch apiErr.(type) {
-	case nil:
-	case *errors.ModelNotFoundError:
-		cmd.ui.Warn(T("Service instance {{.InstanceName}} not found",
-			map[string]interface{}{"InstanceName": instanceName},
-		))
-		return
-	default:
-		cmd.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(err.Error())
 	}
 
 	confirmed := c.Bool("f")
@@ -80,7 +77,7 @@ func (cmd *PurgeServiceInstance) Execute(c flags.FlagContext) {
 		return
 	}
 	cmd.ui.Say(T("Purging service {{.InstanceName}}...", map[string]interface{}{"InstanceName": instanceName}))
-	err := cmd.serviceRepo.PurgeServiceInstance(instance)
+	err = cmd.serviceRepo.PurgeServiceInstance(instance)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
