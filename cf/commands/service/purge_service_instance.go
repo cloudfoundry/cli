@@ -32,13 +32,14 @@ func (cmd *PurgeServiceInstance) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("purge-service-instance"))
 	}
 
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	return
+	return []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+	}, nil
 }
 
 func (cmd *PurgeServiceInstance) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
