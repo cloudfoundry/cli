@@ -65,17 +65,18 @@ func (cmd *PurgeServiceInstance) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	confirmed := c.Bool("f")
-	if !confirmed {
+	force := c.Bool("f")
+	if !force {
 		cmd.ui.Warn(cmd.scaryWarningMessage())
-		confirmed = cmd.ui.Confirm(T("Really purge service instance {{.InstanceName}} from Cloud Foundry?",
+		confirmed := cmd.ui.Confirm(T("Really purge service instance {{.InstanceName}} from Cloud Foundry?",
 			map[string]interface{}{"InstanceName": instanceName},
 		))
+
+		if !confirmed {
+			return
+		}
 	}
 
-	if !confirmed {
-		return
-	}
 	cmd.ui.Say(T("Purging service {{.InstanceName}}...", map[string]interface{}{"InstanceName": instanceName}))
 	err = cmd.serviceRepo.PurgeServiceInstance(instance)
 	if err != nil {
