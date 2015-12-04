@@ -196,6 +196,11 @@ func copyAndClose(wg *sync.WaitGroup, dest io.WriteCloser, src io.Reader) {
 	}
 }
 
+func copyAndDone(wg *sync.WaitGroup, dest io.Writer, src io.Reader) {
+	io.Copy(dest, src)
+	wg.Done()
+}
+
 func (c *secureShell) InteractiveSession() error {
 	var err error
 
@@ -262,9 +267,12 @@ func (c *secureShell) InteractiveSession() error {
 		}
 	}
 
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+
 	go copyAndClose(nil, inPipe, stdin)
-	go io.Copy(stdout, outPipe)
-	go io.Copy(stderr, errPipe)
+	go copyAndDone(wg, stdout, outPipe)
+	go copyAndDone(wg, stderr, errPipe)
 
 	if stdoutIsTerminal {
 		resized := make(chan os.Signal, 16)
@@ -292,7 +300,9 @@ func (c *secureShell) InteractiveSession() error {
 
 	go keepalive(secureClient.Conn(), time.NewTicker(c.keepAliveInterval), keepaliveStopCh)
 
-	return session.Wait()
+	result := session.Wait()
+	wg.Wait()
+	return result
 }
 
 func (c *secureShell) Wait() error {

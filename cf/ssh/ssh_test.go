@@ -175,6 +175,7 @@ var _ = Describe("SSH", func() {
 	Describe("InteractiveSession", func() {
 		var opts *options.SSHOptions
 		var sessionError error
+		var interactiveSessionInvoker func(secureShell sshCmd.SecureShell)
 
 		BeforeEach(func() {
 			sshEndpoint = "ssh.example.com:22"
@@ -188,12 +189,16 @@ var _ = Describe("SSH", func() {
 			currentApp.Diego = true
 			currentApp.Guid = "app-guid"
 			token = "bearer token"
+
+			interactiveSessionInvoker = func(secureShell sshCmd.SecureShell) {
+				sessionError = secureShell.InteractiveSession()
+			}
 		})
 
 		JustBeforeEach(func() {
 			connectErr := secureShell.Connect(opts)
 			Expect(connectErr).NotTo(HaveOccurred())
-			sessionError = secureShell.InteractiveSession()
+			interactiveSessionInvoker(secureShell)
 		})
 
 		It("dials the correct endpoint as the correct user", func() {
@@ -644,6 +649,42 @@ var _ = Describe("SSH", func() {
 
 			It("returns the result from wait", func() {
 				Expect(sessionError).To(MatchError("error result"))
+			})
+
+			Context("when the session terminates before stream copies complete", func() {
+				var sessionErrorCh chan error
+
+				BeforeEach(func() {
+					sessionErrorCh = make(chan error, 1)
+
+					interactiveSessionInvoker = func(secureShell sshCmd.SecureShell) {
+						go func() { sessionErrorCh <- secureShell.InteractiveSession() }()
+					}
+
+					stdoutPipe.ReadStub = func(p []byte) (int, error) {
+						defer GinkgoRecover()
+						Eventually(fakeSecureSession.WaitCallCount).Should(Equal(1))
+						Consistently(sessionErrorCh).ShouldNot(Receive())
+
+						p[0] = 1
+						return 1, io.EOF
+					}
+
+					stderrPipe.ReadStub = func(p []byte) (int, error) {
+						defer GinkgoRecover()
+						Eventually(fakeSecureSession.WaitCallCount).Should(Equal(1))
+						Consistently(sessionErrorCh).ShouldNot(Receive())
+
+						p[0] = 2
+						return 1, io.EOF
+					}
+				})
+
+				It("waits for the copies to complete", func() {
+					Eventually(sessionErrorCh).Should(Receive())
+					Expect(stdoutPipe.ReadCallCount()).To(Equal(1))
+					Expect(stderrPipe.ReadCallCount()).To(Equal(1))
+				})
 			})
 
 			Context("when stdin is closed", func() {
