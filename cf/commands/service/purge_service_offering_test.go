@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	cferrors "github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
@@ -24,7 +25,7 @@ var _ = Describe("purge-service-offering command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
 		ui                  *testterm.FakeUI
-		serviceRepo         *testapi.FakeServiceRepo
+		serviceRepo         *testapi.FakeServiceRepository
 		deps                command_registry.Dependency
 	)
 
@@ -42,7 +43,7 @@ var _ = Describe("purge-service-offering command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepo{}
+		serviceRepo = &testapi.FakeServiceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	})
 
@@ -69,20 +70,22 @@ var _ = Describe("purge-service-offering command", func() {
 
 	It("works when given -p and a provider name", func() {
 		offering := maker.NewServiceOffering("the-service-name")
-		serviceRepo.FindServiceOfferingByLabelAndProviderServiceOffering = offering
+		serviceRepo.FindServiceOfferingByLabelAndProviderReturns(offering, nil)
 
 		ui.Inputs = []string{"yes"}
 
 		runCommand([]string{"-p", "the-provider", "the-service-name"})
 
-		Expect(serviceRepo.FindServiceOfferingByLabelAndProviderName).To(Equal("the-service-name"))
-		Expect(serviceRepo.FindServiceOfferingByLabelAndProviderProvider).To(Equal("the-provider"))
-		Expect(serviceRepo.PurgedServiceOffering).To(Equal(offering))
+		name, provider := serviceRepo.FindServiceOfferingByLabelAndProviderArgsForCall(0)
+		Expect(name).To(Equal("the-service-name"))
+		Expect(provider).To(Equal("the-provider"))
+
+		Expect(serviceRepo.PurgeServiceOfferingArgsForCall(0)).To(Equal(offering))
 	})
 
 	It("works when not given a provider", func() {
 		offering := maker.NewServiceOffering("the-service-name")
-		serviceRepo.FindServiceOfferingByLabelAndProviderServiceOffering = offering
+		serviceRepo.FindServiceOfferingByLabelAndProviderReturns(offering, nil)
 
 		ui.Inputs = []string{"yes"}
 
@@ -92,9 +95,10 @@ var _ = Describe("purge-service-offering command", func() {
 		Expect(ui.Prompts).To(ContainSubstrings([]string{"Really purge service", "the-service-name"}))
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"Purging service the-service-name..."}))
 
-		Expect(serviceRepo.FindServiceOfferingByLabelAndProviderName).To(Equal("the-service-name"))
-		Expect(serviceRepo.FindServiceOfferingByLabelAndProviderProvider).To(Equal(""))
-		Expect(serviceRepo.PurgedServiceOffering).To(Equal(offering))
+		name, provider := serviceRepo.FindServiceOfferingByLabelAndProviderArgsForCall(0)
+		Expect(name).To(Equal("the-service-name"))
+		Expect(provider).To(BeEmpty())
+		Expect(serviceRepo.PurgeServiceOfferingArgsForCall(0)).To(Equal(offering))
 
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 	})
@@ -104,24 +108,24 @@ var _ = Describe("purge-service-offering command", func() {
 
 		runCommand([]string{"the-service-name"})
 
-		Expect(serviceRepo.FindServiceOfferingByLabelAndProviderCalled).To(Equal(true))
-		Expect(serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
+		Expect(serviceRepo.FindServiceOfferingByLabelAndProviderCallCount()).To(Equal(1))
+		Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
 	})
 
 	It("does not prompt with confirmation when -f is passed", func() {
 		offering := maker.NewServiceOffering("the-service-name")
-		serviceRepo.FindServiceOfferingByLabelAndProviderServiceOffering = offering
+		serviceRepo.FindServiceOfferingByLabelAndProviderReturns(offering, nil)
 
 		runCommand(
 			[]string{"-f", "the-service-name"},
 		)
 
 		Expect(len(ui.Prompts)).To(Equal(0))
-		Expect(serviceRepo.PurgeServiceOfferingCalled).To(Equal(true))
+		Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(Equal(1))
 	})
 
 	It("fails with an error message when the request fails", func() {
-		serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = fmt.Errorf("%s: %s", "oh no!", errors.New("!").Error())
+		serviceRepo.FindServiceOfferingByLabelAndProviderReturns(models.ServiceOffering{}, errors.New("oh no!"))
 
 		runCommand(
 			[]string{"-f", "-p", "the-provider", "the-service-name"},
@@ -132,11 +136,11 @@ var _ = Describe("purge-service-offering command", func() {
 			[]string{"oh no!"},
 		))
 
-		Expect(serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
+		Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
 	})
 
 	It("fails with an error message when the purging request fails", func() {
-		serviceRepo.PurgeServiceOfferingApiResponse = fmt.Errorf("crumpets insufficiently buttered")
+		serviceRepo.PurgeServiceOfferingReturns(fmt.Errorf("crumpets insufficiently buttered"))
 
 		runCommand(
 			[]string{"-f", "-p", "the-provider", "the-service-name"},
@@ -149,7 +153,7 @@ var _ = Describe("purge-service-offering command", func() {
 	})
 
 	It("indicates when a service doesn't exist", func() {
-		serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = cferrors.NewModelNotFoundError("Service Offering", "")
+		serviceRepo.FindServiceOfferingByLabelAndProviderReturns(models.ServiceOffering{}, cferrors.NewModelNotFoundError("Service Offering", ""))
 
 		ui.Inputs = []string{"yes"}
 
@@ -161,6 +165,6 @@ var _ = Describe("purge-service-offering command", func() {
 		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING"}))
 		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Ok"}))
 
-		Expect(serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
+		Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
 	})
 })

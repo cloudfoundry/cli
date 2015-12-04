@@ -2,6 +2,7 @@ package requirements_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
@@ -24,19 +25,21 @@ var _ = Describe("ServiceInstanceRequirement", func() {
 			instance := models.ServiceInstance{}
 			instance.Name = "my-service"
 			instance.Guid = "my-service-guid"
-			repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
+			repo := &testapi.FakeServiceRepository{}
+			repo.FindInstanceByNameReturns(instance, nil)
 
 			req := NewServiceInstanceRequirement("my-service", ui, repo)
 
 			Expect(req.Execute()).To(BeTrue())
-			Expect(repo.FindInstanceByNameName).To(Equal("my-service"))
+			Expect(repo.FindInstanceByNameArgsForCall(0)).To(Equal("my-service"))
 			Expect(req.GetServiceInstance()).To(Equal(instance))
 		})
 	})
 
 	Context("when a service instance with the given name can't be found", func() {
 		It("fails", func() {
-			repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
+			repo := &testapi.FakeServiceRepository{}
+			repo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.NewModelNotFoundError("Service instance", "my-service"))
 			testassert.AssertPanic(testterm.QuietPanic, func() {
 				NewServiceInstanceRequirement("foo", ui, repo).Execute()
 			})

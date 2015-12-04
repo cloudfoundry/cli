@@ -44,7 +44,7 @@ var _ = Describe("Push Command", func() {
 		domainRepo                 *testapi.FakeDomainRepository
 		routeRepo                  *testapi.FakeRouteRepository
 		stackRepo                  *testStacks.FakeStackRepository
-		serviceRepo                *testapi.FakeServiceRepo
+		serviceRepo                *testapi.FakeServiceRepository
 		wordGenerator              *testwords.FakeWordGenerator
 		requirementsFactory        *testreq.FakeReqFactory
 		authRepo                   *testapi.FakeAuthenticationRepository
@@ -111,7 +111,7 @@ var _ = Describe("Push Command", func() {
 
 		routeRepo = &testapi.FakeRouteRepository{}
 		stackRepo = &testStacks.FakeStackRepository{}
-		serviceRepo = &testapi.FakeServiceRepo{}
+		serviceRepo = &testapi.FakeServiceRepository{}
 		authRepo = &testapi.FakeAuthenticationRepository{}
 		wordGenerator = new(testwords.FakeWordGenerator)
 		wordGenerator.BabbleReturns("random-host")
@@ -1047,11 +1047,9 @@ var _ = Describe("Push Command", func() {
 
 	Describe("service instances", func() {
 		BeforeEach(func() {
-			serviceRepo.FindInstanceByNameMap = generic.NewMap(map[interface{}]interface{}{
-				"global-service": maker.NewServiceInstance("global-service"),
-				"app1-service":   maker.NewServiceInstance("app1-service"),
-				"app2-service":   maker.NewServiceInstance("app2-service"),
-			})
+			serviceRepo.FindInstanceByNameStub = func(name string) (models.ServiceInstance, error) {
+				return maker.NewServiceInstance(name), nil
+			}
 
 			appRepo.CreateStub = func(params models.AppParams) (models.Application, error) {
 				a := models.Application{}
@@ -1113,8 +1111,7 @@ var _ = Describe("Push Command", func() {
 
 		Context("when the service instance can't be found", func() {
 			BeforeEach(func() {
-				//				routeRepo.FindByHostAndDomainReturns.Error = errors.new("can't find service instance")
-				serviceRepo.FindInstanceByNameErr = true
+				serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.New("Error finding instance"))
 				manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 			})
 

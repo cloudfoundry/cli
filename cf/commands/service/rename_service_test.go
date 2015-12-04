@@ -19,7 +19,7 @@ var _ = Describe("rename-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		serviceRepo         *testapi.FakeServiceRepo
+		serviceRepo         *testapi.FakeServiceRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -34,7 +34,7 @@ var _ = Describe("rename-service command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepo{}
+		serviceRepo = &testapi.FakeServiceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
@@ -84,8 +84,9 @@ var _ = Describe("rename-service command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(serviceRepo.RenameServiceServiceInstance).To(Equal(serviceInstance))
-			Expect(serviceRepo.RenameServiceNewName).To(Equal("new-name"))
+			actualServiceInstance, actualServiceName := serviceRepo.RenameServiceArgsForCall(0)
+			Expect(actualServiceInstance).To(Equal(serviceInstance))
+			Expect(actualServiceName).To(Equal("new-name"))
 		})
 	})
 })

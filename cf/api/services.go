@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter -o fakes/fake_service_repository.go . ServiceRepository
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) error
 	GetServiceOfferingByGuid(serviceGuid string) (offering models.ServiceOffering, apiErr error)
