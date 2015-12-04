@@ -1,6 +1,7 @@
 package requirements
 
 import (
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 )
@@ -45,10 +46,8 @@ type FakeReqFactory struct {
 
 	Buildpack models.Buildpack
 
-	MinCCApiVersionCommandName string
-	MinCCApiVersionMajor       int
-	MinCCApiVersionMinor       int
-	MinCCApiVersionPatch       int
+	MinAPIVersionCommandName     string
+	MinAPIVersionRequiredVersion semver.Version
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -106,11 +105,9 @@ func (f *FakeReqFactory) NewApiEndpointRequirement() requirements.Requirement {
 	return FakeRequirement{f, f.ApiEndpointSuccess}
 }
 
-func (f *FakeReqFactory) NewMinCCApiVersionRequirement(commandName string, major, minor, patch int) requirements.Requirement {
-	f.MinCCApiVersionCommandName = commandName
-	f.MinCCApiVersionMajor = major
-	f.MinCCApiVersionMinor = minor
-	f.MinCCApiVersionPatch = patch
+func (f *FakeReqFactory) NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) requirements.Requirement {
+	f.MinAPIVersionCommandName = commandName
+	f.MinAPIVersionRequiredVersion = requiredVersion
 	return FakeRequirement{f, true}
 }
 

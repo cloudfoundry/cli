@@ -4,6 +4,7 @@ package fakes
 import (
 	"sync"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/requirements"
 )
 
@@ -95,15 +96,13 @@ type FakeFactory struct {
 	newApiEndpointRequirementReturns     struct {
 		result1 requirements.Requirement
 	}
-	NewMinCCApiVersionRequirementStub        func(commandName string, major, minor, patch int) requirements.Requirement
-	newMinCCApiVersionRequirementMutex       sync.RWMutex
-	newMinCCApiVersionRequirementArgsForCall []struct {
-		commandName string
-		major       int
-		minor       int
-		patch       int
+	NewMinAPIVersionRequirementStub        func(commandName string, requiredVersion semver.Version) requirements.Requirement
+	newMinAPIVersionRequirementMutex       sync.RWMutex
+	newMinAPIVersionRequirementArgsForCall []struct {
+		commandName     string
+		requiredVersion semver.Version
 	}
-	newMinCCApiVersionRequirementReturns struct {
+	newMinAPIVersionRequirementReturns struct {
 		result1 requirements.Requirement
 	}
 }
@@ -453,37 +452,35 @@ func (fake *FakeFactory) NewApiEndpointRequirementReturns(result1 requirements.R
 	}{result1}
 }
 
-func (fake *FakeFactory) NewMinCCApiVersionRequirement(commandName string, major int, minor int, patch int) requirements.Requirement {
-	fake.newMinCCApiVersionRequirementMutex.Lock()
-	fake.newMinCCApiVersionRequirementArgsForCall = append(fake.newMinCCApiVersionRequirementArgsForCall, struct {
-		commandName string
-		major       int
-		minor       int
-		patch       int
-	}{commandName, major, minor, patch})
-	fake.newMinCCApiVersionRequirementMutex.Unlock()
-	if fake.NewMinCCApiVersionRequirementStub != nil {
-		return fake.NewMinCCApiVersionRequirementStub(commandName, major, minor, patch)
+func (fake *FakeFactory) NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) requirements.Requirement {
+	fake.newMinAPIVersionRequirementMutex.Lock()
+	fake.newMinAPIVersionRequirementArgsForCall = append(fake.newMinAPIVersionRequirementArgsForCall, struct {
+		commandName     string
+		requiredVersion semver.Version
+	}{commandName, requiredVersion})
+	fake.newMinAPIVersionRequirementMutex.Unlock()
+	if fake.NewMinAPIVersionRequirementStub != nil {
+		return fake.NewMinAPIVersionRequirementStub(commandName, requiredVersion)
 	} else {
-		return fake.newMinCCApiVersionRequirementReturns.result1
+		return fake.newMinAPIVersionRequirementReturns.result1
 	}
 }
 
-func (fake *FakeFactory) NewMinCCApiVersionRequirementCallCount() int {
-	fake.newMinCCApiVersionRequirementMutex.RLock()
-	defer fake.newMinCCApiVersionRequirementMutex.RUnlock()
-	return len(fake.newMinCCApiVersionRequirementArgsForCall)
+func (fake *FakeFactory) NewMinAPIVersionRequirementCallCount() int {
+	fake.newMinAPIVersionRequirementMutex.RLock()
+	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
+	return len(fake.newMinAPIVersionRequirementArgsForCall)
 }
 
-func (fake *FakeFactory) NewMinCCApiVersionRequirementArgsForCall(i int) (string, int, int, int) {
-	fake.newMinCCApiVersionRequirementMutex.RLock()
-	defer fake.newMinCCApiVersionRequirementMutex.RUnlock()
-	return fake.newMinCCApiVersionRequirementArgsForCall[i].commandName, fake.newMinCCApiVersionRequirementArgsForCall[i].major, fake.newMinCCApiVersionRequirementArgsForCall[i].minor, fake.newMinCCApiVersionRequirementArgsForCall[i].patch
+func (fake *FakeFactory) NewMinAPIVersionRequirementArgsForCall(i int) (string, semver.Version) {
+	fake.newMinAPIVersionRequirementMutex.RLock()
+	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
+	return fake.newMinAPIVersionRequirementArgsForCall[i].commandName, fake.newMinAPIVersionRequirementArgsForCall[i].requiredVersion
 }
 
-func (fake *FakeFactory) NewMinCCApiVersionRequirementReturns(result1 requirements.Requirement) {
-	fake.NewMinCCApiVersionRequirementStub = nil
-	fake.newMinCCApiVersionRequirementReturns = struct {
+func (fake *FakeFactory) NewMinAPIVersionRequirementReturns(result1 requirements.Requirement) {
+	fake.NewMinAPIVersionRequirementStub = nil
+	fake.newMinAPIVersionRequirementReturns = struct {
 		result1 requirements.Requirement
 	}{result1}
 }
