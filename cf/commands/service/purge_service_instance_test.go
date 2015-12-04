@@ -3,6 +3,7 @@ package service_test
 import (
 	"errors"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -40,7 +41,8 @@ var _ = Describe("PurgeServiceInstance", func() {
 		factory     *fakerequirements.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement requirements.Requirement
+		loginRequirement         requirements.Requirement
+		minAPIVersionRequirement requirements.Requirement
 	)
 
 	BeforeEach(func() {
@@ -65,6 +67,9 @@ var _ = Describe("PurgeServiceInstance", func() {
 
 		loginRequirement = &passingRequirement{}
 		factory.NewLoginRequirementReturns(loginRequirement)
+
+		minAPIVersionRequirement = &passingRequirement{}
+		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
 	Describe("Requirements", func() {
@@ -94,6 +99,21 @@ var _ = Describe("PurgeServiceInstance", func() {
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a MinAPIVersionRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+
+				expectedVersion, err := semver.Make("2.36.0")
+				Expect(err).NotTo(HaveOccurred())
+
+				commandName, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+				Expect(commandName).To(Equal("purge-service-instance"))
+				Expect(requiredVersion).To(Equal(expectedVersion))
+
+				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 			})
 		})
 	})
