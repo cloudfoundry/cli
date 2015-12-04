@@ -59,9 +59,6 @@ var _ = Describe("Push Actor", func() {
 			appBitsRepo.GetApplicationFilesReturns(presentFiles, nil)
 		})
 
-		AfterEach(func() {
-		})
-
 		Context("when the input is a zipfile", func() {
 			var expectedFileMode string
 
@@ -114,6 +111,57 @@ var _ = Describe("Push Actor", func() {
 				})
 			})
 
+		})
+
+		Context("when the app dir is a symlink", func() {
+			var sourceDir string
+
+			BeforeEach(func() {
+				allFiles = []models.AppFileFields{
+					models.AppFileFields{Path: ".cfignore"},
+					models.AppFileFields{Path: "app.rb"},
+					models.AppFileFields{Path: "config.ru"},
+					models.AppFileFields{Path: "Gemfile"},
+					models.AppFileFields{Path: "Gemfile.lock"},
+					models.AppFileFields{Path: "ignore-me"},
+					models.AppFileFields{Path: "manifest.yml"},
+				}
+
+				presentFiles = []resources.AppFileResource{
+					resources.AppFileResource{Path: "ignore-me"},
+				}
+
+				appFiles.AppFilesInDirReturns(allFiles, nil)
+				appBitsRepo.GetApplicationFilesReturns(presentFiles, nil)
+
+				sourceDir = filepath.Join(fixturesDir, "example-app")
+			})
+			It("uses the symlink's source directory", func() {
+				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
+					Expect(err).NotTo(HaveOccurred())
+					symlinkDir := filepath.Join(fixturesDir, "example-app-symlink")
+
+					_, _, err = actor.GatherFiles(symlinkDir, tmpDir)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(appFiles.AppFilesInDirArgsForCall(0)).To(Equal(sourceDir))
+					_, dir, _ := appFiles.CopyFilesArgsForCall(0)
+					Expect(dir).To(Equal(sourceDir))
+				})
+			})
+			It("follows multiple symlinks", func() {
+				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
+					Expect(err).NotTo(HaveOccurred())
+					symlinkDir := filepath.Join(fixturesDir, "example-app-meta-symlink")
+
+					_, _, err = actor.GatherFiles(symlinkDir, tmpDir)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(appFiles.AppFilesInDirArgsForCall(0)).To(Equal(sourceDir))
+					_, dir, _ := appFiles.CopyFilesArgsForCall(0)
+					Expect(dir).To(Equal(sourceDir))
+				})
+			})
 		})
 
 		Context("when the input is a directory full of files", func() {
