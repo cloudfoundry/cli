@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	cferrors "github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
@@ -21,7 +22,7 @@ var _ = Describe("purge-service-instance command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
 		ui                  *testterm.FakeUI
-		serviceRepo         *testapi.FakeServiceRepo
+		serviceRepo         *testapi.FakeServiceRepository
 		deps                command_registry.Dependency
 	)
 
@@ -39,7 +40,7 @@ var _ = Describe("purge-service-instance command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepo{}
+		serviceRepo = &testapi.FakeServiceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	})
 
@@ -69,25 +70,25 @@ var _ = Describe("purge-service-instance command", func() {
 
 		runCommand([]string{"the-service-name"})
 
-		Expect(serviceRepo.FindInstanceByNameCalled).To(Equal(true))
-		Expect(serviceRepo.PurgeServiceInstanceCalled).To(Equal(false))
+		Expect(serviceRepo.FindInstanceByNameCallCount()).To(Equal(1))
+		Expect(serviceRepo.PurgeServiceInstanceCallCount()).To(BeZero())
 	})
 
 	It("does not prompt with confirmation when -f is passed", func() {
 		instance := maker.NewServiceInstance("the-service-name")
-		serviceRepo.FindInstanceByNameServiceInstance = instance
+		serviceRepo.FindInstanceByNameReturns(instance, nil)
 
 		runCommand(
 			[]string{"-f", "the-service-name"},
 		)
 
 		Expect(len(ui.Prompts)).To(Equal(0))
-		Expect(serviceRepo.PurgedServiceInstance).To(Equal(instance))
-		Expect(serviceRepo.PurgeServiceInstanceCalled).To(Equal(true))
+		Expect(serviceRepo.PurgeServiceInstanceCallCount()).To(Equal(1))
+		Expect(serviceRepo.PurgeServiceInstanceArgsForCall(0)).To(Equal(instance))
 	})
 
 	It("fails with an error message when finding the instance fails", func() {
-		serviceRepo.FindInstanceByNameErr = true
+		serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, cferrors.New("Error finding instance"))
 
 		runCommand(
 			[]string{"-f", "the-service-name"},
@@ -100,7 +101,7 @@ var _ = Describe("purge-service-instance command", func() {
 	})
 
 	It("fails with an error message when the purging request fails", func() {
-		serviceRepo.PurgeServiceInstanceApiResponse = cferrors.New("crumpets insufficiently buttered")
+		serviceRepo.PurgeServiceInstanceReturns(cferrors.New("crumpets insufficiently buttered"))
 
 		runCommand(
 			[]string{"-f", "the-service-name"},
@@ -113,7 +114,7 @@ var _ = Describe("purge-service-instance command", func() {
 	})
 
 	It("indicates when a service doesn't exist", func() {
-		serviceRepo.FindInstanceByNameNotFound = true
+		serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, cferrors.NewModelNotFoundError("Service instance", "nonexistent-service"))
 
 		ui.Inputs = []string{"yes"}
 
@@ -125,6 +126,6 @@ var _ = Describe("purge-service-instance command", func() {
 		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING"}))
 		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Ok"}))
 
-		Expect(serviceRepo.PurgeServiceInstanceCalled).To(Equal(false))
+		Expect(serviceRepo.PurgeServiceInstanceCallCount()).To(BeZero())
 	})
 })

@@ -13,7 +13,7 @@ type FakeTerminalHelper struct {
 	StdStreamsStub        func() (stdin io.ReadCloser, stdout io.Writer, stderr io.Writer)
 	stdStreamsMutex       sync.RWMutex
 	stdStreamsArgsForCall []struct{}
-	stdStreamsReturns struct {
+	stdStreamsReturns     struct {
 		result1 io.ReadCloser
 		result2 io.Writer
 		result3 io.Writer

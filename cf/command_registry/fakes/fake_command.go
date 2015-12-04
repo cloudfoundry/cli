@@ -13,7 +13,7 @@ type FakeCommand struct {
 	MetaDataStub        func() command_registry.CommandMetadata
 	metaDataMutex       sync.RWMutex
 	metaDataArgsForCall []struct{}
-	metaDataReturns struct {
+	metaDataReturns     struct {
 		result1 command_registry.CommandMetadata
 	}
 	SetDependencyStub        func(deps command_registry.Dependency, pluginCall bool) command_registry.Command

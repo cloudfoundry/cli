@@ -4,6 +4,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,7 +20,7 @@ var _ = Describe("delete-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepo
+		serviceRepo         *testapi.FakeServiceRepository
 		serviceInstance     models.ServiceInstance
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -38,7 +39,7 @@ var _ = Describe("delete-service command", func() {
 		}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepo{}
+		serviceRepo = &testapi.FakeServiceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess: true,
 		}
@@ -79,7 +80,7 @@ var _ = Describe("delete-service command", func() {
 					serviceInstance.LastOperation.Type = "delete"
 					serviceInstance.LastOperation.State = "in progress"
 					serviceInstance.LastOperation.Description = "delete"
-					serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
+					serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 				})
 
 				Context("when the command is confirmed", func() {
@@ -94,7 +95,7 @@ var _ = Describe("delete-service command", func() {
 							[]string{"Delete in progress. Use 'cf services' or 'cf service my-service' to check operation status."},
 						))
 
-						Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
+						Expect(serviceRepo.DeleteServiceArgsForCall(0)).To(Equal(serviceInstance))
 					})
 				})
 
@@ -115,7 +116,7 @@ var _ = Describe("delete-service command", func() {
 					serviceInstance = models.ServiceInstance{}
 					serviceInstance.Name = "my-service"
 					serviceInstance.Guid = "my-service-guid"
-					serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
+					serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 				})
 
 				Context("when the command is confirmed", func() {
@@ -129,7 +130,7 @@ var _ = Describe("delete-service command", func() {
 							[]string{"OK"},
 						))
 
-						Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
+						Expect(serviceRepo.DeleteServiceArgsForCall(0)).To(Equal(serviceInstance))
 					})
 				})
 
@@ -147,7 +148,7 @@ var _ = Describe("delete-service command", func() {
 
 		Context("when the service does not exist", func() {
 			BeforeEach(func() {
-				serviceRepo.FindInstanceByNameNotFound = true
+				serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.NewModelNotFoundError("Service instance", "my-service"))
 			})
 
 			It("warns the user the service does not exist", func() {

@@ -17,7 +17,7 @@ var _ = Describe("Service Builder", func() {
 	var (
 		planBuilder     *plan_builder_fakes.FakePlanBuilder
 		serviceBuilder  service_builder.ServiceBuilder
-		serviceRepo     *testapi.FakeServiceRepo
+		serviceRepo     *testapi.FakeServiceRepository
 		service1        models.ServiceOffering
 		service2        models.ServiceOffering
 		v1Service       models.ServiceOffering
@@ -28,7 +28,7 @@ var _ = Describe("Service Builder", func() {
 	)
 
 	BeforeEach(func() {
-		serviceRepo = &testapi.FakeServiceRepo{}
+		serviceRepo = &testapi.FakeServiceRepository{}
 		planBuilder = &plan_builder_fakes.FakePlanBuilder{}
 
 		serviceBuilder = service_builder.NewBuilder(serviceRepo, planBuilder)
@@ -57,25 +57,11 @@ var _ = Describe("Service Builder", func() {
 			},
 		}
 
-		serviceRepo.FindServiceOfferingsByLabelName = "my-service1"
-		serviceRepo.FindServiceOfferingsByLabelServiceOfferings =
-			models.ServiceOfferings([]models.ServiceOffering{service1, v1Service})
-
-		serviceRepo.GetServiceOfferingByGuidReturns = struct {
-			ServiceOffering models.ServiceOffering
-			Error           error
-		}{
-			service1,
-			nil,
-		}
-
-		serviceRepo.ListServicesFromBrokerReturns = map[string][]models.ServiceOffering{
-			"my-service-broker-guid1": []models.ServiceOffering{service1},
-		}
-
-		serviceRepo.ListServicesFromManyBrokersReturns = map[string][]models.ServiceOffering{
-			"my-service-broker-guid1,my-service-broker-guid2": []models.ServiceOffering{service1, service2},
-		}
+		serviceOfferings := models.ServiceOfferings([]models.ServiceOffering{service1, v1Service})
+		serviceRepo.FindServiceOfferingsByLabelReturns(serviceOfferings, nil)
+		serviceRepo.GetServiceOfferingByGuidReturns(service1, nil)
+		serviceRepo.ListServicesFromBrokerReturns([]models.ServiceOffering{service1}, nil)
+		serviceRepo.ListServicesFromManyBrokersReturns([]models.ServiceOffering{service1, service2}, nil)
 
 		plan1 = models.ServicePlanFields{
 			Name:                "service-plan1",
@@ -110,13 +96,7 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetServicesForSpace", func() {
 		BeforeEach(func() {
-			serviceRepo.GetServiceOfferingsForSpaceReturns = struct {
-				ServiceOfferings []models.ServiceOffering
-				Error            error
-			}{
-				[]models.ServiceOffering{service1, service1},
-				nil,
-			}
+			serviceRepo.GetServiceOfferingsForSpaceReturns([]models.ServiceOffering{service1, service1}, nil)
 		})
 
 		It("returns the services for the space", func() {
@@ -129,14 +109,7 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetServicesForSpaceWithPlans", func() {
 		BeforeEach(func() {
-			serviceRepo.GetServiceOfferingsForSpaceReturns = struct {
-				ServiceOfferings []models.ServiceOffering
-				Error            error
-			}{
-				[]models.ServiceOffering{service1, service1},
-				nil,
-			}
-
+			serviceRepo.GetServiceOfferingsForSpaceReturns([]models.ServiceOffering{service1, service1}, nil)
 			planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{planWithoutOrgs}, nil)
 		})
 
@@ -152,13 +125,7 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetAllServices", func() {
 		BeforeEach(func() {
-			serviceRepo.GetAllServiceOfferingsReturns = struct {
-				ServiceOfferings []models.ServiceOffering
-				Error            error
-			}{
-				[]models.ServiceOffering{service1, service1},
-				nil,
-			}
+			serviceRepo.GetAllServiceOfferingsReturns([]models.ServiceOffering{service1, service1}, nil)
 		})
 
 		It("returns the named service, populated with plans", func() {
@@ -171,14 +138,7 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetAllServicesWithPlans", func() {
 		BeforeEach(func() {
-			serviceRepo.GetAllServiceOfferingsReturns = struct {
-				ServiceOfferings []models.ServiceOffering
-				Error            error
-			}{
-				[]models.ServiceOffering{service1, service1},
-				nil,
-			}
-
+			serviceRepo.GetAllServiceOfferingsReturns([]models.ServiceOffering{service1, service1}, nil)
 			planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{plan1}, nil)
 		})
 
@@ -236,14 +196,10 @@ var _ = Describe("Service Builder", func() {
 					},
 				}
 
-				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
-					ServiceOfferings models.ServiceOfferings
-					Error            error
-				}{
-					models.ServiceOfferings([]models.ServiceOffering{
-						service1, service2}),
+				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns(
+					models.ServiceOfferings([]models.ServiceOffering{service1, service2}),
 					nil,
-				}
+				)
 			})
 
 			It("returns the nv2 service", func() {
@@ -264,14 +220,10 @@ var _ = Describe("Service Builder", func() {
 					},
 				}
 
-				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
-					ServiceOfferings models.ServiceOfferings
-					Error            error
-				}{
-					models.ServiceOfferings([]models.ServiceOffering{
-						service}),
+				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns(
+					models.ServiceOfferings([]models.ServiceOffering{service}),
 					nil,
-				}
+				)
 			})
 
 			It("returns the named service", func() {
@@ -293,14 +245,10 @@ var _ = Describe("Service Builder", func() {
 					},
 				}
 
-				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
-					ServiceOfferings models.ServiceOfferings
-					Error            error
-				}{
-					models.ServiceOfferings([]models.ServiceOffering{
-						service}),
+				serviceRepo.FindServiceOfferingsForSpaceByLabelReturns(
+					models.ServiceOfferings([]models.ServiceOffering{service}),
 					nil,
-				}
+				)
 			})
 
 			It("returns the an error", func() {
@@ -319,14 +267,10 @@ var _ = Describe("Service Builder", func() {
 				},
 			}
 
-			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
-				ServiceOfferings models.ServiceOfferings
-				Error            error
-			}{
+			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns(
 				models.ServiceOfferings([]models.ServiceOffering{service}),
 				nil,
-			}
-
+			)
 			planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{planWithoutOrgs}, nil)
 		})
 
@@ -342,13 +286,10 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetServicesByNameForSpaceWithPlans", func() {
 		BeforeEach(func() {
-			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns = struct {
-				ServiceOfferings models.ServiceOfferings
-				Error            error
-			}{
+			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns(
 				models.ServiceOfferings([]models.ServiceOffering{service1, v1Service}),
 				nil,
-			}
+			)
 
 			planBuilder.GetPlansForServiceReturns([]models.ServicePlanFields{planWithoutOrgs}, nil)
 		})
@@ -420,7 +361,7 @@ var _ = Describe("Service Builder", func() {
 		})
 
 		It("raises errors from the service repo", func() {
-			serviceRepo.ListServicesFromManyBrokersErr = errors.New("error")
+			serviceRepo.ListServicesFromManyBrokersReturns([]models.ServiceOffering{}, errors.New("error"))
 			brokerGuids := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
 			_, err := serviceBuilder.GetServicesForManyBrokers(brokerGuids)
 			Expect(err).To(HaveOccurred())
