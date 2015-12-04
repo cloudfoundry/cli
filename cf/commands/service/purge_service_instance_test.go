@@ -1,131 +1,199 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	cferrors "github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/simonleung8/flags"
+
+	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/cli/testhelpers/maker"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("purge-service-instance command", func() {
+type passingRequirement struct{}
+
+func (r passingRequirement) Execute() bool {
+	return true
+}
+
+var _ = Describe("PurgeServiceInstance", func() {
 	var (
-		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
-		ui                  *testterm.FakeUI
-		serviceRepo         *testapi.FakeServiceRepository
-		deps                command_registry.Dependency
+		ui          *testterm.FakeUI
+		configRepo  core_config.Repository
+		serviceRepo *fakeapi.FakeServiceRepository
+
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement requirements.Requirement
 	)
-
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
-		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("purge-service-instance").SetDependency(deps, pluginCall))
-	}
-
-	runCommand := func(args []string) bool {
-		return testcmd.RunCliCommand("purge-service-instance", args, requirementsFactory, updateCommandDependency, false)
-	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		ui.InputsChan = make(chan string)
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		serviceRepo = &fakeapi.FakeServiceRepository{}
+		repoLocator := deps.RepoLocator.SetServiceRepository(serviceRepo)
+
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = &service.PurgeServiceInstance{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{}
+		factory.NewLoginRequirementReturns(loginRequirement)
 	})
 
-	Describe("requirements", func() {
-		It("fails when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+	Describe("Requirements", func() {
+		Context("when not provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance", "extra-arg")
+			})
 
-			passed := runCommand([]string{"-f", "whatever"})
-
-			Expect(passed).To(BeFalse())
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage. Requires an argument"},
+					[]string{"NAME"},
+					[]string{"USAGE"},
+				))
+			})
 		})
 
-		It("fails when called without exactly one arg", func() {
-			requirementsFactory.LoginSuccess = true
+		Context("when provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance")
+			})
 
-			passed := runCommand([]string{})
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
-			Expect(passed).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "argument"},
-			))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
 		})
 	})
 
-	It("exits when the user does not acknowledge the confirmation", func() {
-		ui.Inputs = []string{"no"}
+	Describe("Execute", func() {
+		BeforeEach(func() {
+			err := flagContext.Parse("service-instance-name")
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
+		})
 
-		runCommand([]string{"the-service-name"})
+		It("finds the instance by name in the service repo", func() {
+			err := flagContext.Parse("service-instance-name", "-f")
+			Expect(err).NotTo(HaveOccurred())
+			cmd.Execute(flagContext)
+			Expect(serviceRepo.FindInstanceByNameCallCount()).To(Equal(1))
+		})
 
-		Expect(serviceRepo.FindInstanceByNameCallCount()).To(Equal(1))
-		Expect(serviceRepo.PurgeServiceInstanceCallCount()).To(BeZero())
-	})
+		Context("when the instance can be found", func() {
+			var serviceInstance models.ServiceInstance
 
-	It("does not prompt with confirmation when -f is passed", func() {
-		instance := maker.NewServiceInstance("the-service-name")
-		serviceRepo.FindInstanceByNameReturns(instance, nil)
+			BeforeEach(func() {
+				serviceInstance = models.ServiceInstance{}
+				serviceInstance.Name = "service-instance-name"
+				serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
+			})
 
-		runCommand(
-			[]string{"-f", "the-service-name"},
-		)
+			It("warns the user", func() {
+				go cmd.Execute(flagContext)
+				Eventually(func() []string { return ui.Outputs }).Should(ContainSubstrings(
+					[]string{"WARNING"},
+				))
+			})
 
-		Expect(len(ui.Prompts)).To(Equal(0))
-		Expect(serviceRepo.PurgeServiceInstanceCallCount()).To(Equal(1))
-		Expect(serviceRepo.PurgeServiceInstanceArgsForCall(0)).To(Equal(instance))
-	})
+			It("asks the user if they would like to proceed", func() {
+				go cmd.Execute(flagContext)
+				Eventually(func() []string { return ui.Prompts }).Should(ContainSubstrings(
+					[]string{"Really purge service instance service-instance-name from Cloud Foundry?"},
+				))
+			})
 
-	It("fails with an error message when finding the instance fails", func() {
-		serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, cferrors.New("Error finding instance"))
+			It("purges the service instance when the response is to proceed", func() {
+				go cmd.Execute(flagContext)
+				ui.InputsChan <- "y"
+				Eventually(serviceRepo.PurgeServiceInstanceCallCount()).Should(Equal(1))
+				Expect(serviceRepo.PurgeServiceInstanceArgsForCall(0)).To(Equal(serviceInstance))
+			})
 
-		runCommand(
-			[]string{"-f", "the-service-name"},
-		)
+			It("does not purge the service instance when the response is not to proceed", func() {
+				go cmd.Execute(flagContext)
+				ui.InputsChan <- "n"
+				Consistently(serviceRepo.PurgeServiceInstanceCallCount).Should(BeZero())
+			})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"FAILED"},
-			[]string{"Error finding instance"},
-		))
-	})
+			Context("when force is set", func() {
+				BeforeEach(func() {
+					err := flagContext.Parse("service-instance-name", "-f")
+					Expect(err).NotTo(HaveOccurred())
+				})
 
-	It("fails with an error message when the purging request fails", func() {
-		serviceRepo.PurgeServiceInstanceReturns(cferrors.New("crumpets insufficiently buttered"))
+				It("does not ask the user if they would like to proceed", func() {
+					Expect(ui.Prompts).NotTo(ContainSubstrings(
+						[]string{"Really purge service instance service-instance-name from Cloud Foundry?"},
+					))
+				})
 
-		runCommand(
-			[]string{"-f", "the-service-name"},
-		)
+				It("purges the service instance", func() {
+					cmd.Execute(flagContext)
+					Expect(serviceRepo.PurgeServiceInstanceCallCount()).To(Equal(1))
+					Expect(serviceRepo.PurgeServiceInstanceArgsForCall(0)).To(Equal(serviceInstance))
+				})
+			})
+		})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"FAILED"},
-			[]string{"crumpets insufficiently buttered"},
-		))
-	})
+		Context("when the instance can not be found", func() {
+			BeforeEach(func() {
+				serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, cferrors.NewModelNotFoundError("model-type", "model-name"))
+			})
 
-	It("indicates when a service doesn't exist", func() {
-		serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, cferrors.NewModelNotFoundError("Service instance", "nonexistent-service"))
+			It("prints a warning", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Service instance service-instance-name not found"},
+				))
+			})
+		})
 
-		ui.Inputs = []string{"yes"}
+		Context("when an error occurs fetching the instance", func() {
+			BeforeEach(func() {
+				serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.New("an-error"))
+			})
 
-		runCommand(
-			[]string{"nonexistent-service"},
-		)
-
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"Service instance", "nonexistent-service", "not found"}))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING"}))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Ok"}))
-
-		Expect(serviceRepo.PurgeServiceInstanceCallCount()).To(BeZero())
+			It("panics and prints a message with the error", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"an-error"},
+				))
+			})
+		})
 	})
 })
