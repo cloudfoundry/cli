@@ -1,6 +1,7 @@
 package requirements
 
 import (
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -20,7 +21,7 @@ type Factory interface {
 	NewUserRequirement(username string, wantGuid bool) UserRequirement
 	NewBuildpackRequirement(buildpack string) BuildpackRequirement
 	NewApiEndpointRequirement() Requirement
-	NewMinCCApiVersionRequirement(commandName string, major, minor, patch int) Requirement
+	NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement
 }
 
 type apiRequirementFactory struct {
@@ -126,13 +127,11 @@ func (f apiRequirementFactory) NewApiEndpointRequirement() Requirement {
 	)
 }
 
-func (f apiRequirementFactory) NewMinCCApiVersionRequirement(commandName string, major, minor, patch int) Requirement {
-	return NewCCApiVersionRequirement(
+func (f apiRequirementFactory) NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement {
+	return NewMinAPIVersionRequirement(
 		f.ui,
 		f.config,
 		commandName,
-		major,
-		minor,
-		patch,
+		requiredVersion,
 	)
 }

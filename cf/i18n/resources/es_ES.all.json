@@ -1645,13 +1645,8 @@
       "modified": false
    },
    {
-      "id": "Current CF API version {{.ApiVersion}}",
-      "translation": "Current CF API version {{.ApiVersion}}",
-      "modified": false
-   },
-   {
-      "id": "Current CF CLI version {{.Version}}",
-      "translation": "Current CF CLI version {{.Version}}",
+      "id": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
+      "translation": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
       "modified": false
    },
    {
@@ -4840,11 +4835,6 @@
       "modified": false
    },
    {
-      "id": "To use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.MinApiVersionMajor}}.{{.MinApiVersionMinor}}.{{.MinApiVersionPatch}}",
-      "translation": "To use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.MinApiVersionMajor}}.{{.MinApiVersionMinor}}.{{.MinApiVersionPatch}}",
-      "modified": false
-   },
-   {
       "id": "Total Memory",
       "translation": "Memoria",
       "modified": true
@@ -4920,8 +4910,18 @@
       "modified": false
    },
    {
+      "id": "Unable to determine CC API Version. Please log in again.",
+      "translation": "Unable to determine CC API Version. Please log in again.",
+      "modified": false
+   },
+   {
       "id": "Unable to obtain plugin name for executable {{.Executable}}",
       "translation": "Unable to obtain plugin name for executable {{.Executable}}",
+      "modified": false
+   },
+   {
+      "id": "Unable to parse CC API Version '{{.APIVersion}}'",
+      "translation": "Unable to parse CC API Version '{{.APIVersion}}'",
       "modified": false
    },
    {
