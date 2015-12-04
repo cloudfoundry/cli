@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -37,8 +38,14 @@ func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.F
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("purge-service-instance"))
 	}
 
+	minRequiredAPIVersion, err := semver.Make("2.36.0")
+	if err != nil {
+		panic(err.Error())
+	}
+
 	return []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewMinAPIVersionRequirement("purge-service-instance", minRequiredAPIVersion),
 	}, nil
 }
 
