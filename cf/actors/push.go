@@ -71,25 +71,7 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 }
 
 func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
-	var finalDir string
-	if actor.zipper.IsZipFile(appDir) {
-		tmpDir, err := ioutil.TempDir("", "unzipped-app")
-		if err != nil {
-			return []resources.AppFileResource{}, false, err
-		}
-		defer os.RemoveAll(tmpDir)
-
-		err = actor.zipper.Unzip(appDir, tmpDir)
-		if err != nil {
-			return []resources.AppFileResource{}, false, err
-		}
-
-		finalDir = tmpDir
-	} else {
-		finalDir = appDir
-	}
-
-	files, hasFileToUpload, err := actor.copyUploadableFiles(finalDir, uploadDir)
+	files, hasFileToUpload, err := actor.copyUploadableFiles(appDir, uploadDir)
 	if err != nil {
 		return []resources.AppFileResource{}, false, err
 	}
