@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	"github.com/cloudfoundry/cli/cf/api/resources"
@@ -17,7 +18,6 @@ import (
 //go:generate counterfeiter -o fakes/fake_push_actor.go . PushActor
 type PushActor interface {
 	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
-	PopulateFileMode(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error)
 	ProcessPath(dirOrZipFile string, f func(string)) error
 	GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 }
@@ -34,18 +34,6 @@ func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper
 		appfiles:    appfiles,
 		zipper:      zipper,
 	}
-}
-
-func (actor PushActorImpl) PopulateFileMode(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error) {
-	for i := range presentFiles {
-		fileInfo, err := os.Lstat(filepath.Join(appDir, presentFiles[i].Path))
-		if err != nil {
-			return presentFiles, err
-		}
-		presentFiles[i].Mode = fmt.Sprintf("%#o", fileInfo.Mode())
-	}
-
-	return presentFiles, nil
 }
 
 func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) error {
@@ -76,12 +64,21 @@ func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resou
 		return []resources.AppFileResource{}, false, err
 	}
 
-	filesWithFileMode, err := actor.PopulateFileMode(finalDir, files)
-	if err != nil {
-		return []resources.AppFileResource{}, false, err
+	for i := range files {
+		fileInfo, err := os.Lstat(filepath.Join(appDir, files[i].Path))
+		if err != nil {
+			return []resources.AppFileResource{}, false, err
+		}
+		fileMode := fileInfo.Mode()
+
+		if runtime.GOOS == "windows" {
+			fileMode = fileMode | 0700
+		}
+
+		files[i].Mode = fmt.Sprintf("%#o", fileMode)
 	}
 
-	return filesWithFileMode, hasFileToUpload, nil
+	return files, hasFileToUpload, nil
 }
 
 func (actor PushActorImpl) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {

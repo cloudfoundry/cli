@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	fakeBits "github.com/cloudfoundry/cli/cf/api/application_bits/fakes"
@@ -57,11 +58,40 @@ var _ = Describe("Push Actor", func() {
 			appBitsRepo.GetApplicationFilesReturns(presentFiles, nil)
 		})
 
-		It("returns files list with file mode populated", func() {
+		It("returns files to upload with file mode unchanged", func() {
+			if runtime.GOOS == "windows" {
+				Skip("This does not run on windows")
+			}
+
 			info, err := os.Lstat(filepath.Join(fixturesDir, "example-app/ignore-me"))
 			Expect(err).NotTo(HaveOccurred())
 
 			expectedFileMode := fmt.Sprintf("%#o", info.Mode())
+
+			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
+				actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				expectedFiles := []resources.AppFileResource{
+					resources.AppFileResource{
+						Path: "example-app/ignore-me",
+						Mode: expectedFileMode,
+					},
+				}
+
+				Expect(actualFiles).To(Equal(expectedFiles))
+			})
+		})
+
+		It("returns files to upload with file mode always being executable", func() {
+			if runtime.GOOS != "windows" {
+				Skip("This runs only on windows")
+			}
+
+			info, err := os.Lstat(filepath.Join(fixturesDir, "example-app/ignore-me"))
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedFileMode := fmt.Sprintf("%#o", info.Mode()|0700)
 
 			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
 				actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
@@ -110,30 +140,6 @@ var _ = Describe("Push Actor", func() {
 					Expect(len(files)).To(Equal(0))
 				})
 			})
-		})
-	})
-
-	Describe(".PopulateFileMode()", func() {
-		var files []resources.AppFileResource
-
-		BeforeEach(func() {
-			files = []resources.AppFileResource{
-				resources.AppFileResource{Path: "example-app/.cfignore"},
-				resources.AppFileResource{Path: "example-app/app.rb"},
-				resources.AppFileResource{Path: "example-app/config.ru"},
-			}
-		})
-
-		It("returns []resources.AppFileResource with file mode populated", func() {
-			actualFiles, err := actor.PopulateFileMode(fixturesDir, files)
-			Ω(err).NotTo(HaveOccurred())
-
-			for i := range files {
-				fileInfo, err := os.Lstat(filepath.Join(fixturesDir, files[i].Path))
-				Ω(err).NotTo(HaveOccurred())
-				mode := fileInfo.Mode()
-				Ω(actualFiles[i].Mode).To(Equal(fmt.Sprintf("%#o", mode)))
-			}
 		})
 	})
 
