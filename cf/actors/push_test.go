@@ -59,9 +59,6 @@ var _ = Describe("Push Actor", func() {
 			appBitsRepo.GetApplicationFilesReturns(presentFiles, nil)
 		})
 
-		AfterEach(func() {
-		})
-
 		Context("when the input is a zipfile", func() {
 			var expectedFileMode string
 
