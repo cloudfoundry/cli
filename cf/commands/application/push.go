@@ -16,6 +16,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -603,11 +604,15 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (appParams models.
 	return
 }
 
-func (cmd *Push) uploadApp(appGuid string, appDir string) error {
+func (cmd *Push) uploadApp(appGuid string, appDirOrZipFile string) error {
 	uploadDir, err := ioutil.TempDir("", "apps")
 	defer os.RemoveAll(uploadDir)
 
-	presentFiles, hasFileToUpload, err := cmd.actor.GatherFiles(appDir, uploadDir)
+	var presentFiles []resources.AppFileResource
+	var hasFileToUpload bool
+	cmd.actor.ProcessPath(appDirOrZipFile, func(appDir string) {
+		presentFiles, hasFileToUpload, err = cmd.actor.GatherFiles(appDir, uploadDir)
+	})
 	if err != nil {
 		return err
 	}
@@ -619,7 +624,7 @@ func (cmd *Push) uploadApp(appGuid string, appDir string) error {
 	}()
 
 	if hasFileToUpload {
-		err = cmd.zipAppFiles(zipFile, appDir, uploadDir)
+		err = cmd.zipAppFiles(zipFile, appDirOrZipFile, uploadDir)
 		if err != nil {
 			return err
 		}

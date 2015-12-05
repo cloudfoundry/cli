@@ -3,7 +3,6 @@ package actors_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -54,125 +53,44 @@ var _ = Describe("Push Actor", func() {
 			}
 
 			appDir = filepath.Join(fixturesDir, "example-app.zip")
-			fakezipper.UnzipReturns(nil)
 			appFiles.AppFilesInDirReturns(allFiles, nil)
 			appBitsRepo.GetApplicationFilesReturns(presentFiles, nil)
 		})
 
-		Context("when the input is a zipfile", func() {
-			var expectedFileMode string
+		It("returns files list with file mode populated", func() {
+			info, err := os.Lstat(filepath.Join(fixturesDir, "example-app/ignore-me"))
+			Expect(err).NotTo(HaveOccurred())
 
-			BeforeEach(func() {
-				fakezipper.IsZipFileReturns(true)
+			expectedFileMode := fmt.Sprintf("%#o", info.Mode())
 
-				fakezipper.UnzipStub = func(source string, dest string) error {
-					err := os.Mkdir(filepath.Join(dest, "example-app"), os.ModeDir|os.ModePerm)
-					Expect(err).NotTo(HaveOccurred())
-
-					f, err := os.Create(filepath.Join(dest, "example-app/ignore-me"))
-					Expect(err).NotTo(HaveOccurred())
-					defer f.Close()
-
-					err = ioutil.WriteFile(filepath.Join(dest, "example-app/ignore-me"), []byte("This is a test file"), os.ModePerm)
-
-					info, err := os.Lstat(filepath.Join(dest, "example-app/ignore-me"))
-					Expect(err).NotTo(HaveOccurred())
-
-					expectedFileMode = fmt.Sprintf("%#o", info.Mode())
-
-					return nil
-				}
-			})
-
-			It("extracts the zip", func() {
-				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					Expect(err).NotTo(HaveOccurred())
-
-					_, _, err = actor.GatherFiles(appDir, tmpDir)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(fakezipper.UnzipCallCount()).To(Equal(1))
-				})
-			})
-
-			It("returns files list with file mode populated", func() {
-				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					actualFiles, _, err := actor.GatherFiles(appDir, tmpDir)
-					Expect(err).NotTo(HaveOccurred())
-
-					expectedFiles := []resources.AppFileResource{
-						resources.AppFileResource{
-							Path: "example-app/ignore-me",
-							Mode: expectedFileMode,
-						},
-					}
-
-					Expect(actualFiles).To(Equal(expectedFiles))
-				})
-			})
-
-		})
-
-		Context("when the input is a directory full of files", func() {
-			BeforeEach(func() {
-				fakezipper.IsZipFileReturns(false)
-			})
-
-			It("does not try to unzip the directory", func() {
-				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					Expect(err).NotTo(HaveOccurred())
-
-					_, _, err = actor.GatherFiles(fixturesDir, tmpDir)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(fakezipper.UnzipCallCount()).To(Equal(0))
-				})
-			})
-
-			It("returns files list with file mode populated", func() {
-				info, err := os.Lstat(filepath.Join(fixturesDir, "example-app/ignore-me"))
+			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
+				actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
-				expectedFileMode := fmt.Sprintf("%#o", info.Mode())
+				expectedFiles := []resources.AppFileResource{
+					resources.AppFileResource{
+						Path: "example-app/ignore-me",
+						Mode: expectedFileMode,
+					},
+				}
 
-				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
-					Expect(err).NotTo(HaveOccurred())
-
-					expectedFiles := []resources.AppFileResource{
-						resources.AppFileResource{
-							Path: "example-app/ignore-me",
-							Mode: expectedFileMode,
-						},
-					}
-
-					Expect(actualFiles).To(Equal(expectedFiles))
-				})
+				Expect(actualFiles).To(Equal(expectedFiles))
 			})
 		})
 
-		Context("when errors occur", func() {
-			It("returns an error if it cannot unzip the files", func() {
-				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					fakezipper.IsZipFileReturns(true)
-					fakezipper.UnzipReturns(errors.New("error"))
-					_, _, err = actor.GatherFiles(appDir, tmpDir)
-					Expect(err).To(HaveOccurred())
-				})
+		It("returns an error if it cannot walk the files", func() {
+			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
+				appFiles.AppFilesInDirReturns(nil, errors.New("error"))
+				_, _, err = actor.GatherFiles(appDir, tmpDir)
+				Expect(err).To(HaveOccurred())
 			})
+		})
 
-			It("returns an error if it cannot walk the files", func() {
-				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					appFiles.AppFilesInDirReturns(nil, errors.New("error"))
-					_, _, err = actor.GatherFiles(appDir, tmpDir)
-					Expect(err).To(HaveOccurred())
-				})
-			})
-
-			It("returns an error if we cannot reach the cc", func() {
-				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					appBitsRepo.GetApplicationFilesReturns(nil, errors.New("error"))
-					_, _, err = actor.GatherFiles(appDir, tmpDir)
-					Expect(err).To(HaveOccurred())
-				})
+		It("returns an error if we cannot reach the cc", func() {
+			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
+				appBitsRepo.GetApplicationFilesReturns(nil, errors.New("error"))
+				_, _, err = actor.GatherFiles(appDir, tmpDir)
+				Expect(err).To(HaveOccurred())
 			})
 		})
 

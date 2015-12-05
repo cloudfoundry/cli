@@ -124,7 +124,10 @@ var _ = Describe("Push Command", func() {
 		zipper = &fakeappfiles.FakeZipper{}
 		app_files = &fakeappfiles.FakeAppFiles{}
 		actor = &fakeactors.FakePushActor{}
-
+		actor.ProcessPathStub = func(dirOrZipFile string, f func(string)) error {
+			f(dirOrZipFile)
+			return nil
+		}
 	})
 
 	AfterEach(func() {
