@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	fakeBits "github.com/cloudfoundry/cli/cf/api/application_bits/fakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
+	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/app_files/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -21,7 +22,7 @@ var _ = Describe("Push Actor", func() {
 	var (
 		appBitsRepo  *fakeBits.FakeApplicationBitsRepository
 		appFiles     *fakes.FakeAppFiles
-		zipper       *fakes.FakeZipper
+		fakezipper   *fakes.FakeZipper
 		actor        actors.PushActor
 		fixturesDir  string
 		appDir       string
@@ -32,29 +33,28 @@ var _ = Describe("Push Actor", func() {
 	BeforeEach(func() {
 		appBitsRepo = &fakeBits.FakeApplicationBitsRepository{}
 		appFiles = &fakes.FakeAppFiles{}
-		zipper = &fakes.FakeZipper{}
-		actor = actors.NewPushActor(appBitsRepo, zipper, appFiles)
+		fakezipper = &fakes.FakeZipper{}
+		actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles)
 		fixturesDir = filepath.Join("..", "..", "fixtures", "applications")
+		allFiles = []models.AppFileFields{
+			models.AppFileFields{Path: "example-app/.cfignore"},
+			models.AppFileFields{Path: "example-app/app.rb"},
+			models.AppFileFields{Path: "example-app/config.ru"},
+			models.AppFileFields{Path: "example-app/Gemfile"},
+			models.AppFileFields{Path: "example-app/Gemfile.lock"},
+			models.AppFileFields{Path: "example-app/ignore-me"},
+			models.AppFileFields{Path: "example-app/manifest.yml"},
+		}
 	})
 
 	Describe("GatherFiles", func() {
 		BeforeEach(func() {
-			allFiles = []models.AppFileFields{
-				models.AppFileFields{Path: "example-app/.cfignore"},
-				models.AppFileFields{Path: "example-app/app.rb"},
-				models.AppFileFields{Path: "example-app/config.ru"},
-				models.AppFileFields{Path: "example-app/Gemfile"},
-				models.AppFileFields{Path: "example-app/Gemfile.lock"},
-				models.AppFileFields{Path: "example-app/ignore-me"},
-				models.AppFileFields{Path: "example-app/manifest.yml"},
-			}
-
 			presentFiles = []resources.AppFileResource{
 				resources.AppFileResource{Path: "example-app/ignore-me"},
 			}
 
 			appDir = filepath.Join(fixturesDir, "example-app.zip")
-			zipper.UnzipReturns(nil)
+			fakezipper.UnzipReturns(nil)
 			appFiles.AppFilesInDirReturns(allFiles, nil)
 			appBitsRepo.GetApplicationFilesReturns(presentFiles, nil)
 		})
@@ -63,9 +63,9 @@ var _ = Describe("Push Actor", func() {
 			var expectedFileMode string
 
 			BeforeEach(func() {
-				zipper.IsZipFileReturns(true)
+				fakezipper.IsZipFileReturns(true)
 
-				zipper.UnzipStub = func(source string, dest string) error {
+				fakezipper.UnzipStub = func(source string, dest string) error {
 					err := os.Mkdir(filepath.Join(dest, "example-app"), os.ModeDir|os.ModePerm)
 					Expect(err).NotTo(HaveOccurred())
 
@@ -82,7 +82,6 @@ var _ = Describe("Push Actor", func() {
 
 					return nil
 				}
-
 			})
 
 			It("extracts the zip", func() {
@@ -91,7 +90,7 @@ var _ = Describe("Push Actor", func() {
 
 					_, _, err = actor.GatherFiles(appDir, tmpDir)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(zipper.UnzipCallCount()).To(Equal(1))
+					Expect(fakezipper.UnzipCallCount()).To(Equal(1))
 				})
 			})
 
@@ -115,7 +114,7 @@ var _ = Describe("Push Actor", func() {
 
 		Context("when the input is a directory full of files", func() {
 			BeforeEach(func() {
-				zipper.IsZipFileReturns(false)
+				fakezipper.IsZipFileReturns(false)
 			})
 
 			It("does not try to unzip the directory", func() {
@@ -124,7 +123,7 @@ var _ = Describe("Push Actor", func() {
 
 					_, _, err = actor.GatherFiles(fixturesDir, tmpDir)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(zipper.UnzipCallCount()).To(Equal(0))
+					Expect(fakezipper.UnzipCallCount()).To(Equal(0))
 				})
 			})
 
@@ -148,14 +147,13 @@ var _ = Describe("Push Actor", func() {
 					Expect(actualFiles).To(Equal(expectedFiles))
 				})
 			})
-
 		})
 
 		Context("when errors occur", func() {
 			It("returns an error if it cannot unzip the files", func() {
 				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					zipper.IsZipFileReturns(true)
-					zipper.UnzipReturns(errors.New("error"))
+					fakezipper.IsZipFileReturns(true)
+					fakezipper.UnzipReturns(errors.New("error"))
 					_, _, err = actor.GatherFiles(appDir, tmpDir)
 					Expect(err).To(HaveOccurred())
 				})
@@ -223,5 +221,82 @@ var _ = Describe("Push Actor", func() {
 
 	Describe(".UploadApp", func() {
 		It("Simply delegates to the UploadApp function on the app bits repo, which is not worth testing", func() {})
+	})
+
+	Describe("ProcessPath", func() {
+		var (
+			wasCalled     bool
+			wasCalledWith string
+		)
+
+		BeforeEach(func() {
+			zipper := &app_files.ApplicationZipper{}
+			actor = actors.NewPushActor(appBitsRepo, zipper, appFiles)
+		})
+
+		Context("when given a zip file", func() {
+			var zipFile string
+
+			BeforeEach(func() {
+				zipFile = filepath.Join(fixturesDir, "example-app.zip")
+			})
+
+			It("extracts the zip when given a zip file", func() {
+				f := func(tempDir string) {
+					for _, file := range allFiles {
+						actualFilePath := filepath.Join(tempDir, file.Path)
+						_, err := os.Stat(actualFilePath)
+						Expect(err).NotTo(HaveOccurred())
+					}
+				}
+				err := actor.ProcessPath(zipFile, f)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("calls the provided function with the directory that it extracted to", func() {
+				f := func(tempDir string) {
+					wasCalled = true
+					wasCalledWith = tempDir
+				}
+				err := actor.ProcessPath(zipFile, f)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(wasCalled).To(BeTrue())
+				Expect(wasCalledWith).NotTo(Equal(zipFile))
+			})
+
+			It("cleans up the directory that it extracted to", func() {
+				var tempDirWas string
+				f := func(tempDir string) {
+					tempDirWas = tempDir
+				}
+				err := actor.ProcessPath(zipFile, f)
+				Expect(err).NotTo(HaveOccurred())
+				_, err = os.Stat(tempDirWas)
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("returns an error if the unzipping fails", func() {
+				e := errors.New("some-error")
+				fakezipper.UnzipReturns(e)
+				fakezipper.IsZipFileReturns(true)
+				actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles)
+
+				f := func(tempDir string) {}
+				err := actor.ProcessPath(zipFile, f)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		It("calls the provided function with the provided directory", func() {
+			appDir = filepath.Join(fixturesDir, "example-app")
+			f := func(tempDir string) {
+				wasCalled = true
+				wasCalledWith = tempDir
+			}
+			err := actor.ProcessPath(appDir, f)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(wasCalled).To(BeTrue())
+			Expect(wasCalledWith).To(Equal(appDir))
+		})
 	})
 })

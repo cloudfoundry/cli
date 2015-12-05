@@ -30,6 +30,15 @@ type FakePushActor struct {
 		result1 []resources.AppFileResource
 		result2 error
 	}
+	ProcessPathStub        func(dirOrZipFile string, f func(string)) error
+	processPathMutex       sync.RWMutex
+	processPathArgsForCall []struct {
+		dirOrZipFile string
+		f            func(string)
+	}
+	processPathReturns struct {
+		result1 error
+	}
 	GatherFilesStub        func(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 	gatherFilesMutex       sync.RWMutex
 	gatherFilesArgsForCall []struct {
@@ -109,6 +118,39 @@ func (fake *FakePushActor) PopulateFileModeReturns(result1 []resources.AppFileRe
 		result1 []resources.AppFileResource
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakePushActor) ProcessPath(dirOrZipFile string, f func(string)) error {
+	fake.processPathMutex.Lock()
+	fake.processPathArgsForCall = append(fake.processPathArgsForCall, struct {
+		dirOrZipFile string
+		f            func(string)
+	}{dirOrZipFile, f})
+	fake.processPathMutex.Unlock()
+	if fake.ProcessPathStub != nil {
+		return fake.ProcessPathStub(dirOrZipFile, f)
+	} else {
+		return fake.processPathReturns.result1
+	}
+}
+
+func (fake *FakePushActor) ProcessPathCallCount() int {
+	fake.processPathMutex.RLock()
+	defer fake.processPathMutex.RUnlock()
+	return len(fake.processPathArgsForCall)
+}
+
+func (fake *FakePushActor) ProcessPathArgsForCall(i int) (string, func(string)) {
+	fake.processPathMutex.RLock()
+	defer fake.processPathMutex.RUnlock()
+	return fake.processPathArgsForCall[i].dirOrZipFile, fake.processPathArgsForCall[i].f
+}
+
+func (fake *FakePushActor) ProcessPathReturns(result1 error) {
+	fake.ProcessPathStub = nil
+	fake.processPathReturns = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakePushActor) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {

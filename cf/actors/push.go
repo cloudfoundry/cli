@@ -18,6 +18,7 @@ import (
 type PushActor interface {
 	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
 	PopulateFileMode(appDir string, presentFiles []resources.AppFileResource) ([]resources.AppFileResource, error)
+	ProcessPath(dirOrZipFile string, f func(string)) error
 	GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 }
 
@@ -45,6 +46,28 @@ func (actor PushActorImpl) PopulateFileMode(appDir string, presentFiles []resour
 	}
 
 	return presentFiles, nil
+}
+
+func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) error {
+	if !actor.zipper.IsZipFile(dirOrZipFile) {
+		f(dirOrZipFile)
+		return nil
+	}
+
+	tempDir, err := ioutil.TempDir("", "unzipped-app")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tempDir)
+
+	err = actor.zipper.Unzip(dirOrZipFile, tempDir)
+	if err != nil {
+		return err
+	}
+
+	f(tempDir)
+
+	return nil
 }
 
 func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
