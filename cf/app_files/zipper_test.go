@@ -82,28 +82,50 @@ func zipit(source, target, prefix string) error {
 	return err
 }
 
-var _ = Describe("Zipper", func() {
-	var filesInZip = []string{
-		"foo.txt",
-		"fooDir/",
-		"fooDir/bar/",
-		"lastDir/",
-		"subDir/",
-		"subDir/bar.txt",
-		"subDir/otherDir/",
-		"subDir/otherDir/file.txt",
-	}
+func readFileInZip(index int, reader *zip.Reader) (string, string) {
+	buf := &bytes.Buffer{}
+	file := reader.File[index]
+	fReader, err := file.Open()
+	_, err = io.Copy(buf, fReader)
 
-	It("zips directories", func() {
-		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
+	Expect(err).NotTo(HaveOccurred())
+
+	return file.Name, string(buf.Bytes())
+}
+
+var _ = Describe("Zipper", func() {
+	Describe("Zip", func() {
+		var zipFile *os.File
+		var filesInZip = []string{
+			"foo.txt",
+			"fooDir/",
+			"fooDir/bar/",
+			"lastDir/",
+			"subDir/",
+			"subDir/bar.txt",
+			"subDir/otherDir/",
+			"subDir/otherDir/file.txt",
+		}
+		var zipper ApplicationZipper
+
+		BeforeEach(func() {
+			var err error
+			zipFile, err = ioutil.TempFile("", "zip_test")
+			Expect(err).NotTo(HaveOccurred())
+
+			zipper = ApplicationZipper{}
+		})
+
+		AfterEach(func() {
+			zipFile.Close()
+			os.Remove(zipFile.Name())
+		})
+
+		It("creates a zip with all files and directories from the source directory", func() {
 			workingDir, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
 
 			dir := filepath.Join(workingDir, "../../fixtures/zip/")
-			err = os.Chmod(filepath.Join(dir, "subDir/bar.txt"), 0666)
-			Expect(err).NotTo(HaveOccurred())
-
-			zipper := ApplicationZipper{}
 			err = zipper.Zip(dir, zipFile)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -117,35 +139,35 @@ var _ = Describe("Zipper", func() {
 			for _, file := range reader.File {
 				filenames = append(filenames, file.Name)
 			}
-
 			Expect(filenames).To(Equal(filesInZip))
 
-			readFileInZip := func(index int) (string, string) {
-				buf := &bytes.Buffer{}
-				file := reader.File[index]
-				fReader, err := file.Open()
-				_, err = io.Copy(buf, fReader)
-
-				Expect(err).NotTo(HaveOccurred())
-
-				return file.Name, string(buf.Bytes())
-			}
-
-			Expect(err).NotTo(HaveOccurred())
-
-			name, contents := readFileInZip(0)
+			name, contents := readFileInZip(0, reader)
 			Expect(name).To(Equal("foo.txt"))
 			Expect(contents).To(Equal("This is a simple text file."))
+		})
 
-			name, contents = readFileInZip(5)
-			Expect(name).To(Equal("subDir/bar.txt"))
-			Expect(contents).To(Equal("I am in a subdirectory."))
+		It("creates a zip with the original file modes", func() {
+			workingDir, err := os.Getwd()
+			Expect(err).NotTo(HaveOccurred())
+
+			dir := filepath.Join(workingDir, "../../fixtures/zip/")
+			err = os.Chmod(filepath.Join(dir, "subDir/bar.txt"), 0666)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = zipper.Zip(dir, zipFile)
+			Expect(err).NotTo(HaveOccurred())
+
+			fileStat, err := zipFile.Stat()
+			Expect(err).NotTo(HaveOccurred())
+
+			reader, err := zip.NewReader(zipFile, fileStat.Size())
+			Expect(err).NotTo(HaveOccurred())
+
+			readFileInZip(5, reader)
 			Expect(reader.File[5].FileInfo().Mode()).To(Equal(os.FileMode(0666)))
 		})
-	})
 
-	It("is a no-op for a zipfile", func() {
-		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
+		It("is a no-op for a zipfile", func() {
 			dir, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
 
@@ -158,19 +180,15 @@ var _ = Describe("Zipper", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(readFile(zipFile)).To(Equal(readFile(zippedFile)))
 		})
-	})
 
-	It("returns an error when zipping fails", func() {
-		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
+		It("returns an error when zipping fails", func() {
 			zipper := ApplicationZipper{}
-			err = zipper.Zip("/a/bogus/directory", zipFile)
+			err := zipper.Zip("/a/bogus/directory", zipFile)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("open /a/bogus/directory"))
 		})
-	})
 
-	It("returns an error when the directory is empty", func() {
-		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
+		It("returns an error when the directory is empty", func() {
 			fileutils.TempDir("zip_test", func(emptyDir string, err error) {
 				zipper := ApplicationZipper{}
 				err = zipper.Zip(emptyDir, zipFile)
