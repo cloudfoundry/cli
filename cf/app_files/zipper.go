@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -153,6 +154,10 @@ func writeZipFile(dir string, targetFile *os.File) error {
 		header, err := zip.FileInfoHeader(fileInfo)
 		if err != nil {
 			return err
+		}
+
+		if runtime.GOOS == "windows" {
+			header.SetMode(header.Mode() | 0700)
 		}
 
 		header.Name = filepath.ToSlash(fileName)

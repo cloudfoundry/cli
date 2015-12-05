@@ -3,11 +3,13 @@ package app_files_test
 import (
 	"archive/zip"
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/app_files"
@@ -147,6 +149,10 @@ var _ = Describe("Zipper", func() {
 		})
 
 		It("creates a zip with the original file modes", func() {
+			if runtime.GOOS == "windows" {
+				Skip("This test does not run on Windows")
+			}
+
 			workingDir, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
 
@@ -165,6 +171,31 @@ var _ = Describe("Zipper", func() {
 
 			readFileInZip(5, reader)
 			Expect(reader.File[5].FileInfo().Mode()).To(Equal(os.FileMode(0666)))
+		})
+
+		It("creates a zip with executable file modes", func() {
+			if runtime.GOOS != "windows" {
+				Skip("This test only runs on Windows")
+			}
+
+			workingDir, err := os.Getwd()
+			Expect(err).NotTo(HaveOccurred())
+
+			dir := filepath.Join(workingDir, "../../fixtures/zip/")
+			err = os.Chmod(filepath.Join(dir, "subDir/bar.txt"), 0666)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = zipper.Zip(dir, zipFile)
+			Expect(err).NotTo(HaveOccurred())
+
+			fileStat, err := zipFile.Stat()
+			Expect(err).NotTo(HaveOccurred())
+
+			reader, err := zip.NewReader(zipFile, fileStat.Size())
+			Expect(err).NotTo(HaveOccurred())
+
+			readFileInZip(5, reader)
+			Expect(fmt.Sprintf("%o", reader.File[5].FileInfo().Mode())).To(Equal("766"))
 		})
 
 		It("is a no-op for a zipfile", func() {
