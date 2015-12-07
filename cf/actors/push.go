@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
@@ -59,13 +58,44 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 }
 
 func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
-	files, hasFileToUpload, err := actor.copyUploadableFiles(appDir, uploadDir)
+	localFiles, err := actor.appfiles.AppFilesInDir(appDir)
 	if err != nil {
 		return []resources.AppFileResource{}, false, err
 	}
 
-	for i := range files {
-		fileInfo, err := os.Lstat(filepath.Join(appDir, files[i].Path))
+	appFileResource := []resources.AppFileResource{}
+	for _, file := range localFiles {
+		appFileResource = append(appFileResource, resources.AppFileResource{
+			Path: file.Path,
+			Sha1: file.Sha1,
+			Size: file.Size,
+		})
+	}
+
+	remoteFiles, err := actor.appBitsRepo.GetApplicationFiles(appFileResource)
+	if err != nil {
+		return []resources.AppFileResource{}, false, err
+	}
+
+	filesToUpload := []models.AppFileFields{}
+	for _, localFile := range localFiles {
+		for _, remoteFile := range remoteFiles {
+			if localFile.Path == remoteFile.Path {
+				continue
+			}
+			filesToUpload = append(filesToUpload, localFile)
+		}
+	}
+
+	err = actor.appfiles.CopyFiles(filesToUpload, appDir, uploadDir)
+	if err != nil {
+		return []resources.AppFileResource{}, false, err
+	}
+
+	fileutils.CopyPathToPath(filepath.Join(appDir, ".cfignore"), filepath.Join(uploadDir, ".cfignore")) //error handling?
+
+	for i := range remoteFiles {
+		fileInfo, err := os.Lstat(filepath.Join(appDir, remoteFiles[i].Path))
 		if err != nil {
 			return []resources.AppFileResource{}, false, err
 		}
@@ -75,78 +105,12 @@ func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resou
 			fileMode = fileMode | 0700
 		}
 
-		files[i].Mode = fmt.Sprintf("%#o", fileMode)
+		remoteFiles[i].Mode = fmt.Sprintf("%#o", fileMode)
 	}
 
-	return files, hasFileToUpload, nil
+	return remoteFiles, len(filesToUpload) > 0, nil
 }
 
 func (actor PushActorImpl) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
 	return actor.appBitsRepo.UploadBits(appGuid, zipFile, presentFiles)
-}
-
-func (actor PushActorImpl) copyUploadableFiles(appDir string, uploadDir string) (presentFiles []resources.AppFileResource, hasFileToUpload bool, err error) {
-	// Find which files need to be uploaded
-	var allAppFiles []models.AppFileFields
-	allAppFiles, err = actor.appfiles.AppFilesInDir(appDir)
-	if err != nil {
-		return
-	}
-
-	appFilesToUpload, presentFiles, apiErr := actor.getFilesToUpload(allAppFiles)
-	if apiErr != nil {
-		err = errors.New(apiErr.Error())
-		return
-	}
-	hasFileToUpload = len(appFilesToUpload) > 0
-
-	// Copy files into a temporary directory and return it
-	err = actor.appfiles.CopyFiles(appFilesToUpload, appDir, uploadDir)
-	if err != nil {
-		return
-	}
-
-	// copy cfignore if present
-	fileutils.CopyPathToPath(filepath.Join(appDir, ".cfignore"), filepath.Join(uploadDir, ".cfignore")) //error handling?
-
-	return
-}
-
-func (actor PushActorImpl) getFilesToUpload(allAppFiles []models.AppFileFields) (appFilesToUpload []models.AppFileFields, presentFiles []resources.AppFileResource, apiErr error) {
-	appFilesRequest := []resources.AppFileResource{}
-	for _, file := range allAppFiles {
-		appFilesRequest = append(appFilesRequest, resources.AppFileResource{
-			Path: file.Path,
-			Sha1: file.Sha1,
-			Size: file.Size,
-		})
-	}
-
-	presentFiles, apiErr = actor.appBitsRepo.GetApplicationFiles(appFilesRequest)
-	if apiErr != nil {
-		return nil, nil, apiErr
-	}
-
-	appFilesToUpload = make([]models.AppFileFields, len(allAppFiles))
-	copy(appFilesToUpload, allAppFiles)
-	for _, file := range presentFiles {
-		appFile := models.AppFileFields{
-			Path: file.Path,
-			Sha1: file.Sha1,
-			Size: file.Size,
-		}
-		appFilesToUpload = actor.deleteAppFile(appFilesToUpload, appFile)
-	}
-
-	return
-}
-
-func (actor PushActorImpl) deleteAppFile(appFiles []models.AppFileFields, targetFile models.AppFileFields) []models.AppFileFields {
-	for i, file := range appFiles {
-		if file.Path == targetFile.Path {
-			appFiles[i] = appFiles[len(appFiles)-1]
-			return appFiles[:len(appFiles)-1]
-		}
-	}
-	return appFiles
 }
