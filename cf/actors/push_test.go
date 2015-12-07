@@ -67,7 +67,68 @@ var _ = Describe("Push Actor", func() {
 			os.RemoveAll(tmpDir)
 		})
 
-		It("returns files to upload with file mode unchanged", func() {
+		Context("when we cannot get the app files", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("error")
+				appFiles.AppFilesInDirReturns(nil, expectedErr)
+			})
+
+			It("returns an error", func() {
+				_, _, err := actor.GatherFiles(appDir, tmpDir)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(expectedErr))
+			})
+		})
+
+		Context("when we cannot reach CC", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("error")
+				appBitsRepo.GetApplicationFilesReturns(nil, expectedErr)
+			})
+
+			It("returns an error if we cannot reach the cc", func() {
+				_, _, err := actor.GatherFiles(appDir, tmpDir)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(expectedErr))
+			})
+		})
+
+		Context("when we cannot copy the app files", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("error")
+				appFiles.CopyFilesReturns(expectedErr)
+			})
+
+			It("returns an error", func() {
+				_, _, err := actor.GatherFiles(appDir, tmpDir)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(expectedErr))
+			})
+		})
+
+		Context("when using .cfignore", func() {
+			BeforeEach(func() {
+				appDir = filepath.Join(fixturesDir, "exclude-a-default-cfignore")
+				// Ignore app files for this test as .cfignore is not one of them
+				appBitsRepo.GetApplicationFilesReturns(nil, nil)
+			})
+
+			It("copies the .cfignore file to the upload directory", func() {
+				_, _, err := actor.GatherFiles(appDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = os.Stat(filepath.Join(tmpDir, ".cfignore"))
+				Expect(os.IsNotExist(err)).To(BeFalse())
+			})
+		})
+
+		It("returns files to upload with file mode unchanged on non-Windows platforms", func() {
 			if runtime.GOOS == "windows" {
 				Skip("This does not run on windows")
 			}
@@ -90,7 +151,7 @@ var _ = Describe("Push Actor", func() {
 			Expect(actualFiles).To(Equal(expectedFiles))
 		})
 
-		It("returns files to upload with file mode always being executable", func() {
+		It("returns files to upload with file mode always being executable on Windows platforms", func() {
 			if runtime.GOOS != "windows" {
 				Skip("This runs only on windows")
 			}
@@ -111,34 +172,6 @@ var _ = Describe("Push Actor", func() {
 			}
 
 			Expect(actualFiles).To(Equal(expectedFiles))
-		})
-
-		It("returns an error if it cannot walk the files", func() {
-			appFiles.AppFilesInDirReturns(nil, errors.New("error"))
-			_, _, err := actor.GatherFiles(appDir, tmpDir)
-			Expect(err).To(HaveOccurred())
-		})
-
-		It("returns an error if we cannot reach the cc", func() {
-			appBitsRepo.GetApplicationFilesReturns(nil, errors.New("error"))
-			_, _, err := actor.GatherFiles(appDir, tmpDir)
-			Expect(err).To(HaveOccurred())
-		})
-
-		Context("when using .cfignore", func() {
-			BeforeEach(func() {
-				appBitsRepo.GetApplicationFilesReturns(nil, nil)
-				appDir = filepath.Join(fixturesDir, "exclude-a-default-cfignore")
-			})
-
-			It("includes the .cfignore file in the upload directory", func() {
-				files, _, err := actor.GatherFiles(appDir, tmpDir)
-				Expect(err).NotTo(HaveOccurred())
-
-				_, err = os.Stat(filepath.Join(tmpDir, ".cfignore"))
-				Expect(os.IsNotExist(err)).To(BeFalse())
-				Expect(len(files)).To(Equal(0))
-			})
 		})
 	})
 
