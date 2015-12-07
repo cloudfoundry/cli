@@ -16,7 +16,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -155,16 +154,29 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 		cmd.updateRoutes(routeActor, app, appParams)
 
 		if c.String("docker-image") == "" {
-			cmd.ui.Say(T("Uploading {{.AppName}}...",
-				map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
+			cmd.actor.ProcessPath(*appParams.Path, func(appDir string) {
+				localFiles, err := cmd.appfiles.AppFilesInDir(appDir)
+				if err != nil {
+					cmd.ui.Failed(
+						T("Error processing app files in '{{.Path}}': {{.Error}}",
+							map[string]interface{}{
+								"Path":  *appParams.Path,
+								"Error": err.Error(),
+							}),
+					)
+				}
 
-			apiErr := cmd.uploadApp(app.Guid, *appParams.Path)
-			if apiErr != nil {
-				cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
-					map[string]interface{}{"ApiErr": apiErr.Error()})))
-				return
-			}
-			cmd.ui.Ok()
+				cmd.ui.Say(T("Uploading {{.AppName}}...",
+					map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
+
+				apiErr := cmd.uploadApp(app.Guid, appDir, *appParams.Path, localFiles)
+				if apiErr != nil {
+					cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
+						map[string]interface{}{"ApiErr": apiErr.Error()})))
+					return
+				}
+				cmd.ui.Ok()
+			})
 		}
 
 		if appParams.ServicesToBind != nil {
@@ -604,15 +616,11 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (appParams models.
 	return
 }
 
-func (cmd *Push) uploadApp(appGuid string, appDirOrZipFile string) error {
+func (cmd *Push) uploadApp(appGuid, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {
 	uploadDir, err := ioutil.TempDir("", "apps")
 	defer os.RemoveAll(uploadDir)
 
-	var remoteFiles []resources.AppFileResource
-	var hasFileToUpload bool
-	cmd.actor.ProcessPath(appDirOrZipFile, func(appDir string) {
-		remoteFiles, hasFileToUpload, err = cmd.actor.GatherFiles(appDir, uploadDir)
-	})
+	remoteFiles, hasFileToUpload, err := cmd.actor.GatherFiles(localFiles, appDir, uploadDir)
 	if err != nil {
 		return err
 	}

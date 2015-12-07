@@ -56,7 +56,6 @@ var _ = Describe("Push Actor", func() {
 			}
 
 			appDir = filepath.Join(fixturesDir, "example-app.zip")
-			appFiles.AppFilesInDirReturns(allFiles, nil)
 			appBitsRepo.GetApplicationFilesReturns(presentFiles, nil)
 			var err error
 			tmpDir, err = ioutil.TempDir("", "gather-files")
@@ -65,21 +64,6 @@ var _ = Describe("Push Actor", func() {
 
 		AfterEach(func() {
 			os.RemoveAll(tmpDir)
-		})
-
-		Context("when we cannot get the app files", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("error")
-				appFiles.AppFilesInDirReturns(nil, expectedErr)
-			})
-
-			It("returns an error", func() {
-				_, _, err := actor.GatherFiles(appDir, tmpDir)
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(Equal(expectedErr))
-			})
 		})
 
 		Context("when we cannot reach CC", func() {
@@ -91,7 +75,7 @@ var _ = Describe("Push Actor", func() {
 			})
 
 			It("returns an error if we cannot reach the cc", func() {
-				_, _, err := actor.GatherFiles(appDir, tmpDir)
+				_, _, err := actor.GatherFiles(allFiles, appDir, tmpDir)
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(expectedErr))
 			})
@@ -106,7 +90,7 @@ var _ = Describe("Push Actor", func() {
 			})
 
 			It("returns an error", func() {
-				_, _, err := actor.GatherFiles(appDir, tmpDir)
+				_, _, err := actor.GatherFiles(allFiles, appDir, tmpDir)
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(expectedErr))
 			})
@@ -120,7 +104,7 @@ var _ = Describe("Push Actor", func() {
 			})
 
 			It("copies the .cfignore file to the upload directory", func() {
-				_, _, err := actor.GatherFiles(appDir, tmpDir)
+				_, _, err := actor.GatherFiles(allFiles, appDir, tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
 				_, err = os.Stat(filepath.Join(tmpDir, ".cfignore"))
@@ -138,7 +122,7 @@ var _ = Describe("Push Actor", func() {
 
 			expectedFileMode := fmt.Sprintf("%#o", info.Mode())
 
-			actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
+			actualFiles, _, err := actor.GatherFiles(allFiles, fixturesDir, tmpDir)
 			Expect(err).NotTo(HaveOccurred())
 
 			expectedFiles := []resources.AppFileResource{
@@ -161,7 +145,7 @@ var _ = Describe("Push Actor", func() {
 
 			expectedFileMode := fmt.Sprintf("%#o", info.Mode()|0700)
 
-			actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
+			actualFiles, _, err := actor.GatherFiles(allFiles, fixturesDir, tmpDir)
 			Expect(err).NotTo(HaveOccurred())
 
 			expectedFiles := []resources.AppFileResource{
