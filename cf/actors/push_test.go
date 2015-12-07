@@ -3,6 +3,7 @@ package actors_test
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -13,7 +14,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/app_files/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -48,6 +48,8 @@ var _ = Describe("Push Actor", func() {
 	})
 
 	Describe("GatherFiles", func() {
+		var tmpDir string
+
 		BeforeEach(func() {
 			presentFiles = []resources.AppFileResource{
 				resources.AppFileResource{Path: "example-app/ignore-me"},
@@ -56,6 +58,13 @@ var _ = Describe("Push Actor", func() {
 			appDir = filepath.Join(fixturesDir, "example-app.zip")
 			appFiles.AppFilesInDirReturns(allFiles, nil)
 			appBitsRepo.GetApplicationFilesReturns(presentFiles, nil)
+			var err error
+			tmpDir, err = ioutil.TempDir("", "gather-files")
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			os.RemoveAll(tmpDir)
 		})
 
 		It("returns files to upload with file mode unchanged", func() {
@@ -68,19 +77,17 @@ var _ = Describe("Push Actor", func() {
 
 			expectedFileMode := fmt.Sprintf("%#o", info.Mode())
 
-			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-				actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
-				Expect(err).NotTo(HaveOccurred())
+			actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
+			Expect(err).NotTo(HaveOccurred())
 
-				expectedFiles := []resources.AppFileResource{
-					resources.AppFileResource{
-						Path: "example-app/ignore-me",
-						Mode: expectedFileMode,
-					},
-				}
+			expectedFiles := []resources.AppFileResource{
+				resources.AppFileResource{
+					Path: "example-app/ignore-me",
+					Mode: expectedFileMode,
+				},
+			}
 
-				Expect(actualFiles).To(Equal(expectedFiles))
-			})
+			Expect(actualFiles).To(Equal(expectedFiles))
 		})
 
 		It("returns files to upload with file mode always being executable", func() {
@@ -93,35 +100,29 @@ var _ = Describe("Push Actor", func() {
 
 			expectedFileMode := fmt.Sprintf("%#o", info.Mode()|0700)
 
-			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-				actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
-				Expect(err).NotTo(HaveOccurred())
+			actualFiles, _, err := actor.GatherFiles(fixturesDir, tmpDir)
+			Expect(err).NotTo(HaveOccurred())
 
-				expectedFiles := []resources.AppFileResource{
-					resources.AppFileResource{
-						Path: "example-app/ignore-me",
-						Mode: expectedFileMode,
-					},
-				}
+			expectedFiles := []resources.AppFileResource{
+				resources.AppFileResource{
+					Path: "example-app/ignore-me",
+					Mode: expectedFileMode,
+				},
+			}
 
-				Expect(actualFiles).To(Equal(expectedFiles))
-			})
+			Expect(actualFiles).To(Equal(expectedFiles))
 		})
 
 		It("returns an error if it cannot walk the files", func() {
-			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-				appFiles.AppFilesInDirReturns(nil, errors.New("error"))
-				_, _, err = actor.GatherFiles(appDir, tmpDir)
-				Expect(err).To(HaveOccurred())
-			})
+			appFiles.AppFilesInDirReturns(nil, errors.New("error"))
+			_, _, err := actor.GatherFiles(appDir, tmpDir)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns an error if we cannot reach the cc", func() {
-			fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-				appBitsRepo.GetApplicationFilesReturns(nil, errors.New("error"))
-				_, _, err = actor.GatherFiles(appDir, tmpDir)
-				Expect(err).To(HaveOccurred())
-			})
+			appBitsRepo.GetApplicationFilesReturns(nil, errors.New("error"))
+			_, _, err := actor.GatherFiles(appDir, tmpDir)
+			Expect(err).To(HaveOccurred())
 		})
 
 		Context("when using .cfignore", func() {
@@ -131,14 +132,12 @@ var _ = Describe("Push Actor", func() {
 			})
 
 			It("includes the .cfignore file in the upload directory", func() {
-				fileutils.TempDir("gather-files", func(tmpDir string, err error) {
-					files, _, err := actor.GatherFiles(appDir, tmpDir)
-					Expect(err).NotTo(HaveOccurred())
+				files, _, err := actor.GatherFiles(appDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
 
-					_, err = os.Stat(filepath.Join(tmpDir, ".cfignore"))
-					Expect(os.IsNotExist(err)).To(BeFalse())
-					Expect(len(files)).To(Equal(0))
-				})
+				_, err = os.Stat(filepath.Join(tmpDir, ".cfignore"))
+				Expect(os.IsNotExist(err)).To(BeFalse())
+				Expect(len(files)).To(Equal(0))
 			})
 		})
 	})
