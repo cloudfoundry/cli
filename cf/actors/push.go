@@ -18,7 +18,7 @@ import (
 type PushActor interface {
 	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
 	ProcessPath(dirOrZipFile string, f func(string)) error
-	GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
+	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 }
 
 type PushActorImpl struct {
@@ -57,12 +57,7 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 	return nil
 }
 
-func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
-	localFiles, err := actor.appfiles.AppFilesInDir(appDir)
-	if err != nil {
-		return []resources.AppFileResource{}, false, err
-	}
-
+func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
 	appFileResource := []resources.AppFileResource{}
 	for _, file := range localFiles {
 		appFileResource = append(appFileResource, resources.AppFileResource{

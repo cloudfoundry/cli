@@ -552,18 +552,43 @@ var _ = Describe("Push Command", func() {
 				})
 			})
 
-			It("pushes the contents of the app directory or zip file specified using the -p flag", func() {
-				callPush("-p", "../some/path-to/an-app/zip-file", "app-with-path")
+			It("includes the app files in dir", func() {
+				expectedLocalFiles := []models.AppFileFields{
+					{
+						Path: "the-path",
+					},
+					{
+						Path: "the-other-path",
+					},
+				}
+				appfiles.AppFilesInDirReturns(expectedLocalFiles, nil)
+				callPush("-p", "../some/path-to/an-app/file.zip", "app-with-path")
 
-				appDir, _ := actor.GatherFilesArgsForCall(0)
-				Expect(appDir).To(Equal("../some/path-to/an-app/zip-file"))
+				actualLocalFiles, _, _ := actor.GatherFilesArgsForCall(0)
+				Expect(actualLocalFiles).To(Equal(expectedLocalFiles))
+			})
+
+			It("prints a message when there is an error getting app files", func() {
+				appfiles.AppFilesInDirReturns([]models.AppFileFields{}, errors.New("some error"))
+				callPush("-p", "../some/path-to/an-app/file.zip", "app-with-path")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Error processing app files in '../some/path-to/an-app/file.zip': some error"},
+				))
+			})
+
+			It("pushes the contents of the app directory or zip file specified using the -p flag", func() {
+				callPush("-p", "../some/path-to/an-app/file.zip", "app-with-path")
+
+				_, appDir, _ := actor.GatherFilesArgsForCall(0)
+				Expect(appDir).To(Equal("../some/path-to/an-app/file.zip"))
 			})
 
 			It("pushes the contents of the current working directory by default", func() {
 				callPush("app-with-default-path")
 				dir, _ := os.Getwd()
 
-				appDir, _ := actor.GatherFilesArgsForCall(0)
+				_, appDir, _ := actor.GatherFilesArgsForCall(0)
 				Expect(appDir).To(Equal(dir))
 			})
 

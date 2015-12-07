@@ -2270,6 +2270,11 @@
       "modified": false
    },
    {
+      "id": "Error processing app files in '{{.Path}}': {{.Error}}",
+      "translation": "Error processing app files in '{{.Path}}': {{.Error}}",
+      "modified": false
+   },
+   {
       "id": "Error processing data from server: ",
       "translation": "Error processing data from server: ",
       "modified": false
