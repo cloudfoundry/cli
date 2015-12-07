@@ -123,6 +123,11 @@ var _ = Describe("Push Command", func() {
 
 		zipper = &fakeappfiles.FakeZipper{}
 		appfiles = &fakeappfiles.FakeAppFiles{}
+		appfiles.AppFilesInDirReturns([]models.AppFileFields{
+			{
+				Path: "some-path",
+			},
+		}, nil)
 		actor = &fakeactors.FakePushActor{}
 		actor.ProcessPathStub = func(dirOrZipFile string, f func(string)) error {
 			f(dirOrZipFile)
@@ -566,6 +571,15 @@ var _ = Describe("Push Command", func() {
 
 				actualLocalFiles, _, _ := actor.GatherFilesArgsForCall(0)
 				Expect(actualLocalFiles).To(Equal(expectedLocalFiles))
+			})
+
+			It("prints a message when there are no app files to process", func() {
+				appfiles.AppFilesInDirReturns([]models.AppFileFields{}, nil)
+				callPush("-p", "../some/path-to/an-app/file.zip", "app-with-path")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"No app files found in '../some/path-to/an-app/file.zip'"},
+				))
 			})
 
 			It("prints a message when there is an error getting app files", func() {

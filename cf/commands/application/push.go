@@ -166,6 +166,15 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 					)
 				}
 
+				if len(localFiles) == 0 {
+					cmd.ui.Failed(
+						T("No app files found in '{{.Path}}'",
+							map[string]interface{}{
+								"Path": *appParams.Path,
+							}),
+					)
+				}
+
 				cmd.ui.Say(T("Uploading {{.AppName}}...",
 					map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
 

@@ -3485,6 +3485,11 @@
       "modified": false
    },
    {
+      "id": "No app files found in '{{.Path}}'",
+      "translation": "No app files found in '{{.Path}}'",
+      "modified": false
+   },
+   {
       "id": "No apps found",
       "translation": "No apps found",
       "modified": false
