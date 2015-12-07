@@ -47,7 +47,7 @@ type Push struct {
 	wordGenerator generator.WordGenerator
 	actor         actors.PushActor
 	zipper        app_files.Zipper
-	app_files     app_files.AppFiles
+	appfiles      app_files.AppFiles
 }
 
 func init() {
@@ -127,7 +127,7 @@ func (cmd *Push) SetDependency(deps command_registry.Dependency, pluginCall bool
 	cmd.wordGenerator = deps.WordGenerator
 	cmd.actor = deps.PushActor
 	cmd.zipper = deps.AppZipper
-	cmd.app_files = deps.AppFiles
+	cmd.appfiles = deps.AppFiles
 
 	return cmd
 }
@@ -653,7 +653,7 @@ func (cmd *Push) zipAppFiles(zipFile *os.File, appDir string, uploadDir string) 
 		return err
 	}
 
-	zipFileCount := cmd.app_files.CountFiles(uploadDir)
+	zipFileCount := cmd.appfiles.CountFiles(uploadDir)
 	if zipFileCount > 0 {
 		cmd.ui.Say(T("Uploading app files from: {{.Path}}", map[string]interface{}{"Path": appDir}))
 		cmd.ui.Say(T("Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
