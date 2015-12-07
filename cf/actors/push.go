@@ -92,7 +92,13 @@ func (actor PushActorImpl) GatherFiles(appDir string, uploadDir string) ([]resou
 		return []resources.AppFileResource{}, false, err
 	}
 
-	fileutils.CopyPathToPath(filepath.Join(appDir, ".cfignore"), filepath.Join(uploadDir, ".cfignore")) //error handling?
+	_, err = os.Stat(filepath.Join(appDir, ".cfignore"))
+	if err == nil {
+		err = fileutils.CopyPathToPath(filepath.Join(appDir, ".cfignore"), filepath.Join(uploadDir, ".cfignore"))
+		if err != nil {
+			return []resources.AppFileResource{}, false, err
+		}
+	}
 
 	for i := range remoteFiles {
 		fileInfo, err := os.Lstat(filepath.Join(appDir, remoteFiles[i].Path))
