@@ -49,7 +49,7 @@ var _ = Describe("Push Command", func() {
 		requirementsFactory        *testreq.FakeReqFactory
 		authRepo                   *testapi.FakeAuthenticationRepository
 		actor                      *fakeactors.FakePushActor
-		app_files                  *fakeappfiles.FakeAppFiles
+		appfiles                   *fakeappfiles.FakeAppFiles
 		zipper                     *fakeappfiles.FakeZipper
 		OriginalCommandStart       command_registry.Command
 		OriginalCommandStop        command_registry.Command
@@ -70,7 +70,7 @@ var _ = Describe("Push Command", func() {
 		deps.WordGenerator = wordGenerator
 		deps.PushActor = actor
 		deps.AppZipper = zipper
-		deps.AppFiles = app_files
+		deps.AppFiles = appfiles
 
 		//inject fake commands dependencies into registry
 		command_registry.Register(starter)
@@ -122,7 +122,7 @@ var _ = Describe("Push Command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 		zipper = &fakeappfiles.FakeZipper{}
-		app_files = &fakeappfiles.FakeAppFiles{}
+		appfiles = &fakeappfiles.FakeAppFiles{}
 		actor = &fakeactors.FakePushActor{}
 		actor.ProcessPathStub = func(dirOrZipFile string, f func(string)) error {
 			f(dirOrZipFile)
@@ -1144,7 +1144,7 @@ var _ = Describe("Push Command", func() {
 
 	Describe("displaying information about files being uploaded", func() {
 		It("displays information about the files being uploaded", func() {
-			app_files.CountFilesReturns(11)
+			appfiles.CountFilesReturns(11)
 			zipper.ZipReturns(nil)
 			zipper.GetZipSizeReturns(6100000, nil)
 			actor.GatherFilesReturns([]resources.AppFileResource{resources.AppFileResource{Path: "path/to/app"}, resources.AppFileResource{Path: "bar"}}, true, nil)
