@@ -65,20 +65,46 @@ func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.Ap
 	return
 }
 
-func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err error) {
-	if err != nil {
-		return
-	}
-
+func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) error {
 	for _, file := range appFiles {
 		fromPath := filepath.Join(fromDir, file.Path)
-		toPath := filepath.Join(toDir, file.Path)
-		err = copyPathToPath(fromPath, toPath)
+		srcFileInfo, err := os.Stat(fromPath)
 		if err != nil {
-			return
+			return err
+		}
+
+		toPath := filepath.Join(toDir, file.Path)
+
+		if srcFileInfo.IsDir() {
+			err = os.MkdirAll(toPath, srcFileInfo.Mode())
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
+		var dst *os.File
+		dst, err = fileutils.Create(toPath)
+		if err != nil {
+			return err
+		}
+		defer dst.Close()
+
+		dst.Chmod(srcFileInfo.Mode())
+
+		src, err := os.Open(fromPath)
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		_, err = io.Copy(dst, src)
+		if err != nil {
+			return err
 		}
 	}
-	return
+
+	return nil
 }
 
 func (appfiles ApplicationFiles) CountFiles(directory string) int64 {
@@ -118,42 +144,6 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 
 	err = filepath.Walk(dir, walkFunc)
 	return
-}
-
-func copyPathToPath(fromPath, toPath string) error {
-	srcFileInfo, err := os.Stat(fromPath)
-	if err != nil {
-		return err
-	}
-
-	if srcFileInfo.IsDir() {
-		err = os.MkdirAll(toPath, srcFileInfo.Mode())
-		if err != nil {
-			return err
-		}
-	} else {
-		var dst *os.File
-		dst, err = fileutils.Create(toPath)
-		if err != nil {
-			return err
-		}
-		defer dst.Close()
-
-		dst.Chmod(srcFileInfo.Mode())
-
-		src, err := os.Open(fromPath)
-		if err != nil {
-			return err
-		}
-		defer src.Close()
-
-		_, err = io.Copy(dst, src)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func loadIgnoreFile(dir string) CfIgnore {
