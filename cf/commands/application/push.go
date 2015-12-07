@@ -608,10 +608,10 @@ func (cmd *Push) uploadApp(appGuid string, appDirOrZipFile string) error {
 	uploadDir, err := ioutil.TempDir("", "apps")
 	defer os.RemoveAll(uploadDir)
 
-	var presentFiles []resources.AppFileResource
+	var remoteFiles []resources.AppFileResource
 	var hasFileToUpload bool
 	cmd.actor.ProcessPath(appDirOrZipFile, func(appDir string) {
-		presentFiles, hasFileToUpload, err = cmd.actor.GatherFiles(appDir, uploadDir)
+		remoteFiles, hasFileToUpload, err = cmd.actor.GatherFiles(appDir, uploadDir)
 	})
 	if err != nil {
 		return err
@@ -630,7 +630,7 @@ func (cmd *Push) uploadApp(appGuid string, appDirOrZipFile string) error {
 		}
 	}
 
-	err = cmd.actor.UploadApp(appGuid, zipFile, presentFiles)
+	err = cmd.actor.UploadApp(appGuid, zipFile, remoteFiles)
 	if err != nil {
 		return err
 	}
