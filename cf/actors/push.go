@@ -72,13 +72,14 @@ func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir
 		return []resources.AppFileResource{}, false, err
 	}
 
-	filesToUpload := []models.AppFileFields{}
-	for _, localFile := range localFiles {
-		for _, remoteFile := range remoteFiles {
-			if localFile.Path == remoteFile.Path {
-				continue
+	filesToUpload := make([]models.AppFileFields, len(localFiles), len(localFiles))
+	copy(filesToUpload, localFiles)
+
+	for _, remoteFile := range remoteFiles {
+		for i, fileToUpload := range filesToUpload {
+			if remoteFile.Path == fileToUpload.Path {
+				filesToUpload = append(filesToUpload[:i], filesToUpload[i+1:]...)
 			}
-			filesToUpload = append(filesToUpload, localFile)
 		}
 	}
 

@@ -149,13 +149,115 @@ var _ = Describe("Push Actor", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			expectedFiles := []resources.AppFileResource{
-				resources.AppFileResource{
+				{
 					Path: "example-app/ignore-me",
 					Mode: expectedFileMode,
 				},
 			}
 
 			Expect(actualFiles).To(Equal(expectedFiles))
+		})
+
+		Context("when there are no remote files", func() {
+			BeforeEach(func() {
+				appBitsRepo.GetApplicationFilesReturns([]resources.AppFileResource{}, nil)
+			})
+
+			It("returns true for hasFileToUpload", func() {
+				_, hasFileToUpload, err := actor.GatherFiles(allFiles, fixturesDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(hasFileToUpload).To(BeTrue())
+			})
+
+			It("copies all local files to the upload dir", func() {
+				expectedFiles := []models.AppFileFields{
+					{Path: "example-app/.cfignore"},
+					{Path: "example-app/app.rb"},
+					{Path: "example-app/config.ru"},
+					{Path: "example-app/Gemfile"},
+					{Path: "example-app/Gemfile.lock"},
+					{Path: "example-app/ignore-me"},
+					{Path: "example-app/manifest.yml"},
+				}
+				_, _, err := actor.GatherFiles(allFiles, fixturesDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(appFiles.CopyFilesCallCount()).To(Equal(1))
+				filesToUpload, appDir, uploadDir := appFiles.CopyFilesArgsForCall(0)
+				Expect(filesToUpload).To(Equal(expectedFiles))
+				Expect(appDir).To(Equal(fixturesDir))
+				Expect(uploadDir).To(Equal(tmpDir))
+			})
+		})
+
+		Context("when there are local files that aren't matched", func() {
+			var remoteFiles []resources.AppFileResource
+
+			BeforeEach(func() {
+				remoteFiles = []resources.AppFileResource{
+					resources.AppFileResource{Path: "example-app/manifest.yml"},
+				}
+
+				appBitsRepo.GetApplicationFilesReturns(remoteFiles, nil)
+			})
+
+			It("returns true for hasFileToUpload", func() {
+				_, hasFileToUpload, err := actor.GatherFiles(allFiles, fixturesDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(hasFileToUpload).To(BeTrue())
+			})
+
+			It("copies unmatched local files to the upload dir", func() {
+				expectedFiles := []models.AppFileFields{
+					{Path: "example-app/.cfignore"},
+					{Path: "example-app/app.rb"},
+					{Path: "example-app/config.ru"},
+					{Path: "example-app/Gemfile"},
+					{Path: "example-app/Gemfile.lock"},
+					{Path: "example-app/ignore-me"},
+				}
+				_, _, err := actor.GatherFiles(allFiles, fixturesDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(appFiles.CopyFilesCallCount()).To(Equal(1))
+				filesToUpload, appDir, uploadDir := appFiles.CopyFilesArgsForCall(0)
+				Expect(filesToUpload).To(Equal(expectedFiles))
+				Expect(appDir).To(Equal(fixturesDir))
+				Expect(uploadDir).To(Equal(tmpDir))
+			})
+		})
+
+		Context("when local and remote files are equivalent", func() {
+			BeforeEach(func() {
+				remoteFiles := []resources.AppFileResource{
+					{Path: "example-app/.cfignore", Mode: "0644"},
+					{Path: "example-app/app.rb", Mode: "0755"},
+					{Path: "example-app/config.ru", Mode: "0644"},
+					{Path: "example-app/Gemfile", Mode: "0644"},
+					{Path: "example-app/Gemfile.lock", Mode: "0644"},
+					{Path: "example-app/ignore-me", Mode: "0666"},
+					{Path: "example-app/manifest.yml", Mode: "0644"},
+				}
+
+				appBitsRepo.GetApplicationFilesReturns(remoteFiles, nil)
+			})
+
+			It("returns false for hasFileToUpload", func() {
+				_, hasFileToUpload, err := actor.GatherFiles(allFiles, fixturesDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(hasFileToUpload).To(BeFalse())
+			})
+
+			It("copies nothing to the upload dir", func() {
+				_, _, err := actor.GatherFiles(allFiles, fixturesDir, tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(appFiles.CopyFilesCallCount()).To(Equal(1))
+				filesToUpload, appDir, uploadDir := appFiles.CopyFilesArgsForCall(0)
+				Expect(filesToUpload).To(BeEmpty())
+				Expect(appDir).To(Equal(fixturesDir))
+				Expect(uploadDir).To(Equal(tmpDir))
+			})
 		})
 	})
 
