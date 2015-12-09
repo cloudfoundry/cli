@@ -127,6 +127,13 @@ func (appfiles ApplicationFiles) CountFiles(directory string) int64 {
 func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string, string) error) error {
 	cfIgnore := loadIgnoreFile(dir)
 	walkFunc := func(fullPath string, f os.FileInfo, err error) error {
+		fileRelativePath, _ := filepath.Rel(dir, fullPath)
+		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
+
+		if cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
+			return nil
+		}
+
 		if err != nil {
 			return err
 		}
@@ -139,14 +146,7 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 			return nil
 		}
 
-		fileRelativePath, _ := filepath.Rel(dir, fullPath)
-		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
-
-		if !cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
-			return onEachFile(fileRelativePath, fullPath)
-		}
-
-		return nil
+		return onEachFile(fileRelativePath, fullPath)
 	}
 
 	return filepath.Walk(dir, walkFunc)

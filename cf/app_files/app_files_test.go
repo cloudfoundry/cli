@@ -1,6 +1,7 @@
 package app_files_test
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -136,6 +137,62 @@ var _ = Describe("AppFiles", func() {
 				{"dir2/child-dir2/grandchild-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2"},
 				{"dir2/child-dir2/grandchild-dir2/file4.txt", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2/file4.txt"},
 			}))
+		})
+
+		Context("when the given dir contains an untraversable dir", func() {
+			var nonTraversableDirPath string
+
+			BeforeEach(func() {
+				nonTraversableDirPath = filepath.Join(fixturePath, "app-copy-test", "non-traversable-dir")
+
+				err := os.Mkdir(nonTraversableDirPath, os.ModeDir) // non-traversable without os.ModePerm
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				err := os.Remove(nonTraversableDirPath)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				err := appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
+				Expect(err).To(HaveOccurred())
+			})
+
+			Context("when the untraversable dir is .cfignored", func() {
+				var cfIgnorePath string
+
+				BeforeEach(func() {
+					cfIgnorePath = filepath.Join(fixturePath, "app-copy-test", ".cfignore")
+					err := ioutil.WriteFile(cfIgnorePath, []byte("non-traversable-dir\n"), os.ModePerm)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				AfterEach(func() {
+					err := os.Remove(cfIgnorePath)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("does not return an error", func() {
+					err := appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("does not call the callback with the untraversable dir", func() {
+					appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
+					Expect(seen).To(Equal([][]string{
+						{"dir1", "../../fixtures/applications/app-copy-test/dir1"},
+						{"dir1/child-dir", "../../fixtures/applications/app-copy-test/dir1/child-dir"},
+						{"dir1/child-dir/file2.txt", "../../fixtures/applications/app-copy-test/dir1/child-dir/file2.txt"},
+						{"dir1/child-dir/file3.txt", "../../fixtures/applications/app-copy-test/dir1/child-dir/file3.txt"},
+						{"dir1/file1.txt", "../../fixtures/applications/app-copy-test/dir1/file1.txt"},
+						{"dir2", "../../fixtures/applications/app-copy-test/dir2"},
+						{"dir2/child-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2"},
+						{"dir2/child-dir2/grandchild-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2"},
+						{"dir2/child-dir2/grandchild-dir2/file4.txt", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2/file4.txt"},
+					}))
+				})
+			})
 		})
 	})
 })
