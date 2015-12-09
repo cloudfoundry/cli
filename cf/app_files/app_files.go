@@ -124,34 +124,32 @@ func (appfiles ApplicationFiles) CountFiles(directory string) int64 {
 	return count
 }
 
-func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string, string) error) (err error) {
+func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string, string) error) error {
 	cfIgnore := loadIgnoreFile(dir)
-	walkFunc := func(fullPath string, f os.FileInfo, inErr error) (err error) {
-		err = inErr
+	walkFunc := func(fullPath string, f os.FileInfo, err error) error {
 		if err != nil {
-			return
+			return err
 		}
 
 		if fullPath == dir {
-			return
+			return nil
 		}
 
 		if !f.Mode().IsRegular() && !f.IsDir() {
-			return
+			return nil
 		}
 
 		fileRelativePath, _ := filepath.Rel(dir, fullPath)
 		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
 
 		if !cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
-			err = onEachFile(fileRelativePath, fullPath)
+			return onEachFile(fileRelativePath, fullPath)
 		}
 
-		return
+		return nil
 	}
 
-	err = filepath.Walk(dir, walkFunc)
-	return
+	return filepath.Walk(dir, walkFunc)
 }
 
 func loadIgnoreFile(dir string) CfIgnore {
