@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/cloudfoundry/cli/cf/app_files"
 
@@ -13,6 +15,24 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+type WalkAppFileArgs struct {
+	relativePath string
+	absolutePath string
+}
+
+func (a WalkAppFileArgs) RelativePath() string {
+	return filepath.Join(strings.Split(a.relativePath, "/")...)
+}
+
+func (a WalkAppFileArgs) AbsolutePath() string {
+	return filepath.Join(strings.Split(a.relativePath, "/")...)
+}
+
+func (a WalkAppFileArgs) Equal(other WalkAppFileArgs) bool {
+	return a.RelativePath() == other.RelativePath() &&
+		a.AbsolutePath() == other.AbsolutePath()
+}
 
 var _ = Describe("AppFiles", func() {
 	var appFiles app_files.ApplicationFiles
@@ -113,12 +133,15 @@ var _ = Describe("AppFiles", func() {
 
 	Describe("WalkAppFiles", func() {
 		var cb func(string, string) error
-		var seen [][]string
+		var actualWalkAppFileArgs []WalkAppFileArgs
 
 		BeforeEach(func() {
-			seen = [][]string{}
+			actualWalkAppFileArgs = []WalkAppFileArgs{}
 			cb = func(fileRelativePath, fullPath string) error {
-				seen = append(seen, []string{fileRelativePath, fullPath})
+				actualWalkAppFileArgs = append(actualWalkAppFileArgs, WalkAppFileArgs{
+					relativePath: fileRelativePath,
+					absolutePath: fullPath,
+				})
 				return nil
 			}
 		})
@@ -126,23 +149,58 @@ var _ = Describe("AppFiles", func() {
 		It("calls the callback with the relative and absolute path for each file within the given dir", func() {
 			err := appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(seen).To(Equal([][]string{
-				{"dir1", "../../fixtures/applications/app-copy-test/dir1"},
-				{"dir1/child-dir", "../../fixtures/applications/app-copy-test/dir1/child-dir"},
-				{"dir1/child-dir/file2.txt", "../../fixtures/applications/app-copy-test/dir1/child-dir/file2.txt"},
-				{"dir1/child-dir/file3.txt", "../../fixtures/applications/app-copy-test/dir1/child-dir/file3.txt"},
-				{"dir1/file1.txt", "../../fixtures/applications/app-copy-test/dir1/file1.txt"},
-				{"dir2", "../../fixtures/applications/app-copy-test/dir2"},
-				{"dir2/child-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2"},
-				{"dir2/child-dir2/grandchild-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2"},
-				{"dir2/child-dir2/grandchild-dir2/file4.txt", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2/file4.txt"},
-			}))
+			expectedArgs := []WalkAppFileArgs{
+				{
+					relativePath: "dir1",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir1",
+				},
+				{
+					relativePath: "dir1/child-dir",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir",
+				},
+				{
+					relativePath: "dir1/child-dir/file2.txt",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir/file2.txt",
+				},
+				{
+					relativePath: "dir1/child-dir/file3.txt",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir/file3.txt",
+				},
+				{
+					relativePath: "dir1/file1.txt",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir1/file1.txt",
+				},
+				{
+					relativePath: "dir2",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir2",
+				},
+				{
+					relativePath: "dir2/child-dir2",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2",
+				},
+				{
+					relativePath: "dir2/child-dir2/grandchild-dir2",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2",
+				},
+				{
+					relativePath: "dir2/child-dir2/grandchild-dir2/file4.txt",
+					absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2/file4.txt",
+				},
+			}
+
+			for i, actual := range actualWalkAppFileArgs {
+				Expect(actual.Equal(expectedArgs[i])).To(BeTrue())
+			}
 		})
 
 		Context("when the given dir contains an untraversable dir", func() {
 			var nonTraversableDirPath string
 
 			BeforeEach(func() {
+				if runtime.GOOS == "windows" {
+					Skip("This test is only for non-Windows platforms")
+				}
+
 				nonTraversableDirPath = filepath.Join(fixturePath, "app-copy-test", "non-traversable-dir")
 
 				err := os.Mkdir(nonTraversableDirPath, os.ModeDir) // non-traversable without os.ModePerm
@@ -180,17 +238,48 @@ var _ = Describe("AppFiles", func() {
 
 				It("does not call the callback with the untraversable dir", func() {
 					appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
-					Expect(seen).To(Equal([][]string{
-						{"dir1", "../../fixtures/applications/app-copy-test/dir1"},
-						{"dir1/child-dir", "../../fixtures/applications/app-copy-test/dir1/child-dir"},
-						{"dir1/child-dir/file2.txt", "../../fixtures/applications/app-copy-test/dir1/child-dir/file2.txt"},
-						{"dir1/child-dir/file3.txt", "../../fixtures/applications/app-copy-test/dir1/child-dir/file3.txt"},
-						{"dir1/file1.txt", "../../fixtures/applications/app-copy-test/dir1/file1.txt"},
-						{"dir2", "../../fixtures/applications/app-copy-test/dir2"},
-						{"dir2/child-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2"},
-						{"dir2/child-dir2/grandchild-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2"},
-						{"dir2/child-dir2/grandchild-dir2/file4.txt", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2/file4.txt"},
-					}))
+					expectedArgs := []WalkAppFileArgs{
+						{
+							relativePath: "dir1",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir1",
+						},
+						{
+							relativePath: "dir1/child-dir",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir",
+						},
+						{
+							relativePath: "dir1/child-dir/file2.txt",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir/file2.txt",
+						},
+						{
+							relativePath: "dir1/child-dir/file3.txt",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir/file3.txt",
+						},
+						{
+							relativePath: "dir1/file1.txt",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir1/file1.txt",
+						},
+						{
+							relativePath: "dir2",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir2",
+						},
+						{
+							relativePath: "dir2/child-dir2",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2",
+						},
+						{
+							relativePath: "dir2/child-dir2/grandchild-dir2",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2",
+						},
+						{
+							relativePath: "dir2/child-dir2/grandchild-dir2/file4.txt",
+							absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2/file4.txt",
+						},
+					}
+
+					for i, actual := range actualWalkAppFileArgs {
+						Expect(actual.Equal(expectedArgs[i])).To(BeTrue())
+					}
 				})
 			})
 		})
