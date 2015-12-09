@@ -104,4 +104,33 @@ var _ = Describe("AppFiles", func() {
 			}))
 		})
 	})
+
+	Describe("WalkAppFiles", func() {
+		var cb func(string, string) error
+		var seen [][]string
+
+		BeforeEach(func() {
+			seen = [][]string{}
+			cb = func(fileRelativePath, fullPath string) error {
+				seen = append(seen, []string{fileRelativePath, fullPath})
+				return nil
+			}
+		})
+
+		It("calls the callback with the relative and absolute path for each file within the given dir", func() {
+			err := appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(seen).To(Equal([][]string{
+				{"dir1", "../../fixtures/applications/app-copy-test/dir1"},
+				{"dir1/child-dir", "../../fixtures/applications/app-copy-test/dir1/child-dir"},
+				{"dir1/child-dir/file2.txt", "../../fixtures/applications/app-copy-test/dir1/child-dir/file2.txt"},
+				{"dir1/child-dir/file3.txt", "../../fixtures/applications/app-copy-test/dir1/child-dir/file3.txt"},
+				{"dir1/file1.txt", "../../fixtures/applications/app-copy-test/dir1/file1.txt"},
+				{"dir2", "../../fixtures/applications/app-copy-test/dir2"},
+				{"dir2/child-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2"},
+				{"dir2/child-dir2/grandchild-dir2", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2"},
+				{"dir2/child-dir2/grandchild-dir2/file4.txt", "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2/file4.txt"},
+			}))
+		})
+	})
 })
