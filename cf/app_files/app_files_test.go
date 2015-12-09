@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	. "github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/app_files"
 
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -14,8 +14,13 @@ import (
 )
 
 var _ = Describe("AppFiles", func() {
-	var appFiles = ApplicationFiles{}
-	fixturePath := filepath.Join("..", "..", "fixtures", "applications")
+	var appFiles app_files.ApplicationFiles
+	var fixturePath string
+
+	BeforeEach(func() {
+		appFiles = app_files.ApplicationFiles{}
+		fixturePath = filepath.Join("..", "..", "fixtures", "applications")
+	})
 
 	Describe("AppFilesInDir", func() {
 		It("all files have '/' path separators", func() {
