@@ -131,9 +131,6 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
 
 		if cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
-			if f.IsDir() {
-				return filepath.SkipDir
-			}
 			return nil
 		}
 
