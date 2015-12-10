@@ -213,6 +213,7 @@ var _ = Describe("AppFiles", func() {
 			})
 
 			It("returns an error", func() {
+				Skip("This isn't a reliable test as root can still traverse a non-executable directory")
 				err := appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
 				Expect(err).To(HaveOccurred())
 			})
