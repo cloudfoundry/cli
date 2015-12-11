@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -131,10 +132,23 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
 
 		if cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
-			return nil
-		}
+			if err == nil {
+				if f.IsDir() {
+					return filepath.SkipDir
+				}
+			}
 
-		if err != nil {
+			if runtime.GOOS == "windows" {
+				fi, err := os.Lstat(`\\?\` + fullPath)
+				if err != nil {
+					return err
+				}
+
+				if fi.IsDir() {
+					return filepath.SkipDir
+				}
+			}
+
 			return err
 		}
 
