@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/cloudfoundry/cli",
-	"GoVersion": "go1.5.1",
+	"GoVersion": "go1.5.2",
 	"Packages": [
 		"./..."
 	],
@@ -20,16 +20,6 @@
 			"Rev": "fc5f5493005fa72ff7cc67596263d079a978994b"
 		},
 		{
-			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/helpers",
-			"Comment": "plugin-0.2.1-1-gfc5f549",
-			"Rev": "fc5f5493005fa72ff7cc67596263d079a978994b"
-		},
-		{
-			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/keys",
-			"Comment": "plugin-0.2.1-1-gfc5f549",
-			"Rev": "fc5f5493005fa72ff7cc67596263d079a978994b"
-		},
-		{
 			"ImportPath": "github.com/cloudfoundry-incubator/diego-ssh/server",
 			"Comment": "plugin-0.2.1-1-gfc5f549",
 			"Rev": "fc5f5493005fa72ff7cc67596263d079a978994b"
@@ -44,10 +34,6 @@
 			"Rev": "b9aba8bc5b91f0764131fcac8ea0ff2dd202c8c4"
 		},
 		{
-			"ImportPath": "github.com/cloudfoundry/jibber_jabber",
-			"Rev": "bcc4c8345a21301bf47c032ff42dd1aae2fe3027"
-		},
-		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
 			"Rev": "89d7fe237afae1e8222554359ec03b72c8466d10"
 		},
@@ -60,12 +46,8 @@
 			"Rev": "28ce6c1f1aa0352189bed34cdc9aa4ea8fcb9089"
 		},
 		{
-			"ImportPath": "github.com/cloudfoundry/noaa",
+			"ImportPath": "github.com/cloudfoundry/noaa/errors",
 			"Rev": "3c78d4555842c8a7396fa4fc3ef18376c08a3e31"
-		},
-		{
-			"ImportPath": "github.com/cloudfoundry/sonde-go/events",
-			"Rev": "32dccbbdfb14f855abd7b909bb2efe24c0b2ecff"
 		},
 		{
 			"ImportPath": "github.com/docker/docker/pkg/term",
@@ -93,6 +75,10 @@
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
 			"Comment": "v1.3.0-5-g37e5c2d",
 			"Rev": "37e5c2de3e03e4b82693e3fcb4a6aa2cc4eb07e3"
+		},
+		{
+			"ImportPath": "github.com/nu7hatch/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
