@@ -50,10 +50,8 @@ type GetApp_RouteSummary struct {
 }
 
 type GetApp_DomainFields struct {
-	Guid                   string
-	Name                   string
-	OwningOrganizationGuid string
-	Shared                 bool
+	Guid string
+	Name string
 }
 
 type GetApp_ServiceSummary struct {

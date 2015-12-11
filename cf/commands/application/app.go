@@ -81,10 +81,6 @@ func (cmd *ShowApp) SetDependency(deps command_registry.Dependency, pluginCall b
 func (cmd *ShowApp) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
-	if cmd.pluginCall {
-		cmd.populatePluginModel(app)
-	}
-
 	if c.Bool("guid") {
 		cmd.ui.Say(app.Guid)
 	} else {
@@ -124,6 +120,10 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	if apiErr != nil && !appIsStopped {
 		cmd.ui.Failed(apiErr.Error())
 		return
+	}
+
+	if cmd.pluginCall {
+		cmd.populatePluginModel(application, app.Stack, instances)
 	}
 
 	cmd.ui.Ok()
@@ -185,65 +185,69 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 					"DiskQuota": formatters.ByteSize(instance.DiskQuota)})),
 			fmt.Sprintf("%s", instance.Details),
 		)
-
-		if cmd.pluginCall {
-			i := plugin_models.GetApp_AppInstanceFields{}
-			i.State = fmt.Sprintf("%s", instance.State)
-			i.Details = instance.Details
-			i.Since = instance.Since
-			i.CpuUsage = instance.CpuUsage
-			i.DiskQuota = instance.DiskQuota
-			i.DiskUsage = instance.DiskUsage
-			i.MemQuota = instance.MemQuota
-			i.MemUsage = instance.MemUsage
-			cmd.pluginAppModel.Instances = append(cmd.pluginAppModel.Instances, i)
-		}
 	}
 
 	table.Print()
 }
 
-func (cmd *ShowApp) populatePluginModel(app models.Application) {
-	cmd.pluginAppModel.Name = app.Name
-	cmd.pluginAppModel.State = app.State
-	cmd.pluginAppModel.Guid = app.Guid
-	cmd.pluginAppModel.BuildpackUrl = app.BuildpackUrl
-	cmd.pluginAppModel.Command = app.Command
-	cmd.pluginAppModel.Diego = app.Diego
-	cmd.pluginAppModel.DetectedStartCommand = app.DetectedStartCommand
-	cmd.pluginAppModel.DiskQuota = app.DiskQuota
-	cmd.pluginAppModel.EnvironmentVars = app.EnvironmentVars
-	cmd.pluginAppModel.InstanceCount = app.InstanceCount
-	cmd.pluginAppModel.Memory = app.Memory
-	cmd.pluginAppModel.RunningInstances = app.RunningInstances
-	cmd.pluginAppModel.HealthCheckTimeout = app.HealthCheckTimeout
-	cmd.pluginAppModel.SpaceGuid = app.SpaceGuid
-	cmd.pluginAppModel.PackageUpdatedAt = app.PackageUpdatedAt
-	cmd.pluginAppModel.PackageState = app.PackageState
-	cmd.pluginAppModel.StagingFailedReason = app.StagingFailedReason
-
+func (cmd *ShowApp) populatePluginModel(
+	getSummaryApp models.Application,
+	stack *models.Stack,
+	instances []models.AppInstanceFields,
+) {
+	cmd.pluginAppModel.BuildpackUrl = getSummaryApp.BuildpackUrl
+	cmd.pluginAppModel.Command = getSummaryApp.Command
+	cmd.pluginAppModel.DetectedStartCommand = getSummaryApp.DetectedStartCommand
+	cmd.pluginAppModel.Diego = getSummaryApp.Diego
+	cmd.pluginAppModel.DiskQuota = getSummaryApp.DiskQuota
+	cmd.pluginAppModel.EnvironmentVars = getSummaryApp.EnvironmentVars
+	cmd.pluginAppModel.Guid = getSummaryApp.Guid
+	cmd.pluginAppModel.HealthCheckTimeout = getSummaryApp.HealthCheckTimeout
+	cmd.pluginAppModel.InstanceCount = getSummaryApp.InstanceCount
+	cmd.pluginAppModel.Memory = getSummaryApp.Memory
+	cmd.pluginAppModel.Name = getSummaryApp.Name
+	cmd.pluginAppModel.PackageState = getSummaryApp.PackageState
+	cmd.pluginAppModel.PackageUpdatedAt = getSummaryApp.PackageUpdatedAt
+	cmd.pluginAppModel.RunningInstances = getSummaryApp.RunningInstances
+	cmd.pluginAppModel.SpaceGuid = getSummaryApp.SpaceGuid
 	cmd.pluginAppModel.Stack = &plugin_models.GetApp_Stack{
-		Name: app.Stack.Name,
-		Guid: app.Stack.Guid,
+		Name: stack.Name,
+		Guid: stack.Guid,
+	}
+	cmd.pluginAppModel.StagingFailedReason = getSummaryApp.StagingFailedReason
+	cmd.pluginAppModel.State = getSummaryApp.State
+
+	for _, instance := range instances {
+		instanceFields := plugin_models.GetApp_AppInstanceFields{
+			State:     string(instance.State),
+			Details:   instance.Details,
+			Since:     instance.Since,
+			CpuUsage:  instance.CpuUsage,
+			DiskQuota: instance.DiskQuota,
+			DiskUsage: instance.DiskUsage,
+			MemQuota:  instance.MemQuota,
+			MemUsage:  instance.MemUsage,
+		}
+		cmd.pluginAppModel.Instances = append(cmd.pluginAppModel.Instances, instanceFields)
 	}
 
-	for i := range app.Routes {
-		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, plugin_models.GetApp_RouteSummary{
-			Host: app.Routes[i].Host,
-			Guid: app.Routes[i].Guid,
+	for i := range getSummaryApp.Routes {
+		routeSummary := plugin_models.GetApp_RouteSummary{
+			Host: getSummaryApp.Routes[i].Host,
+			Guid: getSummaryApp.Routes[i].Guid,
 			Domain: plugin_models.GetApp_DomainFields{
-				Name:                   app.Routes[i].Domain.Name,
-				Guid:                   app.Routes[i].Domain.Guid,
-				Shared:                 app.Routes[i].Domain.Shared,
-				OwningOrganizationGuid: app.Routes[i].Domain.OwningOrganizationGuid,
+				Name: getSummaryApp.Routes[i].Domain.Name,
+				Guid: getSummaryApp.Routes[i].Domain.Guid,
 			},
-		})
+		}
+		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, routeSummary)
 	}
 
-	for i := range app.Services {
-		cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, plugin_models.GetApp_ServiceSummary{
-			Name: app.Services[i].Name,
-			Guid: app.Services[i].Guid,
-		})
+	for i := range getSummaryApp.Services {
+		serviceSummary := plugin_models.GetApp_ServiceSummary{
+			Name: getSummaryApp.Services[i].Name,
+			Guid: getSummaryApp.Services[i].Guid,
+		}
+		cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, serviceSummary)
 	}
 }
