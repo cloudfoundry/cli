@@ -139,9 +139,9 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 			}
 
 			if runtime.GOOS == "windows" {
-				fi, err := os.Lstat(`\\?\` + fullPath)
-				if err != nil {
-					return err
+				fi, statErr := os.Lstat(`\\?\` + fullPath)
+				if statErr != nil {
+					return statErr
 				}
 
 				if fi.IsDir() {
