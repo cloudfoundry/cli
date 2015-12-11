@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/nu7hatch/gouuid"
 
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -194,27 +195,38 @@ var _ = Describe("AppFiles", func() {
 		})
 
 		Context("when the given dir contains an untraversable dir", func() {
-			var nonTraversableDirPath string
+			var (
+				untraversableDirName string
+				tmpDir               string
+			)
 
 			BeforeEach(func() {
 				if runtime.GOOS == "windows" {
 					Skip("This test is only for non-Windows platforms")
 				}
 
-				nonTraversableDirPath = filepath.Join(fixturePath, "app-copy-test", "non-traversable-dir")
+				var err error
+				tmpDir, err = ioutil.TempDir("", "untraversable-test")
+				Expect(err).NotTo(HaveOccurred())
 
-				err := os.Mkdir(nonTraversableDirPath, os.ModeDir) // non-traversable without os.ModePerm
+				guid, err := uuid.NewV4()
+				Expect(err).NotTo(HaveOccurred())
+
+				untraversableDirName = guid.String()
+				untraversableDirPath := filepath.Join(tmpDir, untraversableDirName)
+
+				err = os.Mkdir(untraversableDirPath, os.ModeDir) // untraversable without os.ModePerm
 				Expect(err).NotTo(HaveOccurred())
 			})
 
 			AfterEach(func() {
-				err := os.Remove(nonTraversableDirPath)
+				err := os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns an error", func() {
 				Skip("This isn't a reliable test as root can still traverse a non-executable directory")
-				err := appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
+				err := appFiles.WalkAppFiles(tmpDir, cb)
 				Expect(err).To(HaveOccurred())
 			})
 
@@ -222,8 +234,8 @@ var _ = Describe("AppFiles", func() {
 				var cfIgnorePath string
 
 				BeforeEach(func() {
-					cfIgnorePath = filepath.Join(fixturePath, "app-copy-test", ".cfignore")
-					err := ioutil.WriteFile(cfIgnorePath, []byte("non-traversable-dir\n"), os.ModePerm)
+					cfIgnorePath = filepath.Join(tmpDir, ".cfignore")
+					err := ioutil.WriteFile(cfIgnorePath, []byte(untraversableDirName+"\n"), os.ModePerm)
 					Expect(err).NotTo(HaveOccurred())
 				})
 
@@ -239,47 +251,8 @@ var _ = Describe("AppFiles", func() {
 
 				It("does not call the callback with the untraversable dir", func() {
 					appFiles.WalkAppFiles(filepath.Join(fixturePath, "app-copy-test"), cb)
-					expectedArgs := []WalkAppFileArgs{
-						{
-							relativePath: "dir1",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir1",
-						},
-						{
-							relativePath: "dir1/child-dir",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir",
-						},
-						{
-							relativePath: "dir1/child-dir/file2.txt",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir/file2.txt",
-						},
-						{
-							relativePath: "dir1/child-dir/file3.txt",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir1/child-dir/file3.txt",
-						},
-						{
-							relativePath: "dir1/file1.txt",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir1/file1.txt",
-						},
-						{
-							relativePath: "dir2",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir2",
-						},
-						{
-							relativePath: "dir2/child-dir2",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2",
-						},
-						{
-							relativePath: "dir2/child-dir2/grandchild-dir2",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2",
-						},
-						{
-							relativePath: "dir2/child-dir2/grandchild-dir2/file4.txt",
-							absolutePath: "../../fixtures/applications/app-copy-test/dir2/child-dir2/grandchild-dir2/file4.txt",
-						},
-					}
-
-					for i, actual := range actualWalkAppFileArgs {
-						Expect(actual.Equal(expectedArgs[i])).To(BeTrue())
+					for _, actual := range actualWalkAppFileArgs {
+						Expect(actual.RelativePath()).NotTo(Equal(untraversableDirName))
 					}
 				})
 			})
