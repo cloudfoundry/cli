@@ -421,6 +421,11 @@ var _ = Describe("App", func() {
 			It("populates the plugin model", func() {
 				cmd.Execute(flagContext)
 
+				// from AppRequirement model
+				Expect(getAppModel.Stack.Name).To(Equal("fake-stack-name"))
+				Expect(getAppModel.Stack.Guid).To(Equal("fake-stack-guid"))
+
+				// from GetAppSummary model
 				Expect(getAppModel.Name).To(Equal("fake-app-name"))
 				Expect(getAppModel.State).To(Equal("started"))
 				Expect(getAppModel.Guid).To(Equal("fake-app-guid"))
@@ -431,35 +436,30 @@ var _ = Describe("App", func() {
 				Expect(getAppModel.EnvironmentVars).To(Equal(map[string]interface{}{"fake-env-var": "fake-env-var-value"}))
 				Expect(getAppModel.InstanceCount).To(Equal(1))
 				Expect(getAppModel.Memory).To(Equal(int64(1024)))
-				Expect(getAppModel.RunningInstances).To(Equal(0)) // this is wrong
+				Expect(getAppModel.RunningInstances).To(Equal(1))
 				Expect(getAppModel.HealthCheckTimeout).To(Equal(0))
-				Expect(getAppModel.Stack.Name).To(Equal("fake-stack-name"))
-				Expect(getAppModel.Stack.Guid).To(Equal("fake-stack-guid"))
 				Expect(getAppModel.SpaceGuid).To(Equal("fake-space-guid"))
 				Expect(getAppModel.PackageUpdatedAt.String()).To(Equal(time.Date(2015, time.November, 19, 1, 0, 15, 0, time.UTC).String()))
 				Expect(getAppModel.PackageState).To(Equal("STAGED"))
 				Expect(getAppModel.StagingFailedReason).To(BeEmpty())
+				Expect(getAppModel.BuildpackUrl).To(Equal("fake-buildpack"))
 				Expect(getAppModel.Routes[0].Host).To(Equal("fake-route-host"))
 				Expect(getAppModel.Routes[0].Guid).To(Equal("fake-route-guid"))
+				Expect(getAppModel.Routes[0].Domain.Name).To(Equal("fake-route-domain-name"))
+				Expect(getAppModel.Routes[0].Domain.Guid).To(Equal("fake-route-domain-guid"))
+				Expect(getAppModel.Services[0].Guid).To(Equal("fake-service-guid"))
+				Expect(getAppModel.Services[0].Name).To(Equal("fake-service-name"))
 
-				// these are all broken
-				// Expect(getAppModel.BuildpackUrl).To(Equal("http://123.com"))
-				// Expect(getAppModel.Routes[0].Domain.Name).To(Equal("fake-domain-name"))
-				// Expect(getAppModel.Routes[0].Domain.Guid).To(Equal("fake-domain-guid"))
-				// Expect(getAppModel.Routes[0].Domain.Shared).To(BeTrue())
-				// Expect(getAppModel.Routes[0].Domain.OwningOrganizationGuid).To(Equal("fake-owning-organization-guid"))
-				// Expect(getAppModel.Services[0].Guid).To(Equal("fake-service-guid"))
-				// Expect(getAppModel.Services[0].Name).To(Equal("fake-service-name"))
-				// Expect(getAppModel.Instances[0].State).To(Equal("running"))
-				// Expect(getAppModel.Instances[0].Details).To(Equal("normal"))
-				// Expect(getAppModel.Instances[0].CpuUsage).To(Equal(float64(1.0)))
-				// Expect(getAppModel.Instances[0].DiskQuota).To(Equal(int64(1 * formatters.GIGABYTE)))
-				// Expect(getAppModel.Instances[0].DiskUsage).To(Equal(int64(32 * formatters.MEGABYTE)))
-				// Expect(getAppModel.Instances[0].MemQuota).To(Equal(int64(64 * formatters.MEGABYTE)))
-				// Expect(getAppModel.Instances[0].MemUsage).To(Equal(int64(13 * formatters.MEGABYTE)))
+				// from GetInstances model
+				Expect(getAppModel.Instances[0].State).To(Equal("running"))
+				Expect(getAppModel.Instances[0].Details).To(Equal("fake-instance-details"))
+				Expect(getAppModel.Instances[0].CpuUsage).To(Equal(float64(0.25)))
+				Expect(getAppModel.Instances[0].DiskUsage).To(Equal(int64(1 * formatters.GIGABYTE)))
+				Expect(getAppModel.Instances[0].DiskQuota).To(Equal(int64(2 * formatters.GIGABYTE)))
+				Expect(getAppModel.Instances[0].MemUsage).To(Equal(int64(24 * formatters.MEGABYTE)))
+				Expect(getAppModel.Instances[0].MemQuota).To(Equal(int64(32 * formatters.MEGABYTE)))
 			})
 		})
-
 	})
 })
 
@@ -579,19 +579,19 @@ var getApplicationJSON string = `{
 }`
 
 var getSummaryJSON string = `{
-  "guid": "fake-app-guid",
-  "name": "fake-app-name",
-  "routes": [
-    {
-      "guid": "fake-route-guid",
-      "host": "fake-route-host",
-      "domain": {
-        "guid": "fake-route-domain-guid",
-        "name": "fake-route-domain-name"
-      }
-    }
-  ],
-  "running_instances": 1,
+	"guid": "fake-app-guid",
+	"name": "fake-app-name",
+	"routes": [
+	{
+		"guid": "fake-route-guid",
+		"host": "fake-route-host",
+		"domain": {
+			"guid": "fake-route-domain-guid",
+			"name": "fake-route-domain-name"
+		}
+	}
+	],
+	"running_instances": 1,
 	"services": [
 	{
 		"guid": "fake-service-guid",
@@ -611,50 +611,42 @@ var getSummaryJSON string = `{
 		}
 	}
 	],
-  "available_domains": [
-    {
-      "guid": "fake-available-domain-guid",
-      "name": "fake-available-domain-name",
-      "owning_organization_guid": "fake-owning-organization-guid"
-    }
-  ],
-  "production": false,
-  "space_guid": "fake-space-guid",
-  "stack_guid": "fake-stack-guid",
-  "buildpack": null,
-  "detected_buildpack": "fake-detected-buildpack",
+	"available_domains": [
+	{
+		"guid": "fake-available-domain-guid",
+		"name": "fake-available-domain-name",
+		"owning_organization_guid": "fake-owning-organization-guid"
+	}
+	],
+	"production": false,
+	"space_guid": "fake-space-guid",
+	"stack_guid": "fake-stack-guid",
+	"buildpack": "fake-buildpack",
+	"detected_buildpack": "fake-detected-buildpack",
 	"environment_json": {
 		"fake-env-var": "fake-env-var-value"
 	},
-  "memory": 1024,
-  "instances": 1,
-  "disk_quota": 1024,
-  "state": "STARTED",
-  "version": "fake-version",
-  "command": "fake-command",
-  "console": false,
-  "debug": null,
-  "staging_task_id": "fake-staging-task-id",
-  "package_state": "STAGED",
-  "health_check_type": "port",
-  "health_check_timeout": null,
-  "staging_failed_reason": null,
-  "staging_failed_description": null,
-  "diego": true,
-  "docker_image": null,
-  "package_updated_at": "2015-11-19T01:00:15Z",
-  "detected_start_command": "fake-detected-start-command",
-  "enable_ssh": true,
-  "docker_credentials_json": {
-    "redacted_message": "[PRIVATE DATA HIDDEN]"
-  },
-  "ports": null
-}`
-
-var getInstancesJSON string = `{
-  "0": {
-    "state": "RUNNING",
-    "uptime": 156886,
-    "since": 1449613771
-  },
+	"memory": 1024,
+	"instances": 1,
+	"disk_quota": 1024,
+	"state": "STARTED",
+	"version": "fake-version",
+	"command": "fake-command",
+	"console": false,
+	"debug": null,
+	"staging_task_id": "fake-staging-task-id",
+	"package_state": "STAGED",
+	"health_check_type": "port",
+	"health_check_timeout": null,
+	"staging_failed_reason": null,
+	"staging_failed_description": null,
+	"diego": true,
+	"docker_image": null,
+	"package_updated_at": "2015-11-19T01:00:15Z",
+	"detected_start_command": "fake-detected-start-command",
+	"enable_ssh": true,
+	"docker_credentials_json": {
+		"redacted_message": "[PRIVATE DATA HIDDEN]"
+	},
+	"ports": null
 }`
