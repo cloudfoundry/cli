@@ -12,13 +12,13 @@ type FakeApplicationRequirement struct {
 	ExecuteStub        func() (success bool)
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
-	executeReturns struct {
+	executeReturns     struct {
 		result1 bool
 	}
 	GetApplicationStub        func() models.Application
 	getApplicationMutex       sync.RWMutex
 	getApplicationArgsForCall []struct{}
-	getApplicationReturns struct {
+	getApplicationReturns     struct {
 		result1 models.Application
 	}
 }
