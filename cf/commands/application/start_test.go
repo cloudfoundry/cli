@@ -5,35 +5,38 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/api"
-	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/commands/application"
-	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
+
+	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
+
+	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
+	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testlogs "github.com/cloudfoundry/cli/testhelpers/logs"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("start command", func() {
 	var (
 		ui                        *testterm.FakeUI
 		configRepo                core_config.Repository
-		defaultAppForStart        = models.Application{}
-		defaultInstanceResponses  = [][]models.AppInstanceFields{}
-		defaultInstanceErrorCodes = []string{"", ""}
+		defaultAppForStart        models.Application
+		defaultInstanceResponses  [][]models.AppInstanceFields
+		defaultInstanceErrorCodes []string
 		requirementsFactory       *testreq.FakeReqFactory
 		logMessages               []*logmessage.LogMessage
 		logRepo                   *testapi.FakeLogsRepository
@@ -97,6 +100,9 @@ var _ = Describe("start command", func() {
 		//save original command dependency and restore later
 		OriginalAppCommand = command_registry.Commands.FindCommand("app")
 
+		defaultInstanceErrorCodes = []string{"", ""}
+
+		defaultAppForStart = models.Application{}
 		defaultAppForStart.Name = "my-app"
 		defaultAppForStart.Guid = "my-app-guid"
 		defaultAppForStart.InstanceCount = 2
@@ -286,9 +292,7 @@ var _ = Describe("start command", func() {
 
 			updateCommandDependency(logRepo)
 			cmd := command_registry.Commands.FindCommand("start").(*Start)
-			cmd.StagingTimeout = 100 * time.Millisecond
-			cmd.StartupTimeout = 200 * time.Millisecond
-			cmd.PingerThrottle = 50 * time.Millisecond
+			cmd.StagingTimeout = 0
 			cmd.ApplicationStart(defaultAppForStart, "some-org", "some-space")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
