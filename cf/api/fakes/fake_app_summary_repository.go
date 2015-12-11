@@ -12,7 +12,7 @@ type FakeAppSummaryRepository struct {
 	GetSummariesInCurrentSpaceStub        func() (apps []models.Application, apiErr error)
 	getSummariesInCurrentSpaceMutex       sync.RWMutex
 	getSummariesInCurrentSpaceArgsForCall []struct{}
-	getSummariesInCurrentSpaceReturns struct {
+	getSummariesInCurrentSpaceReturns     struct {
 		result1 []models.Application
 		result2 error
 	}
