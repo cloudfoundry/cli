@@ -34,7 +34,7 @@ type Dependency struct {
 	Gateways           map[string]net.Gateway
 	TeePrinter         *terminal.TeePrinter
 	PluginRepo         plugin_repo.PluginRepo
-	PluginModels       *pluginModels
+	PluginModels       *PluginModels
 	ServiceBuilder     service_builder.ServiceBuilder
 	BrokerBuilder      broker_builder.Builder
 	PlanBuilder        plan_builder.PlanBuilder
@@ -48,7 +48,7 @@ type Dependency struct {
 	WilecardDependency interface{} //use for injecting fakes
 }
 
-type pluginModels struct {
+type PluginModels struct {
 	Application   *plugin_models.GetAppModel
 	AppsSummary   *[]plugin_models.GetAppsModel
 	Organizations *[]plugin_models.GetOrgs_Model
@@ -93,7 +93,7 @@ func NewDependency() Dependency {
 	}
 	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways)
 
-	deps.PluginModels = &pluginModels{Application: nil}
+	deps.PluginModels = &PluginModels{Application: nil}
 
 	deps.PlanBuilder = plan_builder.NewBuilder(
 		deps.RepoLocator.GetServicePlanRepository(),
