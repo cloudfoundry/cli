@@ -4,7 +4,7 @@ package fakes
 import (
 	"sync"
 
-	. "github.com/cloudfoundry/cli/cf/api/app_instances"
+	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -12,7 +12,7 @@ type FakeAppInstancesRepository struct {
 	GetInstancesStub        func(appGuid string) (instances []models.AppInstanceFields, apiErr error)
 	getInstancesMutex       sync.RWMutex
 	getInstancesArgsForCall []struct {
-		arg1 string
+		appGuid string
 	}
 	getInstancesReturns struct {
 		result1 []models.AppInstanceFields
@@ -21,22 +21,22 @@ type FakeAppInstancesRepository struct {
 	DeleteInstanceStub        func(appGuid string, instance int) error
 	deleteInstanceMutex       sync.RWMutex
 	deleteInstanceArgsForCall []struct {
-		arg1 string
-		arg2 int
+		appGuid  string
+		instance int
 	}
 	deleteInstanceReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeAppInstancesRepository) GetInstances(arg1 string) (instances []models.AppInstanceFields, apiErr error) {
+func (fake *FakeAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr error) {
 	fake.getInstancesMutex.Lock()
-	defer fake.getInstancesMutex.Unlock()
 	fake.getInstancesArgsForCall = append(fake.getInstancesArgsForCall, struct {
-		arg1 string
-	}{arg1})
+		appGuid string
+	}{appGuid})
+	fake.getInstancesMutex.Unlock()
 	if fake.GetInstancesStub != nil {
-		return fake.GetInstancesStub(arg1)
+		return fake.GetInstancesStub(appGuid)
 	} else {
 		return fake.getInstancesReturns.result1, fake.getInstancesReturns.result2
 	}
@@ -51,25 +51,26 @@ func (fake *FakeAppInstancesRepository) GetInstancesCallCount() int {
 func (fake *FakeAppInstancesRepository) GetInstancesArgsForCall(i int) string {
 	fake.getInstancesMutex.RLock()
 	defer fake.getInstancesMutex.RUnlock()
-	return fake.getInstancesArgsForCall[i].arg1
+	return fake.getInstancesArgsForCall[i].appGuid
 }
 
 func (fake *FakeAppInstancesRepository) GetInstancesReturns(result1 []models.AppInstanceFields, result2 error) {
+	fake.GetInstancesStub = nil
 	fake.getInstancesReturns = struct {
 		result1 []models.AppInstanceFields
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeAppInstancesRepository) DeleteInstance(arg1 string, arg2 int) error {
+func (fake *FakeAppInstancesRepository) DeleteInstance(appGuid string, instance int) error {
 	fake.deleteInstanceMutex.Lock()
-	defer fake.deleteInstanceMutex.Unlock()
 	fake.deleteInstanceArgsForCall = append(fake.deleteInstanceArgsForCall, struct {
-		arg1 string
-		arg2 int
-	}{arg1, arg2})
+		appGuid  string
+		instance int
+	}{appGuid, instance})
+	fake.deleteInstanceMutex.Unlock()
 	if fake.DeleteInstanceStub != nil {
-		return fake.DeleteInstanceStub(arg1, arg2)
+		return fake.DeleteInstanceStub(appGuid, instance)
 	} else {
 		return fake.deleteInstanceReturns.result1
 	}
@@ -84,13 +85,14 @@ func (fake *FakeAppInstancesRepository) DeleteInstanceCallCount() int {
 func (fake *FakeAppInstancesRepository) DeleteInstanceArgsForCall(i int) (string, int) {
 	fake.deleteInstanceMutex.RLock()
 	defer fake.deleteInstanceMutex.RUnlock()
-	return fake.deleteInstanceArgsForCall[i].arg1, fake.deleteInstanceArgsForCall[i].arg2
+	return fake.deleteInstanceArgsForCall[i].appGuid, fake.deleteInstanceArgsForCall[i].instance
 }
 
 func (fake *FakeAppInstancesRepository) DeleteInstanceReturns(result1 error) {
+	fake.DeleteInstanceStub = nil
 	fake.deleteInstanceReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ AppInstancesRepository = new(FakeAppInstancesRepository)
+var _ app_instances.AppInstancesRepository = new(FakeAppInstancesRepository)
