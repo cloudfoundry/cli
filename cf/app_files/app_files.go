@@ -152,6 +152,10 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 			return err
 		}
 
+		if err != nil {
+			return err
+		}
+
 		if fullPath == dir {
 			return nil
 		}
