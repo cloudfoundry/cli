@@ -111,6 +111,7 @@ type DomainSummary struct {
 	OwningOrganizationGuid string
 }
 
+//go:generate counterfeiter -o fakes/fake_app_summary_repository.go . AppSummaryRepository
 type AppSummaryRepository interface {
 	GetSummariesInCurrentSpace() (apps []models.Application, apiErr error)
 	GetSummary(appGuid string) (summary models.Application, apiErr error)
