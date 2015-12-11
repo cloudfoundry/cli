@@ -292,7 +292,6 @@ var _ = Describe("start command", func() {
 
 			updateCommandDependency(logRepo)
 			cmd := command_registry.Commands.FindCommand("start").(*Start)
-			cmd.StagingTimeout = 0
 			cmd.ApplicationStart(defaultAppForStart, "some-org", "some-space")
 
 			Expect(ui.Outputs).To(ContainSubstrings(

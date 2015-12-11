@@ -7,6 +7,7 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/manifest"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"github.com/nu7hatch/gouuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -18,34 +19,37 @@ type outputs struct {
 
 var _ = Describe("generate_manifest", func() {
 	var (
-		m   AppManifest
-		err error
+		m              AppManifest
+		err            error
+		uniqueFilename string
 	)
 
 	BeforeEach(func() {
-		_, err = os.Stat("./output.yml")
-		Ω(err).To(HaveOccurred())
+		guid, err := uuid.NewV4()
+		Expect(err).NotTo(HaveOccurred())
+
+		uniqueFilename = guid.String()
 
 		m = NewGenerator()
-		m.FileSavePath("./output.yml")
+		m.FileSavePath(uniqueFilename)
 	})
 
 	AfterEach(func() {
-		err = os.Remove("./output.yml")
+		err = os.Remove(uniqueFilename)
 		Ω(err).ToNot(HaveOccurred())
 	})
 
 	It("creates a new file at a given path", func() {
 		m.Save()
 
-		_, err = os.Stat("./output.yml")
+		_, err = os.Stat(uniqueFilename)
 		Ω(err).ToNot(HaveOccurred())
 	})
 
 	It("starts the manifest with 3 dashes (---), followed by 'applications'", func() {
 		m.Save()
 
-		contents := getYamlContent("./output.yml")
+		contents := getYamlContent(uniqueFilename)
 
 		Ω(contents[0]).To(Equal("---"))
 		Ω(contents[1]).To(Equal("applications:"))
@@ -58,7 +62,7 @@ var _ = Describe("generate_manifest", func() {
 
 		//outputs.ContainSubstring assert orders
 		cmdOutput := &outputs{
-			contents: getYamlContent("./output.yml"),
+			contents: getYamlContent(uniqueFilename),
 			cursor:   0,
 		}
 
@@ -75,7 +79,7 @@ var _ = Describe("generate_manifest", func() {
 		m.Service("app1", "service3")
 		m.Save()
 
-		contents := getYamlContent("./output.yml")
+		contents := getYamlContent(uniqueFilename)
 
 		Ω(contents).To(ContainSubstrings(
 			[]string{"  services:"},
@@ -97,7 +101,7 @@ var _ = Describe("generate_manifest", func() {
 		err := m.Save()
 		Ω(err).NotTo(HaveOccurred())
 
-		Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
+		Ω(getYamlContent(uniqueFilename)).To(ContainSubstrings(
 			[]string{"- name: app1"},
 			[]string{"  memory: 128M"},
 			[]string{"  command: run main.go"},
@@ -129,7 +133,7 @@ var _ = Describe("generate_manifest", func() {
 			err := m.Save()
 			Ω(err).NotTo(HaveOccurred())
 
-			Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
+			Ω(getYamlContent(uniqueFilename)).To(ContainSubstrings(
 				[]string{"- name: app1"},
 				[]string{"  memory: 128M"},
 				[]string{"  command: run main.go"},
@@ -165,7 +169,7 @@ var _ = Describe("generate_manifest", func() {
 			err := m.Save()
 			Ω(err).NotTo(HaveOccurred())
 
-			Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
+			Ω(getYamlContent(uniqueFilename)).To(ContainSubstrings(
 				[]string{"- name: app1"},
 				[]string{"  memory: 128M"},
 				[]string{"  command: run main.go"},
@@ -199,7 +203,7 @@ var _ = Describe("generate_manifest", func() {
 			err := m.Save()
 			Ω(err).NotTo(HaveOccurred())
 
-			Ω(getYamlContent("./output.yml")).To(ContainSubstrings(
+			Ω(getYamlContent(uniqueFilename)).To(ContainSubstrings(
 				[]string{"- name: app1"},
 				[]string{"  memory: 128M"},
 				[]string{"  command: run main.go"},
