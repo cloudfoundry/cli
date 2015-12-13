@@ -69,6 +69,11 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) SetRunning(runnin
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) marshalToEnvironmentVariables(raw_response interface{}) ([]models.EnvironmentVariable, error) {
 	var variables []models.EnvironmentVariable
+
+	if raw_response == nil {
+		return nil, errors.New(fmt.Sprintf("Response body is not valid"))
+	}
+
 	for key, value := range raw_response.(map[string]interface{}) {
 		stringvalue, err := repo.convertValueToString(value)
 		if err != nil {
