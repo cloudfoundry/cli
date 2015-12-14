@@ -12,6 +12,8 @@ function printStatus {
 
 trap printStatus EXIT
 
+export GO15VENDOREXPERIMENT=1
+
 bin/generate-language-resources
 
 echo -e "\n Running i18n checkup..."
@@ -24,29 +26,7 @@ echo -e "\n Cleaning build artifacts..."
 rm -f fixtures/plugins/*.exe
 rm -f plugin_examples/*.exe
 
-# Clean up old .a files in GOPATH
-# It seems like `go clean` should do this but ... not so much
-if [[ -d $GOPATH/pkg ]] ; then
-  pushd $GOPATH/pkg
-  rm -Rf *
-  popd
-fi
-
-if [ ! $(which godep) ];then
-  go get github.com/tools/godep
-fi
-
-GODEP=$(which godep)
-
-if [[ -d $($GODEP path)/pkg ]] ; then
-  pushd $($GODEP path)/pkg
-  rm -Rf *
-  popd
-fi
-
 export LC_ALL="en_US.UTF-8"
-export GOPATH=$($GODEP path):$GOPATH
-export PATH=$($GODEP path)/bin:$PATH
 
 if [ ! $(which ginkgo) ];then
   echo -e "\n Installing ginkgo..."

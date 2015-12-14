@@ -2,13 +2,8 @@
 
 set -e
 
+export GO15VENDOREXPERIMENT=1
+
 bin/generate-language-resources
 
-GODEP=$(which godep)
-
-if [[ -z $GODEP ]] ; then
-  echo -e "godep is not installed. Run 'go get github.com/tools/godep'"
-  exit 1
-fi
-
-GOPATH=$($GODEP path):$GOPATH go run $(dirname $0)/../main/main.go "$@"
+go run $(dirname $0)/../main/main.go "$@"
