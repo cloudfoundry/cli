@@ -122,12 +122,10 @@ Major new feature proposals are given as a publically viewable google document w
 1. Install [Go 1.5.x](https://golang.org)
 1. Create a directory where you would like to store the source for Go projects and their binaries (e.g. `$HOME/go`)
 1. Set an environment variable, `GOPATH`, pointing at the directory you created
-1. Get `godep`: `go get github.com/tools/godep`
 1. Get the `cf` source: `go get github.com/cloudfoundry/cli`
   * (Ignore any warnings about "no buildable Go source files")
-1. Run `godep restore` in $GOPATH/src/github.com/cloudfoundry/cli (note: this will modify the dependencies in your $GOPATH)
 1. [Fork this repository](https://help.github.com/articles/fork-a-repo/), adding your fork as a remote
-1. Write a new test, see it fail when running `bin/test` (or `ginkgo -p path/to/the/package/being/tested`)
+1. Write a new test, see it fail when running `bin/test` (or `GO15VENDOREXPERIMENT=1 ginkgo -p path/to/the/package/being/tested`)
 1. Write code to pass the test
 1. Repeat the above two steps until the feature is complete
 1. Submit a [pull request](https://help.github.com/articles/using-pull-requests/) to the `master` branch

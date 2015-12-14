@@ -4,16 +4,10 @@ set -e
 
 echo -e "\nGenerating Binary..."
 
+export GO15VENDOREXPERIMENT=1
+
 ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
 
 $ROOT_DIR/bin/generate-language-resources
 
-CLI_GOPATH=$ROOT_DIR/tmp/cli_gopath
-rm -rf $CLI_GOPATH
-mkdir -p $CLI_GOPATH/src/github.com/cloudfoundry/
-ln -s $ROOT_DIR $CLI_GOPATH/src/github.com/cloudfoundry/cli
-
-GODEP_GOPATH=$ROOT_DIR/Godeps/_workspace
-
-GOPATH=$CLI_GOPATH:$GODEP_GOPATH:$GOPATH go build -o $ROOT_DIR/out/cf ./main
-rm -rf $CLI_GOPATH
+go build -o $ROOT_DIR/out/cf ./main

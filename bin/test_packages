@@ -12,16 +12,10 @@
   }
 
   trap printStatus EXIT
+
+  export GO15VENDOREXPERIMENT=1
   
   bin/generate-language-resources
-
-  GODEP=$(which godep)
-  if [[ -z $GODEP ]] ; then
-    echo "godep is not installed. Run 'go get github.com/tools/godep'"
-    exit 1
-  fi
-
-  export GOPATH=$($GODEP path):$GOPATH
 
   echo -e "\n Cleaning build artifacts..."
   go clean
