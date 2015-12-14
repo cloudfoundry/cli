@@ -123,7 +123,6 @@ Major new feature proposals are given as a publically viewable google document w
 1. Create a directory where you would like to store the source for Go projects and their binaries (e.g. `$HOME/go`)
 1. Set an environment variable, `GOPATH`, pointing at the directory you created
 1. Get `godep`: `go get github.com/tools/godep`
-1. Install [Mercurial](http://mercurial.selenic.com/) (for go vet)
 1. Get the `cf` source: `go get github.com/cloudfoundry/cli`
   * (Ignore any warnings about "no buildable Go source files")
 1. Run `godep restore` in $GOPATH/src/github.com/cloudfoundry/cli (note: this will modify the dependencies in your $GOPATH)
