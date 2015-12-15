@@ -6,6 +6,15 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/Azure/go-ansiterm",
+			"Rev": "70b2c90b260171e829f1ebd7c17f600c11858dbe"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.8.7-53-g446d1c1",
+			"Rev": "446d1c146faa8ed3f4218f056fcd165f6bcfda81"
+		},
+		{
 			"ImportPath": "github.com/blang/semver",
 			"Comment": "v3.0.1",
 			"Rev": "31b736133b98f26d5e078ec9eb591666edfd091f"
@@ -48,6 +57,10 @@
 		{
 			"ImportPath": "github.com/cloudfoundry/noaa/errors",
 			"Rev": "3c78d4555842c8a7396fa4fc3ef18376c08a3e31"
+		},
+		{
+			"ImportPath": "github.com/davecgh/go-spew/spew",
+			"Rev": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
 		},
 		{
 			"ImportPath": "github.com/docker/docker/pkg/term",
@@ -95,8 +108,17 @@
 			"Rev": "24bc7249ba26ad2f1493363b9dcedf86023f47d7"
 		},
 		{
+			"ImportPath": "github.com/pmezard/go-difflib/difflib",
+			"Rev": "e8554b8641db39598be7f6342874b958f12ae1d4"
+		},
+		{
 			"ImportPath": "github.com/simonleung8/flags",
 			"Rev": "4304da028804a934cf49cd9a574692d80abd13c7"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-88-ge3a8ff8",
+			"Rev": "e3a8ff8ce36581f87a15341206f205b1da467059"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/ssh",
