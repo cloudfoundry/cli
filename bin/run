@@ -4,6 +4,4 @@ set -e
 
 export GO15VENDOREXPERIMENT=1
 
-bin/generate-language-resources
-
 go run $(dirname $0)/../main/main.go "$@"
