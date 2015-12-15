@@ -58,6 +58,13 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 }
 
 func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
+	var err error
+
+	appDir, err = fileutils.AbsPath(appDir)
+	if err != nil {
+		return []resources.AppFileResource{}, false, err
+	}
+	
 	appFileResource := []resources.AppFileResource{}
 	for _, file := range localFiles {
 		appFileResource = append(appFileResource, resources.AppFileResource{
