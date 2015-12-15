@@ -12,12 +12,12 @@ function printStatus {
 
 trap printStatus EXIT
 
-export GO15VENDOREXPERIMENT=1
-
 bin/generate-language-resources
 
 echo -e "\n Running i18n checkup..."
 bin/i18n-checkup
+
+export GO15VENDOREXPERIMENT=1
 
 echo -e "\n Cleaning build artifacts..."
 
