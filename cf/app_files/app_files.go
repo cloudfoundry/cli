@@ -23,11 +23,11 @@ type AppFiles interface {
 type ApplicationFiles struct{}
 
 func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
-	dir, err = filepath.Abs(dir)
+	dir, err = fileutils.AbsPath(dir)
 	if err != nil {
 		return
 	}
-
+	
 	err = appfiles.WalkAppFiles(dir, func(fileName string, fullPath string) error {
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
@@ -67,6 +67,17 @@ func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.Ap
 }
 
 func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) error {
+	var err error
+	
+	fromDir, err = fileutils.AbsPath(fromDir)
+	if err != nil {
+		return err
+	}
+	toDir, err = fileutils.AbsPath(toDir)
+	if err != nil {
+		return err
+	}
+		
 	for _, file := range appFiles {
 		err := func() error {
 			fromPath := filepath.Join(fromDir, file.Path)
@@ -117,6 +128,8 @@ func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, from
 }
 
 func (appfiles ApplicationFiles) CountFiles(directory string) int64 {
+	directory, _ = fileutils.AbsPath(directory)
+		
 	var count int64
 	appfiles.WalkAppFiles(directory, func(_, _ string) error {
 		count++

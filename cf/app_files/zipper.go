@@ -132,6 +132,13 @@ func (zipper ApplicationZipper) GetZipSize(zipFile *os.File) (int64, error) {
 }
 
 func writeZipFile(dir string, targetFile *os.File) error {
+	var err error
+
+	dir, err = fileutils.AbsPath(dir)
+	if err != nil {
+		return err
+	}	
+	
 	isEmpty, err := fileutils.IsDirEmpty(dir)
 	if err != nil {
 		return err
