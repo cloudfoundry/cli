@@ -30,7 +30,9 @@ if [ $? -eq 0 ]; then
     installer="${BASH_REMATCH[1]}"
     os_arch="${BASH_REMATCH[2]}"
     extension="${BASH_REMATCH[3]}"
-    if [ -z "${installer}" ]; then # don't upload edge installers
+    if [ -n "${installer}" ]; then
+      s3cmd --config=$s3_config_file put $f s3://go-cli/master/cf-cli_edge_installer${os_arch}${extension}
+    else
       s3cmd --config=$s3_config_file put $f s3://go-cli/master/cf-cli_edge${os_arch}${extension}
     fi
   done
