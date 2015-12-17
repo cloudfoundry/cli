@@ -55,7 +55,7 @@ func init() {
 
 func (cmd *Push) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["b"] = &cliFlags.StringFlag{Name: "b", Usage: T("Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch). Use built-in buildpacks only by setting value to 'null' or 'default'")}
+	fs["b"] = &cliFlags.StringFlag{Name: "b", Usage: T("Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'")}
 	fs["c"] = &cliFlags.StringFlag{Name: "c", Usage: T("Startup command, set to null to reset to default start command")}
 	fs["d"] = &cliFlags.StringFlag{Name: "d", Usage: T("Domain (e.g. example.com)")}
 	fs["f"] = &cliFlags.StringFlag{Name: "f", Usage: T("Path to manifest")}
