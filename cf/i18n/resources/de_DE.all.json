@@ -1265,8 +1265,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]'\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com",
-      "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]'\n\nBEISPIEL:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com",
+      "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com",
+      "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com",
       "modified": false
    },
    {
@@ -1632,11 +1632,6 @@
    {
       "id": "Creating user {{.TargetUser}}...",
       "translation": "Erstellen von Benutzer {{.TargetUser}}...",
-      "modified": false
-   },
-   {
-      "id": "Credentials",
-      "translation": "Berechtigungsnachweise",
       "modified": false
    },
    {
@@ -4700,11 +4695,6 @@
       "modified": false
    },
    {
-      "id": "Syslog Drain Url",
-      "translation": "Syslog-Drain-URL",
-      "modified": false
-   },
-   {
       "id": "System-Provided:",
       "translation": "Vom System zur Verfügung gestellt:",
       "modified": false
@@ -5090,8 +5080,8 @@
       "modified": false
    },
    {
-      "id": "Update user-provided service instance name value pairs",
-      "translation": "Vom Benutzer zur Verfügung gestellte Name-Wertepaare für Serviceinstanz aktualisieren",
+      "id": "Update user-provided service instance",
+      "translation": "Update user-provided service instance",
       "modified": false
    },
    {

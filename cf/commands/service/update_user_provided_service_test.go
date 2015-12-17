@@ -94,6 +94,34 @@ var _ = Describe("update-user-provided-service test", func() {
 			})
 		})
 
+		Context("when user provides a valid Route Service URL with -r flag", func() {
+			It("updates a user provided service with a route service url", func() {
+				runCommand("-p", `{"foo":"bar"}`, "-r", "https://example.com", "service-name")
+				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"TIP"},
+				))
+
+				Expect(serviceRepo.UpdateArgsForCall(0).Name).To(Equal("service-name"))
+				Expect(serviceRepo.UpdateArgsForCall(0).Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+				Expect(serviceRepo.UpdateArgsForCall(0).RouteServiceUrl).To(Equal("https://example.com"))
+			})
+		})
+
+		Context("when no flags are passed", func() {
+			It("warns the user that no changes were made", func() {
+				runCommand("service-name")
+
+				Expect(serviceRepo.UpdateCallCount()).To(Equal(1))
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"No flags specified. No changes were made."},
+				))
+			})
+		})
+
 		Context("when the user provides invalid JSON with the -p flag", func() {
 			It("tells the user the JSON is invalid", func() {
 				runCommand("-p", `{"foo":"ba WHOOPS OH MY HOW DID THIS GET HERE???`, "service-name")

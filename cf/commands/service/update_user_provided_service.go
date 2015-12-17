@@ -28,18 +28,20 @@ func init() {
 
 func (cmd *UpdateUserProvidedService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials")}
-	fs["l"] = &cliFlags.StringFlag{ShortName: "l", Usage: T("Syslog Drain Url")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials exposed in the VCAP_SERVICES environment variable for bound applications")}
+	fs["l"] = &cliFlags.StringFlag{ShortName: "l", Usage: T("URL to which logs for bound applications will be streamed")}
+	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("URL to which requests for bound routes will be forwarded. Scheme for this URL must be https")}
 
 	return command_registry.CommandMetadata{
 		Name:        "update-user-provided-service",
 		ShortName:   "uups",
-		Description: T("Update user-provided service instance name value pairs"),
-		Usage: T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG-DRAIN-URL]'
+		Description: T("Update user-provided service instance"),
+		Usage: T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
 
 EXAMPLE:
    CF_NAME update-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
-   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com`),
+   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com
+   CF_NAME update-user-provided-service my-route-service -r https://example.com`),
 		Flags: fs,
 	}
 }
@@ -74,6 +76,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 
 	drainUrl := c.String("l")
 	params := c.String("p")
+	routeServiceUrl := c.String("r")
 
 	paramsMap := make(map[string]interface{})
 	if params != "" {
@@ -95,6 +98,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 
 	serviceInstance.Params = paramsMap
 	serviceInstance.SysLogDrainUrl = drainUrl
+	serviceInstance.RouteServiceUrl = routeServiceUrl
 
 	apiErr := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance.ServiceInstanceFields)
 	if apiErr != nil {
@@ -108,7 +112,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 			"CFRestageCommand": terminal.CommandColor(cf.Name() + " restage"),
 		}))
 
-	if params == "" && drainUrl == "" {
+	if routeServiceUrl == "" && params == "" && drainUrl == "" {
 		cmd.ui.Warn(T("No flags specified. No changes were made."))
 	}
 }
