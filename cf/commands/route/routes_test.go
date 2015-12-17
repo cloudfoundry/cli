@@ -78,6 +78,10 @@ var _ = Describe("routes command", func() {
 			route.Host = "hostname-1"
 			route.Domain = domain
 			route.Apps = []models.ApplicationFields{app1}
+			route.ServiceInstance = models.ServiceInstanceFields{
+				Name: "test-service",
+				Guid: "service-guid",
+			}
 
 			route2 := models.Route{}
 			route2.Host = "hostname-2"
@@ -90,9 +94,9 @@ var _ = Describe("routes command", func() {
 			runCommand()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting routes", "my-user"},
-				[]string{"host", "domain", "apps"},
-				[]string{"hostname-1", "example.com", "dora"},
+				[]string{"Getting routes for org", "/ space", "my-org", "my-space", "my-user"},
+				[]string{"host", "domain", "apps", "service"},
+				[]string{"hostname-1", "example.com", "dora", "test-service"},
 				[]string{"hostname-2", "cookieclicker.co", "dora", "bora"},
 			))
 		})
@@ -114,6 +118,10 @@ var _ = Describe("routes command", func() {
 			route.Domain = domain
 			route.Apps = []models.ApplicationFields{app1}
 			route.Space = space1
+			route.ServiceInstance = models.ServiceInstanceFields{
+				Name: "test-service",
+				Guid: "service-guid",
+			}
 
 			route2 := models.Route{}
 			route2.Host = "hostname-2"
@@ -127,9 +135,9 @@ var _ = Describe("routes command", func() {
 			runCommand("--orglevel")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting routes", "my-user"},
-				[]string{"space", "host", "domain", "apps"},
-				[]string{"space-1", "hostname-1", "example.com", "dora"},
+				[]string{"Getting routes for org", "my-org", "my-user"},
+				[]string{"space", "host", "domain", "apps", "service"},
+				[]string{"space-1", "hostname-1", "example.com", "dora", "test-service"},
 				[]string{"space-2", "hostname-2", "cookieclicker.co", "dora", "bora"},
 			))
 		})
