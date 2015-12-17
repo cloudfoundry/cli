@@ -685,8 +685,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]",
-      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]",
+      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]\n\nEXAMPLE:\n   CF_NAME create-route my-space example.com -n myapp -c /foo\n\t\t",
+      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]\n\nEXAMPLE:\n   CF_NAME create-route my-space example.com -n myapp -c /foo\n\t\t",
       "modified": false
    },
    {
@@ -1397,6 +1397,11 @@
    {
       "id": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
       "translation": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
+      "modified": false
+   },
+   {
+      "id": "Context path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match.",
+      "translation": "Context path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match.",
       "modified": false
    },
    {
@@ -3677,16 +3682,6 @@
    {
       "id": "ORGS",
       "translation": "ORGS",
-      "modified": false
-   },
-   {
-      "id": "Optional context path. Path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match.",
-      "translation": "Optional context path. Path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match.",
-      "modified": false
-   },
-   {
-      "id": "Optional hostname",
-      "translation": "Optional hostname",
       "modified": false
    },
    {
