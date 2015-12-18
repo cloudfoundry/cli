@@ -9,13 +9,15 @@ import (
 
 type FakeRouteCreator struct {
 	CreateRouteHostname     string
+	CreateRoutePath         string
 	CreateRouteDomainFields models.DomainFields
 	CreateRouteSpaceFields  models.SpaceFields
 	ReservedRoute           models.Route
 }
 
-func (cmd *FakeRouteCreator) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (reservedRoute models.Route, apiErr error) {
+func (cmd *FakeRouteCreator) CreateRoute(hostName, path string, domain models.DomainFields, space models.SpaceFields) (reservedRoute models.Route, apiErr error) {
 	cmd.CreateRouteHostname = hostName
+	cmd.CreateRoutePath = path
 	cmd.CreateRouteDomainFields = domain
 	cmd.CreateRouteSpaceFields = space
 	reservedRoute = cmd.ReservedRoute
