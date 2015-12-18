@@ -60,7 +60,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 	flag := c.Bool("orglevel")
 
 	if flag {
-		cmd.ui.Say(T("Getting routes for org {{.OrgName}}  as {{.Username}} ...\n",
+		cmd.ui.Say(T("Getting routes for org {{.OrgName}} as {{.Username}} ...\n",
 			map[string]interface{}{
 				"Username": terminal.EntityNameColor(cmd.config.Username()),
 				"OrgName":  terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
