@@ -7,9 +7,8 @@ type Route struct {
 	Host   string
 	Domain DomainFields
 
-	Space           SpaceFields
-	Apps            []ApplicationFields
-	ServiceInstance ServiceInstanceFields
+	Space SpaceFields
+	Apps  []ApplicationFields
 }
 
 func (route Route) URL() string {

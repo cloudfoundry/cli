@@ -57,27 +57,14 @@ func (cmd *ListRoutes) SetDependency(deps command_registry.Dependency, pluginCal
 }
 
 func (cmd *ListRoutes) Execute(c flags.FlagContext) {
-	flag := c.Bool("orglevel")
+	cmd.ui.Say(T("Getting routes as {{.Username}} ...\n",
+		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	if flag {
-		cmd.ui.Say(T("Getting routes for org {{.OrgName}}  as {{.Username}} ...\n",
-			map[string]interface{}{
-				"Username": terminal.EntityNameColor(cmd.config.Username()),
-				"OrgName":  terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			}))
-	} else {
-		cmd.ui.Say(T("Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
-			map[string]interface{}{
-				"Username":  terminal.EntityNameColor(cmd.config.Username()),
-				"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-				"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			}))
-	}
-
-	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("apps"), T("service")})
+	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("apps")})
 
 	noRoutes := true
 	var apiErr error
+	flag := c.Bool("orglevel")
 
 	if flag {
 		apiErr = cmd.routeRepo.ListAllRoutes(func(route models.Route) bool {
@@ -87,7 +74,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 				appNames = append(appNames, app.Name)
 			}
 
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","), route.ServiceInstance.Name)
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","))
 			return true
 		})
 
@@ -100,7 +87,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 				appNames = append(appNames, app.Name)
 			}
 
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","), route.ServiceInstance.Name)
+			table.Add(route.Space.Name, route.Host, route.Domain.Name, strings.Join(appNames, ","))
 			return true
 		})
 	}
