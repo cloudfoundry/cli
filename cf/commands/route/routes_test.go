@@ -85,6 +85,7 @@ var _ = Describe("routes command", func() {
 
 			route2 := models.Route{}
 			route2.Host = "hostname-2"
+			route2.Path = "/foo"
 			route2.Domain = domain2
 			route2.Apps = []models.ApplicationFields{app1, app2}
 			routeRepo.Routes = []models.Route{route, route2}
@@ -97,7 +98,7 @@ var _ = Describe("routes command", func() {
 				[]string{"Getting routes for org", "/ space", "my-org", "my-space", "my-user"},
 				[]string{"host", "domain", "apps", "service"},
 				[]string{"hostname-1", "example.com", "dora", "test-service"},
-				[]string{"hostname-2", "cookieclicker.co", "dora", "bora"},
+				[]string{"hostname-2", "cookieclicker.co", "/foo", "dora", "bora"},
 			))
 		})
 	})
@@ -125,6 +126,7 @@ var _ = Describe("routes command", func() {
 
 			route2 := models.Route{}
 			route2.Host = "hostname-2"
+			route2.Path = "/foo"
 			route2.Domain = domain2
 			route2.Apps = []models.ApplicationFields{app1, app2}
 			route2.Space = space2
@@ -138,7 +140,7 @@ var _ = Describe("routes command", func() {
 				[]string{"Getting routes for org", "my-org", "my-user"},
 				[]string{"space", "host", "domain", "apps", "service"},
 				[]string{"space-1", "hostname-1", "example.com", "dora", "test-service"},
-				[]string{"space-2", "hostname-2", "cookieclicker.co", "dora", "bora"},
+				[]string{"space-2", "hostname-2", "cookieclicker.co", "/foo", "dora", "bora"},
 			))
 		})
 

@@ -69,7 +69,9 @@ var _ = Describe("route repository", func() {
 			Expect(routes[0].Guid).To(Equal("route-1-guid"))
 			Expect(routes[0].ServiceInstance.Guid).To(Equal("service-guid"))
 			Expect(routes[0].ServiceInstance.Name).To(Equal("test-service"))
+			Expect(routes[0].Path).To(Equal(""))
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
+			Expect(routes[1].Path).To(Equal("/path-2"))
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -106,6 +108,7 @@ var _ = Describe("route repository", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
+
 		It("finds a route by host and domain", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -155,7 +158,7 @@ var _ = Describe("route repository", func() {
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 						{
 							"metadata": { "guid": "my-route-guid" },
@@ -166,11 +169,35 @@ var _ = Describe("route repository", func() {
 			})
 			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
+			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "", "my-domain-guid", "my-space-guid")
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
+		})
+
+		It("creates routes with a path in a given space", func() {
+			ts, handler = testnet.NewServer([]testnet.TestRequest{
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:  "POST",
+					Path:    "/v2/routes?inline-relations-depth=1",
+					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"/this-is-a-path","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+						{
+							"metadata": { "guid": "my-route-guid" },
+							"entity": { "host": "my-cool-app", "path": "/this-is-a-path" }
+						}
+					`},
+				}),
+			})
+			configRepo.SetApiEndpoint(ts.URL)
+
+			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "/this-is-a-path", "my-domain-guid", "my-space-guid")
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
+			Expect(createdRoute.Path).To(Equal("/this-is-a-path"))
 		})
 
 		It("creates routes", func() {
@@ -178,7 +205,7 @@ var _ = Describe("route repository", func() {
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"the-space-guid"}`),
+					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"","domain_guid":"my-domain-guid","space_guid":"the-space-guid"}`),
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 						{
 							"metadata": { "guid": "my-route-guid" },
@@ -324,6 +351,7 @@ var firstPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: 
       },
       "entity": {
         "host": "route-1-host",
+        "path": "",
         "domain": {
           "metadata": {
             "guid": "domain-1-guid"
@@ -381,6 +409,7 @@ var secondPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body:
       },
       "entity": {
         "host": "route-2-host",
+        "path": "/path-2",
         "domain": {
           "metadata": {
             "guid": "domain-2-guid"
