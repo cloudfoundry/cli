@@ -1,3 +1,129 @@
+## 6.14.1
+* Bump version to 6.14.1
+* Revert "Merge pull request #718 from cf-routing/list_route_services"
+* Revert "Remove extra space in command 'routes' prompt"
+* Remove extra space in command 'routes' prompt
+* Merge pull request #718 from cf-routing/list_route_services
+* Reword help text in `cf push -b` to mention CFF buildpack
+* Display route services in cf routes command
+* Publish edge installers
+* Fix delete-quota force flag text
+* Remove developing on windows with powershell note
+* Commit i18n_resources.go
+* Add missing windows dependencies
+* Move GO15VENDOREXPERIMENT lower
+* godep save ./...
+* Add -p -nodes=4 -randomizeAllSpecs to bin/test
+* WalkAppFiles returns error properly
+* Remove go vet from bin/get-tools
+* Add go fmt changes to fakes
+* Update README to reflect switch to Go 1.5
+* Add optimization to WalkAppFiles
+* pluginAppModel includes more fields
+* Export PluginModels
+* Remove WalkAppFiles SkipDir optimization
+* Skip WalkAppFiles test that expects an error
+* Add OS-generic assertions to WalkAppFiles test
+* WalkAppFiles skips problematic .cfignored paths
+* Don't dot import app_files in test
+* Remove named return args from WalkAppFiles
+* Update Travis to 1.5.2
+* Fix bug in GatherFiles
+* Defer close of files in CopyFiles properly
+* Add better error when pushing an empty app
+* Hoist ProcessPath usage
+* Don't use app_files as a local var
+* Add error handling to CopyPathToPath use
+* Remove copyPathToPath
+* Remove presentFiles from GatherFiles
+* Remove some private methods from Push actor
+* Backfill Push actor tests
+* Remove gofileutils from actors/push_test
+* Merge pull request #706 from cloudfoundry/shalako-patch-1
+* Zipped files on Windows are always 07xx
+* Restructure zipper Zip test
+* Resource-matched windows files are always 07xx
+* GatherFiles does not unzip
+* Add ProcessPath to push actor
+* Remove empty AfterEach
+* Update README.md
+* PurgeServiceInstance requires CC API 2.36.0+
+* Rewrite purge_service_instance_test
+* FakeUI accepts a channel for inputs
+* Generate FakeServiceRepository with counterfeiter
+* Update MinAPIVersionRequirement
+* purge-service-instance: confirmed -> force
+* purge-service-instance: Use idiomatic error check
+* purge-service-instance: Remove named return args
+* fake_registry_command -> fake_command
+* Remove diego-ssh/helpers from ssh command
+* Remove unused TestHostKeyFingerprint
+* Remove SynchronizedBeforeSuite from ssh suite
+* bin/test only gets godep if not present
+* bin/test doesn't run in a subshell
+* Update go vet list in bin/test
+* Stop using two copies of fileutils
+* godep update gofileutils/fileutils
+* Remove usages of CopyReaderToPath
+* log_message_queue_old -> loggregator_message_queue
+* logs_old_consumer -> log_repository
+* Update NewLogMessage helper
+* OldLogs -> Logs
+* Remove checkForOrgExistence
+* Remove unused Noaa code
+* Remove unused RunCommandMoreBetter helper
+* Move Requirement interface to requirement.go
+* Merge pull request #695 from jasonkeene/docs-fix
+* Update plugin README
+* Move FakeSSHCodeGetter into appropriate location
+* Move FakeCommand into appropriate location
+* Remove magic from i18n.go
+* Sort known locales when printed
+* Remove SUPPORTED_LOCALES
+* cf/i18n/init.go -> cf/i18n/i18n.go
+* Force zh-tw and zh-hk locales to zh-hant
+* Improve performance of i18n.Init
+* Simplify i18n.Init
+* Move `bind-service` fake into appropriate location
+* teach command_loader test to ignore fakes
+* remove unused fake `FakeApiEndpointSetter`
+* Add notes about untested lines in i18n/init
+* Fix defers in i18n/init
+* Update cf/i18n/init_unix_test
+* godep update github.com/nicksnyder/go-i18n/i18n
+* Fix build instructions.
+* Remove unused logRepo from application/start
+* Set BUILD TIME in help as cf.BuiltOnDate always
+* Remove Installed-Size from debian install template
+* i18n4go -c fixup
+* Add proper Installed-Size to debian installers
+* Update osx Distribution file
+* Show better message for auth ServerErrors
+* Remove -p from bin/test ginkgo
+* Fix reliance on test pollution in registry_test
+* Fix reliance on test pollution in service_keys_test
+* godep update github.com/cloudfoundry/jibber_jabber
+* Rename SUPPORTED_LOCALES ko_KO -> ko_KR
+* Add nodes=4, randomizeAllSpecs to bin/test
+* Add -p to bin/build ginkgo
+* Rewrite file_download_test
+* Add ko_KO i18n support
+* Update Contributing section in README
+* Remove unused ALL_CAPS const
+* findPlan returns error as the last arg
+* NoRedirectsErr -> ErrNoRedirects
+* Don't assign vars to their defaults
+* Don't assign and not use errors
+* Run goimports on files that were not goimported
+* Don't use underscore as receiver name
+* Omit unnecessary 2nd value from range
+* Update CHANGELOG.md
+* Update README.md
+* Update CHANGELOG.md
+* v6.14.0 CHANGELOG for plugin API
+* Add _osx to osx installer name created by CI
+* Add support for prefixed bytes to zipper
+
 ## 6.14.0
 * Bump version to 6.14.0
 * Merge pull request #677 from aminjam/master
