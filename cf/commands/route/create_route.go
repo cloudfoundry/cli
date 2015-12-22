@@ -31,18 +31,18 @@ func init() {
 }
 
 func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
-	contextPathHelp := T(`Context path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match.`)
+	contextPathHelp := T(`Path starting with a forward slash (e.g. /foo)`)
 	fs := make(map[string]flags.FlagSet)
 	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname")}
-	fs["c"] = &cliFlags.StringFlag{Name: "c", Usage: contextPathHelp}
+	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: contextPathHelp}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-route",
 		Description: T("Create a url route in a space for later use"),
-		Usage: T(`CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]
+		Usage: T(`CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [--path PATH]
 
 EXAMPLE:
-   CF_NAME create-route my-space example.com -n myapp -c /foo
+   CF_NAME create-route my-space example.com -n myapp --path /foo
 		`),
 		Flags: fs,
 	}
@@ -78,7 +78,7 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	hostName := c.String("n")
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
-	path := c.String("c")
+	path := c.String("path")
 
 	_, apiErr := cmd.CreateRoute(hostName, path, domain, space.SpaceFields)
 
