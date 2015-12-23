@@ -1,6 +1,8 @@
 package route
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -31,7 +33,7 @@ func init() {
 func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname for the route")}
-	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path for the route, prefixed with a forward slash (/)")}
+	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path for the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-route",
@@ -39,9 +41,9 @@ func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 		Usage: T(`CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [--path PATH]
 
 EXAMPLES:
-   CF_NAME create-route my-space example.com                  # example.com
-   CF_NAME create-route my-space example.com -n myapp         # myapp.example.com
-   CF_NAME create-route my-space example.com -n myapp --path /foo # myapp.example.com/foo`),
+   CF_NAME create-route my-space example.com                     # example.com
+   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com
+   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo`),
 		Flags: fs,
 	}
 }
@@ -77,6 +79,10 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
 	path := c.String("path")
+
+	if !strings.HasPrefix(path, `/`) {
+		path = `/` + path
+	}
 
 	_, apiErr := cmd.CreateRoute(hostName, path, domain, space.SpaceFields)
 
