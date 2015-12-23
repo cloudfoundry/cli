@@ -63,7 +63,7 @@ var _ = Describe("create-route command", func() {
 			runCommand("my-space")
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
-				[]string{"create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]"},
+				[]string{"create-route SPACE DOMAIN [-n HOSTNAME] [--path PATH]"},
 			))
 		})
 	})
@@ -96,7 +96,7 @@ var _ = Describe("create-route command", func() {
 		})
 
 		It("creates routes with a context path", func() {
-			runCommand("-n", "host", "-c", "/path", "my-space", "example.com")
+			runCommand("-n", "host", "--path", "/path", "my-space", "example.com")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating route", "host.example.com/path", "my-org", "my-space", "my-user"},
