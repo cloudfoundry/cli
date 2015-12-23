@@ -80,7 +80,7 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	domain := cmd.domainReq.GetDomain()
 	path := c.String("path")
 
-	if !strings.HasPrefix(path, `/`) {
+	if path != "" && !strings.HasPrefix(path, `/`) {
 		path = `/` + path
 	}
 
