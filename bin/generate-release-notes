@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-VERSION=v$(cat VERSION)
+VERSION=$(cat VERSION)
 
 cat <<-NOTES
-CF version $VERSION
-===================
 Installers
 ----------
 - [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&version=$VERSION&source=github-rel)
