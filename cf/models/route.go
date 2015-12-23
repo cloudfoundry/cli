@@ -1,6 +1,10 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+	"strings"
+)
 
 type Route struct {
 	Guid   string
@@ -12,23 +16,22 @@ type Route struct {
 	Apps  []ApplicationFields
 }
 
-func (route Route) URL() string {
-	if route.Host == "" {
-		return route.Domain.Name
-	}
-	return fmt.Sprintf("%s.%s%s", route.Host, route.Domain.Name, route.Path)
+func (r Route) URL() string {
+	return urlStringFromParts(r.Host, r.Domain.Name, r.Path)
 }
 
-type RouteSummary struct {
-	Guid   string
-	Host   string
-	Domain DomainFields
-	Path   string
-}
-
-func (model RouteSummary) URL() string {
-	if model.Host == "" {
-		return model.Domain.Name
+func urlStringFromParts(hostName, domainName, path string) string {
+	var host string
+	if hostName != "" {
+		host = fmt.Sprintf("%s.%s", hostName, domainName)
+	} else {
+		host = domainName
 	}
-	return fmt.Sprintf("%s.%s%s", model.Host, model.Domain.Name, model.Path)
+
+	u := url.URL{
+		Host: host,
+		Path: path,
+	}
+
+	return strings.TrimPrefix(u.String(), "//") // remove the empty scheme
 }
