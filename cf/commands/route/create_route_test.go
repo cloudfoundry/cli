@@ -96,7 +96,7 @@ var _ = Describe("create-route command", func() {
 		})
 
 		It("creates routes with a context path", func() {
-			runCommand("-n", "host", "--path", "/path", "my-space", "example.com")
+			runCommand("-n", "host", "--path", "path", "my-space", "example.com")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating route", "host.example.com/path", "my-org", "my-space", "my-user"},
