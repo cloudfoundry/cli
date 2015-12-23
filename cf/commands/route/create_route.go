@@ -1,8 +1,6 @@
 package route
 
 import (
-	"fmt"
-
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -85,11 +83,9 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 }
 
 func (cmd *CreateRoute) CreateRoute(hostName string, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
-	url := fmt.Sprintf("%s%s", domain.UrlForHost(hostName), path)
-
 	cmd.ui.Say(T("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
-			"URL":       terminal.EntityNameColor(url),
+			"URL":       terminal.EntityNameColor(domain.UrlForHostAndPath(hostName, path)),
 			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))

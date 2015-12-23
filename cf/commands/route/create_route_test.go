@@ -133,7 +133,7 @@ var _ = Describe("create-route command", func() {
 		})
 
 		Describe("RouteCreator interface", func() {
-			It("creates a route, given a domain and space", func() {
+			It("creates a route", func() {
 				createdRoute := models.Route{}
 				createdRoute.Host = "my-host"
 				createdRoute.Guid = "my-route-guid"
@@ -144,18 +144,19 @@ var _ = Describe("create-route command", func() {
 				updateCommandDependency(false)
 				c := command_registry.Commands.FindCommand("create-route")
 				cmd := c.(RouteCreator)
-				route, apiErr := cmd.CreateRoute("my-host", "", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
+				route, apiErr := cmd.CreateRoute("my-host", "/path", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
 
 				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(route.Guid).To(Equal(createdRoute.Guid))
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Creating route", "my-host.example.com", "my-org", "my-space", "my-user"},
+					[]string{"Creating route", "my-host.example.com/path", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
 
 				Expect(routeRepo.CreateInSpaceHost).To(Equal("my-host"))
 				Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
 				Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+				Expect(routeRepo.CreateInSpacePath).To(Equal("/path"))
 			})
 		})
 	})

@@ -1,7 +1,5 @@
 package models
 
-import "fmt"
-
 type DomainFields struct {
 	Guid                   string
 	Name                   string
@@ -9,9 +7,6 @@ type DomainFields struct {
 	Shared                 bool
 }
 
-func (model DomainFields) UrlForHost(host string) string {
-	if host == "" {
-		return model.Name
-	}
-	return fmt.Sprintf("%s.%s", host, model.Name)
+func (model DomainFields) UrlForHostAndPath(host, path string) string {
+	return urlStringFromParts(host, model.Name, path)
 }
