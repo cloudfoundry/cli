@@ -19,6 +19,7 @@ type FakeRouteRepository struct {
 	CreatedHost       string
 	CreatedDomainGuid string
 	CreatedRoute      models.Route
+	CreatedPath       string
 
 	CreateInSpaceHost         string
 	CreateInSpacePath         string
@@ -82,13 +83,15 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host string, domain models.
 	return
 }
 
-func (repo *FakeRouteRepository) Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error) {
+func (repo *FakeRouteRepository) Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error) {
 	repo.CreatedHost = host
 	repo.CreatedDomainGuid = domain.Guid
+	repo.CreatedPath = path
 
 	createdRoute.Guid = host + "-route-guid"
 	createdRoute.Domain = domain
 	createdRoute.Host = host
+	createdRoute.Path = path
 
 	return
 }
