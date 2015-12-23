@@ -228,7 +228,8 @@ func (cmd *Push) processDomainsAndBindRoutes(appParams models.AppParams, routeAc
 
 func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeActor actors.RouteActor, app models.Application, noHostName bool, domain models.DomainFields) {
 	hostname := cmd.hostnameForApp(host, UseRandomHostname, app.Name, noHostName)
-	route := routeActor.FindOrCreateRoute(hostname, domain)
+	path := "" // not currently configurable in the manifest
+	route := routeActor.FindOrCreateRoute(hostname, domain, path)
 	routeActor.BindRoute(app, route)
 }
 

@@ -16,7 +16,7 @@ type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
 	FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error)
-	Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error)
+	Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error)
 	CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
@@ -73,8 +73,8 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host string, doma
 	return
 }
 
-func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields) (createdRoute models.Route, apiErr error) {
-	return repo.CreateInSpace(host, "", domain.Guid, repo.config.SpaceFields().Guid)
+func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error) {
+	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid)
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error) {
