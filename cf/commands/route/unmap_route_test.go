@@ -80,7 +80,7 @@ var _ = Describe("unmap-route command", func() {
 					Guid: "my-domain-guid",
 					Name: "example.com",
 				}
-				routeRepo.FindByHostAndDomainReturns.Route = models.Route{
+				routeRepo.FindByHostAndDomainReturns(models.Route{
 					Domain: requirementsFactory.Domain,
 					Guid:   "my-route-guid",
 					Host:   "foo",
@@ -90,7 +90,7 @@ var _ = Describe("unmap-route command", func() {
 							Name: "my-app",
 						},
 					},
-				}
+				}, nil)
 			})
 
 			It("passes requirements", func() {
@@ -114,8 +114,10 @@ var _ = Describe("unmap-route command", func() {
 					[]string{"Route to be unmapped is not currently mapped to the application."},
 				))
 
-				Expect(routeRepo.UnboundRouteGuid).To(Equal("my-route-guid"))
-				Expect(routeRepo.UnboundAppGuid).To(Equal("my-app-guid"))
+				Expect(routeRepo.UnbindCallCount()).To(Equal(1))
+				unboundRouteGUID, unboundAppGUID := routeRepo.UnbindArgsForCall(0)
+				Expect(unboundRouteGUID).To(Equal("my-route-guid"))
+				Expect(unboundAppGUID).To(Equal("my-app-guid"))
 			})
 
 			Context("when the route does not exist for the app", func() {

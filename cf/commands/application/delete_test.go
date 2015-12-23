@@ -130,14 +130,15 @@ var _ = Describe("delete app command", func() {
 						It("deletes the app's routes", func() {
 							runCommand("-f", "-r", "app-to-delete")
 
-							Expect(routeRepo.DeletedRouteGuids).To(ContainElement("the-first-route-guid"))
-							Expect(routeRepo.DeletedRouteGuids).To(ContainElement("the-second-route-guid"))
+							Expect(routeRepo.DeleteCallCount()).To(Equal(2))
+							Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("the-first-route-guid"))
+							Expect(routeRepo.DeleteArgsForCall(1)).To(Equal("the-second-route-guid"))
 						})
 					})
 
 					Context("when deleting routes fails", func() {
 						BeforeEach(func() {
-							routeRepo.DeleteErr = errors.New("badness")
+							routeRepo.DeleteReturns(errors.New("an-error"))
 						})
 
 						It("fails with the api error message", func() {
@@ -154,7 +155,7 @@ var _ = Describe("delete app command", func() {
 				Context("when the -r flag is not provided", func() {
 					It("does not delete mapped routes", func() {
 						runCommand("-f", "app-to-delete")
-						Expect(routeRepo.DeletedRouteGuids).To(BeEmpty())
+						Expect(routeRepo.DeleteCallCount()).To(BeZero())
 					})
 				})
 			})
