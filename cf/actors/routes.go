@@ -24,7 +24,7 @@ func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.Do
 	case nil:
 		routeActor.ui.Say(T("Using route {{.RouteURL}}", map[string]interface{}{"RouteURL": terminal.EntityNameColor(route.URL())}))
 	case *errors.ModelNotFoundError:
-		routeActor.ui.Say(T("Creating route {{.Hostname}}...", map[string]interface{}{"Hostname": terminal.EntityNameColor(domain.UrlForHost(hostname))}))
+		routeActor.ui.Say(T("Creating route {{.Hostname}}...", map[string]interface{}{"Hostname": terminal.EntityNameColor(domain.UrlForHostAndPath(hostname, ""))}))
 
 		route, apiErr = routeActor.routeRepo.Create(hostname, domain)
 		if apiErr != nil {
