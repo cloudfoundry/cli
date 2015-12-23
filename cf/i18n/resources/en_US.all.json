@@ -685,8 +685,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]\n\nEXAMPLE:\n   CF_NAME create-route my-space example.com -n myapp -c /foo\n\t\t",
-      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]\n\nEXAMPLE:\n   CF_NAME create-route my-space example.com -n myapp -c /foo\n\t\t",
+      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                  # example.com\n   CF_NAME create-route my-space example.com -n myapp         # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp -c /foo # myapp.example.com/foo",
+      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                  # example.com\n   CF_NAME create-route my-space example.com -n myapp         # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp -c /foo # myapp.example.com/foo",
       "modified": false
    },
    {
@@ -1397,11 +1397,6 @@
    {
       "id": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
       "translation": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
-      "modified": false
-   },
-   {
-      "id": "Context path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match.",
-      "translation": "Context path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match.",
       "modified": false
    },
    {
@@ -2805,6 +2800,11 @@
       "modified": false
    },
    {
+      "id": "Hostname for the route",
+      "translation": "Hostname for the route",
+      "modified": false
+   },
+   {
       "id": "INSTALLED PLUGIN COMMANDS",
       "translation": "INSTALLED PLUGIN COMMANDS",
       "modified": false
@@ -3757,6 +3757,11 @@
    {
       "id": "Password verification does not match",
       "translation": "Password verification does not match",
+      "modified": false
+   },
+   {
+      "id": "Path for the route, prefixed with a forward slash (/)",
+      "translation": "Path for the route, prefixed with a forward slash (/)",
       "modified": false
    },
    {
