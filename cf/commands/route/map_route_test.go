@@ -86,17 +86,20 @@ var _ = Describe("map-route command", func() {
 
 		It("maps a route, obviously", func() {
 			passed := runCommand("-n", "my-host", "my-app", "my-domain.com")
+			Expect(passed).To(BeTrue())
+
+			Expect(routeRepo.BindCallCount()).To(Equal(1))
+			boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
+			Expect(boundRouteGUID).To(Equal("my-route-guid"))
+			Expect(boundAppGUID).To(Equal("my-app-guid"))
+
+			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
+			Expect(requirementsFactory.DomainName).To(Equal("my-domain.com"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Adding route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))
-
-			Expect(routeRepo.BoundRouteGuid).To(Equal("my-route-guid"))
-			Expect(routeRepo.BoundAppGuid).To(Equal("my-app-guid"))
-			Expect(passed).To(BeTrue())
-			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(requirementsFactory.DomainName).To(Equal("my-domain.com"))
 		})
 	})
 })

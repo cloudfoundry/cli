@@ -64,7 +64,7 @@ var _ = Describe("delete-route command", func() {
 				Guid: "domain-guid",
 				Name: "example.com",
 			}
-			routeRepo.FindByHostAndDomainReturns.Route = route
+			routeRepo.FindByHostAndDomainReturns(route, nil)
 		})
 
 		It("fails with usage when given zero args", func() {
@@ -93,7 +93,9 @@ var _ = Describe("delete-route command", func() {
 				[]string{"Deleting route", "my-host.example.com"},
 				[]string{"OK"},
 			))
-			Expect(routeRepo.DeletedRouteGuids).To(Equal([]string{"route-guid"}))
+
+			Expect(routeRepo.DeleteCallCount()).To(Equal(1))
+			Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("route-guid"))
 		})
 
 		It("does not prompt the user to confirm when they pass the '-f' flag", func() {
@@ -106,11 +108,12 @@ var _ = Describe("delete-route command", func() {
 				[]string{"Deleting", "my-host.example.com"},
 				[]string{"OK"},
 			))
-			Expect(routeRepo.DeletedRouteGuids).To(Equal([]string{"route-guid"}))
+			Expect(routeRepo.DeleteCallCount()).To(Equal(1))
+			Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("route-guid"))
 		})
 
 		It("succeeds with a warning when the route does not exist", func() {
-			routeRepo.FindByHostAndDomainReturns.Error = errors.NewModelNotFoundError("Org", "not found")
+			routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "not found"))
 
 			runCommand("-n", "my-host", "example.com")
 

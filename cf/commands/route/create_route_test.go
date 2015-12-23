@@ -1,6 +1,8 @@
 package route_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -90,9 +92,12 @@ var _ = Describe("create-route command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
-			Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
-			Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
+			host, path, domainGUID, spaceGUID := routeRepo.CreateInSpaceArgsForCall(0)
+			Expect(host).To(Equal("host"))
+			Expect(path).To(BeEmpty())
+			Expect(domainGUID).To(Equal("domain-guid"))
+			Expect(spaceGUID).To(Equal("my-space-guid"))
 		})
 
 		It("creates routes with a context path", func() {
@@ -103,21 +108,23 @@ var _ = Describe("create-route command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
-			Expect(routeRepo.CreateInSpacePath).To(Equal("/path"))
-			Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
-			Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
+			host, path, domainGUID, spaceGUID := routeRepo.CreateInSpaceArgsForCall(0)
+			Expect(host).To(Equal("host"))
+			Expect(path).To(Equal("/path"))
+			Expect(domainGUID).To(Equal("domain-guid"))
+			Expect(spaceGUID).To(Equal("my-space-guid"))
 		})
 
 		It("is idempotent", func() {
-			routeRepo.CreateInSpaceErr = true
-			routeRepo.FindByHostAndDomainReturns.Route = models.Route{
+			routeRepo.CreateInSpaceReturns(models.Route{}, errors.New("an-error"))
+			routeRepo.FindByHostAndDomainReturns(models.Route{
 				Space:  requirementsFactory.Space.SpaceFields,
 				Guid:   "my-route-guid",
 				Host:   "host",
 				Path:   "/path",
 				Domain: requirementsFactory.Domain,
-			}
+			}, nil)
 
 			runCommand("-n", "host", "my-space", "example.com")
 
@@ -127,9 +134,12 @@ var _ = Describe("create-route command", func() {
 				[]string{"host.example.com/path", "already exists"},
 			))
 
-			Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
-			Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
-			Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
+			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
+			host, path, domainGUID, spaceGUID := routeRepo.CreateInSpaceArgsForCall(0)
+			Expect(host).To(Equal("host"))
+			Expect(path).To(Equal(""))
+			Expect(domainGUID).To(Equal("domain-guid"))
+			Expect(spaceGUID).To(Equal("my-space-guid"))
 		})
 
 		Describe("RouteCreator interface", func() {
@@ -137,9 +147,8 @@ var _ = Describe("create-route command", func() {
 				createdRoute := models.Route{}
 				createdRoute.Host = "my-host"
 				createdRoute.Guid = "my-route-guid"
-				routeRepo = &testapi.FakeRouteRepository{
-					CreateInSpaceCreatedRoute: createdRoute,
-				}
+				routeRepo = &testapi.FakeRouteRepository{}
+				routeRepo.CreateInSpaceReturns(createdRoute, nil)
 
 				updateCommandDependency(false)
 				c := command_registry.Commands.FindCommand("create-route")
@@ -153,10 +162,12 @@ var _ = Describe("create-route command", func() {
 					[]string{"OK"},
 				))
 
-				Expect(routeRepo.CreateInSpaceHost).To(Equal("my-host"))
-				Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
-				Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
-				Expect(routeRepo.CreateInSpacePath).To(Equal("/path"))
+				Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
+				host, path, domainGUID, spaceGUID := routeRepo.CreateInSpaceArgsForCall(0)
+				Expect(host).To(Equal("my-host"))
+				Expect(path).To(Equal("/path"))
+				Expect(domainGUID).To(Equal("domain-guid"))
+				Expect(spaceGUID).To(Equal("my-space-guid"))
 			})
 		})
 	})

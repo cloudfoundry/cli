@@ -85,7 +85,7 @@ var _ = Describe("check-route command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-			routeRepo.CheckIfExistsFound = true
+			routeRepo.CheckIfExistsReturns(true, nil)
 		})
 
 		It("prints out route does exist", func() {
@@ -105,7 +105,7 @@ var _ = Describe("check-route command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-			routeRepo.CheckIfExistsFound = false
+			routeRepo.CheckIfExistsReturns(false, nil)
 		})
 
 		It("prints out route does not exist", func() {
@@ -140,7 +140,7 @@ var _ = Describe("check-route command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-			routeRepo.CheckIfExistsError = errors.New("Some stupid error")
+			routeRepo.CheckIfExistsReturns(false, errors.New("Some stupid error"))
 		})
 
 		It("prints out route does not exist", func() {

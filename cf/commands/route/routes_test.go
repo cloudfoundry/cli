@@ -1,6 +1,8 @@
 package route_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -68,23 +70,29 @@ var _ = Describe("routes command", func() {
 
 	Context("when there are routes", func() {
 		BeforeEach(func() {
-			domain := models.DomainFields{Name: "example.com"}
-			domain2 := models.DomainFields{Name: "cookieclicker.co"}
+			routeRepo.ListRoutesStub = func(cb func(models.Route) bool) error {
+				app1 := models.ApplicationFields{Name: "dora"}
 
-			app1 := models.ApplicationFields{Name: "dora"}
-			app2 := models.ApplicationFields{Name: "bora"}
+				route := models.Route{}
+				route.Host = "hostname-1"
+				route.Domain = models.DomainFields{Name: "example.com"}
+				route.Apps = []models.ApplicationFields{app1}
 
-			route := models.Route{}
-			route.Host = "hostname-1"
-			route.Domain = domain
-			route.Apps = []models.ApplicationFields{app1}
+				cb(route)
 
-			route2 := models.Route{}
-			route2.Host = "hostname-2"
-			route2.Path = "/foo"
-			route2.Domain = domain2
-			route2.Apps = []models.ApplicationFields{app1, app2}
-			routeRepo.Routes = []models.Route{route, route2}
+				domain2 := models.DomainFields{Name: "cookieclicker.co"}
+				app2 := models.ApplicationFields{Name: "bora"}
+
+				route2 := models.Route{}
+				route2.Host = "hostname-2"
+				route2.Path = "/foo"
+				route2.Domain = domain2
+				route2.Apps = []models.ApplicationFields{app1, app2}
+
+				cb(route2)
+
+				return nil
+			}
 		})
 
 		It("lists routes", func() {
@@ -101,28 +109,34 @@ var _ = Describe("routes command", func() {
 
 	Context("when there are routes in different spaces", func() {
 		BeforeEach(func() {
-			space1 := models.SpaceFields{Name: "space-1"}
-			space2 := models.SpaceFields{Name: "space-2"}
+			routeRepo.ListAllRoutesStub = func(cb func(models.Route) bool) error {
+				space1 := models.SpaceFields{Name: "space-1"}
+				space2 := models.SpaceFields{Name: "space-2"}
 
-			domain := models.DomainFields{Name: "example.com"}
-			domain2 := models.DomainFields{Name: "cookieclicker.co"}
+				domain := models.DomainFields{Name: "example.com"}
+				domain2 := models.DomainFields{Name: "cookieclicker.co"}
 
-			app1 := models.ApplicationFields{Name: "dora"}
-			app2 := models.ApplicationFields{Name: "bora"}
+				app1 := models.ApplicationFields{Name: "dora"}
+				app2 := models.ApplicationFields{Name: "bora"}
 
-			route := models.Route{}
-			route.Host = "hostname-1"
-			route.Domain = domain
-			route.Apps = []models.ApplicationFields{app1}
-			route.Space = space1
+				route := models.Route{}
+				route.Host = "hostname-1"
+				route.Domain = domain
+				route.Apps = []models.ApplicationFields{app1}
+				route.Space = space1
 
-			route2 := models.Route{}
-			route2.Host = "hostname-2"
-			route2.Path = "/foo"
-			route2.Domain = domain2
-			route2.Apps = []models.ApplicationFields{app1, app2}
-			route2.Space = space2
-			routeRepo.Routes = []models.Route{route, route2}
+				route2 := models.Route{}
+				route2.Host = "hostname-2"
+				route2.Path = "/foo"
+				route2.Domain = domain2
+				route2.Apps = []models.ApplicationFields{app1, app2}
+				route2.Space = space2
+
+				cb(route)
+				cb(route2)
+
+				return nil
+			}
 		})
 
 		It("lists routes at orglevel", func() {
@@ -135,8 +149,8 @@ var _ = Describe("routes command", func() {
 				[]string{"space-2", "hostname-2", "cookieclicker.co", "/foo", "dora", "bora"},
 			))
 		})
-
 	})
+
 	Context("when there are not routes", func() {
 		It("tells the user when no routes were found", func() {
 			runCommand()
@@ -150,7 +164,7 @@ var _ = Describe("routes command", func() {
 
 	Context("when there is an error listing routes", func() {
 		BeforeEach(func() {
-			routeRepo.ListErr = true
+			routeRepo.ListRoutesReturns(errors.New("an-error"))
 		})
 
 		It("returns an error to the user", func() {
