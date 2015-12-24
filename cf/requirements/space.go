@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
+//go:generate counterfeiter -o fakes/fake_space_requirement.go . SpaceRequirement
 type SpaceRequirement interface {
 	Requirement
 	SetSpaceName(string)
