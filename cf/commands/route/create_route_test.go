@@ -3,171 +3,306 @@ package route_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	"github.com/simonleung8/flags"
+
+	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	. "github.com/cloudfoundry/cli/cf/commands/route"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("create-route command", func() {
+var _ = Describe("CreateRoute", func() {
 	var (
-		ui                  *testterm.FakeUI
-		routeRepo           *testapi.FakeRouteRepository
-		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
-		deps                command_registry.Dependency
-	)
+		ui         *testterm.FakeUI
+		routeRepo  *fakeapi.FakeRouteRepository
+		configRepo core_config.Repository
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
-		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-route").SetDependency(deps, pluginCall))
-	}
+		cmd         route.CreateRoute
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		spaceRequirement  *fakerequirements.FakeSpaceRequirement
+		domainRequirement *fakerequirements.FakeDomainRequirement
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		routeRepo = &testapi.FakeRouteRepository{}
-		requirementsFactory = &testreq.FakeReqFactory{}
-		config = testconfig.NewRepositoryWithDefaults()
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		routeRepo = &fakeapi.FakeRouteRepository{}
+		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
+
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = route.CreateRoute{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		factory = &fakerequirements.FakeFactory{}
+
+		spaceRequirement = &fakerequirements.FakeSpaceRequirement{}
+		space := models.Space{}
+		space.Guid = "space-guid"
+		space.Name = "space-name"
+		spaceRequirement.GetSpaceReturns(space)
+		factory.NewSpaceRequirementReturns(spaceRequirement)
+
+		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		domainRequirement.GetDomainReturns(models.DomainFields{
+			Guid: "domain-guid",
+			Name: "domain-name",
+		})
+		factory.NewDomainRequirementReturns(domainRequirement)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-route", args, requirementsFactory, updateCommandDependency, false)
-	}
+	Describe("Requirements", func() {
+		Context("when not provided exactly two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("space-name")
+			})
 
-	Describe("requirements", func() {
-		It("fails when not logged in", func() {
-			requirementsFactory.TargetedOrgSuccess = true
-
-			Expect(runCommand("my-space", "example.com", "-n", "foo")).To(BeFalse())
-		})
-
-		It("fails when an org is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-
-			Expect(runCommand("my-space", "example.com", "-n", "foo")).To(BeFalse())
-		})
-
-		It("fails with usage when not provided two args", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
-
-			runCommand("my-space")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "arguments"},
-				[]string{"create-route SPACE DOMAIN [-n HOSTNAME] [--path PATH]"},
-			))
-		})
-	})
-
-	Context("when logged in, targeted a space and given a domain that exists", func() {
-		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.Domain = models.DomainFields{
-				Guid: "domain-guid",
-				Name: "example.com",
-			}
-			requirementsFactory.Space = models.Space{SpaceFields: models.SpaceFields{
-				Guid: "my-space-guid",
-				Name: "my-space",
-			}}
-		})
-
-		It("creates routes, obviously", func() {
-			runCommand("-n", "host", "my-space", "example.com")
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
-				[]string{"OK"},
-			))
-
-			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-			host, path, domainGUID, spaceGUID := routeRepo.CreateInSpaceArgsForCall(0)
-			Expect(host).To(Equal("host"))
-			Expect(path).To(BeEmpty())
-			Expect(domainGUID).To(Equal("domain-guid"))
-			Expect(spaceGUID).To(Equal("my-space-guid"))
-		})
-
-		It("creates routes with a context path", func() {
-			runCommand("-n", "host", "--path", "path", "my-space", "example.com")
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating route", "host.example.com/path", "my-org", "my-space", "my-user"},
-				[]string{"OK"},
-			))
-
-			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-			host, path, domainGUID, spaceGUID := routeRepo.CreateInSpaceArgsForCall(0)
-			Expect(host).To(Equal("host"))
-			Expect(path).To(Equal("/path"))
-			Expect(domainGUID).To(Equal("domain-guid"))
-			Expect(spaceGUID).To(Equal("my-space-guid"))
-		})
-
-		It("is idempotent", func() {
-			routeRepo.CreateInSpaceReturns(models.Route{}, errors.New("an-error"))
-			routeRepo.FindByHostAndDomainReturns(models.Route{
-				Space:  requirementsFactory.Space.SpaceFields,
-				Guid:   "my-route-guid",
-				Host:   "host",
-				Path:   "/path",
-				Domain: requirementsFactory.Domain,
-			}, nil)
-
-			runCommand("-n", "host", "my-space", "example.com")
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating route"},
-				[]string{"OK"},
-				[]string{"host.example.com/path", "already exists"},
-			))
-
-			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-			host, path, domainGUID, spaceGUID := routeRepo.CreateInSpaceArgsForCall(0)
-			Expect(host).To(Equal("host"))
-			Expect(path).To(Equal(""))
-			Expect(domainGUID).To(Equal("domain-guid"))
-			Expect(spaceGUID).To(Equal("my-space-guid"))
-		})
-
-		Describe("RouteCreator interface", func() {
-			It("creates a route", func() {
-				createdRoute := models.Route{}
-				createdRoute.Host = "my-host"
-				createdRoute.Guid = "my-route-guid"
-				routeRepo = &testapi.FakeRouteRepository{}
-				routeRepo.CreateInSpaceReturns(createdRoute, nil)
-
-				updateCommandDependency(false)
-				c := command_registry.Commands.FindCommand("create-route")
-				cmd := c.(RouteCreator)
-				route, apiErr := cmd.CreateRoute("my-host", "/path", requirementsFactory.Domain, requirementsFactory.Space.SpaceFields)
-
-				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(route.Guid).To(Equal(createdRoute.Guid))
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Creating route", "my-host.example.com/path", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
+					[]string{"Incorrect Usage. Requires SPACE and DOMAIN as arguments"},
+					[]string{"NAME"},
+					[]string{"USAGE"},
 				))
+			})
+		})
 
-				Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-				host, path, domainGUID, spaceGUID := routeRepo.CreateInSpaceArgsForCall(0)
-				Expect(host).To(Equal("my-host"))
-				Expect(path).To(Equal("/path"))
-				Expect(domainGUID).To(Equal("domain-guid"))
-				Expect(spaceGUID).To(Equal("my-space-guid"))
+		Context("when provided exactly two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("space-name", "domain-name")
+			})
+
+			It("returns a SpaceRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewSpaceRequirementCallCount()).To(Equal(1))
+				Expect(factory.NewSpaceRequirementArgsForCall(0)).To(Equal("space-name"))
+
+				Expect(actualRequirements).To(ContainElement(spaceRequirement))
+			})
+
+			It("returns a DomainRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
+				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
+
+				Expect(actualRequirements).To(ContainElement(domainRequirement))
+			})
+		})
+	})
+
+	Describe("Execute", func() {
+		BeforeEach(func() {
+			err := flagContext.Parse("space-name", "domain-name", "-n", "hostname", "--path", "path")
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("attempts to create a route in the space", func() {
+			cmd.Execute(flagContext)
+
+			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
+			hostname, path, domain, space := routeRepo.CreateInSpaceArgsForCall(0)
+			Expect(hostname).To(Equal("hostname"))
+			Expect(path).To(Equal("/path"))
+			Expect(domain).To(Equal("domain-guid"))
+			Expect(space).To(Equal("space-guid"))
+		})
+
+		It("does not add an extra forward slash when the path contains a prefixed forward slash", func() {
+			cmd.Execute(flagContext)
+
+			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
+			_, path, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
+			Expect(path).To(Equal("/path"))
+		})
+
+		Context("when creating the route fails", func() {
+			BeforeEach(func() {
+				routeRepo.CreateInSpaceReturns(models.Route{}, errors.New("create-error"))
+			})
+
+			It("attempts to find the route", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
+			})
+
+			Context("when finding the route fails", func() {
+				BeforeEach(func() {
+					routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.New("find-error"))
+				})
+
+				It("fails with the original error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}, []string{"create-error"}))
+				})
+			})
+
+			Context("when a route with the same space guid, but different domain guid is found", func() {
+				It("fails with the original error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}, []string{"create-error"}))
+				})
+			})
+
+			Context("when a route with the same domain guid, but different space guid is found", func() {
+				It("fails with the original error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}, []string{"create-error"}))
+				})
+			})
+
+			Context("when a route with the same domain and space guid is found", func() {
+				BeforeEach(func() {
+					routeRepo.FindByHostAndDomainReturns(models.Route{
+						Host: "hostname",
+						Path: "path",
+						Domain: models.DomainFields{
+							Guid: "domain-guid",
+							Name: "domain-name",
+						},
+						Space: models.SpaceFields{
+							Guid: "space-guid",
+						},
+					}, nil)
+				})
+
+				It("prints a message", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"OK"},
+						[]string{"Route hostname.domain-name/path already exists"},
+					))
+				})
+			})
+		})
+	})
+
+	Describe("CreateRoute", func() {
+		var domainFields models.DomainFields
+		var spaceFields models.SpaceFields
+
+		BeforeEach(func() {
+			domainFields = models.DomainFields{
+				Guid: "domain-guid",
+				Name: "domain-name",
+			}
+			spaceFields = models.SpaceFields{
+				Guid: "space-guid",
+				Name: "space-name",
+			}
+		})
+
+		It("attempts to create a route in the space", func() {
+			cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
+
+			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
+			hostname, path, domain, space := routeRepo.CreateInSpaceArgsForCall(0)
+			Expect(hostname).To(Equal("hostname"))
+			Expect(path).To(Equal("/path"))
+			Expect(domain).To(Equal(domainFields.Guid))
+			Expect(space).To(Equal(spaceFields.Guid))
+		})
+
+		It("does not add an extra forward slash when the path contains a prefixed forward slash", func() {
+			cmd.CreateRoute("hostname", "/path", domainFields, spaceFields)
+
+			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
+			_, path, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
+			Expect(path).To(Equal("/path"))
+		})
+
+		Context("when creating the route fails", func() {
+			BeforeEach(func() {
+				routeRepo.CreateInSpaceReturns(models.Route{}, errors.New("create-error"))
+			})
+
+			It("attempts to find the route", func() {
+				cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
+				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
+			})
+
+			Context("when finding the route fails", func() {
+				BeforeEach(func() {
+					routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.New("find-error"))
+				})
+
+				It("returns the original error", func() {
+					_, err := cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("create-error"))
+				})
+			})
+
+			Context("when a route with the same space guid, but different domain guid is found", func() {
+				It("returns the original error", func() {
+					_, err := cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("create-error"))
+				})
+			})
+
+			Context("when a route with the same domain guid, but different space guid is found", func() {
+				It("returns the original error", func() {
+					_, err := cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("create-error"))
+				})
+			})
+
+			Context("when a route with the same domain and space guid is found", func() {
+				BeforeEach(func() {
+					routeRepo.FindByHostAndDomainReturns(models.Route{
+						Host: "hostname",
+						Path: "path",
+						Domain: models.DomainFields{
+							Guid: "domain-guid",
+							Name: "domain-name",
+						},
+						Space: models.SpaceFields{
+							Guid: "space-guid",
+						},
+					}, nil)
+				})
+
+				It("prints a message that it already exists", func() {
+					cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"OK"},
+						[]string{"Route hostname.domain-name/path already exists"}))
+				})
+			})
+		})
+
+		Context("when creating the route succeeds", func() {
+			BeforeEach(func() {
+				routeRepo.CreateInSpaceReturns(models.Route{}, nil)
+			})
+
+			It("prints a success message", func() {
+				cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 			})
 		})
 	})

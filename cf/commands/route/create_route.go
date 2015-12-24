@@ -80,10 +80,6 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	domain := cmd.domainReq.GetDomain()
 	path := c.String("path")
 
-	if path != "" && !strings.HasPrefix(path, `/`) {
-		path = `/` + path
-	}
-
 	_, apiErr := cmd.CreateRoute(hostName, path, domain, space.SpaceFields)
 
 	if apiErr != nil {
@@ -93,6 +89,10 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 }
 
 func (cmd *CreateRoute) CreateRoute(hostName string, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
+	if path != "" && !strings.HasPrefix(path, `/`) {
+		path = `/` + path
+	}
+
 	cmd.ui.Say(T("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"URL":       terminal.EntityNameColor(domain.UrlForHostAndPath(hostName, path)),
