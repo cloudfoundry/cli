@@ -3,6 +3,7 @@ package route
 import (
 	"strings"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -48,7 +49,7 @@ EXAMPLES:
 	}
 }
 
-func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("create-route"))
 	}
@@ -58,13 +59,23 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 		cmd.domainReq,
 	}
-	return
+
+	if fc.String("path") != "" {
+		minRequiredAPIVersion, err := semver.Make("2.36.0")
+		if err != nil {
+			panic(err.Error())
+		}
+
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("create-route", minRequiredAPIVersion))
+	}
+
+	return reqs, nil
 }
 
 func (cmd *CreateRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
