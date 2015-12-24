@@ -3,6 +3,7 @@ package route_test
 import (
 	"errors"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -10,6 +11,7 @@ import (
 	"github.com/simonleung8/flags"
 
 	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/requirements"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,6 +22,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+type passingRequirement struct{}
+
+func (r passingRequirement) Execute() bool {
+	return true
+}
 
 var _ = Describe("CreateRoute", func() {
 	var (
@@ -32,8 +40,9 @@ var _ = Describe("CreateRoute", func() {
 		factory     *fakerequirements.FakeFactory
 		flagContext flags.FlagContext
 
-		spaceRequirement  *fakerequirements.FakeSpaceRequirement
-		domainRequirement *fakerequirements.FakeDomainRequirement
+		spaceRequirement         *fakerequirements.FakeSpaceRequirement
+		domainRequirement        *fakerequirements.FakeDomainRequirement
+		minAPIVersionRequirement requirements.Requirement
 	)
 
 	BeforeEach(func() {
@@ -68,6 +77,9 @@ var _ = Describe("CreateRoute", func() {
 			Name: "domain-name",
 		})
 		factory.NewDomainRequirementReturns(domainRequirement)
+
+		minAPIVersionRequirement = &passingRequirement{}
+		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
 	Describe("Requirements", func() {
@@ -107,6 +119,38 @@ var _ = Describe("CreateRoute", func() {
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
 
 				Expect(actualRequirements).To(ContainElement(domainRequirement))
+			})
+		})
+
+		Context("when the --path option is given", func() {
+			BeforeEach(func() {
+				flagContext.Parse("space-name", "domain-name", "--path", "path")
+			})
+
+			It("returns a MinAPIVersionRequirement", func() {
+				expectedVersion, err := semver.Make("2.36.0")
+				Expect(err).NotTo(HaveOccurred())
+
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+				commandName, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+				Expect(commandName).To(Equal("create-route"))
+				Expect(requiredVersion).To(Equal(expectedVersion))
+				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
+			})
+		})
+
+		Context("when the --path option is not given", func() {
+			BeforeEach(func() {
+				flagContext.Parse("space-name", "domain-name")
+			})
+
+			It("does not return a MinAPIVersionRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 			})
 		})
 	})
