@@ -88,7 +88,7 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
+func (cmd *CreateRoute) CreateRoute(hostName string, path string, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {
 	if path != "" && !strings.HasPrefix(path, `/`) {
 		path = `/` + path
 	}
@@ -100,24 +100,26 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, domain models.
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	route, apiErr = cmd.routeRepo.CreateInSpace(hostName, path, domain.Guid, space.Guid)
-	if apiErr != nil {
-		var findApiResponse error
-		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain)
-
-		if findApiResponse != nil ||
-			route.Space.Guid != space.Guid ||
-			route.Domain.Guid != domain.Guid {
-			return
+	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.Guid, space.Guid)
+	if err != nil {
+		var findErr error
+		route, findErr = cmd.routeRepo.FindByHostAndDomain(hostName, domain)
+		if findErr != nil {
+			return models.Route{}, err
 		}
 
-		apiErr = nil
+		if route.Space.Guid != space.Guid || route.Domain.Guid != domain.Guid {
+			return models.Route{}, err
+		}
+
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Route {{.URL}} already exists",
 			map[string]interface{}{"URL": route.URL()}))
-		return
+
+		return route, nil
 	}
 
 	cmd.ui.Ok()
-	return
+
+	return route, nil
 }
