@@ -24,8 +24,6 @@ var deps = command_registry.NewDependency()
 var cmdRegistry = command_registry.Commands
 
 func main() {
-	commands_loader.Load()
-
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
 
@@ -58,6 +56,8 @@ func main() {
 		os.Args[2] = os.Args[1]
 		os.Args[1] = "help"
 	}
+
+	commands_loader.Load()
 
 	//run core command
 	cmdName := os.Args[1]
