@@ -2,6 +2,8 @@
 
 set +e
 
+export PATH=$PATH:$GOPATH/bin
+
 go get github.com/maximilien/i18n4go/i18n4go
 OUTPUT=$?
 if [ $OUTPUT -ne 0 ]; then
