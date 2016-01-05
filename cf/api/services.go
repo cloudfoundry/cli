@@ -243,24 +243,20 @@ func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDe
 	path := fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s",
 		url.QueryEscape("label:"+planDescription.ServiceLabel+";provider:"+planDescription.ServiceProvider))
 
-	var planGuid string
-	offerings, apiErr := repo.getServiceOfferings(path)
-	if apiErr != nil {
-		return planGuid, apiErr
+	offerings, err := repo.getServiceOfferings(path)
+	if err != nil {
+		return "", err
 	}
 
 	for _, serviceOfferingResource := range offerings {
 		for _, servicePlanResource := range serviceOfferingResource.Plans {
 			if servicePlanResource.Name == planDescription.ServicePlanName {
-				planGuid := servicePlanResource.Guid
-				return planGuid, apiErr
+				return servicePlanResource.Guid, nil
 			}
 		}
 	}
 
-	apiErr = errors.NewModelNotFoundError("Plan", planDescription.String())
-
-	return planGuid, apiErr
+	return "", errors.NewModelNotFoundError("Plan", planDescription.String())
 }
 
 func (repo CloudControllerServiceRepository) ListServicesFromManyBrokers(brokerGuids []string) ([]models.ServiceOffering, error) {
