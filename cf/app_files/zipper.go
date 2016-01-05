@@ -75,7 +75,7 @@ func (zipper ApplicationZipper) Unzip(name string, destDir string) error {
 	if err == nil {
 		defer rc.Close()
 		for _, f := range rc.File {
-			err := zipper.extractFile(f, destDir)
+			err = zipper.extractFile(f, destDir)
 			if err != nil {
 				return err
 			}
