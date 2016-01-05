@@ -685,7 +685,7 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                     # example.com\n   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo",
+      "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                     # example.com\n   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo",
       "translation": "CF_NAME create-route ESPAÇO DOMÍNIO [-n HOSTNAME]",
       "modified": true
    },

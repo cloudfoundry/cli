@@ -33,13 +33,13 @@ func init() {
 
 func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname for the route")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route")}
 	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path for the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-route",
 		Description: T("Create a url route in a space for later use"),
-		Usage: T(`CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [--path PATH]
+		Usage: T(`CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]
 
 EXAMPLES:
    CF_NAME create-route my-space example.com                     # example.com
