@@ -26,12 +26,12 @@ func init() {
 
 func (cmd *MapRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname")}
 
 	return command_registry.CommandMetadata{
 		Name:        "map-route",
 		Description: T("Add a url route to an app"),
-		Usage:       T("CF_NAME map-route APP_NAME DOMAIN [-n HOSTNAME]"),
+		Usage:       T("CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME]"),
 		Flags:       fs,
 	}
 }

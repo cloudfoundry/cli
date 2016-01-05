@@ -26,12 +26,12 @@ func init() {
 func (cmd *DeleteRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
-	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname")}
 
 	return command_registry.CommandMetadata{
 		Name:        "delete-route",
 		Description: T("Delete a route"),
-		Usage:       T("CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]"),
+		Usage:       T("CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [-f]"),
 		Flags:       fs,
 	}
 }
