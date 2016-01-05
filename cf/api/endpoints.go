@@ -38,30 +38,33 @@ func NewEndpointRepository(config core_config.ReadWriter, gateway net.Gateway) E
 }
 
 func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (string, error) {
-	var err error
-	defer func() {
+	if strings.HasPrefix(endpoint, "http") {
+		err := repo.attemptUpdate(endpoint)
 		if err != nil {
 			repo.config.SetApiEndpoint("")
-		}
-	}()
-
-	if !strings.HasPrefix(endpoint, "http") {
-		finalEndpoint := "https://" + endpoint
-		err = repo.attemptUpdate(finalEndpoint)
-
-		if err != nil {
-			if _, ok := err.(*errors.InvalidSSLCert); ok {
-				return endpoint, err
-			}
-			finalEndpoint = "http://" + endpoint
-			err = repo.attemptUpdate(finalEndpoint)
+			return "", err
 		}
 
-		return finalEndpoint, err
+		return endpoint, nil
 	}
 
-	err = repo.attemptUpdate(endpoint)
-	return endpoint, err
+	finalEndpoint := "https://" + endpoint
+	err := repo.attemptUpdate(finalEndpoint)
+	if err != nil {
+		if _, ok := err.(*errors.InvalidSSLCert); ok {
+			repo.config.SetApiEndpoint("")
+			return "", err
+		}
+
+		finalEndpoint = "http://" + endpoint
+		err = repo.attemptUpdate(finalEndpoint)
+		if err != nil {
+			repo.config.SetApiEndpoint("")
+			return "", err
+		}
+	}
+
+	return finalEndpoint, err
 }
 
 func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) error {
