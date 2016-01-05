@@ -190,9 +190,9 @@
       "modified": false
    },
    {
-      "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n",
-      "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
-      "modified": true
+      "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n",
+      "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n",
+      "modified": false
    },
    {
       "id": " added as '",
@@ -775,8 +775,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]",
-      "translation": "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]",
+      "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [-f]",
+      "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [-f]",
       "modified": false
    },
    {
@@ -910,8 +910,8 @@
       "modified": true
    },
    {
-      "id": "CF_NAME map-route APP_NAME DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME map-route APP DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME]",
+      "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
       "modified": true
    },
    {
@@ -1200,9 +1200,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME unmap-route APP_NAME DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME unmap-route APP DOMAIN [-n HOSTNAME]",
-      "modified": true
+      "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]",
+      "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]",
+      "modified": false
    },
    {
       "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",

@@ -25,12 +25,12 @@ func init() {
 
 func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname")}
 
 	return command_registry.CommandMetadata{
 		Name:        "unmap-route",
 		Description: T("Remove a url route from an app"),
-		Usage:       T("CF_NAME unmap-route APP_NAME DOMAIN [-n HOSTNAME]"),
+		Usage:       T("CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]"),
 		Flags:       fs,
 	}
 }

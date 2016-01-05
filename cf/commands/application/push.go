@@ -62,7 +62,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 	fs["i"] = &cliFlags.IntFlag{Name: "i", Usage: T("Number of instances")}
 	fs["k"] = &cliFlags.StringFlag{Name: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
 	fs["m"] = &cliFlags.StringFlag{Name: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
-	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname (e.g. my-subdomain)")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname (e.g. my-subdomain)")}
 	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Path to app directory or to a zip file of the contents of the app directory")}
 	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
 	fs["t"] = &cliFlags.StringFlag{Name: "t", Usage: T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")}
@@ -78,7 +78,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 		Name:        "push",
 		ShortName:   "p",
 		Description: T("Push a new app or sync changes to an existing app"),
-		Usage: T("Push a single app (with or without a manifest):\n") + T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n") + T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n") +
+		Usage: T("Push a single app (with or without a manifest):\n") + T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n") + T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n") +
 			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n" +
 			"\n" + T("   Push multiple apps with a manifest:\n") + T("   CF_NAME push [-f MANIFEST_PATH]\n"),
 		Flags: fs,
