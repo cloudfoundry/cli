@@ -2870,8 +2870,8 @@
       "modified": false
    },
    {
-      "id": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
-      "translation": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
+      "id": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
       "modified": false
    },
    {

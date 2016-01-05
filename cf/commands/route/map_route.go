@@ -38,7 +38,7 @@ func (cmd *MapRoute) MetaData() command_registry.CommandMetadata {
 
 func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("map-route"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("map-route"))
 	}
 
 	domainName := fc.Args()[1]
