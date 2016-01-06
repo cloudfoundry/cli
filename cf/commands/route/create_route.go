@@ -68,12 +68,12 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 	}
 
 	if fc.String("path") != "" {
-		minRequiredAPIVersion, err := semver.Make("2.36.0")
+		requiredVersion, err := semver.Make("2.36.0")
 		if err != nil {
 			panic(err.Error())
 		}
 
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", minRequiredAPIVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
 	}
 
 	return reqs, nil
