@@ -67,17 +67,17 @@ Finally, it is also important not to translate the argument names in templated s
 
 Our goal is to have translations for the following languages first:
 
-| Language              | Locale | Status                  |
-|-----------------------|--------|-------------------------|
-| English               | en_US  | Complete                |
-| French                | fr_FR  | Complete                |
-| Spanish               | es_ES  | Complete                |
-| German                | de_DE  | English files ready(*)  |
-| Italian               | it_IT  | English files ready     |
-| Japanese              | ja_JA  | English files ready     |
-| Portuguese (Brazil)   | pt_BR  | Complete                |
-| Chinese (simplified)  | zh_Hans  | Complete                |
-| Chinese (traditional) | zh_Hant  | English files ready     |
+| Language              | Locale | Status     |
+|-----------------------|--------|------------|
+| English               | en_US  | Complete   |
+| French                | fr_FR  | Complete   |
+| Spanish               | es_ES  | Complete   |
+| German                | de_DE  | Complete   |
+| Italian               | it_IT  | Complete   |
+| Japanese              | ja_JA  | Complete   |
+| Portuguese (Brazil)   | pt_BR  | Complete   |
+| Chinese (simplified)  | zh_Hans  | Complete   |
+| Chinese (traditional) | zh_Hant  | Complete   |
 
 If you are interested in submitting translations for another language/locale, then please communicate with us via VCAP-DEV mailing list first.
 
