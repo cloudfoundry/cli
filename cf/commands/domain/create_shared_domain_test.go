@@ -64,7 +64,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestShareDomain", func() {
 		runCommand("example.com")
 
-		Expect(domainRepo.CreateSharedDomainName).To(Equal("example.com"))
+		Expect(domainRepo.CreateSharedDomainArgsForCall(0)).To(Equal("example.com"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating shared domain", "example.com", "my-user"},
 			[]string{"OK"},

@@ -102,7 +102,28 @@ var _ = Describe("Push Command", func() {
 
 		domainRepo = &testapi.FakeDomainRepository{}
 		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
-		domainRepo.ListDomainsForOrgDomains = []models.DomainFields{sharedDomain}
+		domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+			cb(sharedDomain)
+			return nil
+		}
+
+		domainRepo.FirstOrDefaultStub = func(orgGuid string, name *string) (models.DomainFields, error) {
+			if name == nil {
+				var foundDomain *models.DomainFields
+				domainRepo.ListDomainsForOrg(orgGuid, func(domain models.DomainFields) bool {
+					foundDomain = &domain
+					return !domain.Shared
+				})
+
+				if foundDomain == nil {
+					return models.DomainFields{}, errors.New("Could not find a default domain")
+				}
+
+				return *foundDomain, nil
+			}
+
+			return domainRepo.FindByNameInOrg(*name, orgGuid)
+		}
 
 		//save original command dependences and restore later
 		OriginalCommandStart = command_registry.Commands.FindCommand("start")
@@ -121,6 +142,7 @@ var _ = Describe("Push Command", func() {
 
 			return route, nil
 		}
+
 		stackRepo = &testStacks.FakeStackRepository{}
 		serviceRepo = &testapi.FakeServiceRepository{}
 		authRepo = &testapi.FakeAuthenticationRepository{}
@@ -202,7 +224,7 @@ var _ = Describe("Push Command", func() {
 				route := models.Route{}
 				route.Guid = "my-route-guid"
 				route.Host = "app-name"
-				route.Domain = domainRepo.ListDomainsForOrgDomains[0]
+				route.Domain = maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
 
 				routeRepo.FindByHostAndDomainReturns(route, nil)
 			})
@@ -270,9 +292,11 @@ var _ = Describe("Push Command", func() {
 
 			Context("when multiple domains are specified in manifest", func() {
 				BeforeEach(func() {
-					domainRepo.FindByNameInOrgDomain = []models.DomainFields{
-						models.DomainFields{Name: "example1.com", Guid: "example-domain-guid"},
-						models.DomainFields{Name: "example2.com", Guid: "example-domain-guid"},
+					domainRepo.FindByNameInOrgStub = func(name string, owningOrgGuid string) (models.DomainFields, error) {
+						return map[string]models.DomainFields{
+							"example1.com": {Name: "example1.com", Guid: "example-domain-guid"},
+							"example2.com": {Name: "example2.com", Guid: "example-domain-guid"},
+						}[name], nil
 					}
 
 					manifestRepo.ReadManifestReturns.Manifest = multipleDomainsManifest()
@@ -389,12 +413,10 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("sets the app params from the flags", func() {
-				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
-					models.DomainFields{
-						Name: "bar.cf-app.com",
-						Guid: "bar-domain-guid",
-					},
-				}
+				domainRepo.FindByNameInOrgReturns(models.DomainFields{
+					Name: "bar.cf-app.com",
+					Guid: "bar-domain-guid",
+				}, nil)
 				stackRepo.FindByNameReturns(models.Stack{
 					Name: "customLinux",
 					Guid: "custom-linux-guid",
@@ -440,8 +462,9 @@ var _ = Describe("Push Command", func() {
 				Expect(*params.HealthCheckType).To(Equal("port"))
 				Expect(*params.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
 
-				Expect(domainRepo.FindByNameInOrgName).To(Equal("bar.cf-app.com"))
-				Expect(domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
+				name, owningOrgGuid := domainRepo.FindByNameInOrgArgsForCall(0)
+				Expect(name).To(Equal("bar.cf-app.com"))
+				Expect(owningOrgGuid).To(Equal("my-org-guid"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, createdDomainFields, createdPath := routeRepo.CreateArgsForCall(0)
@@ -513,7 +536,11 @@ var _ = Describe("Push Command", func() {
 						Guid:   "shared-domain-guid",
 					}
 
-					domainRepo.ListDomainsForOrgDomains = []models.DomainFields{privateDomain, sharedDomain}
+					domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+						cb(privateDomain)
+						cb(sharedDomain)
+						return nil
+					}
 
 					callPush("-t", "111", "app-name")
 
@@ -553,7 +580,11 @@ var _ = Describe("Push Command", func() {
 						Guid:   "private-domain-guid",
 					}
 
-					domainRepo.ListDomainsForOrgDomains = []models.DomainFields{privateDomain}
+					domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+						cb(privateDomain)
+						return nil
+					}
+
 					appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("App", "the-app"))
 
 					callPush("-t", "111", "app-name")
@@ -717,12 +748,10 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("pushes an app when provided a manifest with one app defined", func() {
-				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
-					models.DomainFields{
-						Name: "manifest-example.com",
-						Guid: "bar-domain-guid",
-					},
-				}
+				domainRepo.FindByNameInOrgReturns(models.DomainFields{
+					Name: "manifest-example.com",
+					Guid: "bar-domain-guid",
+				}, nil)
 
 				manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
@@ -751,12 +780,10 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("pushes an app with multiple routes when multiple hosts are provided", func() {
-				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
-					models.DomainFields{
-						Name: "manifest-example.com",
-						Guid: "bar-domain-guid",
-					},
-				}
+				domainRepo.FindByNameInOrgReturns(models.DomainFields{
+					Name: "manifest-example.com",
+					Guid: "bar-domain-guid",
+				}, nil)
 
 				manifestRepo.ReadManifestReturns.Manifest = multipleHostManifest()
 
@@ -787,12 +814,10 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("does not create a route when provided the --no-route flag", func() {
-				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
-					models.DomainFields{
-						Name: "bar.cf-app.com",
-						Guid: "bar-domain-guid",
-					},
-				}
+				domainRepo.FindByNameInOrgReturns(models.DomainFields{
+					Name: "bar.cf-app.com",
+					Guid: "bar-domain-guid",
+				}, nil)
 
 				callPush("--no-route", "app-name")
 
@@ -802,11 +827,15 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("maps the root domain route to the app when given the --no-hostname flag", func() {
-				domainRepo.ListDomainsForOrgDomains = []models.DomainFields{{
-					Name:   "bar.cf-app.com",
-					Guid:   "bar-domain-guid",
-					Shared: true,
-				}}
+				domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+					cb(models.DomainFields{
+						Name:   "bar.cf-app.com",
+						Guid:   "bar-domain-guid",
+						Shared: true,
+					})
+
+					return nil
+				}
 
 				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "uh oh"))
 
@@ -1014,7 +1043,10 @@ var _ = Describe("Push Command", func() {
 					Shared: true,
 				}
 
-				domainRepo.ListDomainsForOrgDomains = []models.DomainFields{domain}
+				domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+					cb(domain)
+					return nil
+				}
 				routeRepo.FindByHostAndDomainReturns(models.Route{
 					Host:   "existing-app",
 					Domain: domain,
@@ -1045,7 +1077,7 @@ var _ = Describe("Push Command", func() {
 
 						appGuid, _, _ := actor.UploadAppArgsForCall(0)
 						Expect(appGuid).To(Equal("existing-app-guid"))
-						Expect(domainRepo.FindByNameInOrgName).To(Equal(""))
+						Expect(domainRepo.FindByNameInOrgCallCount()).To(BeZero())
 						Expect(routeRepo.FindByHostAndDomainCallCount()).To(BeZero())
 						Expect(routeRepo.CreateCallCount()).To(BeZero())
 					})
@@ -1054,12 +1086,8 @@ var _ = Describe("Push Command", func() {
 				Context("and there is a route in the manifest", func() {
 					BeforeEach(func() {
 						manifestRepo.ReadManifestReturns.Manifest = existingAppManifest()
-
 						routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "an-error"))
-
-						domainRepo.FindByNameInOrgDomain = []models.DomainFields{
-							models.DomainFields{Name: "example.com", Guid: "example-domain-guid"},
-						}
+						domainRepo.FindByNameInOrgReturns(models.DomainFields{Name: "example.com", Guid: "example-domain-guid"}, nil)
 					})
 
 					It("adds the route", func() {
@@ -1073,14 +1101,12 @@ var _ = Describe("Push Command", func() {
 
 			It("creates and binds a route when a different domain is specified", func() {
 				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.newdomain.com"))
-				domainRepo.FindByNameInOrgDomain = []models.DomainFields{
-					models.DomainFields{Guid: "domain-guid", Name: "newdomain.com"},
-				}
+				domainRepo.FindByNameInOrgReturns(models.DomainFields{Guid: "domain-guid", Name: "newdomain.com"}, nil)
 
 				callPush("-d", "newdomain.com", "existing-app")
-
-				Expect(domainRepo.FindByNameInOrgName).To(Equal("newdomain.com"))
-				Expect(domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
+				domainName, domainOrgGuid := domainRepo.FindByNameInOrgArgsForCall(0)
+				Expect(domainName).To(Equal("newdomain.com"))
+				Expect(domainOrgGuid).To(Equal("my-org-guid"))
 
 				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
 				host, domain := routeRepo.FindByHostAndDomainArgsForCall(0)
@@ -1126,8 +1152,8 @@ var _ = Describe("Push Command", func() {
 
 				appGuid, _, _ := actor.UploadAppArgsForCall(0)
 				Expect(appGuid).To(Equal("existing-app-guid"))
-				Expect(domainRepo.FindByNameInOrgName).To(Equal(""))
 
+				Expect(domainRepo.FindByNameInOrgCallCount()).To(BeZero())
 				Expect(routeRepo.FindByHostAndDomainCallCount()).To(BeZero())
 				Expect(routeRepo.CreateCallCount()).To(BeZero())
 

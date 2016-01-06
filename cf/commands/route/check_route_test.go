@@ -6,6 +6,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -123,7 +124,7 @@ var _ = Describe("check-route command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-			domainRepo.FindByNameInOrgApiResponse = errors.New("Domain not found")
+			domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.New("Domain not found"))
 		})
 
 		It("prints out route does not exist", func() {
