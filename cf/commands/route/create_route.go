@@ -60,21 +60,23 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
-	reqs := []requirements.Requirement{
+	requiredVersion, err := semver.Make("2.36.0")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var reqs []requirements.Requirement
+
+	if fc.String("path") != "" {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
+	}
+
+	reqs = append(reqs, []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 		cmd.domainReq,
-	}
-
-	if fc.String("path") != "" {
-		requiredVersion, err := semver.Make("2.36.0")
-		if err != nil {
-			panic(err.Error())
-		}
-
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
-	}
+	}...)
 
 	return reqs, nil
 }
