@@ -65,18 +65,17 @@ var _ = Describe("delete-domain command", func() {
 
 	Context("when the domain is shared", func() {
 		BeforeEach(func() {
-			domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+			domainRepo.FindByNameInOrgReturns(
 				models.DomainFields{
 					Name:   "foo1.com",
 					Guid:   "foo1-guid",
 					Shared: true,
-				},
-			}
+				}, nil)
 		})
 		It("informs the user that the domain is shared", func() {
 			runCommand("foo1.com")
 
-			Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
+			Expect(domainRepo.DeleteCallCount()).To(BeZero())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"domain"},
@@ -90,18 +89,17 @@ var _ = Describe("delete-domain command", func() {
 	})
 	Context("when the domain exists", func() {
 		BeforeEach(func() {
-			domainRepo.FindByNameInOrgDomain = []models.DomainFields{
+			domainRepo.FindByNameInOrgReturns(
 				models.DomainFields{
 					Name: "foo.com",
 					Guid: "foo-guid",
-				},
-			}
+				}, nil)
 		})
 
 		It("deletes domains", func() {
 			runCommand("foo.com")
 
-			Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
+			Expect(domainRepo.DeleteArgsForCall(0)).To(Equal("foo-guid"))
 
 			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the domain foo.com"}))
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -112,13 +110,13 @@ var _ = Describe("delete-domain command", func() {
 
 		Context("when there is an error deleting the domain", func() {
 			BeforeEach(func() {
-				domainRepo.DeleteApiResponse = errors.New("failed badly")
+				domainRepo.DeleteReturns(errors.New("failed badly"))
 			})
 
 			It("show the error the user", func() {
 				runCommand("foo.com")
 
-				Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
+				Expect(domainRepo.DeleteArgsForCall(0)).To(Equal("foo-guid"))
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
@@ -137,7 +135,7 @@ var _ = Describe("delete-domain command", func() {
 			It("does nothing", func() {
 				runCommand("foo.com")
 
-				Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
+				Expect(domainRepo.DeleteCallCount()).To(BeZero())
 
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"delete", "foo.com"}))
 
@@ -153,7 +151,7 @@ var _ = Describe("delete-domain command", func() {
 			It("skips confirmation", func() {
 				runCommand("-f", "foo.com")
 
-				Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
+				Expect(domainRepo.DeleteArgsForCall(0)).To(Equal("foo-guid"))
 				Expect(ui.Prompts).To(BeEmpty())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
@@ -165,13 +163,13 @@ var _ = Describe("delete-domain command", func() {
 
 	Context("when a domain with the given name doesn't exist", func() {
 		BeforeEach(func() {
-			domainRepo.FindByNameInOrgApiResponse = errors.NewModelNotFoundError("Domain", "foo.com")
+			domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.NewModelNotFoundError("Domain", "foo.com"))
 		})
 
 		It("fails", func() {
 			runCommand("foo.com")
 
-			Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
+			Expect(domainRepo.DeleteCallCount()).To(BeZero())
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"OK"},
@@ -182,13 +180,13 @@ var _ = Describe("delete-domain command", func() {
 
 	Context("when there is an error finding the domain", func() {
 		BeforeEach(func() {
-			domainRepo.FindByNameInOrgApiResponse = errors.New("failed badly")
+			domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.New("failed badly"))
 		})
 
 		It("shows the error to the user", func() {
 			runCommand("foo.com")
 
-			Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
+			Expect(domainRepo.DeleteCallCount()).To(BeZero())
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"FAILED"},

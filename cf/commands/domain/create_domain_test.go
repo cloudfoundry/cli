@@ -81,8 +81,9 @@ var _ = Describe("create domain command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 		runCommand("myOrg", "example.com")
 
-		Expect(domainRepo.CreateDomainName).To(Equal("example.com"))
-		Expect(domainRepo.CreateDomainOwningOrgGuid).To(Equal("myOrg-guid"))
+		domainName, domainOwningOrgGUID := domainRepo.CreateArgsForCall(0)
+		Expect(domainName).To(Equal("example.com"))
+		Expect(domainOwningOrgGUID).To(Equal("myOrg-guid"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating domain", "example.com", "myOrg", "my-user"},
 			[]string{"OK"},

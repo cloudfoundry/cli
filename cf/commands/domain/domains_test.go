@@ -79,26 +79,31 @@ var _ = Describe("domains command", func() {
 
 		Context("when there is at least one domain", func() {
 			BeforeEach(func() {
-				domainRepo.ListDomainsForOrgDomains = []models.DomainFields{
-					models.DomainFields{
+				domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+					cb(models.DomainFields{
 						Shared: false,
 						Name:   "Private-domain1",
-					},
-					models.DomainFields{
+					})
+
+					cb(models.DomainFields{
 						Shared: true,
 						Name:   "The-shared-domain",
-					},
-					models.DomainFields{
+					})
+
+					cb(models.DomainFields{
 						Shared: false,
 						Name:   "Private-domain2",
-					},
+					})
+
+					return nil
 				}
 			})
 
 			It("lists domains", func() {
 				runCommand()
 
-				Expect(domainRepo.ListDomainsForOrgGuid).To(Equal("my-org-guid"))
+				orgGUID, _ := domainRepo.ListDomainsForOrgArgsForCall(0)
+				Expect(orgGUID).To(Equal("my-org-guid"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting domains in org", "my-org", "my-user"},
 					[]string{"name", "status"},
@@ -118,14 +123,14 @@ var _ = Describe("domains command", func() {
 		})
 
 		It("fails when the domains API returns an error", func() {
-			domainRepo.ListDomainsForOrgApiResponse = errors.New("borked!")
+			domainRepo.ListDomainsForOrgReturns(errors.New("an-error"))
 			runCommand()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting domains in org", "my-org", "my-user"},
 				[]string{"FAILED"},
 				[]string{"Failed fetching domains"},
-				[]string{"borked!"},
+				[]string{"an-error"},
 			))
 		})
 	})

@@ -1,8 +1,6 @@
 package requirements_test
 
 import (
-	"fmt"
-
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -27,18 +25,21 @@ var _ = Describe("DomainRequirement", func() {
 
 	It("succeeds when the domain is found", func() {
 		domain := models.DomainFields{Name: "example.com", Guid: "domain-guid"}
-		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgDomain: []models.DomainFields{domain}}
+		domainRepo := &testapi.FakeDomainRepository{}
+		domainRepo.FindByNameInOrgReturns(domain, nil)
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 		success := domainReq.Execute()
 
 		Expect(success).To(BeTrue())
-		Expect(domainRepo.FindByNameInOrgName).To(Equal("example.com"))
-		Expect(domainRepo.FindByNameInOrgGuid).To(Equal("the-org-guid"))
+		orgName, orgGUID := domainRepo.FindByNameInOrgArgsForCall(0)
+		Expect(orgName).To(Equal("example.com"))
+		Expect(orgGUID).To(Equal("the-org-guid"))
 		Expect(domainReq.GetDomain()).To(Equal(domain))
 	})
 
 	It("fails when the domain is not found", func() {
-		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: errors.NewModelNotFoundError("Domain", "")}
+		domainRepo := &testapi.FakeDomainRepository{}
+		domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.NewModelNotFoundError("Domain", ""))
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
 		testassert.AssertPanic(testterm.QuietPanic, func() {
@@ -47,7 +48,8 @@ var _ = Describe("DomainRequirement", func() {
 	})
 
 	It("fails when an error occurs fetching the domain", func() {
-		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: fmt.Errorf("%s: %s", "", errors.New("").Error())}
+		domainRepo := &testapi.FakeDomainRepository{}
+		domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.New("an-error"))
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
 		testassert.AssertPanic(testterm.QuietPanic, func() {
