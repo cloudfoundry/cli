@@ -1,105 +1,268 @@
 package route_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	routeCmdFakes "github.com/cloudfoundry/cli/cf/commands/route/fakes"
-	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	"errors"
+
+	"github.com/simonleung8/flags"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+
+	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakeroute "github.com/cloudfoundry/cli/cf/commands/route/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("map-route command", func() {
+var _ = Describe("MapRoute", func() {
 	var (
-		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		routeRepo           *testapi.FakeRouteRepository
-		requirementsFactory *testreq.FakeReqFactory
-		routeCreator        *routeCmdFakes.FakeRouteCreator
-		OriginalCreateRoute command_registry.Command
-		deps                command_registry.Dependency
+		ui         *testterm.FakeUI
+		configRepo core_config.Repository
+		routeRepo  *fakeapi.FakeRouteRepository
+
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement       requirements.Requirement
+		applicationRequirement *fakerequirements.FakeApplicationRequirement
+		domainRequirement      *fakerequirements.FakeDomainRequirement
+
+		originalCreateRouteCmd command_registry.Command
+		fakeCreateRouteCmd     command_registry.Command
+
+		fakeDomain models.DomainFields
 	)
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
-		deps.Config = configRepo
-
-		//save original create-route and restore later
-		OriginalCreateRoute = command_registry.Commands.FindCommand("create-route")
-		//inject fake 'CreateRoute' into registry
-		command_registry.Register(routeCreator)
-
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("map-route").SetDependency(deps, pluginCall))
-	}
-
 	BeforeEach(func() {
-		ui = new(testterm.FakeUI)
+		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routeRepo = new(testapi.FakeRouteRepository)
-		routeCreator = &routeCmdFakes.FakeRouteCreator{}
-		requirementsFactory = new(testreq.FakeReqFactory)
+		routeRepo = &fakeapi.FakeRouteRepository{}
+		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
+
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		originalCreateRouteCmd = command_registry.Commands.FindCommand("create-route")
+		fakeCreateRouteCmd = &fakeroute.FakeRouteCreator{}
+		command_registry.Register(fakeCreateRouteCmd)
+
+		cmd = &route.MapRoute{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{}
+		factory.NewLoginRequirementReturns(loginRequirement)
+
+		applicationRequirement = &fakerequirements.FakeApplicationRequirement{}
+		factory.NewApplicationRequirementReturns(applicationRequirement)
+
+		fakeApplication := models.Application{}
+		fakeApplication.Guid = "fake-app-guid"
+		applicationRequirement.GetApplicationReturns(fakeApplication)
+
+		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		factory.NewDomainRequirementReturns(domainRequirement)
+
+		fakeDomain = models.DomainFields{
+			Guid: "fake-domain-guid",
+			Name: "fake-domain-name",
+		}
+		domainRequirement.GetDomainReturns(fakeDomain)
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCreateRoute)
+		command_registry.Register(originalCreateRouteCmd)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("map-route", args, requirementsFactory, updateCommandDependency, false)
-	}
+	Describe("Requirements", func() {
+		Context("when not provided exactly two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name")
+			})
 
-	Describe("requirements", func() {
-		It("fails when not invoked with exactly two args", func() {
-			runCommand("whoops-all-crunchberries")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "arguments"},
-			))
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage. Requires APP_NAME and DOMAIN as arguments"},
+					[]string{"NAME"},
+					[]string{"USAGE"},
+				))
+			})
 		})
 
-		It("fails when not logged in", func() {
-			Expect(runCommand("whatever", "shuttup")).To(BeFalse())
+		Context("when provided exactly two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name", "domain-name")
+			})
+
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns an ApplicationRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
+
+				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
+				Expect(actualRequirements).To(ContainElement(applicationRequirement))
+			})
+
+			It("returns a DomainRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
+
+				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
+				Expect(actualRequirements).To(ContainElement(domainRequirement))
+			})
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	Describe("Execute", func() {
 		BeforeEach(func() {
-			domain := models.DomainFields{Guid: "my-domain-guid", Name: "example.com"}
-			route := models.Route{Guid: "my-route-guid", Host: "foo", Domain: domain}
-
-			app := models.Application{}
-			app.Guid = "my-app-guid"
-			app.Name = "my-app"
-
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.Application = app
-			requirementsFactory.Domain = domain
-			routeCreator.ReservedRoute = route
+			err := flagContext.Parse("app-name", "domain-name")
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("maps a route, obviously", func() {
-			passed := runCommand("-n", "my-host", "my-app", "my-domain.com")
-			Expect(passed).To(BeTrue())
+		It("tries to create the route", func() {
+			cmd.Execute(flagContext)
+			fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+			Expect(ok).To(BeTrue())
 
-			Expect(routeRepo.BindCallCount()).To(Equal(1))
-			boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
-			Expect(boundRouteGUID).To(Equal("my-route-guid"))
-			Expect(boundAppGUID).To(Equal("my-app-guid"))
+			Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
+			_, path, domain, space := fakeRouteCreator.CreateRouteArgsForCall(0)
+			Expect(path).To(Equal(""))
+			Expect(domain).To(Equal(fakeDomain))
+			Expect(space).To(Equal(models.SpaceFields{
+				Name: "my-space",
+				Guid: "my-space-guid",
+			}))
+		})
 
-			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(requirementsFactory.DomainName).To(Equal("my-domain.com"))
+		Context("when creating the route fails", func() {
+			BeforeEach(func() {
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				Expect(ok).To(BeTrue())
+				fakeRouteCreator.CreateRouteReturns(models.Route{}, errors.New("create-route-err"))
+			})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Adding route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
-				[]string{"OK"},
-			))
+			It("panics and prints a failure message", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"FAILED"},
+					[]string{"create-route-err"},
+				))
+			})
+		})
+
+		Context("when creating the route succeeds", func() {
+			BeforeEach(func() {
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				Expect(ok).To(BeTrue())
+				fakeRouteCreator.CreateRouteReturns(models.Route{Guid: "fake-route-guid"}, nil)
+			})
+
+			It("tells the user that it is adding the route", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Adding route", "to app", "in org"},
+				))
+			})
+
+			It("tries to bind the route", func() {
+				cmd.Execute(flagContext)
+				Expect(routeRepo.BindCallCount()).To(Equal(1))
+				routeGUID, appGUID := routeRepo.BindArgsForCall(0)
+				Expect(routeGUID).To(Equal("fake-route-guid"))
+				Expect(appGUID).To(Equal("fake-app-guid"))
+			})
+
+			Context("when binding the route succeeds", func() {
+				BeforeEach(func() {
+					routeRepo.BindReturns(nil)
+				})
+
+				It("tells the user that it succeeded", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"OK"},
+					))
+				})
+			})
+
+			Context("when binding the route fails", func() {
+				BeforeEach(func() {
+					routeRepo.BindReturns(errors.New("bind-error"))
+				})
+
+				It("panics and prints a failure message", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(BeInDisplayOrder(
+						[]string{"FAILED"},
+						[]string{"bind-error"},
+					))
+				})
+			})
+		})
+
+		Context("when a hostname is passed", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("app-name", "domain-name", "-n", "the-hostname")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("tries to create the route with the hostname", func() {
+				cmd.Execute(flagContext)
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				Expect(ok).To(BeTrue())
+				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
+				hostName, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
+				Expect(hostName).To(Equal("the-hostname"))
+			})
+		})
+
+		Context("when a hostname is not passed", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("app-name", "domain-name")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("tries to create the route without a hostname", func() {
+				cmd.Execute(flagContext)
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				Expect(ok).To(BeTrue())
+				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
+				hostName, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
+				Expect(hostName).To(Equal(""))
+			})
 		})
 	})
 })

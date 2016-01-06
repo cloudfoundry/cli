@@ -12,9 +12,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/simonleung8/flags"
-	"github.com/simonleung8/flags/flag"
+	cliFlags "github.com/simonleung8/flags/flag"
 )
 
+//go:generate counterfeiter -o fakes/fake_route_creator.go . RouteCreator
 type RouteCreator interface {
 	CreateRoute(hostName, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
 }
