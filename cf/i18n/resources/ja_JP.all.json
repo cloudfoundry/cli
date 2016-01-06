@@ -910,9 +910,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME]",
+      "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
       "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",

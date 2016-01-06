@@ -5,6 +5,7 @@ import (
 
 	"github.com/simonleung8/flags"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -34,9 +35,10 @@ var _ = Describe("MapRoute", func() {
 		factory     *fakerequirements.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement       requirements.Requirement
-		applicationRequirement *fakerequirements.FakeApplicationRequirement
-		domainRequirement      *fakerequirements.FakeDomainRequirement
+		loginRequirement         requirements.Requirement
+		applicationRequirement   *fakerequirements.FakeApplicationRequirement
+		domainRequirement        *fakerequirements.FakeDomainRequirement
+		minAPIVersionRequirement requirements.Requirement
 
 		originalCreateRouteCmd command_registry.Command
 		fakeCreateRouteCmd     command_registry.Command
@@ -67,7 +69,7 @@ var _ = Describe("MapRoute", func() {
 
 		factory = &fakerequirements.FakeFactory{}
 
-		loginRequirement = &passingRequirement{}
+		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
 		applicationRequirement = &fakerequirements.FakeApplicationRequirement{}
@@ -85,6 +87,9 @@ var _ = Describe("MapRoute", func() {
 			Name: "fake-domain-name",
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
+
+		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
+		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
 	AfterEach(func() {
@@ -136,6 +141,39 @@ var _ = Describe("MapRoute", func() {
 
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
 				Expect(actualRequirements).To(ContainElement(domainRequirement))
+			})
+
+			Context("when a path is passed", func() {
+				BeforeEach(func() {
+					flagContext.Parse("app-name", "domain-name", "--path", "the-path")
+				})
+
+				It("returns a MinAPIVersionRequirement as the first requirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+
+					expectedVersion, err := semver.Make("2.36.0")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(feature).To(Equal("Option '--path'"))
+					Expect(requiredVersion).To(Equal(expectedVersion))
+					Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
+				})
+			})
+
+			Context("when a path is not passed", func() {
+				BeforeEach(func() {
+					flagContext.Parse("app-name", "domain-name")
+				})
+
+				It("does not return a MinAPIVersionRequirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
+					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
+				})
 			})
 		})
 	})
@@ -262,6 +300,24 @@ var _ = Describe("MapRoute", func() {
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
 				hostName, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
 				Expect(hostName).To(Equal(""))
+			})
+		})
+
+		Context("when a path is passed", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("app-name", "domain-name", "--path", "the-path")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("tries to create the route with the path", func() {
+				cmd.Execute(flagContext)
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				Expect(ok).To(BeTrue())
+				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
+				_, path, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
+				Expect(path).To(Equal("the-path"))
 			})
 		})
 	})
