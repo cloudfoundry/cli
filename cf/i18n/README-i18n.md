@@ -74,7 +74,7 @@ Our goal is to have translations for the following languages first:
 | Spanish               | es_ES  | Complete   |
 | German                | de_DE  | Complete   |
 | Italian               | it_IT  | Complete   |
-| Japanese              | ja_JA  | Complete   |
+| Japanese              | ja_JP  | Complete   |
 | Portuguese (Brazil)   | pt_BR  | Complete   |
 | Chinese (simplified)  | zh_Hans  | Complete   |
 | Chinese (traditional) | zh_Hant  | Complete   |
