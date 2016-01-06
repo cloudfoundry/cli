@@ -1645,11 +1645,6 @@
       "modified": false
    },
    {
-      "id": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
-      "translation": "現行 CF CLI 版本 {{.Version}}\n\t現行 CF API 版本 {{.ApiVersion}}\n\t若要使用 {{.CommandName}} 特性，您需要將 CF API 升級為至少 {{.RequiredVersion}}",
-      "modified": false
-   },
-   {
       "id": "Current Password",
       "translation": "現行密碼",
       "modified": false
@@ -6008,6 +6003,11 @@
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
       "translation": "{{.Err}}\n\n提示：如需相關資訊，請使用 '{{.Command}}'",
       "modified": false
+   },
+   {
+      "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
+      "translation": "現行 CF CLI 版本 {{.Version}}\n\t現行 CF API 版本 {{.ApiVersion}}\n\t若要使用 {{.CommandName}} 特性，您需要將 CF API 升級為至少 {{.RequiredVersion}}",
+      "modified": true
    },
    {
       "id": "{{.FlappingCount}} failing",

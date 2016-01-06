@@ -73,7 +73,7 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 			panic(err.Error())
 		}
 
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("create-route", minRequiredAPIVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", minRequiredAPIVersion))
 	}
 
 	return reqs, nil

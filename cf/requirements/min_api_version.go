@@ -2,7 +2,6 @@ package requirements
 
 import (
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/terminal"
 
@@ -12,20 +11,20 @@ import (
 type MinAPIVersionRequirement struct {
 	ui              terminal.UI
 	config          core_config.Reader
-	commandName     string
+	feature         string
 	requiredVersion semver.Version
 }
 
 func NewMinAPIVersionRequirement(
 	ui terminal.UI,
 	config core_config.Reader,
-	commandName string,
+	feature string,
 	requiredVersion semver.Version,
 ) MinAPIVersionRequirement {
 	return MinAPIVersionRequirement{
 		ui:              ui,
 		config:          config,
-		commandName:     commandName,
+		feature:         feature,
 		requiredVersion: requiredVersion,
 	}
 }
@@ -43,13 +42,10 @@ func (r MinAPIVersionRequirement) Execute() bool {
 	}
 
 	if apiVersion.LT(r.requiredVersion) {
-		r.ui.Failed(T(`Current CF CLI version {{.Version}}
-	Current CF API version {{.ApiVersion}}
-	To use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}`,
+		r.ui.Failed(T(`{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.`,
 			map[string]interface{}{
-				"Version":         cf.Version,
 				"ApiVersion":      r.config.ApiVersion(),
-				"CommandName":     r.commandName,
+				"Feature":         r.feature,
 				"RequiredVersion": r.requiredVersion.String(),
 			}))
 	}
