@@ -33,7 +33,7 @@ func init() {
 
 func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route (required for shared domains)")}
 	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path for the route")}
 
 	return command_registry.CommandMetadata{
