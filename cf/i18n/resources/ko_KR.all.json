@@ -530,11 +530,6 @@
       "modified": false
    },
    {
-      "id": "BUILD TIME:",
-      "translation": "빌드 시간:",
-      "modified": false
-   },
-   {
       "id": "BUILDPACKS",
       "translation": "빌드팩",
       "modified": false
@@ -690,7 +685,7 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                     # example.com\n   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo",
+      "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo",
       "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME] [-c PATH]",
       "modified": true
    },
@@ -1580,13 +1575,13 @@
       "modified": false
    },
    {
-      "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "id": "Creating route {{.Hostname}}...",
+      "translation": "{{.Hostname}} 라우트 작성 중...",
       "modified": false
    },
    {
-      "id": "Creating route {{.Hostname}}...",
-      "translation": "{{.Hostname}} 라우트 작성 중...",
+      "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "modified": false
    },
    {
@@ -4370,6 +4365,11 @@
       "modified": false
    },
    {
+      "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
+      "translation": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
+      "modified": false
+   },
+   {
       "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
       "translation": "서버 오류, 상태 코드: 403, 오류 코드: 10003, 메시지: 요청된 조치를 수행할 권한이 없습니다.",
       "modified": false
@@ -4802,6 +4802,11 @@
    {
       "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
       "translation": "{{.URL}} 라우트를 이미 사용 중입니다.\n팁: 호스트 이름을 -n HOSTNAME을 사용하여 변경하거나 --random-route를 사용하여 새 라우트를 생성한 후 다시 푸시하십시오.",
+      "modified": false
+   },
+   {
+      "id": "The targeted API endpoint could not be reached.",
+      "translation": "The targeted API endpoint could not be reached.",
       "modified": false
    },
    {

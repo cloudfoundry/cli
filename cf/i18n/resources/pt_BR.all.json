@@ -190,8 +190,8 @@
       "modified": false
    },
    {
-      "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n",
-      "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n",
+      "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n",
+      "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n",
       "modified": false
    },
    {
@@ -530,11 +530,6 @@
       "modified": false
    },
    {
-      "id": "BUILD TIME:",
-      "translation": "MOMENTO DA CRIAÇÃO:",
-      "modified": false
-   },
-   {
       "id": "BUILDPACKS",
       "translation": "BUILDPACKS",
       "modified": false
@@ -690,9 +685,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME create-route SPACE DOMAIN [-n HOSTNAME]",
-      "modified": false
+      "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo",
+      "translation": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                     # example.com\n   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo",
+      "modified": true
    },
    {
       "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
@@ -780,8 +775,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]",
-      "translation": "CF_NAME delete-route DOMAIN [-n HOSTNAME] [-f]",
+      "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [-f]",
+      "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [-f]",
       "modified": false
    },
    {
@@ -915,8 +910,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME map-route APP_NAME DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME map-route APP_NAME DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME]",
+      "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME]",
       "modified": false
    },
    {
@@ -1205,8 +1200,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME unmap-route APP_NAME DOMAIN [-n HOSTNAME]",
-      "translation": "CF_NAME unmap-route APP_NAME DOMAIN [-n HOSTNAME]",
+      "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]",
+      "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]",
       "modified": false
    },
    {
@@ -1580,13 +1575,13 @@
       "modified": false
    },
    {
-      "id": "Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "Criando a rota {{.Hostname}} para a organização {{.OrgName}} / espaço {{.SpaceName}} como {{.Username}}...",
+      "id": "Creating route {{.Hostname}}...",
+      "translation": "Criando a rota {{.Hostname}}...",
       "modified": false
    },
    {
-      "id": "Creating route {{.Hostname}}...",
-      "translation": "Criando a rota {{.Hostname}}...",
+      "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+      "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "modified": false
    },
    {
@@ -1650,13 +1645,8 @@
       "modified": false
    },
    {
-      "id": "Current CF API version {{.ApiVersion}}",
-      "translation": "Versão atual da API do CF {{.ApiVersion}}",
-      "modified": false
-   },
-   {
-      "id": "Current CF CLI version {{.Version}}",
-      "translation": "Versão atual da CLI do CF {{.Version}}",
+      "id": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
+      "translation": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
       "modified": false
    },
    {
@@ -1670,8 +1660,8 @@
       "modified": false
    },
    {
-      "id": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch). Use built-in buildpacks only by setting value to 'null' or 'default'",
-      "translation": "Buildpack customizado pelo nome (por exemplo, my-buildpack) ou URL do GIT (por exemplo, 'https://github.com/heroku/heroku-buildpack-play.git') ou URL de RAMIFICAÇÃO do GIT (por exemplo, 'https://github.com/heroku/heroku-buildpack-play.git#develop' para a ramificação 'develop'). Use buildpacks integrados somente configurando o valor como 'null' ou 'default'",
+      "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
+      "translation": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
       "modified": false
    },
    {
@@ -2280,6 +2270,11 @@
       "modified": false
    },
    {
+      "id": "Error processing app files in '{{.Path}}': {{.Error}}",
+      "translation": "Error processing app files in '{{.Path}}': {{.Error}}",
+      "modified": false
+   },
+   {
       "id": "Error processing data from server: ",
       "translation": "Erro ao processar dados do servidor: ",
       "modified": false
@@ -2805,6 +2800,11 @@
       "modified": false
    },
    {
+      "id": "Hostname for the route",
+      "translation": "Hostname for the route",
+      "modified": false
+   },
+   {
       "id": "INSTALLED PLUGIN COMMANDS",
       "translation": "COMANDOS DE PLUG-IN INSTALADOS",
       "modified": false
@@ -2870,8 +2870,8 @@
       "modified": false
    },
    {
-      "id": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
-      "translation": "Uso incorreto. Requer APP e DOMAIN como argumentos\n\n",
+      "id": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
+      "translation": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
       "modified": false
    },
    {
@@ -3490,6 +3490,11 @@
       "modified": false
    },
    {
+      "id": "No app files found in '{{.Path}}'",
+      "translation": "No app files found in '{{.Path}}'",
+      "modified": false
+   },
+   {
       "id": "No apps found",
       "translation": "Nenhum app localizado",
       "modified": false
@@ -3752,6 +3757,11 @@
    {
       "id": "Password verification does not match",
       "translation": "A verificação da senha não corresponde",
+      "modified": false
+   },
+   {
+      "id": "Path for the route",
+      "translation": "Path for the route",
       "modified": false
    },
    {
@@ -4355,6 +4365,11 @@
       "modified": false
    },
    {
+      "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
+      "translation": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
+      "modified": false
+   },
+   {
       "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
       "translation": "Erro do servidor, código de status: 403, código de erro: 10003, mensagem: você não está autorizado a executar a ação solicitada",
       "modified": false
@@ -4790,6 +4805,11 @@
       "modified": false
    },
    {
+      "id": "The targeted API endpoint could not be reached.",
+      "translation": "The targeted API endpoint could not be reached.",
+      "modified": false
+   },
+   {
       "id": "There are no running instances of this app.",
       "translation": "Não há instâncias em execução desse app.",
       "modified": false
@@ -4832,11 +4852,6 @@
    {
       "id": "Tip: use 'add-plugin-repo' to register the repo",
       "translation": "Dica: use 'add-plugin-repo' para registrar o repositório",
-      "modified": false
-   },
-   {
-      "id": "To use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.MinApiVersionMajor}}.{{.MinApiVersionMinor}}.{{.MinApiVersionPatch}}",
-      "translation": "Para usar o recurso {{.CommandName}}, será necessário fazer upgrade da API do CF para pelo menos {{.MinApiVersionMajor}}.{{.MinApiVersionMinor}}.{{.MinApiVersionPatch}}",
       "modified": false
    },
    {
@@ -4915,8 +4930,18 @@
       "modified": false
    },
    {
+      "id": "Unable to determine CC API Version. Please log in again.",
+      "translation": "Unable to determine CC API Version. Please log in again.",
+      "modified": false
+   },
+   {
       "id": "Unable to obtain plugin name for executable {{.Executable}}",
       "translation": "Não é possível obter o nome do plug-in para o executável {{.Executable}}",
+      "modified": false
+   },
+   {
+      "id": "Unable to parse CC API Version '{{.APIVersion}}'",
+      "translation": "Unable to parse CC API Version '{{.APIVersion}}'",
       "modified": false
    },
    {
@@ -5622,6 +5647,11 @@
    {
       "id": "paid service plans",
       "translation": "planos de serviço pagos",
+      "modified": false
+   },
+   {
+      "id": "path",
+      "translation": "path",
       "modified": false
    },
    {
