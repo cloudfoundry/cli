@@ -910,7 +910,7 @@
       "modified": true
    },
    {
-      "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME]",
+      "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
       "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n",
       "modified": true
    },
