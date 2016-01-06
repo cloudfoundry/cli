@@ -42,9 +42,9 @@ func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 		Usage: T(`CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]
 
 EXAMPLES:
-   CF_NAME create-route my-space example.com                     # example.com
-   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com
-   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo`),
+   CF_NAME create-route my-space example.com                             # example.com
+   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com
+   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo`),
 		Flags: fs,
 	}
 }
