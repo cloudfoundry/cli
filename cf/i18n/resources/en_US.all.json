@@ -2800,8 +2800,8 @@
       "modified": false
    },
    {
-      "id": "Hostname for the route",
-      "translation": "Hostname for the route",
+      "id": "Hostname for the route (required for shared domains)",
+      "translation": "Hostname for the route (required for shared domains)",
       "modified": false
    },
    {

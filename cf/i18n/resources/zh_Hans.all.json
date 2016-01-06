@@ -2800,9 +2800,9 @@
       "modified": false
    },
    {
-      "id": "Hostname for the route",
+      "id": "Hostname for the route (required for shared domains)",
       "translation": "Hostname for the route",
-      "modified": false
+      "modified": true
    },
    {
       "id": "INSTALLED PLUGIN COMMANDS",
