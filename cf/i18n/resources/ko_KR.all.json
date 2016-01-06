@@ -1580,23 +1580,13 @@
       "modified": false
    },
    {
-<<<<<<< HEAD
-      "id": "Creating route {{.Hostname}}...",
-      "translation": "Creating route {{.Hostname}}...",
-      "modified": false
-   },
-   {
       "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
       "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-=======
-      "id": "Creating route {{.Hostname}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-      "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.Hostname}} 라우트 작성 중...",
       "modified": false
    },
    {
       "id": "Creating route {{.Hostname}}...",
       "translation": "{{.Hostname}} 라우트 작성 중...",
->>>>>>> a0ca9e8... Newly translated resource files from IBM
       "modified": false
    },
    {
@@ -1660,18 +1650,8 @@
       "modified": false
    },
    {
-<<<<<<< HEAD
       "id": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
-      "translation": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
-=======
-      "id": "Current CF API version {{.ApiVersion}}",
-      "translation": "현재 CF API 버전 {{.ApiVersion}}",
-      "modified": false
-   },
-   {
-      "id": "Current CF CLI version {{.Version}}",
-      "translation": "현재 CF CLI 버전 {{.Version}}",
->>>>>>> a0ca9e8... Newly translated resource files from IBM
+      "translation": "현재 CF CLI 버전 {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\t{{.CommandName}} 기능을 사용하려면 CF API를 최소한 {{.RequiredVersion}}(으)로 업그레이드해야 합니다.",
       "modified": false
    },
    {
@@ -1685,15 +1665,9 @@
       "modified": false
    },
    {
-<<<<<<< HEAD
       "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
       "translation": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch). Use built-in buildpacks only by setting value to 'null' or 'default'",
       "modified": true
-=======
-      "id": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch). Use built-in buildpacks only by setting value to 'null' or 'default'",
-      "translation": "이름별(예: my-buildpack), GIT URL별(예: 'https://github.com/heroku/heroku-buildpack-play.git') 또는 GIT BRANCH URL별(예: '개발' 분기의 'https://github.com/heroku/heroku-buildpack-play.git#develop') 사용자 정의 빌드팩. 값을 '널' 또는 '기본값'으로 설정하여 기본 제공 빌드팩만 사용하십시오.",
-      "modified": false
->>>>>>> a0ca9e8... Newly translated resource files from IBM
    },
    {
       "id": "Custom headers to include in the request, flag can be specified multiple times",
@@ -2901,15 +2875,9 @@
       "modified": false
    },
    {
-<<<<<<< HEAD
       "id": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
-      "translation": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
-      "modified": true
-=======
-      "id": "Incorrect Usage. Requires APP and DOMAIN as arguments\n\n",
-      "translation": "올바르지 않은 사용법입니다. 인수로 APP과 DOMAIN이 필요합니다.\n\n",
+      "translation": "올바르지 않은 사용법입니다. 인수로 APP_NAME과 DOMAIN이 필요합니다.\n\n",
       "modified": false
->>>>>>> a0ca9e8... Newly translated resource files from IBM
    },
    {
       "id": "Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n",
@@ -4882,14 +4850,6 @@
       "modified": false
    },
    {
-<<<<<<< HEAD
-=======
-      "id": "To use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.MinApiVersionMajor}}.{{.MinApiVersionMinor}}.{{.MinApiVersionPatch}}",
-      "translation": "{{.CommandName}} 기능을 사용하려면 CF API를 최소한 {{.MinApiVersionMajor}}.{{.MinApiVersionMinor}}.{{.MinApiVersionPatch}}(으)로 업그레이드해야 합니다.",
-      "modified": false
-   },
-   {
->>>>>>> a0ca9e8... Newly translated resource files from IBM
       "id": "Total Memory",
       "translation": "총 메모리",
       "modified": false
