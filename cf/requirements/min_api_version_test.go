@@ -1,10 +1,7 @@
 package requirements_test
 
 import (
-	"fmt"
-
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
 
@@ -30,7 +27,7 @@ var _ = Describe("MinAPIVersionRequirement", func() {
 		requiredVersion, err := semver.Make("1.2.3")
 		Expect(err).NotTo(HaveOccurred())
 
-		requirement = requirements.NewMinAPIVersionRequirement(ui, config, "command-name", requiredVersion)
+		requirement = requirements.NewMinAPIVersionRequirement(ui, config, "version-restricted-feature", requiredVersion)
 	})
 
 	Context("Execute", func() {
@@ -73,9 +70,7 @@ var _ = Describe("MinAPIVersionRequirement", func() {
 				Expect(func() { requirement.Execute() }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
-					[]string{fmt.Sprintf("Current CF CLI version %s", cf.Version)},
-					[]string{"Current CF API version 1.2.2"},
-					[]string{"To use the command-name feature, you need to upgrade the CF API to at least 1.2.3"},
+					[]string{"version-restricted-feature requires CF API version 1.2.3+. Your target is 1.2.2."},
 				))
 			})
 		})

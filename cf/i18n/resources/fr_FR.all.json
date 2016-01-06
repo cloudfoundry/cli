@@ -1645,11 +1645,6 @@
       "modified": false
    },
    {
-      "id": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
-      "translation": "Version de l'interface de ligne de commande CF en cours {{.Version}}\n\tVersion de l'API CF en cours {{.ApiVersion}}\n\tPour utiliser la fonction {{.CommandName}}, vous devez mettre à niveau l'API CF vers au moins la version {{.RequiredVersion}}",
-      "modified": false
-   },
-   {
       "id": "Current Password",
       "translation": "Mot de passe en cours ",
       "modified": false
@@ -6008,6 +6003,11 @@
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
       "translation": "{{.Err}}\n\nASTUCE : utilisez '{{.Command}}' pour plus d'informations ",
       "modified": false
+   },
+   {
+      "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
+      "translation": "Version de l'interface de ligne de commande CF en cours {{.Version}}\n\tVersion de l'API CF en cours {{.ApiVersion}}\n\tPour utiliser la fonction {{.CommandName}}, vous devez mettre à niveau l'API CF vers au moins la version {{.RequiredVersion}}",
+      "modified": true
    },
    {
       "id": "{{.FlappingCount}} failing",

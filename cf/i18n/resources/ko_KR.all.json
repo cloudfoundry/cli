@@ -1645,11 +1645,6 @@
       "modified": false
    },
    {
-      "id": "Current CF CLI version {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\tTo use the {{.CommandName}} feature, you need to upgrade the CF API to at least {{.RequiredVersion}}",
-      "translation": "현재 CF CLI 버전 {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\t{{.CommandName}} 기능을 사용하려면 CF API를 최소한 {{.RequiredVersion}}(으)로 업그레이드해야 합니다.",
-      "modified": false
-   },
-   {
       "id": "Current Password",
       "translation": "현재 비밀번호",
       "modified": false
@@ -6008,6 +6003,11 @@
       "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
       "translation": "{{.Err}}\n\n팁: 자세한 정보는 '{{.Command}}'을(를) 사용하십시오.",
       "modified": false
+   },
+   {
+      "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
+      "translation": "현재 CF CLI 버전 {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\t{{.CommandName}} 기능을 사용하려면 CF API를 최소한 {{.RequiredVersion}}(으)로 업그레이드해야 합니다.",
+      "modified": true
    },
    {
       "id": "{{.FlappingCount}} failing",

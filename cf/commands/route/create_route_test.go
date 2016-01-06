@@ -135,8 +135,8 @@ var _ = Describe("CreateRoute", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-				commandName, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-				Expect(commandName).To(Equal("create-route"))
+				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+				Expect(feature).To(Equal("Option '--path'"))
 				Expect(requiredVersion).To(Equal(expectedVersion))
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 			})
