@@ -1200,8 +1200,8 @@
       "modified": false
    },
    {
-      "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]",
-      "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]",
+      "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
+      "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
       "modified": false
    },
    {
@@ -2792,6 +2792,11 @@
    {
       "id": "Hostname (e.g. my-subdomain)",
       "translation": "Hostname (e.g. my-subdomain)",
+      "modified": false
+   },
+   {
+      "id": "Hostname for the route",
+      "translation": "Hostname for the route",
       "modified": false
    },
    {

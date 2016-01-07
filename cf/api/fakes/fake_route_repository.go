@@ -25,13 +25,14 @@ type FakeRouteRepository struct {
 	listAllRoutesReturns struct {
 		result1 error
 	}
-	FindByHostAndDomainStub        func(host string, domain models.DomainFields) (route models.Route, apiErr error)
-	findByHostAndDomainMutex       sync.RWMutex
-	findByHostAndDomainArgsForCall []struct {
+	FindStub        func(host string, domain models.DomainFields, path string) (route models.Route, apiErr error)
+	findMutex       sync.RWMutex
+	findArgsForCall []struct {
 		host   string
 		domain models.DomainFields
+		path   string
 	}
-	findByHostAndDomainReturns struct {
+	findReturns struct {
 		result1 models.Route
 		result2 error
 	}
@@ -160,35 +161,36 @@ func (fake *FakeRouteRepository) ListAllRoutesReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeRouteRepository) FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error) {
-	fake.findByHostAndDomainMutex.Lock()
-	fake.findByHostAndDomainArgsForCall = append(fake.findByHostAndDomainArgsForCall, struct {
+func (fake *FakeRouteRepository) Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
+	fake.findMutex.Lock()
+	fake.findArgsForCall = append(fake.findArgsForCall, struct {
 		host   string
 		domain models.DomainFields
-	}{host, domain})
-	fake.findByHostAndDomainMutex.Unlock()
-	if fake.FindByHostAndDomainStub != nil {
-		return fake.FindByHostAndDomainStub(host, domain)
+		path   string
+	}{host, domain, path})
+	fake.findMutex.Unlock()
+	if fake.FindStub != nil {
+		return fake.FindStub(host, domain, path)
 	} else {
-		return fake.findByHostAndDomainReturns.result1, fake.findByHostAndDomainReturns.result2
+		return fake.findReturns.result1, fake.findReturns.result2
 	}
 }
 
-func (fake *FakeRouteRepository) FindByHostAndDomainCallCount() int {
-	fake.findByHostAndDomainMutex.RLock()
-	defer fake.findByHostAndDomainMutex.RUnlock()
-	return len(fake.findByHostAndDomainArgsForCall)
+func (fake *FakeRouteRepository) FindCallCount() int {
+	fake.findMutex.RLock()
+	defer fake.findMutex.RUnlock()
+	return len(fake.findArgsForCall)
 }
 
-func (fake *FakeRouteRepository) FindByHostAndDomainArgsForCall(i int) (string, models.DomainFields) {
-	fake.findByHostAndDomainMutex.RLock()
-	defer fake.findByHostAndDomainMutex.RUnlock()
-	return fake.findByHostAndDomainArgsForCall[i].host, fake.findByHostAndDomainArgsForCall[i].domain
+func (fake *FakeRouteRepository) FindArgsForCall(i int) (string, models.DomainFields, string) {
+	fake.findMutex.RLock()
+	defer fake.findMutex.RUnlock()
+	return fake.findArgsForCall[i].host, fake.findArgsForCall[i].domain, fake.findArgsForCall[i].path
 }
 
-func (fake *FakeRouteRepository) FindByHostAndDomainReturns(result1 models.Route, result2 error) {
-	fake.FindByHostAndDomainStub = nil
-	fake.findByHostAndDomainReturns = struct {
+func (fake *FakeRouteRepository) FindReturns(result1 models.Route, result2 error) {
+	fake.FindStub = nil
+	fake.findReturns = struct {
 		result1 models.Route
 		result2 error
 	}{result1, result2}

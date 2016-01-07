@@ -3,6 +3,7 @@ package route_test
 import (
 	"errors"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -32,9 +33,10 @@ var _ = Describe("UnmapRoute", func() {
 		factory     *fakerequirements.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement       requirements.Requirement
-		applicationRequirement *fakerequirements.FakeApplicationRequirement
-		domainRequirement      *fakerequirements.FakeDomainRequirement
+		loginRequirement         requirements.Requirement
+		applicationRequirement   *fakerequirements.FakeApplicationRequirement
+		domainRequirement        *fakerequirements.FakeDomainRequirement
+		minAPIVersionRequirement requirements.Requirement
 
 		fakeDomain models.DomainFields
 	)
@@ -76,6 +78,9 @@ var _ = Describe("UnmapRoute", func() {
 			Name: "fake-domain-name",
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
+
+		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
+		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
 	Describe("Requirements", func() {
@@ -124,6 +129,39 @@ var _ = Describe("UnmapRoute", func() {
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
 				Expect(actualRequirements).To(ContainElement(domainRequirement))
 			})
+
+			Context("when a path is passed", func() {
+				BeforeEach(func() {
+					flagContext.Parse("app-name", "domain-name", "--path", "the-path")
+				})
+
+				It("returns a MinAPIVersionRequirement as the first requirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+
+					expectedVersion, err := semver.Make("2.36.0")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(feature).To(Equal("Option '--path'"))
+					Expect(requiredVersion).To(Equal(expectedVersion))
+					Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
+				})
+			})
+
+			Context("when a path is not passed", func() {
+				BeforeEach(func() {
+					flagContext.Parse("app-name", "domain-name")
+				})
+
+				It("does not return a MinAPIVersionRequirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
+					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
+				})
+			})
 		})
 	})
 
@@ -135,17 +173,34 @@ var _ = Describe("UnmapRoute", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("tries to find the host and domain in the route repo", func() {
+		It("tries to find the route", func() {
 			cmd.Execute(flagContext)
-			Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-			hostname, domain := routeRepo.FindByHostAndDomainArgsForCall(0)
+			Expect(routeRepo.FindCallCount()).To(Equal(1))
+			hostname, domain, path := routeRepo.FindArgsForCall(0)
 			Expect(hostname).To(Equal(""))
 			Expect(domain).To(Equal(fakeDomain))
+			Expect(path).To(Equal(""))
+		})
+
+		Context("when a path is passed", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("app-name", "domain-name", "--path", "the-path")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("tries to find the route with the path", func() {
+				cmd.Execute(flagContext)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				_, _, path := routeRepo.FindArgsForCall(0)
+				Expect(path).To(Equal("/the-path"))
+			})
 		})
 
 		Context("when the route can be found", func() {
 			BeforeEach(func() {
-				routeRepo.FindByHostAndDomainReturns(models.Route{Guid: "route-guid"}, nil)
+				routeRepo.FindReturns(models.Route{Guid: "route-guid"}, nil)
 			})
 
 			It("tells the user that it is removing the route", func() {
@@ -163,7 +218,7 @@ var _ = Describe("UnmapRoute", func() {
 							{Guid: "fake-app-guid"},
 						},
 					}
-					routeRepo.FindByHostAndDomainReturns(route, nil)
+					routeRepo.FindReturns(route, nil)
 				})
 
 				It("tries to unbind the route from the app", func() {
@@ -210,7 +265,7 @@ var _ = Describe("UnmapRoute", func() {
 							{Guid: "other-fake-app-guid"},
 						},
 					}
-					routeRepo.FindByHostAndDomainReturns(route, nil)
+					routeRepo.FindReturns(route, nil)
 				})
 
 				It("does not unbind the route from the app", func() {
@@ -236,7 +291,7 @@ var _ = Describe("UnmapRoute", func() {
 
 		Context("when the route cannot be found", func() {
 			BeforeEach(func() {
-				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.New("find-by-host-and-domain-err"))
+				routeRepo.FindReturns(models.Route{}, errors.New("find-by-host-and-domain-err"))
 			})
 
 			It("panics and prints a failure message", func() {
@@ -247,5 +302,6 @@ var _ = Describe("UnmapRoute", func() {
 				))
 			})
 		})
+
 	})
 })

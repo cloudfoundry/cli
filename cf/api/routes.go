@@ -16,7 +16,7 @@ import (
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
-	FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error)
+	Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error)
 	Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error)
 	CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
@@ -55,11 +55,12 @@ func (repo CloudControllerRouteRepository) ListAllRoutes(cb func(models.Route) b
 			return cb(resource.(resources.RouteResource).ToModel())
 		})
 }
-func (repo CloudControllerRouteRepository) FindByHostAndDomain(host string, domain models.DomainFields) (route models.Route, apiErr error) {
+
+func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid)),
+		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid+";path:"+path)),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
 			route = resource.(resources.RouteResource).ToModel()

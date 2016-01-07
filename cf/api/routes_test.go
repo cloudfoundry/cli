@@ -3,6 +3,7 @@ package api_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"time"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
@@ -18,10 +19,10 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("route repository", func() {
-
 	var (
 		ts         *httptest.Server
 		handler    *testnet.TestHandler
@@ -40,7 +41,9 @@ var _ = Describe("route repository", func() {
 	})
 
 	AfterEach(func() {
-		ts.Close()
+		if ts != nil {
+			ts.Close()
+		}
 	})
 
 	Describe("List routes", func() {
@@ -104,46 +107,85 @@ var _ = Describe("route repository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
-		It("finds a route by host and domain", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "GET",
-					Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
-					Response: findRouteByHostResponse,
-				}),
+		Describe("Find", func() {
+			var ccServer *ghttp.Server
+			BeforeEach(func() {
+				ccServer = ghttp.NewServer()
+				configRepo.SetApiEndpoint(ccServer.URL())
 			})
-			configRepo.SetApiEndpoint(ts.URL)
 
-			domain := models.DomainFields{}
-			domain.Guid = "my-domain-guid"
-
-			route, apiErr := repo.FindByHostAndDomain("my-cool-app", domain)
-
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(route.Host).To(Equal("my-cool-app"))
-			Expect(route.Guid).To(Equal("my-route-guid"))
-			Expect(route.Domain.Guid).To(Equal(domain.Guid))
-		})
-
-		It("returns 'not found' response when there is no route w/ the given domain and host", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "GET",
-					Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
-					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
-				}),
+			AfterEach(func() {
+				ccServer.Close()
 			})
-			configRepo.SetApiEndpoint(ts.URL)
 
-			domain := models.DomainFields{}
-			domain.Guid = "my-domain-guid"
+			Context("when the route is found", func() {
+				BeforeEach(func() {
+					v := url.Values{}
+					v.Set("inline-relations-depth", "1")
+					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath")
 
-			_, apiErr := repo.FindByHostAndDomain("my-cool-app", domain)
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
+							ghttp.VerifyHeader(http.Header{
+								"accept": []string{"application/json"},
+							}),
+							ghttp.RespondWith(http.StatusCreated, findResponseBody),
+						),
+					)
+				})
 
-			Expect(handler).To(HaveAllRequestsCalled())
+				It("returns the route", func() {
+					domain := models.DomainFields{}
+					domain.Guid = "my-domain-guid"
 
-			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
+					route, apiErr := repo.Find("my-cool-app", domain, "/somepath")
+
+					Expect(apiErr).NotTo(HaveOccurred())
+					Expect(route.Host).To(Equal("my-cool-app"))
+					Expect(route.Guid).To(Equal("my-route-guid"))
+					Expect(route.Path).To(Equal("/somepath"))
+					Expect(route.Domain.Guid).To(Equal(domain.Guid))
+				})
+			})
+
+			Context("when the route is not found", func() {
+				BeforeEach(func() {
+					v := url.Values{}
+					v.Set("inline-relations-depth", "1")
+					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath")
+
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
+							ghttp.VerifyHeader(http.Header{
+								"accept": []string{"application/json"},
+							}),
+							ghttp.RespondWith(http.StatusOK, `{ "resources": [] }`),
+						),
+					)
+				})
+
+				It("returns 'not found'", func() {
+					ts, handler = testnet.NewServer([]testnet.TestRequest{
+						testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+							Method:   "GET",
+							Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
+							Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
+						}),
+					})
+					configRepo.SetApiEndpoint(ts.URL)
+
+					domain := models.DomainFields{}
+					domain.Guid = "my-domain-guid"
+
+					_, apiErr := repo.Find("my-cool-app", domain, "/somepath")
+
+					Expect(handler).To(HaveAllRequestsCalled())
+
+					Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
+				})
+			})
 		})
 	})
 
@@ -427,22 +469,23 @@ var secondPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body:
   ]
 }`}
 
-var findRouteByHostResponse = testnet.TestResponse{Status: http.StatusCreated, Body: `
+var findResponseBody = `
 { "resources": [
-    {
-    	"metadata": {
-        	"guid": "my-route-guid"
-    	},
-    	"entity": {
-       	     "host": "my-cool-app",
-       	     "domain": {
-       	     	"metadata": {
-       	     		"guid": "my-domain-guid"
-       	     	}
-       	     }
-    	}
-    }
-]}`}
+	{
+		"metadata": {
+			"guid": "my-route-guid"
+		},
+		"entity": {
+			"host": "my-cool-app",
+			"domain": {
+				"metadata": {
+					"guid": "my-domain-guid"
+				}
+			},
+			"path": "/somepath"
+		}
+	}
+]}`
 
 var firstPageRoutesOrgLvlResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {

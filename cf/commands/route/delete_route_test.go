@@ -64,7 +64,7 @@ var _ = Describe("delete-route command", func() {
 				Guid: "domain-guid",
 				Name: "example.com",
 			}
-			routeRepo.FindByHostAndDomainReturns(route, nil)
+			routeRepo.FindReturns(route, nil)
 		})
 
 		It("fails with usage when given zero args", func() {
@@ -113,7 +113,7 @@ var _ = Describe("delete-route command", func() {
 		})
 
 		It("succeeds with a warning when the route does not exist", func() {
-			routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "not found"))
+			routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "not found"))
 
 			runCommand("-n", "my-host", "example.com")
 
