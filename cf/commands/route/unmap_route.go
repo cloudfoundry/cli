@@ -65,10 +65,11 @@ func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
-	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostName, domain)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	route, err := cmd.routeRepo.FindByHostAndDomain(hostName, domain)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
+
 	cmd.ui.Say(T("Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"URL":       terminal.EntityNameColor(route.URL()),
@@ -81,17 +82,17 @@ func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
 	for _, routeApp := range route.Apps {
 		if routeApp.Guid == app.Guid {
 			routeFound = true
-			apiErr = cmd.routeRepo.Unbind(route.Guid, app.Guid)
-			if apiErr != nil {
-				cmd.ui.Failed(apiErr.Error())
-				return
+			err = cmd.routeRepo.Unbind(route.Guid, app.Guid)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
 			}
+			break
 		}
 	}
+
 	cmd.ui.Ok()
 
 	if !routeFound {
 		cmd.ui.Warn(T("\nRoute to be unmapped is not currently mapped to the application."))
 	}
-
 }
