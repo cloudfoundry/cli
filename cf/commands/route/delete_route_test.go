@@ -1,125 +1,240 @@
 package route_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
+
+	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("delete-route command", func() {
+var _ = Describe("DeleteRoute", func() {
 	var (
-		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
-		routeRepo           *testapi.FakeRouteRepository
-		deps                command_registry.Dependency
-		configRepo          core_config.Repository
+		ui         *testterm.FakeUI
+		configRepo core_config.Repository
+		routeRepo  *fakeapi.FakeRouteRepository
+
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement  requirements.Requirement
+		domainRequirement *fakerequirements.FakeDomainRequirement
+
+		fakeDomain models.DomainFields
 	)
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
-		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-route").SetDependency(deps, pluginCall))
-	}
-
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{Inputs: []string{"yes"}}
+		ui = &testterm.FakeUI{}
+		ui.InputsChan = make(chan string)
 
-		routeRepo = &testapi.FakeRouteRepository{}
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess: true,
-		}
-	})
-
-	runCommand := func(args ...string) bool {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		return testcmd.RunCliCommand("delete-route", args, requirementsFactory, updateCommandDependency, false)
-	}
+		routeRepo = &fakeapi.FakeRouteRepository{}
+		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-	Context("when not logged in", func() {
-		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = false
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = &route.DeleteRoute{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{Name: "login-requirement"}
+		factory.NewLoginRequirementReturns(loginRequirement)
+
+		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		factory.NewDomainRequirementReturns(domainRequirement)
+
+		fakeDomain = models.DomainFields{
+			Guid: "fake-domain-guid",
+			Name: "fake-domain-name",
+		}
+		domainRequirement.GetDomainReturns(fakeDomain)
+	})
+
+	Describe("Requirements", func() {
+		Context("when not provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name", "extra-arg")
+			})
+
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Incorrect Usage. Requires an argument"},
+				))
+			})
 		})
 
-		It("does not pass requirements", func() {
-			Expect(runCommand("-n", "my-host", "example.com")).To(BeFalse())
+		Context("when provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("domain-name")
+			})
+
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a DomainRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
+
+				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
+				Expect(actualRequirements).To(ContainElement(domainRequirement))
+			})
 		})
 	})
 
-	Context("when logged in successfully", func() {
+	Describe("Execute", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			route := models.Route{Guid: "route-guid"}
-			route.Domain = models.DomainFields{
-				Guid: "domain-guid",
-				Name: "example.com",
-			}
-			routeRepo.FindReturns(route, nil)
+			err := flagContext.Parse("domain-name")
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("fails with usage when given zero args", func() {
-			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires an argument"},
+		It("asks the user if they would like to proceed", func() {
+			go cmd.Execute(flagContext)
+			Eventually(func() []string { return ui.Prompts }).Should(ContainSubstrings(
+				[]string{"Really delete the route"},
 			))
 		})
 
-		It("does not fail with usage when provided with a domain", func() {
-			runCommand("example.com")
-			Expect(ui.FailedWithUsage).To(BeFalse())
+		It("tries to delete the route when the response is to proceed", func() {
+			go cmd.Execute(flagContext)
+			ui.InputsChan <- "y"
+			Eventually(routeRepo.DeleteCallCount()).Should(Equal(1))
 		})
 
-		It("does not fail with usage when provided a hostname", func() {
-			runCommand("-n", "my-host", "example.com")
-			Expect(ui.FailedWithUsage).To(BeFalse())
+		It("does not try to delete the route when the response is not to proceed", func() {
+			go cmd.Execute(flagContext)
+			ui.InputsChan <- "n"
+			Consistently(routeRepo.DeleteCallCount()).Should(BeZero())
 		})
 
-		It("deletes routes when the user confirms", func() {
-			runCommand("-n", "my-host", "example.com")
+		Context("when force is set", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("domain-name", "-f")
+				Expect(err).NotTo(HaveOccurred())
+			})
 
-			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the route my-host"}))
+			It("does not ask the user if they would like to proceed", func() {
+				cmd.Execute(flagContext)
+				Consistently(func() []string { return ui.Prompts }).ShouldNot(ContainSubstrings(
+					[]string{"Really delete the route"},
+				))
+			})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Deleting route", "my-host.example.com"},
-				[]string{"OK"},
-			))
+			It("tries to find the route", func() {
+				cmd.Execute(flagContext)
+				Eventually(routeRepo.FindCallCount()).Should(Equal(1))
+				host, domain, path := routeRepo.FindArgsForCall(0)
+				Expect(host).To(Equal(""))
+				Expect(path).To(Equal(""))
+				Expect(domain).To(Equal(fakeDomain))
+			})
 
-			Expect(routeRepo.DeleteCallCount()).To(Equal(1))
-			Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("route-guid"))
-		})
+			Context("when there is an error finding the route	", func() {
+				BeforeEach(func() {
+					routeRepo.FindReturns(models.Route{}, errors.New("find-err"))
+				})
 
-		It("does not prompt the user to confirm when they pass the '-f' flag", func() {
-			ui.Inputs = []string{}
-			runCommand("-f", "-n", "my-host", "example.com")
+				It("fails with error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"find-err"},
+					))
+				})
 
-			Expect(ui.Prompts).To(BeEmpty())
+				It("does not try to delete the route", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(routeRepo.DeleteCallCount()).To(BeZero())
+				})
+			})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Deleting", "my-host.example.com"},
-				[]string{"OK"},
-			))
-			Expect(routeRepo.DeleteCallCount()).To(Equal(1))
-			Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("route-guid"))
-		})
+			Context("when there is a ModelNotFoundError when finding the route	", func() {
+				BeforeEach(func() {
+					routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("model-type", "model-name"))
+				})
 
-		It("succeeds with a warning when the route does not exist", func() {
-			routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "not found"))
+				It("tells the user that it could not delete the route", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Unable to delete, route", "does not exist"},
+					))
+				})
 
-			runCommand("-n", "my-host", "example.com")
+				It("does not try to delete the route", func() {
+					cmd.Execute(flagContext)
+					Expect(routeRepo.DeleteCallCount()).To(BeZero())
+				})
+			})
 
-			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"my-host", "does not exist"}))
+			Context("when the route can be found", func() {
+				BeforeEach(func() {
+					routeRepo.FindReturns(models.Route{
+						Guid: "route-guid",
+					}, nil)
+				})
 
-			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"OK"}))
+				It("tries to delete the route", func() {
+					cmd.Execute(flagContext)
+					Expect(routeRepo.DeleteCallCount()).To(Equal(1))
+					Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("route-guid"))
+				})
+
+				Context("when deleting the route fails", func() {
+					BeforeEach(func() {
+						routeRepo.DeleteReturns(errors.New("delete-err"))
+					})
+
+					It("fails with error", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"delete-err"},
+						))
+					})
+				})
+
+				Context("when deleting the route succeeds", func() {
+					BeforeEach(func() {
+						routeRepo.DeleteReturns(nil)
+					})
+
+					It("tells the user that it succeeded", func() {
+						cmd.Execute(flagContext)
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"OK"},
+						))
+					})
+				})
+			})
 		})
 	})
 })
