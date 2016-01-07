@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/simonleung8/flags"
+	"github.com/cloudfoundry/cli/flags"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fakefeatureflagsapi "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"

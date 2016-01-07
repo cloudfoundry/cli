@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/simonleung8/flags"
+	"github.com/cloudfoundry/cli/flags"
 
 	. "github.com/cloudfoundry/cli/cf/terminal"
 )

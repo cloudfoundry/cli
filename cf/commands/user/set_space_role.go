@@ -2,7 +2,7 @@ package user
 
 import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/simonleung8/flags"
+	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"

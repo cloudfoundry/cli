@@ -10,7 +10,7 @@ import (
 	cferrors "github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/simonleung8/flags"
+	"github.com/cloudfoundry/cli/flags"
 
 	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"

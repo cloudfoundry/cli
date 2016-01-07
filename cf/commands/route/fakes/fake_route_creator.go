@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/simonleung8/flags"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type FakeRouteCreator struct {

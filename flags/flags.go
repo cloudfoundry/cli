@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/simonleung8/flags/flag"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type FlagSet interface {

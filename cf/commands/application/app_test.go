@@ -12,8 +12,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
-	"github.com/simonleung8/flags"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"

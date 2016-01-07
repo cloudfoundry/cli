@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/simonleung8/flags"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type TTYRequest int

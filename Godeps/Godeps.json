@@ -112,10 +112,6 @@
 			"Rev": "e8554b8641db39598be7f6342874b958f12ae1d4"
 		},
 		{
-			"ImportPath": "github.com/simonleung8/flags",
-			"Rev": "4304da028804a934cf49cd9a574692d80abd13c7"
-		},
-		{
 			"ImportPath": "github.com/stretchr/testify/assert",
 			"Comment": "v1.0-88-ge3a8ff8",
 			"Rev": "e3a8ff8ce36581f87a15341206f205b1da467059"

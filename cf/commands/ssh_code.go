@@ -11,6 +11,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -18,7 +19,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
-	"github.com/simonleung8/flags"
 )
 
 //go:generate counterfeiter -o fakes/fake_ssh_code_getter.go . SSHCodeGetter

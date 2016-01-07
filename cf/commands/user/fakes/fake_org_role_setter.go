@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/simonleung8/flags"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type FakeOrgRoleSetter struct {
