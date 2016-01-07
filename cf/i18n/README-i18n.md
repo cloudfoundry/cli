@@ -79,6 +79,6 @@ Our goal is to have translations for the following languages first:
 | Chinese (simplified)  | zh_Hans  | Complete   |
 | Chinese (traditional) | zh_Hant  | Complete   |
 
-If you are interested in submitting translations for another language/locale, then please communicate with us via VCAP-DEV mailing list first.
+If you are interested in submitting translations for another language/locale, then please communicate with us via [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) mailing list first.
 
 (*) We note "English files ready" to mean that our github project contains English versions for the translation files. We are ready for PRs on these files with actual translated strings.
