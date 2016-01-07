@@ -1,8 +1,6 @@
 package route
 
 import (
-	"strings"
-
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -86,10 +84,6 @@ func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
 	path := c.String("path")
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
-
-	if path != "" && !strings.HasPrefix(path, `/`) {
-		path = `/` + path
-	}
 
 	route, err := cmd.routeRepo.Find(hostName, domain, path)
 	if err != nil {

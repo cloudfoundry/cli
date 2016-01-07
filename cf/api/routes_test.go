@@ -139,7 +139,7 @@ var _ = Describe("route repository", func() {
 					domain := models.DomainFields{}
 					domain.Guid = "my-domain-guid"
 
-					route, apiErr := repo.Find("my-cool-app", domain, "/somepath")
+					route, apiErr := repo.Find("my-cool-app", domain, "somepath")
 
 					Expect(apiErr).NotTo(HaveOccurred())
 					Expect(route.Host).To(Equal("my-cool-app"))
@@ -179,7 +179,7 @@ var _ = Describe("route repository", func() {
 					domain := models.DomainFields{}
 					domain.Guid = "my-domain-guid"
 
-					_, apiErr := repo.Find("my-cool-app", domain, "/somepath")
+					_, apiErr := repo.Find("my-cool-app", domain, "somepath")
 
 					Expect(handler).To(HaveAllRequestsCalled())
 
@@ -229,7 +229,7 @@ var _ = Describe("route repository", func() {
 			})
 			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "/this-is-a-path", "my-domain-guid", "my-space-guid")
+			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "this-is-a-path", "my-domain-guid", "my-space-guid")
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -253,7 +253,7 @@ var _ = Describe("route repository", func() {
 			})
 			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.Create("my-cool-app", models.DomainFields{Guid: "my-domain-guid"}, "/the-path")
+			createdRoute, apiErr := repo.Create("my-cool-app", models.DomainFields{Guid: "my-domain-guid"}, "the-path")
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
@@ -282,6 +282,7 @@ var _ = Describe("route repository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(found).To(BeTrue())
 		})
+
 		Context("when the route is not found", func() {
 			It("does not return the error", func() {
 				ts, handler = testnet.NewServer([]testnet.TestRequest{
@@ -303,6 +304,7 @@ var _ = Describe("route repository", func() {
 				Expect(found).To(BeFalse())
 			})
 		})
+
 		Context("when there is a random httpError", func() {
 			It("returns false and the error", func() {
 				ts, handler = testnet.NewServer([]testnet.TestRequest{

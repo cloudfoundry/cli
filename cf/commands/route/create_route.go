@@ -1,8 +1,6 @@
 package route
 
 import (
-	"strings"
-
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -103,10 +101,6 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 }
 
 func (cmd *CreateRoute) CreateRoute(hostName string, path string, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {
-	if path != "" && !strings.HasPrefix(path, `/`) {
-		path = `/` + path
-	}
-
 	cmd.ui.Say(T("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"URL":       terminal.EntityNameColor(domain.UrlForHostAndPath(hostName, path)),
