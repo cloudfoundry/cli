@@ -1,151 +1,250 @@
 package route_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/simonleung8/flags"
+
+	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("unmap-route command", func() {
+var _ = Describe("UnmapRoute", func() {
 	var (
-		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		routeRepo           *testapi.FakeRouteRepository
-		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		ui         *testterm.FakeUI
+		configRepo core_config.Repository
+		routeRepo  *fakeapi.FakeRouteRepository
+
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement       requirements.Requirement
+		applicationRequirement *fakerequirements.FakeApplicationRequirement
+		domainRequirement      *fakerequirements.FakeDomainRequirement
+
+		fakeDomain models.DomainFields
 	)
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
-		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unmap-route").SetDependency(deps, pluginCall))
-	}
-
 	BeforeEach(func() {
-		ui = new(testterm.FakeUI)
+		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routeRepo = new(testapi.FakeRouteRepository)
-		requirementsFactory = new(testreq.FakeReqFactory)
+		routeRepo = &fakeapi.FakeRouteRepository{}
+		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
+
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = &route.UnmapRoute{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{Name: "login-requirement"}
+		factory.NewLoginRequirementReturns(loginRequirement)
+
+		applicationRequirement = &fakerequirements.FakeApplicationRequirement{}
+		factory.NewApplicationRequirementReturns(applicationRequirement)
+
+		fakeApplication := models.Application{}
+		fakeApplication.Guid = "fake-app-guid"
+		applicationRequirement.GetApplicationReturns(fakeApplication)
+
+		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		factory.NewDomainRequirementReturns(domainRequirement)
+
+		fakeDomain = models.DomainFields{
+			Guid: "fake-domain-guid",
+			Name: "fake-domain-name",
+		}
+		domainRequirement.GetDomainReturns(fakeDomain)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("unmap-route", args, requirementsFactory, updateCommandDependency, false)
-	}
-
-	Context("when the user is not logged in", func() {
-		It("fails requirements", func() {
-			Expect(runCommand("my-app", "some-domain.com")).To(BeFalse())
-		})
-	})
-
-	Context("when the user is logged in", func() {
-		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-		})
-
-		Context("when the user does not provide two args", func() {
-			It("fails with usage", func() {
-				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Incorrect Usage", "Requires", "arguments"},
-				))
-			})
-		})
-
-		Context("when the user provides an app and a domain", func() {
+	Describe("Requirements", func() {
+		Context("when not provided exactly two args", func() {
 			BeforeEach(func() {
-				requirementsFactory.Application = models.Application{
-					ApplicationFields: models.ApplicationFields{
-						Guid: "my-app-guid",
-						Name: "my-app",
-					},
-					Routes: []models.RouteSummary{
-						models.RouteSummary{
-							Guid: "my-route-guid",
-						},
-					},
-				}
-
-				requirementsFactory.Domain = models.DomainFields{
-					Guid: "my-domain-guid",
-					Name: "example.com",
-				}
-				routeRepo.FindByHostAndDomainReturns(models.Route{
-					Domain: requirementsFactory.Domain,
-					Guid:   "my-route-guid",
-					Host:   "foo",
-					Apps: []models.ApplicationFields{
-						models.ApplicationFields{
-							Guid: "my-app-guid",
-							Name: "my-app",
-						},
-					},
-				}, nil)
+				flagContext.Parse("app-name")
 			})
 
-			It("passes requirements", func() {
-				Expect(runCommand("-n", "my-host", "my-app", "my-domain.com")).To(BeTrue())
-			})
-
-			It("reads the app and domain from its requirements", func() {
-				runCommand("-n", "my-host", "my-app", "my-domain.com")
-				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-				Expect(requirementsFactory.DomainName).To(Equal("my-domain.com"))
-			})
-
-			It("unmaps the route", func() {
-				runCommand("-n", "my-host", "my-app", "my-domain.com")
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Removing route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
+					[]string{"Incorrect Usage. Requires app_name, domain_name as arguments"},
+					[]string{"NAME"},
+					[]string{"USAGE"},
 				))
+			})
+		})
 
-				Expect(ui.WarnOutputs).ToNot(ContainSubstrings(
-					[]string{"Route to be unmapped is not currently mapped to the application."},
-				))
-
-				Expect(routeRepo.UnbindCallCount()).To(Equal(1))
-				unboundRouteGUID, unboundAppGUID := routeRepo.UnbindArgsForCall(0)
-				Expect(unboundRouteGUID).To(Equal("my-route-guid"))
-				Expect(unboundAppGUID).To(Equal("my-app-guid"))
+		Context("when provided exactly two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name", "domain-name")
 			})
 
-			Context("when the route does not exist for the app", func() {
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns an ApplicationRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
+
+				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
+				Expect(actualRequirements).To(ContainElement(applicationRequirement))
+			})
+
+			It("returns a DomainRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
+
+				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
+				Expect(actualRequirements).To(ContainElement(domainRequirement))
+			})
+		})
+	})
+
+	Describe("Execute", func() {
+		BeforeEach(func() {
+			err := flagContext.Parse("app-name", "domain-name")
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("tries to find the host and domain in the route repo", func() {
+			cmd.Execute(flagContext)
+			Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
+			hostname, domain := routeRepo.FindByHostAndDomainArgsForCall(0)
+			Expect(hostname).To(Equal(""))
+			Expect(domain).To(Equal(fakeDomain))
+		})
+
+		Context("when the route can be found", func() {
+			BeforeEach(func() {
+				routeRepo.FindByHostAndDomainReturns(models.Route{Guid: "route-guid"}, nil)
+			})
+
+			It("tells the user that it is removing the route", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Removing route", "from app", "in org"},
+				))
+			})
+
+			Context("when the returned route has an app with the requested app's guid", func() {
 				BeforeEach(func() {
-					requirementsFactory.Application = models.Application{
-						ApplicationFields: models.ApplicationFields{
-							Guid: "not-my-app-guid",
-							Name: "my-app",
-						},
-						Routes: []models.RouteSummary{
-							models.RouteSummary{
-								Guid: "my-route-guid",
-							},
+					route := models.Route{
+						Guid: "route-guid",
+						Apps: []models.ApplicationFields{
+							{Guid: "fake-app-guid"},
 						},
 					}
+					routeRepo.FindByHostAndDomainReturns(route, nil)
 				})
 
-				It("informs the user the route did not exist on the applicaiton", func() {
-					runCommand("-n", "my-host", "my-app", "my-domain.com")
+				It("tries to unbind the route from the app", func() {
+					cmd.Execute(flagContext)
+					Expect(routeRepo.UnbindCallCount()).To(Equal(1))
+					routeGUID, appGUID := routeRepo.UnbindArgsForCall(0)
+					Expect(routeGUID).To(Equal("route-guid"))
+					Expect(appGUID).To(Equal("fake-app-guid"))
+				})
+
+				Context("when unbinding the route from the app fails", func() {
+					BeforeEach(func() {
+						routeRepo.UnbindReturns(errors.New("unbind-err"))
+					})
+
+					It("panics and prints a failure message", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(BeInDisplayOrder(
+							[]string{"FAILED"},
+							[]string{"unbind-err"},
+						))
+					})
+				})
+
+				Context("when unbinding the route from the app succeeds", func() {
+					BeforeEach(func() {
+						routeRepo.UnbindReturns(nil)
+					})
+
+					It("tells the user it succeeded", func() {
+						cmd.Execute(flagContext)
+						Expect(ui.Outputs).To(BeInDisplayOrder(
+							[]string{"OK"},
+						))
+					})
+				})
+			})
+
+			Context("when the returned route does not have an app with the requested app's guid", func() {
+				BeforeEach(func() {
+					route := models.Route{
+						Guid: "route-guid",
+						Apps: []models.ApplicationFields{
+							{Guid: "other-fake-app-guid"},
+						},
+					}
+					routeRepo.FindByHostAndDomainReturns(route, nil)
+				})
+
+				It("does not unbind the route from the app", func() {
+					cmd.Execute(flagContext)
+					Expect(routeRepo.UnbindCallCount()).To(Equal(0))
+				})
+
+				It("tells the user 'OK'", func() {
+					cmd.Execute(flagContext)
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Removing route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
 						[]string{"OK"},
 					))
+				})
 
-					Expect(ui.WarnOutputs).To(ContainSubstrings(
+				It("warns the user the route was not mapped to the application", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Route to be unmapped is not currently mapped to the application."},
 					))
 				})
+			})
+		})
+
+		Context("when the route cannot be found", func() {
+			BeforeEach(func() {
+				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.New("find-by-host-and-domain-err"))
+			})
+
+			It("panics and prints a failure message", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"FAILED"},
+					[]string{"find-by-host-and-domain-err"},
+				))
 			})
 		})
 	})
