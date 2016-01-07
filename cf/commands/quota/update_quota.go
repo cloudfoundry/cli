@@ -26,11 +26,11 @@ func (cmd *updateQuota) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["allow-paid-service-plans"] = &cliFlags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
 	fs["disallow-paid-service-plans"] = &cliFlags.BoolFlag{Name: "disallow-paid-service-plans", Usage: T("Cannot provision instances of paid service plans")}
-	fs["i"] = &cliFlags.StringFlag{Name: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)")}
-	fs["m"] = &cliFlags.StringFlag{Name: "m", Usage: T("Total amount of memory (e.g. 1024M, 1G, 10G)")}
-	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("New name")}
-	fs["r"] = &cliFlags.IntFlag{Name: "r", Usage: T("Total number of routes")}
-	fs["s"] = &cliFlags.IntFlag{Name: "s", Usage: T("Total number of service instances")}
+	fs["i"] = &cliFlags.StringFlag{ShortName: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)")}
+	fs["m"] = &cliFlags.StringFlag{ShortName: "m", Usage: T("Total amount of memory (e.g. 1024M, 1G, 10G)")}
+	fs["n"] = &cliFlags.StringFlag{ShortName: "n", Usage: T("New name")}
+	fs["r"] = &cliFlags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
+	fs["s"] = &cliFlags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 
 	return command_registry.CommandMetadata{
 		Name:        "update-quota",

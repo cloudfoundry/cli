@@ -209,7 +209,6 @@ var _ = Describe("CommandRegistry", func() {
 				[]string{"USAGE:"},
 				[]string{"OPTIONS:"},
 				[]string{"intFlag", "Usage for"},
-				[]string{"boolFlag", "Usage for"},
 			))
 		})
 

@@ -29,7 +29,7 @@ func init() {
 
 func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["a"] = &cliFlags.BoolFlag{Name: "a", Usage: T("List all users in the org")}
+	fs["a"] = &cliFlags.BoolFlag{ShortName: "a", Usage: T("List all users in the org")}
 
 	return command_registry.CommandMetadata{
 		Name:        "org-users",

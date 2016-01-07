@@ -33,7 +33,7 @@ func init() {
 
 func (cmd *CreateAppManifest) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Specify a path for file creation. If path not specified, manifest file is created in current working directory.")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Specify a path for file creation. If path not specified, manifest file is created in current working directory.")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-app-manifest",

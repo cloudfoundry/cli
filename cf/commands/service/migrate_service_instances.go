@@ -28,7 +28,7 @@ func init() {
 
 func (cmd *MigrateServiceInstances) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force migration without confirmation")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force migration without confirmation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "migrate-service-instances",

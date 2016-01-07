@@ -27,10 +27,10 @@ func init() {
 
 func (cmd *Scale) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["i"] = &cliFlags.IntFlag{Name: "i", Usage: T("Number of instances")}
-	fs["k"] = &cliFlags.StringFlag{Name: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
-	fs["m"] = &cliFlags.StringFlag{Name: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
-	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force restart of app without prompt")}
+	fs["i"] = &cliFlags.IntFlag{ShortName: "i", Usage: T("Number of instances")}
+	fs["k"] = &cliFlags.StringFlag{ShortName: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
+	fs["m"] = &cliFlags.StringFlag{ShortName: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force restart of app without prompt")}
 
 	return command_registry.CommandMetadata{
 		Name:        "scale",

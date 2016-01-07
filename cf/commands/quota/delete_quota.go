@@ -25,7 +25,7 @@ func init() {
 
 func (cmd *DeleteQuota) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "delete-quota",

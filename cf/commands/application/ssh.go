@@ -42,7 +42,7 @@ func init() {
 
 func (cmd *SSH) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["L"] = &cliFlags.StringSliceFlag{Name: "L", Usage: T("Local port forward specification. This flag can be defined more than once.")}
+	fs["L"] = &cliFlags.StringSliceFlag{ShortName: "L", Usage: T("Local port forward specification. This flag can be defined more than once.")}
 	fs["command"] = &cliFlags.StringSliceFlag{Name: "command", ShortName: "c", Usage: T("Command to run. This flag can be defined more than once.")}
 	fs["app-instance-index"] = &cliFlags.IntFlag{Name: "app-instance-index", ShortName: "i", Usage: T("Application instance index")}
 	fs["skip-host-validation"] = &cliFlags.BoolFlag{Name: "skip-host-validation", ShortName: "k", Usage: T("Skip host key validation")}

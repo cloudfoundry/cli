@@ -32,11 +32,11 @@ func init() {
 
 func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["i"] = &cliFlags.BoolFlag{Name: "i", Usage: T("Include response headers in the output")}
-	fs["v"] = &cliFlags.BoolFlag{Name: "v", Usage: T("Enable CF_TRACE output for all requests and responses")}
-	fs["X"] = &cliFlags.StringFlag{Name: "X", Value: "GET", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")}
-	fs["H"] = &cliFlags.StringSliceFlag{Name: "H", Usage: T("Custom headers to include in the request, flag can be specified multiple times")}
-	fs["d"] = &cliFlags.StringFlag{Name: "d", Usage: T("HTTP data to include in the request body")}
+	fs["i"] = &cliFlags.BoolFlag{ShortName: "i", Usage: T("Include response headers in the output")}
+	fs["v"] = &cliFlags.BoolFlag{ShortName: "v", Usage: T("Enable CF_TRACE output for all requests and responses")}
+	fs["X"] = &cliFlags.StringFlag{ShortName: "X", Value: "GET", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")}
+	fs["H"] = &cliFlags.StringSliceFlag{ShortName: "H", Usage: T("Custom headers to include in the request, flag can be specified multiple times")}
+	fs["d"] = &cliFlags.StringFlag{ShortName: "d", Usage: T("HTTP data to include in the request body")}
 	fs["output"] = &cliFlags.StringFlag{Name: "output", Usage: T("Write curl body to FILE instead of stdout")}
 
 	return command_registry.CommandMetadata{

@@ -25,7 +25,7 @@ func init() {
 
 func (cmd *DeleteSpaceQuota) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force delete (do not prompt for confirmation)")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force delete (do not prompt for confirmation)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "delete-space-quota",

@@ -29,8 +29,8 @@ func init() {
 
 func (cmd *Target) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("organization")}
-	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("space")}
+	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("organization")}
+	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("space")}
 
 	return command_registry.CommandMetadata{
 		Name:        "target",
