@@ -226,7 +226,7 @@ var _ = Describe("Push Command", func() {
 				route.Host = "app-name"
 				route.Domain = maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
 
-				routeRepo.FindByHostAndDomainReturns(route, nil)
+				routeRepo.FindReturns(route, nil)
 			})
 
 			It("notifies users about the error actor.GatherFiles() returns", func() {
@@ -244,8 +244,8 @@ var _ = Describe("Push Command", func() {
 
 				Expect(routeRepo.CreateCallCount()).To(BeZero())
 
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-				host, _ := routeRepo.FindByHostAndDomainArgsForCall(0)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				host, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("app-name"))
 
 				Expect(routeRepo.BindCallCount()).To(Equal(1))
@@ -263,7 +263,7 @@ var _ = Describe("Push Command", func() {
 
 		Context("when the default route for the app does not exist", func() {
 			BeforeEach(func() {
-				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "couldn't find it"))
+				routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "couldn't find it"))
 			})
 
 			It("refreshes the auth token (so fresh)", func() { // so clean
@@ -356,8 +356,8 @@ var _ = Describe("Push Command", func() {
 				Expect(*params.Name).To(Equal("app-name"))
 				Expect(*params.SpaceGuid).To(Equal("my-space-guid"))
 
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-				host, _ := routeRepo.FindByHostAndDomainArgsForCall(0)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				host, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("app-name"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -398,8 +398,8 @@ var _ = Describe("Push Command", func() {
 			It("strips special characters when creating a default route", func() {
 				callPush("-t", "111", "app!name")
 
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-				host, _ := routeRepo.FindByHostAndDomainArgsForCall(0)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				host, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("appname"))
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, _, _ := routeRepo.CreateArgsForCall(0)
@@ -544,8 +544,8 @@ var _ = Describe("Push Command", func() {
 
 					callPush("-t", "111", "app-name")
 
-					Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-					host, _ := routeRepo.FindByHostAndDomainArgsForCall(0)
+					Expect(routeRepo.FindCallCount()).To(Equal(1))
+					host, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name"))
 
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -589,8 +589,8 @@ var _ = Describe("Push Command", func() {
 
 					callPush("-t", "111", "app-name")
 
-					Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-					host, _ := routeRepo.FindByHostAndDomainArgsForCall(0)
+					Expect(routeRepo.FindCallCount()).To(Equal(1))
+					host, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name"))
 
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -629,8 +629,8 @@ var _ = Describe("Push Command", func() {
 
 				It("provides a random hostname when the --random-route flag is passed", func() {
 					callPush("--random-route", "app-name")
-					Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-					host, _ := routeRepo.FindByHostAndDomainArgsForCall(0)
+					Expect(routeRepo.FindCallCount()).To(Equal(1))
+					host, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name-random-host"))
 				})
 
@@ -639,8 +639,8 @@ var _ = Describe("Push Command", func() {
 
 					callPush("app-name")
 
-					Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-					host, _ := routeRepo.FindByHostAndDomainArgsForCall(0)
+					Expect(routeRepo.FindCallCount()).To(Equal(1))
+					host, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name-random-host"))
 				})
 			})
@@ -837,7 +837,7 @@ var _ = Describe("Push Command", func() {
 					return nil
 				}
 
-				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "uh oh"))
+				routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "uh oh"))
 
 				callPush("--no-hostname", "app-name")
 
@@ -1047,7 +1047,7 @@ var _ = Describe("Push Command", func() {
 					cb(domain)
 					return nil
 				}
-				routeRepo.FindByHostAndDomainReturns(models.Route{
+				routeRepo.FindReturns(models.Route{
 					Host:   "existing-app",
 					Domain: domain,
 				}, nil)
@@ -1078,7 +1078,7 @@ var _ = Describe("Push Command", func() {
 						appGuid, _, _ := actor.UploadAppArgsForCall(0)
 						Expect(appGuid).To(Equal("existing-app-guid"))
 						Expect(domainRepo.FindByNameInOrgCallCount()).To(BeZero())
-						Expect(routeRepo.FindByHostAndDomainCallCount()).To(BeZero())
+						Expect(routeRepo.FindCallCount()).To(BeZero())
 						Expect(routeRepo.CreateCallCount()).To(BeZero())
 					})
 				})
@@ -1086,7 +1086,7 @@ var _ = Describe("Push Command", func() {
 				Context("and there is a route in the manifest", func() {
 					BeforeEach(func() {
 						manifestRepo.ReadManifestReturns.Manifest = existingAppManifest()
-						routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "an-error"))
+						routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "an-error"))
 						domainRepo.FindByNameInOrgReturns(models.DomainFields{Name: "example.com", Guid: "example-domain-guid"}, nil)
 					})
 
@@ -1100,7 +1100,7 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("creates and binds a route when a different domain is specified", func() {
-				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.newdomain.com"))
+				routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.newdomain.com"))
 				domainRepo.FindByNameInOrgReturns(models.DomainFields{Guid: "domain-guid", Name: "newdomain.com"}, nil)
 
 				callPush("-d", "newdomain.com", "existing-app")
@@ -1108,8 +1108,8 @@ var _ = Describe("Push Command", func() {
 				Expect(domainName).To(Equal("newdomain.com"))
 				Expect(domainOrgGuid).To(Equal("my-org-guid"))
 
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-				host, domain := routeRepo.FindByHostAndDomainArgsForCall(0)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				host, domain, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("existing-app"))
 				Expect(domain.Name).To(Equal("newdomain.com"))
 
@@ -1126,12 +1126,12 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("creates and binds a route when a different hostname is specified", func() {
-				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "new-host.newdomain.com"))
+				routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "new-host.newdomain.com"))
 
 				callPush("-n", "new-host", "existing-app")
 
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-				host, domain := routeRepo.FindByHostAndDomainArgsForCall(0)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				host, domain, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("new-host"))
 				Expect(domain.Name).To(Equal("example.com"))
 
@@ -1154,7 +1154,7 @@ var _ = Describe("Push Command", func() {
 				Expect(appGuid).To(Equal("existing-app-guid"))
 
 				Expect(domainRepo.FindByNameInOrgCallCount()).To(BeZero())
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(BeZero())
+				Expect(routeRepo.FindCallCount()).To(BeZero())
 				Expect(routeRepo.CreateCallCount()).To(BeZero())
 
 				Expect(routeRepo.UnbindCallCount()).To(Equal(1))
@@ -1164,12 +1164,12 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("binds the root domain route to an app with a pre-existing route when the --no-hostname flag is given", func() {
-				routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.example.com"))
+				routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.example.com"))
 
 				callPush("--no-hostname", "existing-app")
 
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
-				host, domain := routeRepo.FindByHostAndDomainArgsForCall(0)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				host, domain, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal(""))
 				Expect(domain.Name).To(Equal("example.com"))
 
@@ -1313,7 +1313,7 @@ var _ = Describe("Push Command", func() {
 
 	Describe("when binding the route fails", func() {
 		BeforeEach(func() {
-			routeRepo.FindByHostAndDomainReturns(models.Route{
+			routeRepo.FindReturns(models.Route{
 				Host:   "existing-app",
 				Domain: models.DomainFields{Name: "foo.cf-app.com"},
 			}, nil)

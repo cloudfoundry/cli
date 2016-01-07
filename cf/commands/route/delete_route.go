@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/simonleung8/flags"
-	"github.com/simonleung8/flags/flag"
+	cliFlags "github.com/simonleung8/flags/flag"
 )
 
 type DeleteRoute struct {
@@ -59,6 +59,7 @@ func (cmd *DeleteRoute) SetDependency(deps command_registry.Dependency, pluginCa
 
 func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 	host := c.String("n")
+	path := "" // path is not yet supported
 	domainName := c.Args()[0]
 
 	url := domainName
@@ -74,7 +75,7 @@ func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Deleting route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(url)}))
 
 	domain := cmd.domainReq.GetDomain()
-	route, apiErr := cmd.routeRepo.FindByHostAndDomain(host, domain)
+	route, apiErr := cmd.routeRepo.Find(host, domain, path)
 
 	switch apiErr.(type) {
 	case nil:

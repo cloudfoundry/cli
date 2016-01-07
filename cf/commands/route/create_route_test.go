@@ -191,12 +191,12 @@ var _ = Describe("CreateRoute", func() {
 
 			It("attempts to find the route", func() {
 				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
 			})
 
 			Context("when finding the route fails", func() {
 				BeforeEach(func() {
-					routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.New("find-error"))
+					routeRepo.FindReturns(models.Route{}, errors.New("find-error"))
 				})
 
 				It("fails with the original error", func() {
@@ -221,7 +221,7 @@ var _ = Describe("CreateRoute", func() {
 
 			Context("when a route with the same domain and space guid is found", func() {
 				BeforeEach(func() {
-					routeRepo.FindByHostAndDomainReturns(models.Route{
+					routeRepo.FindReturns(models.Route{
 						Host: "hostname",
 						Path: "path",
 						Domain: models.DomainFields{
@@ -286,12 +286,12 @@ var _ = Describe("CreateRoute", func() {
 
 			It("attempts to find the route", func() {
 				cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
-				Expect(routeRepo.FindByHostAndDomainCallCount()).To(Equal(1))
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
 			})
 
 			Context("when finding the route fails", func() {
 				BeforeEach(func() {
-					routeRepo.FindByHostAndDomainReturns(models.Route{}, errors.New("find-error"))
+					routeRepo.FindReturns(models.Route{}, errors.New("find-error"))
 				})
 
 				It("returns the original error", func() {
@@ -319,7 +319,7 @@ var _ = Describe("CreateRoute", func() {
 
 			Context("when a route with the same domain and space guid is found", func() {
 				BeforeEach(func() {
-					routeRepo.FindByHostAndDomainReturns(models.Route{
+					routeRepo.FindReturns(models.Route{
 						Host: "hostname",
 						Path: "path",
 						Domain: models.DomainFields{

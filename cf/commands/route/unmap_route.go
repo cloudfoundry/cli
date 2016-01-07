@@ -1,6 +1,9 @@
 package route
 
 import (
+	"strings"
+
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -25,17 +28,23 @@ func init() {
 
 func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route")}
+	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path for the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "unmap-route",
 		Description: T("Remove a url route from an app"),
-		Usage:       T("CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]"),
-		Flags:       fs,
+		Usage: T(`CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]
+
+EXAMPLES:
+   CF_NAME unmap-route my-app example.com                              # example.com
+   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com
+   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo`),
+		Flags: fs,
 	}
 }
 
-func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires app_name, domain_name as arguments\n\n") + command_registry.Commands.CommandUsage("unmap-route"))
 	}
@@ -45,12 +54,24 @@ func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
-	reqs = []requirements.Requirement{
+	requiredVersion, err := semver.Make("2.36.0")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var reqs []requirements.Requirement
+
+	if fc.String("path") != "" {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
+	}
+
+	reqs = append(reqs, []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.appReq,
 		cmd.domainReq,
-	}
-	return
+	}...)
+
+	return reqs, nil
 }
 
 func (cmd *UnmapRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -62,10 +83,15 @@ func (cmd *UnmapRoute) SetDependency(deps command_registry.Dependency, pluginCal
 
 func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
 	hostName := c.String("n")
+	path := c.String("path")
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
-	route, err := cmd.routeRepo.FindByHostAndDomain(hostName, domain)
+	if path != "" && !strings.HasPrefix(path, `/`) {
+		path = `/` + path
+	}
+
+	route, err := cmd.routeRepo.Find(hostName, domain, path)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
