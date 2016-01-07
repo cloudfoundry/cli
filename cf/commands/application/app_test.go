@@ -56,7 +56,6 @@ var _ = Describe("App", func() {
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
 		ui = &testterm.FakeUI{}
-		ui.InputsChan = make(chan string)
 
 		getAppModel = &plugin_models.GetAppModel{}
 
