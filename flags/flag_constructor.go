@@ -1,8 +1,6 @@
 package flags
 
-import (
-	"github.com/simonleung8/flags/flag"
-)
+import "github.com/cloudfoundry/cli/flags/flag"
 
 func (c *flagContext) NewStringFlag(name string, shortName string, usage string) {
 	c.cmdFlags[name] = &cliFlags.StringFlag{Name: name, ShortName: shortName, Usage: usage}

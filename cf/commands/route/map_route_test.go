@@ -3,14 +3,13 @@ package route_test
 import (
 	"errors"
 
-	"github.com/simonleung8/flags"
-
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
 
 	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fakeroute "github.com/cloudfoundry/cli/cf/commands/route/fakes"

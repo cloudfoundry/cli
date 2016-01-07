@@ -329,14 +329,14 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"cf/i18n/resources/de_DE.all.json":   cfI18nResourcesDe_deAllJson,
-	"cf/i18n/resources/en_US.all.json":   cfI18nResourcesEn_usAllJson,
-	"cf/i18n/resources/es_ES.all.json":   cfI18nResourcesEs_esAllJson,
-	"cf/i18n/resources/fr_FR.all.json":   cfI18nResourcesFr_frAllJson,
-	"cf/i18n/resources/it_IT.all.json":   cfI18nResourcesIt_itAllJson,
-	"cf/i18n/resources/ja_JP.all.json":   cfI18nResourcesJa_jpAllJson,
-	"cf/i18n/resources/ko_KR.all.json":   cfI18nResourcesKo_krAllJson,
-	"cf/i18n/resources/pt_BR.all.json":   cfI18nResourcesPt_brAllJson,
+	"cf/i18n/resources/de_DE.all.json": cfI18nResourcesDe_deAllJson,
+	"cf/i18n/resources/en_US.all.json": cfI18nResourcesEn_usAllJson,
+	"cf/i18n/resources/es_ES.all.json": cfI18nResourcesEs_esAllJson,
+	"cf/i18n/resources/fr_FR.all.json": cfI18nResourcesFr_frAllJson,
+	"cf/i18n/resources/it_IT.all.json": cfI18nResourcesIt_itAllJson,
+	"cf/i18n/resources/ja_JP.all.json": cfI18nResourcesJa_jpAllJson,
+	"cf/i18n/resources/ko_KR.all.json": cfI18nResourcesKo_krAllJson,
+	"cf/i18n/resources/pt_BR.all.json": cfI18nResourcesPt_brAllJson,
 	"cf/i18n/resources/zh_Hans.all.json": cfI18nResourcesZh_hansAllJson,
 	"cf/i18n/resources/zh_Hant.all.json": cfI18nResourcesZh_hantAllJson,
 }
@@ -380,19 +380,18 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
-
 var _bintree = &bintree{nil, map[string]*bintree{
 	"cf": &bintree{nil, map[string]*bintree{
 		"i18n": &bintree{nil, map[string]*bintree{
 			"resources": &bintree{nil, map[string]*bintree{
-				"de_DE.all.json":   &bintree{cfI18nResourcesDe_deAllJson, map[string]*bintree{}},
-				"en_US.all.json":   &bintree{cfI18nResourcesEn_usAllJson, map[string]*bintree{}},
-				"es_ES.all.json":   &bintree{cfI18nResourcesEs_esAllJson, map[string]*bintree{}},
-				"fr_FR.all.json":   &bintree{cfI18nResourcesFr_frAllJson, map[string]*bintree{}},
-				"it_IT.all.json":   &bintree{cfI18nResourcesIt_itAllJson, map[string]*bintree{}},
-				"ja_JP.all.json":   &bintree{cfI18nResourcesJa_jpAllJson, map[string]*bintree{}},
-				"ko_KR.all.json":   &bintree{cfI18nResourcesKo_krAllJson, map[string]*bintree{}},
-				"pt_BR.all.json":   &bintree{cfI18nResourcesPt_brAllJson, map[string]*bintree{}},
+				"de_DE.all.json": &bintree{cfI18nResourcesDe_deAllJson, map[string]*bintree{}},
+				"en_US.all.json": &bintree{cfI18nResourcesEn_usAllJson, map[string]*bintree{}},
+				"es_ES.all.json": &bintree{cfI18nResourcesEs_esAllJson, map[string]*bintree{}},
+				"fr_FR.all.json": &bintree{cfI18nResourcesFr_frAllJson, map[string]*bintree{}},
+				"it_IT.all.json": &bintree{cfI18nResourcesIt_itAllJson, map[string]*bintree{}},
+				"ja_JP.all.json": &bintree{cfI18nResourcesJa_jpAllJson, map[string]*bintree{}},
+				"ko_KR.all.json": &bintree{cfI18nResourcesKo_krAllJson, map[string]*bintree{}},
+				"pt_BR.all.json": &bintree{cfI18nResourcesPt_brAllJson, map[string]*bintree{}},
 				"zh_Hans.all.json": &bintree{cfI18nResourcesZh_hansAllJson, map[string]*bintree{}},
 				"zh_Hant.all.json": &bintree{cfI18nResourcesZh_hantAllJson, map[string]*bintree{}},
 			}},
@@ -446,3 +445,4 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
+

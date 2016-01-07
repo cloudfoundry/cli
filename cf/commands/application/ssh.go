@@ -17,8 +17,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/ssh/options"
 	"github.com/cloudfoundry/cli/cf/ssh/terminal"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/simonleung8/flags"
-	"github.com/simonleung8/flags/flag"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type SSH struct {

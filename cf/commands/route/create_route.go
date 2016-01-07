@@ -9,8 +9,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/simonleung8/flags"
-	cliFlags "github.com/simonleung8/flags/flag"
+	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 //go:generate counterfeiter -o fakes/fake_route_creator.go . RouteCreator
