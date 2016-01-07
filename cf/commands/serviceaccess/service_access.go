@@ -29,9 +29,9 @@ func init() {
 
 func (cmd *ServiceAccess) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["b"] = &cliFlags.StringFlag{Name: "b", Usage: T("access for plans of a particular broker")}
-	fs["e"] = &cliFlags.StringFlag{Name: "e", Usage: T("access for service name of a particular service offering")}
-	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("plans accessible by a particular organization")}
+	fs["b"] = &cliFlags.StringFlag{ShortName: "b", Usage: T("access for plans of a particular broker")}
+	fs["e"] = &cliFlags.StringFlag{ShortName: "e", Usage: T("access for service name of a particular service offering")}
+	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("plans accessible by a particular organization")}
 
 	return command_registry.CommandMetadata{
 		Name:        "service-access",

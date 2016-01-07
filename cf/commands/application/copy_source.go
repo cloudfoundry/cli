@@ -36,8 +36,8 @@ func init() {
 func (cmd *CopySource) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["no-restart"] = &cliFlags.BoolFlag{Name: "no-restart", Usage: T("Override restart of the application in target environment after copy-source completes")}
-	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Org that contains the target application")}
-	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Space that contains the target application")}
+	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Org that contains the target application")}
+	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Space that contains the target application")}
 
 	return command_registry.CommandMetadata{
 		Name:        "copy-source",

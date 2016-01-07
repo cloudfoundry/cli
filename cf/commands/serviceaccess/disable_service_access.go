@@ -25,8 +25,8 @@ func init() {
 
 func (cmd *DisableServiceAccess) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Disable access to a specified service plan")}
-	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Disable access for a specified organization")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Disable access to a specified service plan")}
+	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Disable access for a specified organization")}
 
 	return command_registry.CommandMetadata{
 		Name:        "disable-service-access",

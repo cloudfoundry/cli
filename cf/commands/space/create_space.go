@@ -34,8 +34,8 @@ func init() {
 
 func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Organization")}
-	fs["q"] = &cliFlags.StringFlag{Name: "q", Usage: T("Quota to assign to the newly created space (excluding this option results in assignment of default quota)")}
+	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Organization")}
+	fs["q"] = &cliFlags.StringFlag{ShortName: "q", Usage: T("Quota to assign to the newly created space (excluding this option results in assignment of default quota)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-space",

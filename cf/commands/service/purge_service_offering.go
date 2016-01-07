@@ -22,8 +22,8 @@ func init() {
 
 func (cmd *PurgeServiceOffering) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force deletion without confirmation")}
-	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Provider")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Provider")}
 
 	return command_registry.CommandMetadata{
 		Name:        "purge-service-offering",

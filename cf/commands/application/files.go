@@ -24,7 +24,7 @@ func init() {
 
 func (cmd *Files) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["i"] = &cliFlags.IntFlag{Name: "i", Usage: T("Instance")}
+	fs["i"] = &cliFlags.IntFlag{ShortName: "i", Usage: T("Instance")}
 
 	return command_registry.CommandMetadata{
 		Name:        "files",

@@ -25,8 +25,8 @@ func init() {
 
 func (cmd *UpdateBuildpack) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["i"] = &cliFlags.IntFlag{Name: "i", Usage: T("The order in which the buildpacks are checked during buildpack auto-detection")}
-	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Path to directory or zip file")}
+	fs["i"] = &cliFlags.IntFlag{ShortName: "i", Usage: T("The order in which the buildpacks are checked during buildpack auto-detection")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Path to directory or zip file")}
 	fs["enable"] = &cliFlags.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")}
 	fs["disable"] = &cliFlags.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")}
 	fs["lock"] = &cliFlags.BoolFlag{Name: "lock", Usage: T("Lock the buildpack to prevent updates")}

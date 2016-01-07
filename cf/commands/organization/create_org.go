@@ -32,7 +32,7 @@ func init() {
 
 func (cmd *CreateOrg) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["q"] = &cliFlags.StringFlag{Name: "q", Usage: T("Quota to assign to the newly created org (excluding this option results in assignment of default quota)")}
+	fs["q"] = &cliFlags.StringFlag{ShortName: "q", Usage: T("Quota to assign to the newly created org (excluding this option results in assignment of default quota)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-org",

@@ -29,7 +29,7 @@ func init() {
 
 func (cmd *RepoPlugins) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["r"] = &cliFlags.StringFlag{Name: "r", Usage: T("Repo Name - List plugins from just this repository")}
+	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("Repo Name - List plugins from just this repository")}
 
 	return command_registry.CommandMetadata{
 		Name:        T("repo-plugins"),

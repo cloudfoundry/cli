@@ -4,75 +4,124 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("Showing Flags Usage", func() {
+var _ = Describe("ShowUsage", func() {
+	var fc flags.FlagContext
 
-	var (
-		fc flags.FlagContext
-	)
+	Context("when given a flag with a longname", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("flag-a", "", "")
+		})
 
-	BeforeEach(func() {
-		fc = flags.New()
-		fc.NewIntFlag("intFlag", "i", "Usage for intFlag")
-		fc.NewIntFlag("m", "", "Usage for intFlag")
-		fc.NewBoolFlag("boolFlag", "b", "Usage for boolFlag")
-		fc.NewBoolFlag("f", "", "Usage for f")
+		It("prints the longname with two hyphens", func() {
+			outputs := fc.ShowUsage(0)
+			Expect(outputs).To(ContainSubstring("--flag-a\n"))
+		})
 	})
 
-	It("prints both the full and short flag name", func() {
-		outputs := fc.ShowUsage(0)
-		Ω(outputs).To(ContainSubstring("-intFlag, -i"))
-		Ω(outputs).To(ContainSubstring("-f"))
-		Ω(outputs).To(ContainSubstring("--boolFlag, -b"))
+	Context("when given a flag with a longname and usage", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("flag-a", "", "Usage for flag-a")
+		})
+
+		It("prints the longname with two hyphens followed by the usage", func() {
+			outputs := fc.ShowUsage(0)
+			Expect(outputs).To(ContainSubstring("--flag-a      Usage for flag-a\n"))
+		})
 	})
 
-	It("prints full flag name with double dashes (--) if shortName exists", func() {
-		outputs := fc.ShowUsage(1)
-		Ω(outputs).To(ContainSubstring(" --intFlag"))
-		Ω(outputs).To(ContainSubstring(" -m"))
-		Ω(outputs).To(ContainSubstring(" -f"))
-		Ω(outputs).To(ContainSubstring(" --boolFlag, -b"))
+	Context("when given a flag with a longname and a shortname and usage", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("flag-a", "a", "Usage for flag-a")
+		})
+
+		It("prints the longname with two hyphens followed by the shortname followed by the usage", func() {
+			outputs := fc.ShowUsage(0)
+			Expect(outputs).To(ContainSubstring("--flag-a, -a      Usage for flag-a\n"))
+		})
 	})
 
-	It("prefixes the flag name with spaces", func() {
-		outputs := fc.ShowUsage(5)
-		Ω(outputs).To(ContainSubstring("     --intFlag"))
-		Ω(outputs).To(ContainSubstring("     -f"))
-		Ω(outputs).To(ContainSubstring("     --boolFlag"))
+	Context("when given a flag with a longname and a shortname", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("flag-a", "a", "")
+		})
+
+		It("prints the longname with two hyphens followed by the shortname with one hyphen", func() {
+			outputs := fc.ShowUsage(0)
+			Expect(outputs).To(ContainSubstring("--flag-a, -a\n"))
+		})
 	})
 
-	It("prints the usages with non-bool flags first", func() {
-		outputs := fc.ShowUsage(0)
-		buffer := gbytes.BufferWithBytes([]byte(outputs))
-		Eventually(buffer).Should(gbytes.Say("intFlag"))
-		Eventually(buffer).Should(gbytes.Say("Usage for intFlag"))
-		Eventually(buffer).Should(gbytes.Say("boolFlag"))
-		Eventually(buffer).Should(gbytes.Say("Usage for boolFlag"))
-		Ω(outputs).To(ContainSubstring("f"))
-		Ω(outputs).To(ContainSubstring("Usage for f"))
+	Context("when given a flag with a shortname", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("", "a", "")
+		})
+
+		It("prints the shortname with one hyphen", func() {
+			outputs := fc.ShowUsage(0)
+			Expect(outputs).To(ContainSubstring("-a\n"))
+		})
 	})
 
-	It("prefixes the non-bool flag with '-'", func() {
-		outputs := fc.ShowUsage(0)
-		Ω(outputs).To(ContainSubstring("-intFlag"))
+	Context("when given a flag with a shortname and usage", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("", "a", "Usage for a")
+		})
+
+		It("prints the shortname with one hyphen followed by the usage", func() {
+			outputs := fc.ShowUsage(0)
+			Expect(outputs).To(MatchRegexp("^-a      Usage for a\n"))
+		})
 	})
 
-	It("prefixes single character bool flags with '-'", func() {
-		outputs := fc.ShowUsage(0)
-		Ω(outputs).To(ContainSubstring("-f"))
+	Context("when showing usage for multiple flags", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("flag-a", "a", "Usage for flag-a")
+			fc.NewStringFlag("flag-b", "", "")
+			fc.NewBoolFlag("flag-c", "c", "Usage for flag-c")
+		})
+
+		It("prints each flag on its own line", func() {
+			outputs := fc.ShowUsage(0)
+			Expect(outputs).To(ContainSubstring("--flag-a, -a      Usage for flag-a\n"))
+			Expect(outputs).To(ContainSubstring("--flag-b\n"))
+			Expect(outputs).To(ContainSubstring("--flag-c, -c      Usage for flag-c\n"))
+		})
 	})
 
-	It("prefixes multi-character bool flags with '--'", func() {
-		outputs := fc.ShowUsage(0)
-		Ω(outputs).To(ContainSubstring("--boolFlag"))
+	Context("when given a non-zero integer for padding", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("flag-a", "", "")
+		})
+
+		It("prefixes the flag name with the number of spaces requested", func() {
+			outputs := fc.ShowUsage(5)
+			Expect(outputs).To(ContainSubstring("     --flag-a\n"))
+		})
 	})
 
-	It("aligns the text by padding string with spaces", func() {
-		outputs := fc.ShowUsage(0)
-		Ω(outputs).To(ContainSubstring("--intFlag, -i       Usage for intFlag"))
-		Ω(outputs).To(ContainSubstring("-f                  Usage for f"))
-		Ω(outputs).To(ContainSubstring("--boolFlag, -b      Usage for boolFlag"))
+	Context("when showing usage for multiple flags", func() {
+		BeforeEach(func() {
+			fc = flags.New()
+			fc.NewIntFlag("flag-a", "a", "Usage for flag-a")
+			fc.NewStringFlag("flag-b", "", "Usage for flag-b")
+			fc.NewBoolFlag("flag-c", "c", "Usage for flag-c")
+		})
+
+		It("aligns the text by padding string with spaces", func() {
+			outputs := fc.ShowUsage(0)
+			Expect(outputs).To(ContainSubstring("--flag-a, -a      Usage for flag-a"))
+			Expect(outputs).To(ContainSubstring("--flag-b          Usage for flag-b"))
+			Expect(outputs).To(ContainSubstring("--flag-c, -c      Usage for flag-c"))
+		})
 	})
 })

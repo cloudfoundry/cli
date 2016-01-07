@@ -54,9 +54,9 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
    CF_NAME update-service mydb -t "list,of, tags"`)
 
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Change service plan for a service instance")}
-	fs["c"] = &cliFlags.StringFlag{Name: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
-	fs["t"] = &cliFlags.StringFlag{Name: "t", Usage: T("User provided tags")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Change service plan for a service instance")}
+	fs["c"] = &cliFlags.StringFlag{ShortName: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
+	fs["t"] = &cliFlags.StringFlag{ShortName: "t", Usage: T("User provided tags")}
 
 	return command_registry.CommandMetadata{
 		Name:        "update-service",

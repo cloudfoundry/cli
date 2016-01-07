@@ -28,8 +28,8 @@ func init() {
 
 func (cmd *UpdateUserProvidedService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Credentials")}
-	fs["l"] = &cliFlags.StringFlag{Name: "l", Usage: T("Syslog Drain Url")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials")}
+	fs["l"] = &cliFlags.StringFlag{ShortName: "l", Usage: T("Syslog Drain Url")}
 
 	return command_registry.CommandMetadata{
 		Name:        "update-user-provided-service",

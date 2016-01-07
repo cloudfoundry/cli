@@ -40,8 +40,8 @@ func init() {
 
 func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["r"] = &cliFlags.StringFlag{Name: "r", Usage: T("repo name where the plugin binary is located")}
-	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force install of plugin without prompt")}
+	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("repo name where the plugin binary is located")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force install of plugin without prompt")}
 
 	return command_registry.CommandMetadata{
 		Name:        "install-plugin",

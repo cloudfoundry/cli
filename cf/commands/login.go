@@ -36,11 +36,11 @@ func init() {
 
 func (cmd *Login) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["a"] = &cliFlags.StringFlag{Name: "a", Usage: T("API endpoint (e.g. https://api.example.com)")}
-	fs["u"] = &cliFlags.StringFlag{Name: "u", Usage: T("Username")}
-	fs["p"] = &cliFlags.StringFlag{Name: "p", Usage: T("Password")}
-	fs["o"] = &cliFlags.StringFlag{Name: "o", Usage: T("Org")}
-	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Space")}
+	fs["a"] = &cliFlags.StringFlag{ShortName: "a", Usage: T("API endpoint (e.g. https://api.example.com)")}
+	fs["u"] = &cliFlags.StringFlag{ShortName: "u", Usage: T("Username")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Password")}
+	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Org")}
+	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Space")}
 	fs["sso"] = &cliFlags.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")}
 	fs["skip-ssl-validation"] = &cliFlags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")}
 

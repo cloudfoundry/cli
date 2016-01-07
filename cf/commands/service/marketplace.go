@@ -28,7 +28,7 @@ func init() {
 
 func (cmd *MarketplaceServices) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["s"] = &cliFlags.StringFlag{Name: "s", Usage: T("Show plan details for a particular service offering")}
+	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Show plan details for a particular service offering")}
 
 	return command_registry.CommandMetadata{
 		Name:        "marketplace",
