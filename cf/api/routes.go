@@ -57,6 +57,10 @@ func (repo CloudControllerRouteRepository) ListAllRoutes(cb func(models.Route) b
 }
 
 func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
+	if path != "" && !strings.HasPrefix(path, `/`) {
+		path = `/` + path
+	}
+
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
@@ -96,6 +100,10 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 }
 
 func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
+	if path != "" && !strings.HasPrefix(path, `/`) {
+		path = `/` + path
+	}
+
 	data := fmt.Sprintf(`{"host":"%s","path":"%s","domain_guid":"%s","space_guid":"%s"}`, host, path, domainGuid, spaceGuid)
 
 	resource := new(resources.RouteResource)

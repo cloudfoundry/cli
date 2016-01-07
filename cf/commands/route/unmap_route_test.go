@@ -194,7 +194,7 @@ var _ = Describe("UnmapRoute", func() {
 				cmd.Execute(flagContext)
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 				_, _, path := routeRepo.FindArgsForCall(0)
-				Expect(path).To(Equal("/the-path"))
+				Expect(path).To(Equal("the-path"))
 			})
 		})
 

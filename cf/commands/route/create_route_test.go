@@ -171,17 +171,9 @@ var _ = Describe("CreateRoute", func() {
 			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
 			hostname, path, domain, space := routeRepo.CreateInSpaceArgsForCall(0)
 			Expect(hostname).To(Equal("hostname"))
-			Expect(path).To(Equal("/path"))
+			Expect(path).To(Equal("path"))
 			Expect(domain).To(Equal("domain-guid"))
 			Expect(space).To(Equal("space-guid"))
-		})
-
-		It("does not add an extra forward slash when the path contains a prefixed forward slash", func() {
-			cmd.Execute(flagContext)
-
-			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-			_, path, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
-			Expect(path).To(Equal("/path"))
 		})
 
 		Context("when creating the route fails", func() {
@@ -266,17 +258,9 @@ var _ = Describe("CreateRoute", func() {
 			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
 			hostname, path, domain, space := routeRepo.CreateInSpaceArgsForCall(0)
 			Expect(hostname).To(Equal("hostname"))
-			Expect(path).To(Equal("/path"))
+			Expect(path).To(Equal("path"))
 			Expect(domain).To(Equal(domainFields.Guid))
 			Expect(space).To(Equal(spaceFields.Guid))
-		})
-
-		It("does not add an extra forward slash when the path contains a prefixed forward slash", func() {
-			cmd.CreateRoute("hostname", "/path", domainFields, spaceFields)
-
-			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
-			_, path, _, _ := routeRepo.CreateInSpaceArgsForCall(0)
-			Expect(path).To(Equal("/path"))
 		})
 
 		Context("when creating the route fails", func() {
