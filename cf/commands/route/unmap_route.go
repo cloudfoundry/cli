@@ -26,8 +26,8 @@ func init() {
 
 func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route")}
-	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path for the route")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the route")}
+	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path used to identify the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "unmap-route",
