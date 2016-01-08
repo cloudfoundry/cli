@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
+//go:generate counterfeiter -o fakes/fake_targeted_org_requirement.go . TargetedOrgRequirement
 type TargetedOrgRequirement interface {
 	Requirement
 	GetOrganizationFields() models.OrganizationFields
