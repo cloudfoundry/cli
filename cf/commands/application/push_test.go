@@ -314,6 +314,14 @@ var _ = Describe("Push Command", func() {
 						[]string{"OK"},
 						[]string{"Binding", "manifest-host.example2.com"},
 						[]string{"OK"},
+						[]string{"Creating", "host2.example1.com"},
+						[]string{"OK"},
+						[]string{"Binding", "host2.example1.com"},
+						[]string{"OK"},
+						[]string{"Creating", "host2.example2.com"},
+						[]string{"OK"},
+						[]string{"Binding", "host2.example2.com"},
+						[]string{"OK"},
 					))
 				})
 
