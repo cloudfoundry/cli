@@ -152,7 +152,11 @@ var _ = Describe("Push Command", func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{
+			LoginSuccess:         true,
+			TargetedSpaceSuccess: true,
+			MinAPIVersionSuccess: true,
+		}
 
 		zipper = &fakeappfiles.FakeZipper{}
 		appfiles = &fakeappfiles.FakeAppFiles{}
@@ -198,6 +202,26 @@ var _ = Describe("Push Command", func() {
 		// but the test infrastructure for parsing args and flags is sorely lacking
 		It("fails when provided too many args", func() {
 			Expect(callPush("-p", "path", "too-much", "app-name")).To(BeFalse())
+		})
+
+		Context("when the CC API version is too low", func() {
+			BeforeEach(func() {
+				requirementsFactory.MinAPIVersionSuccess = false
+			})
+
+			It("fails when provided the --route-path option", func() {
+				Expect(callPush("--route-path", "the-path", "app-name")).To(BeFalse())
+			})
+		})
+
+		Context("when the CC API version is not too low", func() {
+			BeforeEach(func() {
+				requirementsFactory.MinAPIVersionSuccess = true
+			})
+
+			It("does not fail when provided the --route-path option", func() {
+				Expect(callPush("--route-path", "the-path", "app-name")).To(BeTrue())
+			})
 		})
 	})
 
@@ -434,6 +458,7 @@ var _ = Describe("Push Command", func() {
 					"-c", "unicorn -c config/unicorn.rb -D",
 					"-d", "bar.cf-app.com",
 					"-n", "my-hostname",
+					"--route-path", "my-route-path",
 					"-k", "4G",
 					"-i", "3",
 					"-m", "2G",
@@ -450,9 +475,9 @@ var _ = Describe("Push Command", func() {
 					[]string{"OK"},
 					[]string{"Creating app", "app-name"},
 					[]string{"OK"},
-					[]string{"Creating route", "my-hostname.bar.cf-app.com"},
+					[]string{"Creating route", "my-hostname.bar.cf-app.com/my-route-path"},
 					[]string{"OK"},
-					[]string{"Binding", "my-hostname.bar.cf-app.com", "app-name"},
+					[]string{"Binding", "my-hostname.bar.cf-app.com/my-route-path", "app-name"},
 					[]string{"Uploading", "app-name"},
 					[]string{"OK"},
 				))
@@ -478,7 +503,7 @@ var _ = Describe("Push Command", func() {
 				createdHost, createdDomainFields, createdPath := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("my-hostname"))
 				Expect(createdDomainFields.Guid).To(Equal("bar-domain-guid"))
-				Expect(createdPath).To(BeEmpty())
+				Expect(createdPath).To(Equal("my-route-path"))
 
 				Expect(routeRepo.BindCallCount()).To(Equal(1))
 				boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
@@ -550,7 +575,7 @@ var _ = Describe("Push Command", func() {
 						return nil
 					}
 
-					callPush("-t", "111", "app-name")
+					callPush("-t", "111", "--route-path", "the-route-path", "app-name")
 
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
 					host, _, _ := routeRepo.FindArgsForCall(0)
@@ -560,7 +585,7 @@ var _ = Describe("Push Command", func() {
 					createdHost, createdDomainFields, createdPath := routeRepo.CreateArgsForCall(0)
 					Expect(createdHost).To(Equal("app-name"))
 					Expect(createdDomainFields.Guid).To(Equal("shared-domain-guid"))
-					Expect(createdPath).To(BeEmpty())
+					Expect(createdPath).To(Equal("the-route-path"))
 
 					Expect(routeRepo.BindCallCount()).To(Equal(1))
 					boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
@@ -570,9 +595,9 @@ var _ = Describe("Push Command", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Creating app", "app-name", "my-org", "my-space"},
 						[]string{"OK"},
-						[]string{"Creating", "app-name.shared.cf-app.com"},
+						[]string{"Creating", "app-name.shared.cf-app.com/the-route-path"},
 						[]string{"OK"},
-						[]string{"Binding", "app-name.shared.cf-app.com"},
+						[]string{"Binding", "app-name.shared.cf-app.com/the-route-path"},
 						[]string{"OK"},
 						[]string{"Uploading app-name"},
 						[]string{"OK"},

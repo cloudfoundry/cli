@@ -39,6 +39,8 @@ func (r MinAPIVersionRequirement) Execute() bool {
 		r.ui.Failed(T("Unable to parse CC API Version '{{.APIVersion}}'", map[string]interface{}{
 			"APIVersion": r.config.ApiVersion(),
 		}))
+
+		return false
 	}
 
 	if apiVersion.LT(r.requiredVersion) {
@@ -48,6 +50,8 @@ func (r MinAPIVersionRequirement) Execute() bool {
 				"Feature":         r.feature,
 				"RequiredVersion": r.requiredVersion.String(),
 			}))
+
+		return false
 	}
 
 	return true

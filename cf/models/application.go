@@ -84,6 +84,7 @@ type AppParams struct {
 	Diego              *bool
 	EnableSsh          *bool
 	Hosts              *[]string
+	RoutePath          *string
 	InstanceCount      *int
 	Memory             *int64
 	Name               *string
@@ -126,6 +127,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.Hosts != nil {
 		app.Hosts = other.Hosts
+	}
+	if other.RoutePath != nil {
+		app.RoutePath = other.RoutePath
 	}
 	if other.InstanceCount != nil {
 		app.InstanceCount = other.InstanceCount
