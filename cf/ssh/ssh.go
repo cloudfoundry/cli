@@ -306,6 +306,11 @@ func (c *secureShell) InteractiveSession() error {
 }
 
 func (c *secureShell) Wait() error {
+	keepaliveStopCh := make(chan struct{})
+	defer close(keepaliveStopCh)
+
+	go keepalive(c.secureClient.Conn(), time.NewTicker(c.keepAliveInterval), keepaliveStopCh)
+
 	return c.secureClient.Wait()
 }
 
