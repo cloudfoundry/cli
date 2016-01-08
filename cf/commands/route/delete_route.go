@@ -1,6 +1,7 @@
 package route
 
 import (
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -25,29 +26,47 @@ func init() {
 
 func (cmd *DeleteRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
-	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname")}
+	fs["f"] = &cliFlags.BoolFlag{Name: "force", ShortName: "f", Usage: T("Force deletion without confirmation")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route")}
+	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path for the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "delete-route",
 		Description: T("Delete a route"),
-		Usage:       T("CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [-f]"),
-		Flags:       fs,
+		Usage: T(`CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]
+
+EXAMPLES:
+   CF_NAME delete-route example.com                              # example.com
+   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com
+   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo`),
+		Flags: fs,
 	}
 }
 
-func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-route"))
 	}
 
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(fc.Args()[0])
 
-	reqs = []requirements.Requirement{
+	requiredVersion, err := semver.Make("2.36.0")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var reqs []requirements.Requirement
+
+	if fc.String("path") != "" {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
+	}
+
+	reqs = append(reqs, []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.domainReq,
-	}
-	return
+	}...)
+
+	return reqs, nil
 }
 
 func (cmd *DeleteRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -59,7 +78,7 @@ func (cmd *DeleteRoute) SetDependency(deps command_registry.Dependency, pluginCa
 
 func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 	host := c.String("n")
-	path := "" // path is not yet supported
+	path := c.String("path")
 	domainName := c.Args()[0]
 
 	url := domainName
@@ -75,22 +94,20 @@ func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Deleting route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(url)}))
 
 	domain := cmd.domainReq.GetDomain()
-	route, apiErr := cmd.routeRepo.Find(host, domain, path)
-
-	switch apiErr.(type) {
-	case nil:
-	case *errors.ModelNotFoundError:
-		cmd.ui.Warn(T("Unable to delete, route '{{.URL}}' does not exist.",
-			map[string]interface{}{"URL": url}))
-		return
-	default:
-		cmd.ui.Failed(apiErr.Error())
+	route, err := cmd.routeRepo.Find(host, domain, path)
+	if err != nil {
+		if _, ok := err.(*errors.ModelNotFoundError); ok {
+			cmd.ui.Warn(T("Unable to delete, route '{{.URL}}' does not exist.",
+				map[string]interface{}{"URL": url}))
+			return
+		}
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	apiErr = cmd.routeRepo.Delete(route.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	err = cmd.routeRepo.Delete(route.Guid)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 		return
 	}
 

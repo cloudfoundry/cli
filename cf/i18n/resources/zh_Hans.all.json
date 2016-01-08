@@ -775,9 +775,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [-f]",
+      "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]\n\nEXAMPLES:\n   CF_NAME delete-route example.com                              # example.com\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo",
       "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [-f]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
@@ -2782,11 +2782,6 @@
    {
       "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
       "translation": "HTTP 方法（GET、POST、PUT、DELETE 等）",
-      "modified": false
-   },
-   {
-      "id": "Hostname",
-      "translation": "主机名 ",
       "modified": false
    },
    {
