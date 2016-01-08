@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/blang/semver"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
@@ -73,28 +74,41 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 	fs["no-route"] = &cliFlags.BoolFlag{Name: "no-route", Usage: T("Do not map a route to this app and remove routes from previous pushes of this app.")}
 	fs["no-start"] = &cliFlags.BoolFlag{Name: "no-start", Usage: T("Do not start an app after pushing")}
 	fs["random-route"] = &cliFlags.BoolFlag{Name: "random-route", Usage: T("Create a random route for this app")}
+	fs["route-path"] = &cliFlags.StringFlag{Name: "route-path", Usage: T("Path for the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "push",
 		ShortName:   "p",
 		Description: T("Push a new app or sync changes to an existing app"),
-		Usage: T("Push a single app (with or without a manifest):\n") + T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n") + T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n") +
+		Usage: T("Push a single app (with or without a manifest):\n") + T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n") + T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n") +
 			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n" +
 			"\n" + T("   Push multiple apps with a manifest:\n") + T("   CF_NAME push [-f MANIFEST_PATH]\n"),
 		Flags: fs,
 	}
 }
 
-func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) > 1 {
 		cmd.ui.Failed(T("Incorrect Usage.\n\n") + command_registry.Commands.CommandUsage("push"))
 	}
 
-	reqs = []requirements.Requirement{
+	var reqs []requirements.Requirement
+
+	if fc.String("route-path") != "" {
+		requiredVersion, err := semver.Make("2.36.0")
+		if err != nil {
+			panic(err.Error())
+		}
+
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", requiredVersion))
+	}
+
+	reqs = append(reqs, []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
-	}
-	return
+	}...)
+
+	return reqs, nil
 }
 
 func (cmd *Push) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -218,18 +232,22 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 
 func (cmd *Push) processDomainsAndBindRoutes(appParams models.AppParams, routeActor actors.RouteActor, app models.Application, domain models.DomainFields) {
 	if appParams.IsHostEmpty() {
-		cmd.createAndBindRoute(nil, appParams.UseRandomHostname, routeActor, app, appParams.NoHostname, domain)
+		cmd.createAndBindRoute(nil, appParams.UseRandomHostname, routeActor, app, appParams.NoHostname, domain, appParams.RoutePath)
 	} else {
 		for _, host := range *(appParams.Hosts) {
-			cmd.createAndBindRoute(&host, appParams.UseRandomHostname, routeActor, app, appParams.NoHostname, domain)
+			cmd.createAndBindRoute(&host, appParams.UseRandomHostname, routeActor, app, appParams.NoHostname, domain, appParams.RoutePath)
 		}
 	}
 }
 
-func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeActor actors.RouteActor, app models.Application, noHostName bool, domain models.DomainFields) {
+func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeActor actors.RouteActor, app models.Application, noHostName bool, domain models.DomainFields, routePath *string) {
 	hostname := cmd.hostnameForApp(host, UseRandomHostname, app.Name, noHostName)
-	path := "" // not currently configurable in the manifest
-	route := routeActor.FindOrCreateRoute(hostname, domain, path)
+	var route models.Route
+	if routePath != nil {
+		route = routeActor.FindOrCreateRoute(hostname, domain, *routePath)
+	} else {
+		route = routeActor.FindOrCreateRoute(hostname, domain, "")
+	}
 	routeActor.BindRoute(app, route)
 }
 
@@ -540,6 +558,11 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (appParams models.
 
 	if c.String("n") != "" {
 		appParams.Hosts = &[]string{c.String("n")}
+	}
+
+	if c.String("route-path") != "" {
+		routePath := c.String("route-path")
+		appParams.RoutePath = &routePath
 	}
 
 	if c.String("b") != "" {
