@@ -1125,6 +1125,7 @@ var _ = Describe("SSH", func() {
 
 	Describe("Wait", func() {
 		var opts *options.SSHOptions
+		var waitErr error
 
 		BeforeEach(func() {
 			opts = &options.SSHOptions{
@@ -1143,13 +1144,51 @@ var _ = Describe("SSH", func() {
 		JustBeforeEach(func() {
 			connectErr := secureShell.Connect(opts)
 			Expect(connectErr).NotTo(HaveOccurred())
+
+			waitErr = secureShell.Wait()
 		})
 
-		It("calls close on the secureClient", func() {
-			err := secureShell.Wait()
-			Expect(err).NotTo(HaveOccurred())
-
+		It("calls wait on the secureClient", func() {
+			Expect(waitErr).NotTo(HaveOccurred())
 			Expect(fakeSecureClient.WaitCallCount()).To(Equal(1))
+		})
+
+		Describe("keep alive messages", func() {
+			var times []time.Time
+			var timesCh chan []time.Time
+			var done chan struct{}
+
+			BeforeEach(func() {
+				keepAliveDuration = 100 * time.Millisecond
+
+				times = []time.Time{}
+				timesCh = make(chan []time.Time, 1)
+				done = make(chan struct{}, 1)
+
+				fakeConnection.SendRequestStub = func(reqName string, wantReply bool, message []byte) (bool, []byte, error) {
+					Expect(reqName).To(Equal("keepalive@cloudfoundry.org"))
+					Expect(wantReply).To(BeTrue())
+					Expect(message).To(BeNil())
+
+					times = append(times, time.Now())
+					if len(times) == 3 {
+						timesCh <- times
+						close(done)
+					}
+					return true, nil, nil
+				}
+
+				fakeSecureClient.WaitStub = func() error {
+					Eventually(done).Should(BeClosed())
+					return nil
+				}
+			})
+
+			It("sends keep alive messages at the expected interval", func() {
+				Expect(waitErr).NotTo(HaveOccurred())
+				times := <-timesCh
+				Expect(times[2]).To(BeTemporally("~", times[0].Add(200*time.Millisecond), 100*time.Millisecond))
+			})
 		})
 	})
 
