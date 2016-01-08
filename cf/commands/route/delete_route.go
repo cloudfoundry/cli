@@ -50,14 +50,14 @@ func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, f
 
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(fc.Args()[0])
 
-	requiredVersion, err := semver.Make("2.36.0")
-	if err != nil {
-		panic(err.Error())
-	}
-
 	var reqs []requirements.Requirement
 
 	if fc.String("path") != "" {
+		requiredVersion, err := semver.Make("2.36.0")
+		if err != nil {
+			panic(err.Error())
+		}
+
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
 	}
 
