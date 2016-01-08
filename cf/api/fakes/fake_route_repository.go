@@ -47,11 +47,12 @@ type FakeRouteRepository struct {
 		result1 models.Route
 		result2 error
 	}
-	CheckIfExistsStub        func(host string, domain models.DomainFields) (found bool, apiErr error)
+	CheckIfExistsStub        func(host string, domain models.DomainFields, path string) (found bool, apiErr error)
 	checkIfExistsMutex       sync.RWMutex
 	checkIfExistsArgsForCall []struct {
 		host   string
 		domain models.DomainFields
+		path   string
 	}
 	checkIfExistsReturns struct {
 		result1 bool
@@ -231,15 +232,16 @@ func (fake *FakeRouteRepository) CreateReturns(result1 models.Route, result2 err
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error) {
+func (fake *FakeRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error) {
 	fake.checkIfExistsMutex.Lock()
 	fake.checkIfExistsArgsForCall = append(fake.checkIfExistsArgsForCall, struct {
 		host   string
 		domain models.DomainFields
-	}{host, domain})
+		path   string
+	}{host, domain, path})
 	fake.checkIfExistsMutex.Unlock()
 	if fake.CheckIfExistsStub != nil {
-		return fake.CheckIfExistsStub(host, domain)
+		return fake.CheckIfExistsStub(host, domain, path)
 	} else {
 		return fake.checkIfExistsReturns.result1, fake.checkIfExistsReturns.result2
 	}
@@ -251,10 +253,10 @@ func (fake *FakeRouteRepository) CheckIfExistsCallCount() int {
 	return len(fake.checkIfExistsArgsForCall)
 }
 
-func (fake *FakeRouteRepository) CheckIfExistsArgsForCall(i int) (string, models.DomainFields) {
+func (fake *FakeRouteRepository) CheckIfExistsArgsForCall(i int) (string, models.DomainFields, string) {
 	fake.checkIfExistsMutex.RLock()
 	defer fake.checkIfExistsMutex.RUnlock()
-	return fake.checkIfExistsArgsForCall[i].host, fake.checkIfExistsArgsForCall[i].domain
+	return fake.checkIfExistsArgsForCall[i].host, fake.checkIfExistsArgsForCall[i].domain, fake.checkIfExistsArgsForCall[i].path
 }
 
 func (fake *FakeRouteRepository) CheckIfExistsReturns(result1 bool, result2 error) {
