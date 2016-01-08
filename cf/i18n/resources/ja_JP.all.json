@@ -2790,12 +2790,12 @@
       "modified": false
    },
    {
-      "id": "Hostname for the route",
+      "id": "Hostname for the route (required for shared domains)",
       "translation": "Hostname for the route",
-      "modified": false
+      "modified": true
    },
    {
-      "id": "Hostname for the route (required for shared domains)",
+      "id": "Hostname used to identify the route",
       "translation": "Hostname for the route",
       "modified": true
    },
@@ -3772,6 +3772,11 @@
    {
       "id": "Path to manifest",
       "translation": "マニフェストへのパス",
+      "modified": false
+   },
+   {
+      "id": "Path used to identify the route",
+      "translation": "Path used to identify the route",
       "modified": false
    },
    {
