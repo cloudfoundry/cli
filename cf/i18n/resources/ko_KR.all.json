@@ -650,9 +650,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME check-route HOST DOMAIN",
+      "id": "CF_NAME check-route HOST DOMAIN [--path PATH]\n\nEXAMPLES:\n   CF_NAME check-route myhost example.com            # example.com\n   CF_NAME check-route myhost example.com --path foo # myhost.example.com/foo",
       "translation": "CF_NAME check-route HOST DOMAIN",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false] [--locale (LOCALE | CLEAR)]",
@@ -4245,13 +4245,13 @@
       "modified": false
    },
    {
-      "id": "Route {{.HostName}}.{{.DomainName}} does exist",
-      "translation": "{{.HostName}}.{{.DomainName}} 라우트 있음",
+      "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
+      "translation": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
       "modified": false
    },
    {
-      "id": "Route {{.HostName}}.{{.DomainName}} does not exist",
-      "translation": "{{.HostName}}.{{.DomainName}} 라우트 없음",
+      "id": "Route {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}",
+      "translation": "Route {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}",
       "modified": false
    },
    {

@@ -3,6 +3,7 @@ package route_test
 import (
 	"errors"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -33,8 +34,9 @@ var _ = Describe("CheckRoute", func() {
 		factory     *fakerequirements.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement       requirements.Requirement
-		targetedOrgRequirement *fakerequirements.FakeTargetedOrgRequirement
+		loginRequirement         requirements.Requirement
+		targetedOrgRequirement   *fakerequirements.FakeTargetedOrgRequirement
+		minAPIVersionRequirement requirements.Requirement
 	)
 
 	BeforeEach(func() {
@@ -65,6 +67,9 @@ var _ = Describe("CheckRoute", func() {
 
 		targetedOrgRequirement = &fakerequirements.FakeTargetedOrgRequirement{}
 		factory.NewTargetedOrgRequirementReturns(targetedOrgRequirement)
+
+		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
+		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
 	Describe("Requirements", func() {
@@ -99,6 +104,39 @@ var _ = Describe("CheckRoute", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(targetedOrgRequirement))
+			})
+
+			Context("when a path is passed", func() {
+				BeforeEach(func() {
+					flagContext.Parse("domain-name", "hostname", "--path", "the-path")
+				})
+
+				It("returns a MinAPIVersionRequirement as the first requirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+
+					expectedVersion, err := semver.Make("2.36.0")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(feature).To(Equal("Option '--path'"))
+					Expect(requiredVersion).To(Equal(expectedVersion))
+					Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
+				})
+			})
+
+			Context("when a path is not passed", func() {
+				BeforeEach(func() {
+					flagContext.Parse("domain-name")
+				})
+
+				It("does not return a MinAPIVersionRequirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
+					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
+				})
 			})
 		})
 	})
@@ -145,9 +183,49 @@ var _ = Describe("CheckRoute", func() {
 			It("checks if the route exists", func() {
 				cmd.Execute(flagContext)
 				Expect(routeRepo.CheckIfExistsCallCount()).To(Equal(1))
-				hostName, domain := routeRepo.CheckIfExistsArgsForCall(0)
+				hostName, domain, path := routeRepo.CheckIfExistsArgsForCall(0)
 				Expect(hostName).To(Equal("host-name"))
 				Expect(actualDomain).To(Equal(domain))
+				Expect(path).To(Equal(""))
+			})
+
+			Context("when a path is passed", func() {
+				BeforeEach(func() {
+					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+					err := flagContext.Parse("hostname", "domain-name", "--path", "the-path")
+					Expect(err).NotTo(HaveOccurred())
+					_, err = cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("checks if the route exists", func() {
+					cmd.Execute(flagContext)
+					Expect(routeRepo.CheckIfExistsCallCount()).To(Equal(1))
+					_, _, path := routeRepo.CheckIfExistsArgsForCall(0)
+					Expect(path).To(Equal("the-path"))
+				})
+
+				Context("when finding the route succeeds and the route exists", func() {
+					BeforeEach(func() {
+						routeRepo.CheckIfExistsReturns(true, nil)
+					})
+
+					It("tells the user the route exists", func() {
+						cmd.Execute(flagContext)
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"Route hostname.domain-name/the-path does exist"}))
+					})
+				})
+
+				Context("when finding the route succeeds and the route does not exist", func() {
+					BeforeEach(func() {
+						routeRepo.CheckIfExistsReturns(false, nil)
+					})
+
+					It("tells the user the route exists", func() {
+						cmd.Execute(flagContext)
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"Route hostname.domain-name/the-path does not exist"}))
+					})
+				})
 			})
 
 			Context("when finding the route succeeds and the route exists", func() {

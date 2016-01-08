@@ -263,67 +263,79 @@ var _ = Describe("route repository", func() {
 	})
 
 	Describe("Check routes", func() {
-		It("checks if a route exists", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "GET",
-					Path:     "/v2/routes/reserved/domain/domain-guid/host/my-host",
-					Response: testnet.TestResponse{Status: http.StatusNoContent},
-				}),
+		var (
+			ccServer *ghttp.Server
+			domain   models.DomainFields
+		)
+
+		BeforeEach(func() {
+			domain = models.DomainFields{
+				Guid: "domain-guid",
+			}
+			ccServer = ghttp.NewServer()
+			configRepo.SetApiEndpoint(ccServer.URL())
+		})
+
+		AfterEach(func() {
+			ccServer.Close()
+		})
+
+		Context("when the route is found", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusNoContent, nil),
+					),
+				)
 			})
-			configRepo.SetApiEndpoint(ts.URL)
 
-			domain := models.DomainFields{}
-			domain.Guid = "domain-guid"
-
-			found, apiErr := repo.CheckIfExists("my-host", domain)
-
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(found).To(BeTrue())
+			It("returns true", func() {
+				found, err := repo.CheckIfExists("my-host", domain, "some-path")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(found).To(BeTrue())
+			})
 		})
 
 		Context("when the route is not found", func() {
-			It("does not return the error", func() {
-				ts, handler = testnet.NewServer([]testnet.TestRequest{
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-						Method:   "GET",
-						Path:     "/v2/routes/reserved/domain/domain-guid/host/my-host",
-						Response: testnet.TestResponse{Status: http.StatusNotFound},
-					}),
-				})
-				configRepo.SetApiEndpoint(ts.URL)
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusNotFound, nil),
+					),
+				)
+			})
 
-				domain := models.DomainFields{}
-				domain.Guid = "domain-guid"
-
-				found, apiErr := repo.CheckIfExists("my-host", domain)
-
-				Expect(handler).To(HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(HaveOccurred())
+			It("returns false", func() {
+				found, err := repo.CheckIfExists("my-host", domain, "some-path")
+				Expect(err).NotTo(HaveOccurred())
 				Expect(found).To(BeFalse())
 			})
 		})
 
-		Context("when there is a random httpError", func() {
-			It("returns false and the error", func() {
-				ts, handler = testnet.NewServer([]testnet.TestRequest{
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-						Method:   "GET",
-						Path:     "/v2/routes/reserved/domain/domain-guid/host/my-host",
-						Response: testnet.TestResponse{Status: http.StatusForbidden},
-					}),
-				})
-				configRepo.SetApiEndpoint(ts.URL)
+		Context("when finding the route fails", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusForbidden, nil),
+					),
+				)
+			})
 
-				domain := models.DomainFields{}
-				domain.Guid = "domain-guid"
-
-				found, apiErr := repo.CheckIfExists("my-host", domain)
-
-				Expect(handler).To(HaveAllRequestsCalled())
-				Expect(apiErr).To(HaveOccurred())
-				Expect(found).To(BeFalse())
+			It("returns an error", func() {
+				_, err := repo.CheckIfExists("my-host", domain, "some-path")
+				Expect(err).To(HaveOccurred())
 			})
 		})
 	})

@@ -18,7 +18,7 @@ type RouteRepository interface {
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
 	Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error)
 	Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
-	CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error)
+	CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error)
 	CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
 	Unbind(routeGuid, appGuid string) (apiErr error)
@@ -83,7 +83,7 @@ func (repo CloudControllerRouteRepository) Create(host string, domain models.Dom
 	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid)
 }
 
-func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields) (found bool, apiErr error) {
+func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error) {
 	var raw_response interface{}
 	apiErr = repo.gateway.GetResource(fmt.Sprintf("%s/v2/routes/reserved/domain/%s/host/%s", repo.config.ApiEndpoint(), domain.Guid, host), &raw_response)
 
