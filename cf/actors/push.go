@@ -37,8 +37,11 @@ func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper
 
 func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) error {
 	if !actor.zipper.IsZipFile(dirOrZipFile) {
-		f(dirOrZipFile)
-		return nil
+		appDir, err := filepath.EvalSymlinks(dirOrZipFile)
+		if err == nil {
+			f(appDir)
+		}
+		return err
 	}
 
 	tempDir, err := ioutil.TempDir("", "unzipped-app")

@@ -340,5 +340,23 @@ var _ = Describe("Push Actor", func() {
 			Expect(wasCalled).To(BeTrue())
 			Expect(wasCalledWith).To(Equal(appDir))
 		})
+
+		It("dereferences the symlink when given a symlink to an app dir", func() {
+			if runtime.GOOS == "windows" {
+				Skip("This should not run on Windows")
+			}
+
+			symlink := filepath.Join(fixturesDir, "example-app-symlink")
+			expectedDir := filepath.Join(fixturesDir, "example-app") // example-app-symlink -> example-app
+			f := func(dir string) {
+				wasCalled = true
+				wasCalledWith = dir
+			}
+
+			err := actor.ProcessPath(symlink, f)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(wasCalled).To(BeTrue())
+			Expect(wasCalledWith).To(Equal(expectedDir))
+		})
 	})
 })
