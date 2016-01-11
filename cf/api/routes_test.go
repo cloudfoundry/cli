@@ -284,7 +284,7 @@ var _ = Describe("route repository", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host"),
+						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host", "path=some-path"),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -304,7 +304,7 @@ var _ = Describe("route repository", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host"),
+						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host", "path=some-path"),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -324,7 +324,7 @@ var _ = Describe("route repository", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host"),
+						ghttp.VerifyRequest("GET", "/v2/routes/reserved/domain/domain-guid/host/my-host", "path=some-path"),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -336,6 +336,26 @@ var _ = Describe("route repository", func() {
 			It("returns an error", func() {
 				_, err := repo.CheckIfExists("my-host", domain, "some-path")
 				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when the path is empty", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.RespondWith(http.StatusNoContent, nil),
+					),
+				)
+			})
+
+			It("should not add a path query param", func() {
+				_, err := repo.CheckIfExists("my-host", domain, "")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(len(ccServer.ReceivedRequests())).To(Equal(1))
+				req := ccServer.ReceivedRequests()[0]
+				vals := req.URL.Query()
+				_, ok := vals["path"]
+				Expect(ok).To(BeFalse())
 			})
 		})
 	})

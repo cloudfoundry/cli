@@ -85,7 +85,19 @@ func (repo CloudControllerRouteRepository) Create(host string, domain models.Dom
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error) {
 	var raw_response interface{}
-	apiErr = repo.gateway.GetResource(fmt.Sprintf("%s/v2/routes/reserved/domain/%s/host/%s", repo.config.ApiEndpoint(), domain.Guid, host), &raw_response)
+
+	u, err := url.Parse(repo.config.ApiEndpoint())
+	if err != nil {
+		return false, err
+	}
+
+	u.Path = fmt.Sprintf("/v2/routes/reserved/domain/%s/host/%s", domain.Guid, host)
+	if path != "" {
+		q := u.Query()
+		q.Set("path", path)
+		u.RawQuery = q.Encode()
+	}
+	apiErr = repo.gateway.GetResource(u.String(), &raw_response)
 
 	switch apiErr.(type) {
 	case nil:
