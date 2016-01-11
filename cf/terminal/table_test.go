@@ -111,5 +111,16 @@ var _ = Describe("Table", func() {
 				[]string{"something   something   darkside"},
 			))
 		})
+
+		It("supports multi-byte runes", func() {
+			table.Add("名前", "要求された状態")
+			table.Add("app-name", "stopped")
+			table.Print()
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"名前       要求された状態"},
+				[]string{"app-name   stopped"},
+			))
+		})
 	})
 })
