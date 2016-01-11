@@ -1,13 +1,18 @@
 package application_test
 
 import (
-	testappfiles "github.com/cloudfoundry/cli/cf/api/app_files/fakes"
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
+
+	fakeappfiles "github.com/cloudfoundry/cli/cf/api/app_files/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -15,130 +20,251 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("files command", func() {
+var _ = Describe("Files", func() {
 	var (
-		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		requirementsFactory *testreq.FakeReqFactory
-		appFilesRepo        *testappfiles.FakeAppFilesRepository
-		deps                command_registry.Dependency
-	)
+		ui           *testterm.FakeUI
+		configRepo   core_config.Repository
+		appFilesRepo *fakeappfiles.FakeAppFilesRepository
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.Config = configRepo
-		deps.RepoLocator = deps.RepoLocator.SetAppFileRepository(appFilesRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("files").SetDependency(deps, pluginCall))
-	}
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement         requirements.Requirement
+		targetedSpaceRequirement requirements.Requirement
+		applicationRequirement   *fakerequirements.FakeApplicationRequirement
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
+
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		appFilesRepo = &testappfiles.FakeAppFilesRepository{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		appFilesRepo = &fakeappfiles.FakeAppFilesRepository{}
+		repoLocator := deps.RepoLocator.SetAppFileRepository(appFilesRepo)
+
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = &application.Files{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{Name: "login-requirement"}
+		factory.NewLoginRequirementReturns(loginRequirement)
+
+		targetedSpaceRequirement = &passingRequirement{}
+		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
+
+		applicationRequirement = &fakerequirements.FakeApplicationRequirement{}
+		factory.NewApplicationRequirementReturns(applicationRequirement)
+		app := models.Application{}
+		app.InstanceCount = 1
+		app.Guid = "app-guid"
+		app.Name = "app-name"
+		applicationRequirement.GetApplicationReturns(app)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("files", args, requirementsFactory, updateCommandDependency, false)
-	}
+	Describe("Requirements", func() {
+		Context("when not provided one or two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name", "the-path", "extra-arg")
+			})
 
-	Describe("requirements", func() {
-		It("fails when not logged in", func() {
-			requirementsFactory.TargetedSpaceSuccess = true
-			runCommand("my-app", "/foo")
-		})
-
-		It("fails when a space is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-			Expect(runCommand("my-app", "/foo")).To(BeFalse())
-		})
-
-		It("fails with usage when not provided an app name", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
-
-			passed := runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires an argument"},
-			))
-			Expect(passed).To(BeFalse())
-		})
-	})
-
-	Context("when logged in, a space is targeted and a valid app name is provided", func() {
-		BeforeEach(func() {
-			app := models.Application{}
-			app.Name = "my-found-app"
-			app.Guid = "my-app-guid"
-
-			requirementsFactory.Application = app
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
-			appFilesRepo.ListFilesReturns("file 1\nfile 2", nil)
-		})
-
-		It("it lists files in a directory", func() {
-			runCommand("my-app", "/foo")
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
-				[]string{"OK"},
-				[]string{"file 1"},
-				[]string{"file 2"},
-			))
-
-			guid, _, path := appFilesRepo.ListFilesArgsForCall(0)
-			Expect(guid).To(Equal("my-app-guid"))
-			Expect(path).To(Equal("/foo"))
-		})
-
-		It("does not interpolate or interpret special format characters as though it should be a format string", func() {
-			appFilesRepo.ListFilesReturns("%s %d %i", nil)
-			runCommand("my-app", "/foo")
-
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"%s %d %i"}))
-		})
-
-		Context("checking for bad flags", func() {
-			It("fails when non-positive value is given for instance", func() {
-				runCommand("-i", "-1", "my-app")
-
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
-					[]string{"Invalid instance"},
+					[]string{"Incorrect Usage. Requires an argument"},
+				))
+			})
+		})
+
+		Context("when provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name")
+			})
+
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a TargetedSpaceRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
+
+				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
+			})
+
+			It("returns an ApplicationRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
+
+				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
+				Expect(actualRequirements).To(ContainElement(applicationRequirement))
+			})
+		})
+
+		Context("when provided exactly two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name", "the-path")
+			})
+
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a TargetedSpaceRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
+
+				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
+			})
+
+			It("returns an ApplicationRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
+
+				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
+				Expect(actualRequirements).To(ContainElement(applicationRequirement))
+			})
+		})
+	})
+
+	Describe("Execute", func() {
+		var args []string
+
+		JustBeforeEach(func() {
+			err := flagContext.Parse(args...)
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		Context("when given a valid instance", func() {
+			BeforeEach(func() {
+				args = []string{"app-name", "-i", "0"}
+			})
+
+			It("tells the user it is getting the files", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting files for app app-name"},
+				))
+			})
+
+			It("tries to list the files", func() {
+				cmd.Execute(flagContext)
+				Expect(appFilesRepo.ListFilesCallCount()).To(Equal(1))
+				appGUID, instance, path := appFilesRepo.ListFilesArgsForCall(0)
+				Expect(appGUID).To(Equal("app-guid"))
+				Expect(instance).To(Equal(0))
+				Expect(path).To(Equal("/"))
+			})
+
+			Context("when listing the files succeeds", func() {
+				BeforeEach(func() {
+					appFilesRepo.ListFilesReturns("files", nil)
+				})
+
+				It("tells the user OK", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+				})
+
+				Context("when the files are empty", func() {
+					BeforeEach(func() {
+						appFilesRepo.ListFilesReturns("", nil)
+					})
+
+					It("tells the user no files were found", func() {
+						cmd.Execute(flagContext)
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"No files found"}))
+					})
+				})
+
+				Context("when the files are not empty", func() {
+					BeforeEach(func() {
+						appFilesRepo.ListFilesReturns("the-files", nil)
+					})
+
+					It("tells the user which files were found", func() {
+						cmd.Execute(flagContext)
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"the-files"}))
+					})
+				})
+			})
+
+			Context("when listing the files fails with an error", func() {
+				BeforeEach(func() {
+					appFilesRepo.ListFilesReturns("", errors.New("list-files-err"))
+				})
+
+				It("fails with error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"list-files-err"},
+					))
+				})
+			})
+		})
+
+		Context("when given a negative instance", func() {
+			BeforeEach(func() {
+				args = []string{"app-name", "-i", "-1"}
+			})
+
+			It("fails with error", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
 					[]string{"Instance must be a positive integer"},
 				))
 			})
+		})
 
-			It("fails when instance is larger than instance count", func() {
-				runCommand("-i", "5", "my-app")
+		Context("when given an instance greater than the app's instance count", func() {
+			BeforeEach(func() {
+				args = []string{"app-name", "-i", "2"}
+			})
 
+			It("fails with error", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
-					[]string{"Invalid instance"},
-					[]string{"Instance must be less than"},
+					[]string{"Invalid instance: 2"},
+					[]string{"Instance must be less than 1"},
 				))
 			})
-
 		})
 
-		Context("when there is no file to be listed", func() {
+		Context("when given a path", func() {
 			BeforeEach(func() {
-				appFilesRepo.ListFilesReturns("", nil)
+				args = []string{"app-name", "the-path"}
 			})
 
-			It("informs user that the directory is empty", func() {
-				runCommand("my-app", "/foo")
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
-					[]string{""},
-					[]string{"No files found"},
-				))
+			It("lists the files with the given path", func() {
+				cmd.Execute(flagContext)
+				_, _, path := appFilesRepo.ListFilesArgsForCall(0)
+				Expect(path).To(Equal("the-path"))
 			})
-
 		})
-
 	})
 })

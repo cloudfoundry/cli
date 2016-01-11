@@ -36,7 +36,7 @@ func (cmd *Files) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) < 1 {
+	if len(c.Args()) < 1 || len(c.Args()) > 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("files"))
 	}
 
