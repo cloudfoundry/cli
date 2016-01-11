@@ -83,7 +83,7 @@ func (repo CloudControllerRouteRepository) Create(host string, domain models.Dom
 	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid)
 }
 
-func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error) {
+func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {
 	var raw_response interface{}
 
 	u, err := url.Parse(repo.config.ApiEndpoint())
@@ -97,18 +97,16 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 		q.Set("path", path)
 		u.RawQuery = q.Encode()
 	}
-	apiErr = repo.gateway.GetResource(u.String(), &raw_response)
 
-	switch apiErr.(type) {
-	case nil:
-		found = true
-	case *errors.HttpNotFoundError:
-		found = false
-		apiErr = nil
-	default:
-		return
+	err = repo.gateway.GetResource(u.String(), &raw_response)
+	if err != nil {
+		if _, ok := err.(*errors.HttpNotFoundError); ok {
+			return false, nil
+		}
+		return false, err
 	}
-	return
+
+	return true, nil
 }
 
 func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
