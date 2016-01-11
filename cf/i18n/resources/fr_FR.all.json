@@ -870,6 +870,11 @@
       "modified": false
    },
    {
+      "id": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\t\t\t\nTIP:\n  To list and inspect files of an app running on the Diego backend, use 'CF_NAME ssh'",
+      "translation": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\t\t\t\nTIP:\n  To list and inspect files of an app running on the Diego backend, use 'cf ssh'",
+      "modified": true
+   },
+   {
       "id": "CF_NAME get-health-check APP_NAME",
       "translation": "CF_NAME get-health-check NOM_APP",
       "modified": false
