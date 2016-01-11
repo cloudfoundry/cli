@@ -51,6 +51,10 @@ type FakeReqFactory struct {
 	MinAPIVersionSuccess         bool
 }
 
+func (f *FakeReqFactory) NewDEAApplicationRequirement(name string) requirements.DEAApplicationRequirement {
+	return FakeRequirement{f, false}
+}
+
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
 	f.ApplicationName = name
 	return FakeRequirement{f, !f.ApplicationFails}

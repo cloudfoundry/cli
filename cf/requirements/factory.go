@@ -10,6 +10,7 @@ import (
 //go:generate counterfeiter -o fakes/fake_factory.go . Factory
 type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement
+	NewDEAApplicationRequirement(name string) DEAApplicationRequirement
 	NewServiceInstanceRequirement(name string) ServiceInstanceRequirement
 	NewLoginRequirement() Requirement
 	NewRoutingAPIRequirement() Requirement
@@ -36,6 +37,14 @@ func NewFactory(ui terminal.UI, config core_config.Reader, repoLocator api.Repos
 
 func (f apiRequirementFactory) NewApplicationRequirement(name string) ApplicationRequirement {
 	return NewApplicationRequirement(
+		name,
+		f.ui,
+		f.repoLocator.GetApplicationRepository(),
+	)
+}
+
+func (f apiRequirementFactory) NewDEAApplicationRequirement(name string) DEAApplicationRequirement {
+	return NewDEAApplicationRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetApplicationRepository(),

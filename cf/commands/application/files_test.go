@@ -31,9 +31,9 @@ var _ = Describe("Files", func() {
 		factory     *fakerequirements.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement         requirements.Requirement
-		targetedSpaceRequirement requirements.Requirement
-		applicationRequirement   *fakerequirements.FakeApplicationRequirement
+		loginRequirement          requirements.Requirement
+		targetedSpaceRequirement  requirements.Requirement
+		deaApplicationRequirement *fakerequirements.FakeDEAApplicationRequirement
 	)
 
 	BeforeEach(func() {
@@ -62,13 +62,13 @@ var _ = Describe("Files", func() {
 		targetedSpaceRequirement = &passingRequirement{}
 		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
 
-		applicationRequirement = &fakerequirements.FakeApplicationRequirement{}
-		factory.NewApplicationRequirementReturns(applicationRequirement)
+		deaApplicationRequirement = &fakerequirements.FakeDEAApplicationRequirement{}
+		factory.NewDEAApplicationRequirementReturns(deaApplicationRequirement)
 		app := models.Application{}
 		app.InstanceCount = 1
 		app.Guid = "app-guid"
 		app.Name = "app-name"
-		applicationRequirement.GetApplicationReturns(app)
+		deaApplicationRequirement.GetApplicationReturns(app)
 	})
 
 	Describe("Requirements", func() {
@@ -106,13 +106,12 @@ var _ = Describe("Files", func() {
 				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
 			})
 
-			It("returns an ApplicationRequirement", func() {
+			It("returns an DEAApplicationRequirement", func() {
 				actualRequirements, err := cmd.Requirements(factory, flagContext)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
-
-				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
-				Expect(actualRequirements).To(ContainElement(applicationRequirement))
+				Expect(factory.NewDEAApplicationRequirementCallCount()).To(Equal(1))
+				Expect(factory.NewDEAApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
+				Expect(actualRequirements).To(ContainElement(deaApplicationRequirement))
 			})
 		})
 
@@ -136,13 +135,12 @@ var _ = Describe("Files", func() {
 				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
 			})
 
-			It("returns an ApplicationRequirement", func() {
+			It("returns an DEAApplicationRequirement", func() {
 				actualRequirements, err := cmd.Requirements(factory, flagContext)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
-
-				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
-				Expect(actualRequirements).To(ContainElement(applicationRequirement))
+				Expect(factory.NewDEAApplicationRequirementCallCount()).To(Equal(1))
+				Expect(factory.NewDEAApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
+				Expect(actualRequirements).To(ContainElement(deaApplicationRequirement))
 			})
 		})
 	})

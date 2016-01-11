@@ -17,6 +17,14 @@ type FakeFactory struct {
 	newApplicationRequirementReturns struct {
 		result1 requirements.ApplicationRequirement
 	}
+	NewDEAApplicationRequirementStub        func(name string) requirements.DEAApplicationRequirement
+	newDEAApplicationRequirementMutex       sync.RWMutex
+	newDEAApplicationRequirementArgsForCall []struct {
+		name string
+	}
+	newDEAApplicationRequirementReturns struct {
+		result1 requirements.DEAApplicationRequirement
+	}
 	NewServiceInstanceRequirementStub        func(name string) requirements.ServiceInstanceRequirement
 	newServiceInstanceRequirementMutex       sync.RWMutex
 	newServiceInstanceRequirementArgsForCall []struct {
@@ -136,6 +144,38 @@ func (fake *FakeFactory) NewApplicationRequirementReturns(result1 requirements.A
 	fake.NewApplicationRequirementStub = nil
 	fake.newApplicationRequirementReturns = struct {
 		result1 requirements.ApplicationRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirement(name string) requirements.DEAApplicationRequirement {
+	fake.newDEAApplicationRequirementMutex.Lock()
+	fake.newDEAApplicationRequirementArgsForCall = append(fake.newDEAApplicationRequirementArgsForCall, struct {
+		name string
+	}{name})
+	fake.newDEAApplicationRequirementMutex.Unlock()
+	if fake.NewDEAApplicationRequirementStub != nil {
+		return fake.NewDEAApplicationRequirementStub(name)
+	} else {
+		return fake.newDEAApplicationRequirementReturns.result1
+	}
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirementCallCount() int {
+	fake.newDEAApplicationRequirementMutex.RLock()
+	defer fake.newDEAApplicationRequirementMutex.RUnlock()
+	return len(fake.newDEAApplicationRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirementArgsForCall(i int) string {
+	fake.newDEAApplicationRequirementMutex.RLock()
+	defer fake.newDEAApplicationRequirementMutex.RUnlock()
+	return fake.newDEAApplicationRequirementArgsForCall[i].name
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirementReturns(result1 requirements.DEAApplicationRequirement) {
+	fake.NewDEAApplicationRequirementStub = nil
+	fake.newDEAApplicationRequirementReturns = struct {
+		result1 requirements.DEAApplicationRequirement
 	}{result1}
 }
 

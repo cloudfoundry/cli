@@ -15,7 +15,7 @@ type Files struct {
 	ui           terminal.UI
 	config       core_config.Reader
 	appFilesRepo app_files.AppFilesRepository
-	appReq       requirements.ApplicationRequirement
+	appReq       requirements.DEAApplicationRequirement
 }
 
 func init() {
@@ -29,9 +29,12 @@ func (cmd *Files) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "files",
 		ShortName:   "f",
-		Description: T("Print out a list of files in a directory or the contents of a specific file"),
-		Usage:       T("CF_NAME files APP_NAME [PATH] [-i INSTANCE]"),
-		Flags:       fs,
+		Description: T("Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend."),
+		Usage: T(`CF_NAME files APP_NAME [PATH] [-i INSTANCE]
+			
+TIP:
+  To list and inspect files of an app running on the Diego backend, use ` + "`cf ssh`"),
+		Flags: fs,
 	}
 }
 
@@ -40,7 +43,7 @@ func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("files"))
 	}
 
-	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = requirementsFactory.NewDEAApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
