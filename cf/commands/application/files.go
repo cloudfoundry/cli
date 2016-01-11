@@ -29,7 +29,7 @@ func (cmd *Files) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "files",
 		ShortName:   "f",
-		Description: T("Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend."),
+		Description: T("Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend"),
 		Usage: T(`CF_NAME files APP_NAME [PATH] [-i INSTANCE]
 			
 TIP:

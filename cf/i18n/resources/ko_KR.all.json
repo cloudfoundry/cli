@@ -3865,7 +3865,7 @@
       "modified": false
    },
    {
-      "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend.",
+      "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend",
       "translation": "디렉토리에 있는 파일의 목록 또는 특정 파일의 컨텐츠 인쇄",
       "modified": true
    },

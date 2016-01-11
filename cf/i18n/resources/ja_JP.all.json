@@ -3865,7 +3865,7 @@
       "modified": false
    },
    {
-      "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend.",
+      "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend",
       "translation": "ディレクトリー内のファイルのリストまたは特定のファイルの内容を出力します",
       "modified": true
    },
