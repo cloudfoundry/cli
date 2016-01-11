@@ -52,7 +52,7 @@ if [ $? -eq 0 ]; then # head is tagged as a release
     os_arch="${BASH_REMATCH[2]}"
     extension="${BASH_REMATCH[3]}"
     if [ -n "${installer}" ]; then
-      s3cmd --config=$s3_config_file put $f s3://go-cli/releases/${release_tag}/cf-cli_installer_${release_tag}${os_arch}${extension}
+      s3cmd --config=$s3_config_file put $f s3://go-cli/releases/${release_tag}/cf-cli-installer_${release_tag}${os_arch}${extension}
     else
       s3cmd --config=$s3_config_file put $f s3://go-cli/releases/${release_tag}/cf-cli_${release_tag}${os_arch}${extension}
     fi
