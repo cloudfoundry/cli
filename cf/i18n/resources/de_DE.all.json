@@ -870,11 +870,6 @@
       "modified": false
    },
    {
-      "id": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]",
-      "translation": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]",
-      "modified": false
-   },
-   {
       "id": "CF_NAME get-health-check APP_NAME",
       "translation": "CF_NAME get-health-check APP_NAME",
       "modified": false
@@ -3870,9 +3865,9 @@
       "modified": false
    },
    {
-      "id": "Print out a list of files in a directory or the contents of a specific file",
+      "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend.",
       "translation": "Eine Liste mit Dateien in einem Verzeichnis oder den Inhalt einer bestimmten Datei drucken",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Print the version",
