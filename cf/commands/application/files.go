@@ -33,7 +33,7 @@ func (cmd *Files) MetaData() command_registry.CommandMetadata {
 		Usage: T(`CF_NAME files APP_NAME [PATH] [-i INSTANCE]
 			
 TIP:
-  To list and inspect files of an app running on the Diego backend, use ` + "`cf ssh`"),
+  To list and inspect files of an app running on the Diego backend, use 'CF_NAME ssh'`),
 		Flags: fs,
 	}
 }
