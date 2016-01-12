@@ -3,7 +3,6 @@ package terminal
 import (
 	"fmt"
 	"strings"
-	"unicode/utf8"
 )
 
 type Table interface {
@@ -12,20 +11,18 @@ type Table interface {
 }
 
 type PrintableTable struct {
-	ui                  UI
-	headers             []string
-	headerPrinted       bool
-	maxRuneCountLengths []int
-	maxStringLengths    []int
-	rows                [][]string
+	ui              UI
+	headers         []string
+	headerPrinted   bool
+	maxValueLengths []int
+	rows            [][]string
 }
 
 func NewTable(ui UI, headers []string) Table {
 	return &PrintableTable{
-		ui:                  ui,
-		headers:             headers,
-		maxRuneCountLengths: make([]int, len(headers)),
-		maxStringLengths:    make([]int, len(headers)),
+		ui:              ui,
+		headers:         headers,
+		maxValueLengths: make([]int, len(headers)),
 	}
 }
 
@@ -52,15 +49,9 @@ func (t *PrintableTable) Print() {
 
 func (t *PrintableTable) calculateMaxSize(row []string) {
 	for index, value := range row {
-		runeCount := utf8.RuneCountInString(Decolorize(value))
-		stringLength := len(Decolorize(value))
-
-		if t.maxRuneCountLengths[index] < runeCount {
-			t.maxRuneCountLengths[index] = runeCount
-		}
-
-		if t.maxStringLengths[index] < stringLength {
-			t.maxStringLengths[index] = stringLength
+		l := visibleSize(Decolorize(value))
+		if t.maxValueLengths[index] < l {
+			t.maxValueLengths[index] = l
 		}
 	}
 }
@@ -87,26 +78,32 @@ func (t *PrintableTable) printRow(row []string) {
 
 func (t *PrintableTable) cellValue(col int, value string) string {
 	padding := ""
+	maxVisibleSize := t.maxValueLengths[col]
 
 	if col < len(t.headers)-1 {
-		var count int
-
-		if utf8.RuneCountInString(value) == len(value) {
-			if t.maxRuneCountLengths[col] == t.maxStringLengths[col] {
-				count = t.maxRuneCountLengths[col] - utf8.RuneCountInString(Decolorize(value))
-			} else {
-				count = t.maxRuneCountLengths[col] - len(Decolorize(value))
-			}
-		} else {
-			if t.maxRuneCountLengths[col] == t.maxStringLengths[col] {
-				count = t.maxRuneCountLengths[col] - len(Decolorize(value)) + utf8.RuneCountInString(Decolorize(value))
-			} else {
-				count = t.maxStringLengths[col] - len(Decolorize(value))
-			}
-		}
-
-		padding = strings.Repeat(" ", count)
+		thisVisibleSize := visibleSize(Decolorize(value))
+		padding = strings.Repeat(` `, maxVisibleSize-thisVisibleSize)
 	}
 
 	return fmt.Sprintf("%s%s   ", value, padding)
+}
+
+func visibleSize(s string) int {
+	r := strings.NewReader(s)
+
+	var size int
+	for range s {
+		_, runeSize, err := r.ReadRune()
+		if err != nil {
+			panic(fmt.Sprintf("error when calculating visible size of: %s", s))
+		}
+
+		if runeSize == 3 {
+			size += 2 // Kanji and Katakana characters appear as double-width
+		} else {
+			size += 1
+		}
+	}
+
+	return size
 }
