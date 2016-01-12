@@ -112,7 +112,7 @@ var _ = Describe("Table", func() {
 			))
 		})
 
-		It("supports multi-byte runes", func() {
+		It("supports multi-byte Japanese runes", func() {
 			table.Add("名前", "要求された状態")
 			table.Add("app-name", "stopped")
 			table.Print()
@@ -120,6 +120,17 @@ var _ = Describe("Table", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"名前       要求された状態"},
 				[]string{"app-name   stopped"},
+			))
+		})
+
+		It("supports multi-byte French runes", func() {
+			table.Add("état demandé", "mémoire")
+			table.Add("app-name", "stopped")
+			table.Print()
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"état demandé   mémoire"},
+				[]string{"app-name       stopped"},
 			))
 		})
 	})
