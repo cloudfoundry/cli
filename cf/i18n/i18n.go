@@ -27,14 +27,16 @@ const (
 var T go_i18n.TranslateFunc
 
 func Init(config core_config.Reader) go_i18n.TranslateFunc {
+	loadAsset("cf/i18n/resources/" + defaultLocale + resourceSuffix)
+	defaultTfunc := go_i18n.MustTfunc(defaultLocale)
+
+	assetNames := resources.AssetNames()
+
 	sources := []string{
 		config.Locale(),
 		os.Getenv(lcAll),
 		os.Getenv(lang),
-		defaultLocale,
 	}
-
-	assetNames := resources.AssetNames()
 
 	for _, source := range sources {
 		if source == "" {
@@ -49,26 +51,35 @@ func Init(config core_config.Reader) go_i18n.TranslateFunc {
 			for _, assetName := range assetNames {
 				assetLocale := strings.ToLower(strings.Replace(path.Base(assetName), underscore, hyphen, -1))
 				if strings.HasPrefix(assetLocale, l.Tag) {
-					assetBytes, err := resources.Asset(assetName)
-					if err != nil {
-						panic(fmt.Sprintf("Could not load asset '%s': %s", assetName, err.Error()))
-					}
+					loadAsset(assetName)
 
-					err = go_i18n.ParseTranslationFileBytes(assetName, assetBytes)
-					if err != nil {
-						panic(fmt.Sprintf("Could not load translations '%s': %s", assetName, err.Error()))
-					}
+					t := go_i18n.MustTfunc(source)
 
-					T, err := go_i18n.Tfunc(source)
-					if err == nil {
-						return T
+					return func(translationID string, args ...interface{}) string {
+						if translated := t(translationID, args...); translated != translationID {
+							return translated
+						}
+
+						return defaultTfunc(translationID, args...)
 					}
 				}
 			}
 		}
 	}
 
-	panic("Unable to find suitable translation")
+	return defaultTfunc
+}
+
+func loadAsset(assetName string) {
+	assetBytes, err := resources.Asset(assetName)
+	if err != nil {
+		panic(fmt.Sprintf("Could not load asset '%s': %s", assetName, err.Error()))
+	}
+
+	err = go_i18n.ParseTranslationFileBytes(assetName, assetBytes)
+	if err != nil {
+		panic(fmt.Sprintf("Could not load translations '%s': %s", assetName, err.Error()))
+	}
 }
 
 func SupportedLocales() []string {
