@@ -113,24 +113,26 @@ var _ = Describe("Table", func() {
 		})
 
 		It("supports multi-byte Japanese runes", func() {
-			table.Add("名前", "要求された状態")
-			table.Add("app-name", "stopped")
+			table = NewTable(ui, []string{"", "", "", "", "", ""})
+			table.Add("名前", "要求された状態", "インスタンス", "メモリー", "ディスク", "URL")
+			table.Add("app-name", "stopped", "0/1", "1G", "1G", "app-name.example.com")
 			table.Print()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"名前       要求された状態"},
-				[]string{"app-name   stopped"},
+				[]string{"名前       要求された状態   インスタンス   メモリー   ディスク   URL"},
+				[]string{"app-name   stopped          0/1            1G         1G         app-name.example.com"},
 			))
 		})
 
 		It("supports multi-byte French runes", func() {
-			table.Add("état demandé", "mémoire")
-			table.Add("app-name", "stopped")
+			table = NewTable(ui, []string{"", "", "", "", "", ""})
+			table.Add("nom", "état demandé", "instances", "mémoire", "disque", "adresses URL")
+			table.Add("app-name", "stopped", "0/1", "1G", "1G", "app-name.example.com")
 			table.Print()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"état demandé   mémoire"},
-				[]string{"app-name       stopped"},
+				[]string{"nom        état demandé   instances   mémoire   disque   adresses URL"},
+				[]string{"app-name   stopped        0/1         1G        1G       app-name.example.com"},
 			))
 		})
 	})
