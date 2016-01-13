@@ -1,3 +1,73 @@
+## 6.15.0
+* Bump version to 6.15.0
+* Fix regression in table printer
+* Display text where rune len > string len properly
+* Remove full stop from files description
+* Upload release binaries to v${release_tag}
+* Upload release binaries as cf-cli-installer*
+* Display non-latin table headers properly
+* Remove named return args from CheckIfExists
+* CheckIfExists includes path in api call
+* files fails for Diego-deployed apps
+* Rewrite application/files_test
+* Dereference symlinks to app directories
+* Keep Alive for non-interactive sessions
+* i18n4go -c fixup && bin/generate-language-sources
+* Update hostname and path usage
+* check-route supports --path option
+* Rewrite check_route_test
+* push supports --route-path option
+* Update push-test to show product of domains/hosts
+* Move creation of semver lower in delete-route
+* delete-route supports --path option
+* Rewrite map_route_test
+* Remove unnecessary InputsChan from app_test
+* Update de_DE translations
+* Display two hyphens for all options
+* godep save ./...
+* Move simonleung8/flags back into cloudfoundry/cli
+* Move prepending of '/' to path into Route Repo
+* unmap-route supports --path option
+* Update unmap-route
+* Rewrite unmap-route test
+* updated vcap-dev to cf dev ML
+* Re-order create-route requirements
+* minRequiredAPIVersion -> requiredVersion
+* map-route supports --path option
+* Remove map-route Requirements' named return args
+* Update MinApiVersionRequirement
+* Rewrite map_route_test
+* Generate FakeDomainRepository with counterfeiter
+* Update create-route hostname help text
+* Use ja_JP instead of ja_JA
+* Update i18n README to reflect new translations
+* Remove extra spaces from some fr_FR entries
+* Update create-route examples
+* Convert dos format files to unix
+* Update translations
+* Add --hostname option name for other commands
+* Add --hostname option name for create-route
+* Set PATH in bin/i18n-checkup
+* Fix go vet errors
+* Invert conditional in UpdateEndpoint
+* Remove named return arguments from UpdateEndpoint
+* Don't get i18n4go with -u
+* Load core commands later in main
+* create-route requires CC 2.36.0+ for --path option
+* Remove named return arguments from CreateRoute
+* Don't add '/' to path when it's blank
+* Update README to reflect move to cloudfoundry/tap
+* Update bin/generate-release-notes
+* create-route doesn't require prepended / for path
+* Update create-route help
+* Add context path when listing routes
+* Fix help message as per feedback
+* Don't use magic empty string in RouteRepository
+* Don't construct domain/path with Sprintf
+* Move RouteSummary into its own file
+* create-route command now takes optional context path
+* Update bin/generate-release-notes
+
 ## 6.14.1
 * Bump version to 6.14.1
 * Revert "Merge pull request #718 from cf-routing/list_route_services"
