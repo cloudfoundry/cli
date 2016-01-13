@@ -131,25 +131,15 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 		fileRelativePath, _ := filepath.Rel(dir, fullPath)
 		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
 
+		if err != nil && runtime.GOOS == "windows" {
+			f, err = os.Lstat(`\\?\` + fullPath)
+		}
+
 		if cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
-			if err == nil {
-				if f.IsDir() {
-					return filepath.SkipDir
-				}
+			if err == nil && f.IsDir() {
+				return filepath.SkipDir
 			}
-
-			if runtime.GOOS == "windows" {
-				fi, statErr := os.Lstat(`\\?\` + fullPath)
-				if statErr != nil {
-					return statErr
-				}
-
-				if fi.IsDir() {
-					return filepath.SkipDir
-				}
-			}
-
-			return err
+			return nil
 		}
 
 		if err != nil {
