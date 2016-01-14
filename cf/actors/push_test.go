@@ -338,7 +338,9 @@ var _ = Describe("Push Actor", func() {
 			err := actor.ProcessPath(appDir, f)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(wasCalled).To(BeTrue())
-			Expect(wasCalledWith).To(Equal(appDir))
+			path, err := filepath.Abs(appDir)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(wasCalledWith).To(Equal(path))
 		})
 
 		It("dereferences the symlink when given a symlink to an app dir", func() {
@@ -356,7 +358,9 @@ var _ = Describe("Push Actor", func() {
 			err := actor.ProcessPath(symlink, f)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(wasCalled).To(BeTrue())
-			Expect(wasCalledWith).To(Equal(expectedDir))
+			path, err := filepath.Abs(expectedDir)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(wasCalledWith).To(Equal(path))
 		})
 	})
 })

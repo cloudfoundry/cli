@@ -14,6 +14,8 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
+const windowsPathPrefix = `\\?\`
+
 //go:generate counterfeiter -o fakes/fake_push_actor.go . PushActor
 type PushActor interface {
 	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
@@ -39,7 +41,13 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 	if !actor.zipper.IsZipFile(dirOrZipFile) {
 		appDir, err := filepath.EvalSymlinks(dirOrZipFile)
 		if err == nil {
-			f(appDir)
+			var cwd string
+			cwd, err = os.Getwd()
+			if err != nil {
+				return err
+			}
+
+			f(filepath.Join(cwd, appDir))
 		}
 		return err
 	}
@@ -100,7 +108,11 @@ func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir
 	}
 
 	for i := range remoteFiles {
-		fileInfo, err := os.Lstat(filepath.Join(appDir, remoteFiles[i].Path))
+		fullPath := filepath.Join(appDir, remoteFiles[i].Path)
+		if runtime.GOOS == "windows" {
+			fullPath = windowsPathPrefix + fullPath
+		}
+		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
 			return []resources.AppFileResource{}, false, err
 		}
