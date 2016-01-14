@@ -71,7 +71,11 @@ func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.Ap
 func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) error {
 	for _, file := range appFiles {
 		err := func() error {
-			fromPath := filepath.Join(fromDir, file.Path)
+			fromPath, err := filepath.Abs(filepath.Join(fromDir, file.Path))
+			if err != nil {
+				return err
+			}
+
 			if runtime.GOOS == "windows" {
 				fromPath = windowsPathPrefix + fromPath
 			}
@@ -81,7 +85,11 @@ func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, from
 				return err
 			}
 
-			toPath := filepath.Join(toDir, file.Path)
+			toPath, err := filepath.Abs(filepath.Join(toDir, file.Path))
+			if err != nil {
+				return err
+			}
+
 			if runtime.GOOS == "windows" {
 				toPath = windowsPathPrefix + toPath
 			}
