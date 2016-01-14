@@ -41,13 +41,18 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 	if !actor.zipper.IsZipFile(dirOrZipFile) {
 		appDir, err := filepath.EvalSymlinks(dirOrZipFile)
 		if err == nil {
-			var cwd string
-			cwd, err = os.Getwd()
-			if err != nil {
-				return err
+			if filepath.IsAbs(appDir) {
+				f(appDir)
+			} else {
+				var absPath string
+				absPath, err = filepath.Abs(appDir)
+				if err != nil {
+					return err
+				}
+
+				f(absPath)
 			}
 
-			f(filepath.Join(cwd, appDir))
 		}
 		return err
 	}
@@ -108,7 +113,11 @@ func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir
 	}
 
 	for i := range remoteFiles {
-		fullPath := filepath.Join(appDir, remoteFiles[i].Path)
+		fullPath, err := filepath.Abs(filepath.Join(appDir, remoteFiles[i].Path))
+		if err != nil {
+			return []resources.AppFileResource{}, false, err
+		}
+
 		if runtime.GOOS == "windows" {
 			fullPath = windowsPathPrefix + fullPath
 		}

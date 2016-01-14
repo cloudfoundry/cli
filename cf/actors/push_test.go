@@ -362,5 +362,19 @@ var _ = Describe("Push Actor", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(wasCalledWith).To(Equal(path))
 		})
+
+		It("calls the provided function with the provided absolute directory", func() {
+			appDir = filepath.Join(fixturesDir, "example-app")
+			absolutePath, err := filepath.Abs(appDir)
+			Expect(err).NotTo(HaveOccurred())
+			f := func(tempDir string) {
+				wasCalled = true
+				wasCalledWith = tempDir
+			}
+			err = actor.ProcessPath(absolutePath, f)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(wasCalled).To(BeTrue())
+			Expect(wasCalledWith).To(Equal(absolutePath))
+		})
 	})
 })
