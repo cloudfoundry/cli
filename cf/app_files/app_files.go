@@ -13,6 +13,8 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
+const windowsPathPrefix = `\\?\`
+
 type AppFiles interface {
 	AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error)
 	CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err error)
@@ -70,12 +72,19 @@ func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, from
 	for _, file := range appFiles {
 		err := func() error {
 			fromPath := filepath.Join(fromDir, file.Path)
+			if runtime.GOOS == "windows" {
+				fromPath = windowsPathPrefix + fromPath
+			}
+
 			srcFileInfo, err := os.Stat(fromPath)
 			if err != nil {
 				return err
 			}
 
 			toPath := filepath.Join(toDir, file.Path)
+			if runtime.GOOS == "windows" {
+				toPath = windowsPathPrefix + toPath
+			}
 
 			if srcFileInfo.IsDir() {
 				err = os.MkdirAll(toPath, srcFileInfo.Mode())
@@ -132,7 +141,11 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
 
 		if err != nil && runtime.GOOS == "windows" {
-			f, err = os.Lstat(`\\?\` + fullPath)
+			f, err = os.Lstat(windowsPathPrefix + fullPath)
+			if err != nil {
+				return err
+			}
+			fullPath = windowsPathPrefix + fullPath
 		}
 
 		if cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
