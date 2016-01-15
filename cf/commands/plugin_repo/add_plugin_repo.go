@@ -3,7 +3,9 @@ package plugin_repo
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -66,7 +68,20 @@ func (cmd *AddPluginRepo) Execute(c flags.FlagContext) {
 
 	resp, err := http.Get(repoUrl)
 	if err != nil {
-		cmd.ui.Failed(T("There is an error performing request on '{{.repoUrl}}': ", map[string]interface{}{"repoUrl": repoUrl}), err.Error())
+		if urlErr, ok := err.(*url.Error); ok {
+			if opErr, opErrOk := urlErr.Err.(*net.OpError); opErrOk {
+				if opErr.Op == "dial" {
+					cmd.ui.Failed(T("There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}", map[string]interface{}{
+						"RepoUrl": repoUrl,
+						"Error":   err.Error(),
+						"Tip":     T("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."),
+					}))
+				}
+			}
+		}
+		cmd.ui.Failed(T("There is an error performing request on '{{.RepoUrl}}': ", map[string]interface{}{
+			"RepoUrl": repoUrl,
+		}), err.Error())
 	}
 	defer resp.Body.Close()
 

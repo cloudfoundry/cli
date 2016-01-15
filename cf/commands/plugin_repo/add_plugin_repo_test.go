@@ -119,6 +119,14 @@ var _ = Describe("add-plugin-repo", func() {
 					[]string{"msn.com", "is not a valid url"},
 				))
 			})
+
+			It("should not contain the tip", func() {
+				callAddPluginRepo([]string{"repo", "msn.com"})
+
+				Ω(ui.Outputs).To(Not(ContainSubstrings(
+					[]string{"TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."},
+				)))
+			})
 		})
 
 		Context("server does not has a '/list' endpoint", func() {
@@ -181,6 +189,35 @@ var _ = Describe("add-plugin-repo", func() {
 			})
 		})
 
-	})
+		Context("When connection could not be established", func() {
+			It("prints a tip", func() {
+				callAddPluginRepo([]string{"repo", "https://localhost:111"})
 
+				Ω(ui.Outputs).To(ContainSubstrings(
+					[]string{"TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."},
+				))
+			})
+		})
+
+		Context("server responds with an http error", func() {
+			BeforeEach(func() {
+				h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusInternalServerError)
+				})
+				testServer = httptest.NewServer(h)
+			})
+
+			AfterEach(func() {
+				testServer.Close()
+			})
+
+			It("does not print a tip", func() {
+				callAddPluginRepo([]string{"repo", testServer.URL})
+
+				Ω(ui.Outputs).NotTo(ContainSubstrings(
+					[]string{"TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."},
+				))
+			})
+		})
+	})
 })

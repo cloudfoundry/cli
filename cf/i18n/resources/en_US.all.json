@@ -4720,6 +4720,11 @@
       "modified": false
    },
    {
+      "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
+      "translation": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
+      "modified": false
+   },
+   {
       "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
       "translation": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
       "modified": false
@@ -4820,8 +4825,13 @@
       "modified": false
    },
    {
-      "id": "There is an error performing request on '{{.repoUrl}}': ",
-      "translation": "There is an error performing request on '{{.repoUrl}}': ",
+      "id": "There is an error performing request on '{{.RepoUrl}}': ",
+      "translation": "There is an error performing request on '{{.RepoUrl}}': ",
+      "modified": false
+   },
+   {
+      "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
+      "translation": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
       "modified": false
    },
    {
