@@ -570,9 +570,9 @@
       "modified": false
    },
    {
-      "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
+      "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
       "translation": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -645,9 +645,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
+      "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]\n\nEXAMPLE:\n   CF_NAME bind-route-service example.com myratelimiter -n myapp",
       "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -2017,11 +2017,6 @@
    {
       "id": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
       "translation": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
-      "modified": false
-   },
-   {
-      "id": "EXAMPLE:\n   CF_NAME bind-route-service example.com myratelimiter -n myapp",
-      "translation": "EXAMPLE:\n   CF_NAME bind-route-service example.com myratelimiter -n myapp",
       "modified": false
    },
    {

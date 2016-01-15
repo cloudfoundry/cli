@@ -1,8 +1,6 @@
 package service
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -16,7 +14,7 @@ import (
 )
 
 type RouteServiceBinder interface {
-	BindRoute(route models.Route, serviceInstance models.ServiceInstance) (apiErr error)
+	BindRoute(route models.Route, serviceInstance models.ServiceInstance) error
 }
 
 type BindRouteService struct {
@@ -33,36 +31,38 @@ func init() {
 }
 
 func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
-	baseUsage := T("CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]")
-	exampleUsage := T(`EXAMPLE:
-   CF_NAME bind-route-service example.com myratelimiter -n myapp`)
-
 	fs := make(map[string]flags.FlagSet)
-	fs["n"] = &cliFlags.StringFlag{ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to bind")}
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force binding without confirmation")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to bind")}
+	fs["force"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force binding without confirmation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "bind-route-service",
 		ShortName:   "brs",
 		Description: T("Bind a service instance to a route"),
-		Usage:       strings.Join([]string{baseUsage, exampleUsage}, "\n\n"),
-		Flags:       fs,
+		Usage: T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]
+
+EXAMPLE:
+   CF_NAME bind-route-service example.com myratelimiter -n myapp`),
+		Flags: fs,
 	}
 }
 
-func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("bind-route-service"))
 	}
 
-	serviceName := fc.Args()[1]
+	domainName := fc.Args()[0]
+	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
-	cmd.domainReq = requirementsFactory.NewDomainRequirement(fc.Args()[0])
+	serviceName := fc.Args()[1]
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(), cmd.domainReq, cmd.serviceInstanceReq}
-
-	return
+	return []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		cmd.domainReq,
+		cmd.serviceInstanceReq,
+	}, nil
 }
 
 func (cmd *BindRouteService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -74,24 +74,28 @@ func (cmd *BindRouteService) SetDependency(deps command_registry.Dependency, plu
 }
 
 func (cmd *BindRouteService) Execute(c flags.FlagContext) {
+	host := c.String("hostname")
 	domain := cmd.domainReq.GetDomain()
-	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
+	path := "" // path is not currently supported
 
-	host := c.String("n")
-
-	route, err := cmd.routeRepo.Find(host, domain, "")
-
+	route, err := cmd.routeRepo.Find(host, domain, path)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
-		return
 	}
 
+	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 	if !serviceInstance.IsUserProvided() {
-		confirmed := c.Bool("f")
-		requiresRouteForwarding := requiresRouteForwarding(serviceInstance)
+		var requiresRouteForwarding bool
+		for _, requirement := range serviceInstance.ServiceOffering.Requires {
+			if requirement == "route_forwarding" {
+				requiresRouteForwarding = true
+				break
+			}
+		}
 
+		confirmed := c.Bool("force")
 		if requiresRouteForwarding && !confirmed {
-			confirmed = cmd.ui.Confirm(T("Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)",
+			confirmed = cmd.ui.Confirm(T("Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
 				map[string]interface{}{
 					"URL": route.URL(),
 					"ServiceInstanceName": serviceInstance.Name,
@@ -115,14 +119,12 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 
 	err = cmd.BindRoute(route, serviceInstance)
 	if err != nil {
-		if httperr, ok := err.(errors.HttpError); ok && httperr.ErrorCode() == errors.ROUTE_ALREADY_BOUND_TO_SAME_SERVICE {
-			cmd.ui.Ok()
+		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.ROUTE_ALREADY_BOUND_TO_SAME_SERVICE {
 			cmd.ui.Warn(T("Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
 				map[string]interface{}{
 					"URL": route.URL(),
 					"ServiceInstanceName": serviceInstance.Name,
 				}))
-			return
 		} else {
 			cmd.ui.Failed(err.Error())
 		}
@@ -133,13 +135,4 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 
 func (cmd *BindRouteService) BindRoute(route models.Route, serviceInstance models.ServiceInstance) error {
 	return cmd.routeServiceBindingRepo.Bind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided())
-}
-
-func requiresRouteForwarding(serviceInstance models.ServiceInstance) bool {
-	for _, require := range serviceInstance.ServiceOffering.Requires {
-		if require == "route_forwarding" {
-			return true
-		}
-	}
-	return false
 }
