@@ -4,6 +4,7 @@ import (
 	_ "crypto/sha512"
 	"crypto/x509"
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -81,18 +82,21 @@ func WrapNetworkErrors(host string, err error) error {
 	}
 
 	if innerErr != nil {
-		switch innerErr.(type) {
+		switch typedInnerErr := innerErr.(type) {
 		case x509.UnknownAuthorityError:
 			return errors.NewInvalidSSLCert(host, T("unknown authority"))
 		case x509.HostnameError:
 			return errors.NewInvalidSSLCert(host, T("not valid for the requested host"))
 		case x509.CertificateInvalidError:
 			return errors.NewInvalidSSLCert(host, "")
+		case *net.OpError:
+			if typedInnerErr.Op == "dial" {
+				return fmt.Errorf("%s: %s\n%s", T("Error performing request"), err.Error(), T("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+			}
 		}
 	}
 
 	return fmt.Errorf("%s: %s", T("Error performing request"), err.Error())
-
 }
 
 func getBaseDomain(host string) string {

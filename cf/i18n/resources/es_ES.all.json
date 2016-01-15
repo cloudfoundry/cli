@@ -4720,6 +4720,11 @@
       "modified": false
    },
    {
+      "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
+      "translation": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
+      "modified": false
+   },
+   {
       "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
       "translation": "CONSEJO: No se ha colocado como destino ningún espacio; utilice '{{.CfTargetCommand}}' para colocar como destino un espacio",
       "modified": false
@@ -4820,9 +4825,14 @@
       "modified": false
    },
    {
-      "id": "There is an error performing request on '{{.repoUrl}}': ",
+      "id": "There is an error performing request on '{{.RepoUrl}}': ",
       "translation": "Se ha producido un error al realizar la solicitud en '{{.repoUrl}}': ",
-      "modified": false
+      "modified": true
+   },
+   {
+      "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
+      "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s",
+      "modified": true
    },
    {
       "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
