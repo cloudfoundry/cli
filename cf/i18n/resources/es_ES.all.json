@@ -4755,6 +4755,11 @@
       "modified": false
    },
    {
+      "id": "Tags: {{.Tags}}",
+      "translation": "Tags: {{.Tags}}",
+      "modified": false
+   },
+   {
       "id": "Tail or show recent logs for an app",
       "translation": "Siga o muestre los registros recientes para una app",
       "modified": false

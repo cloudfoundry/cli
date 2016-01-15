@@ -41,6 +41,7 @@ var _ = Describe("ServiceInstanceResource", func() {
           "created_at": "fake created at",
           "updated_at": "fake updated at"
         },
+				"tags": [ "tag1", "tag2" ],
         "service_plan": {
           "metadata": {
             "guid": "fake-service-plan-guid"
@@ -89,6 +90,7 @@ var _ = Describe("ServiceInstanceResource", func() {
         "service_plan_url": "/v2/service_plans/fake-service-plan-guid",
         "service_bindings_url": "/v2/service_instances/fake-guid/service_bindings",
         "last_operation": null,
+				"tags": [ "tag1", "tag2" ],
         "service_plan": {
           "metadata": {
             "guid": "fake-service-plan-guid"
@@ -174,6 +176,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 
 				Expect(fields.Guid).To(Equal("fake-guid"))
 				Expect(fields.Name).To(Equal("fake service name"))
+				Expect(fields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(fields.DashboardUrl).To(Equal("https://fake/dashboard/url"))
 				Expect(fields.LastOperation.Type).To(Equal("create"))
 				Expect(fields.LastOperation.State).To(Equal("in progress"))
@@ -221,6 +224,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 
 				Expect(instance.ServiceInstanceFields.Guid).To(Equal("fake-guid"))
 				Expect(instance.ServiceInstanceFields.Name).To(Equal("fake service name"))
+				Expect(instance.ServiceInstanceFields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(instance.ServiceInstanceFields.DashboardUrl).To(Equal("https://fake/dashboard/url"))
 				Expect(instance.ServiceInstanceFields.LastOperation.Type).To(Equal("create"))
 				Expect(instance.ServiceInstanceFields.LastOperation.State).To(Equal("in progress"))
@@ -249,6 +253,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 
 				Expect(fields.Guid).To(Equal("fake-guid"))
 				Expect(fields.Name).To(Equal("fake service name"))
+				Expect(fields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(fields.DashboardUrl).To(Equal("https://fake/dashboard/url"))
 				Expect(fields.LastOperation.Type).To(Equal(""))
 				Expect(fields.LastOperation.State).To(Equal(""))
@@ -262,6 +267,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 
 				Expect(instance.ServiceInstanceFields.Guid).To(Equal("fake-guid"))
 				Expect(instance.ServiceInstanceFields.Name).To(Equal("fake service name"))
+				Expect(instance.ServiceInstanceFields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(instance.ServiceInstanceFields.DashboardUrl).To(Equal("https://fake/dashboard/url"))
 
 				Expect(instance.ServiceInstanceFields.LastOperation.Type).To(Equal(""))

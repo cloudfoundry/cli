@@ -4755,6 +4755,11 @@
       "modified": false
    },
    {
+      "id": "Tags: {{.Tags}}",
+      "translation": "Tags: {{.Tags}}",
+      "modified": false
+   },
+   {
       "id": "Tail or show recent logs for an app",
       "translation": "앱의 최근 로그 추적 또는 표시",
       "modified": false

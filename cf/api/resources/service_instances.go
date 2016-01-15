@@ -23,6 +23,7 @@ type LastOperation struct {
 type ServiceInstanceEntity struct {
 	Name            string
 	DashboardUrl    string                   `json:"dashboard_url"`
+	Tags            []string                 `json:"tags"`
 	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
 	ServiceKeys     []ServiceKeyResource     `json:"service_keys"`
 	ServicePlan     ServicePlanResource      `json:"service_plan"`
@@ -33,6 +34,7 @@ func (resource ServiceInstanceResource) ToFields() models.ServiceInstanceFields 
 	return models.ServiceInstanceFields{
 		Guid:         resource.Metadata.Guid,
 		Name:         resource.Entity.Name,
+		Tags:         resource.Entity.Tags,
 		DashboardUrl: resource.Entity.DashboardUrl,
 		LastOperation: models.LastOperationFields{
 			Type:        resource.Entity.LastOperation.Type,

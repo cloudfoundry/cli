@@ -243,6 +243,23 @@ var _ = Describe("service command", func() {
 					))
 				})
 			})
+
+			Context("when the service has tags", func() {
+				BeforeEach(func() {
+					serviceInstance := models.ServiceInstance{}
+					serviceInstance.Tags = []string{"tag1", "tag2"}
+					serviceInstance.ServicePlan = models.ServicePlanFields{Guid: "plan-guid", Name: "plan-name"}
+					requirementsFactory.ServiceInstance = serviceInstance
+				})
+
+				It("includes the tags in the output", func() {
+					runCommand("service1")
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Tags: ", "tag1, tag2"},
+					))
+				})
+			})
 		})
 	})
 })
