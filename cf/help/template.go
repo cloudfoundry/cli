@@ -23,7 +23,7 @@ func GetHelpTemplate() string {
    CF_STARTUP_TIMEOUT=5               ` + T("Max wait time for app instance startup, in minutes") + `
    CF_TRACE=true                      ` + T("Print API request diagnostics to stdout") + `
    CF_TRACE=path/to/trace.log         ` + T("Append API request diagnostics to a log file") + `
-   HTTP_PROXY=proxy.example.com:8080  ` + T("Enable HTTP proxying for API requests") + `
+   https_proxy=proxy.example.com:8080 ` + T("Enable HTTP proxying for API requests") + `
 
 {{.Title "` + T("GLOBAL OPTIONS:") + `"}}
    --version, -v                      ` + T("Print the version") + `
