@@ -30,6 +30,7 @@ type ServiceInstanceFields struct {
 	ApplicationNames []string
 	Params           map[string]interface{}
 	DashboardUrl     string
+	Tags             []string
 }
 
 type ServiceInstance struct {

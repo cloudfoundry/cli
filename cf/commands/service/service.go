@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -82,6 +84,10 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 			cmd.ui.Say(T("Service: {{.ServiceDescription}}",
 				map[string]interface{}{
 					"ServiceDescription": terminal.EntityNameColor(serviceInstance.ServiceOffering.Label),
+				}))
+			cmd.ui.Say(T("Tags: {{.Tags}}",
+				map[string]interface{}{
+					"Tags": terminal.EntityNameColor(strings.Join(serviceInstance.Tags, ", ")),
 				}))
 			cmd.ui.Say(T("Plan: {{.ServicePlanName}}",
 				map[string]interface{}{
