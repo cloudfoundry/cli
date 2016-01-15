@@ -7,6 +7,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
+const DeprecatedEndpointWarning = "Endpoint deprecated"
+
 type WarningsCollector struct {
 	ui                terminal.UI
 	warning_producers []WarningProducer
@@ -26,6 +28,9 @@ func (warnings_collector WarningsCollector) PrintWarnings() {
 	warnings := []string{}
 	for _, warning_producer := range warnings_collector.warning_producers {
 		for _, warning := range warning_producer.Warnings() {
+			if warning == DeprecatedEndpointWarning {
+				continue
+			}
 			warnings = append(warnings, warning)
 		}
 	}
