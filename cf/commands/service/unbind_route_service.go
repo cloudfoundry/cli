@@ -38,8 +38,8 @@ func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
 		CF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music`)
 
 	fs := make(map[string]flags.FlagSet)
-	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to unbind")}
-	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force unbinding without confirmation")}
+	fs["n"] = &cliFlags.StringFlag{ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to unbind")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force unbinding without confirmation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "unbind-route-service",
