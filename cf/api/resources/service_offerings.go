@@ -31,26 +31,33 @@ type ServiceOfferingExtra struct {
 	DocumentationURL string `json:"documentationUrl"`
 }
 
-func (resource ServiceOfferingResource) ToFields() (fields models.ServiceOfferingFields) {
-	fields.Label = resource.Entity.Label
-	fields.Version = resource.Entity.Version
-	fields.Provider = resource.Entity.Provider
-	fields.Description = resource.Entity.Description
-	fields.BrokerGuid = resource.Entity.BrokerGuid
-	fields.Guid = resource.Metadata.Guid
-	fields.DocumentationUrl = resource.Entity.Extra.DocumentationURL
-	fields.Requires = resource.Entity.Requires
-	return
+func (resource ServiceOfferingResource) ToFields() models.ServiceOfferingFields {
+	return models.ServiceOfferingFields{
+		Label:            resource.Entity.Label,
+		Version:          resource.Entity.Version,
+		Provider:         resource.Entity.Provider,
+		Description:      resource.Entity.Description,
+		BrokerGuid:       resource.Entity.BrokerGuid,
+		Guid:             resource.Metadata.Guid,
+		DocumentationUrl: resource.Entity.Extra.DocumentationURL,
+		Requires:         resource.Entity.Requires,
+	}
 }
 
-func (resource ServiceOfferingResource) ToModel() (offering models.ServiceOffering) {
-	offering.ServiceOfferingFields = resource.ToFields()
-	for _, p := range resource.Entity.ServicePlans {
-		servicePlan := models.ServicePlanFields{}
-		servicePlan.Name = p.Entity.Name
-		servicePlan.Guid = p.Metadata.Guid
-		offering.Plans = append(offering.Plans, servicePlan)
+func (resource ServiceOfferingResource) ToModel() models.ServiceOffering {
+	offering := models.ServiceOffering{
+		ServiceOfferingFields: resource.ToFields(),
 	}
+
+	for _, p := range resource.Entity.ServicePlans {
+		offering.Plans = append(offering.Plans,
+			models.ServicePlanFields{
+				Name: p.Entity.Name,
+				Guid: p.Metadata.Guid,
+			},
+		)
+	}
+
 	return offering
 }
 
