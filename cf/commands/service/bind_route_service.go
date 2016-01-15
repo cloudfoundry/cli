@@ -38,8 +38,8 @@ func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
    CF_NAME bind-route-service example.com myratelimiter -n myapp`)
 
 	fs := make(map[string]flags.FlagSet)
-	fs["n"] = &cliFlags.StringFlag{Name: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to bind")}
-	fs["f"] = &cliFlags.BoolFlag{Name: "f", Usage: T("Force binding without confirmation")}
+	fs["n"] = &cliFlags.StringFlag{ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to bind")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force binding without confirmation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "bind-route-service",
