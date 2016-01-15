@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/help"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/panic_printer"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -57,6 +58,13 @@ func main() {
 		os.Args[1] = "help"
 	}
 
+	warningProducers := []net.WarningProducer{}
+	for _, warningProducer := range deps.Gateways {
+		warningProducers = append(warningProducers, warningProducer)
+	}
+
+	warningsCollector := net.NewWarningsCollector(deps.Ui, warningProducers...)
+
 	commands_loader.Load()
 
 	//run core command
@@ -88,6 +96,9 @@ func main() {
 		}
 
 		cmd.Execute(flagContext)
+
+		warningsCollector.PrintWarnings()
+
 		os.Exit(0)
 	}
 
@@ -104,6 +115,15 @@ func main() {
 		deps.Ui.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
 		os.Exit(1)
 	}
+
+}
+
+func gatewaySliceFromMap(gateway_map map[string]net.Gateway) []net.WarningProducer {
+	gateways := []net.WarningProducer{}
+	for _, gateway := range gateway_map {
+		gateways = append(gateways, gateway)
+	}
+	return gateways
 }
 
 func handlePanics(printer terminal.Printer) {
