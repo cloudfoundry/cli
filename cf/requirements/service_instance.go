@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
+//go:generate counterfeiter -o fakes/fake_service_instance_requirement.go . ServiceInstanceRequirement
 type ServiceInstanceRequirement interface {
 	Requirement
 	GetServiceInstance() models.ServiceInstance
