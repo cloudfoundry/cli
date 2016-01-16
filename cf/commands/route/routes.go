@@ -76,43 +76,31 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 
 	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("path"), T("apps"), T("service")})
 
-	noRoutes := true
-	var apiErr error
+	var routesFound bool
+	cb := func(route models.Route) bool {
+		routesFound = true
+		appNames := []string{}
+		for _, app := range route.Apps {
+			appNames = append(appNames, app.Name)
+		}
 
+		table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","), route.ServiceInstance.Name)
+		return true
+	}
+
+	var err error
 	if flag {
-		apiErr = cmd.routeRepo.ListAllRoutes(func(route models.Route) bool {
-			noRoutes = false
-			appNames := []string{}
-			for _, app := range route.Apps {
-				appNames = append(appNames, app.Name)
-			}
-
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","), route.ServiceInstance.Name)
-			return true
-		})
-
+		err = cmd.routeRepo.ListAllRoutes(cb)
 	} else {
-
-		apiErr = cmd.routeRepo.ListRoutes(func(route models.Route) bool {
-			noRoutes = false
-			appNames := []string{}
-			for _, app := range route.Apps {
-				appNames = append(appNames, app.Name)
-			}
-
-			table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","), route.ServiceInstance.Name)
-			return true
-		})
+		err = cmd.routeRepo.ListRoutes(cb)
 	}
 
 	table.Print()
-
-	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching routes.\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
-		return
+	if err != nil {
+		cmd.ui.Failed(T("Failed fetching routes.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 
-	if noRoutes {
+	if !routesFound {
 		cmd.ui.Say(T("No routes found"))
 	}
 }
