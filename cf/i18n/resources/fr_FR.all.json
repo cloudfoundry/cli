@@ -1200,9 +1200,9 @@
       "modified": false
    },
    {
-      "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
+      "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]\n\t\t\nEXAMPLE:\n\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
       "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]",
-      "modified": false
+      "modified": true
    },
    {
       "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
@@ -2012,11 +2012,6 @@
    {
       "id": "EXAMPLE:\n",
       "translation": "EXEMPLE :\n",
-      "modified": false
-   },
-   {
-      "id": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
-      "translation": "EXAMPLE:\n\t\tCF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music",
       "modified": false
    },
    {
@@ -5090,9 +5085,9 @@
       "modified": false
    },
    {
-      "id": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)",
+      "id": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed?",
       "translation": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)",
-      "modified": false
+      "modified": true
    },
    {
       "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
