@@ -18,5 +18,6 @@ const (
 	SECURITY_GROUP_EXISTS               = "300005"
 	APP_ALREADY_BOUND                   = "90003"
 	ROUTE_ALREADY_BOUND_TO_SAME_SERVICE = "130008"
+	ROUTE_WAS_NOT_BOUND                 = "1002"
 	UNBINDABLE_SERVICE                  = "90005"
 )

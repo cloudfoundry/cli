@@ -1,272 +1,285 @@
 package service_test
 
 import (
-	"errors"
+	"net/http"
+
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	cferrors "github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("unbind-route-service command", func() {
+var _ = Describe("UnbindRouteService", func() {
 	var (
 		ui                      *testterm.FakeUI
-		requirementsFactory     *testreq.FakeReqFactory
-		config                  core_config.Repository
+		configRepo              core_config.Repository
 		routeRepo               *testapi.FakeRouteRepository
 		routeServiceBindingRepo *testapi.FakeRouteServiceBindingRepository
-		deps                    command_registry.Dependency
-	)
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.Config = config
-		deps.RepoLocator = deps.RepoLocator.SetRouteServiceBindingRepository(routeServiceBindingRepo)
-		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unbind-route-service").SetDependency(deps, pluginCall))
-	}
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		fakeDomain models.DomainFields
+
+		loginRequirement           requirements.Requirement
+		domainRequirement          *fakerequirements.FakeDomainRequirement
+		serviceInstanceRequirement *fakerequirements.FakeServiceInstanceRequirement
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
-		routeServiceBindingRepo = &testapi.FakeRouteServiceBindingRepository{}
+
+		configRepo = testconfig.NewRepositoryWithDefaults()
 		routeRepo = &testapi.FakeRouteRepository{}
+		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
+
+		routeServiceBindingRepo = &testapi.FakeRouteServiceBindingRepository{}
+		repoLocator = repoLocator.SetRouteServiceBindingRepository(routeServiceBindingRepo)
+
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = &service.UnbindRouteService{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{Name: "login-requirement"}
+		factory.NewLoginRequirementReturns(loginRequirement)
+
+		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		factory.NewDomainRequirementReturns(domainRequirement)
+
+		fakeDomain = models.DomainFields{
+			Guid: "fake-domain-guid",
+			Name: "fake-domain-name",
+		}
+		domainRequirement.GetDomainReturns(fakeDomain)
+
+		serviceInstanceRequirement = &fakerequirements.FakeServiceInstanceRequirement{}
+		factory.NewServiceInstanceRequirementReturns(serviceInstanceRequirement)
 	})
 
-	var callUnbindService = func(args []string) bool {
-		return testcmd.RunCliCommand("unbind-route-service", args, requirementsFactory, updateCommandDependency, false)
-	}
+	Describe("Requirements", func() {
+		Context("when not provided exactly two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("domain-name")
+			})
 
-	It("fails requirements when not logged in", func() {
-		Expect(callUnbindService([]string{"domain", "service"})).To(BeFalse())
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments"},
+				))
+			})
+		})
+
+		Context("when provided exactly two args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("domain-name", "service-instance")
+			})
+
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a DomainRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a ServiceInstanceRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewServiceInstanceRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(serviceInstanceRequirement))
+			})
+		})
 	})
 
-	Context("when logged in", func() {
+	Describe("Execute", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			routeRepo.FindReturns(models.Route{
-				Guid: "some-guid",
-				Host: "",
-				Domain: models.DomainFields{
-					Guid: "domain-guid",
-					Name: "example.com",
-				},
-			}, nil)
-			domain := models.DomainFields{Guid: "my-domain-guid", Name: "example.com"}
-
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "my-service"
-			serviceInstance.Guid = "my-service-guid"
-
-			requirementsFactory.Domain = domain
-			requirementsFactory.ServiceInstance = serviceInstance
+			err := flagContext.Parse("domain-name", "service-instance")
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("fails with usage when called without a service instance and route", func() {
-			callUnbindService([]string{"my-service"})
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "arguments"},
-			))
-
-			ui = &testterm.FakeUI{}
-			callUnbindService([]string{"example.com"})
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "arguments"},
-			))
+		It("tries to find the route", func() {
+			ui.Inputs = []string{"n"}
+			cmd.Execute(flagContext)
+			Expect(routeRepo.FindCallCount()).To(Equal(1))
+			host, domain, path := routeRepo.FindArgsForCall(0)
+			Expect(host).To(Equal(""))
+			Expect(domain).To(Equal(fakeDomain))
+			Expect(path).To(Equal(""))
 		})
 
-		Context("when user says yes", func() {
-			It("prompts for confirmation and unbinds the service", func() {
-				ui.Inputs = []string{"yes"}
-				callUnbindService([]string{"example.com", "my-service"})
-				Expect(len(ui.Prompts)).To(Equal(1))
-				Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(1))
+		Context("when given a hostname", func() {
+			BeforeEach(func() {
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+				err := flagContext.Parse("domain-name", "service-instance", "-n", "the-hostname")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("tries to find the route with the given hostname", func() {
+				ui.Inputs = []string{"n"}
+				cmd.Execute(flagContext)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				host, _, _ := routeRepo.FindArgsForCall(0)
+				Expect(host).To(Equal("the-hostname"))
+			})
+		})
+
+		Context("when the route can be found", func() {
+			BeforeEach(func() {
+				routeRepo.FindReturns(models.Route{Guid: "route-guid"}, nil)
+			})
+
+			It("asks the user to confirm", func() {
+				ui.Inputs = []string{"n"}
+				cmd.Execute(flagContext)
 				Expect(ui.Prompts).To(ContainSubstrings(
-					[]string{"Unbinding may leave apps mapped to route", "example.com", "vulnerable; e.g. if service instance", "my-service", "provides authentication. Do you want to proceed?"},
+					[]string{"Unbinding may leave apps mapped to route", "Do you want to proceed?"},
 				))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Unbinding route", "example.com", "from service instance", "my-service", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
-				))
+			})
+
+			Context("when the user confirms", func() {
+				JustBeforeEach(func() {
+					defer func() { recover() }()
+					ui.Inputs = []string{"y"}
+					cmd.Execute(flagContext)
+				})
+
+				It("does not warn", func() {
+					Expect(func() []string { return ui.Outputs }).NotTo(ContainSubstrings(
+						[]string{"Unbind cancelled"},
+					))
+				})
+
+				It("tells the user it is unbinding the route service", func() {
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Unbinding route", "from service instance"},
+					))
+				})
+
+				It("tries to unbind the route service", func() {
+					Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(1))
+				})
+
+				Context("when unbinding the route service succeeds", func() {
+					BeforeEach(func() {
+						routeServiceBindingRepo.UnbindReturns(nil)
+					})
+
+					It("says OK", func() {
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"OK"},
+						))
+					})
+				})
+
+				Context("when unbinding the route service fails because it was not bound", func() {
+					BeforeEach(func() {
+						routeServiceBindingRepo.UnbindReturns(errors.NewHttpError(http.StatusOK, errors.ROUTE_WAS_NOT_BOUND, "http-err"))
+					})
+
+					It("says OK", func() {
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"OK"},
+						))
+					})
+
+					It("warns", func() {
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Route", "was not bound to service instance"},
+						))
+					})
+				})
+
+				Context("when unbinding the route service fails for any other reason", func() {
+					BeforeEach(func() {
+						routeServiceBindingRepo.UnbindReturns(errors.New("unbind-err"))
+					})
+
+					It("fails with the error", func() {
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"unbind-err"},
+						))
+					})
+				})
+			})
+
+			Context("when the user does not confirm", func() {
+				BeforeEach(func() {
+					ui.Inputs = []string{"n"}
+					cmd.Execute(flagContext)
+				})
+
+				It("warns", func() {
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Unbind cancelled"},
+					))
+				})
+
+				It("does not bind the route service", func() {
+					Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(0))
+				})
+			})
+
+			Context("when the -f flag has been passed", func() {
+				BeforeEach(func() {
+					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+					flagContext.Parse("domain-name", "-f")
+				})
+
+				It("does not ask the user to confirm", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Prompts).NotTo(ContainSubstrings(
+						[]string{"Unbinding may leave apps mapped to route", "Do you want to proceed?"},
+					))
+				})
 			})
 		})
 
-		Context("when the user says no", func() {
+		Context("when finding the route results in an error", func() {
 			BeforeEach(func() {
-				ui.Inputs = []string{"no"}
+				routeRepo.FindReturns(models.Route{Guid: "route-guid"}, errors.New("find-err"))
 			})
 
-			It("does not call unbind", func() {
-				callUnbindService([]string{"example.com", "my-service"})
-				Expect(len(ui.Prompts)).To(Equal(1))
-				Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(0))
+			It("fails with error", func() {
+				defer func() { recover() }()
+				cmd.Execute(flagContext)
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Unbind cancelled"},
+					[]string{"FAILED"},
+					[]string{"find-err"},
 				))
-			})
-		})
-
-		Context("when -f flag is provided", func() {
-			It("unbinds a service instance to a route without confirmation", func() {
-				callUnbindService([]string{"example.com", "my-service", "-f"})
-				Expect(len(ui.Prompts)).To(Equal(0))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Unbinding route", "example.com", "from service instance", "my-service", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
-				))
-				Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(1))
-			})
-		})
-
-		Context("with host name", func() {
-			BeforeEach(func() {
-				routeRepo.FindReturns(models.Route{
-					Guid: "some-guid",
-					Host: "host",
-					Domain: models.DomainFields{
-						Guid: "domain-guid",
-						Name: "example.com",
-					},
-				}, nil)
-				ui.Inputs = []string{"yes"}
-			})
-
-			It("binds a service instance to a route", func() {
-				domain := models.DomainFields{Guid: "my-domain-guid", Name: "example.com"}
-
-				serviceInstance := models.ServiceInstance{}
-				serviceInstance.Name = "my-service"
-				serviceInstance.Guid = "my-service-guid"
-
-				requirementsFactory.Domain = domain
-				requirementsFactory.ServiceInstance = serviceInstance
-				callUnbindService([]string{"example.com", "my-service", "-n", "host"})
-
-				Expect(requirementsFactory.DomainName).To(Equal("example.com"))
-				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
-
-				Expect(len(ui.Prompts)).To(Equal(1))
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Unbinding route", "host.example.com", "my-service", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
-				))
-				Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(1))
-			})
-		})
-
-		Context("when route repo returns error", func() {
-			BeforeEach(func() {
-				routeRepo.FindReturns(models.Route{}, errors.New("kaboom"))
-			})
-
-			It("displays the error returned by route repo", func() {
-				domain := models.DomainFields{Guid: "my-domain-guid", Name: "example.com"}
-
-				serviceInstance := models.ServiceInstance{}
-				serviceInstance.Name = "my-service"
-				serviceInstance.Guid = "my-service-guid"
-
-				requirementsFactory.Domain = domain
-				requirementsFactory.ServiceInstance = serviceInstance
-				callUnbindService([]string{"example.com", "my-service", "-n", "host", "-f"})
-
-				Expect(requirementsFactory.DomainName).To(Equal("example.com"))
-				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
-
-				Expect(len(ui.Prompts)).To(Equal(0))
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"kaboom"},
-				))
-				Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(0))
-			})
-		})
-
-		Context("when route service bind repo returns an error", func() {
-			BeforeEach(func() {
-				routeServiceBindingRepo.UnbindReturns(errors.New("unbind-error"))
-			})
-
-			It("displays the error returned by binding repo", func() {
-				domain := models.DomainFields{Guid: "my-domain-guid", Name: "example.com"}
-
-				serviceInstance := models.ServiceInstance{}
-				serviceInstance.Name = "my-service"
-				serviceInstance.Guid = "my-service-guid"
-
-				requirementsFactory.Domain = domain
-				requirementsFactory.ServiceInstance = serviceInstance
-				callUnbindService([]string{"example.com", "my-service", "-n", "host", "-f"})
-				Expect(len(ui.Prompts)).To(Equal(0))
-
-				Expect(requirementsFactory.DomainName).To(Equal("example.com"))
-				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"unbind-error"},
-				))
-			})
-		})
-
-		Context("when route service bind repo returns an error", func() {
-			BeforeEach(func() {
-				routeServiceBindingRepo.UnbindReturns(cferrors.NewHttpError(400, "1002", "Sorry We're Not Related"))
-			})
-
-			It("displays a warning and return okay", func() {
-				domain := models.DomainFields{Guid: "my-domain-guid", Name: "example.com"}
-
-				serviceInstance := models.ServiceInstance{}
-				serviceInstance.Name = "my-service"
-				serviceInstance.Guid = "my-service-guid"
-
-				requirementsFactory.Domain = domain
-				requirementsFactory.ServiceInstance = serviceInstance
-				callUnbindService([]string{"example.com", "my-service", "-n", "host", "-f"})
-				Expect(len(ui.Prompts)).To(Equal(0))
-
-				Expect(requirementsFactory.DomainName).To(Equal("example.com"))
-				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"OK"},
-					[]string{"Route example.com was not bound to service instance my-service"},
-				))
-			})
-		})
-
-		Context("when service instance is not a managed service (UPSI)", func() {
-			BeforeEach(func() {
-				domain := models.DomainFields{Guid: "my-domain-guid", Name: "example.com"}
-
-				serviceInstance := models.ServiceInstance{}
-				serviceInstance.Name = "my-service"
-				serviceInstance.Guid = "my-service-guid"
-
-				requirementsFactory.Domain = domain
-				requirementsFactory.ServiceInstance = serviceInstance
-			})
-
-			It("unbinds a service instance to a route with confirmation", func() {
-				callUnbindService([]string{"example.com", "my-service", "-f"})
-				Expect(len(ui.Prompts)).To(Equal(0))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Unbinding route", "example.com", "my-service", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
-				))
-				Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(1))
 			})
 		})
 	})
