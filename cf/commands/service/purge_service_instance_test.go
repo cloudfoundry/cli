@@ -24,7 +24,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type passingRequirement struct{}
+type passingRequirement struct {
+	Name string
+}
 
 func (r passingRequirement) Execute() bool {
 	return true
