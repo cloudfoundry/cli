@@ -1,0 +1,658 @@
+[
+  {
+    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
+    "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n"
+  },
+  {
+    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
+    "translation": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n"
+  },
+  {
+    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
+    "translation": "   CF_NAME push [-f MANIFEST_PATH]\n"
+  },
+  {
+    "id": "Bind a service instance to a route",
+    "translation": "Bind a service instance to a route"
+  },
+  {
+    "id": "Bind cancelled",
+    "translation": "Bind cancelled"
+  },
+  {
+    "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "CF_NAME allow-space-ssh SPACE_NAME",
+    "translation": "CF_NAME allow-space-ssh SPACE_NAME"
+  },
+  {
+    "id": "CF_NAME api [URL]",
+    "translation": "CF_NAME api [URL]"
+  },
+  {
+    "id": "CF_NAME app APP_NAME",
+    "translation": "CF_NAME app APP_NAME"
+  },
+  {
+    "id": "CF_NAME auth USERNAME PASSWORD\n\n",
+    "translation": "CF_NAME auth USERNAME PASSWORD\n\n"
+  },
+  {
+    "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
+    "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
+  },
+  {
+    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
+    "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
+  },
+  {
+    "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
+    "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]"
+  },
+  {
+    "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
+    "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
+  },
+  {
+    "id": "CF_NAME buildpacks",
+    "translation": "CF_NAME buildpacks"
+  },
+  {
+    "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false] [--locale (LOCALE | CLEAR)]",
+    "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false] [--locale (LOCALE | CLEAR)]"
+  },
+  {
+    "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
+    "translation": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]"
+  },
+  {
+    "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
+    "translation": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]"
+  },
+  {
+    "id": "CF_NAME create-domain ORG DOMAIN",
+    "translation": "CF_NAME create-domain ORG DOMAIN"
+  },
+  {
+    "id": "CF_NAME create-org ORG",
+    "translation": "CF_NAME create-org ORG"
+  },
+  {
+    "id": "CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
+    "translation": "CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
+  },
+  {
+    "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+    "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
+  },
+  {
+    "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]",
+    "translation": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]"
+  },
+  {
+    "id": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
+    "translation": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"
+  },
+  {
+    "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+    "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+  },
+  {
+    "id": "CF_NAME create-shared-domain DOMAIN",
+    "translation": "CF_NAME create-shared-domain DOMAIN"
+  },
+  {
+    "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
+    "translation": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"
+  },
+  {
+    "id": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
+    "translation": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
+  },
+  {
+    "id": "CF_NAME create-user USERNAME PASSWORD",
+    "translation": "CF_NAME create-user USERNAME PASSWORD"
+  },
+  {
+    "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE \n      CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n      CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n      CF_NAME create-user-provided-service my-route-service -r https://example.com\n\n   Linux/Mac:\n      CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n      CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\n",
+    "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n\nEXAMPLE \n      CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n      CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n      CF_NAME create-user-provided-service my-route-service -r https://example.com\n\n   Linux/Mac:\n      CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n      CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\n"
+  },
+  {
+    "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]",
+    "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]"
+  },
+  {
+    "id": "CF_NAME delete APP_NAME [-f -r]",
+    "translation": "CF_NAME delete APP_NAME [-f -r]"
+  },
+  {
+    "id": "CF_NAME delete-buildpack BUILDPACK [-f]",
+    "translation": "CF_NAME delete-buildpack BUILDPACK [-f]"
+  },
+  {
+    "id": "CF_NAME delete-domain DOMAIN [-f]",
+    "translation": "CF_NAME delete-domain DOMAIN [-f]"
+  },
+  {
+    "id": "CF_NAME delete-org ORG [-f]",
+    "translation": "CF_NAME delete-org ORG [-f]"
+  },
+  {
+    "id": "CF_NAME delete-orphaned-routes [-f]",
+    "translation": "CF_NAME delete-orphaned-routes [-f]"
+  },
+  {
+    "id": "CF_NAME delete-quota QUOTA [-f]",
+    "translation": "CF_NAME delete-quota QUOTA [-f]"
+  },
+  {
+    "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
+    "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
+  },
+  {
+    "id": "CF_NAME delete-service SERVICE_INSTANCE [-f]",
+    "translation": "CF_NAME delete-service SERVICE_INSTANCE [-f]"
+  },
+  {
+    "id": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]",
+    "translation": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"
+  },
+  {
+    "id": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
+    "translation": "CF_NAME delete-service-broker SERVICE_BROKER [-f]"
+  },
+  {
+    "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
+    "translation": "CF_NAME delete-shared-domain DOMAIN [-f]"
+  },
+  {
+    "id": "CF_NAME delete-space SPACE [-f]",
+    "translation": "CF_NAME delete-space SPACE [-f]"
+  },
+  {
+    "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME",
+    "translation": "CF_NAME delete-space-quota SPACE-QUOTA-NAME"
+  },
+  {
+    "id": "CF_NAME delete-user USERNAME [-f]",
+    "translation": "CF_NAME delete-user USERNAME [-f]"
+  },
+  {
+    "id": "CF_NAME disable-feature-flag FEATURE_NAME",
+    "translation": "CF_NAME disable-feature-flag FEATURE_NAME"
+  },
+  {
+    "id": "CF_NAME disable-ssh APP_NAME",
+    "translation": "CF_NAME disable-ssh APP_NAME"
+  },
+  {
+    "id": "CF_NAME disallow-space-ssh SPACE_NAME",
+    "translation": "CF_NAME disallow-space-ssh SPACE_NAME"
+  },
+  {
+    "id": "CF_NAME enable-feature-flag FEATURE_NAME",
+    "translation": "CF_NAME enable-feature-flag FEATURE_NAME"
+  },
+  {
+    "id": "CF_NAME enable-ssh APP_NAME",
+    "translation": "CF_NAME enable-ssh APP_NAME"
+  },
+  {
+    "id": "CF_NAME env APP_NAME",
+    "translation": "CF_NAME env APP_NAME"
+  },
+  {
+    "id": "CF_NAME events APP_NAME",
+    "translation": "CF_NAME events APP_NAME"
+  },
+  {
+    "id": "CF_NAME feature-flag FEATURE_NAME",
+    "translation": "CF_NAME feature-flag FEATURE_NAME"
+  },
+  {
+    "id": "CF_NAME feature-flags",
+    "translation": "CF_NAME feature-flags"
+  },
+  {
+    "id": "CF_NAME get-health-check APP_NAME",
+    "translation": "CF_NAME get-health-check APP_NAME"
+  },
+  {
+    "id": "CF_NAME help [COMMAND]",
+    "translation": "CF_NAME help [COMMAND]"
+  },
+  {
+    "id": "CF_NAME list-plugin-repos",
+    "translation": "CF_NAME list-plugin-repos"
+  },
+  {
+    "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
+    "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"
+  },
+  {
+    "id": "CF_NAME logout",
+    "translation": "CF_NAME logout"
+  },
+  {
+    "id": "CF_NAME logs APP_NAME",
+    "translation": "CF_NAME logs APP_NAME"
+  },
+  {
+    "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
+    "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n"
+  },
+  {
+    "id": "CF_NAME oauth-token",
+    "translation": "CF_NAME oauth-token"
+  },
+  {
+    "id": "CF_NAME org ORG",
+    "translation": "CF_NAME org ORG"
+  },
+  {
+    "id": "CF_NAME org-users ORG",
+    "translation": "CF_NAME org-users ORG"
+  },
+  {
+    "id": "CF_NAME passwd",
+    "translation": "CF_NAME passwd"
+  },
+  {
+    "id": "CF_NAME plugins",
+    "translation": "CF_NAME plugins"
+  },
+  {
+    "id": "CF_NAME purge-service-instance SERVICE_INSTANCE",
+    "translation": "CF_NAME purge-service-instance SERVICE_INSTANCE"
+  },
+  {
+    "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]",
+    "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]"
+  },
+  {
+    "id": "CF_NAME quota QUOTA",
+    "translation": "CF_NAME quota QUOTA"
+  },
+  {
+    "id": "CF_NAME quotas",
+    "translation": "CF_NAME quotas"
+  },
+  {
+    "id": "CF_NAME rename APP_NAME NEW_APP_NAME",
+    "translation": "CF_NAME rename APP_NAME NEW_APP_NAME"
+  },
+  {
+    "id": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
+    "translation": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"
+  },
+  {
+    "id": "CF_NAME rename-org ORG NEW_ORG",
+    "translation": "CF_NAME rename-org ORG NEW_ORG"
+  },
+  {
+    "id": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
+    "translation": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"
+  },
+  {
+    "id": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
+    "translation": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"
+  },
+  {
+    "id": "CF_NAME rename-space SPACE NEW_SPACE",
+    "translation": "CF_NAME rename-space SPACE NEW_SPACE"
+  },
+  {
+    "id": "CF_NAME restage APP_NAME",
+    "translation": "CF_NAME restage APP_NAME"
+  },
+  {
+    "id": "CF_NAME restart APP_NAME",
+    "translation": "CF_NAME restart APP_NAME"
+  },
+  {
+    "id": "CF_NAME restart-app-instance APP_NAME INDEX",
+    "translation": "CF_NAME restart-app-instance APP_NAME INDEX"
+  },
+  {
+    "id": "CF_NAME running-environment-variable-group",
+    "translation": "CF_NAME running-environment-variable-group"
+  },
+  {
+    "id": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
+    "translation": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"
+  },
+  {
+    "id": "CF_NAME security-group SECURITY_GROUP",
+    "translation": "CF_NAME security-group SECURITY_GROUP"
+  },
+  {
+    "id": "CF_NAME service SERVICE_INSTANCE",
+    "translation": "CF_NAME service SERVICE_INSTANCE"
+  },
+  {
+    "id": "CF_NAME service-auth-tokens",
+    "translation": "CF_NAME service-auth-tokens"
+  },
+  {
+    "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
+    "translation": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"
+  },
+  {
+    "id": "CF_NAME set-health-check APP_NAME 'port'|'none'",
+    "translation": "CF_NAME set-health-check APP_NAME 'port'|'none'"
+  },
+  {
+    "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
+    "translation": "CF_NAME set-org-role USERNAME ORG ROLE\n\n"
+  },
+  {
+    "id": "CF_NAME set-quota ORG QUOTA\n\n",
+    "translation": "CF_NAME set-quota ORG QUOTA\n\n"
+  },
+  {
+    "id": "CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
+    "translation": "CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
+  },
+  {
+    "id": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME",
+    "translation": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME"
+  },
+  {
+    "id": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n",
+    "translation": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n"
+  },
+  {
+    "id": "CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
+    "translation": "CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
+  },
+  {
+    "id": "CF_NAME share-private-domain ORG DOMAIN",
+    "translation": "CF_NAME share-private-domain ORG DOMAIN"
+  },
+  {
+    "id": "CF_NAME space SPACE",
+    "translation": "CF_NAME space SPACE"
+  },
+  {
+    "id": "CF_NAME space-quota SPACE_QUOTA_NAME",
+    "translation": "CF_NAME space-quota SPACE_QUOTA_NAME"
+  },
+  {
+    "id": "CF_NAME space-quotas",
+    "translation": "CF_NAME space-quotas"
+  },
+  {
+    "id": "CF_NAME space-ssh-allowed SPACE_NAME",
+    "translation": "CF_NAME space-ssh-allowed SPACE_NAME"
+  },
+  {
+    "id": "CF_NAME space-users ORG SPACE",
+    "translation": "CF_NAME space-users ORG SPACE"
+  },
+  {
+    "id": "CF_NAME spaces",
+    "translation": "CF_NAME spaces"
+  },
+  {
+    "id": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]",
+    "translation": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]"
+  },
+  {
+    "id": "CF_NAME ssh-code",
+    "translation": "CF_NAME ssh-code"
+  },
+  {
+    "id": "CF_NAME ssh-enabled APP_NAME",
+    "translation": "CF_NAME ssh-enabled APP_NAME"
+  },
+  {
+    "id": "CF_NAME stack STACK_NAME",
+    "translation": "CF_NAME stack STACK_NAME"
+  },
+  {
+    "id": "CF_NAME stacks",
+    "translation": "CF_NAME stacks"
+  },
+  {
+    "id": "CF_NAME staging-environment-variable-group",
+    "translation": "CF_NAME staging-environment-variable-group"
+  },
+  {
+    "id": "CF_NAME start APP_NAME",
+    "translation": "CF_NAME start APP_NAME"
+  },
+  {
+    "id": "CF_NAME stop APP_NAME",
+    "translation": "CF_NAME stop APP_NAME"
+  },
+  {
+    "id": "CF_NAME target [-o ORG] [-s SPACE]",
+    "translation": "CF_NAME target [-o ORG] [-s SPACE]"
+  },
+  {
+    "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
+    "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
+  },
+  {
+    "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE",
+    "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
+  },
+  {
+    "id": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE",
+    "translation": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"
+  },
+  {
+    "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
+    "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
+  },
+  {
+    "id": "CF_NAME uninstall-plugin PLUGIN-NAME",
+    "translation": "CF_NAME uninstall-plugin PLUGIN-NAME"
+  },
+  {
+    "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
+    "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME"
+  },
+  {
+    "id": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n",
+    "translation": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n"
+  },
+  {
+    "id": "CF_NAME unset-space-quota SPACE QUOTA\n\n",
+    "translation": "CF_NAME unset-space-quota SPACE QUOTA\n\n"
+  },
+  {
+    "id": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n",
+    "translation": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n"
+  },
+  {
+    "id": "CF_NAME unshare-private-domain ORG DOMAIN",
+    "translation": "CF_NAME unshare-private-domain ORG DOMAIN"
+  },
+  {
+    "id": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]",
+    "translation": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]"
+  },
+  {
+    "id": "CF_NAME update-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY][-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
+    "translation": "CF_NAME update-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY][-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
+  },
+  {
+    "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
+    "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
+  },
+  {
+    "id": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]",
+    "translation": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]"
+  },
+  {
+    "id": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
+    "translation": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"
+  },
+  {
+    "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+    "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+  },
+  {
+    "id": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
+    "translation": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
+  },
+  {
+    "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com",
+    "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com"
+  },
+  {
+    "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
+    "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
+  },
+  {
+    "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+  },
+  {
+    "id": "Credentials exposed in the VCAP_SERVICES environment variable for bound applications",
+    "translation": "Credentials exposed in the VCAP_SERVICES environment variable for bound applications"
+  },
+  {
+    "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
+    "translation": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"
+  },
+  {
+    "id": "Error processing app files in '{{.Path}}': {{.Error}}",
+    "translation": "Error processing app files in '{{.Path}}': {{.Error}}"
+  },
+  {
+    "id": "Force binding without confirmation",
+    "translation": "Force binding without confirmation"
+  },
+  {
+    "id": "Force unbinding without confirmation",
+    "translation": "Force unbinding without confirmation"
+  },
+  {
+    "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
+    "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
+  },
+  {
+    "id": "Hostname used in combination with DOMAIN to specify the route to bind",
+    "translation": "Hostname used in combination with DOMAIN to specify the route to bind"
+  },
+  {
+    "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
+    "translation": "Hostname used in combination with DOMAIN to specify the route to unbind"
+  },
+  {
+    "id": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
+    "translation": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n"
+  },
+  {
+    "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
+    "translation": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n"
+  },
+  {
+    "id": "No app files found in '{{.Path}}'",
+    "translation": "No app files found in '{{.Path}}'"
+  },
+  {
+    "id": "Path for the route",
+    "translation": "Path for the route"
+  },
+  {
+    "id": "Path used to identify the route",
+    "translation": "Path used to identify the route"
+  },
+  {
+    "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
+    "translation": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}"
+  },
+  {
+    "id": "Route {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}",
+    "translation": "Route {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
+  },
+  {
+    "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
+    "translation": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}."
+  },
+  {
+    "id": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
+    "translation": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}."
+  },
+  {
+    "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
+    "translation": "Server error, error code: 1002, message: cannot set space role because user is not part of the org"
+  },
+  {
+    "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
+    "translation": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."
+  },
+  {
+    "id": "Tags: {{.Tags}}",
+    "translation": "Tags: {{.Tags}}"
+  },
+  {
+    "id": "The targeted API endpoint could not be reached.",
+    "translation": "The targeted API endpoint could not be reached."
+  },
+  {
+    "id": "URL to which logs for bound applications will be streamed",
+    "translation": "URL to which logs for bound applications will be streamed"
+  },
+  {
+    "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
+    "translation": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https"
+  },
+  {
+    "id": "Unable to determine CC API Version. Please log in again.",
+    "translation": "Unable to determine CC API Version. Please log in again."
+  },
+  {
+    "id": "Unable to parse CC API Version '{{.APIVersion}}'",
+    "translation": "Unable to parse CC API Version '{{.APIVersion}}'"
+  },
+  {
+    "id": "Unbind a service instance from a route",
+    "translation": "Unbind a service instance from a route"
+  },
+  {
+    "id": "Unbind cancelled",
+    "translation": "Unbind cancelled"
+  },
+  {
+    "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "Update user-provided service instance",
+    "translation": "Update user-provided service instance"
+  },
+  {
+    "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",
+    "translation": "[MULTIPART/FORM-DATA CONTENT HIDDEN]"
+  },
+  {
+    "id": "[PRIVATE DATA HIDDEN]",
+    "translation": "[PRIVATE DATA HIDDEN]"
+  },
+  {
+    "id": "[environment variables]",
+    "translation": "[environment variables]"
+  },
+  {
+    "id": "[global options] command [arguments...] [command options]",
+    "translation": "[global options] command [arguments...] [command options]"
+  },
+  {
+    "id": "path",
+    "translation": "path"
+  },
+  {
+    "id": "repo-plugins",
+    "translation": "repo-plugins"
+  },
+  {
+    "id": "service-broker",
+    "translation": "service-broker"
+  }
+]
