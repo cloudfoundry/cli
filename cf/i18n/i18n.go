@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"unicode"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/resources"
@@ -13,13 +14,13 @@ import (
 )
 
 const (
-	defaultLocale  = "en_US"
+	defaultLocale  = "en-us"
 	lang           = "LANG"
 	lcAll          = "LC_ALL"
 	resourceSuffix = ".all.json"
 	zhTW           = "zh-tw"
 	zhHK           = "zh-hk"
-	zhHant         = "zhHant"
+	zhHant         = "zh-hant"
 	hyphen         = "-"
 	underscore     = "_"
 )
@@ -87,10 +88,38 @@ func SupportedLocales() []string {
 	locales := make([]string, len(assetNames))
 
 	for i := range assetNames {
-		locales[i] = strings.TrimSuffix(path.Base(assetNames[i]), resourceSuffix)
+		locale := strings.TrimSuffix(path.Base(assetNames[i]), resourceSuffix)
+		locales[i] = standardizedLocale(locale)
 	}
 
 	return locales
+}
+
+func standardizedLocale(s string) string {
+	localeParts := strings.Split(s, "-")
+	language := localeParts[0]
+	regionOrScript := localeParts[1]
+
+	switch len(s) {
+	case 5:
+		newRegion := ""
+		for _, v := range regionOrScript {
+			newRegion += string(unicode.ToUpper(v))
+		}
+		return language + "_" + newRegion
+	case 7:
+		newScript := ""
+		for i, v := range regionOrScript {
+			if i == 0 {
+				newScript += string(unicode.ToUpper(v))
+			} else {
+				newScript += string(v)
+			}
+		}
+		return language + "-" + newScript
+	}
+
+	return s
 }
 
 func NormalizedSupportedLocales() []string {
