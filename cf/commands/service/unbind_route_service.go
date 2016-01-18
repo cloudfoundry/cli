@@ -42,7 +42,7 @@ func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
 		Usage: T(`CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]
 		
 EXAMPLE:
-	CF_NAME unbind-route-service 10.244.0.34.xip.io myratelimiter -n spring-music`),
+   CF_NAME unbind-route-service example.com myratelimiter -n myapp`),
 		Flags: fs,
 	}
 }
