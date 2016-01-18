@@ -105,6 +105,12 @@ var _ = Describe("org command", func() {
 			orgRepo.ListOrgsReturns([]models.Organization{org1, org2, org3}, nil)
 		})
 
+		It("tries to get the organizations", func() {
+			runCommand()
+			Expect(orgRepo.ListOrgsCallCount()).To(Equal(1))
+			Expect(orgRepo.ListOrgsArgsForCall(0)).To(Equal(0))
+		})
+
 		It("lists orgs", func() {
 			runCommand()
 

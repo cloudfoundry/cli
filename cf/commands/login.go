@@ -218,25 +218,20 @@ func (cmd Login) setOrganization(c flags.FlagContext) (isOrgSet bool) {
 	orgName := c.String("o")
 
 	if orgName == "" {
-		availableOrgs := []models.Organization{}
-		orgs, apiErr := cmd.orgRepo.ListOrgs()
-		if apiErr != nil {
+		orgs, err := cmd.orgRepo.ListOrgs(maxChoices)
+		if err != nil {
 			cmd.ui.Failed(T("Error finding available orgs\n{{.ApiErr}}",
-				map[string]interface{}{"ApiErr": apiErr.Error()}))
-		}
-		for _, org := range orgs {
-			if len(availableOrgs) < maxChoices {
-				availableOrgs = append(availableOrgs, org)
-			}
+				map[string]interface{}{"ApiErr": err.Error()}))
 		}
 
-		if len(availableOrgs) == 0 {
+		switch len(orgs) {
+		case 0:
 			return false
-		} else if len(availableOrgs) == 1 {
-			cmd.targetOrganization(availableOrgs[0])
+		case 1:
+			cmd.targetOrganization(orgs[0])
 			return true
-		} else {
-			orgName = cmd.promptForOrgName(availableOrgs)
+		default:
+			orgName = cmd.promptForOrgName(orgs)
 			if orgName == "" {
 				cmd.ui.Say("")
 				return false

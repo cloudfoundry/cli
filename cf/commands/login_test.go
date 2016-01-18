@@ -244,6 +244,14 @@ var _ = Describe("Login Command", func() {
 			})
 		})
 
+		It("tries to get the organizations", func() {
+			Flags = []string{}
+			ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
+			testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+			Expect(orgRepo.ListOrgsCallCount()).To(Equal(1))
+			Expect(orgRepo.ListOrgsArgsForCall(0)).To(Equal(50))
+		})
+
 		Describe("when there are too many orgs to show", func() {
 			BeforeEach(func() {
 				organizations := []models.Organization{}

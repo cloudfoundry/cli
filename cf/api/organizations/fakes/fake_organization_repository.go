@@ -9,10 +9,12 @@ import (
 )
 
 type FakeOrganizationRepository struct {
-	ListOrgsStub        func() (orgs []models.Organization, apiErr error)
+	ListOrgsStub        func(limit int) ([]models.Organization, error)
 	listOrgsMutex       sync.RWMutex
-	listOrgsArgsForCall []struct{}
-	listOrgsReturns     struct {
+	listOrgsArgsForCall []struct {
+		limit int
+	}
+	listOrgsReturns struct {
 		result1 []models.Organization
 		result2 error
 	}
@@ -79,12 +81,14 @@ type FakeOrganizationRepository struct {
 	}
 }
 
-func (fake *FakeOrganizationRepository) ListOrgs() (orgs []models.Organization, apiErr error) {
+func (fake *FakeOrganizationRepository) ListOrgs(limit int) ([]models.Organization, error) {
 	fake.listOrgsMutex.Lock()
-	fake.listOrgsArgsForCall = append(fake.listOrgsArgsForCall, struct{}{})
+	fake.listOrgsArgsForCall = append(fake.listOrgsArgsForCall, struct {
+		limit int
+	}{limit})
 	fake.listOrgsMutex.Unlock()
 	if fake.ListOrgsStub != nil {
-		return fake.ListOrgsStub()
+		return fake.ListOrgsStub(limit)
 	} else {
 		return fake.listOrgsReturns.result1, fake.listOrgsReturns.result2
 	}
@@ -94,6 +98,12 @@ func (fake *FakeOrganizationRepository) ListOrgsCallCount() int {
 	fake.listOrgsMutex.RLock()
 	defer fake.listOrgsMutex.RUnlock()
 	return len(fake.listOrgsArgsForCall)
+}
+
+func (fake *FakeOrganizationRepository) ListOrgsArgsForCall(i int) int {
+	fake.listOrgsMutex.RLock()
+	defer fake.listOrgsMutex.RUnlock()
+	return fake.listOrgsArgsForCall[i].limit
 }
 
 func (fake *FakeOrganizationRepository) ListOrgsReturns(result1 []models.Organization, result2 error) {
