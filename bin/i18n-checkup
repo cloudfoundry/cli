@@ -4,7 +4,7 @@ set +e
 
 export PATH=$PATH:$GOPATH/bin
 
-go get github.com/maximilien/i18n4go/i18n4go
+go get github.com/krishicks/i18n4go/i18n4go
 OUTPUT=$?
 if [ $OUTPUT -ne 0 ]; then
   printf "Cannot install latest i18n tool to verify strings:\n${OUTPUT}"

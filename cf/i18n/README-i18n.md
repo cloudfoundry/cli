@@ -34,7 +34,7 @@ Available today are:
 
 1. __Give it a test drive.__ Download the latest CLI and try it in your locale. You should always at least see no difference since English is the default locale if your current locale does not have any translations yet. If your locale is any of the translated locales, then you should see that the CLI strings are in that language. If you run into error, please submit an issue on Github.
 
-2. __Submit pull requests for languages files with translations/improvements.__ If you see typos, grammar errors,  ambiguous strings or lingering English then please find the appropriate string in the `cf/i18n/resources/<language>_<locale>.all.json` and submit a PR with the fix(es).  It is much better to submit small pull requests as you complete translations, rather than submitting one giant pull request after you finish everything.  This makes it much easier to rapidly merge your changes in.  You can also report translations needing fixes as an issue in Github, but if you do understand the language, we would really appreciate the fix.
+2. __Submit pull requests for languages files with translations/improvements.__ If you see typos, grammar errors, ambiguous strings or lingering English then please find the appropriate entry in the `cf/i18n/resources/<language>_<locale>.all.json` and submit a PR with the fix(es).  It is much better to submit small pull requests as you complete translations, rather than submitting one giant pull request after you finish everything.  This makes it much easier to rapidly merge your changes in.  You can also report translations needing fixes as an issue in Github, but if you do understand the language, we would really appreciate the fix.
 
 ### Note on contributing translations
 
