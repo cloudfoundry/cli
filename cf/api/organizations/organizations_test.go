@@ -17,6 +17,7 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Organization Repository", func() {
@@ -54,7 +55,7 @@ var _ = Describe("Organization Repository", func() {
 			defer testserver.Close()
 
 			orgs := []models.Organization{}
-			orgs, apiErr := repo.ListOrgs()
+			orgs, apiErr := repo.ListOrgs(0)
 
 			Expect(len(orgs)).To(Equal(3))
 			Expect(orgs[0].Guid).To(Equal("org1-guid"))
@@ -74,10 +75,96 @@ var _ = Describe("Organization Repository", func() {
 			testserver, handler, repo := createOrganizationRepo(emptyOrgsRequest)
 			defer testserver.Close()
 
-			_, apiErr := repo.ListOrgs()
+			_, apiErr := repo.ListOrgs(0)
 
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(handler).To(HaveAllRequestsCalled())
+		})
+	})
+
+	Describe("ListOrgs", func() {
+		var (
+			ccServer *ghttp.Server
+			repo     CloudControllerOrganizationRepository
+		)
+
+		BeforeEach(func() {
+			ccServer = ghttp.NewServer()
+			configRepo := testconfig.NewRepositoryWithDefaults()
+			configRepo.SetApiEndpoint(ccServer.URL())
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+			repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations"),
+					ghttp.VerifyHeader(http.Header{
+						"accept": []string{"application/json"},
+					}),
+					ghttp.RespondWith(http.StatusOK, `{
+						"total_results": 3,
+						"total_pages": 2,
+						"prev_url": null,
+						"next_url": "/v2/organizations?page=2",
+						"resources": [
+							{
+								"metadata": { "guid": "org1-guid" },
+								"entity": { "name": "Org1" }
+							},
+							{
+								"metadata": { "guid": "org2-guid" },
+								"entity": { "name": "Org2" }
+							}
+						]
+					}`),
+				),
+			)
+
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations"),
+					ghttp.VerifyHeader(http.Header{
+						"accept": []string{"application/json"},
+					}),
+					ghttp.RespondWith(http.StatusOK, `{
+						"total_results": 3,
+						"total_pages": 2,
+						"prev_url": null,
+						"next_url": null,
+						"resources": [
+							{
+								"metadata": { "guid": "org3-guid" },
+								"entity": { "name": "Org3" }
+							}
+						]
+					}`),
+				),
+			)
+		})
+
+		AfterEach(func() {
+			ccServer.Close()
+		})
+
+		Context("when given a non-zero positive limit", func() {
+			It("should return no more than the limit number of organizations", func() {
+				orgs, err := repo.ListOrgs(2)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(len(orgs)).To(Equal(2))
+			})
+
+			It("should not make more requests than necessary to retrieve the requested number of orgs", func() {
+				_, err := repo.ListOrgs(2)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).Should(HaveLen(1))
+			})
+		})
+
+		Context("when given a zero limit", func() {
+			It("should return all organizations", func() {
+				orgs, err := repo.ListOrgs(0)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(len(orgs)).To(Equal(3))
+			})
 		})
 	})
 

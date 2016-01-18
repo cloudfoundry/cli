@@ -12,6 +12,8 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 )
 
+const orgLimit = 0
+
 type ListOrgs struct {
 	ui              terminal.UI
 	config          core_config.Reader
@@ -60,7 +62,7 @@ func (cmd ListOrgs) Execute(fc flags.FlagContext) {
 	noOrgs := true
 	table := cmd.ui.Table([]string{T("name")})
 
-	orgs, apiErr := cmd.orgRepo.ListOrgs()
+	orgs, apiErr := cmd.orgRepo.ListOrgs(orgLimit)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}
