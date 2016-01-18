@@ -11,7 +11,7 @@ def split_locale(locale)
 end
 
 def install_i18n
-  output = `go get -u go get github.com/maximilien/i18n4go/i18n4go`
+  output = `go get -u go get github.com/krishicks/i18n4go/i18n4go`
   unless $?.exitstatus == 0
     puts "Cannot install latest i18n tool to verify strings:\n#{output}"
     exit 1

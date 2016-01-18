@@ -199,10 +199,15 @@ to be logged in, and the actual behavior of the command itself. You can find it 
 
 i18n
 ----
-All pull requests which include user-facing strings should include updated translation files. These files are generated/ maintained using [i18n4go](https://github.com/maximilien/i18n4go). 
+All pull requests which add, update or remove user-facing strings should include updated translation files. These files are generated/ maintained using [i18n4go](https://github.com/krishicks/i18n4go) and [goi18n](https://github.com/nicksnyder/go-i18n). 
 
-To add/ update translation strings run the command `i18n4go -c fixup`. For each change or update, you will be presented with the choices `new` or `upd`. Type in the appropriate choice. If `upd` is chosen, you will be asked to confirm which string is being updated using a numbered list.
+Typical workflow is as follows:
 
+    i18n4go -c fixup # answer any prompts appropriately
+    goi18n -outdir cf/i18n/resources cf/i18n/resources/*.all.json
+    bin/generate-language-resources
+
+When running `i18n4go -c fixup`, you will be presented with the choices `new` or `upd` for each addition or update. Type in the appropriate choice. If `upd` is chosen, you will be asked to confirm which string is being updated using a numbered list.
 
 Current conventions
 ===================
