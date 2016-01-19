@@ -4,16 +4,18 @@ package fakes
 import (
 	"sync"
 
+	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
 )
 
 type FakeRouteCreator struct {
-	CreateRouteStub        func(hostName string, port string, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
+	CreateRouteStub        func(hostName, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		hostName string
-		port     string
 		path     string
 		domain   models.DomainFields
 		space    models.SpaceFields
@@ -24,18 +26,17 @@ type FakeRouteCreator struct {
 	}
 }
 
-func (fake *FakeRouteCreator) CreateRoute(hostName string, port string, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
+func (fake *FakeRouteCreator) CreateRoute(hostName string, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
 	fake.createRouteMutex.Lock()
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
 		hostName string
-		port     string
 		path     string
 		domain   models.DomainFields
 		space    models.SpaceFields
-	}{hostName, port, path, domain, space})
+	}{hostName, path, domain, space})
 	fake.createRouteMutex.Unlock()
 	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(hostName, port, path, domain, space)
+		return fake.CreateRouteStub(hostName, path, domain, space)
 	} else {
 		return fake.createRouteReturns.result1, fake.createRouteReturns.result2
 	}
@@ -47,10 +48,10 @@ func (fake *FakeRouteCreator) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeRouteCreator) CreateRouteArgsForCall(i int) (string, string, string, models.DomainFields, models.SpaceFields) {
+func (fake *FakeRouteCreator) CreateRouteArgsForCall(i int) (string, string, models.DomainFields, models.SpaceFields) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
-	return fake.createRouteArgsForCall[i].hostName, fake.createRouteArgsForCall[i].port, fake.createRouteArgsForCall[i].path, fake.createRouteArgsForCall[i].domain, fake.createRouteArgsForCall[i].space
+	return fake.createRouteArgsForCall[i].hostName, fake.createRouteArgsForCall[i].path, fake.createRouteArgsForCall[i].domain, fake.createRouteArgsForCall[i].space
 }
 
 func (fake *FakeRouteCreator) CreateRouteReturns(result1 models.Route, result2 error) {
@@ -60,5 +61,19 @@ func (fake *FakeRouteCreator) CreateRouteReturns(result1 models.Route, result2 e
 		result2 error
 	}{result1, result2}
 }
+
+func (cmd *FakeRouteCreator) MetaData() command_registry.CommandMetadata {
+	return command_registry.CommandMetadata{Name: "create-route"}
+}
+
+func (cmd *FakeRouteCreator) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+	return cmd
+}
+
+func (cmd *FakeRouteCreator) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
+	return
+}
+
+func (cmd *FakeRouteCreator) Execute(_ flags.FlagContext) {}
 
 var _ route.RouteCreator = new(FakeRouteCreator)

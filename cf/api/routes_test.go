@@ -70,12 +70,10 @@ var _ = Describe("route repository", func() {
 
 			Expect(len(routes)).To(Equal(2))
 			Expect(routes[0].Guid).To(Equal("route-1-guid"))
-			Expect(routes[0].Port).To(Equal(9090))
 			Expect(routes[0].Path).To(Equal(""))
 			Expect(routes[0].ServiceInstance.Guid).To(Equal("service-guid"))
 			Expect(routes[0].ServiceInstance.Name).To(Equal("test-service"))
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
-			Expect(routes[1].Port).To(Equal(0))
 			Expect(routes[1].Path).To(Equal("/path-2"))
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -129,7 +127,7 @@ var _ = Describe("route repository", func() {
 				BeforeEach(func() {
 					v := url.Values{}
 					v.Set("inline-relations-depth", "1")
-					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath;port:8080")
+					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath")
 
 					ccServer.AppendHandlers(
 						ghttp.CombineHandlers(
@@ -146,12 +144,11 @@ var _ = Describe("route repository", func() {
 					domain := models.DomainFields{}
 					domain.Guid = "my-domain-guid"
 
-					route, apiErr := repo.Find("my-cool-app", "8080", domain, "somepath")
+					route, apiErr := repo.Find("my-cool-app", domain, "somepath")
 
 					Expect(apiErr).NotTo(HaveOccurred())
 					Expect(route.Host).To(Equal("my-cool-app"))
 					Expect(route.Guid).To(Equal("my-route-guid"))
-					Expect(route.Port).To(Equal(8080))
 					Expect(route.Path).To(Equal("/somepath"))
 					Expect(route.Domain.Guid).To(Equal(domain.Guid))
 				})
@@ -161,7 +158,7 @@ var _ = Describe("route repository", func() {
 				BeforeEach(func() {
 					v := url.Values{}
 					v.Set("inline-relations-depth", "1")
-					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath;port:8080")
+					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath")
 
 					ccServer.AppendHandlers(
 						ghttp.CombineHandlers(
@@ -187,7 +184,7 @@ var _ = Describe("route repository", func() {
 					domain := models.DomainFields{}
 					domain.Guid = "my-domain-guid"
 
-					_, apiErr := repo.Find("my-cool-app", "8080", domain, "somepath")
+					_, apiErr := repo.Find("my-cool-app", domain, "somepath")
 
 					Expect(handler).To(HaveAllRequestsCalled())
 
@@ -214,7 +211,7 @@ var _ = Describe("route repository", func() {
 			})
 			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "", "", "my-domain-guid", "my-space-guid")
+			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "", "my-domain-guid", "my-space-guid")
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -237,36 +234,12 @@ var _ = Describe("route repository", func() {
 			})
 			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "", "this-is-a-path", "my-domain-guid", "my-space-guid")
+			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "this-is-a-path", "my-domain-guid", "my-space-guid")
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
 			Expect(createdRoute.Path).To(Equal("/this-is-a-path"))
-		})
-
-		It("creates routes with a port in a given space", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","port":8080,"domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-						{
-							"metadata": { "guid": "my-route-guid" },
-							"entity": { "host": "my-cool-app", "port": 8080 }
-						}
-					`},
-				}),
-			})
-			configRepo.SetApiEndpoint(ts.URL)
-
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "8080", "", "my-domain-guid", "my-space-guid")
-
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
-			Expect(createdRoute.Port).To(Equal(8080))
 		})
 
 		It("creates routes", func() {
@@ -454,7 +427,6 @@ var firstPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: 
       },
       "entity": {
         "host": "route-1-host",
-        "port": 9090,
         "path": "",
         "domain": {
           "metadata": {
@@ -513,7 +485,6 @@ var secondPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body:
       },
       "entity": {
         "host": "route-2-host",
-        "port": 0,
         "path": "/path-2",
         "domain": {
           "metadata": {
@@ -562,7 +533,6 @@ var findResponseBody = `
 		},
 		"entity": {
 			"host": "my-cool-app",
-			"port": 8080,
 			"domain": {
 				"metadata": {
 					"guid": "my-domain-guid"
@@ -583,7 +553,6 @@ var firstPageRoutesOrgLvlResponse = testnet.TestResponse{Status: http.StatusOK, 
       },
       "entity": {
         "host": "route-1-host",
-        "port": 9090,
         "domain": {
           "metadata": {
             "guid": "domain-1-guid"

@@ -9,7 +9,6 @@ import (
 type Route struct {
 	Guid   string
 	Host   string
-	Port   int
 	Domain DomainFields
 	Path   string
 
@@ -19,19 +18,15 @@ type Route struct {
 }
 
 func (r Route) URL() string {
-	return urlStringFromParts(r.Host, r.Port, r.Domain.Name, r.Path)
+	return urlStringFromParts(r.Host, r.Domain.Name, r.Path)
 }
 
-func urlStringFromParts(hostName string, port int, domainName string, path string) string {
+func urlStringFromParts(hostName, domainName, path string) string {
 	var host string
 	if hostName != "" {
 		host = fmt.Sprintf("%s.%s", hostName, domainName)
 	} else {
 		host = domainName
-	}
-
-	if port > 0 {
-		host = fmt.Sprintf("%s:%d", host, port)
 	}
 
 	u := url.URL{
