@@ -159,7 +159,7 @@ var _ = Describe("CreateRoute", func() {
 
 	Describe("Execute", func() {
 		BeforeEach(func() {
-			err := flagContext.Parse("space-name", "domain-name", "-n", "hostname", "--path", "path", "--port", "8080")
+			err := flagContext.Parse("space-name", "domain-name", "-n", "hostname", "--path", "path")
 			Expect(err).NotTo(HaveOccurred())
 			_, err = cmd.Requirements(factory, flagContext)
 			Expect(err).NotTo(HaveOccurred())
@@ -253,7 +253,7 @@ var _ = Describe("CreateRoute", func() {
 		})
 
 		It("attempts to create a route in the space", func() {
-			cmd.CreateRoute("hostname", "8080", "path", domainFields, spaceFields)
+			cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
 
 			Expect(routeRepo.CreateInSpaceCallCount()).To(Equal(1))
 			hostname, path, domain, space := routeRepo.CreateInSpaceArgsForCall(0)
@@ -269,7 +269,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("attempts to find the route", func() {
-				cmd.CreateRoute("hostname", "8080", "path", domainFields, spaceFields)
+				cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 			})
 
@@ -279,7 +279,7 @@ var _ = Describe("CreateRoute", func() {
 				})
 
 				It("returns the original error", func() {
-					_, err := cmd.CreateRoute("hostname", "8080", "path", domainFields, spaceFields)
+					_, err := cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(Equal("create-error"))
 				})
@@ -287,7 +287,7 @@ var _ = Describe("CreateRoute", func() {
 
 			Context("when a route with the same space guid, but different domain guid is found", func() {
 				It("returns the original error", func() {
-					_, err := cmd.CreateRoute("hostname", "8080", "path", domainFields, spaceFields)
+					_, err := cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(Equal("create-error"))
 				})
@@ -295,7 +295,7 @@ var _ = Describe("CreateRoute", func() {
 
 			Context("when a route with the same domain guid, but different space guid is found", func() {
 				It("returns the original error", func() {
-					_, err := cmd.CreateRoute("hostname", "8080", "path", domainFields, spaceFields)
+					_, err := cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(Equal("create-error"))
 				})
@@ -317,7 +317,7 @@ var _ = Describe("CreateRoute", func() {
 				})
 
 				It("prints a message that it already exists", func() {
-					cmd.CreateRoute("hostname", "8080", "path", domainFields, spaceFields)
+					cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"OK"},
 						[]string{"Route hostname.domain-name/path already exists"}))
@@ -331,7 +331,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("prints a success message", func() {
-				cmd.CreateRoute("hostname", "8080", "path", domainFields, spaceFields)
+				cmd.CreateRoute("hostname", "path", domainFields, spaceFields)
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 			})
 		})
