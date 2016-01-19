@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	fakeAPI "github.com/cloudfoundry/cli/cf/api/fakes"
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -696,12 +696,12 @@ var _ = Describe("Server", func() {
 			})
 
 			Context(".AccessToken", func() {
-				var fakeAuthenticator *fakeAPI.FakeAuthenticationRepository
+				var authRepo *authenticationfakes.FakeAuthenticationRepository
 
 				BeforeEach(func() {
-					fakeAuthenticator = &fakeAPI.FakeAuthenticationRepository{}
+					authRepo = &authenticationfakes.FakeAuthenticationRepository{}
 					locator := api.RepositoryLocator{}
-					locator = locator.SetAuthenticationRepository(fakeAuthenticator)
+					locator = locator.SetAuthenticationRepository(authRepo)
 
 					rpcService, err = NewRpcService(nil, nil, config, locator, nil)
 					err := rpcService.Start()
@@ -718,11 +718,11 @@ var _ = Describe("Server", func() {
 					err = client.Call("CliRpcCmd.AccessToken", "", &result)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(fakeAuthenticator.RefreshTokenCalled).To(BeTrue())
+					Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 				})
 
 				It("returns the access token", func() {
-					fakeAuthenticator.RefreshToken = "fake-access-token"
+					authRepo.RefreshAuthTokenReturns("fake-access-token", nil)
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())
@@ -734,7 +734,7 @@ var _ = Describe("Server", func() {
 				})
 
 				It("returns the error from refreshing the access token", func() {
-					fakeAuthenticator.RefreshTokenError = errors.New("refresh error")
+					authRepo.RefreshAuthTokenReturns("", errors.New("refresh error"))
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())

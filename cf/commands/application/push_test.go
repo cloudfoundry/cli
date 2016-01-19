@@ -7,6 +7,7 @@ import (
 
 	fakeactors "github.com/cloudfoundry/cli/cf/actors/fakes"
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	testStacks "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
@@ -47,7 +48,7 @@ var _ = Describe("Push Command", func() {
 		serviceRepo                *testapi.FakeServiceRepository
 		wordGenerator              *testwords.FakeWordGenerator
 		requirementsFactory        *testreq.FakeReqFactory
-		authRepo                   *testapi.FakeAuthenticationRepository
+		authRepo                   *authenticationfakes.FakeAuthenticationRepository
 		actor                      *fakeactors.FakePushActor
 		appfiles                   *fakeappfiles.FakeAppFiles
 		zipper                     *fakeappfiles.FakeZipper
@@ -145,7 +146,7 @@ var _ = Describe("Push Command", func() {
 
 		stackRepo = &testStacks.FakeStackRepository{}
 		serviceRepo = &testapi.FakeServiceRepository{}
-		authRepo = &testapi.FakeAuthenticationRepository{}
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
 		wordGenerator = new(testwords.FakeWordGenerator)
 		wordGenerator.BabbleReturns("random-host")
 
@@ -293,12 +294,12 @@ var _ = Describe("Push Command", func() {
 			It("refreshes the auth token (so fresh)", func() { // so clean
 				callPush("fresh-prince")
 
-				Expect(authRepo.RefreshTokenCalled).To(BeTrue())
+				Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 			})
 
 			Context("when refreshing the auth token fails", func() {
 				BeforeEach(func() {
-					authRepo.RefreshTokenError = errors.New("I accidentally the UAA")
+					authRepo.RefreshAuthTokenReturns("", errors.New("I accidentally the UAA"))
 				})
 
 				It("it displays an error", func() {

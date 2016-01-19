@@ -18,6 +18,7 @@ type TokenRefresher interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
 }
 
+//go:generate counterfeiter -o fakes/fake_authentication_repository.go . AuthenticationRepository
 type AuthenticationRepository interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
 	Authenticate(credentials map[string]string) (apiErr error)

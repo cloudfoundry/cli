@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -18,10 +19,10 @@ import (
 
 var _ = Describe("loggregator logs repository", func() {
 	var (
-		fakeConsumer       *testapi.FakeLoggregatorConsumer
-		logsRepo           LogsRepository
-		configRepo         core_config.ReadWriter
-		fakeTokenRefresher *testapi.FakeAuthenticationRepository
+		fakeConsumer *testapi.FakeLoggregatorConsumer
+		logsRepo     LogsRepository
+		configRepo   core_config.ReadWriter
+		authRepo     *authenticationfakes.FakeAuthenticationRepository
 	)
 
 	BeforeEach(func() {
@@ -30,11 +31,11 @@ var _ = Describe("loggregator logs repository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
 		configRepo.SetAccessToken("the-access-token")
-		fakeTokenRefresher = &testapi.FakeAuthenticationRepository{}
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
 	})
 
 	JustBeforeEach(func() {
-		logsRepo = NewLoggregatorLogsRepository(configRepo, fakeConsumer, fakeTokenRefresher)
+		logsRepo = NewLoggregatorLogsRepository(configRepo, fakeConsumer, authRepo)
 	})
 
 	Describe("RecentLogsFor", func() {
@@ -49,7 +50,7 @@ var _ = Describe("loggregator logs repository", func() {
 			It("refreshes the access token", func() {
 				_, err := logsRepo.RecentLogsFor("app-guid")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeTokenRefresher.RefreshTokenCalled).To(BeTrue())
+				Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 			})
 		})
 
@@ -117,7 +118,7 @@ var _ = Describe("loggregator logs repository", func() {
 
 				err := logsRepo.TailLogsFor("app-guid", func() {}, func(*logmessage.LogMessage) {})
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeTokenRefresher.RefreshTokenCalled).To(BeTrue())
+				Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 			})
 
 			Context("when LoggregatorConsumer.UnauthorizedError occurs again", func() {

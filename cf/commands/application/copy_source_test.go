@@ -2,6 +2,7 @@ package application_test
 
 import (
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	testCopyApplication "github.com/cloudfoundry/cli/cf/api/copy_application_source/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	testorg "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
@@ -27,7 +28,7 @@ var _ = Describe("CopySource", func() {
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		authRepo            *testapi.FakeAuthenticationRepository
+		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		appRepo             *testApplication.FakeApplicationRepository
 		copyAppSourceRepo   *testCopyApplication.FakeCopyApplicationSourceRepository
 		spaceRepo           *testapi.FakeSpaceRepository
@@ -55,7 +56,7 @@ var _ = Describe("CopySource", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-		authRepo = &testapi.FakeAuthenticationRepository{}
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
 		appRepo = &testApplication.FakeApplicationRepository{}
 		copyAppSourceRepo = &testCopyApplication.FakeCopyApplicationSourceRepository{}
 		spaceRepo = &testapi.FakeSpaceRepository{}
@@ -106,12 +107,12 @@ var _ = Describe("CopySource", func() {
 		Context("refreshing the auth token", func() {
 			It("makes a call for the app token", func() {
 				runCommand("source-app", "target-app")
-				Expect(authRepo.RefreshTokenCalled).To(BeTrue())
+				Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 			})
 
 			Context("when refreshing the auth token fails", func() {
 				BeforeEach(func() {
-					authRepo.RefreshTokenError = errors.New("I accidentally the UAA")
+					authRepo.RefreshAuthTokenReturns("", errors.New("I accidentally the UAA"))
 				})
 
 				It("it displays an error", func() {

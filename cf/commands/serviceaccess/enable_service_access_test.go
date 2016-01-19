@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -24,7 +24,7 @@ var _ = Describe("enable-service-access command", func() {
 		actor               *testactor.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		tokenRefresher      *testapi.FakeAuthenticationRepository
+		tokenRefresher      *authenticationfakes.FakeAuthenticationRepository
 		deps                command_registry.Dependency
 	)
 
@@ -41,7 +41,7 @@ var _ = Describe("enable-service-access command", func() {
 		actor = &testactor.FakeServicePlanActor{}
 		configRepo = configuration.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		tokenRefresher = &testapi.FakeAuthenticationRepository{}
+		tokenRefresher = &authenticationfakes.FakeAuthenticationRepository{}
 	})
 
 	runCommand := func(args []string) bool {
@@ -69,12 +69,12 @@ var _ = Describe("enable-service-access command", func() {
 
 		It("Refreshes the auth token", func() {
 			runCommand([]string{"service"})
-			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
+			Expect(tokenRefresher.RefreshAuthTokenCallCount()).To(Equal(1))
 		})
 
 		Context("when refreshing the auth token fails", func() {
 			It("fails and returns the error", func() {
-				tokenRefresher.RefreshTokenError = errors.New("Refreshing went wrong")
+				tokenRefresher.RefreshAuthTokenReturns("", errors.New("Refreshing went wrong"))
 				runCommand([]string{"service"})
 
 				Expect(ui.Outputs).To(ContainSubstrings(

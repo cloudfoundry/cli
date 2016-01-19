@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/trace"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -26,7 +27,7 @@ var _ = Describe("ssh-code command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
-		authRepo            *testapi.FakeAuthenticationRepository
+		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		endpointRepo        *testapi.FakeEndpointRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
@@ -44,7 +45,7 @@ var _ = Describe("ssh-code command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		authRepo = &testapi.FakeAuthenticationRepository{}
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
 		endpointRepo = &testapi.FakeEndpointRepository{}
 
 		deps = command_registry.NewDependency()
@@ -98,15 +99,15 @@ var _ = Describe("ssh-code command", func() {
 		Context("refresh oauth-token to make sure it is not stale", func() {
 			It("refreshes the oauth token to make sure it is not stale", func() {
 				runCommand()
-				Ω(authRepo.RefreshTokenCalled).To(BeTrue())
+				Ω(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 			})
 
 			Context("when refreshing fails", func() {
 				It("refreshes the oauth token to make sure it is not stale", func() {
-					authRepo.RefreshTokenError = errors.New("no token for you!")
+					authRepo.RefreshAuthTokenReturns("", errors.New("no token for you!"))
 
 					runCommand()
-					Ω(authRepo.RefreshTokenCalled).To(BeTrue())
+
 					Ω(ui.Outputs).To(ContainSubstrings(
 						[]string{"Error refreshing oauth token", "no token for you"},
 					))
@@ -118,7 +119,7 @@ var _ = Describe("ssh-code command", func() {
 			var fakeUAA *ghttp.Server
 
 			BeforeEach(func() {
-				authRepo.RefreshToken = "bearer client-bearer-token"
+				authRepo.RefreshAuthTokenReturns("bearer client-bearer-token", nil)
 				configRepo.SetSSLDisabled(true)
 				configRepo.SetSSHOAuthClient("ssh-oauth-client-id")
 
@@ -140,7 +141,7 @@ var _ = Describe("ssh-code command", func() {
 			It("gets the access code from the token endpoint", func() {
 				runCommand()
 
-				Ω(authRepo.RefreshTokenCalled).To(BeTrue())
+				Ω(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 				Ω(fakeUAA.ReceivedRequests()).To(HaveLen(1))
 				Ω(ui.Outputs).To(ContainSubstrings(
 					[]string{"abc123"},
@@ -166,7 +167,7 @@ var _ = Describe("ssh-code command", func() {
 
 				runCommand()
 
-				Ω(authRepo.RefreshTokenCalled).To(BeTrue())
+				Ω(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 				Ω(ui.Outputs).To(ContainSubstrings(
 					[]string{"signed by unknown authority"},
 				))

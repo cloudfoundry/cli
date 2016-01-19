@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -26,14 +26,14 @@ var _ = Describe("service-access command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		serviceBroker1      models.ServiceBroker
 		serviceBroker2      models.ServiceBroker
-		tokenRefresher      *testapi.FakeAuthenticationRepository
+		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(tokenRefresher)
+		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		deps.ServiceHandler = actor
 		deps.Config = configRepo
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("service-access").SetDependency(deps, pluginCall))
@@ -43,7 +43,7 @@ var _ = Describe("service-access command", func() {
 		ui = &testterm.FakeUI{}
 		actor = &testactor.FakeServiceActor{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		tokenRefresher = &testapi.FakeAuthenticationRepository{}
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -105,12 +105,12 @@ var _ = Describe("service-access command", func() {
 
 		It("refreshes the auth token", func() {
 			runCommand()
-			Expect(tokenRefresher.RefreshTokenCalled).To(BeTrue())
+			Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 		})
 
 		Context("when refreshing the auth token fails", func() {
 			It("fails and returns the error", func() {
-				tokenRefresher.RefreshTokenError = errors.New("Refreshing went wrong")
+				authRepo.RefreshAuthTokenReturns("", errors.New("Refreshing went wrong"))
 				runCommand()
 
 				Expect(ui.Outputs).To(ContainSubstrings(
