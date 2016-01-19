@@ -1,8 +1,10 @@
 package commands_test
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,7 +22,7 @@ var _ = Describe("auth command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		repo                *testapi.FakeAuthenticationRepository
+		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -28,7 +30,7 @@ var _ = Describe("auth command", func() {
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = config
-		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(repo)
+		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("auth").SetDependency(deps, pluginCall))
 	}
 
@@ -36,10 +38,11 @@ var _ = Describe("auth command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		repo = &testapi.FakeAuthenticationRepository{
-			Config:       config,
-			AccessToken:  "my-access-token",
-			RefreshToken: "my-refresh-token",
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo.AuthenticateStub = func(credentials map[string]string) error {
+			config.SetAccessToken("my-access-token")
+			config.SetRefreshToken("my-refresh-token")
+			return nil
 		}
 
 		deps = command_registry.NewDependency()
@@ -75,11 +78,9 @@ var _ = Describe("auth command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(repo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-				{
-					"username": "foo@example.com",
-					"password": "password",
-				},
+			Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+				"username": "foo@example.com",
+				"password": "password",
 			}))
 		})
 
@@ -99,12 +100,12 @@ var _ = Describe("auth command", func() {
 		It("gets the UAA endpoint and saves it to the config file", func() {
 			requirementsFactory.ApiEndpointSuccess = true
 			testcmd.RunCliCommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
-			Expect(repo.GetLoginPromptsWasCalled).To(BeTrue())
+			Expect(authRepo.GetLoginPromptsAndSaveUAAServerURLCallCount()).To(Equal(1))
 		})
 
 		Describe("when authentication fails", func() {
 			BeforeEach(func() {
-				repo.AuthError = true
+				authRepo.AuthenticateReturns(errors.New("Error authenticating."))
 				testcmd.RunCliCommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)
 			})
 

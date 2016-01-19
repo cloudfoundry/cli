@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf"
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_organizations "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -24,7 +25,7 @@ var _ = Describe("Login Command", func() {
 		Flags        []string
 		Config       core_config.Repository
 		ui           *testterm.FakeUI
-		authRepo     *testapi.FakeAuthenticationRepository
+		authRepo     *authenticationfakes.FakeAuthenticationRepository
 		endpointRepo *testapi.FakeEndpointRepository
 		orgRepo      *fake_organizations.FakeOrganizationRepository
 		spaceRepo    *testapi.FakeSpaceRepository
@@ -60,10 +61,11 @@ var _ = Describe("Login Command", func() {
 		Flags = []string{}
 		Config = testconfig.NewRepository()
 		ui = &testterm.FakeUI{}
-		authRepo = &testapi.FakeAuthenticationRepository{
-			AccessToken:  "my_access_token",
-			RefreshToken: "my_refresh_token",
-			Config:       Config,
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo.AuthenticateStub = func(credentials map[string]string) error {
+			Config.SetAccessToken("my_access_token")
+			Config.SetRefreshToken("my_refresh_token")
+			return nil
 		}
 		endpointRepo = &testapi.FakeEndpointRepository{}
 
@@ -81,7 +83,7 @@ var _ = Describe("Login Command", func() {
 		spaceRepo = &testapi.FakeSpaceRepository{}
 		spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
-		authRepo.GetLoginPromptsReturns.Prompts = map[string]core_config.AuthPrompt{
+		authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]core_config.AuthPrompt{
 			"username": core_config.AuthPrompt{
 				DisplayName: "Username",
 				Type:        core_config.AuthPromptTypeText,
@@ -90,7 +92,7 @@ var _ = Describe("Login Command", func() {
 				DisplayName: "Password",
 				Type:        core_config.AuthPromptTypePassword,
 			},
-		}
+		}, nil)
 	})
 
 	Context("interactive usage", func() {
@@ -198,11 +200,10 @@ var _ = Describe("Login Command", func() {
 
 				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
 				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-					{
-						"username": "user@example.com",
-						"password": "password",
-					},
+				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+					"username": "user@example.com",
+					"password": "password",
 				}))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
@@ -304,11 +305,10 @@ var _ = Describe("Login Command", func() {
 
 				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
 				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-					{
-						"username": "user@example.com",
-						"password": "password",
-					},
+				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+					"username": "user@example.com",
+					"password": "password",
 				}))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -331,11 +331,10 @@ var _ = Describe("Login Command", func() {
 
 				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
 				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-					{
-						"username": "user@example.com",
-						"password": "password",
-					},
+				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+					"username": "user@example.com",
+					"password": "password",
 				}))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -358,11 +357,10 @@ var _ = Describe("Login Command", func() {
 
 				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
 				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-					{
-						"username": "user@example.com",
-						"password": "password",
-					},
+				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+					"username": "user@example.com",
+					"password": "password",
 				}))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -370,7 +368,7 @@ var _ = Describe("Login Command", func() {
 
 		Describe("login prompts", func() {
 			BeforeEach(func() {
-				authRepo.GetLoginPromptsReturns.Prompts = map[string]core_config.AuthPrompt{
+				authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]core_config.AuthPrompt{
 					"account_number": core_config.AuthPrompt{
 						DisplayName: "Account Number",
 						Type:        core_config.AuthPromptTypeText,
@@ -387,7 +385,7 @@ var _ = Describe("Login Command", func() {
 						DisplayName: "Your Password",
 						Type:        core_config.AuthPromptTypePassword,
 					},
-				}
+				}, nil)
 			})
 
 			Context("when the user does not provide the --sso flag", func() {
@@ -406,12 +404,11 @@ var _ = Describe("Login Command", func() {
 						[]string{"passcode"},
 					))
 
-					Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-						{
-							"account_number": "the-account-number",
-							"username":       "the-username",
-							"password":       "the-password",
-						},
+					Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+					Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+						"account_number": "the-account-number",
+						"username":       "the-username",
+						"password":       "the-password",
 					}))
 				})
 			})
@@ -425,10 +422,9 @@ var _ = Describe("Login Command", func() {
 
 					Expect(ui.Prompts).To(BeEmpty())
 					Expect(ui.PasswordPrompts).To(ContainSubstrings([]string{"passcode"}))
-					Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-						{
-							"passcode": "the-one-time-code",
-						},
+					Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+					Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+						"passcode": "the-one-time-code",
 					}))
 				})
 			})
@@ -440,45 +436,43 @@ var _ = Describe("Login Command", func() {
 				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.PasswordPrompts).ToNot(ContainSubstrings([]string{"Your Password"}))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-					{
-						"account_number": "the-account-number",
-						"username":       "the-username",
-						"password":       "the-password",
-					},
+				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+					"account_number": "the-account-number",
+					"username":       "the-username",
+					"password":       "the-password",
 				}))
 			})
 
 			It("tries 3 times for the password-type prompts", func() {
-				authRepo.AuthError = true
+				authRepo.AuthenticateReturns(errors.New("Error authenticating."))
 				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number",
 					"the-password-1", "the-password-2", "the-password-3"}
 
 				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-					{
-						"username":       "the-username",
-						"account_number": "the-account-number",
-						"password":       "the-password-1",
-					},
-					{
-						"username":       "the-username",
-						"account_number": "the-account-number",
-						"password":       "the-password-2",
-					},
-					{
-						"username":       "the-username",
-						"account_number": "the-account-number",
-						"password":       "the-password-3",
-					},
+				Expect(authRepo.AuthenticateCallCount()).To(Equal(3))
+				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+					"username":       "the-username",
+					"account_number": "the-account-number",
+					"password":       "the-password-1",
+				}))
+				Expect(authRepo.AuthenticateArgsForCall(1)).To(Equal(map[string]string{
+					"username":       "the-username",
+					"account_number": "the-account-number",
+					"password":       "the-password-2",
+				}))
+				Expect(authRepo.AuthenticateArgsForCall(2)).To(Equal(map[string]string{
+					"username":       "the-username",
+					"account_number": "the-account-number",
+					"password":       "the-password-3",
 				}))
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
 
 			It("prompts user for password again if password given on the cmd line fails", func() {
-				authRepo.AuthError = true
+				authRepo.AuthenticateReturns(errors.New("Error authenticating."))
 
 				Flags = []string{"-p", "the-password-1"}
 
@@ -487,22 +481,21 @@ var _ = Describe("Login Command", func() {
 
 				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
-					{
-						"account_number": "the-account-number",
-						"username":       "the-username",
-						"password":       "the-password-1",
-					},
-					{
-						"account_number": "the-account-number",
-						"username":       "the-username",
-						"password":       "the-password-2",
-					},
-					{
-						"account_number": "the-account-number",
-						"username":       "the-username",
-						"password":       "the-password-3",
-					},
+				Expect(authRepo.AuthenticateCallCount()).To(Equal(3))
+				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+					"username":       "the-username",
+					"account_number": "the-account-number",
+					"password":       "the-password-1",
+				}))
+				Expect(authRepo.AuthenticateArgsForCall(1)).To(Equal(map[string]string{
+					"username":       "the-username",
+					"account_number": "the-account-number",
+					"password":       "the-password-2",
+				}))
+				Expect(authRepo.AuthenticateArgsForCall(2)).To(Equal(map[string]string{
+					"username":       "the-username",
+					"account_number": "the-account-number",
+					"password":       "the-password-3",
 				}))
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
@@ -673,7 +666,7 @@ var _ = Describe("Login Command", func() {
 
 			Describe("and the login fails authenticaton", func() {
 				BeforeEach(func() {
-					authRepo.AuthError = true
+					authRepo.AuthenticateReturns(errors.New("Error authenticating."))
 
 					Config.SetSSLDisabled(true)
 
@@ -760,8 +753,11 @@ var _ = Describe("Login Command", func() {
 				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1})
 				spaceRepo.FindByNameReturns(space1, nil)
 
-				authRepo.AccessToken = "new_access_token"
-				authRepo.RefreshToken = "new_refresh_token"
+				authRepo.AuthenticateStub = func(credentials map[string]string) error {
+					Config.SetAccessToken("new_access_token")
+					Config.SetRefreshToken("new_refresh_token")
+					return nil
+				}
 
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "new-org", "-s", "new-space"}
 

@@ -197,8 +197,13 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 			}
 		}
 
+		credentialsCopy := make(map[string]string, len(credentials))
+		for k, v := range credentials {
+			credentialsCopy[k] = v
+		}
+
 		cmd.ui.Say(T("Authenticating..."))
-		err = cmd.authenticator.Authenticate(credentials)
+		err = cmd.authenticator.Authenticate(credentialsCopy)
 
 		if err == nil {
 			cmd.ui.Ok()

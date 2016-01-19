@@ -3,7 +3,7 @@ package commands_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/plugin/models"
@@ -20,7 +20,7 @@ import (
 var _ = Describe("OauthToken", func() {
 	var (
 		ui                  *testterm.FakeUI
-		authRepo            *testapi.FakeAuthenticationRepository
+		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -35,7 +35,7 @@ var _ = Describe("OauthToken", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		authRepo = &testapi.FakeAuthenticationRepository{}
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		deps = command_registry.NewDependency()
@@ -57,7 +57,7 @@ var _ = Describe("OauthToken", func() {
 		})
 
 		It("fails if oauth refresh fails", func() {
-			authRepo.RefreshTokenError = errors.New("Could not refresh")
+			authRepo.RefreshAuthTokenReturns("", errors.New("Could not refresh"))
 			runCommand()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -67,7 +67,7 @@ var _ = Describe("OauthToken", func() {
 		})
 
 		It("returns to the user the oauth token after a refresh", func() {
-			authRepo.RefreshToken = "1234567890"
+			authRepo.RefreshAuthTokenReturns("1234567890", nil)
 			runCommand()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -88,7 +88,7 @@ var _ = Describe("OauthToken", func() {
 			})
 
 			It("populates the plugin model upon execution", func() {
-				authRepo.RefreshToken = "911999111"
+				authRepo.RefreshAuthTokenReturns("911999111", nil)
 				testcmd.RunCliCommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Token).To(Equal("911999111"))
 			})
