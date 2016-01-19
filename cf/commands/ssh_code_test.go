@@ -27,7 +27,7 @@ var _ = Describe("ssh-code command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		authRepo            *testapi.FakeAuthenticationRepository
-		endpointRepo        *testapi.FakeEndpointRepo
+		endpointRepo        *testapi.FakeEndpointRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -45,7 +45,7 @@ var _ = Describe("ssh-code command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		authRepo = &testapi.FakeAuthenticationRepository{}
-		endpointRepo = &testapi.FakeEndpointRepo{}
+		endpointRepo = &testapi.FakeEndpointRepository{}
 
 		deps = command_registry.NewDependency()
 	})
@@ -79,16 +79,16 @@ var _ = Describe("ssh-code command", func() {
 				configRepo.SetApiEndpoint("test.endpoint.com")
 
 				runCommand()
-				Ω(endpointRepo.CallCount).To(Equal(1))
-				Ω(endpointRepo.UpdateEndpointReceived).To(Equal(configRepo.ApiEndpoint()))
+				Ω(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Ω(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal(configRepo.ApiEndpoint()))
 			})
 
 			It("reports any error to user", func() {
 				configRepo.SetApiEndpoint("test.endpoint.com")
-				endpointRepo.UpdateEndpointError = errors.New("endpoint error")
+				endpointRepo.UpdateEndpointReturns("", errors.New("endpoint error"))
 
 				runCommand()
-				Ω(endpointRepo.CallCount).To(Equal(1))
+				Ω(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
 				Ω(ui.Outputs).To(ContainSubstrings(
 					[]string{"Error getting info", "endpoint error"},
 				))

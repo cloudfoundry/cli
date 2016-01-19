@@ -21,7 +21,7 @@ import (
 var _ = Describe("api command", func() {
 	var (
 		config              core_config.Repository
-		endpointRepo        *testapi.FakeEndpointRepo
+		endpointRepo        *testapi.FakeEndpointRepository
 		deps                command_registry.Dependency
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
@@ -34,7 +34,7 @@ var _ = Describe("api command", func() {
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("api").SetDependency(deps, pluginCall))
 	}
 
-	callApi := func(args []string, config core_config.Repository, endpointRepo *testapi.FakeEndpointRepo) {
+	callApi := func(args []string, config core_config.Repository, endpointRepo *testapi.FakeEndpointRepository) {
 		testcmd.RunCliCommand("api", args, requirementsFactory, updateCommandDependency, false)
 	}
 
@@ -42,13 +42,13 @@ var _ = Describe("api command", func() {
 		ui = new(testterm.FakeUI)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		config = testconfig.NewRepository()
-		endpointRepo = &testapi.FakeEndpointRepo{}
+		endpointRepo = &testapi.FakeEndpointRepository{}
 		deps = command_registry.NewDependency()
 	})
 
 	Context("when the api endpoint's ssl certificate is invalid", func() {
 		It("warns the user and prints out a tip", func() {
-			endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://buttontomatoes.org", "why? no. go away")
+			endpointRepo.UpdateEndpointReturns("", errors.NewInvalidSSLCert("https://buttontomatoes.org", "why? no. go away"))
 			callApi([]string{"https://buttontomatoes.org"}, config, endpointRepo)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -113,7 +113,8 @@ var _ = Describe("api command", func() {
 			It("disables SSL validation in the config", func() {
 				callApi([]string{"--skip-ssl-validation", "https://example.com"}, config, endpointRepo)
 
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://example.com"))
 				Expect(config.IsSSLDisabled()).To(BeTrue())
 			})
 		})
@@ -155,7 +156,8 @@ var _ = Describe("api command", func() {
 		Context("when the ssl certificate is valid", func() {
 			It("updates the api endpoint with the given url", func() {
 				callApi([]string{"https://example.com"}, config, endpointRepo)
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://example.com"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Setting api endpoint to", "example.com"},
 					[]string{"OK"},
@@ -164,7 +166,8 @@ var _ = Describe("api command", func() {
 
 			It("trims trailing slashes from the api endpoint", func() {
 				callApi([]string{"https://example.com/"}, config, endpointRepo)
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://example.com"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Setting api endpoint to", "example.com"},
 					[]string{"OK"},
@@ -174,7 +177,7 @@ var _ = Describe("api command", func() {
 
 		Context("when the ssl certificate is invalid", func() {
 			BeforeEach(func() {
-				endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://example.com", "it don't work")
+				endpointRepo.UpdateEndpointReturns("", errors.NewInvalidSSLCert("https://example.com", "it don't work"))
 			})
 
 			It("fails and gives the user a helpful message about skipping", func() {

@@ -25,7 +25,7 @@ var _ = Describe("Login Command", func() {
 		Config       core_config.Repository
 		ui           *testterm.FakeUI
 		authRepo     *testapi.FakeAuthenticationRepository
-		endpointRepo *testapi.FakeEndpointRepo
+		endpointRepo *testapi.FakeEndpointRepository
 		orgRepo      *fake_organizations.FakeOrganizationRepository
 		spaceRepo    *testapi.FakeSpaceRepository
 
@@ -65,7 +65,7 @@ var _ = Describe("Login Command", func() {
 			RefreshToken: "my_refresh_token",
 			Config:       Config,
 		}
-		endpointRepo = &testapi.FakeEndpointRepo{}
+		endpointRepo = &testapi.FakeEndpointRepository{}
 
 		org = models.Organization{}
 		org.Name = "my-new-org"
@@ -147,7 +147,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
@@ -175,7 +176,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
@@ -194,7 +196,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
 						"username": "user@example.com",
@@ -220,7 +223,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 		})
@@ -298,7 +302,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
 						"username": "user@example.com",
@@ -324,7 +329,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
 						"username": "user@example.com",
@@ -350,7 +356,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
 					{
 						"username": "user@example.com",
@@ -558,7 +565,8 @@ var _ = Describe("Login Command", func() {
 					ItShowsTheTarget()
 
 					It("stores the API endpoint and the skip-ssl flag", func() {
-						Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://api.the-server.com"))
+						Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+						Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://api.the-server.com"))
 						Expect(Config.IsSSLDisabled()).To(BeTrue())
 					})
 				})
@@ -566,7 +574,7 @@ var _ = Describe("Login Command", func() {
 				Describe("setting api endpoint failed", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
-						endpointRepo.UpdateEndpointError = errors.New("API endpoint not found")
+						endpointRepo.UpdateEndpointReturns("", errors.New("API endpoint not found"))
 					})
 
 					ItFails()
@@ -593,7 +601,8 @@ var _ = Describe("Login Command", func() {
 					ItShowsTheTarget()
 
 					It("updates the API endpoint and enables SSL validation", func() {
-						Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://api.the-server.com"))
+						Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+						Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://api.the-server.com"))
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 					})
 				})
@@ -601,7 +610,7 @@ var _ = Describe("Login Command", func() {
 				Describe("setting api endpoint failed", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
-						endpointRepo.UpdateEndpointError = errors.New("API endpoint not found")
+						endpointRepo.UpdateEndpointReturns("", errors.New("API endpoint not found"))
 					})
 
 					ItFails()
@@ -620,7 +629,7 @@ var _ = Describe("Login Command", func() {
 
 			Describe("when there is an invalid SSL cert", func() {
 				BeforeEach(func() {
-					endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS")
+					endpointRepo.UpdateEndpointReturns("", errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS"))
 					ui.Inputs = []string{"bobs-burgers.com"}
 				})
 
