@@ -452,6 +452,10 @@
     "translation": "CF_NAME target [-o ORG] [-s SPACE]"
   },
   {
+    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]\n\t\t\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter -n myapp",
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]\n\t\t\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter -n myapp"
+  },
+  {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
     "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
   },
