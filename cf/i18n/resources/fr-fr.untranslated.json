@@ -116,6 +116,10 @@
     "translation": "CF_NAME staging-environment-variable-group"
   },
   {
+    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]\n\t\t\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter -n myapp",
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]\n\t\t\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter -n myapp"
+  },
+  {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com",
     "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
