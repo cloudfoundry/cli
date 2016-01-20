@@ -1,13 +1,18 @@
 package authentication
 
 import (
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strings"
+	"time"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -22,6 +27,7 @@ type TokenRefresher interface {
 type AuthenticationRepository interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
 	Authenticate(credentials map[string]string) (apiErr error)
+	Authorize(token string) (string, error)
 	GetLoginPromptsAndSaveUAAServerURL() (map[string]core_config.AuthPrompt, error)
 }
 
@@ -30,10 +36,77 @@ type UAAAuthenticationRepository struct {
 	gateway net.Gateway
 }
 
+var ErrPreventRedirect = errors.New("prevent-redirect")
+
 func NewUAAAuthenticationRepository(gateway net.Gateway, config core_config.ReadWriter) (uaa UAAAuthenticationRepository) {
 	uaa.gateway = gateway
 	uaa.config = config
 	return
+}
+
+func (uaa UAAAuthenticationRepository) Authorize(token string) (string, error) {
+	httpClient := &http.Client{
+		CheckRedirect: func(req *http.Request, _ []*http.Request) error {
+			dumpRequest(req)
+			return ErrPreventRedirect
+		},
+		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			DisableKeepAlives: true,
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: uaa.config.IsSSLDisabled(),
+			},
+			TLSHandshakeTimeout: 10 * time.Second,
+		},
+	}
+
+	authorizeURL, err := url.Parse(uaa.config.AuthenticationEndpoint())
+	if err != nil {
+		return "", err
+	}
+
+	values := url.Values{}
+	values.Set("response_type", "code")
+	values.Set("grant_type", "authorization_code")
+	values.Set("client_id", uaa.config.SSHOAuthClient())
+
+	authorizeURL.Path = "/oauth/authorize"
+	authorizeURL.RawQuery = values.Encode()
+
+	authorizeReq, err := http.NewRequest("GET", authorizeURL.String(), nil)
+	if err != nil {
+		return "", err
+	}
+
+	authorizeReq.Header.Add("authorization", token)
+
+	resp, err := httpClient.Do(authorizeReq)
+	if resp != nil {
+		dumpResponse(resp)
+	}
+	if err == nil {
+		return "", errors.New(T("Authorization server did not redirect with one time code"))
+	}
+
+	if netErr, ok := err.(*url.Error); !ok || netErr.Err != ErrPreventRedirect {
+		return "", errors.New(T("Error requesting one time code from server: {{.Error}}", map[string]interface{}{
+			"Error": err.Error(),
+		}))
+	}
+
+	loc, err := resp.Location()
+	if err != nil {
+		return "", errors.New(T("Error getting the redirected location: {{.Error}}", map[string]interface{}{
+			"Error": err.Error(),
+		}))
+	}
+
+	codes := loc.Query()["code"]
+	if len(codes) != 1 {
+		return "", errors.New(T("Unable to acquire one time code from authorization response"))
+	}
+
+	return codes[0], nil
 }
 
 func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) error {
@@ -153,4 +226,26 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	uaa.config.SetRefreshToken(response.RefreshToken)
 
 	return nil
+}
+
+func dumpRequest(req *http.Request) {
+	shouldDisplayBody := !strings.Contains(req.Header.Get("Content-Type"), "multipart/form-data")
+	dumpedRequest, err := httputil.DumpRequestOut(req, shouldDisplayBody)
+	if err != nil {
+		trace.Logger.Printf(T("Error dumping request\n{{.Err}}\n", map[string]interface{}{"Err": err}))
+	} else {
+		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor(T("REQUEST:")), time.Now().Format(time.RFC3339), trace.Sanitize(string(dumpedRequest)))
+		if !shouldDisplayBody {
+			trace.Logger.Println(T("[MULTIPART/FORM-DATA CONTENT HIDDEN]"))
+		}
+	}
+}
+
+func dumpResponse(res *http.Response) {
+	dumpedResponse, err := httputil.DumpResponse(res, false)
+	if err != nil {
+		trace.Logger.Printf(T("Error dumping response\n{{.Err}}\n", map[string]interface{}{"Err": err}))
+	} else {
+		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor(T("RESPONSE:")), time.Now().Format(time.RFC3339), trace.Sanitize(string(dumpedResponse)))
+	}
 }

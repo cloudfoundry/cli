@@ -1,225 +1,146 @@
 package commands_test
 
 import (
-	"bytes"
 	"errors"
-	"io/ioutil"
-	"net/http"
+
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
 
 	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/trace"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("ssh-code command", func() {
-	var (
-		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		authRepo            *authenticationfakes.FakeAuthenticationRepository
-		endpointRepo        *testapi.FakeEndpointRepository
-		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
-	)
+type passingRequirement struct {
+	Name string
+}
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.Config = configRepo
-		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
-		deps.RepoLocator = deps.RepoLocator.SetEndpointRepository(endpointRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("ssh-code").SetDependency(deps, pluginCall))
-	}
+func (r passingRequirement) Execute() bool {
+	return true
+}
+
+var _ = Describe("OneTimeSSHCode", func() {
+	var (
+		ui           *testterm.FakeUI
+		configRepo   core_config.Repository
+		authRepo     *authenticationfakes.FakeAuthenticationRepository
+		endpointRepo *testapi.FakeEndpointRepository
+
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		endpointRequirement requirements.Requirement
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
+
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		configRepo.SetApiEndpoint("fake-api-endpoint")
 		endpointRepo = &testapi.FakeEndpointRepository{}
+		repoLocator := deps.RepoLocator.SetEndpointRepository(endpointRepo)
+		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		repoLocator = repoLocator.SetAuthenticationRepository(authRepo)
 
-		deps = command_registry.NewDependency()
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = &commands.OneTimeSSHCode{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		factory = &fakerequirements.FakeFactory{}
+
+		endpointRequirement = &passingRequirement{Name: "endpoint-requirement"}
+		factory.NewApiEndpointRequirementReturns(endpointRequirement)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("ssh-code", args, requirementsFactory, updateCommandDependency, false)
-	}
-
-	Describe("requirements", func() {
-		It("fails with usage when invoked with any args", func() {
-			runCommand("whoops")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "No argument required"},
-			))
+	Describe("Requirements", func() {
+		It("returns an EndpointRequirement", func() {
+			actualRequirements, err := cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(factory.NewApiEndpointRequirementCallCount()).To(Equal(1))
+			Expect(actualRequirements).To(ContainElement(endpointRequirement))
 		})
 
-		It("fails if the user has not set an api endpoint", func() {
-			requirementsFactory.ApiEndpointSuccess = false
-
-			Ω(runCommand()).To(BeFalse())
-		})
-	})
-
-	Describe("ssh-code", func() {
-		BeforeEach(func() {
-			requirementsFactory.ApiEndpointSuccess = true
-		})
-
-		Context("calling endpoint repository to update 'app_ssh_oauth_client'", func() {
-			It("passes the repo the targeted API endpoint", func() {
-				configRepo.SetApiEndpoint("test.endpoint.com")
-
-				runCommand()
-				Ω(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Ω(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal(configRepo.ApiEndpoint()))
+		Context("when not provided exactly zero args", func() {
+			BeforeEach(func() {
+				flagContext.Parse("domain-name")
 			})
 
-			It("reports any error to user", func() {
-				configRepo.SetApiEndpoint("test.endpoint.com")
-				endpointRepo.UpdateEndpointReturns("", errors.New("endpoint error"))
-
-				runCommand()
-				Ω(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error getting info", "endpoint error"},
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Incorrect Usage. No argument required"},
 				))
 			})
 		})
+	})
 
-		Context("refresh oauth-token to make sure it is not stale", func() {
-			It("refreshes the oauth token to make sure it is not stale", func() {
-				runCommand()
-				Ω(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
+	Describe("Execute", func() {
+		BeforeEach(func() {
+			_, err := cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("tries to update the endpoint", func() {
+			cmd.Execute(flagContext)
+			Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
+			Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("fake-api-endpoint"))
+		})
+
+		Context("when updating the endpoint succeeds", func() {
+			BeforeEach(func() {
+				endpointRepo.UpdateEndpointReturns("updated-endpoint", nil)
 			})
 
-			Context("when refreshing fails", func() {
-				It("refreshes the oauth token to make sure it is not stale", func() {
-					authRepo.RefreshAuthTokenReturns("", errors.New("no token for you!"))
+			It("tries to refresh the auth token", func() {
+				cmd.Execute(flagContext)
+				Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
+			})
 
-					runCommand()
+			Context("when refreshing the token fails with an error", func() {
+				BeforeEach(func() {
+					authRepo.RefreshAuthTokenReturns("", errors.New("auth-error"))
+				})
 
-					Ω(ui.Outputs).To(ContainSubstrings(
-						[]string{"Error refreshing oauth token", "no token for you"},
+				It("fails with error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Error refreshing oauth token"},
+					))
+				})
+			})
+
+			Context("when refreshing the token succeeds", func() {
+				BeforeEach(func() {
+					authRepo.RefreshAuthTokenReturns("auth-token", nil)
+				})
+
+				It("displays the token", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"auth-token"},
 					))
 				})
 			})
 		})
-
-		Context("setting up http client to request one time code", func() {
-			var fakeUAA *ghttp.Server
-
-			BeforeEach(func() {
-				authRepo.RefreshAuthTokenReturns("bearer client-bearer-token", nil)
-				configRepo.SetSSLDisabled(true)
-				configRepo.SetSSHOAuthClient("ssh-oauth-client-id")
-
-				fakeUAA = ghttp.NewTLSServer()
-				configRepo.SetUaaEndpoint(fakeUAA.URL())
-
-				fakeUAA.RouteToHandler("GET", "/oauth/authorize", ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/oauth/authorize"),
-					ghttp.VerifyFormKV("response_type", "code"),
-					ghttp.VerifyFormKV("client_id", "ssh-oauth-client-id"),
-					ghttp.VerifyFormKV("grant_type", "authorization_code"),
-					ghttp.VerifyHeaderKV("authorization", "bearer client-bearer-token"),
-					ghttp.RespondWith(http.StatusFound, "", http.Header{
-						"Location": []string{"https://uaa.example.com/login?code=abc123"},
-					}),
-				))
-			})
-
-			It("gets the access code from the token endpoint", func() {
-				runCommand()
-
-				Ω(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
-				Ω(fakeUAA.ReceivedRequests()).To(HaveLen(1))
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"abc123"},
-				))
-			})
-
-			It("dumps all the http requests and responses for logging", func() {
-				var stdout *bytes.Buffer
-				stdout = bytes.NewBuffer([]byte{})
-				trace.SetStdout(stdout)
-
-				trace.NewLogger("true")
-				runCommand()
-
-				result, err := ioutil.ReadAll(stdout)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(result).To(ContainSubstring("REQUEST"))
-				Expect(result).To(ContainSubstring("RESPONSE"))
-			})
-
-			It("returns an error when the uaa certificate is not valid and certificate validation is enabled", func() {
-				configRepo.SetSSLDisabled(false)
-
-				runCommand()
-
-				Ω(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"signed by unknown authority"},
-				))
-			})
-
-			It("returns an error when the endpoint url cannot be parsed", func() {
-				configRepo.SetUaaEndpoint(":goober#swallow?yak")
-
-				runCommand()
-				Ω(fakeUAA.ReceivedRequests()).To(HaveLen(0))
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error getting AuthenticationEndpoint"},
-				))
-			})
-
-			It("returns an error when the request to the authorization server fails", func() {
-				configRepo.SetUaaEndpoint("http://0.0.0.0") //invalid address
-
-				runCommand()
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error requesting one time code from server"},
-				))
-			})
-
-			It("returns an error when the authorization server does not redirect", func() {
-				fakeUAA.RouteToHandler("GET", "/oauth/authorize", ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/oauth/authorize"),
-					ghttp.RespondWith(http.StatusOK, ""),
-				))
-
-				runCommand()
-				Ω(fakeUAA.ReceivedRequests()).To(HaveLen(1))
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"Authorization server did not redirect with one time code"},
-				))
-			})
-
-			It("returns an error when the redirect URL does not contain a code", func() {
-				fakeUAA.RouteToHandler("GET", "/oauth/authorize", ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/oauth/authorize"),
-					ghttp.RespondWith(http.StatusFound, "", http.Header{
-						"Location": []string{"https://uaa.example.com/login"},
-					}),
-				))
-
-				runCommand()
-				Ω(fakeUAA.ReceivedRequests()).To(HaveLen(1))
-				Ω(ui.Outputs).To(ContainSubstrings(
-					[]string{"Unable to acquire one time code from authorization response"},
-				))
-			})
-		})
-
 	})
 })

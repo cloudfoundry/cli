@@ -1776,10 +1776,6 @@
     "translation": "포트 전달 중에 오류 발생: "
   },
   {
-    "id": "Error getting AuthenticationEndpoint() ",
-    "translation": "AuthenticationEndpoint()를 가져오는 중에 오류 발생 "
-  },
-  {
     "id": "Error getting SSH info:",
     "translation": "SSH 정보를 가져오는 중에 오류 발생:"
   },
@@ -1806,6 +1802,10 @@
   {
     "id": "Error getting plugin metadata from repo: ",
     "translation": "저장소에서 플러그인 메타데이터를 가져오는 중에 오류 발생: "
+  },
+  {
+    "id": "Error getting the redirected location: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error initializing RPC service: ",
@@ -1870,6 +1870,10 @@
   {
     "id": "Error requesting from",
     "translation": "요청 중에 오류가 발생한 대상"
+  },
+  {
+    "id": "Error requesting one time code from server: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error resolving route:\n{{.Err}}",
@@ -3546,10 +3550,6 @@
   {
     "id": "Select an org (or press enter to skip):",
     "translation": "조직 선택(또는 Enter를 눌러 건너뜀):"
-  },
-  {
-    "id": "Server did not response with auth code",
-    "translation": "서버가 인증 코드를 사용하여 응답하지 않음"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",

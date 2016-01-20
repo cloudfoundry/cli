@@ -1776,10 +1776,6 @@
     "translation": "ポートの転送時にエラーが発生しました: "
   },
   {
-    "id": "Error getting AuthenticationEndpoint() ",
-    "translation": "AuthenticationEndpoint() の取得時にエラーが発生しました"
-  },
-  {
     "id": "Error getting SSH info:",
     "translation": "SSH 情報の取得時にエラーが発生しました:"
   },
@@ -1806,6 +1802,10 @@
   {
     "id": "Error getting plugin metadata from repo: ",
     "translation": "リポジトリーからプラグイン・メタデータを取得しようとしたときエラーが発生しました: "
+  },
+  {
+    "id": "Error getting the redirected location: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error initializing RPC service: ",
@@ -1870,6 +1870,10 @@
   {
     "id": "Error requesting from",
     "translation": "次のものから要求があったときエラーが発生しました: "
+  },
+  {
+    "id": "Error requesting one time code from server: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error resolving route:\n{{.Err}}",
@@ -3546,10 +3550,6 @@
   {
     "id": "Select an org (or press enter to skip):",
     "translation": "組織を選択します (または Enter キーを押してスキップします):"
-  },
-  {
-    "id": "Server did not response with auth code",
-    "translation": "サーバーが認証コードで応答しませんでした"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",

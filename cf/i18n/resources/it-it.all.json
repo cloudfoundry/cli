@@ -1776,10 +1776,6 @@
     "translation": "Errore di inoltro porta: "
   },
   {
-    "id": "Error getting AuthenticationEndpoint() ",
-    "translation": "Errore durante il richiamo di AuthenticationEndpoint() "
-  },
-  {
     "id": "Error getting SSH info:",
     "translation": "Errore durante il richiamo delle informazioni SSH:"
   },
@@ -1806,6 +1802,10 @@
   {
     "id": "Error getting plugin metadata from repo: ",
     "translation": "Errore durante il richiamo dei metadati del plug-in dal repository: "
+  },
+  {
+    "id": "Error getting the redirected location: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error initializing RPC service: ",
@@ -1870,6 +1870,10 @@
   {
     "id": "Error requesting from",
     "translation": "Errore durante la richiesta da"
+  },
+  {
+    "id": "Error requesting one time code from server: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error resolving route:\n{{.Err}}",
@@ -3546,10 +3550,6 @@
   {
     "id": "Select an org (or press enter to skip):",
     "translation": "Seleziona un'organizzazione (o premi Invio per ignorare):"
-  },
-  {
-    "id": "Server did not response with auth code",
-    "translation": "Il server non ha risposto con il codice di autorizzazione"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
