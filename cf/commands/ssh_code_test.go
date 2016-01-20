@@ -20,14 +20,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type passingRequirement struct {
-	Name string
-}
-
-func (r passingRequirement) Execute() bool {
-	return true
-}
-
 var _ = Describe("OneTimeSSHCode", func() {
 	var (
 		ui           *testterm.FakeUI

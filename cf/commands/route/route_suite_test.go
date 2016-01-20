@@ -16,3 +16,11 @@ func TestRoute(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Route Suite")
 }
+
+type passingRequirement struct {
+	Name string
+}
+
+func (r passingRequirement) Execute() bool {
+	return true
+}
