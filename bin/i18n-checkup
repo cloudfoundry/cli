@@ -4,16 +4,33 @@ set +e
 
 export PATH=$PATH:$GOPATH/bin
 
+function killed {
+  exit 1
+}
+trap killed SIGINT
+
+echo -e "\n Updating translation files"
+
 go get -u github.com/krishicks/i18n4go/i18n4go
-OUTPUT=$?
-if [ $OUTPUT -ne 0 ]; then
-  printf "Cannot install latest i18n tool to verify strings:\n${OUTPUT}"
+if [ $? -ne 0 ]; then
+  printf "Failed to run `go get -u github.com/krishicks/i18n4go/i18n4go`"
   exit 1
 fi
 
-OUTPUT=`i18n4go -c checkup -v`
+i18n4go -c fixup
 if [ $? -ne 0 ]; then
-  echo "Error:"
-  echo "$OUTPUT"
+  printf "Failed to run `i18n4go -c fixup`"
+  exit 1
+fi
+
+goi18n -outdir cf/i18n/resources cf/i18n/resources/*.all.json
+if [ $? -ne 0 ]; then
+  printf "Failed to run `goi18n -outdir cf/i18n/resources cf/i18n/resources/*.all.json`"
+  exit 1
+fi
+
+bin/generate-language-resources
+if [ $? -ne 0 ]; then
+  printf "Failed to run `bin/generate-language-resources`"
   exit 1
 fi
