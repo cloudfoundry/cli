@@ -56,6 +56,7 @@ func (uaa UAAAuthenticationRepository) Authorize(token string) (string, error) {
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: uaa.config.IsSSLDisabled(),
 			},
+			Proxy:               http.ProxyFromEnvironment,
 			TLSHandshakeTimeout: 10 * time.Second,
 		},
 	}
