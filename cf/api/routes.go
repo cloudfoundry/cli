@@ -84,7 +84,9 @@ func (repo CloudControllerRouteRepository) Create(host string, domain models.Dom
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {
-	var raw_response interface{}
+	if path != "" && !strings.HasPrefix(path, `/`) {
+		path = `/` + path
+	}
 
 	u, err := url.Parse(repo.config.ApiEndpoint())
 	if err != nil {
@@ -98,6 +100,7 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 		u.RawQuery = q.Encode()
 	}
 
+	var raw_response interface{}
 	err = repo.gateway.GetResource(u.String(), &raw_response)
 	if err != nil {
 		if _, ok := err.(*errors.HttpNotFoundError); ok {
