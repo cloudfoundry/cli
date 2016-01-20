@@ -520,6 +520,14 @@
     "translation": "Credentials exposed in the VCAP_SERVICES environment variable for bound applications"
   },
   {
+    "id": "Error getting the redirected location: {{.Error}}",
+    "translation": "Error getting the redirected location: {{.Error}}"
+  },
+  {
+    "id": "Error requesting one time code from server: {{.Error}}",
+    "translation": "Error requesting one time code from server: {{.Error}}"
+  },
+  {
     "id": "Force binding without confirmation",
     "translation": "Force binding without confirmation"
   },

@@ -1776,10 +1776,6 @@
     "translation": "转发以下端口时出错："
   },
   {
-    "id": "Error getting AuthenticationEndpoint() ",
-    "translation": "获取 AuthenticationEndpoint() 时出错"
-  },
-  {
     "id": "Error getting SSH info:",
     "translation": "获取 SSH 信息时出错："
   },
@@ -1806,6 +1802,10 @@
   {
     "id": "Error getting plugin metadata from repo: ",
     "translation": "从存储库获取插件元数据时出错："
+  },
+  {
+    "id": "Error getting the redirected location: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error initializing RPC service: ",
@@ -1870,6 +1870,10 @@
   {
     "id": "Error requesting from",
     "translation": "从以下位置进行请求时出错"
+  },
+  {
+    "id": "Error requesting one time code from server: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error resolving route:\n{{.Err}}",
@@ -3546,10 +3550,6 @@
   {
     "id": "Select an org (or press enter to skip):",
     "translation": "选择组织（或按 Enter 键跳过）："
-  },
-  {
-    "id": "Server did not response with auth code",
-    "translation": "服务器未使用授权代码进行响应"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",

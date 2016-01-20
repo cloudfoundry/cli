@@ -528,8 +528,16 @@
     "translation": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"
   },
   {
+    "id": "Error getting the redirected location: {{.Error}}",
+    "translation": "Error getting the redirected location: {{.Error}}"
+  },
+  {
     "id": "Error processing app files in '{{.Path}}': {{.Error}}",
     "translation": "Error processing app files in '{{.Path}}': {{.Error}}"
+  },
+  {
+    "id": "Error requesting one time code from server: {{.Error}}",
+    "translation": "Error requesting one time code from server: {{.Error}}"
   },
   {
     "id": "Force binding without confirmation",

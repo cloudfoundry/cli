@@ -552,8 +552,16 @@
     "translation": "DOMAINS"
   },
   {
+    "id": "Error getting the redirected location: {{.Error}}",
+    "translation": "Error getting the redirected location: {{.Error}}"
+  },
+  {
     "id": "Error processing app files in '{{.Path}}': {{.Error}}",
     "translation": "Error processing app files in '{{.Path}}': {{.Error}}"
+  },
+  {
+    "id": "Error requesting one time code from server: {{.Error}}",
+    "translation": "Error requesting one time code from server: {{.Error}}"
   },
   {
     "id": "Error: ",

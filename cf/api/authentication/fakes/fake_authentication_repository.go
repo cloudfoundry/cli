@@ -24,6 +24,15 @@ type FakeAuthenticationRepository struct {
 	authenticateReturns struct {
 		result1 error
 	}
+	AuthorizeStub        func(token string) (string, error)
+	authorizeMutex       sync.RWMutex
+	authorizeArgsForCall []struct {
+		token string
+	}
+	authorizeReturns struct {
+		result1 string
+		result2 error
+	}
 	GetLoginPromptsAndSaveUAAServerURLStub        func() (map[string]core_config.AuthPrompt, error)
 	getLoginPromptsAndSaveUAAServerURLMutex       sync.RWMutex
 	getLoginPromptsAndSaveUAAServerURLArgsForCall []struct{}
@@ -88,6 +97,39 @@ func (fake *FakeAuthenticationRepository) AuthenticateReturns(result1 error) {
 	fake.authenticateReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeAuthenticationRepository) Authorize(token string) (string, error) {
+	fake.authorizeMutex.Lock()
+	fake.authorizeArgsForCall = append(fake.authorizeArgsForCall, struct {
+		token string
+	}{token})
+	fake.authorizeMutex.Unlock()
+	if fake.AuthorizeStub != nil {
+		return fake.AuthorizeStub(token)
+	} else {
+		return fake.authorizeReturns.result1, fake.authorizeReturns.result2
+	}
+}
+
+func (fake *FakeAuthenticationRepository) AuthorizeCallCount() int {
+	fake.authorizeMutex.RLock()
+	defer fake.authorizeMutex.RUnlock()
+	return len(fake.authorizeArgsForCall)
+}
+
+func (fake *FakeAuthenticationRepository) AuthorizeArgsForCall(i int) string {
+	fake.authorizeMutex.RLock()
+	defer fake.authorizeMutex.RUnlock()
+	return fake.authorizeArgsForCall[i].token
+}
+
+func (fake *FakeAuthenticationRepository) AuthorizeReturns(result1 string, result2 error) {
+	fake.AuthorizeStub = nil
+	fake.authorizeReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (map[string]core_config.AuthPrompt, error) {
