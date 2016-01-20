@@ -1840,6 +1840,10 @@
     "translation": ""
   },
   {
+    "id": "Error processing app files: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error processing data from server: ",
     "translation": "Erro ao processar dados do servidor: "
   },

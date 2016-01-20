@@ -40,21 +40,23 @@ func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper
 func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) error {
 	if !actor.zipper.IsZipFile(dirOrZipFile) {
 		appDir, err := filepath.EvalSymlinks(dirOrZipFile)
-		if err == nil {
-			if filepath.IsAbs(appDir) {
-				f(appDir)
-			} else {
-				var absPath string
-				absPath, err = filepath.Abs(appDir)
-				if err != nil {
-					return err
-				}
+		if err != nil {
+			return err
+		}
 
-				f(absPath)
+		if filepath.IsAbs(appDir) {
+			f(appDir)
+		} else {
+			var absPath string
+			absPath, err = filepath.Abs(appDir)
+			if err != nil {
+				return err
 			}
 
+			f(absPath)
 		}
-		return err
+
+		return nil
 	}
 
 	tempDir, err := ioutil.TempDir("", "unzipped-app")

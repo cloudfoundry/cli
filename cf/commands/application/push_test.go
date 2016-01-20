@@ -244,6 +244,22 @@ var _ = Describe("Push Command", func() {
 			actor.UploadAppReturns(nil)
 		})
 
+		Context("when given a bad path", func() {
+			BeforeEach(func() {
+				actor.ProcessPathStub = func(dirOrZipFile string, f func(string)) error {
+					return errors.New("process-path-error")
+				}
+			})
+
+			It("fails with error", func() {
+				callPush("app-name", "-p", "badpath")
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Error processing app files: process-path-error"},
+				))
+			})
+		})
+
 		Context("when the default route for the app already exists", func() {
 			BeforeEach(func() {
 				route := models.Route{}
