@@ -23,14 +23,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type passingRequirement struct {
-	Name string
-}
-
-func (r passingRequirement) Execute() bool {
-	return true
-}
-
 var _ = Describe("CreateRoute", func() {
 	var (
 		ui         *testterm.FakeUI

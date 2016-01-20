@@ -16,3 +16,11 @@ func TestService(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Service Suite")
 }
+
+type passingRequirement struct {
+	Name string
+}
+
+func (r passingRequirement) Execute() bool {
+	return true
+}

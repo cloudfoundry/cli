@@ -21,12 +21,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type passingRequirement struct{}
-
-func (r passingRequirement) Execute() bool {
-	return true
-}
-
 var _ = Describe("SetOrgRole", func() {
 	var (
 		ui         *testterm.FakeUI
