@@ -11,6 +11,12 @@ trap killed SIGINT
 
 echo -e "\n Updating translation files"
 
+if [ ! $(which goi18n) ];then
+  echo -e "\n Installing go-i18n..."
+  go get github.com/nicksnyder/go-i18n/goi18n
+fi
+
+echo -e "\n Updating i18n4go..."
 go get -u github.com/krishicks/i18n4go/i18n4go
 if [ $? -ne 0 ]; then
   printf "Failed to run `go get -u github.com/krishicks/i18n4go/i18n4go`"
