@@ -32,17 +32,17 @@ func init() {
 
 func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["n"] = &cliFlags.StringFlag{ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to unbind")}
+	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to unbind")}
 	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force unbinding without confirmation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "unbind-route-service",
 		ShortName:   "urs",
 		Description: T("Unbind a service instance from a route"),
-		Usage: T(`CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]
-		
+		Usage: T(`CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]
+
 EXAMPLE:
-   CF_NAME unbind-route-service example.com myratelimiter -n myapp`),
+   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp`),
 		Flags: fs,
 	}
 }
@@ -74,7 +74,7 @@ func (cmd *UnbindRouteService) SetDependency(deps command_registry.Dependency, p
 }
 
 func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
-	host := c.String("n")
+	host := c.String("hostname")
 	domain := cmd.domainReq.GetDomain()
 	path := "" // path is not currently supported
 

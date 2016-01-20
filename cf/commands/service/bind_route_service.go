@@ -39,10 +39,10 @@ func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
 		Name:        "bind-route-service",
 		ShortName:   "brs",
 		Description: T("Bind a service instance to a route"),
-		Usage: T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-n HOST] [-f]
+		Usage: T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]
 
 EXAMPLE:
-   CF_NAME bind-route-service example.com myratelimiter -n myapp`),
+   CF_NAME bind-route-service example.com myratelimiter --hostname myapp`),
 		Flags: fs,
 	}
 }
