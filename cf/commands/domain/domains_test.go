@@ -1,137 +1,297 @@
 package domain_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	"errors"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
+
+	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+
+	"github.com/cloudfoundry/cli/cf/commands/domain"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("domains command", func() {
+var _ = Describe("ListDomains", func() {
 	var (
-		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		domainRepo          *testapi.FakeDomainRepository
-		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
-	)
+		ui             *testterm.FakeUI
+		routingApiRepo *fakeapi.FakeRoutingApiRepository
+		domainRepo     *fakeapi.FakeDomainRepository
+		configRepo     core_config.Repository
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
-		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("domains").SetDependency(deps, pluginCall))
-	}
+		cmd         domain.ListDomains
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement       requirements.Requirement
+		targetedOrgRequirement *fakerequirements.FakeTargetedOrgRequirement
+
+		domainFields []models.DomainFields
+		routerGroups models.RouterGroups
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		domainRepo = &testapi.FakeDomainRepository{}
-		requirementsFactory = &testreq.FakeReqFactory{}
-	})
+		routingApiRepo = &fakeapi.FakeRoutingApiRepository{}
+		repoLocator := deps.RepoLocator.SetRoutingApiRepository(routingApiRepo)
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("domains", args, requirementsFactory, updateCommandDependency, false)
-	}
+		domainRepo = &fakeapi.FakeDomainRepository{}
+		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
-	Describe("requirements", func() {
-		It("fails when an org is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
 
-			Expect(runCommand()).To(BeFalse())
-		})
+		cmd = domain.ListDomains{}
+		cmd.SetDependency(deps, false)
 
-		It("fails when not logged in", func() {
-			requirementsFactory.TargetedOrgSuccess = true
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-			Expect(runCommand()).To(BeFalse())
-		})
+		factory = &fakerequirements.FakeFactory{}
+		loginRequirement = &passingRequirement{Name: "LoginRequirement"}
+		factory.NewLoginRequirementReturns(loginRequirement)
 
-		It("fails with usage when invoked with any args what so ever ", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+		targetedOrgRequirement = &fakerequirements.FakeTargetedOrgRequirement{}
+		factory.NewTargetedOrgRequirementReturns(targetedOrgRequirement)
 
-			runCommand("whoops")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "No argument required"},
-			))
-		})
-	})
-
-	Context("when logged in and an org is targeted", func() {
-		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.OrganizationFields = models.OrganizationFields{
-				Name: "my-org",
-				Guid: "my-org-guid",
-			}
-		})
-
-		Context("when there is at least one domain", func() {
-			BeforeEach(func() {
-				domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
-					cb(models.DomainFields{
-						Shared: false,
-						Name:   "Private-domain1",
-					})
-
-					cb(models.DomainFields{
-						Shared: true,
-						Name:   "The-shared-domain",
-					})
-
-					cb(models.DomainFields{
-						Shared: false,
-						Name:   "Private-domain2",
-					})
-
-					return nil
+		domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+			for _, field := range domainFields {
+				if !cb(field) {
+					break
 				}
+			}
+			return nil
+		}
+
+		routerGroups = models.RouterGroups{
+			models.RouterGroup{
+				Guid: "router-group-guid",
+				Name: "my-router-name1",
+				Type: "tcp",
+			},
+		}
+		routingApiRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) error {
+			for _, routerGroup := range routerGroups {
+				if !cb(routerGroup) {
+					break
+				}
+			}
+			return nil
+		}
+	})
+
+	Describe("Requirements", func() {
+		Context("when provided one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("arg-1")
 			})
 
-			It("lists domains", func() {
-				runCommand()
-
-				orgGUID, _ := domainRepo.ListDomainsForOrgArgsForCall(0)
-				Expect(orgGUID).To(Equal("my-org-guid"))
+			It("fails with usage", func() {
+				Expect(func() {
+					cmd.Requirements(factory, flagContext)
+				}).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Getting domains in org", "my-org", "my-user"},
-					[]string{"name", "status"},
-					[]string{"The-shared-domain", "shared"},
-					[]string{"Private-domain1", "owned"},
-					[]string{"Private-domain2", "owned"},
+					[]string{"Incorrect Usage. No argument required"},
+					[]string{"NAME"},
+					[]string{"USAGE"},
 				))
 			})
 		})
 
-		It("displays a message when no domains are found", func() {
-			runCommand()
+		Context("when provided no arguments", func() {
+			BeforeEach(func() {
+				flagContext.Parse()
+			})
+
+			It("does not fail with usage", func() {
+				cmd.Requirements(factory, flagContext)
+				Expect(ui.Outputs).NotTo(ContainSubstrings(
+					[]string{"Incorrect Usage. No argument required"},
+					[]string{"NAME"},
+					[]string{"USAGE"},
+				))
+			})
+
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a TargetedOrgRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(targetedOrgRequirement))
+			})
+		})
+	})
+
+	Describe("Execute", func() {
+		It("prints getting domains", func() {
+			cmd.Execute(flagContext)
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting domains in org", "my-org", "my-user"},
-				[]string{"No domains found"},
+				[]string{"Getting domains in org my-org"},
 			))
 		})
 
-		It("fails when the domains API returns an error", func() {
-			domainRepo.ListDomainsForOrgReturns(errors.New("an-error"))
-			runCommand()
+		It("tries to get the list of domains for org", func() {
+			cmd.Execute(flagContext)
+			Expect(domainRepo.ListDomainsForOrgCallCount()).To(Equal(1))
+			orgGuid, _ := domainRepo.ListDomainsForOrgArgsForCall(0)
+			Expect(orgGuid).To(Equal("my-org-guid"))
+		})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting domains in org", "my-org", "my-user"},
-				[]string{"FAILED"},
-				[]string{"Failed fetching domains"},
-				[]string{"an-error"},
-			))
+		Context("when list domans for org returns error", func() {
+			BeforeEach(func() {
+				domainRepo.ListDomainsForOrgReturns(errors.New("org-domain-err"))
+			})
+
+			It("fails with message", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Failed fetching domains."},
+					[]string{"org-domain-err"},
+				))
+			})
+		})
+
+		Context("when there are no domains for org", func() {
+			BeforeEach(func() {
+				domainFields = []models.DomainFields{}
+				cmd.Execute(flagContext)
+			})
+
+			It("prints no domains found message", func() {
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"name", "status", "type"},
+					[]string{"No domains found"},
+				))
+			})
+		})
+
+		Context("when domains are found", func() {
+			BeforeEach(func() {
+				domainFields = []models.DomainFields{
+					models.DomainFields{Shared: false, Name: "Private-domain1"},
+					models.DomainFields{Shared: true, Name: "Shared-domain1"},
+				}
+			})
+
+			It("does not print no domains found message", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).NotTo(ContainSubstrings(
+					[]string{"No domains found"},
+				))
+			})
+
+			It("prints the domain information", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(BeInDisplayOrder(
+					[]string{"name", "status", "type"},
+					[]string{"Shared-domain1", "shared"},
+					[]string{"Private-domain1", "owned"},
+				))
+			})
+
+			Context("when routing api endpoint is not set", func() {
+				BeforeEach(func() {
+					configRepo.SetRoutingApiEndpoint("")
+				})
+
+				It("does not panic", func() {
+					Expect(func() { cmd.Execute(flagContext) }).NotTo(Panic())
+				})
+
+				Context("when returned domain has a router-group-guid", func() {
+					BeforeEach(func() {
+						domainFields = []models.DomainFields{
+							models.DomainFields{
+								Shared:          true,
+								Name:            "Shared-domain1",
+								RouterGroupGuid: "router-group-guid"},
+						}
+					})
+
+					It("panics with error about missing routing api endpoint", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Routing API URI missing."},
+						))
+					})
+				})
+			})
+
+			Context("when routing api endpoint is set", func() {
+				BeforeEach(func() {
+					configRepo.SetRoutingApiEndpoint("routing-api-endpoint")
+
+					domainFields = []models.DomainFields{
+						models.DomainFields{Shared: true,
+							Name:            "Shared-domain1",
+							RouterGroupGuid: "router-group-guid"},
+					}
+				})
+
+				It("prints domain information with router group type", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"name", "status", "type"},
+						[]string{"Shared-domain1", "shared", "tcp"},
+					))
+				})
+
+				Context("when list router groups returns error", func() {
+					BeforeEach(func() {
+						routingApiRepo.ListRouterGroupsReturns(errors.New("router-group-err"))
+					})
+
+					It("fails with error message", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Failed fetching router groups."},
+							[]string{"router-group-err"},
+						))
+					})
+				})
+
+				Context("when router group does not exists", func() {
+					BeforeEach(func() {
+						routerGroups = models.RouterGroups{}
+					})
+
+					It("prints the invalid router group message", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Invalid router group guid: router-group-guid"},
+						))
+					})
+
+					It("does not print table header", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).ToNot(ContainSubstrings(
+							[]string{"name", "status", "type"},
+						))
+					})
+				})
+			})
 		})
 	})
 })

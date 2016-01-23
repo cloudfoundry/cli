@@ -15,7 +15,6 @@ import (
 type DeleteDomain struct {
 	ui         terminal.UI
 	config     core_config.Reader
-	orgReq     requirements.TargetedOrgRequirement
 	domainRepo api.DomainRepository
 }
 
@@ -35,20 +34,15 @@ func (cmd *DeleteDomain) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-domain"))
 	}
 
-	loginReq := requirementsFactory.NewLoginRequirement()
-	cmd.orgReq = requirementsFactory.NewTargetedOrgRequirement()
-
-	reqs = []requirements.Requirement{
-		loginReq,
-		cmd.orgReq,
-	}
-
-	return
+	return []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedOrgRequirement(),
+	}, nil
 }
 
 func (cmd *DeleteDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -60,9 +54,9 @@ func (cmd *DeleteDomain) SetDependency(deps command_registry.Dependency, pluginC
 
 func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 	domainName := c.Args()[0]
-	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
+	domain, err := cmd.domainRepo.FindByNameInOrg(domainName, cmd.config.OrganizationFields().Guid)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case nil:
 		if domain.Shared {
 			cmd.ui.Failed(T("domain {{.DomainName}} is a shared domain, not an owned domain.",
@@ -72,11 +66,11 @@ func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 		}
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn(apiErr.Error())
+		cmd.ui.Warn(err.Error())
 		return
 	default:
-		cmd.ui.Failed(T("Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-			map[string]interface{}{"DomainName": domainName, "ApiErr": apiErr.Error()}))
+		cmd.ui.Failed(T("Error finding domain {{.DomainName}}\n{{.Error}}",
+			map[string]interface{}{"DomainName": domainName, "Error": err.Error()}))
 		return
 	}
 
@@ -91,10 +85,10 @@ func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 			"DomainName": terminal.EntityNameColor(domainName),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr = cmd.domainRepo.Delete(domain.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(T("Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-			map[string]interface{}{"DomainName": domainName, "ApiErr": apiErr.Error()}))
+	err = cmd.domainRepo.Delete(domain.Guid)
+	if err != nil {
+		cmd.ui.Failed(T("Error deleting domain {{.DomainName}}\n{{.Error}}",
+			map[string]interface{}{"DomainName": domainName, "Error": err.Error()}))
 		return
 	}
 

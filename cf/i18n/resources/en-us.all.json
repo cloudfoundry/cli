@@ -1720,6 +1720,10 @@
     "translation": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
+    "translation": "Error deleting domain {{.DomainName}}\n{{.Error}}"
+  },
+  {
     "id": "Error disabling ssh support for ",
     "translation": "Error disabling ssh support for "
   },
@@ -1754,6 +1758,10 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
     "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
+    "translation": "Error finding domain {{.DomainName}}\n{{.Error}}"
   },
   {
     "id": "Error finding manifest",
@@ -1972,8 +1980,8 @@
     "translation": "Failed fetching buildpacks.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains.\n{{.ApiErr}}",
-    "translation": "Failed fetching domains.\n{{.ApiErr}}"
+    "id": "Failed fetching domains.\n{{.Error}}",
+    "translation": "Failed fetching domains.\n{{.Error}}"
   },
   {
     "id": "Failed fetching events.\n{{.ApiErr}}",
@@ -2614,6 +2622,10 @@
   {
     "id": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
     "translation": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}"
+  },
+  {
+    "id": "Invalid router group guid: {{.Guid}}",
+    "translation": "Invalid router group guid: {{.Guid}}"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",

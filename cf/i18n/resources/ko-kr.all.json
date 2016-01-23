@@ -1720,6 +1720,10 @@
     "translation": "{{.DomainName}} 도메인 삭제 중에 오류 발생\n{{.ApiErr}}"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error disabling ssh support for ",
     "translation": "대상에 대한 SSH 지원 사용 안함 설정 중에 오류가 발생한 대상 "
   },
@@ -1754,6 +1758,10 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
     "translation": "{{.DomainName}} 도메인을 찾는 중에 오류 발생\n{{.ApiErr}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error finding manifest",
@@ -1972,8 +1980,8 @@
     "translation": "빌드팩 페치에 실패했습니다.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains.\n{{.ApiErr}}",
-    "translation": "도메인 페치에 실패했습니다.\n{{.ApiErr}}"
+    "id": "Failed fetching domains.\n{{.Error}}",
+    "translation": ""
   },
   {
     "id": "Failed fetching events.\n{{.ApiErr}}",
@@ -2101,7 +2109,7 @@
   },
   {
     "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
-    "translation": "{{.Username}}(으)로 {{.OrgName}} 조직의 도메인을 가져오는 중..."
+    "translation": ""
   },
   {
     "id": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -2616,6 +2624,10 @@
     "translation": "올바르지 않은 메모리 한계: {{.Memory}}\n{{.ErrorDescription}}"
   },
   {
+    "id": "Invalid router group guid: {{.Guid}}",
+    "translation": ""
+  },
+  {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
     "translation": "올바르지 않은 제한시간 매개변수: {{.Timeout}}\n{{.Err}}"
   },
@@ -2869,7 +2881,7 @@
   },
   {
     "id": "No domains found",
-    "translation": "도메인을 찾을 수 없음"
+    "translation": ""
   },
   {
     "id": "No events for app {{.AppName}}",

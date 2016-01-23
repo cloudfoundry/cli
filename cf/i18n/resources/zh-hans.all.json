@@ -1720,6 +1720,10 @@
     "translation": "删除域 {{.DomainName}} 时出错\n{{.ApiErr}}"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error disabling ssh support for ",
     "translation": "禁用对以下项的 SSH 支持时出错："
   },
@@ -1754,6 +1758,10 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
     "translation": "查找域 {{.DomainName}} 时出错\n{{.ApiErr}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error finding manifest",
@@ -1972,8 +1980,8 @@
     "translation": "访存 buildpack 失败。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains.\n{{.ApiErr}}",
-    "translation": "访存域失败。\n{{.ApiErr}}"
+    "id": "Failed fetching domains.\n{{.Error}}",
+    "translation": ""
   },
   {
     "id": "Failed fetching events.\n{{.ApiErr}}",
@@ -2101,7 +2109,7 @@
   },
   {
     "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
-    "translation": "正在以 {{.Username}} 身份获取组织 {{.OrgName}} 中的域..."
+    "translation": ""
   },
   {
     "id": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -2616,6 +2624,10 @@
     "translation": "内存限制 {{.Memory}} 无效\n{{.ErrorDescription}}"
   },
   {
+    "id": "Invalid router group guid: {{.Guid}}",
+    "translation": ""
+  },
+  {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
     "translation": "timeout 参数 {{.Timeout}} 无效\n{{.Err}}"
   },
@@ -2869,7 +2881,7 @@
   },
   {
     "id": "No domains found",
-    "translation": "找不到域"
+    "translation": ""
   },
   {
     "id": "No events for app {{.AppName}}",

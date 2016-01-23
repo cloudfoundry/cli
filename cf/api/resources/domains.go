@@ -22,5 +22,6 @@ func (resource DomainResource) ToFields() models.DomainFields {
 		Guid: resource.Metadata.Guid,
 		OwningOrganizationGuid: resource.Entity.OwningOrganizationGuid,
 		Shared:                 !privateDomain,
+		RouterGroupGuid:        resource.Entity.RouterGroupGuid,
 	}
 }
