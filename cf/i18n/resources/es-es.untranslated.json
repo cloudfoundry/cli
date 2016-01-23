@@ -556,6 +556,14 @@
     "translation": "DOMAINS"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
+    "translation": "Error deleting domain {{.DomainName}}\n{{.Error}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
+    "translation": "Error finding domain {{.DomainName}}\n{{.Error}}"
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "Error getting the redirected location: {{.Error}}"
   },
@@ -580,12 +588,20 @@
     "translation": "Error: {{.Err}}"
   },
   {
+    "id": "Failed fetching domains.\n{{.Error}}",
+    "translation": "Failed fetching domains.\n{{.Error}}"
+  },
+  {
     "id": "Force binding without confirmation",
     "translation": "Force binding without confirmation"
   },
   {
     "id": "Force unbinding without confirmation",
     "translation": "Force unbinding without confirmation"
+  },
+  {
+    "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
+    "translation": "Getting domains in org {{.OrgName}} as {{.Username}}..."
   },
   {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
@@ -608,8 +624,16 @@
     "translation": "Incorrect Usage. Requires DOMAIN as an argument\n\n"
   },
   {
+    "id": "Invalid router group guid: {{.Guid}}",
+    "translation": "Invalid router group guid: {{.Guid}}"
+  },
+  {
     "id": "No app files found in '{{.Path}}'",
     "translation": "No app files found in '{{.Path}}'"
+  },
+  {
+    "id": "No domains found",
+    "translation": "No domains found"
   },
   {
     "id": "Path used to identify the route",

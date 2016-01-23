@@ -144,6 +144,14 @@
     "translation": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
+    "translation": "Error deleting domain {{.DomainName}}\n{{.Error}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
+    "translation": "Error finding domain {{.DomainName}}\n{{.Error}}"
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "Error getting the redirected location: {{.Error}}"
   },
@@ -160,12 +168,20 @@
     "translation": "Error requesting one time code from server: {{.Error}}"
   },
   {
+    "id": "Failed fetching domains.\n{{.Error}}",
+    "translation": "Failed fetching domains.\n{{.Error}}"
+  },
+  {
     "id": "Force binding without confirmation",
     "translation": "Force binding without confirmation"
   },
   {
     "id": "Force unbinding without confirmation",
     "translation": "Force unbinding without confirmation"
+  },
+  {
+    "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
+    "translation": "Getting domains in org {{.OrgName}} as {{.Username}}..."
   },
   {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
@@ -192,8 +208,16 @@
     "translation": "Instance"
   },
   {
+    "id": "Invalid router group guid: {{.Guid}}",
+    "translation": "Invalid router group guid: {{.Guid}}"
+  },
+  {
     "id": "No app files found in '{{.Path}}'",
     "translation": "No app files found in '{{.Path}}'"
+  },
+  {
+    "id": "No domains found",
+    "translation": "No domains found"
   },
   {
     "id": "OK",

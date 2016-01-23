@@ -1720,6 +1720,10 @@
     "translation": "Errore durante l'eliminazione del dominio {{.DomainName}}\n{{.ApiErr}}"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error disabling ssh support for ",
     "translation": "Errore durante la disabilitazione del supporto ssh per "
   },
@@ -1754,6 +1758,10 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
     "translation": "Errore durante la ricerca del dominio {{.DomainName}}\n{{.ApiErr}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
+    "translation": ""
   },
   {
     "id": "Error finding manifest",
@@ -1972,8 +1980,8 @@
     "translation": "Errore durante il recupero dei pacchetti di build.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains.\n{{.ApiErr}}",
-    "translation": "Errore durante il recupero dei domini.\n{{.ApiErr}}"
+    "id": "Failed fetching domains.\n{{.Error}}",
+    "translation": ""
   },
   {
     "id": "Failed fetching events.\n{{.ApiErr}}",
@@ -2101,7 +2109,7 @@
   },
   {
     "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
-    "translation": "Richiamo dei domini nell'organizzazione {{.OrgName}} come {{.Username}}..."
+    "translation": ""
   },
   {
     "id": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -2616,6 +2624,10 @@
     "translation": "Limite di memoria non valido: {{.Memory}}\n{{.ErrorDescription}}"
   },
   {
+    "id": "Invalid router group guid: {{.Guid}}",
+    "translation": ""
+  },
+  {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
     "translation": "Parametro timeout non valido: {{.Timeout}}\n{{.Err}}"
   },
@@ -2869,7 +2881,7 @@
   },
   {
     "id": "No domains found",
-    "translation": "Nessun dominio trovato"
+    "translation": ""
   },
   {
     "id": "No events for app {{.AppName}}",

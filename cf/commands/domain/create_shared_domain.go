@@ -18,7 +18,6 @@ type CreateSharedDomain struct {
 	config         core_config.Reader
 	domainRepo     api.DomainRepository
 	routingApiRepo api.RoutingApiRepository
-	orgReq         requirements.OrganizationRequirement
 }
 
 func init() {

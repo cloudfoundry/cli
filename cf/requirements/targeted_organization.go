@@ -6,14 +6,12 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 //go:generate counterfeiter -o fakes/fake_targeted_org_requirement.go . TargetedOrgRequirement
 type TargetedOrgRequirement interface {
 	Requirement
-	GetOrganizationFields() models.OrganizationFields
 }
 
 type targetedOrgApiRequirement struct {
@@ -31,10 +29,5 @@ func (req targetedOrgApiRequirement) Execute() (success bool) {
 		req.ui.Failed(message)
 		return false
 	}
-
 	return true
-}
-
-func (req targetedOrgApiRequirement) GetOrganizationFields() (org models.OrganizationFields) {
-	return req.config.OrganizationFields()
 }
