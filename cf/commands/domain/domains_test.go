@@ -100,9 +100,7 @@ var _ = Describe("ListDomains", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() {
-					cmd.Requirements(factory, flagContext)
-				}).To(Panic())
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Incorrect Usage. No argument required"},
 					[]string{"NAME"},
@@ -142,7 +140,7 @@ var _ = Describe("ListDomains", func() {
 	})
 
 	Describe("Execute", func() {
-		It("prints getting domains", func() {
+		It("prints getting domains message", func() {
 			cmd.Execute(flagContext)
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting domains in org my-org"},
@@ -156,7 +154,15 @@ var _ = Describe("ListDomains", func() {
 			Expect(orgGuid).To(Equal("my-org-guid"))
 		})
 
-		Context("when list domans for org returns error", func() {
+		It("prints no domains found message", func() {
+			cmd.Execute(flagContext)
+			Expect(ui.Outputs).To(BeInDisplayOrder(
+				[]string{"name", "status", "type"},
+				[]string{"No domains found"},
+			))
+		})
+
+		Context("when list domains for org returns error", func() {
 			BeforeEach(func() {
 				domainRepo.ListDomainsForOrgReturns(errors.New("org-domain-err"))
 			})
@@ -171,26 +177,16 @@ var _ = Describe("ListDomains", func() {
 			})
 		})
 
-		Context("when there are no domains for org", func() {
-			BeforeEach(func() {
-				domainFields = []models.DomainFields{}
-				cmd.Execute(flagContext)
-			})
-
-			It("prints no domains found message", func() {
-				Expect(ui.Outputs).To(BeInDisplayOrder(
-					[]string{"name", "status", "type"},
-					[]string{"No domains found"},
-				))
-			})
-		})
-
 		Context("when domains are found", func() {
 			BeforeEach(func() {
 				domainFields = []models.DomainFields{
 					models.DomainFields{Shared: false, Name: "Private-domain1"},
 					models.DomainFields{Shared: true, Name: "Shared-domain1"},
 				}
+			})
+
+			AfterEach(func() {
+				domainFields = []models.DomainFields{}
 			})
 
 			It("does not print no domains found message", func() {
@@ -210,8 +206,14 @@ var _ = Describe("ListDomains", func() {
 			})
 
 			Context("when routing api endpoint is not set", func() {
+				var originalRoutingApiEndpoint string
 				BeforeEach(func() {
+					originalRoutingApiEndpoint = configRepo.RoutingApiEndpoint()
 					configRepo.SetRoutingApiEndpoint("")
+				})
+
+				AfterEach(func() {
+					configRepo.SetRoutingApiEndpoint(originalRoutingApiEndpoint)
 				})
 
 				It("does not panic", func() {
@@ -228,6 +230,10 @@ var _ = Describe("ListDomains", func() {
 						}
 					})
 
+					AfterEach(func() {
+						domainFields = []models.DomainFields{}
+					})
+
 					It("panics with error about missing routing api endpoint", func() {
 						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 						Expect(ui.Outputs).To(ContainSubstrings(
@@ -236,16 +242,30 @@ var _ = Describe("ListDomains", func() {
 					})
 				})
 			})
+		})
 
-			Context("when routing api endpoint is set", func() {
+		Context("when routing api endpoint is set", func() {
+			var originalRoutingApiEndpoint string
+			BeforeEach(func() {
+				originalRoutingApiEndpoint = configRepo.RoutingApiEndpoint()
+				configRepo.SetRoutingApiEndpoint("routing-api-endpoint")
+			})
+			AfterEach(func() {
+				configRepo.SetRoutingApiEndpoint(originalRoutingApiEndpoint)
+			})
+
+			Context("when domains with router group guid are found", func() {
 				BeforeEach(func() {
-					configRepo.SetRoutingApiEndpoint("routing-api-endpoint")
-
 					domainFields = []models.DomainFields{
-						models.DomainFields{Shared: true,
+						models.DomainFields{
+							Shared:          true,
 							Name:            "Shared-domain1",
 							RouterGroupGuid: "router-group-guid"},
 					}
+				})
+
+				AfterEach(func() {
+					domainFields = []models.DomainFields{}
 				})
 
 				It("prints domain information with router group type", func() {
