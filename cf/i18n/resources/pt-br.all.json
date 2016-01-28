@@ -1720,10 +1720,6 @@
     "translation": "Erro ao excluir domínio {{.DomainName}}\n{{.ApiErr}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
-    "translation": ""
-  },
-  {
     "id": "Error disabling ssh support for ",
     "translation": "Erro ao desativar suporte ssh de "
   },
@@ -1758,10 +1754,6 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
     "translation": "Erro ao localizar domínio {{.DomainName}}\n{{.ApiErr}}"
-  },
-  {
-    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
-    "translation": ""
   },
   {
     "id": "Error finding manifest",
@@ -1981,7 +1973,7 @@
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
-    "translation": ""
+    "translation": "Falha ao buscar domínios.\n{{.Error}}"
   },
   {
     "id": "Failed fetching events.\n{{.ApiErr}}",
@@ -2109,7 +2101,7 @@
   },
   {
     "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
-    "translation": ""
+    "translation": "Obtendo domínios na organização {{.OrgName}} como {{.Username}}..."
   },
   {
     "id": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -2881,7 +2873,7 @@
   },
   {
     "id": "No domains found",
-    "translation": ""
+    "translation": "Nenhum domínio encontrado"
   },
   {
     "id": "No events for app {{.AppName}}",

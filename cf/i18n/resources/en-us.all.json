@@ -1720,10 +1720,6 @@
     "translation": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
-    "translation": "Error deleting domain {{.DomainName}}\n{{.Error}}"
-  },
-  {
     "id": "Error disabling ssh support for ",
     "translation": "Error disabling ssh support for "
   },
@@ -1758,10 +1754,6 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
     "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}"
-  },
-  {
-    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
-    "translation": "Error finding domain {{.DomainName}}\n{{.Error}}"
   },
   {
     "id": "Error finding manifest",

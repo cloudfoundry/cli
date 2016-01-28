@@ -4,6 +4,7 @@ package fakes
 import (
 	"sync"
 
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 )
 
@@ -13,6 +14,12 @@ type FakeTargetedOrgRequirement struct {
 	executeArgsForCall []struct{}
 	executeReturns     struct {
 		result1 bool
+	}
+	GetOrganizationFieldsStub        func() models.OrganizationFields
+	getOrganizationFieldsMutex       sync.RWMutex
+	getOrganizationFieldsArgsForCall []struct{}
+	getOrganizationFieldsReturns     struct {
+		result1 models.OrganizationFields
 	}
 }
 
@@ -37,6 +44,30 @@ func (fake *FakeTargetedOrgRequirement) ExecuteReturns(result1 bool) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
 		result1 bool
+	}{result1}
+}
+
+func (fake *FakeTargetedOrgRequirement) GetOrganizationFields() models.OrganizationFields {
+	fake.getOrganizationFieldsMutex.Lock()
+	fake.getOrganizationFieldsArgsForCall = append(fake.getOrganizationFieldsArgsForCall, struct{}{})
+	fake.getOrganizationFieldsMutex.Unlock()
+	if fake.GetOrganizationFieldsStub != nil {
+		return fake.GetOrganizationFieldsStub()
+	} else {
+		return fake.getOrganizationFieldsReturns.result1
+	}
+}
+
+func (fake *FakeTargetedOrgRequirement) GetOrganizationFieldsCallCount() int {
+	fake.getOrganizationFieldsMutex.RLock()
+	defer fake.getOrganizationFieldsMutex.RUnlock()
+	return len(fake.getOrganizationFieldsArgsForCall)
+}
+
+func (fake *FakeTargetedOrgRequirement) GetOrganizationFieldsReturns(result1 models.OrganizationFields) {
+	fake.GetOrganizationFieldsStub = nil
+	fake.getOrganizationFieldsReturns = struct {
+		result1 models.OrganizationFields
 	}{result1}
 }
 
