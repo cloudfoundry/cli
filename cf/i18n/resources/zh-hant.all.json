@@ -2332,6 +2332,10 @@
     "translation": "用法不正確。不需要任何引數\n\n"
   },
   {
+    "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n",
     "translation": "用法不正確。需要 'app-name env-name env-value' 作為引數\n\n"
   },

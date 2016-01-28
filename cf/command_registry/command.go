@@ -21,4 +21,5 @@ type CommandMetadata struct {
 	Flags           map[string]flags.FlagSet
 	SkipFlagParsing bool
 	TotalArgs       int //Optional: number of required arguments to skip for flag verification
+	Hidden          bool
 }
