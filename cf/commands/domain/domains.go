@@ -67,7 +67,7 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) {
 
 	var routerGroups map[string]models.RouterGroup
 	if populateRouterGroups {
-		if !cmd.hasValidRouterEndpointSet() {
+		if len(cmd.config.RoutingApiEndpoint()) == 0 {
 			cmd.ui.Failed(T("Routing API URI missing. Please log in again to set the URI automatically."))
 		}
 
@@ -90,10 +90,6 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) {
 	if len(domains) == 0 {
 		cmd.ui.Say(T("No domains found"))
 	}
-}
-
-func (cmd *ListDomains) hasValidRouterEndpointSet() bool {
-	return len(cmd.config.RoutingApiEndpoint()) > 0
 }
 
 func (cmd *ListDomains) getDomains(orgGuid string) ([]models.DomainFields, bool, error) {
