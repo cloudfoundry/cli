@@ -1,7 +1,7 @@
 [
   {
     "id": "\n\nTIP:\n",
-    "translation": "\n\n提示：\n"
+    "translation": "\n\n提示:\n"
   },
   {
     "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
@@ -105,11 +105,11 @@
   },
   {
     "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"permissions\": \"read-only\"\n   }",
-    "translation": "   （可选）在有效的 JSON 对象中以直接插入方式提供特定于服务的配置参数：\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   （可选）提供包含有效 JSON 对象中特定于服务的配置参数的文件。\n   参数文件的路径可以为文件的绝对路径或相对路径。\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   有效 JSON 对象的示例：\n   {\n      \"permissions\": \"read-only\"\n   }"
+    "translation": "   （可选）在有效的 JSON 对象中以直接插入方式提供特定于服务的配置参数：\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   （可选）提供包含有效 JSON 对象中特定于服务的配置参数的文件。\n   参数文件的路径可以为文件的绝对路径或相对路径。\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   有效 JSON 对象的示例:\n   {\n      \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object.\n   The path to the parameters file can be an absolute or relative path to a file:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
-    "translation": "   （可选）在有效的 JSON 对象中以直接插入方式提供特定于服务的配置参数：\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   （可选）提供包含有效 JSON 对象中特定于服务的配置参数的文件。\n   参数文件的路径可以为文件的绝对路径或相对路径：\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n\n   有效 JSON 对象的示例：\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }"
+    "translation": "   （可选）在有效的 JSON 对象中以直接插入方式提供特定于服务的配置参数：\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   （可选）提供包含有效 JSON 对象中特定于服务的配置参数的文件。\n   参数文件的路径可以为文件的绝对路径或相对路径：\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n\n   有效 JSON 对象的示例:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }"
   },
   {
     "id": "   OrgAuditor - Read-only access to org info and reports\n",
@@ -497,7 +497,7 @@
   },
   {
     "id": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n",
-    "translation": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\n示例：\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n"
+    "translation": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\n示例:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n"
   },
   {
     "id": "CF_NAME allow-space-ssh SPACE_NAME",
@@ -661,7 +661,7 @@
   },
   {
     "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
-    "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\n示例：\n   CF_NAME delete-service-key mydb mykey"
+    "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\n示例:\n   CF_NAME delete-service-key mydb mykey"
   },
   {
     "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
@@ -729,7 +729,7 @@
   },
   {
     "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nThe command will download the plugin binary from repository if '-r' is provided\nPrompts for confirmation unless '-f' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
-    "translation": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\n如果提供了“-r”，此命令将从存储库下载插件二进制文件\n除非提供了“-f”，否则将提示进行确认\n\n示例：\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n"
+    "translation": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\n如果提供了“-r”，此命令将从存储库下载插件二进制文件\n除非提供了“-f”，否则将提示进行确认\n\n示例:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n"
   },
   {
     "id": "CF_NAME list-plugin-repos",
@@ -793,7 +793,7 @@
   },
   {
     "id": "CF_NAME remove-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n",
-    "translation": "CF_NAME remove-plugin-repo [REPO_NAME] [URL]\n\n示例：\n   cf remove-plugin-repo PrivateRepo\n"
+    "translation": "CF_NAME remove-plugin-repo [REPO_NAME] [URL]\n\n示例:\n   cf remove-plugin-repo PrivateRepo\n"
   },
   {
     "id": "CF_NAME rename APP_NAME NEW_APP_NAME",
@@ -821,7 +821,7 @@
   },
   {
     "id": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins [-r REPO_NAME]\n",
-    "translation": "CF_NAME repo-plugins\n\n示例：\n   cf repo-plugins [-r REPO_NAME]\n"
+    "translation": "CF_NAME repo-plugins\n\n示例:\n   cf repo-plugins [-r REPO_NAME]\n"
   },
   {
     "id": "CF_NAME restage APP_NAME",
@@ -857,11 +857,11 @@
   },
   {
     "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
-    "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\n示例：\n   CF_NAME service-key mydb mykey"
+    "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\n示例:\n   CF_NAME service-key mydb mykey"
   },
   {
     "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
-    "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\n示例：\n   CF_NAME service-keys mydb"
+    "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\n示例:\n   CF_NAME service-keys mydb"
   },
   {
     "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
@@ -1609,19 +1609,19 @@
   },
   {
     "id": "EXAMPLE:\n",
-    "translation": "示例：\n"
+    "translation": "示例:\n"
   },
   {
     "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
-    "translation": "示例：\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\""
+    "translation": "示例:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\""
   },
   {
     "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
-    "translation": "示例：\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows 命令行：\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell：\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json"
+    "translation": "示例:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows 命令行：\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell：\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json"
   },
   {
     "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\"",
-    "translation": "示例：\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows 命令行：\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell：\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\""
+    "translation": "示例:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows 命令行：\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell：\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\""
   },
   {
     "id": "Enable CF_TRACE output for all requests and responses",
@@ -3825,11 +3825,11 @@
   },
   {
     "id": "TIP:\n",
-    "translation": "提示：\n"
+    "translation": "提示:\n"
   },
   {
     "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-    "translation": "提示：\n   使用“CF_NAME create-user-provided-service”可使用户提供的服务可供 cf 应用程序使用"
+    "translation": "提示:\n   使用“CF_NAME create-user-provided-service”可使用户提供的服务可供 cf 应用程序使用"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
@@ -4285,7 +4285,7 @@
   },
   {
     "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
-    "translation": "警告：\n   强烈建议不要将密码作为命令行选项提供\n   密码可能会被其他人看到，并可能会记录在 shell 历史记录中\n\n"
+    "translation": "警告:\n   强烈建议不要将密码作为命令行选项提供\n   密码可能会被其他人看到，并可能会记录在 shell 历史记录中\n\n"
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",
@@ -4453,11 +4453,11 @@
   },
   {
     "id": "domain {{.DomainName}} is a shared domain, not an owned domain.",
-    "translation": "域 {{.DomainName}} 是共享域，而不是自有域。\n\n提示：\n使用“cf delete-shared-domain”可删除共享域。"
+    "translation": "域 {{.DomainName}} 是共享域，而不是自有域。\n\n提示:\n使用“cf delete-shared-domain”可删除共享域。"
   },
   {
     "id": "domain {{.DomainName}} is an owned domain, not a shared domain.",
-    "translation": "域 {{.DomainName}} 是自有域，而不是共享域。\n\n提示：\n使用“cf delete-domain”可删除自有域。"
+    "translation": "域 {{.DomainName}} 是自有域，而不是共享域。\n\n提示:\n使用“cf delete-domain”可删除自有域。"
   },
   {
     "id": "domains:",
