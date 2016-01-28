@@ -108,8 +108,8 @@
     "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
   },
   {
-    "id": "CF_NAME create-shared-domain DOMAIN",
-    "translation": "CF_NAME create-shared-domain DOMAIN"
+    "id": "CF_NAME create-shared-domain DOMAIN --router-group ROUTER_GROUP]",
+    "translation": "CF_NAME create-shared-domain DOMAIN --router-group ROUTER_GROUP]"
   },
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
@@ -572,6 +572,10 @@
     "translation": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n"
   },
   {
+    "id": "Incorrect Usage. Requires DOMAIN as an argument\n\n",
+    "translation": "Incorrect Usage. Requires DOMAIN as an argument\n\n"
+  },
+  {
     "id": "No app files found in '{{.Path}}'",
     "translation": "No app files found in '{{.Path}}'"
   },
@@ -602,6 +606,14 @@
   {
     "id": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
     "translation": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}."
+  },
+  {
+    "id": "Router group {{.RouterGroup}} not found",
+    "translation": "Router group {{.RouterGroup}} not found"
+  },
+  {
+    "id": "Routes for this domain will be configured only on the specified router group",
+    "translation": "Routes for this domain will be configured only on the specified router group"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
