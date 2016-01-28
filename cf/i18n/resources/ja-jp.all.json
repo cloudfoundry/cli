@@ -1720,10 +1720,6 @@
     "translation": "ドメイン {{.DomainName}} の削除時にエラーが発生しました\n{{.ApiErr}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.Error}}",
-    "translation": ""
-  },
-  {
     "id": "Error disabling ssh support for ",
     "translation": "次のものに対する SSH サポートを無効にしようとしたときエラーが発生しました: "
   },
@@ -1758,10 +1754,6 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
     "translation": "ドメイン {{.DomainName}} の検索時にエラーが発生しました\n{{.ApiErr}}"
-  },
-  {
-    "id": "Error finding domain {{.DomainName}}\n{{.Error}}",
-    "translation": ""
   },
   {
     "id": "Error finding manifest",
@@ -1981,7 +1973,7 @@
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
-    "translation": ""
+    "translation": "ドメインを取り出せませんでした。\n{{.Error}}"
   },
   {
     "id": "Failed fetching events.\n{{.ApiErr}}",
@@ -2109,7 +2101,7 @@
   },
   {
     "id": "Getting domains in org {{.OrgName}} as {{.Username}}...",
-    "translation": ""
+    "translation": "{{.Username}} として組織 {{.OrgName}} 内のドメインを取得しています..."
   },
   {
     "id": "Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -2881,7 +2873,7 @@
   },
   {
     "id": "No domains found",
-    "translation": ""
+    "translation": "ドメインが見つかりませんでした"
   },
   {
     "id": "No events for app {{.AppName}}",

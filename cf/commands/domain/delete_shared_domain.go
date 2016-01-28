@@ -15,6 +15,7 @@ import (
 type DeleteSharedDomain struct {
 	ui         terminal.UI
 	config     core_config.Reader
+	orgReq     requirements.TargetedOrgRequirement
 	domainRepo api.DomainRepository
 }
 
@@ -34,15 +35,20 @@ func (cmd *DeleteSharedDomain) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteSharedDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *DeleteSharedDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-shared-domain"))
 	}
 
-	return []requirements.Requirement{
-		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewTargetedOrgRequirement(),
-	}, nil
+	loginReq := requirementsFactory.NewLoginRequirement()
+	cmd.orgReq = requirementsFactory.NewTargetedOrgRequirement()
+
+	reqs = []requirements.Requirement{
+		loginReq,
+		cmd.orgReq,
+	}
+
+	return
 }
 
 func (cmd *DeleteSharedDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -61,7 +67,7 @@ func (cmd *DeleteSharedDomain) Execute(c flags.FlagContext) {
 			"DomainName": terminal.EntityNameColor(domainName),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.config.OrganizationFields().Guid)
+	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
 	switch apiErr.(type) {
 	case nil:
 		if !domain.Shared {
