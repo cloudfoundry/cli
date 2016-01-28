@@ -56,10 +56,11 @@ type FakeDomainRepository struct {
 		result1 models.DomainFields
 		result2 error
 	}
-	CreateSharedDomainStub        func(domainName string) (apiErr error)
+	CreateSharedDomainStub        func(domainName string, routerGroupGuid string) (apiErr error)
 	createSharedDomainMutex       sync.RWMutex
 	createSharedDomainArgsForCall []struct {
-		domainName string
+		domainName      string
+		routerGroupGuid string
 	}
 	createSharedDomainReturns struct {
 		result1 error
@@ -259,14 +260,15 @@ func (fake *FakeDomainRepository) CreateReturns(result1 models.DomainFields, res
 	}{result1, result2}
 }
 
-func (fake *FakeDomainRepository) CreateSharedDomain(domainName string) (apiErr error) {
+func (fake *FakeDomainRepository) CreateSharedDomain(domainName string, routerGroupGuid string) (apiErr error) {
 	fake.createSharedDomainMutex.Lock()
 	fake.createSharedDomainArgsForCall = append(fake.createSharedDomainArgsForCall, struct {
-		domainName string
-	}{domainName})
+		domainName      string
+		routerGroupGuid string
+	}{domainName, routerGroupGuid})
 	fake.createSharedDomainMutex.Unlock()
 	if fake.CreateSharedDomainStub != nil {
-		return fake.CreateSharedDomainStub(domainName)
+		return fake.CreateSharedDomainStub(domainName, routerGroupGuid)
 	} else {
 		return fake.createSharedDomainReturns.result1
 	}
@@ -278,10 +280,10 @@ func (fake *FakeDomainRepository) CreateSharedDomainCallCount() int {
 	return len(fake.createSharedDomainArgsForCall)
 }
 
-func (fake *FakeDomainRepository) CreateSharedDomainArgsForCall(i int) string {
+func (fake *FakeDomainRepository) CreateSharedDomainArgsForCall(i int) (string, string) {
 	fake.createSharedDomainMutex.RLock()
 	defer fake.createSharedDomainMutex.RUnlock()
-	return fake.createSharedDomainArgsForCall[i].domainName
+	return fake.createSharedDomainArgsForCall[i].domainName, fake.createSharedDomainArgsForCall[i].routerGroupGuid
 }
 
 func (fake *FakeDomainRepository) CreateSharedDomainReturns(result1 error) {

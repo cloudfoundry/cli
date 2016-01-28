@@ -313,13 +313,32 @@ var _ = Describe("DomainRepository", func() {
 						Path:    "/v2/shared_domains",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
 						Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-						{
-							"metadata": { "guid": "abc-123" },
-							"entity": { "name": "example.com" }
-						}`}}),
+					{
+						"metadata": { "guid": "abc-123" },
+						"entity": { "name": "example.com" }
+					}`}}),
 				)
 
-				apiErr := repo.CreateSharedDomain("example.com")
+				apiErr := repo.CreateSharedDomain("example.com", "")
+
+				Expect(handler).To(HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+			})
+
+			It("creates a shared domain with a router_group_guid", func() {
+				setupTestServer(
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:  "POST",
+						Path:    "/v2/shared_domains",
+						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "router_group_guid": "tcp-group", "wildcard": true}`),
+						Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+					{
+						"metadata": { "guid": "abc-123" },
+						"entity": { "name": "example.com", "router_group_guid":"tcp-group" }
+					}`}}),
+				)
+
+				apiErr := repo.CreateSharedDomain("example.com", "tcp-group")
 
 				Expect(handler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
@@ -341,7 +360,7 @@ var _ = Describe("DomainRepository", func() {
 					}),
 				)
 
-				apiErr := repo.CreateSharedDomain("example.com")
+				apiErr := repo.CreateSharedDomain("example.com", "")
 
 				Expect(handler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())

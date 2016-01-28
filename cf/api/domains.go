@@ -21,7 +21,7 @@ type DomainRepository interface {
 	FindPrivateByName(name string) (domain models.DomainFields, apiErr error)
 	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiErr error)
 	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr error)
-	CreateSharedDomain(domainName string) (apiErr error)
+	CreateSharedDomain(domainName string, routerGroupGuid string) (apiErr error)
 	Delete(domainGuid string) (apiErr error)
 	DeleteSharedDomain(domainGuid string) (apiErr error)
 	FirstOrDefault(orgGuid string, name *string) (domain models.DomainFields, error error)
@@ -127,10 +127,11 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	return
 }
 
-func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) error {
+func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string, routerGroupGuid string) error {
 	data, err := json.Marshal(resources.DomainEntity{
-		Name:     domainName,
-		Wildcard: true,
+		Name:            domainName,
+		RouterGroupGuid: routerGroupGuid,
+		Wildcard:        true,
 	})
 	if err != nil {
 		return err

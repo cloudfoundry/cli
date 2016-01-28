@@ -592,7 +592,7 @@
     "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  Opcionalmente, proporcione parámetros de configuración específicos del servicio en un objeto JSON válido en línea.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Opcionalmente, proporciona un archivo que contiene los parámetros de configuración específicos del servicio en un objeto JSON válido. La vía de acceso al archivo de parámetros puede ser una vía de acceso absoluta o relativa a un archivo.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Ejemplo de objeto JSON válido:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEJEMPLO:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json"
   },
   {
-    "id": "CF_NAME create-shared-domain DOMAIN",
+    "id": "CF_NAME create-shared-domain DOMAIN --router-group ROUTER_GROUP]",
     "translation": ""
   },
   {
@@ -2376,6 +2376,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage. Requires DOMAIN as an argument\n\n",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
     "translation": "Uso incorrecto. Requiere LABEL, PROVIDER y TOKEN como argumentos\n\n"
   },
@@ -3480,8 +3484,16 @@
     "translation": ""
   },
   {
+    "id": "Router group {{.RouterGroup}} not found",
+    "translation": ""
+  },
+  {
     "id": "Routes",
     "translation": "Rutas"
+  },
+  {
+    "id": "Routes for this domain will be configured only on the specified router group",
+    "translation": ""
   },
   {
     "id": "Routing API URI missing. Please log in again to set the URI automatically.",
