@@ -564,6 +564,10 @@
     "translation": "Hostname used in combination with DOMAIN to specify the route to unbind"
   },
   {
+    "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
+    "translation": "Incorrect Usage. No argument required\n\n{{.Usage}}"
+  },
+  {
     "id": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
     "translation": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n"
   },

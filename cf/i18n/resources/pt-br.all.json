@@ -2332,6 +2332,10 @@
     "translation": "Uso incorreto. Nenhum argumento necessário\n\n"
   },
   {
+    "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n",
     "translation": "Uso incorreto. Requer 'app-name env-name env-value' como argumentos\n\n"
   },
