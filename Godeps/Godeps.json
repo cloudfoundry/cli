@@ -43,6 +43,10 @@
 			"Rev": "fb58b1b516bba4daa255b3f504df95d6ddfde045"
 		},
 		{
+			"ImportPath": "github.com/cloudfoundry/go-ccapi/v3/routing",
+			"Rev": "fb58b1b516bba4daa255b3f504df95d6ddfde045"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
 			"Rev": "b9aba8bc5b91f0764131fcac8ea0ff2dd202c8c4"
 		},
@@ -119,6 +123,10 @@
 			"ImportPath": "github.com/stretchr/testify/assert",
 			"Comment": "v1.0-88-ge3a8ff8",
 			"Rev": "e3a8ff8ce36581f87a15341206f205b1da467059"
+		},
+		{
+			"ImportPath": "github.com/tedsuo/rata",
+			"Rev": "b15ebd8bd97ae9202eb00c076d59b2f2824bce37"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/ssh",
