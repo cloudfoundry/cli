@@ -39,6 +39,10 @@
 			"Rev": "fc5f5493005fa72ff7cc67596263d079a978994b"
 		},
 		{
+			"ImportPath": "github.com/cloudfoundry/go-ccapi/v3/client",
+			"Rev": "fb58b1b516bba4daa255b3f504df95d6ddfde045"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
 			"Rev": "b9aba8bc5b91f0764131fcac8ea0ff2dd202c8c4"
 		},
