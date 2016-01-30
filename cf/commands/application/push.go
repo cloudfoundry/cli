@@ -146,16 +146,23 @@ func (cmd *Push) SetDependency(deps command_registry.Dependency, pluginCall bool
 }
 
 func (cmd *Push) Execute(c flags.FlagContext) {
-	appSet := cmd.findAndValidateAppsToPush(c)
-	_, apiErr := cmd.authRepo.RefreshAuthToken()
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	appsFromManifest := cmd.getAppParamsFromManifest(c)
+	appFromContext := cmd.getAppParamsFromContext(c)
+	appSet := cmd.createAppSetFromContextAndManifest(appFromContext, appsFromManifest)
+
+	_, err := cmd.authRepo.RefreshAuthToken()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
 	routeActor := actors.NewRouteActor(cmd.ui, cmd.routeRepo)
 
 	for _, appParams := range appSet {
+		if appParams.Name == nil {
+			cmd.ui.Failed(T("Error: No name found for app"))
+		}
+
 		cmd.fetchStackGuid(&appParams)
 
 		if c.IsSet("docker-image") {
@@ -163,7 +170,50 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 			appParams.Diego = &diego
 		}
 
-		app := cmd.createOrUpdateApp(appParams)
+		var app models.Application
+		existingApp, err := cmd.appRepo.Read(*appParams.Name)
+		switch err.(type) {
+		case nil:
+			cmd.ui.Say(T("Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+				map[string]interface{}{
+					"AppName":   terminal.EntityNameColor(existingApp.Name),
+					"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+					"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+					"Username":  terminal.EntityNameColor(cmd.config.Username())}))
+
+			if appParams.EnvironmentVars != nil {
+				for key, val := range existingApp.EnvironmentVars {
+					if _, ok := (*appParams.EnvironmentVars)[key]; !ok {
+						(*appParams.EnvironmentVars)[key] = val
+					}
+				}
+			}
+
+			app, err = cmd.appRepo.Update(existingApp.Guid, appParams)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
+		case *errors.ModelNotFoundError:
+			spaceGuid := cmd.config.SpaceFields().Guid
+			appParams.SpaceGuid = &spaceGuid
+
+			cmd.ui.Say(T("Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+				map[string]interface{}{
+					"AppName":   terminal.EntityNameColor(*appParams.Name),
+					"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+					"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+					"Username":  terminal.EntityNameColor(cmd.config.Username())}))
+
+			app, err = cmd.appRepo.Create(appParams)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
+		default:
+			cmd.ui.Failed(err.Error())
+		}
+
+		cmd.ui.Ok()
+		cmd.ui.Say("")
 
 		cmd.updateRoutes(routeActor, app, appParams)
 
@@ -213,10 +263,10 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 		cmd.ui.Say(T("Uploading {{.AppName}}...",
 			map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
 
-		apiErr := cmd.uploadApp(app.Guid, appDir, path, localFiles)
-		if apiErr != nil {
+		err = cmd.uploadApp(app.Guid, appDir, path, localFiles)
+		if err != nil {
 			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
-				map[string]interface{}{"ApiErr": apiErr.Error()})))
+				map[string]interface{}{"ApiErr": err.Error()})))
 			return
 		}
 		cmd.ui.Ok()
@@ -228,7 +278,12 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 	routeDefined := appParams.Domains != nil || !appParams.IsHostEmpty() || appParams.NoHostname
 
 	if appParams.NoRoute {
-		cmd.removeRoutes(app, routeActor)
+		if len(app.Routes) == 0 {
+			cmd.ui.Say(T("App {{.AppName}} is a worker, skipping route creation",
+				map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
+		} else {
+			routeActor.UnbindAll(app)
+		}
 		return
 	}
 
@@ -254,7 +309,18 @@ func (cmd *Push) processDomainsAndBindRoutes(appParams models.AppParams, routeAc
 }
 
 func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeActor actors.RouteActor, app models.Application, noHostName bool, domain models.DomainFields, routePath *string) {
-	hostname := cmd.hostnameForApp(host, UseRandomHostname, app.Name, noHostName)
+	var hostname string
+	if !noHostName {
+		switch {
+		case host != nil:
+			hostname = *host
+		case UseRandomHostname:
+			hostname = hostNameForString(app.Name) + "-" + cmd.wordGenerator.Babble()
+		default:
+			hostname = hostNameForString(app.Name)
+		}
+	}
+
 	var route models.Route
 	if routePath != nil {
 		route = routeActor.FindOrCreateRoute(hostname, domain, *routePath)
@@ -262,29 +328,6 @@ func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeA
 		route = routeActor.FindOrCreateRoute(hostname, domain, "")
 	}
 	routeActor.BindRoute(app, route)
-}
-
-func (cmd *Push) removeRoutes(app models.Application, routeActor actors.RouteActor) {
-	if len(app.Routes) == 0 {
-		cmd.ui.Say(T("App {{.AppName}} is a worker, skipping route creation",
-			map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
-	} else {
-		routeActor.UnbindAll(app)
-	}
-}
-
-func (cmd *Push) hostnameForApp(host *string, useRandomHostName bool, name string, noHostName bool) string {
-	if noHostName {
-		return ""
-	}
-
-	if host != nil {
-		return *host
-	} else if useRandomHostName {
-		return hostNameForString(name) + "-" + cmd.wordGenerator.Babble()
-	} else {
-		return hostNameForString(name)
-	}
 }
 
 var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")
@@ -351,9 +394,9 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 	cmd.ui.Say(T("Using stack {{.StackName}}...",
 		map[string]interface{}{"StackName": terminal.EntityNameColor(stackName)}))
 
-	stack, apiErr := cmd.stackRepo.FindByName(stackName)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	stack, err := cmd.stackRepo.FindByName(stackName)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
@@ -378,81 +421,6 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c flag
 	}
 
 	cmd.appStarter.ApplicationStart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
-}
-
-func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Application) {
-	if appParams.Name == nil {
-		cmd.ui.Failed(T("Error: No name found for app"))
-	}
-
-	app, apiErr := cmd.appRepo.Read(*appParams.Name)
-
-	switch apiErr.(type) {
-	case nil:
-		app = cmd.updateApp(app, appParams)
-	case *errors.ModelNotFoundError:
-		app = cmd.createApp(appParams)
-	default:
-		cmd.ui.Failed(apiErr.Error())
-	}
-
-	return
-}
-
-func (cmd *Push) createApp(appParams models.AppParams) (app models.Application) {
-	spaceGuid := cmd.config.SpaceFields().Guid
-	appParams.SpaceGuid = &spaceGuid
-
-	cmd.ui.Say(T("Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-		map[string]interface{}{
-			"AppName":   terminal.EntityNameColor(*appParams.Name),
-			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
-
-	app, apiErr := cmd.appRepo.Create(appParams)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-	}
-
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	return
-}
-
-func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (updatedApp models.Application) {
-	cmd.ui.Say(T("Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-		map[string]interface{}{
-			"AppName":   terminal.EntityNameColor(app.Name),
-			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
-
-	if appParams.EnvironmentVars != nil {
-		for key, val := range app.EnvironmentVars {
-			if _, ok := (*appParams.EnvironmentVars)[key]; !ok {
-				(*appParams.EnvironmentVars)[key] = val
-			}
-		}
-	}
-
-	var apiErr error
-	updatedApp, apiErr = cmd.appRepo.Update(app.Guid, appParams)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-	}
-
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	return
-}
-
-func (cmd *Push) findAndValidateAppsToPush(c flags.FlagContext) []models.AppParams {
-	appsFromManifest := cmd.getAppParamsFromManifest(c)
-	appFromContext := cmd.getAppParamsFromContext(c)
-	return cmd.createAppSetFromContextAndManifest(appFromContext, appsFromManifest)
 }
 
 func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) []models.AppParams {
@@ -490,8 +458,9 @@ func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) []models.AppParam
 	return apps
 }
 
-func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams, manifestApps []models.AppParams) (apps []models.AppParams) {
+func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams, manifestApps []models.AppParams) []models.AppParams {
 	var err error
+	var apps []models.AppParams
 
 	switch len(manifestApps) {
 	case 0:
@@ -516,10 +485,16 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 		}
 
 		if selectedAppName != nil {
-			var manifestApp models.AppParams
-			manifestApp, err = findAppWithNameInManifest(*selectedAppName, manifestApps)
-			if err == nil {
-				addApp(&apps, manifestApp)
+			var foundApp bool
+			for _, appParams := range manifestApps {
+				if appParams.Name != nil && *appParams.Name == *selectedAppName {
+					foundApp = true
+					addApp(&apps, appParams)
+				}
+			}
+
+			if !foundApp {
+				err = errors.New(T("Could not find app named '{{.AppName}}' in manifest", map[string]interface{}{"AppName": *selectedAppName}))
 			}
 		} else {
 			for _, manifestApp := range manifestApps {
@@ -532,42 +507,37 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 		cmd.ui.Failed(T("Error: {{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 
-	return
+	return apps
 }
 
-func addApp(apps *[]models.AppParams, app models.AppParams) (err error) {
+func addApp(apps *[]models.AppParams, app models.AppParams) error {
 	if app.Name == nil {
-		err = errors.New(T("App name is a required field"))
+		return errors.New(T("App name is a required field"))
 	}
+
 	if app.Path == nil {
-		cwd, _ := os.Getwd()
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
 		app.Path = &cwd
 	}
+
 	*apps = append(*apps, app)
-	return
+
+	return nil
 }
 
-func findAppWithNameInManifest(name string, manifestApps []models.AppParams) (app models.AppParams, err error) {
-	for _, appParams := range manifestApps {
-		if appParams.Name != nil && *appParams.Name == name {
-			app = appParams
-			return
-		}
+func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
+	appParams := models.AppParams{
+		NoRoute:           c.Bool("no-route"),
+		UseRandomHostname: c.Bool("random-route"),
+		NoHostname:        c.Bool("no-hostname"),
 	}
 
-	err = errors.New(T("Could not find app named '{{.AppName}}' in manifest",
-		map[string]interface{}{"AppName": name}))
-	return
-}
-
-func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (appParams models.AppParams) {
 	if len(c.Args()) > 0 {
 		appParams.Name = &c.Args()[0]
 	}
-
-	appParams.NoRoute = c.Bool("no-route")
-	appParams.UseRandomHostname = c.Bool("random-route")
-	appParams.NoHostname = c.Bool("no-hostname")
 
 	if c.String("n") != "" {
 		appParams.Hosts = &[]string{c.String("n")}
@@ -659,11 +629,14 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (appParams models.
 		appParams.HealthCheckType = &healthCheckType
 	}
 
-	return
+	return appParams
 }
 
 func (cmd *Push) uploadApp(appGuid, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {
 	uploadDir, err := ioutil.TempDir("", "apps")
+	if err != nil {
+		return err
+	}
 	defer os.RemoveAll(uploadDir)
 
 	remoteFiles, hasFileToUpload, err := cmd.actor.GatherFiles(localFiles, appDir, uploadDir)
@@ -672,49 +645,37 @@ func (cmd *Push) uploadApp(appGuid, appDir, appDirOrZipFile string, localFiles [
 	}
 
 	zipFile, err := ioutil.TempFile("", "uploads")
+	if err != nil {
+		return err
+	}
 	defer func() {
 		zipFile.Close()
 		os.Remove(zipFile.Name())
 	}()
 
 	if hasFileToUpload {
-		err = cmd.zipAppFiles(zipFile, appDirOrZipFile, uploadDir)
+		err = cmd.zipper.Zip(uploadDir, zipFile)
+		if err != nil {
+			if emptyDirErr, ok := err.(*errors.EmptyDirError); ok {
+				return emptyDirErr
+			}
+			return fmt.Errorf("%s: %s", T("Error zipping application"), err.Error())
+		}
+
+		zipFileSize, err := cmd.zipper.GetZipSize(zipFile)
 		if err != nil {
 			return err
 		}
-	}
 
-	err = cmd.actor.UploadApp(appGuid, zipFile, remoteFiles)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (cmd *Push) zipAppFiles(zipFile *os.File, appDir string, uploadDir string) error {
-	err := cmd.zipper.Zip(uploadDir, zipFile)
-	if err != nil {
-		if emptyDirErr, ok := err.(*errors.EmptyDirError); ok {
-			zipFile = nil
-			return emptyDirErr
+		zipFileCount := cmd.appfiles.CountFiles(uploadDir)
+		if zipFileCount > 0 {
+			cmd.ui.Say(T("Uploading app files from: {{.Path}}", map[string]interface{}{"Path": appDir}))
+			cmd.ui.Say(T("Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
+				map[string]interface{}{
+					"ZipFileBytes": formatters.ByteSize(zipFileSize),
+					"FileCount":    zipFileCount}))
 		}
-		return fmt.Errorf("%s: %s", T("Error zipping application"), err.Error())
 	}
 
-	zipFileSize, err := cmd.zipper.GetZipSize(zipFile)
-	if err != nil {
-		return err
-	}
-
-	zipFileCount := cmd.appfiles.CountFiles(uploadDir)
-	if zipFileCount > 0 {
-		cmd.ui.Say(T("Uploading app files from: {{.Path}}", map[string]interface{}{"Path": appDir}))
-		cmd.ui.Say(T("Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
-			map[string]interface{}{
-				"ZipFileBytes": formatters.ByteSize(zipFileSize),
-				"FileCount":    zipFileCount}))
-	}
-
-	return nil
+	return cmd.actor.UploadApp(appGuid, zipFile, remoteFiles)
 }

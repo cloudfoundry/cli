@@ -19,11 +19,11 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"strings"
+	"os"
 	"time"
+	"io/ioutil"
+	"path/filepath"
 )
 
 func bindataRead(data []byte, name string) ([]byte, error) {
@@ -52,9 +52,9 @@ type asset struct {
 }
 
 type bindataFileInfo struct {
-	name    string
-	size    int64
-	mode    os.FileMode
+	name string
+	size int64
+	mode os.FileMode
 	modTime time.Time
 }
 
@@ -92,8 +92,8 @@ func cfI18nResourcesDeDeAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/de-de.all.json", size: 197298, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/de-de.all.json", size: 197298, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -112,8 +112,8 @@ func cfI18nResourcesEnUsAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/en-us.all.json", size: 194039, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/en-us.all.json", size: 194039, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -132,8 +132,8 @@ func cfI18nResourcesEsEsAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/es-es.all.json", size: 196684, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/es-es.all.json", size: 196684, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -152,8 +152,8 @@ func cfI18nResourcesFrFrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/fr-fr.all.json", size: 207678, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/fr-fr.all.json", size: 207678, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -172,8 +172,8 @@ func cfI18nResourcesItItAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/it-it.all.json", size: 196983, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/it-it.all.json", size: 196983, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -192,8 +192,8 @@ func cfI18nResourcesJaJpAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/ja-jp.all.json", size: 216357, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/ja-jp.all.json", size: 216357, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -212,8 +212,8 @@ func cfI18nResourcesKoKrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/ko-kr.all.json", size: 197222, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/ko-kr.all.json", size: 197222, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -232,8 +232,8 @@ func cfI18nResourcesPtBrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/pt-br.all.json", size: 192528, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/pt-br.all.json", size: 192528, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -252,8 +252,8 @@ func cfI18nResourcesZhHansAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/zh-hans.all.json", size: 183414, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/zh-hans.all.json", size: 183414, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -272,8 +272,8 @@ func cfI18nResourcesZhHantAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/zh-hant.all.json", size: 184492, mode: os.FileMode(420), modTime: time.Unix(1453964378, 0)}
-	a := &asset{bytes: bytes, info: info}
+	info := bindataFileInfo{name: "cf/i18n/resources/zh-hant.all.json", size: 184492, mode: os.FileMode(420), modTime: time.Unix(1454145529, 0)}
+	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
@@ -296,7 +296,7 @@ func Asset(name string) ([]byte, error) {
 // It simplifies safe initialization of global variables.
 func MustAsset(name string) []byte {
 	a, err := Asset(name)
-	if err != nil {
+	if (err != nil) {
 		panic("asset: Asset(" + name + "): " + err.Error())
 	}
 
@@ -377,23 +377,33 @@ func AssetDir(name string) ([]string, error) {
 }
 
 type bintree struct {
-	Func     func() (*asset, error)
+	Func func() (*asset, error)
 	Children map[string]*bintree
 }
 var _bintree = &bintree{nil, map[string]*bintree{
 	"cf": &bintree{nil, map[string]*bintree{
 		"i18n": &bintree{nil, map[string]*bintree{
 			"resources": &bintree{nil, map[string]*bintree{
-				"de-de.all.json": &bintree{cfI18nResourcesDeDeAllJson, map[string]*bintree{}},
-				"en-us.all.json": &bintree{cfI18nResourcesEnUsAllJson, map[string]*bintree{}},
-				"es-es.all.json": &bintree{cfI18nResourcesEsEsAllJson, map[string]*bintree{}},
-				"fr-fr.all.json": &bintree{cfI18nResourcesFrFrAllJson, map[string]*bintree{}},
-				"it-it.all.json": &bintree{cfI18nResourcesItItAllJson, map[string]*bintree{}},
-				"ja-jp.all.json": &bintree{cfI18nResourcesJaJpAllJson, map[string]*bintree{}},
-				"ko-kr.all.json": &bintree{cfI18nResourcesKoKrAllJson, map[string]*bintree{}},
-				"pt-br.all.json": &bintree{cfI18nResourcesPtBrAllJson, map[string]*bintree{}},
-				"zh-hans.all.json": &bintree{cfI18nResourcesZhHansAllJson, map[string]*bintree{}},
-				"zh-hant.all.json": &bintree{cfI18nResourcesZhHantAllJson, map[string]*bintree{}},
+				"de-de.all.json": &bintree{cfI18nResourcesDeDeAllJson, map[string]*bintree{
+				}},
+				"en-us.all.json": &bintree{cfI18nResourcesEnUsAllJson, map[string]*bintree{
+				}},
+				"es-es.all.json": &bintree{cfI18nResourcesEsEsAllJson, map[string]*bintree{
+				}},
+				"fr-fr.all.json": &bintree{cfI18nResourcesFrFrAllJson, map[string]*bintree{
+				}},
+				"it-it.all.json": &bintree{cfI18nResourcesItItAllJson, map[string]*bintree{
+				}},
+				"ja-jp.all.json": &bintree{cfI18nResourcesJaJpAllJson, map[string]*bintree{
+				}},
+				"ko-kr.all.json": &bintree{cfI18nResourcesKoKrAllJson, map[string]*bintree{
+				}},
+				"pt-br.all.json": &bintree{cfI18nResourcesPtBrAllJson, map[string]*bintree{
+				}},
+				"zh-hans.all.json": &bintree{cfI18nResourcesZhHansAllJson, map[string]*bintree{
+				}},
+				"zh-hant.all.json": &bintree{cfI18nResourcesZhHantAllJson, map[string]*bintree{
+				}},
 			}},
 		}},
 	}},
@@ -401,48 +411,48 @@ var _bintree = &bintree{nil, map[string]*bintree{
 
 // RestoreAsset restores an asset under the given directory
 func RestoreAsset(dir, name string) error {
-	data, err := Asset(name)
-	if err != nil {
-		return err
-	}
-	info, err := AssetInfo(name)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(_filePath(dir, filepath.Dir(name)), os.FileMode(0755))
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
-	if err != nil {
-		return err
-	}
-	err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
-	if err != nil {
-		return err
-	}
-	return nil
+        data, err := Asset(name)
+        if err != nil {
+                return err
+        }
+        info, err := AssetInfo(name)
+        if err != nil {
+                return err
+        }
+        err = os.MkdirAll(_filePath(dir, filepath.Dir(name)), os.FileMode(0755))
+        if err != nil {
+                return err
+        }
+        err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
+        if err != nil {
+                return err
+        }
+        err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
+        if err != nil {
+                return err
+        }
+        return nil
 }
 
 // RestoreAssets restores an asset under the given directory recursively
 func RestoreAssets(dir, name string) error {
-	children, err := AssetDir(name)
-	// File
-	if err != nil {
-		return RestoreAsset(dir, name)
-	}
-	// Dir
-	for _, child := range children {
-		err = RestoreAssets(dir, filepath.Join(name, child))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+        children, err := AssetDir(name)
+        // File
+        if err != nil {
+                return RestoreAsset(dir, name)
+        }
+        // Dir
+        for _, child := range children {
+                err = RestoreAssets(dir, filepath.Join(name, child))
+                if err != nil {
+                        return err
+                }
+        }
+        return nil
 }
 
 func _filePath(dir, name string) string {
-	cannonicalName := strings.Replace(name, "\\", "/", -1)
-	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
+        cannonicalName := strings.Replace(name, "\\", "/", -1)
+        return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
 
