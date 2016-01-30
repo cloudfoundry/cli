@@ -37,6 +37,15 @@ func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper
 	}
 }
 
+// ProcessPath takes in a director of app files or a zip file which contains
+// the app files. If given a zip file, it will extract the zip to a temporary
+// location, call the provided callback with that location, and then clean up
+// the location after the callback has been executed.
+//
+// This was done so that the caller of ProcessPath wouldn't need to know if it
+// was a zip file or an app dir that it was given, and the caller would not be
+// responsible for cleaning up the temporary directory ProcessPath creates when
+// given a zip.
 func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) error {
 	if !actor.zipper.IsZipFile(dirOrZipFile) {
 		appDir, err := filepath.EvalSymlinks(dirOrZipFile)
