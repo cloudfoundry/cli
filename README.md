@@ -199,15 +199,23 @@ to be logged in, and the actual behavior of the command itself. You can find it 
 
 i18n
 ----
-All pull requests which add, update or remove user-facing strings should include updated translation files. These files are generated/ maintained using [i18n4go](https://github.com/krishicks/i18n4go) and [goi18n](https://github.com/nicksnyder/go-i18n). 
+#### For Translators
 
-Typical workflow is as follows:
+If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
+
+#### For CLI Developers
+
+If you are adding new strings or updating existing strings within the CLI code, you'll need to update the binary representation of the translation files. This file is generated/maintained using [i18n4go](https://github.com/krishicks/i18n4go), [goi18n](https://github.com/nicksnyder/go-i18n), and `bin/generate-language-resources`.
+
+After adding/changing strings supplied to the goi18n `T()` translation func, run the following to update the translations binary:
 
     i18n4go -c fixup # answer any prompts appropriately
     goi18n -outdir cf/i18n/resources cf/i18n/resources/*.all.json
     bin/generate-language-resources
 
 When running `i18n4go -c fixup`, you will be presented with the choices `new` or `upd` for each addition or update. Type in the appropriate choice. If `upd` is chosen, you will be asked to confirm which string is being updated using a numbered list.
+
+After running the above, be sure to commit the translations binary, `cf/resources/i18n_resources.go`.
 
 Current conventions
 ===================
