@@ -108,8 +108,8 @@
     "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
   },
   {
-    "id": "CF_NAME create-shared-domain DOMAIN --router-group ROUTER_GROUP]",
-    "translation": "CF_NAME create-shared-domain DOMAIN --router-group ROUTER_GROUP]"
+    "id": "CF_NAME create-shared-domain DOMAIN --router-group [ROUTER_GROUP]",
+    "translation": "CF_NAME create-shared-domain DOMAIN --router-group [ROUTER_GROUP]"
   },
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
