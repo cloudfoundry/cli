@@ -30,7 +30,7 @@ func (cmd *UpdateBuildpack) MetaData() command_registry.CommandMetadata {
 	fs["enable"] = &cliFlags.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")}
 	fs["disable"] = &cliFlags.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")}
 	fs["lock"] = &cliFlags.BoolFlag{Name: "lock", Usage: T("Lock the buildpack to prevent updates")}
-	fs["unlock"] = &cliFlags.BoolFlag{Name: "disable", Usage: T("Unlock the buildpack to enable updates")}
+	fs["unlock"] = &cliFlags.BoolFlag{Name: "unlock", Usage: T("Unlock the buildpack to enable updates")}
 
 	return command_registry.CommandMetadata{
 		Name:        "update-buildpack",
