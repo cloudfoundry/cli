@@ -35,13 +35,14 @@ type FakeServiceBrokerRepository struct {
 		result1 models.ServiceBroker
 		result2 error
 	}
-	CreateStub        func(name, url, username, password string) (apiErr error)
+	CreateStub        func(name, url, username, password, spaceGUID string) (apiErr error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
-		name     string
-		url      string
-		username string
-		password string
+		name      string
+		url       string
+		username  string
+		password  string
+		spaceGUID string
 	}
 	createReturns struct {
 		result1 error
@@ -171,17 +172,18 @@ func (fake *FakeServiceBrokerRepository) FindByGuidReturns(result1 models.Servic
 	}{result1, result2}
 }
 
-func (fake *FakeServiceBrokerRepository) Create(name string, url string, username string, password string) (apiErr error) {
+func (fake *FakeServiceBrokerRepository) Create(name string, url string, username string, password string, spaceGUID string) (apiErr error) {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		name     string
-		url      string
-		username string
-		password string
-	}{name, url, username, password})
+		name      string
+		url       string
+		username  string
+		password  string
+		spaceGUID string
+	}{name, url, username, password, spaceGUID})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(name, url, username, password)
+		return fake.CreateStub(name, url, username, password, spaceGUID)
 	} else {
 		return fake.createReturns.result1
 	}
@@ -193,10 +195,10 @@ func (fake *FakeServiceBrokerRepository) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeServiceBrokerRepository) CreateArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeServiceBrokerRepository) CreateArgsForCall(i int) (string, string, string, string, string) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].name, fake.createArgsForCall[i].url, fake.createArgsForCall[i].username, fake.createArgsForCall[i].password
+	return fake.createArgsForCall[i].name, fake.createArgsForCall[i].url, fake.createArgsForCall[i].username, fake.createArgsForCall[i].password, fake.createArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeServiceBrokerRepository) CreateReturns(result1 error) {

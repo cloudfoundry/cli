@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -17,7 +19,7 @@ type ServiceBrokerRepository interface {
 	ListServiceBrokers(callback func(models.ServiceBroker) bool) error
 	FindByName(name string) (serviceBroker models.ServiceBroker, apiErr error)
 	FindByGuid(guid string) (serviceBroker models.ServiceBroker, apiErr error)
-	Create(name, url, username, password string) (apiErr error)
+	Create(name, url, username, password, spaceGUID string) (apiErr error)
 	Update(serviceBroker models.ServiceBroker) (apiErr error)
 	Rename(guid, name string) (apiErr error)
 	Delete(guid string) (apiErr error)
@@ -70,12 +72,26 @@ func (repo CloudControllerServiceBrokerRepository) FindByGuid(guid string) (serv
 	return
 }
 
-func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, password string) (apiErr error) {
+func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, password, spaceGUID string) error {
 	path := "/v2/service_brokers"
-	body := fmt.Sprintf(
-		`{"name":"%s","broker_url":"%s","auth_username":"%s","auth_password":"%s"}`, name, url, username, password,
-	)
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
+	args := struct {
+		Name      string `json:"name"`
+		Url       string `json:"broker_url"`
+		Username  string `json:"auth_username"`
+		Password  string `json:"auth_password"`
+		SpaceGUID string `json:"space_guid,omitempty"`
+	}{
+		name,
+		url,
+		username,
+		password,
+		spaceGUID,
+	}
+	bs, err := json.Marshal(args)
+	if err != nil {
+		return err
+	}
+	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(bs))
 }
 
 func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker models.ServiceBroker) (apiErr error) {
