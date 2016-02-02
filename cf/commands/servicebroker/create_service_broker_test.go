@@ -19,7 +19,7 @@ var _ = Describe("create-service-broker command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		serviceBrokerRepo   *testapi.FakeServiceBrokerRepo
+		serviceBrokerRepo   *testapi.FakeServiceBrokerRepository
 		deps                command_registry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("create-service-broker command", func() {
 
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		serviceBrokerRepo = &testapi.FakeServiceBrokerRepo{}
+		serviceBrokerRepo = &testapi.FakeServiceBrokerRepository{}
 	})
 
 	runCommand := func(args ...string) bool {
@@ -69,10 +69,12 @@ var _ = Describe("create-service-broker command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(serviceBrokerRepo.CreateName).To(Equal("my-broker"))
-			Expect(serviceBrokerRepo.CreateUrl).To(Equal("http://example.com"))
-			Expect(serviceBrokerRepo.CreateUsername).To(Equal("my-username"))
-			Expect(serviceBrokerRepo.CreatePassword).To(Equal("my-password"))
+			Expect(serviceBrokerRepo.CreateCallCount()).To(Equal(1))
+			name, url, username, password := serviceBrokerRepo.CreateArgsForCall(0)
+			Expect(name).To(Equal("my-broker"))
+			Expect(url).To(Equal("http://example.com"))
+			Expect(username).To(Equal("my-username"))
+			Expect(password).To(Equal("my-password"))
 		})
 	})
 })

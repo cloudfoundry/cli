@@ -19,7 +19,7 @@ var _ = Describe("rename-service-broker command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		serviceBrokerRepo   *testapi.FakeServiceBrokerRepo
+		serviceBrokerRepo   *testapi.FakeServiceBrokerRepository
 		deps                command_registry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("rename-service-broker command", func() {
 
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		serviceBrokerRepo = &testapi.FakeServiceBrokerRepo{}
+		serviceBrokerRepo = &testapi.FakeServiceBrokerRepository{}
 	})
 
 	runCommand := func(args ...string) bool {
@@ -62,20 +62,23 @@ var _ = Describe("rename-service-broker command", func() {
 			broker := models.ServiceBroker{}
 			broker.Name = "my-found-broker"
 			broker.Guid = "my-found-broker-guid"
-			serviceBrokerRepo.FindByNameServiceBroker = broker
+			serviceBrokerRepo.FindByNameReturns(broker, nil)
 		})
 
 		It("renames the given service broker", func() {
 			runCommand("my-broker", "my-new-broker")
-			Expect(serviceBrokerRepo.FindByNameName).To(Equal("my-broker"))
+			Expect(serviceBrokerRepo.FindByNameCallCount()).To(Equal(1))
+			Expect(serviceBrokerRepo.FindByNameArgsForCall(0)).To(Equal("my-broker"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
 				[]string{"OK"},
 			))
 
-			Expect(serviceBrokerRepo.RenamedServiceBrokerGuid).To(Equal("my-found-broker-guid"))
-			Expect(serviceBrokerRepo.RenamedServiceBrokerName).To(Equal("my-new-broker"))
+			Expect(serviceBrokerRepo.RenameCallCount()).To(Equal(1))
+			guid, name := serviceBrokerRepo.RenameArgsForCall(0)
+			Expect(guid).To(Equal("my-found-broker-guid"))
+			Expect(name).To(Equal("my-new-broker"))
 		})
 	})
 })
