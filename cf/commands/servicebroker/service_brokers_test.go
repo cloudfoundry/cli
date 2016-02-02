@@ -1,6 +1,8 @@
 package servicebroker_test
 
 import (
+	"errors"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -21,7 +23,7 @@ var _ = Describe("service-brokers command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		repo                *testapi.FakeServiceBrokerRepo
+		repo                *testapi.FakeServiceBrokerRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -36,7 +38,7 @@ var _ = Describe("service-brokers command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		repo = &testapi.FakeServiceBrokerRepo{}
+		repo = &testapi.FakeServiceBrokerRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
@@ -55,19 +57,31 @@ var _ = Describe("service-brokers command", func() {
 	})
 
 	It("lists service brokers", func() {
-		repo.ServiceBrokers = []models.ServiceBroker{models.ServiceBroker{
-			Name: "service-broker-to-list-a",
-			Guid: "service-broker-to-list-guid-a",
-			Url:  "http://service-a-url.com",
-		}, models.ServiceBroker{
-			Name: "service-broker-to-list-b",
-			Guid: "service-broker-to-list-guid-b",
-			Url:  "http://service-b-url.com",
-		}, models.ServiceBroker{
-			Name: "service-broker-to-list-c",
-			Guid: "service-broker-to-list-guid-c",
-			Url:  "http://service-c-url.com",
-		}}
+		repo.ListServiceBrokersStub = func(callback func(models.ServiceBroker) bool) error {
+			sbs := []models.ServiceBroker{
+				{
+					Name: "service-broker-to-list-a",
+					Guid: "service-broker-to-list-guid-a",
+					Url:  "http://service-a-url.com",
+				},
+				{
+					Name: "service-broker-to-list-b",
+					Guid: "service-broker-to-list-guid-b",
+					Url:  "http://service-b-url.com",
+				},
+				{
+					Name: "service-broker-to-list-c",
+					Guid: "service-broker-to-list-guid-c",
+					Url:  "http://service-c-url.com",
+				},
+			}
+
+			for _, sb := range sbs {
+				callback(sb)
+			}
+
+			return nil
+		}
 
 		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
@@ -81,23 +95,36 @@ var _ = Describe("service-brokers command", func() {
 	})
 
 	It("lists service brokers by alphabetical order", func() {
-		repo.ServiceBrokers = []models.ServiceBroker{models.ServiceBroker{
-			Name: "z-service-broker-to-list",
-			Guid: "z-service-broker-to-list-guid-a",
-			Url:  "http://service-a-url.com",
-		}, models.ServiceBroker{
-			Name: "a-service-broker-to-list",
-			Guid: "a-service-broker-to-list-guid-c",
-			Url:  "http://service-c-url.com",
-		}, models.ServiceBroker{
-			Name: "fun-service-broker-to-list",
-			Guid: "fun-service-broker-to-list-guid-b",
-			Url:  "http://service-b-url.com",
-		}, models.ServiceBroker{
-			Name: "123-service-broker-to-list",
-			Guid: "123-service-broker-to-list-guid-c",
-			Url:  "http://service-d-url.com",
-		}}
+		repo.ListServiceBrokersStub = func(callback func(models.ServiceBroker) bool) error {
+			sbs := []models.ServiceBroker{
+				{
+					Name: "z-service-broker-to-list",
+					Guid: "z-service-broker-to-list-guid-a",
+					Url:  "http://service-a-url.com",
+				},
+				{
+					Name: "a-service-broker-to-list",
+					Guid: "a-service-broker-to-list-guid-c",
+					Url:  "http://service-c-url.com",
+				},
+				{
+					Name: "fun-service-broker-to-list",
+					Guid: "fun-service-broker-to-list-guid-b",
+					Url:  "http://service-b-url.com",
+				},
+				{
+					Name: "123-service-broker-to-list",
+					Guid: "123-service-broker-to-list-guid-c",
+					Url:  "http://service-d-url.com",
+				},
+			}
+
+			for _, sb := range sbs {
+				callback(sb)
+			}
+
+			return nil
+		}
 
 		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
@@ -121,7 +148,7 @@ var _ = Describe("service-brokers command", func() {
 	})
 
 	It("reports errors when listing service brokers", func() {
-		repo.ListErr = true
+		repo.ListServiceBrokersReturns(errors.New("Error finding service brokers"))
 		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(ContainSubstrings(

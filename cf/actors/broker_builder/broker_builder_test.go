@@ -18,7 +18,7 @@ var _ = Describe("Broker Builder", func() {
 		brokerBuilder broker_builder.BrokerBuilder
 
 		serviceBuilder *fake_service_builder.FakeServiceBuilder
-		brokerRepo     *fakes.FakeServiceBrokerRepo
+		brokerRepo     *fakes.FakeServiceBrokerRepository
 
 		serviceBroker1 models.ServiceBroker
 
@@ -31,7 +31,7 @@ var _ = Describe("Broker Builder", func() {
 	)
 
 	BeforeEach(func() {
-		brokerRepo = &fakes.FakeServiceBrokerRepo{}
+		brokerRepo = &fakes.FakeServiceBrokerRepository{}
 		serviceBuilder = &fake_service_builder.FakeServiceBuilder{}
 		brokerBuilder = broker_builder.NewBuilder(brokerRepo, serviceBuilder)
 
@@ -95,7 +95,7 @@ var _ = Describe("Broker Builder", func() {
 				service2,
 			})
 
-		brokerRepo.FindByGuidServiceBroker = serviceBroker1
+		brokerRepo.FindByGuidReturns(serviceBroker1, nil)
 	})
 
 	Describe(".AttachBrokersToServices", func() {
@@ -158,7 +158,7 @@ var _ = Describe("Broker Builder", func() {
 
 		It("attaches a single broker to only services that match", func() {
 			serviceBroker1.Services = models.ServiceOfferings{}
-			brokerRepo.FindByNameServiceBroker = serviceBroker1
+			brokerRepo.FindByNameReturns(serviceBroker1, nil)
 			broker, err := brokerBuilder.AttachSpecificBrokerToServices("my-service-broker", services)
 
 			Expect(err).NotTo(HaveOccurred())
@@ -173,14 +173,18 @@ var _ = Describe("Broker Builder", func() {
 
 	Describe(".GetAllServiceBrokers", func() {
 		It("returns an error if we cannot list all brokers", func() {
-			brokerRepo.ListErr = true
+			brokerRepo.ListServiceBrokersReturns(errors.New("Error finding service brokers"))
 
 			_, err := brokerBuilder.GetAllServiceBrokers()
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns an error if we cannot list the services for a broker", func() {
-			brokerRepo.ServiceBrokers = []models.ServiceBroker{serviceBroker1}
+			brokerRepo.ListServiceBrokersStub = func(callback func(models.ServiceBroker) bool) error {
+				callback(serviceBroker1)
+				return nil
+			}
+
 			serviceBuilder.GetServicesForManyBrokersReturns(nil, errors.New("Cannot find services"))
 
 			_, err := brokerBuilder.GetAllServiceBrokers()
@@ -188,7 +192,10 @@ var _ = Describe("Broker Builder", func() {
 		})
 
 		It("returns all service brokers populated with their services", func() {
-			brokerRepo.ServiceBrokers = []models.ServiceBroker{serviceBroker1}
+			brokerRepo.ListServiceBrokersStub = func(callback func(models.ServiceBroker) bool) error {
+				callback(serviceBroker1)
+				return nil
+			}
 			serviceBuilder.GetServicesForManyBrokersReturns(services, nil)
 
 			brokers, err := brokerBuilder.GetAllServiceBrokers()
@@ -204,7 +211,7 @@ var _ = Describe("Broker Builder", func() {
 
 	Describe(".GetBrokerWithAllServices", func() {
 		It("returns a service broker populated with their services", func() {
-			brokerRepo.FindByNameServiceBroker = serviceBroker1
+			brokerRepo.FindByNameReturns(serviceBroker1, nil)
 			serviceBuilder.GetServicesForBrokerReturns(services, nil)
 
 			broker, err := brokerBuilder.GetBrokerWithAllServices("my-service-broker")
@@ -227,7 +234,7 @@ var _ = Describe("Broker Builder", func() {
 
 		It("returns the service broker populated with the specific service", func() {
 			serviceBuilder.GetServiceByNameWithPlansWithOrgNamesReturns(service1, nil)
-			brokerRepo.FindByGuidServiceBroker = serviceBroker1
+			brokerRepo.FindByGuidReturns(serviceBroker1, nil)
 
 			broker, err := brokerBuilder.GetBrokerWithSpecifiedService("my-public-service")
 			Expect(err).NotTo(HaveOccurred())

@@ -4,6 +4,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,7 +19,7 @@ var _ = Describe("delete-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
-		brokerRepo          *testapi.FakeServiceBrokerRepo
+		brokerRepo          *testapi.FakeServiceBrokerRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -32,7 +33,7 @@ var _ = Describe("delete-service-broker command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
-		brokerRepo = &testapi.FakeServiceBrokerRepo{}
+		brokerRepo = &testapi.FakeServiceBrokerRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
@@ -58,17 +59,18 @@ var _ = Describe("delete-service-broker command", func() {
 
 	Context("when the service broker exists", func() {
 		BeforeEach(func() {
-			brokerRepo.FindByNameServiceBroker = models.ServiceBroker{
+			brokerRepo.FindByNameReturns(models.ServiceBroker{
 				Name: "service-broker-to-delete",
 				Guid: "service-broker-to-delete-guid",
-			}
+			}, nil)
 		})
 
 		It("deletes the service broker with the given name", func() {
 			runCommand("service-broker-to-delete")
-
-			Expect(brokerRepo.FindByNameName).To(Equal("service-broker-to-delete"))
-			Expect(brokerRepo.DeletedServiceBrokerGuid).To(Equal("service-broker-to-delete-guid"))
+			Expect(brokerRepo.FindByNameCallCount()).To(Equal(1))
+			Expect(brokerRepo.FindByNameArgsForCall(0)).To(Equal("service-broker-to-delete"))
+			Expect(brokerRepo.DeleteCallCount()).To(Equal(1))
+			Expect(brokerRepo.DeleteArgsForCall(0)).To(Equal("service-broker-to-delete-guid"))
 			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the service-broker service-broker-to-delete"}))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -80,8 +82,8 @@ var _ = Describe("delete-service-broker command", func() {
 		It("does not prompt when the -f flag is provided", func() {
 			runCommand("-f", "service-broker-to-delete")
 
-			Expect(brokerRepo.FindByNameName).To(Equal("service-broker-to-delete"))
-			Expect(brokerRepo.DeletedServiceBrokerGuid).To(Equal("service-broker-to-delete-guid"))
+			Expect(brokerRepo.FindByNameArgsForCall(0)).To(Equal("service-broker-to-delete"))
+			Expect(brokerRepo.DeleteArgsForCall(0)).To(Equal("service-broker-to-delete-guid"))
 
 			Expect(ui.Prompts).To(BeEmpty())
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -93,15 +95,16 @@ var _ = Describe("delete-service-broker command", func() {
 
 	Context("when the service broker does not exist", func() {
 		BeforeEach(func() {
-			brokerRepo.FindByNameNotFound = true
+			brokerRepo.FindByNameReturns(models.ServiceBroker{}, errors.NewModelNotFoundError("Service Broker", "service-broker-to-delete"))
 		})
 
 		It("warns the user", func() {
 			ui.Inputs = []string{}
 			runCommand("-f", "service-broker-to-delete")
 
-			Expect(brokerRepo.FindByNameName).To(Equal("service-broker-to-delete"))
-			Expect(brokerRepo.DeletedServiceBrokerGuid).To(Equal(""))
+			Expect(brokerRepo.FindByNameCallCount()).To(Equal(1))
+			Expect(brokerRepo.FindByNameArgsForCall(0)).To(Equal("service-broker-to-delete"))
+			Expect(brokerRepo.DeleteCallCount()).To(BeZero())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Deleting service broker", "service-broker-to-delete"},
 				[]string{"OK"},

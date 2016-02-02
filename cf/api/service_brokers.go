@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter -o fakes/fake_service_broker_repository.go . ServiceBrokerRepository
 type ServiceBrokerRepository interface {
 	ListServiceBrokers(callback func(models.ServiceBroker) bool) error
 	FindByName(name string) (serviceBroker models.ServiceBroker, apiErr error)

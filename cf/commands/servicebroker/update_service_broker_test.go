@@ -20,7 +20,7 @@ var _ = Describe("update-service-broker command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		serviceBrokerRepo   *testapi.FakeServiceBrokerRepo
+		serviceBrokerRepo   *testapi.FakeServiceBrokerRepository
 		deps                command_registry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("update-service-broker command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		serviceBrokerRepo = &testapi.FakeServiceBrokerRepo{}
+		serviceBrokerRepo = &testapi.FakeServiceBrokerRepository{}
 	})
 
 	runCommand := func(args ...string) bool {
@@ -63,13 +63,13 @@ var _ = Describe("update-service-broker command", func() {
 			broker := models.ServiceBroker{}
 			broker.Name = "my-found-broker"
 			broker.Guid = "my-found-broker-guid"
-			serviceBrokerRepo.FindByNameServiceBroker = broker
+			serviceBrokerRepo.FindByNameReturns(broker, nil)
 		})
 
 		It("updates the service broker with the provided properties", func() {
 			runCommand("my-broker", "new-username", "new-password", "new-url")
 
-			Expect(serviceBrokerRepo.FindByNameName).To(Equal("my-broker"))
+			Expect(serviceBrokerRepo.FindByNameArgsForCall(0)).To(Equal("my-broker"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Updating service broker", "my-found-broker", "my-user"},
@@ -83,7 +83,7 @@ var _ = Describe("update-service-broker command", func() {
 			expectedServiceBroker.Url = "new-url"
 			expectedServiceBroker.Guid = "my-found-broker-guid"
 
-			Expect(serviceBrokerRepo.UpdatedServiceBroker).To(Equal(expectedServiceBroker))
+			Expect(serviceBrokerRepo.UpdateArgsForCall(0)).To(Equal(expectedServiceBroker))
 		})
 	})
 })
