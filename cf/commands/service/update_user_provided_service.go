@@ -2,6 +2,8 @@ package service
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
@@ -28,7 +30,7 @@ func init() {
 
 func (cmd *UpdateUserProvidedService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials exposed in the VCAP_SERVICES environment variable for bound applications")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications")}
 	fs["l"] = &cliFlags.StringFlag{ShortName: "l", Usage: T("URL to which logs for bound applications will be streamed")}
 	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("URL to which requests for bound routes will be forwarded. Scheme for this URL must be https")}
 
@@ -38,8 +40,18 @@ func (cmd *UpdateUserProvidedService) MetaData() command_registry.CommandMetadat
 		Description: T("Update user-provided service instance"),
 		Usage: T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
 
+  Pass comma separated credential parameter names to enable interactive mode:
+  CF_NAME update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
+
+  Pass credential parameters as JSON to create a service non-interactively:
+  CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'
+
+  Specify an '@' followed by the path to a file with the parameters:
+  CF_NAME update-user-provided-service SERVICE_INSTANCE -p @PATH_TO_FILE
+
 EXAMPLE:
    CF_NAME update-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
+   CF_NAME update-user-provided-service my-db-mine -p @/path/to/credentials.json
    CF_NAME update-user-provided-service my-drain-service -l syslog://example.com
    CF_NAME update-user-provided-service my-route-service -r https://example.com`),
 		Flags: fs,
@@ -75,16 +87,28 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 	}
 
 	drainUrl := c.String("l")
-	params := c.String("p")
+	params := strings.Trim(c.String("p"), `'"`)
 	routeServiceUrl := c.String("r")
 
 	paramsMap := make(map[string]interface{})
-	if params != "" {
 
-		err := json.Unmarshal([]byte(params), &paramsMap)
-		if err != nil {
-			cmd.ui.Failed(T("JSON is invalid: {{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err.Error()}))
-			return
+	if c.IsSet("p") {
+		switch {
+		case strings.HasPrefix(params, "@"):
+			jsonFileBytes, err := ioutil.ReadFile(params[1:])
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
+
+			err = json.Unmarshal(jsonFileBytes, &paramsMap)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
+		case strings.HasPrefix(params, "{"):
+			err := json.Unmarshal([]byte(params), &paramsMap)
+			if err != nil {
+				cmd.ui.Failed(T("JSON is invalid: {{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err.Error()}))
+			}
 		}
 	}
 

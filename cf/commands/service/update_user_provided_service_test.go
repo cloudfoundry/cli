@@ -1,6 +1,10 @@
 package service_test
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -77,9 +81,9 @@ var _ = Describe("update-user-provided-service test", func() {
 			})
 		})
 
-		Context("when the user provides valid JSON with the -p flag", func() {
+		Context("when the user provides valid single-quoted JSON with the -p flag", func() {
 			It("updates the user provided service specified", func() {
-				runCommand("-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name")
+				runCommand("-p", `'{"foo":"bar"}'`, "-l", "syslog://example.com", "service-name")
 
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -94,9 +98,58 @@ var _ = Describe("update-user-provided-service test", func() {
 			})
 		})
 
+		Context("when the user provides valid double-quoted JSON with the -p flag", func() {
+			It("updates the user provided service specified", func() {
+				runCommand("-p", `"{"foo":"bar"}"`, "-l", "syslog://example.com", "service-name")
+
+				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"TIP"},
+				))
+
+				Expect(serviceRepo.UpdateArgsForCall(0).Name).To(Equal("service-name"))
+				Expect(serviceRepo.UpdateArgsForCall(0).Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+				Expect(serviceRepo.UpdateArgsForCall(0).SysLogDrainUrl).To(Equal("syslog://example.com"))
+			})
+		})
+
+		It("accepts service parameters as a file containing JSON without prompting", func() {
+			tempfile, err := ioutil.TempFile("", "update-user-provided-service-test")
+			Expect(err).NotTo(HaveOccurred())
+			ioutil.WriteFile(tempfile.Name(), []byte(`{"foo": "bar"}`), os.ModePerm)
+
+			runCommand("-p", fmt.Sprintf("@%s", tempfile.Name()), "my-custom-service")
+
+			serviceInstanceFields := serviceRepo.UpdateArgsForCall(0)
+			Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
+
+			Expect(ui.Prompts).To(BeEmpty())
+		})
+
+		It("fails with an error when given a file containing bad JSON", func() {
+			tempfile, err := ioutil.TempFile("", "update-user-provided-service-test")
+			Expect(err).NotTo(HaveOccurred())
+			jsonData := `{:bad_json:}`
+			ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+
+			runCommand("-p", fmt.Sprintf("@%s", tempfile.Name()), "my-custom-service")
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+			))
+		})
+
+		It("fails with an error when given a file that cannot be read", func() {
+			runCommand("-p", "@nonexistent-file", "my-custom-service")
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"FAILED"},
+			))
+		})
+
 		Context("when user provides a valid Route Service URL with -r flag", func() {
 			It("updates a user provided service with a route service url", func() {
-				runCommand("-p", `{"foo":"bar"}`, "-r", "https://example.com", "service-name")
+				runCommand("-p", `'{"foo":"bar"}'`, "-r", "https://example.com", "service-name")
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
@@ -124,7 +177,7 @@ var _ = Describe("update-user-provided-service test", func() {
 
 		Context("when the user provides invalid JSON with the -p flag", func() {
 			It("tells the user the JSON is invalid", func() {
-				runCommand("-p", `{"foo":"ba WHOOPS OH MY HOW DID THIS GET HERE???`, "service-name")
+				runCommand("-p", `'{"foo":"bar'`, "service-name")
 
 				Expect(serviceRepo.UpdateCallCount()).To(Equal(0))
 
