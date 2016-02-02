@@ -100,8 +100,8 @@
     "translation": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"
   },
   {
-    "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-    "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
+    "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]",
+    "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -582,6 +582,10 @@
   {
     "id": "Invalid router group guid: {{.Guid}}",
     "translation": "Invalid router group guid: {{.Guid}}"
+  },
+  {
+    "id": "Make the broker's service plans only visible within the targeted space",
+    "translation": "Make the broker's service plans only visible within the targeted space"
   },
   {
     "id": "No app files found in '{{.Path}}'",

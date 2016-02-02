@@ -30,7 +30,8 @@ var _ = Describe("CreateServiceBroker", func() {
 		factory     *fakerequirements.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement requirements.Requirement
+		loginRequirement         requirements.Requirement
+		targetedSpaceRequirement requirements.Requirement
 	)
 
 	BeforeEach(func() {
@@ -53,6 +54,9 @@ var _ = Describe("CreateServiceBroker", func() {
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
+
+		targetedSpaceRequirement = &passingRequirement{Name: "targeted-space-requirement"}
+		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
 	})
 
 	Describe("Requirements", func() {
@@ -82,6 +86,19 @@ var _ = Describe("CreateServiceBroker", func() {
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 		})
+
+		Context("when the --space-scoped flag is provided", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-broker", "username", "password", "url", "--space-scoped")
+			})
+
+			It("returns a TargetedSpaceRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
+			})
+		})
 	})
 
 	Describe("Execute", func() {
@@ -103,11 +120,30 @@ var _ = Describe("CreateServiceBroker", func() {
 		It("tries to create the service broker", func() {
 			cmd.Execute(flagContext)
 			Expect(serviceBrokerRepo.CreateCallCount()).To(Equal(1))
-			name, url, username, password := serviceBrokerRepo.CreateArgsForCall(0)
+			name, url, username, password, spaceGUID := serviceBrokerRepo.CreateArgsForCall(0)
 			Expect(name).To(Equal("service-broker"))
 			Expect(url).To(Equal("url"))
 			Expect(username).To(Equal("username"))
 			Expect(password).To(Equal("password"))
+			Expect(spaceGUID).To(Equal(""))
+		})
+
+		Context("when the --space-scoped flag is passed", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("service-broker", "username", "password", "url", "--space-scoped")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("tries to create the service broker with the targeted space guid", func() {
+				cmd.Execute(flagContext)
+				Expect(serviceBrokerRepo.CreateCallCount()).To(Equal(1))
+				name, url, username, password, spaceGUID := serviceBrokerRepo.CreateArgsForCall(0)
+				Expect(name).To(Equal("service-broker"))
+				Expect(url).To(Equal("url"))
+				Expect(username).To(Equal("username"))
+				Expect(password).To(Equal("password"))
+				Expect(spaceGUID).To(Equal("my-space-guid"))
+			})
 		})
 
 		Context("when creating the service broker succeeds", func() {

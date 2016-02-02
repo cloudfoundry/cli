@@ -584,7 +584,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
+    "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]",
     "translation": ""
   },
   {
@@ -2770,6 +2770,10 @@
   {
     "id": "Make a user-provided service instance available to cf apps",
     "translation": "cf 앱에서 사용자 제공 서비스 인스턴스를 사용 가능하도록 작성"
+  },
+  {
+    "id": "Make the broker's service plans only visible within the targeted space",
+    "translation": ""
   },
   {
     "id": "Manifest file created successfully at ",

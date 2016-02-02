@@ -16,6 +16,7 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Service Brokers Repo", func() {
@@ -217,23 +218,65 @@ var _ = Describe("Service Brokers Repo", func() {
 	})
 
 	Describe("Create", func() {
+		var (
+			ccServer *ghttp.Server
+			repo     CloudControllerServiceBrokerRepository
+		)
+
+		BeforeEach(func() {
+			ccServer = ghttp.NewServer()
+
+			configRepo := testconfig.NewRepositoryWithDefaults()
+			configRepo.SetApiEndpoint(ccServer.URL())
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+			repo = NewCloudControllerServiceBrokerRepository(configRepo, gateway)
+		})
+
+		AfterEach(func() {
+			ccServer.Close()
+		})
+
 		It("creates the service broker with the given name, URL, username and password", func() {
-			expectedReqBody := `{"name":"foobroker","broker_url":"http://example.com","auth_username":"foouser","auth_password":"password"}`
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/v2/service_brokers"),
+					ghttp.VerifyJSON(`
+						{
+						    "name": "foobroker",
+						    "broker_url": "http://example.com",
+						    "auth_username": "foouser",
+						    "auth_password": "password"
+						}
+					`),
+					ghttp.RespondWith(http.StatusCreated, nil),
+				),
+			)
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "POST",
-				Path:     "/v2/service_brokers",
-				Matcher:  testnet.RequestBodyMatcher(expectedReqBody),
-				Response: testnet.TestResponse{Status: http.StatusCreated},
-			})
+			err := repo.Create("foobroker", "http://example.com", "foouser", "password", "")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+		})
 
-			ts, handler, repo := createServiceBrokerRepo(req)
-			defer ts.Close()
+		It("creates the service broker with the correct params when given a space GUID", func() {
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/v2/service_brokers"),
+					ghttp.VerifyJSON(`
+						{
+								"name": "foobroker",
+								"broker_url": "http://example.com",
+								"auth_username": "foouser",
+								"auth_password": "password",
+								"space_guid": "space-guid"
+						}
+					`),
+					ghttp.RespondWith(http.StatusCreated, nil),
+				),
+			)
 
-			apiErr := repo.Create("foobroker", "http://example.com", "foouser", "password")
-
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
+			err := repo.Create("foobroker", "http://example.com", "foouser", "password", "space-guid")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
 	})
 
