@@ -592,7 +592,7 @@
     "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  Opcionalmente, forneça parâmetros de configuração específicos do serviço em um objeto JSON válido sequencial.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Opcionalmente, forneça um arquivo contendo parâmetros de configuração específicos do serviço em um objeto JSON válido. O caminho para o arquivo de parâmetros pode ser um caminho absoluto ou relativo para um arquivo.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Exemplo de objeto JSON válido:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEXEMPLO:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json"
   },
   {
-    "id": "CF_NAME create-shared-domain DOMAIN --router-group [ROUTER_GROUP]",
+    "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
     "translation": ""
   },
   {

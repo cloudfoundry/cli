@@ -592,7 +592,7 @@
     "translation": "CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE [-c PARAMETRES_JSON]\n\n  Si vous le souhaitez, fournissez des paramètres de configuration propres au service dans un objet JSON valide en ligne. \n  CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c '{\"nom\":\"valeur\",\"nom\":\"valeur\"}'\n\n  Si vous le souhaitez, fournissez un fichier contenant des paramètres de configuration propres au service dans un objet JSON valide. Le chemin d'accès au fichier de paramètres peut être absolu ou relatif. \n  CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c CHEMIN_FICHIER\n\n   Exemple d'objet JSON valide :\n   {\n     \"permissions\": \"read-only\"\n }\n\nEXEMPLE :\n   CF_NAME create-service-key mabd maclé -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mabd maclé -c ~/workspace/tmp/instance_config.json"
   },
   {
-    "id": "CF_NAME create-shared-domain DOMAIN --router-group [ROUTER_GROUP]",
+    "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
     "translation": ""
   },
   {
