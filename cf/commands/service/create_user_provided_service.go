@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -27,7 +28,7 @@ func init() {
 
 func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials exposed in the VCAP_SERVICES environment variable for bound applications")}
+	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications")}
 	fs["l"] = &cliFlags.StringFlag{ShortName: "l", Usage: T("URL to which logs for bound applications will be streamed")}
 	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("URL to which requests for bound routes will be forwarded. Scheme for this URL must be https")}
 
@@ -41,22 +42,25 @@ func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadat
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
 
    Pass credential parameters as JSON to create a service non-interactively:
-   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"name":"value","name":"value"}'
+   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'
+
+   Specify an '@' followed by the path to a file with the parameters:
+   CF_NAME create-user-provided-service SERVICE_INSTANCE -p @PATH_TO_FILE
 
 EXAMPLE
-      CF_NAME create-user-provided-service my-db-mine -p "username, password"
-      CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
-      CF_NAME create-user-provided-service my-route-service -r https://example.com
+   CF_NAME create-user-provided-service my-db-mine -p "username, password"
+   CF_NAME create-user-provided-service my-db-mine -p @/path/to/credentials.json
+   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
+   CF_NAME create-user-provided-service my-route-service -r https://example.com
 
    Linux/Mac:
-      CF_NAME create-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
+   CF_NAME create-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
 
    Windows Command Line
-      CF_NAME create-user-provided-service my-db-mine -p "{\"username\":\"admin\",\"password\":\"pa55woRD\"}"
+   CF_NAME create-user-provided-service my-db-mine -p "{\"username\":\"admin\",\"password\":\"pa55woRD\"}"
 
    Windows PowerShell
-      CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'
-`),
+   CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'`),
 		Flags: fs,
 	}
 }
@@ -84,14 +88,29 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 	name := c.Args()[0]
 	drainUrl := c.String("l")
 	routeServiceUrl := c.String("r")
+	credentials := strings.Trim(c.String("p"), `"'`)
+	credentialsMap := make(map[string]interface{})
 
-	params := c.String("p")
-	params = strings.Trim(params, `"`)
-	paramsMap := make(map[string]interface{})
+	if c.IsSet("p") {
+		switch {
+		case strings.HasPrefix(credentials, "@"):
+			jsonFileBytes, err := ioutil.ReadFile(credentials[1:])
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
 
-	err := json.Unmarshal([]byte(params), &paramsMap)
-	if err != nil && params != "" {
-		paramsMap = cmd.mapValuesFromPrompt(params, paramsMap)
+			err = json.Unmarshal(jsonFileBytes, &credentialsMap)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
+		case strings.HasPrefix(credentials, "{"):
+			err := json.Unmarshal([]byte(credentials), &credentialsMap)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
+		default:
+			credentialsMap = cmd.mapValuesFromPrompt(credentials, credentialsMap)
+		}
 	}
 
 	cmd.ui.Say(T("Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -102,19 +121,19 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr := cmd.userProvidedServiceInstanceRepo.Create(name, drainUrl, routeServiceUrl, paramsMap)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	err := cmd.userProvidedServiceInstanceRepo.Create(name, drainUrl, routeServiceUrl, credentialsMap)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
 	cmd.ui.Ok()
 }
 
-func (cmd CreateUserProvidedService) mapValuesFromPrompt(params string, paramsMap map[string]interface{}) map[string]interface{} {
-	for _, param := range strings.Split(params, ",") {
+func (cmd CreateUserProvidedService) mapValuesFromPrompt(credentials string, credentialsMap map[string]interface{}) map[string]interface{} {
+	for _, param := range strings.Split(credentials, ",") {
 		param = strings.Trim(param, " ")
-		paramsMap[param] = cmd.ui.Ask("%s", param)
+		credentialsMap[param] = cmd.ui.Ask("%s", param)
 	}
-	return paramsMap
+	return credentialsMap
 }

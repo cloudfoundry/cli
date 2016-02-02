@@ -1,6 +1,10 @@
 package service_test
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -80,8 +84,8 @@ var _ = Describe("create-user-provided-service command", func() {
 		))
 	})
 
-	It("accepts service parameters as JSON without prompting", func() {
-		args := []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": 4}`, "my-custom-service"}
+	It("accepts service parameters as single-quoted JSON without prompting", func() {
+		args := []string{"-p", `'{"foo": "foo value", "bar": "bar value", "baz": 4}'`, "my-custom-service"}
 		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
 
 		name, _, _, params := repo.CreateArgsForCall(0)
@@ -97,6 +101,80 @@ var _ = Describe("create-user-provided-service command", func() {
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating user provided service"},
 			[]string{"OK"},
+		))
+	})
+
+	It("accepts service parameters as double-quoted JSON without prompting", func() {
+		args := []string{"-p", `"{"foo": "foo value", "bar": "bar value", "baz": 4}"`, "my-custom-service"}
+		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+
+		name, _, _, params := repo.CreateArgsForCall(0)
+		Expect(name).To(Equal("my-custom-service"))
+
+		Expect(ui.Prompts).To(BeEmpty())
+		Expect(params).To(Equal(map[string]interface{}{
+			"foo": "foo value",
+			"bar": "bar value",
+			"baz": float64(4),
+		}))
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user provided service"},
+			[]string{"OK"},
+		))
+	})
+
+	It("fails with an error when given bad literal JSON", func() {
+		args := []string{"-p", `'{:bad_json:}'`, "my-custom-service"}
+		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+		))
+	})
+
+	It("accepts service parameters as a file containing JSON without prompting", func() {
+		tempfile, err := ioutil.TempFile("", "create-user-provided-service-test")
+		Expect(err).NotTo(HaveOccurred())
+		jsonData := `{"foo": "foo value", "bar": "bar value", "baz": 4}`
+		ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+		args := []string{"-p", fmt.Sprintf("@%s", tempfile.Name()), "my-custom-service"}
+
+		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+
+		name, _, _, params := repo.CreateArgsForCall(0)
+		Expect(name).To(Equal("my-custom-service"))
+
+		Expect(ui.Prompts).To(BeEmpty())
+		Expect(params).To(Equal(map[string]interface{}{
+			"foo": "foo value",
+			"bar": "bar value",
+			"baz": float64(4),
+		}))
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user provided service"},
+			[]string{"OK"},
+		))
+	})
+
+	It("fails with an error when given a file containing bad JSON", func() {
+		tempfile, err := ioutil.TempFile("", "create-user-provided-service-test")
+		Expect(err).NotTo(HaveOccurred())
+		jsonData := `{:bad_json:}`
+		ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+		args := []string{"-p", fmt.Sprintf("@%s", tempfile.Name()), "my-custom-service"}
+
+		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
+		))
+	})
+
+	It("fails with an error when given a file that cannot be read", func() {
+		args := []string{"-p", "@nonexistent-file", "my-custom-service"}
+		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"FAILED"},
 		))
 	})
 
