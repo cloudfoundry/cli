@@ -43,7 +43,7 @@ func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadat
    Pass credential parameters as JSON to create a service non-interactively:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"name":"value","name":"value"}'
 
-EXAMPLE 
+EXAMPLE
       CF_NAME create-user-provided-service my-db-mine -p "username, password"
       CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
       CF_NAME create-user-provided-service my-route-service -r https://example.com
