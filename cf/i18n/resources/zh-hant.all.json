@@ -1605,7 +1605,7 @@
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
-    "translation": "環境變數："
+    "translation": "環境變數:"
   },
   {
     "id": "EXAMPLE:\n",
@@ -2077,7 +2077,7 @@
   },
   {
     "id": "GLOBAL OPTIONS:",
-    "translation": "廣域選項："
+    "translation": "廣域選項:"
   },
   {
     "id": "Get a one time password for ssh clients",
@@ -2829,7 +2829,7 @@
   },
   {
     "id": "NAME:",
-    "translation": "名稱："
+    "translation": "名稱:"
   },
   {
     "id": "Name",
@@ -4021,7 +4021,7 @@
   },
   {
     "id": "USAGE:",
-    "translation": "用法："
+    "translation": "用法:"
   },
   {
     "id": "USER ADMIN",
@@ -4285,7 +4285,7 @@
   },
   {
     "id": "VERSION:",
-    "translation": "版本："
+    "translation": "版本:"
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
