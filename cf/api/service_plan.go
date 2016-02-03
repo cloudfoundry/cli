@@ -30,18 +30,11 @@ func NewCloudControllerServicePlanRepository(config core_config.Reader, gateway 
 }
 
 func (repo CloudControllerServicePlanRepository) Update(servicePlan models.ServicePlanFields, serviceGuid string, public bool) error {
-	var body string
-
-	body = fmt.Sprintf(`{"name":"%s", "free":%t, "description":"%s", "public":%t, "service_guid":"%s"}`,
-		servicePlan.Name,
-		servicePlan.Free,
-		servicePlan.Description,
-		public,
-		serviceGuid,
+	return repo.gateway.UpdateResource(
+		repo.config.ApiEndpoint(),
+		fmt.Sprintf("/v2/service_plans/%s", servicePlan.Guid),
+		strings.NewReader(fmt.Sprintf(`{"public":%t}`, public)),
 	)
-
-	url := fmt.Sprintf("/v2/service_plans/%s", servicePlan.Guid)
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, strings.NewReader(body))
 }
 
 func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(serviceGuids []string) ([]models.ServicePlanFields, error) {

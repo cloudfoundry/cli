@@ -96,12 +96,12 @@ var _ = Describe("Service Plan Repository", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_plans/my-service-plan-guid",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-service-plan", "free":true, "description":"descriptive text", "public":true, "service_guid":"service-guid"}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"public":true}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			}))
 		})
 
-		It("Updates the service to public", func() {
+		It("updates public on the service to whatever is passed", func() {
 			servicePlan := models.ServicePlanFields{
 				Name:        "my-service-plan",
 				Guid:        "my-service-plan-guid",
