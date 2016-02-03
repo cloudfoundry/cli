@@ -51,6 +51,10 @@ type FakeReqFactory struct {
 	MinAPIVersionRequiredVersion semver.Version
 	MinAPIVersionSuccess         bool
 
+	MaxAPIVersionFeatureName     string
+	MaxAPIVersionRequiredVersion semver.Version
+	MaxAPIVersionSuccess         bool
+
 	UI terminal.UI
 }
 
@@ -117,6 +121,12 @@ func (f *FakeReqFactory) NewMinAPIVersionRequirement(featureName string, require
 	f.MinAPIVersionFeatureName = featureName
 	f.MinAPIVersionRequiredVersion = requiredVersion
 	return FakeRequirement{f, f.MinAPIVersionSuccess}
+}
+
+func (f *FakeReqFactory) NewMaxAPIVersionRequirement(featureName string, maximumVersion semver.Version) requirements.Requirement {
+	f.MaxAPIVersionFeatureName = featureName
+	f.MaxAPIVersionRequiredVersion = maximumVersion
+	return FakeRequirement{f, f.MaxAPIVersionSuccess}
 }
 
 type FakeRequirement struct {
