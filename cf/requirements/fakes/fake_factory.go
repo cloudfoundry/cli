@@ -36,13 +36,13 @@ type FakeFactory struct {
 	NewLoginRequirementStub        func() requirements.Requirement
 	newLoginRequirementMutex       sync.RWMutex
 	newLoginRequirementArgsForCall []struct{}
-	newLoginRequirementReturns struct {
+	newLoginRequirementReturns     struct {
 		result1 requirements.Requirement
 	}
 	NewRoutingAPIRequirementStub        func() requirements.Requirement
 	newRoutingAPIRequirementMutex       sync.RWMutex
 	newRoutingAPIRequirementArgsForCall []struct{}
-	newRoutingAPIRequirementReturns struct {
+	newRoutingAPIRequirementReturns     struct {
 		result1 requirements.Requirement
 	}
 	NewSpaceRequirementStub        func(name string) requirements.SpaceRequirement
@@ -56,13 +56,13 @@ type FakeFactory struct {
 	NewTargetedSpaceRequirementStub        func() requirements.Requirement
 	newTargetedSpaceRequirementMutex       sync.RWMutex
 	newTargetedSpaceRequirementArgsForCall []struct{}
-	newTargetedSpaceRequirementReturns struct {
+	newTargetedSpaceRequirementReturns     struct {
 		result1 requirements.Requirement
 	}
 	NewTargetedOrgRequirementStub        func() requirements.TargetedOrgRequirement
 	newTargetedOrgRequirementMutex       sync.RWMutex
 	newTargetedOrgRequirementArgsForCall []struct{}
-	newTargetedOrgRequirementReturns struct {
+	newTargetedOrgRequirementReturns     struct {
 		result1 requirements.TargetedOrgRequirement
 	}
 	NewOrganizationRequirementStub        func(name string) requirements.OrganizationRequirement
@@ -101,7 +101,7 @@ type FakeFactory struct {
 	NewApiEndpointRequirementStub        func() requirements.Requirement
 	newApiEndpointRequirementMutex       sync.RWMutex
 	newApiEndpointRequirementArgsForCall []struct{}
-	newApiEndpointRequirementReturns struct {
+	newApiEndpointRequirementReturns     struct {
 		result1 requirements.Requirement
 	}
 	NewMinAPIVersionRequirementStub        func(commandName string, requiredVersion semver.Version) requirements.Requirement
