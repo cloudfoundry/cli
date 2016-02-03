@@ -47,13 +47,22 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 		})
 
 		It("requires five arguments to run", func() {
-			requirementsFactory.LoginSuccess = true
 			args = []string{"one", "two", "three"}
 
 			Expect(testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 
+		It("requires CC API version 2.47 or greater", func() {
+			requirementsFactory.MaxAPIVersionSuccess = false
+			requirementsFactory.LoginSuccess = true
+			args = []string{"one", "two", "three", "four", "five"}
+			ui.Inputs = append(ui.Inputs, "no")
+
+			Expect(testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+		})
+
 		It("passes requirements if user is logged in and provided five args to run", func() {
+			requirementsFactory.MaxAPIVersionSuccess = true
 			requirementsFactory.LoginSuccess = true
 			args = []string{"one", "two", "three", "four", "five"}
 			ui.Inputs = append(ui.Inputs, "no")
@@ -64,6 +73,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 
 	Describe("migrating service instances", func() {
 		BeforeEach(func() {
+			requirementsFactory.MaxAPIVersionSuccess = true
 			requirementsFactory.LoginSuccess = true
 			args = []string{"v1-service-label", "v1-provider-name", "v1-plan-name", "v2-service-label", "v2-plan-name"}
 			serviceRepo.GetServiceInstanceCountForServicePlanReturns(1, nil)
