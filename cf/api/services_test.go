@@ -139,8 +139,7 @@ var _ = Describe("Services Repo", func() {
             "label": "my-service",
             "provider": "androsterone-ensphere",
             "description": "Dummy addon that is cool",
-            "version": "damageableness-preheat",
-            "documentation_url": "YESWECAN.com"
+            "version": "damageableness-preheat"
          }
       }
    ]
@@ -159,8 +158,7 @@ var _ = Describe("Services Repo", func() {
             "label": "my-service2",
             "provider": "androsterone-ensphere",
             "description": "Dummy addon that is cooler",
-            "version": "seraphine-lowdah",
-            "documentation_url": "YESWECAN.com"
+            "version": "seraphine-lowdah"
          }
       }
    ]
@@ -211,8 +209,7 @@ var _ = Describe("Services Repo", func() {
             "label": "my-service",
             "provider": "androsterone-ensphere",
             "description": "Dummy addon that is cool",
-            "version": "damageableness-preheat",
-            "documentation_url": "YESWECAN.com"
+            "version": "damageableness-preheat"
          }
 			 }
    ]
@@ -233,8 +230,7 @@ var _ = Describe("Services Repo", func() {
             "label": "my-service2",
             "provider": "androsterone-ensphere",
             "description": "Dummy addon that is cool",
-            "version": "damageableness-preheat",
-            "documentation_url": "YESWECAN.com"
+            "version": "damageableness-preheat"
          }
       }
    ]
