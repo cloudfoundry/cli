@@ -4928,6 +4928,10 @@
     "translation": "{{.Err}}\n\nTIPP: Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten."
   },
   {
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
     "translation": "Aktuelle CF CLI Version {{.Version}}\n\tAktuelle CF API Version {{.ApiVersion}}\n\tUm die Funktion {{.CommandName}} zu verwenden, müssen Sie die CF API mindestens auf {{.RequiredVersion}} aktualisieren."
   },

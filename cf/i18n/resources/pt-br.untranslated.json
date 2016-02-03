@@ -818,5 +818,9 @@
   {
     "id": "version",
     "translation": "version"
+  },
+  {
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}."
   }
 ]

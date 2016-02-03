@@ -364,6 +364,10 @@
     "translation": "version"
   },
   {
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}."
+  },
+  {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
     "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances"
   }

@@ -4928,6 +4928,10 @@
     "translation": "{{.Err}}\n\nヒント: 詳しくは '{{.Command}}' を使用してください"
   },
   {
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
     "translation": "現在の CF CLI バージョン {{.Version}}\n\t現在の CF API バージョン {{.ApiVersion}}\n\t{{.CommandName}} フィーチャーを使用するには、CF API を少なくとも {{.RequiredVersion}} にアップグレードする必要があります"
   },
