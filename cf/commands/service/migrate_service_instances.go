@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/blang/semver"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
@@ -38,15 +39,22 @@ func (cmd *MigrateServiceInstances) MetaData() command_registry.CommandMetadata 
 	}
 }
 
-func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 5 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n") + command_registry.Commands.CommandUsage("migrate-service-instances"))
 	}
 
-	reqs = []requirements.Requirement{
-		requirementsFactory.NewLoginRequirement(),
+	maximumVersion, err := semver.Make("2.46.0")
+	if err != nil {
+		panic(err.Error())
 	}
-	return
+
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewMaxAPIVersionRequirement("migrate-service-instances", maximumVersion),
+	}
+
+	return reqs, nil
 }
 
 func (cmd *MigrateServiceInstances) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
