@@ -37,7 +37,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
 		authTokenRepo = &testapi.FakeAuthTokenRepo{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, MaxAPIVersionSuccess: true}
 	})
 
 	runCommand := func(args ...string) bool {
@@ -55,6 +55,12 @@ var _ = Describe("delete-service-auth-token command", func() {
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
 			Expect(runCommand()).To(BeFalse())
+		})
+
+		It("requires CC API version 2.47 or greater", func() {
+			requirementsFactory.MaxAPIVersionSuccess = false
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand("one", "two")).To(BeFalse())
 		})
 	})
 

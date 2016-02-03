@@ -54,11 +54,18 @@ var _ = Describe("update-service-auth-token command", func() {
 		It("fails when not logged in", func() {
 			Expect(runCommand("label", "provider", "token")).To(BeFalse())
 		})
+
+		It("requires CC API version 2.47 or greater", func() {
+			requirementsFactory.MaxAPIVersionSuccess = false
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand("one", "two", "three")).To(BeFalse())
+		})
 	})
 
 	Context("when logged in and the service auth token exists", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.MaxAPIVersionSuccess = true
 			foundAuthToken := models.ServiceAuthTokenFields{}
 			foundAuthToken.Guid = "found-auth-token-guid"
 			foundAuthToken.Label = "found label"
