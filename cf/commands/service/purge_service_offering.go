@@ -1,10 +1,12 @@
 package service
 
 import (
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -33,13 +35,24 @@ func (cmd *PurgeServiceOffering) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("purge-service-offering"))
 	}
 
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	return
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+	}
+
+	if fc.IsSet("p") {
+		maximumVersion, err := semver.Make("2.46.0")
+		if err != nil {
+			panic(err.Error())
+		}
+		reqs = append(reqs, requirementsFactory.NewMaxAPIVersionRequirement("Option '-p'", maximumVersion))
+	}
+
+	return reqs, nil
 }
 
 func (cmd *PurgeServiceOffering) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -55,15 +68,27 @@ func scaryWarningMessage() string {
 func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) {
 	serviceName := c.Args()[0]
 
-	offering, apiErr := cmd.serviceRepo.FindServiceOfferingByLabelAndProvider(serviceName, c.String("p"))
-
-	switch apiErr.(type) {
-	case nil:
-	case *errors.ModelNotFoundError:
-		cmd.ui.Warn(T("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag."))
-		return
-	default:
-		cmd.ui.Failed(apiErr.Error())
+	var offering models.ServiceOffering
+	if c.IsSet("p") {
+		var err error
+		offering, err = cmd.serviceRepo.FindServiceOfferingByLabelAndProvider(serviceName, c.String("p"))
+		if err != nil {
+			if _, ok := err.(*errors.ModelNotFoundError); ok {
+				cmd.ui.Warn(T("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag."))
+				return
+			}
+			cmd.ui.Failed(err.Error())
+		}
+	} else {
+		offerings, err := cmd.serviceRepo.FindServiceOfferingsByLabel(serviceName)
+		if err != nil {
+			if _, ok := err.(*errors.ModelNotFoundError); ok {
+				cmd.ui.Warn(T("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag."))
+				return
+			}
+			cmd.ui.Failed(err.Error())
+		}
+		offering = offerings[0]
 	}
 
 	confirmed := c.Bool("f")
@@ -77,7 +102,9 @@ func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) {
 	if !confirmed {
 		return
 	}
+
 	cmd.ui.Say(T("Purging service {{.ServiceName}}...", map[string]interface{}{"ServiceName": serviceName}))
+
 	err := cmd.serviceRepo.PurgeServiceOffering(offering)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

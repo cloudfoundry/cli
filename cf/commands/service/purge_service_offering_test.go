@@ -30,7 +30,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 		factory     *fakerequirements.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement requirements.Requirement
+		loginRequirement         requirements.Requirement
+		maxAPIVersionRequirement requirements.Requirement
 	)
 
 	BeforeEach(func() {
@@ -53,6 +54,9 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
+
+		maxAPIVersionRequirement = &passingRequirement{Name: "max-api-version-requirement"}
+		factory.NewMaxAPIVersionRequirementReturns(maxAPIVersionRequirement)
 	})
 
 	Describe("Requirements", func() {
@@ -82,39 +86,59 @@ var _ = Describe("PurgeServiceOffering", func() {
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 		})
+
+		Context("when the -p flag is passed", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service", "-p", "provider-name")
+			})
+
+			It("returns a MaxAPIVersion requirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(actualRequirements).To(ContainElement(maxAPIVersionRequirement))
+			})
+		})
 	})
 
 	Describe("Execute", func() {
 		BeforeEach(func() {
-			err := flagContext.Parse("service")
+			err := flagContext.Parse("service-name")
 			Expect(err).NotTo(HaveOccurred())
 			_, err = cmd.Requirements(factory, flagContext)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("tries to find the service offering by label and provider", func() {
+		It("tries to find the service offering by label", func() {
 			ui.Inputs = []string{"n"}
+			serviceRepo.FindServiceOfferingsByLabelReturns([]models.ServiceOffering{{}}, nil)
 			cmd.Execute(flagContext)
-			Expect(serviceRepo.FindServiceOfferingByLabelAndProviderCallCount()).To(Equal(1))
+			Expect(serviceRepo.FindServiceOfferingsByLabelCallCount()).To(Equal(1))
+			name := serviceRepo.FindServiceOfferingsByLabelArgsForCall(0)
+			Expect(name).To(Equal("service-name"))
 		})
 
 		Context("when finding the service offering succeeds", func() {
 			BeforeEach(func() {
 				serviceOffering := models.ServiceOffering{}
 				serviceOffering.Guid = "service-offering-guid"
-				serviceRepo.FindServiceOfferingByLabelAndProviderReturns(serviceOffering, nil)
+				serviceRepo.FindServiceOfferingsByLabelReturns([]models.ServiceOffering{serviceOffering}, nil)
 			})
 
 			It("asks the user to confirm", func() {
 				ui.Inputs = []string{"n"}
 				cmd.Execute(flagContext)
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"WARNING"}))
-				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really purge service offering service from Cloud Foundry?"}))
+				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really purge service offering service-name from Cloud Foundry?"}))
 			})
 
 			Context("when the user confirms", func() {
 				BeforeEach(func() {
 					ui.Inputs = []string{"y"}
+				})
+
+				It("tells the user it will purge the service offering", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"Purging service service-name..."}))
 				})
 
 				It("tries to purge the service offering", func() {
@@ -130,6 +154,20 @@ var _ = Describe("PurgeServiceOffering", func() {
 					It("says OK", func() {
 						cmd.Execute(flagContext)
 						Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					})
+				})
+
+				Context("when purging fails", func() {
+					BeforeEach(func() {
+						serviceRepo.PurgeServiceOfferingReturns(errors.New("purge-err"))
+					})
+
+					It("fails with error", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"purge-err"},
+						))
 					})
 				})
 			})
@@ -148,7 +186,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 		Context("when finding the service offering fails with an error other than 404", func() {
 			BeforeEach(func() {
-				serviceRepo.FindServiceOfferingByLabelAndProviderReturns(models.ServiceOffering{}, errors.New("find-err"))
+				serviceRepo.FindServiceOfferingsByLabelReturns([]models.ServiceOffering{}, errors.New("find-err"))
 			})
 
 			It("fails with error", func() {
@@ -159,8 +197,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 		Context("when finding the service offering fails with 404 not found", func() {
 			BeforeEach(func() {
-				serviceRepo.FindServiceOfferingByLabelAndProviderReturns(
-					models.ServiceOffering{},
+				serviceRepo.FindServiceOfferingsByLabelReturns(
+					[]models.ServiceOffering{{}},
 					errors.NewModelNotFoundError("model-type", "find-err"),
 				)
 			})
@@ -170,6 +208,137 @@ var _ = Describe("PurgeServiceOffering", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Service offering does not exist"},
 				))
+			})
+
+			It("does not try to purge the service offering", func() {
+				cmd.Execute(flagContext)
+				Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
+			})
+		})
+
+		Context("when the -p flag is passed", func() {
+			var origAPIVersion string
+			BeforeEach(func() {
+				origAPIVersion = configRepo.ApiVersion()
+				configRepo.SetApiVersion("2.46.0")
+
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+				err := flagContext.Parse("service-name", "-p", "provider-name")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				configRepo.SetApiVersion(origAPIVersion)
+			})
+
+			It("tries to find the service offering by label and provider", func() {
+				ui.Inputs = []string{"n"}
+				cmd.Execute(flagContext)
+				Expect(serviceRepo.FindServiceOfferingByLabelAndProviderCallCount()).To(Equal(1))
+				name, provider := serviceRepo.FindServiceOfferingByLabelAndProviderArgsForCall(0)
+				Expect(name).To(Equal("service-name"))
+				Expect(provider).To(Equal("provider-name"))
+			})
+
+			Context("when finding the service offering succeeds", func() {
+				BeforeEach(func() {
+					serviceOffering := models.ServiceOffering{}
+					serviceOffering.Guid = "service-offering-guid"
+					serviceRepo.FindServiceOfferingByLabelAndProviderReturns(serviceOffering, nil)
+				})
+
+				It("asks the user to confirm", func() {
+					ui.Inputs = []string{"n"}
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"WARNING"}))
+					Expect(ui.Prompts).To(ContainSubstrings([]string{"Really purge service offering service-name from Cloud Foundry?"}))
+				})
+
+				Context("when the user confirms", func() {
+					BeforeEach(func() {
+						ui.Inputs = []string{"y"}
+					})
+
+					It("tells the user it will purge the service offering", func() {
+						cmd.Execute(flagContext)
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"Purging service service-name..."}))
+					})
+
+					It("tries to purge the service offering", func() {
+						cmd.Execute(flagContext)
+						Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(Equal(1))
+					})
+
+					Context("when purging succeeds", func() {
+						BeforeEach(func() {
+							serviceRepo.PurgeServiceOfferingReturns(nil)
+						})
+
+						It("says OK", func() {
+							cmd.Execute(flagContext)
+							Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+						})
+					})
+
+					Context("when purging fails", func() {
+						BeforeEach(func() {
+							serviceRepo.PurgeServiceOfferingReturns(errors.New("purge-err"))
+						})
+
+						It("fails with error", func() {
+							Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+							Expect(ui.Outputs).To(ContainSubstrings(
+								[]string{"FAILED"},
+								[]string{"purge-err"},
+							))
+						})
+					})
+				})
+
+				Context("when the user does not confirm", func() {
+					BeforeEach(func() {
+						ui.Inputs = []string{"n"}
+					})
+
+					It("does not try to purge the service offering", func() {
+						cmd.Execute(flagContext)
+						Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
+					})
+				})
+			})
+
+			Context("when finding the service offering fails with an error other than 404", func() {
+				BeforeEach(func() {
+					serviceRepo.FindServiceOfferingByLabelAndProviderReturns(models.ServiceOffering{}, errors.New("find-err"))
+				})
+
+				It("fails with error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				})
+			})
+
+			Context("when finding the service offering fails with 404 not found", func() {
+				BeforeEach(func() {
+					serviceRepo.FindServiceOfferingByLabelAndProviderReturns(
+						models.ServiceOffering{},
+						errors.NewModelNotFoundError("model-type", "find-err"),
+					)
+				})
+
+				It("warns the user", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Service offering does not exist"},
+					))
+				})
+
+				It("does not try to purge the service offering", func() {
+					cmd.Execute(flagContext)
+					Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
+				})
 			})
 		})
 	})

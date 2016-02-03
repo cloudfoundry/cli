@@ -23,6 +23,7 @@ type Factory interface {
 	NewBuildpackRequirement(buildpack string) BuildpackRequirement
 	NewApiEndpointRequirement() Requirement
 	NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement
+	NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement
 }
 
 type apiRequirementFactory struct {
@@ -142,5 +143,14 @@ func (f apiRequirementFactory) NewMinAPIVersionRequirement(commandName string, r
 		f.config,
 		commandName,
 		requiredVersion,
+	)
+}
+
+func (f apiRequirementFactory) NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement {
+	return NewMaxAPIVersionRequirement(
+		f.ui,
+		f.config,
+		commandName,
+		maximumVersion,
 	)
 }

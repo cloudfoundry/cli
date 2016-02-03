@@ -36,13 +36,13 @@ type FakeFactory struct {
 	NewLoginRequirementStub        func() requirements.Requirement
 	newLoginRequirementMutex       sync.RWMutex
 	newLoginRequirementArgsForCall []struct{}
-	newLoginRequirementReturns     struct {
+	newLoginRequirementReturns struct {
 		result1 requirements.Requirement
 	}
 	NewRoutingAPIRequirementStub        func() requirements.Requirement
 	newRoutingAPIRequirementMutex       sync.RWMutex
 	newRoutingAPIRequirementArgsForCall []struct{}
-	newRoutingAPIRequirementReturns     struct {
+	newRoutingAPIRequirementReturns struct {
 		result1 requirements.Requirement
 	}
 	NewSpaceRequirementStub        func(name string) requirements.SpaceRequirement
@@ -56,13 +56,13 @@ type FakeFactory struct {
 	NewTargetedSpaceRequirementStub        func() requirements.Requirement
 	newTargetedSpaceRequirementMutex       sync.RWMutex
 	newTargetedSpaceRequirementArgsForCall []struct{}
-	newTargetedSpaceRequirementReturns     struct {
+	newTargetedSpaceRequirementReturns struct {
 		result1 requirements.Requirement
 	}
 	NewTargetedOrgRequirementStub        func() requirements.TargetedOrgRequirement
 	newTargetedOrgRequirementMutex       sync.RWMutex
 	newTargetedOrgRequirementArgsForCall []struct{}
-	newTargetedOrgRequirementReturns     struct {
+	newTargetedOrgRequirementReturns struct {
 		result1 requirements.TargetedOrgRequirement
 	}
 	NewOrganizationRequirementStub        func(name string) requirements.OrganizationRequirement
@@ -101,7 +101,7 @@ type FakeFactory struct {
 	NewApiEndpointRequirementStub        func() requirements.Requirement
 	newApiEndpointRequirementMutex       sync.RWMutex
 	newApiEndpointRequirementArgsForCall []struct{}
-	newApiEndpointRequirementReturns     struct {
+	newApiEndpointRequirementReturns struct {
 		result1 requirements.Requirement
 	}
 	NewMinAPIVersionRequirementStub        func(commandName string, requiredVersion semver.Version) requirements.Requirement
@@ -111,6 +111,15 @@ type FakeFactory struct {
 		requiredVersion semver.Version
 	}
 	newMinAPIVersionRequirementReturns struct {
+		result1 requirements.Requirement
+	}
+	NewMaxAPIVersionRequirementStub        func(commandName string, maximumVersion semver.Version) requirements.Requirement
+	newMaxAPIVersionRequirementMutex       sync.RWMutex
+	newMaxAPIVersionRequirementArgsForCall []struct {
+		commandName    string
+		maximumVersion semver.Version
+	}
+	newMaxAPIVersionRequirementReturns struct {
 		result1 requirements.Requirement
 	}
 }
@@ -521,6 +530,39 @@ func (fake *FakeFactory) NewMinAPIVersionRequirementArgsForCall(i int) (string, 
 func (fake *FakeFactory) NewMinAPIVersionRequirementReturns(result1 requirements.Requirement) {
 	fake.NewMinAPIVersionRequirementStub = nil
 	fake.newMinAPIVersionRequirementReturns = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) requirements.Requirement {
+	fake.newMaxAPIVersionRequirementMutex.Lock()
+	fake.newMaxAPIVersionRequirementArgsForCall = append(fake.newMaxAPIVersionRequirementArgsForCall, struct {
+		commandName    string
+		maximumVersion semver.Version
+	}{commandName, maximumVersion})
+	fake.newMaxAPIVersionRequirementMutex.Unlock()
+	if fake.NewMaxAPIVersionRequirementStub != nil {
+		return fake.NewMaxAPIVersionRequirementStub(commandName, maximumVersion)
+	} else {
+		return fake.newMaxAPIVersionRequirementReturns.result1
+	}
+}
+
+func (fake *FakeFactory) NewMaxAPIVersionRequirementCallCount() int {
+	fake.newMaxAPIVersionRequirementMutex.RLock()
+	defer fake.newMaxAPIVersionRequirementMutex.RUnlock()
+	return len(fake.newMaxAPIVersionRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewMaxAPIVersionRequirementArgsForCall(i int) (string, semver.Version) {
+	fake.newMaxAPIVersionRequirementMutex.RLock()
+	defer fake.newMaxAPIVersionRequirementMutex.RUnlock()
+	return fake.newMaxAPIVersionRequirementArgsForCall[i].commandName, fake.newMaxAPIVersionRequirementArgsForCall[i].maximumVersion
+}
+
+func (fake *FakeFactory) NewMaxAPIVersionRequirementReturns(result1 requirements.Requirement) {
+	fake.NewMaxAPIVersionRequirementStub = nil
+	fake.newMaxAPIVersionRequirementReturns = struct {
 		result1 requirements.Requirement
 	}{result1}
 }
