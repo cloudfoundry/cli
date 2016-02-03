@@ -1,6 +1,7 @@
 package serviceauthtoken
 
 import (
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -28,15 +29,22 @@ func (cmd *ListServiceAuthTokens) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 0 {
 		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("service-auth-tokens"))
 	}
 
-	reqs = []requirements.Requirement{
-		requirementsFactory.NewLoginRequirement(),
+	maximumVersion, err := semver.Make("2.46.0")
+	if err != nil {
+		panic(err.Error())
 	}
-	return
+
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewMaxAPIVersionRequirement("service-auth-tokens", maximumVersion),
+	}
+
+	return reqs, nil
 }
 
 func (cmd *ListServiceAuthTokens) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

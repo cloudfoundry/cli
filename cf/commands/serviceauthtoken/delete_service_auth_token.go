@@ -3,6 +3,7 @@ package serviceauthtoken
 import (
 	"fmt"
 
+	"github.com/blang/semver"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
@@ -37,13 +38,22 @@ func (cmd *DeleteServiceAuthTokenFields) MetaData() command_registry.CommandMeta
 	}
 }
 
-func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n") + command_registry.Commands.CommandUsage("delete-service-auth-token"))
 	}
 
-	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
-	return
+	maximumVersion, err := semver.Make("2.46.0")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewMaxAPIVersionRequirement("delete-service-auth-token", maximumVersion),
+	}
+
+	return reqs, nil
 }
 
 func (cmd *DeleteServiceAuthTokenFields) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

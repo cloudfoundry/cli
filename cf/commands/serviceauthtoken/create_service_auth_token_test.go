@@ -55,11 +55,18 @@ var _ = Describe("create-service-auth-token command", func() {
 		It("fails when not logged in", func() {
 			Expect(runCommand("just", "enough", "args")).To(BeFalse())
 		})
+
+		It("requires CC API version 2.47 or greater", func() {
+			requirementsFactory.MaxAPIVersionSuccess = false
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand("one", "two", "three")).To(BeFalse())
+		})
 	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.MaxAPIVersionSuccess = true
 		})
 
 		It("creates a service auth token, obviously", func() {

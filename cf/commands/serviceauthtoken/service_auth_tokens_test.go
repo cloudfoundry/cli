@@ -53,11 +53,18 @@ var _ = Describe("service-auth-tokens command", func() {
 				[]string{"Incorrect Usage", "No argument"},
 			))
 		})
+
+		It("requires CC API version 2.47 or greater", func() {
+			requirementsFactory.MaxAPIVersionSuccess = false
+			requirementsFactory.LoginSuccess = true
+			Expect(runCommand()).To(BeFalse())
+		})
 	})
 
 	Context("when logged in and some service auth tokens exist", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.MaxAPIVersionSuccess = true
 
 			authTokenRepo.FindAllAuthTokens = []models.ServiceAuthTokenFields{
 				models.ServiceAuthTokenFields{Label: "a label", Provider: "a provider"},
