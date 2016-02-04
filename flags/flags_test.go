@@ -1,6 +1,9 @@
 package flags_test
 
 import (
+	"io/ioutil"
+	"os"
+
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
 	. "github.com/onsi/ginkgo"
@@ -52,6 +55,26 @@ var _ = Describe("Flags", func() {
 				Ω(fCtx.IsSet("n")).To(BeTrue())
 				Ω(fCtx.String("name")).To(Equal("red"))
 				Ω(fCtx.String("n")).To(Equal("red"))
+			})
+
+			It("sets a flag value to the content of the file specified by a preceding "+flags.URLIndicatorPrefix, func() {
+				content := "This is from a file"
+				tmpfile, err := ioutil.TempFile("", "TEST")
+				Ω(err).ToNot(HaveOccurred())
+				defer tmpfile.Close()
+				defer os.Remove(tmpfile.Name())
+				err = ioutil.WriteFile(tmpfile.Name(), []byte(content), 0644)
+				Ω(err).ToNot(HaveOccurred())
+				err = fCtx.Parse("-n", flags.URLIndicatorPrefix+tmpfile.Name())
+				Ω(err).ToNot(HaveOccurred())
+				Ω(fCtx.String("n")).To(Equal(content))
+			})
+
+			It("keeps flag value if the file specified by a preceding "+flags.URLIndicatorPrefix+" cannot be read", func() {
+				content := "@q:\\This file cannot exist"
+				err := fCtx.Parse("-n", content)
+				Ω(err).ToNot(HaveOccurred())
+				Ω(fCtx.String("n")).To(Equal(content))
 			})
 
 			It("checks if a flag is defined in the FlagContext", func() {
@@ -146,6 +169,21 @@ var _ = Describe("Flags", func() {
 				Ω(len(fCtx.Args())).To(Equal(2))
 				Ω(fCtx.Args()[0]).To(Equal("Arg-1"))
 				Ω(fCtx.Args()[1]).To(Equal("Arg-2"))
+			})
+
+			It("returns any non-flag arguments in Args() processed via "+flags.URLIndicatorPrefix+" if specified", func() {
+				content := "This is from a file"
+				tmpfile, err := ioutil.TempFile("", "TEST")
+				Ω(err).ToNot(HaveOccurred())
+				defer tmpfile.Close()
+				defer os.Remove(tmpfile.Name())
+				err = ioutil.WriteFile(tmpfile.Name(), []byte(content), 0644)
+				Ω(err).ToNot(HaveOccurred())
+				err = fCtx.Parse("Arg-1", "--instance", "10", "--skip", flags.URLIndicatorPrefix+tmpfile.Name())
+				Ω(err).ToNot(HaveOccurred())
+				Ω(len(fCtx.Args())).To(Equal(2))
+				Ω(fCtx.Args()[0]).To(Equal("Arg-1"))
+				Ω(fCtx.Args()[1]).To(Equal(content))
 			})
 
 			It("accepts flag/value in the forms of '-flag=value' and '-flag value'", func() {

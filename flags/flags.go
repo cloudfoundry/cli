@@ -3,11 +3,14 @@ package flags
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"strconv"
 	"strings"
 
 	"github.com/cloudfoundry/cli/flags/flag"
 )
+
+const URLIndicatorPrefix = "@"
 
 type FlagSet interface {
 	fmt.Stringer
@@ -123,11 +126,23 @@ func (c *flagContext) Parse(args ...string) error {
 				}
 			}
 		} else {
-			c.args = append(c.args, args[c.cursor])
+			arg, _ := c.processURLIndicatorPrefix(args[c.cursor])
+			c.args = append(c.args, arg)
 		}
 		c.cursor++
 	}
 	return nil
+}
+
+func (c *flagContext) processURLIndicatorPrefix(flagval string) (retval string, err error) {
+	// if unable to process URI prefix, return the original flag
+	retval = flagval
+	if strings.HasPrefix(flagval, URLIndicatorPrefix) {
+		if flagbytes, err := ioutil.ReadFile(strings.Trim(flagval, URLIndicatorPrefix)); err == nil {
+			retval = string(flagbytes[:])
+		}
+	}
+	return
 }
 
 func (c *flagContext) getFlagValue(args []string) (string, error) {
@@ -136,7 +151,7 @@ func (c *flagContext) getFlagValue(args []string) (string, error) {
 	}
 
 	c.cursor++
-	return args[c.cursor], nil
+	return c.processURLIndicatorPrefix(args[c.cursor])
 }
 
 func (c *flagContext) getBoolFlagValue(args []string) bool {
