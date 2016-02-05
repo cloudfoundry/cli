@@ -104,7 +104,10 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 				cmd.ui.Failed(err.Error())
 			}
 		} else {
-			credentialsMap = cmd.mapValuesFromPrompt(credentials, credentialsMap)
+			for _, param := range strings.Split(credentials, ",") {
+				param = strings.Trim(param, " ")
+				credentialsMap[param] = cmd.ui.Ask("%s", param)
+			}
 		}
 	}
 
@@ -123,12 +126,4 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 	}
 
 	cmd.ui.Ok()
-}
-
-func (cmd CreateUserProvidedService) mapValuesFromPrompt(credentials string, credentialsMap map[string]interface{}) map[string]interface{} {
-	for _, param := range strings.Split(credentials, ",") {
-		param = strings.Trim(param, " ")
-		credentialsMap[param] = cmd.ui.Ask("%s", param)
-	}
-	return credentialsMap
 }
