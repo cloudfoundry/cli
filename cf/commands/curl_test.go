@@ -154,6 +154,18 @@ var _ = Describe("curl command", func() {
 			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
+		It("sets the request body when the -d flag is given with an @-prefixed file", func() {
+			tempfile, err := ioutil.TempFile("", "get-data-test")
+			Expect(err).NotTo(HaveOccurred())
+			jsonData := `{"some":"json"}`
+			ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+
+			runCurlWithInputs([]string{"-d", "@" + tempfile.Name(), "/foo"})
+
+			Expect(curlRepo.Body).To(Equal(`{"some":"json"}`))
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		})
+
 		It("prints verbose output given the -v flag", func() {
 			output := bytes.NewBuffer(make([]byte, 1024))
 			trace.SetStdout(output)

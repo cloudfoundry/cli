@@ -93,7 +93,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 	credentialsMap := make(map[string]interface{})
 
 	if c.IsSet("p") {
-		jsonBytes, err := util.GetJSONFromFlagValue(credentials)
+		jsonBytes, err := util.GetContentsFromFlagValue(credentials)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		} else {

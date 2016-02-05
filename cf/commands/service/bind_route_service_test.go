@@ -386,7 +386,7 @@ var _ = Describe("BindRouteService", func() {
 				Context("when given parameters as a file containing JSON", func() {
 					BeforeEach(func() {
 						flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-						tempfile, err := ioutil.TempFile("", "get-json-test")
+						tempfile, err := ioutil.TempFile("", "get-data-test")
 						Expect(err).NotTo(HaveOccurred())
 						jsonData := `{"some":"json"}`
 						ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)

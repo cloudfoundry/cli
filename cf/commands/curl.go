@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
 
@@ -36,14 +37,20 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 	fs["v"] = &cliFlags.BoolFlag{ShortName: "v", Usage: T("Enable CF_TRACE output for all requests and responses")}
 	fs["X"] = &cliFlags.StringFlag{ShortName: "X", Value: "GET", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")}
 	fs["H"] = &cliFlags.StringSliceFlag{ShortName: "H", Usage: T("Custom headers to include in the request, flag can be specified multiple times")}
-	fs["d"] = &cliFlags.StringFlag{ShortName: "d", Usage: T("HTTP data to include in the request body")}
+	fs["d"] = &cliFlags.StringFlag{ShortName: "d", Usage: T("HTTP data to include in the request body, or '@' followed by a file name to read the data from")}
 	fs["output"] = &cliFlags.StringFlag{Name: "output", Usage: T("Write curl body to FILE instead of stdout")}
 
 	return command_registry.CommandMetadata{
 		Name:        "curl",
 		Description: T("Executes a raw request, content-type set to application/json by default"),
-		Usage:       T("CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]") + "\n   " + T("For API documentation, please visit http://apidocs.cloudfoundry.org"),
-		Flags:       fs,
+		Usage: T(`CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]
+
+EXAMPLES:
+   cf curl "/v2/apps" -d 'q=name:myapp'
+   cf curl "/v2/apps" -d @/path/to/file
+
+   For API documentation, please visit http://apidocs.cloudfoundry.org`),
+		Flags: fs,
 	}
 }
 
@@ -69,7 +76,14 @@ func (cmd *Curl) Execute(c flags.FlagContext) {
 	path := c.Args()[0]
 	method := c.String("X")
 	headers := c.StringSlice("H")
-	body := c.String("d")
+	var body string
+	if c.IsSet("d") {
+		jsonBytes, err := util.GetContentsFromFlagValue(c.String("d"))
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+		body = string(jsonBytes)
+	}
 	verbose := c.Bool("v")
 
 	reqHeader := strings.Join(headers, "\n")
