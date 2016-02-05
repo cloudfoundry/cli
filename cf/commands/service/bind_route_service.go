@@ -6,16 +6,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
 )
-
-type RouteServiceBinder interface {
-	BindRoute(route models.Route, serviceInstance models.ServiceInstance) error
-}
 
 type BindRouteService struct {
 	ui                      terminal.UI
@@ -117,7 +112,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err = cmd.BindRoute(route, serviceInstance)
+	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided())
 	if err != nil {
 		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.ROUTE_ALREADY_BOUND_TO_SAME_SERVICE {
 			cmd.ui.Warn(T("Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
@@ -131,8 +126,4 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 	}
 
 	cmd.ui.Ok()
-}
-
-func (cmd *BindRouteService) BindRoute(route models.Route, serviceInstance models.ServiceInstance) error {
-	return cmd.routeServiceBindingRepo.Bind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided())
 }
