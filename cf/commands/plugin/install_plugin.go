@@ -40,22 +40,23 @@ func init() {
 
 func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("repo name where the plugin binary is located")}
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force install of plugin without prompt")}
+	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("Name of a registered repository where the specified plugin is located")}
+	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force install of plugin without confirmation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "install-plugin",
-		Description: T("Install the plugin defined in command argument"),
-		Usage: T(`CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]
+		Description: T("Install CLI plugin"),
+		Usage: T(`CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)
 
-The command will download the plugin binary from repository if '-r' is provided
-Prompts for confirmation unless '-f' is provided
+   If no local path is specified the plugin binary will be downloaded from the URL, or
+   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.
 
-EXAMPLE:
-   cf install-plugin https://github.com/cf-experimental/plugin-foobar
+   Prompts for confirmation unless '-f' is provided.
+
+EXAMPLES:
    cf install-plugin ~/Downloads/plugin-foobar
-   cf install-plugin plugin-echo -r My-Repo 
-`),
+   cf install-plugin https://github.com/cf-experimental/plugin-foobar
+   cf install-plugin -r My-Repo plugin-echo`),
 		Flags:     fs,
 		TotalArgs: 1,
 	}
