@@ -728,12 +728,8 @@
     "translation": "CF_NAME help [COMMANDE]"
   },
   {
-    "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n\t If no local path is specified the plugin binary will be downloaded from the URL,\n\t or from the named plugin repository (registered using 'cf add-plugin-repo')\n\t if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
-    "translation": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n\t If no local path is specified the plugin binary will be downloaded from the URL,\n\t or from the named plugin repository (registered using 'cf add-plugin-repo')\n\t if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
-  },
-  {
     "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n   If no local path is specified the plugin binary will be downloaded from the URL, or\n   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
-    "translation": ""
+    "translation": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n   If no local path is specified the plugin binary will be downloaded from the URL, or\n   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
   },
   {
     "id": "CF_NAME list-plugin-repos",
@@ -824,8 +820,8 @@
     "translation": "CF_NAME rename-space ESPACE NOUVEL_ESPACE "
   },
   {
-    "id": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins [-r REPO_NAME]\n",
-    "translation": "CF_NAME repo-plugins\n\nEXEMPLE :\n   cf repo-plugins [-r NOM_REFERENTIEL]\n"
+    "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
+    "translation": ""
   },
   {
     "id": "CF_NAME restage APP_NAME",
@@ -2640,8 +2636,8 @@
     "translation": "Répertorier toutes les applications dans l'espace cible"
   },
   {
-    "id": "List all available plugins in all added repositories",
-    "translation": "Répertorier tous les plug-in disponibles dans tous les référentiels ajoutés "
+    "id": "List all available plugins in specified repository or in all added repositories",
+    "translation": ""
   },
   {
     "id": "List all buildpacks",
@@ -2830,6 +2826,10 @@
   {
     "id": "Name",
     "translation": "Nom"
+  },
+  {
+    "id": "Name of a registered repository",
+    "translation": ""
   },
   {
     "id": "Name of a registered repository where the specified plugin is located",
@@ -3382,10 +3382,6 @@
   {
     "id": "Repo Name",
     "translation": "Nom du référentiel "
-  },
-  {
-    "id": "Repo Name - List plugins from just this repository",
-    "translation": "Nom du référentiel - Répertorier les plug-in de ce référentiel seulement "
   },
   {
     "id": "Repository: ",

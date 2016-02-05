@@ -29,16 +29,15 @@ func init() {
 
 func (cmd *RepoPlugins) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("Repo Name - List plugins from just this repository")}
+	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("Name of a registered repository")}
 
 	return command_registry.CommandMetadata{
 		Name:        T("repo-plugins"),
-		Description: T("List all available plugins in all added repositories"),
-		Usage: T(`CF_NAME repo-plugins
+		Description: T("List all available plugins in specified repository or in all added repositories"),
+		Usage: T(`CF_NAME repo-plugins [-r REPO_NAME]
 
 EXAMPLE:
-   cf repo-plugins [-r REPO_NAME]
-`),
+   cf repo-plugins -r PrivateRepo`),
 		Flags: fs,
 	}
 }

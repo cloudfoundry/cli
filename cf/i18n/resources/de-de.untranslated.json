@@ -1,6 +1,14 @@
 [
   {
-    "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n   If no local path is specified the plugin binary will be downloaded from the URL, or\n   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
-    "translation": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n   If no local path is specified the plugin binary will be downloaded from the URL, or\n   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
+    "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
+    "translation": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo"
+  },
+  {
+    "id": "List all available plugins in specified repository or in all added repositories",
+    "translation": "List all available plugins in specified repository or in all added repositories"
+  },
+  {
+    "id": "Name of a registered repository",
+    "translation": "Name of a registered repository"
   }
 ]
