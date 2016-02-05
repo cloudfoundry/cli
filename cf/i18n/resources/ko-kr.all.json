@@ -728,8 +728,12 @@
     "translation": "CF_NAME help [COMMAND]"
   },
   {
-    "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nThe command will download the plugin binary from repository if '-r' is provided\nPrompts for confirmation unless '-f' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
-    "translation": "CF_NAME install-plugin URL 또는 LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\n이 명령은 '-r'이 제공된 경우 저장소에서 플러그인 2진을 다운로드합니다.\n'-f'가 제공되지 않은 경우에는 확인을 요청하는 프롬프트를 표시합니다.\n\n예:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n"
+    "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n\t If no local path is specified the plugin binary will be downloaded from the URL,\n\t or from the named plugin repository (registered using 'cf add-plugin-repo')\n\t if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
+    "translation": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n\t If no local path is specified the plugin binary will be downloaded from the URL,\n\t or from the named plugin repository (registered using 'cf add-plugin-repo')\n\t if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
+  },
+  {
+    "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n   If no local path is specified the plugin binary will be downloaded from the URL, or\n   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
+    "translation": ""
   },
   {
     "id": "CF_NAME list-plugin-repos",
@@ -2048,8 +2052,8 @@
     "translation": "확인 없이 삭제 강제 실행"
   },
   {
-    "id": "Force install of plugin without prompt",
-    "translation": "프롬프트를 표시하지 않고 플러그인 설치 강제 실행"
+    "id": "Force install of plugin without confirmation",
+    "translation": "Force install of plugin without confirmation"
   },
   {
     "id": "Force migration without confirmation",
@@ -2516,8 +2520,8 @@
     "translation": "올바르지 않은 JSON 형식: 파일: {{.JSONFile}}\n\t\t\n올바른 JSON 파일 예:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
-    "id": "Install the plugin defined in command argument",
-    "translation": "명령 인수에 정의된 플러그인 설치"
+    "id": "Install CLI plugin",
+    "translation": "Install CLI plugin"
   },
   {
     "id": "Installing plugin {{.PluginPath}}...",
@@ -2826,6 +2830,10 @@
   {
     "id": "Name",
     "translation": "이름"
+  },
+  {
+    "id": "Name of a registered repository where the specified plugin is located",
+    "translation": "Name of a registered repository where the specified plugin is located"
   },
   {
     "id": "New Password",
@@ -4662,10 +4670,6 @@
   {
     "id": "quota:",
     "translation": "할당량:"
-  },
-  {
-    "id": "repo name where the plugin binary is located",
-    "translation": "플러그인 2진이 있는 저장소 이름"
   },
   {
     "id": "repo-plugins",

@@ -728,8 +728,12 @@
     "translation": "CF_NAME help [COMMAND]"
   },
   {
-    "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nThe command will download the plugin binary from repository if '-r' is provided\nPrompts for confirmation unless '-f' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
-    "translation": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nMit dem Befehl wird die Plug-in-Binärdatei aus dem Repository heruntergeladen, wenn '-r' zur Verfügung gestellt wurde.\nEine Bestätigung wird abgefragt, wenn '-f' nicht angegeben wurde.\n\nBEISPIEL:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n"
+    "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n\t If no local path is specified the plugin binary will be downloaded from the URL,\n\t or from the named plugin repository (registered using 'cf add-plugin-repo')\n\t if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
+    "translation": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n\t If no local path is specified the plugin binary will be downloaded from the URL,\n\t or from the named plugin repository (registered using 'cf add-plugin-repo')\n\t if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
+  },
+  {
+    "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n   If no local path is specified the plugin binary will be downloaded from the URL, or\n   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
+    "translation": ""
   },
   {
     "id": "CF_NAME list-plugin-repos",
@@ -2048,8 +2052,8 @@
     "translation": "Löschen ohne Bestätigung erzwingen"
   },
   {
-    "id": "Force install of plugin without prompt",
-    "translation": "Installieren des Plug-ins ohne Eingabeaufforderung erzwingen"
+    "id": "Force install of plugin without confirmation",
+    "translation": "Force install of plugin without confirmation"
   },
   {
     "id": "Force migration without confirmation",
@@ -2516,8 +2520,8 @@
     "translation": "Falsches JSON-Format: Datei: {{.JSONFile}}\n\t\t\nBeispiel für gültige JSON-Datei:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
-    "id": "Install the plugin defined in command argument",
-    "translation": "Im Befehlsargument definiertes Plug-in installieren"
+    "id": "Install CLI plugin",
+    "translation": "Install CLI plugin"
   },
   {
     "id": "Installing plugin {{.PluginPath}}...",
@@ -2826,6 +2830,10 @@
   {
     "id": "Name",
     "translation": "Name"
+  },
+  {
+    "id": "Name of a registered repository where the specified plugin is located",
+    "translation": "Name of a registered repository where the specified plugin is located"
   },
   {
     "id": "New Password",
@@ -4662,10 +4670,6 @@
   {
     "id": "quota:",
     "translation": "Größenbeschränkung:"
-  },
-  {
-    "id": "repo name where the plugin binary is located",
-    "translation": "Repositoryname, bei dem die Plug-in-Binärdatei lokalisiert wird"
   },
   {
     "id": "repo-plugins",

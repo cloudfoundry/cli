@@ -728,8 +728,12 @@
     "translation": "CF_NAME help [COMMAND]"
   },
   {
-    "id": "CF_NAME install-plugin URL or LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nThe command will download the plugin binary from repository if '-r' is provided\nPrompts for confirmation unless '-f' is provided\n\nEXAMPLE:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n",
-    "translation": "CF_NAME install-plugin URL o LOCAL-PATH/TO/PLUGIN [-r REPO_NAME] [-f]\n\nIl comando scaricherà il binario del plugin dal repository se viene fornito '-r'\nRichiede la conferma a meno che non venga fornito '-f'\n\nESEMPIO:\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin plugin-echo -r My-Repo \n"
+    "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n\t If no local path is specified the plugin binary will be downloaded from the URL,\n\t or from the named plugin repository (registered using 'cf add-plugin-repo')\n\t if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
+    "translation": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n\t If no local path is specified the plugin binary will be downloaded from the URL,\n\t or from the named plugin repository (registered using 'cf add-plugin-repo')\n\t if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
+  },
+  {
+    "id": "CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)\n\n   If no local path is specified the plugin binary will be downloaded from the URL, or\n   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
+    "translation": ""
   },
   {
     "id": "CF_NAME list-plugin-repos",
@@ -2048,8 +2052,8 @@
     "translation": "Forza eliminazione senza conferma"
   },
   {
-    "id": "Force install of plugin without prompt",
-    "translation": "Forza installazione del plug-in senza chiedere conferma"
+    "id": "Force install of plugin without confirmation",
+    "translation": "Force install of plugin without confirmation"
   },
   {
     "id": "Force migration without confirmation",
@@ -2516,8 +2520,8 @@
     "translation": "Formato json non corretto: file: {{.JSONFile}}\n\t\t\nEsempio di file json valido:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
-    "id": "Install the plugin defined in command argument",
-    "translation": "Installa il plug-in definito nell'argomento del comando"
+    "id": "Install CLI plugin",
+    "translation": "Install CLI plugin"
   },
   {
     "id": "Installing plugin {{.PluginPath}}...",
@@ -2826,6 +2830,10 @@
   {
     "id": "Name",
     "translation": "Nome"
+  },
+  {
+    "id": "Name of a registered repository where the specified plugin is located",
+    "translation": "Name of a registered repository where the specified plugin is located"
   },
   {
     "id": "New Password",
@@ -4662,10 +4670,6 @@
   {
     "id": "quota:",
     "translation": "quota:"
-  },
-  {
-    "id": "repo name where the plugin binary is located",
-    "translation": "nome del repository in cui si trova il binario del plug-in"
   },
   {
     "id": "repo-plugins",
