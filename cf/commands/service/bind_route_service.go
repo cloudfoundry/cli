@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -27,17 +29,30 @@ func init() {
 
 func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to bind")}
 	fs["force"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force binding without confirmation")}
+	fs["hostname"] = &cliFlags.StringFlag{
+		Name:      "hostname",
+		ShortName: "n",
+		Usage:     T("Hostname used in combination with DOMAIN to specify the route to bind"),
+	}
+	fs["parameters"] = &cliFlags.StringFlag{
+		ShortName: "c",
+		Usage:     T("Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."),
+	}
 
 	return command_registry.CommandMetadata{
 		Name:        "bind-route-service",
 		ShortName:   "brs",
 		Description: T("Bind a service instance to a route"),
-		Usage: T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]
+		Usage: T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]
 
-EXAMPLE:
-   CF_NAME bind-route-service example.com myratelimiter --hostname myapp`),
+EXAMPLES:
+   CF_NAME bind-route-service example.com myratelimiter --hostname myapp
+   CF_NAME bind-route-service example.com myratelimiter -c file.json
+   CF_NAME bind-route-service example.com myratelimiter -c '{"valid":"json"}'
+
+   In Windows PowerShell use double-quoted, escaped JSON: "{\"valid\":\"json\"}"
+   In Windows Command Line use single-quoted, escaped JSON: '{\"valid\":\"json\"}'`),
 		Flags: fs,
 	}
 }
@@ -72,6 +87,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 	host := c.String("hostname")
 	domain := cmd.domainReq.GetDomain()
 	path := "" // path is not currently supported
+	parameters := strings.Trim(c.String("parameters"), `"'`)
 
 	route, err := cmd.routeRepo.Find(host, domain, path)
 	if err != nil {
@@ -112,7 +128,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided())
+	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided(), parameters)
 	if err != nil {
 		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.ROUTE_ALREADY_BOUND_TO_SAME_SERVICE {
 			cmd.ui.Warn(T("Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",

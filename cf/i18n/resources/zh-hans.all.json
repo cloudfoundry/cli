@@ -516,7 +516,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]\n\nEXAMPLE:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp",
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\nEXAMPLES:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
     "translation": ""
   },
   {
@@ -4290,6 +4290,10 @@
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
     "translation": "包含特定于服务的配置参数的有效 JSON 对象，以直接插入方式提供或在文件中提供。有关受支持配置参数的列表，请参阅特定服务产品的文档。"
+  },
+  {
+    "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
+    "translation": ""
   },
   {
     "id": "Value for flag 'app-instance-index' cannot be negative",

@@ -342,6 +342,7 @@ var _ = Describe("BindRouteService", func() {
 			Context("when the service instance is user-provided", func() {
 				BeforeEach(func() {
 					serviceInstance := models.ServiceInstance{}
+					serviceInstance.Guid = "service-instance-guid"
 					serviceInstance.ServicePlan = models.ServicePlanFields{
 						Guid: "",
 					}
@@ -358,6 +359,26 @@ var _ = Describe("BindRouteService", func() {
 				It("tries to bind the route service", func() {
 					cmd.Execute(flagContext)
 					Expect(routeServiceBindingRepo.BindCallCount()).To(Equal(1))
+					serviceInstanceGUID, routeGUID, isUserProvided, parameters := routeServiceBindingRepo.BindArgsForCall(0)
+					Expect(serviceInstanceGUID).To(Equal("service-instance-guid"))
+					Expect(routeGUID).To(Equal("route-guid"))
+					Expect(isUserProvided).To(BeTrue())
+					Expect(parameters).To(Equal(""))
+				})
+
+				Context("when given parameters", func() {
+					BeforeEach(func() {
+						flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+						err := flagContext.Parse("domain-name", "service-instance", "-c", `"{"some":"json"}"`)
+						Expect(err).NotTo(HaveOccurred())
+					})
+
+					It("tries to find the route with the given parameters", func() {
+						cmd.Execute(flagContext)
+						Expect(routeRepo.FindCallCount()).To(Equal(1))
+						_, _, _, parameters := routeServiceBindingRepo.BindArgsForCall(0)
+						Expect(parameters).To(Equal(`{"some":"json"}`))
+					})
 				})
 
 				Context("when binding the route service succeeds", func() {

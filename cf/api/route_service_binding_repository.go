@@ -10,7 +10,7 @@ import (
 
 //go:generate counterfeiter -o fakes/fake_route_service_binding_repository.go . RouteServiceBindingRepository
 type RouteServiceBindingRepository interface {
-	Bind(instanceGuid, routeGuid string, userProvided bool) error
+	Bind(instanceGuid, routeGuid string, userProvided bool, parameters string) error
 	Unbind(instanceGuid, routeGuid string, userProvided bool) error
 }
 
@@ -26,9 +26,14 @@ func NewCloudControllerRouteServiceBindingRepository(config core_config.Reader, 
 	}
 }
 
-func (repo CloudControllerRouteServiceBindingRepository) Bind(instanceGuid, routeGuid string, userProvided bool) error {
+func (repo CloudControllerRouteServiceBindingRepository) Bind(
+	instanceGuid string,
+	routeGuid string,
+	userProvided bool,
+	parameters string,
+) error {
 	path := getPath(instanceGuid, routeGuid, userProvided)
-	return repo.gateway.UpdateResourceSync(repo.config.ApiEndpoint(), path, strings.NewReader(""))
+	return repo.gateway.UpdateResourceSync(repo.config.ApiEndpoint(), path, strings.NewReader(parameters))
 }
 
 func (repo CloudControllerRouteServiceBindingRepository) Unbind(instanceGuid, routeGuid string, userProvided bool) error {
