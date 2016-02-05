@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
 	"strings"
 
@@ -94,12 +95,19 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 
 	if c.IsSet("p") {
 		jsonBytes, err := util.GetContentsFromFlagValue(credentials)
-		if err != nil {
+		if err != nil && strings.HasPrefix(credentials, "@") {
 			cmd.ui.Failed(err.Error())
-		} else {
+		}
+
+		if bytes.IndexAny(jsonBytes, "[{") != -1 {
 			err = json.Unmarshal(jsonBytes, &credentialsMap)
 			if err != nil {
 				cmd.ui.Failed(T("JSON is invalid: {{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err.Error()}))
+			}
+		} else {
+			for _, param := range strings.Split(credentials, ",") {
+				param = strings.Trim(param, " ")
+				credentialsMap[param] = cmd.ui.Ask("%s", param)
 			}
 		}
 	}
