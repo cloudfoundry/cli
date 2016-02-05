@@ -115,6 +115,25 @@ var _ = Describe("update-user-provided-service test", func() {
 			})
 		})
 
+		It("accepts service parameters interactively", func() {
+			ui.Inputs = []string{"foo value", "bar value", "baz value"}
+			runCommand("-p", "foo, bar, baz", "my-custom-service")
+
+			Expect(ui.Prompts).To(ContainSubstrings(
+				[]string{"foo"},
+				[]string{"bar"},
+				[]string{"baz"},
+			))
+
+			Expect(serviceRepo.UpdateCallCount()).To(Equal(1))
+			serviceInstanceFields := serviceRepo.UpdateArgsForCall(0)
+			Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{
+				"foo": "foo value",
+				"bar": "bar value",
+				"baz": "baz value",
+			}))
+		})
+
 		It("accepts service parameters as a file containing JSON without prompting", func() {
 			tempfile, err := ioutil.TempFile("", "update-user-provided-service-test")
 			Expect(err).NotTo(HaveOccurred())
