@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func GetJSONFromFlagValue(input string) ([]byte, error) {
+func GetContentsFromFlagValue(input string) ([]byte, error) {
 	if len(input) == 0 {
 		return []byte{}, fmt.Errorf("invalid input: %s", input)
 	}
@@ -14,21 +14,18 @@ func GetJSONFromFlagValue(input string) ([]byte, error) {
 	trimmedInput := strings.Trim(input, `"'`)
 	if strings.HasPrefix(trimmedInput, `@`) {
 		trimmedInput = strings.Trim(trimmedInput[1:], `"'`)
-		jsonBytes, err := ioutil.ReadFile(trimmedInput)
+		bs, err := ioutil.ReadFile(trimmedInput)
 		if err != nil {
 			return []byte{}, err
 		}
 
-		return jsonBytes, nil
+		return bs, nil
 	}
 
-	jsonBytes, err := ioutil.ReadFile(trimmedInput)
+	bs, err := ioutil.ReadFile(trimmedInput)
 	if err != nil {
-		if strings.ContainsAny(trimmedInput, "[{") {
-			return []byte(trimmedInput), nil
-		}
-		return []byte{}, err
+		return []byte(trimmedInput), nil
 	}
 
-	return jsonBytes, nil
+	return bs, nil
 }

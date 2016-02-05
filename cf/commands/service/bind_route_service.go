@@ -89,7 +89,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 	var parameters string
 
 	if c.IsSet("parameters") {
-		jsonBytes, err := util.GetJSONFromFlagValue(c.String("parameters"))
+		jsonBytes, err := util.GetContentsFromFlagValue(c.String("parameters"))
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}

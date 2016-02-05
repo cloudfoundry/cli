@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
 	"strings"
 
@@ -92,17 +93,18 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 	credentialsMap := make(map[string]interface{})
 
 	if c.IsSet("p") {
-		jsonBytes, err := util.GetJSONFromFlagValue(credentials)
-		if err != nil {
-			if strings.HasPrefix(credentials, "@") {
-				cmd.ui.Failed(err.Error())
-			}
-			credentialsMap = cmd.mapValuesFromPrompt(credentials, credentialsMap)
-		} else {
+		jsonBytes, err := util.GetContentsFromFlagValue(credentials)
+		if err != nil && strings.HasPrefix(credentials, "@") {
+			cmd.ui.Failed(err.Error())
+		}
+
+		if bytes.IndexAny(jsonBytes, "[{") != -1 {
 			err = json.Unmarshal(jsonBytes, &credentialsMap)
 			if err != nil {
 				cmd.ui.Failed(err.Error())
 			}
+		} else {
+			credentialsMap = cmd.mapValuesFromPrompt(credentials, credentialsMap)
 		}
 	}
 
