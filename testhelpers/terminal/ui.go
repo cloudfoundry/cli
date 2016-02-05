@@ -19,7 +19,6 @@ type FakeUI struct {
 	WarnOutputs                []string
 	Prompts                    []string
 	PasswordPrompts            []string
-	InputsChan                 chan string
 	Inputs                     []string
 	FailedWithUsage            bool
 	FailedWithUsageCommandName string
@@ -68,17 +67,13 @@ func (ui *FakeUI) Warn(message string, args ...interface{}) {
 func (ui *FakeUI) Ask(prompt string, args ...interface{}) string {
 	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
 
-	if ui.InputsChan == nil {
-		if len(ui.Inputs) == 0 {
-			panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
-		}
-
-		answer := ui.Inputs[0]
-		ui.Inputs = ui.Inputs[1:]
-		return answer
+	if len(ui.Inputs) == 0 {
+		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
 	}
 
-	return <-ui.InputsChan
+	answer := ui.Inputs[0]
+	ui.Inputs = ui.Inputs[1:]
+	return answer
 }
 
 func (ui *FakeUI) ConfirmDelete(modelType, modelName string) bool {
@@ -104,17 +99,14 @@ func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
 
 func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) string {
 	ui.PasswordPrompts = append(ui.PasswordPrompts, fmt.Sprintf(prompt, args...))
-	if ui.InputsChan == nil {
-		if len(ui.Inputs) == 0 {
-			panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
-		}
 
-		answer := ui.Inputs[0]
-		ui.Inputs = ui.Inputs[1:]
-		return answer
+	if len(ui.Inputs) == 0 {
+		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
 	}
 
-	return <-ui.InputsChan
+	answer := ui.Inputs[0]
+	ui.Inputs = ui.Inputs[1:]
+	return answer
 }
 
 func (ui *FakeUI) Ok() {
