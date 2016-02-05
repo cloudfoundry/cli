@@ -5,7 +5,7 @@ install:
   - go get -v golang.org/x/tools/cmd/vet
   - go get -v github.com/tools/godep
   - go get -v github.com/onsi/ginkgo/ginkgo
-script:  bin/test --compilers=2
+script:  bin/test -nodes=2
 branches:
   only:
   - master
