@@ -1,8 +1,6 @@
 package service
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -10,6 +8,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
 )
@@ -87,7 +86,15 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 	host := c.String("hostname")
 	domain := cmd.domainReq.GetDomain()
 	path := "" // path is not currently supported
-	parameters := strings.Trim(c.String("parameters"), `"'`)
+	var parameters string
+
+	if c.IsSet("parameters") {
+		jsonBytes, err := util.GetJSONFromFlagValue(c.String("parameters"))
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+		parameters = string(jsonBytes)
+	}
 
 	route, err := cmd.routeRepo.Find(host, domain, path)
 	if err != nil {
