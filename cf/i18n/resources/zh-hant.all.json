@@ -2080,10 +2080,6 @@
     "translation": "取得 ssh 用戶端的一次性密碼"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "正在取得 OAuth 記號..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "正在從市場取得所有服務..."
   },

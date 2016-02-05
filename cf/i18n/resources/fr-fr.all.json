@@ -2080,10 +2080,6 @@
     "translation": "Obtenir un mot de passe à utilisation unique pour les clients ssh "
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "Obtention d'un jeton OAuth... "
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "Obtention de tous les services de la place de marché... "
   },

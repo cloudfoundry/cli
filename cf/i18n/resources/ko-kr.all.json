@@ -2080,10 +2080,6 @@
     "translation": "SSH 클라이언트의 일회성 비밀번호 가져오기"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "OAuth 토큰을 가져오는 중..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "마켓플레이스에서 모든 서비스를 가져오는 중.."
   },

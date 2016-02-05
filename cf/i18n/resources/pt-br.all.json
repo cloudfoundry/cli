@@ -2080,10 +2080,6 @@
     "translation": "Obter uma senha descartável para clientes ssh"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "Obtendo token OAuth..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "Obtendo todos os serviços do mercado de trabalho..."
   },
