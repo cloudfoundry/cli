@@ -33,18 +33,17 @@ func (cmd *AddPluginRepo) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "add-plugin-repo",
 		Description: T("Add a new plugin repository"),
-		Usage: T(`CF_NAME add-plugin-repo [REPO_NAME] [URL]
+		Usage: T(`CF_NAME add-plugin-repo REPO_NAME URL
 
 EXAMPLE:
-   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/
-`),
+   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/`),
 		TotalArgs: 2,
 	}
 }
 
 func (cmd *AddPluginRepo) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n") + command_registry.Commands.CommandUsage("add-plugin-repo"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n") + command_registry.Commands.CommandUsage("add-plugin-repo"))
 	}
 
 	return

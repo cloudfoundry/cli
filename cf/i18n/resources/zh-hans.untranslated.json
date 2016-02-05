@@ -1,7 +1,15 @@
 [
   {
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+    "translation": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/"
+  },
+  {
     "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
     "translation": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo"
+  },
+  {
+    "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
+    "translation": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n"
   },
   {
     "id": "List all available plugins in specified repository or in all added repositories",

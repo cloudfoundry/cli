@@ -496,8 +496,8 @@
     "translation": "字节数量必须是带计量单位（例如，M、MB、G 或 GB）的整数"
   },
   {
-    "id": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n",
-    "translation": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\n示例:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n"
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+    "translation": ""
   },
   {
     "id": "CF_NAME allow-space-ssh SPACE_NAME",
@@ -2396,6 +2396,10 @@
     "translation": "用法不正确。需要 ORG_NAME 和 QUOTA 作为参数\n\n"
   },
   {
+    "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
     "translation": "用法不正确。需要 SECURITY_GROUP 和 PATH_TO_JSON_RULES_FILE 作为参数\n\n"
   },
@@ -2454,10 +2458,6 @@
   {
     "id": "Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n",
     "translation": "用法不正确。需要 USERNAME、ORG、SPACE 和 ROLE 作为参数\n\n"
-  },
-  {
-    "id": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
-    "translation": "用法不正确。需要 [REPO_NAME] [URL] 作为参数\n\n"
   },
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
