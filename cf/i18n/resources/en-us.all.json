@@ -820,8 +820,8 @@
     "translation": "CF_NAME rename-space SPACE NEW_SPACE"
   },
   {
-    "id": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins [-r REPO_NAME]\n",
-    "translation": "CF_NAME repo-plugins\n\nEXAMPLE:\n   cf repo-plugins [-r REPO_NAME]\n"
+    "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
+    "translation": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo"
   },
   {
     "id": "CF_NAME restage APP_NAME",
@@ -2636,8 +2636,8 @@
     "translation": "List all apps in the target space"
   },
   {
-    "id": "List all available plugins in all added repositories",
-    "translation": "List all available plugins in all added repositories"
+    "id": "List all available plugins in specified repository or in all added repositories",
+    "translation": "List all available plugins in specified repository or in all added repositories"
   },
   {
     "id": "List all buildpacks",
@@ -2826,6 +2826,10 @@
   {
     "id": "Name",
     "translation": "Name"
+  },
+  {
+    "id": "Name of a registered repository",
+    "translation": "Name of a registered repository"
   },
   {
     "id": "Name of a registered repository where the specified plugin is located",
@@ -3378,10 +3382,6 @@
   {
     "id": "Repo Name",
     "translation": "Repo Name"
-  },
-  {
-    "id": "Repo Name - List plugins from just this repository",
-    "translation": "Repo Name - List plugins from just this repository"
   },
   {
     "id": "Repository: ",
