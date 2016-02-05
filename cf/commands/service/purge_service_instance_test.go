@@ -41,7 +41,6 @@ var _ = Describe("PurgeServiceInstance", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		ui.InputsChan = make(chan string)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		serviceRepo = &fakeapi.FakeServiceRepository{}
 		repoLocator := deps.RepoLocator.SetServiceRepository(serviceRepo)
@@ -137,29 +136,32 @@ var _ = Describe("PurgeServiceInstance", func() {
 			})
 
 			It("warns the user", func() {
-				go cmd.Execute(flagContext)
+				ui.Inputs = []string{"n"}
+				cmd.Execute(flagContext)
 				Eventually(func() []string { return ui.Outputs }).Should(ContainSubstrings(
 					[]string{"WARNING"},
 				))
 			})
 
 			It("asks the user if they would like to proceed", func() {
-				go cmd.Execute(flagContext)
+				ui.Inputs = []string{"n"}
+				cmd.Execute(flagContext)
 				Eventually(func() []string { return ui.Prompts }).Should(ContainSubstrings(
 					[]string{"Really purge service instance service-instance-name from Cloud Foundry?"},
 				))
 			})
 
 			It("purges the service instance when the response is to proceed", func() {
-				go cmd.Execute(flagContext)
-				ui.InputsChan <- "y"
+				ui.Inputs = []string{"y"}
+				cmd.Execute(flagContext)
+
 				Eventually(serviceRepo.PurgeServiceInstanceCallCount()).Should(Equal(1))
 				Expect(serviceRepo.PurgeServiceInstanceArgsForCall(0)).To(Equal(serviceInstance))
 			})
 
 			It("does not purge the service instance when the response is not to proceed", func() {
-				go cmd.Execute(flagContext)
-				ui.InputsChan <- "n"
+				ui.Inputs = []string{"n"}
+				cmd.Execute(flagContext)
 				Consistently(serviceRepo.PurgeServiceInstanceCallCount).Should(BeZero())
 			})
 
