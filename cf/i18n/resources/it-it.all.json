@@ -496,8 +496,8 @@
     "translation": "La quantità di byte deve essere un numero intero con un'unità di misura come M, MB, G o GB"
   },
   {
-    "id": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n",
-    "translation": "CF_NAME add-plugin-repo [REPO_NAME] [URL]\n\nESEMPIO:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/\n"
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+    "translation": ""
   },
   {
     "id": "CF_NAME allow-space-ssh SPACE_NAME",
@@ -2396,6 +2396,10 @@
     "translation": "Utilizzo non corretto. Richiede ORG_NAME, QUOTA come argomenti\n\n"
   },
   {
+    "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
     "translation": "Utilizzo non corretto. Richiede SECURITY_GROUP e PATH_TO_JSON_RULES_FILE come argomenti\n\n"
   },
@@ -2454,10 +2458,6 @@
   {
     "id": "Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n",
     "translation": "Utilizzo non corretto. Richiede USERNAME, ORG, SPACE, ROLE come argomenti\n\n"
-  },
-  {
-    "id": "Incorrect Usage. Requires [REPO_NAME] [URL] as arguments\n\n",
-    "translation": "Utilizzo non corretto. Richiede [REPO_NAME] [URL] come argomenti\n\n"
   },
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
