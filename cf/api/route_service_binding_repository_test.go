@@ -57,7 +57,7 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 					ghttp.RespondWith(http.StatusNoContent, nil),
 				),
 			)
-			err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, false)
+			err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, false, "")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
@@ -69,7 +69,20 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 					ghttp.RespondWith(http.StatusCreated, nil),
 				),
 			)
-			err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, true)
+			err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, true, "")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+		})
+
+		It("creates the service binding with the provided body", func() {
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", fmt.Sprintf("/v2/user_provided_service_instances/%s/routes/%s", serviceInstanceGuid, routeGuid)),
+					ghttp.RespondWith(http.StatusCreated, nil),
+					ghttp.VerifyJSON(`{"some":"json"}`),
+				),
+			)
+			err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, true, `{"some":"json"}`)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
@@ -85,7 +98,7 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 			})
 
 			It("returns an HttpError", func() {
-				err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, false)
+				err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, false, "")
 				Expect(err).To(HaveOccurred())
 				httpErr, ok := err.(errors.HttpError)
 				Expect(ok).To(BeTrue())
