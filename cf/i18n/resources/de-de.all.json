@@ -2080,10 +2080,6 @@
     "translation": "Einmalkennwort für SSH-Clients abrufen"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "Abrufen des OAuth-Tokens..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "Abrufen aller Services vom Marktplatz..."
   },

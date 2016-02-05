@@ -2080,10 +2080,6 @@
     "translation": "为 SSH 客户机获取一次性密码"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "正在获取 OAuth 令牌..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "正在从市场中获取所有服务..."
   },

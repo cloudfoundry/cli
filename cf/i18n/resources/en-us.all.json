@@ -2080,10 +2080,6 @@
     "translation": "Get a one time password for ssh clients"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "Getting OAuth token..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "Getting all services from marketplace..."
   },

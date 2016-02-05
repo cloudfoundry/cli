@@ -71,8 +71,6 @@ var _ = Describe("OauthToken", func() {
 			runCommand()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting OAuth token..."},
-				[]string{"OK"},
 				[]string{"1234567890"},
 			))
 		})

@@ -48,8 +48,6 @@ func (cmd *OAuthToken) SetDependency(deps command_registry.Dependency, pluginCal
 }
 
 func (cmd *OAuthToken) Execute(c flags.FlagContext) {
-	cmd.ui.Say(T("Getting OAuth token..."))
-
 	token, err := cmd.authRepo.RefreshAuthToken()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -58,8 +56,6 @@ func (cmd *OAuthToken) Execute(c flags.FlagContext) {
 	if cmd.pluginCall {
 		cmd.pluginModel.Token = token
 	} else {
-		cmd.ui.Ok()
-		cmd.ui.Say("")
 		cmd.ui.Say(token)
 	}
 }

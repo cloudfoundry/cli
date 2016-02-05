@@ -2080,10 +2080,6 @@
     "translation": "SSH クライアント用のワンタイム・パスワードを取得します"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "OAuth トークンを取得しています..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "マーケットプレイスからすべてのサービスを取得しています..."
   },

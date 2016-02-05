@@ -2080,10 +2080,6 @@
     "translation": "Obtener una contraseña de un solo uso para los clientes de ssh"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "Obteniendo el indicador de OAuth..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "Obteniendo todos los servicios del mercado..."
   },

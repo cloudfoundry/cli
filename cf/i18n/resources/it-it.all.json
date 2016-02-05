@@ -2080,10 +2080,6 @@
     "translation": "Ottieni una password monouso per i client ssh"
   },
   {
-    "id": "Getting OAuth token...",
-    "translation": "Richiamo del token OAuth..."
-  },
-  {
     "id": "Getting all services from marketplace...",
     "translation": "Richiamo di tutti i servizi dal marketplace..."
   },
