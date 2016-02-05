@@ -2,10 +2,10 @@ package service
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
 
@@ -92,24 +92,17 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 	credentialsMap := make(map[string]interface{})
 
 	if c.IsSet("p") {
-		switch {
-		case strings.HasPrefix(credentials, "@"):
-			jsonFileBytes, err := ioutil.ReadFile(credentials[1:])
-			if err != nil {
+		jsonBytes, err := util.GetJSONFromFlagValue(credentials)
+		if err != nil {
+			if strings.HasPrefix(credentials, "@") {
 				cmd.ui.Failed(err.Error())
 			}
-
-			err = json.Unmarshal(jsonFileBytes, &credentialsMap)
-			if err != nil {
-				cmd.ui.Failed(err.Error())
-			}
-		case strings.HasPrefix(credentials, "{"):
-			err := json.Unmarshal([]byte(credentials), &credentialsMap)
-			if err != nil {
-				cmd.ui.Failed(err.Error())
-			}
-		default:
 			credentialsMap = cmd.mapValuesFromPrompt(credentials, credentialsMap)
+		} else {
+			err = json.Unmarshal(jsonBytes, &credentialsMap)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
 		}
 	}
 

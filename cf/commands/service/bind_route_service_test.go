@@ -1,7 +1,9 @@
 package service_test
 
 import (
+	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
@@ -366,10 +368,29 @@ var _ = Describe("BindRouteService", func() {
 					Expect(parameters).To(Equal(""))
 				})
 
-				Context("when given parameters", func() {
+				Context("when given parameters as JSON", func() {
 					BeforeEach(func() {
 						flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 						err := flagContext.Parse("domain-name", "service-instance", "-c", `"{"some":"json"}"`)
+						Expect(err).NotTo(HaveOccurred())
+					})
+
+					It("tries to find the route with the given parameters", func() {
+						cmd.Execute(flagContext)
+						Expect(routeRepo.FindCallCount()).To(Equal(1))
+						_, _, _, parameters := routeServiceBindingRepo.BindArgsForCall(0)
+						Expect(parameters).To(Equal(`{"some":"json"}`))
+					})
+				})
+
+				Context("when given parameters as a file containing JSON", func() {
+					BeforeEach(func() {
+						flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+						tempfile, err := ioutil.TempFile("", "get-json-test")
+						Expect(err).NotTo(HaveOccurred())
+						jsonData := `{"some":"json"}`
+						ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+						err = flagContext.Parse("domain-name", "service-instance", "-c", tempfile.Name())
 						Expect(err).NotTo(HaveOccurred())
 					})
 

@@ -2,10 +2,10 @@ package service
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/flags/flag"
 
@@ -87,25 +87,17 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 	}
 
 	drainUrl := c.String("l")
-	params := strings.Trim(c.String("p"), `'"`)
+	credentials := strings.Trim(c.String("p"), `'"`)
 	routeServiceUrl := c.String("r")
 
-	paramsMap := make(map[string]interface{})
+	credentialsMap := make(map[string]interface{})
 
 	if c.IsSet("p") {
-		switch {
-		case strings.HasPrefix(params, "@"):
-			jsonFileBytes, err := ioutil.ReadFile(params[1:])
-			if err != nil {
-				cmd.ui.Failed(err.Error())
-			}
-
-			err = json.Unmarshal(jsonFileBytes, &paramsMap)
-			if err != nil {
-				cmd.ui.Failed(err.Error())
-			}
-		case strings.HasPrefix(params, "{"):
-			err := json.Unmarshal([]byte(params), &paramsMap)
+		jsonBytes, err := util.GetJSONFromFlagValue(credentials)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		} else {
+			err = json.Unmarshal(jsonBytes, &credentialsMap)
 			if err != nil {
 				cmd.ui.Failed(T("JSON is invalid: {{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err.Error()}))
 			}
@@ -120,7 +112,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	serviceInstance.Params = paramsMap
+	serviceInstance.Params = credentialsMap
 	serviceInstance.SysLogDrainUrl = drainUrl
 	serviceInstance.RouteServiceUrl = routeServiceUrl
 
@@ -136,7 +128,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 			"CFRestageCommand": terminal.CommandColor(cf.Name() + " restage"),
 		}))
 
-	if routeServiceUrl == "" && params == "" && drainUrl == "" {
+	if routeServiceUrl == "" && credentials == "" && drainUrl == "" {
 		cmd.ui.Warn(T("No flags specified. No changes were made."))
 	}
 }
