@@ -792,8 +792,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME remove-plugin-repo [REPO_NAME] [URL]\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n",
-    "translation": "CF_NAME remove-plugin-repo [NOM_REFERENTIEL] [URL]\n\nEXEMPLE :\n   cf remove-plugin-repo RéférentielPrivé\n"
+    "id": "CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n",
+    "translation": ""
   },
   {
     "id": "CF_NAME rename APP_NAME NEW_APP_NAME",
