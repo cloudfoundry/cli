@@ -46,10 +46,7 @@ func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "install-plugin",
 		Description: T("Install CLI plugin"),
-		Usage: T(`CF_NAME install-plugin [-r REPO_NAME] [-f] (LOCAL-PATH/TO/PLUGIN | URL | PLUGIN_NAME)
-
-   If no local path is specified the plugin binary will be downloaded from the URL, or
-   from the named plugin repository (registered using 'cf add-plugin-repo') if '-r' is provided.
+		Usage: T(`CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]
 
    Prompts for confirmation unless '-f' is provided.
 
