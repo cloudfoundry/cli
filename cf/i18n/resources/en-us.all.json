@@ -1928,8 +1928,8 @@
     "translation": "Error: {{.Err}}"
   },
   {
-    "id": "Executes a request to the specified path",
-    "translation": "Executes a request to the specified path"
+    "id": "Executes a request to the targeted API endpoint",
+    "translation": "Executes a request to the targeted API endpoint"
   },
   {
     "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",

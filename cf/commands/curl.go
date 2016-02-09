@@ -42,7 +42,7 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 
 	return command_registry.CommandMetadata{
 		Name:        "curl",
-		Description: T("Executes a request to the specified path"),
+		Description: T("Executes a request to the targeted API endpoint"),
 		Usage: T(`CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]
 
    By default 'CF_NAME curl' will perform a GET to the specified PATH. If data
