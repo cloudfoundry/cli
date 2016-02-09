@@ -35,7 +35,7 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["i"] = &cliFlags.BoolFlag{ShortName: "i", Usage: T("Include response headers in the output")}
 	fs["v"] = &cliFlags.BoolFlag{ShortName: "v", Usage: T("Enable CF_TRACE output for all requests and responses")}
-	fs["X"] = &cliFlags.StringFlag{ShortName: "X", Value: "GET", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")}
+	fs["X"] = &cliFlags.StringFlag{ShortName: "X", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")}
 	fs["H"] = &cliFlags.StringSliceFlag{ShortName: "H", Usage: T("Custom headers to include in the request, flag can be specified multiple times")}
 	fs["d"] = &cliFlags.StringFlag{ShortName: "d", Usage: T("HTTP data to include in the request body, or '@' followed by a file name to read the data from")}
 	fs["output"] = &cliFlags.StringFlag{Name: "output", Usage: T("Write curl body to FILE instead of stdout")}

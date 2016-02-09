@@ -74,7 +74,7 @@ var _ = Describe("curl command", func() {
 			curlRepo.ResponseBody = "response for get"
 			runCurlWithInputs([]string{"/foo"})
 
-			Expect(curlRepo.Method).To(Equal("GET"))
+			Expect(curlRepo.Method).To(Equal(""))
 			Expect(curlRepo.Path).To(Equal("/foo"))
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"response for get"}))
 			Expect(ui.Outputs).ToNot(ContainSubstrings(
