@@ -87,7 +87,7 @@ Models return from APIs
 - [GetApps_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_apps.go#L3)
 - [GetOrgs_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_orgs.go#L3)
 - [GetOrg_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_org.go#L3)
-- [GetSpaces_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_space_users.go#L3)
+- [GetSpaces_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_spaces.go#L3)
 - [GetSpace_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_space.go#L3)
 - [GetOrgUsers_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_org_users.go#L3)
 - [GetSpaceUsers_Model](https://github.com/cloudfoundry/cli/blob/master/plugin/models/get_space_users.go#L3)
