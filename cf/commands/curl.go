@@ -42,14 +42,22 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 
 	return command_registry.CommandMetadata{
 		Name:        "curl",
-		Description: T("Executes a raw request, content-type set to application/json by default"),
+		Description: T("Executes a request to the specified path"),
 		Usage: T(`CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]
 
-EXAMPLES:
-   cf curl "/v2/apps" -d 'q=name:myapp'
-   cf curl "/v2/apps" -d @/path/to/file
+   By default 'CF_NAME curl' will perform a GET to the specified PATH. If data
+   is provided via -d, a POST will be performed instead, and the Content-Type
+   will be set to application/json. You may override headers with -H and the
+   request method with -X.
 
-   For API documentation, please visit http://apidocs.cloudfoundry.org`),
+   For API documentation, please visit http://apidocs.cloudfoundry.org.
+
+EXAMPLES:
+   cf curl "/v2/apps" -X GET \
+                      -H "Content-Type: application/x-www-form-urlencoded" \
+                      -d 'q=name:myapp'
+
+   cf curl "/v2/apps" -d @/path/to/file`),
 		Flags: fs,
 	}
 }
