@@ -560,8 +560,8 @@
     "translation": "Error requesting one time code from server: {{.Error}}"
   },
   {
-    "id": "Executes a request to the specified path",
-    "translation": "Executes a request to the specified path"
+    "id": "Executes a request to the targeted API endpoint",
+    "translation": "Executes a request to the targeted API endpoint"
   },
   {
     "id": "Force binding without confirmation",
