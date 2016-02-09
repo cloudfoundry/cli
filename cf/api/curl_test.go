@@ -16,6 +16,7 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("CloudControllerCurlRepository ", func() {
@@ -154,6 +155,38 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 		})
+	})
+
+	It("uses POST as the default method when a body is provided", func() {
+		ccServer := ghttp.NewServer()
+		ccServer.AppendHandlers(
+			ghttp.VerifyRequest("POST", "/v2/endpoint"),
+		)
+
+		deps := newCurlDependencies()
+		deps.config.SetApiEndpoint(ccServer.URL())
+
+		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+		_, _, err := repo.Request("", "/v2/endpoint", "", "body")
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+	})
+
+	It("uses GET as the default method when a body is not provided", func() {
+		ccServer := ghttp.NewServer()
+		ccServer.AppendHandlers(
+			ghttp.VerifyRequest("GET", "/v2/endpoint"),
+		)
+
+		deps := newCurlDependencies()
+		deps.config.SetApiEndpoint(ccServer.URL())
+
+		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+		_, _, err := repo.Request("", "/v2/endpoint", "", "")
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 	})
 })
 
