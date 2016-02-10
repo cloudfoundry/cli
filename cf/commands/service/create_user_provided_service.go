@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bytes"
 	"encoding/json"
 	"strings"
 
@@ -45,12 +44,12 @@ func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadat
    Pass credential parameters as JSON to create a service non-interactively:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'
 
-   Specify an '@' followed by the path to a file with the parameters:
-   CF_NAME create-user-provided-service SERVICE_INSTANCE -p @PATH_TO_FILE
+   Specify a path to a file containing JSON:
+   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE
 
 EXAMPLE
    CF_NAME create-user-provided-service my-db-mine -p "username, password"
-   CF_NAME create-user-provided-service my-db-mine -p @/path/to/credentials.json
+   CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json
    CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
    CF_NAME create-user-provided-service my-route-service -r https://example.com
 
@@ -94,16 +93,12 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 
 	if c.IsSet("p") {
 		jsonBytes, err := util.GetContentsFromFlagValue(credentials)
-		if err != nil && strings.HasPrefix(credentials, "@") {
+		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
 
-		if bytes.IndexAny(jsonBytes, "[{") != -1 {
-			err = json.Unmarshal(jsonBytes, &credentialsMap)
-			if err != nil {
-				cmd.ui.Failed(err.Error())
-			}
-		} else {
+		err = json.Unmarshal(jsonBytes, &credentialsMap)
+		if err != nil {
 			for _, param := range strings.Split(credentials, ",") {
 				param = strings.Trim(param, " ")
 				credentialsMap[param] = cmd.ui.Ask("%s", param)
