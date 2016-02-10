@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -124,20 +123,12 @@ var _ = Describe("create-user-provided-service command", func() {
 		))
 	})
 
-	It("fails with an error when given bad literal JSON", func() {
-		args := []string{"-p", `'{:bad_json:}'`, "my-custom-service"}
-		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"FAILED"},
-		))
-	})
-
 	It("accepts service parameters as a file containing JSON without prompting", func() {
 		tempfile, err := ioutil.TempFile("", "create-user-provided-service-test")
 		Expect(err).NotTo(HaveOccurred())
 		jsonData := `{"foo": "foo value", "bar": "bar value", "baz": 4}`
 		ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
-		args := []string{"-p", fmt.Sprintf("@%s", tempfile.Name()), "my-custom-service"}
+		args := []string{"-p", tempfile.Name(), "my-custom-service"}
 
 		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
 
@@ -154,27 +145,6 @@ var _ = Describe("create-user-provided-service command", func() {
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating user provided service"},
 			[]string{"OK"},
-		))
-	})
-
-	It("fails with an error when given a file containing bad JSON", func() {
-		tempfile, err := ioutil.TempFile("", "create-user-provided-service-test")
-		Expect(err).NotTo(HaveOccurred())
-		jsonData := `{:bad_json:}`
-		ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
-		args := []string{"-p", fmt.Sprintf("@%s", tempfile.Name()), "my-custom-service"}
-
-		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"FAILED"},
-		))
-	})
-
-	It("fails with an error when given a file that cannot be read", func() {
-		args := []string{"-p", "@nonexistent-file", "my-custom-service"}
-		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"FAILED"},
 		))
 	})
 
