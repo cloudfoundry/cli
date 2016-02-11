@@ -3016,6 +3016,10 @@
     "translation": "ORGS"
   },
   {
+    "id": "Option '--parameters/-c'",
+    "translation": "Option '--parameters/-c'"
+  },
+  {
     "id": "Org",
     "translation": "Org"
   },

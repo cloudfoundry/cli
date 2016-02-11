@@ -648,6 +648,10 @@
     "translation": "OK"
   },
   {
+    "id": "Option '--parameters/-c'",
+    "translation": "Option '--parameters/-c'"
+  },
+  {
     "id": "Password",
     "translation": "Password"
   },

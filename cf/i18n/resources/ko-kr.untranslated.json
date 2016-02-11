@@ -628,6 +628,10 @@
     "translation": "No app files found in '{{.Path}}'"
   },
   {
+    "id": "Option '--parameters/-c'",
+    "translation": "Option '--parameters/-c'"
+  },
+  {
     "id": "Path used to identify the route",
     "translation": "Path used to identify the route"
   },

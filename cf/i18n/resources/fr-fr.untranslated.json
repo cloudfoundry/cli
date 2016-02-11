@@ -268,6 +268,10 @@
     "translation": "OPTIONS"
   },
   {
+    "id": "Option '--parameters/-c'",
+    "translation": "Option '--parameters/-c'"
+  },
+  {
     "id": "Path for the route",
     "translation": "Path for the route"
   },
