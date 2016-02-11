@@ -1,7 +1,10 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -30,10 +33,32 @@ func (repo CloudControllerRouteServiceBindingRepository) Bind(
 	instanceGuid string,
 	routeGuid string,
 	userProvided bool,
-	parameters string,
+	opaque_params string,
 ) error {
-	path := getPath(instanceGuid, routeGuid, userProvided)
-	return repo.gateway.UpdateResourceSync(repo.config.ApiEndpoint(), path, strings.NewReader(parameters))
+	var rs io.ReadSeeker
+	if opaque_params != "" {
+		opaqueJSON := json.RawMessage(opaque_params)
+		s := struct {
+			Parameters *json.RawMessage `json:"parameters"`
+		}{
+			&opaqueJSON,
+		}
+
+		jsonBytes, err := json.Marshal(s)
+		if err != nil {
+			return err
+		}
+
+		rs = bytes.NewReader(jsonBytes)
+	} else {
+		rs = strings.NewReader("")
+	}
+
+	return repo.gateway.UpdateResourceSync(
+		repo.config.ApiEndpoint(),
+		getPath(instanceGuid, routeGuid, userProvided),
+		rs,
+	)
 }
 
 func (repo CloudControllerRouteServiceBindingRepository) Unbind(instanceGuid, routeGuid string, userProvided bool) error {
