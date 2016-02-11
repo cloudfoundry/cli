@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -34,6 +35,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 		flagContext flags.FlagContext
 
 		loginRequirement           requirements.Requirement
+		minAPIVersionRequirement   requirements.Requirement
 		serviceInstanceRequirement *fakerequirements.FakeServiceInstanceRequirement
 	)
 
@@ -57,6 +59,9 @@ var _ = Describe("UpdateUserProvidedService", func() {
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
+
+		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
+		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 
 		serviceInstanceRequirement = &fakerequirements.FakeServiceInstanceRequirement{}
 		factory.NewServiceInstanceRequirementReturns(serviceInstanceRequirement)
@@ -87,6 +92,25 @@ var _ = Describe("UpdateUserProvidedService", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+		})
+
+		Context("when provided the -r flag", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance", "-r", "route-service-url")
+			})
+
+			It("returns a MinAPIVersionRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
+
+				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+				Expect(feature).To(Equal("Option '-r'"))
+				expectedRequiredVersion, err := semver.Make("2.51.0")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(requiredVersion).To(Equal(expectedRequiredVersion))
 			})
 		})
 	})
