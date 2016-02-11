@@ -3,6 +3,7 @@ package service_test
 import (
 	"net/http"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -36,6 +37,7 @@ var _ = Describe("UnbindRouteService", func() {
 		fakeDomain models.DomainFields
 
 		loginRequirement           requirements.Requirement
+		minAPIVersionRequirement   requirements.Requirement
 		domainRequirement          *fakerequirements.FakeDomainRequirement
 		serviceInstanceRequirement *fakerequirements.FakeServiceInstanceRequirement
 	)
@@ -77,6 +79,9 @@ var _ = Describe("UnbindRouteService", func() {
 
 		serviceInstanceRequirement = &fakerequirements.FakeServiceInstanceRequirement{}
 		factory.NewServiceInstanceRequirementReturns(serviceInstanceRequirement)
+
+		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
+		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
 	Describe("Requirements", func() {
@@ -118,6 +123,19 @@ var _ = Describe("UnbindRouteService", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewServiceInstanceRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(serviceInstanceRequirement))
+			})
+
+			It("returns a MinAPIVersionRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
+
+				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+				Expect(feature).To(Equal("unbind-route-service"))
+				expectedRequiredVersion, err := semver.Make("2.51.0")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(requiredVersion).To(Equal(expectedRequiredVersion))
 			})
 		})
 	})
