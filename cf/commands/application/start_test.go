@@ -155,7 +155,7 @@ var _ = Describe("start command", func() {
 		updateCommandDependency(logRepo)
 		cmd := command_registry.Commands.FindCommand("start").(*Start)
 		cmd.StagingTimeout = 100 * time.Millisecond
-		cmd.StartupTimeout = 200 * time.Millisecond
+		cmd.StartupTimeout = 500 * time.Millisecond
 		cmd.PingerThrottle = 50 * time.Millisecond
 		command_registry.Register(cmd)
 		return testcmd.RunCliCommandWithoutDependency("start", args, requirementsFactory)
