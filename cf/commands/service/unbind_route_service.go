@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -58,7 +59,18 @@ func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Fac
 	domainName := fc.Args()[0]
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
+	minAPIVersion, err := semver.Make("2.51.0")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	minAPIVersionRequirement := requirementsFactory.NewMinAPIVersionRequirement(
+		"unbind-route-service",
+		minAPIVersion,
+	)
+
 	return []requirements.Requirement{
+		minAPIVersionRequirement,
 		requirementsFactory.NewLoginRequirement(),
 		cmd.domainReq,
 		cmd.serviceInstanceReq,
