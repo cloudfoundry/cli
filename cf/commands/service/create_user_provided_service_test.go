@@ -1,166 +1,239 @@
 package service_test
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
+
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("create-user-provided-service command", func() {
+var _ = Describe("CreateUserProvidedService", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
-		repo                *testapi.FakeUserProvidedServiceInstanceRepository
-		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
-	)
+		configRepo          core_config.Repository
+		serviceInstanceRepo *testapi.FakeUserProvidedServiceInstanceRepository
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetUserProvidedServiceInstanceRepository(repo)
-		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-user-provided-service").SetDependency(deps, pluginCall))
-	}
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement         requirements.Requirement
+		targetedSpaceRequirement requirements.Requirement
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		config = testconfig.NewRepositoryWithDefaults()
-		repo = &testapi.FakeUserProvidedServiceInstanceRepository{}
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		serviceInstanceRepo = &testapi.FakeUserProvidedServiceInstanceRepository{}
+		repoLocator := deps.RepoLocator.SetUserProvidedServiceInstanceRepository(serviceInstanceRepo)
+
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = &service.CreateUserProvidedService{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{Name: "login-requirement"}
+		factory.NewLoginRequirementReturns(loginRequirement)
+
+		targetedSpaceRequirement = &passingRequirement{Name: "targeted-space-requirement"}
+		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
 	})
 
-	Describe("login requirements", func() {
-		It("fails if the user is not logged in", func() {
-			requirementsFactory.LoginSuccess = false
-			Expect(testcmd.RunCliCommand("create-user-provided-service", []string{"my-service"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+	Describe("Requirements", func() {
+		Context("when not provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance", "extra-arg")
+			})
+
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Incorrect Usage. Requires an argument"},
+				))
+			})
 		})
-		It("fails when a space is not targeted", func() {
-			requirementsFactory.TargetedSpaceSuccess = false
-			Expect(testcmd.RunCliCommand("create-user-provided-service", []string{"my-service"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+
+		Context("when provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance")
+			})
+
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a TargetedSpaceRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
+			})
 		})
 	})
 
-	It("creates a new user provided service given just a name", func() {
-		testcmd.RunCliCommand("create-user-provided-service", []string{"my-custom-service"}, requirementsFactory, updateCommandDependency, false)
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Creating user provided service"},
-			[]string{"OK"},
-		))
-	})
+	Describe("Execute", func() {
+		BeforeEach(func() {
+			err := flagContext.Parse("service-instance")
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
+		})
 
-	It("accepts service parameters interactively", func() {
-		ui.Inputs = []string{"foo value", "bar value", "baz value"}
-		testcmd.RunCliCommand("create-user-provided-service", []string{"-p", `"foo, bar, baz"`, "my-custom-service"}, requirementsFactory, updateCommandDependency, false)
+		It("tells the user it will create the user provided service", func() {
+			cmd.Execute(flagContext)
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Creating user provided service service-instance in org"},
+			))
+		})
 
-		Expect(ui.Prompts).To(ContainSubstrings(
-			[]string{"foo"},
-			[]string{"bar"},
-			[]string{"baz"},
-		))
+		It("tries to create the user provided service instance", func() {
+			cmd.Execute(flagContext)
+			Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
+			name, drainURL, routeServiceURL, credentialsMap := serviceInstanceRepo.CreateArgsForCall(0)
+			Expect(name).To(Equal("service-instance"))
+			Expect(drainURL).To(Equal(""))
+			Expect(routeServiceURL).To(Equal(""))
+			Expect(credentialsMap).To(Equal(map[string]interface{}{}))
+		})
 
-		Expect(repo.CreateCallCount()).To(Equal(1))
-		name, drainUrl, _, params := repo.CreateArgsForCall(0)
-		Expect(name).To(Equal("my-custom-service"))
-		Expect(drainUrl).To(Equal(""))
-		Expect(params["foo"]).To(Equal("foo value"))
-		Expect(params["bar"]).To(Equal("bar value"))
-		Expect(params["baz"]).To(Equal("baz value"))
+		Context("when creating the user provided service instance succeeds", func() {
+			BeforeEach(func() {
+				serviceInstanceRepo.CreateReturns(nil)
+			})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Creating user provided service", "my-custom-service", "my-org", "my-space", "my-user"},
-			[]string{"OK"},
-		))
-	})
+			It("tells the user OK", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"OK"},
+				))
+			})
+		})
 
-	It("accepts service parameters as single-quoted JSON without prompting", func() {
-		args := []string{"-p", `'{"foo": "foo value", "bar": "bar value", "baz": 4}'`, "my-custom-service"}
-		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+		Context("when creating the user provided service instance fails", func() {
+			BeforeEach(func() {
+				serviceInstanceRepo.CreateReturns(errors.New("create-err"))
+			})
 
-		name, _, _, params := repo.CreateArgsForCall(0)
-		Expect(name).To(Equal("my-custom-service"))
+			It("fails with error", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"create-err"},
+				))
+			})
+		})
 
-		Expect(ui.Prompts).To(BeEmpty())
-		Expect(params).To(Equal(map[string]interface{}{
-			"foo": "foo value",
-			"bar": "bar value",
-			"baz": float64(4),
-		}))
+		Context("when the -l flag is passed", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance", "-l", "drain-url")
+			})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Creating user provided service"},
-			[]string{"OK"},
-		))
-	})
+			It("tries to create the user provided service instance with the drain url", func() {
+				cmd.Execute(flagContext)
+				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
+				_, drainURL, _, _ := serviceInstanceRepo.CreateArgsForCall(0)
+				Expect(drainURL).To(Equal("drain-url"))
+			})
+		})
 
-	It("accepts service parameters as double-quoted JSON without prompting", func() {
-		args := []string{"-p", `"{"foo": "foo value", "bar": "bar value", "baz": 4}"`, "my-custom-service"}
-		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+		Context("when the -r flag is passed", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance", "-r", "route-service-url")
+			})
 
-		name, _, _, params := repo.CreateArgsForCall(0)
-		Expect(name).To(Equal("my-custom-service"))
+			It("tries to create the user provided service instance with the route service url", func() {
+				cmd.Execute(flagContext)
+				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
+				_, _, routeServiceURL, _ := serviceInstanceRepo.CreateArgsForCall(0)
+				Expect(routeServiceURL).To(Equal("route-service-url"))
+			})
+		})
 
-		Expect(ui.Prompts).To(BeEmpty())
-		Expect(params).To(Equal(map[string]interface{}{
-			"foo": "foo value",
-			"bar": "bar value",
-			"baz": float64(4),
-		}))
+		Context("when the -p flag is passed with inline JSON", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance", "-p", `"{"some":"json"}"`)
+			})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Creating user provided service"},
-			[]string{"OK"},
-		))
-	})
+			It("tries to create the user provided service instance with the credentials", func() {
+				cmd.Execute(flagContext)
+				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
+				_, _, _, credentialsMap := serviceInstanceRepo.CreateArgsForCall(0)
+				Expect(credentialsMap).To(Equal(map[string]interface{}{
+					"some": "json",
+				}))
+			})
+		})
 
-	It("accepts service parameters as a file containing JSON without prompting", func() {
-		tempfile, err := ioutil.TempFile("", "create-user-provided-service-test")
-		Expect(err).NotTo(HaveOccurred())
-		jsonData := `{"foo": "foo value", "bar": "bar value", "baz": 4}`
-		ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
-		args := []string{"-p", tempfile.Name(), "my-custom-service"}
+		Context("when the -p flag is passed with a file containing JSON", func() {
+			BeforeEach(func() {
+				tempfile, err := ioutil.TempFile("", "create-user-provided-service-test")
+				Expect(err).NotTo(HaveOccurred())
+				jsonData := `{"some":"json"}`
+				ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+				flagContext.Parse("service-instance", "-p", tempfile.Name())
+			})
 
-		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
+			It("tries to create the user provided service instance with the credentials", func() {
+				cmd.Execute(flagContext)
+				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
+				_, _, _, credentialsMap := serviceInstanceRepo.CreateArgsForCall(0)
+				Expect(credentialsMap).To(Equal(map[string]interface{}{
+					"some": "json",
+				}))
+			})
+		})
 
-		name, _, _, params := repo.CreateArgsForCall(0)
-		Expect(name).To(Equal("my-custom-service"))
+		Context("when the -p flag is passed with inline JSON", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance", "-p", `key1,key2`)
+			})
 
-		Expect(ui.Prompts).To(BeEmpty())
-		Expect(params).To(Equal(map[string]interface{}{
-			"foo": "foo value",
-			"bar": "bar value",
-			"baz": float64(4),
-		}))
+			It("prompts the user for the values", func() {
+				ui.Inputs = []string{"value1", "value2"}
+				cmd.Execute(flagContext)
+				Expect(ui.Prompts).To(ContainSubstrings(
+					[]string{"key1"},
+					[]string{"key2"},
+				))
+			})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Creating user provided service"},
-			[]string{"OK"},
-		))
-	})
+			It("tries to create the user provided service instance with the credentials", func() {
+				ui.Inputs = []string{"value1", "value2"}
+				cmd.Execute(flagContext)
 
-	It("calls the create api with the corresponding syslog drain url", func() {
-		args := []string{"-l", "syslog://example.com", "my-custom-service"}
-		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
-
-		_, drainUrl, _, _ := repo.CreateArgsForCall(0)
-		Expect(drainUrl).To(Equal("syslog://example.com"))
-	})
-
-	It("calls the create api with the corresponding route service url", func() {
-		args := []string{"-r", "https://example.com", "my-custom-service"}
-		testcmd.RunCliCommand("create-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
-
-		_, _, routeServiceUrl, _ := repo.CreateArgsForCall(0)
-		Expect(routeServiceUrl).To(Equal("https://example.com"))
+				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
+				_, _, _, credentialsMap := serviceInstanceRepo.CreateArgsForCall(0)
+				Expect(credentialsMap).To(Equal(map[string]interface{}{
+					"key1": "value1",
+					"key2": "value2",
+				}))
+			})
+		})
 	})
 })
