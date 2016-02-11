@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -34,6 +35,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 
 		loginRequirement         requirements.Requirement
 		targetedSpaceRequirement requirements.Requirement
+		minAPIVersionRequirement requirements.Requirement
 	)
 
 	BeforeEach(func() {
@@ -56,6 +58,9 @@ var _ = Describe("CreateUserProvidedService", func() {
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
+
+		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
+		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 
 		targetedSpaceRequirement = &passingRequirement{Name: "targeted-space-requirement"}
 		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
@@ -93,6 +98,25 @@ var _ = Describe("CreateUserProvidedService", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
+			})
+		})
+
+		Context("when provided the -r flag", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance", "-r", "route-service-url")
+			})
+
+			It("returns a MinAPIVersionRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
+
+				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+				Expect(feature).To(Equal("Option '-r'"))
+				expectedRequiredVersion, err := semver.Make("2.51.0")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(requiredVersion).To(Equal(expectedRequiredVersion))
 			})
 		})
 	})
