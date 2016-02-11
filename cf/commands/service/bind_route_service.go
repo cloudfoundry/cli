@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -67,10 +68,21 @@ func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Facto
 	serviceName := fc.Args()[1]
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
+	minAPIVersion, err := semver.Make("2.51.0")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	minAPIVersionRequirement := requirementsFactory.NewMinAPIVersionRequirement(
+		T("Option '--parameters/-c'"),
+		minAPIVersion,
+	)
+
 	return []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.domainReq,
 		cmd.serviceInstanceReq,
+		minAPIVersionRequirement,
 	}, nil
 }
 
