@@ -1,196 +1,249 @@
 package service_test
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
+
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("update-user-provided-service test", func() {
+var _ = Describe("UpdateUserProvidedService", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
-		serviceRepo         *testapi.FakeUserProvidedServiceInstanceRepository
-		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
-	)
+		serviceInstanceRepo *testapi.FakeUserProvidedServiceInstanceRepository
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetUserProvidedServiceInstanceRepository(serviceRepo)
-		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-user-provided-service").SetDependency(deps, pluginCall))
-	}
+		cmd         command_registry.Command
+		deps        command_registry.Dependency
+		factory     *fakerequirements.FakeFactory
+		flagContext flags.FlagContext
+
+		loginRequirement           requirements.Requirement
+		serviceInstanceRequirement *fakerequirements.FakeServiceInstanceRequirement
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		serviceRepo = &testapi.FakeUserProvidedServiceInstanceRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		serviceInstanceRepo = &testapi.FakeUserProvidedServiceInstanceRepository{}
+		repoLocator := deps.RepoLocator.SetUserProvidedServiceInstanceRepository(serviceInstanceRepo)
+
+		deps = command_registry.Dependency{
+			Ui:          ui,
+			Config:      configRepo,
+			RepoLocator: repoLocator,
+		}
+
+		cmd = &service.UpdateUserProvidedService{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+		factory = &fakerequirements.FakeFactory{}
+
+		loginRequirement = &passingRequirement{Name: "login-requirement"}
+		factory.NewLoginRequirementReturns(loginRequirement)
+
+		serviceInstanceRequirement = &fakerequirements.FakeServiceInstanceRequirement{}
+		factory.NewServiceInstanceRequirementReturns(serviceInstanceRequirement)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("update-user-provided-service", args, requirementsFactory, updateCommandDependency, false)
-	}
-
-	Describe("requirements", func() {
-		It("fails with usage when not provided the name of the service to update", func() {
-			requirementsFactory.LoginSuccess = true
-			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "argument"},
-			))
-		})
-
-		It("fails when not logged in", func() {
-			Expect(runCommand("whoops")).To(BeFalse())
-		})
-	})
-
-	Context("when logged in", func() {
-		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "service-name"
-			requirementsFactory.ServiceInstance = serviceInstance
-		})
-
-		Context("when no flags are provided", func() {
-			It("tells the user that no changes occurred", func() {
-				runCommand("service-name")
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
-					[]string{"No changes"},
-				))
-			})
-		})
-
-		It("updates the user provided service specified when given single-quoted JSON", func() {
-			runCommand("-p", `'{"foo":"bar"}'`, "-l", "syslog://example.com", "service-name")
-
-			Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
-			Expect(ui.Prompts).To(BeEmpty())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
-				[]string{"OK"},
-				[]string{"TIP"},
-			))
-
-			Expect(serviceRepo.UpdateArgsForCall(0).Name).To(Equal("service-name"))
-			Expect(serviceRepo.UpdateArgsForCall(0).Params).To(Equal(map[string]interface{}{"foo": "bar"}))
-			Expect(serviceRepo.UpdateArgsForCall(0).SysLogDrainUrl).To(Equal("syslog://example.com"))
-		})
-
-		It("updates the user provided service specified when given double-quoted JSON", func() {
-			runCommand("-p", `"{"foo":"bar"}"`, "-l", "syslog://example.com", "service-name")
-
-			Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
-			Expect(ui.Prompts).To(BeEmpty())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
-				[]string{"OK"},
-				[]string{"TIP"},
-			))
-
-			Expect(serviceRepo.UpdateArgsForCall(0).Name).To(Equal("service-name"))
-			Expect(serviceRepo.UpdateArgsForCall(0).Params).To(Equal(map[string]interface{}{"foo": "bar"}))
-			Expect(serviceRepo.UpdateArgsForCall(0).SysLogDrainUrl).To(Equal("syslog://example.com"))
-		})
-
-		It("accepts service parameters interactively", func() {
-			ui.Inputs = []string{"foo value", "bar value", "baz value"}
-			runCommand("-p", "foo, bar, baz", "my-custom-service")
-
-			Expect(ui.Prompts).To(ContainSubstrings(
-				[]string{"foo"},
-				[]string{"bar"},
-				[]string{"baz"},
-			))
-
-			Expect(serviceRepo.UpdateCallCount()).To(Equal(1))
-			serviceInstanceFields := serviceRepo.UpdateArgsForCall(0)
-			Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{
-				"foo": "foo value",
-				"bar": "bar value",
-				"baz": "baz value",
-			}))
-		})
-
-		It("accepts service parameters as a file containing JSON without prompting", func() {
-			tempfile, err := ioutil.TempFile("", "update-user-provided-service-test")
-			Expect(err).NotTo(HaveOccurred())
-			ioutil.WriteFile(tempfile.Name(), []byte(`{"foo": "bar"}`), os.ModePerm)
-
-			runCommand("-p", tempfile.Name(), "my-custom-service")
-
-			serviceInstanceFields := serviceRepo.UpdateArgsForCall(0)
-			Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
-
-			Expect(ui.Prompts).To(BeEmpty())
-		})
-
-		Context("when user provides a valid Route Service URL with -r flag", func() {
-			It("updates a user provided service with a route service url", func() {
-				runCommand("-p", `'{"foo":"bar"}'`, "-r", "https://example.com", "service-name")
-				Expect(requirementsFactory.ServiceInstanceName).To(Equal("service-name"))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Updating user provided service", "service-name", "my-org", "my-space", "my-user"},
-					[]string{"OK"},
-					[]string{"TIP"},
-				))
-
-				Expect(serviceRepo.UpdateArgsForCall(0).Name).To(Equal("service-name"))
-				Expect(serviceRepo.UpdateArgsForCall(0).Params).To(Equal(map[string]interface{}{"foo": "bar"}))
-				Expect(serviceRepo.UpdateArgsForCall(0).RouteServiceUrl).To(Equal("https://example.com"))
-			})
-		})
-
-		Context("when no flags are passed", func() {
-			It("warns the user that no changes were made", func() {
-				runCommand("service-name")
-
-				Expect(serviceRepo.UpdateCallCount()).To(Equal(1))
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"No flags specified. No changes were made."},
-				))
-			})
-		})
-
-		Context("when the service with the given name is not user provided", func() {
+	Describe("Requirements", func() {
+		Context("when not provided exactly one arg", func() {
 			BeforeEach(func() {
-				plan := models.ServicePlanFields{Guid: "my-plan-guid"}
-				serviceInstance := models.ServiceInstance{}
-				serviceInstance.Name = "found-service-name"
-				serviceInstance.ServicePlan = plan
-
-				requirementsFactory.ServiceInstance = serviceInstance
+				flagContext.Parse("service-instance", "extra-arg")
 			})
 
-			It("fails and tells the user what went wrong", func() {
-				runCommand("-p", `{"foo":"bar"}`, "service-name")
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Incorrect Usage. Requires an argument"},
+				))
+			})
+		})
 
-				Expect(serviceRepo.UpdateCallCount()).To(Equal(0))
+		Context("when provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("service-instance")
+			})
 
+			It("returns a LoginRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+		})
+	})
+
+	Describe("Execute", func() {
+		BeforeEach(func() {
+			err := flagContext.Parse("service-instance")
+			Expect(err).NotTo(HaveOccurred())
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		Context("when the service instance is not user-provided", func() {
+			BeforeEach(func() {
+				serviceInstanceRequirement.GetServiceInstanceReturns(models.ServiceInstance{
+					ServicePlan: models.ServicePlanFields{
+						Guid: "service-plan-guid",
+					},
+				})
+			})
+
+			It("fails with error", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Service Instance is not user provided"},
 				))
+			})
+		})
+
+		Context("when the service instance is user-provided", func() {
+			var serviceInstance models.ServiceInstance
+			BeforeEach(func() {
+				serviceInstance = models.ServiceInstance{
+					ServicePlan: models.ServicePlanFields{
+						Guid:        "",
+						Description: "service-plan-description",
+					},
+				}
+				serviceInstance.Name = "service-instance"
+				serviceInstance.Params = map[string]interface{}{}
+				serviceInstanceRequirement.GetServiceInstanceReturns(serviceInstance)
+			})
+
+			It("tells the user it is updating the user provided service", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating user provided service service-instance in org"},
+				))
+			})
+
+			It("tries to update the service instance", func() {
+				cmd.Execute(flagContext)
+				Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
+				Expect(serviceInstanceRepo.UpdateArgsForCall(0)).To(Equal(serviceInstance.ServiceInstanceFields))
+			})
+
+			It("tells the user no changes were made", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"No flags specified. No changes were made."},
+				))
+			})
+
+			Context("when the -p flag is passed with inline JSON", func() {
+				BeforeEach(func() {
+					flagContext.Parse("service-instance", "-p", `"{"some":"json"}"`)
+				})
+
+				It("tries to update the user provided service instance with the credentials", func() {
+					cmd.Execute(flagContext)
+					Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
+					serviceInstanceFields := serviceInstanceRepo.UpdateArgsForCall(0)
+					Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{
+						"some": "json",
+					}))
+				})
+			})
+
+			Context("when the -p flag is passed with a file containing JSON", func() {
+				BeforeEach(func() {
+					tempfile, err := ioutil.TempFile("", "update-user-provided-service-test")
+					Expect(err).NotTo(HaveOccurred())
+					jsonData := `{"some":"json"}`
+					ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+					flagContext.Parse("service-instance", "-p", tempfile.Name())
+				})
+
+				It("tries to update the user provided service instance with the credentials", func() {
+					cmd.Execute(flagContext)
+					Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
+					serviceInstanceFields := serviceInstanceRepo.UpdateArgsForCall(0)
+					Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{
+						"some": "json",
+					}))
+				})
+			})
+
+			Context("when the -p flag is passed with inline JSON", func() {
+				BeforeEach(func() {
+					flagContext.Parse("service-instance", "-p", `key1,key2`)
+				})
+
+				It("prompts the user for the values", func() {
+					ui.Inputs = []string{"value1", "value2"}
+					cmd.Execute(flagContext)
+					Expect(ui.Prompts).To(ContainSubstrings(
+						[]string{"key1"},
+						[]string{"key2"},
+					))
+				})
+
+				It("tries to update the user provided service instance with the credentials", func() {
+					ui.Inputs = []string{"value1", "value2"}
+					cmd.Execute(flagContext)
+
+					Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
+					serviceInstanceFields := serviceInstanceRepo.UpdateArgsForCall(0)
+					Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{
+						"key1": "value1",
+						"key2": "value2",
+					}))
+				})
+			})
+
+			Context("when updating succeeds", func() {
+				BeforeEach(func() {
+					serviceInstanceRepo.UpdateReturns(nil)
+				})
+
+				It("tells the user OK", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"OK"},
+					))
+				})
+
+				It("prints a tip", func() {
+					cmd.Execute(flagContext)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"TIP"},
+					))
+				})
+			})
+
+			Context("when updating fails", func() {
+				BeforeEach(func() {
+					serviceInstanceRepo.UpdateReturns(errors.New("update-err"))
+				})
+
+				It("fails with error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"update-err"},
+					))
+				})
 			})
 		})
 	})
