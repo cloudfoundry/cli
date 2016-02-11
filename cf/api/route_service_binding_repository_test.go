@@ -74,12 +74,12 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
 
-		It("creates the service binding with the provided body", func() {
+		It("creates the service binding with the provided body wrapped in parameters", func() {
 			ccServer.AppendHandlers(
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("PUT", fmt.Sprintf("/v2/user_provided_service_instances/%s/routes/%s", serviceInstanceGuid, routeGuid)),
 					ghttp.RespondWith(http.StatusCreated, nil),
-					ghttp.VerifyJSON(`{"some":"json"}`),
+					ghttp.VerifyJSON(`{"parameters":{"some":"json"}}`),
 				),
 			)
 			err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, true, `{"some":"json"}`)
