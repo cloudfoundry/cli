@@ -544,6 +544,10 @@
     "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
   {
+    "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
+    "translation": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}..."
+  },
+  {
     "id": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications",
     "translation": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications"
   },

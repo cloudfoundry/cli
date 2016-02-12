@@ -72,15 +72,20 @@ func (cmd *CreateServiceBroker) Execute(c flags.FlagContext) {
 	password := c.Args()[2]
 	url := c.Args()[3]
 
-	cmd.ui.Say(T("Creating service broker {{.Name}} as {{.Username}}...",
-		map[string]interface{}{
-			"Name":     terminal.EntityNameColor(name),
-			"Username": terminal.EntityNameColor(cmd.config.Username())}))
-
 	var err error
 	if c.Bool("space-scoped") {
+		cmd.ui.Say(T("Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
+			map[string]interface{}{
+				"Name":     terminal.EntityNameColor(name),
+				"Org":      terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"Space":    terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"Username": terminal.EntityNameColor(cmd.config.Username())}))
 		err = cmd.serviceBrokerRepo.Create(name, url, username, password, cmd.config.SpaceFields().Guid)
 	} else {
+		cmd.ui.Say(T("Creating service broker {{.Name}} as {{.Username}}...",
+			map[string]interface{}{
+				"Name":     terminal.EntityNameColor(name),
+				"Username": terminal.EntityNameColor(cmd.config.Username())}))
 		err = cmd.serviceBrokerRepo.Create(name, url, username, password, "")
 	}
 
