@@ -1304,6 +1304,10 @@
     "translation": "{{.Username}} としてサービス・ブローカー {{.Name}} を作成しています..."
   },
   {
+    "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}} としてサービス・インスタンス {{.ServiceName}} を組織 {{.OrgName}} / スペース {{.SpaceName}} 内に作成しています..."
   },

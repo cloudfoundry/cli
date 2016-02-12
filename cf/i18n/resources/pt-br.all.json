@@ -1304,6 +1304,10 @@
     "translation": "Criando o broker de serviço {{.Name}} como {{.Username}}..."
   },
   {
+    "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Criando a instância de serviço {{.ServiceName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}..."
   },

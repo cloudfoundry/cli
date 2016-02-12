@@ -1304,6 +1304,10 @@
     "translation": "正在以 {{.Username}} 身份创建服务代理程序 {{.Name}}..."
   },
   {
+    "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身份在组织 {{.OrgName}}/空间 {{.SpaceName}} 中创建服务实例 {{.ServiceName}}..."
   },

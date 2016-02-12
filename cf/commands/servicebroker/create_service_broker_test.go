@@ -154,6 +154,14 @@ var _ = Describe("CreateServiceBroker", func() {
 				Expect(password).To(Equal("password"))
 				Expect(spaceGUID).To(Equal("my-space-guid"))
 			})
+
+			It("tells the user it is creating the service broker in the targeted org and space", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating service broker service-broker in org my-org / space my-space as my-user"},
+					[]string{"OK"},
+				))
+			})
 		})
 
 		Context("when creating the service broker succeeds", func() {
