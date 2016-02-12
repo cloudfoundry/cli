@@ -544,8 +544,8 @@
     "translation": "CF_NAME check-route HOTE DOMAINE "
   },
   {
-    "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false] [--locale (LOCALE | CLEAR)]",
-    "translation": "CF_NAME config [--async-timeout DELAI_ATTENTE_EN_MINUTES] [--trace true | false | chemin/fichier] [--color true | false] [--locale (ENVIRONNEMENT_LOCAL | CLEAR)]"
+    "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]",
+    "translation": ""
   },
   {
     "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
@@ -588,8 +588,8 @@
     "translation": "CF_NAME create-service-broker COURTIER_SERVICES NOM_UTILISATEUR MOT_DE_PASSE URL [--space-scoped]"
   },
   {
-    "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json",
-    "translation": "CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE [-c PARAMETRES_JSON]\n\n  Si vous le souhaitez, fournissez des paramètres de configuration propres au service dans un objet JSON valide en ligne. \n  CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c '{\"nom\":\"valeur\",\"nom\":\"valeur\"}'\n\n  Si vous le souhaitez, fournissez un fichier contenant des paramètres de configuration propres au service dans un objet JSON valide. Le chemin d'accès au fichier de paramètres peut être absolu ou relatif. \n  CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c CHEMIN_FICHIER\n\n   Exemple d'objet JSON valide :\n   {\n     \"permissions\": \"read-only\"\n }\n\nEXEMPLE :\n   CF_NAME create-service-key mabd maclé -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mabd maclé -c ~/workspace/tmp/instance_config.json"
+    "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json",
+    "translation": ""
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -608,7 +608,7 @@
     "translation": "CF_NAME create-user NOM_UTILISATEUR MOT_DE_PASSE "
   },
   {
-    "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\nEXAMPLE\n   CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n   CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME create-user-provided-service my-route-service -r https://example.com\n\n   Linux/Mac:\n   CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n   CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n   CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'",
+    "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\nEXAMPLE:\n   CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n   CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME create-user-provided-service my-route-service -r https://example.com\n\n   Linux/Mac:\n   CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n   CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n   CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'",
     "translation": ""
   },
   {
@@ -672,8 +672,8 @@
     "translation": "CF_NAME delete-space ESPACE [-f]"
   },
   {
-    "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME",
-    "translation": "CF_NAME delete-space-quota NOM_QUOTA_ESPACE"
+    "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]",
+    "translation": ""
   },
   {
     "id": "CF_NAME delete-user USERNAME [-f]",
@@ -1036,7 +1036,7 @@
     "translation": "CF_NAME update-space-quota NOM_QUOTA_ESPACE [-i MEMOIRE_INSTANCE_MAX] [-m MEMOIRE] [-n NOUVEAU_NOM] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
   },
   {
-    "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n  Pass comma separated credential parameter names to enable interactive mode:\n  CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n  Pass credential parameters as JSON to create a service non-interactively:\n  CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com",
+    "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com",
     "translation": ""
   },
   {

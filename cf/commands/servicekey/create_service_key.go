@@ -36,11 +36,11 @@ func (cmd *CreateServiceKey) MetaData() command_registry.CommandMetadata {
 		Description: T("Create key for a service instance"),
 		Usage: T(`CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]
 
-  Optionally provide service-specific configuration parameters in a valid JSON object in-line.
-  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{"name":"value","name":"value"}'
+   Optionally provide service-specific configuration parameters in a valid JSON object in-line.
+   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{"name":"value","name":"value"}'
 
-  Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
-  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE
+   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
+   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE
 
    Example of valid JSON object:
    {
