@@ -41,11 +41,11 @@ func (cmd *UpdateUserProvidedService) MetaData() command_registry.CommandMetadat
 		Description: T("Update user-provided service instance"),
 		Usage: T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
 
-  Pass comma separated credential parameter names to enable interactive mode:
-  CF_NAME update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
+   Pass comma separated credential parameter names to enable interactive mode:
+   CF_NAME update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
 
-  Pass credential parameters as JSON to create a service non-interactively:
-  CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'
+   Pass credential parameters as JSON to create a service non-interactively:
+   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'
 
    Specify a path to a file containing JSON:
    CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE

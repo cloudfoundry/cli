@@ -33,7 +33,7 @@ func (cmd *ConfigCommands) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "config",
 		Description: T("write default values to the config"),
-		Usage:       T("CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace true | false | path/to/file] [--color true | false] [--locale (LOCALE | CLEAR)]"),
+		Usage:       T("CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]"),
 		Flags:       fs,
 	}
 }

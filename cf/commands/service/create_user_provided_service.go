@@ -48,7 +48,7 @@ func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadat
    Specify a path to a file containing JSON:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE
 
-EXAMPLE
+EXAMPLE:
    CF_NAME create-user-provided-service my-db-mine -p "username, password"
    CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json
    CF_NAME create-user-provided-service my-drain-service -l syslog://example.com

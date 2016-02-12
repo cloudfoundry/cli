@@ -33,7 +33,7 @@ func (cmd *ListRoutes) MetaData() command_registry.CommandMetadata {
 		Name:        "routes",
 		ShortName:   "r",
 		Description: T("List all routes in the current space or the current organization"),
-		Usage:       "CF_NAME routes",
+		Usage:       "CF_NAME routes [--orglevel]",
 		Flags:       fs,
 	}
 }
