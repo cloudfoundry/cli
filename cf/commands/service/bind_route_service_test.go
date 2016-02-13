@@ -134,7 +134,7 @@ var _ = Describe("BindRouteService", func() {
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-				Expect(feature).To(Equal("Option '--parameters/-c'"))
+				Expect(feature).To(Equal("bind-route-service"))
 				expectedRequiredVersion, err := semver.Make("2.51.0")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(requiredVersion).To(Equal(expectedRequiredVersion))
