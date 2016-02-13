@@ -2,57 +2,85 @@ package space_quotas_test
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"time"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/onsi/gomega/ghttp"
+
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/api/space_quotas"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("CloudControllerQuotaRepository", func() {
 	var (
-		testServer  *httptest.Server
-		testHandler *testnet.TestHandler
-		configRepo  core_config.ReadWriter
-		repo        CloudControllerSpaceQuotaRepository
+		ccServer   *ghttp.Server
+		configRepo core_config.ReadWriter
+		repo       space_quotas.CloudControllerSpaceQuotaRepository
 	)
 
-	setupTestServer := func(reqs ...testnet.TestRequest) {
-		testServer, testHandler = testnet.NewServer(reqs)
-		configRepo.SetApiEndpoint(testServer.URL)
-	}
-
 	BeforeEach(func() {
+		ccServer = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
+		configRepo.SetApiEndpoint(ccServer.URL())
 		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
-		repo = NewCloudControllerSpaceQuotaRepository(configRepo, gateway)
+		repo = space_quotas.NewCloudControllerSpaceQuotaRepository(configRepo, gateway)
 	})
 
 	AfterEach(func() {
-		testServer.Close()
+		ccServer.Close()
 	})
 
 	Describe("FindByName", func() {
 		BeforeEach(func() {
-			setupTestServer(firstSpaceQuotaRequest, secondSpaceQuotaRequest)
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/space_quota_definitions"),
+					ghttp.RespondWith(http.StatusOK, `{
+						"next_url": "/v2/organizations/my-org-guid/space_quota_definitions?page=2",
+						"resources": [
+							{
+								"metadata": { "guid": "my-quota-guid" },
+								"entity": {
+									"name": "my-remote-quota",
+									"memory_limit": 1024,
+									"total_routes": 123,
+									"total_services": 321,
+									"non_basic_services_allowed": true,
+									"organization_guid": "my-org-guid"
+								}
+							}
+						]
+					}`),
+				),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/space_quota_definitions", "page=2"),
+					ghttp.RespondWith(http.StatusOK, `{
+						"resources": [
+							{
+								"metadata": { "guid": "my-quota-guid2" },
+								"entity": { "name": "my-remote-quota2", "memory_limit": 1024, "organization_guid": "my-org-guid" }
+							},
+							{
+								"metadata": { "guid": "my-quota-guid3" },
+								"entity": { "name": "my-remote-quota3", "memory_limit": 1024, "organization_guid": "my-org-guid" }
+							}
+						]
+				  }`),
+				),
+			)
 		})
 
 		It("Finds Quota definitions by name", func() {
 			quota, err := repo.FindByName("my-remote-quota")
-
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			Expect(quota).To(Equal(models.SpaceQuota{
 				Guid:                    "my-quota-guid",
 				Name:                    "my-remote-quota",
@@ -66,23 +94,55 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 		It("Returns an error if the quota cannot be found", func() {
 			_, err := repo.FindByName("totally-not-a-quota")
-
-			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 	})
 
 	Describe("FindByOrg", func() {
 		BeforeEach(func() {
-			setupTestServer(firstSpaceQuotaRequest, secondSpaceQuotaRequest)
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/space_quota_definitions"),
+					ghttp.RespondWith(http.StatusOK, `{
+						"next_url": "/v2/organizations/my-org-guid/space_quota_definitions?page=2",
+						"resources": [
+							{
+								"metadata": { "guid": "my-quota-guid" },
+								"entity": {
+									"name": "my-remote-quota",
+									"memory_limit": 1024,
+									"total_routes": 123,
+									"total_services": 321,
+									"non_basic_services_allowed": true,
+									"organization_guid": "my-org-guid"
+								}
+							}
+						]
+					}`),
+				),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/space_quota_definitions", "page=2"),
+					ghttp.RespondWith(http.StatusOK, `{
+						"resources": [
+							{
+								"metadata": { "guid": "my-quota-guid2" },
+								"entity": { "name": "my-remote-quota2", "memory_limit": 1024, "organization_guid": "my-org-guid" }
+							},
+							{
+								"metadata": { "guid": "my-quota-guid3" },
+								"entity": { "name": "my-remote-quota3", "memory_limit": 1024, "organization_guid": "my-org-guid" }
+							}
+						]
+				  }`),
+				),
+			)
 		})
 
 		It("finds all quota definitions by org guid", func() {
 			quotas, err := repo.FindByOrg("my-org-guid")
-
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
-			Expect(len(quotas)).To(Equal(3))
+			Expect(quotas).To(HaveLen(3))
+
 			Expect(quotas[0].Guid).To(Equal("my-quota-guid"))
 			Expect(quotas[0].Name).To(Equal("my-remote-quota"))
 			Expect(quotas[0].MemoryLimit).To(Equal(int64(1024)))
@@ -99,14 +159,47 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 	Describe("FindByGuid", func() {
 		BeforeEach(func() {
-			setupTestServer(firstSpaceQuotaRequest, secondSpaceQuotaRequest)
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/space_quota_definitions"),
+					ghttp.RespondWith(http.StatusOK, `{
+						"next_url": "/v2/organizations/my-org-guid/space_quota_definitions?page=2",
+						"resources": [
+							{
+								"metadata": { "guid": "my-quota-guid" },
+								"entity": {
+									"name": "my-remote-quota",
+									"memory_limit": 1024,
+									"total_routes": 123,
+									"total_services": 321,
+									"non_basic_services_allowed": true,
+									"organization_guid": "my-org-guid"
+								}
+							}
+						]
+					}`),
+				),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/space_quota_definitions", "page=2"),
+					ghttp.RespondWith(http.StatusOK, `{
+						"resources": [
+							{
+								"metadata": { "guid": "my-quota-guid2" },
+								"entity": { "name": "my-remote-quota2", "memory_limit": 1024, "organization_guid": "my-org-guid" }
+							},
+							{
+								"metadata": { "guid": "my-quota-guid3" },
+								"entity": { "name": "my-remote-quota3", "memory_limit": 1024, "organization_guid": "my-org-guid" }
+							}
+						]
+				  }`),
+				),
+			)
 		})
 
 		It("Finds Quota definitions by Guid", func() {
 			quota, err := repo.FindByGuid("my-quota-guid")
-
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(quota).To(Equal(models.SpaceQuota{
 				Guid:                    "my-quota-guid",
 				Name:                    "my-remote-quota",
@@ -117,51 +210,49 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				OrgGuid:                 "my-org-guid",
 			}))
 		})
+
 		It("Returns an error if the quota cannot be found", func() {
 			_, err := repo.FindByGuid("totally-not-a-quota-guid")
-
-			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(err.(*errors.ModelNotFoundError)).NotTo(BeNil())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 		})
 	})
 
 	Describe("AssociateSpaceWithQuota", func() {
+		BeforeEach(func() {
+			ccServer.AppendHandlers(
+				ghttp.VerifyRequest("PUT", "/v2/space_quota_definitions/my-quota-guid/spaces/my-space-guid"),
+				ghttp.RespondWith(http.StatusCreated, nil),
+			)
+		})
+
 		It("sets the quota for a space", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "PUT",
-				Path:     "/v2/space_quota_definitions/my-quota-guid/spaces/my-space-guid",
-				Response: testnet.TestResponse{Status: http.StatusCreated},
-			})
-
-			setupTestServer(req)
-
 			err := repo.AssociateSpaceWithQuota("my-space-guid", "my-quota-guid")
-			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 
 	Describe("UnassignQuotaFromSpace", func() {
-		It("deletes the association between the quota and the space", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "DELETE",
-				Path:     "/v2/space_quota_definitions/my-quota-guid/spaces/my-space-guid",
-				Response: testnet.TestResponse{Status: http.StatusNoContent},
-			})
-			setupTestServer(req)
+		BeforeEach(func() {
+			ccServer.AppendHandlers(
+				ghttp.VerifyRequest("DELETE", "/v2/space_quota_definitions/my-quota-guid/spaces/my-space-guid"),
+				ghttp.RespondWith(http.StatusNoContent, nil),
+			)
+		})
 
+		It("deletes the association between the quota and the space", func() {
 			err := repo.UnassignQuotaFromSpace("my-space-guid", "my-quota-guid")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
 	})
 
 	Describe("Create", func() {
-		It("creates a new quota with the given name", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "POST",
-				Path:   "/v2/space_quota_definitions",
-				Matcher: testnet.RequestBodyMatcher(`{
+		BeforeEach(func() {
+			ccServer.AppendHandlers(
+				ghttp.VerifyRequest("POST", "/v2/space_quota_definitions"),
+				ghttp.VerifyJSON(`{
 					"name": "not-so-strict",
 					"non_basic_services_allowed": false,
 					"total_services": 1,
@@ -170,10 +261,11 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					"instance_memory_limit": 0,
 					"organization_guid": "my-org-guid"
 				}`),
-				Response: testnet.TestResponse{Status: http.StatusCreated},
-			})
-			setupTestServer(req)
+				ghttp.RespondWith(http.StatusNoContent, nil),
+			)
+		})
 
+		It("creates a new quota with the given name", func() {
 			quota := models.SpaceQuota{
 				Name:          "not-so-strict",
 				ServicesLimit: 1,
@@ -183,16 +275,15 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			}
 			err := repo.Create(quota)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
 	})
 
 	Describe("Update", func() {
-		It("updates an existing quota", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "PUT",
-				Path:   "/v2/space_quota_definitions/my-quota-guid",
-				Matcher: testnet.RequestBodyMatcher(`{
+		BeforeEach(func() {
+			ccServer.AppendHandlers(
+				ghttp.VerifyRequest("PUT", "/v2/space_quota_definitions/my-quota-guid"),
+				ghttp.VerifyJSON(`{
 					"guid": "my-quota-guid",
 					"non_basic_services_allowed": false,
 					"name": "amazing-quota",
@@ -202,8 +293,11 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					"instance_memory_limit": 1234,
 					"organization_guid": "myorgguid"
 				}`),
-			}))
+				ghttp.RespondWith(http.StatusOK, nil),
+			)
+		})
 
+		It("updates an existing quota", func() {
 			quota := models.SpaceQuota{
 				Guid: "my-quota-guid",
 				Name: "amazing-quota",
@@ -217,105 +311,22 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 			err := repo.Update(quota)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
 	})
 
 	Describe("Delete", func() {
-		It("deletes the quota with the given name", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "DELETE",
-				Path:     "/v2/space_quota_definitions/my-quota-guid",
-				Response: testnet.TestResponse{Status: http.StatusNoContent},
-			})
-			setupTestServer(req)
+		BeforeEach(func() {
+			ccServer.AppendHandlers(
+				ghttp.VerifyRequest("DELETE", "/v2/space_quota_definitions/my-quota-guid"),
+				ghttp.RespondWith(http.StatusNoContent, nil),
+			)
+		})
 
+		It("deletes the quota with the given name", func() {
 			err := repo.Delete("my-quota-guid")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
 	})
-})
-
-var firstQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/space_quota_definitions",
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body: `{
-		"next_url": "/v2/quota_definitions?page=2",
-		"resources": [
-			{
-			  "metadata": { "guid": "my-quota-guid" },
-			  "entity": {
-			  	"name": "my-remote-quota",
-			  	"memory_limit": 1024,
-			  	"total_routes": 123,
-			  	"total_services": 321,
-			  	"non_basic_services_allowed": true,
-			  }
-			}
-		]}`,
-	},
-})
-
-var secondQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/space_quota_definitions?page=2",
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body: `{
-		"resources": [
-			{
-			  "metadata": { "guid": "my-quota-guid2" },
-			  "entity": { "name": "my-remote-quota2", "memory_limit": 1024 }
-			},
-			{
-			  "metadata": { "guid": "my-quota-guid3" },
-			  "entity": { "name": "my-remote-quota3", "memory_limit": 1024 }
-			}
-		]}`,
-	},
-})
-
-var firstSpaceQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/organizations/my-org-guid/space_quota_definitions",
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body: `{
-		"next_url": "/v2/organizations/my-org-guid/space_quota_definitions?page=2",
-		"resources": [
-			{
-			  "metadata": { "guid": "my-quota-guid" },
-			  "entity": {
-			  	"name": "my-remote-quota",
-			  	"memory_limit": 1024,
-			  	"total_routes": 123,
-			  	"total_services": 321,
-			  	"non_basic_services_allowed": true,
-			  	"organization_guid": "my-org-guid"
-			  }
-			}
-		]}`,
-	},
-})
-
-var secondSpaceQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/organizations/my-org-guid/space_quota_definitions?page=2",
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body: `{
-		"resources": [
-			{
-			  "metadata": { "guid": "my-quota-guid2" },
-			  "entity": { "name": "my-remote-quota2", "memory_limit": 1024, "organization_guid": "my-org-guid" }
-			},
-			{
-			  "metadata": { "guid": "my-quota-guid3" },
-			  "entity": { "name": "my-remote-quota3", "memory_limit": 1024, "organization_guid": "my-org-guid" }
-			}
-		]}`,
-	},
 })
