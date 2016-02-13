@@ -74,7 +74,7 @@ func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Facto
 	}
 
 	minAPIVersionRequirement := requirementsFactory.NewMinAPIVersionRequirement(
-		T("Option '--parameters/-c'"),
+		"bind-route-service",
 		minAPIVersion,
 	)
 
