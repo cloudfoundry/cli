@@ -25,7 +25,7 @@ func init() {
 func (cmd *GetHealthCheck) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "get-health-check",
-		Description: T("get the health_check_type value of an app"),
+		Description: T("Get the health_check_type value of an app"),
 		Usage:       T("CF_NAME get-health-check APP_NAME"),
 	}
 }

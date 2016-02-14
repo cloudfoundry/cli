@@ -4380,7 +4380,7 @@
     "translation": "모두"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "영역에 대한 SSH 액세스 허용"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "세부사항"
   },
   {
-    "id": "disable ssh for the application",
+    "id": "Disable ssh for the application",
     "translation": "애플리케이션에 SSH 사용 안함"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "영역에 대한 SSH 액세스 허용 안 함"
   },
   {
@@ -4492,7 +4492,7 @@
     "translation": "작동 중지"
   },
   {
-    "id": "enable ssh for the application",
+    "id": "Enable ssh for the application",
     "translation": "애플리케이션에 SSH 사용"
   },
   {
@@ -4520,7 +4520,7 @@
     "translation": "무료 또는 유료"
   },
   {
-    "id": "get the health_check_type value of an app",
+    "id": "Get the health_check_type value of an app",
     "translation": "앱의 health_check_type 값 가져오기"
   },
   {
@@ -4584,11 +4584,11 @@
     "translation": "제한됨"
   },
   {
-    "id": "list all available plugin commands",
+    "id": "List all available plugin commands",
     "translation": "사용 가능한 모든 플러그인 명령 나열"
   },
   {
-    "id": "list all the added plugin repository",
+    "id": "List all the added plugin repository",
     "translation": "추가된 모든 플러그인 저장소 나열"
   },
   {
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "영역에서 SSH가 허용되는지 보고"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "애플리케이션 컨테이너 인스턴스에서 SSH가 사용되는지 보고"
   },
   {
@@ -4732,7 +4732,7 @@
     "translation": "서비스"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
+    "id": "Set health_check_type flag to either 'port' or 'none'",
     "translation": "health_check_type 플래그를 'port' 또는 'none'으로 설정"
   },
   {
@@ -4840,7 +4840,7 @@
     "translation": "무제한"
   },
   {
-    "id": "update an existing space quota",
+    "id": "Update an existing space quota",
     "translation": "기존 영역 할당량 업데이트"
   },
   {
@@ -4872,7 +4872,7 @@
     "translation": "버전"
   },
   {
-    "id": "write default values to the config",
+    "id": "Write default values to the config",
     "translation": "구성에 기본값 쓰기"
   },
   {

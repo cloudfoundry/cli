@@ -4380,7 +4380,7 @@
     "translation": "すべて"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "このスペースに対する SSH アクセスを許可します"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "詳細"
   },
   {
-    "id": "disable ssh for the application",
+    "id": "Disable ssh for the application",
     "translation": "このアプリケーションに対して SSH を無効にします"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "このスペースに対する SSH アクセスを不許可にします"
   },
   {
@@ -4492,7 +4492,7 @@
     "translation": "ダウン"
   },
   {
-    "id": "enable ssh for the application",
+    "id": "Enable ssh for the application",
     "translation": "このアプリケーションに対して SSH を有効にします"
   },
   {
@@ -4520,7 +4520,7 @@
     "translation": "無料または有料"
   },
   {
-    "id": "get the health_check_type value of an app",
+    "id": "Get the health_check_type value of an app",
     "translation": "アプリの health_check_type 値を取得します"
   },
   {
@@ -4584,11 +4584,11 @@
     "translation": "制限"
   },
   {
-    "id": "list all available plugin commands",
+    "id": "List all available plugin commands",
     "translation": "使用可能なプラグイン・コマンドをすべてリストします"
   },
   {
-    "id": "list all the added plugin repository",
+    "id": "List all the added plugin repository",
     "translation": "追加されたプラグイン・リポジトリーをすべてリストします"
   },
   {
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "スペース内で SSH が許可されているかどうかを報告します"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "アプリケーション・コンテナー・インスタンスで SSH に有効になっているかどうかを報告します"
   },
   {
@@ -4732,7 +4732,7 @@
     "translation": "サービス"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
+    "id": "Set health_check_type flag to either 'port' or 'none'",
     "translation": "health_check_type フラグを 'port' または 'none' のいずれかに設定します"
   },
   {
@@ -4840,7 +4840,7 @@
     "translation": "制限なし"
   },
   {
-    "id": "update an existing space quota",
+    "id": "Update an existing space quota",
     "translation": "既存のスペース割り当て量を更新します"
   },
   {
@@ -4872,7 +4872,7 @@
     "translation": "バージョン"
   },
   {
-    "id": "write default values to the config",
+    "id": "Write default values to the config",
     "translation": "デフォルト値を構成に書き込みます"
   },
   {

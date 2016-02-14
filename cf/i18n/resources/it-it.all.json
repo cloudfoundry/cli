@@ -4380,7 +4380,7 @@
     "translation": "tutto"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "Consenti accesso SSH per lo spazio"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "dettagli"
   },
   {
-    "id": "disable ssh for the application",
-    "translation": "disabilita ssh per l'applicazione"
+    "id": "Disable ssh for the application",
+    "translation": "Disabilita ssh per l'applicazione"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "Non consentire accesso SSH per lo spazio"
   },
   {
@@ -4492,8 +4492,8 @@
     "translation": "non attivo"
   },
   {
-    "id": "enable ssh for the application",
-    "translation": "abilita ssh per l'applicazione"
+    "id": "Enable ssh for the application",
+    "translation": "Abilita ssh per l'applicazione"
   },
   {
     "id": "enabled",
@@ -4520,8 +4520,8 @@
     "translation": "gratuito o a pagamento"
   },
   {
-    "id": "get the health_check_type value of an app",
-    "translation": "ottieni il valore health_check_type di un'applicazione"
+    "id": "Get the health_check_type value of an app",
+    "translation": "Ottieni il valore health_check_type di un'applicazione"
   },
   {
     "id": "health_check_type is ",
@@ -4584,12 +4584,12 @@
     "translation": "limitato"
   },
   {
-    "id": "list all available plugin commands",
-    "translation": "elenca tutti i comandi di plug-in disponibili"
+    "id": "List all available plugin commands",
+    "translation": "Elenca tutti i comandi di plug-in disponibili"
   },
   {
-    "id": "list all the added plugin repository",
-    "translation": "elenca tutti i repository di plug-in aggiunti"
+    "id": "List all the added plugin repository",
+    "translation": "Elenca tutti i repository di plug-in aggiunti"
   },
   {
     "id": "locked",
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "Indica se SSH è consentito in uno spazio"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "Indica se SSH è abilitato su un'istanza del contenitore applicazioni"
   },
   {
@@ -4732,8 +4732,8 @@
     "translation": "servizi"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
-    "translation": "imposta l'indicatore health_check_type su 'port' o 'none'"
+    "id": "Set health_check_type flag to either 'port' or 'none'",
+    "translation": "Imposta l'indicatore health_check_type su 'port' o 'none'"
   },
   {
     "id": "shared",
@@ -4840,8 +4840,8 @@
     "translation": "illimitato"
   },
   {
-    "id": "update an existing space quota",
-    "translation": "aggiorna una quota di spazio esistente"
+    "id": "Update an existing space quota",
+    "translation": "Aggiorna una quota di spazio esistente"
   },
   {
     "id": "url",
@@ -4872,8 +4872,8 @@
     "translation": "versione"
   },
   {
-    "id": "write default values to the config",
-    "translation": "scrivi valori predefiniti nella configurazione"
+    "id": "Write default values to the config",
+    "translation": "Scrivi valori predefiniti nella configurazione"
   },
   {
     "id": "yes",

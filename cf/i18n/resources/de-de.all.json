@@ -4380,7 +4380,7 @@
     "translation": "Alle"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "SSH-Zugriff für den Bereich ermöglichen"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "Details"
   },
   {
-    "id": "disable ssh for the application",
+    "id": "Disable ssh for the application",
     "translation": "SSH für Anwendung inaktivieren"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "SSH-Zugriff für diesen Bereich nicht zulassen"
   },
   {
@@ -4492,7 +4492,7 @@
     "translation": "inaktiv"
   },
   {
-    "id": "enable ssh for the application",
+    "id": "Enable ssh for the application",
     "translation": "SSH für Anwendung aktivieren"
   },
   {
@@ -4520,7 +4520,7 @@
     "translation": "kostenfrei oder bezahlt"
   },
   {
-    "id": "get the health_check_type value of an app",
+    "id": "Get the health_check_type value of an app",
     "translation": "Wert für health_check_type einer App abrufen"
   },
   {
@@ -4584,11 +4584,11 @@
     "translation": "begrenzt"
   },
   {
-    "id": "list all available plugin commands",
+    "id": "List all available plugin commands",
     "translation": "Alle verfügbaren Plug-in-Befehle auflisten"
   },
   {
-    "id": "list all the added plugin repository",
+    "id": "List all the added plugin repository",
     "translation": "Alle hinzugefügten Plug-in-Repositorys auflisten"
   },
   {
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "Berichtet, ob SSH in einem Bereich zulässig ist"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "Berichtet, ob SSH für eine Anwendungscontainerinstanz aktiviert ist"
   },
   {
@@ -4732,7 +4732,7 @@
     "translation": "Services"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
+    "id": "Set health_check_type flag to either 'port' or 'none'",
     "translation": "Für Flag health_check_type entweder 'port' oder 'none' festlegen"
   },
   {
@@ -4840,8 +4840,8 @@
     "translation": "unbegrenzt"
   },
   {
-    "id": "update an existing space quota",
-    "translation": "vorhandene Bereichsgrößenbeschränkung aktualisieren"
+    "id": "Update an existing space quota",
+    "translation": "Vorhandene Bereichsgrößenbeschränkung aktualisieren"
   },
   {
     "id": "url",
@@ -4872,7 +4872,7 @@
     "translation": "Version"
   },
   {
-    "id": "write default values to the config",
+    "id": "Write default values to the config",
     "translation": "Standardwerte in die Konfiguration schreiben"
   },
   {

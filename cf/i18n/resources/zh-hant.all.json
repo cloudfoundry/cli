@@ -4380,7 +4380,7 @@
     "translation": "全部"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "容許空間的 SSH 存取權"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "詳細資料"
   },
   {
-    "id": "disable ssh for the application",
+    "id": "Disable ssh for the application",
     "translation": "停用應用程式的 ssh"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "禁止空間的 SSH 存取權"
   },
   {
@@ -4492,7 +4492,7 @@
     "translation": "關閉"
   },
   {
-    "id": "enable ssh for the application",
+    "id": "Enable ssh for the application",
     "translation": "啟用應用程式的 ssh"
   },
   {
@@ -4520,7 +4520,7 @@
     "translation": "免費或付費"
   },
   {
-    "id": "get the health_check_type value of an app",
+    "id": "Get the health_check_type value of an app",
     "translation": "取得應用程式的 health_check_type 值"
   },
   {
@@ -4584,11 +4584,11 @@
     "translation": "限制"
   },
   {
-    "id": "list all available plugin commands",
+    "id": "List all available plugin commands",
     "translation": "列出所有可用的外掛程式指令"
   },
   {
-    "id": "list all the added plugin repository",
+    "id": "List all the added plugin repository",
     "translation": "列出所有已新增的外掛程式儲存庫"
   },
   {
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "空間中是否容許 SSH 的報告"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "在應用程式儲存器實例上是否啟用 SSH 的報告"
   },
   {
@@ -4732,7 +4732,7 @@
     "translation": "服務"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
+    "id": "Set health_check_type flag to either 'port' or 'none'",
     "translation": "將 health_check_type 旗標設定為 'port' 或 'none'"
   },
   {
@@ -4840,7 +4840,7 @@
     "translation": "無限制"
   },
   {
-    "id": "update an existing space quota",
+    "id": "Update an existing space quota",
     "translation": "更新現有的空間配額"
   },
   {
@@ -4872,7 +4872,7 @@
     "translation": "版本"
   },
   {
-    "id": "write default values to the config",
+    "id": "Write default values to the config",
     "translation": "將預設值寫入至配置"
   },
   {
