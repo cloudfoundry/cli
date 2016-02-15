@@ -340,8 +340,8 @@
     "translation": "Anexar diagnósticos de solicitação de API a um arquivo de log"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "Tipo de verificação de funcionamento do aplicativo (por exemplo, porta ou nenhum)"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "Tipo de verificação de funcionamento do aplicativo (por exemplo, 'port' ou 'none')"
   },
   {
     "id": "Application instance index",
@@ -3648,8 +3648,8 @@
     "translation": "Configurar uma variável de ambiente para um app"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "Configurar o código padrão de idioma. Se LOCALE for CLEAR, o código de idioma anterior será excluído."
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "Configurar o código padrão de idioma. Se LOCALE for 'CLEAR', o código de idioma anterior será excluído."
   },
   {
     "id": "Set or view target api url",

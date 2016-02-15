@@ -340,8 +340,8 @@
     "translation": "Añadir el diagnóstico de solicitud de API a un archivo de registro"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "Tipo de comprobación de estado de la aplicación (p. ej., port o none)"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "Tipo de comprobación de estado de la aplicación (p. ej., 'port' o 'none')"
   },
   {
     "id": "Application instance index",
@@ -3648,8 +3648,8 @@
     "translation": "Establecer una variable de entorno para una app"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "Establecer el entorno local predeterminado. Si ENTORNO LOCAL está BORRADO, se suprimirá un entorno local anterior."
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "Establecer el entorno local predeterminado. Si LOCALE está 'CLEAR', se suprimirá un entorno local anterior."
   },
   {
     "id": "Set or view target api url",

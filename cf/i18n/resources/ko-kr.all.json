@@ -340,8 +340,8 @@
     "translation": "로그 파일에 API 요청 진단 추가"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "애플리케이션 상태 검사 유형(예: 포트 또는 없음)"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "애플리케이션 상태 검사 유형(예: 'port' 또는 'none')"
   },
   {
     "id": "Application instance index",
@@ -3648,8 +3648,8 @@
     "translation": "앱의 환경 변수 설정"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "기본 로케일을 설정합니다. LOCALE이 CLEAR인 경우 이전 로케일이 삭제됩니다."
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "기본 로케일을 설정합니다. LOCALE이 'CLEAR'인 경우 이전 로케일이 삭제됩니다."
   },
   {
     "id": "Set or view target api url",

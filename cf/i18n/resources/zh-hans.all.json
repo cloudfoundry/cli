@@ -340,8 +340,8 @@
     "translation": "将 API 请求诊断附加到日志文件"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "应用程序运行状况检查类型（例如，port 或 none）"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "应用程序运行状况检查类型（例如，'port' 或 'none'）"
   },
   {
     "id": "Application instance index",
@@ -3648,8 +3648,8 @@
     "translation": "为应用程序设置环境变量"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "设置缺省语言环境。如果 LOCALE 为 CLEAR，将删除先前的语言环境。"
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "设置缺省语言环境。如果 LOCALE 为 'CLEAR'，将删除先前的语言环境。"
   },
   {
     "id": "Set or view target api url",
