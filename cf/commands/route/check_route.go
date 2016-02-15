@@ -31,7 +31,7 @@ func (cmd *CheckRoute) MetaData() command_registry.CommandMetadata {
 
 	return command_registry.CommandMetadata{
 		Name:        "check-route",
-		Description: T("Perform a simple check to determine whether a route currently exists or not."),
+		Description: T("Perform a simple check to determine whether a route currently exists or not"),
 		Usage: T(`CF_NAME check-route HOST DOMAIN [--path PATH]
 
 EXAMPLES:

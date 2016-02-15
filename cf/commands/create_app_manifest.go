@@ -37,7 +37,7 @@ func (cmd *CreateAppManifest) MetaData() command_registry.CommandMetadata {
 
 	return command_registry.CommandMetadata{
 		Name:        "create-app-manifest",
-		Description: T("Create an app manifest for an app that has been pushed successfully."),
+		Description: T("Create an app manifest for an app that has been pushed successfully"),
 		Usage:       T("CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>-manifest.yml ]"),
 		Flags:       fs,
 	}
