@@ -65,7 +65,7 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
 
    CF_NAME create-service db-service silver mydb -t "list, of, tags"`)
 	tipsUsage := T(`TIP:
-   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps`)
+   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps`)
 	return command_registry.CommandMetadata{
 		Name:        "create-service",
 		ShortName:   "cs",
