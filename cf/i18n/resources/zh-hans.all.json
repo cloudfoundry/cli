@@ -4364,11 +4364,11 @@
     "translation": "访问权"
   },
   {
-    "id": "access for plans of a particular broker",
+    "id": "Access for plans of a particular broker",
     "translation": "对特定代理程序的套餐的访问权"
   },
   {
-    "id": "access for service name of a particular service offering",
+    "id": "Access for service name of a particular service offering",
     "translation": "对特定服务产品的服务名称的访问权"
   },
   {
@@ -4464,7 +4464,7 @@
     "translation": "磁盘："
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
+    "id": "Docker image to use (e.g. user/docker-image-name)",
     "translation": "要使用的 docker-image（例如，user/docker-image-name）"
   },
   {
@@ -4588,7 +4588,7 @@
     "translation": "列出所有可用的插件命令"
   },
   {
-    "id": "List all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "列出所有添加的插件存储库"
   },
   {
@@ -4652,7 +4652,7 @@
     "translation": "套餐"
   },
   {
-    "id": "plans accessible by a particular organization",
+    "id": "Plans accessible by a particular organization",
     "translation": "可由特定组织访问的套餐"
   },
   {

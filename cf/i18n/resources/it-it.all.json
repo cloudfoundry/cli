@@ -4364,12 +4364,12 @@
     "translation": "accesso"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "accesso per i piani di un determinato broker"
+    "id": "Access for plans of a particular broker",
+    "translation": "Accesso per i piani di un determinato broker"
   },
   {
-    "id": "access for service name of a particular service offering",
-    "translation": "accesso per il nome del servizio di una determinata offerta di servizi"
+    "id": "Access for service name of a particular service offering",
+    "translation": "Accesso per il nome del servizio di una determinata offerta di servizi"
   },
   {
     "id": "actor",
@@ -4464,8 +4464,8 @@
     "translation": "disco:"
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "immagine docker da utilizzare (ad esempio, user/docker-image-name)"
+    "id": "Docker image to use (e.g. user/docker-image-name)",
+    "translation": "Immagine Docker da utilizzare (ad esempio, user/docker-image-name)"
   },
   {
     "id": "does not exist.",
@@ -4588,7 +4588,7 @@
     "translation": "Elenca tutti i comandi di plug-in disponibili"
   },
   {
-    "id": "List all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "Elenca tutti i repository di plug-in aggiunti"
   },
   {
@@ -4652,8 +4652,8 @@
     "translation": "piani"
   },
   {
-    "id": "plans accessible by a particular organization",
-    "translation": "piani accessibili da una particolare organizzazione"
+    "id": "Plans accessible by a particular organization",
+    "translation": "Piani accessibili da una particolare organizzazione"
   },
   {
     "id": "position",

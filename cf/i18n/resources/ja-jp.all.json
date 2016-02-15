@@ -4364,11 +4364,11 @@
     "translation": "アクセス"
   },
   {
-    "id": "access for plans of a particular broker",
+    "id": "Access for plans of a particular broker",
     "translation": "特定のブローカーに対するアクセス"
   },
   {
-    "id": "access for service name of a particular service offering",
+    "id": "Access for service name of a particular service offering",
     "translation": "特定のサービス・オファリングのサービス名に対するアクセス"
   },
   {
@@ -4464,8 +4464,8 @@
     "translation": "ディスク:"
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "使用される docker-image (例: user/docker-image-name)"
+    "id": "Docker image to use (e.g. user/docker-image-name)",
+    "translation": "使用される docker イメージ (例: user/docker-image-name)"
   },
   {
     "id": "does not exist.",
@@ -4588,7 +4588,7 @@
     "translation": "使用可能なプラグイン・コマンドをすべてリストします"
   },
   {
-    "id": "List all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "追加されたプラグイン・リポジトリーをすべてリストします"
   },
   {
@@ -4652,7 +4652,7 @@
     "translation": "プラン"
   },
   {
-    "id": "plans accessible by a particular organization",
+    "id": "Plans accessible by a particular organization",
     "translation": "特定の組織がアクセスできるプラン"
   },
   {

@@ -1381,7 +1381,7 @@
   },
   {
     "id": "Delete a domain",
-    "translation": "Excluir um excluir"
+    "translation": "Excluir um domínio"
   },
   {
     "id": "Delete a quota",
@@ -4364,12 +4364,12 @@
     "translation": "acessar"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "acesso para planos de um broker específico"
+    "id": "Access for plans of a particular broker",
+    "translation": "Acesso para planos de um broker específico"
   },
   {
-    "id": "access for service name of a particular service offering",
-    "translation": "acesso para nome do serviço de uma oferta de serviços específica"
+    "id": "Access for service name of a particular service offering",
+    "translation": "Acesso para nome do serviço de uma oferta de serviços específica"
   },
   {
     "id": "actor",
@@ -4464,8 +4464,8 @@
     "translation": "disco:"
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "docker-image a ser usado (por exemplo, user/docker-image-name)"
+    "id": "Docker image to use (e.g. user/docker-image-name)",
+    "translation": "Imagem Docker a ser usado (por exemplo, user/docker-image-name)"
   },
   {
     "id": "does not exist.",
@@ -4588,7 +4588,7 @@
     "translation": "Listar todos os comandos de plug-in disponíveis"
   },
   {
-    "id": "List all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "Listar todos os repositórios de plug-in incluídos"
   },
   {
@@ -4652,8 +4652,8 @@
     "translation": "planos"
   },
   {
-    "id": "plans accessible by a particular organization",
-    "translation": "planos acessíveis por uma organização específica"
+    "id": "Plans accessible by a particular organization",
+    "translation": "Planos acessíveis por uma organização específica"
   },
   {
     "id": "position",

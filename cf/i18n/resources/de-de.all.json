@@ -4364,11 +4364,11 @@
     "translation": "Zugriff"
   },
   {
-    "id": "access for plans of a particular broker",
+    "id": "Access for plans of a particular broker",
     "translation": "Zugriff auf Pläne für einen bestimmten Broker"
   },
   {
-    "id": "access for service name of a particular service offering",
+    "id": "Access for service name of a particular service offering",
     "translation": "Zugriff auf Servicename eines bestimmten Serviceangebots"
   },
   {
@@ -4464,7 +4464,7 @@
     "translation": "Platte:"
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
+    "id": "Docker image to use (e.g. user/docker-image-name)",
     "translation": "Zu verwendendes Docker-Image (z. B. user/docker-image-name)"
   },
   {
@@ -4588,7 +4588,7 @@
     "translation": "Alle verfügbaren Plug-in-Befehle auflisten"
   },
   {
-    "id": "List all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "Alle hinzugefügten Plug-in-Repositorys auflisten"
   },
   {
@@ -4652,7 +4652,7 @@
     "translation": "Pläne"
   },
   {
-    "id": "plans accessible by a particular organization",
+    "id": "Plans accessible by a particular organization",
     "translation": "Pläne, auf die eine bestimmte Organisation zugreifen kann"
   },
   {

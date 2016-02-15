@@ -4364,12 +4364,12 @@
     "translation": "access"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "access for plans of a particular broker"
+    "id": "Access for plans of a particular broker",
+    "translation": "Access for plans of a particular broker"
   },
   {
-    "id": "access for service name of a particular service offering",
-    "translation": "access for service name of a particular service offering"
+    "id": "Access for service name of a particular service offering",
+    "translation": "Access for service name of a particular service offering"
   },
   {
     "id": "actor",
@@ -4464,8 +4464,8 @@
     "translation": "disk:"
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "docker-image to be used (e.g. user/docker-image-name)"
+    "id": "Docker image to use (e.g. user/docker-image-name)",
+    "translation": "Docker image to use (e.g. user/docker-image-name)"
   },
   {
     "id": "does not exist.",
@@ -4588,8 +4588,8 @@
     "translation": "List all available plugin commands"
   },
   {
-    "id": "List all the added plugin repository",
-    "translation": "List all the added plugin repository"
+    "id": "List all the added plugin repositories",
+    "translation": "List all the added plugin repositories"
   },
   {
     "id": "locked",
@@ -4652,8 +4652,8 @@
     "translation": "plans"
   },
   {
-    "id": "plans accessible by a particular organization",
-    "translation": "plans accessible by a particular organization"
+    "id": "Plans accessible by a particular organization",
+    "translation": "Plans accessible by a particular organization"
   },
   {
     "id": "position",

@@ -4364,11 +4364,11 @@
     "translation": "存取權"
   },
   {
-    "id": "access for plans of a particular broker",
+    "id": "Access for plans of a particular broker",
     "translation": "特定分配管理系統之方案的存取權"
   },
   {
-    "id": "access for service name of a particular service offering",
+    "id": "Access for service name of a particular service offering",
     "translation": "特定服務供應項目之服務名稱的存取權"
   },
   {
@@ -4464,7 +4464,7 @@
     "translation": "磁碟："
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
+    "id": "Docker image to use (e.g. user/docker-image-name)",
     "translation": "要使用的 docker-image（例如 user/docker-image-name）"
   },
   {
@@ -4588,7 +4588,7 @@
     "translation": "列出所有可用的外掛程式指令"
   },
   {
-    "id": "List all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "列出所有已新增的外掛程式儲存庫"
   },
   {
@@ -4652,7 +4652,7 @@
     "translation": "方案"
   },
   {
-    "id": "plans accessible by a particular organization",
+    "id": "Plans accessible by a particular organization",
     "translation": "特定組織可存取的方案"
   },
   {
