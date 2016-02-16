@@ -441,7 +441,7 @@
   },
   {
     "id": "Bind a service instance to a route",
-    "translation": ""
+    "translation": "サービス・インスタンスを経路にバインドします"
   },
   {
     "id": "Bind a service instance to an app",
@@ -517,7 +517,7 @@
   },
   {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\nEXAMPLES:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
-    "translation": ""
+    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\n例:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   Windows PowerShell ではダブルクォーテーションを使用します、エスケープしたJSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   Windows コマンドラインはシングルクオーテーションを使用します、エスケープしたJSON: '{\\\"valid\\\":\\\"json\\\"}'"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -569,7 +569,7 @@
   },
   {
     "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo",
-    "translation": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                     # example.com\n   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo"
+    "translation": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n例:\n   CF_NAME create-route my-space example.com                     # example.com\n   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo"
   },
   {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
@@ -609,11 +609,11 @@
   },
   {
     "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\nEXAMPLE:\n   CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n   CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME create-user-provided-service my-route-service -r https://example.com\n\n   Linux/Mac:\n   CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows Command Line\n   CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n   CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'",
-    "translation": ""
+    "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   コンマ区切りの資格情報パラメーター名を渡して対話モードを有効にします:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   資格情報パラメーターをJSONとして渡してサービスを非対話式に作成します:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   JSONを含むファイルのパスを指定します:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\n例:\n   CF_NAME create-user-provided-service my-db-mine -p \"username, password\"\n   CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME create-user-provided-service my-route-service -r https://example.com\n\n   Linux/Mac:\n   CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n\n   Windows コマンドライン\n   CF_NAME create-user-provided-service my-db-mine -p \"{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}\"\n\n   Windows PowerShell\n   CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'"
   },
   {
     "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   By default 'CF_NAME curl' will perform a GET to the specified PATH. If data\n   is provided via -d, a POST will be performed instead, and the Content-Type\n   will be set to application/json. You may override headers with -H and the\n   request method with -X.\n\n   For API documentation, please visit http://apidocs.cloudfoundry.org.\n\nEXAMPLES:\n   cf curl \"/v2/apps\" -X GET \\\n                      -H \"Content-Type: application/x-www-form-urlencoded\" \\\n                      -d 'q=name:myapp'\n\n   cf curl \"/v2/apps\" -d @/path/to/file",
-    "translation": ""
+    "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   デフォルトでは'CF_NAME curl'は指定したパスに対してGETを実行します。もし-dを介してデータが渡された場合、Content-Typeはapplication/jsonが設定され、POSTとして動作します。ヘッダーは-Hで、リクエストメソッドは-Xで上書きが可能です。\n\n   API資料については、http://apidocs.cloudfoundry.orgにアクセスしてください\n\n例:\n   cf curl \"/v2/apps\" -X GET \\\n                      -H \"Content-Type: application/x-www-form-urlencoded\" \\\n                      -d 'q=name:myapp'\n\n   cf curl \"/v2/apps\" -d @/path/to/file"
   },
   {
     "id": "CF_NAME delete APP_NAME [-f -r]",
@@ -729,7 +729,7 @@
   },
   {
     "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
-    "translation": ""
+    "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   '-f'が指定された場合を除き確認プロンプトをだします。\n\n例:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
   },
   {
     "id": "CF_NAME list-plugin-repos",
@@ -821,7 +821,7 @@
   },
   {
     "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
-    "translation": ""
+    "translation": "CF_NAME repo-plugins [-r REPO_NAME]\n\n例:\n   cf repo-plugins -r PrivateRepo"
   },
   {
     "id": "CF_NAME restage APP_NAME",
@@ -961,7 +961,7 @@
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]\n\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp",
-    "translation": ""
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]\n\n例:\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
@@ -1037,7 +1037,7 @@
   },
   {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com",
-    "translation": ""
+    "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   コンマで区切られた資格情報パラメーターを渡して対話モードを有効にします:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   資格情報パラメーターをJSONとして渡してサービスを非対話式に作成します:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   JSONを含むファイルパスを指定してください:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\n例:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
@@ -1341,7 +1341,7 @@
   },
   {
     "id": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications",
-    "translation": ""
+    "translation": "インラインもしくは、ファイルで提供された資格情報をバインド済みのアプリケーションのためにVCAP_SERVICES環境から参照できるようにします"
   },
   {
     "id": "Current Password",
@@ -1933,7 +1933,7 @@
   },
   {
     "id": "Executes a request to the targeted API endpoint",
-    "translation": ""
+    "translation": "ターゲットのAPIエンドポイントに対してリクエストを実行します"
   },
   {
     "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
@@ -2041,7 +2041,7 @@
   },
   {
     "id": "Force binding without confirmation",
-    "translation": ""
+    "translation": "確認を求めずにバインドを強制します"
   },
   {
     "id": "Force delete (do not prompt for confirmation)",
@@ -2053,7 +2053,7 @@
   },
   {
     "id": "Force install of plugin without confirmation",
-    "translation": ""
+    "translation": "確認を求めずにプラグインのインストールを強制します"
   },
   {
     "id": "Force migration without confirmation",
@@ -2069,7 +2069,7 @@
   },
   {
     "id": "Force unbinding without confirmation",
-    "translation": ""
+    "translation": "確認を求めずにアンバインドを強制します"
   },
   {
     "id": "GETTING STARTED",
@@ -2265,7 +2265,7 @@
   },
   {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
-    "translation": ""
+    "translation": "リクエストボディに含まれるHTTPデータ、もしくは'@'に続けたファイル名からデータを読み取ります"
   },
   {
     "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
@@ -2281,11 +2281,11 @@
   },
   {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
-    "translation": ""
+    "translation": "ホスト名は経路をバインドするためにドメインと結合して使用します"
   },
   {
     "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
-    "translation": ""
+    "translation": "ホスト名は経路をアンバインドするためにドメインと結合して使用します"
   },
   {
     "id": "Hostname used to identify the route",
@@ -2521,7 +2521,7 @@
   },
   {
     "id": "Install CLI plugin",
-    "translation": ""
+    "translation": "CLIプラグインをインストールします"
   },
   {
     "id": "Installing plugin {{.PluginPath}}...",
@@ -2637,7 +2637,7 @@
   },
   {
     "id": "List all available plugins in specified repository or in all added repositories",
-    "translation": ""
+    "translation": "指定したリポジトリーまたは追加されたすべてのリポジトリー内にあるすべてのプラグインをリストします "
   },
   {
     "id": "List all buildpacks",
@@ -2829,11 +2829,11 @@
   },
   {
     "id": "Name of a registered repository",
-    "translation": ""
+    "translation": "登録済みリポジトリ名"
   },
   {
     "id": "Name of a registered repository where the specified plugin is located",
-    "translation": ""
+    "translation": "プラグイン・バイナリーが置かれているリポジトリー名"
   },
   {
     "id": "New Password",
@@ -4001,11 +4001,11 @@
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
-    "translation": ""
+    "translation": "バインド済みアプリケーションのログがストリーミングされるURL"
   },
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
-    "translation": ""
+    "translation": "バインド済みルートのリクエストが転送されるURL。URLのスキームはhttpsでなければなりません"
   },
   {
     "id": "USAGE",
@@ -4073,7 +4073,7 @@
   },
   {
     "id": "Unbind a service instance from a route",
-    "translation": ""
+    "translation": "経路からサービス・インスタンスをアンバインドします"
   },
   {
     "id": "Unbind a service instance from an app",
@@ -4161,7 +4161,7 @@
   },
   {
     "id": "Update user-provided service instance",
-    "translation": ""
+    "translation": "ユーザ提供のサービス・インスタンスを更新します"
   },
   {
     "id": "Updated: {{.Updated}}",
@@ -4281,11 +4281,11 @@
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": "インラインまたはファイルのいずれかで提供されるサービス固有の構成パラメーターを含む有効な JSON オブジェクト。サポートされている構成パラメーターのリストについては、当該サービス・オファリングの資料を参照してください。"
+    "translation": "インラインまたはファイルのいずれかで提供されるサービス固有の構成パラメーターを含む有効な JSON オブジェクト。サポートされている構成パラメーターのリストについては、当該サービス・オファリングの資料を参照してください"
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": ""
+    "translation": "インラインまたはファイルのいずれかで提供されるサービス固有の構成パラメーターを含む有効な JSON オブジェクト。サポートされている構成パラメーターのリストについては、当該サービス・オファリングの資料を参照してください"
   },
   {
     "id": "Value for flag 'app-instance-index' cannot be negative",
@@ -4421,7 +4421,7 @@
   },
   {
     "id": "commands.flags.skip_ssl_validation.description",
-    "translation": ""
+    "translation": "APIエンドポイントの検証をスキップします。非推奨！"
   },
   {
     "id": "cpu",
