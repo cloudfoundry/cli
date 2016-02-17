@@ -36,14 +36,14 @@ var _ = Describe("generate_manifest", func() {
 
 	AfterEach(func() {
 		err = os.Remove(uniqueFilename)
-		Ω(err).ToNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("creates a new file at a given path", func() {
 		m.Save()
 
 		_, err = os.Stat(uniqueFilename)
-		Ω(err).ToNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("starts the manifest with 3 dashes (---), followed by 'applications'", func() {
@@ -51,8 +51,8 @@ var _ = Describe("generate_manifest", func() {
 
 		contents := getYamlContent(uniqueFilename)
 
-		Ω(contents[0]).To(Equal("---"))
-		Ω(contents[1]).To(Equal("applications:"))
+		Expect(contents[0]).To(Equal("---"))
+		Expect(contents[1]).To(Equal("applications:"))
 	})
 
 	It("creates entry under the given app name", func() {
@@ -66,11 +66,11 @@ var _ = Describe("generate_manifest", func() {
 			cursor:   0,
 		}
 
-		Ω(cmdOutput.ContainsSubstring("- name: app1")).To(BeTrue())
-		Ω(cmdOutput.ContainsSubstring("  memory: 128M")).To(BeTrue())
+		Expect(cmdOutput.ContainsSubstring("- name: app1")).To(BeTrue())
+		Expect(cmdOutput.ContainsSubstring("  memory: 128M")).To(BeTrue())
 
-		Ω(cmdOutput.ContainsSubstring("- name: app2")).To(BeTrue())
-		Ω(cmdOutput.ContainsSubstring("  memory: 64M")).To(BeTrue())
+		Expect(cmdOutput.ContainsSubstring("- name: app2")).To(BeTrue())
+		Expect(cmdOutput.ContainsSubstring("  memory: 64M")).To(BeTrue())
 	})
 
 	It("prefixes each service with '-'", func() {
@@ -81,7 +81,7 @@ var _ = Describe("generate_manifest", func() {
 
 		contents := getYamlContent(uniqueFilename)
 
-		Ω(contents).To(ContainSubstrings(
+		Expect(contents).To(ContainSubstrings(
 			[]string{"  services:"},
 			[]string{"- service1"},
 			[]string{"- service2"},
@@ -99,9 +99,9 @@ var _ = Describe("generate_manifest", func() {
 		m.Domain("app1", "foo", "blahblahblah.com")
 		m.BuildpackUrl("app1", "ruby-buildpack")
 		err := m.Save()
-		Ω(err).NotTo(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
-		Ω(getYamlContent(uniqueFilename)).To(ContainSubstrings(
+		Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
 			[]string{"- name: app1"},
 			[]string{"  memory: 128M"},
 			[]string{"  command: run main.go"},
@@ -131,9 +131,9 @@ var _ = Describe("generate_manifest", func() {
 			m.Domain("app1", "foo2", "test2.com")
 			m.BuildpackUrl("app1", "ruby-buildpack")
 			err := m.Save()
-			Ω(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-			Ω(getYamlContent(uniqueFilename)).To(ContainSubstrings(
+			Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
 				[]string{"- name: app1"},
 				[]string{"  memory: 128M"},
 				[]string{"  command: run main.go"},
@@ -167,9 +167,9 @@ var _ = Describe("generate_manifest", func() {
 			m.Domain("app1", "foo2", "test.com")
 			m.BuildpackUrl("app1", "ruby-buildpack")
 			err := m.Save()
-			Ω(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-			Ω(getYamlContent(uniqueFilename)).To(ContainSubstrings(
+			Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
 				[]string{"- name: app1"},
 				[]string{"  memory: 128M"},
 				[]string{"  command: run main.go"},
@@ -201,9 +201,9 @@ var _ = Describe("generate_manifest", func() {
 			m.Domain("app1", "foo", "test2.com")
 			m.BuildpackUrl("app1", "ruby-buildpack")
 			err := m.Save()
-			Ω(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-			Ω(getYamlContent(uniqueFilename)).To(ContainSubstrings(
+			Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
 				[]string{"- name: app1"},
 				[]string{"  memory: 128M"},
 				[]string{"  command: run main.go"},
@@ -226,7 +226,7 @@ var _ = Describe("generate_manifest", func() {
 
 func getYamlContent(path string) []string {
 	b, err := ioutil.ReadFile(path)
-	Ω(err).ToNot(HaveOccurred())
+	Expect(err).NotTo(HaveOccurred())
 
 	return strings.Split(string(b), "\n")
 }
