@@ -3124,10 +3124,6 @@
     "translation": "Scegli se consentire o non consentire. Non è possibile trasmettere entrambi gli indicatori nello stesso comando."
   },
   {
-    "id": "Please don't",
-    "translation": "Non "
-  },
-  {
     "id": "Please log in again",
     "translation": "Accedi di nuovo"
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "byte scaricati"
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",

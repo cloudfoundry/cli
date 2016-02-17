@@ -3124,10 +3124,6 @@
     "translation": "Elegir entre permitir o no permitir. No está permitido pasar ambas señales en el mismo mandato."
   },
   {
-    "id": "Please don't",
-    "translation": "No"
-  },
-  {
     "id": "Please log in again",
     "translation": "Vuelva a iniciar la sesión"
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "bytes descargados"
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",

@@ -3124,10 +3124,6 @@
     "translation": "허용 또는 허용 안 함을 선택하십시오. 두 플래그를 모두 동일한 명령에서 전달할 수 없습니다."
   },
   {
-    "id": "Please don't",
-    "translation": "다음을 수행하지 마십시오."
-  },
-  {
     "id": "Please log in again",
     "translation": "다시 로그인하십시오."
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "다운로드된 바이트 수"
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",

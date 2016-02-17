@@ -3124,10 +3124,6 @@
     "translation": "Bitte wählen Sie entweder zulassen oder nicht zulassen aus. Beide Flags dürfen nicht in ein und demselben Befehl übergeben werden. "
   },
   {
-    "id": "Please don't",
-    "translation": "Bitte tun Sie Folgendes nicht: "
-  },
-  {
     "id": "Please log in again",
     "translation": "Bitte melden Sie sich erneut an."
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "Heruntergeladene Byte"
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",

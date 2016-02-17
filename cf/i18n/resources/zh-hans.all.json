@@ -3124,10 +3124,6 @@
     "translation": "请选择 allow 或 disallow。不允许在同一命令中同时传递这两个标志。"
   },
   {
-    "id": "Please don't",
-    "translation": "请勿"
-  },
-  {
     "id": "Please log in again",
     "translation": "请重新登录。"
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "字节已下载"
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",

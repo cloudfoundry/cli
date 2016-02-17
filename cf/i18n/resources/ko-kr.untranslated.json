@@ -716,6 +716,10 @@
     "translation": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."
   },
   {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": "Skip verification of the API endpoint. Not recommended!"
+  },
+  {
     "id": "path",
     "translation": "path"
   },
