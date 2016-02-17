@@ -116,6 +116,26 @@ var _ = Describe("generate_manifest", func() {
 			[]string{"  buildpack: ruby-buildpack"},
 		))
 	})
+
+	Context("When there is a route with no hostname", func() {
+		It("generates a manifest containing no-hostname: true", func() {
+			m.Domain("app1", "", "test1.com")
+
+			err := m.Save()
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
+				[]string{"- name: app1"},
+				[]string{"  no-hostname: true"},
+			))
+
+			Expect(getYamlContent(uniqueFilename)).NotTo(ContainSubstrings(
+				[]string{"  host: "},
+				[]string{"  hosts:"},
+			))
+		})
+	})
+
 	Context("When there are multiple hosts and domains", func() {
 
 		It("generates a manifest containing two hosts two domains", func() {

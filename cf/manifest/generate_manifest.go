@@ -131,9 +131,18 @@ func (m *appManifest) Save() error {
 
 		if len(app.Routes) > 0 {
 			if len(app.Routes) == 1 {
-				if _, err := fmt.Fprintf(f, "  host: %s\n", app.Routes[0].Host); err != nil {
-					return err
+				if host := app.Routes[0].Host; host == "" {
+					// No-Hostname
+					if _, err := fmt.Fprintf(f, "  no-hostname: true\n"); err != nil {
+						return err
+					}
+				} else {
+					// Hostname
+					if _, err := fmt.Fprintf(f, "  host: %s\n", host); err != nil {
+						return err
+					}
 				}
+
 				if _, err := fmt.Fprintf(f, "  domain: %s\n", app.Routes[0].Domain.Name); err != nil {
 					return err
 				}
