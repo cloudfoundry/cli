@@ -3124,10 +3124,6 @@
     "translation": "allow または disallow のいずれかを選んでください。両方のフラグを同じコマンドで渡すことはできません。"
   },
   {
-    "id": "Please don't",
-    "translation": "次のことをしないでください:"
-  },
-  {
     "id": "Please log in again",
     "translation": "ログインし直してください"
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "ダウンロードされたバイト数"
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",

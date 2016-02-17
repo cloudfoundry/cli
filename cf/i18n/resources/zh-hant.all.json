@@ -3124,10 +3124,6 @@
     "translation": "請選擇容許或禁止。不允許在相同指令中傳遞這兩個旗標。"
   },
   {
-    "id": "Please don't",
-    "translation": "請不要"
-  },
-  {
     "id": "Please log in again",
     "translation": "請重新登入"
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "位元組（已下載）"
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",

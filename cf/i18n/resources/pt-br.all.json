@@ -3124,10 +3124,6 @@
     "translation": "Escolha permitir ou desaprovar. Não é permitido passar ambas as sinalizações no mesmo comando."
   },
   {
-    "id": "Please don't",
-    "translation": "Não"
-  },
-  {
     "id": "Please log in again",
     "translation": "Efetue login novamente."
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "bytes transferidos por download"
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",

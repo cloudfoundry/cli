@@ -42,7 +42,7 @@ func (cmd *Login) MetaData() command_registry.CommandMetadata {
 	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Org")}
 	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Space")}
 	fs["sso"] = &cliFlags.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")}
-	fs["skip-ssl-validation"] = &cliFlags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Please don't")}
+	fs["skip-ssl-validation"] = &cliFlags.BoolFlag{Name: "skip-ssl-validation", Usage: T("commands.flags.skip_ssl_validation.description")}
 
 	return command_registry.CommandMetadata{
 		Name:        "login",

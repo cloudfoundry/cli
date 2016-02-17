@@ -3124,10 +3124,6 @@
     "translation": "Choisissez allow ou disallow. Vous ne pouvez pas transmettre les deux indicateurs simultanément dans une même commande. "
   },
   {
-    "id": "Please don't",
-    "translation": "N'effectuez pas cette opération "
-  },
-  {
     "id": "Please log in again",
     "translation": "Reconnectez-vous "
   },
@@ -4422,6 +4418,10 @@
   {
     "id": "bytes downloaded",
     "translation": "octets téléchargés "
+  },
+  {
+    "id": "commands.flags.skip_ssl_validation.description",
+    "translation": ""
   },
   {
     "id": "cpu",
