@@ -98,23 +98,24 @@ var _ = Describe("config command", func() {
 
 	Context("--locale flag", func() {
 		It("stores the locale value when --locale [locale] is provided", func() {
-			runCommand("--locale", "zh_Hans")
-			Expect(configRepo.Locale()).Should(Equal("zh_Hans"))
+			runCommand("--locale", "zh-Hans")
+			Expect(configRepo.Locale()).Should(Equal("zh-Hans"))
 		})
 
 		It("informs the user of known locales if an unknown locale is provided", func() {
-			runCommand("--locale", "foo_BAR")
+			runCommand("--locale", "foo-BAR")
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"known locales are"},
-				[]string{"en_US"},
-				[]string{"fr_FR"},
+				[]string{"en-US"},
+				[]string{"fr-FR"},
+				[]string{"zh-Hans"},
 			))
 		})
 
 		Context("when the locale is already set", func() {
 			BeforeEach(func() {
-				configRepo.SetLocale("fr_FR")
-				Expect(configRepo.Locale()).Should(Equal("fr_FR"))
+				configRepo.SetLocale("fr-FR")
+				Expect(configRepo.Locale()).Should(Equal("fr-FR"))
 			})
 
 			It("clears the locale when the '--locale clear' flag is provided", func() {
