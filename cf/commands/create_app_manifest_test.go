@@ -115,13 +115,13 @@ var _ = Describe("create-app-manifest Command", func() {
 
 			It("creates a manifest with services, routes and environment vars", func() {
 				runCommand("my-app")
-				Ω(fakeManifest.MemoryCallCount()).To(Equal(1))
-				Ω(fakeManifest.EnvironmentVarsCallCount()).To(Equal(1))
-				Ω(fakeManifest.HealthCheckTimeoutCallCount()).To(Equal(1))
-				Ω(fakeManifest.InstancesCallCount()).To(Equal(1))
-				Ω(fakeManifest.DomainCallCount()).To(Equal(2))
-				Ω(fakeManifest.ServiceCallCount()).To(Equal(1))
-				Ω(fakeManifest.StartCommandCallCount()).To(Equal(1))
+				Expect(fakeManifest.MemoryCallCount()).To(Equal(1))
+				Expect(fakeManifest.EnvironmentVarsCallCount()).To(Equal(1))
+				Expect(fakeManifest.HealthCheckTimeoutCallCount()).To(Equal(1))
+				Expect(fakeManifest.InstancesCallCount()).To(Equal(1))
+				Expect(fakeManifest.DomainCallCount()).To(Equal(2))
+				Expect(fakeManifest.ServiceCallCount()).To(Equal(1))
+				Expect(fakeManifest.StartCommandCallCount()).To(Equal(1))
 			})
 		})
 
@@ -134,7 +134,7 @@ var _ = Describe("create-app-manifest Command", func() {
 
 			It("creates a manifest with a buildpack", func() {
 				runCommand("my-app")
-				Ω(fakeManifest.BuildpackUrlCallCount()).To(Equal(1))
+				Expect(fakeManifest.BuildpackUrlCallCount()).To(Equal(1))
 			})
 		})
 
@@ -147,15 +147,15 @@ var _ = Describe("create-app-manifest Command", func() {
 
 			It("calls manifest EnvironmentVars() aphlhabetically", func() {
 				runCommand("my-app")
-				Ω(fakeManifest.EnvironmentVarsCallCount()).To(Equal(4))
+				Expect(fakeManifest.EnvironmentVarsCallCount()).To(Equal(4))
 				_, k, _ := fakeManifest.EnvironmentVarsArgsForCall(0)
-				Ω(k).To(Equal("abc"))
+				Expect(k).To(Equal("abc"))
 				_, k, _ = fakeManifest.EnvironmentVarsArgsForCall(1)
-				Ω(k).To(Equal("bar"))
+				Expect(k).To(Equal("bar"))
 				_, k, _ = fakeManifest.EnvironmentVarsArgsForCall(2)
-				Ω(k).To(Equal("foo"))
+				Expect(k).To(Equal("foo"))
 				_, k, _ = fakeManifest.EnvironmentVarsArgsForCall(3)
-				Ω(k).To(Equal("xyz"))
+				Expect(k).To(Equal("xyz"))
 			})
 		})
 
@@ -168,15 +168,15 @@ var _ = Describe("create-app-manifest Command", func() {
 
 			It("calls manifest EnvironmentVars() aphlhabetically", func() {
 				runCommand("my-app")
-				Ω(fakeManifest.EnvironmentVarsCallCount()).To(Equal(4))
+				Expect(fakeManifest.EnvironmentVarsCallCount()).To(Equal(4))
 				_, _, v := fakeManifest.EnvironmentVarsArgsForCall(0)
-				Ω(v).To(Equal("\"abc\""))
+				Expect(v).To(Equal("\"abc\""))
 				_, _, v = fakeManifest.EnvironmentVarsArgsForCall(1)
-				Ω(v).To(Equal("10"))
+				Expect(v).To(Equal("10"))
 				_, _, v = fakeManifest.EnvironmentVarsArgsForCall(2)
-				Ω(v).To(Equal("true"))
+				Expect(v).To(Equal("true"))
 				_, _, v = fakeManifest.EnvironmentVarsArgsForCall(3)
-				Ω(v).To(Equal("false"))
+				Expect(v).To(Equal("false"))
 			})
 		})
 
@@ -189,12 +189,12 @@ var _ = Describe("create-app-manifest Command", func() {
 
 			It("creates a manifest with services, routes and environment vars", func() {
 				runCommand("my-app")
-				Ω(fakeManifest.MemoryCallCount()).To(Equal(1))
-				Ω(fakeManifest.EnvironmentVarsCallCount()).To(Equal(0))
-				Ω(fakeManifest.HealthCheckTimeoutCallCount()).To(Equal(0))
-				Ω(fakeManifest.InstancesCallCount()).To(Equal(1))
-				Ω(fakeManifest.DomainCallCount()).To(Equal(0))
-				Ω(fakeManifest.ServiceCallCount()).To(Equal(0))
+				Expect(fakeManifest.MemoryCallCount()).To(Equal(1))
+				Expect(fakeManifest.EnvironmentVarsCallCount()).To(Equal(0))
+				Expect(fakeManifest.HealthCheckTimeoutCallCount()).To(Equal(0))
+				Expect(fakeManifest.InstancesCallCount()).To(Equal(1))
+				Expect(fakeManifest.DomainCallCount()).To(Equal(0))
+				Expect(fakeManifest.ServiceCallCount()).To(Equal(0))
 			})
 		})
 
@@ -208,7 +208,7 @@ var _ = Describe("create-app-manifest Command", func() {
 			It("creates a manifest with services, routes and environment vars", func() {
 				filePath := "another/location/manifest.yml"
 				runCommand("-p", filePath, "my-app")
-				Ω(fakeManifest.FileSavePathArgsForCall(0)).To(Equal(filePath))
+				Expect(fakeManifest.FileSavePathArgsForCall(0)).To(Equal(filePath))
 			})
 		})
 
@@ -221,7 +221,7 @@ var _ = Describe("create-app-manifest Command", func() {
 
 			It("creates a manifest named <app-name>_manifest.yml", func() {
 				runCommand("my-app2")
-				Ω(fakeManifest.FileSavePathArgsForCall(0)).To(Equal("./my-app2_manifest.yml"))
+				Expect(fakeManifest.FileSavePathArgsForCall(0)).To(Equal("./my-app2_manifest.yml"))
 			})
 		})
 
