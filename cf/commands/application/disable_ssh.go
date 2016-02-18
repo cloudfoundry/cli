@@ -27,7 +27,7 @@ func init() {
 func (cmd *DisableSSH) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "disable-ssh",
-		Description: T("disable ssh for the application"),
+		Description: T("Disable ssh for the application"),
 		Usage:       T("CF_NAME disable-ssh APP_NAME"),
 	}
 }

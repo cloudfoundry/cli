@@ -22,7 +22,7 @@ func init() {
 func (cmd *ListPluginRepos) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "list-plugin-repos",
-		Description: T("list all the added plugin repository"),
+		Description: T("List all the added plugin repository"),
 		Usage:       T("CF_NAME list-plugin-repos"),
 	}
 }

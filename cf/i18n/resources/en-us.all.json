@@ -308,6 +308,10 @@
     "translation": "All plans of the service are already inaccessible for this org"
   },
   {
+    "id": "Allow SSH access for the space",
+    "translation": "Allow SSH access for the space"
+  },
+  {
     "id": "Also delete any mapped routes",
     "translation": "Also delete any mapped routes"
   },
@@ -1524,6 +1528,10 @@
     "translation": "Disable pseudo-tty allocation"
   },
   {
+    "id": "Disable ssh for the application",
+    "translation": "Disable ssh for the application"
+  },
+  {
     "id": "Disable the buildpack from being used for staging",
     "translation": "Disable the buildpack from being used for staging"
   },
@@ -1554,6 +1562,10 @@
   {
     "id": "Disabling ssh support for space '%s'...",
     "translation": "Disabling ssh support for space '%s'..."
+  },
+  {
+    "id": "Disallow SSH access for the space",
+    "translation": "Disallow SSH access for the space"
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -1650,6 +1662,10 @@
   {
     "id": "Enable or disable color",
     "translation": "Enable or disable color"
+  },
+  {
+    "id": "Enable ssh for the application",
+    "translation": "Enable ssh for the application"
   },
   {
     "id": "Enable the buildpack to be used for staging",
@@ -2082,6 +2098,10 @@
   {
     "id": "Get a one time password for ssh clients",
     "translation": "Get a one time password for ssh clients"
+  },
+  {
+    "id": "Get the health_check_type value of an app",
+    "translation": "Get the health_check_type value of an app"
   },
   {
     "id": "Getting all services from marketplace...",
@@ -2636,6 +2656,10 @@
     "translation": "List all apps in the target space"
   },
   {
+    "id": "List all available plugin commands",
+    "translation": "List all available plugin commands"
+  },
+  {
     "id": "List all available plugins in specified repository or in all added repositories",
     "translation": "List all available plugins in specified repository or in all added repositories"
   },
@@ -2666,6 +2690,10 @@
   {
     "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
     "translation": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"
+  },
+  {
+    "id": "List all the added plugin repository",
+    "translation": "List all the added plugin repository"
   },
   {
     "id": "List all the routes for all spaces of current organization",
@@ -3380,6 +3408,14 @@
     "translation": "Repo Name"
   },
   {
+    "id": "Reports whether SSH is allowed in a space",
+    "translation": "Reports whether SSH is allowed in a space"
+  },
+  {
+    "id": "Reports whether SSH is enabled on an application container instance",
+    "translation": "Reports whether SSH is enabled on an application container instance"
+  },
+  {
     "id": "Repository: ",
     "translation": "Repository: "
   },
@@ -3646,6 +3682,10 @@
   {
     "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
     "translation": "Set default locale. If LOCALE is CLEAR, previous locale is deleted."
+  },
+  {
+    "id": "Set health_check_type flag to either 'port' or 'none'",
+    "translation": "Set health_check_type flag to either 'port' or 'none'"
   },
   {
     "id": "Set or view target api url",
@@ -4160,6 +4200,10 @@
     "translation": "Update an existing resource quota"
   },
   {
+    "id": "Update an existing space quota",
+    "translation": "Update an existing space quota"
+  },
+  {
     "id": "Update user-provided service instance",
     "translation": "Update user-provided service instance"
   },
@@ -4336,6 +4380,10 @@
     "translation": "Write curl body to FILE instead of stdout"
   },
   {
+    "id": "Write default values to the config",
+    "translation": "Write default values to the config"
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "Zip archive does not contain a buildpack"
   },
@@ -4374,10 +4422,6 @@
   {
     "id": "all",
     "translation": "all"
-  },
-  {
-    "id": "allow SSH access for the space",
-    "translation": "Allow SSH access for the space"
   },
   {
     "id": "allowed",
@@ -4444,14 +4488,6 @@
     "translation": "details"
   },
   {
-    "id": "disable ssh for the application",
-    "translation": "disable ssh for the application"
-  },
-  {
-    "id": "disallow SSH access for the space",
-    "translation": "Disallow SSH access for the space"
-  },
-  {
     "id": "disallowed",
     "translation": "disallowed"
   },
@@ -4492,10 +4528,6 @@
     "translation": "down"
   },
   {
-    "id": "enable ssh for the application",
-    "translation": "enable ssh for the application"
-  },
-  {
     "id": "enabled",
     "translation": "enabled"
   },
@@ -4518,10 +4550,6 @@
   {
     "id": "free or paid",
     "translation": "free or paid"
-  },
-  {
-    "id": "get the health_check_type value of an app",
-    "translation": "get the health_check_type value of an app"
   },
   {
     "id": "health_check_type is ",
@@ -4582,14 +4610,6 @@
   {
     "id": "limited",
     "translation": "limited"
-  },
-  {
-    "id": "list all available plugin commands",
-    "translation": "list all available plugin commands"
-  },
-  {
-    "id": "list all the added plugin repository",
-    "translation": "list all the added plugin repository"
   },
   {
     "id": "locked",
@@ -4672,14 +4692,6 @@
     "translation": "repo-plugins"
   },
   {
-    "id": "reports whether SSH is allowed in a space",
-    "translation": "Reports whether SSH is allowed in a space"
-  },
-  {
-    "id": "reports whether SSH is enabled on an application container instance",
-    "translation": "Reports whether SSH is enabled on an application container instance"
-  },
-  {
     "id": "requested state",
     "translation": "requested state"
   },
@@ -4730,10 +4742,6 @@
   {
     "id": "services",
     "translation": "services"
-  },
-  {
-    "id": "set health_check_type flag to either 'port' or 'none'",
-    "translation": "set health_check_type flag to either 'port' or 'none'"
   },
   {
     "id": "shared",
@@ -4840,10 +4848,6 @@
     "translation": "unlimited"
   },
   {
-    "id": "update an existing space quota",
-    "translation": "update an existing space quota"
-  },
-  {
     "id": "url",
     "translation": "url"
   },
@@ -4870,10 +4874,6 @@
   {
     "id": "version",
     "translation": "version"
-  },
-  {
-    "id": "write default values to the config",
-    "translation": "write default values to the config"
   },
   {
     "id": "yes",

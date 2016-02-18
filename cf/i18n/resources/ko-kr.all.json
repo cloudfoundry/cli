@@ -308,6 +308,10 @@
     "translation": "이미 이 조직이 서비스의 모든 플랜에 액세스할 수 없음"
   },
   {
+    "id": "Allow SSH access for the space",
+    "translation": "영역에 대한 SSH 액세스 허용"
+  },
+  {
     "id": "Also delete any mapped routes",
     "translation": "맵핑된 라우트도 삭제"
   },
@@ -1524,6 +1528,10 @@
     "translation": "pseudo-tty 할당 사용 안함"
   },
   {
+    "id": "Disable ssh for the application",
+    "translation": "애플리케이션에 SSH 사용 안함"
+  },
+  {
     "id": "Disable the buildpack from being used for staging",
     "translation": "빌드팩을 스테이징에 사용 안함"
   },
@@ -1554,6 +1562,10 @@
   {
     "id": "Disabling ssh support for space '%s'...",
     "translation": "'%s' 영역에 대한 SSH 지원 사용 안함 설정 중..."
+  },
+  {
+    "id": "Disallow SSH access for the space",
+    "translation": "영역에 대한 SSH 액세스 허용 안 함"
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -1650,6 +1662,10 @@
   {
     "id": "Enable or disable color",
     "translation": "색상 사용 또는 사용 안함"
+  },
+  {
+    "id": "Enable ssh for the application",
+    "translation": "애플리케이션에 SSH 사용"
   },
   {
     "id": "Enable the buildpack to be used for staging",
@@ -2082,6 +2098,10 @@
   {
     "id": "Get a one time password for ssh clients",
     "translation": "SSH 클라이언트의 일회성 비밀번호 가져오기"
+  },
+  {
+    "id": "Get the health_check_type value of an app",
+    "translation": "앱의 health_check_type 값 가져오기"
   },
   {
     "id": "Getting all services from marketplace...",
@@ -2636,6 +2656,10 @@
     "translation": "대상 영역에 모든 앱 나열"
   },
   {
+    "id": "List all available plugin commands",
+    "translation": "사용 가능한 모든 플러그인 명령 나열"
+  },
+  {
     "id": "List all available plugins in specified repository or in all added repositories",
     "translation": ""
   },
@@ -2666,6 +2690,10 @@
   {
     "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
     "translation": "모든 스택 나열(스택은 앱을 실행할 수 있는 운영 체제를 비롯한 사전 빌드된 파일 시스템)"
+  },
+  {
+    "id": "List all the added plugin repository",
+    "translation": "추가된 모든 플러그인 저장소 나열"
   },
   {
     "id": "List all the routes for all spaces of current organization",
@@ -3380,6 +3408,14 @@
     "translation": "저장소 이름"
   },
   {
+    "id": "Reports whether SSH is allowed in a space",
+    "translation": "영역에서 SSH가 허용되는지 보고"
+  },
+  {
+    "id": "Reports whether SSH is enabled on an application container instance",
+    "translation": "애플리케이션 컨테이너 인스턴스에서 SSH가 사용되는지 보고"
+  },
+  {
     "id": "Repository: ",
     "translation": "저장소: "
   },
@@ -3646,6 +3682,10 @@
   {
     "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
     "translation": "기본 로케일을 설정합니다. LOCALE이 CLEAR인 경우 이전 로케일이 삭제됩니다."
+  },
+  {
+    "id": "Set health_check_type flag to either 'port' or 'none'",
+    "translation": "health_check_type 플래그를 'port' 또는 'none'으로 설정"
   },
   {
     "id": "Set or view target api url",
@@ -4160,6 +4200,10 @@
     "translation": "기존 자원 할당량 업데이트"
   },
   {
+    "id": "Update an existing space quota",
+    "translation": "기존 영역 할당량 업데이트"
+  },
+  {
     "id": "Update user-provided service instance",
     "translation": ""
   },
@@ -4336,6 +4380,10 @@
     "translation": "stdout 대신 FILE에 curl 본문 쓰기"
   },
   {
+    "id": "Write default values to the config",
+    "translation": "구성에 기본값 쓰기"
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "Zip 아카이브에 빌드팩이 없음"
   },
@@ -4374,10 +4422,6 @@
   {
     "id": "all",
     "translation": "모두"
-  },
-  {
-    "id": "allow SSH access for the space",
-    "translation": "영역에 대한 SSH 액세스 허용"
   },
   {
     "id": "allowed",
@@ -4444,14 +4488,6 @@
     "translation": "세부사항"
   },
   {
-    "id": "disable ssh for the application",
-    "translation": "애플리케이션에 SSH 사용 안함"
-  },
-  {
-    "id": "disallow SSH access for the space",
-    "translation": "영역에 대한 SSH 액세스 허용 안 함"
-  },
-  {
     "id": "disallowed",
     "translation": "허용 안 함"
   },
@@ -4492,10 +4528,6 @@
     "translation": "작동 중지"
   },
   {
-    "id": "enable ssh for the application",
-    "translation": "애플리케이션에 SSH 사용"
-  },
-  {
     "id": "enabled",
     "translation": "사용"
   },
@@ -4518,10 +4550,6 @@
   {
     "id": "free or paid",
     "translation": "무료 또는 유료"
-  },
-  {
-    "id": "get the health_check_type value of an app",
-    "translation": "앱의 health_check_type 값 가져오기"
   },
   {
     "id": "health_check_type is ",
@@ -4582,14 +4610,6 @@
   {
     "id": "limited",
     "translation": "제한됨"
-  },
-  {
-    "id": "list all available plugin commands",
-    "translation": "사용 가능한 모든 플러그인 명령 나열"
-  },
-  {
-    "id": "list all the added plugin repository",
-    "translation": "추가된 모든 플러그인 저장소 나열"
   },
   {
     "id": "locked",
@@ -4672,14 +4692,6 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
-    "translation": "영역에서 SSH가 허용되는지 보고"
-  },
-  {
-    "id": "reports whether SSH is enabled on an application container instance",
-    "translation": "애플리케이션 컨테이너 인스턴스에서 SSH가 사용되는지 보고"
-  },
-  {
     "id": "requested state",
     "translation": "요청된 상태"
   },
@@ -4730,10 +4742,6 @@
   {
     "id": "services",
     "translation": "서비스"
-  },
-  {
-    "id": "set health_check_type flag to either 'port' or 'none'",
-    "translation": "health_check_type 플래그를 'port' 또는 'none'으로 설정"
   },
   {
     "id": "shared",
@@ -4840,10 +4848,6 @@
     "translation": "무제한"
   },
   {
-    "id": "update an existing space quota",
-    "translation": "기존 영역 할당량 업데이트"
-  },
-  {
     "id": "url",
     "translation": "URL"
   },
@@ -4870,10 +4874,6 @@
   {
     "id": "version",
     "translation": "버전"
-  },
-  {
-    "id": "write default values to the config",
-    "translation": "구성에 기본값 쓰기"
   },
   {
     "id": "yes",
