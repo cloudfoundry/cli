@@ -27,7 +27,7 @@ func init() {
 func (cmd *EnableSSH) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "enable-ssh",
-		Description: T("enable ssh for the application"),
+		Description: T("Enable ssh for the application"),
 		Usage:       T("CF_NAME enable-ssh APP_NAME"),
 	}
 }

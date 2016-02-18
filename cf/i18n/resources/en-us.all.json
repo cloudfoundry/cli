@@ -340,8 +340,8 @@
     "translation": "Append API request diagnostics to a log file"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "Application health check type (e.g. port or none)"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "Application health check type (e.g. 'port' or 'none')"
   },
   {
     "id": "Application instance index",
@@ -1248,8 +1248,8 @@
     "translation": "Create a url route in a space for later use"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "Create an app manifest for an app that has been pushed successfully."
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "Create an app manifest for an app that has been pushed successfully"
   },
   {
     "id": "Create an org",
@@ -1424,8 +1424,8 @@
     "translation": "Delete a user"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
-    "translation": "Delete all orphaned routes (e.g.: those that are not mapped to an app)"
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
+    "translation": "Delete all orphaned routes (i.e. those that are not mapped to an app)"
   },
   {
     "id": "Delete an app",
@@ -1528,8 +1528,8 @@
     "translation": "Disable the buildpack from being used for staging"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Disable the use of a feature so that users have access to and can use the feature."
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "Disable the use of a feature so that users have access to and can use the feature"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1572,8 +1572,8 @@
     "translation": "Do not execute a remote command"
   },
   {
-    "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
-    "translation": "Do not map a route to this app and remove routes from previous pushes of this app."
+    "id": "Do not map a route to this app and remove routes from previous pushes of this app",
+    "translation": "Do not map a route to this app and remove routes from previous pushes of this app"
   },
   {
     "id": "Do not start an app after pushing",
@@ -1656,8 +1656,8 @@
     "translation": "Enable the buildpack to be used for staging"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Enable the use of a feature so that users have access to and can use the feature."
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "Enable the use of a feature so that users have access to and can use the feature"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -2760,8 +2760,8 @@
     "translation": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application."
   },
   {
-    "id": "Make a user-provided service instance available to cf apps",
-    "translation": "Make a user-provided service instance available to cf apps"
+    "id": "Make a user-provided service instance available to CF apps",
+    "translation": "Make a user-provided service instance available to CF apps"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
@@ -3100,8 +3100,8 @@
     "translation": "Path used to identify the route"
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "Perform a simple check to determine whether a route currently exists or not."
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "Perform a simple check to determine whether a route currently exists or not"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3644,8 +3644,8 @@
     "translation": "Set an env variable for an app"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "Set default locale. If LOCALE is CLEAR, previous locale is deleted."
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted."
   },
   {
     "id": "Set or view target api url",
@@ -3844,8 +3844,8 @@
     "translation": "TIP:\n"
   },
   {
-    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-    "translation": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps"
+    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
+    "translation": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
@@ -4360,12 +4360,12 @@
     "translation": "access"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "access for plans of a particular broker"
+    "id": "Access for plans of a particular broker",
+    "translation": "Access for plans of a particular broker"
   },
   {
-    "id": "access for service name of a particular service offering",
-    "translation": "access for service name of a particular service offering"
+    "id": "Access for service name of a particular service offering",
+    "translation": "Access for service name of a particular service offering"
   },
   {
     "id": "actor",
@@ -4376,7 +4376,7 @@
     "translation": "all"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "Allow SSH access for the space"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "details"
   },
   {
-    "id": "disable ssh for the application",
-    "translation": "disable ssh for the application"
+    "id": "Disable ssh for the application",
+    "translation": "Disable ssh for the application"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "Disallow SSH access for the space"
   },
   {
@@ -4464,8 +4464,8 @@
     "translation": "disk:"
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "docker-image to be used (e.g. user/docker-image-name)"
+    "id": "Docker image to use (e.g. user/docker-image-name)",
+    "translation": "Docker image to use (e.g. user/docker-image-name)"
   },
   {
     "id": "does not exist.",
@@ -4492,8 +4492,8 @@
     "translation": "down"
   },
   {
-    "id": "enable ssh for the application",
-    "translation": "enable ssh for the application"
+    "id": "Enable ssh for the application",
+    "translation": "Enable ssh for the application"
   },
   {
     "id": "enabled",
@@ -4520,8 +4520,8 @@
     "translation": "free or paid"
   },
   {
-    "id": "get the health_check_type value of an app",
-    "translation": "get the health_check_type value of an app"
+    "id": "Get the health_check_type value of an app",
+    "translation": "Get the health_check_type value of an app"
   },
   {
     "id": "health_check_type is ",
@@ -4584,12 +4584,12 @@
     "translation": "limited"
   },
   {
-    "id": "list all available plugin commands",
-    "translation": "list all available plugin commands"
+    "id": "List all available plugin commands",
+    "translation": "List all available plugin commands"
   },
   {
-    "id": "list all the added plugin repository",
-    "translation": "list all the added plugin repository"
+    "id": "List all the added plugin repositories",
+    "translation": "List all the added plugin repositories"
   },
   {
     "id": "locked",
@@ -4652,8 +4652,8 @@
     "translation": "plans"
   },
   {
-    "id": "plans accessible by a particular organization",
-    "translation": "plans accessible by a particular organization"
+    "id": "Plans accessible by a particular organization",
+    "translation": "Plans accessible by a particular organization"
   },
   {
     "id": "position",
@@ -4672,11 +4672,11 @@
     "translation": "repo-plugins"
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "Reports whether SSH is allowed in a space"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "Reports whether SSH is enabled on an application container instance"
   },
   {
@@ -4732,8 +4732,8 @@
     "translation": "services"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
-    "translation": "set health_check_type flag to either 'port' or 'none'"
+    "id": "Set health_check_type flag to either 'port' or 'none'",
+    "translation": "Set health_check_type flag to either 'port' or 'none'"
   },
   {
     "id": "shared",
@@ -4840,8 +4840,8 @@
     "translation": "unlimited"
   },
   {
-    "id": "update an existing space quota",
-    "translation": "update an existing space quota"
+    "id": "Update an existing space quota",
+    "translation": "Update an existing space quota"
   },
   {
     "id": "url",
@@ -4872,8 +4872,8 @@
     "translation": "version"
   },
   {
-    "id": "write default values to the config",
-    "translation": "write default values to the config"
+    "id": "Write default values to the config",
+    "translation": "Write default values to the config"
   },
   {
     "id": "yes",

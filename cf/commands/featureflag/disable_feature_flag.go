@@ -23,7 +23,7 @@ func init() {
 func (cmd *DisableFeatureFlag) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "disable-feature-flag",
-		Description: T("Disable the use of a feature so that users have access to and can use the feature."),
+		Description: T("Disable the use of a feature so that users have access to and can use the feature"),
 		Usage:       T("CF_NAME disable-feature-flag FEATURE_NAME"),
 	}
 }

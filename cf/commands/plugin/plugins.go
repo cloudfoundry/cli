@@ -28,7 +28,7 @@ func (cmd *Plugins) MetaData() command_registry.CommandMetadata {
 
 	return command_registry.CommandMetadata{
 		Name:        "plugins",
-		Description: T("list all available plugin commands"),
+		Description: T("List all available plugin commands"),
 		Usage:       T("CF_NAME plugins"),
 		Flags:       fs,
 	}

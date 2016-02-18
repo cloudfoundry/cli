@@ -26,7 +26,7 @@ func init() {
 func (cmd *AllowSpaceSSH) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "allow-space-ssh",
-		Description: T("allow SSH access for the space"),
+		Description: T("Allow SSH access for the space"),
 		Usage:       T("CF_NAME allow-space-ssh SPACE_NAME"),
 	}
 }

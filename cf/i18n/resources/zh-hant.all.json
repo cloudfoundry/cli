@@ -340,8 +340,8 @@
     "translation": "將 API 要求診斷附加至日誌檔"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "應用程式性能檢查類型（例如 port 或 none）"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "應用程式性能檢查類型（例如 'port' 或 'none'）"
   },
   {
     "id": "Application instance index",
@@ -1248,8 +1248,8 @@
     "translation": "在空間中建立 URL 路徑以供稍後使用"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "建立已順利推送之應用程式的應用程式資訊清單。"
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "建立已順利推送之應用程式的應用程式資訊清單"
   },
   {
     "id": "Create an org",
@@ -1424,7 +1424,7 @@
     "translation": "刪除使用者"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "刪除所有遺留的路徑（例如：未對映至應用程式的路徑）"
   },
   {
@@ -1528,8 +1528,8 @@
     "translation": "停止使用建置套件進行編譯打包"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "禁止使用特性，讓使用者可以存取和使用特性。"
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "禁止使用特性，讓使用者可以存取和使用特性"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1572,8 +1572,8 @@
     "translation": "不執行遠端指令"
   },
   {
-    "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
-    "translation": "不要將路徑對映至此應用程式，並從此應用程式的先前推送中移除路徑。"
+    "id": "Do not map a route to this app and remove routes from previous pushes of this app",
+    "translation": "不要將路徑對映至此應用程式，並從此應用程式的先前推送中移除路徑"
   },
   {
     "id": "Do not start an app after pushing",
@@ -1656,8 +1656,8 @@
     "translation": "啟用要用於編譯打包的建置套件"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "允許使用特性，讓使用者可以存取和使用特性。"
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "允許使用特性，讓使用者可以存取和使用特性"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -2760,8 +2760,8 @@
     "translation": "將應用程式原始碼從某個應用程式複製到另一個應用程式。除非予以置換，否則 copy-source 指令將重新啟動應用程式。"
   },
   {
-    "id": "Make a user-provided service instance available to cf apps",
-    "translation": "讓使用者提供的服務實例可供 cf 應用程式使用"
+    "id": "Make a user-provided service instance available to CF apps",
+    "translation": "讓使用者提供的服務實例可供 CF 應用程式使用"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
@@ -3100,8 +3100,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "執行簡單的檢查，以判斷路徑目前是否存在。"
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "執行簡單的檢查，以判斷路徑目前是否存在"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3644,8 +3644,8 @@
     "translation": "設定應用程式的環境變數"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "設定預設語言環境。如果 LOCALE 是 CLEAR，則會刪除先前的語言環境。"
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "設定預設語言環境。如果 LOCALE 是 'CLEAR'，則會刪除先前的語言環境。"
   },
   {
     "id": "Set or view target api url",
@@ -3844,8 +3844,8 @@
     "translation": "提示:\n"
   },
   {
-    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-    "translation": "提示:\n   使用 'CF_NAME create-user-provided-service'，讓使用者提供的服務可供 cf 應用程式使用"
+    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
+    "translation": "提示:\n   使用 'CF_NAME create-user-provided-service'，讓使用者提供的服務可供 CF 應用程式使用"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
@@ -4360,11 +4360,11 @@
     "translation": "存取權"
   },
   {
-    "id": "access for plans of a particular broker",
+    "id": "Access for plans of a particular broker",
     "translation": "特定分配管理系統之方案的存取權"
   },
   {
-    "id": "access for service name of a particular service offering",
+    "id": "Access for service name of a particular service offering",
     "translation": "特定服務供應項目之服務名稱的存取權"
   },
   {
@@ -4376,7 +4376,7 @@
     "translation": "全部"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "容許空間的 SSH 存取權"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "詳細資料"
   },
   {
-    "id": "disable ssh for the application",
+    "id": "Disable ssh for the application",
     "translation": "停用應用程式的 ssh"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "禁止空間的 SSH 存取權"
   },
   {
@@ -4464,7 +4464,7 @@
     "translation": "磁碟："
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
+    "id": "Docker image to use (e.g. user/docker-image-name)",
     "translation": "要使用的 docker-image（例如 user/docker-image-name）"
   },
   {
@@ -4492,7 +4492,7 @@
     "translation": "關閉"
   },
   {
-    "id": "enable ssh for the application",
+    "id": "Enable ssh for the application",
     "translation": "啟用應用程式的 ssh"
   },
   {
@@ -4520,7 +4520,7 @@
     "translation": "免費或付費"
   },
   {
-    "id": "get the health_check_type value of an app",
+    "id": "Get the health_check_type value of an app",
     "translation": "取得應用程式的 health_check_type 值"
   },
   {
@@ -4584,11 +4584,11 @@
     "translation": "限制"
   },
   {
-    "id": "list all available plugin commands",
+    "id": "List all available plugin commands",
     "translation": "列出所有可用的外掛程式指令"
   },
   {
-    "id": "list all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "列出所有已新增的外掛程式儲存庫"
   },
   {
@@ -4652,7 +4652,7 @@
     "translation": "方案"
   },
   {
-    "id": "plans accessible by a particular organization",
+    "id": "Plans accessible by a particular organization",
     "translation": "特定組織可存取的方案"
   },
   {
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "空間中是否容許 SSH 的報告"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "在應用程式儲存器實例上是否啟用 SSH 的報告"
   },
   {
@@ -4732,7 +4732,7 @@
     "translation": "服務"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
+    "id": "Set health_check_type flag to either 'port' or 'none'",
     "translation": "將 health_check_type 旗標設定為 'port' 或 'none'"
   },
   {
@@ -4840,7 +4840,7 @@
     "translation": "無限制"
   },
   {
-    "id": "update an existing space quota",
+    "id": "Update an existing space quota",
     "translation": "更新現有的空間配額"
   },
   {
@@ -4872,7 +4872,7 @@
     "translation": "版本"
   },
   {
-    "id": "write default values to the config",
+    "id": "Write default values to the config",
     "translation": "將預設值寫入至配置"
   },
   {

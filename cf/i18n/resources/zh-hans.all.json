@@ -340,8 +340,8 @@
     "translation": "将 API 请求诊断附加到日志文件"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "应用程序运行状况检查类型（例如，port 或 none）"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "应用程序运行状况检查类型（例如，'port' 或 'none'）"
   },
   {
     "id": "Application instance index",
@@ -1248,8 +1248,8 @@
     "translation": "在空间中创建 URL 路径以供日后使用"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "为已成功推送的应用程序创建应用程序清单。"
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "为已成功推送的应用程序创建应用程序清单"
   },
   {
     "id": "Create an org",
@@ -1424,7 +1424,7 @@
     "translation": "删除用户"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "删除所有孤立的路径（例如：未映射到应用程序的路径）"
   },
   {
@@ -1528,8 +1528,8 @@
     "translation": "禁止 buildpack 用于编译打包"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "禁止使用某个功能，使用户无权访问和无法使用该功能。"
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "禁止使用某个功能，使用户无权访问和无法使用该功能"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1572,8 +1572,8 @@
     "translation": "不执行远程命令"
   },
   {
-    "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
-    "translation": "不将路径映射到此应用程序，并从此应用程序的先前推送中除去路径。"
+    "id": "Do not map a route to this app and remove routes from previous pushes of this app",
+    "translation": "不将路径映射到此应用程序，并从此应用程序的先前推送中除去路径"
   },
   {
     "id": "Do not start an app after pushing",
@@ -1656,8 +1656,8 @@
     "translation": "支持 buildpack 用于编译打包"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "支持使用某个功能，以便用户有权访问并可以使用该功能。"
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "支持使用某个功能，以便用户有权访问并可以使用该功能"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -2760,8 +2760,8 @@
     "translation": "将应用程序源代码从一个应用程序复制到另一个应用程序。除非已覆盖，否则 copy-source 命令将重新启动应用程序。"
   },
   {
-    "id": "Make a user-provided service instance available to cf apps",
-    "translation": "使用户提供的服务实例可供 cf 应用程序使用"
+    "id": "Make a user-provided service instance available to CF apps",
+    "translation": "使用户提供的服务实例可供 CF 应用程序使用"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
@@ -3100,8 +3100,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "执行简单检查，以确定路径当前是否存在。"
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "执行简单检查，以确定路径当前是否存在"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3644,8 +3644,8 @@
     "translation": "为应用程序设置环境变量"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "设置缺省语言环境。如果 LOCALE 为 CLEAR，将删除先前的语言环境。"
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "设置缺省语言环境。如果 LOCALE 为 'CLEAR'，将删除先前的语言环境。"
   },
   {
     "id": "Set or view target api url",
@@ -3844,8 +3844,8 @@
     "translation": "提示:\n"
   },
   {
-    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-    "translation": "提示:\n   使用“CF_NAME create-user-provided-service”可使用户提供的服务可供 cf 应用程序使用"
+    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
+    "translation": "提示:\n   使用“CF_NAME create-user-provided-service”可使用户提供的服务可供 CF 应用程序使用"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
@@ -4360,11 +4360,11 @@
     "translation": "访问权"
   },
   {
-    "id": "access for plans of a particular broker",
+    "id": "Access for plans of a particular broker",
     "translation": "对特定代理程序的套餐的访问权"
   },
   {
-    "id": "access for service name of a particular service offering",
+    "id": "Access for service name of a particular service offering",
     "translation": "对特定服务产品的服务名称的访问权"
   },
   {
@@ -4376,7 +4376,7 @@
     "translation": "所有"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "允许对空间进行 SSH 访问"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "详细信息"
   },
   {
-    "id": "disable ssh for the application",
+    "id": "Disable ssh for the application",
     "translation": "禁用应用程序的 SSH"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "不允许对空间进行 SSH 访问"
   },
   {
@@ -4464,7 +4464,7 @@
     "translation": "磁盘："
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
+    "id": "Docker image to use (e.g. user/docker-image-name)",
     "translation": "要使用的 docker-image（例如，user/docker-image-name）"
   },
   {
@@ -4492,7 +4492,7 @@
     "translation": "停止运行"
   },
   {
-    "id": "enable ssh for the application",
+    "id": "Enable ssh for the application",
     "translation": "启用应用程序的 SSH"
   },
   {
@@ -4520,7 +4520,7 @@
     "translation": "免费或付费"
   },
   {
-    "id": "get the health_check_type value of an app",
+    "id": "Get the health_check_type value of an app",
     "translation": "获取应用程序的 health_check_type 值"
   },
   {
@@ -4584,11 +4584,11 @@
     "translation": "受限"
   },
   {
-    "id": "list all available plugin commands",
+    "id": "List all available plugin commands",
     "translation": "列出所有可用的插件命令"
   },
   {
-    "id": "list all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "列出所有添加的插件存储库"
   },
   {
@@ -4652,7 +4652,7 @@
     "translation": "套餐"
   },
   {
-    "id": "plans accessible by a particular organization",
+    "id": "Plans accessible by a particular organization",
     "translation": "可由特定组织访问的套餐"
   },
   {
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "报告是否允许在空间中使用 SSH"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "报告是否在应用程序容器实例上启用了 SSH"
   },
   {
@@ -4732,7 +4732,7 @@
     "translation": "服务"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
+    "id": "Set health_check_type flag to either 'port' or 'none'",
     "translation": "将 health_check_type 标志设置为“port”或“none”"
   },
   {
@@ -4840,7 +4840,7 @@
     "translation": "无限制"
   },
   {
-    "id": "update an existing space quota",
+    "id": "Update an existing space quota",
     "translation": "更新现有空间配额"
   },
   {
@@ -4872,7 +4872,7 @@
     "translation": "版本"
   },
   {
-    "id": "write default values to the config",
+    "id": "Write default values to the config",
     "translation": "将缺省值写入配置"
   },
   {

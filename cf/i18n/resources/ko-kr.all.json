@@ -340,8 +340,8 @@
     "translation": "로그 파일에 API 요청 진단 추가"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "애플리케이션 상태 검사 유형(예: 포트 또는 없음)"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "애플리케이션 상태 검사 유형(예: 'port' 또는 'none')"
   },
   {
     "id": "Application instance index",
@@ -1248,8 +1248,8 @@
     "translation": "나중에 사용하도록 영역에 URL 작성"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "푸시된 앱의 앱 Manifest를 작성합니다."
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "푸시된 앱의 앱 Manifest를 작성합니다"
   },
   {
     "id": "Create an org",
@@ -1424,7 +1424,7 @@
     "translation": "사용자 삭제"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "모든 고아 라우트(예: 앱에 맵핑되지 않은 라우트) 삭제"
   },
   {
@@ -1528,8 +1528,8 @@
     "translation": "빌드팩을 스테이징에 사용 안함"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용 안함으로 설정합니다."
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용 안함으로 설정합니다"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1572,8 +1572,8 @@
     "translation": "원격 명령을 실행하지 않음"
   },
   {
-    "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
-    "translation": "이 앱에 라우트를 맵핑하지 말고 이 앱의 이전 푸시에서 라우트를 제거하십시오."
+    "id": "Do not map a route to this app and remove routes from previous pushes of this app",
+    "translation": "이 앱에 라우트를 맵핑하지 말고 이 앱의 이전 푸시에서 라우트를 제거하십시오"
   },
   {
     "id": "Do not start an app after pushing",
@@ -1656,8 +1656,8 @@
     "translation": "스테이징에 사용할 빌드팩 사용"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용으로 설정합니다."
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용으로 설정합니다"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -2760,8 +2760,8 @@
     "translation": "한 애플리케이션에서 다른 애플리케이션으로 앱 소스 코드를 복사합니다. 대체되지 않는 한 copy-source 명령은 애플리케이션을 다시 시작합니다."
   },
   {
-    "id": "Make a user-provided service instance available to cf apps",
-    "translation": "cf 앱에서 사용자 제공 서비스 인스턴스를 사용 가능하도록 작성"
+    "id": "Make a user-provided service instance available to CF apps",
+    "translation": "CF 앱에서 사용자 제공 서비스 인스턴스를 사용 가능하도록 작성"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
@@ -3100,8 +3100,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "단순 검사를 수행하여 라우트가 현재 있는지 여부를 판별합니다."
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "단순 검사를 수행하여 라우트가 현재 있는지 여부를 판별합니다"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3644,8 +3644,8 @@
     "translation": "앱의 환경 변수 설정"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "기본 로케일을 설정합니다. LOCALE이 CLEAR인 경우 이전 로케일이 삭제됩니다."
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "기본 로케일을 설정합니다. LOCALE이 'CLEAR'인 경우 이전 로케일이 삭제됩니다."
   },
   {
     "id": "Set or view target api url",
@@ -3844,7 +3844,7 @@
     "translation": "팁:\n"
   },
   {
-    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
+    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
     "translation": "팁:\n CF 앱에서 사용자 제공 서비스를 사용할 수 있게 하려면 'CF_NAME create-user-provided-service'를 사용하십시오."
   },
   {
@@ -4360,11 +4360,11 @@
     "translation": "액세스"
   },
   {
-    "id": "access for plans of a particular broker",
+    "id": "Access for plans of a particular broker",
     "translation": "특정 브로커의 플랜에 액세스"
   },
   {
-    "id": "access for service name of a particular service offering",
+    "id": "Access for service name of a particular service offering",
     "translation": "특정 서비스 오퍼링의 서비스 이름에 액세스"
   },
   {
@@ -4376,7 +4376,7 @@
     "translation": "모두"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "영역에 대한 SSH 액세스 허용"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "세부사항"
   },
   {
-    "id": "disable ssh for the application",
+    "id": "Disable ssh for the application",
     "translation": "애플리케이션에 SSH 사용 안함"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "영역에 대한 SSH 액세스 허용 안 함"
   },
   {
@@ -4464,7 +4464,7 @@
     "translation": "디스크:"
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
+    "id": "Docker image to use (e.g. user/docker-image-name)",
     "translation": "사용할 Docker 이미지(예: 사용자/Docker 이미지 이름)"
   },
   {
@@ -4492,7 +4492,7 @@
     "translation": "작동 중지"
   },
   {
-    "id": "enable ssh for the application",
+    "id": "Enable ssh for the application",
     "translation": "애플리케이션에 SSH 사용"
   },
   {
@@ -4520,7 +4520,7 @@
     "translation": "무료 또는 유료"
   },
   {
-    "id": "get the health_check_type value of an app",
+    "id": "Get the health_check_type value of an app",
     "translation": "앱의 health_check_type 값 가져오기"
   },
   {
@@ -4584,11 +4584,11 @@
     "translation": "제한됨"
   },
   {
-    "id": "list all available plugin commands",
+    "id": "List all available plugin commands",
     "translation": "사용 가능한 모든 플러그인 명령 나열"
   },
   {
-    "id": "list all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "추가된 모든 플러그인 저장소 나열"
   },
   {
@@ -4652,7 +4652,7 @@
     "translation": "플랜"
   },
   {
-    "id": "plans accessible by a particular organization",
+    "id": "Plans accessible by a particular organization",
     "translation": "특정 조직에서 액세스할 수 있는 플랜"
   },
   {
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "영역에서 SSH가 허용되는지 보고"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "애플리케이션 컨테이너 인스턴스에서 SSH가 사용되는지 보고"
   },
   {
@@ -4732,7 +4732,7 @@
     "translation": "서비스"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
+    "id": "Set health_check_type flag to either 'port' or 'none'",
     "translation": "health_check_type 플래그를 'port' 또는 'none'으로 설정"
   },
   {
@@ -4840,7 +4840,7 @@
     "translation": "무제한"
   },
   {
-    "id": "update an existing space quota",
+    "id": "Update an existing space quota",
     "translation": "기존 영역 할당량 업데이트"
   },
   {
@@ -4872,7 +4872,7 @@
     "translation": "버전"
   },
   {
-    "id": "write default values to the config",
+    "id": "Write default values to the config",
     "translation": "구성에 기본값 쓰기"
   },
   {

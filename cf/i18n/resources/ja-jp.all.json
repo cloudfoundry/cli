@@ -340,8 +340,8 @@
     "translation": "API 要求診断をログ・ファイルに付加します"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "アプリケーション・ヘルス・チェック・タイプ (例: port または none)"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "アプリケーション・ヘルス・チェック・タイプ (例: 'port' または 'none')"
   },
   {
     "id": "Application instance index",
@@ -1248,8 +1248,8 @@
     "translation": "後で使用するためにスペース内に URL 経路を作成します"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "正常にプッシュされたアプリのアプリ・マニフェストを作成します。"
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "正常にプッシュされたアプリのアプリ・マニフェストを作成します"
   },
   {
     "id": "Create an org",
@@ -1424,7 +1424,7 @@
     "translation": "ユーザーを削除します"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "すべての孤立した経路 (例: アプリにマップされていない経路) を削除します"
   },
   {
@@ -1528,7 +1528,7 @@
     "translation": "このビルドパックをステージングに使用できないようにします"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
     "translation": "フィーチャーの使用を無効にすると、ユーザーはそのフィーチャーにアクセスしたり使用したりできるようになります"
   },
   {
@@ -1572,8 +1572,8 @@
     "translation": "リモート・コマンドを実行しません"
   },
   {
-    "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
-    "translation": "このアプリに経路をマップせずに、このアプリの前回までのプッシュから経路を削除します。"
+    "id": "Do not map a route to this app and remove routes from previous pushes of this app",
+    "translation": "このアプリに経路をマップせずに、このアプリの前回までのプッシュから経路を削除します"
   },
   {
     "id": "Do not start an app after pushing",
@@ -1656,7 +1656,7 @@
     "translation": "このビルドパックをステージングに使用できるようにします"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
     "translation": "フィーチャーの使用を有効にすると、ユーザーはそのフィーチャーにアクセスしたり使用したりできるようになります"
   },
   {
@@ -2760,8 +2760,8 @@
     "translation": "あるアプリケーションから他のアプリケーションにアプリ・ソース・コードをコピーします。オーバーライドされない限り、copy-source コマンドはそのアプリケーションを再始動します。"
   },
   {
-    "id": "Make a user-provided service instance available to cf apps",
-    "translation": "ユーザー提供のサービス・インスタンスを cf アプリが使用できるようにします"
+    "id": "Make a user-provided service instance available to CF apps",
+    "translation": "ユーザー提供のサービス・インスタンスを CF アプリが使用できるようにします"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
@@ -3100,8 +3100,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "経路が現在存在しているかどうかを調べる簡単なチェックを行います。"
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "経路が現在存在しているかどうかを調べる簡単なチェックを行います"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3644,8 +3644,8 @@
     "translation": "アプリの環境変数を設定します"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "デフォルト・ロケールを設定します。LOCALE が CLEAR の場合は、前のロケールが削除されます。"
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "デフォルト・ロケールを設定します。LOCALE が 'CLEAR' の場合は、前のロケールが削除されます。"
   },
   {
     "id": "Set or view target api url",
@@ -3844,8 +3844,8 @@
     "translation": "ヒント:\n"
   },
   {
-    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-    "translation": "ヒント:\n   ユーザー提供のサービスを cf アプリが使用できるようにするには、'CF_NAME create-user-provided-service' を使用します"
+    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
+    "translation": "ヒント:\n   ユーザー提供のサービスを CF アプリが使用できるようにするには、'CF_NAME create-user-provided-service' を使用します"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
@@ -4360,11 +4360,11 @@
     "translation": "アクセス"
   },
   {
-    "id": "access for plans of a particular broker",
+    "id": "Access for plans of a particular broker",
     "translation": "特定のブローカーに対するアクセス"
   },
   {
-    "id": "access for service name of a particular service offering",
+    "id": "Access for service name of a particular service offering",
     "translation": "特定のサービス・オファリングのサービス名に対するアクセス"
   },
   {
@@ -4376,7 +4376,7 @@
     "translation": "すべて"
   },
   {
-    "id": "allow SSH access for the space",
+    "id": "Allow SSH access for the space",
     "translation": "このスペースに対する SSH アクセスを許可します"
   },
   {
@@ -4444,11 +4444,11 @@
     "translation": "詳細"
   },
   {
-    "id": "disable ssh for the application",
+    "id": "Disable ssh for the application",
     "translation": "このアプリケーションに対して SSH を無効にします"
   },
   {
-    "id": "disallow SSH access for the space",
+    "id": "Disallow SSH access for the space",
     "translation": "このスペースに対する SSH アクセスを不許可にします"
   },
   {
@@ -4464,8 +4464,8 @@
     "translation": "ディスク:"
   },
   {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "使用される docker-image (例: user/docker-image-name)"
+    "id": "Docker image to use (e.g. user/docker-image-name)",
+    "translation": "使用される docker イメージ (例: user/docker-image-name)"
   },
   {
     "id": "does not exist.",
@@ -4492,7 +4492,7 @@
     "translation": "ダウン"
   },
   {
-    "id": "enable ssh for the application",
+    "id": "Enable ssh for the application",
     "translation": "このアプリケーションに対して SSH を有効にします"
   },
   {
@@ -4520,7 +4520,7 @@
     "translation": "無料または有料"
   },
   {
-    "id": "get the health_check_type value of an app",
+    "id": "Get the health_check_type value of an app",
     "translation": "アプリの health_check_type 値を取得します"
   },
   {
@@ -4584,11 +4584,11 @@
     "translation": "制限"
   },
   {
-    "id": "list all available plugin commands",
+    "id": "List all available plugin commands",
     "translation": "使用可能なプラグイン・コマンドをすべてリストします"
   },
   {
-    "id": "list all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "追加されたプラグイン・リポジトリーをすべてリストします"
   },
   {
@@ -4652,7 +4652,7 @@
     "translation": "プラン"
   },
   {
-    "id": "plans accessible by a particular organization",
+    "id": "Plans accessible by a particular organization",
     "translation": "特定の組織がアクセスできるプラン"
   },
   {
@@ -4672,11 +4672,11 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
+    "id": "Reports whether SSH is allowed in a space",
     "translation": "スペース内で SSH が許可されているかどうかを報告します"
   },
   {
-    "id": "reports whether SSH is enabled on an application container instance",
+    "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "アプリケーション・コンテナー・インスタンスで SSH に有効になっているかどうかを報告します"
   },
   {
@@ -4732,7 +4732,7 @@
     "translation": "サービス"
   },
   {
-    "id": "set health_check_type flag to either 'port' or 'none'",
+    "id": "Set health_check_type flag to either 'port' or 'none'",
     "translation": "health_check_type フラグを 'port' または 'none' のいずれかに設定します"
   },
   {
@@ -4840,7 +4840,7 @@
     "translation": "制限なし"
   },
   {
-    "id": "update an existing space quota",
+    "id": "Update an existing space quota",
     "translation": "既存のスペース割り当て量を更新します"
   },
   {
@@ -4872,7 +4872,7 @@
     "translation": "バージョン"
   },
   {
-    "id": "write default values to the config",
+    "id": "Write default values to the config",
     "translation": "デフォルト値を構成に書き込みます"
   },
   {
