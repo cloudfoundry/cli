@@ -1057,11 +1057,11 @@
   },
   {
     "id": "Can not provision instances of paid service plans",
-    "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden."
+    "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden"
   },
   {
     "id": "Can provision instances of paid service plans",
-    "translation": "Instanzen bezahlter Servicepläne können bereitgestellt werden."
+    "translation": "Instanzen bezahlter Servicepläne können bereitgestellt werden"
   },
   {
     "id": "Can provision instances of paid service plans (Default: disallowed)",
@@ -1081,7 +1081,7 @@
   },
   {
     "id": "Cannot provision instances of paid service plans",
-    "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden. "
+    "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden"
   },
   {
     "id": "Cannot specify both lock and unlock options.",
@@ -1097,7 +1097,7 @@
   },
   {
     "id": "Change or view the instance count, disk space limit, and memory limit for an app",
-    "translation": "Den Instanzzähler, den Grenzwert für den Plattenspeicher und die Speicherbegrenzung für eine App ändern oder anzeigen. "
+    "translation": "Den Instanzzähler, den Grenzwert für den Plattenspeicher und die Speicherbegrenzung für eine App ändern oder anzeigen"
   },
   {
     "id": "Change service plan for a service instance",
@@ -1141,7 +1141,7 @@
   },
   {
     "id": "Compute and show the sha1 value of the plugin binary file",
-    "translation": "Berechnen Sie den sha1-Wert der Binärdatei des Plug-ins und zeigen Sie ihn an. "
+    "translation": "Berechnen Sie den sha1-Wert der Binärdatei des Plug-ins und zeigen Sie ihn an"
   },
   {
     "id": "Computing sha1 for installed plugins, this may take a while ...",
@@ -1592,12 +1592,12 @@
     "translation": "Fernbefehl nicht ausführen"
   },
   {
-    "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
-    "translation": "Ordnen Sie keine Route zu dieser App zu und entfernen Sie Routen von vorherigen Push-Operationen dieser App. "
+    "id": "Do not map a route to this app and remove routes from previous pushes of this app",
+    "translation": "Ordnen Sie keine Route zu dieser App zu und entfernen Sie Routen von vorherigen Push-Operationen dieser App"
   },
   {
     "id": "Do not start an app after pushing",
-    "translation": "Starten Sie keine App nach einer Push-Operation. "
+    "translation": "Starten Sie keine App nach einer Push-Operation"
   },
   {
     "id": "Docker-image to be used (e.g. user/docker-image-name)",
@@ -2729,7 +2729,7 @@
   },
   {
     "id": "List domains in the target org",
-    "translation": "Domänen in der Zielorganisation auflisten. "
+    "translation": "Domänen in der Zielorganisation auflisten"
   },
   {
     "id": "List keys for a service instance",
@@ -2769,15 +2769,15 @@
   },
   {
     "id": "Lock the buildpack to prevent updates",
-    "translation": "Sperren Sie das Buildpack, um Aktualisierungen zu vermeiden."
+    "translation": "Sperren Sie das Buildpack, um Aktualisierungen zu vermeiden"
   },
   {
     "id": "Log user in",
-    "translation": "Melden Sie den Benutzer an."
+    "translation": "Melden Sie den Benutzer an"
   },
   {
     "id": "Log user out",
-    "translation": "Melden Sie den Benutzer ab."
+    "translation": "Melden Sie den Benutzer ab"
   },
   {
     "id": "Logged errors:",
@@ -2801,7 +2801,7 @@
   },
   {
     "id": "Make a user-provided service instance available to cf apps",
-    "translation": "Stellen Sie eine vom Benutzer zur Verfügung gestellte Serviceinstanz für cf-Apps zur Verfügung. "
+    "translation": "Stellen Sie eine vom Benutzer zur Verfügung gestellte Serviceinstanz für cf-Apps zur Verfügung"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
@@ -3321,11 +3321,11 @@
   },
   {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
-    "translation": "Entfernen Sie einen Service und untergeordnete Objekte rekursiv aus der Cloud Foundry-Datenbank, ohne Anforderungen an den Service-Broker zu stellen."
+    "translation": "Entfernen Sie einen Service und untergeordnete Objekte rekursiv aus der Cloud Foundry-Datenbank, ohne Anforderungen an den Service-Broker zu stellen"
   },
   {
     "id": "Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker",
-    "translation": "Entfernen Sie eine Serviceinstanz und untergeordnete Objekte rekursiv aus der Cloud Foundry-Datenbank, ohne Anforderungen an den Service-Broker zu stellen."
+    "translation": "Entfernen Sie eine Serviceinstanz und untergeordnete Objekte rekursiv aus der Cloud Foundry-Datenbank, ohne Anforderungen an den Service-Broker zu stellen"
   },
   {
     "id": "Remove a plugin repository",
@@ -3501,7 +3501,7 @@
   },
   {
     "id": "Retrieve the rules for all the security groups associated with the space",
-    "translation": "Regeln für alle Sicherheitsgruppen abrufen, die dem Bereich zugeordnet sind."
+    "translation": "Regeln für alle Sicherheitsgruppen abrufen, die dem Bereich zugeordnet sind"
   },
   {
     "id": "Retrieving status of all flagged features as {{.Username}}...",
@@ -4037,7 +4037,7 @@
   },
   {
     "id": "Total amount of memory a space can have (e.g. 1024M, 1G, 10G)",
-    "translation": "Der gesamte Speicherplatz eines Bereichs kann z. B. 1024M, 1G oder 10G betragen."
+    "translation": "Der gesamte Speicherplatz eines Bereichs kann z. B. 1024M, 1G oder 10G betragen"
   },
   {
     "id": "Total number of routes",
@@ -4301,7 +4301,7 @@
   },
   {
     "id": "Use a one-time password to login",
-    "translation": "Verwenden Sie ein Einmalkennwort für die Anmeldung."
+    "translation": "Verwenden Sie ein Einmalkennwort für die Anmeldung"
   },
   {
     "id": "User provided tags",

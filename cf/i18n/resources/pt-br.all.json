@@ -1592,8 +1592,8 @@
     "translation": "Não executar um comando remoto"
   },
   {
-    "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
-    "translation": "Não mapear uma rota para este app e remover as rotas de pushes anteriores deste app."
+    "id": "Do not map a route to this app and remove routes from previous pushes of this app",
+    "translation": "Não mapear uma rota para este app e remover as rotas de pushes anteriores deste app"
   },
   {
     "id": "Do not start an app after pushing",
