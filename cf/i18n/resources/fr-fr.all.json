@@ -1260,8 +1260,8 @@
     "translation": "Créer une route d'URL dans un espace pour une utilisation ultérieure "
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "Créez un manifeste d'application pour une application dont l'envoi par commande push a abouti. "
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "Créez un manifeste d'application pour une application dont l'envoi par commande push a abouti"
   },
   {
     "id": "Create an org",
@@ -1544,8 +1544,8 @@
     "translation": "Désactiver le pack de construction pour qu'il ne soit pas utilisé pour la constitution "
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Désactivez l'utilisation d'une fonction pour que les utilisateurs n'y aient pas accès et ne puissent pas l'utiliser. "
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "Désactivez l'utilisation d'une fonction pour que les utilisateurs n'y aient pas accès et ne puissent pas l'utiliser"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1684,8 +1684,8 @@
     "translation": "Activer le pack de construction pour qu'il soit utilisé pour la constitution "
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Activer l'utilisation d'une fonction pour que les utilisateurs aient accès à la fonction et puissent l'utiliser "
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "Activer l'utilisation d'une fonction pour que les utilisateurs aient accès à la fonction et puissent l'utiliser"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -3140,8 +3140,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "Effectuez un contrôle simple afin de déterminer si une route existe ou non. "
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "Effectuez un contrôle simple afin de déterminer si une route existe ou non"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",

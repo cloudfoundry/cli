@@ -1260,8 +1260,8 @@
     "translation": "Create a url route in a space for later use"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "Create an app manifest for an app that has been pushed successfully."
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "Create an app manifest for an app that has been pushed successfully"
   },
   {
     "id": "Create an org",
@@ -1544,8 +1544,8 @@
     "translation": "Disable the buildpack from being used for staging"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Disable the use of a feature so that users have access to and can use the feature."
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "Disable the use of a feature so that users have access to and can use the feature"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1684,8 +1684,8 @@
     "translation": "Enable the buildpack to be used for staging"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Enable the use of a feature so that users have access to and can use the feature."
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "Enable the use of a feature so that users have access to and can use the feature"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -3140,8 +3140,8 @@
     "translation": "Path used to identify the route"
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "Perform a simple check to determine whether a route currently exists or not."
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "Perform a simple check to determine whether a route currently exists or not"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",

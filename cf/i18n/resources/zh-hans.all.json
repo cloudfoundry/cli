@@ -1260,8 +1260,8 @@
     "translation": "在空间中创建 URL 路径以供日后使用"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "为已成功推送的应用程序创建应用程序清单。"
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "为已成功推送的应用程序创建应用程序清单"
   },
   {
     "id": "Create an org",
@@ -1544,8 +1544,8 @@
     "translation": "禁止 buildpack 用于编译打包"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "禁止使用某个功能，使用户无权访问和无法使用该功能。"
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "禁止使用某个功能，使用户无权访问和无法使用该功能"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1684,8 +1684,8 @@
     "translation": "支持 buildpack 用于编译打包"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "支持使用某个功能，以便用户有权访问并可以使用该功能。"
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "支持使用某个功能，以便用户有权访问并可以使用该功能"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -3140,8 +3140,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "执行简单检查，以确定路径当前是否存在。"
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "执行简单检查，以确定路径当前是否存在"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
