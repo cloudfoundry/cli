@@ -308,6 +308,10 @@
     "translation": "Tous les plans du service sont déjà inaccessibles pour cette organisation "
   },
   {
+    "id": "Allow SSH access for the space",
+    "translation": "Autoriser l'accès SSH pour l'espace "
+  },
+  {
     "id": "Also delete any mapped routes",
     "translation": "Supprimer aussi les routes mappées "
   },
@@ -1524,6 +1528,10 @@
     "translation": "Désactiver l'allocation pseudo-tty "
   },
   {
+    "id": "Disable ssh for the application",
+    "translation": "désactiver ssh pour l'application "
+  },
+  {
     "id": "Disable the buildpack from being used for staging",
     "translation": "Désactiver le pack de construction pour qu'il ne soit pas utilisé pour la constitution "
   },
@@ -1554,6 +1562,10 @@
   {
     "id": "Disabling ssh support for space '%s'...",
     "translation": "Désactivation du support ssh pour l'espace '%s'..."
+  },
+  {
+    "id": "Disallow SSH access for the space",
+    "translation": "Bloquer l'accès SSH pour l'espace "
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -1650,6 +1662,10 @@
   {
     "id": "Enable or disable color",
     "translation": "Activer ou désactiver la mise en couleur "
+  },
+  {
+    "id": "Enable ssh for the application",
+    "translation": "activer ssh pour l'application "
   },
   {
     "id": "Enable the buildpack to be used for staging",
@@ -2082,6 +2098,10 @@
   {
     "id": "Get a one time password for ssh clients",
     "translation": "Obtenir un mot de passe à utilisation unique pour les clients ssh "
+  },
+  {
+    "id": "Get the health_check_type value of an app",
+    "translation": "obtenir la valeur du type de diagnostic d'intégrité pour une application "
   },
   {
     "id": "Getting all services from marketplace...",
@@ -2636,6 +2656,10 @@
     "translation": "Répertorier toutes les applications dans l'espace cible"
   },
   {
+    "id": "List all available plugin commands",
+    "translation": "répertorier toutes les commandes de plug-in disponibles "
+  },
+  {
     "id": "List all available plugins in specified repository or in all added repositories",
     "translation": ""
   },
@@ -2666,6 +2690,10 @@
   {
     "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
     "translation": "Répertorier toutes les piles (une pile est un système de fichiers prégénérés incluant un système d'exploitation, qui peut exécuter des applications) "
+  },
+  {
+    "id": "List all the added plugin repository",
+    "translation": "répertorier l'intégralité du référentiel de plug-in ajouté "
   },
   {
     "id": "List all the routes for all spaces of current organization",
@@ -3380,6 +3408,14 @@
     "translation": "Nom du référentiel "
   },
   {
+    "id": "Reports whether SSH is allowed in a space",
+    "translation": "Indique si SSH est autorisé dans un espace "
+  },
+  {
+    "id": "Reports whether SSH is enabled on an application container instance",
+    "translation": "Indique si SSH est activé dans une instance de conteneur d'applications "
+  },
+  {
     "id": "Repository: ",
     "translation": "Référentiel : "
   },
@@ -3646,6 +3682,10 @@
   {
     "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
     "translation": "Définissez l'environnement local par défaut. Si locale a pour valeur CLEAR, l'environnement local précédent est supprimé. "
+  },
+  {
+    "id": "Set health_check_type flag to either 'port' or 'none'",
+    "translation": "associer le type de diagnostic d'intégrité à 'port' ou 'none'"
   },
   {
     "id": "Set or view target api url",
@@ -4160,6 +4200,10 @@
     "translation": "Mettre à jour un quota de ressources existant "
   },
   {
+    "id": "Update an existing space quota",
+    "translation": "mettre à jour un quota d'espace existant "
+  },
+  {
     "id": "Update user-provided service instance",
     "translation": ""
   },
@@ -4336,6 +4380,10 @@
     "translation": "Ecrire le corps curl dans un fichier (FILE) au lieu de stdout "
   },
   {
+    "id": "Write default values to the config",
+    "translation": "écrire les valeurs par défaut dans la configuration "
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "L'archive zip ne contient pas de pack de construction "
   },
@@ -4374,10 +4422,6 @@
   {
     "id": "all",
     "translation": "tout "
-  },
-  {
-    "id": "allow SSH access for the space",
-    "translation": "Autoriser l'accès SSH pour l'espace "
   },
   {
     "id": "allowed",
@@ -4444,14 +4488,6 @@
     "translation": "détails "
   },
   {
-    "id": "disable ssh for the application",
-    "translation": "désactiver ssh pour l'application "
-  },
-  {
-    "id": "disallow SSH access for the space",
-    "translation": "Bloquer l'accès SSH pour l'espace "
-  },
-  {
     "id": "disallowed",
     "translation": "bloqué "
   },
@@ -4492,10 +4528,6 @@
     "translation": "arrêté "
   },
   {
-    "id": "enable ssh for the application",
-    "translation": "activer ssh pour l'application "
-  },
-  {
     "id": "enabled",
     "translation": "activé "
   },
@@ -4518,10 +4550,6 @@
   {
     "id": "free or paid",
     "translation": "gratuit ou payant "
-  },
-  {
-    "id": "get the health_check_type value of an app",
-    "translation": "obtenir la valeur du type de diagnostic d'intégrité pour une application "
   },
   {
     "id": "health_check_type is ",
@@ -4582,14 +4610,6 @@
   {
     "id": "limited",
     "translation": "limité"
-  },
-  {
-    "id": "list all available plugin commands",
-    "translation": "répertorier toutes les commandes de plug-in disponibles "
-  },
-  {
-    "id": "list all the added plugin repository",
-    "translation": "répertorier l'intégralité du référentiel de plug-in ajouté "
   },
   {
     "id": "locked",
@@ -4672,14 +4692,6 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
-    "translation": "Indique si SSH est autorisé dans un espace "
-  },
-  {
-    "id": "reports whether SSH is enabled on an application container instance",
-    "translation": "Indique si SSH est activé dans une instance de conteneur d'applications "
-  },
-  {
     "id": "requested state",
     "translation": "état demandé "
   },
@@ -4730,10 +4742,6 @@
   {
     "id": "services",
     "translation": ""
-  },
-  {
-    "id": "set health_check_type flag to either 'port' or 'none'",
-    "translation": "associer le type de diagnostic d'intégrité à 'port' ou 'none'"
   },
   {
     "id": "shared",
@@ -4840,10 +4848,6 @@
     "translation": "illimité "
   },
   {
-    "id": "update an existing space quota",
-    "translation": "mettre à jour un quota d'espace existant "
-  },
-  {
     "id": "url",
     "translation": "adresse URL "
   },
@@ -4870,10 +4874,6 @@
   {
     "id": "version",
     "translation": ""
-  },
-  {
-    "id": "write default values to the config",
-    "translation": "écrire les valeurs par défaut dans la configuration "
   },
   {
     "id": "yes",

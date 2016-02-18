@@ -308,6 +308,10 @@
     "translation": "服务的所有套餐对于此组织已经不可访问"
   },
   {
+    "id": "Allow SSH access for the space",
+    "translation": "允许对空间进行 SSH 访问"
+  },
+  {
     "id": "Also delete any mapped routes",
     "translation": "同时删除所有映射的路径"
   },
@@ -1524,6 +1528,10 @@
     "translation": "禁用伪 tty 分配"
   },
   {
+    "id": "Disable ssh for the application",
+    "translation": "禁用应用程序的 SSH"
+  },
+  {
     "id": "Disable the buildpack from being used for staging",
     "translation": "禁止 buildpack 用于编译打包"
   },
@@ -1554,6 +1562,10 @@
   {
     "id": "Disabling ssh support for space '%s'...",
     "translation": "正在禁用对空间“%s”的 SSH 支持..."
+  },
+  {
+    "id": "Disallow SSH access for the space",
+    "translation": "不允许对空间进行 SSH 访问"
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -1650,6 +1662,10 @@
   {
     "id": "Enable or disable color",
     "translation": "启用或禁用颜色"
+  },
+  {
+    "id": "Enable ssh for the application",
+    "translation": "启用应用程序的 SSH"
   },
   {
     "id": "Enable the buildpack to be used for staging",
@@ -2082,6 +2098,10 @@
   {
     "id": "Get a one time password for ssh clients",
     "translation": "为 SSH 客户机获取一次性密码"
+  },
+  {
+    "id": "Get the health_check_type value of an app",
+    "translation": "获取应用程序的 health_check_type 值"
   },
   {
     "id": "Getting all services from marketplace...",
@@ -2636,6 +2656,10 @@
     "translation": "列出目标空间中的所有应用程序"
   },
   {
+    "id": "List all available plugin commands",
+    "translation": "列出所有可用的插件命令"
+  },
+  {
     "id": "List all available plugins in specified repository or in all added repositories",
     "translation": ""
   },
@@ -2666,6 +2690,10 @@
   {
     "id": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
     "translation": "列出所有堆栈（堆栈是一种可以运行应用程序的预构建文件系统，包括操作系统）"
+  },
+  {
+    "id": "List all the added plugin repository",
+    "translation": "列出所有添加的插件存储库"
   },
   {
     "id": "List all the routes for all spaces of current organization",
@@ -3380,6 +3408,14 @@
     "translation": "存储库名称"
   },
   {
+    "id": "Reports whether SSH is allowed in a space",
+    "translation": "报告是否允许在空间中使用 SSH"
+  },
+  {
+    "id": "Reports whether SSH is enabled on an application container instance",
+    "translation": "报告是否在应用程序容器实例上启用了 SSH"
+  },
+  {
     "id": "Repository: ",
     "translation": "存储库："
   },
@@ -3646,6 +3682,10 @@
   {
     "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
     "translation": "设置缺省语言环境。如果 LOCALE 为 CLEAR，将删除先前的语言环境。"
+  },
+  {
+    "id": "Set health_check_type flag to either 'port' or 'none'",
+    "translation": "将 health_check_type 标志设置为“port”或“none”"
   },
   {
     "id": "Set or view target api url",
@@ -4160,6 +4200,10 @@
     "translation": "更新现有资源配额"
   },
   {
+    "id": "Update an existing space quota",
+    "translation": "更新现有空间配额"
+  },
+  {
     "id": "Update user-provided service instance",
     "translation": ""
   },
@@ -4336,6 +4380,10 @@
     "translation": "将 curl 主体写入文件，而不写入 stdout"
   },
   {
+    "id": "Write default values to the config",
+    "translation": "将缺省值写入配置"
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "Zip 归档未包含 buildpack"
   },
@@ -4374,10 +4422,6 @@
   {
     "id": "all",
     "translation": "所有"
-  },
-  {
-    "id": "allow SSH access for the space",
-    "translation": "允许对空间进行 SSH 访问"
   },
   {
     "id": "allowed",
@@ -4444,14 +4488,6 @@
     "translation": "详细信息"
   },
   {
-    "id": "disable ssh for the application",
-    "translation": "禁用应用程序的 SSH"
-  },
-  {
-    "id": "disallow SSH access for the space",
-    "translation": "不允许对空间进行 SSH 访问"
-  },
-  {
     "id": "disallowed",
     "translation": "不允许"
   },
@@ -4492,10 +4528,6 @@
     "translation": "停止运行"
   },
   {
-    "id": "enable ssh for the application",
-    "translation": "启用应用程序的 SSH"
-  },
-  {
     "id": "enabled",
     "translation": "已启用"
   },
@@ -4518,10 +4550,6 @@
   {
     "id": "free or paid",
     "translation": "免费或付费"
-  },
-  {
-    "id": "get the health_check_type value of an app",
-    "translation": "获取应用程序的 health_check_type 值"
   },
   {
     "id": "health_check_type is ",
@@ -4582,14 +4610,6 @@
   {
     "id": "limited",
     "translation": "受限"
-  },
-  {
-    "id": "list all available plugin commands",
-    "translation": "列出所有可用的插件命令"
-  },
-  {
-    "id": "list all the added plugin repository",
-    "translation": "列出所有添加的插件存储库"
   },
   {
     "id": "locked",
@@ -4672,14 +4692,6 @@
     "translation": ""
   },
   {
-    "id": "reports whether SSH is allowed in a space",
-    "translation": "报告是否允许在空间中使用 SSH"
-  },
-  {
-    "id": "reports whether SSH is enabled on an application container instance",
-    "translation": "报告是否在应用程序容器实例上启用了 SSH"
-  },
-  {
     "id": "requested state",
     "translation": "请求的状态"
   },
@@ -4730,10 +4742,6 @@
   {
     "id": "services",
     "translation": "服务"
-  },
-  {
-    "id": "set health_check_type flag to either 'port' or 'none'",
-    "translation": "将 health_check_type 标志设置为“port”或“none”"
   },
   {
     "id": "shared",
@@ -4840,10 +4848,6 @@
     "translation": "无限制"
   },
   {
-    "id": "update an existing space quota",
-    "translation": "更新现有空间配额"
-  },
-  {
     "id": "url",
     "translation": "URL"
   },
@@ -4870,10 +4874,6 @@
   {
     "id": "version",
     "translation": "版本"
-  },
-  {
-    "id": "write default values to the config",
-    "translation": "将缺省值写入配置"
   },
   {
     "id": "yes",
