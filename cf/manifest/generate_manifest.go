@@ -2,9 +2,13 @@ package manifest
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/generic"
+
+	"gopkg.in/yaml.v2"
 )
 
 type AppManifest interface {
@@ -86,6 +90,76 @@ func (m *appManifest) GetContents() []models.Application {
 	return m.contents
 }
 
+func generateAppMap(app models.Application) generic.Map {
+	m := generic.NewMap()
+
+	m.Set("name", app.Name)
+	m.Set("memory", fmt.Sprintf("%dM", app.Memory))
+	m.Set("instances", app.InstanceCount)
+
+	if app.BuildpackUrl != "" {
+		m.Set("buildpack", app.BuildpackUrl)
+	}
+
+	if app.HealthCheckTimeout > 0 {
+		m.Set("timeout", app.HealthCheckTimeout)
+	}
+
+	if app.Command != "" {
+		m.Set("command", app.Command)
+	}
+
+	switch len(app.Routes) {
+	case 0:
+		m.Set("no-route", true)
+	case 1:
+		const noHostname = ""
+
+		m.Set("domain", app.Routes[0].Domain.Name)
+		host := app.Routes[0].Host
+
+		if host == noHostname {
+			m.Set("no-hostname", true)
+		} else {
+			m.Set("host", host)
+		}
+	default:
+		hosts, domains := separateHostsAndDomains(app.Routes)
+
+		switch len(hosts) {
+		case 0:
+			m.Set("no-hostname", true)
+		case 1:
+			m.Set("host", hosts[0])
+		default:
+			m.Set("hosts", hosts)
+		}
+
+		switch len(domains) {
+		case 1:
+			m.Set("domain", domains[0])
+		default:
+			m.Set("domains", domains)
+		}
+	}
+
+	if len(app.Services) > 0 {
+		var services []string
+
+		for _, s := range app.Services {
+			services = append(services, s.Name)
+		}
+
+		m.Set("services", services)
+	}
+
+	if len(app.EnvironmentVars) > 0 {
+		m.Set("env", app.EnvironmentVars)
+	}
+
+	return m
+}
+
 func (m *appManifest) Save() error {
 	f, err := os.Create(m.savePath)
 	if err != nil {
@@ -93,84 +167,21 @@ func (m *appManifest) Save() error {
 	}
 	defer f.Close()
 
-	_, err = fmt.Fprintln(f, "---\napplications:")
-	if err != nil {
-		return err
-	}
+	y := generic.NewMap()
+
+	apps := []generic.Map{}
 
 	for _, app := range m.contents {
-		if _, err := fmt.Fprintf(f, "- name: %s\n", app.Name); err != nil {
-			return err
-		}
-
-		if _, err := fmt.Fprintf(f, "  memory: %dM\n", app.Memory); err != nil {
-			return err
-		}
-
-		if _, err := fmt.Fprintf(f, "  instances: %d\n", app.InstanceCount); err != nil {
-			return err
-		}
-
-		if app.BuildpackUrl != "" {
-			if _, err := fmt.Fprintf(f, "  buildpack: %s\n", app.BuildpackUrl); err != nil {
-				return err
-			}
-		}
-
-		if app.HealthCheckTimeout > 0 {
-			if _, err := fmt.Fprintf(f, "  timeout: %d\n", app.HealthCheckTimeout); err != nil {
-				return err
-			}
-		}
-
-		if app.Command != "" {
-			if _, err := fmt.Fprintf(f, "  command: %s\n", app.Command); err != nil {
-				return err
-			}
-		}
-
-		if len(app.Routes) > 0 {
-			if len(app.Routes) == 1 {
-				if host := app.Routes[0].Host; host == "" {
-					// No-Hostname
-					if _, err := fmt.Fprintf(f, "  no-hostname: true\n"); err != nil {
-						return err
-					}
-				} else {
-					// Hostname
-					if _, err := fmt.Fprintf(f, "  host: %s\n", host); err != nil {
-						return err
-					}
-				}
-
-				if _, err := fmt.Fprintf(f, "  domain: %s\n", app.Routes[0].Domain.Name); err != nil {
-					return err
-				}
-			} else {
-				if err := writeRoutesToFile(f, app.Routes); err != nil {
-					return err
-				}
-			}
-		} else {
-			if _, err := fmt.Fprintf(f, "  no-route: true\n"); err != nil {
-				return err
-			}
-		}
-
-		if len(app.Services) > 0 {
-			if err := writeServicesToFile(f, app.Services); err != nil {
-				return err
-			}
-		}
-
-		if len(app.EnvironmentVars) > 0 {
-			if err := writeEnvironmentVarToFile(f, app.EnvironmentVars); err != nil {
-				return err
-			}
-		}
-
+		apps = append(apps, generateAppMap(app))
 	}
-	return nil
+
+	y.Set("applications", apps)
+
+	contents, err := yaml.Marshal(y)
+
+	err = ioutil.WriteFile(m.savePath, contents, os.ModePerm)
+
+	return err
 }
 
 func (m *appManifest) findOrCreateApplication(name string) int {
@@ -191,7 +202,8 @@ func (m *appManifest) addApplication(name string) {
 		},
 	})
 }
-func writeRoutesToFile(f *os.File, routes []models.RouteSummary) error {
+
+func separateHostsAndDomains(routes []models.RouteSummary) ([]string, []string) {
 	var (
 		hostSlice    []string
 		domainSlice  []string
@@ -216,64 +228,5 @@ func writeRoutesToFile(f *os.File, routes []models.RouteSummary) error {
 		domains = *domainPSlice
 	}
 
-	if len(hosts) == 1 {
-		if _, err := fmt.Fprintf(f, "  host: %s\n", hosts[0]); err != nil {
-			return err
-		}
-	} else {
-		if _, err := fmt.Fprintln(f, "  hosts:"); err != nil {
-			return err
-		}
-		for i := 0; i < len(hosts); i++ {
-			if _, err := fmt.Fprintf(f, "  - %s\n", hosts[i]); err != nil {
-				return err
-			}
-		}
-	}
-
-	if len(domains) == 1 {
-		if _, err := fmt.Fprintf(f, "  domain: %s\n", domains[0]); err != nil {
-			return err
-		}
-	} else {
-		if _, err := fmt.Fprintln(f, "  domains:"); err != nil {
-			return err
-		}
-		for i := 0; i < len(domains); i++ {
-			if _, err := fmt.Fprintf(f, "  - %s\n", domains[i]); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-func writeServicesToFile(f *os.File, entries []models.ServicePlanSummary) error {
-	_, err := fmt.Fprintln(f, "  services:")
-	if err != nil {
-		return err
-	}
-	for _, service := range entries {
-		_, err = fmt.Fprintf(f, "  - %s\n", service.Name)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func writeEnvironmentVarToFile(f *os.File, envVars map[string]interface{}) error {
-	_, err := fmt.Fprintln(f, "  env:")
-	if err != nil {
-		return err
-	}
-	for k, v := range envVars {
-		_, err = fmt.Fprintf(f, "    %s: %s\n", k, v)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return hosts, domains
 }

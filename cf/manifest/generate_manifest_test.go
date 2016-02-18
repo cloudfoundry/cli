@@ -5,17 +5,13 @@ import (
 	"os"
 	"strings"
 
+	"gopkg.in/yaml.v2"
+
 	. "github.com/cloudfoundry/cli/cf/manifest"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	"github.com/nu7hatch/gouuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
-
-type outputs struct {
-	contents []string
-	cursor   int
-}
 
 var _ = Describe("generate_manifest", func() {
 	var (
@@ -46,13 +42,12 @@ var _ = Describe("generate_manifest", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("starts the manifest with 3 dashes (---), followed by 'applications'", func() {
+	It("has applications", func() {
 		m.Save()
 
 		contents := getYamlContent(uniqueFilename)
 
-		Expect(contents[0]).To(Equal("---"))
-		Expect(contents[1]).To(Equal("applications:"))
+		Expect(contents[0]).To(Equal("applications: []"))
 	})
 
 	It("creates entry under the given app name", func() {
@@ -60,33 +55,30 @@ var _ = Describe("generate_manifest", func() {
 		m.Memory("app2", 64)
 		m.Save()
 
-		//outputs.ContainSubstring assert orders
-		cmdOutput := &outputs{
-			contents: getYamlContent(uniqueFilename),
-			cursor:   0,
-		}
+		applications := getYaml(uniqueFilename).Applications
 
-		Expect(cmdOutput.ContainsSubstring("- name: app1")).To(BeTrue())
-		Expect(cmdOutput.ContainsSubstring("  memory: 128M")).To(BeTrue())
+		Expect(applications[0].Name).To(Equal("app1"))
+		Expect(applications[0].Memory).To(Equal("128M"))
+		Expect(applications[0].NoRoute).To(BeTrue())
 
-		Expect(cmdOutput.ContainsSubstring("- name: app2")).To(BeTrue())
-		Expect(cmdOutput.ContainsSubstring("  memory: 64M")).To(BeTrue())
+		Expect(applications[1].Name).To(Equal("app2"))
+		Expect(applications[1].Memory).To(Equal("64M"))
+		Expect(applications[1].NoRoute).To(BeTrue())
 	})
 
-	It("prefixes each service with '-'", func() {
+	It("can generate services", func() {
 		m.Service("app1", "service1")
 		m.Service("app1", "service2")
 		m.Service("app1", "service3")
 		m.Save()
 
-		contents := getYamlContent(uniqueFilename)
+		contents := getYaml(uniqueFilename)
 
-		Expect(contents).To(ContainSubstrings(
-			[]string{"  services:"},
-			[]string{"- service1"},
-			[]string{"- service2"},
-			[]string{"- service3"},
-		))
+		application := contents.Applications[0]
+
+		Expect(application.Services).To(ContainElement("service1"))
+		Expect(application.Services).To(ContainElement("service2"))
+		Expect(application.Services).To(ContainElement("service3"))
 	})
 
 	It("generates a manifest containing all the attributes", func() {
@@ -101,20 +93,18 @@ var _ = Describe("generate_manifest", func() {
 		err := m.Save()
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
-			[]string{"- name: app1"},
-			[]string{"  memory: 128M"},
-			[]string{"  command: run main.go"},
-			[]string{"  services:"},
-			[]string{"  - service1"},
-			[]string{"  env:"},
-			[]string{"    foo: boo"},
-			[]string{"  timeout: 100"},
-			[]string{"  instances: 3"},
-			[]string{"  host: foo"},
-			[]string{"  domain: blahblahblah.com"},
-			[]string{"  buildpack: ruby-buildpack"},
-		))
+		application := getYaml(uniqueFilename).Applications[0]
+
+		Expect(application.Name).To(Equal("app1"))
+		Expect(application.Buildpack).To(Equal("ruby-buildpack"))
+		Expect(application.Memory).To(Equal("128M"))
+		Expect(application.Services[0]).To(Equal("service1"))
+		Expect(application.Env["foo"]).To(Equal("boo"))
+		Expect(application.Timeout).To(Equal(100))
+		Expect(application.Instances).To(Equal(3))
+		Expect(application.Host).To(Equal("foo"))
+		Expect(application.Domain).To(Equal("blahblahblah.com"))
+		Expect(application.NoRoute).To(BeFalse())
 	})
 
 	Context("When there is a route with no hostname", func() {
@@ -124,125 +114,105 @@ var _ = Describe("generate_manifest", func() {
 			err := m.Save()
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
-				[]string{"- name: app1"},
-				[]string{"  no-hostname: true"},
-			))
+			application := getYaml(uniqueFilename).Applications[0]
 
-			Expect(getYamlContent(uniqueFilename)).NotTo(ContainSubstrings(
-				[]string{"  host: "},
-				[]string{"  hosts:"},
-			))
+			Expect(application.Name).To(Equal("app1"))
+			Expect(application.NoHostname).To(BeTrue())
+
+			Expect(application.Host).To(Equal(""))
+			Expect(application.Hosts).To(BeEmpty())
+			Expect(application.NoRoute).To(BeFalse())
 		})
 	})
 
 	Context("When there are multiple hosts and domains", func() {
-
 		It("generates a manifest containing two hosts two domains", func() {
-			m.Memory("app1", 128)
-			m.StartCommand("app1", "run main.go")
-			m.Service("app1", "service1")
-			m.EnvironmentVars("app1", "foo", "boo")
-			m.HealthCheckTimeout("app1", 100)
-			m.Instances("app1", 3)
 			m.Domain("app1", "foo1", "test1.com")
 			m.Domain("app1", "foo1", "test2.com")
 			m.Domain("app1", "foo2", "test1.com")
 			m.Domain("app1", "foo2", "test2.com")
-			m.BuildpackUrl("app1", "ruby-buildpack")
 			err := m.Save()
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
-				[]string{"- name: app1"},
-				[]string{"  memory: 128M"},
-				[]string{"  command: run main.go"},
-				[]string{"  services:"},
-				[]string{"  - service1"},
-				[]string{"  env:"},
-				[]string{"    foo: boo"},
-				[]string{"  timeout: 100"},
-				[]string{"  instances: 3"},
-				[]string{"  hosts:"},
-				[]string{"  - foo1"},
-				[]string{"  - foo2"},
-				[]string{"  domains:"},
-				[]string{"  - test1.com"},
-				[]string{"  - test2.com"},
-				[]string{"  buildpack: ruby-buildpack"},
-			))
+			application := getYaml(uniqueFilename).Applications[0]
+
+			Expect(application.Name).To(Equal("app1"))
+			Expect(application.Hosts).To(ContainElement("foo1"))
+			Expect(application.Hosts).To(ContainElement("foo2"))
+			Expect(application.Domains).To(ContainElement("test1.com"))
+			Expect(application.Domains).To(ContainElement("test2.com"))
+
+			Expect(application.Host).To(Equal(""))
+			Expect(application.Domain).To(Equal(""))
+			Expect(application.NoRoute).To(BeFalse())
+			Expect(application.NoHostname).To(BeFalse())
 		})
 	})
 
 	Context("When there are multiple hosts and single domain", func() {
-
 		It("generates a manifest containing two hosts one domain", func() {
-			m.Memory("app1", 128)
-			m.StartCommand("app1", "run main.go")
-			m.Service("app1", "service1")
-			m.EnvironmentVars("app1", "foo", "boo")
-			m.HealthCheckTimeout("app1", 100)
-			m.Instances("app1", 3)
 			m.Domain("app1", "foo1", "test.com")
 			m.Domain("app1", "foo2", "test.com")
-			m.BuildpackUrl("app1", "ruby-buildpack")
 			err := m.Save()
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
-				[]string{"- name: app1"},
-				[]string{"  memory: 128M"},
-				[]string{"  command: run main.go"},
-				[]string{"  services:"},
-				[]string{"  - service1"},
-				[]string{"  env:"},
-				[]string{"    foo: boo"},
-				[]string{"  timeout: 100"},
-				[]string{"  instances: 3"},
-				[]string{"  hosts:"},
-				[]string{"  - foo1"},
-				[]string{"  - foo2"},
-				[]string{"  domain: test.com"},
-				[]string{"  buildpack: ruby-buildpack"},
-			))
+			application := getYaml(uniqueFilename).Applications[0]
+
+			Expect(application.Name).To(Equal("app1"))
+			Expect(application.Hosts).To(ContainElement("foo1"))
+			Expect(application.Hosts).To(ContainElement("foo2"))
+			Expect(application.Domain).To(Equal("test.com"))
+
+			Expect(application.Host).To(Equal(""))
+			Expect(application.Domains).To(BeEmpty())
+			Expect(application.NoRoute).To(BeFalse())
+			Expect(application.NoHostname).To(BeFalse())
 		})
 	})
 
 	Context("When there is single host and multiple domains", func() {
-
 		It("generates a manifest containing one host two domains", func() {
-			m.Memory("app1", 128)
-			m.StartCommand("app1", "run main.go")
-			m.Service("app1", "service1")
-			m.EnvironmentVars("app1", "foo", "boo")
-			m.HealthCheckTimeout("app1", 100)
-			m.Instances("app1", 3)
 			m.Domain("app1", "foo", "test1.com")
 			m.Domain("app1", "foo", "test2.com")
-			m.BuildpackUrl("app1", "ruby-buildpack")
 			err := m.Save()
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(getYamlContent(uniqueFilename)).To(ContainSubstrings(
-				[]string{"- name: app1"},
-				[]string{"  memory: 128M"},
-				[]string{"  command: run main.go"},
-				[]string{"  services:"},
-				[]string{"  - service1"},
-				[]string{"  env:"},
-				[]string{"    foo: boo"},
-				[]string{"  timeout: 100"},
-				[]string{"  instances: 3"},
-				[]string{"  host: foo"},
-				[]string{"  domains:"},
-				[]string{"  - test1.com"},
-				[]string{"  - test2.com"},
-				[]string{"  buildpack: ruby-buildpack"},
-			))
+			application := getYaml(uniqueFilename).Applications[0]
+
+			Expect(application.Name).To(Equal("app1"))
+			Expect(application.Host).To(Equal("foo"))
+			Expect(application.Domains).To(ContainElement("test1.com"))
+			Expect(application.Domains).To(ContainElement("test2.com"))
+
+			Expect(application.Hosts).To(BeEmpty())
+			Expect(application.Domain).To(Equal(""))
+			Expect(application.NoRoute).To(BeFalse())
+			Expect(application.NoHostname).To(BeFalse())
 		})
 	})
 
 })
+
+type YManifest struct {
+	Applications []YApplication `yaml:"applications"`
+}
+
+type YApplication struct {
+	Name       string                 `yaml:"name"`
+	Services   []string               `yaml:"services"`
+	Buildpack  string                 `yaml:"buildpack"`
+	Memory     string                 `yaml:"memory"`
+	Command    string                 `yaml:"command"`
+	Env        map[string]interface{} `yaml:"env"`
+	Timeout    int                    `yaml:"timeout"`
+	Instances  int                    `yaml:"instances"`
+	Host       string                 `yaml:"host"`
+	Hosts      []string               `yaml:"hosts"`
+	Domain     string                 `yaml:"domain"`
+	Domains    []string               `yaml:"domains"`
+	NoHostname bool                   `yaml:"no-hostname"`
+	NoRoute    bool                   `yaml:"no-route"`
+}
 
 func getYamlContent(path string) []string {
 	b, err := ioutil.ReadFile(path)
@@ -251,12 +221,14 @@ func getYamlContent(path string) []string {
 	return strings.Split(string(b), "\n")
 }
 
-func (o *outputs) ContainsSubstring(str string) bool {
-	for i := o.cursor; i < len(o.contents)-1; i++ {
-		if strings.Contains(o.contents[i], str) {
-			o.cursor = i
-			return true
-		}
-	}
-	return false
+func getYaml(path string) YManifest {
+	contents, err := ioutil.ReadFile(path)
+	Expect(err).NotTo(HaveOccurred())
+
+	var document YManifest
+
+	err = yaml.Unmarshal(contents, &document)
+	Expect(err).NotTo(HaveOccurred())
+
+	return document
 }
