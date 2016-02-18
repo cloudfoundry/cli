@@ -1592,8 +1592,8 @@
     "translation": "リモート・コマンドを実行しません"
   },
   {
-    "id": "Do not map a route to this app and remove routes from previous pushes of this app.",
-    "translation": "このアプリに経路をマップせずに、このアプリの前回までのプッシュから経路を削除します。"
+    "id": "Do not map a route to this app and remove routes from previous pushes of this app",
+    "translation": "このアプリに経路をマップせずに、このアプリの前回までのプッシュから経路を削除します"
   },
   {
     "id": "Do not start an app after pushing",
