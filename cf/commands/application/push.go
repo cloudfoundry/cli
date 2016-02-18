@@ -67,7 +67,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Path to app directory or to a zip file of the contents of the app directory")}
 	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
 	fs["t"] = &cliFlags.StringFlag{ShortName: "t", Usage: T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")}
-	fs["docker-image"] = &cliFlags.StringFlag{Name: "docker-image", ShortName: "o", Usage: T("docker-image to be used (e.g. user/docker-image-name)")}
+	fs["docker-image"] = &cliFlags.StringFlag{Name: "docker-image", ShortName: "o", Usage: T("Docker-image to be used (e.g. user/docker-image-name)")}
 	fs["health-check-type"] = &cliFlags.StringFlag{Name: "health-check-type", ShortName: "u", Usage: T("Application health check type (e.g. port or none)")}
 	fs["no-hostname"] = &cliFlags.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")}
 	fs["no-manifest"] = &cliFlags.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")}

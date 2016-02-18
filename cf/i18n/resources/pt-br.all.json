@@ -264,6 +264,14 @@
     "translation": ""
   },
   {
+    "id": "Access for plans of a particular broker",
+    "translation": "Acesso para planos de um broker específico"
+  },
+  {
+    "id": "Access for service name of a particular service offering",
+    "translation": "Acesso para nome do serviço de uma oferta de serviços específica"
+  },
+  {
     "id": "Acquiring running security groups as '{{.username}}'",
     "translation": "Adquirindo grupos de segurança em execução como '{{.username}}'"
   },
@@ -1590,6 +1598,10 @@
   {
     "id": "Do not start an app after pushing",
     "translation": "Não iniciar um app após o push"
+  },
+  {
+    "id": "Docker-image to be used (e.g. user/docker-image-name)",
+    "translation": "Docker-image a ser usado (por exemplo, user/docker-image-name)"
   },
   {
     "id": "Documentation url: {{.URL}}",
@@ -3148,6 +3160,10 @@
     "translation": "Plano: {{.ServicePlanName}}"
   },
   {
+    "id": "Plans accessible by a particular organization",
+    "translation": "Planos acessíveis por uma organização específica"
+  },
+  {
     "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
     "translation": "Escolha permitir ou desaprovar. Não é permitido passar ambas as sinalizações no mesmo comando."
   },
@@ -4408,14 +4424,6 @@
     "translation": "acessar"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "acesso para planos de um broker específico"
-  },
-  {
-    "id": "access for service name of a particular service offering",
-    "translation": "acesso para nome do serviço de uma oferta de serviços específica"
-  },
-  {
     "id": "actor",
     "translation": "agente"
   },
@@ -4498,10 +4506,6 @@
   {
     "id": "disk:",
     "translation": "disco:"
-  },
-  {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "docker-image a ser usado (por exemplo, user/docker-image-name)"
   },
   {
     "id": "does not exist.",
@@ -4644,10 +4648,6 @@
     "translation": ""
   },
   {
-    "id": "organization",
-    "translation": "organização"
-  },
-  {
     "id": "orgs",
     "translation": "organizações"
   },
@@ -4670,10 +4670,6 @@
   {
     "id": "plans",
     "translation": "planos"
-  },
-  {
-    "id": "plans accessible by a particular organization",
-    "translation": "planos acessíveis por uma organização específica"
   },
   {
     "id": "position",

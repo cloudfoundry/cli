@@ -264,6 +264,14 @@
     "translation": "앱"
   },
   {
+    "id": "Access for plans of a particular broker",
+    "translation": "특정 브로커의 플랜에 액세스"
+  },
+  {
+    "id": "Access for service name of a particular service offering",
+    "translation": "특정 서비스 오퍼링의 서비스 이름에 액세스"
+  },
+  {
     "id": "Acquiring running security groups as '{{.username}}'",
     "translation": "'{{.username}}'(으)로 실행 보안 그룹 획득"
   },
@@ -1590,6 +1598,10 @@
   {
     "id": "Do not start an app after pushing",
     "translation": "푸시 후 앱을 시작하지 않음"
+  },
+  {
+    "id": "Docker-image to be used (e.g. user/docker-image-name)",
+    "translation": "사용할 Docker 이미지(예: 사용자/Docker 이미지 이름)"
   },
   {
     "id": "Documentation url: {{.URL}}",
@@ -3148,6 +3160,10 @@
     "translation": "플랜: {{.ServicePlanName}}"
   },
   {
+    "id": "Plans accessible by a particular organization",
+    "translation": "특정 조직에서 액세스할 수 있는 플랜"
+  },
+  {
     "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
     "translation": "허용 또는 허용 안 함을 선택하십시오. 두 플래그를 모두 동일한 명령에서 전달할 수 없습니다."
   },
@@ -4408,14 +4424,6 @@
     "translation": "액세스"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "특정 브로커의 플랜에 액세스"
-  },
-  {
-    "id": "access for service name of a particular service offering",
-    "translation": "특정 서비스 오퍼링의 서비스 이름에 액세스"
-  },
-  {
     "id": "actor",
     "translation": "액터"
   },
@@ -4498,10 +4506,6 @@
   {
     "id": "disk:",
     "translation": "디스크:"
-  },
-  {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "사용할 Docker 이미지(예: 사용자/Docker 이미지 이름)"
   },
   {
     "id": "does not exist.",
@@ -4644,10 +4648,6 @@
     "translation": "조직"
   },
   {
-    "id": "organization",
-    "translation": "조직"
-  },
-  {
     "id": "orgs",
     "translation": "조직"
   },
@@ -4670,10 +4670,6 @@
   {
     "id": "plans",
     "translation": "플랜"
-  },
-  {
-    "id": "plans accessible by a particular organization",
-    "translation": "특정 조직에서 액세스할 수 있는 플랜"
   },
   {
     "id": "position",

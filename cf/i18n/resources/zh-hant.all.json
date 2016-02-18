@@ -264,6 +264,14 @@
     "translation": "應用程式"
   },
   {
+    "id": "Access for plans of a particular broker",
+    "translation": "特定分配管理系統之方案的存取權"
+  },
+  {
+    "id": "Access for service name of a particular service offering",
+    "translation": "特定服務供應項目之服務名稱的存取權"
+  },
+  {
     "id": "Acquiring running security groups as '{{.username}}'",
     "translation": "正在以 '{{.username}}' 身分獲得執行安全群組 "
   },
@@ -1590,6 +1598,10 @@
   {
     "id": "Do not start an app after pushing",
     "translation": "在推送之後，不要啟動應用程式"
+  },
+  {
+    "id": "Docker-image to be used (e.g. user/docker-image-name)",
+    "translation": "要使用的 docker-image（例如 user/docker-image-name）"
   },
   {
     "id": "Documentation url: {{.URL}}",
@@ -3148,6 +3160,10 @@
     "translation": "方案：{{.ServicePlanName}}"
   },
   {
+    "id": "Plans accessible by a particular organization",
+    "translation": "特定組織可存取的方案"
+  },
+  {
     "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
     "translation": "請選擇容許或禁止。不允許在相同指令中傳遞這兩個旗標。"
   },
@@ -4408,14 +4424,6 @@
     "translation": "存取權"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "特定分配管理系統之方案的存取權"
-  },
-  {
-    "id": "access for service name of a particular service offering",
-    "translation": "特定服務供應項目之服務名稱的存取權"
-  },
-  {
     "id": "actor",
     "translation": "動作者"
   },
@@ -4498,10 +4506,6 @@
   {
     "id": "disk:",
     "translation": "磁碟："
-  },
-  {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "要使用的 docker-image（例如 user/docker-image-name）"
   },
   {
     "id": "does not exist.",
@@ -4644,10 +4648,6 @@
     "translation": "組織"
   },
   {
-    "id": "organization",
-    "translation": "組織"
-  },
-  {
     "id": "orgs",
     "translation": "組織"
   },
@@ -4670,10 +4670,6 @@
   {
     "id": "plans",
     "translation": "方案"
-  },
-  {
-    "id": "plans accessible by a particular organization",
-    "translation": "特定組織可存取的方案"
   },
   {
     "id": "position",
