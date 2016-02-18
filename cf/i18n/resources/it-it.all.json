@@ -1260,8 +1260,8 @@
     "translation": "Crea una rotta URL in uno spazio da utilizzare successivamente"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "Crea un manifest di applicazione per un'applicazione distribuita correttamente."
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "Crea un manifest di applicazione per un'applicazione distribuita correttamente"
   },
   {
     "id": "Create an org",
@@ -1544,8 +1544,8 @@
     "translation": "Disabilita l'utilizzo del pacchetto di build per la preparazione"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Disabilita l'uso di una funzione in modo che gli utenti possano accedere e utilizzare la funzione."
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "Disabilita l'uso di una funzione in modo che gli utenti possano accedere e utilizzare la funzione"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1684,8 +1684,8 @@
     "translation": "Abilita l'utilizzo del pacchetto di build per la preparazione"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Abilita l'uso di una funzione in modo che gli utenti possano accedere e utilizzare la funzione."
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "Abilita l'uso di una funzione in modo che gli utenti possano accedere e utilizzare la funzione"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -3140,8 +3140,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "Effettua un semplice controllo per determinare la presenza di una rotta."
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "Effettua un semplice controllo per determinare la presenza di una rotta"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",

@@ -1260,8 +1260,8 @@
     "translation": "URL-Route in einem Bereich zur späteren Verwendung erstellen"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "App-Manifest für eine App erstellen, die erfolgreich mit einer Push-Operation übertragen wurde. "
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "App-Manifest für eine App erstellen, die erfolgreich mit einer Push-Operation übertragen wurde"
   },
   {
     "id": "Create an org",
@@ -1544,8 +1544,8 @@
     "translation": "Verwendung des Buildpacks für Staging inaktivieren"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Verwendung eines Features inaktivieren, so dass Benutzer Zugriff auf dieses Feature haben und es verwenden können."
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "Verwendung eines Features inaktivieren, so dass Benutzer Zugriff auf dieses Feature haben und es verwenden können"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1684,8 +1684,8 @@
     "translation": "Verwendung des Buildpacks für Staging aktivieren"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "Verwendung eines Features aktivieren, damit Benutzer Zugriff auf dieses Feature haben und es verwenden können. "
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "Verwendung eines Features aktivieren, damit Benutzer Zugriff auf dieses Feature haben und es verwenden können"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -3140,8 +3140,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "Führen Sie eine einfache Überprüfung aus, um festzustellen, ob eine Route aktuell vorhanden ist. "
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "Führen Sie eine einfache Überprüfung aus, um festzustellen, ob eine Route aktuell vorhanden ist"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",

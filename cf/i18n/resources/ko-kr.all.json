@@ -1260,8 +1260,8 @@
     "translation": "나중에 사용하도록 영역에 URL 작성"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "푸시된 앱의 앱 Manifest를 작성합니다."
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "푸시된 앱의 앱 Manifest를 작성합니다"
   },
   {
     "id": "Create an org",
@@ -1544,8 +1544,8 @@
     "translation": "빌드팩을 스테이징에 사용 안함"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용 안함으로 설정합니다."
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용 안함으로 설정합니다"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1684,8 +1684,8 @@
     "translation": "스테이징에 사용할 빌드팩 사용"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용으로 설정합니다."
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용으로 설정합니다"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -3140,8 +3140,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "단순 검사를 수행하여 라우트가 현재 있는지 여부를 판별합니다."
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "단순 검사를 수행하여 라우트가 현재 있는지 여부를 판별합니다"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",

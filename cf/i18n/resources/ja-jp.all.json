@@ -1260,8 +1260,8 @@
     "translation": "後で使用するためにスペース内に URL 経路を作成します"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "正常にプッシュされたアプリのアプリ・マニフェストを作成します。"
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "正常にプッシュされたアプリのアプリ・マニフェストを作成します"
   },
   {
     "id": "Create an org",
@@ -1544,7 +1544,7 @@
     "translation": "このビルドパックをステージングに使用できないようにします"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
     "translation": "フィーチャーの使用を無効にすると、ユーザーはそのフィーチャーにアクセスしたり使用したりできるようになります"
   },
   {
@@ -1684,7 +1684,7 @@
     "translation": "このビルドパックをステージングに使用できるようにします"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
     "translation": "フィーチャーの使用を有効にすると、ユーザーはそのフィーチャーにアクセスしたり使用したりできるようになります"
   },
   {
@@ -3140,8 +3140,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "経路が現在存在しているかどうかを調べる簡単なチェックを行います。"
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "経路が現在存在しているかどうかを調べる簡単なチェックを行います"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",

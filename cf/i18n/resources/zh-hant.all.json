@@ -1260,8 +1260,8 @@
     "translation": "在空間中建立 URL 路徑以供稍後使用"
   },
   {
-    "id": "Create an app manifest for an app that has been pushed successfully.",
-    "translation": "建立已順利推送之應用程式的應用程式資訊清單。"
+    "id": "Create an app manifest for an app that has been pushed successfully",
+    "translation": "建立已順利推送之應用程式的應用程式資訊清單"
   },
   {
     "id": "Create an org",
@@ -1544,8 +1544,8 @@
     "translation": "停止使用建置套件進行編譯打包"
   },
   {
-    "id": "Disable the use of a feature so that users have access to and can use the feature.",
-    "translation": "禁止使用特性，讓使用者可以存取和使用特性。"
+    "id": "Disable the use of a feature so that users have access to and can use the feature",
+    "translation": "禁止使用特性，讓使用者可以存取和使用特性"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1684,8 +1684,8 @@
     "translation": "啟用要用於編譯打包的建置套件"
   },
   {
-    "id": "Enable the use of a feature so that users have access to and can use the feature.",
-    "translation": "允許使用特性，讓使用者可以存取和使用特性。"
+    "id": "Enable the use of a feature so that users have access to and can use the feature",
+    "translation": "允許使用特性，讓使用者可以存取和使用特性"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -3140,8 +3140,8 @@
     "translation": ""
   },
   {
-    "id": "Perform a simple check to determine whether a route currently exists or not.",
-    "translation": "執行簡單的檢查，以判斷路徑目前是否存在。"
+    "id": "Perform a simple check to determine whether a route currently exists or not",
+    "translation": "執行簡單的檢查，以判斷路徑目前是否存在"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",

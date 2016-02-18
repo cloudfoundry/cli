@@ -23,7 +23,7 @@ func init() {
 func (cmd *EnableFeatureFlag) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "enable-feature-flag",
-		Description: T("Enable the use of a feature so that users have access to and can use the feature."),
+		Description: T("Enable the use of a feature so that users have access to and can use the feature"),
 		Usage:       T("CF_NAME enable-feature-flag FEATURE_NAME"),
 	}
 }
