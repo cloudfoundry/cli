@@ -264,6 +264,14 @@
     "translation": ""
   },
   {
+    "id": "Access for plans of a particular broker",
+    "translation": "Zugriff auf Pläne für einen bestimmten Broker"
+  },
+  {
+    "id": "Access for service name of a particular service offering",
+    "translation": "Zugriff auf Servicename eines bestimmten Serviceangebots"
+  },
+  {
     "id": "Acquiring running security groups as '{{.username}}'",
     "translation": "Aktive Sicherheitsgruppen als '{{.username}}' anfordern"
   },
@@ -1590,6 +1598,10 @@
   {
     "id": "Do not start an app after pushing",
     "translation": "Starten Sie keine App nach einer Push-Operation. "
+  },
+  {
+    "id": "Docker-image to be used (e.g. user/docker-image-name)",
+    "translation": "Zu verwendendes Docker-Image (z. B. user/docker-image-name)"
   },
   {
     "id": "Documentation url: {{.URL}}",
@@ -3148,6 +3160,10 @@
     "translation": ""
   },
   {
+    "id": "Plans accessible by a particular organization",
+    "translation": "Pläne, auf die eine bestimmte Organisation zugreifen kann"
+  },
+  {
     "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
     "translation": "Bitte wählen Sie entweder zulassen oder nicht zulassen aus. Beide Flags dürfen nicht in ein und demselben Befehl übergeben werden. "
   },
@@ -4408,14 +4424,6 @@
     "translation": "Zugriff"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "Zugriff auf Pläne für einen bestimmten Broker"
-  },
-  {
-    "id": "access for service name of a particular service offering",
-    "translation": "Zugriff auf Servicename eines bestimmten Serviceangebots"
-  },
-  {
     "id": "actor",
     "translation": "Akteur"
   },
@@ -4498,10 +4506,6 @@
   {
     "id": "disk:",
     "translation": "Platte:"
-  },
-  {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "Zu verwendendes Docker-Image (z. B. user/docker-image-name)"
   },
   {
     "id": "does not exist.",
@@ -4644,10 +4648,6 @@
     "translation": "Organisation"
   },
   {
-    "id": "organization",
-    "translation": "Organisation"
-  },
-  {
     "id": "orgs",
     "translation": "Organisationen"
   },
@@ -4670,10 +4670,6 @@
   {
     "id": "plans",
     "translation": "Pläne"
-  },
-  {
-    "id": "plans accessible by a particular organization",
-    "translation": "Pläne, auf die eine bestimmte Organisation zugreifen kann"
   },
   {
     "id": "position",

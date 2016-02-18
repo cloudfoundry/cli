@@ -264,6 +264,14 @@
     "translation": "APPLICATIONS"
   },
   {
+    "id": "Access for plans of a particular broker",
+    "translation": "Accès aux plans d'un courtier particulier "
+  },
+  {
+    "id": "Access for service name of a particular service offering",
+    "translation": "Accès au nom de service d'une offre de services particulière "
+  },
+  {
     "id": "Acquiring running security groups as '{{.username}}'",
     "translation": "Acquisition de groupes de sécurité d'exécution en tant que {{.username}}'"
   },
@@ -1590,6 +1598,10 @@
   {
     "id": "Do not start an app after pushing",
     "translation": "Ne pas démarrer une application après l'envoi par commande push "
+  },
+  {
+    "id": "Docker-image to be used (e.g. user/docker-image-name)",
+    "translation": "Image docker à utiliser (par exemple utilisateur/nom-image-docker)"
   },
   {
     "id": "Documentation url: {{.URL}}",
@@ -3148,6 +3160,10 @@
     "translation": "Plan : {{.ServicePlanName}}"
   },
   {
+    "id": "Plans accessible by a particular organization",
+    "translation": "Plans accessibles par une organisation particulière "
+  },
+  {
     "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
     "translation": "Choisissez allow ou disallow. Vous ne pouvez pas transmettre les deux indicateurs simultanément dans une même commande. "
   },
@@ -4408,14 +4424,6 @@
     "translation": "accès "
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "accès aux plans d'un courtier particulier "
-  },
-  {
-    "id": "access for service name of a particular service offering",
-    "translation": "accès au nom de service d'une offre de services particulière "
-  },
-  {
     "id": "actor",
     "translation": "acteur"
   },
@@ -4498,10 +4506,6 @@
   {
     "id": "disk:",
     "translation": "disque :"
-  },
-  {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "image docker à utiliser (par exemple utilisateur/nom-image-docker)"
   },
   {
     "id": "does not exist.",
@@ -4644,10 +4648,6 @@
     "translation": "organisation"
   },
   {
-    "id": "organization",
-    "translation": "organisation"
-  },
-  {
     "id": "orgs",
     "translation": "organisations"
   },
@@ -4670,10 +4670,6 @@
   {
     "id": "plans",
     "translation": ""
-  },
-  {
-    "id": "plans accessible by a particular organization",
-    "translation": "plans accessibles par une organisation particulière "
   },
   {
     "id": "position",

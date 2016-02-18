@@ -264,6 +264,14 @@
     "translation": "应用程序"
   },
   {
+    "id": "Access for plans of a particular broker",
+    "translation": "对特定代理程序的套餐的访问权"
+  },
+  {
+    "id": "Access for service name of a particular service offering",
+    "translation": "对特定服务产品的服务名称的访问权"
+  },
+  {
     "id": "Acquiring running security groups as '{{.username}}'",
     "translation": "正在以“{{.username}}”身份获取运行安全组"
   },
@@ -1590,6 +1598,10 @@
   {
     "id": "Do not start an app after pushing",
     "translation": "推送后不启动应用程序"
+  },
+  {
+    "id": "Docker-image to be used (e.g. user/docker-image-name)",
+    "translation": "要使用的 docker-image（例如，user/docker-image-name）"
   },
   {
     "id": "Documentation url: {{.URL}}",
@@ -3148,6 +3160,10 @@
     "translation": "套餐：{{.ServicePlanName}}"
   },
   {
+    "id": "Plans accessible by a particular organization",
+    "translation": "可由特定组织访问的套餐"
+  },
+  {
     "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
     "translation": "请选择 allow 或 disallow。不允许在同一命令中同时传递这两个标志。"
   },
@@ -4408,14 +4424,6 @@
     "translation": "访问权"
   },
   {
-    "id": "access for plans of a particular broker",
-    "translation": "对特定代理程序的套餐的访问权"
-  },
-  {
-    "id": "access for service name of a particular service offering",
-    "translation": "对特定服务产品的服务名称的访问权"
-  },
-  {
     "id": "actor",
     "translation": "参与者"
   },
@@ -4498,10 +4506,6 @@
   {
     "id": "disk:",
     "translation": "磁盘："
-  },
-  {
-    "id": "docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "要使用的 docker-image（例如，user/docker-image-name）"
   },
   {
     "id": "does not exist.",
@@ -4644,10 +4648,6 @@
     "translation": "组织"
   },
   {
-    "id": "organization",
-    "translation": "组织"
-  },
-  {
     "id": "orgs",
     "translation": "组织"
   },
@@ -4670,10 +4670,6 @@
   {
     "id": "plans",
     "translation": "套餐"
-  },
-  {
-    "id": "plans accessible by a particular organization",
-    "translation": "可由特定组织访问的套餐"
   },
   {
     "id": "position",
