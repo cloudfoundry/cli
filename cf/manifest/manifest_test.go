@@ -69,7 +69,6 @@ var _ = Describe("Manifests", func() {
 		Expect(err.Error()).To(ContainSubstring("Invalid value for 'memory': 512"))
 	})
 
-	//candiedyaml returns an integer value when no unit is provided
 	It("returns an error when the memory limit is a non-string", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",
