@@ -1537,7 +1537,7 @@
   },
   {
     "id": "Disable ssh for the application",
-    "translation": "désactiver ssh pour l'application "
+    "translation": "Désactiver ssh pour l'application"
   },
   {
     "id": "Disable the buildpack from being used for staging",
@@ -1677,7 +1677,7 @@
   },
   {
     "id": "Enable ssh for the application",
-    "translation": "activer ssh pour l'application "
+    "translation": "Activer ssh pour l'application "
   },
   {
     "id": "Enable the buildpack to be used for staging",
@@ -2113,7 +2113,7 @@
   },
   {
     "id": "Get the health_check_type value of an app",
-    "translation": "obtenir la valeur du type de diagnostic d'intégrité pour une application "
+    "translation": "Obtenir la valeur du type de diagnostic d'intégrité pour une application "
   },
   {
     "id": "Getting all services from marketplace...",
@@ -2705,7 +2705,7 @@
   },
   {
     "id": "List all the added plugin repository",
-    "translation": "répertorier l'intégralité du référentiel de plug-in ajouté "
+    "translation": "Répertorier l'intégralité du référentiel de plug-in ajouté "
   },
   {
     "id": "List all the routes for all spaces of current organization",
@@ -3701,7 +3701,7 @@
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",
-    "translation": "associer le type de diagnostic d'intégrité à 'port' ou 'none'"
+    "translation": "Associer le type de diagnostic d'intégrité à 'port' ou 'none'"
   },
   {
     "id": "Set or view target api url",
@@ -4217,7 +4217,7 @@
   },
   {
     "id": "Update an existing space quota",
-    "translation": "mettre à jour un quota d'espace existant "
+    "translation": "Mettre à jour un quota d'espace existant "
   },
   {
     "id": "Update user-provided service instance",
@@ -4397,7 +4397,7 @@
   },
   {
     "id": "Write default values to the config",
-    "translation": "écrire les valeurs par défaut dans la configuration "
+    "translation": "Écrire les valeurs par défaut dans la configuration "
   },
   {
     "id": "Zip archive does not contain a buildpack",

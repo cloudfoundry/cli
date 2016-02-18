@@ -1537,7 +1537,7 @@
   },
   {
     "id": "Disable ssh for the application",
-    "translation": "disabilita ssh per l'applicazione"
+    "translation": "Disabilita ssh per l'applicazione"
   },
   {
     "id": "Disable the buildpack from being used for staging",
@@ -1677,7 +1677,7 @@
   },
   {
     "id": "Enable ssh for the application",
-    "translation": "abilita ssh per l'applicazione"
+    "translation": "Abilita ssh per l'applicazione"
   },
   {
     "id": "Enable the buildpack to be used for staging",
@@ -2113,7 +2113,7 @@
   },
   {
     "id": "Get the health_check_type value of an app",
-    "translation": "ottieni il valore health_check_type di un'applicazione"
+    "translation": "Ottieni il valore health_check_type di un'applicazione"
   },
   {
     "id": "Getting all services from marketplace...",
@@ -2669,7 +2669,7 @@
   },
   {
     "id": "List all available plugin commands",
-    "translation": "elenca tutti i comandi di plug-in disponibili"
+    "translation": "Elenca tutti i comandi di plug-in disponibili"
   },
   {
     "id": "List all available plugins in specified repository or in all added repositories",
@@ -2705,7 +2705,7 @@
   },
   {
     "id": "List all the added plugin repository",
-    "translation": "elenca tutti i repository di plug-in aggiunti"
+    "translation": "Elenca tutti i repository di plug-in aggiunti"
   },
   {
     "id": "List all the routes for all spaces of current organization",
@@ -3701,7 +3701,7 @@
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",
-    "translation": "imposta l'indicatore health_check_type su 'port' o 'none'"
+    "translation": "Imposta l'indicatore health_check_type su 'port' o 'none'"
   },
   {
     "id": "Set or view target api url",
@@ -4217,7 +4217,7 @@
   },
   {
     "id": "Update an existing space quota",
-    "translation": "aggiorna una quota di spazio esistente"
+    "translation": "Aggiorna una quota di spazio esistente"
   },
   {
     "id": "Update user-provided service instance",
@@ -4397,7 +4397,7 @@
   },
   {
     "id": "Write default values to the config",
-    "translation": "scrivi valori predefiniti nella configurazione"
+    "translation": "Scrivi valori predefiniti nella configurazione"
   },
   {
     "id": "Zip archive does not contain a buildpack",
