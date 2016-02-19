@@ -320,9 +320,9 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.Command = "command start command"
 			defaultAppForStart.DetectedStartCommand = "detected start command"
 			ui, appRepo, _ = startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
-			appRepo.GetAppReturns(defaultAppForStart, nil)
 
-			Expect(appRepo.ReadCallCount()).To(Equal(1))
+			Expect(appRepo.GetAppCallCount()).To(Equal(1))
+			Expect(appRepo.GetAppArgsForCall(0)).To(Equal("my-app-guid"))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"App my-app was started using this command `command start command`"},
 			))
@@ -333,7 +333,8 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.Command = ""
 			ui, appRepo, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-			Expect(appRepo.ReadCallCount()).To(Equal(1))
+			Expect(appRepo.GetAppCallCount()).To(Equal(1))
+			Expect(appRepo.GetAppArgsForCall(0)).To(Equal("my-app-guid"))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"App my-app was started using this command `detected start command`"},
 			))

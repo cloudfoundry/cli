@@ -189,7 +189,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	cmd.ui.Ok()
 
 	//detectedstartcommand on first push is not present until starting completes
-	startedApp, apiErr := cmd.appRepo.Read(updatedApp.Name)
+	startedApp, apiErr := cmd.appRepo.GetApp(updatedApp.Guid)
 	if err != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
