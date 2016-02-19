@@ -2704,7 +2704,7 @@
     "translation": "すべてのスタックをリストします (スタックはオペレーティング・システムを含む事前ビルドされたファイル・システムであり、このファイル・システムはアプリを実行できます)"
   },
   {
-    "id": "List all the added plugin repository",
+    "id": "List all the added plugin repositories",
     "translation": "追加されたプラグイン・リポジトリーをすべてリストします"
   },
   {
