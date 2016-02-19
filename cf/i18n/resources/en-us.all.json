@@ -2704,8 +2704,8 @@
     "translation": "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"
   },
   {
-    "id": "List all the added plugin repository",
-    "translation": "List all the added plugin repository"
+    "id": "List all the added plugin repositories",
+    "translation": "List all the added plugin repositories"
   },
   {
     "id": "List all the routes for all spaces of current organization",
