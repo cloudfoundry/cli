@@ -352,7 +352,7 @@
     "translation": "API 要求診断をログ・ファイルに付加します"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
+    "id": "Application health check type (e.g. 'port' or 'none')",
     "translation": "アプリケーション・ヘルス・チェック・タイプ (例: port または none)"
   },
   {
@@ -3696,7 +3696,7 @@
     "translation": "アプリの環境変数を設定します"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
     "translation": "デフォルト・ロケールを設定します。LOCALE が CLEAR の場合は、前のロケールが削除されます。"
   },
   {

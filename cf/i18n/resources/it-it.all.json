@@ -352,7 +352,7 @@
     "translation": "Aggiungi diagnostica della richiesta API in un file di log"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
+    "id": "Application health check type (e.g. 'port' or 'none')",
     "translation": "Tipo di verifica integrità dell'applicazione (ad esempio, porta o nessuno)"
   },
   {
@@ -3696,7 +3696,7 @@
     "translation": "Imposta una variabile di ambiente per un'applicazione"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
     "translation": "Imposta la locale predefinita. Se LOCALE è CLEAR, la locale precedente viene eliminata."
   },
   {

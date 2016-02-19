@@ -28,7 +28,7 @@ func (cmd *ConfigCommands) MetaData() command_registry.CommandMetadata {
 	fs["async-timeout"] = &cliFlags.IntFlag{Name: "async-timeout", Usage: T("Timeout for async HTTP requests")}
 	fs["trace"] = &cliFlags.StringFlag{Name: "trace", Usage: T("Trace HTTP requests")}
 	fs["color"] = &cliFlags.StringFlag{Name: "color", Usage: T("Enable or disable color")}
-	fs["locale"] = &cliFlags.StringFlag{Name: "locale", Usage: T("Set default locale. If LOCALE is CLEAR, previous locale is deleted.")}
+	fs["locale"] = &cliFlags.StringFlag{Name: "locale", Usage: T("Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.")}
 
 	return command_registry.CommandMetadata{
 		Name:        "config",

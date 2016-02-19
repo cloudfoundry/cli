@@ -352,7 +352,7 @@
     "translation": "Ajouter les diagnostics de demande d'API à un fichier journal "
   },
   {
-    "id": "Application health check type (e.g. port or none)",
+    "id": "Application health check type (e.g. 'port' or 'none')",
     "translation": "Type de diagnostic d'intégrité d'application (par exemple port ou none) "
   },
   {
@@ -3696,7 +3696,7 @@
     "translation": "Définir une variable d'environnement pour une application "
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
     "translation": "Définissez l'environnement local par défaut. Si locale a pour valeur CLEAR, l'environnement local précédent est supprimé. "
   },
   {
