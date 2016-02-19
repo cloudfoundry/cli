@@ -224,10 +224,6 @@
     "translation": "CF_NAME help [COMMAND]"
   },
   {
-    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
-    "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
-  },
-  {
     "id": "CF_NAME list-plugin-repos",
     "translation": "CF_NAME list-plugin-repos"
   },
@@ -310,10 +306,6 @@
   {
     "id": "CF_NAME rename-space SPACE NEW_SPACE",
     "translation": "CF_NAME rename-space SPACE NEW_SPACE"
-  },
-  {
-    "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
-    "translation": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo"
   },
   {
     "id": "CF_NAME restage APP_NAME",
@@ -442,10 +434,6 @@
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
     "translation": "CF_NAME target [-o ORG] [-s SPACE]"
-  },
-  {
-    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]\n\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp",
-    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]\n\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
