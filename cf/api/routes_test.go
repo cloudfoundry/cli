@@ -123,6 +123,37 @@ var _ = Describe("route repository", func() {
 				ccServer.Close()
 			})
 
+			Context("when the path is empty", func() {
+				BeforeEach(func() {
+					v := url.Values{}
+					v.Set("inline-relations-depth", "1")
+					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid")
+
+					ccServer.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
+							ghttp.VerifyHeader(http.Header{
+								"accept": []string{"application/json"},
+							}),
+							ghttp.RespondWith(http.StatusCreated, findResponseBodyWithoutPath),
+						),
+					)
+				})
+
+				It("returns the route", func() {
+					domain := models.DomainFields{}
+					domain.Guid = "my-domain-guid"
+
+					route, apiErr := repo.Find("my-cool-app", domain, "")
+
+					Expect(apiErr).NotTo(HaveOccurred())
+					Expect(route.Host).To(Equal("my-cool-app"))
+					Expect(route.Guid).To(Equal("my-route-guid"))
+					Expect(route.Path).To(Equal(""))
+					Expect(route.Domain.Guid).To(Equal(domain.Guid))
+				})
+			})
+
 			Context("when the route is found", func() {
 				BeforeEach(func() {
 					v := url.Values{}
@@ -539,6 +570,23 @@ var findResponseBody = `
 				}
 			},
 			"path": "/somepath"
+		}
+	}
+]}`
+
+var findResponseBodyWithoutPath = `
+{ "resources": [
+	{
+		"metadata": {
+			"guid": "my-route-guid"
+		},
+		"entity": {
+			"host": "my-cool-app",
+			"domain": {
+				"metadata": {
+					"guid": "my-domain-guid"
+				}
+			}
 		}
 	}
 ]}`
