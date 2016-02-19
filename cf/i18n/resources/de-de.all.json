@@ -3816,6 +3816,10 @@
     "translation": "Hostschlüsselüberprüfung überspringen"
   },
   {
+    "id": "Skip verification of the API endpoint. Not recommended!",
+    "translation": ""
+  },
+  {
     "id": "Space",
     "translation": "Bereich"
   },
@@ -4470,10 +4474,6 @@
   {
     "id": "bytes downloaded",
     "translation": "Heruntergeladene Byte"
-  },
-  {
-    "id": "commands.flags.skip_ssl_validation.description",
-    "translation": ""
   },
   {
     "id": "cpu",

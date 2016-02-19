@@ -3816,6 +3816,10 @@
     "translation": "호스트 키 유효성 검증 건너뛰기"
   },
   {
+    "id": "Skip verification of the API endpoint. Not recommended!",
+    "translation": ""
+  },
+  {
     "id": "Space",
     "translation": "영역"
   },
@@ -4470,10 +4474,6 @@
   {
     "id": "bytes downloaded",
     "translation": "다운로드된 바이트 수"
-  },
-  {
-    "id": "commands.flags.skip_ssl_validation.description",
-    "translation": ""
   },
   {
     "id": "cpu",

@@ -29,7 +29,7 @@ func init() {
 func (cmd Api) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["unset"] = &cliFlags.BoolFlag{Name: "unset", Usage: T("Remove all api endpoint targeting")}
-	fs["skip-ssl-validation"] = &cliFlags.BoolFlag{Name: "skip-ssl-validation", Usage: T("commands.flags.skip_ssl_validation.description")}
+	fs["skip-ssl-validation"] = &cliFlags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
 
 	return command_registry.CommandMetadata{
 		Name:        "api",

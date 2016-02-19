@@ -3816,6 +3816,10 @@
     "translation": "Skip host key validation"
   },
   {
+    "id": "Skip verification of the API endpoint. Not recommended!",
+    "translation": "Skip verification of the API endpoint. Not recommended!"
+  },
+  {
     "id": "Space",
     "translation": "Space"
   },
@@ -4470,10 +4474,6 @@
   {
     "id": "bytes downloaded",
     "translation": "bytes downloaded"
-  },
-  {
-    "id": "commands.flags.skip_ssl_validation.description",
-    "translation": "Skip verification of the API endpoint. Not recommended!"
   },
   {
     "id": "cpu",

@@ -732,6 +732,10 @@
     "translation": "Services:"
   },
   {
+    "id": "Skip verification of the API endpoint. Not recommended!",
+    "translation": "Skip verification of the API endpoint. Not recommended!"
+  },
+  {
     "id": "Status: {{.State}}",
     "translation": "Status: {{.State}}"
   },
@@ -790,10 +794,6 @@
   {
     "id": "Version",
     "translation": "Version"
-  },
-  {
-    "id": "commands.flags.skip_ssl_validation.description",
-    "translation": "Skip verification of the API endpoint. Not recommended!"
   },
   {
     "id": "path",
