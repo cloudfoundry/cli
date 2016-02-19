@@ -684,6 +684,10 @@
     "translation": "Server error, error code: 1002, message: cannot set space role because user is not part of the org"
   },
   {
+    "id": "Skip verification of the API endpoint. Not recommended!",
+    "translation": "Skip verification of the API endpoint. Not recommended!"
+  },
+  {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
     "translation": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."
   },
@@ -746,10 +750,6 @@
   {
     "id": "[global options] command [arguments...] [command options]",
     "translation": "[global options] command [arguments...] [command options]"
-  },
-  {
-    "id": "commands.flags.skip_ssl_validation.description",
-    "translation": "Skip verification of the API endpoint. Not recommended!"
   },
   {
     "id": "path",

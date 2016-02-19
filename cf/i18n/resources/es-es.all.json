@@ -3816,6 +3816,10 @@
     "translation": "Omitir la validación de claves del host"
   },
   {
+    "id": "Skip verification of the API endpoint. Not recommended!",
+    "translation": ""
+  },
+  {
     "id": "Space",
     "translation": "Espacio"
   },
@@ -4470,10 +4474,6 @@
   {
     "id": "bytes downloaded",
     "translation": "bytes descargados"
-  },
-  {
-    "id": "commands.flags.skip_ssl_validation.description",
-    "translation": ""
   },
   {
     "id": "cpu",

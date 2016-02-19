@@ -336,6 +336,10 @@
     "translation": "Services"
   },
   {
+    "id": "Skip verification of the API endpoint. Not recommended!",
+    "translation": "Skip verification of the API endpoint. Not recommended!"
+  },
+  {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
     "translation": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."
   },
@@ -386,10 +390,6 @@
   {
     "id": "Version",
     "translation": "Version"
-  },
-  {
-    "id": "commands.flags.skip_ssl_validation.description",
-    "translation": "Skip verification of the API endpoint. Not recommended!"
   },
   {
     "id": "description",
