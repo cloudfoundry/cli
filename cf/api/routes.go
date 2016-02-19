@@ -56,15 +56,34 @@ func (repo CloudControllerRouteRepository) ListAllRoutes(cb func(models.Route) b
 		})
 }
 
-func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
+func normalizedPath(path string) string {
 	if path != "" && !strings.HasPrefix(path, `/`) {
-		path = `/` + path
+		return `/` + path
 	}
+
+	return path
+}
+
+func queryStringForRouteSearch(host, guid, path string) string {
+	args := []string{
+		fmt.Sprintf("host:%s", host),
+		fmt.Sprintf("domain_guid:%s", guid),
+	}
+
+	if path != "" {
+		args = append(args, fmt.Sprintf("path:%s", normalizedPath(path)))
+	}
+
+	return url.QueryEscape(strings.Join(args, ";"))
+}
+
+func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
+	queryString := queryStringForRouteSearch(host, domain.Guid, path)
 
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid+";path:"+path)),
+		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", queryString),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
 			route = resource.(resources.RouteResource).ToModel()
@@ -84,9 +103,7 @@ func (repo CloudControllerRouteRepository) Create(host string, domain models.Dom
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {
-	if path != "" && !strings.HasPrefix(path, `/`) {
-		path = `/` + path
-	}
+	path = normalizedPath(path)
 
 	u, err := url.Parse(repo.config.ApiEndpoint())
 	if err != nil {
@@ -113,9 +130,7 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 }
 
 func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
-	if path != "" && !strings.HasPrefix(path, `/`) {
-		path = `/` + path
-	}
+	path = normalizedPath(path)
 
 	data := fmt.Sprintf(`{"host":"%s","path":"%s","domain_guid":"%s","space_guid":"%s"}`, host, path, domainGuid, spaceGuid)
 
