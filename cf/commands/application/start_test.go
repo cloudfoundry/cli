@@ -178,7 +178,7 @@ var _ = Describe("start command", func() {
 		return
 	}
 
-	startAppWithInstancesAndErrors := func(displayApp ApplicationDisplayer, app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *testApplication.FakeApplicationRepository, *testAppInstanaces.FakeAppInstancesRepository) {
+	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *testApplication.FakeApplicationRepository, *testAppInstanaces.FakeAppInstancesRepository) {
 		appRepo = &testApplication.FakeApplicationRepository{}
 		appRepo.UpdateReturns(app, nil)
 		appRepo.ReadReturns(app, nil)
@@ -301,7 +301,7 @@ var _ = Describe("start command", func() {
 		})
 
 		It("starts an app, when given the app's name", func() {
-			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, appRepo, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"my-app", "my-org", "my-space", "my-user"},
@@ -319,7 +319,7 @@ var _ = Describe("start command", func() {
 		It("displays the command start command instead of the detected start command when set", func() {
 			defaultAppForStart.Command = "command start command"
 			defaultAppForStart.DetectedStartCommand = "detected start command"
-			ui, appRepo, _ = startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, appRepo, _ = startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 			appRepo.GetAppReturns(defaultAppForStart, nil)
 
 			Expect(appRepo.ReadCallCount()).To(Equal(1))
@@ -331,7 +331,7 @@ var _ = Describe("start command", func() {
 		It("displays the detected start command when no other command is set", func() {
 			defaultAppForStart.DetectedStartCommand = "detected start command"
 			defaultAppForStart.Command = ""
-			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, appRepo, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 			Expect(appRepo.ReadCallCount()).To(Equal(1))
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -410,7 +410,7 @@ var _ = Describe("start command", func() {
 
 			defaultInstanceErrorCodes = []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, "", "", ""}
 			defaultAppForStart.PackageState = "PENDING"
-			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, appRepo, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 			Expect(appRepo.GetAppArgsForCall(0)).To(Equal("my-app-guid"))
 
@@ -426,7 +426,7 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.PackageState = "FAILED"
 			defaultAppForStart.StagingFailedReason = "AWWW, FAILED"
 
-			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"my-app"},
@@ -439,7 +439,7 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.PackageState = "FAILED"
 			defaultAppForStart.StagingFailedReason = "NoAppDetectedError"
 
-			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"my-app"},
@@ -464,7 +464,7 @@ var _ = Describe("start command", func() {
 
 			defaultInstanceErrorCodes = []string{"some error", ""}
 
-			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"TIP: Application must be listening on the right port."},
@@ -475,7 +475,7 @@ var _ = Describe("start command", func() {
 			defaultInstanceResponses = [][]models.AppInstanceFields{}
 			defaultInstanceErrorCodes = []string{"an-error"}
 
-			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"an-error"},
@@ -499,7 +499,7 @@ var _ = Describe("start command", func() {
 
 				defaultInstanceErrorCodes = []string{"", ""}
 
-				ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+				ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},
@@ -527,7 +527,7 @@ var _ = Describe("start command", func() {
 
 				defaultInstanceErrorCodes = []string{"", ""}
 
-				ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+				ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},
@@ -580,7 +580,7 @@ var _ = Describe("start command", func() {
 
 				defaultInstanceErrorCodes = []string{"", ""}
 
-				ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+				ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},
 					[]string{"0 of 2 instances running", "2 starting"},
@@ -596,7 +596,7 @@ var _ = Describe("start command", func() {
 			defaultInstanceErrorCodes = []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, errors.APP_NOT_STAGED}
 
 			defaultAppForStart.PackageState = "PENDING"
-			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, requirementsFactory)
+			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Starting", "my-app"},
