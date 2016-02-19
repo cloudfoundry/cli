@@ -86,7 +86,7 @@ func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
 	cmd.createManifest(application, savePath)
 }
 
-func (cmd *CreateAppManifest) createManifest(app models.Application, savePath string) error {
+func (cmd *CreateAppManifest) createManifest(app models.Application, savePath string) {
 	cmd.manifest.FileSavePath(savePath)
 	cmd.manifest.Memory(app.Name, app.Memory)
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
@@ -141,8 +141,6 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 	cmd.ui.Ok()
 	cmd.ui.Say(T("Manifest file created successfully at ") + savePath)
 	cmd.ui.Say("")
-
-	return nil
 }
 
 func sortEnvVar(vars map[string]interface{}) []string {
