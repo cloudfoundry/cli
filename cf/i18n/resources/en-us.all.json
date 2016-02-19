@@ -352,8 +352,8 @@
     "translation": "Append API request diagnostics to a log file"
   },
   {
-    "id": "Application health check type (e.g. port or none)",
-    "translation": "Application health check type (e.g. port or none)"
+    "id": "Application health check type (e.g. 'port' or 'none')",
+    "translation": "Application health check type (e.g. 'port' or 'none')"
   },
   {
     "id": "Application instance index",
@@ -3696,8 +3696,8 @@
     "translation": "Set an env variable for an app"
   },
   {
-    "id": "Set default locale. If LOCALE is CLEAR, previous locale is deleted.",
-    "translation": "Set default locale. If LOCALE is CLEAR, previous locale is deleted."
+    "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
+    "translation": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted."
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",
