@@ -560,6 +560,10 @@
     "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
   },
   {
+    "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
+    "translation": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n"
+  },
+  {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },

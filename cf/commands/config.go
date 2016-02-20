@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"sort"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -92,7 +91,9 @@ func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 			return
 		}
 
-		unsupportedLocaleMessage := fmt.Sprintf("Could not find locale '%s'. The known locales are:\n", locale)
+		unsupportedLocaleMessage := T("Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n", map[string]interface{}{
+			"UnsupportedLocale": locale,
+		})
 		supportedLocales := SupportedLocales()
 		sort.Strings(supportedLocales)
 		for i := range supportedLocales {

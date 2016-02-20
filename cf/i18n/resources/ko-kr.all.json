@@ -1180,6 +1180,10 @@
     "translation": "Manifest에서 이름이 '{{.AppName}}'인 앱을 찾을 수 없음"
   },
   {
+    "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
+    "translation": ""
+  },
+  {
     "id": "Could not find plan with name {{.ServicePlanName}}",
     "translation": "이름이 {{.ServicePlanName}}인 플랜을 찾을 수 없음"
   },

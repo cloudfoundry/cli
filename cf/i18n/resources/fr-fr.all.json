@@ -1180,6 +1180,10 @@
     "translation": "Application '{{.AppName}}' introuvable dans le manifeste "
   },
   {
+    "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
+    "translation": ""
+  },
+  {
     "id": "Could not find plan with name {{.ServicePlanName}}",
     "translation": "Le plan dont le nom est {{.ServicePlanName}} est introuvable "
   },
