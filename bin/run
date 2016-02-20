@@ -2,6 +2,4 @@
 
 set -e
 
-export GO15VENDOREXPERIMENT=1
-
 go run $(dirname $0)/../main/main.go "$@"

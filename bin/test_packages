@@ -12,8 +12,6 @@
   }
 
   trap printStatus EXIT
-
-  export GO15VENDOREXPERIMENT=1
   
   bin/generate-language-resources
 
