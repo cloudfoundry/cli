@@ -1440,7 +1440,7 @@
     "translation": "ユーザーを削除します"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "すべての孤立した経路 (例: アプリにマップされていない経路) を削除します"
   },
   {

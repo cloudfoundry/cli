@@ -1440,7 +1440,7 @@
     "translation": "사용자 삭제"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "모든 고아 라우트(예: 앱에 맵핑되지 않은 라우트) 삭제"
   },
   {

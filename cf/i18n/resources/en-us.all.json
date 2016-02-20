@@ -1440,8 +1440,8 @@
     "translation": "Delete a user"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
-    "translation": "Delete all orphaned routes (e.g.: those that are not mapped to an app)"
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
+    "translation": "Delete all orphaned routes (i.e. those that are not mapped to an app)"
   },
   {
     "id": "Delete an app",

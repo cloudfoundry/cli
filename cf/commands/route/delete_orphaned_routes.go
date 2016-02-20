@@ -28,7 +28,7 @@ func (cmd *DeleteOrphanedRoutes) MetaData() command_registry.CommandMetadata {
 
 	return command_registry.CommandMetadata{
 		Name:        "delete-orphaned-routes",
-		Description: T("Delete all orphaned routes (e.g.: those that are not mapped to an app)"),
+		Description: T("Delete all orphaned routes (i.e. those that are not mapped to an app)"),
 		Usage:       T("CF_NAME delete-orphaned-routes [-f]"),
 		Flags:       fs,
 	}

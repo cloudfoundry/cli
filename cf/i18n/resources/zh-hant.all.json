@@ -1440,7 +1440,7 @@
     "translation": "刪除使用者"
   },
   {
-    "id": "Delete all orphaned routes (e.g.: those that are not mapped to an app)",
+    "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "刪除所有遺留的路徑（例如：未對映至應用程式的路徑）"
   },
   {
