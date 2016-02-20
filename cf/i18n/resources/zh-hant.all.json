@@ -1180,6 +1180,10 @@
     "translation": "在資訊清單中找不到名稱為 '{{.AppName}}' 的應用程式"
   },
   {
+    "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
+    "translation": ""
+  },
+  {
     "id": "Could not find plan with name {{.ServicePlanName}}",
     "translation": "找不到名稱為 {{.ServicePlanName}} 的方案"
   },

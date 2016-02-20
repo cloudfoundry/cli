@@ -1180,6 +1180,10 @@
     "translation": "Não foi possível localizar o app denominado '{{.AppName}}' no manifest"
   },
   {
+    "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
+    "translation": ""
+  },
+  {
     "id": "Could not find plan with name {{.ServicePlanName}}",
     "translation": "Não foi possível localizar o plano com o nome {{.ServicePlanName}}"
   },
