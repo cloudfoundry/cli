@@ -132,6 +132,10 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 		}
 	}
 
+	if app.DiskQuota != 0 {
+		cmd.manifest.DiskQuota(app.Name, app.DiskQuota)
+	}
+
 	err := cmd.manifest.Save()
 	if err != nil {
 		cmd.ui.Failed(T("Error creating manifest file: ") + err.Error())

@@ -11,8 +11,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+//go:generate counterfeiter -o fakes/fake_app_manifest.go . AppManifest
 type AppManifest interface {
 	BuildpackUrl(string, string)
+	DiskQuota(string, int64)
 	Memory(string, int64)
 	Service(string, string)
 	StartCommand(string, string)
@@ -41,6 +43,11 @@ func (m *appManifest) FileSavePath(savePath string) {
 func (m *appManifest) Memory(appName string, memory int64) {
 	i := m.findOrCreateApplication(appName)
 	m.contents[i].Memory = memory
+}
+
+func (m *appManifest) DiskQuota(appName string, diskQuota int64) {
+	i := m.findOrCreateApplication(appName)
+	m.contents[i].DiskQuota = diskQuota
 }
 
 func (m *appManifest) StartCommand(appName string, cmd string) {
@@ -96,6 +103,7 @@ func generateAppMap(app models.Application) generic.Map {
 	m.Set("name", app.Name)
 	m.Set("memory", fmt.Sprintf("%dM", app.Memory))
 	m.Set("instances", app.InstanceCount)
+	m.Set("disk_quota", fmt.Sprintf("%dM", app.DiskQuota))
 
 	if app.BuildpackUrl != "" {
 		m.Set("buildpack", app.BuildpackUrl)
