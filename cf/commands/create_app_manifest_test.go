@@ -357,6 +357,20 @@ var _ = Describe("CreateAppManifest", func() {
 					Expect(domainName).To(Equal("domain-2-name"))
 				})
 			})
+
+			Context("when the app has a disk quota", func() {
+				BeforeEach(func() {
+					application.DiskQuota = 1024
+				})
+
+				It("sets the disk quota", func() {
+					cmd.Execute(flagContext)
+					Expect(fakeManifest.DiskQuotaCallCount()).To(Equal(1))
+					name, quota := fakeManifest.DiskQuotaArgsForCall(0)
+					Expect(name).To(Equal("app-name"))
+					Expect(quota).To(Equal(int64(1024)))
+				})
+			})
 		})
 	})
 })

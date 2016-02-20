@@ -15,6 +15,12 @@ type FakeAppManifest struct {
 		arg1 string
 		arg2 string
 	}
+	DiskQuotaStub        func(string, int64)
+	diskQuotaMutex       sync.RWMutex
+	diskQuotaArgsForCall []struct {
+		arg1 string
+		arg2 int64
+	}
 	MemoryStub        func(string, int64)
 	memoryMutex       sync.RWMutex
 	memoryArgsForCall []struct {
@@ -100,6 +106,30 @@ func (fake *FakeAppManifest) BuildpackUrlArgsForCall(i int) (string, string) {
 	fake.buildpackUrlMutex.RLock()
 	defer fake.buildpackUrlMutex.RUnlock()
 	return fake.buildpackUrlArgsForCall[i].arg1, fake.buildpackUrlArgsForCall[i].arg2
+}
+
+func (fake *FakeAppManifest) DiskQuota(arg1 string, arg2 int64) {
+	fake.diskQuotaMutex.Lock()
+	fake.diskQuotaArgsForCall = append(fake.diskQuotaArgsForCall, struct {
+		arg1 string
+		arg2 int64
+	}{arg1, arg2})
+	fake.diskQuotaMutex.Unlock()
+	if fake.DiskQuotaStub != nil {
+		fake.DiskQuotaStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeAppManifest) DiskQuotaCallCount() int {
+	fake.diskQuotaMutex.RLock()
+	defer fake.diskQuotaMutex.RUnlock()
+	return len(fake.diskQuotaArgsForCall)
+}
+
+func (fake *FakeAppManifest) DiskQuotaArgsForCall(i int) (string, int64) {
+	fake.diskQuotaMutex.RLock()
+	defer fake.diskQuotaMutex.RUnlock()
+	return fake.diskQuotaArgsForCall[i].arg1, fake.diskQuotaArgsForCall[i].arg2
 }
 
 func (fake *FakeAppManifest) Memory(arg1 string, arg2 int64) {

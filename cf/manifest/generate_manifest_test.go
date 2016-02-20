@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
+	uuid "github.com/nu7hatch/gouuid"
 	"gopkg.in/yaml.v2"
 
 	. "github.com/cloudfoundry/cli/cf/manifest"
-	"github.com/nu7hatch/gouuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -191,6 +191,14 @@ var _ = Describe("generate_manifest", func() {
 		})
 	})
 
+	It("supports setting disk quota", func() {
+		m.DiskQuota("app1", 1024)
+		err := m.Save()
+		Expect(err).NotTo(HaveOccurred())
+
+		application := getYaml(uniqueFilename).Applications[0]
+		Expect(application.DiskQuota).To(Equal("1024M"))
+	})
 })
 
 type YManifest struct {
@@ -212,6 +220,7 @@ type YApplication struct {
 	Domains    []string               `yaml:"domains"`
 	NoHostname bool                   `yaml:"no-hostname"`
 	NoRoute    bool                   `yaml:"no-route"`
+	DiskQuota  string                 `yaml:"disk_quota"`
 }
 
 func getYamlContent(path string) []string {
