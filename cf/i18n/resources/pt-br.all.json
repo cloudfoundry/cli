@@ -2800,8 +2800,8 @@
     "translation": "Faça uma cópia do código-fonte do app de um aplicativo para outro. A menos que seja substituído, o comando copy-source reiniciará o aplicativo."
   },
   {
-    "id": "Make a user-provided service instance available to cf apps",
-    "translation": "Disponibilize uma instância de serviço fornecida pelo usuário aos apps cf"
+    "id": "Make a user-provided service instance available to CF apps",
+    "translation": "Disponibilize uma instância de serviço fornecida pelo usuário aos apps CF"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
@@ -3904,8 +3904,8 @@
     "translation": "DICA:\n"
   },
   {
-    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-    "translation": "`DICA:\n   use 'CF_NAME create-user-provided-service' para disponibilizar serviços fornecidos pelo usuário para apps cf"
+    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
+    "translation": "`DICA:\n   use 'CF_NAME create-user-provided-service' para disponibilizar serviços fornecidos pelo usuário para apps CF"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",

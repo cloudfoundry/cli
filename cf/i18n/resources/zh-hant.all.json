@@ -2800,8 +2800,8 @@
     "translation": "將應用程式原始碼從某個應用程式複製到另一個應用程式。除非予以置換，否則 copy-source 指令將重新啟動應用程式。"
   },
   {
-    "id": "Make a user-provided service instance available to cf apps",
-    "translation": "讓使用者提供的服務實例可供 cf 應用程式使用"
+    "id": "Make a user-provided service instance available to CF apps",
+    "translation": "讓使用者提供的服務實例可供 CF 應用程式使用"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
@@ -3904,8 +3904,8 @@
     "translation": "提示:\n"
   },
   {
-    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to cf apps",
-    "translation": "提示:\n   使用 'CF_NAME create-user-provided-service'，讓使用者提供的服務可供 cf 應用程式使用"
+    "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
+    "translation": "提示:\n   使用 'CF_NAME create-user-provided-service'，讓使用者提供的服務可供 CF 應用程式使用"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
