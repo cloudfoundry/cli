@@ -4,8 +4,6 @@ set -e
 
 echo -e "\nGenerating Binary..."
 
-export GO15VENDOREXPERIMENT=1
-
 ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
 
 $ROOT_DIR/bin/generate-language-resources

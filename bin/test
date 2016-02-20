@@ -14,8 +14,6 @@ trap printStatus EXIT
 
 bin/i18n-checkup
 
-export GO15VENDOREXPERIMENT=1
-
 echo -e "\n Cleaning build artifacts..."
 
 # Clean up old plugin binaries used in test
