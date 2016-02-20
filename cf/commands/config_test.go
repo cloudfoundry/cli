@@ -105,7 +105,8 @@ var _ = Describe("config command", func() {
 		It("informs the user of known locales if an unknown locale is provided", func() {
 			runCommand("--locale", "foo-BAR")
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"known locales are"},
+				[]string{"FAILED"},
+				[]string{"Could not find locale 'foo-BAR'. The known locales are:"},
 				[]string{"en-US"},
 				[]string{"fr-FR"},
 				[]string{"zh-Hans"},

@@ -92,12 +92,13 @@ func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 			return
 		}
 
-		cmd.ui.Say(fmt.Sprintf("Could not find locale '%s'. The known locales are:", locale))
-		cmd.ui.Say("")
+		unsupportedLocaleMessage := fmt.Sprintf("Could not find locale '%s'. The known locales are:\n", locale)
 		supportedLocales := SupportedLocales()
 		sort.Strings(supportedLocales)
 		for i := range supportedLocales {
-			cmd.ui.Say(supportedLocales[i])
+			unsupportedLocaleMessage = unsupportedLocaleMessage + "\n" + supportedLocales[i]
 		}
+
+		cmd.ui.Failed(unsupportedLocaleMessage)
 	}
 }
