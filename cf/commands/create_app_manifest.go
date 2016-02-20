@@ -66,9 +66,7 @@ func (cmd *CreateAppManifest) SetDependency(deps command_registry.Dependency, pl
 }
 
 func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
-	app := cmd.appReq.GetApplication()
-
-	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
+	application, apiErr := cmd.appSummaryRepo.GetSummary(cmd.appReq.GetApplication().Guid)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error getting application summary: ") + apiErr.Error())
 	}
