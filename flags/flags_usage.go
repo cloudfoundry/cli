@@ -1,48 +1,105 @@
 package flags
 
-import "strings"
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
 
 func (c *flagContext) ShowUsage(leadingSpace int) string {
-	output := ""
-	names := make([][]string, len(c.cmdFlags))
+	displayFlags := make(flags, len(c.cmdFlags))
 
-	var l, i int
+	var i int
 	for _, f := range c.cmdFlags {
-		var line string
-		if f.GetName() != "" {
-			line += "--" + f.GetName()
-			if f.GetShortName() != "" {
-				line += ", "
-			}
+		d := flagPresenter{
+			flagSet: f,
 		}
 
-		if f.GetShortName() != "" {
-			line += "-" + f.GetShortName()
-		}
-
-		if len(line) > l {
-			l = len(line)
-		}
-
-		names[i] = []string{
-			strings.Repeat(" ", leadingSpace) + line,
-			f.String(),
-		}
+		displayFlags[i] = d
 
 		i++
 	}
 
-	for _, atts := range names {
-		flagList := atts[0]
-		usage := atts[1]
-		line := flagList
+	return displayFlags.toString(strings.Repeat(" ", leadingSpace))
+}
 
-		if usage != "" {
-			line += strings.Repeat(" ", 6+(l-len(flagList))) + usage
-		}
+type flagPresenter struct {
+	flagSet FlagSet
+}
 
-		output += line + "\n"
+func (p *flagPresenter) line(l int) string {
+	flagList := p.flagList()
+	usage := p.usage()
+	spaces := strings.Repeat(" ", 6+(l-len(flagList)))
+
+	return strings.TrimRight(fmt.Sprintf("%s%s%s", flagList, spaces, usage), " ")
+}
+
+func (p *flagPresenter) flagList() string {
+	f := p.flagSet
+	var parts []string
+
+	if f.GetName() != "" {
+		parts = append(parts, fmt.Sprintf("--%s", f.GetName()))
 	}
 
-	return output
+	if f.GetShortName() != "" {
+		parts = append(parts, fmt.Sprintf("-%s", f.GetShortName()))
+	}
+
+	return strings.Join(parts, ", ")
+}
+
+func (p *flagPresenter) usage() string {
+	return p.flagSet.String()
+}
+
+func (p *flagPresenter) comparableString() string {
+	if p.flagSet.GetName() != "" {
+		return p.flagSet.GetName()
+	}
+
+	return p.flagSet.GetShortName()
+}
+
+type flags []flagPresenter
+
+func (f flags) Len() int {
+	return len(f)
+}
+
+func (f flags) Less(i, j int) bool {
+	return (f[i].comparableString() < f[j].comparableString())
+}
+
+func (f flags) Swap(i, j int) {
+	f[i], f[j] = f[j], f[i]
+}
+
+func (f flags) toString(prefix string) string {
+	sort.Sort(f)
+
+	lines := make([]string, f.Len())
+	maxLength := f.maxLineLength()
+
+	for i, l := range f {
+		lines[i] = fmt.Sprintf("%s%s", prefix, l.line(maxLength))
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func (f flags) maxLineLength() int {
+	var l int
+
+	for _, x := range f {
+
+		lPrime := len(x.flagList())
+
+		if lPrime > l {
+			l = lPrime
+		}
+	}
+
+	return l
 }
