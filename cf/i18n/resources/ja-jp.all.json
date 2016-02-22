@@ -353,7 +353,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "アプリケーション・ヘルス・チェック・タイプ (例: port または none)"
+    "translation": "アプリケーション・ヘルス・チェック・タイプ (例: 'port' または 'none')"
   },
   {
     "id": "Application instance index",
@@ -3701,7 +3701,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "デフォルト・ロケールを設定します。LOCALE が CLEAR の場合は、前のロケールが削除されます。"
+    "translation": "デフォルト・ロケールを設定します。LOCALE が 'CLEAR' の場合は、前のロケールが削除されます。"
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",

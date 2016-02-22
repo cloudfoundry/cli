@@ -353,7 +353,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "应用程序运行状况检查类型（例如，port 或 none）"
+    "translation": "应用程序运行状况检查类型（例如，'port' 或 'none'）"
   },
   {
     "id": "Application instance index",
@@ -3701,11 +3701,11 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "设置缺省语言环境。如果 LOCALE 为 CLEAR，将删除先前的语言环境。"
+    "translation": "设置缺省语言环境。如果 LOCALE 为 'CLEAR'，将删除先前的语言环境。"
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",
-    "translation": "将 health_check_type 标志设置为“port”或“none”"
+    "translation": "将 health_check_type 标志设置为'port'或'none'"
   },
   {
     "id": "Set or view target api url",
