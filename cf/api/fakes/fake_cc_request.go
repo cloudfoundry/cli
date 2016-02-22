@@ -1,8 +1,9 @@
 package fakes
 
 import (
-	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	"net/http"
+
+	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 )
 
 func NewCloudControllerTestRequest(request testnet.TestRequest) testnet.TestRequest {

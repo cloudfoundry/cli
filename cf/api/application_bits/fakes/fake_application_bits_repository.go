@@ -2,10 +2,11 @@
 package fakes
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api/application_bits"
-	"github.com/cloudfoundry/cli/cf/api/resources"
 	"os"
 	"sync"
+
+	. "github.com/cloudfoundry/cli/cf/api/application_bits"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 )
 
 type FakeApplicationBitsRepository struct {

@@ -2,9 +2,10 @@
 package fakes
 
 import (
+	"sync"
+
 	. "github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"sync"
 )
 
 type FakeServiceActor struct {

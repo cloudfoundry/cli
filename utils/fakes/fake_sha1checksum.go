@@ -2,8 +2,9 @@
 package fakes
 
 import (
-	"github.com/cloudfoundry/cli/utils"
 	"sync"
+
+	"github.com/cloudfoundry/cli/utils"
 )
 
 type FakeSha1Checksum struct {
