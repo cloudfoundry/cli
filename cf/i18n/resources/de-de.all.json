@@ -3909,7 +3909,7 @@
   },
   {
     "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
-    "translation": "TIPP:\n   Verwenden Sie 'CF_NAME create-user-provided-service', um vom Benutzer zur Verfügung gestellte Services für cf-Apps verfügbar zu machen. "
+    "translation": "TIPP:\n   Verwenden Sie 'CF_NAME create-user-provided-service', um vom Benutzer zur Verfügung gestellte Services für CF-Apps verfügbar zu machen. "
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
