@@ -11,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type BindRouteService struct {
@@ -29,13 +28,13 @@ func init() {
 
 func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["force"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force binding without confirmation")}
-	fs["hostname"] = &cliFlags.StringFlag{
+	fs["force"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force binding without confirmation")}
+	fs["hostname"] = &flags.StringFlag{
 		Name:      "hostname",
 		ShortName: "n",
 		Usage:     T("Hostname used in combination with DOMAIN to specify the route to bind"),
 	}
-	fs["parameters"] = &cliFlags.StringFlag{
+	fs["parameters"] = &flags.StringFlag{
 		ShortName: "c",
 		Usage:     T("Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."),
 	}

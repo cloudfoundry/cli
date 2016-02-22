@@ -9,7 +9,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DisableServiceAccess struct {
@@ -25,8 +24,8 @@ func init() {
 
 func (cmd *DisableServiceAccess) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Disable access to a specified service plan")}
-	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Disable access for a specified organization")}
+	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Disable access to a specified service plan")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Disable access for a specified organization")}
 
 	return command_registry.CommandMetadata{
 		Name:        "disable-service-access",

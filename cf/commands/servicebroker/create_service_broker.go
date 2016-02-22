@@ -9,7 +9,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CreateServiceBroker struct {
@@ -24,7 +23,7 @@ func init() {
 
 func (cmd *CreateServiceBroker) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["space-scoped"] = &cliFlags.BoolFlag{Name: "space-scoped", Usage: T("Make the broker's service plans only visible within the targeted space")}
+	fs["space-scoped"] = &flags.BoolFlag{Name: "space-scoped", Usage: T("Make the broker's service plans only visible within the targeted space")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-service-broker",

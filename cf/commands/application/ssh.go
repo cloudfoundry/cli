@@ -18,7 +18,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/ssh/terminal"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type SSH struct {
@@ -42,14 +41,14 @@ func init() {
 
 func (cmd *SSH) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["L"] = &cliFlags.StringSliceFlag{ShortName: "L", Usage: T("Local port forward specification. This flag can be defined more than once.")}
-	fs["command"] = &cliFlags.StringSliceFlag{Name: "command", ShortName: "c", Usage: T("Command to run. This flag can be defined more than once.")}
-	fs["app-instance-index"] = &cliFlags.IntFlag{Name: "app-instance-index", ShortName: "i", Usage: T("Application instance index")}
-	fs["skip-host-validation"] = &cliFlags.BoolFlag{Name: "skip-host-validation", ShortName: "k", Usage: T("Skip host key validation")}
-	fs["skip-remote-execution"] = &cliFlags.BoolFlag{Name: "skip-remote-execution", ShortName: "N", Usage: T("Do not execute a remote command")}
-	fs["request-pseudo-tty"] = &cliFlags.BoolFlag{Name: "request-pseudo-tty", ShortName: "t", Usage: T("Request pseudo-tty allocation")}
-	fs["force-pseudo-tty"] = &cliFlags.BoolFlag{Name: "force-pseudo-tty", ShortName: "tt", Usage: T("Force pseudo-tty allocation")}
-	fs["disable-pseudo-tty"] = &cliFlags.BoolFlag{Name: "disable-pseudo-tty", ShortName: "T", Usage: T("Disable pseudo-tty allocation")}
+	fs["L"] = &flags.StringSliceFlag{ShortName: "L", Usage: T("Local port forward specification. This flag can be defined more than once.")}
+	fs["command"] = &flags.StringSliceFlag{Name: "command", ShortName: "c", Usage: T("Command to run. This flag can be defined more than once.")}
+	fs["app-instance-index"] = &flags.IntFlag{Name: "app-instance-index", ShortName: "i", Usage: T("Application instance index")}
+	fs["skip-host-validation"] = &flags.BoolFlag{Name: "skip-host-validation", ShortName: "k", Usage: T("Skip host key validation")}
+	fs["skip-remote-execution"] = &flags.BoolFlag{Name: "skip-remote-execution", ShortName: "N", Usage: T("Do not execute a remote command")}
+	fs["request-pseudo-tty"] = &flags.BoolFlag{Name: "request-pseudo-tty", ShortName: "t", Usage: T("Request pseudo-tty allocation")}
+	fs["force-pseudo-tty"] = &flags.BoolFlag{Name: "force-pseudo-tty", ShortName: "tt", Usage: T("Force pseudo-tty allocation")}
+	fs["disable-pseudo-tty"] = &flags.BoolFlag{Name: "disable-pseudo-tty", ShortName: "T", Usage: T("Disable pseudo-tty allocation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "ssh",

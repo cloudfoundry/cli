@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type FlagSet interface {
@@ -88,7 +86,7 @@ func (c *flagContext) Parse(args ...string) error {
 
 			switch flagset.GetValue().(type) {
 			case bool:
-				c.flagsets[flg] = &cliFlags.BoolFlag{Name: flg, Value: c.getBoolFlagValue(args)}
+				c.flagsets[flg] = &BoolFlag{Name: flg, Value: c.getBoolFlagValue(args)}
 			case int:
 				if v, err = c.getFlagValue(args); err != nil {
 					return err
@@ -97,7 +95,7 @@ func (c *flagContext) Parse(args ...string) error {
 				if err != nil {
 					return errors.New("Value for flag '" + flg + "' must be an integer")
 				}
-				c.flagsets[flg] = &cliFlags.IntFlag{Name: flg, Value: int(i)}
+				c.flagsets[flg] = &IntFlag{Name: flg, Value: int(i)}
 			case float64:
 				if v, err = c.getFlagValue(args); err != nil {
 					return err
@@ -106,18 +104,18 @@ func (c *flagContext) Parse(args ...string) error {
 				if err != nil {
 					return errors.New("Value for flag '" + flg + "' must be a float64")
 				}
-				c.flagsets[flg] = &cliFlags.Float64Flag{Name: flg, Value: float64(i)}
+				c.flagsets[flg] = &Float64Flag{Name: flg, Value: float64(i)}
 			case string:
 				if v, err = c.getFlagValue(args); err != nil {
 					return err
 				}
-				c.flagsets[flg] = &cliFlags.StringFlag{Name: flg, Value: v}
+				c.flagsets[flg] = &StringFlag{Name: flg, Value: v}
 			case []string:
 				if v, err = c.getFlagValue(args); err != nil {
 					return err
 				}
 				if _, ok = c.flagsets[flg]; !ok {
-					c.flagsets[flg] = &cliFlags.StringSliceFlag{Name: flg, Value: []string{v}}
+					c.flagsets[flg] = &StringSliceFlag{Name: flg, Value: []string{v}}
 				} else {
 					c.flagsets[flg].Set(v)
 				}
@@ -248,23 +246,23 @@ func (c *flagContext) setDefaultFlagValueIfAny() {
 		switch v.(type) {
 		case bool:
 			if v.(bool) != false {
-				c.flagsets[flgName] = &cliFlags.BoolFlag{Name: flgName, Value: v.(bool)}
+				c.flagsets[flgName] = &BoolFlag{Name: flgName, Value: v.(bool)}
 			}
 		case int:
 			if v.(int) != 0 {
-				c.flagsets[flgName] = &cliFlags.IntFlag{Name: flgName, Value: v.(int)}
+				c.flagsets[flgName] = &IntFlag{Name: flgName, Value: v.(int)}
 			}
 		case float64:
 			if v.(float64) != 0 {
-				c.flagsets[flgName] = &cliFlags.Float64Flag{Name: flgName, Value: v.(float64)}
+				c.flagsets[flgName] = &Float64Flag{Name: flgName, Value: v.(float64)}
 			}
 		case string:
 			if len(v.(string)) != 0 {
-				c.flagsets[flgName] = &cliFlags.StringFlag{Name: flgName, Value: v.(string)}
+				c.flagsets[flgName] = &StringFlag{Name: flgName, Value: v.(string)}
 			}
 		case []string:
 			if len(v.([]string)) != 0 {
-				c.flagsets[flgName] = &cliFlags.StringSliceFlag{Name: flgName, Value: v.([]string)}
+				c.flagsets[flgName] = &StringSliceFlag{Name: flgName, Value: v.([]string)}
 			}
 		}
 	}

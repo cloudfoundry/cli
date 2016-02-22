@@ -14,7 +14,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
@@ -31,7 +30,7 @@ func init() {
 
 func (cmd *Logs) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["recent"] = &cliFlags.BoolFlag{Name: "recent", Usage: T("Dump recent logs instead of tailing")}
+	fs["recent"] = &flags.BoolFlag{Name: "recent", Usage: T("Dump recent logs instead of tailing")}
 
 	return command_registry.CommandMetadata{
 		Name:        "logs",

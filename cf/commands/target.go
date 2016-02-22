@@ -13,7 +13,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type Target struct {
@@ -29,8 +28,8 @@ func init() {
 
 func (cmd *Target) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Organization")}
-	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Space")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Organization")}
+	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Space")}
 
 	return command_registry.CommandMetadata{
 		Name:        "target",

@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DeleteApp struct {
@@ -27,8 +26,8 @@ func init() {
 
 func (cmd *DeleteApp) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
-	fs["r"] = &cliFlags.BoolFlag{ShortName: "r", Usage: T("Also delete any mapped routes")}
+	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
+	fs["r"] = &flags.BoolFlag{ShortName: "r", Usage: T("Also delete any mapped routes")}
 
 	return command_registry.CommandMetadata{
 		Name:        "delete",

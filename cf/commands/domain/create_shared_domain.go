@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CreateSharedDomain struct {
@@ -26,7 +25,7 @@ func init() {
 
 func (cmd *CreateSharedDomain) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["router-group"] = &cliFlags.StringFlag{Name: "router-group", Usage: T("Routes for this domain will be configured only on the specified router group")}
+	fs["router-group"] = &flags.StringFlag{Name: "router-group", Usage: T("Routes for this domain will be configured only on the specified router group")}
 	return command_registry.CommandMetadata{
 		Name:        "create-shared-domain",
 		Description: T("Create a domain that can be used by all orgs (admin-only)"),

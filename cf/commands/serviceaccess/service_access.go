@@ -13,7 +13,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type ServiceAccess struct {
@@ -29,9 +28,9 @@ func init() {
 
 func (cmd *ServiceAccess) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["b"] = &cliFlags.StringFlag{ShortName: "b", Usage: T("Access for plans of a particular broker")}
-	fs["e"] = &cliFlags.StringFlag{ShortName: "e", Usage: T("Access for service name of a particular service offering")}
-	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Plans accessible by a particular organization")}
+	fs["b"] = &flags.StringFlag{ShortName: "b", Usage: T("Access for plans of a particular broker")}
+	fs["e"] = &flags.StringFlag{ShortName: "e", Usage: T("Access for service name of a particular service offering")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Plans accessible by a particular organization")}
 
 	return command_registry.CommandMetadata{
 		Name:        "service-access",

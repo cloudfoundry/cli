@@ -11,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CreateQuota struct {
@@ -26,11 +25,11 @@ func init() {
 
 func (cmd *CreateQuota) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["allow-paid-service-plans"] = &cliFlags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
-	fs["i"] = &cliFlags.StringFlag{ShortName: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.")}
-	fs["m"] = &cliFlags.StringFlag{ShortName: "m", Usage: T("Total amount of memory (e.g. 1024M, 1G, 10G)")}
-	fs["r"] = &cliFlags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
-	fs["s"] = &cliFlags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
+	fs["allow-paid-service-plans"] = &flags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
+	fs["i"] = &flags.StringFlag{ShortName: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.")}
+	fs["m"] = &flags.StringFlag{ShortName: "m", Usage: T("Total amount of memory (e.g. 1024M, 1G, 10G)")}
+	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
+	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-quota",

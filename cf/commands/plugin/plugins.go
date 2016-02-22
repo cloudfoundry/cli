@@ -9,7 +9,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/cli/utils"
 )
 
@@ -24,7 +23,7 @@ func init() {
 
 func (cmd *Plugins) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["checksum"] = &cliFlags.BoolFlag{Name: "checksum", Usage: T("Compute and show the sha1 value of the plugin binary file")}
+	fs["checksum"] = &flags.BoolFlag{Name: "checksum", Usage: T("Compute and show the sha1 value of the plugin binary file")}
 
 	return command_registry.CommandMetadata{
 		Name:        "plugins",

@@ -9,7 +9,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type UnmapRoute struct {
@@ -26,8 +25,8 @@ func init() {
 
 func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the route")}
-	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path used to identify the route")}
+	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the route")}
+	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path used to identify the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "unmap-route",

@@ -2,7 +2,6 @@ package flags_test
 
 import (
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -18,12 +17,12 @@ var _ = Describe("Flags", func() {
 			BeforeEach(func() {
 				cmdFlagMap = make(map[string]flags.FlagSet)
 
-				cmdFlagMap["name"] = &cliFlags.StringFlag{Name: "name", ShortName: "n", Usage: "test string flag"}
-				cmdFlagMap["skip"] = &cliFlags.BoolFlag{Name: "skip", Usage: "test bool flag"}
-				cmdFlagMap["instance"] = &cliFlags.IntFlag{Name: "instance", Usage: "test int flag"}
-				cmdFlagMap["float"] = &cliFlags.Float64Flag{Name: "float", Usage: "test float64 flag"}
-				cmdFlagMap["skip2"] = &cliFlags.BoolFlag{Name: "skip2", Usage: "test bool flag"}
-				cmdFlagMap["slice"] = &cliFlags.StringSliceFlag{Name: "slice", Usage: "test stringSlice flag"}
+				cmdFlagMap["name"] = &flags.StringFlag{Name: "name", ShortName: "n", Usage: "test string flag"}
+				cmdFlagMap["skip"] = &flags.BoolFlag{Name: "skip", Usage: "test bool flag"}
+				cmdFlagMap["instance"] = &flags.IntFlag{Name: "instance", Usage: "test int flag"}
+				cmdFlagMap["float"] = &flags.Float64Flag{Name: "float", Usage: "test float64 flag"}
+				cmdFlagMap["skip2"] = &flags.BoolFlag{Name: "skip2", Usage: "test bool flag"}
+				cmdFlagMap["slice"] = &flags.StringSliceFlag{Name: "slice", Usage: "test stringSlice flag"}
 
 				fCtx = flags.NewFlagContext(cmdFlagMap)
 			})
@@ -169,12 +168,12 @@ var _ = Describe("Flags", func() {
 				BeforeEach(func() {
 					cmdFlagMap = make(map[string]flags.FlagSet)
 
-					cmdFlagMap["defaultStringFlag"] = &cliFlags.StringFlag{Name: "defaultStringFlag", Value: "Set by default"}
-					cmdFlagMap["defaultBoolFlag"] = &cliFlags.BoolFlag{Name: "defaultBoolFlag", Value: true}
-					cmdFlagMap["defaultIntFlag"] = &cliFlags.IntFlag{Name: "defaultIntFlag", Value: 100}
-					cmdFlagMap["defaultStringAryFlag"] = &cliFlags.StringSliceFlag{Name: "defaultStringAryFlag", Value: []string{"abc", "def"}}
-					cmdFlagMap["defaultFloat64Flag"] = &cliFlags.Float64Flag{Name: "defaultFloat64Flag", Value: 100.5}
-					cmdFlagMap["noDefaultStringFlag"] = &cliFlags.StringFlag{Name: "noDefaultStringFlag"}
+					cmdFlagMap["defaultStringFlag"] = &flags.StringFlag{Name: "defaultStringFlag", Value: "Set by default"}
+					cmdFlagMap["defaultBoolFlag"] = &flags.BoolFlag{Name: "defaultBoolFlag", Value: true}
+					cmdFlagMap["defaultIntFlag"] = &flags.IntFlag{Name: "defaultIntFlag", Value: 100}
+					cmdFlagMap["defaultStringAryFlag"] = &flags.StringSliceFlag{Name: "defaultStringAryFlag", Value: []string{"abc", "def"}}
+					cmdFlagMap["defaultFloat64Flag"] = &flags.Float64Flag{Name: "defaultFloat64Flag", Value: 100.5}
+					cmdFlagMap["noDefaultStringFlag"] = &flags.StringFlag{Name: "noDefaultStringFlag"}
 
 					fCtx = flags.NewFlagContext(cmdFlagMap)
 				})

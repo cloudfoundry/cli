@@ -6,7 +6,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
@@ -36,13 +35,13 @@ func init() {
 
 func (cmd *Login) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["a"] = &cliFlags.StringFlag{ShortName: "a", Usage: T("API endpoint (e.g. https://api.example.com)")}
-	fs["u"] = &cliFlags.StringFlag{ShortName: "u", Usage: T("Username")}
-	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Password")}
-	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Org")}
-	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Space")}
-	fs["sso"] = &cliFlags.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")}
-	fs["skip-ssl-validation"] = &cliFlags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
+	fs["a"] = &flags.StringFlag{ShortName: "a", Usage: T("API endpoint (e.g. https://api.example.com)")}
+	fs["u"] = &flags.StringFlag{ShortName: "u", Usage: T("Username")}
+	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Password")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Org")}
+	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Space")}
+	fs["sso"] = &flags.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")}
+	fs["skip-ssl-validation"] = &flags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
 
 	return command_registry.CommandMetadata{
 		Name:        "login",
