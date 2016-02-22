@@ -1,6 +1,8 @@
 package user
 
 import (
+	"fmt"
+
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -39,9 +41,9 @@ func (cmd *SetSpaceRole) MetaData() command_registry.CommandMetadata {
 		Description: T("Assign a space role to a user"),
 		Usage: T("CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n") +
 			T("ROLES:\n") +
-			T("   SpaceManager - Invite and manage users, and enable features for a given space\n") +
-			T("   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n") +
-			T("   SpaceAuditor - View logs, reports, and settings on this space\n"),
+			fmt.Sprintf("   'SpaceManager' - %s", T("Invite and manage users, and enable features for a given space\n")) +
+			fmt.Sprintf("   'SpaceDeveloper' - %s", T("Create and manage apps and services, and see logs and reports\n")) +
+			fmt.Sprintf("   'SpaceAuditor' - %s", T("View logs, reports, and settings on this space\n")),
 	}
 }
 

@@ -52,10 +52,6 @@
     "translation": "\nDICA: Use 'cf login -a API --skip-ssl-validation' ou 'cf api API --skip-ssl-validation' para suprimir esse erro"
   },
   {
-    "id": "   BillingManager - Create and manage the billing account and payment info\n",
-    "translation": "   BillingManager - Criar e gerenciar a conta de cobrança e as informações de pagamento\n"
-  },
-  {
     "id": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
     "translation": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escapar aspas se usadas na senha)"
   },
@@ -112,32 +108,12 @@
     "translation": "   Opcionalmente, forneça parâmetros de configuração específicos do serviço em um objeto JSON válido sequencial:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Opcionalmente, forneça um arquivo contendo parâmetros de configuração específicos do serviço em um objeto JSON válido.\n   O caminho para o arquivo de parâmetros pode ser um caminho absoluto ou relativo para um arquivo:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Exemplo de objeto JSON válido:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }"
   },
   {
-    "id": "   OrgAuditor - Read-only access to org info and reports\n",
-    "translation": "   OrgAuditor - Acesso somente leitura a informações e relatórios da organização\n"
-  },
-  {
-    "id": "   OrgManager - Invite and manage users, select and change plans, and set spending limits\n",
-    "translation": "   OrgManager - Convidar e gerenciar usuários, selecionar e mudar planos e configurar limites de gastos\n"
-  },
-  {
     "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.",
     "translation": "   O caminho deve ser um arquivo zip, uma URL para um arquivo zip ou um diretório local. Ranqueamento é um número inteiro positivo, configura a prioridade e é classificado do mais baixo para o mais alto."
   },
   {
     "id": "   Push multiple apps with a manifest:\n",
     "translation": "   Enviar por push vários apps com um manifest:\n"
-  },
-  {
-    "id": "   SpaceAuditor - View logs, reports, and settings on this space\n",
-    "translation": "   SpaceAuditor - Visualizar logs, relatórios e configurações neste espaço\n"
-  },
-  {
-    "id": "   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n",
-    "translation": "   SpaceDeveloper - Criar e gerenciar apps e serviços e consultar logs e relatórios\n"
-  },
-  {
-    "id": "   SpaceManager - Invite and manage users, and enable features for a given space\n",
-    "translation": "   SpaceManager - Convidar e gerenciar usuários e ativar recursos para um determinado espaço\n"
   },
   {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
@@ -1270,6 +1246,14 @@
   {
     "id": "Create an org",
     "translation": "Criar uma organização"
+  },
+  {
+    "id": "Create and manage apps and services, and see logs and reports\n",
+    "translation": "Criar e gerenciar apps e serviços e consultar logs e relatórios\n"
+  },
+  {
+    "id": "Create and manage the billing account and payment info\n",
+    "translation": "Criar e gerenciar a conta de cobrança e as informações de pagamento\n"
   },
   {
     "id": "Create key for a service instance",
@@ -2664,6 +2648,14 @@
     "translation": "Valor inválido para '{{.PropertyName}}': {{.StringVal}}\n{{.Error}}"
   },
   {
+    "id": "Invite and manage users, and enable features for a given space\n",
+    "translation": "Convidar e gerenciar usuários e ativar recursos para um determinado espaço\n"
+  },
+  {
+    "id": "Invite and manage users, select and change plans, and set spending limits\n",
+    "translation": "Convidar e gerenciar usuários, selecionar e mudar planos e configurar limites de gastos\n"
+  },
+  {
     "id": "Last Operation",
     "translation": "Última Operação"
   },
@@ -3294,6 +3286,10 @@
   {
     "id": "ROUTES",
     "translation": "ROTAS"
+  },
+  {
+    "id": "Read-only access to org info and reports\n",
+    "translation": "Acesso somente leitura a informações e relatórios da organização\n"
   },
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
@@ -4370,6 +4366,10 @@
   {
     "id": "Version",
     "translation": "Versão"
+  },
+  {
+    "id": "View logs, reports, and settings on this space\n",
+    "translation": "Visualizar logs, relatórios e configurações neste espaço\n"
   },
   {
     "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",

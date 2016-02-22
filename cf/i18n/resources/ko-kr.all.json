@@ -52,10 +52,6 @@
     "translation": "\n팁: 이 오류를 억제하려면 'cf login -a API --skip-ssl-validation' 또는 'cf api API --skip-ssl-validation'을 사용하십시오."
   },
   {
-    "id": "   BillingManager - Create and manage the billing account and payment info\n",
-    "translation": "   BillingManager - 청구 계정과 지불 정보를 작성하고 관리합니다.\n"
-  },
-  {
     "id": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
     "translation": "   CF_NAME auth name@example.com \"\\\"password\\\"\"(비밀번호에서 사용되는 경우 따옴표 이스케이프)"
   },
@@ -112,32 +108,12 @@
     "translation": "   선택적으로 올바른 JSON 오브젝트 인라인에 서비스별 구성 매개변수를 제공하십시오.\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   선택적으로 올바른 JSON 오브젝트에 서비스별 구성 매개변수를 포함하는 파일을 제공하십시오.\n매개변수 파일의 경로는 파일의 절대 또는 상대 경로입니다.\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n\n   올바른 JSON 오브젝트의 예:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }"
   },
   {
-    "id": "   OrgAuditor - Read-only access to org info and reports\n",
-    "translation": "   OrgAuditor - 조직 정보와 보고서에 대한 읽기 전용 액세스 권한\n"
-  },
-  {
-    "id": "   OrgManager - Invite and manage users, select and change plans, and set spending limits\n",
-    "translation": "   OrgManager - 사용자 초대와 관리, 플랜 선택과 변경, 지출 한계 설정\n"
-  },
-  {
     "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.",
     "translation": "   경로는 zip 파일, zip 파일의 URL 또는 로컬 디렉토리여야 합니다. 위치는 양의 정수이며 우선순위를 설정하고 낮은 순위에서 높은 순위순으로 정렬됩니다."
   },
   {
     "id": "   Push multiple apps with a manifest:\n",
     "translation": "   Manifest로 여러 앱 푸시:\n"
-  },
-  {
-    "id": "   SpaceAuditor - View logs, reports, and settings on this space\n",
-    "translation": "   SpaceAuditor - 이 영역에 대한 설정, 보고서, 로그 보기\n"
-  },
-  {
-    "id": "   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n",
-    "translation": "   SpaceDeveloper - 앱과 서비스를 작성하고 관리하며 로그와 보고서 표시\n"
-  },
-  {
-    "id": "   SpaceManager - Invite and manage users, and enable features for a given space\n",
-    "translation": "   SpaceManager - 사용자 초대와 관리, 주어진 영역에 대한 기능 사용 설정\n"
   },
   {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
@@ -1270,6 +1246,14 @@
   {
     "id": "Create an org",
     "translation": "조직 작성"
+  },
+  {
+    "id": "Create and manage apps and services, and see logs and reports\n",
+    "translation": "앱과 서비스를 작성하고 관리하며 로그와 보고서 표시\n"
+  },
+  {
+    "id": "Create and manage the billing account and payment info\n",
+    "translation": "청구 계정과 지불 정보를 작성하고 관리합니다.\n"
   },
   {
     "id": "Create key for a service instance",
@@ -2664,6 +2648,14 @@
     "translation": ";{{.PropertyName}}'에 올바르지 않은 값: {{.StringVal}}\n{{.Error}}"
   },
   {
+    "id": "Invite and manage users, and enable features for a given space\n",
+    "translation": "사용자 초대와 관리, 주어진 영역에 대한 기능 사용 설정\n"
+  },
+  {
+    "id": "Invite and manage users, select and change plans, and set spending limits\n",
+    "translation": "사용자 초대와 관리, 플랜 선택과 변경, 지출 한계 설정\n"
+  },
+  {
     "id": "Last Operation",
     "translation": "마지막 조작"
   },
@@ -3294,6 +3286,10 @@
   {
     "id": "ROUTES",
     "translation": "라우트"
+  },
+  {
+    "id": "Read-only access to org info and reports\n",
+    "translation": "조직 정보와 보고서에 대한 읽기 전용 액세스 권한\n"
   },
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
@@ -4370,6 +4366,10 @@
   {
     "id": "Version",
     "translation": "버전"
+  },
+  {
+    "id": "View logs, reports, and settings on this space\n",
+    "translation": "이 영역에 대한 설정, 보고서, 로그 보기\n"
   },
   {
     "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
