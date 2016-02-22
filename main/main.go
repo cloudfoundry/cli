@@ -118,14 +118,6 @@ func main() {
 
 }
 
-func gatewaySliceFromMap(gateway_map map[string]net.Gateway) []net.WarningProducer {
-	gateways := []net.WarningProducer{}
-	for _, gateway := range gateway_map {
-		gateways = append(gateways, gateway)
-	}
-	return gateways
-}
-
 func handlePanics(printer terminal.Printer) {
 	panic_printer.UI = terminal.NewUI(os.Stdin, printer)
 
