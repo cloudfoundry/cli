@@ -2,8 +2,9 @@
 package fakes
 
 import (
-	. "github.com/cloudfoundry/cli/cf/terminal"
 	"sync"
+
+	. "github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type FakeTerminalOutputSwitch struct {
