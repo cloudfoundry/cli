@@ -8,7 +8,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -25,7 +24,7 @@ func init() {
 
 func (cmd *DeleteSpaceQuota) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force delete (do not prompt for confirmation)")}
+	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force delete (do not prompt for confirmation)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "delete-space-quota",

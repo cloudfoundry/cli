@@ -8,7 +8,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type Files struct {
@@ -24,7 +23,7 @@ func init() {
 
 func (cmd *Files) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["i"] = &cliFlags.IntFlag{ShortName: "i", Usage: T("Instance")}
+	fs["i"] = &flags.IntFlag{ShortName: "i", Usage: T("Instance")}
 
 	return command_registry.CommandMetadata{
 		Name:        "files",

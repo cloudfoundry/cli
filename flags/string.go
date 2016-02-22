@@ -1,4 +1,4 @@
-package cliFlags
+package flags
 
 type StringFlag struct {
 	Name      string

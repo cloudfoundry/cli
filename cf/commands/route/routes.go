@@ -5,7 +5,6 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -27,7 +26,7 @@ func init() {
 
 func (cmd *ListRoutes) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["orglevel"] = &cliFlags.BoolFlag{Name: "orglevel", Usage: T("List all the routes for all spaces of current organization")}
+	fs["orglevel"] = &flags.BoolFlag{Name: "orglevel", Usage: T("List all the routes for all spaces of current organization")}
 
 	return command_registry.CommandMetadata{
 		Name:        "routes",

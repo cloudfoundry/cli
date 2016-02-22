@@ -9,7 +9,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type MapRoute struct {
@@ -27,8 +26,8 @@ func init() {
 
 func (cmd *MapRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route (required for shared domains)")}
-	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path for the route")}
+	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route (required for shared domains)")}
+	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "map-route",

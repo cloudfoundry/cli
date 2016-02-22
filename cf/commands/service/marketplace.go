@@ -6,7 +6,6 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -28,7 +27,7 @@ func init() {
 
 func (cmd *MarketplaceServices) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Show plan details for a particular service offering")}
+	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Show plan details for a particular service offering")}
 
 	return command_registry.CommandMetadata{
 		Name:        "marketplace",

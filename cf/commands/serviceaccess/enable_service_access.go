@@ -8,7 +8,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -26,8 +25,8 @@ func init() {
 
 func (cmd *EnableServiceAccess) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Enable access to a specified service plan")}
-	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Enable access for a specified organization")}
+	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Enable access to a specified service plan")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Enable access for a specified organization")}
 
 	return command_registry.CommandMetadata{
 		Name:        "enable-service-access",

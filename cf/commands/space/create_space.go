@@ -15,7 +15,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CreateSpace struct {
@@ -34,8 +33,8 @@ func init() {
 
 func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Organization")}
-	fs["q"] = &cliFlags.StringFlag{ShortName: "q", Usage: T("Quota to assign to the newly created space (excluding this option results in assignment of default quota)")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Organization")}
+	fs["q"] = &flags.StringFlag{ShortName: "q", Usage: T("Quota to assign to the newly created space (excluding this option results in assignment of default quota)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-space",

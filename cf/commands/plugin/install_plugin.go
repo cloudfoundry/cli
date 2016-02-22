@@ -17,7 +17,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/downloader"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/utils"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -40,8 +39,8 @@ func init() {
 
 func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("Name of a registered repository where the specified plugin is located")}
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force install of plugin without confirmation")}
+	fs["r"] = &flags.StringFlag{ShortName: "r", Usage: T("Name of a registered repository where the specified plugin is located")}
+	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force install of plugin without confirmation")}
 
 	return command_registry.CommandMetadata{
 		Name:        "install-plugin",

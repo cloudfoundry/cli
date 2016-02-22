@@ -8,7 +8,6 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
@@ -33,8 +32,8 @@ func init() {
 
 func (cmd *ShowSpace) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["guid"] = &cliFlags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given space's guid.  All other output for the space is suppressed.")}
-	fs["security-group-rules"] = &cliFlags.BoolFlag{Name: "security-group-rules", Usage: T("Retrieve the rules for all the security groups associated with the space")}
+	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given space's guid.  All other output for the space is suppressed.")}
+	fs["security-group-rules"] = &flags.BoolFlag{Name: "security-group-rules", Usage: T("Retrieve the rules for all the security groups associated with the space")}
 	return command_registry.CommandMetadata{
 		Name:        "space",
 		Description: T("Show space info"),

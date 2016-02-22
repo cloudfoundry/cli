@@ -6,7 +6,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type FakeCommand1 struct {
@@ -19,9 +18,9 @@ func init() {
 
 func (cmd FakeCommand1) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: "Usage for BoolFlag"}
-	fs["boolFlag"] = &cliFlags.BoolFlag{Name: "BoolFlag", Usage: "Usage for BoolFlag"}
-	fs["intFlag"] = &cliFlags.IntFlag{Name: "intFlag", Usage: "Usage for intFlag"}
+	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: "Usage for BoolFlag"}
+	fs["boolFlag"] = &flags.BoolFlag{Name: "BoolFlag", Usage: "Usage for BoolFlag"}
+	fs["intFlag"] = &flags.IntFlag{Name: "intFlag", Usage: "Usage for intFlag"}
 
 	return command_registry.CommandMetadata{
 		Name:        "fake-command",

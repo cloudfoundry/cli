@@ -1,4 +1,4 @@
-package cliFlags
+package flags
 
 import "strconv"
 

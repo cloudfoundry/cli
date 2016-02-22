@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type DeleteRoute struct {
@@ -26,9 +25,9 @@ func init() {
 
 func (cmd *DeleteRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
-	fs["hostname"] = &cliFlags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the route")}
-	fs["path"] = &cliFlags.StringFlag{Name: "path", Usage: T("Path used to identify the route")}
+	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
+	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the route")}
+	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path used to identify the route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "delete-route",

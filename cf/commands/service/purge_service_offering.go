@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type PurgeServiceOffering struct {
@@ -24,8 +23,8 @@ func init() {
 
 func (cmd *PurgeServiceOffering) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
-	fs["p"] = &cliFlags.StringFlag{ShortName: "p", Usage: T("Provider")}
+	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
+	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Provider")}
 
 	return command_registry.CommandMetadata{
 		Name:        "purge-service-offering",

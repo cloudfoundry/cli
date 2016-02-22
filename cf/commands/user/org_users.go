@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 	"github.com/cloudfoundry/cli/plugin/models"
 )
 
@@ -29,7 +28,7 @@ func init() {
 
 func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["a"] = &cliFlags.BoolFlag{ShortName: "a", Usage: T("List all users in the org")}
+	fs["a"] = &flags.BoolFlag{ShortName: "a", Usage: T("List all users in the org")}
 
 	return command_registry.CommandMetadata{
 		Name:        "org-users",

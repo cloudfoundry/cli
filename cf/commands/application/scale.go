@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type Scale struct {
@@ -27,10 +26,10 @@ func init() {
 
 func (cmd *Scale) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["i"] = &cliFlags.IntFlag{ShortName: "i", Usage: T("Number of instances")}
-	fs["k"] = &cliFlags.StringFlag{ShortName: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
-	fs["m"] = &cliFlags.StringFlag{ShortName: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
-	fs["f"] = &cliFlags.BoolFlag{ShortName: "f", Usage: T("Force restart of app without prompt")}
+	fs["i"] = &flags.IntFlag{ShortName: "i", Usage: T("Number of instances")}
+	fs["k"] = &flags.StringFlag{ShortName: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
+	fs["m"] = &flags.StringFlag{ShortName: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
+	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force restart of app without prompt")}
 
 	return command_registry.CommandMetadata{
 		Name:        "scale",

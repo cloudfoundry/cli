@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
@@ -29,7 +28,7 @@ func init() {
 
 func (cmd *RepoPlugins) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["r"] = &cliFlags.StringFlag{ShortName: "r", Usage: T("Name of a registered repository")}
+	fs["r"] = &flags.StringFlag{ShortName: "r", Usage: T("Name of a registered repository")}
 
 	return command_registry.CommandMetadata{
 		Name:        T("repo-plugins"),

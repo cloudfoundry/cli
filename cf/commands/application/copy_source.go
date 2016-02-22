@@ -15,7 +15,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/flags/flag"
 )
 
 type CopySource struct {
@@ -35,9 +34,9 @@ func init() {
 
 func (cmd *CopySource) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["no-restart"] = &cliFlags.BoolFlag{Name: "no-restart", Usage: T("Override restart of the application in target environment after copy-source completes")}
-	fs["o"] = &cliFlags.StringFlag{ShortName: "o", Usage: T("Org that contains the target application")}
-	fs["s"] = &cliFlags.StringFlag{ShortName: "s", Usage: T("Space that contains the target application")}
+	fs["no-restart"] = &flags.BoolFlag{Name: "no-restart", Usage: T("Override restart of the application in target environment after copy-source completes")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Org that contains the target application")}
+	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Space that contains the target application")}
 
 	return command_registry.CommandMetadata{
 		Name:        "copy-source",

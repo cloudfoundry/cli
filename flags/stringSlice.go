@@ -1,4 +1,4 @@
-package cliFlags
+package flags
 
 //StringSlice flag can be define multiple times in the arguments
 type StringSliceFlag struct {
