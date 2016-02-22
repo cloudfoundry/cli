@@ -353,7 +353,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "應用程式性能檢查類型（例如 port 或 none）"
+    "translation": "應用程式性能檢查類型（例如 'port' 或 'none'）"
   },
   {
     "id": "Application instance index",
@@ -3701,7 +3701,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "設定預設語言環境。如果 LOCALE 是 CLEAR，則會刪除先前的語言環境。"
+    "translation": "設定預設語言環境。如果 LOCALE 是 'CLEAR'，則會刪除先前的語言環境。"
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",

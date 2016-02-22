@@ -353,7 +353,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "Überprüfungstyp für Anwendungsdiagnose (z.B. Port oder keiner) "
+    "translation": "Überprüfungstyp für Anwendungsdiagnose (z.B. 'port' (Port) oder 'none' (keiner))"
   },
   {
     "id": "Application instance index",
@@ -3701,7 +3701,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "Standard für Ländereinstellung festlegen. Wenn für LOCALE der Wert CLEAR angegeben ist, wird die vorherige Ländereinstellung gelöscht. "
+    "translation": "Standard für Ländereinstellung festlegen. Wenn für LOCALE der Wert 'CLEAR' angegeben ist, wird die vorherige Ländereinstellung gelöscht. "
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",

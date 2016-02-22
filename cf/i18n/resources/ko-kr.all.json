@@ -3701,7 +3701,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "기본 로케일을 설정합니다. LOCALE이 CLEAR인 경우 이전 로케일이 삭제됩니다."
+    "translation": "기본 로케일을 설정합니다. LOCALE이 'CLEAR'인 경우 이전 로케일이 삭제됩니다."
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",

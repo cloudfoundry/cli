@@ -353,7 +353,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "Tipo de comprobación de estado de la aplicación (p. ej., port o none)"
+    "translation": "Tipo de comprobación de estado de la aplicación (p. ej., 'port' o 'none')"
   },
   {
     "id": "Application instance index",
@@ -3701,7 +3701,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "Establecer el entorno local predeterminado. Si ENTORNO LOCAL está BORRADO, se suprimirá un entorno local anterior."
+    "translation": "Establecer el entorno local predeterminado. Si ENTORNO LOCAL está 'CLEAR', se suprimirá un entorno local anterior."
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",
