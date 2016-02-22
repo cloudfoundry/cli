@@ -1181,7 +1181,7 @@
   },
   {
     "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
-    "translation": ""
+    "translation": "'{{.UnsupportedLocale}}' というロケールは見つかりませんでした。既知のロケールは:\n"
   },
   {
     "id": "Could not find plan with name {{.ServicePlanName}}",
@@ -1369,7 +1369,7 @@
   },
   {
     "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
-    "translation": ""
+    "translation": "カスタム・ビルドパックの名前（例 my-buildpack）もしくはGitのURL（例 'https://github.com/cloudfoundry/java-buildpack.git'）もしくはブランチを含めたGitのURL、もしくはタグ（例 タグ'v3.3.0'を指定 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0'）。ビルトイン・ビルドパックだけを利用するためには、'default'もしくは'null'を指定してください"
   },
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
@@ -1441,7 +1441,7 @@
   },
   {
     "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
-    "translation": "すべての孤立した経路 (例: アプリにマップされていない経路) を削除します"
+    "translation": "すべての孤立した経路 (つまり、アプリにマップされていない経路) を削除します"
   },
   {
     "id": "Delete an app",
@@ -3917,7 +3917,7 @@
   },
   {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
-    "translation": ""
+    "translation": "ヒント: ファイアウォールに守られている側でHTTPプロキシが必要な場合、https_proxy環境変数が正確に設定されていることを確認してください。その他、ネットワーク接続を確認してください。"
   },
   {
     "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
@@ -3945,7 +3945,7 @@
   },
   {
     "id": "Tags: {{.Tags}}",
-    "translation": ""
+    "translation": "タグ: {{.Tags}}"
   },
   {
     "id": "Tail or show recent logs for an app",
