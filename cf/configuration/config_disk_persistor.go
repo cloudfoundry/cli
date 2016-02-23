@@ -3,7 +3,6 @@ package configuration
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 )
 
 const (
@@ -63,10 +62,7 @@ func (dp DiskPersistor) Save(data DataInterface) (err error) {
 }
 
 func (dp DiskPersistor) read(data DataInterface) error {
-	err := os.MkdirAll(filepath.Dir(dp.filePath), dirPermissions)
-	if err != nil {
-		return err
-	}
+	dp.makeDirectory()
 
 	jsonBytes, err := ioutil.ReadFile(dp.filePath)
 	if err != nil {
