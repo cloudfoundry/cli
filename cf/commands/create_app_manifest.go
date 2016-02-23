@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
+	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -21,6 +22,7 @@ type CreateAppManifest struct {
 	ui               terminal.UI
 	config           core_config.Reader
 	appSummaryRepo   api.AppSummaryRepository
+	stackRepo        stacks.StackRepository
 	appInstancesRepo app_instances.AppInstancesRepository
 	appReq           requirements.ApplicationRequirement
 	manifest         manifest.AppManifest
@@ -60,6 +62,7 @@ func (cmd *CreateAppManifest) SetDependency(deps command_registry.Dependency, pl
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
+	cmd.stackRepo = deps.RepoLocator.GetStackRepository()
 	cmd.manifest = deps.AppManifest
 	return cmd
 }
@@ -69,6 +72,13 @@ func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error getting application summary: ") + apiErr.Error())
 	}
+
+	stack, err := cmd.stackRepo.FindByGUID(application.StackGuid)
+	if err != nil {
+		cmd.ui.Failed(T("Error retrieving stack: ") + err.Error())
+	}
+
+	application.Stack = &stack
 
 	cmd.ui.Say(T("Creating an app manifest from current settings of app ") + application.Name + " ...")
 	cmd.ui.Say("")
@@ -86,6 +96,7 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 	cmd.manifest.FileSavePath(savePath)
 	cmd.manifest.Memory(app.Name, app.Memory)
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
+	cmd.manifest.Stack(app.Name, app.Stack.Name)
 
 	if app.Command != "" {
 		cmd.manifest.StartCommand(app.Name, app.Command)

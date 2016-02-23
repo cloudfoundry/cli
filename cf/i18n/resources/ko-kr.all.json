@@ -1904,6 +1904,18 @@
     "translation": "라우트 분석 중에 오류 발생:\n{{.Err}}"
   },
   {
+    "id": "Error retrieving stack: ",
+    "translation": ""
+  },
+  {
+    "id": "Error retrieving stacks: {{.Error}}",
+    "translation": ""
+  },
+  {
+    "id": "Error saving manifest: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
     "translation": "{{.Name}} 빌드팩 업데이트 중에 오류 발생\n{{.Error}}"
   },
@@ -2962,6 +2974,10 @@
   {
     "id": "No running security groups set",
     "translation": "실행 보안 그룹이 설정되지 않음"
+  },
+  {
+    "id": "No save path has been set",
+    "translation": ""
   },
   {
     "id": "No security groups",
@@ -4698,6 +4714,22 @@
   {
     "id": "requested state:",
     "translation": "요청된 상태:"
+  },
+  {
+    "id": "required attribute 'disk_quota' missing",
+    "translation": ""
+  },
+  {
+    "id": "required attribute 'instances' missing",
+    "translation": ""
+  },
+  {
+    "id": "required attribute 'memory' missing",
+    "translation": ""
+  },
+  {
+    "id": "required attribute 'stack' missing",
+    "translation": ""
   },
   {
     "id": "routes",

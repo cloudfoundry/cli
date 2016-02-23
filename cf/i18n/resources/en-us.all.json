@@ -1904,6 +1904,18 @@
     "translation": "Error resolving route:\n{{.Err}}"
   },
   {
+    "id": "Error retrieving stack: ",
+    "translation": "Error retrieving stack: "
+  },
+  {
+    "id": "Error retrieving stacks: {{.Error}}",
+    "translation": "Error retrieving stacks: {{.Error}}"
+  },
+  {
+    "id": "Error saving manifest: {{.Error}}",
+    "translation": "Error saving manifest: {{.Error}}"
+  },
+  {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
     "translation": "Error updating buildpack {{.Name}}\n{{.Error}}"
   },
@@ -2962,6 +2974,10 @@
   {
     "id": "No running security groups set",
     "translation": "No running security groups set"
+  },
+  {
+    "id": "No save path has been set",
+    "translation": "No save path has been set"
   },
   {
     "id": "No security groups",
@@ -4698,6 +4714,22 @@
   {
     "id": "requested state:",
     "translation": "requested state:"
+  },
+  {
+    "id": "required attribute 'disk_quota' missing",
+    "translation": "required attribute 'disk_quota' missing"
+  },
+  {
+    "id": "required attribute 'instances' missing",
+    "translation": "required attribute 'instances' missing"
+  },
+  {
+    "id": "required attribute 'memory' missing",
+    "translation": "required attribute 'memory' missing"
+  },
+  {
+    "id": "required attribute 'stack' missing",
+    "translation": "required attribute 'stack' missing"
   },
   {
     "id": "routes",

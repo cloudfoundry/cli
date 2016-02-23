@@ -18,6 +18,15 @@ type FakeStackRepository struct {
 		result1 models.Stack
 		result2 error
 	}
+	FindByGUIDStub        func(guid string) (models.Stack, error)
+	findByGUIDMutex       sync.RWMutex
+	findByGUIDArgsForCall []struct {
+		guid string
+	}
+	findByGUIDReturns struct {
+		result1 models.Stack
+		result2 error
+	}
 	FindAllStub        func() (stacks []models.Stack, apiErr error)
 	findAllMutex       sync.RWMutex
 	findAllArgsForCall []struct{}
@@ -55,6 +64,39 @@ func (fake *FakeStackRepository) FindByNameArgsForCall(i int) string {
 func (fake *FakeStackRepository) FindByNameReturns(result1 models.Stack, result2 error) {
 	fake.FindByNameStub = nil
 	fake.findByNameReturns = struct {
+		result1 models.Stack
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeStackRepository) FindByGUID(guid string) (models.Stack, error) {
+	fake.findByGUIDMutex.Lock()
+	fake.findByGUIDArgsForCall = append(fake.findByGUIDArgsForCall, struct {
+		guid string
+	}{guid})
+	fake.findByGUIDMutex.Unlock()
+	if fake.FindByGUIDStub != nil {
+		return fake.FindByGUIDStub(guid)
+	} else {
+		return fake.findByGUIDReturns.result1, fake.findByGUIDReturns.result2
+	}
+}
+
+func (fake *FakeStackRepository) FindByGUIDCallCount() int {
+	fake.findByGUIDMutex.RLock()
+	defer fake.findByGUIDMutex.RUnlock()
+	return len(fake.findByGUIDArgsForCall)
+}
+
+func (fake *FakeStackRepository) FindByGUIDArgsForCall(i int) string {
+	fake.findByGUIDMutex.RLock()
+	defer fake.findByGUIDMutex.RUnlock()
+	return fake.findByGUIDArgsForCall[i].guid
+}
+
+func (fake *FakeStackRepository) FindByGUIDReturns(result1 models.Stack, result2 error) {
+	fake.FindByGUIDStub = nil
+	fake.findByGUIDReturns = struct {
 		result1 models.Stack
 		result2 error
 	}{result1, result2}

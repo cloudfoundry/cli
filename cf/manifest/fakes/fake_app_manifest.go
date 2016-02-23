@@ -76,6 +76,12 @@ type FakeAppManifest struct {
 	fileSavePathArgsForCall []struct {
 		arg1 string
 	}
+	StackStub        func(string, string)
+	stackMutex       sync.RWMutex
+	stackArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
 	SaveStub        func() error
 	saveMutex       sync.RWMutex
 	saveArgsForCall []struct{}
@@ -347,6 +353,30 @@ func (fake *FakeAppManifest) FileSavePathArgsForCall(i int) string {
 	fake.fileSavePathMutex.RLock()
 	defer fake.fileSavePathMutex.RUnlock()
 	return fake.fileSavePathArgsForCall[i].arg1
+}
+
+func (fake *FakeAppManifest) Stack(arg1 string, arg2 string) {
+	fake.stackMutex.Lock()
+	fake.stackArgsForCall = append(fake.stackArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.stackMutex.Unlock()
+	if fake.StackStub != nil {
+		fake.StackStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeAppManifest) StackCallCount() int {
+	fake.stackMutex.RLock()
+	defer fake.stackMutex.RUnlock()
+	return len(fake.stackArgsForCall)
+}
+
+func (fake *FakeAppManifest) StackArgsForCall(i int) (string, string) {
+	fake.stackMutex.RLock()
+	defer fake.stackMutex.RUnlock()
+	return fake.stackArgsForCall[i].arg1, fake.stackArgsForCall[i].arg2
 }
 
 func (fake *FakeAppManifest) Save() error {
