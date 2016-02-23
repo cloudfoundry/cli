@@ -236,8 +236,8 @@
     "translation": "CF_NAME help [COMMAND]"
   },
   {
-    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo",
-    "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://github.com/cf-experimental/plugin-foobar\n   cf install-plugin -r My-Repo plugin-echo"
+    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://example.com/plugin-foobar_linux_amd64\n   cf install-plugin -r My-Repo plugin-echo",
+    "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   cf install-plugin ~/Downloads/plugin-foobar\n   cf install-plugin https://example.com/plugin-foobar_linux_amd64\n   cf install-plugin -r My-Repo plugin-echo"
   },
   {
     "id": "CF_NAME list-plugin-repos",
