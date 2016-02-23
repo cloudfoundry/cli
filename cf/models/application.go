@@ -62,6 +62,7 @@ type ApplicationFields struct {
 	HealthCheckTimeout   int
 	State                string
 	SpaceGuid            string
+	StackGuid            string
 	PackageUpdatedAt     *time.Time
 	PackageState         string
 	StagingFailedReason  string

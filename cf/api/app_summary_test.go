@@ -126,6 +126,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			Expect(app.RunningInstances).To(Equal(1))
 			Expect(app.Memory).To(Equal(int64(128)))
 			Expect(app.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2014-10-24T19:54:00Z"))
+			Expect(app.StackGuid).To(Equal("the-stack-guid"))
 		})
 	})
 
@@ -226,6 +227,7 @@ const getAppSummaryResponseBody string = `
 		],
 		"running_instances":1,
 		"name":"app1",
+		"stack_guid":"the-stack-guid",
 		"memory":128,
 		"command": "start_command",
 		"instances":1,

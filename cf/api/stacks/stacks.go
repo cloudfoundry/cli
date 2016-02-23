@@ -9,10 +9,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type StackRepository interface {
 	FindByName(name string) (stack models.Stack, apiErr error)
+	FindByGUID(guid string) (models.Stack, error)
 	FindAll() (stacks []models.Stack, apiErr error)
 }
 
@@ -25,6 +28,23 @@ func NewCloudControllerStackRepository(config core_config.Reader, gateway net.Ga
 	repo.config = config
 	repo.gateway = gateway
 	return
+}
+
+func (repo CloudControllerStackRepository) FindByGUID(guid string) (models.Stack, error) {
+	stackRequest := resources.StackResource{}
+	path := fmt.Sprintf("%s/v2/stacks/%s", repo.config.ApiEndpoint(), guid)
+	err := repo.gateway.GetResource(path, &stackRequest)
+	if err != nil {
+		if errNotFound, ok := err.(*errors.HttpNotFoundError); ok {
+			return models.Stack{}, errNotFound
+		}
+
+		return models.Stack{}, fmt.Errorf(T("Error retrieving stacks: {{.Error}}", map[string]interface{}{
+			"Error": err.Error(),
+		}))
+	}
+
+	return *stackRequest.ToFields(), nil
 }
 
 func (repo CloudControllerStackRepository) FindByName(name string) (stack models.Stack, apiErr error) {

@@ -37,6 +37,7 @@ type ApplicationFromSummary struct {
 	State                string
 	DetectedStartCommand string     `json:"detected_start_command"`
 	SpaceGuid            string     `json:"space_guid"`
+	StackGuid            string     `json:"stack_guid"`
 	Command              string     `json:"command"`
 	PackageState         string     `json:"package_state"`
 	PackageUpdatedAt     *time.Time `json:"package_updated_at"`
@@ -54,6 +55,7 @@ func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields)
 	app.RunningInstances = resource.RunningInstances
 	app.Memory = resource.Memory
 	app.SpaceGuid = resource.SpaceGuid
+	app.StackGuid = resource.StackGuid
 	app.PackageUpdatedAt = resource.PackageUpdatedAt
 	app.PackageState = resource.PackageState
 	app.DetectedStartCommand = resource.DetectedStartCommand

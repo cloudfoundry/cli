@@ -532,6 +532,18 @@
     "translation": "Error requesting one time code from server: {{.Error}}"
   },
   {
+    "id": "Error retrieving stack: ",
+    "translation": "Error retrieving stack: "
+  },
+  {
+    "id": "Error retrieving stacks: {{.Error}}",
+    "translation": "Error retrieving stacks: {{.Error}}"
+  },
+  {
+    "id": "Error saving manifest: {{.Error}}",
+    "translation": "Error saving manifest: {{.Error}}"
+  },
+  {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
   },
@@ -562,6 +574,10 @@
   {
     "id": "No app files found in '{{.Path}}'",
     "translation": "No app files found in '{{.Path}}'"
+  },
+  {
+    "id": "No save path has been set",
+    "translation": "No save path has been set"
   },
   {
     "id": "OK",
@@ -638,6 +654,22 @@
   {
     "id": "repo-plugins",
     "translation": "repo-plugins"
+  },
+  {
+    "id": "required attribute 'disk_quota' missing",
+    "translation": "required attribute 'disk_quota' missing"
+  },
+  {
+    "id": "required attribute 'instances' missing",
+    "translation": "required attribute 'instances' missing"
+  },
+  {
+    "id": "required attribute 'memory' missing",
+    "translation": "required attribute 'memory' missing"
+  },
+  {
+    "id": "required attribute 'stack' missing",
+    "translation": "required attribute 'stack' missing"
   },
   {
     "id": "{{.CFName}} api",

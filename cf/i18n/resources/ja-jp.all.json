@@ -1904,6 +1904,18 @@
     "translation": "経路の解決時にエラーが発生しました:\n{{.Err}}"
   },
   {
+    "id": "Error retrieving stack: ",
+    "translation": ""
+  },
+  {
+    "id": "Error retrieving stacks: {{.Error}}",
+    "translation": ""
+  },
+  {
+    "id": "Error saving manifest: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
     "translation": "ビルドパック {{.Name}} の更新時にエラーが発生しました\n{{.Error}}"
   },
@@ -2962,6 +2974,10 @@
   {
     "id": "No running security groups set",
     "translation": "実行セキュリティー・グループが設定されていません"
+  },
+  {
+    "id": "No save path has been set",
+    "translation": ""
   },
   {
     "id": "No security groups",
@@ -4698,6 +4714,22 @@
   {
     "id": "requested state:",
     "translation": "要求された状態:"
+  },
+  {
+    "id": "required attribute 'disk_quota' missing",
+    "translation": ""
+  },
+  {
+    "id": "required attribute 'instances' missing",
+    "translation": ""
+  },
+  {
+    "id": "required attribute 'memory' missing",
+    "translation": ""
+  },
+  {
+    "id": "required attribute 'stack' missing",
+    "translation": ""
   },
   {
     "id": "routes",

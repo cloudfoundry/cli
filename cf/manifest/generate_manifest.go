@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"github.com/cloudfoundry/cli/generic"
 
 	"gopkg.in/yaml.v2"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 //go:generate counterfeiter -o fakes/fake_app_manifest.go . AppManifest
@@ -24,6 +27,7 @@ type AppManifest interface {
 	Domain(string, string, string)
 	GetContents() []models.Application
 	FileSavePath(string)
+	Stack(string, string)
 	Save() error
 }
 
@@ -34,6 +38,13 @@ type appManifest struct {
 
 func NewGenerator() AppManifest {
 	return &appManifest{}
+}
+
+func (m *appManifest) Stack(appName string, stackName string) {
+	i := m.findOrCreateApplication(appName)
+	m.contents[i].Stack = &models.Stack{
+		Name: stackName,
+	}
 }
 
 func (m *appManifest) FileSavePath(savePath string) {
@@ -97,13 +108,30 @@ func (m *appManifest) GetContents() []models.Application {
 	return m.contents
 }
 
-func generateAppMap(app models.Application) generic.Map {
+func generateAppMap(app models.Application) (generic.Map, error) {
+	if app.Stack == nil {
+		return generic.NewMap(), errors.New(T("required attribute 'stack' missing"))
+	}
+
+	if app.Memory == 0 {
+		return generic.NewMap(), errors.New(T("required attribute 'memory' missing"))
+	}
+
+	if app.DiskQuota == 0 {
+		return generic.NewMap(), errors.New(T("required attribute 'disk_quota' missing"))
+	}
+
+	if app.InstanceCount == 0 {
+		return generic.NewMap(), errors.New(T("required attribute 'instances' missing"))
+	}
+
 	m := generic.NewMap()
 
 	m.Set("name", app.Name)
 	m.Set("memory", fmt.Sprintf("%dM", app.Memory))
 	m.Set("instances", app.InstanceCount)
 	m.Set("disk_quota", fmt.Sprintf("%dM", app.DiskQuota))
+	m.Set("stack", app.Stack.Name)
 
 	if app.BuildpackUrl != "" {
 		m.Set("buildpack", app.BuildpackUrl)
@@ -165,10 +193,14 @@ func generateAppMap(app models.Application) generic.Map {
 		m.Set("env", app.EnvironmentVars)
 	}
 
-	return m
+	return m, nil
 }
 
 func (m *appManifest) Save() error {
+	if m.savePath == "" {
+		return errors.New(T("No save path has been set"))
+	}
+
 	f, err := os.Create(m.savePath)
 	if err != nil {
 		return err
@@ -180,7 +212,13 @@ func (m *appManifest) Save() error {
 	apps := []generic.Map{}
 
 	for _, app := range m.contents {
-		apps = append(apps, generateAppMap(app))
+		appMap, mapErr := generateAppMap(app)
+		if mapErr != nil {
+			return fmt.Errorf(T("Error saving manifest: {{.Error}}", map[string]interface{}{
+				"Error": mapErr.Error(),
+			}))
+		}
+		apps = append(apps, appMap)
 	}
 
 	y.Set("applications", apps)

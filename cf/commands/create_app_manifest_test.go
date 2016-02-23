@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	teststacksapi "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
 	testManifest "github.com/cloudfoundry/cli/cf/manifest/fakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -26,6 +27,7 @@ var _ = Describe("CreateAppManifest", func() {
 		ui             *testterm.FakeUI
 		configRepo     core_config.Repository
 		appSummaryRepo *testapi.FakeAppSummaryRepository
+		stackRepo      *teststacksapi.FakeStackRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -44,6 +46,8 @@ var _ = Describe("CreateAppManifest", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		appSummaryRepo = &testapi.FakeAppSummaryRepository{}
 		repoLocator := deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
+		stackRepo = &teststacksapi.FakeStackRepository{}
+		repoLocator = repoLocator.SetStackRepository(stackRepo)
 
 		fakeManifest = &testManifest.FakeAppManifest{}
 
@@ -140,6 +144,7 @@ var _ = Describe("CreateAppManifest", func() {
 				application.Name = "app-name"
 				application.Memory = 1024
 				application.InstanceCount = 2
+				application.StackGuid = "the-stack-guid"
 			})
 
 			JustBeforeEach(func() {
@@ -179,6 +184,43 @@ var _ = Describe("CreateAppManifest", func() {
 				name, instances := fakeManifest.InstancesArgsForCall(0)
 				Expect(name).To(Equal("app-name"))
 				Expect(instances).To(Equal(2))
+			})
+
+			It("tries to get stacks", func() {
+				cmd.Execute(flagContext)
+				Expect(stackRepo.FindByGUIDCallCount()).To(Equal(1))
+				Expect(stackRepo.FindByGUIDArgsForCall(0)).To(Equal("the-stack-guid"))
+			})
+
+			Context("when getting stacks succeeds", func() {
+				BeforeEach(func() {
+					stackRepo.FindByGUIDReturns(models.Stack{
+						Guid: "the-stack-guid",
+						Name: "the-stack-name",
+					}, nil)
+				})
+
+				It("sets the stacks", func() {
+					cmd.Execute(flagContext)
+					Expect(fakeManifest.StackCallCount()).To(Equal(1))
+					name, stackName := fakeManifest.StackArgsForCall(0)
+					Expect(name).To(Equal("app-name"))
+					Expect(stackName).To(Equal("the-stack-name"))
+				})
+			})
+
+			Context("when getting stacks fails", func() {
+				BeforeEach(func() {
+					stackRepo.FindByGUIDReturns(models.Stack{}, errors.New("find-by-guid-err"))
+				})
+
+				It("fails with error", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"find-by-guid-err"},
+					))
+				})
 			})
 
 			It("tries to save the manifest", func() {
