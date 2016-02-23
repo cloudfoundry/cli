@@ -51,7 +51,7 @@ func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 
 EXAMPLES:
    cf install-plugin ~/Downloads/plugin-foobar
-   cf install-plugin https://github.com/cf-experimental/plugin-foobar
+   cf install-plugin https://example.com/plugin-foobar_linux_amd64
    cf install-plugin -r My-Repo plugin-echo`),
 		Flags:     fs,
 		TotalArgs: 1,
