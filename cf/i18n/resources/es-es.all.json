@@ -580,7 +580,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
+    "id": "CF_NAME create-shared-domain DOMAIN",
     "translation": ""
   },
   {
@@ -3562,10 +3562,6 @@
   {
     "id": "Routes",
     "translation": "Rutas"
-  },
-  {
-    "id": "Routes for this domain will be configured only on the specified router group",
-    "translation": ""
   },
   {
     "id": "Routing API URI missing. Please log in again to set the URI automatically.",
