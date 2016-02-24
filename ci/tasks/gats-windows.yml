@@ -1,0 +1,16 @@
+---
+platform: windows
+
+params:
+  ADMIN_USER:
+  ADMIN_PASSWORD:
+
+inputs:
+- name: cli-acceptance-tests
+  path: gopath/src/github.com/cloudfoundry/cli-acceptance-tests
+- name: cf-cli-binaries
+- name: ci
+- name: bosh-lite-lock
+
+run:
+  path: ci/concourse/builds/gats-windows.bat
