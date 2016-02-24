@@ -95,14 +95,20 @@ var _ = Describe("logs command", func() {
 
 			requirementsFactory.Application = app
 			logsRepo.RecentLogsForReturns(recentLogs, nil)
-			logsRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
-				onConnect()
-				for _, log := range appLogs {
-					onMessage(log)
-				}
-				return nil
-			}
+			logsRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+				c := make(chan *logmessage.LogMessage)
 
+				onConnect()
+				go func() {
+					for _, log := range appLogs {
+						c <- log
+					}
+
+					close(c)
+				}()
+
+				return c, nil
+			}
 		})
 
 		It("shows the recent logs when the --recent flag is provided", func() {
@@ -134,7 +140,7 @@ var _ = Describe("logs command", func() {
 			runCommand("my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			appGuid, _, _ := logsRepo.TailLogsForArgsForCall(0)
+			appGuid, _ := logsRepo.TailLogsForArgsForCall(0)
 			Expect(app.Guid).To(Equal(appGuid))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
@@ -145,7 +151,7 @@ var _ = Describe("logs command", func() {
 		Context("when the loggregator server has an invalid cert", func() {
 			Context("when the skip-ssl-validation flag is not set", func() {
 				It("fails and informs the user about the skip-ssl-validation flag", func() {
-					logsRepo.TailLogsForReturns(errors.NewInvalidSSLCert("https://example.com", "it don't work good"))
+					logsRepo.TailLogsForReturns(nil, errors.NewInvalidSSLCert("https://example.com", "it don't work good"))
 					runCommand("my-app")
 
 					Expect(ui.Outputs).To(ContainSubstrings(

@@ -1,9 +1,6 @@
 package api_test
 
 import (
-	"fmt"
-	"time"
-
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/gogo/protobuf/proto"
@@ -11,9 +8,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("is a priority queue used to sort loggregator messages", func() {
-	It("PriorityQueue returns a new queue", func() {
-		pq := NewLoggregator_SortedMessageQueue(10*time.Millisecond, time.Now)
+var _ = Describe("Loggregator_SortedMessageQueue", func() {
+	It("sorts messages based on their timestamp, clearing after it's enumerated over", func() {
+		pq := NewLoggregator_SortedMessageQueue()
 
 		msg3 := logLoggregatorMessageWithTime("message 3", 130)
 		pq.PushMessage(msg3)
@@ -24,63 +21,26 @@ var _ = Describe("is a priority queue used to sort loggregator messages", func()
 		msg1 := logLoggregatorMessageWithTime("message 1", 110)
 		pq.PushMessage(msg1)
 
-		Expect(getLoggregatorMsgString(pq.PopMessage())).To(Equal(getLoggregatorMsgString(msg1)))
-		Expect(getLoggregatorMsgString(pq.PopMessage())).To(Equal(getLoggregatorMsgString(msg2)))
-		Expect(getLoggregatorMsgString(pq.PopMessage())).To(Equal(getLoggregatorMsgString(msg3)))
-		Expect(getLoggregatorMsgString(pq.PopMessage())).To(Equal(getLoggregatorMsgString(msg4)))
-	})
+		var messages []*logmessage.LogMessage
 
-	It("pops on empty queue", func() {
-		pq := NewLoggregator_SortedMessageQueue(10*time.Millisecond, time.Now)
-		Expect(pq.PopMessage()).To(BeNil())
-	})
+		pq.EnumerateAndClear(func(m *logmessage.LogMessage) {
+			messages = append(messages, m)
+		})
 
-	It("NextTimeStamp returns the timestamp of the log message at the head of the queue", func() {
-		currentTime := time.Unix(5, 0)
-		clock := func() time.Time {
-			return currentTime
-		}
+		Expect(messages).To(Equal([]*logmessage.LogMessage{
+			msg1,
+			msg2,
+			msg3,
+			msg4,
+		}))
 
-		pq := NewLoggregator_SortedMessageQueue(5*time.Second, clock)
-		Expect(pq.NextTimestamp()).To(Equal(MAX_INT64))
+		var messagesAfter []*logmessage.LogMessage
 
-		msg2 := logLoggregatorMessageWithTime("message 2", 130)
-		pq.PushMessage(msg2)
+		pq.EnumerateAndClear(func(m *logmessage.LogMessage) {
+			messagesAfter = append(messagesAfter, m)
+		})
 
-		currentTime = time.Unix(6, 0)
-		msg1 := logLoggregatorMessageWithTime("message 1", 100)
-		pq.PushMessage(msg1)
-		Expect(pq.NextTimestamp()).To(Equal(time.Unix(11, 0).UnixNano()))
-
-		readMessage := pq.PopMessage()
-		Expect(readMessage.GetTimestamp()).To(Equal(int64(100)))
-		Expect(pq.NextTimestamp()).To(Equal(time.Unix(10, 0).UnixNano()))
-
-		readMessage = pq.PopMessage()
-		Expect(readMessage.GetTimestamp()).To(Equal(int64(130)))
-		Expect(pq.NextTimestamp()).To(Equal(MAX_INT64))
-	})
-
-	It("sorts messages based on their timestamp", func() {
-		pq := NewLoggregator_SortedMessageQueue(10*time.Millisecond, time.Now)
-
-		msg1 := logLoggregatorMessageWithTime("message first", 109)
-		pq.PushMessage(msg1)
-
-		for i := 1; i < 1000; i++ {
-			msg := logLoggregatorMessageWithTime(fmt.Sprintf("message %d", i), 110)
-			pq.PushMessage(msg)
-		}
-		msg2 := logLoggregatorMessageWithTime("message last", 111)
-		pq.PushMessage(msg2)
-
-		Expect(getLoggregatorMsgString(pq.PopMessage())).To(Equal("message first"))
-
-		for i := 1; i < 1000; i++ {
-			Expect(getLoggregatorMsgString(pq.PopMessage())).To(Equal(fmt.Sprintf("message %d", i)))
-		}
-
-		Expect(getLoggregatorMsgString(pq.PopMessage())).To(Equal("message last"))
+		Expect(messagesAfter).To(BeEmpty())
 	})
 })
 
@@ -98,8 +58,4 @@ func generateLoggregatorMessage(messageString string, timestamp int64) *logmessa
 		SourceName:  &sourceName,
 		Timestamp:   proto.Int64(timestamp),
 	}
-}
-
-func getLoggregatorMsgString(message *logmessage.LogMessage) string {
-	return string(message.GetMessage())
 }

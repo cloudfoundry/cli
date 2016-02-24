@@ -101,12 +101,13 @@ func (cmd *Logs) tailLogsFor(app models.Application) {
 				"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 	}
 
-	err := cmd.logsRepo.TailLogsFor(app.Guid, onConnect, func(msg *logmessage.LogMessage) {
-		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
-	})
-
+	c, err := cmd.logsRepo.TailLogsFor(app.Guid, onConnect)
 	if err != nil {
 		cmd.handleError(err)
+	}
+
+	for msg := range c {
+		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
 	}
 }
 

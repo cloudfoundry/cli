@@ -10,8 +10,6 @@ import (
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/gogo/protobuf/proto"
 
-	"time"
-
 	. "github.com/cloudfoundry/cli/cf/api"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,7 +24,6 @@ var _ = Describe("loggregator logs repository", func() {
 	)
 
 	BeforeEach(func() {
-		BufferTime = 1 * time.Millisecond
 		fakeConsumer = testapi.NewFakeLoggregatorConsumer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
@@ -97,7 +94,7 @@ var _ = Describe("loggregator logs repository", func() {
 			})
 
 			It("returns an error", func() {
-				err := logsRepo.TailLogsFor("app-guid", func() {}, func(*logmessage.LogMessage) {})
+				_, err := logsRepo.TailLogsFor("app-guid", func() {})
 				Expect(err).To(Equal(errors.New("oops")))
 			})
 		})
@@ -116,7 +113,7 @@ var _ = Describe("loggregator logs repository", func() {
 					}
 				}
 
-				err := logsRepo.TailLogsFor("app-guid", func() {}, func(*logmessage.LogMessage) {})
+				_, err := logsRepo.TailLogsFor("app-guid", func() {})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 			})
@@ -127,7 +124,7 @@ var _ = Describe("loggregator logs repository", func() {
 						return nil, noaa_errors.NewUnauthorizedError("All the errors")
 					}
 
-					err := logsRepo.TailLogsFor("app-guid", func() {}, func(*logmessage.LogMessage) {})
+					_, err := logsRepo.TailLogsFor("app-guid", func() {})
 					Expect(err).To(HaveOccurred())
 					close(done)
 				})
@@ -143,7 +140,7 @@ var _ = Describe("loggregator logs repository", func() {
 					return nil, nil
 				}
 
-				logsRepo.TailLogsFor("app-guid", func() {}, func(msg *logmessage.LogMessage) {})
+				logsRepo.TailLogsFor("app-guid", func() {})
 			})
 
 			It("sets the on connect callback", func(done Done) {
@@ -153,91 +150,97 @@ var _ = Describe("loggregator logs repository", func() {
 				}
 
 				called := false
-				logsRepo.TailLogsFor("app-guid", func() { called = true }, func(msg *logmessage.LogMessage) {})
+				logsRepo.TailLogsFor("app-guid", func() { called = true })
 				fakeConsumer.OnConnectCallback()
 				Expect(called).To(BeTrue())
 			})
 
-			Context("and the buffer time is sufficient for sorting", func() {
-				BeforeEach(func() {
-					BufferTime = 250 * time.Millisecond
-				})
+			It("sorts the messages before yielding them", func(done Done) {
+				var receivedMessages []*logmessage.LogMessage
+				msg3 := makeLogMessage("hello3", 300)
+				msg2 := makeLogMessage("hello2", 200)
+				msg1 := makeLogMessage("hello1", 100)
 
-				It("sorts the messages before yielding them", func(done Done) {
-					fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
-						logChan := make(chan *logmessage.LogMessage)
-						go func() {
-							logChan <- makeLogMessage("hello3", 300)
-							logChan <- makeLogMessage("hello2", 200)
-							logChan <- makeLogMessage("hello1", 100)
-							fakeConsumer.WaitForClose()
-							close(logChan)
-						}()
-
-						return logChan, nil
-					}
-
-					receivedMessages := []*logmessage.LogMessage{}
-					err := logsRepo.TailLogsFor("app-guid", func() {}, func(msg *logmessage.LogMessage) {
-						receivedMessages = append(receivedMessages, msg)
-						if len(receivedMessages) >= 3 {
-							logsRepo.Close()
-						}
-					})
-
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
-						makeLogMessage("hello1", 100),
-						makeLogMessage("hello2", 200),
-						makeLogMessage("hello3", 300),
-					}))
-
-					close(done)
-				})
-			})
-
-			Context("and the buffer time is very long", func() {
-				BeforeEach(func() {
-					BufferTime = 30 * time.Second
-				})
-
-				It("flushes remaining log messages when Close is called", func(done Done) {
-					synchronizationChannel := make(chan (bool))
-
-					fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
-						fakeConsumer.OnConnectCallback()
-						logChan := make(chan *logmessage.LogMessage)
-						go func() {
-							logChan <- makeLogMessage("One does not simply consume a log message", 1000)
-							synchronizationChannel <- true
-							fakeConsumer.WaitForClose()
-							close(logChan)
-						}()
-
-						return logChan, nil
-					}
-
-					receivedMessages := []*logmessage.LogMessage{}
-
+				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+					logChan := make(chan *logmessage.LogMessage)
 					go func() {
-						defer GinkgoRecover()
-
-						<-synchronizationChannel
-
-						Expect(receivedMessages).To(BeEmpty())
-						logsRepo.Close()
-						Expect(receivedMessages).ToNot(BeEmpty())
-
-						done <- true
+						logChan <- msg3
+						logChan <- msg2
+						logChan <- msg1
+						fakeConsumer.WaitForClose()
+						close(logChan)
 					}()
 
-					err := logsRepo.TailLogsFor("app-guid", func() {}, func(msg *logmessage.LogMessage) {
-						receivedMessages = append(receivedMessages, msg)
-					})
+					return logChan, nil
+				}
 
-					Expect(err).NotTo(HaveOccurred())
-				})
+				c, err := logsRepo.TailLogsFor("app-guid", func() {})
+
+				for msg := range c {
+					receivedMessages = append(receivedMessages, msg)
+					if len(receivedMessages) >= 3 {
+						logsRepo.Close()
+					}
+				}
+
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
+					msg1,
+					msg2,
+					msg3,
+				}))
+
+				close(done)
+			})
+
+			It("flushes remaining log messages and closes the returned channel when Close is called", func() {
+				synchronizationChannel := make(chan (bool))
+				var receivedMessages []*logmessage.LogMessage
+				msg3 := makeLogMessage("hello3", 300)
+				msg2 := makeLogMessage("hello2", 200)
+				msg1 := makeLogMessage("hello1", 100)
+
+				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+					logChan := make(chan *logmessage.LogMessage)
+					go func() {
+						logChan <- msg3
+						logChan <- msg2
+						logChan <- msg1
+						fakeConsumer.WaitForClose()
+						close(logChan)
+					}()
+
+					return logChan, nil
+				}
+
+				Expect(fakeConsumer.IsClosed).To(BeFalse())
+
+				channel, err := logsRepo.TailLogsFor("app-guid", func() {})
+				Expect(err).NotTo(HaveOccurred())
+				Expect(channel).NotTo(BeClosed())
+
+				go func() {
+					for msg := range channel {
+						receivedMessages = append(receivedMessages, msg)
+					}
+
+					synchronizationChannel <- true
+				}()
+
+				logsRepo.Close()
+
+				Expect(fakeConsumer.IsClosed).To(BeTrue())
+
+				<-synchronizationChannel
+
+				Expect(channel).To(BeClosed())
+
+				Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
+					msg1,
+					msg2,
+					msg3,
+				}))
 			})
 		})
 	})
