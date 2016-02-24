@@ -580,7 +580,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-shared-domain DOMAIN",
+    "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
     "translation": ""
   },
   {
@@ -3561,6 +3561,10 @@
   },
   {
     "id": "Routes",
+    "translation": ""
+  },
+  {
+    "id": "Routes for this domain will be configured only on the specified router group",
     "translation": ""
   },
   {

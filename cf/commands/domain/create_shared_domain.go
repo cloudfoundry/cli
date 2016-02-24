@@ -24,10 +24,13 @@ func init() {
 }
 
 func (cmd *CreateSharedDomain) MetaData() command_registry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["router-group"] = &flags.StringFlag{Name: "router-group", Usage: T("Routes for this domain will be configured only on the specified router group")}
 	return command_registry.CommandMetadata{
 		Name:        "create-shared-domain",
 		Description: T("Create a domain that can be used by all orgs (admin-only)"),
-		Usage:       T("CF_NAME create-shared-domain DOMAIN"),
+		Usage:       T("CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"),
+		Flags:       fs,
 	}
 }
 
