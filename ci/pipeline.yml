@@ -1,0 +1,454 @@
+---
+groups:
+- name: cli
+  jobs:
+  - units
+  - build-binaries
+  - gats-linux
+  - gats-windows
+  - cats-linux
+  - cats-windows
+  - create-installers
+  - publish-edge-archives
+  - publish-final-release
+- name: bosh-lites
+  jobs:
+  - deploy-boshlite-1
+  - deploy-boshlite-2
+  - deploy-boshlite-3
+  - deploy-boshlite-4
+
+resources:
+- name: cli
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+
+- name: final-cli
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+    paths: VERSION
+
+- name: ci
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-ci
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+
+- name: cli-acceptance-tests
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-acceptance-tests
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+
+- name: cf-acceptance-tests
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cf-acceptance-tests
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+
+- name: cf-release
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-release.git
+    branch: master
+
+- name: bosh-lite
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/bosh-lite.git
+    branch: master
+
+- name: cf-cli-binaries
+  type: s3
+  source:
+    bucket: {{staging-bucket-name}}
+    access_key_id: {{staging-bucket-access-key-id}}
+    secret_access_key: {{staging-bucket-secret-access-key}}
+    versioned_file: cf-cli-binaries.tgz
+
+- name: cf-cli-installers
+  type: s3
+  source:
+    bucket: {{staging-bucket-name}}
+    access_key_id: {{staging-bucket-access-key-id}}
+    secret_access_key: {{staging-bucket-secret-access-key}}
+    versioned_file: cf-cli-installers.tgz
+
+- name: cf-cli-installer-win32
+  type: s3
+  source:
+    bucket: {{staging-bucket-name}}
+    access_key_id: {{staging-bucket-access-key-id}}
+    secret_access_key: {{staging-bucket-secret-access-key}}
+    versioned_file: cf-cli-installer_win32.zip
+
+- name: cf-cli-installer-win64
+  type: s3
+  source:
+    bucket: {{staging-bucket-name}}
+    access_key_id: {{staging-bucket-access-key-id}}
+    secret_access_key: {{staging-bucket-secret-access-key}}
+    versioned_file: cf-cli-installer_winx64.zip
+
+- name: bosh-lite-lock
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-ci
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: locks
+    pool: bosh-lites
+
+jobs:
+- name: deploy-boshlite-1
+  serial: true
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-1-hostname}}
+  - do:
+    - aggregate:
+      - get: ci
+      - get: cf-release
+      - get: bosh-lite
+    - task: provision
+      privileged: true
+      file: ci/concourse/lite/provision-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+          LITE_NAME: {{lite-1-name}}
+          LITE_KEYPAIR: {{lite-keypair}}
+          LITE_HOSTNAME: {{lite-1-hostname}}
+          LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+  - put: ci
+    params:
+      repository: ci
+      rebase: true
+
+- name: deploy-boshlite-2
+  serial: true
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-2-hostname}}
+  - do:
+    - aggregate:
+      - get: ci
+      - get: cf-release
+      - get: bosh-lite
+    - task: provision
+      privileged: true
+      file: ci/concourse/lite/provision-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+          LITE_NAME: {{lite-2-name}}
+          LITE_KEYPAIR: {{lite-keypair}}
+          LITE_HOSTNAME: {{lite-2-hostname}}
+          LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+  - put: ci
+    params:
+      repository: ci
+      rebase: true
+
+- name: deploy-boshlite-3
+  serial: true
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-3-hostname}}
+  - do:
+    - aggregate:
+      - get: ci
+      - get: cf-release
+      - get: bosh-lite
+    - task: provision
+      privileged: true
+      file: ci/concourse/lite/provision-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+          LITE_NAME: {{lite-3-name}}
+          LITE_KEYPAIR: {{lite-keypair}}
+          LITE_HOSTNAME: {{lite-3-hostname}}
+          LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+  - put: ci
+    params:
+      repository: ci
+      rebase: true
+
+- name: deploy-boshlite-4
+  serial: true
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-4-hostname}}
+  - do:
+    - aggregate:
+      - get: ci
+      - get: cf-release
+      - get: bosh-lite
+    - task: provision
+      privileged: true
+      file: ci/concourse/lite/provision-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+          LITE_NAME: {{lite-4-name}}
+          LITE_KEYPAIR: {{lite-keypair}}
+          LITE_HOSTNAME: {{lite-4-hostname}}
+          LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+  - put: ci
+    params:
+      repository: ci
+      rebase: true
+
+- name: units
+  serial: true
+  plan:
+  - get: cli
+    trigger: true
+  - get: final-cli
+  - get: ci
+  - aggregate:
+    - task: units-linux
+      file: cli/ci/tasks/units-linux.yml
+    - task: units-osx
+      file: cli/ci/tasks/units-osx.yml
+    - task: units-windows
+      file: cli/ci/tasks/units-windows.yml
+
+- name: build-binaries
+  serial: true
+  plan:
+  - get: cli
+    trigger: true
+    passed: [units]
+  - get: final-cli
+    passed: [units]
+  - get: ci
+  - task: build
+    file: cli/ci/tasks/build-binaries.yml
+  - put: cf-cli-binaries
+    params:
+      file: compiled/cf-cli-binaries.tgz
+
+- name: gats-linux
+  serial: true
+  plan:
+  - aggregate:
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [build-binaries]
+    - get: final-cli
+      passed: [build-binaries]
+    - get: cli
+      passed: [build-binaries]
+    - get: cli-acceptance-tests
+    - get: ci
+    - put: bosh-lite-lock
+      params:
+        acquire: true
+  - task: gats
+    file: cli/ci/tasks/gats-linux.yml
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: cats-windows
+  serial: true
+  plan:
+  - aggregate:
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [gats-windows]
+    - get: final-cli
+      passed: [gats-windows]
+    - get: cli
+      passed: [gats-windows]
+    - get: cf-acceptance-tests
+    - get: ci
+    - put: bosh-lite-lock
+      params:
+        acquire: true
+  - task: cats
+    file: cli/ci/tasks/cats-windows.yml
+    config:
+      params:
+        ADMIN_USER: {{bosh-lite-admin-username}}
+        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: gats-windows
+  serial: true
+  plan:
+  - aggregate:
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [build-binaries]
+    - get: final-cli
+      passed: [build-binaries]
+    - get: cli
+      passed: [build-binaries]
+    - get: cli-acceptance-tests
+    - get: ci
+    - put: bosh-lite-lock
+      params:
+        acquire: true
+  - task: gats
+    file: cli/ci/tasks/gats-windows.yml
+    config:
+      params:
+        ADMIN_USER: {{bosh-lite-admin-username}}
+        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: cats-linux
+  serial: true
+  plan:
+  - aggregate:
+    - get: final-cli
+      passed: [gats-linux]
+    - get: cli
+      passed: [gats-linux]
+    - get: cf-acceptance-tests
+    - get: ci
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [gats-linux]
+    - put: bosh-lite-lock
+      params:
+        acquire: true
+  - task: cats
+    file: cli/ci/tasks/cats-linux.yml
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: create-installers
+  serial: true
+  plan:
+  - aggregate:
+    - get: final-cli
+      passed: [cats-linux, cats-windows]
+    - get: cli
+      passed: [cats-linux, cats-windows]
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [cats-linux, cats-windows]
+    - get: ci
+  - aggregate:
+    - task: windows
+      file: cli/ci/tasks/create-installers-windows.yml
+    - task: unix
+      file: cli/ci/tasks/create-installers.yml
+  - aggregate:
+    - put: cf-cli-installer-win32
+      params:
+        file: winstallers/cf-cli-installer_win32.zip
+    - put: cf-cli-installer-win64
+      params:
+        file: winstallers/cf-cli-installer_winx64.zip
+    - put: cf-cli-installers
+      params:
+        file: installers/cf-cli-installers.tgz
+
+- name: publish-edge-archives
+  serial: true
+  plan:
+  - aggregate:
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [create-installers]
+    - get: cli
+      passed: [create-installers]
+    - get: cf-cli-installers
+      passed: [create-installers]
+    - get: cf-cli-installer-win32
+      passed: [create-installers]
+    - get: cf-cli-installer-win64
+      passed: [create-installers]
+    - get: ci
+  - task: publish
+    file: cli/ci/tasks/publish-edge-archives.yml
+    config:
+      params:
+        AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+
+- name: publish-final-release
+  serial: true
+  plan:
+  - aggregate:
+    - get: final-cli
+      trigger: true
+      passed: [create-installers]
+    - get: cf-cli-binaries
+      passed: [create-installers]
+    - get: cf-cli-installers
+      passed: [create-installers]
+    - get: cf-cli-installer-win32
+      passed: [create-installers]
+    - get: cf-cli-installer-win64
+      passed: [create-installers]
+    - get: ci
+  - task: publish
+    file: cli/ci/tasks/publish-final-release.yml
+    config:
+      params:
+        AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+
