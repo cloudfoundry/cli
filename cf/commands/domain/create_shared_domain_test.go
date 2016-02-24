@@ -3,6 +3,7 @@ package domain_test
 import (
 	"errors"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -138,10 +139,113 @@ var _ = Describe("CreateSharedDomain", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 			})
+
+			Context("when router-group flag is set", func() {
+				BeforeEach(func() {
+					flagContext.Parse("domain-name", "--router-group", "route-group-name")
+				})
+
+				It("returns a LoginRequirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+					Expect(actualRequirements).To(ContainElement(loginRequirement))
+				})
+
+				It("returns a RoutingApiRequirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(1))
+					Expect(actualRequirements).To(ContainElement(routingApiRequirement))
+				})
+
+				It("returns a MinAPIVersionRequirement", func() {
+					expectedVersion, err := semver.Make("2.36.0")
+					Expect(err).NotTo(HaveOccurred())
+
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(feature).To(Equal("Option '--router-group'"))
+					Expect(requiredVersion).To(Equal(expectedVersion))
+					Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
+				})
+			})
 		})
 	})
 
 	Describe("Execute", func() {
+		Context("when router-group flag is set", func() {
+			BeforeEach(func() {
+				routerGroups = models.RouterGroups{
+					models.RouterGroup{
+						Name: "router-group-name",
+						Guid: "router-group-guid",
+						Type: "router-group-type",
+					},
+				}
+				flagContext.Parse("domain-name", "--router-group", "router-group-name")
+			})
+
+			It("tries to retrieve the router group", func() {
+				cmd.Execute(flagContext)
+				Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(1))
+			})
+
+			It("prints a message", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Creating shared domain domain-name"},
+				))
+			})
+
+			It("tries to create a shared domain with router group", func() {
+				cmd.Execute(flagContext)
+				Expect(domainRepo.CreateSharedDomainCallCount()).To(Equal(1))
+				domainName, routerGroupGuid := domainRepo.CreateSharedDomainArgsForCall(0)
+				Expect(domainName).To(Equal("domain-name"))
+				Expect(routerGroupGuid).To(Equal("router-group-guid"))
+			})
+
+			It("prints success message", func() {
+				cmd.Execute(flagContext)
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"OK"},
+				))
+			})
+
+			Context("when listing router groups returns an error", func() {
+				BeforeEach(func() {
+					routingApiRepo.ListRouterGroupsReturns(errors.New("router-group-error"))
+				})
+
+				It("fails with error message", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"router-group-error"},
+					))
+				})
+			})
+
+			Context("when router group is not found", func() {
+				BeforeEach(func() {
+					routerGroups = models.RouterGroups{}
+				})
+
+				It("fails with a message", func() {
+					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Router group router-group-name not found"},
+					))
+				})
+			})
+		})
+
 		Context("when router-group flag is not set", func() {
 			BeforeEach(func() {
 				flagContext.Parse("domain-name")
