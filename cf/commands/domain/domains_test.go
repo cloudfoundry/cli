@@ -157,7 +157,7 @@ var _ = Describe("ListDomains", func() {
 		It("prints no domains found message", func() {
 			cmd.Execute(flagContext)
 			Expect(ui.Outputs).To(BeInDisplayOrder(
-				[]string{"name", "status", "type"},
+				[]string{"name", "status"},
 				[]string{"No domains found"},
 			))
 		})
@@ -199,7 +199,7 @@ var _ = Describe("ListDomains", func() {
 			It("prints the domain information", func() {
 				cmd.Execute(flagContext)
 				Expect(ui.Outputs).To(BeInDisplayOrder(
-					[]string{"name", "status", "type"},
+					[]string{"name", "status"},
 					[]string{"Shared-domain1", "shared"},
 					[]string{"Private-domain1", "owned"},
 				))
@@ -252,65 +252,6 @@ var _ = Describe("ListDomains", func() {
 			})
 			AfterEach(func() {
 				configRepo.SetRoutingApiEndpoint(originalRoutingApiEndpoint)
-			})
-
-			Context("when domains with router group guid are found", func() {
-				BeforeEach(func() {
-					domainFields = []models.DomainFields{
-						models.DomainFields{
-							Shared:          true,
-							Name:            "Shared-domain1",
-							RouterGroupGuid: "router-group-guid"},
-					}
-				})
-
-				AfterEach(func() {
-					domainFields = []models.DomainFields{}
-				})
-
-				It("prints domain information with router group type", func() {
-					cmd.Execute(flagContext)
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"name", "status", "type"},
-						[]string{"Shared-domain1", "shared", "tcp"},
-					))
-				})
-
-				Context("when list router groups returns error", func() {
-					BeforeEach(func() {
-						routingApiRepo.ListRouterGroupsReturns(errors.New("router-group-err"))
-					})
-
-					It("fails with error message", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"Failed fetching router groups."},
-							[]string{"router-group-err"},
-						))
-					})
-				})
-
-				Context("when router group does not exists", func() {
-					BeforeEach(func() {
-						routerGroups = models.RouterGroups{}
-					})
-
-					It("prints the invalid router group message", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"Invalid router group guid: router-group-guid"},
-						))
-					})
-
-					It("does not print table header", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).ToNot(ContainSubstrings(
-							[]string{"name", "status", "type"},
-						))
-					})
-				})
 			})
 		})
 	})
