@@ -11,6 +11,7 @@ inputs:
 - name: cf-cli-binaries
 - name: ci
 - name: bosh-lite-lock
+- name: cli
 
 run:
-  path: ci/concourse/builds/cats-windows.bat
+  path: cli/ci/tasks/cats-windows.bat

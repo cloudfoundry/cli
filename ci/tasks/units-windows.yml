@@ -7,4 +7,4 @@ inputs:
 - name: ci
 
 run:
-  path: ci/concourse/builds/units-windows.bat
+  path: gopath/src/github.com/cloudfoundry/cli/ci/tasks/units-windows.bat
