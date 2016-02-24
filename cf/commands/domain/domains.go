@@ -111,15 +111,11 @@ func (cmd *ListDomains) getDomains(orgGuid string) ([]models.DomainFields, bool,
 }
 
 func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields, routerGroups map[string]models.RouterGroup) {
-	table := cmd.ui.Table([]string{T("name"), T("status"), T("type")})
+	table := cmd.ui.Table([]string{T("name"), T("status")})
 
 	for _, domain := range domains {
 		if domain.Shared {
-			if domain.RouterGroupGuid != "" {
-				table.Add(domain.Name, T("shared"), routerGroups[domain.RouterGroupGuid].Type)
-			} else {
-				table.Add(domain.Name, T("shared"))
-			}
+			table.Add(domain.Name, T("shared"))
 		}
 	}
 
