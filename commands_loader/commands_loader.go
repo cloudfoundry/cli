@@ -12,7 +12,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/commands/routergroups"
 	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
@@ -44,7 +43,6 @@ func Load() {
 	_ = plugin_repo.RepoPlugins{}
 	_ = quota.CreateQuota{}
 	_ = route.CreateRoute{}
-	_ = routergroups.RouterGroups{}
 	_ = securitygroup.ShowSecurityGroup{}
 	_ = service.ShowService{}
 	_ = serviceauthtoken.ListServiceAuthTokens{}
