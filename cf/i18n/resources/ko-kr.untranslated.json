@@ -112,8 +112,8 @@
     "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json"
   },
   {
-    "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
-    "translation": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"
+    "id": "CF_NAME create-shared-domain DOMAIN",
+    "translation": "CF_NAME create-shared-domain DOMAIN"
   },
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
@@ -678,10 +678,6 @@
   {
     "id": "Router group {{.RouterGroup}} not found",
     "translation": "Router group {{.RouterGroup}} not found"
-  },
-  {
-    "id": "Routes for this domain will be configured only on the specified router group",
-    "translation": "Routes for this domain will be configured only on the specified router group"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
