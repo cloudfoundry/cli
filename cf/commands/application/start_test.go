@@ -2,7 +2,6 @@ package application_test
 
 import (
 	"os"
-	"sync"
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
@@ -59,8 +58,6 @@ var _ = Describe("start command", func() {
 
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("start").SetDependency(deps, false))
 	}
-
-	var mutex = &sync.Mutex{}
 
 	getInstance := func(appGuid string) (instances []models.AppInstanceFields, apiErr error) {
 		if len(defaultInstanceResponses) > 0 {
@@ -136,17 +133,20 @@ var _ = Describe("start command", func() {
 		}
 
 		logRepo = &testapi.FakeLogsRepository{}
-		mutex.Lock()
 		logMessages = []*logmessage.LogMessage{}
-		mutex.Unlock()
-		logRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+		logRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+			c := make(chan *logmessage.LogMessage)
+
 			onConnect()
-			mutex.Lock()
-			for _, log := range logMessages {
-				onMessage(log)
-			}
-			mutex.Unlock()
-			return nil
+			go func() {
+				for _, log := range logMessages {
+					c <- log
+				}
+
+				close(c)
+			}()
+
+			return c, nil
 		}
 
 	})
@@ -384,17 +384,23 @@ var _ = Describe("start command", func() {
 		It("gracefully handles starting an app that is still staging", func() {
 			logRepoClosed := make(chan struct{})
 
-			logRepo.TailLogsForStub = func(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+			logRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+				c := make(chan *logmessage.LogMessage)
 				onConnect()
-				onMessage(testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now()))
 
-				<-logRepoClosed
+				go func() {
+					c <- testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
 
-				time.Sleep(50 * time.Millisecond)
-				onMessage(testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now()))
-				onMessage(testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now()))
+					<-logRepoClosed
 
-				return nil
+					time.Sleep(50 * time.Millisecond)
+					c <- testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					c <- testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+
+					close(c)
+				}()
+
+				return c, nil
 			}
 
 			logRepo.CloseStub = func() {
@@ -650,7 +656,7 @@ var _ = Describe("start command", func() {
 			appRepo.ReadReturns(defaultAppForStart, nil)
 			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 
-			logRepo.TailLogsForReturns(errors.New("Ooops"))
+			logRepo.TailLogsForReturns(nil, errors.New("Ooops"))
 
 			requirementsFactory.Application = defaultAppForStart
 

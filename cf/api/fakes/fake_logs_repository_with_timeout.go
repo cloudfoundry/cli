@@ -13,9 +13,9 @@ func (fake *FakeLogsRepositoryWithTimeout) RecentLogsFor(appGuid string) ([]*log
 	return nil, nil
 }
 
-func (fake *FakeLogsRepositoryWithTimeout) TailLogsFor(appGuid string, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+func (fake *FakeLogsRepositoryWithTimeout) TailLogsFor(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
 	time.Sleep(150 * time.Millisecond)
-	return errors.New("Fake http timeout error")
+	return nil, errors.New("Fake http timeout error")
 }
 
 func (fake *FakeLogsRepositoryWithTimeout) Close() {}
