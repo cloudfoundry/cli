@@ -1,3 +1,180 @@
+## 6.16.0
+* Bump version to 6.16.0
+* Remove 'type' column from domains output
+* Hide router-groups command
+* Hide --router-group option to create-shared-domain
+* Fix typo in pt-BR translation
+* Replaced confusing url in `cf install-plugin` help
+* Fix fr translation with extra space at end
+* Hide .cf directory on Windows
+* bin/generate-language-resources
+* create-app-manifest stores stack
+* Update travis to run on go1.6
+* Don't translate role names
+* Update translation files post-PR merge
+* Move Dockerfile & Makefile to cli-ci repository
+* Promote cliFlags package to flags
+* Run goimports
+* Remove unused code
+* Sort command flags
+* bin/generate-language-resources
+* Merge branch 'update-ja-jp-messages-route-services' of https://github.com/fujitsu-cf/cli into fujitsu-cf-update-ja-jp-messages-route-services
+* cf-Apps -> CF-Apps
+* Wrap 'CLEAR', 'port', and 'none' in translations
+* translate the messages to Japanese.
+* Don't set GO15VENDOREXPERIMENT=1
+* Simplify i18n/locale
+* Fixed incorrect usage of e.g. in delete-orphaned-routes
+* Add translation to invalid locale error message
+* Fail when config is given an invalid locale
+* Replace cf with CF when referring to Cloud Foundry
+* Remove 'app' local var
+* Add disk quota to create-app-manifest manifest
+* Remove named return args from create_app_manifest
+* Surround option values with single quotes
+* Fix `list-plugin-repos` typo in help
+* Added GitHub issue template
+* Don't send empty path when searching routes
+* Start command doesn't use appRepo.Read
+* Remove unused arg from setup func
+* Update French translation for plugins cmd description
+* Switch non-English key back to English
+* bin/generate-language-resources
+* Update ja-jp untranslated json
+* Merge branch 'update-ja_jp-files' of https://github.com/fujitsu-cf/cli into fujitsu-cf-update-ja_jp-files
+* Update ja-JP files
+* Update Dockerfile for latest Concourse builds
+* Capitalize non-english descriptions of commands
+* Remove trailing period from command option descriptions
+* Remove trailing period from command descriptions
+* Capitalized command option descriptions
+* Capitalized command descriptions
+* Produce manifest with no-hostname attribute
+* Support generating manifest with no-hostname
+* Replace Ω with Expect, ToNot with NotTo
+* Rename Omega to Expect
+* Update skip_ssl_validation flag description
+* Standardizes on hyphenated locale names
+* Make space_quotas test work in Go 1.6
+* Make quotas_test test work in Go 1.6
+* Make env_var_groups test work in Go 1.6
+* Make service_keys_test work in Go 1.6
+* Fix bind-route-service min API failure message
+* Update create-service-broker creation message
+* Remove long name 'force' from delete-route flag
+* Update formatting of help text for some commands
+* unbind-route-service requires CC >=2.51
+* bind-route-service requires CC >=2.51
+* update-user-provided-service -r requires CC >=2.51
+* Rewrite update_user_provided_service_test
+* create-user-provided-service -r requires CC >=2.51
+* Remove named return args from cups
+* Rewrite create_user_provided_service_test
+* Merge pull request #755 from emirozer/master
+* Increase StartupTimeout in start test
+* RouteServiceBindingRepository includes 'parameters'
+* uups does not accept files prefixed with @
+* cups does not accept files prefixed with @
+* Update help text for curl command
+* Remove default method from cf curl -X StringFlag
+* fix wrong link in Plugin API doc
+* Update curl help text
+* curl defaults to POST when body is given
+* Update install-plugin help text
+* Update remove-plugin-repo help text
+* Update untranslated files
+* Improve help text of add-plugin-repo
+* Remove InputsChan from FakeUI
+* Improve help text of repo-plugins
+* Improve help text of install-plugin
+* Correctly define flags for delete/delete-space
+* oauth-token only prints the token
+* Remove mapValuesFromPrompt from cups command
+* Update tests for update-user-provided-service
+* curl -d flag accepts @file
+* Add compilers=2 back to .travis.yml
+* Extract JSON loader into util package
+* bind-route-service takes -c parameters
+* Remove unused RouteServiceBinder interface
+* Set nodes=4 in travis.yml
+* Remove -nodes=4 from bin/test
+* Updating a service plan only updates 'public'
+* Service auth token commands require API <=2.46
+* migrate-service-instances requires api <=2.46
+* Add API version req to create-service-broker
+* purge-service-offering only takes -p for <=2.46
+* Add MaxAPIVersionRequirement
+* Remove unused JSON in tests
+* update-user-provided-service -p flag accepts @file
+* create-user-provided-service -p flag accepts @file
+* Remove trailing space from EXAMPLE in usage
+* bin/generate-language-resources
+* Merge branch 'help2' of https://github.com/fujitsu-cf/cli into fujitsu-cf-help2
+* Add space-scoped flag to create-service-broker
+* Rewrite create_service_broker_test
+* Generate FakeServiceBrokerRepo with counterfeiter
+* Make add-plugin-repo test not take 15 seconds
+* Fix typo in create-shared-domain usage text again
+* replace double-byte colons in main Chinese help text
+* Fix typo in create-shared-domain usage text
+* bin/generate-language-resources
+* Merge branch 'generated-help' of https://github.com/fujitsu-cf/cli into fujitsu-cf-generated-help
+* Merge branch 'fix_ja' of https://github.com/tnaoto/cli into tnaoto-fix_ja
+* Update README/README-i18n
+* Refactor push command a bit
+* Add explanatory comment to ProcessPath
+* godep save ./... (again)
+* godep save ./...
+* Bring in missing go-ccapi dependency
+* Add V3Apps
+* Move passingRequirement definition to suites
+* Fix translations to only update the modified messages
+* Cleanup test cases for list shared domains
+* Add the routing field to 'cf domains' command. Rewrite test cases for domains command
+* Enable creating a shared domain with a router group
+* fix typo
+* Modify Japanese transration
+* Push returns an error when given an invalid path
+* CheckIfExists ensures path has prefixed slash
+* i18n-checkup installs goi18n
+* Bind/UnbindRouteService allow --hostname flag
+* AuthRepo.Authorize() sets Proxy from environment
+* Refactor ssh_code Get() implementation
+* Update i18n-checkup
+* Regenerate FakeAuthenticationRepository
+* Regenerate FakeEndpointRepository
+* Revert "WIP merging create route with port"
+* Fixing example for unbind-route-services in translation files
+* Improving example from usage of the unbind-route-service
+* Add -u back to go get of i18n4go
+* Login retrieves a max of 50 orgs
+* bin/generate-language-resources
+* Fix translations
+* Add untranslated files
+* Print standardized locales when given bad locale
+* Fall back to en-us by default
+* Rename translation files to what go-i18n expects
+* Remove non-translation translations
+* Update routes command
+* Update unbind_route_service
+* Rewrite bind_route_service_test
+* Update bind_route_service
+* Remove named return args from service_offerings
+* Add "repository" to route_service_binding
+* Display route services in cf routes command
+* Add bind-route-service and unbind-route-service commands
+* Add route_service_url flag to update-user-provided-service command.
+* Add route_service_url support for create user provided service command.
+* HTTP_PROXY -> https_proxy in help template
+* cf service includes service tags
+* Display X-Cf-Warnings after running commands
+* Switch add plugin repo test to use example.com
+* On connection refusal include tip to set http proxy
+* CopyFiles uses absolute paths
+* Update Push actor's handling of paths
+* Handle paths that exceed MAX_PATH elsewhere
+* WalkAppFiles handles paths that exceed MAX_PATH
+
 ## 6.15.0
 * Bump version to 6.15.0
 * Fix regression in table printer
