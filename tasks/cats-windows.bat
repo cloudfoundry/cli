@@ -9,7 +9,7 @@ SET PATH=C:\Program Files\cURL\bin;%PATH%
 SET PATH=%CD%;%PATH%
 
 SET /p DOMAIN=<%CD%\bosh-lite-lock\name
-call %CD%\ci\concourse\builds\create-cats-config.bat
+call %CD%\cli\ci\tasks\create-cats-config.bat
 SET CONFIG=%CD%\config.json
 
 go get -v github.com/onsi/ginkgo/ginkgo
