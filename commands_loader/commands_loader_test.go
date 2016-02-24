@@ -40,5 +40,5 @@ func walkDirAndCountCommand(path string) int {
 		return nil
 	})
 
-	return cmdCount
+	return cmdCount - 1 // temporarily hide router-groups command
 }
