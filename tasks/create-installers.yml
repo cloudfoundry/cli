@@ -1,0 +1,124 @@
+---
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+- name: cf-cli-binaries
+- name: ci
+- name: cli
+
+outputs:
+- name: installers
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+    set -o pipefail
+
+    root=$PWD
+
+    pushd cf-cli-binaries
+       tar xvf cf-cli-binaries.tgz
+    popd
+
+    VERSION=$(cat cli/VERSION)
+    RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
+
+    mkdir archives
+
+    echo "Building 32-bit Debian package"
+    (
+        SIZE="$(BLOCKSIZE=1000 du $root/cf-cli-binaries/cf-cli_linux_i686 | cut -f 1)"
+
+        pushd cli/installers/deb
+          mkdir -p cf/usr/bin
+
+          cp $root/cf-cli-binaries/cf-cli_linux_i686 cf/usr/bin/cf
+
+          cp control.template cf/DEBIAN/control
+          echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+          echo "Version: ${VERSION}" >> cf/DEBIAN/control
+          echo "Architecture: i386" >> cf/DEBIAN/control
+
+          fakeroot dpkg --build cf cf-cli-installer_i686.deb
+          mv cf-cli-installer_i686.deb $root/archives
+          rm -rf cf/usr/bin cf/DEBIAN/control
+        popd
+    )
+
+    echo "Building 64-bit Debian package"
+    (
+        SIZE="$(BLOCKSIZE=1000 du $root/cf-cli-binaries/cf-cli_linux_x86-64 | cut -f 1)"
+
+        pushd cli/installers/deb
+          mkdir -p cf/usr/bin
+
+          cp $root/cf-cli-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
+
+          cp control.template cf/DEBIAN/control
+          echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
+          echo "Version: ${VERSION}" >> cf/DEBIAN/control
+          echo "Architecture: amd64" >> cf/DEBIAN/control
+
+          fakeroot dpkg --build cf cf-cli-installer_x86-64.deb
+          mv cf-cli-installer_x86-64.deb $root/archives
+          rm -rf cf/usr/bin cf/DEBIAN/control
+        popd
+    )
+
+    echo "Building 32-bit RedHat package"
+    (
+      pushd cli/installers/rpm
+        cp $root/cf-cli-binaries/cf-cli_linux_i686 cf
+        echo "Version: ${RPM_VERSION}" > cf-cli.spec
+        cat cf-cli.spec.template >> cf-cli.spec
+        rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+        mv build/RPMS/i386/cf-cli*.rpm $root/archives/cf-cli-installer_i686.rpm
+        rm -rf build cf cf-cli.spec
+      popd
+    )
+
+    echo "Building 64-bit RedHat package"
+    (
+      pushd cli/installers/rpm
+        cp $root/cf-cli-binaries/cf-cli_linux_x86-64 cf
+        echo "Version: ${RPM_VERSION}" > cf-cli.spec
+        cat cf-cli.spec.template >> cf-cli.spec
+        rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+        mv build/RPMS/x86_64/cf-cli*.rpm $root/archives/cf-cli-installer_x86-64.rpm
+        rm -rf build cf cf-cli.spec
+      popd
+    )
+
+    echo "Building OS X installer"
+    (
+      SIZE="$(BLOCKSIZE=1000 du $root/cf-cli-binaries/cf-cli_osx | cut -f 1)"
+
+      pushd cli/installers/osx
+        sed -i -e "s/VERSION/${VERSION}/g" Distribution
+        sed -i -e "s/SIZE/${SIZE}/g" Distribution
+        mkdir -p cf-cli/usr/local/bin
+        mkdir -p cf-cli/usr/local/share/doc/cf-cli
+        cp $root/cf-cli-binaries/cf-cli_osx cf-cli/usr/local/bin/cf
+        cp COPYING cf-cli/usr/local/share/doc/cf-cli
+        chmod -R go-w cf-cli
+        pushd cf-cli
+          find usr | cpio -o --format=odc | gzip -c > ../Payload
+        popd
+        ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
+        mkbom -i bom_list Bom
+        mv Bom Payload com.cloudfoundry.cli.pkg
+        xar -c --compression none -f cf-cli-installer_osx.pkg com.cloudfoundry.cli.pkg Distribution
+        mv cf-cli-installer_osx.pkg $root/archives/cf-cli-installer_osx.pkg
+        rm -rf cf-cli com.cloudfoundry.cli.pkg/Payload com.cloudfoundry.cli.pkg/Bom bom_list
+      popd
+    )
+
+    echo "Packaging Installers"
+    (
+      cd installers
+      tar cvzf cf-cli-installers.tgz -C $root/archives .
+    )
