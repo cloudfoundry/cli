@@ -31,18 +31,20 @@ func init() {
 
 func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route (required for shared domains)")}
-	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the route")}
+	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the HTTP route (required for shared domains)")}
+	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the HTTP route")}
+	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port for the TCP route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-route",
 		Description: T("Create a url route in a space for later use"),
-		Usage: T(`CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]
+		Usage: T(`CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT]
 
 EXAMPLES:
    CF_NAME create-route my-space example.com                             # example.com
    CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com
-   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo`),
+   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo
+   CF_NAME create-route my-space example.com --port 50000                # example.com:50000`),
 		Flags: fs,
 	}
 }
@@ -52,28 +54,39 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("create-route"))
 	}
 
+	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
+		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+	}
+
 	domainName := fc.Args()[1]
 
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
-	requiredVersion, err := semver.Make("2.36.0")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	var reqs []requirements.Requirement
-
-	if fc.String("path") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
-	}
-
-	reqs = append(reqs, []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 		cmd.domainReq,
-	}...)
+	}
+
+	if fc.IsSet("path") {
+		requiredVersion, err := semver.Make("2.36.0")
+		if err != nil {
+			panic(err.Error())
+		}
+
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
+	}
+
+	if fc.IsSet("port") {
+		requiredVersion, err := semver.Make("2.51.0")
+		if err != nil {
+			panic(err.Error())
+		}
+
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", requiredVersion))
+	}
 
 	return reqs, nil
 }
@@ -90,8 +103,9 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
 	path := c.String("path")
+	port := c.Int("port")
 
-	_, apiErr := cmd.CreateRoute(hostName, path, domain, space.SpaceFields)
+	_, apiErr := cmd.CreateRoute(hostName, path, port, domain, space.SpaceFields)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
@@ -99,7 +113,7 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, path string, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {
+func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {
 	cmd.ui.Say(T("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"URL":       terminal.EntityNameColor(domain.UrlForHostAndPath(hostName, path)),
@@ -107,7 +121,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, domain models.
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.Guid, space.Guid)
+	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.Guid, space.Guid, port)
 	if err != nil {
 		var findErr error
 		route, findErr = cmd.routeRepo.Find(hostName, domain, path)

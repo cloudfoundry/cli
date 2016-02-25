@@ -88,6 +88,10 @@
     "translation": "CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
   },
   {
+    "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000",
+    "translation": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000"
+  },
+  {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
     "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
   },
@@ -508,6 +512,10 @@
     "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
   },
   {
+    "id": "Cannot specify port together with hostname and/or path.",
+    "translation": "Cannot specify port together with hostname and/or path."
+  },
+  {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
@@ -548,6 +556,10 @@
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
   },
   {
+    "id": "Hostname for the HTTP route (required for shared domains)",
+    "translation": "Hostname for the HTTP route (required for shared domains)"
+  },
+  {
     "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
     "translation": "Incorrect Usage. No argument required\n\n{{.Usage}}"
   },
@@ -584,12 +596,20 @@
     "translation": "OK"
   },
   {
+    "id": "Path for the HTTP route",
+    "translation": "Path for the HTTP route"
+  },
+  {
     "id": "Path for the route",
     "translation": "Path for the route"
   },
   {
     "id": "Path used to identify the route",
     "translation": "Path used to identify the route"
+  },
+  {
+    "id": "Port for the TCP route",
+    "translation": "Port for the TCP route"
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",

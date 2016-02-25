@@ -40,6 +40,10 @@
     "translation": "CF_NAME create-org ORG"
   },
   {
+    "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000",
+    "translation": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000"
+  },
+  {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json",
     "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }\n\nEXAMPLE:\n   CF_NAME create-service-key mydb mykey -c '{\"permissions\":\"read-only\"}'\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json"
   },
@@ -164,6 +168,10 @@
     "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\nEXAMPLE:\n   CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n   CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json\n   CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n   CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
+    "id": "Cannot specify port together with hostname and/or path.",
+    "translation": "Cannot specify port together with hostname and/or path."
+  },
+  {
     "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
     "translation": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n"
   },
@@ -236,6 +244,10 @@
     "translation": "HTTP data to include in the request body, or '@' followed by a file name to read the data from"
   },
   {
+    "id": "Hostname for the HTTP route (required for shared domains)",
+    "translation": "Hostname for the HTTP route (required for shared domains)"
+  },
+  {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
     "translation": "Hostname used in combination with DOMAIN to specify the route to bind"
   },
@@ -304,12 +316,20 @@
     "translation": "OPTIONS"
   },
   {
+    "id": "Path for the HTTP route",
+    "translation": "Path for the HTTP route"
+  },
+  {
     "id": "Path for the route",
     "translation": "Path for the route"
   },
   {
     "id": "Path used to identify the route",
     "translation": "Path used to identify the route"
+  },
+  {
+    "id": "Port for the TCP route",
+    "translation": "Port for the TCP route"
   },
   {
     "id": "ROUTES",
