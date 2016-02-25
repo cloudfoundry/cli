@@ -25,6 +25,7 @@ resources:
     uri: git@github.com:cloudfoundry/cli
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
+    ignore_paths: ci/*
 
 - name: final-cli
   type: git
@@ -40,6 +41,14 @@ resources:
     uri: git@github.com:cloudfoundry/cli-ci
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
+
+- name: cli-ci
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+    paths: ci/*
 
 - name: cli-acceptance-tests
   type: git
@@ -119,6 +128,8 @@ jobs:
       - get: ci
       - get: cf-release
       - get: bosh-lite
+      - get: cli
+        resource: cli-ci
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -154,6 +165,8 @@ jobs:
       - get: ci
       - get: cf-release
       - get: bosh-lite
+      - get: cli
+        resource: cli-ci
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -189,6 +202,8 @@ jobs:
       - get: ci
       - get: cf-release
       - get: bosh-lite
+      - get: cli
+        resource: cli-ci
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -224,6 +239,8 @@ jobs:
       - get: ci
       - get: cf-release
       - get: bosh-lite
+      - get: cli
+        resource: cli-ci
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -251,29 +268,33 @@ jobs:
 - name: units
   serial: true
   plan:
-  - get: cli
-    trigger: true
-  - get: final-cli
-  - get: ci
+  - aggregate:
+    - get: cli
+      trigger: true
+    - get: final-cli
+    - get: ci
+    - get: cli-ci
   - aggregate:
     - task: units-linux
-      file: cli/ci/tasks/units-linux.yml
+      file: cli-ci/ci/tasks/units-linux.yml
     - task: units-osx
-      file: cli/ci/tasks/units-osx.yml
+      file: cli-ci/ci/tasks/units-osx.yml
     - task: units-windows
-      file: cli/ci/tasks/units-windows.yml
+      file: cli-ci/ci/tasks/units-windows.yml
 
 - name: build-binaries
   serial: true
   plan:
-  - get: cli
-    trigger: true
-    passed: [units]
-  - get: final-cli
-    passed: [units]
-  - get: ci
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [units]
+    - get: final-cli
+      passed: [units]
+    - get: ci
+    - get: cli-ci
   - task: build
-    file: cli/ci/tasks/build-binaries.yml
+    file: cli-ci/ci/tasks/build-binaries.yml
   - put: cf-cli-binaries
     params:
       file: compiled/cf-cli-binaries.tgz
@@ -291,11 +312,12 @@ jobs:
       passed: [build-binaries]
     - get: cli-acceptance-tests
     - get: ci
+    - get: cli-ci
     - put: bosh-lite-lock
       params:
         acquire: true
   - task: gats
-    file: cli/ci/tasks/gats-linux.yml
+    file: cli-ci/ci/tasks/gats-linux.yml
     ensure:
       put: bosh-lite-lock
       params:
@@ -314,11 +336,12 @@ jobs:
       passed: [gats-windows]
     - get: cf-acceptance-tests
     - get: ci
+    - get: cli-ci
     - put: bosh-lite-lock
       params:
         acquire: true
   - task: cats
-    file: cli/ci/tasks/cats-windows.yml
+    file: cli-ci/ci/tasks/cats-windows.yml
     config:
       params:
         ADMIN_USER: {{bosh-lite-admin-username}}
@@ -341,11 +364,12 @@ jobs:
       passed: [build-binaries]
     - get: cli-acceptance-tests
     - get: ci
+    - get: cli-ci
     - put: bosh-lite-lock
       params:
         acquire: true
   - task: gats
-    file: cli/ci/tasks/gats-windows.yml
+    file: cli-ci/ci/tasks/gats-windows.yml
     config:
       params:
         ADMIN_USER: {{bosh-lite-admin-username}}
@@ -368,11 +392,12 @@ jobs:
     - get: cf-cli-binaries
       trigger: true
       passed: [gats-linux]
+    - get: cli-ci
     - put: bosh-lite-lock
       params:
         acquire: true
   - task: cats
-    file: cli/ci/tasks/cats-linux.yml
+    file: cli-ci/ci/tasks/cats-linux.yml
     ensure:
       put: bosh-lite-lock
       params:
@@ -390,11 +415,12 @@ jobs:
       trigger: true
       passed: [cats-linux, cats-windows]
     - get: ci
+    - get: cli-ci
   - aggregate:
     - task: windows
-      file: cli/ci/tasks/create-installers-windows.yml
+      file: cli-ci/ci/tasks/create-installers-windows.yml
     - task: unix
-      file: cli/ci/tasks/create-installers.yml
+      file: cli-ci/ci/tasks/create-installers.yml
   - aggregate:
     - put: cf-cli-installer-win32
       params:
@@ -422,8 +448,9 @@ jobs:
     - get: cf-cli-installer-win64
       passed: [create-installers]
     - get: ci
+    - get: cli-ci
   - task: publish
-    file: cli/ci/tasks/publish-edge-archives.yml
+    file: cli-ci/ci/tasks/publish-edge-archives.yml
     config:
       params:
         AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
@@ -445,10 +472,10 @@ jobs:
     - get: cf-cli-installer-win64
       passed: [create-installers]
     - get: ci
+    - get: cli-ci
   - task: publish
-    file: cli/ci/tasks/publish-final-release.yml
+    file: cli-ci/ci/tasks/publish-final-release.yml
     config:
       params:
         AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
-
