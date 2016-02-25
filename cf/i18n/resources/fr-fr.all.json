@@ -1796,6 +1796,10 @@
     "translation": "Erreur lors de la transmission du port : "
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "Erreur lors de l'obtention des informations SSH : "
   },

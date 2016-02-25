@@ -77,5 +77,10 @@ func (cmd *OneTimeSSHCode) Get() (string, error) {
 		return "", errors.New(T("Error refreshing oauth token: ") + err.Error())
 	}
 
-	return token, nil
+	sshCode, err := cmd.authRepo.Authorize(token)
+	if err != nil {
+		return "", errors.New(T("Error getting SSH code: ") + err.Error())
+	}
+
+	return sshCode, nil
 }

@@ -516,6 +516,10 @@
     "translation": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}..."
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": "Error getting SSH code: "
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "Error getting the redirected location: {{.Error}}"
   },

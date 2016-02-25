@@ -1796,6 +1796,10 @@
     "translation": "Errore di inoltro porta: "
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "Errore durante il richiamo delle informazioni SSH:"
   },
