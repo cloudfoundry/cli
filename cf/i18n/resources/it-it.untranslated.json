@@ -812,6 +812,10 @@
     "translation": "path"
   },
   {
+    "id": "port",
+    "translation": "port"
+  },
+  {
     "id": "provider",
     "translation": "provider"
   },

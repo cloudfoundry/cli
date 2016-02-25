@@ -1,6 +1,7 @@
 package route
 
 import (
+	"fmt"
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -56,9 +57,9 @@ func (cmd *ListRoutes) SetDependency(deps command_registry.Dependency, pluginCal
 }
 
 func (cmd *ListRoutes) Execute(c flags.FlagContext) {
-	flag := c.Bool("orglevel")
+	orglevel := c.Bool("orglevel")
 
-	if flag {
+	if orglevel {
 		cmd.ui.Say(T("Getting routes for org {{.OrgName}} as {{.Username}} ...\n",
 			map[string]interface{}{
 				"Username": terminal.EntityNameColor(cmd.config.Username()),
@@ -73,7 +74,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 			}))
 	}
 
-	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("path"), T("apps"), T("service")})
+	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("port"), T("path"), T("type"), T("apps"), T("service")})
 
 	var routesFound bool
 	cb := func(route models.Route) bool {
@@ -83,12 +84,26 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 			appNames = append(appNames, app.Name)
 		}
 
-		table.Add(route.Space.Name, route.Host, route.Domain.Name, route.Path, strings.Join(appNames, ","), route.ServiceInstance.Name)
+		var port string
+		if route.Port != 0 {
+			port = fmt.Sprintf("%d", route.Port)
+		}
+
+		table.Add(
+			route.Space.Name,
+			route.Host,
+			route.Domain.Name,
+			port,
+			route.Path,
+			strings.Join(route.Domain.RouterGroupTypes, ","),
+			strings.Join(appNames, ","),
+			route.ServiceInstance.Name,
+		)
 		return true
 	}
 
 	var err error
-	if flag {
+	if orglevel {
 		err = cmd.routeRepo.ListAllRoutes(cb)
 	} else {
 		err = cmd.routeRepo.ListRoutes(cb)

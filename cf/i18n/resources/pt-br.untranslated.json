@@ -892,6 +892,10 @@
     "translation": "path"
   },
   {
+    "id": "port",
+    "translation": "port"
+  },
+  {
     "id": "repo-plugins",
     "translation": "repo-plugins"
   },
