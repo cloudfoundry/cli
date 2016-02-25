@@ -448,6 +448,10 @@
     "translation": "plans"
   },
   {
+    "id": "port",
+    "translation": "port"
+  },
+  {
     "id": "position",
     "translation": "position"
   },

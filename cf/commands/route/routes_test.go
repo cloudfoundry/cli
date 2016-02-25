@@ -72,28 +72,47 @@ var _ = Describe("routes command", func() {
 		BeforeEach(func() {
 			routeRepo.ListRoutesStub = func(cb func(models.Route) bool) error {
 				app1 := models.ApplicationFields{Name: "dora"}
+				app2 := models.ApplicationFields{Name: "bora"}
 
-				route := models.Route{}
-				route.Host = "hostname-1"
-				route.Domain = models.DomainFields{Name: "example.com"}
-				route.Apps = []models.ApplicationFields{app1}
-				route.ServiceInstance = models.ServiceInstanceFields{
-					Name: "test-service",
-					Guid: "service-guid",
+				route := models.Route{
+					Space: models.SpaceFields{
+						Name: "my-space",
+					},
+					Host:   "hostname-1",
+					Domain: models.DomainFields{Name: "example.com"},
+					Apps:   []models.ApplicationFields{app1},
+					ServiceInstance: models.ServiceInstanceFields{
+						Name: "test-service",
+						Guid: "service-guid",
+					},
+				}
+
+				route2 := models.Route{
+					Space: models.SpaceFields{
+						Name: "my-space",
+					},
+					Host:   "hostname-2",
+					Path:   "/foo",
+					Domain: models.DomainFields{Name: "cookieclicker.co"},
+					Apps:   []models.ApplicationFields{app1, app2},
+				}
+
+				route3 := models.Route{
+					Space: models.SpaceFields{
+						Name: "my-space",
+					},
+					Domain: models.DomainFields{
+						Name: "cookieclicker.co",
+						RouterGroupTypes: []string{
+							"tcp", "bar"},
+					},
+					Apps: []models.ApplicationFields{app1, app2},
+					Port: 9090,
 				}
 
 				cb(route)
-
-				domain2 := models.DomainFields{Name: "cookieclicker.co"}
-				app2 := models.ApplicationFields{Name: "bora"}
-
-				route2 := models.Route{}
-				route2.Host = "hostname-2"
-				route2.Path = "/foo"
-				route2.Domain = domain2
-				route2.Apps = []models.ApplicationFields{app1, app2}
-
 				cb(route2)
+				cb(route3)
 
 				return nil
 			}
@@ -102,12 +121,14 @@ var _ = Describe("routes command", func() {
 		It("lists routes", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting routes for org", "/ space", "my-org", "my-space", "my-user"},
-				[]string{"host", "domain", "apps", "service"},
-				[]string{"hostname-1", "example.com", "dora", "test-service"},
-				[]string{"hostname-2", "cookieclicker.co", "dora", "bora"},
+			Expect(ui.Outputs).To(BeInDisplayOrder(
+				[]string{"Getting routes for org my-org / space my-space as my-user"},
+				[]string{"host", "domain", "port", "path", "type", "apps", "service"},
 			))
+
+			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`)))
+			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+hostname-2\s+cookieclicker\.co\s+/foo\s+dora,bora\s*$`)))
+			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp,bar\s+dora,bora\s*$`)))
 		})
 	})
 
