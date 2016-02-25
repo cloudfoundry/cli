@@ -556,8 +556,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo",
-    "translation": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                     # example.com\n   CF_NAME create-route my-space example.com -n myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com -n myapp --path foo # myapp.example.com/foo"
+    "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000",
+    "translation": ""
   },
   {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
@@ -1070,6 +1070,10 @@
   {
     "id": "Cannot specify buildpack bits and lock/unlock.",
     "translation": "No se pueden especificar los bits de paquete de compilación ni bloquear/desbloquear."
+  },
+  {
+    "id": "Cannot specify port together with hostname and/or path.",
+    "translation": ""
   },
   {
     "id": "Change or view the instance count, disk space limit, and memory limit for an app",
@@ -2308,6 +2312,10 @@
     "translation": "Nombre de host (p. ej. mi-subdominio)"
   },
   {
+    "id": "Hostname for the HTTP route (required for shared domains)",
+    "translation": ""
+  },
+  {
     "id": "Hostname for the route (required for shared domains)",
     "translation": "Hostname for the route"
   },
@@ -3132,6 +3140,10 @@
     "translation": "La comprobación de la contraseña no coincide"
   },
   {
+    "id": "Path for the HTTP route",
+    "translation": ""
+  },
+  {
     "id": "Path for the route",
     "translation": "Context path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match."
   },
@@ -3218,6 +3230,10 @@
   {
     "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
     "translation": "El plugin {{.PluginName}} v{{.Version}} se ha instalado correctamente."
+  },
+  {
+    "id": "Port for the TCP route",
+    "translation": ""
   },
   {
     "id": "Print API request diagnostics to stdout",
