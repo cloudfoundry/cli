@@ -181,7 +181,9 @@ var _ = Describe("ListDomains", func() {
 			BeforeEach(func() {
 				domainFields = []models.DomainFields{
 					models.DomainFields{Shared: false, Name: "Private-domain1"},
+					models.DomainFields{Shared: false, Name: "Private-domain2", RouterGroupTypes: []string{"tcp", "bazquux"}},
 					models.DomainFields{Shared: true, Name: "Shared-domain1"},
+					models.DomainFields{Shared: true, Name: "Shared-domain2", RouterGroupTypes: []string{"tcp", "foobar"}},
 				}
 			})
 
@@ -199,59 +201,12 @@ var _ = Describe("ListDomains", func() {
 			It("prints the domain information", func() {
 				cmd.Execute(flagContext)
 				Expect(ui.Outputs).To(BeInDisplayOrder(
-					[]string{"name", "status"},
+					[]string{"name", "status", "type"},
 					[]string{"Shared-domain1", "shared"},
+					[]string{"Shared-domain2", "shared", "tcp, foobar"},
 					[]string{"Private-domain1", "owned"},
+					[]string{"Private-domain2", "owned", "tcp, bazquux"},
 				))
-			})
-
-			Context("when routing api endpoint is not set", func() {
-				var originalRoutingApiEndpoint string
-				BeforeEach(func() {
-					originalRoutingApiEndpoint = configRepo.RoutingApiEndpoint()
-					configRepo.SetRoutingApiEndpoint("")
-				})
-
-				AfterEach(func() {
-					configRepo.SetRoutingApiEndpoint(originalRoutingApiEndpoint)
-				})
-
-				It("does not panic", func() {
-					Expect(func() { cmd.Execute(flagContext) }).NotTo(Panic())
-				})
-
-				Context("when returned domain has a router-group-guid", func() {
-					BeforeEach(func() {
-						domainFields = []models.DomainFields{
-							models.DomainFields{
-								Shared:          true,
-								Name:            "Shared-domain1",
-								RouterGroupGuid: "router-group-guid"},
-						}
-					})
-
-					AfterEach(func() {
-						domainFields = []models.DomainFields{}
-					})
-
-					It("panics with error about missing routing api endpoint", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Routing API URI missing."},
-						))
-					})
-				})
-			})
-		})
-
-		Context("when routing api endpoint is set", func() {
-			var originalRoutingApiEndpoint string
-			BeforeEach(func() {
-				originalRoutingApiEndpoint = configRepo.RoutingApiEndpoint()
-				configRepo.SetRoutingApiEndpoint("routing-api-endpoint")
-			})
-			AfterEach(func() {
-				configRepo.SetRoutingApiEndpoint(originalRoutingApiEndpoint)
 			})
 		})
 	})

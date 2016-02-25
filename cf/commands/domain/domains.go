@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -60,85 +62,42 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) {
 			"OrgName":  terminal.EntityNameColor(org.Name),
 			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	domains, populateRouterGroups, err := cmd.getDomains(org.Guid)
+	domains, err := cmd.getDomains(org.Guid)
 	if err != nil {
 		cmd.ui.Failed(T("Failed fetching domains.\n{{.Error}}", map[string]interface{}{"Error": err.Error()}))
 	}
 
-	var routerGroups map[string]models.RouterGroup
-	if populateRouterGroups {
-		if len(cmd.config.RoutingApiEndpoint()) == 0 {
-			cmd.ui.Failed(T("Routing API URI missing. Please log in again to set the URI automatically."))
-		}
+	table := cmd.ui.Table([]string{T("name"), T("status"), T("type")})
 
-		routerGroups, err = cmd.getRouterGroups()
-		if err != nil {
-			cmd.ui.Failed(T("Failed fetching router groups.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
-		}
-
-		for _, domain := range domains {
-			if domain.Shared && domain.RouterGroupGuid != "" {
-				if _, ok := routerGroups[domain.RouterGroupGuid]; !ok {
-					cmd.ui.Failed(T("Invalid router group guid: {{.Guid}}", map[string]interface{}{"Guid": domain.RouterGroupGuid}))
-				}
-			}
+	for _, domain := range domains {
+		if domain.Shared {
+			table.Add(domain.Name, T("shared"), strings.Join(domain.RouterGroupTypes, ", "))
 		}
 	}
 
-	cmd.printDomainsTable(domains, routerGroups)
+	for _, domain := range domains {
+		if !domain.Shared {
+			table.Add(domain.Name, T("owned"), strings.Join(domain.RouterGroupTypes, ", "))
+		}
+	}
+
+	table.Print()
 
 	if len(domains) == 0 {
 		cmd.ui.Say(T("No domains found"))
 	}
 }
 
-func (cmd *ListDomains) getDomains(orgGuid string) ([]models.DomainFields, bool, error) {
+func (cmd *ListDomains) getDomains(orgGuid string) ([]models.DomainFields, error) {
 	domains := []models.DomainFields{}
-	populateRouterGroups := false
 	err := cmd.domainRepo.ListDomainsForOrg(orgGuid, func(domain models.DomainFields) bool {
 		domains = append(domains, domain)
-		if domain.Shared && domain.RouterGroupGuid != "" {
-			populateRouterGroups = true
-		}
 		return true
 	})
 
 	if err != nil {
-		return []models.DomainFields{}, false, err
+		return []models.DomainFields{}, err
 	}
 
-	return domains, populateRouterGroups, nil
-}
-
-func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields, routerGroups map[string]models.RouterGroup) {
-	table := cmd.ui.Table([]string{T("name"), T("status")})
-
-	for _, domain := range domains {
-		if domain.Shared {
-			table.Add(domain.Name, T("shared"))
-		}
-	}
-
-	for _, domain := range domains {
-		if !domain.Shared {
-			table.Add(domain.Name, T("owned"))
-		}
-	}
-
-	table.Print()
-}
-
-func (cmd *ListDomains) getRouterGroups() (map[string]models.RouterGroup, error) {
-	routerGroupsMap := map[string]models.RouterGroup{}
-	cb := func(routerGroup models.RouterGroup) bool {
-		routerGroupsMap[routerGroup.Guid] = routerGroup
-		return true
-	}
-
-	err := cmd.routingApiRepo.ListRouterGroups(cb)
-	if err != nil {
-		return map[string]models.RouterGroup{}, err
-	}
-
-	return routerGroupsMap, nil
+	return domains, nil
 }

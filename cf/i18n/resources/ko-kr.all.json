@@ -2656,10 +2656,6 @@
     "translation": "올바르지 않은 메모리 한계: {{.Memory}}\n{{.ErrorDescription}}"
   },
   {
-    "id": "Invalid router group guid: {{.Guid}}",
-    "translation": ""
-  },
-  {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
     "translation": "올바르지 않은 제한시간 매개변수: {{.Timeout}}\n{{.Err}}"
   },

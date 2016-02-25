@@ -2656,10 +2656,6 @@
     "translation": "Limite de mémoire non valide : {{.Memory}}\n{{.ErrorDescription}}"
   },
   {
-    "id": "Invalid router group guid: {{.Guid}}",
-    "translation": ""
-  },
-  {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
     "translation": "Paramètre de délai d'attente non valide : {{.Timeout}}\n{{.Err}}"
   },

@@ -136,6 +136,37 @@ var _ = Describe("DomainRepository", func() {
 		Expect(domain.Shared).To(BeFalse())
 	})
 
+	It("returns domains with router group types", func() {
+		setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method: "GET",
+			Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+			Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+				{
+					"resources": [
+						{
+						  "metadata": { "guid": "domain2-guid" },
+							"entity": {
+								"name": "domain2.cf-app.com",
+								"router_group_guid": "my-random-guid",
+								"router_group_types": [
+									"tcp",
+									"bar"
+								]
+							}
+						}
+					]
+				}`},
+		}))
+
+		domain, apiErr := repo.FindSharedByName("domain2.cf-app.com")
+		Expect(handler).To(HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+
+		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
+		Expect(domain.Guid).To(Equal("domain2-guid"))
+		Expect(domain.RouterGroupTypes).To(Equal([]string{"tcp", "bar"}))
+	})
+
 	Describe("finding a domain by name in an org", func() {
 		It("looks in the org's domains first", func() {
 			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{

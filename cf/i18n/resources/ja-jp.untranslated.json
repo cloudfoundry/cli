@@ -576,10 +576,6 @@
     "translation": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n"
   },
   {
-    "id": "Invalid router group guid: {{.Guid}}",
-    "translation": "Invalid router group guid: {{.Guid}}"
-  },
-  {
     "id": "Make the broker's service plans only visible within the targeted space",
     "translation": "Make the broker's service plans only visible within the targeted space"
   },
