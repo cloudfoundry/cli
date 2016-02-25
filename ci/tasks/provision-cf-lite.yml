@@ -18,7 +18,6 @@ params:
 
 inputs:
   - name: ci
-  - name: cli
   - name: bosh-lite
   - name: cf-release
 
