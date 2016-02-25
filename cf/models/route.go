@@ -11,6 +11,7 @@ type Route struct {
 	Host   string
 	Domain DomainFields
 	Path   string
+	Port   int
 
 	Space           SpaceFields
 	Apps            []ApplicationFields
