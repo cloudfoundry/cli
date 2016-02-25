@@ -1,0 +1,82 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-vagrant-ci
+
+params:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+  AWS_REGION: us-east-1
+  AWS_SUBNET_ID:
+  AWS_SECURITY_GROUP:
+  LITE_NAME:
+  LITE_PRIVATE_IP_ADDRESS:
+  LITE_HOSTNAME:
+  LITE_PRIVATE_KEY_PATH:
+  LITE_INSTANCE_TYPE: m3.2xlarge
+  LITE_KEYPAIR:
+
+inputs:
+  - name: ci
+  - name: cli
+  - name: bosh-lite
+  - name: cf-release
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    export AWS_DEFAULT_REGION="${AWS_REGION}"
+    export BOSH_AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
+    export BOSH_AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
+    export BOSH_LITE_SUBNET_ID="${AWS_SUBNET_ID}"
+    export BOSH_LITE_SECURITY_GROUP="${AWS_SECURITY_GROUP}"
+    export BOSH_LITE_KEYPAIR="${LITE_KEYPAIR}"
+    export BOSH_LITE_PRIVATE_KEY=$PWD/"${LITE_PRIVATE_KEY_PATH}"
+    export BOSH_LITE_NAME="${LITE_NAME}"
+    export BOSH_LITE_INSTANCE_TYPE="${LITE_INSTANCE_TYPE}"
+    export VAGRANT_DOTFILE_PATH=$PWD/ci/concourse/lite/${LITE_NAME}/vagrant
+
+    git config --global user.email "ci@localhost"
+    git config --global user.name "CI Bot"
+
+    function commit_vagrant_artifacts() {
+      cd $root/ci
+
+      if [ -n "$(git status --porcelain)" ]; then
+        git add -A
+        git commit -m "provisioned"
+      fi
+    }
+
+    mkdir scratch
+
+    pushd scratch
+      if [ -d "$VAGRANT_DOTFILE_PATH" ]; then
+        vagrant destroy -f
+      fi
+
+      vagrant init cloudfoundry/bosh-lite
+
+      sed -i -e "s/do |config|/do |config|\n  config.vm.provider 'aws' do |aws|\n    aws.private_ip_address = '${LITE_PRIVATE_IP_ADDRESS}'\n  end/" \
+        Vagrantfile
+
+      vagrant up --provider aws
+    popd
+
+    trap commit_vagrant_artifacts EXIT
+
+    sed -i -e "s/bosh-lite-ip-${LITE_NAME}: \(.*\)/bosh-lite-ip-${LITE_NAME}: ${DIRECTOR_IP}/" \
+      ci/concourse/credentials.yml
+
+    pushd cf-release
+      sed -i -e "s/^properties:/properties:\n  domain: ${LITE_HOSTNAME}/" \
+        bosh-lite/stubs/property_overrides.yml
+    popd
+
+    cd bosh-lite
+
+    ./bin/provision_cf
