@@ -191,8 +191,10 @@ var _ = Describe("MapRoute", func() {
 			Expect(ok).To(BeTrue())
 
 			Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
-			_, path, domain, space := fakeRouteCreator.CreateRouteArgsForCall(0)
+			host, path, port, domain, space := fakeRouteCreator.CreateRouteArgsForCall(0)
+			Expect(host).To(Equal(""))
 			Expect(path).To(Equal(""))
+			Expect(port).To(Equal(0))
 			Expect(domain).To(Equal(fakeDomain))
 			Expect(space).To(Equal(models.SpaceFields{
 				Name: "my-space",
@@ -279,7 +281,7 @@ var _ = Describe("MapRoute", func() {
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
-				hostName, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
+				hostName, _, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
 				Expect(hostName).To(Equal("the-hostname"))
 			})
 		})
@@ -297,7 +299,7 @@ var _ = Describe("MapRoute", func() {
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
-				hostName, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
+				hostName, _, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
 				Expect(hostName).To(Equal(""))
 			})
 		})
@@ -315,7 +317,7 @@ var _ = Describe("MapRoute", func() {
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
-				_, path, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
+				_, path, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
 				Expect(path).To(Equal("the-path"))
 			})
 		})

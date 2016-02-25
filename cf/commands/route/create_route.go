@@ -14,7 +14,7 @@ import (
 
 //go:generate counterfeiter -o fakes/fake_route_creator.go . RouteCreator
 type RouteCreator interface {
-	CreateRoute(hostName, path string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
+	CreateRoute(hostName string, path string, port int, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
 }
 
 type CreateRoute struct {
