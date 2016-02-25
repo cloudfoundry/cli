@@ -226,76 +226,152 @@ var _ = Describe("route repository", func() {
 	})
 
 	Describe("Create routes", func() {
-		It("creates routes in a given space", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-						{
-							"metadata": { "guid": "my-route-guid" },
-							"entity": { "host": "my-cool-app" }
-						}
-					`},
-				}),
-			})
-			configRepo.SetApiEndpoint(ts.URL)
-
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "", "my-domain-guid", "my-space-guid")
-
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
+		var ccServer *ghttp.Server
+		BeforeEach(func() {
+			ccServer = ghttp.NewServer()
+			configRepo.SetApiEndpoint(ccServer.URL())
 		})
 
-		It("creates routes with a path in a given space", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"/this-is-a-path","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-						{
-							"metadata": { "guid": "my-route-guid" },
-							"entity": { "host": "my-cool-app", "path": "/this-is-a-path" }
-						}
-					`},
-				}),
-			})
-			configRepo.SetApiEndpoint(ts.URL)
-
-			createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "this-is-a-path", "my-domain-guid", "my-space-guid")
-
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
-			Expect(createdRoute.Path).To(Equal("/this-is-a-path"))
+		AfterEach(func() {
+			ccServer.Close()
 		})
 
-		It("creates routes", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","path":"/the-path","domain_guid":"my-domain-guid","space_guid":"the-space-guid"}`),
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-						{
-							"metadata": { "guid": "my-route-guid" },
-							"entity": { "host": "my-cool-app" }
-						}
-					`},
-				}),
+		Context("when no host, path, or port are given", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/v2/routes", "inline-relations-depth=1&async=true"),
+						ghttp.VerifyJSON(`
+							{
+								"domain_guid":"my-domain-guid",
+								"space_guid":"my-space-guid"
+							}
+						`),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+					),
+				)
 			})
-			configRepo.SetApiEndpoint(ts.URL)
 
-			createdRoute, apiErr := repo.Create("my-cool-app", models.DomainFields{Guid: "my-domain-guid"}, "the-path")
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
+			It("tries to create a route", func() {
+				repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid")
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
 
-			Expect(createdRoute.Guid).To(Equal("my-route-guid"))
+			Context("when creating the route succeeds", func() {
+				BeforeEach(func() {
+					h := ccServer.GetHandler(0)
+					ccServer.SetHandler(0, ghttp.CombineHandlers(
+						h,
+						ghttp.RespondWith(http.StatusCreated, `
+								{
+									"metadata": { "guid": "my-route-guid" },
+									"entity": { "host": "my-cool-app" }
+								}
+							`),
+					))
+				})
+
+				It("returns the created route", func() {
+					createdRoute, err := repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(createdRoute.Guid).To(Equal("my-route-guid"))
+				})
+			})
 		})
 
+		Context("when a host is given", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/v2/routes", "inline-relations-depth=1&async=true"),
+						ghttp.VerifyJSON(`
+							{
+								"host":"the-host",
+								"domain_guid":"my-domain-guid",
+								"space_guid":"my-space-guid"
+							}
+						`),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+					),
+				)
+			})
+
+			It("tries to create a route", func() {
+				repo.CreateInSpace("the-host", "", "my-domain-guid", "my-space-guid")
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			Context("when creating the route succeeds", func() {
+				BeforeEach(func() {
+					h := ccServer.GetHandler(0)
+					ccServer.SetHandler(0, ghttp.CombineHandlers(
+						h,
+						ghttp.RespondWith(http.StatusCreated, `
+								{
+									"metadata": { "guid": "my-route-guid" },
+									"entity": { "host": "the-host" }
+								}
+							`),
+					))
+				})
+
+				It("returns the created route", func() {
+					createdRoute, err := repo.CreateInSpace("the-host", "", "my-domain-guid", "my-space-guid")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(createdRoute.Host).To(Equal("the-host"))
+				})
+			})
+		})
+
+		Context("when a path is given", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/v2/routes", "inline-relations-depth=1&async=true"),
+						ghttp.VerifyJSON(`
+							{
+								"domain_guid":"my-domain-guid",
+								"space_guid":"my-space-guid",
+								"path":"/the-path"
+							}
+						`),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+					),
+				)
+			})
+
+			It("tries to create a route", func() {
+				repo.CreateInSpace("", "the-path", "my-domain-guid", "my-space-guid")
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			Context("when creating the route succeeds", func() {
+				BeforeEach(func() {
+					h := ccServer.GetHandler(0)
+					ccServer.SetHandler(0, ghttp.CombineHandlers(
+						h,
+						ghttp.RespondWith(http.StatusCreated, `
+								{
+									"metadata": { "guid": "my-route-guid" },
+									"entity": { "path": "the-path" }
+								}
+							`),
+					))
+				})
+
+				It("returns the created route", func() {
+					createdRoute, err := repo.CreateInSpace("", "the-path", "my-domain-guid", "my-space-guid")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(createdRoute.Path).To(Equal("the-path"))
+				})
+			})
+		})
 	})
 
 	Describe("Check routes", func() {

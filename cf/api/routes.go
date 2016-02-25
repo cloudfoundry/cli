@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -129,19 +131,33 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 	return true, nil
 }
 
-func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error) {
+func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (models.Route, error) {
 	path = normalizedPath(path)
 
-	data := fmt.Sprintf(`{"host":"%s","path":"%s","domain_guid":"%s","space_guid":"%s"}`, host, path, domainGuid, spaceGuid)
+	body := struct {
+		Host       string `json:"host,omitempty"`
+		Path       string `json:"path,omitempty"`
+		DomainGuid string `json:"domain_guid"`
+		SpaceGuid  string `json:"space_guid"`
+	}{host, path, domainGuid, spaceGuid}
 
-	resource := new(resources.RouteResource)
-	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/routes?inline-relations-depth=1", strings.NewReader(data), resource)
-	if apiErr != nil {
-		return
+	data, err := json.Marshal(body)
+	if err != nil {
+		return models.Route{}, err
 	}
 
-	createdRoute = resource.ToModel()
-	return
+	resource := new(resources.RouteResource)
+	err = repo.gateway.CreateResource(
+		repo.config.ApiEndpoint(),
+		"/v2/routes?inline-relations-depth=1",
+		bytes.NewReader(data),
+		resource,
+	)
+	if err != nil {
+		return models.Route{}, err
+	}
+
+	return resource.ToModel(), nil
 }
 
 func (repo CloudControllerRouteRepository) Bind(routeGuid, appGuid string) (apiErr error) {
