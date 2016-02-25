@@ -26,7 +26,7 @@ resources:
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
     ignore_paths:
-    - ci/**/*
+    - ci
 
 - name: final-cli
   type: git
@@ -50,7 +50,7 @@ resources:
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
     paths:
-    - ci/**/*
+    - ci
 
 - name: cli-acceptance-tests
   type: git
