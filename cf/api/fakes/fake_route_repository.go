@@ -58,13 +58,14 @@ type FakeRouteRepository struct {
 		result1 bool
 		result2 error
 	}
-	CreateInSpaceStub        func(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
+	CreateInSpaceStub        func(host, path, domainGuid, spaceGuid string, port int) (createdRoute models.Route, apiErr error)
 	createInSpaceMutex       sync.RWMutex
 	createInSpaceArgsForCall []struct {
 		host       string
 		path       string
 		domainGuid string
 		spaceGuid  string
+		port       int
 	}
 	createInSpaceReturns struct {
 		result1 models.Route
@@ -267,17 +268,18 @@ func (fake *FakeRouteRepository) CheckIfExistsReturns(result1 bool, result2 erro
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) CreateInSpace(host string, path string, domainGuid string, spaceGuid string) (createdRoute models.Route, apiErr error) {
+func (fake *FakeRouteRepository) CreateInSpace(host string, path string, domainGuid string, spaceGuid string, port int) (createdRoute models.Route, apiErr error) {
 	fake.createInSpaceMutex.Lock()
 	fake.createInSpaceArgsForCall = append(fake.createInSpaceArgsForCall, struct {
 		host       string
 		path       string
 		domainGuid string
 		spaceGuid  string
-	}{host, path, domainGuid, spaceGuid})
+		port       int
+	}{host, path, domainGuid, spaceGuid, port})
 	fake.createInSpaceMutex.Unlock()
 	if fake.CreateInSpaceStub != nil {
-		return fake.CreateInSpaceStub(host, path, domainGuid, spaceGuid)
+		return fake.CreateInSpaceStub(host, path, domainGuid, spaceGuid, port)
 	} else {
 		return fake.createInSpaceReturns.result1, fake.createInSpaceReturns.result2
 	}
@@ -289,10 +291,10 @@ func (fake *FakeRouteRepository) CreateInSpaceCallCount() int {
 	return len(fake.createInSpaceArgsForCall)
 }
 
-func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string, int) {
 	fake.createInSpaceMutex.RLock()
 	defer fake.createInSpaceMutex.RUnlock()
-	return fake.createInSpaceArgsForCall[i].host, fake.createInSpaceArgsForCall[i].path, fake.createInSpaceArgsForCall[i].domainGuid, fake.createInSpaceArgsForCall[i].spaceGuid
+	return fake.createInSpaceArgsForCall[i].host, fake.createInSpaceArgsForCall[i].path, fake.createInSpaceArgsForCall[i].domainGuid, fake.createInSpaceArgsForCall[i].spaceGuid, fake.createInSpaceArgsForCall[i].port
 }
 
 func (fake *FakeRouteRepository) CreateInSpaceReturns(result1 models.Route, result2 error) {

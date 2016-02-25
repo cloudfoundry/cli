@@ -21,7 +21,7 @@ type RouteRepository interface {
 	Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error)
 	Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error)
-	CreateInSpace(host, path, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
+	CreateInSpace(host, path, domainGuid, spaceGuid string, port int) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
 	Unbind(routeGuid, appGuid string) (apiErr error)
 	Delete(routeGuid string) (apiErr error)
@@ -101,7 +101,8 @@ func (repo CloudControllerRouteRepository) Find(host string, domain models.Domai
 }
 
 func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error) {
-	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid)
+	var port int
+	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid, port)
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {
@@ -131,15 +132,16 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 	return true, nil
 }
 
-func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string) (models.Route, error) {
+func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string, port int) (models.Route, error) {
 	path = normalizedPath(path)
 
 	body := struct {
 		Host       string `json:"host,omitempty"`
 		Path       string `json:"path,omitempty"`
+		Port       int    `json:"port,omitempty"`
 		DomainGuid string `json:"domain_guid"`
 		SpaceGuid  string `json:"space_guid"`
-	}{host, path, domainGuid, spaceGuid}
+	}{host, path, port, domainGuid, spaceGuid}
 
 	data, err := json.Marshal(body)
 	if err != nil {
