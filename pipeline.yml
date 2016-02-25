@@ -25,7 +25,8 @@ resources:
     uri: git@github.com:cloudfoundry/cli
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
-    ignore_paths: ci/*
+    ignore_paths:
+    - ci/**/*
 
 - name: final-cli
   type: git
@@ -48,7 +49,8 @@ resources:
     uri: git@github.com:cloudfoundry/cli
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
-    paths: ci/*
+    paths:
+    - ci/**/*
 
 - name: cli-acceptance-tests
   type: git
