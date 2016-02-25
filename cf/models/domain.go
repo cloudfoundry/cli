@@ -5,6 +5,7 @@ type DomainFields struct {
 	Name                   string
 	OwningOrganizationGuid string
 	RouterGroupGuid        string
+	RouterGroupTypes       []string
 	Shared                 bool
 }
 

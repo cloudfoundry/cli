@@ -2656,10 +2656,6 @@
     "translation": "内存限制 {{.Memory}} 无效\n{{.ErrorDescription}}"
   },
   {
-    "id": "Invalid router group guid: {{.Guid}}",
-    "translation": ""
-  },
-  {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
     "translation": "timeout 参数 {{.Timeout}} 无效\n{{.Err}}"
   },

@@ -656,10 +656,6 @@
     "translation": "Install CLI plugin"
   },
   {
-    "id": "Invalid router group guid: {{.Guid}}",
-    "translation": "Invalid router group guid: {{.Guid}}"
-  },
-  {
     "id": "List all available plugins in specified repository or in all added repositories",
     "translation": "List all available plugins in specified repository or in all added repositories"
   },
