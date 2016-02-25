@@ -229,7 +229,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		BeforeEach(func() {
 			uaaServer = ghttp.NewServer()
 			config = testconfig.NewRepository()
-			config.SetAuthenticationEndpoint(uaaServer.URL())
+			config.SetUaaEndpoint(uaaServer.URL())
 			config.SetSSHOAuthClient("ssh-oauth-client")
 
 			gateway = net.NewUAAGateway(config, &testterm.FakeUI{})
@@ -266,7 +266,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		Context("when the authentication endpoint is malformed", func() {
 			BeforeEach(func() {
-				config.SetAuthenticationEndpoint(":not-well-formed")
+				config.SetUaaEndpoint(":not-well-formed")
 			})
 
 			It("returns an error", func() {
@@ -289,7 +289,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		Context("when the authorization server does not return a redirect", func() {
 			BeforeEach(func() {
-				config.SetAuthenticationEndpoint("https://127.0.0.1:1")
+				config.SetUaaEndpoint("https://127.0.0.1:1")
 			})
 
 			It("returns an error", func() {

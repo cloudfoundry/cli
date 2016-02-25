@@ -1796,6 +1796,10 @@
     "translation": "ポートの転送時にエラーが発生しました: "
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "SSH 情報の取得時にエラーが発生しました:"
   },

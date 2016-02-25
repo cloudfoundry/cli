@@ -1796,6 +1796,10 @@
     "translation": "Erro de encaminhamento da porta: "
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "Erro ao obter informações de SSH:"
   },

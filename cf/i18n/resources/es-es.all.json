@@ -1796,6 +1796,10 @@
     "translation": "Error al reenviar el puerto: "
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "Error al obtener la información de SSH:"
   },
