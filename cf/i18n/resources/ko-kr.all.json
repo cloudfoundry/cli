@@ -3260,10 +3260,6 @@
     "translation": "버전 인쇄"
   },
   {
-    "id": "Print the version of Go the CLI was built against",
-    "translation": "CLI를 빌드하는 데 대응된 Go의 버전 인쇄"
-  },
-  {
     "id": "Problem removing downloaded binary in temp directory: ",
     "translation": "임시 디렉토리에서 다운로드된 2진 제거 중에 문제 발생: "
   },

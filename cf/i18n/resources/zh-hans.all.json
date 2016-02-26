@@ -3260,10 +3260,6 @@
     "translation": "打印版本"
   },
   {
-    "id": "Print the version of Go the CLI was built against",
-    "translation": "打印 CLI 构建时所依据的 Go 版本"
-  },
-  {
     "id": "Problem removing downloaded binary in temp directory: ",
     "translation": "除去临时目录中下载的二进制文件时发生问题："
   },

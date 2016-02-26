@@ -3260,10 +3260,6 @@
     "translation": "Print the version"
   },
   {
-    "id": "Print the version of Go the CLI was built against",
-    "translation": "Print the version of Go the CLI was built against"
-  },
-  {
     "id": "Problem removing downloaded binary in temp directory: ",
     "translation": "Problem removing downloaded binary in temp directory: "
   },
