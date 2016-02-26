@@ -2608,6 +2608,10 @@
     "translation": "{{.URL}}에 올바르지 않은 SSL 인증서\n{{.TipMessage}}"
   },
   {
+    "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
+    "translation": ""
+  },
+  {
     "id": "Invalid async response from server",
     "translation": "서버에서 올바르지 않은 비동기 응답"
   },
@@ -4494,6 +4498,10 @@
   {
     "id": "app crashed",
     "translation": "앱 충돌"
+  },
+  {
+    "id": "app ports",
+    "translation": ""
   },
   {
     "id": "apps",

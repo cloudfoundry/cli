@@ -596,6 +596,10 @@
     "translation": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n"
   },
   {
+    "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
+    "translation": "Invalid app port: {{.AppPort}}\nApp port must be a number"
+  },
+  {
     "id": "Make the broker's service plans only visible within the targeted space",
     "translation": "Make the broker's service plans only visible within the targeted space"
   },
@@ -686,6 +690,10 @@
   {
     "id": "[PRIVATE DATA HIDDEN]",
     "translation": "[PRIVATE DATA HIDDEN]"
+  },
+  {
+    "id": "app ports",
+    "translation": "app ports"
   },
   {
     "id": "path",

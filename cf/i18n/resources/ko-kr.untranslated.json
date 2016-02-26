@@ -656,6 +656,10 @@
     "translation": "Install CLI plugin"
   },
   {
+    "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
+    "translation": "Invalid app port: {{.AppPort}}\nApp port must be a number"
+  },
+  {
     "id": "List all available plugins in specified repository or in all added repositories",
     "translation": "List all available plugins in specified repository or in all added repositories"
   },
@@ -770,6 +774,10 @@
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
     "translation": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."
+  },
+  {
+    "id": "app ports",
+    "translation": "app ports"
   },
   {
     "id": "path",

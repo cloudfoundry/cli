@@ -70,6 +70,7 @@ type ApplicationFields struct {
 	DetectedBuildpack    string
 	DockerImage          string
 	EnableSsh            bool
+	AppPorts             []int
 }
 
 type AppParams struct {

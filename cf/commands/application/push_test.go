@@ -535,6 +535,12 @@ var _ = Describe("Push Command", func() {
 				Expect(starter.ApplicationStartCallCount()).To(Equal(0))
 			})
 
+			It("fails when an invalid app port is provided", func() {
+				callPush("--app-ports", "8080,abc", "app-name")
+				Expect(ui.Outputs).To(ContainElement("Invalid app port: abc"))
+				Expect(ui.Outputs).To(ContainElement("App port must be a number"))
+			})
+
 			Context("when pushing a docker image with --docker-image or -o", func() {
 				It("sets diego to true", func() {
 					callPush("testApp", "--docker-image", "sample/dockerImage")

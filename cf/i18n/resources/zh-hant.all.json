@@ -2608,6 +2608,10 @@
     "translation": "{{.URL}} 的 SSL 憑證無效\n{{.TipMessage}}"
   },
   {
+    "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
+    "translation": ""
+  },
+  {
     "id": "Invalid async response from server",
     "translation": "來自伺服器的非同步回應無效"
   },
@@ -4494,6 +4498,10 @@
   {
     "id": "app crashed",
     "translation": "應用程式毀損"
+  },
+  {
+    "id": "app ports",
+    "translation": ""
   },
   {
     "id": "apps",
