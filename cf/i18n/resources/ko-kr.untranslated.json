@@ -568,6 +568,10 @@
     "translation": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications"
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": "Error getting SSH code: "
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "Error getting the redirected location: {{.Error}}"
   },

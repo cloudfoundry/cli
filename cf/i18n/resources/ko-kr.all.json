@@ -1808,6 +1808,10 @@
     "translation": "포트 전달 중에 오류 발생: "
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "SSH 정보를 가져오는 중에 오류 발생:"
   },

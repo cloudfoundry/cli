@@ -126,11 +126,37 @@ var _ = Describe("OneTimeSSHCode", func() {
 					authRepo.RefreshAuthTokenReturns("auth-token", nil)
 				})
 
-				It("displays the token", func() {
+				It("tries to get the ssh-code", func() {
 					cmd.Execute(flagContext)
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"auth-token"},
-					))
+					Expect(authRepo.AuthorizeCallCount()).To(Equal(1))
+					Expect(authRepo.AuthorizeArgsForCall(0)).To(Equal("auth-token"))
+				})
+
+				Context("when getting the ssh-code succeeds", func() {
+					BeforeEach(func() {
+						authRepo.AuthorizeReturns("some-code", nil)
+					})
+
+					It("displays the token", func() {
+						cmd.Execute(flagContext)
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"some-code"},
+						))
+					})
+				})
+
+				Context("when getting the ssh-code fails", func() {
+					BeforeEach(func() {
+						authRepo.AuthorizeReturns("", errors.New("auth-err"))
+					})
+
+					It("fails with error", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Error getting SSH code: auth-err"},
+						))
+					})
 				})
 			})
 		})

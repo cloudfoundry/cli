@@ -1808,6 +1808,10 @@
     "translation": "转发以下端口时出错："
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "获取 SSH 信息时出错："
   },

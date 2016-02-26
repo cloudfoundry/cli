@@ -1,3 +1,7 @@
+## 6.16.1
+* Bump version to 6.16.1
+* ssh-code returns an SSH code instead of auth token
+
 ## 6.16.0
 * Bump version to 6.16.0
 * Remove 'type' column from domains output

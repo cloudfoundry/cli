@@ -1808,6 +1808,10 @@
     "translation": "Fehler beim Weiterleiten von Port: "
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "Fehler beim Abrufen der SSH-Info: "
   },
