@@ -4172,7 +4172,7 @@
     "translation": "Annuler la liaison d'un groupe de sécurité depuis l'ensemble de groupes de sécurité pour la constitution d'applications "
   },
   {
-    "id": "Unbind a service instance from a route",
+    "id": "Unbind a service instance from an HTTP route",
     "translation": ""
   },
   {

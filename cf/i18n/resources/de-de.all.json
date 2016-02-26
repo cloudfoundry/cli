@@ -4172,7 +4172,7 @@
     "translation": "Bindung einer Sicherheitsgruppe von der Menge der Sicherheitsgruppen für Staging-Anwendungen aufheben"
   },
   {
-    "id": "Unbind a service instance from a route",
+    "id": "Unbind a service instance from an HTTP route",
     "translation": ""
   },
   {

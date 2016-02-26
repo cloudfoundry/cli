@@ -4172,7 +4172,7 @@
     "translation": "Annulla il bind di un gruppo di sicurezza dalla serie di gruppi di sicurezza per le applicazioni in fase di preparazione"
   },
   {
-    "id": "Unbind a service instance from a route",
+    "id": "Unbind a service instance from an HTTP route",
     "translation": ""
   },
   {

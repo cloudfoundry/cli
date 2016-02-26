@@ -4172,7 +4172,7 @@
     "translation": "Desenlazar un grupo de seguridad desde el conjunto de grupos de seguridad para transferir aplicaciones"
   },
   {
-    "id": "Unbind a service instance from a route",
+    "id": "Unbind a service instance from an HTTP route",
     "translation": ""
   },
   {

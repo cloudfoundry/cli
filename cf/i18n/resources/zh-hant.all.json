@@ -4172,7 +4172,7 @@
     "translation": "取消安全群組與用於編譯打包應用程式之安全群組集的連結"
   },
   {
-    "id": "Unbind a service instance from a route",
+    "id": "Unbind a service instance from an HTTP route",
     "translation": ""
   },
   {
