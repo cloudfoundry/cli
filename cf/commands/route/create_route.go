@@ -14,7 +14,7 @@ import (
 
 //go:generate counterfeiter -o fakes/fake_route_creator.go . RouteCreator
 type RouteCreator interface {
-	CreateRoute(hostName string, path string, port int, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
+	CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
 }
 
 type CreateRoute struct {
@@ -34,11 +34,12 @@ func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the HTTP route (required for shared domains)")}
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the HTTP route")}
 	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port for the TCP route")}
+	fs["random-port"] = &flags.BoolFlag{Name: "random-port", Usage: T("Create a random port for the TCP route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-route",
 		Description: T("Create a url route in a space for later use"),
-		Usage: T(`CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT]
+		Usage: T(`CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT] [--random-port]
 
 EXAMPLES:
    CF_NAME create-route my-space example.com                             # example.com
@@ -56,6 +57,10 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 
 	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
 		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+	}
+
+	if fc.IsSet("random-port") && (fc.IsSet("port") || fc.IsSet("hostname") || fc.IsSet("path")) {
+		cmd.ui.Failed(T("Cannot specify random-port together with port, hostname and/or path."))
 	}
 
 	domainName := fc.Args()[1]
@@ -88,6 +93,15 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", requiredVersion))
 	}
 
+	if fc.IsSet("random-port") {
+		requiredVersion, err := semver.Make("2.51.0")
+		if err != nil {
+			panic(err.Error())
+		}
+
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--random-port'", requiredVersion))
+	}
+
 	return reqs, nil
 }
 
@@ -104,16 +118,16 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	domain := cmd.domainReq.GetDomain()
 	path := c.String("path")
 	port := c.Int("port")
+	randomPort := c.Bool("random-port")
 
-	_, apiErr := cmd.CreateRoute(hostName, path, port, domain, space.SpaceFields)
+	_, err := cmd.CreateRoute(hostName, path, port, randomPort, domain, space.SpaceFields)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {
+func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {
 	cmd.ui.Say(T("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"URL":       terminal.EntityNameColor(domain.UrlForHostAndPath(hostName, path)),
@@ -121,7 +135,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, doma
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.Guid, space.Guid, port)
+	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.Guid, space.Guid, port, randomPort)
 	if err != nil {
 		var findErr error
 		route, findErr = cmd.routeRepo.Find(hostName, domain, path)

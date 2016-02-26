@@ -58,7 +58,7 @@ type FakeRouteRepository struct {
 		result1 bool
 		result2 error
 	}
-	CreateInSpaceStub        func(host, path, domainGuid, spaceGuid string, port int) (createdRoute models.Route, apiErr error)
+	CreateInSpaceStub        func(host, path, domainGuid, spaceGuid string, port int, randomPort bool) (createdRoute models.Route, apiErr error)
 	createInSpaceMutex       sync.RWMutex
 	createInSpaceArgsForCall []struct {
 		host       string
@@ -66,6 +66,7 @@ type FakeRouteRepository struct {
 		domainGuid string
 		spaceGuid  string
 		port       int
+		randomPort bool
 	}
 	createInSpaceReturns struct {
 		result1 models.Route
@@ -268,7 +269,7 @@ func (fake *FakeRouteRepository) CheckIfExistsReturns(result1 bool, result2 erro
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) CreateInSpace(host string, path string, domainGuid string, spaceGuid string, port int) (createdRoute models.Route, apiErr error) {
+func (fake *FakeRouteRepository) CreateInSpace(host string, path string, domainGuid string, spaceGuid string, port int, randomPort bool) (createdRoute models.Route, apiErr error) {
 	fake.createInSpaceMutex.Lock()
 	fake.createInSpaceArgsForCall = append(fake.createInSpaceArgsForCall, struct {
 		host       string
@@ -276,10 +277,11 @@ func (fake *FakeRouteRepository) CreateInSpace(host string, path string, domainG
 		domainGuid string
 		spaceGuid  string
 		port       int
-	}{host, path, domainGuid, spaceGuid, port})
+		randomPort bool
+	}{host, path, domainGuid, spaceGuid, port, randomPort})
 	fake.createInSpaceMutex.Unlock()
 	if fake.CreateInSpaceStub != nil {
-		return fake.CreateInSpaceStub(host, path, domainGuid, spaceGuid, port)
+		return fake.CreateInSpaceStub(host, path, domainGuid, spaceGuid, port, randomPort)
 	} else {
 		return fake.createInSpaceReturns.result1, fake.createInSpaceReturns.result2
 	}
@@ -291,10 +293,10 @@ func (fake *FakeRouteRepository) CreateInSpaceCallCount() int {
 	return len(fake.createInSpaceArgsForCall)
 }
 
-func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string, int) {
+func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string, int, bool) {
 	fake.createInSpaceMutex.RLock()
 	defer fake.createInSpaceMutex.RUnlock()
-	return fake.createInSpaceArgsForCall[i].host, fake.createInSpaceArgsForCall[i].path, fake.createInSpaceArgsForCall[i].domainGuid, fake.createInSpaceArgsForCall[i].spaceGuid, fake.createInSpaceArgsForCall[i].port
+	return fake.createInSpaceArgsForCall[i].host, fake.createInSpaceArgsForCall[i].path, fake.createInSpaceArgsForCall[i].domainGuid, fake.createInSpaceArgsForCall[i].spaceGuid, fake.createInSpaceArgsForCall[i].port, fake.createInSpaceArgsForCall[i].randomPort
 }
 
 func (fake *FakeRouteRepository) CreateInSpaceReturns(result1 models.Route, result2 error) {
