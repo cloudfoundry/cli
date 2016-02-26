@@ -428,7 +428,7 @@
     "translation": "스테이징 애플리케이션에 사용할 보안 그룹의 목록에 보안 그룹 바인드"
   },
   {
-    "id": "Bind a service instance to a route",
+    "id": "Bind a service instance to an HTTP route",
     "translation": ""
   },
   {

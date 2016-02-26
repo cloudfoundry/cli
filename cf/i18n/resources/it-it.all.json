@@ -428,7 +428,7 @@
     "translation": "Esegui il bind di un gruppo di sicurezza all'elenco di gruppi di sicurezza da utilizzare per le applicazioni in fase di preparazione"
   },
   {
-    "id": "Bind a service instance to a route",
+    "id": "Bind a service instance to an HTTP route",
     "translation": ""
   },
   {

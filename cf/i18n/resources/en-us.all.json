@@ -428,8 +428,8 @@
     "translation": "Bind a security group to the list of security groups to be used for staging applications"
   },
   {
-    "id": "Bind a service instance to a route",
-    "translation": "Bind a service instance to a route"
+    "id": "Bind a service instance to an HTTP route",
+    "translation": "Bind a service instance to an HTTP route"
   },
   {
     "id": "Bind a service instance to an app",

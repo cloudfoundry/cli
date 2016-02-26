@@ -428,7 +428,7 @@
     "translation": "Lier un groupe de sécurité à la liste de groupes de sécurité à utiliser pour la constitution d'applications "
   },
   {
-    "id": "Bind a service instance to a route",
+    "id": "Bind a service instance to an HTTP route",
     "translation": ""
   },
   {
