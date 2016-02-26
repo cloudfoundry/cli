@@ -556,7 +556,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000",
+    "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT] [--random-port]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000",
     "translation": ""
   },
   {
@@ -1076,6 +1076,10 @@
     "translation": ""
   },
   {
+    "id": "Cannot specify random-port together with port, hostname and/or path.",
+    "translation": ""
+  },
+  {
     "id": "Change or view the instance count, disk space limit, and memory limit for an app",
     "translation": "Den Instanzzähler, den Grenzwert für den Plattenspeicher und die Speicherbegrenzung für eine App ändern oder anzeigen"
   },
@@ -1214,6 +1218,10 @@
   {
     "id": "Create a new user",
     "translation": "Neuen Benutzer erstellen"
+  },
+  {
+    "id": "Create a random port for the TCP route",
+    "translation": ""
   },
   {
     "id": "Create a random route for this app",
