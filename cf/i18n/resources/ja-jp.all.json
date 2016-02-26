@@ -3260,10 +3260,6 @@
     "translation": "バージョンを出力します"
   },
   {
-    "id": "Print the version of Go the CLI was built against",
-    "translation": "CLI の作成に使用された Go のバージョンを出力します"
-  },
-  {
     "id": "Problem removing downloaded binary in temp directory: ",
     "translation": "一時ディレクトリー内のダウンロード済みバイナリーを削除しようとしたとき問題が発生しました: "
   },
