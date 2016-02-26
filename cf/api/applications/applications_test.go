@@ -18,6 +18,7 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("ApplicationsRepository", func() {
@@ -87,42 +88,110 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 	})
 
-	Describe("creating applications", func() {
-		It("makes the right request", func() {
-			ts, handler, repo := createAppRepo([]testnet.TestRequest{createApplicationRequest})
-			defer ts.Close()
+	Describe("Create", func() {
+		var (
+			ccServer  *ghttp.Server
+			repo      CloudControllerApplicationRepository
+			appParams models.AppParams
+		)
 
-			params := defaultAppParams()
-			createdApp, apiErr := repo.Create(params)
+		BeforeEach(func() {
+			ccServer = ghttp.NewServer()
+			configRepo := testconfig.NewRepositoryWithDefaults()
+			configRepo.SetApiEndpoint(ccServer.URL())
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+			repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
+			name := "my-cool-app"
+			buildpackUrl := "buildpack-url"
+			spaceGuid := "some-space-guid"
+			stackGuid := "some-stack-guid"
+			command := "some-command"
+			memory := int64(2048)
+			diskQuota := int64(512)
+			instanceCount := 3
 
-			app := models.Application{}
-			app.Name = "my-cool-app"
-			app.Guid = "my-cool-app-guid"
-			Expect(createdApp).To(Equal(app))
+			appParams = models.AppParams{
+				Name:          &name,
+				BuildpackUrl:  &buildpackUrl,
+				SpaceGuid:     &spaceGuid,
+				StackGuid:     &stackGuid,
+				Command:       &command,
+				Memory:        &memory,
+				DiskQuota:     &diskQuota,
+				InstanceCount: &instanceCount,
+			}
+
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/v2/apps"),
+					ghttp.VerifyJSON(`{
+						"name":"my-cool-app",
+						"instances":3,
+						"buildpack":"buildpack-url",
+						"memory":2048,
+						"disk_quota": 512,
+						"space_guid":"some-space-guid",
+						"stack_guid":"some-stack-guid",
+						"command":"some-command"
+					}`),
+				),
+			)
 		})
 
-		It("omits fields that are not set", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "POST",
-				Path:     "/v2/apps",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"memory":2048,"disk_quota":512,"space_guid":"some-space-guid"}`),
-				Response: testnet.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
+		AfterEach(func() {
+			ccServer.Close()
+		})
+
+		It("tries to create the app", func() {
+			repo.Create(appParams)
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+		})
+
+		Context("when the create succeeds", func() {
+			BeforeEach(func() {
+				h := ccServer.GetHandler(0)
+				ccServer.SetHandler(0,
+					ghttp.CombineHandlers(
+						h,
+						ghttp.RespondWith(http.StatusCreated, `{
+							"metadata": {
+									"guid": "my-cool-app-guid"
+							},
+							"entity": {
+									"name": "my-cool-app"
+							}
+					}`),
+					),
+				)
 			})
 
-			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
-			defer ts.Close()
+			It("returns the application", func() {
+				createdApp, err := repo.Create(appParams)
+				Expect(err).NotTo(HaveOccurred())
 
-			params := defaultAppParams()
-			params.BuildpackUrl = nil
-			params.StackGuid = nil
-			params.Command = nil
+				app := models.Application{}
+				app.Name = "my-cool-app"
+				app.Guid = "my-cool-app-guid"
+				Expect(createdApp).To(Equal(app))
+			})
+		})
 
-			_, apiErr := repo.Create(params)
-			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
+		Context("when the create fails", func() {
+			BeforeEach(func() {
+				h := ccServer.GetHandler(0)
+				ccServer.SetHandler(0,
+					ghttp.CombineHandlers(
+						h,
+						ghttp.RespondWith(http.StatusInternalServerError, ""),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				_, err := repo.Create(appParams)
+				Expect(err).To(HaveOccurred())
+			})
 		})
 	})
 
