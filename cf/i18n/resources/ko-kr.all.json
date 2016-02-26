@@ -4172,7 +4172,7 @@
     "translation": "스테이징 애플리케이션의 보안 그룹 세트에서 보안 그룹 바인드 해제"
   },
   {
-    "id": "Unbind a service instance from a route",
+    "id": "Unbind a service instance from an HTTP route",
     "translation": ""
   },
   {

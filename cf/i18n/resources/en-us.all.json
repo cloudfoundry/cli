@@ -4172,8 +4172,8 @@
     "translation": "Unbind a security group from the set of security groups for staging applications"
   },
   {
-    "id": "Unbind a service instance from a route",
-    "translation": "Unbind a service instance from a route"
+    "id": "Unbind a service instance from an HTTP route",
+    "translation": "Unbind a service instance from an HTTP route"
   },
   {
     "id": "Unbind a service instance from an app",

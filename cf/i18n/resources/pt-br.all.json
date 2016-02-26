@@ -4172,7 +4172,7 @@
     "translation": "Desvincular um grupo de segurança do conjunto de grupos de segurança para aplicativos temporários"
   },
   {
-    "id": "Unbind a service instance from a route",
+    "id": "Unbind a service instance from an HTTP route",
     "translation": ""
   },
   {

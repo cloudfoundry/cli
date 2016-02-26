@@ -4172,8 +4172,8 @@
     "translation": "ステージング・アプリケーションのセキュリティー・グループのセットからセキュリティー・グループをアンバインドします"
   },
   {
-    "id": "Unbind a service instance from a route",
-    "translation": "経路からサービス・インスタンスをアンバインドします"
+    "id": "Unbind a service instance from an HTTP route",
+    "translation": ""
   },
   {
     "id": "Unbind a service instance from an app",

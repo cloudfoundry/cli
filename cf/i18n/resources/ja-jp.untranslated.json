@@ -664,6 +664,10 @@
     "translation": "Unable to parse CC API Version '{{.APIVersion}}'"
   },
   {
+    "id": "Unbind a service instance from an HTTP route",
+    "translation": "Unbind a service instance from an HTTP route"
+  },
+  {
     "id": "Unbind cancelled",
     "translation": "Unbind cancelled"
   },
