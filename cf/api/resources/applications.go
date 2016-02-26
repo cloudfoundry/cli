@@ -111,9 +111,11 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		state := strings.ToUpper(*app.State)
 		entity.State = &state
 	}
+
 	if app.EnvironmentVars != nil && *app.EnvironmentVars != nil {
 		entity.EnvironmentJson = app.EnvironmentVars
 	}
+
 	return entity
 }
 
