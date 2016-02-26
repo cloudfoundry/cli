@@ -848,6 +848,10 @@
     "translation": "app ports"
   },
   {
+    "id": "app ports:",
+    "translation": "app ports:"
+  },
+  {
     "id": "cpu",
     "translation": "cpu"
   },

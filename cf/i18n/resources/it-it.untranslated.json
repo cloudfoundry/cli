@@ -820,6 +820,10 @@
     "translation": "app ports"
   },
   {
+    "id": "app ports:",
+    "translation": "app ports:"
+  },
+  {
     "id": "broker: {{.Name}}",
     "translation": "broker: {{.Name}}"
   },
