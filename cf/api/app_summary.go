@@ -31,6 +31,7 @@ type ApplicationFromSummary struct {
 	Memory               int64
 	Instances            int
 	DiskQuota            int64 `json:"disk_quota"`
+	AppPorts             []int `json:"ports"`
 	Urls                 []string
 	EnvironmentVars      map[string]interface{} `json:"environment_json,omitempty"`
 	HealthCheckTimeout   int                    `json:"health_check_timeout"`
@@ -62,11 +63,15 @@ func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields)
 	app.HealthCheckTimeout = resource.HealthCheckTimeout
 	app.BuildpackUrl = resource.Buildpack
 	app.Command = resource.Command
+	app.AppPorts = resource.AppPorts
+	app.EnvironmentVars = resource.EnvironmentVars
 
 	return
 }
 
-func (resource ApplicationFromSummary) ToModel() (app models.Application) {
+func (resource ApplicationFromSummary) ToModel() models.Application {
+	var app models.Application
+
 	app.ApplicationFields = resource.ToFields()
 
 	routes := []models.RouteSummary{}
@@ -80,11 +85,10 @@ func (resource ApplicationFromSummary) ToModel() (app models.Application) {
 		services = append(services, service.ToModel())
 	}
 
-	app.EnvironmentVars = resource.EnvironmentVars
 	app.Routes = routes
 	app.Services = services
 
-	return
+	return app
 }
 
 type RouteSummary struct {
@@ -134,19 +138,21 @@ func NewCloudControllerAppSummaryRepository(config core_config.Reader, gateway n
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []models.Application, apiErr error) {
+func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() ([]models.Application, error) {
 	resources := new(ApplicationSummaries)
 
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
-	apiErr = repo.gateway.GetResource(path, resources)
-	if apiErr != nil {
-		return
+	err := repo.gateway.GetResource(path, resources)
+	if err != nil {
+		return []models.Application{}, err
 	}
 
-	for _, resource := range resources.Apps {
-		apps = append(apps, resource.ToModel())
+	apps := make([]models.Application, len(resources.Apps))
+	for i, resource := range resources.Apps {
+		apps[i] = resource.ToModel()
 	}
-	return
+
+	return apps, nil
 }
 
 func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.Application, apiErr error) {

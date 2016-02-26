@@ -553,7 +553,12 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 		appPorts := make([]int, len(appPortStrings))
 
 		for i, s := range appPortStrings {
-			p, _ := strconv.Atoi(s)
+			p, err := strconv.Atoi(s)
+			if err != nil {
+				cmd.ui.Failed(T("Invalid app port: {{.AppPort}}\nApp port must be a number", map[string]interface{}{
+					"AppPort": s,
+				}))
+			}
 			appPorts[i] = p
 		}
 

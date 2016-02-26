@@ -2608,6 +2608,10 @@
     "translation": "Certificado SSL inválido para {{.URL}}\n{{.TipMessage}}"
   },
   {
+    "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
+    "translation": ""
+  },
+  {
     "id": "Invalid async response from server",
     "translation": "Resposta assíncrona inválida do servidor"
   },
@@ -4494,6 +4498,10 @@
   {
     "id": "app crashed",
     "translation": "app travado"
+  },
+  {
+    "id": "app ports",
+    "translation": ""
   },
   {
     "id": "apps",

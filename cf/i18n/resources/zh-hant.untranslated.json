@@ -668,6 +668,10 @@
     "translation": "Install CLI plugin"
   },
   {
+    "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
+    "translation": "Invalid app port: {{.AppPort}}\nApp port must be a number"
+  },
+  {
     "id": "List all available plugins in specified repository or in all added repositories",
     "translation": "List all available plugins in specified repository or in all added repositories"
   },
@@ -802,6 +806,10 @@
   {
     "id": "[global options] command [arguments...] [command options]",
     "translation": "[global options] command [arguments...] [command options]"
+  },
+  {
+    "id": "app ports",
+    "translation": "app ports"
   },
   {
     "id": "cpu",
