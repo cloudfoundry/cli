@@ -28,8 +28,8 @@
     "translation": "Apps:"
   },
   {
-    "id": "Bind a service instance to a route",
-    "translation": "Bind a service instance to a route"
+    "id": "Bind a service instance to an HTTP route",
+    "translation": "Bind a service instance to an HTTP route"
   },
   {
     "id": "Bind cancelled",

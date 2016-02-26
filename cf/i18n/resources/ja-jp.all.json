@@ -428,8 +428,8 @@
     "translation": "ステージング・アプリケーションに対して使用されるセキュリティー・グループのリストにセキュリティー・グループをバインドします"
   },
   {
-    "id": "Bind a service instance to a route",
-    "translation": "サービス・インスタンスを経路にバインドします"
+    "id": "Bind a service instance to an HTTP route",
+    "translation": ""
   },
   {
     "id": "Bind a service instance to an app",

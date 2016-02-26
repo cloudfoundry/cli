@@ -12,8 +12,8 @@
     "translation": "   CF_NAME push [-f MANIFEST_PATH]\n"
   },
   {
-    "id": "Bind a service instance to a route",
-    "translation": "Bind a service instance to a route"
+    "id": "Bind a service instance to an HTTP route",
+    "translation": "Bind a service instance to an HTTP route"
   },
   {
     "id": "Bind cancelled",

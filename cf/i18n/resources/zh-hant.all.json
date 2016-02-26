@@ -428,7 +428,7 @@
     "translation": "將安全群組連結至要用於編譯打包應用程式的安全群組清單"
   },
   {
-    "id": "Bind a service instance to a route",
+    "id": "Bind a service instance to an HTTP route",
     "translation": ""
   },
   {

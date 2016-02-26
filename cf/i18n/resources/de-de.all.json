@@ -428,7 +428,7 @@
     "translation": "Eine Sicherheitsgruppe an die Liste der Sicherheitsgruppen binden, um sie für Staginganwendungen zu verwenden"
   },
   {
-    "id": "Bind a service instance to a route",
+    "id": "Bind a service instance to an HTTP route",
     "translation": ""
   },
   {
