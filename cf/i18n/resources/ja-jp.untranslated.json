@@ -524,6 +524,10 @@
     "translation": "Cannot specify random-port together with port, hostname and/or path."
   },
   {
+    "id": "Comma delimited list of ports the application may listen on",
+    "translation": "Comma delimited list of ports the application may listen on"
+  },
+  {
     "id": "Create a random port for the TCP route",
     "translation": "Create a random port for the TCP route"
   },
