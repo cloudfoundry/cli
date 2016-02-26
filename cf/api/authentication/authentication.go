@@ -61,7 +61,7 @@ func (uaa UAAAuthenticationRepository) Authorize(token string) (string, error) {
 		},
 	}
 
-	authorizeURL, err := url.Parse(uaa.config.AuthenticationEndpoint())
+	authorizeURL, err := url.Parse(uaa.config.UaaEndpoint())
 	if err != nil {
 		return "", err
 	}
@@ -90,16 +90,12 @@ func (uaa UAAAuthenticationRepository) Authorize(token string) (string, error) {
 	}
 
 	if netErr, ok := err.(*url.Error); !ok || netErr.Err != ErrPreventRedirect {
-		return "", errors.New(T("Error requesting one time code from server: {{.Error}}", map[string]interface{}{
-			"Error": err.Error(),
-		}))
+		return "", errors.New(T("Error requesting one time code from server: {{.Error}}", map[string]interface{}{"Error": err.Error()}))
 	}
 
 	loc, err := resp.Location()
 	if err != nil {
-		return "", errors.New(T("Error getting the redirected location: {{.Error}}", map[string]interface{}{
-			"Error": err.Error(),
-		}))
+		return "", errors.New(T("Error getting the redirected location: {{.Error}}", map[string]interface{}{"Error": err.Error()}))
 	}
 
 	codes := loc.Query()["code"]

@@ -1808,6 +1808,10 @@
     "translation": "Error forwarding port: "
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": "Error getting SSH code: "
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "Error getting SSH info:"
   },

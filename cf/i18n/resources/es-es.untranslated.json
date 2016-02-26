@@ -600,6 +600,10 @@
     "translation": "DOMAINS"
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": "Error getting SSH code: "
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "Error getting the redirected location: {{.Error}}"
   },

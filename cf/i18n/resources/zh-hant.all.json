@@ -1808,6 +1808,10 @@
     "translation": "轉遞埠時發生錯誤："
   },
   {
+    "id": "Error getting SSH code: ",
+    "translation": ""
+  },
+  {
     "id": "Error getting SSH info:",
     "translation": "取得 SSH 資訊時發生錯誤："
   },
