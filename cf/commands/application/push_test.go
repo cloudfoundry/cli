@@ -483,6 +483,7 @@ var _ = Describe("Push Command", func() {
 					"-s", "customLinux",
 					"-t", "1",
 					"-u", "port",
+					"--app-ports", "8080,9000",
 					"--no-start",
 					"app-name",
 				)
@@ -511,6 +512,7 @@ var _ = Describe("Push Command", func() {
 				Expect(*params.HealthCheckTimeout).To(Equal(1))
 				Expect(*params.HealthCheckType).To(Equal("port"))
 				Expect(*params.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
+				Expect(*params.AppPorts).To(Equal([]int{8080, 9000}))
 
 				name, owningOrgGuid := domainRepo.FindByNameInOrgArgsForCall(0)
 				Expect(name).To(Equal("bar.cf-app.com"))

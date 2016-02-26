@@ -1104,6 +1104,10 @@
     "translation": "La API de Cloud Foundry versión {{.ApiVer}} requiere la versión de CLI {{.CliMin}}. Actualmente está en la versión {{.CliVer}}. Para actualizar el CLI, visite: https://github.com/cloudfoundry/cli#downloads"
   },
   {
+    "id": "Comma delimited list of ports the application may listen on",
+    "translation": ""
+  },
+  {
     "id": "Command Help",
     "translation": "Ayuda de mandato"
   },

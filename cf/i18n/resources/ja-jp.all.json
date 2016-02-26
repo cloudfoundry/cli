@@ -1104,6 +1104,10 @@
     "translation": "Cloud Foundry API バージョン {{.ApiVer}} には CLI バージョン {{.CliMin}} が必要です。現在のバージョンは {{.CliVer}} です。CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
   },
   {
+    "id": "Comma delimited list of ports the application may listen on",
+    "translation": ""
+  },
+  {
     "id": "Command Help",
     "translation": "コマンド・ヘルプ"
   },

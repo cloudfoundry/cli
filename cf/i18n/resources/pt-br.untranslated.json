@@ -568,6 +568,10 @@
     "translation": "Cannot specify random-port together with port, hostname and/or path."
   },
   {
+    "id": "Comma delimited list of ports the application may listen on",
+    "translation": "Comma delimited list of ports the application may listen on"
+  },
+  {
     "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
     "translation": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n"
   },

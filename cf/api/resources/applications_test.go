@@ -78,6 +78,7 @@ var _ = Describe("Application resources", func() {
 			stackGUID = "stack-guid"
 			state = "state"
 			packageUpdatedAt = time.Now()
+			appPorts = []int{9090, 123}
 
 			appParams = models.AppParams{
 				BuildpackUrl:       &buildpackURL,
@@ -96,6 +97,7 @@ var _ = Describe("Application resources", func() {
 				StackGuid:          &stackGUID,
 				State:              &state,
 				PackageUpdatedAt:   &packageUpdatedAt,
+				AppPorts:           &appPorts,
 			}
 		})
 
@@ -115,6 +117,7 @@ var _ = Describe("Application resources", func() {
 			Expect(*entity.Diego).To(Equal(diego))
 			Expect(*entity.EnableSsh).To(Equal(enableSSH))
 			Expect(*entity.PackageUpdatedAt).To(Equal(packageUpdatedAt))
+			Expect(*entity.AppPorts).To(Equal(appPorts))
 		})
 
 		It("upcases the state", func() {

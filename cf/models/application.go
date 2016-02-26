@@ -99,6 +99,7 @@ type AppParams struct {
 	StackName          *string
 	State              *string
 	PackageUpdatedAt   *time.Time
+	AppPorts           *[]int
 }
 
 func (app *AppParams) Merge(other *AppParams) {
@@ -167,6 +168,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.EnableSsh != nil {
 		app.EnableSsh = other.EnableSsh
+	}
+	if other.AppPorts != nil {
+		app.AppPorts = other.AppPorts
 	}
 
 	app.NoRoute = app.NoRoute || other.NoRoute
