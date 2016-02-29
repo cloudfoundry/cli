@@ -84,5 +84,5 @@ func (cmd *SetEnv) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
-		map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " restage")}))
+		map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " restage")}))
 }

@@ -144,6 +144,6 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 
 	cmd.ui.Say(T("\nTIP: Use '{{.CFTargetCommand}}' to target new space",
 		map[string]interface{}{
-			"CFTargetCommand": terminal.CommandColor(cf.Name() + " target -o \"" + orgName + "\" -s \"" + space.Name + "\""),
+			"CFTargetCommand": terminal.CommandColor(cf.Name + " target -o \"" + orgName + "\" -s \"" + space.Name + "\""),
 		}))
 }

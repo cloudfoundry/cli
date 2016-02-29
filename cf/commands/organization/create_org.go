@@ -131,5 +131,5 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 	}
 
 	cmd.ui.Say(T("\nTIP: Use '{{.Command}}' to target new org",
-		map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " target -o " + name)}))
+		map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o " + name)}))
 }

@@ -20,7 +20,7 @@ func NewTargetedSpaceRequirement(ui terminal.UI, config core_config.Reader) Targ
 
 func (req TargetedSpaceRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
-		message := fmt.Sprintf(T("No org and space targeted, use '{{.Command}}' to target an org and space", map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " target -o ORG -s SPACE")}))
+		message := fmt.Sprintf(T("No org and space targeted, use '{{.Command}}' to target an org and space", map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o ORG -s SPACE")}))
 		req.ui.Failed(message)
 		return false
 	}

@@ -27,7 +27,7 @@ func NewTargetedOrgRequirement(ui terminal.UI, config core_config.Reader) Target
 
 func (req targetedOrgApiRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
-		message := fmt.Sprintf(T("No org targeted, use '{{.Command}}' to target an org.", map[string]interface{}{"Command": terminal.CommandColor(cf.Name() + " target -o ORG")}))
+		message := fmt.Sprintf(T("No org targeted, use '{{.Command}}' to target an org.", map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o ORG")}))
 		req.ui.Failed(message)
 		return false
 	}

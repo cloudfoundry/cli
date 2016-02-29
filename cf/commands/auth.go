@@ -62,7 +62,7 @@ func (cmd *Authenticate) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("Use '{{.Name}}' to view or set your target org and space",
-		map[string]interface{}{"Name": terminal.CommandColor(cf.Name() + " target")}))
+		map[string]interface{}{"Name": terminal.CommandColor(cf.Name + " target")}))
 
 	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
 

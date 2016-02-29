@@ -16,7 +16,7 @@ import (
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
-	return fmt.Sprintf(T("Not logged in. Use '{{.CFLoginCommand}}' to log in.", map[string]interface{}{"CFLoginCommand": CommandColor(cf.Name() + " " + "login")}))
+	return fmt.Sprintf(T("Not logged in. Use '{{.CFLoginCommand}}' to log in.", map[string]interface{}{"CFLoginCommand": CommandColor(cf.Name + " " + "login")}))
 }
 
 type UI interface {
@@ -184,7 +184,7 @@ func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
 
 	if !config.HasOrganization() && !config.HasSpace() {
 		table.Print()
-		command := fmt.Sprintf("%s target -o ORG -s SPACE", cf.Name())
+		command := fmt.Sprintf("%s target -o ORG -s SPACE", cf.Name)
 		ui.Say(T("No org or space targeted, use '{{.CFTargetCommand}}'",
 			map[string]interface{}{
 				"CFTargetCommand": CommandColor(command),
@@ -198,7 +198,7 @@ func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
 			EntityNameColor(config.OrganizationFields().Name),
 		)
 	} else {
-		command := fmt.Sprintf("%s target -o Org", cf.Name())
+		command := fmt.Sprintf("%s target -o Org", cf.Name)
 		table.Add(
 			T("Org:"),
 			T("No org targeted, use '{{.CFTargetCommand}}'",
@@ -214,7 +214,7 @@ func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
 			EntityNameColor(config.SpaceFields().Name),
 		)
 	} else {
-		command := fmt.Sprintf("%s target -s SPACE", cf.Name())
+		command := fmt.Sprintf("%s target -s SPACE", cf.Name)
 		table.Add(
 			T("Space:"),
 			T("No space targeted, use '{{.CFTargetCommand}}'", map[string]interface{}{"CFTargetCommand": CommandColor(command)}),

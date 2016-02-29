@@ -217,7 +217,7 @@ var _ = Describe("CommandRegistry", func() {
 			outputs := strings.Split(o, "\n")
 			Expect(outputs).To(BeInDisplayOrder(
 				[]string{"USAGE:"},
-				[]string{"command_registry.test", "Usage of"},
+				[]string{"cf", "Usage of"},
 			))
 			Consistently(outputs).ShouldNot(ContainSubstrings([]string{"CF_NAME"}))
 		})

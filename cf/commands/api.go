@@ -60,7 +60,7 @@ func (cmd Api) Execute(c flags.FlagContext) {
 	} else if len(c.Args()) == 0 {
 		if cmd.config.ApiEndpoint() == "" {
 			cmd.ui.Say(fmt.Sprintf(T("No api endpoint set. Use '{{.Name}}' to set an endpoint",
-				map[string]interface{}{"Name": terminal.CommandColor(cf.Name() + " api")})))
+				map[string]interface{}{"Name": terminal.CommandColor(cf.Name + " api")})))
 		} else {
 			cmd.ui.Say(T("API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
 				map[string]interface{}{"ApiEndpoint": terminal.EntityNameColor(cmd.config.ApiEndpoint()),
@@ -93,7 +93,7 @@ func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
 
 		switch typedErr := err.(type) {
 		case *errors.InvalidSSLCert:
-			cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s %s --skip-ssl-validation", cf.Name(), cmdName))
+			cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s %s --skip-ssl-validation", cf.Name, cmdName))
 			tipMessage := fmt.Sprintf(T("TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
 				map[string]interface{}{"ApiCommand": cfApiCommand}))
 			cmd.ui.Failed(T("Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
