@@ -184,6 +184,10 @@
     "translation": "' is not a registered command. See 'cf help'"
   },
   {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted."
+  },
+  {
     "id": ") already exists.",
     "translation": ") already exists."
   },

@@ -184,6 +184,10 @@
     "translation": "' no es un mandato registrado. Consulte 'cf help'"
   },
   {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": ""
+  },
+  {
     "id": ") already exists.",
     "translation": ") ya existe."
   },

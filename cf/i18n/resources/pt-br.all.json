@@ -184,6 +184,10 @@
     "translation": "' não é um comando registrado. Consulte 'cf help'"
   },
   {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": ""
+  },
+  {
     "id": ") already exists.",
     "translation": ") já existe."
   },

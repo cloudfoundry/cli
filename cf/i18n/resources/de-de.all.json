@@ -184,6 +184,10 @@
     "translation": "' ist kein registrierter Befehl. Siehe 'cf help'"
   },
   {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": ""
+  },
+  {
     "id": ") already exists.",
     "translation": ") ist bereits vorhanden."
   },
