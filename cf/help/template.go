@@ -26,7 +26,6 @@ func GetHelpTemplate() string {
    https_proxy=proxy.example.com:8080 ` + T("Enable HTTP proxying for API requests") + `
 
 {{.Title "` + T("GLOBAL OPTIONS:") + `"}}
-   --version, -v                      ` + T("Print the version") + `
    --help, -h                         ` + T("Show help") + `
 `
 }

@@ -12,6 +12,10 @@
     "translation": "   CF_NAME push [-f MANIFEST_PATH]\n"
   },
   {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted."
+  },
+  {
     "id": "ALIAS",
     "translation": "ALIAS"
   },

@@ -184,6 +184,10 @@
     "translation": "' 不是注册的命令。请参阅“cf help”"
   },
   {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": ""
+  },
+  {
     "id": ") already exists.",
     "translation": ") 已存在。"
   },

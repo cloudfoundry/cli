@@ -16,6 +16,10 @@
     "translation": " for "
   },
   {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted."
+  },
+  {
     "id": "Bind a service instance to an HTTP route",
     "translation": "Bind a service instance to an HTTP route"
   },

@@ -184,6 +184,10 @@
     "translation": "' は登録済みコマンドではありません。'cf help' を参照してください"
   },
   {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": ""
+  },
+  {
     "id": ") already exists.",
     "translation": ") は既に存在しています。"
   },

@@ -97,6 +97,7 @@ func newAppPresenter() (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentNonCodegangstaCommand("help"),
+					presentNonCodegangstaCommand("version"),
 					presentNonCodegangstaCommand("login"),
 					presentNonCodegangstaCommand("logout"),
 					presentNonCodegangstaCommand("passwd"),

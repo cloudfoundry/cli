@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	"github.com/cloudfoundry/cli/cf/help"
@@ -37,8 +36,7 @@ func main() {
 
 	//handle `cf -v` for cf version
 	if len(os.Args) == 2 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
-		deps.Ui.Say(os.Args[0] + " version " + cf.Version + "-" + cf.BuiltOnDate)
-		os.Exit(0)
+		os.Args[1] = "version"
 	}
 
 	//handle `cf --build`
@@ -52,7 +50,7 @@ func main() {
 	}
 
 	//handles `cf [COMMAND] -h ...`
-	//rearrage args to `cf help COMMAND` and let `command help` to print out usage
+	//rearrange args to `cf help COMMAND` and let `command help` to print out usage
 	if requestHelp(os.Args[2:]) {
 		os.Args[2] = os.Args[1]
 		os.Args[1] = "help"
