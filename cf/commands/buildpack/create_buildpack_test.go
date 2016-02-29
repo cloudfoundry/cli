@@ -72,7 +72,7 @@ var _ = Describe("create-buildpack command", func() {
 			[]string{"Creating buildpack", "my-buildpack"},
 			[]string{"OK"},
 			[]string{"my-buildpack", "already exists"},
-			[]string{"TIP", "use", cf.Name(), "update-buildpack"},
+			[]string{"TIP", "use", cf.Name, "update-buildpack"},
 		))
 		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})

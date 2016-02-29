@@ -73,7 +73,7 @@ func (cmd *RenameService) Execute(c flags.FlagContext) {
 			cmd.ui.Failed(T("{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
 				map[string]interface{}{
 					"ErrorDescription":  httpError.Error(),
-					"CFServicesCommand": cf.Name() + " " + "services",
+					"CFServicesCommand": cf.Name + " " + "services",
 				}))
 		} else {
 			cmd.ui.Failed(err.Error())

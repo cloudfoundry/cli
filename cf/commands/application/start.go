@@ -284,14 +284,14 @@ Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.
 Use '{{.Command}}' for more in depth log information.`,
 				map[string]interface{}{
 					"Err":              app.StagingFailedReason,
-					"PushCommand":      terminal.CommandColor(fmt.Sprintf("%s push", cf.Name())),
-					"BuildpackCommand": terminal.CommandColor(fmt.Sprintf("%s buildpacks", cf.Name())),
-					"Command":          terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))}))
+					"PushCommand":      terminal.CommandColor(fmt.Sprintf("%s push", cf.Name)),
+					"BuildpackCommand": terminal.CommandColor(fmt.Sprintf("%s buildpacks", cf.Name)),
+					"Command":          terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))}))
 		} else {
 			cmd.ui.Failed(T("{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
 				map[string]interface{}{
 					"Err":     app.StagingFailedReason,
-					"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))}))
+					"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))}))
 		}
 	}
 
@@ -308,7 +308,7 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 	for {
 		if time.Since(startupStartTime) > cmd.StartupTimeout {
 			tipMsg := T("Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.") + "\n\n"
-			tipMsg += T("Use '{{.Command}}' for more information", map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))})
+			tipMsg += T("Use '{{.Command}}' for more information", map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))})
 
 			cmd.ui.Failed(tipMsg)
 			return
@@ -329,7 +329,7 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 
 		if count.flapping > 0 || count.crashed > 0 {
 			cmd.ui.Failed(fmt.Sprintf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
-				map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))})))
+				map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))})))
 			return
 		}
 

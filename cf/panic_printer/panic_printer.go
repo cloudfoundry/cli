@@ -62,5 +62,5 @@ func CrashDialog(errorMessage string, commandArgs string, stackTrace string) str
 		e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator
 `
 
-	return fmt.Sprintf(formattedString, cf.Name(), commandArgs, cf.Version, errorMessage, stackTrace)
+	return fmt.Sprintf(formattedString, cf.Name, commandArgs, cf.Version, errorMessage, stackTrace)
 }

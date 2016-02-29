@@ -93,7 +93,7 @@ var _ = Describe("api command", func() {
 				callApi([]string{}, config, endpointRepo)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"No api endpoint set", fmt.Sprintf("Use '%s api' to set an endpoint", cf.Name())},
+					[]string{"No api endpoint set", fmt.Sprintf("Use '%s api' to set an endpoint", cf.Name)},
 				))
 			})
 		})

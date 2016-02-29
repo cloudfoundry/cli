@@ -128,7 +128,7 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
-		map[string]interface{}{"CFCommand": terminal.CommandColor(cf.Name() + " restage"), "AppName": app.Name}))
+		map[string]interface{}{"CFCommand": terminal.CommandColor(cf.Name + " restage"), "AppName": app.Name}))
 }
 
 func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error) {

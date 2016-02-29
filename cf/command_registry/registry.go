@@ -119,7 +119,7 @@ func (r *registry) CommandUsage(cmdName string) string {
 	output += "   " + cmd.MetaData().Name + " - " + cmd.MetaData().Description + "\n\n"
 
 	output += i18n.T("USAGE") + ":" + "\n"
-	output += "   " + strings.Replace(cmd.MetaData().Usage, "CF_NAME", cf.Name(), -1) + "\n"
+	output += "   " + strings.Replace(cmd.MetaData().Usage, "CF_NAME", cf.Name, -1) + "\n"
 
 	if cmd.MetaData().ShortName != "" {
 		output += "\n" + i18n.T("ALIAS") + ":" + "\n"
