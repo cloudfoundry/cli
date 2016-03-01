@@ -348,8 +348,8 @@
     "translation": "CF_NAME quotas"
   },
   {
-    "id": "CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n",
-    "translation": "CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n"
+    "id": "CF_NAME remove-plugin-repo REPO_NAME",
+    "translation": "CF_NAME remove-plugin-repo REPO_NAME"
   },
   {
     "id": "CF_NAME rename APP_NAME NEW_APP_NAME",
