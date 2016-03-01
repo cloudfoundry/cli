@@ -560,10 +560,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT] [--random-port]\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
     "translation": ""
   },
@@ -1258,6 +1254,10 @@
   {
     "id": "Create a url route in a space for later use",
     "translation": "URL-Route in einem Bereich zur späteren Verwendung erstellen"
+  },
+  {
+    "id": "Create an HTTP route:\n   cf create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   cf create-route SPACE DOMAIN [--port PORT] [--random-port]\n\nEXAMPLES:\n   cf create-route my-space example.com                             # example.com\n   cf create-route my-space example.com --hostname myapp            # myapp.example.com\n   cf create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   cf create-route my-space example.com --port 50000                # example.com:50000",
+    "translation": ""
   },
   {
     "id": "Create an app manifest for an app that has been pushed successfully",
