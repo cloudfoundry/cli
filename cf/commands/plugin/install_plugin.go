@@ -48,12 +48,12 @@ func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T(`CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]
 
-   Prompts for confirmation unless '-f' is provided.
-
-EXAMPLES:
-   cf install-plugin ~/Downloads/plugin-foobar
-   cf install-plugin https://example.com/plugin-foobar_linux_amd64
-   cf install-plugin -r My-Repo plugin-echo`),
+   Prompts for confirmation unless '-f' is provided.`),
+		},
+		Example: []string{
+			"CF_NAME install-plugin ~/Downloads/plugin-foobar",
+			"CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64",
+			"CF_NAME install-plugin -r My-Repo plugin-echo",
 		},
 		Flags:     fs,
 		TotalArgs: 1,
