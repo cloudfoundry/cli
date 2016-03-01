@@ -220,8 +220,8 @@
     "translation": "Create a random port for the TCP route"
   },
   {
-    "id": "Create an HTTP route:\n   cf create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   cf create-route SPACE DOMAIN [--port PORT] [--random-port]\n\nEXAMPLES:\n   cf create-route my-space example.com                             # example.com\n   cf create-route my-space example.com --hostname myapp            # myapp.example.com\n   cf create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   cf create-route my-space example.com --port 50000                # example.com:50000",
-    "translation": "Create an HTTP route:\n   cf create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   cf create-route SPACE DOMAIN [--port PORT] [--random-port]\n\nEXAMPLES:\n   cf create-route my-space example.com                             # example.com\n   cf create-route my-space example.com --hostname myapp            # myapp.example.com\n   cf create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   cf create-route my-space example.com --port 50000                # example.com:50000"
+    "id": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]",
+    "translation": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]"
   },
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
