@@ -180,6 +180,10 @@
     "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY"
   },
   {
+    "id": "CF_NAME service-keys SERVICE_INSTANCE",
+    "translation": "CF_NAME service-keys SERVICE_INSTANCE"
+  },
+  {
     "id": "CF_NAME set-quota ORG QUOTA\n\n",
     "translation": "CF_NAME set-quota ORG QUOTA\n\n"
   },

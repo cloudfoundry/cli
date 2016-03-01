@@ -848,8 +848,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME service-keys SERVICE_INSTANCE\n\nEXAMPLE:\n   CF_NAME service-keys mydb",
-    "translation": "CF_NAME service-keys SERVICE_INSTANCE\n\nESEMPIO:\n   CF_NAME service-keys mydb"
+    "id": "CF_NAME service-keys SERVICE_INSTANCE",
+    "translation": ""
   },
   {
     "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
