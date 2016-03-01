@@ -33,12 +33,12 @@ func (cmd *MapRoute) MetaData() command_registry.CommandMetadata {
 		Name:        "map-route",
 		Description: T("Add a url route to an app"),
 		Usage: []string{
-			T(`CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]
-
-EXAMPLES:
-   CF_NAME map-route my-app example.com                              # example.com
-   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com
-   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo`),
+			T("CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"),
+		},
+		Example: []string{
+			"CF_NAME map-route my-app example.com                              # example.com",
+			"CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com",
+			"CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
 		},
 		Flags: fs,
 	}

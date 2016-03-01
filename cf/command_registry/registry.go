@@ -124,7 +124,7 @@ func (r *registry) CommandUsage(cmdName string) string {
 	if len(cmd.MetaData().Example) > 0 {
 		output += "\n"
 		output += fmt.Sprintf("%s:\n", T("EXAMPLES"))
-		for _, e := range(cmd.MetaData().Example) {
+		for _, e := range cmd.MetaData().Example {
 			output += fmt.Sprintf("   %s\n", strings.Replace(e, "CF_NAME", cf.Name, -1))
 		}
 	}
