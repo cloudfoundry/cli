@@ -421,14 +421,6 @@ jobs:
   - aggregate:
     - task: windows
       file: cli-ci/ci/tasks/create-installers-windows.yml
-      on_success:
-        task: empty-tmp-dir
-        config:
-          platform: windows
-          inputs:
-          - name: cli-ci
-          run:
-            path: cli-ci/ci/tasks/empty-tmp-dir-windows.bat
     - task: unix
       file: cli-ci/ci/tasks/create-installers.yml
   - aggregate:

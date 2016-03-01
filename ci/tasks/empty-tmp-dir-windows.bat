@@ -1,2 +1,0 @@
-RMDIR /S /Q %TMP%
-MKDIR %TMP%
