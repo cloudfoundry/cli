@@ -292,6 +292,10 @@
     "translation": "CF_NAME logs APP_NAME"
   },
   {
+    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
+    "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
+  },
+  {
     "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
     "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n"
   },

@@ -128,6 +128,10 @@
     "translation": "CF_NAME logout"
   },
   {
+    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
+    "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
+  },
+  {
     "id": "CF_NAME oauth-token",
     "translation": "CF_NAME oauth-token"
   },
