@@ -13,6 +13,14 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
+var buildPath string
+var buildErr error
+
+var _ = BeforeSuite(func() {
+	buildPath, buildErr = Build("github.com/cloudfoundry/cli/main")
+	Expect(buildErr).NotTo(HaveOccurred())
+})
+
 var _ = Describe("main", func() {
 	var (
 		old_PLUGINS_HOME string
@@ -220,19 +228,14 @@ var _ = Describe("main", func() {
 })
 
 func Cf(args ...string) *Session {
-	path, err := Build("github.com/cloudfoundry/cli/main")
-	Expect(err).NotTo(HaveOccurred())
-
-	session, err := Start(exec.Command(path, args...), GinkgoWriter, GinkgoWriter)
+	session, err := Start(exec.Command(buildPath, args...), GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 
 	return session
 }
-func CfWithIo(command string, args string) *Session {
-	path, err := Build("github.com/cloudfoundry/cli/main")
-	Expect(err).NotTo(HaveOccurred())
 
-	cmd := exec.Command(path, command)
+func CfWithIo(command string, args string) *Session {
+	cmd := exec.Command(buildPath, command)
 
 	stdin, err := cmd.StdinPipe()
 	Expect(err).ToNot(HaveOccurred())
@@ -246,11 +249,9 @@ func CfWithIo(command string, args string) *Session {
 
 	return session
 }
-func CfWith_CF_HOME(cfHome string, args ...string) *Session {
-	path, err := Build("github.com/cloudfoundry/cli/main")
-	Expect(err).NotTo(HaveOccurred())
 
-	cmd := exec.Command(path, args...)
+func CfWith_CF_HOME(cfHome string, args ...string) *Session {
+	cmd := exec.Command(buildPath, args...)
 	cmd.Env = append(cmd.Env, "CF_HOME="+cfHome)
 	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
