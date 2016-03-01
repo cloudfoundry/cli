@@ -60,8 +60,16 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "update-service",
 		Description: T("Update a service instance"),
-		Usage:       T(strings.Join([]string{baseUsage, paramsUsage, tagsUsage, exampleUsage}, "\n\n")),
-		Flags:       fs,
+		Usage: []string{
+			baseUsage,
+			"\n\n",
+			paramsUsage,
+			"\n\n",
+			tagsUsage,
+			"\n\n",
+			exampleUsage,
+		},
+		Flags: fs,
 	}
 }
 

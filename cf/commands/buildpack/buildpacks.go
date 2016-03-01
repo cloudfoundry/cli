@@ -26,7 +26,9 @@ func (cmd *ListBuildpacks) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "buildpacks",
 		Description: T("List all buildpacks"),
-		Usage:       T("CF_NAME buildpacks"),
+		Usage: []string{
+			T("CF_NAME buildpacks"),
+		},
 	}
 }
 

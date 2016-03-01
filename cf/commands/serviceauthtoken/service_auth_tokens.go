@@ -25,7 +25,9 @@ func (cmd *ListServiceAuthTokens) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "service-auth-tokens",
 		Description: T("List service auth tokens"),
-		Usage:       T("CF_NAME service-auth-tokens"),
+		Usage: []string{
+			T("CF_NAME service-auth-tokens"),
+		},
 	}
 }
 

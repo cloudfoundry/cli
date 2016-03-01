@@ -28,8 +28,10 @@ func (cmd *CreateServiceBroker) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-service-broker",
 		Description: T("Create a service broker"),
-		Usage:       T("CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]"),
+		},
+		Flags: fs,
 	}
 }
 

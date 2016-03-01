@@ -26,7 +26,9 @@ func (cmd *bindToStagingGroup) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "bind-staging-security-group",
 		Description: T("Bind a security group to the list of security groups to be used for staging applications"),
-		Usage:       T("CF_NAME bind-staging-security-group SECURITY_GROUP"),
+		Usage: []string{
+			T("CF_NAME bind-staging-security-group SECURITY_GROUP"),
+		},
 	}
 }
 

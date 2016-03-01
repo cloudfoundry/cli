@@ -25,7 +25,9 @@ func (cmd *RenameSpace) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "rename-space",
 		Description: T("Rename a space"),
-		Usage:       T("CF_NAME rename-space SPACE NEW_SPACE"),
+		Usage: []string{
+			T("CF_NAME rename-space SPACE NEW_SPACE"),
+		},
 	}
 }
 

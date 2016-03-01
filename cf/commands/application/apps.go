@@ -36,7 +36,9 @@ func (cmd *ListApps) MetaData() command_registry.CommandMetadata {
 		Name:        "apps",
 		ShortName:   "a",
 		Description: T("List all apps in the target space"),
-		Usage:       "CF_NAME apps",
+		Usage: []string{
+			"CF_NAME apps",
+		},
 	}
 }
 

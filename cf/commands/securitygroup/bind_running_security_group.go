@@ -1,8 +1,6 @@
 package securitygroup
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -30,7 +28,11 @@ func (cmd *bindToRunningGroup) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "bind-running-security-group",
 		Description: T("Bind a security group to the list of security groups to be used for running applications"),
-		Usage:       strings.Join([]string{primaryUsage, tipUsage}, "\n\n"),
+		Usage: []string{
+			primaryUsage,
+			"\n\n",
+			tipUsage,
+		},
 	}
 }
 

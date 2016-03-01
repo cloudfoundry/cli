@@ -25,7 +25,9 @@ func (cmd *SSHEnabled) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "ssh-enabled",
 		Description: T("Reports whether SSH is enabled on an application container instance"),
-		Usage:       T("CF_NAME ssh-enabled APP_NAME"),
+		Usage: []string{
+			T("CF_NAME ssh-enabled APP_NAME"),
+		},
 	}
 }
 

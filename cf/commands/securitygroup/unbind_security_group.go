@@ -1,8 +1,6 @@
 package securitygroup
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	sgbinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
@@ -34,7 +32,11 @@ func (cmd *UnbindSecurityGroup) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "unbind-security-group",
 		Description: T("Unbind a security group from a space"),
-		Usage:       strings.Join([]string{primaryUsage, tipUsage}, "\n\n"),
+		Usage: []string{
+			primaryUsage,
+			"\n\n",
+			tipUsage,
+		},
 	}
 }
 

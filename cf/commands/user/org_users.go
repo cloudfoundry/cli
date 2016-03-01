@@ -33,8 +33,10 @@ func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "org-users",
 		Description: T("Show org users by role"),
-		Usage:       T("CF_NAME org-users ORG"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME org-users ORG"),
+		},
+		Flags: fs,
 	}
 }
 

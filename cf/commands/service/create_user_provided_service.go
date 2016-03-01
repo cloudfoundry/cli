@@ -36,7 +36,8 @@ func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadat
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",
 		Description: T("Make a user-provided service instance available to CF apps"),
-		Usage: T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
+		Usage: []string{
+			T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
 
    Pass comma separated credential parameter names to enable interactive mode:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
@@ -61,6 +62,7 @@ EXAMPLE:
 
    Windows PowerShell
    CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'`),
+		},
 		Flags: fs,
 	}
 }

@@ -37,8 +37,10 @@ func (cmd *ShowSpace) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "space",
 		Description: T("Show space info"),
-		Usage:       T("CF_NAME space SPACE"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME space SPACE"),
+		},
+		Flags: fs,
 	}
 }
 

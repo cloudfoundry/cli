@@ -28,8 +28,10 @@ func (cmd *DeleteUser) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-user",
 		Description: T("Delete a user"),
-		Usage:       T("CF_NAME delete-user USERNAME [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-user USERNAME [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

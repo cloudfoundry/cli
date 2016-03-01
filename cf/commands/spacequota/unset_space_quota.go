@@ -26,7 +26,9 @@ func (cmd *UnsetSpaceQuota) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "unset-space-quota",
 		Description: T("Unassign a quota from a space"),
-		Usage:       T("CF_NAME unset-space-quota SPACE QUOTA\n\n"),
+		Usage: []string{
+			T("CF_NAME unset-space-quota SPACE QUOTA\n\n"),
+		},
 	}
 }
 

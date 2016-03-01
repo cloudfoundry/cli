@@ -35,8 +35,10 @@ func (cmd *ServiceAccess) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "service-access",
 		Description: T("List service access settings"),
-		Usage:       "CF_NAME service-access [-b BROKER] [-e SERVICE] [-o ORG]",
-		Flags:       fs,
+		Usage: []string{
+			"CF_NAME service-access [-b BROKER] [-e SERVICE] [-o ORG]",
+		},
+		Flags: fs,
 	}
 }
 

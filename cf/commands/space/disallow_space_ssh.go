@@ -27,7 +27,9 @@ func (cmd *DisallowSpaceSSH) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "disallow-space-ssh",
 		Description: T("Disallow SSH access for the space"),
-		Usage:       T("CF_NAME disallow-space-ssh SPACE_NAME"),
+		Usage: []string{
+			T("CF_NAME disallow-space-ssh SPACE_NAME"),
+		},
 	}
 }
 

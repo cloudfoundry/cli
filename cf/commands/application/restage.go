@@ -28,7 +28,9 @@ func (cmd *Restage) MetaData() command_registry.CommandMetadata {
 		Name:        "restage",
 		ShortName:   "rg",
 		Description: T("Restage an app"),
-		Usage:       T("CF_NAME restage APP_NAME"),
+		Usage: []string{
+			T("CF_NAME restage APP_NAME"),
+		},
 	}
 }
 

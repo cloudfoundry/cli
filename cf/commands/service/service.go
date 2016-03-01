@@ -30,8 +30,10 @@ func (cmd *ShowService) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "service",
 		Description: T("Show service instance info"),
-		Usage:       T("CF_NAME service SERVICE_INSTANCE"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME service SERVICE_INSTANCE"),
+		},
+		Flags: fs,
 	}
 }
 

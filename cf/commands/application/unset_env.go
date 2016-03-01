@@ -34,7 +34,9 @@ func (cmd *UnsetEnv) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "unset-env",
 		Description: T("Remove an env variable"),
-		Usage:       T("CF_NAME unset-env APP_NAME ENV_VAR_NAME"),
+		Usage: []string{
+			T("CF_NAME unset-env APP_NAME ENV_VAR_NAME"),
+		},
 	}
 }
 

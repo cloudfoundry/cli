@@ -25,7 +25,11 @@ func (cmd *SetQuota) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "set-quota",
 		Description: T("Assign a quota to an org"),
-		Usage:       T("CF_NAME set-quota ORG QUOTA\n\n") + T("TIP:\n") + T("   View allowable quotas with 'CF_NAME quotas'"),
+		Usage: []string{
+			T("CF_NAME set-quota ORG QUOTA\n\n"),
+			T("TIP:\n"),
+			T("   View allowable quotas with 'CF_NAME quotas'"),
+		},
 	}
 }
 

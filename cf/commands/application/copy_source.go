@@ -41,8 +41,10 @@ func (cmd *CopySource) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "copy-source",
 		Description: T("Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application."),
-		Usage:       T("   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n"),
-		Flags:       fs,
+		Usage: []string{
+			T("   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n"),
+		},
+		Flags: fs,
 	}
 }
 

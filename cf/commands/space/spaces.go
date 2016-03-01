@@ -29,7 +29,9 @@ func (cmd *ListSpaces) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "spaces",
 		Description: T("List all spaces in an org"),
-		Usage:       T("CF_NAME spaces"),
+		Usage: []string{
+			T("CF_NAME spaces"),
+		},
 	}
 
 }

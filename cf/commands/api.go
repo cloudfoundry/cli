@@ -33,8 +33,10 @@ func (cmd Api) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "api",
 		Description: T("Set or view target api url"),
-		Usage:       T("CF_NAME api [URL]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME api [URL]"),
+		},
+		Flags: fs,
 	}
 }
 

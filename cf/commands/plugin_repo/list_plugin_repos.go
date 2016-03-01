@@ -23,7 +23,9 @@ func (cmd *ListPluginRepos) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "list-plugin-repos",
 		Description: T("List all the added plugin repositories"),
-		Usage:       T("CF_NAME list-plugin-repos"),
+		Usage: []string{
+			T("CF_NAME list-plugin-repos"),
+		},
 	}
 }
 

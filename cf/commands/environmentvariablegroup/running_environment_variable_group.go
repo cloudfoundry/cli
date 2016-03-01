@@ -25,7 +25,9 @@ func (cmd *RunningEnvironmentVariableGroup) MetaData() command_registry.CommandM
 		Name:        "running-environment-variable-group",
 		Description: T("Retrieve the contents of the running environment variable group"),
 		ShortName:   "revg",
-		Usage:       T("CF_NAME running-environment-variable-group"),
+		Usage: []string{
+			T("CF_NAME running-environment-variable-group"),
+		},
 	}
 }
 

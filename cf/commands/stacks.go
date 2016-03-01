@@ -24,7 +24,9 @@ func (cmd *ListStacks) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "stacks",
 		Description: T("List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"),
-		Usage:       T("CF_NAME stacks"),
+		Usage: []string{
+			T("CF_NAME stacks"),
+		},
 	}
 }
 

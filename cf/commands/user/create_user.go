@@ -26,7 +26,9 @@ func (cmd *CreateUser) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-user",
 		Description: T("Create a new user"),
-		Usage:       T("CF_NAME create-user USERNAME PASSWORD"),
+		Usage: []string{
+			T("CF_NAME create-user USERNAME PASSWORD"),
+		},
 	}
 }
 

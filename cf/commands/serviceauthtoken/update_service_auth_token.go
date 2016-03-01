@@ -25,7 +25,9 @@ func (cmd *UpdateServiceAuthTokenFields) MetaData() command_registry.CommandMeta
 	return command_registry.CommandMetadata{
 		Name:        "update-service-auth-token",
 		Description: T("Update a service auth token"),
-		Usage:       T("CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"),
+		Usage: []string{
+			T("CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"),
+		},
 	}
 }
 

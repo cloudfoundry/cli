@@ -28,10 +28,12 @@ func (cmd *ServiceKeys) MetaData() command_registry.CommandMetadata {
 		Name:        "service-keys",
 		ShortName:   "sk",
 		Description: T("List keys for a service instance"),
-		Usage: T(`CF_NAME service-keys SERVICE_INSTANCE
+		Usage: []string{
+			T(`CF_NAME service-keys SERVICE_INSTANCE
 
 EXAMPLE:
    CF_NAME service-keys mydb`),
+		},
 	}
 }
 

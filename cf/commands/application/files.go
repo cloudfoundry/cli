@@ -29,10 +29,12 @@ func (cmd *Files) MetaData() command_registry.CommandMetadata {
 		Name:        "files",
 		ShortName:   "f",
 		Description: T("Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend"),
-		Usage: T(`CF_NAME files APP_NAME [PATH] [-i INSTANCE]
+		Usage: []string{
+			T(`CF_NAME files APP_NAME [PATH] [-i INSTANCE]
 			
 TIP:
   To list and inspect files of an app running on the Diego backend, use 'CF_NAME ssh'`),
+		},
 		Flags: fs,
 	}
 }

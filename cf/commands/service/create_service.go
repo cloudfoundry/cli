@@ -1,8 +1,6 @@
 package service
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -69,8 +67,16 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
 		Name:        "create-service",
 		ShortName:   "cs",
 		Description: T("Create a service instance"),
-		Usage:       strings.Join([]string{baseUsage, paramsUsage, exampleUsage, tipsUsage}, "\n\n"),
-		Flags:       fs,
+		Usage: []string{
+			baseUsage,
+			"\n\n",
+			paramsUsage,
+			"\n\n",
+			exampleUsage,
+			"\n\n",
+			tipsUsage,
+		},
+		Flags: fs,
 	}
 }
 

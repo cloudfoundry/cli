@@ -32,8 +32,10 @@ func (cmd *DeleteServiceAuthTokenFields) MetaData() command_registry.CommandMeta
 	return command_registry.CommandMetadata{
 		Name:        "delete-service-auth-token",
 		Description: T("Delete a service auth token"),
-		Usage:       T("CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

@@ -27,7 +27,9 @@ func (cmd *Help) MetaData() command_registry.CommandMetadata {
 		Name:        "help",
 		ShortName:   "h",
 		Description: T("Show help"),
-		Usage:       T("CF_NAME help [COMMAND]"),
+		Usage: []string{
+			T("CF_NAME help [COMMAND]"),
+		},
 	}
 }
 

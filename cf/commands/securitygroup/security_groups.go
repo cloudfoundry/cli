@@ -28,7 +28,9 @@ func (cmd *SecurityGroups) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "security-groups",
 		Description: T("List all security groups"),
-		Usage:       "CF_NAME security-groups",
+		Usage: []string{
+			"CF_NAME security-groups",
+		},
 	}
 }
 

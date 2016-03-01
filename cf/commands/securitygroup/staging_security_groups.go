@@ -24,7 +24,9 @@ func (cmd *listStagingSecurityGroups) MetaData() command_registry.CommandMetadat
 	return command_registry.CommandMetadata{
 		Name:        "staging-security-groups",
 		Description: T("List security groups in the staging set for applications"),
-		Usage:       "CF_NAME staging-security-groups",
+		Usage: []string{
+			"CF_NAME staging-security-groups",
+		},
 	}
 }
 

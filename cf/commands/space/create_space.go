@@ -39,8 +39,10 @@ func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-space",
 		Description: T("Create a space"),
-		Usage:       T("CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"),
+		},
+		Flags: fs,
 	}
 }
 

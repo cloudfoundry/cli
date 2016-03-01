@@ -28,7 +28,9 @@ func (cmd *ListSpaceQuotas) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "space-quotas",
 		Description: T("List available space resource quotas"),
-		Usage:       T("CF_NAME space-quotas"),
+		Usage: []string{
+			T("CF_NAME space-quotas"),
+		},
 	}
 }
 

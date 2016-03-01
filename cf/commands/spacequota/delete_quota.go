@@ -29,8 +29,10 @@ func (cmd *DeleteSpaceQuota) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-space-quota",
 		Description: T("Delete a space quota definition and unassign the space quota from all spaces"),
-		Usage:       T("CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

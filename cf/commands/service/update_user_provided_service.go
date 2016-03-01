@@ -38,7 +38,8 @@ func (cmd *UpdateUserProvidedService) MetaData() command_registry.CommandMetadat
 		Name:        "update-user-provided-service",
 		ShortName:   "uups",
 		Description: T("Update user-provided service instance"),
-		Usage: T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
+		Usage: []string{
+			T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
 
    Pass comma separated credential parameter names to enable interactive mode:
    CF_NAME update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
@@ -54,6 +55,7 @@ EXAMPLE:
    CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json
    CF_NAME update-user-provided-service my-drain-service -l syslog://example.com
    CF_NAME update-user-provided-service my-route-service -r https://example.com`),
+		},
 		Flags: fs,
 	}
 }

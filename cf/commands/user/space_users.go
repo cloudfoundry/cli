@@ -32,7 +32,9 @@ func (cmd *SpaceUsers) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "space-users",
 		Description: T("Show space users by role"),
-		Usage:       T("CF_NAME space-users ORG SPACE"),
+		Usage: []string{
+			T("CF_NAME space-users ORG SPACE"),
+		},
 	}
 }
 

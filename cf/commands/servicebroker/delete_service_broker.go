@@ -28,8 +28,10 @@ func (cmd *DeleteServiceBroker) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-service-broker",
 		Description: T("Delete a service broker"),
-		Usage:       T("CF_NAME delete-service-broker SERVICE_BROKER [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-service-broker SERVICE_BROKER [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

@@ -31,7 +31,9 @@ func (cmd ListServices) MetaData() command_registry.CommandMetadata {
 		Name:        "services",
 		ShortName:   "s",
 		Description: T("List all service instances in the target space"),
-		Usage:       "CF_NAME services",
+		Usage: []string{
+			"CF_NAME services",
+		},
 	}
 }
 

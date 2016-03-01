@@ -25,10 +25,12 @@ func init() {
 
 func (cmd *SetEnv) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
-		Name:            "set-env",
-		ShortName:       "se",
-		Description:     T("Set an env variable for an app"),
-		Usage:           T("CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"),
+		Name:        "set-env",
+		ShortName:   "se",
+		Description: T("Set an env variable for an app"),
+		Usage: []string{
+			T("CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"),
+		},
 		SkipFlagParsing: true,
 	}
 }

@@ -37,8 +37,10 @@ func (cmd *CreateOrg) MetaData() command_registry.CommandMetadata {
 		Name:        "create-org",
 		ShortName:   "co",
 		Description: T("Create an org"),
-		Usage:       T("CF_NAME create-org ORG"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME create-org ORG"),
+		},
+		Flags: fs,
 	}
 }
 

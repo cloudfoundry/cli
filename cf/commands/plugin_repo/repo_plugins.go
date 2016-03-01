@@ -33,10 +33,12 @@ func (cmd *RepoPlugins) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        T("repo-plugins"),
 		Description: T("List all available plugins in specified repository or in all added repositories"),
-		Usage: T(`CF_NAME repo-plugins [-r REPO_NAME]
+		Usage: []string{
+			T(`CF_NAME repo-plugins [-r REPO_NAME]
 
 EXAMPLE:
    cf repo-plugins -r PrivateRepo`),
+		},
 		Flags: fs,
 	}
 }

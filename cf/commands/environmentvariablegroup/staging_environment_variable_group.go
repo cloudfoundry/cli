@@ -25,7 +25,9 @@ func (cmd *StagingEnvironmentVariableGroup) MetaData() command_registry.CommandM
 		Name:        "staging-environment-variable-group",
 		Description: T("Retrieve the contents of the staging environment variable group"),
 		ShortName:   "sevg",
-		Usage:       T("CF_NAME staging-environment-variable-group"),
+		Usage: []string{
+			T("CF_NAME staging-environment-variable-group"),
+		},
 	}
 }
 

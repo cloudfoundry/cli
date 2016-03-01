@@ -27,7 +27,9 @@ func (cmd *OAuthToken) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "oauth-token",
 		Description: T("Retrieve and display the OAuth token for the current session"),
-		Usage:       T("CF_NAME oauth-token"),
+		Usage: []string{
+			T("CF_NAME oauth-token"),
+		},
 	}
 }
 

@@ -28,7 +28,9 @@ func (cmd *ListDomains) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "domains",
 		Description: T("List domains in the target org"),
-		Usage:       "CF_NAME domains",
+		Usage: []string{
+			"CF_NAME domains",
+		},
 	}
 }
 

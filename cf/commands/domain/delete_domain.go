@@ -29,8 +29,10 @@ func (cmd *DeleteDomain) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-domain",
 		Description: T("Delete a domain"),
-		Usage:       T("CF_NAME delete-domain DOMAIN [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-domain DOMAIN [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

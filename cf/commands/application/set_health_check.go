@@ -29,7 +29,9 @@ func (cmd *SetHealthCheck) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "set-health-check",
 		Description: T("Set health_check_type flag to either 'port' or 'none'"),
-		Usage:       T("CF_NAME set-health-check APP_NAME 'port'|'none'"),
+		Usage: []string{
+			T("CF_NAME set-health-check APP_NAME 'port'|'none'"),
+		},
 	}
 }
 
