@@ -844,7 +844,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLE:\n   CF_NAME service-key mydb mykey",
+    "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY",
     "translation": ""
   },
   {

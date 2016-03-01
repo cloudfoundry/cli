@@ -420,6 +420,10 @@
     "translation": "CF_NAME service-auth-tokens"
   },
   {
+    "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY",
+    "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY"
+  },
+  {
     "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
     "translation": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"
   },
