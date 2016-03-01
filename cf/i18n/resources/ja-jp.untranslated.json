@@ -52,6 +52,14 @@
     "translation": "CF_NAME auth USERNAME PASSWORD\n\n"
   },
   {
+    "id": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
+    "translation": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"
+  },
+  {
+    "id": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)",
+    "translation": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)"
+  },
+  {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
     "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
   },
@@ -236,6 +244,26 @@
     "translation": "CF_NAME list-plugin-repos"
   },
   {
+    "id": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)",
+    "translation": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)"
+  },
+  {
+    "id": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
+    "translation": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+    "translation": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)",
+    "translation": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)",
+    "translation": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)"
+  },
+  {
     "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
     "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"
   },
@@ -314,6 +342,10 @@
   {
     "id": "CF_NAME rename-space SPACE NEW_SPACE",
     "translation": "CF_NAME rename-space SPACE NEW_SPACE"
+  },
+  {
+    "id": "CF_NAME repo-plugins [-r REPO_NAME]",
+    "translation": "CF_NAME repo-plugins [-r REPO_NAME]"
   },
   {
     "id": "CF_NAME restage APP_NAME",
@@ -686,6 +718,10 @@
   {
     "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history",
+    "translation": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history"
   },
   {
     "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",

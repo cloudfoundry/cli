@@ -48,6 +48,14 @@
     "translation": "CF_NAME auth USERNAME PASSWORD\n\n"
   },
   {
+    "id": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
+    "translation": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"
+  },
+  {
+    "id": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)",
+    "translation": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)"
+  },
+  {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\nEXAMPLES:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
     "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\nEXAMPLES:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'"
   },
@@ -248,6 +256,26 @@
     "translation": "CF_NAME list-plugin-repos"
   },
   {
+    "id": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)",
+    "translation": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)"
+  },
+  {
+    "id": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
+    "translation": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+    "translation": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)",
+    "translation": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)",
+    "translation": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)"
+  },
+  {
     "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
     "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"
   },
@@ -328,8 +356,8 @@
     "translation": "CF_NAME rename-space SPACE NEW_SPACE"
   },
   {
-    "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
-    "translation": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo"
+    "id": "CF_NAME repo-plugins [-r REPO_NAME]",
+    "translation": "CF_NAME repo-plugins [-r REPO_NAME]"
   },
   {
     "id": "CF_NAME restage APP_NAME",
@@ -576,6 +604,10 @@
     "translation": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications"
   },
   {
+    "id": "EXAMPLES",
+    "translation": "EXAMPLES"
+  },
+  {
     "id": "Error getting SSH code: ",
     "translation": "Error getting SSH code: "
   },
@@ -778,6 +810,10 @@
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
     "translation": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."
+  },
+  {
+    "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history",
+    "translation": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history"
   },
   {
     "id": "app ports",
