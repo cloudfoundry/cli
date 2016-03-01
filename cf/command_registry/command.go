@@ -22,4 +22,5 @@ type CommandMetadata struct {
 	SkipFlagParsing bool
 	TotalArgs       int //Optional: number of required arguments to skip for flag verification
 	Hidden          bool
+	Example					[]string
 }
