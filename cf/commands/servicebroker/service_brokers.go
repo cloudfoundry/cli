@@ -34,7 +34,9 @@ func (cmd *ListServiceBrokers) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "service-brokers",
 		Description: T("List service brokers"),
-		Usage:       "CF_NAME service-brokers",
+		Usage: []string{
+			"CF_NAME service-brokers",
+		},
 	}
 }
 

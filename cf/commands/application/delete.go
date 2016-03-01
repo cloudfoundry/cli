@@ -33,8 +33,10 @@ func (cmd *DeleteApp) MetaData() command_registry.CommandMetadata {
 		Name:        "delete",
 		ShortName:   "d",
 		Description: T("Delete an app"),
-		Usage:       T("CF_NAME delete APP_NAME [-f -r]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete APP_NAME [-f -r]"),
+		},
+		Flags: fs,
 	}
 }
 

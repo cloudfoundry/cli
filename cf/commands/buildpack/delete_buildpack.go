@@ -32,8 +32,10 @@ func (cmd *DeleteBuildpack) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-buildpack",
 		Description: T("Delete a buildpack"),
-		Usage:       T("CF_NAME delete-buildpack BUILDPACK [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-buildpack BUILDPACK [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

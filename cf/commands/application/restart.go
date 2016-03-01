@@ -33,7 +33,9 @@ func (cmd *Restart) MetaData() command_registry.CommandMetadata {
 		Name:        "restart",
 		ShortName:   "rs",
 		Description: T("Restart an app"),
-		Usage:       T("CF_NAME restart APP_NAME"),
+		Usage: []string{
+			T("CF_NAME restart APP_NAME"),
+		},
 	}
 }
 

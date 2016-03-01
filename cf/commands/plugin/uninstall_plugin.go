@@ -30,7 +30,9 @@ func (cmd *PluginUninstall) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "uninstall-plugin",
 		Description: T("Uninstall the plugin defined in command argument"),
-		Usage:       T("CF_NAME uninstall-plugin PLUGIN-NAME"),
+		Usage: []string{
+			T("CF_NAME uninstall-plugin PLUGIN-NAME"),
+		},
 	}
 }
 

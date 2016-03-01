@@ -23,7 +23,9 @@ func (cmd FakeCommand1) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "fake-non-codegangsta-command",
 		Description: "Description for fake-command",
-		Usage:       "Usage of fake-command",
+		Usage: []string{
+			"Usage of fake-command",
+		},
 	}
 }
 

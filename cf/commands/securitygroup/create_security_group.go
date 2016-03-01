@@ -1,8 +1,6 @@
 package securitygroup
 
 import (
-	"strings"
-
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -43,7 +41,11 @@ func (cmd *CreateSecurityGroup) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-security-group",
 		Description: T("Create a security group"),
-		Usage:       strings.Join([]string{primaryUsage, secondaryUsage}, "\n\n"),
+		Usage: []string{
+			primaryUsage,
+			"\n\n",
+			secondaryUsage,
+		},
 	}
 }
 

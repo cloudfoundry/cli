@@ -22,10 +22,14 @@ func (cmd *Version) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "version",
 		Description: T("Print the version"),
-		Usage: "CF_NAME version" + "\n\n   " + T("'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.", map[string]string{
-			"VersionShort": "cf -v",
-			"VersionLong":  "cf --version",
-		}),
+		Usage: []string{
+			"CF_NAME version",
+			"\n\n   ",
+			T("'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.", map[string]string{
+				"VersionShort": "cf -v",
+				"VersionLong":  "cf --version",
+			}),
+		},
 	}
 }
 

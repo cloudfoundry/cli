@@ -27,8 +27,10 @@ func init() {
 
 func (cmd *showQuota) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
-		Name:        "quota",
-		Usage:       T("CF_NAME quota QUOTA"),
+		Name: "quota",
+		Usage: []string{
+			T("CF_NAME quota QUOTA"),
+		},
 		Description: T("Show quota info"),
 	}
 }

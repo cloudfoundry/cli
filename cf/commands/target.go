@@ -35,8 +35,10 @@ func (cmd *Target) MetaData() command_registry.CommandMetadata {
 		Name:        "target",
 		ShortName:   "t",
 		Description: T("Set or view the targeted org or space"),
-		Usage:       T("CF_NAME target [-o ORG] [-s SPACE]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME target [-o ORG] [-s SPACE]"),
+		},
+		Flags: fs,
 	}
 }
 

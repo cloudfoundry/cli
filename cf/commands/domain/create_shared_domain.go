@@ -29,8 +29,10 @@ func (cmd *CreateSharedDomain) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-shared-domain",
 		Description: T("Create a domain that can be used by all orgs (admin-only)"),
-		Usage:       T("CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"),
+		},
+		Flags: fs,
 	}
 }
 

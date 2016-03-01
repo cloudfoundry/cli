@@ -29,8 +29,10 @@ func (cmd *DeleteQuota) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-quota",
 		Description: T("Delete a quota"),
-		Usage:       T("CF_NAME delete-quota QUOTA [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-quota QUOTA [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

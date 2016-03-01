@@ -24,7 +24,9 @@ func (cmd *RenameServiceBroker) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "rename-service-broker",
 		Description: T("Rename a service broker"),
-		Usage:       T("CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"),
+		Usage: []string{
+			T("CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"),
+		},
 	}
 }
 

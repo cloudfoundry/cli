@@ -29,8 +29,12 @@ func (cmd *PurgeServiceOffering) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "purge-service-offering",
 		Description: T("Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"),
-		Usage:       T("CF_NAME purge-service-offering SERVICE [-p PROVIDER]") + "\n\n" + scaryWarningMessage(),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME purge-service-offering SERVICE [-p PROVIDER]"),
+			"\n\n",
+			scaryWarningMessage(),
+		},
+		Flags: fs,
 	}
 }
 

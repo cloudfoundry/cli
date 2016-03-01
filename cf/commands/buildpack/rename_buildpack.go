@@ -22,7 +22,9 @@ func (cmd *RenameBuildpack) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "rename-buildpack",
 		Description: T("Rename a buildpack"),
-		Usage:       T("CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"),
+		Usage: []string{
+			T("CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"),
+		},
 	}
 }
 

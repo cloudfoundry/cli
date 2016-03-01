@@ -33,11 +33,13 @@ func (cmd *UnsetSpaceRole) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "unset-space-role",
 		Description: T("Remove a space role from a user"),
-		Usage: T("CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n") +
-			T("ROLES:\n") +
-			fmt.Sprintf("   'SpaceManager' - %s", T("Invite and manage users, and enable features for a given space\n")) +
-			fmt.Sprintf("   'SpaceDeveloper' - %s", T("Create and manage apps and services, and see logs and reports\n")) +
+		Usage: []string{
+			T("CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n"),
+			T("ROLES:\n"),
+			fmt.Sprintf("   'SpaceManager' - %s", T("Invite and manage users, and enable features for a given space\n")),
+			fmt.Sprintf("   'SpaceDeveloper' - %s", T("Create and manage apps and services, and see logs and reports\n")),
 			fmt.Sprintf("   'SpaceAuditor' - %s", T("View logs, reports, and settings on this space\n")),
+		},
 	}
 }
 

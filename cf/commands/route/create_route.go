@@ -40,7 +40,8 @@ func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-route",
 		Description: T("Create a url route in a space for later use"),
-		Usage: T(`Create an HTTP route:
+		Usage: []string{
+			T(`Create an HTTP route:
    cf create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]
 
    Create a TCP route:
@@ -51,6 +52,7 @@ EXAMPLES:
    cf create-route my-space example.com --hostname myapp            # myapp.example.com
    cf create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo
    cf create-route my-space example.com --port 50000                # example.com:50000`),
+		},
 		Flags: fs,
 	}
 }

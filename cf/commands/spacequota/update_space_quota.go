@@ -34,8 +34,10 @@ func (cmd *UpdateSpaceQuota) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "update-space-quota",
 		Description: T("Update an existing space quota"),
-		Usage:       T("CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"),
+		},
+		Flags: fs,
 	}
 }
 

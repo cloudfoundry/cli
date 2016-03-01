@@ -30,8 +30,10 @@ func (cmd *DeleteService) MetaData() command_registry.CommandMetadata {
 		Name:        "delete-service",
 		ShortName:   "ds",
 		Description: T("Delete a service instance"),
-		Usage:       T("CF_NAME delete-service SERVICE_INSTANCE [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-service SERVICE_INSTANCE [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

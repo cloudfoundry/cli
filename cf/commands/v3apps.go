@@ -30,8 +30,10 @@ func (c *V3Apps) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "v3apps",
 		Description: T("List all apps in the target space"),
-		Usage:       "CF_NAME v3apps",
-		Hidden:      true,
+		Usage: []string{
+			"CF_NAME v3apps",
+		},
+		Hidden: true,
 	}
 }
 

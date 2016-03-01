@@ -33,10 +33,12 @@ func (cmd *AddPluginRepo) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "add-plugin-repo",
 		Description: T("Add a new plugin repository"),
-		Usage: T(`CF_NAME add-plugin-repo REPO_NAME URL
+		Usage: []string{
+			T(`CF_NAME add-plugin-repo REPO_NAME URL
 
 EXAMPLE:
    cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/`),
+		},
 		TotalArgs: 2,
 	}
 }

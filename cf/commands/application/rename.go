@@ -26,7 +26,9 @@ func (cmd *RenameApp) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "rename",
 		Description: T("Rename an app"),
-		Usage:       T("CF_NAME rename APP_NAME NEW_APP_NAME"),
+		Usage: []string{
+			T("CF_NAME rename APP_NAME NEW_APP_NAME"),
+		},
 	}
 }
 

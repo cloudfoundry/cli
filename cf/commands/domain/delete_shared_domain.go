@@ -29,8 +29,10 @@ func (cmd *DeleteSharedDomain) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-shared-domain",
 		Description: T("Delete a shared domain"),
-		Usage:       T("CF_NAME delete-shared-domain DOMAIN [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-shared-domain DOMAIN [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

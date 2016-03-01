@@ -26,7 +26,9 @@ func (cmd *CreateServiceAuthTokenFields) MetaData() command_registry.CommandMeta
 	return command_registry.CommandMetadata{
 		Name:        "create-service-auth-token",
 		Description: T("Create a service auth token"),
-		Usage:       T("CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"),
+		Usage: []string{
+			T("CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"),
+		},
 	}
 }
 

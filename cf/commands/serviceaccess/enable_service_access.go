@@ -31,8 +31,10 @@ func (cmd *EnableServiceAccess) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "enable-service-access",
 		Description: T("Enable access to a service or service plan for one or all orgs"),
-		Usage:       "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
-		Flags:       fs,
+		Usage: []string{
+			"CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
+		},
+		Flags: fs,
 	}
 }
 

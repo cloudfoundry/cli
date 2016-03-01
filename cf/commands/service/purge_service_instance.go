@@ -27,8 +27,12 @@ func (cmd *PurgeServiceInstance) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "purge-service-instance",
 		Description: T("Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"),
-		Usage:       T("CF_NAME purge-service-instance SERVICE_INSTANCE") + "\n\n" + cmd.scaryWarningMessage(),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME purge-service-instance SERVICE_INSTANCE"),
+			"\n\n",
+			cmd.scaryWarningMessage(),
+		},
+		Flags: fs,
 	}
 }
 

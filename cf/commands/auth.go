@@ -25,8 +25,13 @@ func (cmd *Authenticate) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "auth",
 		Description: T("Authenticate user non-interactively"),
-		Usage: T("CF_NAME auth USERNAME PASSWORD\n\n") +
-			terminal.WarningColor(T("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n")) + T("EXAMPLE:\n") + T("   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n") + T("   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"),
+		Usage: []string{
+			T("CF_NAME auth USERNAME PASSWORD\n\n"),
+			terminal.WarningColor(T("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n")),
+			T("EXAMPLE:\n"),
+			T("   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n"),
+			T("   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"),
+		},
 	}
 }
 

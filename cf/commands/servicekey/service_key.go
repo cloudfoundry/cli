@@ -33,10 +33,12 @@ func (cmd *ServiceKey) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "service-key",
 		Description: T("Show service key info"),
-		Usage: T(`CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY
+		Usage: []string{
+			T(`CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY
 
 EXAMPLE:
    CF_NAME service-key mydb mykey`),
+		},
 		Flags: fs,
 	}
 }

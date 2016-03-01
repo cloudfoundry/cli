@@ -66,7 +66,9 @@ func (cmd *Start) MetaData() command_registry.CommandMetadata {
 		Name:        "start",
 		ShortName:   "st",
 		Description: T("Start an app"),
-		Usage:       T("CF_NAME start APP_NAME"),
+		Usage: []string{
+			T("CF_NAME start APP_NAME"),
+		},
 	}
 }
 

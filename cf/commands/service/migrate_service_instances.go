@@ -33,8 +33,11 @@ func (cmd *MigrateServiceInstances) MetaData() command_registry.CommandMetadata 
 	return command_registry.CommandMetadata{
 		Name:        "migrate-service-instances",
 		Description: T("Migrate service instances from one service plan to another"),
-		Usage:       T("CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n") + migrateServiceInstanceWarning(),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n"),
+			migrateServiceInstanceWarning(),
+		},
+		Flags: fs,
 	}
 }
 

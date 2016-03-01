@@ -35,8 +35,10 @@ func (cmd *Logs) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "logs",
 		Description: T("Tail or show recent logs for an app"),
-		Usage:       T("CF_NAME logs APP_NAME"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME logs APP_NAME"),
+		},
+		Flags: fs,
 	}
 }
 

@@ -33,8 +33,10 @@ func (cmd *ShowOrg) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "org",
 		Description: T("Show org info"),
-		Usage:       T("CF_NAME org ORG"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME org ORG"),
+		},
+		Flags: fs,
 	}
 }
 

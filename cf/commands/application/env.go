@@ -30,7 +30,9 @@ func (cmd *Env) MetaData() command_registry.CommandMetadata {
 		Name:        "env",
 		ShortName:   "e",
 		Description: T("Show all env variables for an app"),
-		Usage:       T("CF_NAME env APP_NAME"),
+		Usage: []string{
+			T("CF_NAME env APP_NAME"),
+		},
 	}
 }
 

@@ -26,7 +26,9 @@ func (cmd *SetSpaceQuota) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "set-space-quota",
 		Description: T("Assign a space quota definition to a space"),
-		Usage:       T("CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME"),
+		Usage: []string{
+			T("CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME"),
+		},
 	}
 }
 

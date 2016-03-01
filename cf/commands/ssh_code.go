@@ -35,7 +35,9 @@ func (cmd *OneTimeSSHCode) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "ssh-code",
 		Description: T("Get a one time password for ssh clients"),
-		Usage:       T("CF_NAME ssh-code"),
+		Usage: []string{
+			T("CF_NAME ssh-code"),
+		},
 	}
 }
 

@@ -46,8 +46,10 @@ func (cmd *ShowApp) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "app",
 		Description: T("Display health and status for app"),
-		Usage:       T("CF_NAME app APP_NAME"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME app APP_NAME"),
+		},
+		Flags: fs,
 	}
 }
 

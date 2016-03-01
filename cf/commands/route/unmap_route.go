@@ -31,12 +31,14 @@ func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "unmap-route",
 		Description: T("Remove a url route from an app"),
-		Usage: T(`CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]
+		Usage: []string{
+			T(`CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]
 
 EXAMPLES:
    CF_NAME unmap-route my-app example.com                              # example.com
    CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com
    CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo`),
+		},
 		Flags: fs,
 	}
 }

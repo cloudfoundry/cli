@@ -27,7 +27,9 @@ func (cmd *UnbindService) MetaData() command_registry.CommandMetadata {
 		Name:        "unbind-service",
 		ShortName:   "us",
 		Description: T("Unbind a service instance from an app"),
-		Usage:       T("CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"),
+		Usage: []string{
+			T("CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"),
+		},
 	}
 }
 

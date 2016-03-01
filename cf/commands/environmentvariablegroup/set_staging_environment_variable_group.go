@@ -26,7 +26,9 @@ func (cmd *SetStagingEnvironmentVariableGroup) MetaData() command_registry.Comma
 		Name:        "set-staging-environment-variable-group",
 		Description: T("Pass parameters as JSON to create a staging environment variable group"),
 		ShortName:   "ssevg",
-		Usage:       T(`CF_NAME set-staging-environment-variable-group '{"name":"value","name":"value"}'`),
+		Usage: []string{
+			T(`CF_NAME set-staging-environment-variable-group '{"name":"value","name":"value"}'`),
+		},
 	}
 }
 

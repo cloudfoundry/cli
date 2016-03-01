@@ -31,7 +31,9 @@ func (cmd *ListOrgs) MetaData() command_registry.CommandMetadata {
 		Name:        "orgs",
 		ShortName:   "o",
 		Description: T("List all orgs"),
-		Usage:       "CF_NAME orgs",
+		Usage: []string{
+			"CF_NAME orgs",
+		},
 	}
 }
 

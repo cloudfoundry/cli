@@ -28,8 +28,10 @@ func (cmd *DeleteSecurityGroup) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-security-group",
 		Description: T("Deletes a security group"),
-		Usage:       T("CF_NAME delete-security-group SECURITY_GROUP [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-security-group SECURITY_GROUP [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

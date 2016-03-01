@@ -25,11 +25,13 @@ func (cmd *RemovePluginRepo) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "remove-plugin-repo",
 		Description: T("Remove a plugin repository"),
-		Usage: T(`CF_NAME remove-plugin-repo REPO_NAME
+		Usage: []string{
+			T(`CF_NAME remove-plugin-repo REPO_NAME
 
 EXAMPLE:
    cf remove-plugin-repo PrivateRepo
 `),
+		},
 		TotalArgs: 1,
 	}
 }

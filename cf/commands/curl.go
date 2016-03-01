@@ -42,7 +42,8 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "curl",
 		Description: T("Executes a request to the targeted API endpoint"),
-		Usage: T(`CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]
+		Usage: []string{
+			T(`CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]
 
    By default 'CF_NAME curl' will perform a GET to the specified PATH. If data
    is provided via -d, a POST will be performed instead, and the Content-Type
@@ -57,6 +58,7 @@ EXAMPLES:
                       -d 'q=name:myapp'
 
    cf curl "/v2/apps" -d @/path/to/file`),
+		},
 		Flags: fs,
 	}
 }

@@ -24,7 +24,9 @@ func (cmd *ShowFeatureFlag) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "feature-flag",
 		Description: T("Retrieve an individual feature flag with status"),
-		Usage:       T("CF_NAME feature-flag FEATURE_NAME"),
+		Usage: []string{
+			T("CF_NAME feature-flag FEATURE_NAME"),
+		},
 	}
 }
 

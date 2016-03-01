@@ -152,7 +152,7 @@ type Command interface {
 type CommandMetadata struct {
 	Name            string
 	ShortName       string
-	Usage           string
+	Usage           []string
 	Description     string
 	Flags           map[string]flags.FlagSet
 	SkipFlagParsing bool

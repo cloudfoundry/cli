@@ -23,7 +23,9 @@ func (cmd *Logout) MetaData() command_registry.CommandMetadata {
 		Name:        "logout",
 		ShortName:   "lo",
 		Description: T("Log user out"),
-		Usage:       T("CF_NAME logout"),
+		Usage: []string{
+			T("CF_NAME logout"),
+		},
 	}
 }
 

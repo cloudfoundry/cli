@@ -26,7 +26,9 @@ func (cmd *Password) MetaData() command_registry.CommandMetadata {
 		Name:        "passwd",
 		ShortName:   "pw",
 		Description: T("Change user password"),
-		Usage:       T("CF_NAME passwd"),
+		Usage: []string{
+			T("CF_NAME passwd"),
+		},
 	}
 }
 

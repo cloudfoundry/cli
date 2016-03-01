@@ -33,8 +33,10 @@ func (cmd *MarketplaceServices) MetaData() command_registry.CommandMetadata {
 		Name:        "marketplace",
 		ShortName:   "m",
 		Description: T("List available offerings in the marketplace"),
-		Usage:       "CF_NAME marketplace",
-		Flags:       fs,
+		Usage: []string{
+			"CF_NAME marketplace",
+		},
+		Flags: fs,
 	}
 }
 

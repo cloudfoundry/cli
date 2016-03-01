@@ -35,8 +35,11 @@ func (cmd *CreateBuildpack) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-buildpack",
 		Description: T("Create a buildpack"),
-		Usage: T("CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]") +
-			T("\n\nTIP:\n") + T("   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."),
+		Usage: []string{
+			T("CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]"),
+			T("\n\nTIP:\n"),
+			T("   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."),
+		},
 		Flags:     fs,
 		TotalArgs: 3,
 	}

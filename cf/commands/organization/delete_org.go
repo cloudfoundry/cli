@@ -30,8 +30,10 @@ func (cmd *DeleteOrg) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "delete-org",
 		Description: T("Delete an org"),
-		Usage:       T("CF_NAME delete-org ORG [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME delete-org ORG [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

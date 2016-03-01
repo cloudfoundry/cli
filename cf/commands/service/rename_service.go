@@ -27,7 +27,9 @@ func (cmd *RenameService) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "rename-service",
 		Description: T("Rename a service instance"),
-		Usage:       T("CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"),
+		Usage: []string{
+			T("CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"),
+		},
 	}
 }
 

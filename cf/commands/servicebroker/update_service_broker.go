@@ -24,7 +24,9 @@ func (cmd *UpdateServiceBroker) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "update-service-broker",
 		Description: T("Update a service broker"),
-		Usage:       T("CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"),
+		Usage: []string{
+			T("CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"),
+		},
 	}
 }
 

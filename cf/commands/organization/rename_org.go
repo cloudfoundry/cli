@@ -25,7 +25,9 @@ func (cmd *RenameOrg) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "rename-org",
 		Description: T("Rename an org"),
-		Usage:       T("CF_NAME rename-org ORG NEW_ORG"),
+		Usage: []string{
+			T("CF_NAME rename-org ORG NEW_ORG"),
+		},
 	}
 }
 

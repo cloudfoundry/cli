@@ -25,7 +25,9 @@ func (cmd *CreateDomain) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-domain",
 		Description: T("Create a domain in an org for later use"),
-		Usage:       T("CF_NAME create-domain ORG DOMAIN"),
+		Usage: []string{
+			T("CF_NAME create-domain ORG DOMAIN"),
+		},
 	}
 }
 

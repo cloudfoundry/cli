@@ -24,7 +24,9 @@ func (cmd *listRunningSecurityGroups) MetaData() command_registry.CommandMetadat
 	return command_registry.CommandMetadata{
 		Name:        "running-security-groups",
 		Description: T("List security groups in the set of security groups for running applications"),
-		Usage:       "CF_NAME running-security-groups",
+		Usage: []string{
+			"CF_NAME running-security-groups",
+		},
 	}
 }
 

@@ -81,13 +81,13 @@ var _ = Describe("CommandRegistry", func() {
 
 			It("returns the command when the command's name is given", func() {
 				cmd := command_registry.Commands.FindCommand("fake-command")
-				Expect(cmd.MetaData().Usage).To(ContainSubstring("Usage of fake-command"))
+				Expect(cmd.MetaData().Usage[0]).To(ContainSubstring("Usage of fake-command"))
 				Expect(cmd.MetaData().Description).To(Equal("Description for fake-command"))
 			})
 
 			It("returns the command when the command's alias is given", func() {
 				cmd := command_registry.Commands.FindCommand("fc1")
-				Expect(cmd.MetaData().Usage).To(ContainSubstring("Usage of fake-command"))
+				Expect(cmd.MetaData().Usage[0]).To(ContainSubstring("Usage of fake-command"))
 				Expect(cmd.MetaData().Description).To(Equal("Description for fake-command"))
 			})
 		})

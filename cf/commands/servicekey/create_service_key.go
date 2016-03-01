@@ -33,7 +33,8 @@ func (cmd *CreateServiceKey) MetaData() command_registry.CommandMetadata {
 		Name:        "create-service-key",
 		ShortName:   "csk",
 		Description: T("Create key for a service instance"),
-		Usage: T(`CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]
+		Usage: []string{
+			T(`CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]
 
    Optionally provide service-specific configuration parameters in a valid JSON object in-line.
    CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{"name":"value","name":"value"}'
@@ -49,6 +50,7 @@ func (cmd *CreateServiceKey) MetaData() command_registry.CommandMetadata {
 EXAMPLE:
    CF_NAME create-service-key mydb mykey -c '{"permissions":"read-only"}'
    CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json`),
+		},
 		Flags: fs,
 	}
 }

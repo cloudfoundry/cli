@@ -31,11 +31,13 @@ func (cmd *UnsetOrgRole) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "unset-org-role",
 		Description: T("Remove an org role from a user"),
-		Usage: T("CF_NAME unset-org-role USERNAME ORG ROLE\n\n") +
-			T("ROLES:\n") +
-			fmt.Sprintf("   'OrgManager' - %s", T("Invite and manage users, select and change plans, and set spending limits\n")) +
-			fmt.Sprintf("   'BillingManager' - %s", T("Create and manage the billing account and payment info\n")) +
+		Usage: []string{
+			T("CF_NAME unset-org-role USERNAME ORG ROLE\n\n"),
+			T("ROLES:\n"),
+			fmt.Sprintf("   'OrgManager' - %s", T("Invite and manage users, select and change plans, and set spending limits\n")),
+			fmt.Sprintf("   'BillingManager' - %s", T("Create and manage the billing account and payment info\n")),
 			fmt.Sprintf("   'OrgAuditor' - %s", T("Read-only access to org info and reports\n")),
+		},
 	}
 }
 

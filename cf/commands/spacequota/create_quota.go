@@ -36,8 +36,10 @@ func (cmd *CreateSpaceQuota) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "create-space-quota",
 		Description: T("Define a new space resource quota"),
-		Usage:       T("CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
+		},
+		Flags: fs,
 	}
 }
 

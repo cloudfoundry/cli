@@ -30,8 +30,10 @@ func (cmd *DisableServiceAccess) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "disable-service-access",
 		Description: T("Disable access to a service or service plan for one or all orgs"),
-		Usage:       "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
-		Flags:       fs,
+		Usage: []string{
+			"CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
+		},
+		Flags: fs,
 	}
 }
 

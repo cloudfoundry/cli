@@ -36,7 +36,9 @@ func (cmd *Stop) MetaData() command_registry.CommandMetadata {
 		Name:        "stop",
 		ShortName:   "sp",
 		Description: T("Stop an app"),
-		Usage:       T("CF_NAME stop APP_NAME"),
+		Usage: []string{
+			T("CF_NAME stop APP_NAME"),
+		},
 	}
 }
 

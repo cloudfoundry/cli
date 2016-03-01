@@ -34,8 +34,10 @@ func (cmd *Scale) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "scale",
 		Description: T("Change or view the instance count, disk space limit, and memory limit for an app"),
-		Usage:       T("CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"),
-		Flags:       fs,
+		Usage: []string{
+			T("CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"),
+		},
+		Flags: fs,
 	}
 }
 

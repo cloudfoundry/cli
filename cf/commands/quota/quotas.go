@@ -29,7 +29,9 @@ func (cmd *ListQuotas) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "quotas",
 		Description: T("List available usage quotas"),
-		Usage:       T("CF_NAME quotas"),
+		Usage: []string{
+			T("CF_NAME quotas"),
+		},
 	}
 }
 

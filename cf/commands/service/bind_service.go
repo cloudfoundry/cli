@@ -1,8 +1,6 @@
 package service
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -65,8 +63,14 @@ func (cmd *BindService) MetaData() command_registry.CommandMetadata {
 		Name:        "bind-service",
 		ShortName:   "bs",
 		Description: T("Bind a service instance to an app"),
-		Usage:       strings.Join([]string{baseUsage, paramsUsage, exampleUsage}, "\n\n"),
-		Flags:       fs,
+		Usage: []string{
+			baseUsage,
+			"\n\n",
+			paramsUsage,
+			"\n\n",
+			exampleUsage,
+		},
+		Flags: fs,
 	}
 }
 

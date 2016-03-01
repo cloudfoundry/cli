@@ -1,8 +1,6 @@
 package securitygroup
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -31,7 +29,11 @@ func (cmd *unbindFromStagingGroup) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "unbind-staging-security-group",
 		Description: T("Unbind a security group from the set of security groups for staging applications"),
-		Usage:       strings.Join([]string{primaryUsage, tipUsage}, "\n\n"),
+		Usage: []string{
+			primaryUsage,
+			"\n\n",
+			tipUsage,
+		},
 	}
 }
 

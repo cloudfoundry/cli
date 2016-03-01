@@ -27,7 +27,9 @@ func (cmd *UnsharePrivateDomain) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
 		Name:        "unshare-private-domain",
 		Description: T("Unshare a private domain with an org"),
-		Usage:       T("CF_NAME unshare-private-domain ORG DOMAIN"),
+		Usage: []string{
+			T("CF_NAME unshare-private-domain ORG DOMAIN"),
+		},
 	}
 }
 
