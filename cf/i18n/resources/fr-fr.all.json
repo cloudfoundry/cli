@@ -972,8 +972,8 @@
     "translation": "CF_NAME uninstall-plugin NOM_PLUGIN "
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
-    "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME]"
+    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
+    "translation": ""
   },
   {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",

@@ -516,6 +516,10 @@
     "translation": "CF_NAME uninstall-plugin PLUGIN-NAME"
   },
   {
+    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
+    "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
+  },
+  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME"
   },
