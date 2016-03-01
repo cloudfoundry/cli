@@ -80,6 +80,10 @@
     "translation": "CF_NAME buildpacks"
   },
   {
+    "id": "CF_NAME check-route HOST DOMAIN [--path PATH]",
+    "translation": "CF_NAME check-route HOST DOMAIN [--path PATH]"
+  },
+  {
     "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]",
     "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]"
   },

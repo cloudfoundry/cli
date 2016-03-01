@@ -32,11 +32,11 @@ func (cmd *CheckRoute) MetaData() command_registry.CommandMetadata {
 		Name:        "check-route",
 		Description: T("Perform a simple check to determine whether a route currently exists or not"),
 		Usage: []string{
-			T(`CF_NAME check-route HOST DOMAIN [--path PATH]
-
-EXAMPLES:
-   CF_NAME check-route myhost example.com            # example.com
-   CF_NAME check-route myhost example.com --path foo # myhost.example.com/foo`),
+			T("CF_NAME check-route HOST DOMAIN [--path PATH]"),
+		},
+		Example: []string{
+			"CF_NAME check-route myhost example.com            # example.com",
+			"CF_NAME check-route myhost example.com --path foo # myhost.example.com/foo",
 		},
 		Flags: fs,
 	}

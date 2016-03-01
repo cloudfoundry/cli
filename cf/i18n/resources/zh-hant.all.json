@@ -512,8 +512,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME check-route HOST DOMAIN [--path PATH]\n\nEXAMPLES:\n   CF_NAME check-route myhost example.com            # example.com\n   CF_NAME check-route myhost example.com --path foo # myhost.example.com/foo",
-    "translation": "CF_NAME check-route HOST DOMAIN"
+    "id": "CF_NAME check-route HOST DOMAIN [--path PATH]",
+    "translation": ""
   },
   {
     "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]",
