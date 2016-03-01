@@ -460,7 +460,7 @@
     "translation": "Die Bytemenge muss eine ganze Zahl mit einer Maßeinheit wie M, MB, G oder GB sein."
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL",
     "translation": ""
   },
   {
