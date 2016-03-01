@@ -28,6 +28,14 @@
     "translation": "CF_NAME api [URL]"
   },
   {
+    "id": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
+    "translation": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"
+  },
+  {
+    "id": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)",
+    "translation": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)"
+  },
+  {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\nEXAMPLES:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
     "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\nEXAMPLES:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'"
   },
@@ -88,6 +96,26 @@
     "translation": "CF_NAME list-plugin-repos"
   },
   {
+    "id": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)",
+    "translation": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)"
+  },
+  {
+    "id": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
+    "translation": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+    "translation": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)",
+    "translation": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)"
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)",
+    "translation": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)"
+  },
+  {
     "id": "CF_NAME logout",
     "translation": "CF_NAME logout"
   },
@@ -124,8 +152,8 @@
     "translation": "CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n"
   },
   {
-    "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
-    "translation": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo"
+    "id": "CF_NAME repo-plugins [-r REPO_NAME]",
+    "translation": "CF_NAME repo-plugins [-r REPO_NAME]"
   },
   {
     "id": "CF_NAME running-environment-variable-group",
@@ -206,6 +234,10 @@
   {
     "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
     "translation": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"
+  },
+  {
+    "id": "EXAMPLES",
+    "translation": "EXAMPLES"
   },
   {
     "id": "Error getting SSH code: ",
@@ -450,6 +482,10 @@
   {
     "id": "Version",
     "translation": "Version"
+  },
+  {
+    "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history",
+    "translation": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history"
   },
   {
     "id": "app ports",

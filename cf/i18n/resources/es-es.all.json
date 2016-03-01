@@ -52,36 +52,8 @@
     "translation": "\nCONSEJO: Utilice 'cf login -a API --skip-ssl-validation' o 'cf api API --skip-ssl-validation' para suprimir este error"
   },
   {
-    "id": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
-    "translation": "   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape comillas si se utiliza en la contraseña)"
-  },
-  {
-    "id": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n",
-    "translation": "   CF_NAME auth name@example.com \"my password\" (utilice comillas para contraseñas con un espacio)\n"
-  },
-  {
     "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
     "translation": ""
-  },
-  {
-    "id": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n",
-    "translation": "   CF_NAME login (omita el nombre de usuario y la contraseña para iniciar sesión de forma interactiva -- CF_NAME se solicitará para ambos)\n"
-  },
-  {
-    "id": "   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
-    "translation": "   CF_NAME login --sso (CF_NAME proporcionará un URL para obtener una contraseña única para iniciar la sesión)"
-  },
-  {
-    "id": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)\n",
-    "translation": "   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape comillas si se utiliza en la contraseña)\n"
-  },
-  {
-    "id": "   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n",
-    "translation": "   CF_NAME login -u name@example.com -p \"my password\" (utilice comillas para contraseñas con un espacio)\n"
-  },
-  {
-    "id": "   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n",
-    "translation": "   CF_NAME login -u name@example.com -p pa55woRD (especifique el nombre de usuario y la contraseña como argumentos)\n"
   },
   {
     "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
@@ -508,6 +480,14 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\nEXAMPLES:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
     "translation": ""
   },
@@ -724,6 +704,26 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
     "translation": ""
   },
@@ -808,7 +808,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLE:\n   cf repo-plugins -r PrivateRepo",
+    "id": "CF_NAME repo-plugins [-r REPO_NAME]",
     "translation": ""
   },
   {
@@ -1644,10 +1644,6 @@
     "translation": "VARIABLES DE ENTORNO:"
   },
   {
-    "id": "EXAMPLE:\n",
-    "translation": "EJEMPLO:\n"
-  },
-  {
     "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
     "translation": "EJEMPLO:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\""
   },
@@ -1658,6 +1654,10 @@
   {
     "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\"",
     "translation": "EJEMPLO:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Línea de mandatos de Windows:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\""
+  },
+  {
+    "id": "EXAMPLES",
+    "translation": ""
   },
   {
     "id": "Enable CF_TRACE output for all requests and responses",
@@ -4420,8 +4420,8 @@
     "translation": "Vea registros, informes y valores en este espacio\n"
   },
   {
-    "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n",
-    "translation": "AVISO:\n   No se recomienda proporcionar su contraseña como una opción de línea de mandatos\n   Su contraseña será visible para otros usuarios y se puede registrar en el historial del shell\n\n"
+    "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history",
+    "translation": ""
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",

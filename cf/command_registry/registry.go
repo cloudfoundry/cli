@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/i18n"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
 	. "github.com/cloudfoundry/cli/cf/terminal"
@@ -26,7 +26,7 @@ func initI18nFunc() bool {
 			os.Exit(1)
 		}
 	}
-	i18n.T = i18n.Init(core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler))
+	T = Init(core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler))
 	return true
 }
 
@@ -115,27 +115,27 @@ func (r *registry) CommandUsage(cmdName string) string {
 	output := ""
 	cmd := r.FindCommand(cmdName)
 
-	output = i18n.T("NAME") + ":" + "\n"
+	output = T("NAME") + ":" + "\n"
 	output += "   " + cmd.MetaData().Name + " - " + cmd.MetaData().Description + "\n\n"
 
-	output += i18n.T("USAGE") + ":" + "\n"
+	output += T("USAGE") + ":" + "\n"
 	output += "   " + strings.Replace(strings.Join(cmd.MetaData().Usage, ""), "CF_NAME", cf.Name, -1) + "\n"
 
 	if len(cmd.MetaData().Example) > 0 {
 		output += "\n"
-		output += fmt.Sprintf("%s:\n", i18n.T("EXAMPLE"))
+		output += fmt.Sprintf("%s:\n", T("EXAMPLES"))
 		for _, e := range(cmd.MetaData().Example) {
 			output += fmt.Sprintf("   %s\n", strings.Replace(e, "CF_NAME", cf.Name, -1))
 		}
 	}
 
 	if cmd.MetaData().ShortName != "" {
-		output += "\n" + i18n.T("ALIAS") + ":" + "\n"
+		output += "\n" + T("ALIAS") + ":" + "\n"
 		output += "   " + cmd.MetaData().ShortName + "\n"
 	}
 
 	if cmd.MetaData().Flags != nil {
-		output += "\n" + i18n.T("OPTIONS") + ":" + "\n"
+		output += "\n" + T("OPTIONS") + ":" + "\n"
 		output += flags.NewFlagContext(cmd.MetaData().Flags).ShowUsage(3)
 	}
 
