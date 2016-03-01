@@ -33,12 +33,12 @@ func (cmd *DeleteRoute) MetaData() command_registry.CommandMetadata {
 		Name:        "delete-route",
 		Description: T("Delete a route"),
 		Usage: []string{
-			T(`CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]
-
-EXAMPLES:
-   CF_NAME delete-route example.com                              # example.com
-   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com
-   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo`),
+			T("CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"),
+		},
+		Example: []string{
+			"CF_NAME delete-route example.com                              # example.com",
+			"CF_NAME delete-route example.com --hostname myhost            # myhost.example.com",
+			"CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo",
 		},
 		Flags: fs,
 	}

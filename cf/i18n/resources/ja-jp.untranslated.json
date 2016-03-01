@@ -172,6 +172,10 @@
     "translation": "CF_NAME delete-quota QUOTA [-f]"
   },
   {
+    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
+    "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"
+  },
+  {
     "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
     "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
   },
