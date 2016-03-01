@@ -460,8 +460,8 @@
     "translation": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
-    "translation": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/"
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL",
+    "translation": "CF_NAME add-plugin-repo REPO_NAME URL"
   },
   {
     "id": "CF_NAME allow-space-ssh SPACE_NAME",

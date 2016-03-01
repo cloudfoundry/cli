@@ -460,7 +460,7 @@
     "translation": "字节数量必须是带计量单位（例如，M、MB、G 或 GB）的整数"
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL",
     "translation": ""
   },
   {

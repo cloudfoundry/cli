@@ -460,7 +460,7 @@
     "translation": "바이트 양은 M, MB, G 또는 GB와 같은 측정 단위를 사용하는 정수여야 함"
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL",
     "translation": ""
   },
   {

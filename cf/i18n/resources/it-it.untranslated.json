@@ -32,8 +32,8 @@
     "translation": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
-    "translation": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/"
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL",
+    "translation": "CF_NAME add-plugin-repo REPO_NAME URL"
   },
   {
     "id": "CF_NAME allow-space-ssh SPACE_NAME",

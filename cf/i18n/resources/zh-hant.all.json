@@ -460,7 +460,7 @@
     "translation": "位元組數量必須是具有度量單位（如 M、MB、G 或 GB）的整數"
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL",
     "translation": ""
   },
   {

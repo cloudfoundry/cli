@@ -460,7 +460,7 @@
     "translation": "La cantidad de bytes debe ser un entero con una unidad de medida como M, MB, G o GB"
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLE:\n   cf add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL",
     "translation": ""
   },
   {
