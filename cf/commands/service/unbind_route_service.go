@@ -40,10 +40,10 @@ func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
 		ShortName:   "urs",
 		Description: T("Unbind a service instance from an HTTP route"),
 		Usage: []string{
-			T(`CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]
-
-EXAMPLE:
-   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp`),
+			T("CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]"),
+		},
+		Example: []string{
+			"CF_NAME unbind-route-service example.com myratelimiter --hostname myapp",
 		},
 		Flags: fs,
 	}

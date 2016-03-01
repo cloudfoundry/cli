@@ -948,7 +948,7 @@
     "translation": "CF_NAME target [-o ORG] [-s ESPACE]"
   },
   {
-    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]\n\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp",
+    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]",
     "translation": ""
   },
   {

@@ -208,8 +208,8 @@
     "translation": "CF_NAME staging-environment-variable-group"
   },
   {
-    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]\n\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp",
-    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]\n\nEXAMPLE:\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp"
+    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]",
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]"
   },
   {
     "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
