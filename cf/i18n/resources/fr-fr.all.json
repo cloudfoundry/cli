@@ -780,7 +780,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLE:\n   cf remove-plugin-repo PrivateRepo\n",
+    "id": "CF_NAME remove-plugin-repo REPO_NAME",
     "translation": ""
   },
   {
