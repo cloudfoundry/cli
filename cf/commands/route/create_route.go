@@ -2,6 +2,7 @@ package route
 
 import (
 	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -89,21 +90,11 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 	}
 
 	if fc.IsSet("port") {
-		requiredVersion, err := semver.Make("2.51.0")
-		if err != nil {
-			panic(err.Error())
-		}
-
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", requiredVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TcpRoutingMinimumApiVersion))
 	}
 
 	if fc.IsSet("random-port") {
-		requiredVersion, err := semver.Make("2.51.0")
-		if err != nil {
-			panic(err.Error())
-		}
-
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--random-port'", requiredVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--random-port'", cf.TcpRoutingMinimumApiVersion))
 	}
 
 	return reqs, nil
