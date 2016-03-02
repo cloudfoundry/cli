@@ -18,7 +18,8 @@ func NewRouteActor(ui terminal.UI, routeRepo api.RouteRepository) RouteActor {
 }
 
 func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string) (route models.Route) {
-	route, apiErr := routeActor.routeRepo.Find(hostname, domain, path)
+	var port int
+	route, apiErr := routeActor.routeRepo.Find(hostname, domain, path, port)
 
 	switch apiErr.(type) {
 	case nil:

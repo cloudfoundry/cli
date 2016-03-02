@@ -87,11 +87,13 @@ func (cmd *UnbindRouteService) SetDependency(deps command_registry.Dependency, p
 }
 
 func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
+	var path string
+	var port int
+
 	host := c.String("hostname")
 	domain := cmd.domainReq.GetDomain()
-	path := "" // path is not currently supported
 
-	route, err := cmd.routeRepo.Find(host, domain, path)
+	route, err := cmd.routeRepo.Find(host, domain, path, port)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
