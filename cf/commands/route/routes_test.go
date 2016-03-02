@@ -122,8 +122,8 @@ var _ = Describe("routes command", func() {
 			runCommand()
 
 			Expect(ui.Outputs).To(BeInDisplayOrder(
-				[]string{"Getting routes for org my-org / space my-space as my-user"},
-				[]string{"host", "domain", "port", "path", "type", "apps", "service"},
+				[]string{"Getting routes for org my-org / space my-space as my-user ..."},
+				[]string{"space", "host", "domain", "port", "path", "type", "apps", "service"},
 			))
 
 			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`)))
