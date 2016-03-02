@@ -11,10 +11,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter -o fakes/fake_space_quota_repository.go . SpaceQuotaRepository
 type SpaceQuotaRepository interface {
 	FindByName(name string) (quota models.SpaceQuota, apiErr error)
 	FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error)
 	FindByGuid(guid string) (quota models.SpaceQuota, apiErr error)
+	FindByNameAndOrgGuid(spaceQuotaName string, orgGuid string) (quota models.SpaceQuota, apiErr error)
 
 	AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error
 	UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error
@@ -52,18 +54,22 @@ func (repo CloudControllerSpaceQuotaRepository) findAllWithPath(path string) ([]
 }
 
 func (repo CloudControllerSpaceQuotaRepository) FindByName(name string) (quota models.SpaceQuota, apiErr error) {
-	quotas, apiErr := repo.FindByOrg(repo.config.OrganizationFields().Guid)
+	return repo.FindByNameAndOrgGuid(name, repo.config.OrganizationFields().Guid)
+}
+
+func (repo CloudControllerSpaceQuotaRepository) FindByNameAndOrgGuid(spaceQuotaName string, orgGuid string) (models.SpaceQuota, error) {
+	quotas, apiErr := repo.FindByOrg(orgGuid)
 	if apiErr != nil {
-		return
+		return models.SpaceQuota{}, apiErr
 	}
 
 	for _, quota := range quotas {
-		if quota.Name == name {
+		if quota.Name == spaceQuotaName {
 			return quota, nil
 		}
 	}
 
-	apiErr = errors.NewModelNotFoundError("Space Quota", name)
+	apiErr = errors.NewModelNotFoundError("Space Quota", spaceQuotaName)
 	return models.SpaceQuota{}, apiErr
 }
 

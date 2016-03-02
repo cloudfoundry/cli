@@ -92,15 +92,6 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	var spaceQuotaGuid string
-	if spaceQuotaName != "" {
-		spaceQuota, err := cmd.spaceQuotaRepo.FindByName(spaceQuotaName)
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-		}
-		spaceQuotaGuid = spaceQuota.Guid
-	}
-
 	if orgGuid == "" {
 		org, apiErr := cmd.orgRepo.FindByName(orgName)
 		switch apiErr.(type) {
@@ -118,6 +109,15 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 		}
 
 		orgGuid = org.Guid
+	}
+
+	var spaceQuotaGuid string
+	if spaceQuotaName != "" {
+		spaceQuota, err := cmd.spaceQuotaRepo.FindByNameAndOrgGuid(spaceQuotaName, orgGuid)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+		spaceQuotaGuid = spaceQuota.Guid
 	}
 
 	space, err := cmd.spaceRepo.Create(spaceName, orgGuid, spaceQuotaGuid)
