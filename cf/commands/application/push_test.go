@@ -13,6 +13,7 @@ import (
 	testStacks "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/application"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	serviceCmdFakes "github.com/cloudfoundry/cli/cf/commands/service/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -30,7 +31,10 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"github.com/cloudfoundry/cli/cf"
+	"github.com/blang/semver"
 )
 
 var _ = Describe("Push Command", func() {
@@ -222,6 +226,36 @@ var _ = Describe("Push Command", func() {
 
 			It("does not fail when provided the --route-path option", func() {
 				Expect(callPush("--route-path", "the-path", "app-name")).To(BeTrue())
+			})
+		})
+
+		Describe("--app-ports flag", func() {
+			It("does not require a MinApiVersion if you don't provide it", func() {
+				cmd := &application.Push{}
+
+				fc := flags.NewFlagContext(cmd.MetaData().Flags)
+
+				reqs, err := cmd.Requirements(requirementsFactory, fc)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(reqs).NotTo(BeEmpty())
+
+				var s semver.Version
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal(""))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(s))
+			})
+
+			It("requires cf.MultipleAppPortsMinimumApiVersion when provided", func() {
+				cmd := &application.Push{}
+
+				fc := flags.NewFlagContext(cmd.MetaData().Flags)
+				fc.Parse("--app-ports", "8080,9090")
+
+				reqs, err := cmd.Requirements(requirementsFactory, fc)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(reqs).NotTo(BeEmpty())
+
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '--app-ports'"))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.MultipleAppPortsMinimumApiVersion))
 			})
 		})
 	})
