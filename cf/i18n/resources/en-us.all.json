@@ -60,8 +60,8 @@
     "translation": "   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n"
   },
   {
-    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
-    "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n"
+    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
+    "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n"
   },
   {
     "id": "   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n",
