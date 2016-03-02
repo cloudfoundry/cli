@@ -61,7 +61,7 @@ func newAppPresenter() (presenter appPresenter) {
 	maxNameLen := command_registry.Commands.MaxCommandNameLength()
 	maxNameLen = maxPluginCommandNameLength(plugins, maxNameLen)
 
-	presentNonCodegangstaCommand := func(commandName string) (presenter cmdPresenter) {
+	presentCommand := func(commandName string) (presenter cmdPresenter) {
 		cmd := command_registry.Commands.FindCommand(commandName)
 		presenter.Name = cmd.MetaData().Name
 		padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
@@ -96,255 +96,255 @@ func newAppPresenter() (presenter appPresenter) {
 			Name: T("GETTING STARTED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("help"),
-					presentNonCodegangstaCommand("version"),
-					presentNonCodegangstaCommand("login"),
-					presentNonCodegangstaCommand("logout"),
-					presentNonCodegangstaCommand("passwd"),
-					presentNonCodegangstaCommand("target"),
+					presentCommand("help"),
+					presentCommand("version"),
+					presentCommand("login"),
+					presentCommand("logout"),
+					presentCommand("passwd"),
+					presentCommand("target"),
 				}, {
-					presentNonCodegangstaCommand("api"),
-					presentNonCodegangstaCommand("auth"),
+					presentCommand("api"),
+					presentCommand("auth"),
 				},
 			},
 		}, {
 			Name: T("APPS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("apps"),
-					presentNonCodegangstaCommand("app"),
+					presentCommand("apps"),
+					presentCommand("app"),
 				}, {
-					presentNonCodegangstaCommand("push"),
-					presentNonCodegangstaCommand("scale"),
-					presentNonCodegangstaCommand("delete"),
-					presentNonCodegangstaCommand("rename"),
+					presentCommand("push"),
+					presentCommand("scale"),
+					presentCommand("delete"),
+					presentCommand("rename"),
 				}, {
-					presentNonCodegangstaCommand("start"),
-					presentNonCodegangstaCommand("stop"),
-					presentNonCodegangstaCommand("restart"),
-					presentNonCodegangstaCommand("restage"),
-					presentNonCodegangstaCommand("restart-app-instance"),
+					presentCommand("start"),
+					presentCommand("stop"),
+					presentCommand("restart"),
+					presentCommand("restage"),
+					presentCommand("restart-app-instance"),
 				}, {
-					presentNonCodegangstaCommand("events"),
-					presentNonCodegangstaCommand("files"),
-					presentNonCodegangstaCommand("logs"),
+					presentCommand("events"),
+					presentCommand("files"),
+					presentCommand("logs"),
 				}, {
-					presentNonCodegangstaCommand("env"),
-					presentNonCodegangstaCommand("set-env"),
-					presentNonCodegangstaCommand("unset-env"),
+					presentCommand("env"),
+					presentCommand("set-env"),
+					presentCommand("unset-env"),
 				}, {
-					presentNonCodegangstaCommand("stacks"),
-					presentNonCodegangstaCommand("stack"),
+					presentCommand("stacks"),
+					presentCommand("stack"),
 				}, {
-					presentNonCodegangstaCommand("copy-source"),
+					presentCommand("copy-source"),
 				}, {
-					presentNonCodegangstaCommand("create-app-manifest"),
+					presentCommand("create-app-manifest"),
 				}, {
-					presentNonCodegangstaCommand("get-health-check"),
-					presentNonCodegangstaCommand("set-health-check"),
-					presentNonCodegangstaCommand("enable-ssh"),
-					presentNonCodegangstaCommand("disable-ssh"),
-					presentNonCodegangstaCommand("ssh-enabled"),
-					presentNonCodegangstaCommand("ssh"),
+					presentCommand("get-health-check"),
+					presentCommand("set-health-check"),
+					presentCommand("enable-ssh"),
+					presentCommand("disable-ssh"),
+					presentCommand("ssh-enabled"),
+					presentCommand("ssh"),
 				},
 			},
 		}, {
 			Name: T("SERVICES"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("marketplace"),
-					presentNonCodegangstaCommand("services"),
-					presentNonCodegangstaCommand("service"),
+					presentCommand("marketplace"),
+					presentCommand("services"),
+					presentCommand("service"),
 				}, {
-					presentNonCodegangstaCommand("create-service"),
-					presentNonCodegangstaCommand("update-service"),
-					presentNonCodegangstaCommand("delete-service"),
-					presentNonCodegangstaCommand("rename-service"),
+					presentCommand("create-service"),
+					presentCommand("update-service"),
+					presentCommand("delete-service"),
+					presentCommand("rename-service"),
 				}, {
-					presentNonCodegangstaCommand("create-service-key"),
-					presentNonCodegangstaCommand("service-keys"),
-					presentNonCodegangstaCommand("service-key"),
-					presentNonCodegangstaCommand("delete-service-key"),
+					presentCommand("create-service-key"),
+					presentCommand("service-keys"),
+					presentCommand("service-key"),
+					presentCommand("delete-service-key"),
 				}, {
-					presentNonCodegangstaCommand("bind-service"),
-					presentNonCodegangstaCommand("unbind-service"),
+					presentCommand("bind-service"),
+					presentCommand("unbind-service"),
 				}, {
-					presentNonCodegangstaCommand("bind-route-service"),
-					presentNonCodegangstaCommand("unbind-route-service"),
+					presentCommand("bind-route-service"),
+					presentCommand("unbind-route-service"),
 				}, {
-					presentNonCodegangstaCommand("create-user-provided-service"),
-					presentNonCodegangstaCommand("update-user-provided-service"),
+					presentCommand("create-user-provided-service"),
+					presentCommand("update-user-provided-service"),
 				},
 			},
 		}, {
 			Name: T("ORGS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("orgs"),
-					presentNonCodegangstaCommand("org"),
+					presentCommand("orgs"),
+					presentCommand("org"),
 				}, {
-					presentNonCodegangstaCommand("create-org"),
-					presentNonCodegangstaCommand("delete-org"),
-					presentNonCodegangstaCommand("rename-org"),
+					presentCommand("create-org"),
+					presentCommand("delete-org"),
+					presentCommand("rename-org"),
 				},
 			},
 		}, {
 			Name: T("SPACES"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("spaces"),
-					presentNonCodegangstaCommand("space"),
+					presentCommand("spaces"),
+					presentCommand("space"),
 				}, {
-					presentNonCodegangstaCommand("create-space"),
-					presentNonCodegangstaCommand("delete-space"),
-					presentNonCodegangstaCommand("rename-space"),
+					presentCommand("create-space"),
+					presentCommand("delete-space"),
+					presentCommand("rename-space"),
 				}, {
-					presentNonCodegangstaCommand("allow-space-ssh"),
-					presentNonCodegangstaCommand("disallow-space-ssh"),
-					presentNonCodegangstaCommand("space-ssh-allowed"),
+					presentCommand("allow-space-ssh"),
+					presentCommand("disallow-space-ssh"),
+					presentCommand("space-ssh-allowed"),
 				},
 			},
 		}, {
 			Name: T("DOMAINS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("domains"),
-					presentNonCodegangstaCommand("create-domain"),
-					presentNonCodegangstaCommand("delete-domain"),
-					presentNonCodegangstaCommand("create-shared-domain"),
-					presentNonCodegangstaCommand("delete-shared-domain"),
+					presentCommand("domains"),
+					presentCommand("create-domain"),
+					presentCommand("delete-domain"),
+					presentCommand("create-shared-domain"),
+					presentCommand("delete-shared-domain"),
 				},
 			},
 		}, {
 			Name: T("ROUTES"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("routes"),
-					presentNonCodegangstaCommand("create-route"),
-					presentNonCodegangstaCommand("check-route"),
-					presentNonCodegangstaCommand("map-route"),
-					presentNonCodegangstaCommand("unmap-route"),
-					presentNonCodegangstaCommand("delete-route"),
-					presentNonCodegangstaCommand("delete-orphaned-routes"),
+					presentCommand("routes"),
+					presentCommand("create-route"),
+					presentCommand("check-route"),
+					presentCommand("map-route"),
+					presentCommand("unmap-route"),
+					presentCommand("delete-route"),
+					presentCommand("delete-orphaned-routes"),
 				},
 			},
 		}, {
 			Name: T("ROUTER GROUPS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("router-groups"),
+					presentCommand("router-groups"),
 				},
 			},
 		}, {
 			Name: T("BUILDPACKS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("buildpacks"),
-					presentNonCodegangstaCommand("create-buildpack"),
-					presentNonCodegangstaCommand("update-buildpack"),
-					presentNonCodegangstaCommand("rename-buildpack"),
-					presentNonCodegangstaCommand("delete-buildpack"),
+					presentCommand("buildpacks"),
+					presentCommand("create-buildpack"),
+					presentCommand("update-buildpack"),
+					presentCommand("rename-buildpack"),
+					presentCommand("delete-buildpack"),
 				},
 			},
 		}, {
 			Name: T("USER ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("create-user"),
-					presentNonCodegangstaCommand("delete-user"),
+					presentCommand("create-user"),
+					presentCommand("delete-user"),
 				}, {
-					presentNonCodegangstaCommand("org-users"),
-					presentNonCodegangstaCommand("set-org-role"),
-					presentNonCodegangstaCommand("unset-org-role"),
+					presentCommand("org-users"),
+					presentCommand("set-org-role"),
+					presentCommand("unset-org-role"),
 				}, {
-					presentNonCodegangstaCommand("space-users"),
-					presentNonCodegangstaCommand("set-space-role"),
-					presentNonCodegangstaCommand("unset-space-role"),
+					presentCommand("space-users"),
+					presentCommand("set-space-role"),
+					presentCommand("unset-space-role"),
 				},
 			},
 		}, {
 			Name: T("ORG ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("quotas"),
-					presentNonCodegangstaCommand("quota"),
-					presentNonCodegangstaCommand("set-quota"),
+					presentCommand("quotas"),
+					presentCommand("quota"),
+					presentCommand("set-quota"),
 				}, {
-					presentNonCodegangstaCommand("create-quota"),
-					presentNonCodegangstaCommand("delete-quota"),
-					presentNonCodegangstaCommand("update-quota"),
+					presentCommand("create-quota"),
+					presentCommand("delete-quota"),
+					presentCommand("update-quota"),
 				},
 				{
-					presentNonCodegangstaCommand("share-private-domain"),
-					presentNonCodegangstaCommand("unshare-private-domain"),
+					presentCommand("share-private-domain"),
+					presentCommand("unshare-private-domain"),
 				},
 			},
 		}, {
 			Name: T("SPACE ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("space-quotas"),
-					presentNonCodegangstaCommand("space-quota"),
-					presentNonCodegangstaCommand("create-space-quota"),
-					presentNonCodegangstaCommand("update-space-quota"),
-					presentNonCodegangstaCommand("delete-space-quota"),
-					presentNonCodegangstaCommand("set-space-quota"),
-					presentNonCodegangstaCommand("unset-space-quota"),
+					presentCommand("space-quotas"),
+					presentCommand("space-quota"),
+					presentCommand("create-space-quota"),
+					presentCommand("update-space-quota"),
+					presentCommand("delete-space-quota"),
+					presentCommand("set-space-quota"),
+					presentCommand("unset-space-quota"),
 				},
 			},
 		}, {
 			Name: T("SERVICE ADMIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("service-auth-tokens"),
-					presentNonCodegangstaCommand("create-service-auth-token"),
-					presentNonCodegangstaCommand("update-service-auth-token"),
-					presentNonCodegangstaCommand("delete-service-auth-token"),
+					presentCommand("service-auth-tokens"),
+					presentCommand("create-service-auth-token"),
+					presentCommand("update-service-auth-token"),
+					presentCommand("delete-service-auth-token"),
 				}, {
-					presentNonCodegangstaCommand("service-brokers"),
-					presentNonCodegangstaCommand("create-service-broker"),
-					presentNonCodegangstaCommand("update-service-broker"),
-					presentNonCodegangstaCommand("delete-service-broker"),
-					presentNonCodegangstaCommand("rename-service-broker"),
+					presentCommand("service-brokers"),
+					presentCommand("create-service-broker"),
+					presentCommand("update-service-broker"),
+					presentCommand("delete-service-broker"),
+					presentCommand("rename-service-broker"),
 				}, {
-					presentNonCodegangstaCommand("migrate-service-instances"),
-					presentNonCodegangstaCommand("purge-service-offering"),
-					presentNonCodegangstaCommand("purge-service-instance"),
+					presentCommand("migrate-service-instances"),
+					presentCommand("purge-service-offering"),
+					presentCommand("purge-service-instance"),
 				}, {
-					presentNonCodegangstaCommand("service-access"),
-					presentNonCodegangstaCommand("enable-service-access"),
-					presentNonCodegangstaCommand("disable-service-access"),
+					presentCommand("service-access"),
+					presentCommand("enable-service-access"),
+					presentCommand("disable-service-access"),
 				},
 			},
 		}, {
 			Name: T("SECURITY GROUP"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("security-group"),
-					presentNonCodegangstaCommand("security-groups"),
-					presentNonCodegangstaCommand("create-security-group"),
-					presentNonCodegangstaCommand("update-security-group"),
-					presentNonCodegangstaCommand("delete-security-group"),
-					presentNonCodegangstaCommand("bind-security-group"),
-					presentNonCodegangstaCommand("unbind-security-group"),
+					presentCommand("security-group"),
+					presentCommand("security-groups"),
+					presentCommand("create-security-group"),
+					presentCommand("update-security-group"),
+					presentCommand("delete-security-group"),
+					presentCommand("bind-security-group"),
+					presentCommand("unbind-security-group"),
 				}, {
-					presentNonCodegangstaCommand("bind-staging-security-group"),
-					presentNonCodegangstaCommand("staging-security-groups"),
-					presentNonCodegangstaCommand("unbind-staging-security-group"),
+					presentCommand("bind-staging-security-group"),
+					presentCommand("staging-security-groups"),
+					presentCommand("unbind-staging-security-group"),
 				}, {
-					presentNonCodegangstaCommand("bind-running-security-group"),
-					presentNonCodegangstaCommand("running-security-groups"),
-					presentNonCodegangstaCommand("unbind-running-security-group"),
+					presentCommand("bind-running-security-group"),
+					presentCommand("running-security-groups"),
+					presentCommand("unbind-running-security-group"),
 				},
 			},
 		}, {
 			Name: T("ENVIRONMENT VARIABLE GROUPS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("running-environment-variable-group"),
-					presentNonCodegangstaCommand("staging-environment-variable-group"),
-					presentNonCodegangstaCommand("set-staging-environment-variable-group"),
-					presentNonCodegangstaCommand("set-running-environment-variable-group"),
+					presentCommand("running-environment-variable-group"),
+					presentCommand("staging-environment-variable-group"),
+					presentCommand("set-staging-environment-variable-group"),
+					presentCommand("set-running-environment-variable-group"),
 				},
 			},
 		},
@@ -352,39 +352,39 @@ func newAppPresenter() (presenter appPresenter) {
 			Name: T("FEATURE FLAGS"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("feature-flags"),
-					presentNonCodegangstaCommand("feature-flag"),
-					presentNonCodegangstaCommand("enable-feature-flag"),
-					presentNonCodegangstaCommand("disable-feature-flag"),
+					presentCommand("feature-flags"),
+					presentCommand("feature-flag"),
+					presentCommand("enable-feature-flag"),
+					presentCommand("disable-feature-flag"),
 				},
 			},
 		}, {
 			Name: T("ADVANCED"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("curl"),
-					presentNonCodegangstaCommand("config"),
-					presentNonCodegangstaCommand("oauth-token"),
-					presentNonCodegangstaCommand("ssh-code"),
+					presentCommand("curl"),
+					presentCommand("config"),
+					presentCommand("oauth-token"),
+					presentCommand("ssh-code"),
 				},
 			},
 		}, {
 			Name: T("ADD/REMOVE PLUGIN REPOSITORY"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("add-plugin-repo"),
-					presentNonCodegangstaCommand("remove-plugin-repo"),
-					presentNonCodegangstaCommand("list-plugin-repos"),
-					presentNonCodegangstaCommand("repo-plugins"),
+					presentCommand("add-plugin-repo"),
+					presentCommand("remove-plugin-repo"),
+					presentCommand("list-plugin-repos"),
+					presentCommand("repo-plugins"),
 				},
 			},
 		}, {
 			Name: T("ADD/REMOVE PLUGIN"),
 			CommandSubGroups: [][]cmdPresenter{
 				{
-					presentNonCodegangstaCommand("plugins"),
-					presentNonCodegangstaCommand("install-plugin"),
-					presentNonCodegangstaCommand("uninstall-plugin"),
+					presentCommand("plugins"),
+					presentCommand("install-plugin"),
+					presentCommand("uninstall-plugin"),
 				},
 			},
 		}, {

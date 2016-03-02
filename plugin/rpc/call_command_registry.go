@@ -8,17 +8,18 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-type NonCodegangstaRunner interface {
+//go:generate counterfeiter -o fakes/fake_command_runner.go . CommandRunner
+type CommandRunner interface {
 	Command([]string, command_registry.Dependency, bool) error
 }
 
-type nonCodegangstaRunner struct{}
+type commandRunner struct{}
 
-func NewNonCodegangstaRunner() NonCodegangstaRunner {
-	return &nonCodegangstaRunner{}
+func NewCommandRunner() CommandRunner {
+	return &commandRunner{}
 }
 
-func (c *nonCodegangstaRunner) Command(args []string, deps command_registry.Dependency, pluginApiCall bool) error {
+func (c *commandRunner) Command(args []string, deps command_registry.Dependency, pluginApiCall bool) error {
 	var err error
 
 	cmdRegistry := command_registry.Commands
