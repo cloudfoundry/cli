@@ -71,7 +71,9 @@ func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsF
 			panic(errMsg)
 		}
 	}()
+
 	requirements, err := cmd.Requirements(requirementsFactory, context)
+
 	if err != nil {
 		return false
 	}
@@ -82,9 +84,7 @@ func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsF
 		}
 	}
 
-	passedRequirements = true
-
 	cmd.Execute(context)
 
-	return
+	return true
 }
