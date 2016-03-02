@@ -28,6 +28,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/words/generator"
+	"github.com/cloudfoundry/cli/cf"
 )
 
 type Push struct {
@@ -107,6 +108,10 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 		}
 
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", requiredVersion))
+	}
+
+	if fc.String("app-ports") != "" {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumApiVersion))
 	}
 
 	reqs = append(reqs, []requirements.Requirement{
