@@ -3308,8 +3308,8 @@
     "translation": "Quota à affecter à l'organisation nouvellement créée (si vous excluez cette option, le quota par défaut est affecté) "
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "Quota à affecter à l'espace nouvellement créé (si vous excluez cette option, le quota par défaut est affecté) "
+    "id": "Quota to assign to the newly created space",
+    "translation": "Quota à affecter à l'espace nouvellement créé"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",

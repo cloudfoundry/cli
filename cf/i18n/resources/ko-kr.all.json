@@ -3308,8 +3308,8 @@
     "translation": "새로 작성된 조직에 지정할 할당량(이 옵션을 제외하면 기본 할당량이 지정됨)"
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "새로 작성된 영역에 지정할 할당량(이 옵션을 제외하면 기본 할당량이 지정됨)"
+    "id": "Quota to assign to the newly created space",
+    "translation": "새로 작성된 영역에 지정할 할당량"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",
