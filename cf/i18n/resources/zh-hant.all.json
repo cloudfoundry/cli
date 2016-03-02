@@ -3308,8 +3308,8 @@
     "translation": "要指派給新建立組織的配額（排除這個選項會導致指派預設配額）"
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "要指派給新建立空間的配額（排除這個選項會導致指派預設配額）"
+    "id": "Quota to assign to the newly created space",
+    "translation": "要指派給新建立空間的配額"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",

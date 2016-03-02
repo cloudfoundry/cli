@@ -3308,8 +3308,8 @@
     "translation": "Größenbeschränkung, die der neu erstellten Organisation zugeordnet werden soll (außer wenn diese Option zu einer Zuordnung der Standardgrößenbeschränkung führt)"
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "Größenbeschränkung, die dem neu erstellten Bereich zugeordnet werden soll (außer, wenn diese Option zu einer Zuordnung der Standardgrößenbeschränkung führt)"
+    "id": "Quota to assign to the newly created space",
+    "translation": "Größenbeschränkung, die dem neu erstellten Bereich zugeordnet werden soll"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",

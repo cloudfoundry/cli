@@ -3308,8 +3308,8 @@
     "translation": "新しく作成された組織に割り当てる割り当て量 (このオプションを除外するとデフォルトの割り当て量が割り当てられます)"
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "新しく作成されたスペースに割り当てる割り当て量 (このオプションを除外するとデフォルトの割り当て量が割り当てられます)"
+    "id": "Quota to assign to the newly created space",
+    "translation": "新しく作成されたスペースに割り当てる割り当て量"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",
