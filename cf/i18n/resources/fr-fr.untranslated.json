@@ -88,6 +88,10 @@
     "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"
   },
   {
+    "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]",
+    "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]"
+  },
+  {
     "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]",
     "translation": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"
   },

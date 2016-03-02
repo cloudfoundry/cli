@@ -628,8 +628,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLE:\n   CF_NAME delete-service-key mydb mykey",
-    "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nESEMPIO:\n   CF_NAME delete-service-key mydb mykey"
+    "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]",
+    "translation": ""
   },
   {
     "id": "CF_NAME delete-shared-domain DOMAIN [-f]",

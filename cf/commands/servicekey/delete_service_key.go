@@ -32,10 +32,10 @@ func (cmd *DeleteServiceKey) MetaData() command_registry.CommandMetadata {
 		ShortName:   "dsk",
 		Description: T("Delete a service key"),
 		Usage: []string{
-			T(`CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]
-
-EXAMPLE:
-   CF_NAME delete-service-key mydb mykey`),
+			T("CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]"),
+		},
+		Example: []string{
+			"CF_NAME delete-service-key mydb mykey",
 		},
 		Flags: fs,
 	}
