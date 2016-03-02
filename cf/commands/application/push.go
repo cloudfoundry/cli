@@ -84,7 +84,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 			T("Push a single app (with or without a manifest):\n"),
 			T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n"),
 			T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n"),
-			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n",
+			"   [--app-ports APP_PORTS] [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n",
 			"\n",
 			T("   Push multiple apps with a manifest:\n"),
 			T("   CF_NAME push [-f MANIFEST_PATH]\n"),
