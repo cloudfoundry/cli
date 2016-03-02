@@ -135,7 +135,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, rand
 	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.Guid, space.Guid, port, randomPort)
 	if err != nil {
 		var findErr error
-		route, findErr = cmd.routeRepo.Find(hostName, domain, path)
+		route, findErr = cmd.routeRepo.Find(hostName, domain, path, port)
 		if findErr != nil {
 			return models.Route{}, err
 		}

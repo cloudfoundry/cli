@@ -144,7 +144,7 @@ var _ = Describe("route repository", func() {
 					domain := models.DomainFields{}
 					domain.Guid = "my-domain-guid"
 
-					route, apiErr := repo.Find("my-cool-app", domain, "")
+					route, apiErr := repo.Find("my-cool-app", domain, "", 0)
 
 					Expect(apiErr).NotTo(HaveOccurred())
 					Expect(route.Host).To(Equal("my-cool-app"))
@@ -158,7 +158,7 @@ var _ = Describe("route repository", func() {
 				BeforeEach(func() {
 					v := url.Values{}
 					v.Set("inline-relations-depth", "1")
-					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath")
+					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath;port:8148")
 
 					ccServer.AppendHandlers(
 						ghttp.CombineHandlers(
@@ -175,7 +175,7 @@ var _ = Describe("route repository", func() {
 					domain := models.DomainFields{}
 					domain.Guid = "my-domain-guid"
 
-					route, apiErr := repo.Find("my-cool-app", domain, "somepath")
+					route, apiErr := repo.Find("my-cool-app", domain, "somepath", 8148)
 
 					Expect(apiErr).NotTo(HaveOccurred())
 					Expect(route.Host).To(Equal("my-cool-app"))
@@ -189,7 +189,7 @@ var _ = Describe("route repository", func() {
 				BeforeEach(func() {
 					v := url.Values{}
 					v.Set("inline-relations-depth", "1")
-					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath")
+					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath;port:1478")
 
 					ccServer.AppendHandlers(
 						ghttp.CombineHandlers(
@@ -215,7 +215,7 @@ var _ = Describe("route repository", func() {
 					domain := models.DomainFields{}
 					domain.Guid = "my-domain-guid"
 
-					_, apiErr := repo.Find("my-cool-app", domain, "somepath")
+					_, apiErr := repo.Find("my-cool-app", domain, "somepath", 1478)
 
 					Expect(handler).To(HaveAllRequestsCalled())
 

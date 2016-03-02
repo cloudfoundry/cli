@@ -244,6 +244,19 @@ var _ = Describe("Push Command", func() {
 			actor.UploadAppReturns(nil)
 		})
 
+		It("tries to find the default route for the app", func() {
+			callPush("app-name")
+
+			Expect(routeRepo.FindCallCount()).To(Equal(1))
+
+			host, domain, path, port := routeRepo.FindArgsForCall(0)
+
+			Expect(host).To(Equal("app-name"))
+			Expect(domain.Name).To(Equal("foo.cf-app.com"))
+			Expect(path).To(Equal(""))
+			Expect(port).To(Equal(0))
+		})
+
 		Context("when given a bad path", func() {
 			BeforeEach(func() {
 				actor.ProcessPathStub = func(dirOrZipFile string, f func(string)) error {
@@ -286,7 +299,7 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreateCallCount()).To(BeZero())
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, _, _ := routeRepo.FindArgsForCall(0)
+				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("app-name"))
 
 				Expect(routeRepo.BindCallCount()).To(Equal(1))
@@ -406,7 +419,7 @@ var _ = Describe("Push Command", func() {
 				Expect(*params.SpaceGuid).To(Equal("my-space-guid"))
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, _, _ := routeRepo.FindArgsForCall(0)
+				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("app-name"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -448,7 +461,7 @@ var _ = Describe("Push Command", func() {
 				callPush("-t", "111", "app!name")
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, _, _ := routeRepo.FindArgsForCall(0)
+				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("appname"))
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, _, _ := routeRepo.CreateArgsForCall(0)
@@ -603,7 +616,7 @@ var _ = Describe("Push Command", func() {
 					callPush("-t", "111", "--route-path", "the-route-path", "app-name")
 
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _ := routeRepo.FindArgsForCall(0)
+					host, _, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name"))
 
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -648,7 +661,7 @@ var _ = Describe("Push Command", func() {
 					callPush("-t", "111", "app-name")
 
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _ := routeRepo.FindArgsForCall(0)
+					host, _, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name"))
 
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -688,7 +701,7 @@ var _ = Describe("Push Command", func() {
 				It("provides a random hostname when the --random-route flag is passed", func() {
 					callPush("--random-route", "app-name")
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _ := routeRepo.FindArgsForCall(0)
+					host, _, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name-random-host"))
 				})
 
@@ -698,7 +711,7 @@ var _ = Describe("Push Command", func() {
 					callPush("app-name")
 
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _ := routeRepo.FindArgsForCall(0)
+					host, _, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name-random-host"))
 				})
 			})
@@ -1167,7 +1180,7 @@ var _ = Describe("Push Command", func() {
 				Expect(domainOrgGuid).To(Equal("my-org-guid"))
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, domain, _ := routeRepo.FindArgsForCall(0)
+				host, domain, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("existing-app"))
 				Expect(domain.Name).To(Equal("newdomain.com"))
 
@@ -1189,7 +1202,7 @@ var _ = Describe("Push Command", func() {
 				callPush("-n", "new-host", "existing-app")
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, domain, _ := routeRepo.FindArgsForCall(0)
+				host, domain, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("new-host"))
 				Expect(domain.Name).To(Equal("example.com"))
 
@@ -1227,7 +1240,7 @@ var _ = Describe("Push Command", func() {
 				callPush("--no-hostname", "existing-app")
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, domain, _ := routeRepo.FindArgsForCall(0)
+				host, domain, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal(""))
 				Expect(domain.Name).To(Equal("example.com"))
 

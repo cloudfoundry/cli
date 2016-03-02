@@ -96,9 +96,12 @@ func (cmd *BindRouteService) SetDependency(deps command_registry.Dependency, plu
 }
 
 func (cmd *BindRouteService) Execute(c flags.FlagContext) {
+	var path string
+	var port int
+
 	host := c.String("hostname")
 	domain := cmd.domainReq.GetDomain()
-	path := "" // path is not currently supported
+
 	var parameters string
 
 	if c.IsSet("parameters") {
@@ -109,7 +112,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 		parameters = string(jsonBytes)
 	}
 
-	route, err := cmd.routeRepo.Find(host, domain, path)
+	route, err := cmd.routeRepo.Find(host, domain, path, port)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

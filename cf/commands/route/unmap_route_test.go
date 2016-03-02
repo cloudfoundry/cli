@@ -176,10 +176,11 @@ var _ = Describe("UnmapRoute", func() {
 		It("tries to find the route", func() {
 			cmd.Execute(flagContext)
 			Expect(routeRepo.FindCallCount()).To(Equal(1))
-			hostname, domain, path := routeRepo.FindArgsForCall(0)
+			hostname, domain, path, port := routeRepo.FindArgsForCall(0)
 			Expect(hostname).To(Equal(""))
 			Expect(domain).To(Equal(fakeDomain))
 			Expect(path).To(Equal(""))
+			Expect(port).To(Equal(0))
 		})
 
 		Context("when a path is passed", func() {
@@ -193,7 +194,7 @@ var _ = Describe("UnmapRoute", func() {
 			It("tries to find the route with the path", func() {
 				cmd.Execute(flagContext)
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				_, _, path := routeRepo.FindArgsForCall(0)
+				_, _, path, _ := routeRepo.FindArgsForCall(0)
 				Expect(path).To(Equal("the-path"))
 			})
 		})
