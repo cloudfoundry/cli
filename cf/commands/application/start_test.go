@@ -13,7 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
-	testAppInstanaces "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
+	testAppInstances "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
@@ -39,9 +39,9 @@ var _ = Describe("start command", func() {
 		requirementsFactory       *testreq.FakeReqFactory
 		logMessages               []*logmessage.LogMessage
 		logRepo                   *testapi.FakeLogsRepository
-		appInstancesRepo          *testAppInstanaces.FakeAppInstancesRepository
+		appInstancesRepo          *testAppInstances.FakeAppInstancesRepository
 		appRepo                   *testApplication.FakeApplicationRepository
-		OriginalAppCommand        command_registry.Command
+		originalAppCommand        command_registry.Command
 		deps                      command_registry.Dependency
 		displayApp                *appCmdFakes.FakeAppDisplayer
 	)
@@ -53,33 +53,33 @@ var _ = Describe("start command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
 
-		//inject fake 'CreateRoute' into registry
+		//inject fake 'Start' into registry
 		command_registry.Register(displayApp)
 
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("start").SetDependency(deps, false))
 	}
 
-	getInstance := func(appGuid string) (instances []models.AppInstanceFields, apiErr error) {
+	getInstance := func(appGuid string) ([]models.AppInstanceFields, error) {
+		var apiErr error
+		var instances []models.AppInstanceFields
+
 		if len(defaultInstanceResponses) > 0 {
-			instances = defaultInstanceResponses[0]
-			if len(defaultInstanceResponses) > 1 {
-				defaultInstanceResponses = defaultInstanceResponses[1:]
-			}
+			instances, defaultInstanceResponses = defaultInstanceResponses[0], defaultInstanceResponses[1:]
 		}
 		if len(defaultInstanceErrorCodes) > 0 {
-			errorCode := defaultInstanceErrorCodes[0]
-			if len(defaultInstanceErrorCodes) > 1 {
-				defaultInstanceErrorCodes = defaultInstanceErrorCodes[1:]
-			}
+			var errorCode string
+			errorCode, defaultInstanceErrorCodes = defaultInstanceErrorCodes[0], defaultInstanceErrorCodes[1:]
+
 			if errorCode != "" {
 				apiErr = errors.NewHttpError(400, errorCode, "Error staging app")
 			}
 		}
-		return
+
+		return instances, apiErr
 	}
 
 	AfterEach(func() {
-		command_registry.Register(OriginalAppCommand)
+		command_registry.Register(originalAppCommand)
 	})
 
 	BeforeEach(func() {
@@ -89,42 +89,49 @@ var _ = Describe("start command", func() {
 
 		configRepo = testconfig.NewRepository()
 
-		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
+		appInstancesRepo = &testAppInstances.FakeAppInstancesRepository{}
 		appRepo = &testApplication.FakeApplicationRepository{}
 
 		displayApp = &appCmdFakes.FakeAppDisplayer{}
 
 		//save original command dependency and restore later
-		OriginalAppCommand = command_registry.Commands.FindCommand("app")
+		originalAppCommand = command_registry.Commands.FindCommand("app")
 
 		defaultInstanceErrorCodes = []string{"", ""}
 
-		defaultAppForStart = models.Application{}
-		defaultAppForStart.Name = "my-app"
-		defaultAppForStart.Guid = "my-app-guid"
-		defaultAppForStart.InstanceCount = 2
-		defaultAppForStart.PackageState = "STAGED"
+		defaultAppForStart = models.Application{
+			ApplicationFields: models.ApplicationFields{
+				Name:          "my-app",
+				Guid:          "my-app-guid",
+				InstanceCount: 2,
+				PackageState:  "STAGED",
+			},
+		}
 
-		domain := models.DomainFields{}
-		domain.Name = "example.com"
+		defaultAppForStart.Routes = []models.RouteSummary{
+			models.RouteSummary{
+				Host: "my-app",
+				Domain: models.DomainFields{
+					Name: "example.com",
+				},
+			},
+		}
 
-		route := models.RouteSummary{}
-		route.Host = "my-app"
-		route.Domain = domain
+		instance1 := models.AppInstanceFields{
+			State: models.InstanceStarting,
+		}
 
-		defaultAppForStart.Routes = []models.RouteSummary{route}
+		instance2 := models.AppInstanceFields{
+			State: models.InstanceStarting,
+		}
 
-		instance1 := models.AppInstanceFields{}
-		instance1.State = models.InstanceStarting
+		instance3 := models.AppInstanceFields{
+			State: models.InstanceRunning,
+		}
 
-		instance2 := models.AppInstanceFields{}
-		instance2.State = models.InstanceStarting
-
-		instance3 := models.AppInstanceFields{}
-		instance3.State = models.InstanceRunning
-
-		instance4 := models.AppInstanceFields{}
-		instance4.State = models.InstanceStarting
+		instance4 := models.AppInstanceFields{
+			State: models.InstanceStarting,
+		}
 
 		defaultInstanceResponses = [][]models.AppInstanceFields{
 			[]models.AppInstanceFields{instance1, instance2},
@@ -156,7 +163,7 @@ var _ = Describe("start command", func() {
 		cmd := command_registry.Commands.FindCommand("start").(*Start)
 		cmd.StagingTimeout = 100 * time.Millisecond
 		cmd.StartupTimeout = 500 * time.Millisecond
-		cmd.PingerThrottle = 50 * time.Millisecond
+		cmd.PingerThrottle = 10 * time.Millisecond
 		command_registry.Register(cmd)
 		return testcmd.RunCliCommandWithoutDependency("start", args, requirementsFactory)
 	}
@@ -171,19 +178,17 @@ var _ = Describe("start command", func() {
 		cmd.LogServerConnectionTimeout = 100 * time.Millisecond
 		cmd.StagingTimeout = 100 * time.Millisecond
 		cmd.StartupTimeout = 200 * time.Millisecond
-		cmd.PingerThrottle = 50 * time.Millisecond
+		cmd.PingerThrottle = 10 * time.Millisecond
 		command_registry.Register(cmd)
 
 		testcmd.RunCliCommandWithoutDependency("start", args, requirementsFactory)
 		return
 	}
 
-	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *testApplication.FakeApplicationRepository, *testAppInstanaces.FakeAppInstancesRepository) {
-		appRepo = &testApplication.FakeApplicationRepository{}
+	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *testApplication.FakeApplicationRepository, *testAppInstances.FakeAppInstancesRepository) {
 		appRepo.UpdateReturns(app, nil)
 		appRepo.ReadReturns(app, nil)
 		appRepo.GetAppReturns(app, nil)
-		appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 		appInstancesRepo.GetInstancesStub = getInstance
 
 		args := []string{"my-app"}
@@ -239,7 +244,6 @@ var _ = Describe("start command", func() {
 			BeforeEach(func() {
 				app = defaultAppForStart
 
-				appRepo = &testApplication.FakeApplicationRepository{}
 				appRepo.UpdateReturns(app, nil)
 
 				app.PackageState = "FAILED"
@@ -287,11 +291,13 @@ var _ = Describe("start command", func() {
 		It("uses proper org name and space name", func() {
 			appRepo.ReadReturns(defaultAppForStart, nil)
 			appRepo.GetAppReturns(defaultAppForStart, nil)
-			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 			appInstancesRepo.GetInstancesStub = getInstance
 
 			updateCommandDependency(logRepo)
 			cmd := command_registry.Commands.FindCommand("start").(*Start)
+			cmd.PingerThrottle = 10 * time.Millisecond
+
+			//defaultAppForStart.State = "started"
 			cmd.ApplicationStart(defaultAppForStart, "some-org", "some-space")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -342,7 +348,6 @@ var _ = Describe("start command", func() {
 
 		It("handles timeouts gracefully", func() {
 			requirementsFactory.Application = defaultAppForStart
-			appRepo = &testApplication.FakeApplicationRepository{}
 			appRepo.UpdateReturns(defaultAppForStart, nil)
 			appRepo.ReadReturns(defaultAppForStart, nil)
 
@@ -354,7 +359,6 @@ var _ = Describe("start command", func() {
 
 		It("only displays staging logs when an app is starting", func() {
 			requirementsFactory.Application = defaultAppForStart
-			appRepo = &testApplication.FakeApplicationRepository{}
 			appRepo.UpdateReturns(defaultAppForStart, nil)
 			appRepo.ReadReturns(defaultAppForStart, nil)
 
@@ -617,7 +621,6 @@ var _ = Describe("start command", func() {
 			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
-			appRepo = &testApplication.FakeApplicationRepository{}
 			appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 			appRepo.ReadReturns(app, nil)
 			args := []string{"my-app"}
@@ -652,9 +655,7 @@ var _ = Describe("start command", func() {
 		})
 
 		It("tells the user when connecting to the log server fails", func() {
-			appRepo = &testApplication.FakeApplicationRepository{}
 			appRepo.ReadReturns(defaultAppForStart, nil)
-			appInstancesRepo = &testAppInstanaces.FakeAppInstancesRepository{}
 
 			logRepo.TailLogsForReturns(nil, errors.New("Ooops"))
 
