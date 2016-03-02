@@ -6,7 +6,7 @@ echo -e "\nGenerating Binary..."
 
 ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
 
-if [[ $(git diff $ROOT_DIR/cf/i18n/resources/) ]]; then
+if [[ $(git status --porcelain cf/i18n/resources) ]]; then
   $ROOT_DIR/bin/generate-language-resources
 fi
 
