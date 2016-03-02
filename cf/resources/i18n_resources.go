@@ -92,7 +92,7 @@ func cfI18nResourcesDeDeAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/de-de.all.json", size: 198387, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/de-de.all.json", size: 198387, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -112,7 +112,7 @@ func cfI18nResourcesEnUsAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/en-us.all.json", size: 200627, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/en-us.all.json", size: 200627, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -132,7 +132,7 @@ func cfI18nResourcesEsEsAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/es-es.all.json", size: 197585, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/es-es.all.json", size: 197585, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -152,7 +152,7 @@ func cfI18nResourcesFrFrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/fr-fr.all.json", size: 208111, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/fr-fr.all.json", size: 208111, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -172,7 +172,7 @@ func cfI18nResourcesItItAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/it-it.all.json", size: 197966, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/it-it.all.json", size: 197966, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -192,7 +192,7 @@ func cfI18nResourcesJaJpAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/ja-jp.all.json", size: 223783, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/ja-jp.all.json", size: 223783, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -212,7 +212,7 @@ func cfI18nResourcesKoKrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/ko-kr.all.json", size: 198402, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/ko-kr.all.json", size: 198402, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -232,7 +232,7 @@ func cfI18nResourcesPtBrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/pt-br.all.json", size: 193474, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/pt-br.all.json", size: 193474, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -252,7 +252,7 @@ func cfI18nResourcesZhHansAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/zh-hans.all.json", size: 184566, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/zh-hans.all.json", size: 184566, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -272,7 +272,7 @@ func cfI18nResourcesZhHantAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/zh-hant.all.json", size: 185685, mode: os.FileMode(420), modTime: time.Unix(1456958412, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/zh-hant.all.json", size: 185685, mode: os.FileMode(420), modTime: time.Unix(1456959561, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -329,14 +329,14 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"cf/i18n/resources/de-de.all.json": cfI18nResourcesDeDeAllJson,
-	"cf/i18n/resources/en-us.all.json": cfI18nResourcesEnUsAllJson,
-	"cf/i18n/resources/es-es.all.json": cfI18nResourcesEsEsAllJson,
-	"cf/i18n/resources/fr-fr.all.json": cfI18nResourcesFrFrAllJson,
-	"cf/i18n/resources/it-it.all.json": cfI18nResourcesItItAllJson,
-	"cf/i18n/resources/ja-jp.all.json": cfI18nResourcesJaJpAllJson,
-	"cf/i18n/resources/ko-kr.all.json": cfI18nResourcesKoKrAllJson,
-	"cf/i18n/resources/pt-br.all.json": cfI18nResourcesPtBrAllJson,
+	"cf/i18n/resources/de-de.all.json":   cfI18nResourcesDeDeAllJson,
+	"cf/i18n/resources/en-us.all.json":   cfI18nResourcesEnUsAllJson,
+	"cf/i18n/resources/es-es.all.json":   cfI18nResourcesEsEsAllJson,
+	"cf/i18n/resources/fr-fr.all.json":   cfI18nResourcesFrFrAllJson,
+	"cf/i18n/resources/it-it.all.json":   cfI18nResourcesItItAllJson,
+	"cf/i18n/resources/ja-jp.all.json":   cfI18nResourcesJaJpAllJson,
+	"cf/i18n/resources/ko-kr.all.json":   cfI18nResourcesKoKrAllJson,
+	"cf/i18n/resources/pt-br.all.json":   cfI18nResourcesPtBrAllJson,
 	"cf/i18n/resources/zh-hans.all.json": cfI18nResourcesZhHansAllJson,
 	"cf/i18n/resources/zh-hant.all.json": cfI18nResourcesZhHantAllJson,
 }
@@ -380,18 +380,19 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"cf": &bintree{nil, map[string]*bintree{
 		"i18n": &bintree{nil, map[string]*bintree{
 			"resources": &bintree{nil, map[string]*bintree{
-				"de-de.all.json": &bintree{cfI18nResourcesDeDeAllJson, map[string]*bintree{}},
-				"en-us.all.json": &bintree{cfI18nResourcesEnUsAllJson, map[string]*bintree{}},
-				"es-es.all.json": &bintree{cfI18nResourcesEsEsAllJson, map[string]*bintree{}},
-				"fr-fr.all.json": &bintree{cfI18nResourcesFrFrAllJson, map[string]*bintree{}},
-				"it-it.all.json": &bintree{cfI18nResourcesItItAllJson, map[string]*bintree{}},
-				"ja-jp.all.json": &bintree{cfI18nResourcesJaJpAllJson, map[string]*bintree{}},
-				"ko-kr.all.json": &bintree{cfI18nResourcesKoKrAllJson, map[string]*bintree{}},
-				"pt-br.all.json": &bintree{cfI18nResourcesPtBrAllJson, map[string]*bintree{}},
+				"de-de.all.json":   &bintree{cfI18nResourcesDeDeAllJson, map[string]*bintree{}},
+				"en-us.all.json":   &bintree{cfI18nResourcesEnUsAllJson, map[string]*bintree{}},
+				"es-es.all.json":   &bintree{cfI18nResourcesEsEsAllJson, map[string]*bintree{}},
+				"fr-fr.all.json":   &bintree{cfI18nResourcesFrFrAllJson, map[string]*bintree{}},
+				"it-it.all.json":   &bintree{cfI18nResourcesItItAllJson, map[string]*bintree{}},
+				"ja-jp.all.json":   &bintree{cfI18nResourcesJaJpAllJson, map[string]*bintree{}},
+				"ko-kr.all.json":   &bintree{cfI18nResourcesKoKrAllJson, map[string]*bintree{}},
+				"pt-br.all.json":   &bintree{cfI18nResourcesPtBrAllJson, map[string]*bintree{}},
 				"zh-hans.all.json": &bintree{cfI18nResourcesZhHansAllJson, map[string]*bintree{}},
 				"zh-hant.all.json": &bintree{cfI18nResourcesZhHantAllJson, map[string]*bintree{}},
 			}},
@@ -445,4 +446,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-
