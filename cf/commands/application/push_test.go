@@ -31,10 +31,10 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/blang/semver"
 )
 
 var _ = Describe("Push Command", func() {
