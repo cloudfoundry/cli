@@ -4284,10 +4284,6 @@
     "translation": "%s health_check_type을 '%s'(으)로 업데이트"
   },
   {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "플랜을 업데이트하려면 API v{{.RequiredCCAPIVersion}} 이상이 필요합니다. 현재 대상은 v{{.CurrentCCAPIVersion}}입니다."
-  },
-  {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 업데이트 중..."
   },

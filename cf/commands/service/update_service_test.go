@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/blang/semver"
 	testplanbuilder "github.com/cloudfoundry/cli/cf/actors/plan_builder/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -17,6 +18,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -41,9 +45,15 @@ var _ = Describe("update-service command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
+
 		config = testconfig.NewRepositoryWithDefaults()
-		config.SetApiVersion("2.26.0")
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+
+		requirementsFactory = &testreq.FakeReqFactory{
+			LoginSuccess:         true,
+			TargetedSpaceSuccess: true,
+			MinAPIVersionSuccess: true,
+		}
+
 		serviceRepo = &testapi.FakeServiceRepository{}
 		planBuilder = &testplanbuilder.FakePlanBuilder{}
 
@@ -81,6 +91,38 @@ var _ = Describe("update-service command", func() {
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
 			Expect(callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeFalse())
+		})
+
+		Context("-p", func() {
+			It("when provided, requires a CC API version > cf.UpdateServicePlanMinimumApiVersion", func() {
+				cmd := &service.UpdateService{}
+
+				fc := flags.NewFlagContext(cmd.MetaData().Flags)
+				fc.Parse("potato", "-p", "plan-name")
+
+				reqs, err := cmd.Requirements(requirementsFactory, fc)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(reqs).NotTo(BeEmpty())
+
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Updating a plan"))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.UpdateServicePlanMinimumApiVersion))
+			})
+
+			It("does not requirue a CC Api Version if not provided", func() {
+				cmd := &service.UpdateService{}
+
+				fc := flags.NewFlagContext(cmd.MetaData().Flags)
+				fc.Parse("potato")
+
+				reqs, err := cmd.Requirements(requirementsFactory, fc)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(reqs).NotTo(BeEmpty())
+
+				var s semver.Version
+
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal(""))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(s))
+			})
 		})
 	})
 
@@ -299,85 +341,64 @@ var _ = Describe("update-service command", func() {
 				Expect(planGUID).To(Equal("murkydb-flare-guid"))
 			})
 
-			Context("and the CC API Version >= 2.16.0", func() {
-				BeforeEach(func() {
-					config.SetApiVersion("2.16.0")
-				})
+			It("successfully updates a service", func() {
+				callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
-				It("successfully updates a service", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Updating service", "my-service", "as", "my-user", "..."},
+					[]string{"OK"},
+					[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
+				))
+
+				Expect(serviceRepo.FindInstanceByNameArgsForCall(0)).To(Equal("my-service-instance"))
+
+				instanceGUID, planGUID, _, _ := serviceRepo.UpdateServiceInstanceArgsForCall(0)
+				Expect(instanceGUID).To(Equal("my-service-instance-guid"))
+				Expect(planGUID).To(Equal("murkydb-flare-guid"))
+			})
+
+			Context("when there is an err finding the instance", func() {
+				It("returns an error", func() {
+					serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.New("Error finding instance"))
+
+					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error finding instance"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when there is an err finding service plans", func() {
+				It("returns an error", func() {
+					planBuilder.GetPlansForServiceForOrgReturns(nil, errors.New("Error fetching plans"))
+
+					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error fetching plans"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when the plan specified does not exist in the service offering", func() {
+				It("returns an error", func() {
+					callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
+
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Plan does not exist for the murkydb service"},
+						[]string{"FAILED"},
+					))
+				})
+			})
+			Context("when there is an error updating the service instance", func() {
+				It("returns an error", func() {
+					serviceRepo.UpdateServiceInstanceReturns(errors.New("Error updating service instance"))
 					callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Updating service", "my-service", "as", "my-user", "..."},
-						[]string{"OK"},
-						[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
-					))
-
-					Expect(serviceRepo.FindInstanceByNameArgsForCall(0)).To(Equal("my-service-instance"))
-
-					instanceGUID, planGUID, _, _ := serviceRepo.UpdateServiceInstanceArgsForCall(0)
-					Expect(instanceGUID).To(Equal("my-service-instance-guid"))
-					Expect(planGUID).To(Equal("murkydb-flare-guid"))
-				})
-
-				Context("when there is an err finding the instance", func() {
-					It("returns an error", func() {
-						serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.New("Error finding instance"))
-
-						callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
-
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Error finding instance"},
-							[]string{"FAILED"},
-						))
-					})
-				})
-				Context("when there is an err finding service plans", func() {
-					It("returns an error", func() {
-						planBuilder.GetPlansForServiceForOrgReturns(nil, errors.New("Error fetching plans"))
-
-						callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
-
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Error fetching plans"},
-							[]string{"FAILED"},
-						))
-					})
-				})
-				Context("when the plan specified does not exist in the service offering", func() {
-					It("returns an error", func() {
-						callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
-
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Plan does not exist for the murkydb service"},
-							[]string{"FAILED"},
-						))
-					})
-				})
-				Context("when there is an error updating the service instance", func() {
-					It("returns an error", func() {
-						serviceRepo.UpdateServiceInstanceReturns(errors.New("Error updating service instance"))
-						callUpdateService([]string{"-p", "flare", "my-service-instance"})
-
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Error updating service instance"},
-							[]string{"FAILED"},
-						))
-					})
-				})
-			})
-
-			Context("and the CC API Version < 2.16.0", func() {
-				BeforeEach(func() {
-					config.SetApiVersion("2.15.0")
-				})
-
-				It("returns an error", func() {
-					callUpdateService([]string{"-p", "flare", "instance-without-service-offering"})
-
-					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Error updating service instance"},
 						[]string{"FAILED"},
-						[]string{"Updating a plan requires API v2.16.0 or newer. Your current target is v2.15.0."},
 					))
 				})
 			})

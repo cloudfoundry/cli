@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -107,7 +108,8 @@ var _ = Describe("Configuration Repository", func() {
 		Expect(config.PluginRepos()[0].Name).To(Equal("repo"))
 		Expect(config.PluginRepos()[0].Url).To(Equal("nowhere.com"))
 
-		Expect(config.IsMinApiVersion("3.1")).To(Equal(false))
+		s, _ := semver.Make("3.1")
+		Expect(config.IsMinApiVersion(s)).To(Equal(false))
 
 		config.SetMinCliVersion("6.5.0")
 		Expect(config.MinCliVersion()).To(Equal("6.5.0"))

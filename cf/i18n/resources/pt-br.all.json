@@ -4284,10 +4284,6 @@
     "translation": "Atualizando %s health_check_type para '%s'"
   },
   {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "A atualização de um plano requer a API v{{.RequiredCCAPIVersion}} ou mais recente. Seu destino atual é v{{.CurrentCCAPIVersion}}."
-  },
-  {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Atualizando o app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.Username}}..."
   },

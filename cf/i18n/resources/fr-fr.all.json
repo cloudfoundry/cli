@@ -4284,10 +4284,6 @@
     "translation": "Mise à jour du type de diagnostic d'intégrité %s avec '%s'"
   },
   {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "La mise à jour d'un plan requiert une API de version {{.RequiredCCAPIVersion}} ou plus récente. Votre cible en cours est la version {{.CurrentCCAPIVersion}}."
-  },
-  {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Mise à jour de l'application {{.AppName}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.Username}}..."
   },
