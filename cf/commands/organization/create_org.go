@@ -103,7 +103,7 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 
-	if cmd.config.IsMinApiVersion("2.37.0") {
+	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
 		if err != nil {
 			cmd.ui.Warn(T("Warning: accessing feature flag 'set_roles_by_username'") + " - " + err.Error() + "\n" + T("Skip assigning org role to user"))

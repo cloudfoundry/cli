@@ -4284,10 +4284,6 @@
     "translation": "正在將 %s health_check_type 更新為 '%s'"
   },
   {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "更新方案時需要 API {{.RequiredCCAPIVersion}} 版或更新版本。您的現行目標是 {{.CurrentCCAPIVersion}} 版。"
-  },
-  {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身分更新組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}}..."
   },
