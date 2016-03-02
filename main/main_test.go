@@ -95,14 +95,14 @@ var _ = Describe("main", func() {
 		})
 	})
 
-	Describe("Commands /w new non-codegangsta structure", func() {
-		It("prints usage help for all non-codegangsta commands by providing `help` flag", func() {
+	Describe("Commands /w new command structure", func() {
+		It("prints usage help for all commands by providing `help` flag", func() {
 			output := Cf("api", "-h").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE"))
 			Eventually(output.Out.Contents).Should(ContainSubstring("OPTIONS"))
 		})
 
-		It("accepts -h and --h flags for non-codegangsta commands", func() {
+		It("accepts -h and --h flags for commands", func() {
 			result := Cf("api", "-h")
 			Consistently(result.Out).ShouldNot(Say("Invalid flag: -h"))
 			Eventually(result.Out.Contents).Should(ContainSubstring("api - Set or view target api url"))
@@ -112,7 +112,7 @@ var _ = Describe("main", func() {
 			Eventually(result.Out.Contents).Should(ContainSubstring("api - Set or view target api url"))
 		})
 
-		It("runs requirement of the non-codegangsta command", func() {
+		It("runs requirement of the command", func() {
 			dir, err := os.Getwd()
 			Expect(err).ToNot(HaveOccurred())
 			fullDir := filepath.Join(dir, "..", "fixtures") //set home to a config w/o targeted api
