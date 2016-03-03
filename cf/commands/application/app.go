@@ -102,7 +102,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 
 	appIsStopped := (application.State == "stopped")
 	if err, ok := apiErr.(errors.HttpError); ok {
-		if err.ErrorCode() == errors.APP_STOPPED || err.ErrorCode() == errors.APP_NOT_STAGED {
+		if err.ErrorCode() == errors.InstancesError || err.ErrorCode() == errors.NotStaged {
 			appIsStopped = true
 		}
 	}

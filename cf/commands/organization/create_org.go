@@ -91,7 +91,7 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 
 	err := cmd.orgRepo.Create(org)
 	if err != nil {
-		if apiErr, ok := err.(errors.HttpError); ok && apiErr.ErrorCode() == errors.ORG_EXISTS {
+		if apiErr, ok := err.(errors.HttpError); ok && apiErr.ErrorCode() == errors.OrganizationNameTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Org {{.OrgName}} already exists",
 				map[string]interface{}{"OrgName": name}))

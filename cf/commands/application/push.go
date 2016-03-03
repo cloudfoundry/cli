@@ -382,7 +382,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 
 		switch httpErr := err.(type) {
 		case errors.HttpError:
-			if httpErr.ErrorCode() == errors.APP_ALREADY_BOUND {
+			if httpErr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
 				err = nil
 			}
 		}

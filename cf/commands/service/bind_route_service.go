@@ -153,7 +153,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 
 	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided(), parameters)
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.ROUTE_ALREADY_BOUND_TO_SAME_SERVICE {
+		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.ServiceInstanceAlreadyBoundToSameRoute {
 			cmd.ui.Warn(T("Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
 				map[string]interface{}{
 					"URL": route.URL(),

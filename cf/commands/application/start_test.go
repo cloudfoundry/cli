@@ -419,7 +419,7 @@ var _ = Describe("start command", func() {
 				[]models.AppInstanceFields{{State: models.InstanceRunning}, {State: models.InstanceRunning}},
 			}
 
-			defaultInstanceErrorCodes = []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, "", "", ""}
+			defaultInstanceErrorCodes = []string{errors.NotStaged, errors.NotStaged, "", "", ""}
 			defaultAppForStart.PackageState = "PENDING"
 			ui, appRepo, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
@@ -604,7 +604,7 @@ var _ = Describe("start command", func() {
 		})
 
 		It("tells the user about the failure when waiting for the app to stage times out", func() {
-			defaultInstanceErrorCodes = []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, errors.APP_NOT_STAGED}
+			defaultInstanceErrorCodes = []string{errors.NotStaged, errors.NotStaged, errors.NotStaged}
 
 			defaultAppForStart.PackageState = "PENDING"
 			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
