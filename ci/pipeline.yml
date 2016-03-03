@@ -132,6 +132,14 @@ jobs:
       - get: bosh-lite
       - get: cli
         resource: cli-ci
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          LITE_INSTANCE_NAME: bosh-lite-1
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -151,10 +159,6 @@ jobs:
       put: bosh-lite-lock
       params:
         release: bosh-lite-lock
-  - put: ci
-    params:
-      repository: ci
-      rebase: true
 
 - name: deploy-boshlite-2
   serial: true
@@ -169,6 +173,14 @@ jobs:
       - get: bosh-lite
       - get: cli
         resource: cli-ci
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          LITE_INSTANCE_NAME: bosh-lite-2
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -188,10 +200,6 @@ jobs:
       put: bosh-lite-lock
       params:
         release: bosh-lite-lock
-  - put: ci
-    params:
-      repository: ci
-      rebase: true
 
 - name: deploy-boshlite-3
   serial: true
@@ -206,6 +214,14 @@ jobs:
       - get: bosh-lite
       - get: cli
         resource: cli-ci
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          LITE_INSTANCE_NAME: bosh-lite-3
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -225,10 +241,6 @@ jobs:
       put: bosh-lite-lock
       params:
         release: bosh-lite-lock
-  - put: ci
-    params:
-      repository: ci
-      rebase: true
 
 - name: deploy-boshlite-4
   serial: true
@@ -243,6 +255,14 @@ jobs:
       - get: bosh-lite
       - get: cli
         resource: cli-ci
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          LITE_INSTANCE_NAME: bosh-lite-4
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -262,10 +282,6 @@ jobs:
       put: bosh-lite-lock
       params:
         release: bosh-lite-lock
-  - put: ci
-    params:
-      repository: ci
-      rebase: true
 
 - name: units
   serial: true
