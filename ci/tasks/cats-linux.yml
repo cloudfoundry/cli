@@ -69,7 +69,7 @@ run:
 
     export CONFIG=$PWD/config.json
 
-    GOPATH=$PWD/Godeps/_workspace:$GOPATH ginkgo \
+    ginkgo \
       -r \
       -slowSpecThreshold=120  \
       -skipPackage="logging,services,v3,routing_api,routing,backend_compatibility,ssh" \
