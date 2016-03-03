@@ -97,11 +97,11 @@ func (ui *FakeUI) Confirm(prompt string) bool {
 	return false
 }
 
-func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) string {
-	ui.PasswordPrompts = append(ui.PasswordPrompts, fmt.Sprintf(prompt, args...))
+func (ui *FakeUI) AskForPassword(prompt string) string {
+	ui.PasswordPrompts = append(ui.PasswordPrompts, prompt)
 
 	if len(ui.Inputs) == 0 {
-		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+		panic("No input provided to Fake UI for prompt: " + prompt)
 	}
 
 	answer := ui.Inputs[0]
