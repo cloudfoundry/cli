@@ -229,7 +229,7 @@ func (repo CloudControllerUserRepository) Delete(userGuid string) (apiErr error)
 
 	apiErr = repo.ccGateway.DeleteResource(repo.config.ApiEndpoint(), path)
 
-	if httpErr, ok := apiErr.(errors.HttpError); ok && httpErr.ErrorCode() != errors.USER_NOT_FOUND {
+	if httpErr, ok := apiErr.(errors.HttpError); ok && httpErr.ErrorCode() != errors.UserNotFound {
 		return
 	}
 	uaaEndpoint, apiErr := repo.getAuthEndpoint()

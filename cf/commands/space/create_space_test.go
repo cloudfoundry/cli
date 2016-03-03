@@ -135,7 +135,7 @@ var _ = Describe("create-space command", func() {
 	})
 
 	It("warns the user when a space with that name already exists", func() {
-		spaceRepo.CreateReturns(models.Space{}, errors.NewHttpError(400, errors.SPACE_EXISTS, "Space already exists"))
+		spaceRepo.CreateReturns(models.Space{}, errors.NewHttpError(400, errors.SpaceNameTaken, "Space already exists"))
 		runCommand("my-space")
 
 		Expect(ui.Outputs).To(ContainSubstrings(
