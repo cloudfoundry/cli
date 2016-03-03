@@ -26,7 +26,7 @@ type UI interface {
 	PrintCapturingNoOutput(message string, args ...interface{})
 	Warn(message string, args ...interface{})
 	Ask(prompt string) (answer string)
-	AskForPassword(prompt string, args ...interface{}) (answer string)
+	AskForPassword(prompt string) (answer string)
 	Confirm(message string) bool
 	ConfirmDelete(modelType, modelName string) bool
 	ConfirmDeleteWithAssociations(modelType, modelName string) bool

@@ -142,7 +142,7 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) {
 	passcode := prompts["passcode"]
 
 	for i := 0; i < maxLoginTries; i++ {
-		credentials["passcode"] = cmd.ui.AskForPassword("%s", passcode.DisplayName)
+		credentials["passcode"] = cmd.ui.AskForPassword(passcode.DisplayName)
 
 		cmd.ui.Say(T("Authenticating..."))
 		err = cmd.authenticator.Authenticate(credentials)
@@ -200,7 +200,7 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 				credentials[key] = passwordFlagValue
 				passwordFlagValue = ""
 			} else {
-				credentials[key] = cmd.ui.AskForPassword("%s", prompts[key].DisplayName)
+				credentials[key] = cmd.ui.AskForPassword(prompts[key].DisplayName)
 			}
 		}
 

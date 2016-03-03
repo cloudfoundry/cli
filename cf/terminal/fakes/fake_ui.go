@@ -41,11 +41,10 @@ type FakeUI struct {
 	askReturns struct {
 		result1 string
 	}
-	AskForPasswordStub        func(prompt string, args ...interface{}) (answer string)
+	AskForPasswordStub        func(prompt string) (answer string)
 	askForPasswordMutex       sync.RWMutex
 	askForPasswordArgsForCall []struct {
 		prompt string
-		args   []interface{}
 	}
 	askForPasswordReturns struct {
 		result1 string
@@ -239,15 +238,14 @@ func (fake *FakeUI) AskReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeUI) AskForPassword(prompt string, args ...interface{}) (answer string) {
+func (fake *FakeUI) AskForPassword(prompt string) (answer string) {
 	fake.askForPasswordMutex.Lock()
 	fake.askForPasswordArgsForCall = append(fake.askForPasswordArgsForCall, struct {
 		prompt string
-		args   []interface{}
-	}{prompt, args})
+	}{prompt})
 	fake.askForPasswordMutex.Unlock()
 	if fake.AskForPasswordStub != nil {
-		return fake.AskForPasswordStub(prompt, args...)
+		return fake.AskForPasswordStub(prompt)
 	} else {
 		return fake.askForPasswordReturns.result1
 	}
@@ -259,10 +257,10 @@ func (fake *FakeUI) AskForPasswordCallCount() int {
 	return len(fake.askForPasswordArgsForCall)
 }
 
-func (fake *FakeUI) AskForPasswordArgsForCall(i int) (string, []interface{}) {
+func (fake *FakeUI) AskForPasswordArgsForCall(i int) string {
 	fake.askForPasswordMutex.RLock()
 	defer fake.askForPasswordMutex.RUnlock()
-	return fake.askForPasswordArgsForCall[i].prompt, fake.askForPasswordArgsForCall[i].args
+	return fake.askForPasswordArgsForCall[i].prompt
 }
 
 func (fake *FakeUI) AskForPasswordReturns(result1 string) {
