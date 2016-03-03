@@ -125,7 +125,6 @@ run:
             -in digestinfo.dat \
             -out signature.dat
         xar --inject-sig signature.dat -f $f
-        pkgutil --check-signature $f
 
         mv cf-cli-installer_osx.pkg $root/archives/cf-cli-installer_osx.pkg
         rm -rf cf-cli com.cloudfoundry.cli.pkg/Payload com.cloudfoundry.cli.pkg/Bom bom_list
