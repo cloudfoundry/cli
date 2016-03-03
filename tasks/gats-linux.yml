@@ -69,4 +69,4 @@ run:
 
     export CONFIG=`pwd`/config.json
 
-    GOPATH=$PWD/Godeps/_workspace:$GOPATH ginkgo -r -slowSpecThreshold=120 ./gats
+    ginkgo -r -slowSpecThreshold=120 ./gats

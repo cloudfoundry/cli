@@ -21,5 +21,4 @@ popd
 go get -v github.com/onsi/ginkgo/ginkgo
 
 cd %GATSPATH%
-SET GOPATH=%GATSPATH%\Godeps\_workspace;%GOPATH%
 ginkgo.exe -r -slowSpecThreshold=120 ./gats
