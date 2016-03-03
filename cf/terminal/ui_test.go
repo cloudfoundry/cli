@@ -111,7 +111,7 @@ var _ = Describe("UI", func() {
 			io_helpers.SimulateStdin("y\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader, NewTeePrinter())
-					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
+					Expect(ui.Confirm("Hello World?")).To(BeTrue())
 				})
 
 				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
@@ -135,7 +135,7 @@ var _ = Describe("UI", func() {
 			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader, NewTeePrinter())
-					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
+					Expect(ui.Confirm("Hello World?")).To(BeTrue())
 				})
 				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
 			})
@@ -145,7 +145,7 @@ var _ = Describe("UI", func() {
 			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader, NewTeePrinter())
-					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
+					Expect(ui.Confirm("Hello World?")).To(BeTrue())
 				})
 
 				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
@@ -156,7 +156,7 @@ var _ = Describe("UI", func() {
 			io_helpers.SimulateStdin("wat\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
 					ui := NewUI(reader, NewTeePrinter())
-					Expect(ui.Confirm("Hello %s", "World?")).To(BeFalse())
+					Expect(ui.Confirm("Hello World?")).To(BeFalse())
 				})
 
 				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))

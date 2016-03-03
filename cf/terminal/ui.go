@@ -19,14 +19,15 @@ func NotLoggedInText() string {
 	return fmt.Sprintf(T("Not logged in. Use '{{.CFLoginCommand}}' to log in.", map[string]interface{}{"CFLoginCommand": CommandColor(cf.Name + " " + "login")}))
 }
 
+//go:generate counterfeiter . UI
 type UI interface {
 	PrintPaginator(rows []string, err error)
 	Say(message string, args ...interface{})
 	PrintCapturingNoOutput(message string, args ...interface{})
 	Warn(message string, args ...interface{})
-	Ask(prompt string, args ...interface{}) (answer string)
+	Ask(prompt string) (answer string)
 	AskForPassword(prompt string, args ...interface{}) (answer string)
-	Confirm(message string, args ...interface{}) bool
+	Confirm(message string) bool
 	ConfirmDelete(modelType, modelName string) bool
 	ConfirmDeleteWithAssociations(modelType, modelName string) bool
 	Ok()
@@ -109,8 +110,8 @@ func (ui *terminalUI) confirmDelete(message string) bool {
 	return result
 }
 
-func (ui *terminalUI) Confirm(message string, args ...interface{}) bool {
-	response := ui.Ask(message, args...)
+func (ui *terminalUI) Confirm(message string) bool {
+	response := ui.Ask(message)
 	switch strings.ToLower(response) {
 	case "y", "yes", T("yes"):
 		return true
@@ -118,9 +119,8 @@ func (ui *terminalUI) Confirm(message string, args ...interface{}) bool {
 	return false
 }
 
-func (ui *terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
-	fmt.Println("")
-	fmt.Printf(prompt+PromptColor(">")+" ", args...)
+func (ui *terminalUI) Ask(prompt string) (answer string) {
+	fmt.Printf("\n%s%s ", prompt, PromptColor(">"))
 
 	rd := bufio.NewReader(ui.stdin)
 	line, err := rd.ReadString('\n')
