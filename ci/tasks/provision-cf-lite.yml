@@ -39,18 +39,6 @@ run:
     export BOSH_LITE_INSTANCE_TYPE="${LITE_INSTANCE_TYPE}"
     export VAGRANT_DOTFILE_PATH=$PWD/ci/concourse/lite/${LITE_NAME}/vagrant
 
-    git config --global user.email "ci@localhost"
-    git config --global user.name "CI Bot"
-
-    function commit_vagrant_artifacts() {
-      cd $root/ci
-
-      if [ -n "$(git status --porcelain)" ]; then
-        git add -A
-        git commit -m "provisioned"
-      fi
-    }
-
     mkdir scratch
 
     pushd scratch
@@ -65,8 +53,6 @@ run:
 
       vagrant up --provider aws
     popd
-
-    trap commit_vagrant_artifacts EXIT
 
     sed -i -e "s/bosh-lite-ip-${LITE_NAME}: \(.*\)/bosh-lite-ip-${LITE_NAME}: ${DIRECTOR_IP}/" \
       ci/concourse/credentials.yml
