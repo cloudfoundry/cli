@@ -54,7 +54,7 @@ run:
 
     pushd archives
       for archive in *; do
-          aws cp $archive s3://go-cli/master/$archive
+          aws s3 cp $archive s3://go-cli/master/$archive
       done
     popd
 
