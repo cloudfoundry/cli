@@ -114,7 +114,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 		if err != nil {
 			for _, param := range strings.Split(credentials, ",") {
 				param = strings.Trim(param, " ")
-				credentialsMap[param] = cmd.ui.Ask("%s", param)
+				credentialsMap[param] = cmd.ui.Ask(param)
 			}
 		}
 	}

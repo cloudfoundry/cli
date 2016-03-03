@@ -176,7 +176,7 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 		if prompts["username"].Type == core_config.AuthPromptTypeText && usernameFlagValue != "" {
 			credentials["username"] = usernameFlagValue
 		} else {
-			credentials["username"] = cmd.ui.Ask("%s", value.DisplayName)
+			credentials["username"] = cmd.ui.Ask(value.DisplayName)
 		}
 	}
 
@@ -190,7 +190,7 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 		} else if key == "username" {
 			continue
 		} else {
-			credentials[key] = cmd.ui.Ask("%s", prompt.DisplayName)
+			credentials[key] = cmd.ui.Ask(prompt.DisplayName)
 		}
 	}
 
@@ -346,7 +346,7 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 			cmd.ui.Say(T("There are too many options to display, please type in the name."))
 		}
 
-		nameString = cmd.ui.Ask("%s", itemPrompt)
+		nameString = cmd.ui.Ask(itemPrompt)
 		if nameString == "" {
 			return ""
 		}
