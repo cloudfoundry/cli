@@ -720,10 +720,6 @@
     "translation": "No app files found in '{{.Path}}'"
   },
   {
-    "id": "No save path has been set",
-    "translation": "No save path has been set"
-  },
-  {
     "id": "OK",
     "translation": "OK"
   },

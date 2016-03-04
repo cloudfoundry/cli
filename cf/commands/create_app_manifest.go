@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"os"
 	"sort"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -16,6 +17,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"io"
 )
 
 type CreateAppManifest struct {
@@ -91,11 +93,20 @@ func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
 		savePath = c.String("p")
 	}
 
-	cmd.createManifest(application, savePath)
+	f, err := os.Create(savePath)
+	if err != nil {
+		cmd.ui.Failed(T("Error creating manifest file: ") + err.Error())
+	}
+	defer f.Close()
+
+	cmd.createManifest(application, f)
+
+	cmd.ui.Ok()
+	cmd.ui.Say(T("Manifest file created successfully at ") + savePath)
+	cmd.ui.Say("")
 }
 
-func (cmd *CreateAppManifest) createManifest(app models.Application, savePath string) {
-	cmd.manifest.FileSavePath(savePath)
+func (cmd *CreateAppManifest) createManifest(app models.Application, f io.Writer) {
 	cmd.manifest.Memory(app.Name, app.Memory)
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
 	cmd.manifest.Stack(app.Name, app.Stack.Name)
@@ -146,14 +157,10 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, savePath st
 		cmd.manifest.DiskQuota(app.Name, app.DiskQuota)
 	}
 
-	err := cmd.manifest.Save()
+	err := cmd.manifest.Save(f)
 	if err != nil {
 		cmd.ui.Failed(T("Error creating manifest file: ") + err.Error())
 	}
-
-	cmd.ui.Ok()
-	cmd.ui.Say(T("Manifest file created successfully at ") + savePath)
-	cmd.ui.Say("")
 }
 
 func sortEnvVar(vars map[string]interface{}) []string {

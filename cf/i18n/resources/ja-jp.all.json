@@ -3004,10 +3004,6 @@
     "translation": "実行セキュリティー・グループが設定されていません"
   },
   {
-    "id": "No save path has been set",
-    "translation": ""
-  },
-  {
     "id": "No security groups",
     "translation": "セキュリティー・グループがありません"
   },
