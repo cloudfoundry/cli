@@ -151,25 +151,6 @@ var _ = Describe("CreateAppManifest", func() {
 				appSummaryRepo.GetSummaryReturns(application, nil)
 			})
 
-			It("sets the save path", func() {
-				cmd.Execute(flagContext)
-				Expect(fakeManifest.FileSavePathCallCount()).To(Equal(1))
-				Expect(fakeManifest.FileSavePathArgsForCall(0)).To(Equal("./app-name_manifest.yml"))
-			})
-
-			Context("when a save path is provided", func() {
-				BeforeEach(func() {
-					err := flagContext.Parse("app-name", "-p", "save-path")
-					Expect(err).NotTo(HaveOccurred())
-				})
-
-				It("sets the save path to the provided path", func() {
-					cmd.Execute(flagContext)
-					Expect(fakeManifest.FileSavePathCallCount()).To(Equal(1))
-					Expect(fakeManifest.FileSavePathArgsForCall(0)).To(Equal("save-path"))
-				})
-			})
-
 			It("sets memory", func() {
 				cmd.Execute(flagContext)
 				Expect(fakeManifest.MemoryCallCount()).To(Equal(1))

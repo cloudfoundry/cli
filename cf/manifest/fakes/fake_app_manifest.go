@@ -2,6 +2,7 @@
 package fakes
 
 import (
+	"io"
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -71,10 +72,11 @@ type FakeAppManifest struct {
 	getContentsReturns     struct {
 		result1 []models.Application
 	}
-	FileSavePathStub        func(string)
+	FileSavePathStub        func() string
 	fileSavePathMutex       sync.RWMutex
-	fileSavePathArgsForCall []struct {
-		arg1 string
+	fileSavePathArgsForCall []struct{}
+	fileSavePathReturns     struct {
+		result1 string
 	}
 	StackStub        func(string, string)
 	stackMutex       sync.RWMutex
@@ -82,10 +84,12 @@ type FakeAppManifest struct {
 		arg1 string
 		arg2 string
 	}
-	SaveStub        func() error
+	SaveStub        func(f io.Writer) error
 	saveMutex       sync.RWMutex
-	saveArgsForCall []struct{}
-	saveReturns     struct {
+	saveArgsForCall []struct {
+		f io.Writer
+	}
+	saveReturns struct {
 		result1 error
 	}
 }
@@ -332,14 +336,14 @@ func (fake *FakeAppManifest) GetContentsReturns(result1 []models.Application) {
 	}{result1}
 }
 
-func (fake *FakeAppManifest) FileSavePath(arg1 string) {
+func (fake *FakeAppManifest) FileSavePath() string {
 	fake.fileSavePathMutex.Lock()
-	fake.fileSavePathArgsForCall = append(fake.fileSavePathArgsForCall, struct {
-		arg1 string
-	}{arg1})
+	fake.fileSavePathArgsForCall = append(fake.fileSavePathArgsForCall, struct{}{})
 	fake.fileSavePathMutex.Unlock()
 	if fake.FileSavePathStub != nil {
-		fake.FileSavePathStub(arg1)
+		return fake.FileSavePathStub()
+	} else {
+		return fake.fileSavePathReturns.result1
 	}
 }
 
@@ -349,10 +353,11 @@ func (fake *FakeAppManifest) FileSavePathCallCount() int {
 	return len(fake.fileSavePathArgsForCall)
 }
 
-func (fake *FakeAppManifest) FileSavePathArgsForCall(i int) string {
-	fake.fileSavePathMutex.RLock()
-	defer fake.fileSavePathMutex.RUnlock()
-	return fake.fileSavePathArgsForCall[i].arg1
+func (fake *FakeAppManifest) FileSavePathReturns(result1 string) {
+	fake.FileSavePathStub = nil
+	fake.fileSavePathReturns = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeAppManifest) Stack(arg1 string, arg2 string) {
@@ -379,12 +384,14 @@ func (fake *FakeAppManifest) StackArgsForCall(i int) (string, string) {
 	return fake.stackArgsForCall[i].arg1, fake.stackArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) Save() error {
+func (fake *FakeAppManifest) Save(f io.Writer) error {
 	fake.saveMutex.Lock()
-	fake.saveArgsForCall = append(fake.saveArgsForCall, struct{}{})
+	fake.saveArgsForCall = append(fake.saveArgsForCall, struct {
+		f io.Writer
+	}{f})
 	fake.saveMutex.Unlock()
 	if fake.SaveStub != nil {
-		return fake.SaveStub()
+		return fake.SaveStub(f)
 	} else {
 		return fake.saveReturns.result1
 	}
@@ -394,6 +401,12 @@ func (fake *FakeAppManifest) SaveCallCount() int {
 	fake.saveMutex.RLock()
 	defer fake.saveMutex.RUnlock()
 	return len(fake.saveArgsForCall)
+}
+
+func (fake *FakeAppManifest) SaveArgsForCall(i int) io.Writer {
+	fake.saveMutex.RLock()
+	defer fake.saveMutex.RUnlock()
+	return fake.saveArgsForCall[i].f
 }
 
 func (fake *FakeAppManifest) SaveReturns(result1 error) {
