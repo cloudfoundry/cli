@@ -154,6 +154,13 @@ var _ = Describe("curl command", func() {
 			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
+		It("does not fail when given -d with empty string", func() {
+			runCurlWithInputs([]string{"/foo", "-d", "\"\""})
+
+			Expect(curlRepo.Body).To(Equal(""))
+			Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"FAILED"}))
+		})
+
 		It("sets the request body when the -d flag is given with an @-prefixed file", func() {
 			tempfile, err := ioutil.TempFile("", "get-data-test")
 			Expect(err).NotTo(HaveOccurred())
