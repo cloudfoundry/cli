@@ -1,6 +1,9 @@
 package generic
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 // interface declaration
 type Map interface {
@@ -120,12 +123,8 @@ func IsMappable(value interface{}) bool {
 	switch value.(type) {
 	case Map:
 		return true
-	case map[string]interface{}:
-		return true
-	case map[interface{}]interface{}:
-		return true
 	default:
-		return false
+		return reflect.TypeOf(value).Kind() == reflect.Map
 	}
 }
 
