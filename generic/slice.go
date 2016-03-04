@@ -1,12 +1,7 @@
 package generic
 
+import "reflect"
+
 func IsSliceable(value interface{}) bool {
-	switch value.(type) {
-	case []string:
-		return true
-	case []interface{}:
-		return true
-	default:
-		return false
-	}
+	return reflect.TypeOf(value).Kind() == reflect.Slice
 }
