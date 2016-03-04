@@ -57,3 +57,6 @@ fixtures/plugins/empty_plugin
 fixtures/config/plugin-config/.cf/plugins/test_1
 fixtures/config/plugin-config/.cf/plugins/test_2
 fixtures/config/plugin-config/.cf/plugins/empty_plugin
+
+### VisualStudioCode ###
+.vscode
