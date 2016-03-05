@@ -1,0 +1,26 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-vagrant-ci
+
+params:
+  LITE_PRIVATE_IP_ADDRESS:
+
+inputs:
+- name: etcd-release
+- name: garden-linux-release
+- name: diego-release
+- name: diego-repo
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    bosh target $LITE_PRIVATE_IP_ADDRESS
+    bosh upload release etcd-release/release.tgz
+    bosh upload release garden-linux-release/release.tgz
+    bosh upload release diego-release/release.tgz
+
