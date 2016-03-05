@@ -24,7 +24,7 @@ run:
     bosh -n -u admin -p admin upload release garden-linux-release/release.tgz --skip-if-exists
     bosh -n -u admin -p admin upload release diego-release/release.tgz --skip-if-exists
 
-    pushd diego-release
+    pushd diego-repo
       ./scripts/generate-bosh-lite-manifests
       bosh deployment bosh-lite/deployments/diego.yml
       bosh -n -u admin -p admin deploy
