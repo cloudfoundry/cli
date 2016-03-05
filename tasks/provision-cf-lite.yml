@@ -17,7 +17,7 @@ params:
   LITE_KEYPAIR:
 
 inputs:
-  - name: ci
+  - name: cli-ci
   - name: bosh-lite
   - name: cf-release
 
@@ -37,15 +37,10 @@ run:
     export BOSH_LITE_PRIVATE_KEY=$PWD/"${LITE_PRIVATE_KEY_PATH}"
     export BOSH_LITE_NAME="${LITE_NAME}"
     export BOSH_LITE_INSTANCE_TYPE="${LITE_INSTANCE_TYPE}"
-    export VAGRANT_DOTFILE_PATH=$PWD/ci/concourse/lite/${LITE_NAME}/vagrant
 
     mkdir scratch
 
     pushd scratch
-      if [ -d "$VAGRANT_DOTFILE_PATH" ]; then
-        vagrant destroy -f
-      fi
-
       vagrant init cloudfoundry/bosh-lite
 
       sed -i -e "s/do |config|/do |config|\n  config.vm.provider 'aws' do |aws|\n    aws.private_ip_address = '${LITE_PRIVATE_IP_ADDRESS}'\n  end/" \
@@ -55,7 +50,7 @@ run:
     popd
 
     sed -i -e "s/bosh-lite-ip-${LITE_NAME}: \(.*\)/bosh-lite-ip-${LITE_NAME}: ${DIRECTOR_IP}/" \
-      ci/concourse/credentials.yml
+      cli-ci/concourse/credentials.yml
 
     pushd cf-release
       sed -i -e "s/^properties:/properties:\n  domain: ${LITE_HOSTNAME}/" \
