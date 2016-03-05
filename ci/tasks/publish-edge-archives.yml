@@ -7,7 +7,6 @@ params:
   AWS_SECRET_ACCESS_KEY:
 
 inputs:
-- name: ci
 - name: cli
 - name: cf-cli-binaries
 - name: cf-cli-installers

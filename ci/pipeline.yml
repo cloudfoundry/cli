@@ -95,7 +95,6 @@ jobs:
     - get: cli
       trigger: true
     - get: final-cli
-    - get: ci
     - get: cli-ci
   - aggregate:
     - task: units-linux
@@ -114,7 +113,6 @@ jobs:
       passed: [units]
     - get: final-cli
       passed: [units]
-    - get: ci
     - get: cli-ci
   - task: build
     file: cli-ci/ci/tasks/build-binaries.yml
@@ -134,7 +132,6 @@ jobs:
     - get: cli
       passed: [build-binaries]
     - get: cli-acceptance-tests
-    - get: ci
     - get: cli-ci
     - put: bosh-lite-lock
       params:
@@ -158,7 +155,6 @@ jobs:
     - get: cli
       passed: [gats-windows]
     - get: cf-acceptance-tests
-    - get: ci
     - get: cli-ci
     - put: bosh-lite-lock
       params:
@@ -186,7 +182,6 @@ jobs:
     - get: cli
       passed: [build-binaries]
     - get: cli-acceptance-tests
-    - get: ci
     - get: cli-ci
     - put: bosh-lite-lock
       params:
@@ -211,7 +206,6 @@ jobs:
     - get: cli
       passed: [gats-linux]
     - get: cf-acceptance-tests
-    - get: ci
     - get: cf-cli-binaries
       trigger: true
       passed: [gats-linux]
@@ -270,7 +264,6 @@ jobs:
       passed: [create-installers]
     - get: cf-cli-installer-win64
       passed: [create-installers]
-    - get: ci
     - get: cli-ci
   - task: publish
     file: cli-ci/ci/tasks/publish-edge-archives.yml
@@ -294,7 +287,6 @@ jobs:
       passed: [create-installers]
     - get: cf-cli-installer-win64
       passed: [create-installers]
-    - get: ci
     - get: cli-ci
   - task: publish
     file: cli-ci/ci/tasks/publish-final-release.yml
