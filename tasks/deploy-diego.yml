@@ -20,9 +20,8 @@ run:
     set -ex
 
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
-    bosh -n -u admin -p admin upload release etcd-release/release.tgz
-    bosh -n -u admin -p admin upload release garden-linux-release/release.tgz
-    bosh -n -u admin -p admin upload release diego-release/release.tgz
+    bosh -n -u admin -p admin --skip-if-exists upload release etcd-release/release.tgz
+    bosh -n -u admin -p admin --skip-if-exists upload release garden-linux-release/release.tgz
 
     pushd diego-release
       ./scripts/generate-bosh-lite-manifests
