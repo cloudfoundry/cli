@@ -5,7 +5,6 @@ image: docker:///cloudfoundry/cli-ci
 inputs:
 - name: cli-acceptance-tests
 - name: cf-cli-binaries
-- name: ci
 - name: bosh-lite-lock
 
 run:
