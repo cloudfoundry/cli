@@ -60,7 +60,7 @@ resources:
 - name: cf-routing-release-repo
   type: git
   source:
-    uri: git@github.com/cloudfoundry-incubator/cf-routing-release
+    uri: https://github.com/cloudfoundry-incubator/cf-routing-release.git
     branch: release_candidate
 
 jobs:
