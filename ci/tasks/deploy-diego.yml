@@ -7,6 +7,7 @@ params:
   LITE_PRIVATE_IP_ADDRESS:
 
 inputs:
+- name: bosh-lite-lock
 - name: etcd-release
 - name: garden-linux-release
 - name: diego-release
@@ -18,7 +19,13 @@ run:
   args:
   - -c
   - |
-    set -ex
+    set -eux
+
+    export DOMAIN=`cat bosh-lite-lock/name`
+
+    export ADMIN_USER=admin
+    export ADMIN_PASSWORD=admin
+    export API_ENDPOINT="https://api.${DOMAIN}"
 
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
     bosh -n -u admin -p admin upload release etcd-release/release.tgz --skip-if-exists
@@ -31,4 +38,7 @@ run:
       bosh -n -u admin -p admin deploy
     popd
 
+    curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
+    ./cf login -a $API_ENDPOINT -u $ADMIN_USER -p $ADMIN_PASSWORD --skip-ssl-validation
+    ./cf enable-feature-flag diego_docker
 
