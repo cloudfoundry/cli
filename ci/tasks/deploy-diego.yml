@@ -11,6 +11,7 @@ inputs:
 - name: garden-linux-release
 - name: diego-release
 - name: diego-repo
+- name: cf-release # needed for diego-repo/generate-bosh-lite-manifests
 
 run:
   path: bash
