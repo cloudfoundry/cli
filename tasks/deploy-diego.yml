@@ -39,6 +39,7 @@ run:
     popd
 
     curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
-    ./cf login -a $API_ENDPOINT -u $ADMIN_USER -p $ADMIN_PASSWORD --skip-ssl-validation
+    ./cf api $API_ENDPOINT --skip-ssl-validation
+    ./cf auth $ADMIN_USER $ADMIN_PASSWORD
     ./cf enable-feature-flag diego_docker
 
