@@ -30,7 +30,14 @@ run:
     diego_deployment_name=cf-warden-diego
     diego_deployment_file=cf-warden-diego.yml
 
+    routing_deployment_file=cf-warden-routing.yml
+
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
+
+    cat<<EOF > cf-routing-release-repo/worker-overrides.yml
+    compilation:
+      workers: 2
+    EOF
 
     pushd cf-routing-release-repo
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD create release --force
@@ -40,6 +47,10 @@ run:
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $diego_deployment_name $diego_deployment_file
 
       ./scripts/generate-bosh-lite-manifest $cf_deployment_file $diego_deployment_file
+
+      spiff merge ./bosh-lite/deployments/cf-routing-manifest.yml worker_overrides.yml > $routing_deployment_file
+      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deployment $routing_deployment_file
+
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
     popd
 
