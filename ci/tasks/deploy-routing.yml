@@ -5,6 +5,7 @@ image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
   LITE_PRIVATE_IP_ADDRESS:
+  LITE_HOSTNAME:
 
 inputs:
 - name: cf-routing-release-repo
@@ -49,6 +50,7 @@ run:
         default_to_diego_backend: true
       router:
         enable_routing_api: true
+      domain: $LITE_HOSTNAME
     EOF
 
     pushd cf-release-repo
