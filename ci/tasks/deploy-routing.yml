@@ -48,7 +48,7 @@ run:
 
       ./scripts/generate-bosh-lite-manifest $cf_deployment_file $diego_deployment_file
 
-      spiff merge ./bosh-lite/deployments/cf-routing-manifest.yml worker_overrides.yml > $routing_deployment_file
+      spiff merge ./bosh-lite/deployments/cf-routing-manifest.yml worker-overrides.yml > $routing_deployment_file
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deployment $routing_deployment_file
 
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
