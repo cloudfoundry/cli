@@ -1,0 +1,56 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-vagrant-ci
+
+params:
+  LITE_PRIVATE_IP_ADDRESS:
+
+inputs:
+- name: cf-routing-release-repo
+- name: cf-release-repo
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -eux
+
+    export DOMAIN=`cat bosh-lite-lock/name`
+
+    export ADMIN_USER=admin
+    export ADMIN_PASSWORD=admin
+    export API_ENDPOINT="https://api.${DOMAIN}"
+
+    cf_deployment_name=cf-warden
+    cf_deployment_file=cf-warden.yml
+
+    diego_deployment_name=cf-warden-diego
+    diego_deployment_file=cf-warden-diego.yml
+
+    bosh -n target $LITE_PRIVATE_IP_ADDRESS
+
+    pushd cf-routing-release-repo
+      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD create release --force
+      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD upload release --skip-if-exists
+
+      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $cf_deployment_name $cf_deployment_file
+      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $diego_deployment_name $diego_deployment_file
+
+      ./scripts/generate-bosh-lite-manifest $cf_deployment_file $diego_deployment_file
+      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
+    popd
+
+    pushd cf-release-repo
+      cat<<EOF > property-overrides.yml
+      properties:
+        cc:
+          default_to_diego_backend: true
+        router:
+          enable_routing_api: true
+      EOF
+
+      ./scripts/generate-bosh-lite-dev-manifest property-overrides.yml
+      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
+    popd
