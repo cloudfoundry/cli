@@ -724,6 +724,10 @@
     "translation": "Invalid app port: {{.AppPort}}\nApp port must be a number"
   },
   {
+    "id": "Linux/Mac",
+    "translation": "Linux/Mac"
+  },
+  {
     "id": "List all available plugins in specified repository or in all added repositories",
     "translation": "List all available plugins in specified repository or in all added repositories"
   },
@@ -838,6 +842,10 @@
   {
     "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history",
     "translation": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history"
+  },
+  {
+    "id": "Windows PowerShell",
+    "translation": "Windows PowerShell"
   },
   {
     "id": "app ports",

@@ -1648,10 +1648,6 @@
     "translation": "EXEMPLE :\n   CF_NAME update-service mabd -p gold\n   CF_NAME update-service mabd -c '{\"ram_gb\":4}'\n   CF_NAME update-service mabd -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mabd -t \"liste,étiquettes\""
   },
   {
-    "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
-    "translation": "EXEMPLE :\n   Linux/Mac :\n      CF_NAME bind-service monapp mabd -c '{\"permissions\":\"read-only\"}'\n\n   Ligne de commande Windows :\n CF_NAME bind-service monapp mabd -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell :\n      CF_NAME bind-service monapp mabd -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service monapp mabd -c ~/workspace/tmp/instance_config.json"
-  },
-  {
     "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\"",
     "translation": "EXEMPLE :\n   Linux/Mac :\n      CF_NAME create-service db-service silver mabd -c '{\"ram_gb\":4}'\n\n   Ligne de commande Windows :\n CF_NAME create-service db-service silver mabd -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell :\n      CF_NAME create-service db-service silver mabd -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mabd -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mabd -t \"liste, étiquettes\""
   },
@@ -2698,6 +2694,10 @@
   {
     "id": "Last Operation",
     "translation": "Dernière opération"
+  },
+  {
+    "id": "Linux/Mac",
+    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -4438,6 +4438,14 @@
   {
     "id": "Warning: error tailing logs",
     "translation": "Avertissement : erreur lors de l'affichage des dernières lignes des journaux "
+  },
+  {
+    "id": "Windows Command Line",
+    "translation": "Ligne de commande Windows"
+  },
+  {
+    "id": "Windows PowerShell",
+    "translation": ""
   },
   {
     "id": "Write curl body to FILE instead of stdout",

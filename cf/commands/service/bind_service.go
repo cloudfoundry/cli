@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -44,17 +45,6 @@ func (cmd *BindService) MetaData() command_registry.CommandMetadata {
    {
       "permissions": "read-only"
    }`)
-	exampleUsage := T(`EXAMPLE:
-   Linux/Mac:
-      CF_NAME bind-service myapp mydb -c '{"permissions":"read-only"}'
-
-   Windows Command Line:
-      CF_NAME bind-service myapp mydb -c "{\"permissions\":\"read-only\"}"
-
-   Windows PowerShell:
-      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'
-	
-   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json`)
 
 	fs := make(map[string]flags.FlagSet)
 	fs["c"] = &flags.StringFlag{ShortName: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
@@ -67,8 +57,18 @@ func (cmd *BindService) MetaData() command_registry.CommandMetadata {
 			baseUsage,
 			"\n\n",
 			paramsUsage,
-			"\n\n",
-			exampleUsage,
+		},
+		Example: []string{
+			fmt.Sprintf("%s:", T(`Linux/Mac`)),
+			`   CF_NAME bind-service myapp mydb -c '{"permissions":"read-only"}'`,
+			``,
+			fmt.Sprintf("%s:", T(`Windows Command Line`)),
+			`   CF_NAME bind-service myapp mydb -c "{\"permissions\":\"read-only\"}"`,
+			``,
+			fmt.Sprintf("%s:", T(`Windows PowerShell`)),
+			`   CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'`,
+			``,
+			`CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json`,
 		},
 		Flags: fs,
 	}
