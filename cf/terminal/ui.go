@@ -42,12 +42,14 @@ type UI interface {
 type terminalUI struct {
 	stdin   io.Reader
 	printer Printer
+	logger  trace.Printer
 }
 
-func NewUI(r io.Reader, printer Printer) UI {
+func NewUI(r io.Reader, printer Printer, logger trace.Printer) UI {
 	return &terminalUI{
 		stdin:   r,
 		printer: printer,
+		logger:  logger,
 	}
 }
 
@@ -143,15 +145,15 @@ func (ui *terminalUI) Failed(message string, args ...interface{}) {
 		ui.Say(FailureColor("FAILED"))
 		ui.Say(message)
 
-		trace.Logger.Print("FAILED")
-		trace.Logger.Print(message)
+		ui.logger.Print("FAILED")
+		ui.logger.Print(message)
 		ui.PanicQuietly()
 	} else {
 		ui.Say(FailureColor(T("FAILED")))
 		ui.Say(message)
 
-		trace.Logger.Print(T("FAILED"))
-		trace.Logger.Print(message)
+		ui.logger.Print(T("FAILED"))
+		ui.logger.Print(message)
 		ui.PanicQuietly()
 	}
 }

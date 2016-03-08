@@ -21,6 +21,7 @@ import (
 	"github.com/cloudfoundry/cli/utils"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
+	"github.com/cloudfoundry/cli/cf/trace"
 	rpcService "github.com/cloudfoundry/cli/plugin/rpc"
 )
 
@@ -79,7 +80,7 @@ func (cmd *PluginInstall) SetDependency(deps command_registry.Dependency, plugin
 	//each service can only be registered once
 	rpc.DefaultServer = rpc.NewServer()
 
-	rpcService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewCommandRunner())
+	rpcService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewCommandRunner(), trace.Logger)
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}

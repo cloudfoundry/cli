@@ -18,6 +18,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/plugin/models"
 	"github.com/cloudfoundry/cli/utils"
 	"github.com/cloudfoundry/cli/words/generator"
@@ -64,7 +65,7 @@ type PluginModels struct {
 func NewDependency() Dependency {
 	deps := Dependency{}
 	deps.TeePrinter = terminal.NewTeePrinter()
-	deps.Ui = terminal.NewUI(os.Stdin, deps.TeePrinter)
+	deps.Ui = terminal.NewUI(os.Stdin, deps.TeePrinter, trace.Logger)
 	deps.ManifestRepo = manifest.NewManifestDiskRepository()
 	deps.AppManifest = manifest.NewGenerator()
 

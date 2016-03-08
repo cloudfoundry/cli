@@ -120,7 +120,7 @@ func main() {
 }
 
 func handlePanics(printer terminal.Printer) {
-	panic_printer.UI = terminal.NewUI(os.Stdin, printer)
+	panic_printer.UI = terminal.NewUI(os.Stdin, printer, trace.Logger)
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()
@@ -178,7 +178,7 @@ func handleVerbose(args []string) []string {
 }
 
 func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {
-	cliServer, err := rpc.NewRpcService(outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator, rpc.NewCommandRunner())
+	cliServer, err := rpc.NewRpcService(outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), trace.Logger)
 	if err != nil {
 		deps.Ui.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)
