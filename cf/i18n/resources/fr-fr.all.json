@@ -1648,10 +1648,6 @@
     "translation": "EXEMPLE :\n   CF_NAME update-service mabd -p gold\n   CF_NAME update-service mabd -c '{\"ram_gb\":4}'\n   CF_NAME update-service mabd -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mabd -t \"liste,étiquettes\""
   },
   {
-    "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\"",
-    "translation": "EXEMPLE :\n   Linux/Mac :\n      CF_NAME create-service db-service silver mabd -c '{\"ram_gb\":4}'\n\n   Ligne de commande Windows :\n CF_NAME create-service db-service silver mabd -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell :\n      CF_NAME create-service db-service silver mabd -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mabd -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mabd -t \"liste, étiquettes\""
-  },
-  {
     "id": "EXAMPLES",
     "translation": ""
   },

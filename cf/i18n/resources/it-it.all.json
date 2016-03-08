@@ -1648,10 +1648,6 @@
     "translation": "ESEMPIO:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\""
   },
   {
-    "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\"",
-    "translation": "ESEMPIO:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Riga di comando di Windows:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\""
-  },
-  {
     "id": "EXAMPLES",
     "translation": ""
   },
