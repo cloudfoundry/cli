@@ -1208,6 +1208,10 @@
     "translation": "Konnte keine ZIP-Datei schreiben"
   },
   {
+    "id": "Create a TCP route",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "Buildpack erstellen"
   },
@@ -1256,7 +1260,7 @@
     "translation": "URL-Route in einem Bereich zur späteren Verwendung erstellen"
   },
   {
-    "id": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]",
+    "id": "Create an HTTP route",
     "translation": ""
   },
   {

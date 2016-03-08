@@ -1208,6 +1208,10 @@
     "translation": "無法寫入 zip 檔案"
   },
   {
+    "id": "Create a TCP route",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "建立建置套件"
   },
@@ -1256,7 +1260,7 @@
     "translation": "在空間中建立 URL 路徑以供稍後使用"
   },
   {
-    "id": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]",
+    "id": "Create an HTTP route",
     "translation": ""
   },
   {

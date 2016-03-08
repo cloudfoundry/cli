@@ -1208,6 +1208,10 @@
     "translation": "Couldn't write zip file"
   },
   {
+    "id": "Create a TCP route",
+    "translation": "Create a TCP route"
+  },
+  {
     "id": "Create a buildpack",
     "translation": "Create a buildpack"
   },
@@ -1256,8 +1260,8 @@
     "translation": "Create a url route in a space for later use"
   },
   {
-    "id": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]",
-    "translation": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]"
+    "id": "Create an HTTP route",
+    "translation": "Create an HTTP route"
   },
   {
     "id": "Create an app manifest for an app that has been pushed successfully",

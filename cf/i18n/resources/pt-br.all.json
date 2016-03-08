@@ -1208,6 +1208,10 @@
     "translation": "Não foi possível gravar o arquivo zip"
   },
   {
+    "id": "Create a TCP route",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "Criar um buildpack"
   },
@@ -1256,7 +1260,7 @@
     "translation": "Criar uma rota de URL em um espaço para uso posterior"
   },
   {
-    "id": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]",
+    "id": "Create an HTTP route",
     "translation": ""
   },
   {
