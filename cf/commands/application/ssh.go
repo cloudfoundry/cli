@@ -89,8 +89,8 @@ func (cmd *SSH) SetDependency(deps command_registry.Dependency, pluginCall bool)
 	cmd.config = deps.Config
 	cmd.gateway = deps.Gateways["cloud-controller"]
 
-	if deps.WilecardDependency != nil {
-		cmd.secureShell = deps.WilecardDependency.(sshCmd.SecureShell)
+	if deps.WildcardDependency != nil {
+		cmd.secureShell = deps.WildcardDependency.(sshCmd.SecureShell)
 	}
 
 	//get ssh-code for dependency

@@ -241,7 +241,7 @@ var _ = Describe("SSH command", func() {
 			BeforeEach(func() {
 				fakeSecureShell = &testssh.FakeSecureShell{}
 
-				deps.WilecardDependency = fakeSecureShell
+				deps.WildcardDependency = fakeSecureShell
 
 				getRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
