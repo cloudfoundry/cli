@@ -418,7 +418,7 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 		makeHttpTransport(&gateway)
 	}
 
-	httpClient := NewHttpClient(gateway.transport, RequestDumper{printer: trace.Logger})
+	httpClient := NewHttpClient(gateway.transport, NewRequestDumper(trace.Logger))
 
 	httpClient.DumpRequest(request)
 

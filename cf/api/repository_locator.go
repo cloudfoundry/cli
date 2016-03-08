@@ -31,6 +31,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/v3/repository"
 	v3client "github.com/cloudfoundry/go-ccapi/v3/client"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
+	"github.com/cloudfoundry/cli/cf/trace"
 )
 
 type RepositoryLocator struct {
@@ -83,7 +84,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	routingApiGateway := gatewaysByName["routing-api"]
 	uaaGateway := gatewaysByName["uaa"]
-	loc.authRepo = authentication.NewUAAAuthenticationRepository(uaaGateway, config)
+	loc.authRepo = authentication.NewUAAAuthenticationRepository(uaaGateway, config, net.NewRequestDumper(trace.Logger))
 
 	// ensure gateway refreshers are set before passing them by value to repositories
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)

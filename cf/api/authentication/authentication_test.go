@@ -13,6 +13,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/authentication"
+	"github.com/cloudfoundry/cli/cf/trace/fakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,17 +23,21 @@ import (
 var _ = Describe("AuthenticationRepository", func() {
 	Describe("legacy tests", func() {
 		var (
-			gateway    net.Gateway
-			testServer *httptest.Server
-			handler    *testnet.TestHandler
-			config     core_config.ReadWriter
-			auth       AuthenticationRepository
+			gateway     net.Gateway
+			testServer  *httptest.Server
+			handler     *testnet.TestHandler
+			config      core_config.ReadWriter
+			auth        AuthenticationRepository
+			dumper      net.RequestDumper
+			fakePrinter fakes.FakePrinter
 		)
 
 		BeforeEach(func() {
 			config = testconfig.NewRepository()
 			gateway = net.NewUAAGateway(config, &testterm.FakeUI{})
-			auth = NewUAAAuthenticationRepository(gateway, config)
+			fakePrinter = *new(fakes.FakePrinter)
+			dumper = net.NewRequestDumper(&fakePrinter)
+			auth = NewUAAAuthenticationRepository(gateway, config, dumper)
 		})
 
 		AfterEach(func() {
@@ -224,6 +229,8 @@ var _ = Describe("AuthenticationRepository", func() {
 			gateway   net.Gateway
 			config    core_config.ReadWriter
 			authRepo  AuthenticationRepository
+			dumper      net.RequestDumper
+			fakePrinter fakes.FakePrinter
 		)
 
 		BeforeEach(func() {
@@ -233,7 +240,9 @@ var _ = Describe("AuthenticationRepository", func() {
 			config.SetSSHOAuthClient("ssh-oauth-client")
 
 			gateway = net.NewUAAGateway(config, &testterm.FakeUI{})
-			authRepo = NewUAAAuthenticationRepository(gateway, config)
+			fakePrinter = *new(fakes.FakePrinter)
+			dumper = net.NewRequestDumper(&fakePrinter)
+			authRepo = NewUAAAuthenticationRepository(gateway, config, dumper)
 
 			uaaServer.AppendHandlers(
 				ghttp.CombineHandlers(
