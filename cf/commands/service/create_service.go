@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -48,19 +50,6 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
          "memory_mb": 1024
       }
    }`)
-	exampleUsage := T(`EXAMPLE:
-   Linux/Mac:
-      CF_NAME create-service db-service silver mydb -c '{"ram_gb":4}'
-
-   Windows Command Line:
-      CF_NAME create-service db-service silver mydb -c "{\"ram_gb\":4}"
-
-   Windows PowerShell:
-      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'
-
-   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json
-
-   CF_NAME create-service db-service silver mydb -t "list, of, tags"`)
 	tipsUsage := T(`TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps`)
 	return command_registry.CommandMetadata{
@@ -72,9 +61,21 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
 			"\n\n",
 			paramsUsage,
 			"\n\n",
-			exampleUsage,
-			"\n\n",
 			tipsUsage,
+		},
+		Example: []string{
+			fmt.Sprintf("%s:", T(`Linux/Mac`)),
+			`   CF_NAME create-service db-service silver mydb -c '{"ram_gb":4}'`,
+			``,
+			fmt.Sprintf("%s:", T(`Windows Command Line`)),
+			`   CF_NAME create-service db-service silver mydb -c "{\"ram_gb\":4}"`,
+			``,
+			fmt.Sprintf("%s:", T(`Windows PowerShell`)),
+			`   CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'`,
+			``,
+			`CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json`,
+			``,
+			`CF_NAME create-service db-service silver mydb -t "list, of, tags"`,
 		},
 		Flags: fs,
 	}
